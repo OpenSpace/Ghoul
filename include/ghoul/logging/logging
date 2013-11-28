@@ -1,0 +1,6 @@
+#include "logmanager.h"
+#include "consolelog.h"
+#include "htmllog.h"
+#include "log.h"
+#include "streamlog.h"
+#include "textlog.h"

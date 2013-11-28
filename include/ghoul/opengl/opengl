@@ -1,0 +1,6 @@
+#include "programobject.h"
+#include "shaderobject.h"
+#include "texture.h"
+#include "texturemanager.h"
+#include "texturereader.h"
+#include "textureunit.h"
