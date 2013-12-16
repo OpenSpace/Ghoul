@@ -129,7 +129,7 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
 
 void ShaderObject::setName(const std::string& name) {
     _shaderName = name;
-    _loggerCat = "ShaderObject('" + name + "')";
+    _loggerCat = "ShaderObject['" + name + "']";
 #ifdef GL_VERSION_4_3
     glObjectLabel(GL_SHADER, _id, _shaderName.length() + 1, _shaderName.c_str());
 #endif

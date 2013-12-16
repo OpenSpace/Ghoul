@@ -94,13 +94,13 @@ ProgramObject::ProgramObject(const string& name)
     _id = glCreateProgram();
     if (_id == 0)
         LERROR_SAFE("glCreateProgram returned 0");
-#ifdef GL_VERSION_4_3
-    glObjectLabel(
-        GL_PROGRAM,
-        _id,
-        static_cast<GLsizei>(_programName.length() + 1),
-        _programName.c_str());
-#endif
+    if (glObjectLabel) {
+        glObjectLabel(
+                      GL_PROGRAM,
+                      _id,
+                      static_cast<GLsizei>(_programName.length() + 1),
+                      _programName.c_str());
+    }
 }
 
 ProgramObject::ProgramObject(const ProgramObject& cpy)
@@ -115,13 +115,13 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
     _id = glCreateProgram();
     if (_id == 0)
         LERROR_SAFE("glCreateProgram returned 0");
-#ifdef GL_VERSION_4_3
-    glObjectLabel(
-        GL_PROGRAM,
-        _id,
-        static_cast<GLsizei>(_programName.length() + 1),
-        _programName.c_str());
-#endif
+    if (glObjectLabel) {
+        glObjectLabel(
+                      GL_PROGRAM,
+                      _id,
+                      static_cast<GLsizei>(_programName.length() + 1),
+                      _programName.c_str());
+    }
 
     for (auto it = _shaderObjects.cbegin(); it != _shaderObjects.cend(); ++it) {
         if (it->second) {
@@ -151,13 +151,13 @@ ProgramObject::operator GLuint() const {
 ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
     if (this != &rhs) {
         _programName = rhs._programName;
-#ifdef GL_VERSION_4_3
-        glObjectLabel(
-            GL_PROGRAM,
-            _id,
-            static_cast<GLsizei>(rhs._programName.length() + 1),
-            rhs._programName.c_str());
-#endif
+        if (glObjectLabel) {
+            glObjectLabel(
+                          GL_PROGRAM,
+                          _id,
+                          static_cast<GLsizei>(rhs._programName.length() + 1),
+                          rhs._programName.c_str());
+        }
         _loggerCat = rhs._loggerCat;
         _ignoreUniformLocationError = rhs._ignoreUniformLocationError;
         _ignoreAttributeLocationError = rhs._ignoreAttributeLocationError;
@@ -175,13 +175,13 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
         _id = glCreateProgram();
         if (_id == 0)
             LERROR_SAFE("glCreateProgram returned 0");
-#ifdef GL_VERSION_4_3
-        glObjectLabel(
-            GL_PROGRAM,
-            _id,
-            static_cast<GLsizei>(_programName.length() + 1),
-            _programName.c_str());
-#endif
+        if (glObjectLabel) {
+            glObjectLabel(
+                          GL_PROGRAM,
+                          _id,
+                          static_cast<GLsizei>(_programName.length() + 1),
+                          _programName.c_str());
+        }
 
         for (auto it = rhs._shaderObjects.cbegin(); it != rhs._shaderObjects.end(); ++it) {
             if (it->second) {
@@ -198,14 +198,14 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
 
 void ProgramObject::setName(const string& name) {
     _programName = name;
-    _loggerCat = "ProgramObject('" + name + "')";
-#ifdef GL_VERSION_4_3
-    glObjectLabel(
-        GL_PROGRAM,
-        _id,
-        static_cast<GLsizei>(_programName.length() + 1),
-        _programName.c_str());
-#endif
+    _loggerCat = "ProgramObject['" + name + "']";
+    if (glObjectLabel) {
+        glObjectLabel(
+                      GL_PROGRAM,
+                      _id,
+                      static_cast<GLsizei>(_programName.length() + 1),
+                      _programName.c_str());
+    }
 }
 
 const string& ProgramObject::name() const{
@@ -942,38 +942,102 @@ bool ProgramObject::setUniform(const string& name, const dmat4x4& value, bool tr
 }
 
 void ProgramObject::setUniform(GLint location, bool value) {
-    glProgramUniform1i(_id, location, value);
+    if (glProgramUniform1i)
+        glProgramUniform1i(_id, location, value);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform1i(location, value);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, bool v1, bool v2) {
-    glProgramUniform2i(_id, location, v1, v2);
+    if (glProgramUniform2i)
+        glProgramUniform2i(_id, location, v1, v2);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2i(location, v1, v2);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, bool v1, bool v2, bool v3) {
-    glProgramUniform3i(_id, location, v1, v2, v3);
+    if (glProgramUniform3i)
+        glProgramUniform3i(_id, location, v1, v2, v3);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3i(location, v1, v2, v3);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, bool v1, bool v2, bool v3, bool v4) {
-    glProgramUniform4i(_id, location, v1, v2, v3, v4);
+    if (glProgramUniform4i)
+        glProgramUniform4i(_id, location, v1, v2, v3, v4);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4i(location, v1, v2, v3, v4);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const bvec2& value) {
-    glProgramUniform2iv(_id, location, 1, glm::value_ptr(glm::ivec2(value)));
+    if (glProgramUniform2iv)
+        glProgramUniform2iv(_id, location, 1, glm::value_ptr(glm::ivec2(value)));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2iv(location, 1, glm::value_ptr(glm::ivec2(value)));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const bvec3& value) {
-    glProgramUniform3iv(_id, location, 1, glm::value_ptr(glm::ivec3(value)));
+    if (glProgramUniform3iv)
+        glProgramUniform3iv(_id, location, 1, glm::value_ptr(glm::ivec3(value)));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3iv(location, 1, glm::value_ptr(glm::ivec3(value)));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const bvec4& value) {
-    glProgramUniform4iv(_id, location, 1, glm::value_ptr(glm::ivec4(value)));
+    if (glProgramUniform4iv)
+        glProgramUniform4iv(_id, location, 1, glm::value_ptr(glm::ivec4(value)));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4iv(location, 1, glm::value_ptr(glm::ivec4(value)));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const bool* values, int count) {
     GLint* castValues = new GLint[count];
     for (int i = 0; i < count; ++i)
         castValues[i] = values[i];
-    glProgramUniform1iv(_id, location, count, castValues);
+    if (glProgramUniform1iv)
+        glProgramUniform1iv(_id, location, count, castValues);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform1iv(location, count, castValues);
+        glUseProgram(oldProgram);
+    }
     delete[] castValues;
 }
 
@@ -983,7 +1047,15 @@ void ProgramObject::setUniform(GLint location, bvec2* values, int count) {
         castValues[2 * i] = values[i].x;
         castValues[2 * i + 1] = values[i].y;
     }
-    glProgramUniform2iv(_id, location, count, castValues);
+    if (glProgramUniform2iv)
+        glProgramUniform2iv(_id, location, count, castValues);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2iv(location, count, castValues);
+        glUseProgram(oldProgram);
+    }
     delete[] castValues;
 }
 
@@ -994,7 +1066,15 @@ void ProgramObject::setUniform(GLint location, bvec3* values, int count) {
         castValues[3 * i + 1] = values[i].y;
         castValues[3 * i + 2] = values[i].z;
     }
-    glProgramUniform3iv(_id, location, count, castValues);
+    if (glProgramUniform3iv)
+        glProgramUniform3iv(_id, location, count, castValues);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3iv(location, count, castValues);
+        glUseProgram(oldProgram);
+    }
     delete[] castValues;
 }
 
@@ -1006,268 +1086,760 @@ void ProgramObject::setUniform(GLint location, bvec4* values, int count /*= 1*/)
         castValues[4 * i + 2] = values[i].z;
         castValues[4 * i + 3] = values[i].w;
     }
-    glProgramUniform4iv(_id, location, count, castValues);
+    if (glProgramUniform4iv)
+        glProgramUniform4iv(_id, location, count, castValues);
+    {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4iv(location, count, castValues);
+        glUseProgram(oldProgram);
+    }
     delete[] castValues;
 }
 
 void ProgramObject::setUniform(GLint location, GLuint value) {
-    glProgramUniform1ui(_id, location, value);
+    if (glProgramUniform1ui)
+        glProgramUniform1ui(_id, location, value);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform1ui(location, value);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLuint v1, GLuint v2) {
-    glProgramUniform2ui(_id, location, v1, v2);
+    if (glProgramUniform2ui)
+        glProgramUniform2ui(_id, location, v1, v2);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2ui(location, v1, v2);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLuint v1, GLuint v2, GLuint v3) {
-    glProgramUniform3ui(_id, location, v1, v2, v3);
+    if (glProgramUniform3ui)
+        glProgramUniform3ui(_id, location, v1, v2, v3);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3ui(location, v1, v2, v3);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLuint v1, GLuint v2, GLuint v3, GLuint v4) {
-    glProgramUniform4ui(_id, location, v1, v2, v3, v4);
+    if (glProgramUniform4ui)
+        glProgramUniform4ui(_id, location, v1, v2, v3, v4);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4ui(location, v1, v2, v3, v4);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const uvec2& value) {
-    glProgramUniform2uiv(_id, location, 1, value_ptr(value));
+    if (glProgramUniform2uiv)
+        glProgramUniform2uiv(_id, location, 1, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2uiv(location, 1, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const uvec3& value) {
-    glProgramUniform3uiv(_id, location, 1, value_ptr(value));
+    if (glProgramUniform3uiv)
+        glProgramUniform3uiv(_id, location, 1, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3uiv(location, 1, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const uvec4& value) {
-    glProgramUniform4uiv(_id, location, 1, value_ptr(value));
+    if (glProgramUniform4uiv)
+        glProgramUniform4uiv(_id, location, 1, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4uiv(location, 1, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const GLuint* values, int count) {
-    glProgramUniform1uiv(_id, location, count, values);
+    if (glProgramUniform1uiv)
+        glProgramUniform1uiv(_id, location, count, values);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform1uiv(location, count, values);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, uvec2* values, int count) {
-    // Assumes that glm::ivec2 stores values contiguously (tested on VS 2012)
-    glProgramUniform2uiv(_id, location, count, reinterpret_cast<unsigned int*>(values));
+    if (glProgramUniform2uiv)
+        glProgramUniform2uiv(_id, location, count, reinterpret_cast<unsigned int*>(values));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2uiv(location, count, reinterpret_cast<unsigned int*>(values));
+        glUseProgram(oldProgram);
+    }
 }   
 
 void ProgramObject::setUniform(GLint location, uvec3* values, int count) {
-    // Assumes that glm::ivec3 stores values contiguously (tested on VS 2012)
-    glProgramUniform3uiv(_id, location, count, reinterpret_cast<unsigned int*>(values));
+    if (glProgramUniform3uiv)
+        glProgramUniform3uiv(_id, location, count, reinterpret_cast<unsigned int*>(values));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3uiv(location, count, reinterpret_cast<unsigned int*>(values));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, uvec4* values, int count) {
-    // Assumes that glm::ivec4 stores values contiguously (tested on VS 2012)
-    glProgramUniform4uiv(_id, location, count, reinterpret_cast<unsigned int*>(values));
+    if (glProgramUniform4uiv)
+        glProgramUniform4uiv(_id, location, count, reinterpret_cast<unsigned int*>(values));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4uiv(location, count, reinterpret_cast<unsigned int*>(values));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLint value) {
-    glProgramUniform1i(_id, location, value);
+    if (glProgramUniform1i)
+        glProgramUniform1i(_id, location, value);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform1i(location, value);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLint v1, GLint v2) {
-    glProgramUniform2i(_id, location, v1, v2);
+    if (glProgramUniform2i)
+        glProgramUniform2i(_id, location, v1, v2);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2i(location, v1, v2);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLint v1, GLint v2, GLint v3) {
-    glProgramUniform3i(_id, location, v1, v2, v3);
+    if (glProgramUniform3i)
+        glProgramUniform3i(_id, location, v1, v2, v3);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3i(location, v1, v2, v3);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLint v1, GLint v2, GLint v3, GLint v4) {
-    glProgramUniform4i(_id, location, v1, v2, v3, v4);
+    if (glProgramUniform4i)
+        glProgramUniform4i(_id, location, v1, v2, v3, v4);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4i(location, v1, v2, v3, v4);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const ivec2& value) {
-    glProgramUniform2iv(_id, location, 1, value_ptr(value));
+    if (glProgramUniform2iv)
+        glProgramUniform2iv(_id, location, 1, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2iv(location, 1, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const ivec3& value) {
-    glProgramUniform3iv(_id, location, 1, value_ptr(value));
+    if (glProgramUniform3iv)
+        glProgramUniform3iv(_id, location, 1, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3iv(location, 1, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const ivec4& value) {
-    glProgramUniform4iv(_id, location, 1, value_ptr(value));
+    if (glProgramUniform4iv)
+        glProgramUniform4iv(_id, location, 1, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4iv(location, 1, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const GLint* values, int count) {
-    glProgramUniform1iv(_id, location, count, values);
+    if (glProgramUniform1iv)
+        glProgramUniform1iv(_id, location, count, values);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform1iv(location, count, values);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, ivec2* values, int count) {
-    // Assumes that glm::ivec2 stores values contiguously (tested on VS 2012)
-    glProgramUniform2iv(_id, location, count, reinterpret_cast<int*>(values));
+    if (glProgramUniform2iv)
+        glProgramUniform2iv(_id, location, count, reinterpret_cast<int*>(values));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2iv(location, count, reinterpret_cast<int*>(values));
+        glUseProgram(oldProgram);
+    }
 }   
 
 void ProgramObject::setUniform(GLint location, ivec3* values, int count) {
-    // Assumes that glm::ivec3 stores values contiguously (tested on VS 2012)
-    glProgramUniform3iv(_id, location, count, reinterpret_cast<int*>(values));
+    if (glProgramUniform3iv)
+        glProgramUniform3iv(_id, location, count, reinterpret_cast<int*>(values));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3iv(location, count, reinterpret_cast<int*>(values));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, ivec4* values, int count) {
-    // Assumes that glm::ivec4 stores values contiguously (tested on VS 2012)
-    glProgramUniform4iv(_id, location, count, reinterpret_cast<int*>(values));
+    if (glProgramUniform4iv)
+        glProgramUniform4iv(_id, location, count, reinterpret_cast<int*>(values));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4iv(location, count, reinterpret_cast<int*>(values));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLfloat value) {
-    glProgramUniform1f(_id, location, value);
+    if (glProgramUniform1f)
+        glProgramUniform1f(_id, location, value);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform1f(location, value);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLfloat v1, GLfloat v2) {
-    glProgramUniform2f(_id, location, v1, v2);
+    if (glProgramUniform2f)
+        glProgramUniform2f(_id, location, v1, v2);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2f(location, v1, v2);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLfloat v1, GLfloat v2, GLfloat v3) {
-    glProgramUniform3f(_id, location, v1, v2, v3);
+    if (glProgramUniform3f)
+        glProgramUniform3f(_id, location, v1, v2, v3);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3f(location, v1, v2, v3);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4) {
-    glProgramUniform4f(_id, location, v1, v2, v3, v4);
+    if (glProgramUniform4f)
+        glProgramUniform4f(_id, location, v1, v2, v3, v4);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4f(location, v1, v2, v3, v4);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const vec2& value) {
-    glProgramUniform2fv(_id, location, 1, value_ptr(value));
+    if (glProgramUniform2fv)
+        glProgramUniform2fv(_id, location, 1, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2fv(location, 1, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const vec3& value) {
-    glProgramUniform3fv(_id, location, 1, value_ptr(value));
+    if (glProgramUniform3fv)
+        glProgramUniform3fv(_id, location, 1, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3fv(location, 1, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const vec4& value) {
-    glProgramUniform4fv(_id, location, 1, value_ptr(value));
+    if (glProgramUniform4fv)
+        glProgramUniform4fv(_id, location, 1, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4fv(location, 1, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const GLfloat* values, int count) {
-    glProgramUniform1fv(_id, location, count, values);
+    if (glProgramUniform1fv)
+        glProgramUniform1fv(_id, location, count, values);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform1fv(location, count, values);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, vec2* values, int count) {
-    // Assumes that glm::vec2 stores values contiguously (tested on VS 2012)
-    glProgramUniform2fv(_id, location, count, reinterpret_cast<float*>(values));
+    if (glProgramUniform2fv)
+        glProgramUniform2fv(_id, location, count, reinterpret_cast<float*>(values));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2fv(location, count, reinterpret_cast<float*>(values));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, vec3* values, int count /*= 1*/) {
-    // Assumes that glm::vec3 stores values contiguously (tested on VS 2012)
-    glProgramUniform3fv(_id, location, count, reinterpret_cast<float*>(values));
+    if (glProgramUniform3fv)
+        glProgramUniform3fv(_id, location, count, reinterpret_cast<float*>(values));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3fv(location, count, reinterpret_cast<float*>(values));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, vec4* values, int count /*= 1*/) {
-    // Assumes that glm::vec4 stores values contiguously (tested on VS 2012)
-    glProgramUniform4fv(_id, location, count, reinterpret_cast<float*>(values));
+    if (glProgramUniform4fv)
+        glProgramUniform4fv(_id, location, count, reinterpret_cast<float*>(values));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4fv(location, count, reinterpret_cast<float*>(values));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLdouble value) {
-    glProgramUniform1d(_id, location, value);
+    if (glProgramUniform1d)
+        glProgramUniform1d(_id, location, value);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform1d(location, value);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLdouble v1, GLdouble v2) {
-    glProgramUniform2d(_id, location, v1, v2);
+    if (glProgramUniform2d)
+        glProgramUniform2d(_id, location, v1, v2);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2d(location, v1, v2);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLdouble v1, GLdouble v2, GLdouble v3) {
-    glProgramUniform3d(_id, location, v1, v2, v3);
+    if (glProgramUniform3d)
+        glProgramUniform3d(_id, location, v1, v2, v3);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3d(location, v1, v2, v3);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4) {
-    glProgramUniform4d(_id, location, v1, v2, v3, v4);
+    if (glProgramUniform4d)
+        glProgramUniform4d(_id, location, v1, v2, v3, v4);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4d(location, v1, v2, v3, v4);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const dvec2& value) {
-    glProgramUniform2dv(_id, location, 1, value_ptr(value));
+    if (glProgramUniform2dv)
+        glProgramUniform2dv(_id, location, 1, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2dv(location, 1, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const dvec3& value) {
-    glProgramUniform3dv(_id, location, 1, value_ptr(value));
+    if (glProgramUniform3dv)
+        glProgramUniform3dv(_id, location, 1, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3dv(location, 1, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const dvec4& value) {
-    glProgramUniform4dv(_id, location, 1, value_ptr(value));
+    if (glProgramUniform4dv)
+        glProgramUniform4dv(_id, location, 1, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4dv(location, 1, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const GLdouble* values, int count) {
-    glProgramUniform1dv(_id, location, count, values);
+    if (glProgramUniform1dv)
+        glProgramUniform1dv(_id, location, count, values);
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform1dv(location, count, values);
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, dvec2* values, int count) {
-    // Assumes that glm::dvec2 stores values contiguously (tested on VS 2012)
-    glProgramUniform2dv(_id, location, count, reinterpret_cast<double*>(values));
+    if (glProgramUniform2dv)
+        glProgramUniform2dv(_id, location, count, reinterpret_cast<double*>(values));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform2dv(location, count, reinterpret_cast<double*>(values));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, dvec3* values, int count) {
-    // Assumes that glm::dvec3 stores values contiguously (tested on VS 2012)
-    glProgramUniform3dv(_id, location, count, reinterpret_cast<double*>(values));
+    if (glProgramUniform3dv)
+        glProgramUniform3dv(_id, location, count, reinterpret_cast<double*>(values));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform3dv(location, count, reinterpret_cast<double*>(values));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, dvec4* values, int count) {
-    // Assumes that glm::dvec4 stores values contiguously (tested on VS 2012)
-    glProgramUniform4dv(_id, location, count, reinterpret_cast<double*>(values));
+    if (glProgramUniform4dv)
+        glProgramUniform4dv(_id, location, count, reinterpret_cast<double*>(values));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniform4dv(location, count, reinterpret_cast<double*>(values));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const mat2x2& value, bool transpose) {
-    glProgramUniformMatrix2fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix2fv)
+        glProgramUniformMatrix2fv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix2fv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const mat2x3& value, bool transpose) {
-    glProgramUniformMatrix2x3fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix2x3fv)
+        glProgramUniformMatrix2x3fv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix2x3fv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const mat2x4& value, bool transpose) {
-    glProgramUniformMatrix2x4fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix2x4fv)
+        glProgramUniformMatrix2x4fv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix2x4fv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const mat3x2& value, bool transpose) {
-    glProgramUniformMatrix3x2fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix3x2fv)
+        glProgramUniformMatrix3x2fv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix3x2fv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const mat3x3& value, bool transpose) {
-    glProgramUniformMatrix3fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix3fv)
+        glProgramUniformMatrix3fv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix3fv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const mat3x4& value, bool transpose) {
-    glProgramUniformMatrix3x4fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix3x4fv)
+        glProgramUniformMatrix3x4fv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix3x4fv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const mat4x2& value, bool transpose) {
-    glProgramUniformMatrix4x2fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix4x2fv)
+        glProgramUniformMatrix4x2fv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix4x2fv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const mat4x3& value, bool transpose) {
-    glProgramUniformMatrix4x3fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix4x3fv)
+        glProgramUniformMatrix4x3fv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix4x3fv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const mat4x4& value, bool transpose) {
-    glProgramUniformMatrix4fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix4fv)
+        glProgramUniformMatrix4fv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix4fv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const dmat2x2& value, bool transpose) {
-    glProgramUniformMatrix2dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix2dv)
+        glProgramUniformMatrix2dv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix2dv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const dmat2x3& value, bool transpose) {
-    glProgramUniformMatrix2x3dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix2x3dv)
+        glProgramUniformMatrix2x3dv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix2x3dv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const dmat2x4& value, bool transpose) {
-    glProgramUniformMatrix2x4dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix2x4dv)
+        glProgramUniformMatrix2x4dv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix2x4dv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const dmat3x2& value, bool transpose) {
-    glProgramUniformMatrix3x2dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix3x2dv)
+        glProgramUniformMatrix3x2dv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix3x2dv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const dmat3x3& value, bool transpose) {
-    glProgramUniformMatrix3dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix3dv)
+        glProgramUniformMatrix3dv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix3dv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const dmat3x4& value, bool transpose) {
-    glProgramUniformMatrix3x4dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix3x4dv)
+        glProgramUniformMatrix3x4dv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix3x4dv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const dmat4x2& value, bool transpose) {
-    glProgramUniformMatrix4x2dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix4x2dv)
+        glProgramUniformMatrix4x2dv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix4x2dv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const dmat4x3& value, bool transpose) {
-    glProgramUniformMatrix4x3dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix4x3dv)
+        glProgramUniformMatrix4x3dv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix4x3dv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 void ProgramObject::setUniform(GLint location, const dmat4x4& value, bool transpose) {
-    glProgramUniformMatrix4dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix4dv)
+        glProgramUniformMatrix4dv(_id, location, 1, transpose, value_ptr(value));
+    else {
+        GLint oldProgram;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+        glUseProgram(_id);
+        glUniformMatrix4dv(location, 1, transpose, value_ptr(value));
+        glUseProgram(oldProgram);
+    }
 }
 
 GLint ProgramObject::attributeLocation(const string& name) const {

@@ -27,8 +27,11 @@
 #define __GHOULGL_H__
 
 #ifdef __APPLE__
+    #define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
+    #undef __gl_h_
     #include <GL/glew.h>
-    #include <OpenGL/gl.h>
+    #include <OpenGL/gl3.h>
+//    #include <OpenGL/gl.h>
     #include <OpenGL/glu.h>
 #else
     #include <GL/glew.h>

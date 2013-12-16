@@ -101,6 +101,8 @@ void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {
             _stream << "\033[22;34m";   // blue
             break;
     }
+#elif __APPLE__
+#pragma unused(level)
 #endif
 }
 

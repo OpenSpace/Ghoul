@@ -37,6 +37,10 @@ if (UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -ggdb")
 endif ()
 
+if (APPLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif ()
+
 ######
 # Options
 ######
@@ -69,6 +73,14 @@ if (GHOUL_USE_DEVIL)
     find_package(DevIL)
     include_directories(${IL_INCLUDE_DIR})
     set(DEVIL_LIBRARIES ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
+endif ()
+
+#####
+# Platform-dependent Settings
+#####
+if (APPLE)
+	add_definitions(-D__gl_h_)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-gnu")
 endif ()
 
 add_subdirectory(src)

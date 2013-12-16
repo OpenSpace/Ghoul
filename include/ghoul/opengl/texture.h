@@ -27,7 +27,7 @@
 #define __TEXTURE_H__
 
 #include <ghoul/opengl/ghoul_gl.h>
-#include <glm/glm.hpp>
+#include <ghoul/glm.h>
 #include <glm/gtx/std_based_type.hpp>
 #include <string>
 

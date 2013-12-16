@@ -84,6 +84,7 @@ set(GHOUL_HEADER_CRC32
 source_group(CRC32 FILES ${GHOUL_HEADER_CRC32})    
     
 set(GHOUL_HEADER_OTHER
+	${GHOUL_ROOT_DIR}/include/ghoul/glm.h
     ${GHOUL_ROOT_DIR}/include/ghoul/syscapabilities.h)
 source_group(Other FILES ${GHOUL_HEADER_OTHER})    
     

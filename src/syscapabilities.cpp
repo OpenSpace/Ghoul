@@ -22,7 +22,7 @@
 
 #include "syscapabilities.h"
 
-#include <GL/glew.h>
+#include <ghoul/opengl/ghoul_gl.h>
 #include <algorithm>
 #include <cassert>
 #include <sstream>
@@ -170,32 +170,18 @@ void SystemCapabilities::detectCapabilities() {
             << _glslCompiler);
         _vendor = VendorOther;
     }
-
+    
     _glRenderer = string(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
 
     // Extensions
-    const char* extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
-    if (extensions) {
-        // extensions are separated by ' ', so iterate over the string and jump from ' ' to ' '
-        // and collect all the extensions in between
-        string extensionsString = string(extensions);
-        size_t lastPos = static_cast<size_t>(-1);
-        size_t currentPos = extensionsString.find_first_of(' ');
-        while (currentPos != string::npos) {
-            size_t length = currentPos - (lastPos + 1);
-            string currentExtension = extensionsString.substr(lastPos + 1, length);
-            _extensions.push_back(currentExtension);
-            lastPos = currentPos;
-            currentPos = extensionsString.find_first_of(' ', lastPos + 1);
-        }
-        // we are missing the last extension
-        string lastExtension = extensionsString.substr(lastPos, extensionsString.size() - lastPos);
-        if (!lastExtension.empty())
-            _extensions.push_back(lastExtension);
+    GLint nExtensions;
+    glGetIntegerv(GL_NUM_EXTENSIONS, &nExtensions);
+    for (GLint i = 0; i < nExtensions; ++i) {
+        const GLubyte* ext = glGetStringi(GL_EXTENSIONS, i);
+        const string extension = string(reinterpret_cast<const char*>(ext));
+        _extensions.push_back(extension);
     }
-    else
-        LERROR_SAFE("Detection of the GLSL extensions failed. 'glGetString' returned 0.");
-
+    
     // GLEW Version
     _glewVersion._major = GLEW_VERSION_MAJOR;
     _glewVersion._minor = GLEW_VERSION_MINOR;
@@ -760,7 +746,7 @@ SystemCapabilities::Version::Version(int major, int minor, int release)
 bool SystemCapabilities::Version::parseGLSLString(const string& version) {
     // version string has one of the formats:
     // <major version>.<minor version>.<release version> <vendor specific information>
-    // <major version>.<minor version> <vendor specific information>
+    // <major version>.<minor version> [<vendor specific information>]
 
     stringstream stream;
 
@@ -785,9 +771,11 @@ bool SystemCapabilities::Version::parseGLSLString(const string& version) {
         // second format
         size_t spaceSeparator = version.find_first_of(' ', separatorMajorMinor + 1);
         if (spaceSeparator == string::npos)
-            return false;
-        size_t len = spaceSeparator - (separatorMajorMinor + 1);
-        minor = version.substr(separatorMajorMinor + 1, len);
+            minor = version.substr(separatorMajorMinor + 1);
+        else {
+            size_t len = spaceSeparator - (separatorMajorMinor + 1);
+            minor = version.substr(separatorMajorMinor + 1, len);
+        }
     }
 
     stream << major;

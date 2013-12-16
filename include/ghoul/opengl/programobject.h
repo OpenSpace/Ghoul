@@ -25,7 +25,7 @@
 
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/shaderobject.h>
-#include <glm/glm.hpp>
+#include <ghoul/glm.h>
 #include <map>
 #include <string>
 #include <vector>
