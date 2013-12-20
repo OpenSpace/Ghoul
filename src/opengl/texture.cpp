@@ -1,24 +1,28 @@
-/**************************************************************************************************
- * GHOUL                                                                                          *
- * General Helpful Open Utility Library                                                           *
- *                                                                                                *
- * Copyright (c) 2012 Alexander Bock                                                              *
- *                                                                                                *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software  *
- * and associated documentation files (the "Software"), to deal in the Software without           *
- * restriction, including without limitation the rights to use, copy, modify, merge, publish,     *
- * distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the  *
- * Software is furnished to do so, subject to the following conditions:                           *
- *                                                                                                *
- * The above copyright notice and this permission notice shall be included in all copies or       *
- * substantial portions of the Software.                                                          *
- *                                                                                                *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING  *
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND     *
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,   *
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.        *
- *************************************************************************************************/
+/*****************************************************************************************
+ *                                                                                       *
+ * GHOUL                                                                                 *
+ * General Helpful Open Utility Library                                                  *
+ *                                                                                       *
+ * Copyright (c) 2012 Alexander Bock                                                     *
+ *                                                                                       *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
+ * software and associated documentation files (the "Software"), to deal in the Software *
+ * without restriction, including without limitation the rights to use, copy, modify,    *
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to    *
+ * permit persons to whom the Software is furnished to do so, subject to the following   *
+ * conditions:                                                                           *
+ *                                                                                       *
+ * The above copyright notice and this permission notice shall be included in all copies *
+ * or substantial portions of the Software.                                              *
+ *                                                                                       *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,   *
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A         *
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT    *
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
+ ****************************************************************************************/
+
 
 #include <ghoul/opengl/texture.h>
 
@@ -57,8 +61,9 @@ Texture::Texture(const size3_t& dimensions, Format format, GLint internalFormat,
     initialize(true);
 }
 
-Texture::Texture(void* data, const size3_t& dimensions, Format format, GLint internalFormat,
-                 GLenum dataType, FilterMode filter, WrappingMode wrapping)
+Texture::Texture(void* data, const size3_t& dimensions, Format format,
+                 GLint internalFormat, GLenum dataType, FilterMode filter,
+                 WrappingMode wrapping)
      : _dimensions(dimensions)
      , _format(format)
      , _internalFormat(internalFormat)
@@ -183,25 +188,28 @@ void Texture::applyFilter() {
     bind();
 
     switch(_filter) {
-        case FilterModeNearest:
+        case FilterMode::Nearest:
             glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             break;
-        case FilterModeLinear:
+        case FilterMode::Linear:
             glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             break;
-        case FilterModeAnisotropicMipMap: {
+        case FilterMode::AnisotropicMipMap: {
                 glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
                 glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 glGenerateMipmap(_type);
                 if (_anisotropyLevel == -1.f) {
                     GLfloat maxTextureAnisotropy = 1.0;
-                    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxTextureAnisotropy);
-                    glTexParameterf(_type, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxTextureAnisotropy);
+                    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT,
+                                &maxTextureAnisotropy);
+                    glTexParameterf(_type, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+                                    maxTextureAnisotropy);
                 }
                 else
-                    glTexParameterf(_type, GL_TEXTURE_MAX_ANISOTROPY_EXT, _anisotropyLevel);
+                    glTexParameterf(_type, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+                                    _anisotropyLevel);
                 glTexParameteri(_type, GL_TEXTURE_BASE_LEVEL, 0);
                 glTexParameteri(_type, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
                 break;
@@ -229,19 +237,19 @@ size_t Texture::expectedPixelDataSize() const {
 
 size_t Texture::numberOfChannels() const {
     switch (_format) {
-        case FormatRed:
-        case FormatDepthComponent:
+        case Format::Red:
+        case Format::DepthComponent:
             return 1;
             break;
-        case FormatRG:
+        case Format::RG:
             return 2;
             break;
-        case FormatRGB:
-        case FormatBGR:
+        case Format::RGB:
+        case Format::BGR:
             return 3;
             break;
-        case FormatRGBA:
-        case FormatBGRA:
+        case Format::RGBA:
+        case Format::BGRA:
             return 4;
             break;
     }
@@ -297,7 +305,7 @@ void Texture::setMipMapLevel(int mipMapLevel) {
 
 void Texture::applyWrapping() {
     bind();
-    GLint wrapping = _wrapping;
+    GLint wrapping = GLint(_wrapping);
     switch (_type) {
         case GL_TEXTURE_3D:
             glTexParameteri(_type, GL_TEXTURE_WRAP_R, wrapping);
@@ -315,15 +323,18 @@ void Texture::uploadTexture() {
     bind();
     switch (_type) {
         case GL_TEXTURE_1D:
-            glTexImage1D(_type, 0, _internalFormat, _dimensions.x, 0, _format, _dataType, _pixels);
+            glTexImage1D(_type, 0, _internalFormat,
+                         _dimensions.x, 0, GLint(_format), _dataType, _pixels);
             break;
         case GL_TEXTURE_2D:
-            glTexImage2D(_type, 0, _internalFormat, _dimensions.x, _dimensions.y, 0, _format,
-                _dataType, _pixels);
+            glTexImage2D(_type, 0, _internalFormat,
+                         _dimensions.x, _dimensions.y, 0, GLint(_format), _dataType,
+                         _pixels);
             break;
         case GL_TEXTURE_3D:
-            glTexImage3D(_type, 0, _internalFormat, _dimensions.x, _dimensions.y, _dimensions.z,
-                0, _format, _dataType, _pixels);
+            glTexImage3D(_type, 0, _internalFormat,
+                         _dimensions.x, _dimensions.y, _dimensions.z,
+                        0, GLint(_format), _dataType, _pixels);
             break;
         default:
             assert(false);
@@ -334,7 +345,7 @@ void Texture::downloadTexture() {
     bind();
     if (!_pixels)
         allocateMemory();
-    glGetTexImage(_type, 0, _format, _dataType, _pixels);
+    glGetTexImage(_type, 0, GLint(_format), _dataType, _pixels);
 }
 
 void Texture::determineTextureType() {
@@ -354,7 +365,7 @@ vec4 Texture::texelAsFloat(size_t x) const {
 
     vec4 result(0.f);
     switch (_format) {
-        case FormatRed:
+        case Format::Red:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     uint8 t = texel<uint8>(x);
@@ -414,7 +425,7 @@ vec4 Texture::texelAsFloat(size_t x) const {
                 }
             }
             break;
-        case FormatRG:
+        case Format::RG:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec2<uint8> t = texel<tvec2<uint8> >(x);
@@ -474,7 +485,7 @@ vec4 Texture::texelAsFloat(size_t x) const {
                 }
             }
             break;
-        case FormatRGB:
+        case Format::RGB:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec3<uint8> t = texel<tvec3<uint8> >(x);
@@ -534,7 +545,7 @@ vec4 Texture::texelAsFloat(size_t x) const {
                 }
             }
             break;
-        case FormatBGR:
+        case Format::BGR:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec3<uint8> t = texel<tvec3<uint8> >(x);
@@ -594,7 +605,7 @@ vec4 Texture::texelAsFloat(size_t x) const {
                 }
             }
             break;
-        case FormatRGBA:
+        case Format::RGBA:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec4<uint8> t = texel<tvec4<uint8> >(x);
@@ -654,7 +665,7 @@ vec4 Texture::texelAsFloat(size_t x) const {
                 }
             }
             break;
-        case FormatBGRA:
+        case Format::BGRA:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec4<uint8> t = texel<tvec4<uint8> >(x);
@@ -714,7 +725,7 @@ vec4 Texture::texelAsFloat(size_t x) const {
                 }
             }
             break;
-        case FormatDepthComponent:
+        case Format::DepthComponent:
             break;
     }
     return result;
@@ -726,7 +737,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y) const {
 
     vec4 result(0.f);
     switch (_format) {
-        case FormatRed:
+        case Format::Red:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     uint8 t = texel<uint8>(x,y);
@@ -786,7 +797,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y) const {
                 }
             }
             break;
-        case FormatRG:
+        case Format::RG:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec2<uint8> t = texel<tvec2<uint8> >(x,y);
@@ -846,7 +857,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y) const {
                 }
             }
             break;
-        case FormatRGB:
+        case Format::RGB:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec3<uint8> t = texel<tvec3<uint8> >(x,y);
@@ -906,7 +917,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y) const {
                 }
             }
             break;
-        case FormatBGR:
+        case Format::BGR:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec3<uint8> t = texel<tvec3<uint8> >(x,y);
@@ -966,7 +977,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y) const {
                 }
             }
             break;
-        case FormatRGBA:
+        case Format::RGBA:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec4<uint8> t = texel<tvec4<uint8> >(x,y);
@@ -1026,7 +1037,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y) const {
                 }
             }
             break;
-        case FormatBGRA:
+        case Format::BGRA:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec4<uint8> t = texel<tvec4<uint8> >(x,y);
@@ -1086,7 +1097,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y) const {
                 }
             }
             break;
-        case FormatDepthComponent:
+        case Format::DepthComponent:
             break;
     }
     return result;
@@ -1098,7 +1109,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y, size_t z) const {
 
     vec4 result(0.f);
     switch (_format) {
-        case FormatRed:
+        case Format::Red:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     uint8 t = texel<uint8>(x,y,z);
@@ -1158,7 +1169,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y, size_t z) const {
                 }
             }
             break;
-        case FormatRG:
+        case Format::RG:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec2<uint8> t = texel<tvec2<uint8> >(x,y,z);
@@ -1218,7 +1229,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y, size_t z) const {
                 }
             }
             break;
-        case FormatRGB:
+        case Format::RGB:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec3<uint8> t = texel<tvec3<uint8> >(x,y,z);
@@ -1278,7 +1289,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y, size_t z) const {
                 }
             }
             break;
-        case FormatBGR:
+        case Format::BGR:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec3<uint8> t = texel<tvec3<uint8> >(x,y,z);
@@ -1338,7 +1349,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y, size_t z) const {
                 }
             }
             break;
-        case FormatRGBA:
+        case Format::RGBA:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec4<uint8> t = texel<tvec4<uint8> >(x,y,z);
@@ -1398,7 +1409,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y, size_t z) const {
                 }
             }
             break;
-        case FormatBGRA:
+        case Format::BGRA:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE: {
                     tvec4<uint8> t = texel<tvec4<uint8> >(x,y,z);
@@ -1458,7 +1469,7 @@ vec4 Texture::texelAsFloat(size_t x, size_t y, size_t z) const {
                 }
             }
             break;
-        case FormatDepthComponent:
+        case Format::DepthComponent:
             break;
     }
     return result;
@@ -1508,5 +1519,5 @@ void Texture::calculateBytesPerPixel() {
     _bpp = static_cast<GLubyte>(szType * numChannels);
 }
 
-}
-}
+} // opengl
+} // ghoul

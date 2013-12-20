@@ -1,24 +1,28 @@
-/**************************************************************************************************
- * GHOUL                                                                                          *
- * General Helpful Open Utility Library                                                           *
- *                                                                                                *
- * Copyright (c) 2012 Alexander Bock                                                              *
- *                                                                                                *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software  *
- * and associated documentation files (the "Software"), to deal in the Software without           *
- * restriction, including without limitation the rights to use, copy, modify, merge, publish,     *
- * distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the  *
- * Software is furnished to do so, subject to the following conditions:                           *
- *                                                                                                *
- * The above copyright notice and this permission notice shall be included in all copies or       *
- * substantial portions of the Software.                                                          *
- *                                                                                                *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING  *
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND     *
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,   *
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.        *
- *************************************************************************************************/
+/*****************************************************************************************
+ *                                                                                       *
+ * GHOUL                                                                                 *
+ * General Helpful Open Utility Library                                                  *
+ *                                                                                       *
+ * Copyright (c) 2012 Alexander Bock                                                     *
+ *                                                                                       *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
+ * software and associated documentation files (the "Software"), to deal in the Software *
+ * without restriction, including without limitation the rights to use, copy, modify,    *
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to    *
+ * permit persons to whom the Software is furnished to do so, subject to the following   *
+ * conditions:                                                                           *
+ *                                                                                       *
+ * The above copyright notice and this permission notice shall be included in all copies *
+ * or substantial portions of the Software.                                              *
+ *                                                                                       *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,   *
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A         *
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT    *
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
+ ****************************************************************************************/
+
 
 #include <ghoul/opengl/programobject.h>
 
@@ -183,7 +187,9 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
                           _programName.c_str());
         }
 
-        for (auto it = rhs._shaderObjects.cbegin(); it != rhs._shaderObjects.end(); ++it) {
+        for (auto it = rhs._shaderObjects.cbegin();
+             it != rhs._shaderObjects.end(); ++it)
+        {
             if (it->second) {
                 // ProgramObject owns ShaderObjects
                 ShaderObject* shaderCopy = new ShaderObject(*(it->first));
@@ -226,8 +232,10 @@ void ProgramObject::attachObject(ShaderObject* shaderObject, bool transferOwners
     // Check if ShaderObject is already attached
     for (auto it = _shaderObjects.begin(); it != _shaderObjects.end(); ++it) {
         if (it->first == shaderObject) {
-            if (it->first->hasName())
-                LWARNING_SAFE("Shader object [" + it->first->name() + "] already attached");
+            if (it->first->hasName()) {
+                const std::string name = it->first->name();
+                LWARNING_SAFE("Shader object [" + name + "] already attached");
+            }
             else
                 LWARNING_SAFE("ShaderObject already attached");
             return;
@@ -469,7 +477,9 @@ bool ProgramObject::setUniform(const string& name, GLuint v1, GLuint v2, GLuint 
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLuint v1, GLuint v2, GLuint v3, GLuint v4) {
+bool ProgramObject::setUniform(const string& name,
+                               GLuint v1, GLuint v2, GLuint v3, GLuint v4)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -557,7 +567,9 @@ bool ProgramObject::setUniform(const string& name, GLint v1, GLint v2, GLint v3)
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLint v1, GLint v2, GLint v3, GLint v4) {
+bool ProgramObject::setUniform(const string& name,
+                               GLint v1, GLint v2, GLint v3, GLint v4)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -645,7 +657,9 @@ bool ProgramObject::setUniform(const string& name, GLfloat v1, GLfloat v2, GLflo
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4) {
+bool ProgramObject::setUniform(const string& name,
+                               GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -733,7 +747,9 @@ bool ProgramObject::setUniform(const string& name, GLdouble v1, GLdouble v2, GLd
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4) {
+bool ProgramObject::setUniform(const string& name,
+                               GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -1134,7 +1150,9 @@ void ProgramObject::setUniform(GLint location, GLuint v1, GLuint v2, GLuint v3) 
     }
 }
 
-void ProgramObject::setUniform(GLint location, GLuint v1, GLuint v2, GLuint v3, GLuint v4) {
+void ProgramObject::setUniform(GLint location,
+                               GLuint v1, GLuint v2, GLuint v3, GLuint v4)
+{
     if (glProgramUniform4ui)
         glProgramUniform4ui(_id, location, v1, v2, v3, v4);
     else {
@@ -1196,7 +1214,8 @@ void ProgramObject::setUniform(GLint location, const GLuint* values, int count) 
 
 void ProgramObject::setUniform(GLint location, uvec2* values, int count) {
     if (glProgramUniform2uiv)
-        glProgramUniform2uiv(_id, location, count, reinterpret_cast<unsigned int*>(values));
+        glProgramUniform2uiv(_id, location, count,
+                             reinterpret_cast<unsigned int*>(values));
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
@@ -1208,7 +1227,8 @@ void ProgramObject::setUniform(GLint location, uvec2* values, int count) {
 
 void ProgramObject::setUniform(GLint location, uvec3* values, int count) {
     if (glProgramUniform3uiv)
-        glProgramUniform3uiv(_id, location, count, reinterpret_cast<unsigned int*>(values));
+        glProgramUniform3uiv(_id, location, count,
+                             reinterpret_cast<unsigned int*>(values));
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
@@ -1220,7 +1240,8 @@ void ProgramObject::setUniform(GLint location, uvec3* values, int count) {
 
 void ProgramObject::setUniform(GLint location, uvec4* values, int count) {
     if (glProgramUniform4uiv)
-        glProgramUniform4uiv(_id, location, count, reinterpret_cast<unsigned int*>(values));
+        glProgramUniform4uiv(_id, location, count,
+                             reinterpret_cast<unsigned int*>(values));
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
@@ -1398,7 +1419,9 @@ void ProgramObject::setUniform(GLint location, GLfloat v1, GLfloat v2, GLfloat v
     }
 }
 
-void ProgramObject::setUniform(GLint location, GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4) {
+void ProgramObject::setUniform(GLint location,
+                               GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4)
+{
     if (glProgramUniform4f)
         glProgramUniform4f(_id, location, v1, v2, v3, v4);
     else {
@@ -1530,7 +1553,9 @@ void ProgramObject::setUniform(GLint location, GLdouble v1, GLdouble v2, GLdoubl
     }
 }
 
-void ProgramObject::setUniform(GLint location, GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4) {
+void ProgramObject::setUniform(GLint location,
+                               GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4)
+{
     if (glProgramUniform4d)
         glProgramUniform4d(_id, location, v1, v2, v3, v4);
     else {
@@ -1941,7 +1966,9 @@ bool ProgramObject::setAttribute(const string& name, GLint v1, GLint v2, GLint v
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, GLint v1, GLint v2, GLint v3, GLint v4) {
+bool ProgramObject::setAttribute(const string& name,
+                                 GLint v1, GLint v2, GLint v3, GLint v4)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1997,7 +2024,9 @@ bool ProgramObject::setAttribute(const string& name, GLfloat v1, GLfloat v2, GLf
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4) {
+bool ProgramObject::setAttribute(const string& name,
+                                 GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2045,7 +2074,9 @@ bool ProgramObject::setAttribute(const string& name, GLdouble v1, GLdouble v2) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, GLdouble v1, GLdouble v2, GLdouble v3) {
+bool ProgramObject::setAttribute(const string& name,
+                                 GLdouble v1, GLdouble v2, GLdouble v3)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2053,7 +2084,9 @@ bool ProgramObject::setAttribute(const string& name, GLdouble v1, GLdouble v2, G
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4) {
+bool ProgramObject::setAttribute(const string& name,
+                                 GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2085,7 +2118,9 @@ bool ProgramObject::setAttribute(const string& name, const dvec4& value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const mat2x2& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const mat2x2& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2093,7 +2128,9 @@ bool ProgramObject::setAttribute(const string& name, const mat2x2& value, bool t
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const mat2x3& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const mat2x3& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2101,7 +2138,9 @@ bool ProgramObject::setAttribute(const string& name, const mat2x3& value, bool t
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const mat2x4& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const mat2x4& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2109,7 +2148,9 @@ bool ProgramObject::setAttribute(const string& name, const mat2x4& value, bool t
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const mat3x2& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const mat3x2& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2117,7 +2158,9 @@ bool ProgramObject::setAttribute(const string& name, const mat3x2& value, bool t
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const mat3x3& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const mat3x3& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2125,7 +2168,9 @@ bool ProgramObject::setAttribute(const string& name, const mat3x3& value, bool t
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const mat3x4& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const mat3x4& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2133,7 +2178,9 @@ bool ProgramObject::setAttribute(const string& name, const mat3x4& value, bool t
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const mat4x2& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const mat4x2& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2141,7 +2188,9 @@ bool ProgramObject::setAttribute(const string& name, const mat4x2& value, bool t
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const mat4x3& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const mat4x3& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2149,7 +2198,9 @@ bool ProgramObject::setAttribute(const string& name, const mat4x3& value, bool t
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const mat4x4& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const mat4x4& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2157,7 +2208,9 @@ bool ProgramObject::setAttribute(const string& name, const mat4x4& value, bool t
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const dmat2x2& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const dmat2x2& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2165,7 +2218,9 @@ bool ProgramObject::setAttribute(const string& name, const dmat2x2& value, bool 
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const dmat2x3& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const dmat2x3& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2173,7 +2228,9 @@ bool ProgramObject::setAttribute(const string& name, const dmat2x3& value, bool 
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const dmat2x4& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const dmat2x4& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2181,7 +2238,9 @@ bool ProgramObject::setAttribute(const string& name, const dmat2x4& value, bool 
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const dmat3x2& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const dmat3x2& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2189,7 +2248,9 @@ bool ProgramObject::setAttribute(const string& name, const dmat3x2& value, bool 
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const dmat3x3& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const dmat3x3& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2197,7 +2258,9 @@ bool ProgramObject::setAttribute(const string& name, const dmat3x3& value, bool 
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const dmat3x4& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const dmat3x4& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2205,7 +2268,9 @@ bool ProgramObject::setAttribute(const string& name, const dmat3x4& value, bool 
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const dmat4x2& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const dmat4x2& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2213,7 +2278,9 @@ bool ProgramObject::setAttribute(const string& name, const dmat4x2& value, bool 
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const dmat4x3& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const dmat4x3& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2221,7 +2288,9 @@ bool ProgramObject::setAttribute(const string& name, const dmat4x3& value, bool 
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const dmat4x4& value, bool transpose) {
+bool ProgramObject::setAttribute(const string& name,
+                                 const dmat4x4& value, bool transpose)
+{
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2297,7 +2366,9 @@ void ProgramObject::setAttribute(GLint location, GLfloat v1, GLfloat v2, GLfloat
     glVertexAttrib3f(location, v1, v2, v3);
 }
 
-void ProgramObject::setAttribute(GLint location, GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4) {
+void ProgramObject::setAttribute(GLint location,
+                                 GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4)
+{
     glVertexAttrib4f(location, v1, v2, v3, v4);
 }
 
@@ -2325,7 +2396,9 @@ void ProgramObject::setAttribute(GLint location, GLdouble v1, GLdouble v2, GLdou
     glVertexAttribL3d(location, v1, v2, v3);
 }
 
-void ProgramObject::setAttribute(GLint location, GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4) {
+void ProgramObject::setAttribute(GLint location,
+                                 GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4)
+{
     glVertexAttribL4d(location, v1, v2, v3, v4);
 }
 
@@ -2537,30 +2610,38 @@ bool ProgramObject::ignoreSubroutineUniformLocationError() const {
     return _ignoreSubroutineUniformLocationError;
 }
 
-GLuint ProgramObject::subroutineIndex(ShaderObject::ShaderType shaderType, const std::string& name) {
+GLuint ProgramObject::subroutineIndex(ShaderObject::ShaderType shaderType,
+                                      const std::string& name)
+{
     const GLuint index = glGetSubroutineIndex(_id, shaderType, name.c_str());
     if (!_ignoreSubroutineLocationError && index == GL_INVALID_INDEX)
         LWARNING_SAFE("Failed to locate subroutine index for: " + name);
     return index;
 }
 
-GLint ProgramObject::subroutineUniformLocation(ShaderObject::ShaderType shaderType, const std::string& name) {
+GLint ProgramObject::subroutineUniformLocation(ShaderObject::ShaderType shaderType,
+                                               const std::string& name)
+{
     const GLint location = glGetSubroutineUniformLocation(_id, shaderType, name.c_str());
     if (!_ignoreSubroutineUniformLocationError && location == -1)
         LWARNING_SAFE("Failed to locate subroutine uniform location for: " + name);
     return location;
 }
 
-vector<string> ProgramObject::activeSubroutineUniformNames(ShaderObject::ShaderType shaderType) {
+vector<string> ProgramObject::activeSubroutineUniformNames(
+                                                    ShaderObject::ShaderType shaderType)
+{
 #ifdef GHL_DEBUG
     GLint maximumUniformNameLength;
-    glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH, &maximumUniformNameLength);
+    glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH,
+                        &maximumUniformNameLength);
     if (maximumUniformNameLength > 1024)
         LWARNING_SAFE("String buffer for Subroutine Uniform name (1024) is insufficient");
 #endif
     int countActiveSubroutineUniforms;
     char buffer[1024];
-    glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORMS, &countActiveSubroutineUniforms);
+    glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORMS,
+                        &countActiveSubroutineUniforms);
     vector<string> result(countActiveSubroutineUniforms);
     for (int i = 0; i < countActiveSubroutineUniforms; ++i) {
         glGetActiveSubroutineUniformName(_id, shaderType, i, 1024, NULL, buffer);
@@ -2570,23 +2651,30 @@ vector<string> ProgramObject::activeSubroutineUniformNames(ShaderObject::ShaderT
     return result;
 }
 
-vector<string> ProgramObject::compatibleSubroutineNames(ShaderObject::ShaderType shaderType, GLuint subroutineUniformLocation) {
+vector<string> ProgramObject::compatibleSubroutineNames(
+                                                ShaderObject::ShaderType shaderType,
+                                                GLuint subroutineUniformLocation)
+{
 #ifdef GHL_DEBUG
     GLint maximumUniformNameLength;
-    glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH, &maximumUniformNameLength);
+    glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH,
+                        &maximumUniformNameLength);
     if (maximumUniformNameLength > 1024)
         LWARNING_SAFE("String buffer for Subroutine Uniform name (1024) is insufficient");
 #endif
 
     GLint numCompatibleSubroutines;
-    glGetActiveSubroutineUniformiv(_id, shaderType, subroutineUniformLocation, GL_NUM_COMPATIBLE_SUBROUTINES, &numCompatibleSubroutines);
+    glGetActiveSubroutineUniformiv(_id, shaderType, subroutineUniformLocation,
+                                   GL_NUM_COMPATIBLE_SUBROUTINES,
+                                   &numCompatibleSubroutines);
     if (numCompatibleSubroutines == 0)
         return vector<string>();
     
     vector<string> result(numCompatibleSubroutines);
     GLint* indices = new GLint[numCompatibleSubroutines];
     char buffer[1024];
-    glGetActiveSubroutineUniformiv(_id, shaderType, subroutineUniformLocation, GL_COMPATIBLE_SUBROUTINES, indices);
+    glGetActiveSubroutineUniformiv(_id, shaderType, subroutineUniformLocation,
+                                   GL_COMPATIBLE_SUBROUTINES, indices);
     for (int i = 0; i < numCompatibleSubroutines; ++i) {
        glGetActiveSubroutineName(_id, shaderType, indices[i], 1024, NULL, buffer);
        result[i] = string(buffer);
@@ -2595,7 +2683,10 @@ vector<string> ProgramObject::compatibleSubroutineNames(ShaderObject::ShaderType
     return result;
 }
 
-vector<string> ProgramObject::compatibleSubroutineNames(ShaderObject::ShaderType shaderType, const string& subroutineUniformName) {
+vector<string> ProgramObject::compatibleSubroutineNames(
+                                                ShaderObject::ShaderType shaderType,
+                                                const string& subroutineUniformName)
+{
     const GLint index = subroutineUniformLocation(shaderType, subroutineUniformName);
     if (index == -1)
         return vector<string>();
@@ -2603,7 +2694,9 @@ vector<string> ProgramObject::compatibleSubroutineNames(ShaderObject::ShaderType
         return compatibleSubroutineNames(shaderType, index);
 }
 
-bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType, const vector<GLuint>& values) {
+bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
+                                          const vector<GLuint>& values)
+{
 #ifdef GHL_DEBUG
     if (values.size() == 0) {
         LWARNING_SAFE("No values passed");
@@ -2611,10 +2704,13 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType, c
     }
 
     int countActiveSubroutineUniforms;
-    glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORMS, &countActiveSubroutineUniforms);
+    glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORMS,
+                        &countActiveSubroutineUniforms);
     if (static_cast<size_t>(countActiveSubroutineUniforms) != values.size()) {
-        LWARNING_SAFE("Number of active subroutine uniform (" << countActiveSubroutineUniforms <<
-            ") is different from passed uniform subroutine indices (" << values.size() << ")");
+        LWARNING_SAFE("Number of active subroutine uniform (" <<
+            countActiveSubroutineUniforms <<
+            ") is different from passed uniform subroutine indices (" << values.size() <<
+            ")");
         return false;
     }
 #endif
@@ -2622,7 +2718,9 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType, c
     return true;
 }
 
-bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType, const map<string, string>& values) {
+bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
+                                          const map<string, string>& values)
+{
 #ifdef GHL_DEBUG
     if (values.size() == 0) {
         LWARNING_SAFE("No values passed");
@@ -2630,10 +2728,13 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType, c
     }
 
     int countActiveSubroutineUniforms;
-    glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORMS, &countActiveSubroutineUniforms);
+    glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORMS,
+                        &countActiveSubroutineUniforms);
     if (static_cast<size_t>(countActiveSubroutineUniforms) != values.size()) {
-        LWARNING_SAFE("Number of active subroutine uniform (" << countActiveSubroutineUniforms <<
-            ") is different from passed uniform subroutine indices (" << values.size() << ")");
+        LWARNING_SAFE("Number of active subroutine uniform (" <<
+            countActiveSubroutineUniforms <<
+            ") is different from passed uniform subroutine indices (" << values.size()
+            << ")");
         return false;
     }
 #endif
@@ -2670,11 +2771,11 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType, c
 
 void ProgramObject::bindFragDataLocation(const std::string& name, GLuint colorNumber) {
 #ifdef GHL_DEBUG
-    GLint maxDrawBuffers;
-    glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxDrawBuffers);
-    if (colorNumber >= maxDrawBuffers) {
+    GLint maxBuffers;
+    glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxBuffers);
+    if (colorNumber >= maxBuffers) {
         LWARNING_SAFE("ColorNumber '" + colorNumber +
-            "' is bigger than the maximum of simultaneous outputs '" + maxDrawBuffers "'");
+            "' is bigger than the maximum of simultaneous outputs '" + maxBuffers "'");
         return;
     }
 #endif

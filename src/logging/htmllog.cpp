@@ -1,24 +1,28 @@
-/**************************************************************************************************
- * GHOUL                                                                                          *
- * General Helpful Open Utility Library                                                           *
- *                                                                                                *
- * Copyright (c) 2012 Alexander Bock                                                              *
- *                                                                                                *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software  *
- * and associated documentation files (the "Software"), to deal in the Software without           *
- * restriction, including without limitation the rights to use, copy, modify, merge, publish,     *
- * distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the  *
- * Software is furnished to do so, subject to the following conditions:                           *
- *                                                                                                *
- * The above copyright notice and this permission notice shall be included in all copies or       *
- * substantial portions of the Software.                                                          *
- *                                                                                                *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING  *
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND     *
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,   *
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.        *
- *************************************************************************************************/
+/*****************************************************************************************
+ *                                                                                       *
+ * GHOUL                                                                                 *
+ * General Helpful Open Utility Library                                                  *
+ *                                                                                       *
+ * Copyright (c) 2012 Alexander Bock                                                     *
+ *                                                                                       *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
+ * software and associated documentation files (the "Software"), to deal in the Software *
+ * without restriction, including without limitation the rights to use, copy, modify,    *
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to    *
+ * permit persons to whom the Software is furnished to do so, subject to the following   *
+ * conditions:                                                                           *
+ *                                                                                       *
+ * The above copyright notice and this permission notice shall be included in all copies *
+ * or substantial portions of the Software.                                              *
+ *                                                                                       *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,   *
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A         *
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT    *
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
+ ****************************************************************************************/
+
 
 #include "logging/htmllog.h"
 
@@ -27,8 +31,10 @@
 namespace ghoul {
 namespace logging {
 
-HTMLLog::HTMLLog(const std::string& filename, bool timeStamping, bool dateStamping, bool categoryStamping, bool logLevelStamping) 
-    : TextLog(filename, false, timeStamping, dateStamping, categoryStamping, logLevelStamping)
+HTMLLog::HTMLLog(const std::string& filename, bool timeStamping, bool dateStamping,
+                 bool categoryStamping, bool logLevelStamping)
+    : TextLog(filename, false, timeStamping, dateStamping, categoryStamping,
+              logLevelStamping)
 {
     if (hasValidFile()) {
         std::string output = \
@@ -70,7 +76,9 @@ HTMLLog::~HTMLLog() {
 }
 
 
-void HTMLLog::log(LogManager::LogLevel level, const std::string& category, const std::string& message) {
+void HTMLLog::log(LogManager::LogLevel level, const std::string& category,
+                  const std::string& message)
+{
     std::string output = "\t\t\t<tr bgcolor=\"" + colorForLevel(level) + "\">\n";
     if (isDateStamping())
         output += "\t\t\t\t<td>" + getDateString() + "</td>\n";
@@ -87,15 +95,15 @@ void HTMLLog::log(LogManager::LogLevel level, const std::string& category, const
 
 std::string HTMLLog::colorForLevel(LogManager::LogLevel level) {
     switch (level) {
-        case LogManager::LogLevelDebug:
+        case LogManager::LogLevel::Debug:
             return "#00CC00";
-        case LogManager::LogLevelInfo:
+        case LogManager::LogLevel::Info:
             return "#FFFFFF";
-        case LogManager::LogLevelWarning:
+        case LogManager::LogLevel::Warning:
             return "#FFFF00";
-        case LogManager::LogLevelError:
+        case LogManager::LogLevel::Error:
             return "#FF0000";
-        case LogManager::LogLevelFatal:
+        case LogManager::LogLevel::Fatal:
             return "#00FFFF";
     }
     assert(false);
