@@ -32,17 +32,18 @@ source_group(FileSystem FILES ${GHOUL_SOURCE_FILESYSTEM})
 set(GHOUL_SOURCE_CRC32
     ${GHOUL_ROOT_DIR}/src/crc32.cpp)
 source_group(CRC32 FILES ${GHOUL_SOURCE_CRC32})    
-    
-set(GHOUL_SOURCE_OTHER
-    ${GHOUL_ROOT_DIR}/src/syscapabilities.cpp)
-source_group(Other FILES ${GHOUL_SOURCE_OTHER})    
+
+set(GHOUL_SOURCE_MISC
+    ${GHOUL_ROOT_DIR}/src/syscapabilities.cpp
+	)
+source_group(Misc FILES ${GHOUL_SOURCE_MISC})
     
 set(GHOUL_SOURCE
-    ${GHOUL_SOURCE_LOG}
-    ${GHOUL_SOURCE_OPENGL}
-    ${GHOUL_SOURCE_FILESYSTEM}
     ${GHOUL_SOURCE_CRC32}
-    ${GHOUL_SOURCE_OTHER}
+    ${GHOUL_SOURCE_FILESYSTEM}
+    ${GHOUL_SOURCE_LOG}
+    ${GHOUL_SOURCE_MISC}
+    ${GHOUL_SOURCE_OPENGL}
     )
 
 ######
@@ -83,17 +84,17 @@ set(GHOUL_HEADER_CRC32
     ${GHOUL_ROOT_DIR}/include/ghoul/crc32.h)
 source_group(CRC32 FILES ${GHOUL_HEADER_CRC32})    
     
-set(GHOUL_HEADER_OTHER
+set(GHOUL_HEADER_MISC
 	${GHOUL_ROOT_DIR}/include/ghoul/glm.h
     ${GHOUL_ROOT_DIR}/include/ghoul/syscapabilities.h)
-source_group(Other FILES ${GHOUL_HEADER_OTHER})    
+source_group(Misc FILES ${GHOUL_HEADER_MISC})    
     
 set(GHOUL_HEADER
-    ${GHOUL_HEADER_LOG}
-    ${GHOUL_HEADER_OPENGL}
-    ${GHOUL_HEADER_FILESYSTEM}
     ${GHOUL_HEADER_CRC32}
-    ${GHOUL_HEADER_OTHER}
+    ${GHOUL_HEADER_FILESYSTEM}
+    ${GHOUL_HEADER_LOG}
+    ${GHOUL_HEADER_MISC}
+    ${GHOUL_HEADER_OPENGL}
     )
 
 ######

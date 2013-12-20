@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 #ifndef __TEXTUREMANAGER_H__
 #define __TEXTUREMANAGER_H__
 
@@ -38,11 +37,11 @@ class Texture;
 /**
  * This singleton class provides a central and efficient storage for \see Texture objects.
  * The Textures stored in this class belong to the TextureManager and should be deleted 
- * using \see unregisterTexture or their ownership taken away from the TextureManager by 
- * using \see forgetTexture.
+ * using \see unregisterTexture or their ownership taken be away from the TextureManager 
+ * by using \see forgetTexture.
  * Textures can be registered (\see registerTexture), unregistered
  * (\see unregisterTexture), forgotten (\see forgetTexture), or retrieved (\see texture)
- * using either a string name, or a generated hash value that is more efficient to 
+ * using either a string name, or a generated hash value which is more efficient to
  * retrieve than a string.
  */
 class TextureManager {
@@ -69,14 +68,6 @@ public:
      */
     static TextureManager& ref();
 
-    /**
-     * This method will return the \see Texture that was registered with a string whose 
-     * hash value is equal to <code>hashedName</code>. The hashed name that can be used 
-     * will be returned from the \see registerTexture method.
-     * \param hashedName The hashed name of the texture that is to be fetched
-     * \return The \see Texture that has been registered with a string that evaluates to 
-     * the <code>hashedName</code>
-     */
     Texture* texture(unsigned int hashedName);
 
     /**
@@ -168,6 +159,7 @@ public:
 private:
     TextureManager();
     TextureManager(const TextureManager& c);
+    
     ~TextureManager();
 
     static TextureManager* _manager; ///< singleton member

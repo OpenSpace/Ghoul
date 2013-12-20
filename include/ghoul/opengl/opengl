@@ -1,4 +1,5 @@
 #include "programobject.h"
+#include "shadermanager.h"
 #include "shaderobject.h"
 #include "texture.h"
 #include "texturemanager.h"
