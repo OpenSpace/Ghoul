@@ -41,29 +41,30 @@
 
 namespace ghoul {
 
-unsigned int _crcLookup[8][256];
-bool _isInitialized = false;
+namespace {
+    unsigned int _crcLookup[8][256];
+    bool _isInitialized = false;
 
-void initializeLookupTable() {
-    assert(!_isInitialized);
-    for (unsigned int i = 0; i <= 0xFF; i++) {
-        unsigned int x = i;
-        for (unsigned int j = 0; j < 8; j++)
-            x = (x>>1) ^ (CRCPOLY & (-(int)(x & 1)));
-        _crcLookup[0][i] = x;
-    }
-
-    for (unsigned int i = 0; i <= 0xFF; i++) {
-        unsigned int c = _crcLookup[0][i];
-        for (unsigned int j = 1; j < 8; j++) {
-            c = _crcLookup[0][c & 0xFF] ^ (c >> 8);
-            _crcLookup[j][i] = c;
+    void initializeLookupTable() {
+        assert(!_isInitialized);
+        for (unsigned int i = 0; i <= 0xFF; i++) {
+            unsigned int x = i;
+            for (unsigned int j = 0; j < 8; j++)
+                x = (x>>1) ^ (CRCPOLY & (-(int)(x & 1)));
+            _crcLookup[0][i] = x;
         }
+        
+        for (unsigned int i = 0; i <= 0xFF; i++) {
+            unsigned int c = _crcLookup[0][i];
+            for (unsigned int j = 1; j < 8; j++) {
+                c = _crcLookup[0][c & 0xFF] ^ (c >> 8);
+                _crcLookup[j][i] = c;
+            }
+        }
+        
+        _isInitialized = true;
     }
-
-    _isInitialized = true;
 }
-
     // dword unsigned long
     // res unsigned int
 

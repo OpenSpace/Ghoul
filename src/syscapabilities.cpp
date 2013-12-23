@@ -733,7 +733,12 @@ int SystemCapabilities::maximumNumberOfTextureUnits() const {
 /// OpenGLVersion
 /////////////////////////////
 
-unsigned int packVersion(unsigned char major, unsigned minor, unsigned release) {
+unsigned int packVersion(unsigned char major, unsigned char minor, unsigned char release);
+
+unsigned int packVersion(unsigned char major,
+                         unsigned char minor,
+                         unsigned char release)
+{
     // safe since: 2^8 * 1000 * 1000 < 2^32
     return
         major * 1000 * 1000 +

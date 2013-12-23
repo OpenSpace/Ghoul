@@ -190,8 +190,8 @@ public:
 
     /**
      * Overrides the type of the texture that was automatically determined.
-     * \param [in] The new type for the texture. This value can either be GL_TEXTURE_1D,
-     * GL_TEXTURE_2D or GL_TEXTURE_3D.
+     * \param [in] type The new type for the texture. This value can either be
+     * GL_TEXTURE_1D, GL_TEXTURE_2D or GL_TEXTURE_3D.
      */
     void setType(GLenum type);
 
@@ -246,7 +246,7 @@ public:
      * </code> to apply changes. See <url>
      * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml</url> for more
      * information and possible parameter values.
-     * \param [in] The new internal format. See
+     * \param [in] internalFormat The new internal format. See
      * <url>http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml</url> Tables 1, 2, 
      * and 3 for possible values.
      */
@@ -374,7 +374,7 @@ public:
      * function on another type will lead to undefined behavior in the return value.
      * \tparam T The type of the data that is returned. The size of T must be equal to the
      * bytes per pixel stored in the Texture or an assertion will be triggered.
-     * \param i The position of the texel that should be fetched. This value must be with
+     * \param x The position of the texel that should be fetched. This value must be with
      * in the width of the Texture or an assertion will be triggered.
      * \return The texel at the specified position casted to the requested type T.
      */
@@ -388,9 +388,9 @@ public:
      * GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT. Trying to
      * use this function on another type will lead to undefined behavior in the return 
      * value.
-     * \param T The type of the data that is returned. The size of T must be equal to the 
+     * \tparam T The type of the data that is returned. The size of T must be equal to the
      * bytes per pixel stored in the Texture or an assertion will be triggered.
-     * \param i The position of the texel that should be fetched. This value must be with 
+     * \param x The position of the texel that should be fetched. This value must be with 
      * in the width of the Texture or an assertion will be triggered.
      * \return The texel at the specified position casted to the requested type T.
      */
@@ -422,7 +422,7 @@ public:
      * GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT. Trying to
      * use this function on another type will lead to undefined behavior in the return 
      * value.
-     * \param T The type of the data that is returned. The size of T must be equal to the
+     * \tparam T The type of the data that is returned. The size of T must be equal to the
      * bytes per pixel stored in the Texture or an assertion will be triggered.
      * \param x The coordinate on the <code>width</code> axis. The value must be smaller
      * than the width of the Texture or an assertion will be triggered.
@@ -441,7 +441,7 @@ public:
      * GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT. Trying to
      * use this function on another type will lead to undefined behavior in the return 
      * value.
-     * \param T The type of the data that is returned. The size of T must be equal to the 
+     * \tparam T The type of the data that is returned. The size of T must be equal to the
      * bytes per pixel stored in the Texture or an assertion will be triggered.
      * \param position The coordinate of the texel. <code>position.x</code> must be 
      * smaller than the width of the Texture, while <code>position.y</code> must be 
@@ -458,7 +458,7 @@ public:
      * GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT. Trying to 
      * use this function on another type will lead to undefined behavior in the return 
      * value.
-     * \param T The type of the data that is returned. The size of T must be equal to the 
+     * \tparam T The type of the data that is returned. The size of T must be equal to the
      * bytes per pixel stored in the Texture or an assertion will be triggered.
      * \param position The coordinate of the texel. <code>position.x</code> must be 
      * smaller than the width of the Texture, while <code>position.y</code> must be
@@ -475,7 +475,7 @@ public:
      * following list can be used to fetch textures: GL_UNSIGNED_BYTE, GL_BYTE, 
      * GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT. Trying to use this
      * function on another type will lead to undefined behavior in the return value.
-     * \param T The type of the data that is returned. The size of T must be equal to the
+     * \tparam T The type of the data that is returned. The size of T must be equal to the
      * bytes per pixel stored in the Texture or an assertion will be triggered.
      * \param x The coordinate on the <code>width</code> axis. The value must be smaller 
      * than the width of the Texture or an assertion will be triggered.
@@ -495,7 +495,7 @@ public:
      * GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT. Trying to
      * use this function on another type will lead to undefined behavior in the return 
      * value.
-     * \param T The type of the data that is returned. The size of T must be equal to the
+     * \tparam T The type of the data that is returned. The size of T must be equal to the
      * bytes per pixel stored in the Texture or an assertion will be triggered.
      * \param x The coordinate on the <code>width</code> axis. The value must be smaller 
      * than the width of the Texture or an assertion will be triggered.
@@ -516,7 +516,7 @@ public:
      * GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT. Trying to
      * use this function on another type will lead to undefined behavior in the return 
      * value.
-     * \param T The type of the data that is returned. The size of T must be equal to the
+     * \tparam T The type of the data that is returned. The size of T must be equal to the
      * bytes per pixel stored in the Texture or an assertion will be triggered.
      * \param position The coordinate of the texel. <code>position.x</code> must be 
      * smaller than the width of the Texture, while <code>position.y</code> must be 
@@ -533,7 +533,7 @@ public:
      * GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT. Trying to
      * use this function on another type will lead to undefined behavior in the return 
      * value.
-     * \param T The type of the data that is returned. The size of T must be equal to the 
+     * \tparam T The type of the data that is returned. The size of T must be equal to the
      * bytes per pixel stored in the Texture or an assertion will be triggered.
      * \param position The coordinate of the texel. <code>position.x</code> must be 
      * smaller than the width of the Texture, while <code>position.y</code> must be 
@@ -553,7 +553,7 @@ public:
      * value.
      * \param x The coordinate on the <code>width</code> axis. The value must be smaller 
      * than the width of the Texture or an assertion will be triggered.
-     * \return The texel at the specified position as a vector with each component \in 
+     * \return The texel at the specified position as a vector with each component in
      * [0,1].
      */
     glm::vec4 texelAsFloat(size_t x) const;
@@ -570,7 +570,7 @@ public:
      * than the width of the Texture or an assertion will be triggered.
      * \param y The coordinate on the <code>height</code> axis. The value must be smaller
      * than the height of the Texture or an assertion will be triggered.
-     * \return The texel at the specified position as a vector with each component \in 
+     * \return The texel at the specified position as a vector with each component in
      * [0,1].
      */
     glm::vec4 texelAsFloat(size_t x, size_t y) const;
@@ -583,10 +583,10 @@ public:
      * GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT. Trying to
      * use this function on another type will lead to undefined behavior in the return 
      * value.
-     * \param position The coordinate of the texel. <code>position.x</code> must be 
+     * \param pos The coordinate of the texel. <code>position.x</code> must be
      * smaller than the width of the Texture, while <code>position.y</code> must be 
      * smaller than the height.
-     * \return The texel at the specified position as a vector with each component \in [0,1].
+     * \return The texel at the specified position as a vector with each component in [0,1].
      */
     glm::vec4 texelAsFloat(const glm::size2_t& pos) const;
 
@@ -604,7 +604,7 @@ public:
      * than the height of the Texture or an assertion will be triggered.
      * \param z The coordinate on the <code>depth</code> axis. The value must be smaller 
      * than the depth of the Texture or an assertion will be triggered.
-     * \return The texel at the specified position as a vector with each component \in 
+     * \return The texel at the specified position as a vector with each component in
      * [0,1].
      */
     glm::vec4 texelAsFloat(size_t x, size_t y, size_t z) const;
@@ -617,10 +617,10 @@ public:
      * GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT. Trying to
      * use this function on another type will lead to undefined behavior in the return 
      * value.
-     * \param position The coordinate of the texel. <code>position.x</code> must be 
+     * \param pos The coordinate of the texel. <code>position.x</code> must be 
      * smaller than the width of the Texture, while <code>position.y</code> must be 
      * smaller than the height and <code>position.z</code> must be smaller than the depth.
-     * \return The texel at the specified position as a vector with each component \in
+     * \return The texel at the specified position as a vector with each component in
      * [0,1].
      */
     glm::vec4 texelAsFloat(const glm::size3_t& pos) const;

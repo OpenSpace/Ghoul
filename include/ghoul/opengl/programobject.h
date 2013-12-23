@@ -1586,8 +1586,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::mat2x2& value, bool transpose = false);
 
@@ -1599,8 +1597,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::mat2x3& value, bool transpose = false);
 
@@ -1612,8 +1608,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::mat2x4& value, bool transpose = false);
 
@@ -1625,8 +1619,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::mat3x2& value, bool transpose = false);
 
@@ -1638,8 +1630,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located,
-     * <code>false</code> otherwise
      */
     void setUniform(GLint location, const glm::mat3x3& value, bool transpose = false);
 
@@ -1651,8 +1641,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::mat3x4& value, bool transpose = false);
 
@@ -1664,8 +1652,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::mat4x2& value, bool transpose = false);
 
@@ -1677,8 +1663,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::mat4x3& value, bool transpose = false);
 
@@ -1690,8 +1674,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::mat4x4& value, bool transpose = false);
 
@@ -1703,8 +1685,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::dmat2x2& value, bool transpose = false);
 
@@ -1716,8 +1696,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::dmat2x3& value, bool transpose = false);
 
@@ -1729,8 +1707,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::dmat2x4& value, bool transpose = false);
 
@@ -1742,8 +1718,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::dmat3x2& value, bool transpose = false);
 
@@ -1755,8 +1729,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::dmat3x3& value, bool transpose = false);
 
@@ -1768,8 +1740,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::dmat3x4& value, bool transpose = false);
 
@@ -1781,8 +1751,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::dmat4x2& value, bool transpose = false);
 
@@ -1794,8 +1762,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::dmat4x3& value, bool transpose = false);
 
@@ -1807,8 +1773,6 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the initial uniform was successfully located, <code>
-     * false</code> otherwise
      */
     void setUniform(GLint location, const glm::dmat4x4& value, bool transpose = false);
 
@@ -2486,8 +2450,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttribI1i</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, bool value);
 
@@ -2498,8 +2460,6 @@ public:
      * \param location The location of the vertex attribute
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, bool v1, bool v2);
 
@@ -2511,8 +2471,6 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, bool v1, bool v2, bool v3);
 
@@ -2525,8 +2483,6 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, bool v1, bool v2, bool v3, bool v4);
 
@@ -2535,8 +2491,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttribI2iv</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::bvec2& value);
 
@@ -2545,8 +2499,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttribI3iv</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::bvec3& value);
 
@@ -2555,8 +2507,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttribI4iv</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::bvec4& value);
 
@@ -2565,8 +2515,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttribI1i</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, GLint value);
 
@@ -2577,8 +2525,6 @@ public:
      * \param location The location of the vertex attribute
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, GLint v1, GLint v2);
 
@@ -2590,8 +2536,6 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, GLint v1, GLint v2, GLint v3);
 
@@ -2604,8 +2548,6 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, GLint v1, GLint v2, GLint v3, GLint v4);
 
@@ -2614,8 +2556,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttribI2iv</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::ivec2& value);
 
@@ -2624,8 +2564,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttribI3iv</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::ivec3& value);
 
@@ -2634,8 +2572,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttribI4iv</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::ivec4& value);
 
@@ -2644,8 +2580,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttrib1f</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, GLfloat value);
 
@@ -2656,8 +2590,6 @@ public:
      * \param location The location of the vertex attribute
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, GLfloat v1, GLfloat v2);
 
@@ -2669,8 +2601,6 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, GLfloat v1, GLfloat v2, GLfloat v3);
 
@@ -2683,8 +2613,6 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4);
 
@@ -2693,8 +2621,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttrib2fv</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::vec2& value);
 
@@ -2703,8 +2629,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttrib3fv</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::vec3& value);
 
@@ -2713,7 +2637,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttrib4fv</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      */
     void setAttribute(GLint location, const glm::vec4& value);
@@ -2723,8 +2646,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttribL1d</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, GLdouble value);
 
@@ -2735,8 +2656,6 @@ public:
      * \param location The location of the vertex attribute
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, GLdouble v1, GLdouble v2);
 
@@ -2748,8 +2667,6 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, GLdouble v1, GLdouble v2, GLdouble v3);
 
@@ -2762,8 +2679,6 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4);
 
@@ -2772,8 +2687,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttribL2dv</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::dvec2& value);
 
@@ -2783,8 +2696,6 @@ public:
      * </code> otherwise. Will call the OpenGL function <code>glVertexAttribL3dv</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::dvec3& value);
 
@@ -2793,8 +2704,6 @@ public:
      * </code>. Will call the OpenGL function <code>glVertexAttribL4dv</code>.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::dvec4& value);
 
@@ -2806,8 +2715,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::mat2x2& value, bool transpose = false);
 
@@ -2819,8 +2726,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::mat2x3& value, bool transpose = false);
 
@@ -2832,8 +2737,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::mat2x4& value, bool transpose = false);
 
@@ -2845,8 +2748,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::mat3x2& value, bool transpose = false);
 
@@ -2858,8 +2759,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::mat3x3& value, bool transpose = false);
 
@@ -2871,8 +2770,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::mat3x4& value, bool transpose = false);
 
@@ -2884,8 +2781,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::mat4x2& value, bool transpose = false);
 
@@ -2897,8 +2792,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::mat4x3& value, bool transpose = false);
 
@@ -2910,8 +2803,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::mat4x4& value, bool transpose = false);
 
@@ -2922,8 +2813,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::dmat2x2& value, bool transpose = false);
 
@@ -2935,8 +2824,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::dmat2x3& value, bool transpose = false);
 
@@ -2948,8 +2835,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::dmat2x4& value, bool transpose = false);
 
@@ -2961,8 +2846,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::dmat3x2& value, bool transpose = false);
 
@@ -2974,8 +2857,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::dmat3x3& value, bool transpose = false);
 
@@ -2987,8 +2868,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::dmat3x4& value, bool transpose = false);
 
@@ -3000,8 +2879,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::dmat4x2& value, bool transpose = false);
 
@@ -3013,8 +2890,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::dmat4x3& value, bool transpose = false);
 
@@ -3026,8 +2901,6 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
-     * \return <code>true</code> if the attribute was successfully set, <code>false</code>
-     * otherwise
      */
     void setAttribute(GLint location, const glm::dmat4x4& value, bool transpose = false);
 

@@ -23,9 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 #include <ghoul/filesystem/directory.h>
-
 #include <ghoul/filesystem/filesystem.h>
 
 #include <algorithm>
@@ -57,7 +55,7 @@ namespace {
 }
 
 Directory::Directory() 
-    : _directoryPath(".")
+    : _directoryPath(FileSys.absolutePath("."))
 {}
 
 Directory::Directory(const char* path, bool isRawPath) {
@@ -83,15 +81,12 @@ const std::string& Directory::path() const {
     return _directoryPath;
 }
 
-Directory Directory::parentDirectory() const {
-    if (_directoryPath.back() == pathSeparator) {
-        string::size_type separator = _directoryPath.rfind(pathSeparator, _directoryPath.back());
-        return Directory(_directoryPath.substr(0, separator));
-    }
-    else {
-        string::size_type separator = _directoryPath.rfind(pathSeparator);
-        return Directory(_directoryPath.substr(0, separator));
-    }
+Directory Directory::parentDirectory(bool absolutePath) const {
+    if (_directoryPath.back() == pathSeparator)
+        return Directory(_directoryPath + "..", !absolutePath);
+    else
+        return Directory(_directoryPath + pathSeparator + "..",
+                         !absolutePath);
 }
 
 vector<string> Directory::read(bool recursiveSearch, bool sort) const {

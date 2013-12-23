@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 #include <ghoul/filesystem/file.h>
 
 #include <ghoul/filesystem/filesystem.h>
@@ -40,16 +39,24 @@ namespace {
 #ifdef _WIN32
     const char pathSeparator = '\\';
     const unsigned int changeBufferSize = 16384u;
+#elif __APPLE__
+    const char pathSeparator = '/';
+    // the maximum latency allowed before a changed is registered
+    const CFAbsoluteTime latency = 3.0;
 #else
     const char pathSeparator = '/';
 #endif
 }
 
-
-File::File(const char* filename, bool isRawPath, const std::function<void ()>& fileChangedCallback)
+    
+File::File(const char* filename, bool isRawPath, const FileChangedCallback& fileChangedCallback)
     : _fileChangedCallback(fileChangedCallback)
 #ifdef _WIN32
+    , _directoryHandle(nullptr)
     , _activeBuffer(0)
+#elif __APPLE__
+    , _eventStream(nullptr)
+    , _lastModifiedTime(0)
 #endif
 {
     if (isRawPath)
@@ -57,14 +64,18 @@ File::File(const char* filename, bool isRawPath, const std::function<void ()>& f
     else
         _filename = FileSys.absolutePath(string(filename));
 
-    //if (_fileChangedCallback)
+    if (_fileChangedCallback)
         installFileChangeListener();
 }
 
-File::File(const string& filename, bool isRawPath, const function<void ()>& fileChangedCallback)
+File::File(const string& filename, bool isRawPath, const FileChangedCallback& fileChangedCallback)
     : _fileChangedCallback(fileChangedCallback)
 #ifdef _WIN32
+    , _directoryHandle(nullptr)
     , _activeBuffer(0)
+#elif __APPLE__
+    , _eventStream(nullptr)
+    , _lastModifiedTime(0)
 #endif
 {
     if (isRawPath)
@@ -72,12 +83,15 @@ File::File(const string& filename, bool isRawPath, const function<void ()>& file
     else
         _filename = FileSys.absolutePath(filename);
 
-    if (_fileChangedCallback) {
+    if (_fileChangedCallback)
         installFileChangeListener();
-    }
+}
+    
+File::~File() {
+    removeFileChangeListener();
 }
 
-void File::setCallback(const function<void ()> callback) {
+void File::setCallback(const FileChangedCallback& callback) {
     if (_fileChangedCallback)
         removeFileChangeListener();
     _fileChangedCallback = callback;
@@ -85,11 +99,15 @@ void File::setCallback(const function<void ()> callback) {
         installFileChangeListener();
 }
 
-const function<void ()>& File::callback() const {
+const File::FileChangedCallback& File::callback() const {
     return _fileChangedCallback;
 }
 
 File::operator const string&() const {
+    return _filename;
+}
+
+const std::string& File::path() const {
     return _filename;
 }
 
@@ -133,11 +151,11 @@ string File::fileExtension() const {
     else
         return _filename;
 }
-
+    
 void File::installFileChangeListener() {
-#ifdef _WIN32
+    removeFileChangeListener();
     const string& directory = directoryName();
-
+#ifdef _WIN32
     // Create a handle to the directory that is non-blocking
     _directoryHandle = CreateFile(
         directory.c_str(),
@@ -154,28 +172,66 @@ void File::installFileChangeListener() {
     }
 
     beginRead();
-#else
+#elif __APPLE__
+    // Get the current last-modified time
+    struct stat fileinfo;
+    stat(_filename.c_str(), &fileinfo);
+    _lastModifiedTime = fileinfo.st_mtimespec.tv_sec;
+    
+    // Create the FSEventStream responsible for this directory (Apple's callback system
+    // only works on the granularity of the directory)
+    CFStringRef path = CFStringCreateWithCString(NULL,
+                                                 directory.c_str(),
+                                                 kCFStringEncodingASCII);
+    CFArrayRef pathsToWatch = CFArrayCreate(NULL, (const void **)&path, 1, NULL);
+    FSEventStreamContext callbackInfo;
+    callbackInfo.version = 0;
+    callbackInfo.info = this;
+    callbackInfo.release = NULL;
+    callbackInfo.retain = NULL;
+    callbackInfo.copyDescription = NULL;
+    
+    _eventStream = FSEventStreamCreate(
+                    NULL,
+                    &completionHandler,
+                    &callbackInfo,
+                    pathsToWatch,
+                    kFSEventStreamEventIdSinceNow,
+                    latency,
+                    kFSEventStreamEventFlagItemModified);
 
+    // Add checking the event stream to the current run loop
+    // If there is a performance bottleneck, this could be done on a separate thread?
+    FSEventStreamScheduleWithRunLoop(_eventStream,
+                                     CFRunLoopGetCurrent(),
+                                     kCFRunLoopDefaultMode);
+    // Start monitoring
+    FSEventStreamStart(_eventStream);
 #endif
 }
 
 void File::removeFileChangeListener() {
 #ifdef _WIN32
-    CancelIo(_directoryHandle);
-    CloseHandle(_directoryHandle);
-    _directoryHandle = nullptr;
-#else
-
+    if (_direcoryHandle != nullptr) {
+        CancelIo(_directoryHandle);
+        CloseHandle(_directoryHandle);
+        _directoryHandle = nullptr;
+    }
+#elif __APPLE__
+    FSEventStreamStop(_eventStream);
+    FSEventStreamInvalidate(_eventStream);
+    FSEventStreamRelease(_eventStream);
+    _eventStream = nullptr;
 #endif
 }
 
 #ifdef _WIN32
-void CALLBACK File::completionHandler(DWORD dwErrorCode, DWORD /*dwNumberOfBytesTransferred*/, LPOVERLAPPED lpOverlapped) {
+void CALLBACK File::completionHandler(DWORD dwErrorCode, DWORD, LPOVERLAPPED lpOverlapped) {
     File* file = static_cast<File*>(lpOverlapped->hEvent);
 
     unsigned char currentBuffer = file->_activeBuffer;
 
-    // Change active buffer
+    // Change active buffer (ping-pong buffering)
     file->_activeBuffer = (file->_activeBuffer + 1) % 2;
     // Restart change listener as soon as possible
     file->beginRead();
@@ -183,7 +239,9 @@ void CALLBACK File::completionHandler(DWORD dwErrorCode, DWORD /*dwNumberOfBytes
     const string thisFilename = file->filename();
 
     char* buffer = (char*)(&(file->_changeBuffer[currentBuffer][0]));
+    // data might have queued up, so we need to check all changes
     while (true) {
+        // extract the information which file has changed
         FILE_NOTIFY_INFORMATION& information = (FILE_NOTIFY_INFORMATION&)*buffer;
         char* currentFilenameBuffer = new char[information.FileNameLength];
         std::wcstombs(currentFilenameBuffer, information.FileName, information.FileNameLength);
@@ -191,13 +249,16 @@ void CALLBACK File::completionHandler(DWORD dwErrorCode, DWORD /*dwNumberOfBytes
         delete[] currentFilenameBuffer;
 
         if (currentFilename == thisFilename) {
-            file->_fileChangedCallback();
+            // if it is the file we are interested in, call the callback
+            file->_fileChangedCallback(*this);
             break;
         }
         else {
             if (!information.NextEntryOffset)
+                // we are done with all entries and didn't find our file
                 break;
             else
+                //continue with the next entry
                 buffer += information.NextEntryOffset;
         }
     }
@@ -220,7 +281,32 @@ void File::beginRead() {
         &_overlappedBuffer,
         &completionHandler);
 }
+    
+#elif __APPLE__
 
+void File::completionHandler(
+                             ConstFSEventStreamRef,
+                             void *clientCallBackInfo,
+                             size_t numEvents,
+                             void *eventPaths,
+                             const FSEventStreamEventFlags*,
+                             const FSEventStreamEventId*)
+{
+    File* fileObj = reinterpret_cast<File*>(clientCallBackInfo);
+    char** paths = reinterpret_cast<char**>(eventPaths);
+    for (size_t i=0; i<numEvents; i++) {
+        const string path = string(paths[i]);
+        const string directory = fileObj->directoryName() + '/';
+        if (path == directory) {
+            struct stat fileinfo;
+            stat(fileObj->_filename.c_str(), &fileinfo);
+            if (fileinfo.st_mtimespec.tv_sec != fileObj->_lastModifiedTime) {
+                fileObj->_lastModifiedTime = fileinfo.st_atimespec.tv_sec;
+                fileObj->_fileChangedCallback(*fileObj);
+            }
+        }
+    }
+}
 #endif
 
 } // namespace filesystem

@@ -82,7 +82,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, const std::string& filename,
         LERROR_SAFE("glCreateShader returned 0");
 #ifdef GL_VERSION_4_3
     if (glObjectLabel)
-        glObjectLabel(GL_SHADER, _id, _shaderName.length() + 1, _shaderName.c_str());
+        glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1), _shaderName.c_str());
 #endif
     setShaderFilename(_fileName);
 }
@@ -99,7 +99,7 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
         LERROR_SAFE("glCreateShader returned 0");
 #ifdef GL_VERSION_4_3
     if (glObjectLabel)
-        glObjectLabel(GL_SHADER, _id, _shaderName.length() + 1, _shaderName.c_str());
+        glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1), _shaderName.c_str());
 #endif
     setShaderFilename(_fileName);
 }
@@ -126,7 +126,7 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
             LERROR_SAFE("glCreateShader returned 0");
 #ifdef GL_VERSION_4_3
         if (glObjectLabel)
-            glObjectLabel(GL_SHADER, _id, _shaderName.length() + 1, _shaderName.c_str());
+            glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1), _shaderName.c_str());
 #endif
         setShaderFilename(_fileName);
     }
@@ -138,7 +138,7 @@ void ShaderObject::setName(const std::string& name) {
     _loggerCat = "ShaderObject['" + name + "']";
 #ifdef GL_VERSION_4_3
     if (glObjectLabel)
-        glObjectLabel(GL_SHADER, _id, _shaderName.length() + 1, _shaderName.c_str());
+        glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1), _shaderName.c_str());
 #endif
 }
 
@@ -187,7 +187,7 @@ bool ShaderObject::setShaderFilename(const std::string& filename) {
     }
     shaderFile.close();
 
-    glShaderSource(_id, shaderSource.size(), &shaderSource[0], NULL);
+    glShaderSource(_id, GLsizei(shaderSource.size()), &shaderSource[0], NULL);
 
     for (size_t i = 0; i < shaderSource.size(); ++i)
         delete[] shaderSource[i];

@@ -324,17 +324,17 @@ void Texture::uploadTexture() {
     switch (_type) {
         case GL_TEXTURE_1D:
             glTexImage1D(_type, 0, _internalFormat,
-                         _dimensions.x, 0, GLint(_format), _dataType, _pixels);
+                         GLsizei(_dimensions.x), 0, GLint(_format), _dataType, _pixels);
             break;
         case GL_TEXTURE_2D:
             glTexImage2D(_type, 0, _internalFormat,
-                         _dimensions.x, _dimensions.y, 0, GLint(_format), _dataType,
-                         _pixels);
+                         GLsizei(_dimensions.x), GLsizei(_dimensions.y), 0, GLint(_format),
+                         _dataType, _pixels);
             break;
         case GL_TEXTURE_3D:
             glTexImage3D(_type, 0, _internalFormat,
-                         _dimensions.x, _dimensions.y, _dimensions.z,
-                        0, GLint(_format), _dataType, _pixels);
+                         GLsizei(_dimensions.x), GLsizei(_dimensions.y),
+                         GLsizei(_dimensions.z), 0, GLint(_format), _dataType, _pixels);
             break;
         default:
             assert(false);
