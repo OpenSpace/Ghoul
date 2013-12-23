@@ -27,7 +27,7 @@
 #include <ghoul/opengl/shaderobject.h>
 #include <ghoul/logging/logmanager.h>
 
-#include <ghoul/crc32.h>
+#include <ghoul/misc/crc32.h>
 #include <cassert>
 
 namespace {

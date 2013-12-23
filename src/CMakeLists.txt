@@ -29,12 +29,9 @@ set(GHOUL_SOURCE_FILESYSTEM
     )
 source_group(FileSystem FILES ${GHOUL_SOURCE_FILESYSTEM})
     
-set(GHOUL_SOURCE_CRC32
-    ${GHOUL_ROOT_DIR}/src/crc32.cpp)
-source_group(CRC32 FILES ${GHOUL_SOURCE_CRC32})    
-
 set(GHOUL_SOURCE_MISC
-    ${GHOUL_ROOT_DIR}/src/syscapabilities.cpp
+    ${GHOUL_ROOT_DIR}/src/misc/crc32.cpp
+    ${GHOUL_ROOT_DIR}/src/misc/syscapabilities.cpp
 	)
 source_group(Misc FILES ${GHOUL_SOURCE_MISC})
     
@@ -80,13 +77,10 @@ set(GHOUL_HEADER_FILESYSTEM
     )
 source_group(FileSystem FILES ${GHOUL_HEADER_FILESYSTEM})
     
-set(GHOUL_HEADER_CRC32
-    ${GHOUL_ROOT_DIR}/include/ghoul/crc32.h)
-source_group(CRC32 FILES ${GHOUL_HEADER_CRC32})    
-    
 set(GHOUL_HEADER_MISC
 	${GHOUL_ROOT_DIR}/include/ghoul/glm.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/syscapabilities.h)
+    ${GHOUL_ROOT_DIR}/include/ghoul/misc/crc32.h
+    ${GHOUL_ROOT_DIR}/include/ghoul/misc/syscapabilities.h)
 source_group(Misc FILES ${GHOUL_HEADER_MISC})    
     
 set(GHOUL_HEADER

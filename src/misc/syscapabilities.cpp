@@ -24,7 +24,7 @@
  ****************************************************************************************/
 
 
-#include "syscapabilities.h"
+#include "misc/syscapabilities.h"
 
 #include <ghoul/opengl/ghoul_gl.h>
 #include <algorithm>
