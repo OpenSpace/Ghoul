@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 #include <ghoul/filesystem/filesystem.h>
 
 #include <ghoul/logging/logmanager.h>
@@ -31,10 +30,13 @@
 #include <algorithm>
 #include <cassert>
 #include <regex>
+#include <stdio.h>
 
 #ifdef _WIN32
+#include <direct.h>
 #include <windows.h>
 #else
+#include <dirent.h>
 #include <unistd.h>
 #include <sys/param.h>
 #endif
@@ -62,6 +64,7 @@ FileSystem* FileSystem::_fileSystem = nullptr;
 FileSystem::FileSystem() {}
 
 void FileSystem::initialize() {
+    assert(_fileSystem == nullptr);
     if (_fileSystem == nullptr)
         _fileSystem = new FileSystem;
 }
@@ -76,12 +79,7 @@ FileSystem& FileSystem::ref() {
     return *_fileSystem;
 }
 
-bool FileSystem::isInitialized() {
-    return _fileSystem != nullptr;
-}
-
 string FileSystem::absolutePath(const string& path) const {
-
     string result = path;
     expandPathTokens(result);
 
@@ -107,7 +105,9 @@ string FileSystem::absolutePath(const string& path) const {
     return result;
 }
 
-string FileSystem::relativePath(const string& path, const Directory& baseDirectory) const {
+string FileSystem::relativePath(const string& path,
+                                const Directory& baseDirectory) const
+{
     if (path.empty()) {
         LERROR_SAFE("'path' must contain a path");
         return path;
@@ -142,84 +142,7 @@ string FileSystem::relativePath(const string& path, const Directory& baseDirecto
     }
     return relativePath;
 }
-
-bool FileSystem::hasTokens(const string& path) const {
-    const bool hasOpeningBrace = path.find(_tokenOpeningBraces) != string::npos;
-    const bool hasClosingBrace = path.find(_tokenClosingBraces) != string::npos;
-    return hasOpeningBrace && hasClosingBrace;
-}
-
-void FileSystem::registerPathToken(const string& token, const string& path) {
-#ifdef GHL_DEBUG
-    if (token.empty()) {
-        LERROR_SAFE("Token cannot not be empty");
-        return;
-    }
-
-    const std::string beginning = token.substr(0, _tokenOpeningBraces.size());
-    const std::string ending = token.substr(token.size() - _tokenClosingBraces.size());
-    if ((beginning != _tokenOpeningBraces) || (ending != _tokenClosingBraces)) {
-        LERROR_SAFE("Token has to start with '" + _tokenOpeningBraces + "' and end with '" +
-            _tokenClosingBraces + "'");
-        return;
-    }
-
-
-    if (_fileSystem->_tokenMap.find(token) != _fileSystem->_tokenMap.end()) {
-        LERROR_SAFE("Token already bound to path '" + _fileSystem->_tokenMap[token] + "'");
-        return;
-    }
-#endif
-    _fileSystem->_tokenMap[token] = path;
-}
-
-bool FileSystem::expandPathTokens(std::string& path) const {
-    while (hasTokens(path)) {
-        string::size_type beginning = path.find(_tokenOpeningBraces);
-        string::size_type closing = path.find(_tokenClosingBraces);
-        string::size_type closingLocation = closing + _tokenClosingBraces.size();
-        const std::string currentToken = path.substr(beginning, closingLocation);
-        const std::string& replacement = resolveToken(currentToken);
-        if (replacement == currentToken) {
-            // replacement == currentToken will be true if the respective token could not be found
-            // resolveToken will print an error in that case
-            return false;
-        }
-        path.replace(beginning, closing + _tokenClosingBraces.size() - beginning, replacement);
-    }
-    return true;
-}
-
-const std::string FileSystem::resolveToken(const std::string& token) const {
-    const std::map<std::string, std::string>::const_iterator it = _tokenMap.find(token);
-    if (it == _tokenMap.end()) {
-        LERROR_SAFE("Token '" + token + "' could not be resolved");
-        return token;
-    }
-    else
-        return it->second;
-}
-
-bool FileSystem::hasToken(const std::string& path, const std::string& token) const {
-    if (!hasTokens(path))
-        return false;
-    else {
-        string::size_type beginning = path.find(_tokenOpeningBraces);
-        string::size_type closing = path.find(_tokenClosingBraces);
-        while ((beginning != string::npos) && (closing != string::npos)) {
-            string::size_type closingLocation = closing + _tokenClosingBraces.size();
-            const std::string currentToken = path.substr(beginning, closingLocation);
-            if (currentToken == token)
-                return true;
-            else {
-                beginning = path.find(_tokenOpeningBraces, closing);
-                closing = path.find(_tokenClosingBraces, beginning);
-            }
-        }
-        return false;
-    }
-}
-
+    
 Directory FileSystem::currentDirectory() const {
     string currentDir;
 #ifdef _WIN32
@@ -232,14 +155,14 @@ Directory FileSystem::currentDirectory() const {
         DWORD error = GetLastError();
         LPTSTR errorBuffer = nullptr;
         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_ALLOCATE_BUFFER |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
-            error,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer,
-            0,
-            NULL);
+                      FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                      FORMAT_MESSAGE_IGNORE_INSERTS,
+                      NULL,
+                      error,
+                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                      (LPTSTR)&errorBuffer,
+                      0,
+                      NULL);
         if (errorBuffer != nullptr) {
             string error(errorBuffer);
             LocalFree(errorBuffer);
@@ -261,7 +184,7 @@ Directory FileSystem::currentDirectory() const {
 #endif
     return Directory(currentDir);
 }
-
+    
 void FileSystem::setCurrentDirectory(const Directory& directory) const {
 #ifdef _WIN32
     const BOOL success = SetCurrentDirectory(directory.path().c_str());
@@ -291,74 +214,152 @@ void FileSystem::setCurrentDirectory(const Directory& directory) const {
 #endif
 }
 
-//string FileSystem::fileName(const string& path) const {
-//    size_t separatorPosition = path.rfind(pathSeparator);
-//    if (separatorPosition != string::npos)
-//        return path.substr(separatorPosition + 1);
-//    else
-//        return path;
-//}
-//
-//string FileSystem::baseName(const string& path) const {
-//    const string& name = fileName(path);
-//    return fullBaseName(name);
-//}
-//
-//string FileSystem::fullBaseName(const string& path) const {
-//    size_t dotPosition = path.rfind(".");
-//    if (dotPosition != string::npos)
-//        return path.substr(0, dotPosition);
-//    else
-//        return path;
-//}
-//
-//string FileSystem::directoryName(const string& path) const {
-//    size_t separatorPosition = path.rfind(pathSeparator);
-//    if (separatorPosition != string::npos)
-//        return path.substr(0, separatorPosition);
-//    else
-//        return path;
-//}
-//
-//string FileSystem::fileExtension(const string& path) const {
-//    size_t dotPosition = path.rfind(".");
-//    if (dotPosition != string::npos)
-//        return path.substr(dotPosition + 1);
-//    else
-//        return path;
-//}
+bool FileSystem::fileExists(const File& path) const {
+#ifdef _WIN32
+    
+#else
+    const string& filePath = path.path();
+    struct stat buffer;
+    const int statResult = stat(filePath.c_str(), &buffer);
+    if (statResult != 0)
+        return false;
+    const int isFile = S_ISREG(buffer.st_mode);
+    return (isFile != 0);
+#endif
+}
 
-string FileSystem::cleanupPath(string path) const {
+bool FileSystem::directoryExists(const Directory& path) const {
+#ifdef _WIN32
+    
+#else
+    const string& dirPath = path.path();
+    struct stat buffer;
+    const int statResult = stat(dirPath.c_str(), &buffer);
+    if (statResult != 0)
+        return false;
+    const int isDir = S_ISDIR(buffer.st_mode);
+    return (isDir != 0);
+#endif
+}
+    
+bool FileSystem::deleteFile(const File& path) const {
+    const bool isFile = fileExists(path);
+    if (isFile) {
+        const int removeResult = remove(path.path().c_str());
+        return removeResult == 0;
+    }
+    else
+        return false;
+}
+    
+bool FileSystem::deleteDirectory(const Directory& path) const {
+    const bool isDir = directoryExists(path);
+    if (!isDir)
+        return false;
+#ifdef _WIN32
+    const int rmDirResult = _rmdir(path.path());
+    return rmDirResult != -1;
+#else
+    const string& dirPath = path;
+    DIR* directory = opendir(dirPath.c_str());
+    bool success = false;
+    
+    if (directory) {
+        struct dirent* p;
+        
+        success = true;
+        
+        while (success) {
+            p = readdir(directory);
+            if (p == nullptr)
+                break;
+            
+            const string name = string(p->d_name);
+            if (name == "." || name == "..")
+                continue;
+
+            struct stat statbuf;
+            const string fullName = dirPath + "/" + name;
+            const int statResult = stat(fullName.c_str(), &statbuf);
+            if (statResult == 0) {
+                if (S_ISDIR(statbuf.st_mode))
+                    success &= deleteDirectory(fullName);
+                else {
+                    const int removeSuccess = remove(fullName.c_str());
+                    success &= (removeSuccess == 0);
+                }
+            }
+        }
+        closedir(directory);
+    }
+    
+    if (success) {
+        const int rmdirSuccess = rmdir(dirPath.c_str());
+        success = (rmdirSuccess == 0);
+    }
+    
+    return success;
+#endif
+}
+
+void FileSystem::registerPathToken(const string& token, const string& path) {
+#ifdef GHL_DEBUG
+    if (token.empty()) {
+        LERROR_SAFE("Token cannot not be empty");
+        return;
+    }
+    
+    const std::string beginning = token.substr(0, _tokenOpeningBraces.size());
+    const std::string ending = token.substr(token.size() - _tokenClosingBraces.size());
+    if ((beginning != _tokenOpeningBraces) || (ending != _tokenClosingBraces)) {
+        LERROR_SAFE("Token has to start with '" + _tokenOpeningBraces +
+                    "' and end with '" + _tokenClosingBraces + "'");
+        return;
+    }
+    
+    
+    if (_fileSystem->_tokenMap.find(token) != _fileSystem->_tokenMap.end()) {
+        LERROR_SAFE("Token already bound to path '" +
+                    _fileSystem->_tokenMap[token] + "'");
+        return;
+    }
+#endif
+    _fileSystem->_tokenMap[token] = path;
+}
+    
+string FileSystem::cleanupPath(const string& path) const {
+    string localPath = path;
 #ifdef _WIN32
     // In Windows, replace all '/' by '\\' for conformity
-    std::replace(path.begin(), path.end(), '/', '\\');
-    const std::string& drivePart = path.substr(0,3);
+    std::replace(localPath.begin(), localPath.end(), '/', '\\');
+    const std::string& drivePart = localPath.substr(0,3);
     const std::regex& driveRegex = std::regex("([[:lower:]][\\:][\\\\])");
-    const bool hasCorrectSize = path.size() >= 3;
+    const bool hasCorrectSize = localPath.size() >= 3;
     if (hasCorrectSize && std::regex_match(drivePart, driveRegex))
-        std::transform(path.begin(), path.begin() + 1, path.begin(), toupper);
+        std::transform(localPath.begin(), localPath.begin() + 1,
+                       localPath.begin(), toupper);
 #endif
-
+    
     // Remove all double separators
     size_t position = 0;
     while (position != string::npos) {
-        position = path.find(pathSeparator + pathSeparator);
+        position = localPath.find(pathSeparator + pathSeparator);
         if (position != string::npos)
-            path = path.substr(0, position) + path.substr(position + 1);
+            localPath = localPath.substr(0, position) + localPath.substr(position + 1);
     }
-
+    
     // Remove trailing separator
-    if (path[path.size() - 1] == pathSeparator)
-        path = path.substr(0, path.size() - 1);
-
-    return path;
+    if (localPath[localPath.size() - 1] == pathSeparator)
+        localPath = localPath.substr(0, localPath.size() - 1);
+    
+    return localPath;
 }
-
+    
 size_t FileSystem::commonBasePathPosition(const string& p1, const string& p2) const {
-    // 'currentPosition' stores the position until which the two paths are the same, 'nextPosition'
-    // is a look-ahead. If the look-ahead is equal as well, 'currentPosition' is replaced by this.
-    // At the end of the loop 'currentPosition' contains the last position until which both paths
-    // are the same
+    // 'currentPosition' stores the position until which the two paths are the same,
+    // 'nextPosition' is a look-ahead. If the look-ahead is equal as well,
+    // 'currentPosition' is replaced by this. At the end of the loop 'currentPosition'
+    // contains the last position until which both paths are the same
     size_t currentPosition = 0;
     size_t nextPosition = p1.find(pathSeparator);
     while (nextPosition != string::npos) {
@@ -374,6 +375,59 @@ size_t FileSystem::commonBasePathPosition(const string& p1, const string& p2) co
     if (result == 0)
         currentPosition = p1.length();
     return currentPosition;
+}
+    
+bool FileSystem::hasTokens(const string& path) const {
+    const bool hasOpeningBrace = path.find(_tokenOpeningBraces) != string::npos;
+    const bool hasClosingBrace = path.find(_tokenClosingBraces) != string::npos;
+    return hasOpeningBrace && hasClosingBrace;
+}
+
+bool FileSystem::expandPathTokens(std::string& path) const {
+    while (hasTokens(path)) {
+        string::size_type beginning = path.find(_tokenOpeningBraces);
+        string::size_type closing = path.find(_tokenClosingBraces);
+        string::size_type closingLocation = closing + _tokenClosingBraces.size();
+        const std::string currentToken = path.substr(beginning, closingLocation);
+        const std::string& replacement = resolveToken(currentToken);
+        if (replacement == currentToken) {
+            // replacement == currentToken will be true if the respective token could not be found
+            // resolveToken will print an error in that case
+            return false;
+        }
+        path.replace(beginning, closing + _tokenClosingBraces.size() - beginning, replacement);
+    }
+    return true;
+}
+
+bool FileSystem::hasToken(const std::string& path, const std::string& token) const {
+    if (!hasTokens(path))
+        return false;
+    else {
+        string::size_type beginning = path.find(_tokenOpeningBraces);
+        string::size_type closing = path.find(_tokenClosingBraces);
+        while ((beginning != string::npos) && (closing != string::npos)) {
+            string::size_type closingLocation = closing + _tokenClosingBraces.size();
+            const std::string currentToken = path.substr(beginning, closingLocation);
+            if (currentToken == token)
+                return true;
+            else {
+                beginning = path.find(_tokenOpeningBraces, closing);
+                closing = path.find(_tokenClosingBraces, beginning);
+            }
+        }
+        return false;
+    }
+}
+    
+const std::string FileSystem::resolveToken(const std::string& token) const {
+    const std::map<std::string, std::string>::const_iterator it = _tokenMap.find(token);
+    if (it == _tokenMap.end()) {
+        LERROR_SAFE("Token '" + token + "' could not be resolved");
+        return token;
+    }
+    else
+        return it->second;
 }
 
 } // namespace filesystem

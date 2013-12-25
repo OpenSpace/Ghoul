@@ -218,10 +218,12 @@ void File::removeFileChangeListener() {
         _directoryHandle = nullptr;
     }
 #elif __APPLE__
-    FSEventStreamStop(_eventStream);
-    FSEventStreamInvalidate(_eventStream);
-    FSEventStreamRelease(_eventStream);
-    _eventStream = nullptr;
+    if (_eventStream != nullptr) {
+        FSEventStreamStop(_eventStream);
+        FSEventStreamInvalidate(_eventStream);
+        FSEventStreamRelease(_eventStream);
+        _eventStream = nullptr;
+    }
 #endif
 }
 

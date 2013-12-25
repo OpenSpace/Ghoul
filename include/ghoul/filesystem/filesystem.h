@@ -32,58 +32,201 @@
 #include <vector>
 
 #include <ghoul/filesystem/directory.h>
+#include <ghoul/filesystem/file.h>
 
 namespace ghoul {
 namespace filesystem {
 
-class File;
-
+/**
+ * The methods in this class are used to access platform-independent information about the
+ * underlying filesystem. It is possible to convert relative paths into absolute paths
+ * (\see absolutePath) and vice versa (\see relativePath). The current working directory
+ * can be accessed and changed (\see currentDirectory , \see changeDirectory , \see
+ * setCurrentDirectory). All methods that require a \see Directory or \see File parameter
+ * can use an <code>std::string</code> or <code>char*</code> directly as this will be
+ * converted into a lightweight \see Directory or \see File object. The main functionality
+ * of the FileSystem is to deal with path tokens. These are tokens of the form <code>
+ * ${...}</code> which are like variables, pointing to a specific location. These tokens
+ * are resolved in various methods (for example \see absolutePath) and thus be used to
+ * dynamically set, for example, asset paths with only one point of specification. These
+ * tokens can only be bound once, as some of the tokens might already have been resolved
+ * and changing the tokens later might lead to inconsistencies. For the same reason, it is
+ * not possible to unregister tokens.
+ */
 class FileSystem {
 public:
+    /**
+     * Initializes the singleton object. This method triggers an assert if the FileSystem
+     * already has been initialized before without being deinitialized in between (\see
+     * initialize).
+     */
     static void initialize();
+    
+    /**
+     * Deinitializes the Filesystem and removes all registered path tokens. As some tokens
+     * might already have been resolved in some paths, deleting the tokens might lead to
+     * inconsistencies. This function will trigger an assert if the Filesystem has not
+     * been initialized (\see initialize) before.
+     */
     static void deinitialize();
+    
+    /**
+     * Returns a reference to the static FileSystem. This method will trigger an assert if
+     * the FileSystem has not been initialized before.
+     * \return A reference to the static FileSystem.
+     */
     static FileSystem& ref();
-    static bool isInitialized();
-
+    
+    /**
+     * Returns the absolute path to the passed <code>path</code>, resolvinging any tokens
+     * (if present) in the process. The current working directory (\see currentDirectory)
+     * is used as a base path for this.
+     * \param path The path that should be converted into an absolute path
+     * \return The absolute path to the passed <code>path</code>
+     */
     std::string absolutePath(const std::string& path) const;
-    std::string relativePath(const std::string& path, const Directory& baseDirectory = Directory()) const;
+    
+    /**
+     * Returns the relative path of the passed <code>path</code> relative to the passed
+     * <code>baseDirectory</code>. All path tokens present in the <code>path</code> are
+     * automatically resolved. The <code>baseDirectory</code> can be resolved if the \see
+     * Directory object has been created that way. If, on Windows, the <code>path</code>
+     * and the <code>baseDirectory</code> are on different drives, no relative path can be
+     * constructed and the unchanged path is returned.
+     * \param path The path that should be converted into a relative path
+     * \param baseDirectory The base directory the path is relative to
+     * \return The relative path leading from the <code>baseDirectory</code> to the <code>
+     * path</code>
+     */
+    std::string relativePath(const std::string& path,
+                             const Directory& baseDirectory = Directory()) const;
 
-    //std::string fileName(const std::string& path) const;
-    //std::string baseName(const std::string& path) const;
-    //std::string fullBaseName(const std::string& path) const;
-    //std::string directoryName(const std::string& path) const;
-    //std::string parentDirectory(const std::string& directory) const;
-    //std::string fileExtension(const std::string& path) const;
+    /**
+     * Returns the current working directory of this process
+     * \return The current working directory of this process
+     */
     Directory currentDirectory() const;
-    bool changeDirectory(const Directory& directory) const;
+    
+    /**
+     * Changes the current working directory of this process. Please note that this will
+     * have an effect on all relative paths which are used henceforth.
+     * \param directory The path that will be used as the new working directory
+     */
     void setCurrentDirectory(const Directory& directory) const;
 
+    /**
+     * Checks if the file at the <code>path</code> exists or not. This method will return
+     * <code>false</code> if <code>path</code> points to a directory.
+     * \param path The path that should be tested for existence
+     * \return <code>true</code> if <code>path</code> points to an existing file, <code>
+     * false</code> otherwise
+     */
     bool fileExists(const File& path) const;
+    
+    /**
+     * Checks if the directory at the <code>path</code> exists or not. This method will
+     * return <code>false</code> if <code>path</code> points to a file.
+     * \param path The path that should be tested for existence
+     * \return <code>true</code> if <code>path</code> points to an existing directory,
+     * <code>false</code> otherwise
+     */
+    bool directoryExists(const Directory& path) const;
+    
+    /**
+     * Deletes the file pointed to by <code>path</code>. The method will return <code>true
+     * </code> if the file was deleted successfully, <code>false</code> otherwise.
+     * \param path The file that should be deleted
+     * \return <code>true</code> if the file was deleted successfully, <code>false</code>
+     * otherwise
+     */
     bool deleteFile(const File& path) const;
 
+    /**
+     * Deletes the directory pointed to by <code>path</code>. The method will return
+     * <code>true</code> if the file was deleted successfully, <code>false</code>
+     * otherwise.
+     * \param path The file that should be deleted
+     * \return <code>true</code> if the file was deleted successfully, <code>false</code>
+     * otherwise
+     */
+    bool deleteDirectory(const Directory& path) const;
+    
+    /**
+     * Registers the path token <code>token</code> with this FileSystem. Henceforth, every
+     * call to, for example, \see absolutePath , the constructors of \see File , or \see
+     * Directory, will replace the <code>token</code> with<code>path</code>. The tokens
+     * cannot be removed or replaced afterwards, as this might lead to inconsistencies
+     * since some files might have replaced the tokens while others have not.
+     * \param token The token in the form "${...}"
+     * \param path The path the token should point to
+     */
     void registerPathToken(const std::string& token, const std::string& path);
-    //static void unregisterPathToken(const std::string& token);
 
-    //File& open(const std::string& filename, bool listenForFileChange);
-    //bool exists(const std::string& filename);
-
-//private:
-    std::string cleanupPath(std::string path) const;
+private:
+    /**
+     * This method cleans up a passed path by removing any double path separators and
+     * replacing all separators into the ones used by the local operating system. It also
+     * removes any trailing separators at the end of the path.
+     * \param path The path that should be cleaned up
+     * \return The cleaned path with correct separators
+     */
+    std::string cleanupPath(const std::string& path) const;
+    
+    /**
+     * This method returns the position until both paths <code>p1</code> and <code>p2
+     * </code> are equal. After the returned position, the paths are diverging.
+     * \param p1 The one path that is used for the comparison
+     * \param p2 The other path that is used for the comparison
+     * \return The position until the paths <code>p1</code> and <code>p2</code> are equal
+     */
     size_t commonBasePathPosition(const std::string& p1, const std::string& p2) const;
 
-
+    /**
+     * Returns <code>true</code> if the <code>path</code> contains any tokens
+     * \param path The path that is checked for tokens
+     * \return <code>true</code> if the <code>path</code> contains any tokens
+     */
     bool hasTokens(const std::string& path) const;
+    
+    /**
+     * Replaces the path tokens present in the <code>path</code> if any exist. If all 
+     * tokens could be replaced, the method returns <code>true</code>; if <code>false
+     * </code> is returned, one or more tokens could not be replaced. In this case, only
+     * part of the path is modified.
+     * \param path The path whose tokens should be replaced
+     * \return <code>true</code> if all tokens were replaced successfully, <code>false
+     * </code> otherwise
+     */
     bool expandPathTokens(std::string& path) const;
-    std::vector<std::string> unresolvedTokens(const std::string& path) const;
+    
+    /**
+     * Returns true, if the <code>path</code> contains the token <code>token</code>
+     * \param path The path that is checked for the existence of the <code>token</code>
+     * \param token The token that is checked for existance in the <code>path</code>
+     * \return <code>true</code> if the <code>token</code> exists in the <code>path</code>
+     */
     bool hasToken(const std::string& path, const std::string& token) const;
+    
+    /**
+     * Returns the path that was registered for the <code>token</code>. If the token has
+     * not been registered with any replacement path, the token itself is returned.
+     * \param token The token whose replacement is looked up
+     * \return The replacement string for the token
+     */
     const std::string resolveToken(const std::string& token) const;
 
+    /// Empty constructor. In here as there should not be any local FileSystems around,
+    /// but the static one
     FileSystem();
 
-    FileSystem(const FileSystem& rhs); // don't implement
-    FileSystem& operator=(const FileSystem& rhs); // don't implement
-
+    // these methods are not implemented on purpose; using them should produce an error
+    FileSystem(const FileSystem& rhs);
+    FileSystem& operator=(const FileSystem& rhs);
+    
+    /// This map stores all the tokens that are used in the FileSystem
     std::map<std::string, std::string> _tokenMap;
+    /// This member variable stores the static FileSystem. Has to be initialized and
+    /// deinitialized using the \see initialize and \see deinitialize methods
     static FileSystem* _fileSystem;
 };
 
