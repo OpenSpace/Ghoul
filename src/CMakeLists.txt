@@ -30,6 +30,7 @@ set(GHOUL_SOURCE_FILESYSTEM
 source_group(FileSystem FILES ${GHOUL_SOURCE_FILESYSTEM})
     
 set(GHOUL_SOURCE_MISC
+    ${GHOUL_ROOT_DIR}/src/misc/bufferlog.cpp
     ${GHOUL_ROOT_DIR}/src/misc/crc32.cpp
     ${GHOUL_ROOT_DIR}/src/misc/syscapabilities.cpp
 	)
@@ -79,6 +80,7 @@ source_group(FileSystem FILES ${GHOUL_HEADER_FILESYSTEM})
     
 set(GHOUL_HEADER_MISC
 	${GHOUL_ROOT_DIR}/include/ghoul/glm.h
+    ${GHOUL_ROOT_DIR}/include/ghoul/misc/bufferlog.h
     ${GHOUL_ROOT_DIR}/include/ghoul/misc/crc32.h
     ${GHOUL_ROOT_DIR}/include/ghoul/misc/syscapabilities.h)
 source_group(Misc FILES ${GHOUL_HEADER_MISC})    
