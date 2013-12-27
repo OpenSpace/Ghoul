@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 #ifndef __SHADEROBJECT_H__
 #define __SHADEROBJECT_H__
 

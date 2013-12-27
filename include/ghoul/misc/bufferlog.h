@@ -31,7 +31,6 @@
 
 namespace ghoul {
     
-    
 /**
  * The BufferLog stores timestamped messages into a, provided, custom buffer of memory. It
  * automatically reserves a part of the block for use as a header in which the verson, 

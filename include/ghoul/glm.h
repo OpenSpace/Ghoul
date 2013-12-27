@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 #ifndef __GLM_H__
 #define __GLM_H__
 

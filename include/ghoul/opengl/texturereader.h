@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 #ifndef __TEXTUREREADER_H__
 #define __TEXTUREREADER_H__
 

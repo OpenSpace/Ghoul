@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 #include <ghoul/opengl/texturereader.h>
+
 #include <ghoul/opengl/texture.h>
 #include <ghoul/logging/logmanager.h>
 #include "glm/glm.hpp"

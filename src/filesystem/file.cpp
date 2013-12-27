@@ -49,7 +49,8 @@ namespace {
 }
 
     
-File::File(const char* filename, bool isRawPath, const FileChangedCallback& fileChangedCallback)
+File::File(const char* filename, bool isRawPath,
+           const FileChangedCallback& fileChangedCallback)
     : _fileChangedCallback(fileChangedCallback)
 #ifdef _WIN32
     , _directoryHandle(nullptr)
@@ -68,7 +69,8 @@ File::File(const char* filename, bool isRawPath, const FileChangedCallback& file
         installFileChangeListener();
 }
 
-File::File(const string& filename, bool isRawPath, const FileChangedCallback& fileChangedCallback)
+File::File(const string& filename, bool isRawPath,
+           const FileChangedCallback& fileChangedCallback)
     : _fileChangedCallback(fileChangedCallback)
 #ifdef _WIN32
     , _directoryHandle(nullptr)
@@ -167,7 +169,7 @@ void File::installFileChangeListener() {
         NULL);
 
     if (_directoryHandle == INVALID_HANDLE_VALUE) {
-        LERROR_SAFE("Directory handle for file '" << _filename << "' could not be obtained");
+        LERROR_SAFE("Directory handle for '" << _filename << "' could not be obtained");
         return;
     }
 
@@ -228,7 +230,9 @@ void File::removeFileChangeListener() {
 }
 
 #ifdef _WIN32
-void CALLBACK File::completionHandler(DWORD dwErrorCode, DWORD, LPOVERLAPPED lpOverlapped) {
+void CALLBACK File::completionHandler(DWORD dwErrorCode, DWORD,
+                                      LPOVERLAPPED lpOverlapped)
+{
     File* file = static_cast<File*>(lpOverlapped->hEvent);
 
     unsigned char currentBuffer = file->_activeBuffer;
@@ -246,7 +250,8 @@ void CALLBACK File::completionHandler(DWORD dwErrorCode, DWORD, LPOVERLAPPED lpO
         // extract the information which file has changed
         FILE_NOTIFY_INFORMATION& information = (FILE_NOTIFY_INFORMATION&)*buffer;
         char* currentFilenameBuffer = new char[information.FileNameLength];
-        std::wcstombs(currentFilenameBuffer, information.FileName, information.FileNameLength);
+        std::wcstombs(currentFilenameBuffer,
+                      information.FileName, information.FileNameLength);
         const string& currentFilename(currentFilenameBuffer);
         delete[] currentFilenameBuffer;
 

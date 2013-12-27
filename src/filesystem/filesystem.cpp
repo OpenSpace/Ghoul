@@ -391,8 +391,8 @@ bool FileSystem::expandPathTokens(std::string& path) const {
         const std::string currentToken = path.substr(beginning, closingLocation);
         const std::string& replacement = resolveToken(currentToken);
         if (replacement == currentToken) {
-            // replacement == currentToken will be true if the respective token could not be found
-            // resolveToken will print an error in that case
+            // replacement == currentToken will be true if the respective token could not
+            // be found;  resolveToken will print an error in that case
             return false;
         }
         path.replace(beginning, closing + _tokenClosingBraces.size() - beginning, replacement);

@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 #include <ghoul/opengl/texture.h>
 
 using glm::detail::int8;

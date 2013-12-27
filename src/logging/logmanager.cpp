@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 #include "logging/logmanager.h"
 #include "logging/log.h"
 #include <cassert>
@@ -54,7 +53,8 @@ LogManager* LogManager::_manager = nullptr;
 template <LogManager::LogLevel LEVEL, bool IMMEDIATEFLUSH>
 class LogManager_P : public LogManager {
 public:
-    void logMessage(LogLevel level, const std::string& category, const std::string& message);
+    void logMessage(LogLevel level, const std::string& category,
+                    const std::string& message);
 };
 
 template<LogManager::LogLevel LEVEL, bool IMMEDIATEFLUSH>

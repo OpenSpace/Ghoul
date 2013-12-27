@@ -24,6 +24,7 @@
  ****************************************************************************************/
 
 #include <ghoul/opengl/shadermanager.h>
+
 #include <ghoul/opengl/shaderobject.h>
 #include <ghoul/logging/logmanager.h>
 
@@ -35,100 +36,100 @@ namespace {
 }
 
 namespace ghoul {
-    namespace opengl {
+namespace opengl {
         
-        ShaderManager* ShaderManager::_manager = nullptr;
-        
-        ShaderManager::ShaderManager() {}
-        ShaderManager::ShaderManager(const ShaderManager&){}
-        
-        ShaderManager::~ShaderManager() {
-            std::map<unsigned int, ShaderObject*>::iterator it = _objects.begin();
-            for (; it != _objects.end(); ++it)
-                delete it->second;
-            _objects.clear();
-        }
-        
-        void ShaderManager::initialize() {
-            if (_manager == nullptr)
-                _manager = new ShaderManager;
-            assert(_manager != nullptr);
-        }
-        
-        void ShaderManager::deinitialize() {
-            delete _manager;
-            _manager = nullptr;
-        }
-        
-        ShaderManager& ShaderManager::ref() {
-            if (_manager == nullptr)
-                ShaderManager::initialize();
-            return *_manager;
-        }
-        
-        ShaderObject* ShaderManager::shaderObject(unsigned int hashedName) {
-            std::map<unsigned int, ShaderObject*>::iterator it = _objects.find(hashedName);
-            if (it == _objects.end())
-                return nullptr;
-            else
-                return it->second;
-        }
-        
-        ShaderObject* ShaderManager::shaderObject(const std::string& name) {
-            const unsigned int hash = hashCRC32(name);
-            return shaderObject(hash);
-        }
-        
-        bool ShaderManager::registerShaderObject(const std::string& name, ShaderObject* shader) {
-            unsigned int hashedName = 0;
-            return registerShaderObject(name, shader, hashedName);
-        }
-        
-        bool ShaderManager::registerShaderObject(const std::string& name,
-                                                 ShaderObject* shader, unsigned int& hashedName)
-        {
-            hashedName = hashCRC32(name);
-            std::map<unsigned int, ShaderObject*>::iterator it = _objects.find(hashedName);
-            if (it == _objects.end()) {
-                _objects[hashedName] = shader;
-                return true;
-            }
-            else {
-                if (_objects[hashedName] == shader)
-                    LWARNING_SAFE("Name '" + name + "' is already registered in ShaderManager.");
-                else
-                    LWARNING_SAFE("Name '" + name +
-                                  "' is already registered for a different ShaderObject in ShaderManager");
-                return false;
-            }
-        }
-        
-        void ShaderManager::unregisterShaderObject(const std::string& name) {
-            const unsigned int hashedName = hashCRC32(name);
-            unregisterShaderObject(hashedName);
-        }
-        
-        void ShaderManager::unregisterShaderObject(unsigned int hashedName) {
-            std::map<unsigned int, ShaderObject*>::iterator it = _objects.find(hashedName);
-            if (it != _objects.end())
-                delete (it->second);
-            _objects.erase(it);
-        }
-        
-        void ShaderManager::forgetShaderObject(const std::string& name) {
-            const unsigned int hashedName = hashCRC32(name);
-            forgetShaderObject(hashedName);
-        }
-        
-        void ShaderManager::forgetShaderObject(unsigned int hashedName) {
-            std::map<unsigned int, ShaderObject*>::iterator it = _objects.find(hashedName);
-            if (it != _objects.end())
-                _objects.erase(it);
-        }
-        
-        unsigned int ShaderManager::hashedNameForName(const std::string& name) const {
-            return hashCRC32(name);
-        }
-        
-    } // namespace opengl
+ShaderManager* ShaderManager::_manager = nullptr;
+    
+ShaderManager::ShaderManager() {}
+ShaderManager::ShaderManager(const ShaderManager&){}
+
+ShaderManager::~ShaderManager() {
+    std::map<unsigned int, ShaderObject*>::iterator it = _objects.begin();
+    for (; it != _objects.end(); ++it)
+        delete it->second;
+    _objects.clear();
+}
+
+void ShaderManager::initialize() {
+    if (_manager == nullptr)
+        _manager = new ShaderManager;
+    assert(_manager != nullptr);
+}
+
+void ShaderManager::deinitialize() {
+    delete _manager;
+    _manager = nullptr;
+}
+
+ShaderManager& ShaderManager::ref() {
+    if (_manager == nullptr)
+        ShaderManager::initialize();
+    return *_manager;
+}
+
+ShaderObject* ShaderManager::shaderObject(unsigned int hashedName) {
+    std::map<unsigned int, ShaderObject*>::iterator it = _objects.find(hashedName);
+    if (it == _objects.end())
+        return nullptr;
+    else
+        return it->second;
+}
+
+ShaderObject* ShaderManager::shaderObject(const std::string& name) {
+    const unsigned int hash = hashCRC32(name);
+    return shaderObject(hash);
+}
+
+bool ShaderManager::registerShaderObject(const std::string& name, ShaderObject* shader) {
+    unsigned int hashedName = 0;
+    return registerShaderObject(name, shader, hashedName);
+}
+
+bool ShaderManager::registerShaderObject(const std::string& name,
+                                         ShaderObject* shader, unsigned int& hashedName)
+{
+    hashedName = hashCRC32(name);
+    std::map<unsigned int, ShaderObject*>::iterator it = _objects.find(hashedName);
+    if (it == _objects.end()) {
+        _objects[hashedName] = shader;
+        return true;
+    }
+    else {
+        if (_objects[hashedName] == shader)
+            LWARNING_SAFE("Name '" + name + "' is already registered.");
+        else
+            LWARNING_SAFE("Name '" + name +
+                          "' is already registered for a different ShaderObject");
+        return false;
+    }
+}
+
+void ShaderManager::unregisterShaderObject(const std::string& name) {
+    const unsigned int hashedName = hashCRC32(name);
+    unregisterShaderObject(hashedName);
+}
+
+void ShaderManager::unregisterShaderObject(unsigned int hashedName) {
+    std::map<unsigned int, ShaderObject*>::iterator it = _objects.find(hashedName);
+    if (it != _objects.end())
+        delete (it->second);
+    _objects.erase(it);
+}
+
+void ShaderManager::forgetShaderObject(const std::string& name) {
+    const unsigned int hashedName = hashCRC32(name);
+    forgetShaderObject(hashedName);
+}
+
+void ShaderManager::forgetShaderObject(unsigned int hashedName) {
+    std::map<unsigned int, ShaderObject*>::iterator it = _objects.find(hashedName);
+    if (it != _objects.end())
+        _objects.erase(it);
+}
+
+unsigned int ShaderManager::hashedNameForName(const std::string& name) const {
+    return hashCRC32(name);
+}
+
+} // namespace opengl
 } // namespace ghoul

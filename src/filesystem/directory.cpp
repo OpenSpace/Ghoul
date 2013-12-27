@@ -24,6 +24,7 @@
  ****************************************************************************************/
 
 #include <ghoul/filesystem/directory.h>
+
 #include <ghoul/filesystem/filesystem.h>
 
 #include <algorithm>
@@ -59,7 +60,6 @@ Directory::Directory()
 {}
 
 Directory::Directory(const char* path, bool isRawPath) {
-    // Move into Directory(const string&, bool) as soon as delegating constructors are supported
     if (isRawPath)
         _directoryPath = string(path);
     else
@@ -108,7 +108,9 @@ vector<string> Directory::readFiles(bool recursiveSearch, bool sort) const {
     return result;
 }
 
-void Directory::readFiles(vector<string>& result, const string& path, bool recursiveSearch) const {
+void Directory::readFiles(vector<string>& result,
+                          const string& path, bool recursiveSearch) const
+{
     std::stack<string> directories;
 #ifdef WIN32
     WIN32_FIND_DATA findFileData = {0};
@@ -118,10 +120,10 @@ void Directory::readFiles(vector<string>& result, const string& path, bool recur
     if (findHandle != INVALID_HANDLE_VALUE) {
         do {
             string file(findFileData.cFileName);
-            const DWORD isDirectory = findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
-            if (!isDirectory)
+            const DWORD isDir = findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+            if (!isDir)
                 result.push_back(path + "/" + file);
-            if (recursiveSearch && isDirectory && file != "." && file != "..")
+            if (recursiveSearch && isDir && file != "." && file != "..")
                 directories.push(path + "/" + file);
         } while (FindNextFile(findHandle, &findFileData) != 0);
     }
@@ -173,8 +175,8 @@ void Directory::readDirectories(
     if (findHandle != INVALID_HANDLE_VALUE) {
         do {
             string file(findFileData.cFileName);
-            const DWORD isDirectory = findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
-            if (isDirectory && (file != ".") && (file != "..")) {
+            const DWORD isDir = findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+            if (isDir && (file != ".") && (file != "..")) {
                 result.push_back(path + "\\" + file);
                 if (recursiveSearch)
                     directories.push(path + "\\" + file);
@@ -207,6 +209,3 @@ void Directory::readDirectories(
 
 } // filesystem
 } // ghoul
-
-
-

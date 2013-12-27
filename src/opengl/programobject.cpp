@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 #include <ghoul/opengl/programobject.h>
 
 #include <ghoul/opengl/ghoul_gl.h>

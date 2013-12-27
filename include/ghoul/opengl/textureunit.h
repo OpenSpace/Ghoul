@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 #ifndef __TEXTUREUNIT_H__
 #define __TEXTUREUNIT_H__
 
@@ -153,6 +152,5 @@ private:
 
 } // namespace opengl
 } // namespace ghoul
-   
 
 #endif // __TEXTUREUNIT_H__

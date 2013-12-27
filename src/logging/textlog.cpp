@@ -23,8 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
-
 #include "logging/textlog.h"
 
 #include <cstdio>
@@ -37,7 +35,7 @@ TextLog::TextLog(const std::string& filename, bool writeToAppend, bool timeStamp
                  bool dateStamping, bool categoryStamping, bool logLevelStamping)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
     , _printFooter(writeToAppend)
-    , _file(0)
+    , _file(nullptr)
 {
     const char* writeMode;
     if (writeToAppend)
@@ -55,7 +53,7 @@ TextLog::TextLog(const std::string& filename, bool writeToAppend, bool timeStamp
 }
 
 TextLog::~TextLog() {
-    if (_file) {
+    if (_file != nullptr) {
         if (_printFooter)
             fputs("--------\n", _file);
         fclose(_file);
@@ -65,7 +63,7 @@ TextLog::~TextLog() {
 void TextLog::log(LogManager::LogLevel level, const std::string& category,
                   const std::string& message)
 {
-    if (_file) {
+    if (_file != nullptr) {
         std::string output;
         if (isDateStamping())
             output += "[" + getDateString();
@@ -85,17 +83,17 @@ void TextLog::log(LogManager::LogLevel level, const std::string& category,
 }
 
 void TextLog::flush() {
-    if (_file)
+    if (_file != nullptr)
         fflush(_file);
 }
 
 void TextLog::writeLine(const std::string& line) {
-    if (_file)
+    if (_file != nullptr)
         fputs(line.c_str(), _file);
 }
 
 bool TextLog::hasValidFile() const {
-    return (_file != 0);
+    return (_file != nullptr);
 }
 
 } // namespace logging

@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 #ifndef __PROGRAMOBJECT_H__
 #define __PROGRAMOBJECT_H__
 

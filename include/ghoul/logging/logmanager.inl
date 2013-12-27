@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Debug
 #define LDEBUGC(__category__, __message__) \
     do { \

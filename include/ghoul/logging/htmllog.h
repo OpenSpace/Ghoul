@@ -23,8 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
-
 #ifndef __HTMLLOG_H__
 #define __HTMLLOG_H__
 

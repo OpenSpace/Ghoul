@@ -35,7 +35,7 @@ namespace logging {
 
 #ifdef WIN32
 namespace {
-    WORD _originalConsoleColors; ///< storing the original colors to be able to reset them again
+    WORD _originalConsoleColors; ///< storing the original colors to be able to reset them
 }
 #endif
 

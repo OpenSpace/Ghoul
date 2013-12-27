@@ -23,8 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
-
 #ifndef __STREAMLOG_H__
 #define __STREAMLOG_H__
 

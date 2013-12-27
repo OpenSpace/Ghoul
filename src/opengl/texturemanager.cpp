@@ -24,6 +24,7 @@
  ****************************************************************************************/
 
 #include <ghoul/opengl/texturemanager.h>
+
 #include <ghoul/opengl/texture.h>
 #include <ghoul/logging/logmanager.h>
 

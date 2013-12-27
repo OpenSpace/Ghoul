@@ -23,8 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
-
 #include "logging/streamlog.h"
 
 namespace ghoul {

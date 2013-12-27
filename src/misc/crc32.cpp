@@ -30,6 +30,7 @@
  ****************************************************************************************/
 
 #include "misc/crc32.h"
+
 #include <cassert>
 
 #define CRCPOLY 0x82f63b78 // reversed 0x1EDC6F41

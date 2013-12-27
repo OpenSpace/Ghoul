@@ -23,8 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
-
 #ifndef __TEXTLOG_H__
 #define __TEXTLOG_H__
 
