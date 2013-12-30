@@ -130,7 +130,7 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
 #ifdef GL_VERSION_4_3
         if (glObjectLabel)
             glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1)
-                          _shaderName.c_str());
+                          , _shaderName.c_str());
 #endif
         setShaderFilename(_fileName);
     }
@@ -143,7 +143,7 @@ void ShaderObject::setName(const std::string& name) {
 #ifdef GL_VERSION_4_3
     if (glObjectLabel)
         glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1),
-                      _shaderName.c_str());
+_shaderName.c_str());
 #endif
 }
 

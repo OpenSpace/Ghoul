@@ -41,7 +41,8 @@ namespace ghoul {
  * there is enough memory left in the buffer. For memory exhaustion management, a custom
  * callback (\see MemoryExhausedCallback) can be specified (\see setCallback) that will
  * have to reset the buffer (\see resetBuffer) or a warning will be logged.
- * The buffer can be written to disk (\see writeToDisk), or access directly (\see buffer)
+ * The buffer can be written to disk (\see writeToDisk), or access directly (\see buffer).
+ * Most of the methods are thread-safe.
  */
 class BufferLog {
 public:
@@ -95,7 +96,9 @@ public:
      * Logs a <code>message</code> with a particular <code>timestamp</code>. The unit of
      * the timestamp is undefined and depends on the specific use case. The timestamp and
      * the message, which has to be <code>\0</code>-terminated, will be copied into the
-     * buffer
+     * buffer. This method will acqurire a lock before calling the callback function (if
+     * provided). Calling this function from the callback will result in an infinite loop.
+     * This method is thread-safe.
      * \param timestamp The timestamp of the message
      * \param message The <code>\0</code>-terminated ASCII string
      * \return <code>true</code> if the message was logged successfully, <code>false
@@ -133,7 +136,7 @@ public:
      * <code>buffer</code> contains at least as may bytes as <code>totalSize</code>. As
      * the BufferLog does not take ownership of the provided buffer, the old buffer might
      * become unavailable after this function call/ This has to be taken care of by the
-     * caller or a memory leak will occur.
+     * caller or a memory leak will occur. This method is thread-safe.
      * \param buffer The buffer that will be used by the BufferLog from now on
      * \param totalSize The size of the buffer that will be used by the BufferLog to store
      * messages. If the used size would exceed the <code>totalSize</code> the \see
@@ -144,7 +147,7 @@ public:
     /**
      * Resets the used buffer so that it can hold as many bytes as it did when the
      * BufferLog was first initialized. This method does not actually overwrite anything
-     * in the buffer, but marks the buffer as available avain
+     * in the buffer, but marks the buffer as available avain. This method is thread-safe.
      */
     void resetBuffer();
     
@@ -152,7 +155,8 @@ public:
      * This method writes the contents of the buffer to disk as a binary file. The full
      * buffer, including the header, will be written out. Only the parts of the buffer 
      * that have been used will be written to disk, as opposed to the whole buffer. This
-     * means that the file may contain less bytes than \see totalSize.
+     * means that the file may contain less bytes than \see totalSize. This method is
+     * thread-safe.
      * \param filename The path to the file which will hold the contents of the buffer.
      * Any existing file at that location will be overwritten in the process.
      */
@@ -179,6 +183,12 @@ protected:
      * reusable (\resetBuffer)
      */
     MemoryExhaustedCallback _callback;
+    
+    /** This variable is <code>true</code> if this BufferLog has had its callback trigged
+     * in the current callstack. It forces some methods to ignore the atomic_lock to
+     * ensure that no deadlock can happen
+     */
+    bool _inCallbackStack;
 };
     
 } // namespace ghoul
