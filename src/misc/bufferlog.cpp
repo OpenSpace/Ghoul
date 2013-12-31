@@ -105,6 +105,8 @@ BufferLog::BufferLog(void* address, const size_t totalSize)
     , _inCallbackStack(false)
 {
     initializeBuffer();
+    Header* h = header(_buffer);
+    h->mutex.clear();
 }
     
 BufferLog::BufferLog(void* address, const size_t totalSize,
@@ -115,6 +117,8 @@ BufferLog::BufferLog(void* address, const size_t totalSize,
     , _inCallbackStack(false)
 {
     initializeBuffer();
+    Header* h = header(_buffer);
+    h->mutex.clear();
 }
     
 void BufferLog::initializeBuffer() {
@@ -182,7 +186,12 @@ bool BufferLog::log(unsigned long long int timestamp, const char* message) {
     // Advance the empty pointer
     h->firstEmptyByte += sizeof(unsigned long long int);
     // Copy the message into the buffer, strcpy will copy the \0 terminator character, too
-    strcpy(reinterpret_cast<char*>(firstEmptyMemory(_buffer)), message);
+    char* destination = reinterpret_cast<char*>(firstEmptyMemory(_buffer));
+#ifdef WIN32
+    strcpy_s(destination, strlen(message) + 1, message);
+#else
+    strcpy(destination, message);
+#endif
     // Advance the empty pointer; +1 for the \0 terminator
     h->firstEmptyByte += strlen(message) + 1;
     h->mutex.clear();

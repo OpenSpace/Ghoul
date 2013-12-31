@@ -32,7 +32,7 @@
 #include <regex>
 #include <stdio.h>
 
-#ifdef _WIN32
+#ifdef WIN32
 #include <direct.h>
 #include <windows.h>
 #else
@@ -42,14 +42,13 @@
 #endif
 
 using std::string;
-#define GHL_DEBUG
 namespace {
     const string _loggerCat = "FileSystem";
 
     const string _tokenOpeningBraces = "${";
     const string _tokenClosingBraces = "}";
 
-#ifdef _WIN32
+#ifdef WIN32
     const char pathSeparator = '\\';
 #else
     const char pathSeparator = '/';
@@ -84,7 +83,7 @@ string FileSystem::absolutePath(const string& path) const {
     expandPathTokens(result);
 
     char* buffer = nullptr;
-#ifdef _WIN32
+#ifdef WIN32
     static const int PATH_BUFFER_SIZE = 4096;
     buffer = new char[PATH_BUFFER_SIZE];
     const DWORD success = GetFullPathName(result.c_str(), PATH_BUFFER_SIZE, buffer, 0);
@@ -145,7 +144,7 @@ string FileSystem::relativePath(const string& path,
     
 Directory FileSystem::currentDirectory() const {
     string currentDir;
-#ifdef _WIN32
+#ifdef WIN32
     // Get the size of the directory
     DWORD size = GetCurrentDirectory(0, NULL);
     char* buffer = new char[size];
@@ -186,7 +185,7 @@ Directory FileSystem::currentDirectory() const {
 }
     
 void FileSystem::setCurrentDirectory(const Directory& directory) const {
-#ifdef _WIN32
+#ifdef WIN32
     const BOOL success = SetCurrentDirectory(directory.path().c_str());
     if (success == 0) {
         // Log error
@@ -215,8 +214,31 @@ void FileSystem::setCurrentDirectory(const Directory& directory) const {
 }
 
 bool FileSystem::fileExists(const File& path) const {
-#ifdef _WIN32
-    
+#ifdef WIN32
+    const DWORD attributes = GetFileAttributes(path.path().c_str());
+    if (attributes == INVALID_FILE_ATTRIBUTES) {
+        const DWORD error = GetLastError();
+        if (error != ERROR_FILE_NOT_FOUND) {
+            LPTSTR errorBuffer = nullptr;
+            FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+                FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL,
+                error,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                (LPTSTR)&errorBuffer,
+                0,
+                NULL);
+            if (errorBuffer != nullptr) {
+                string error(errorBuffer);
+                LocalFree(errorBuffer);
+                LERROR_SAFE("Error retrieving file attributes: " << error);
+            }
+        }
+        return false;
+    }
+    else
+        return (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
 #else
     const string& filePath = path.path();
     struct stat buffer;
@@ -229,8 +251,31 @@ bool FileSystem::fileExists(const File& path) const {
 }
 
 bool FileSystem::directoryExists(const Directory& path) const {
-#ifdef _WIN32
-    
+#ifdef WIN32
+    const DWORD attributes = GetFileAttributes(path.path().c_str());
+    if (attributes == INVALID_FILE_ATTRIBUTES) {
+        const DWORD error = GetLastError();
+        if (error != ERROR_FILE_NOT_FOUND) {
+            LPTSTR errorBuffer = nullptr;
+            FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+                FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL,
+                error,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                (LPTSTR)&errorBuffer,
+                0,
+                NULL);
+            if (errorBuffer != nullptr) {
+                string error(errorBuffer);
+                LocalFree(errorBuffer);
+                LERROR_SAFE("Error retrieving file attributes: " << error);
+            }
+        }
+        return false;
+    }
+    else
+        return (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 #else
     const string& dirPath = path.path();
     struct stat buffer;
@@ -256,8 +301,8 @@ bool FileSystem::deleteDirectory(const Directory& path) const {
     const bool isDir = directoryExists(path);
     if (!isDir)
         return false;
-#ifdef _WIN32
-    const int rmDirResult = _rmdir(path.path());
+#ifdef WIN32
+    const int rmDirResult = _rmdir(path.path().c_str());
     return rmDirResult != -1;
 #else
     const string& dirPath = path;
@@ -329,7 +374,7 @@ void FileSystem::registerPathToken(const string& token, const string& path) {
     
 string FileSystem::cleanupPath(const string& path) const {
     string localPath = path;
-#ifdef _WIN32
+#ifdef WIN32
     // In Windows, replace all '/' by '\\' for conformity
     std::replace(localPath.begin(), localPath.end(), '/', '\\');
     const std::string& drivePart = localPath.substr(0,3);
@@ -343,7 +388,10 @@ string FileSystem::cleanupPath(const string& path) const {
     // Remove all double separators
     size_t position = 0;
     while (position != string::npos) {
-        position = localPath.find(pathSeparator + pathSeparator);
+        char dualSeparator[2];
+        dualSeparator[0] = pathSeparator;
+        dualSeparator[1] = pathSeparator;
+        position = localPath.find(dualSeparator);
         if (position != string::npos)
             localPath = localPath.substr(0, position) + localPath.substr(position + 1);
     }

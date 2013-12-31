@@ -72,6 +72,9 @@ public:
     void flush();
 
 protected:
+    // Not implemented on purpose; use should generate a linker error
+    StreamLog(const StreamLog& rhs);
+    StreamLog& operator=(const StreamLog& rhs);
     std::ostream& _stream; ///< The stream to which the log messages will be sent
 };
 

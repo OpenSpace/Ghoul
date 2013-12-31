@@ -36,9 +36,11 @@ namespace filesystem {
 
 namespace {
     const string _loggerCat = "File";
-#ifdef _WIN32
+#ifdef WIN32
     const char pathSeparator = '\\';
     const unsigned int changeBufferSize = 16384u;
+
+#define _CRT_SECURE_NO_WARNINGS
 #elif __APPLE__
     const char pathSeparator = '/';
     // the maximum latency allowed before a changed is registered
@@ -52,7 +54,7 @@ namespace {
 File::File(const char* filename, bool isRawPath,
            const FileChangedCallback& fileChangedCallback)
     : _fileChangedCallback(fileChangedCallback)
-#ifdef _WIN32
+#ifdef WIN32
     , _directoryHandle(nullptr)
     , _activeBuffer(0)
 #elif __APPLE__
@@ -72,7 +74,7 @@ File::File(const char* filename, bool isRawPath,
 File::File(const string& filename, bool isRawPath,
            const FileChangedCallback& fileChangedCallback)
     : _fileChangedCallback(fileChangedCallback)
-#ifdef _WIN32
+#ifdef WIN32
     , _directoryHandle(nullptr)
     , _activeBuffer(0)
 #elif __APPLE__
@@ -157,7 +159,7 @@ string File::fileExtension() const {
 void File::installFileChangeListener() {
     removeFileChangeListener();
     const string& directory = directoryName();
-#ifdef _WIN32
+#ifdef WIN32
     // Create a handle to the directory that is non-blocking
     _directoryHandle = CreateFile(
         directory.c_str(),
@@ -213,8 +215,8 @@ void File::installFileChangeListener() {
 }
 
 void File::removeFileChangeListener() {
-#ifdef _WIN32
-    if (_direcoryHandle != nullptr) {
+#ifdef WIN32
+    if (_directoryHandle != nullptr) {
         CancelIo(_directoryHandle);
         CloseHandle(_directoryHandle);
         _directoryHandle = nullptr;
@@ -229,8 +231,8 @@ void File::removeFileChangeListener() {
 #endif
 }
 
-#ifdef _WIN32
-void CALLBACK File::completionHandler(DWORD dwErrorCode, DWORD,
+#ifdef WIN32
+void CALLBACK File::completionHandler(DWORD /*dwErrorCode*/, DWORD,
                                       LPOVERLAPPED lpOverlapped)
 {
     File* file = static_cast<File*>(lpOverlapped->hEvent);
@@ -250,6 +252,7 @@ void CALLBACK File::completionHandler(DWORD dwErrorCode, DWORD,
         // extract the information which file has changed
         FILE_NOTIFY_INFORMATION& information = (FILE_NOTIFY_INFORMATION&)*buffer;
         char* currentFilenameBuffer = new char[information.FileNameLength];
+        // fix warning
         std::wcstombs(currentFilenameBuffer,
                       information.FileName, information.FileNameLength);
         const string& currentFilename(currentFilenameBuffer);
@@ -257,7 +260,7 @@ void CALLBACK File::completionHandler(DWORD dwErrorCode, DWORD,
 
         if (currentFilename == thisFilename) {
             // if it is the file we are interested in, call the callback
-            file->_fileChangedCallback(*this);
+            file->_fileChangedCallback(*file);
             break;
         }
         else {
@@ -287,6 +290,26 @@ void File::beginRead() {
         &returnedBytes,
         &_overlappedBuffer,
         &completionHandler);
+
+    if (success == 0) {
+        const DWORD error = GetLastError();
+        LPTSTR errorBuffer = nullptr;
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            error,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR)&errorBuffer,
+            0,
+            NULL);
+        if (errorBuffer != nullptr) {
+            std::string error(errorBuffer);
+            LocalFree(errorBuffer);
+        }
+        else
+            LERROR_SAFE("Error reading directory changes: " << error);
+    }
 }
     
 #elif __APPLE__

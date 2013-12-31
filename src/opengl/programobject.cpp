@@ -2772,9 +2772,9 @@ void ProgramObject::bindFragDataLocation(const std::string& name, GLuint colorNu
 #ifdef GHL_DEBUG
     GLint maxBuffers;
     glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxBuffers);
-    if (colorNumber >= maxBuffers) {
-        LWARNING_SAFE("ColorNumber '" + colorNumber +
-            "' is bigger than the maximum of simultaneous outputs '" + maxBuffers "'");
+    if (colorNumber >= static_cast<GLuint>(maxBuffers)) {
+        LWARNING_SAFE("ColorNumber '" << colorNumber <<
+            "' is bigger than the maximum of simultaneous outputs '" << maxBuffers << "'");
         return;
     }
 #endif

@@ -48,7 +48,7 @@ namespace ghoul {
 namespace filesystem {
 
 namespace {
-#ifdef _WIN32
+#ifdef WIN32
     const char pathSeparator = '\\';
 #else
     const char pathSeparator = '/';

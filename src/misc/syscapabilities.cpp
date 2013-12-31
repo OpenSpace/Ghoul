@@ -31,7 +31,7 @@
 #include <sstream>
 #include "logging/logmanager.h"
 
-#ifdef _WIN32
+#ifdef WIN32
     #include <Windows.h>
     #include <tchar.h>
     #pragma comment(lib, "User32.lib")
@@ -334,7 +334,7 @@ void SystemCapabilities::logCapabilities() const {
 
 
 void SystemCapabilities::detectOS() {
-#ifdef _WIN32
+#ifdef WIN32
     // This code is taken from
     // http://msdn.microsoft.com/en-us/library/windows/desktop/ms724429%28v=vs.85%29.aspx
     // All rights remain with their original copyright owners

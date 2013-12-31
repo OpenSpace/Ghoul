@@ -71,38 +71,38 @@ void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     WORD colorIndex = _originalConsoleColors;
     switch (level) {
-        case LogManager::LogLevelDebug:
+     case LogManager::LogLevel::Debug:
             colorIndex = 10;        // green
             break;
-        case LogManager::LogLevelInfo:
+        case LogManager::LogLevel::Info:
             colorIndex = _originalConsoleColors;        // default color scheme
             break;
-        case LogManager::LogLevelWarning:
+        case LogManager::LogLevel::Warning:
             colorIndex = 14;        // yellow on black
             break;
-        case LogManager::LogLevelError:
+        case LogManager::LogLevel::Error:
             colorIndex = 12;        // red
             break;
-        case LogManager::LogLevelFatal:
+        case LogManager::LogLevel::Fatal:
             colorIndex = 11;        // cyan
             break;
     }
     SetConsoleTextAttribute(hConsole, colorIndex);
 #elif __unix__
     switch (level) {
-        case LogManager::LogLevelDebug:
+        case LogManager::LogLevel::Debug:
             _stream << "\033[22;32m";   // green
             break;
-        case LogManager::LogLevelInfo:
+        case LogManager::LogLevel::Info:
             _stream << "\033[0m";       // white
             break;
-        case LogManager::LogLevelWarning:
+        case LogManager::LogLevel::Warning:
             _stream << "\033[01;40;33m";// yellow on black
             break;
-        case LogManager::LogLevelError:
+        case LogManager::LogLevel::Error:
             _stream << "\033[22;31m";   // red
             break;
-        case LogManager::LogLevelFatal:
+        case LogManager::LogLevel::Fatal:
             _stream << "\033[22;34m";   // blue
             break;
     }

@@ -29,7 +29,8 @@
 #include <functional>
 #include <string>
 
-#ifdef _WIN32
+#ifdef WIN32
+#include <vector>
 #include <windows.h>
 #elif __APPLE__
 #include <CoreServices/CoreServices.h>
@@ -178,7 +179,7 @@ private:
     std::string _filename; ///< The filename of this File
     FileChangedCallback _fileChangedCallback; ///< The callback that is called
 
-#ifdef _WIN32
+#ifdef WIN32
     void beginRead();
     static void CALLBACK completionHandler(
         DWORD dwErrorCode,
