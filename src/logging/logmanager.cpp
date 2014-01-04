@@ -27,6 +27,7 @@
 #include "logging/log.h"
 #include <cassert>
 #include <algorithm>
+#include <atomic>
 #include <vector>
 
 namespace ghoul {
@@ -37,7 +38,7 @@ LogManager* LogManager::_manager = nullptr;
 /**
  * \intern
  * The LogManager_P is the private version of the LogManager and uses template
- * instanciation to increase the performance of the logging. Specifying the
+ * instantiation to increase the performance of the logging. Specifying the
  * LogManager::LogLevel as a template argument allows the compiler to optimize the check
  * if a passed message should be relayed or not.
  * The same argument holds for the IMMEDIATEFLUSH that is used to control if the
@@ -53,8 +54,14 @@ LogManager* LogManager::_manager = nullptr;
 template <LogManager::LogLevel LEVEL, bool IMMEDIATEFLUSH>
 class LogManager_P : public LogManager {
 public:
+    LogManager_P() : LogManager() {
+        _mutex.clear();
+    }
+
     void logMessage(LogLevel level, const std::string& category,
                     const std::string& message);
+private:
+    std::atomic_flag _mutex;
 };
 
 template<LogManager::LogLevel LEVEL, bool IMMEDIATEFLUSH>
@@ -63,12 +70,17 @@ void LogManager_P<LEVEL,IMMEDIATEFLUSH>::logMessage(LogManager::LogLevel level,
                                                     const std::string& message)
 {
     if (level >= LEVEL) {
+        // Acquire lock
+        while (_mutex.test_and_set()) {}
+
         std::vector<Log*>::const_iterator it = _logs.begin();
         for (; it != _logs.end(); ++it) {
             (*it)->log(level, category, message);
             if (IMMEDIATEFLUSH)
                 (*it)->flush();
         }
+
+        _mutex.clear();
     }
 }
 

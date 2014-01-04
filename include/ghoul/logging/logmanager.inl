@@ -26,41 +26,41 @@
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Debug
 #define LDEBUGC(__category__, __message__) \
     do { \
-        std::ostringstream tmp; tmp << __message__; \
+        std::ostringstream __tmp__; __tmp__ << __message__; \
         LogMgr.logMessage( \
-            ghoul::logging::LogManager::LogLevel::Debug, __category__, tmp.str()); \
+            ghoul::logging::LogManager::LogLevel::Debug, __category__, __tmp__.str()); \
     } while (false)
 
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Info
 #define LINFOC(__category__, __message__) \
     do { \
-        std::ostringstream tmp; tmp << __message__; \
+        std::ostringstream __tmp__; __tmp__ << __message__; \
         LogMgr.logMessage( \
-            ghoul::logging::LogManager::LogLevel::Info, __category__, tmp.str()); \
+            ghoul::logging::LogManager::LogLevel::Info, __category__, __tmp__.str()); \
     } while (false)
 
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Warning
 #define LWARNINGC(__category__, __message__) \
     do { \
-        std::ostringstream tmp; tmp << __message__; \
+        std::ostringstream __tmp__; __tmp__ << __message__; \
         LogMgr.logMessage( \
-            ghoul::logging::LogManager::LogLevel::Warning, __category__, tmp.str()); \
+            ghoul::logging::LogManager::LogLevel::Warning, __category__, __tmp__.str()); \
     } while (false)
 
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevelError
 #define LERRORC(__category__, __message__) \
     do { \
-        std::ostringstream tmp; tmp << __message__; \
+        std::ostringstream __tmp__; __tmp__ << __message__; \
         LogMgr.logMessage( \
-            ghoul::logging::LogManager::LogLevel::Error, __category__, tmp.str()); \
+            ghoul::logging::LogManager::LogLevel::Error, __category__, __tmp__.str()); \
     } while (false)
 
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevelFatal
 #define LFATALC(__category__, __message__) \
     do { \
-        std::ostringstream tmp; tmp << __message__; \
+        std::ostringstream __tmp__; __tmp__ << __message__; \
         LogMgr.logMessage( \
-            ghoul::logging::LogManager::LogLevel::Fatal, __category__, tmp.str()); \
+            ghoul::logging::LogManager::LogLevel::Fatal, __category__, __tmp__.str()); \
     } while (false)
 
 /**

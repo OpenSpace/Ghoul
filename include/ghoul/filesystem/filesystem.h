@@ -230,6 +230,7 @@ private:
 };
 
 #define FileSys (ghoul::filesystem::FileSystem::ref())
+#define p(__path__) ghoul::filesystem::FileSystem::ref().absolutePath(__path__)
 
 } // namespace filesystem
 } // namespace ghoul

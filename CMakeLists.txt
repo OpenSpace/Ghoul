@@ -65,6 +65,7 @@ include_directories(${OPENGL_INCLUDE_DIR})
 
 find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
+add_definitions(-DGLEW_STATIC)
 
 option(GHOUL_USE_DEVIL "Use the DevIL library" ON)
 if (GHOUL_USE_DEVIL)

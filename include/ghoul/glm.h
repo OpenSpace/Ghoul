@@ -34,6 +34,7 @@
 #endif
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #ifdef __APPLE__
 #pragma clang diagnostic pop

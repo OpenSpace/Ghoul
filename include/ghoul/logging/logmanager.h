@@ -45,6 +45,7 @@ class Log;
  * The LogManager instance has to be initialized with the LogManager::init(LogLevel, bool)
  * method and can be accessed using the LogManager::ref() method afterwards. Initializing
  * an instance twice or accessing an uninitialized LogManager will result in an assertion.
+ * The logging is performed thread-safe.
  *
  * The different LogManager::LogLevel available are: Debug, Info, Warning, Error, Fatal.
  * If a LogManager was created with a LogLevel x, all messages with LogLevel y <= x will
