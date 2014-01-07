@@ -84,3 +84,5 @@ if (APPLE)
 endif ()
 
 add_subdirectory(src)
+
+add_subdirectory(${GHOUL_ROOT_DIR}/ext/lua)

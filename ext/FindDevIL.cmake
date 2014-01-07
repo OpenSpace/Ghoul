@@ -42,11 +42,11 @@ find_path(IL_INCLUDE_DIR IL/il.h
 )
 
 if (WIN32)
-    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+    if (CMAKE_CL_64)
         find_library(IL_LIBRARIES
         NAMES IL DEVIL
         PATHS ${CMAKE_MODULE_PATH}/il
-        PATH_SUFFIXES $MACHINE_LIB_SUFFIX{
+        PATH_SUFFIXES lib64 lib lib/win64
         DOC "The file that corresponds to the base il library."
         )
         
