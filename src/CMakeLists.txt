@@ -121,4 +121,4 @@ else()
 endif ()
     
 add_library(Ghoul ${GHOUL_SOURCE} ${GHOUL_HEADER})
-target_link_libraries(Ghoul ${GHOUL_DEPENDENCIES})
+target_link_libraries(Ghoul Lua ${GHOUL_DEPENDENCIES})
