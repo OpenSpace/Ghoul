@@ -1,99 +1,52 @@
 ######
 # Source
 ######
-set(GHOUL_SOURCE_LOG
-    ${GHOUL_ROOT_DIR}/src/logging/callbacklog.cpp
-    ${GHOUL_ROOT_DIR}/src/logging/consolelog.cpp
-    ${GHOUL_ROOT_DIR}/src/logging/htmllog.cpp
-    ${GHOUL_ROOT_DIR}/src/logging/log.cpp
-    ${GHOUL_ROOT_DIR}/src/logging/logmanager.cpp
-    ${GHOUL_ROOT_DIR}/src/logging/textlog.cpp
-    ${GHOUL_ROOT_DIR}/src/logging/streamlog.cpp)
-source_group(LogManager FILES ${GHOUL_SOURCE_LOG})    
-    
-set(GHOUL_SOURCE_OPENGL
-    ${GHOUL_ROOT_DIR}/src/opengl/programobject.cpp
-    ${GHOUL_ROOT_DIR}/src/opengl/shaderobject.cpp
-    ${GHOUL_ROOT_DIR}/src/opengl/shadermanager.cpp
-    ${GHOUL_ROOT_DIR}/src/opengl/texture.cpp
-    ${GHOUL_ROOT_DIR}/src/opengl/texturemanager.cpp
-    ${GHOUL_ROOT_DIR}/src/opengl/texturereader.cpp
-    ${GHOUL_ROOT_DIR}/src/opengl/textureunit.cpp
-    )
-source_group(OpenGL FILES ${GHOUL_SOURCE_OPENGL})    
 
-set(GHOUL_SOURCE_FILESYSTEM
-    ${GHOUL_ROOT_DIR}/src/filesystem/directory.cpp
-    ${GHOUL_ROOT_DIR}/src/filesystem/file.cpp
-    ${GHOUL_ROOT_DIR}/src/filesystem/filesystem.cpp
-    )
-source_group(FileSystem FILES ${GHOUL_SOURCE_FILESYSTEM})
-    
-set(GHOUL_SOURCE_MISC
-    ${GHOUL_ROOT_DIR}/src/misc/bufferlog.cpp
-    ${GHOUL_ROOT_DIR}/src/misc/crc32.cpp
-    ${GHOUL_ROOT_DIR}/src/misc/sharedmemory.cpp
-    ${GHOUL_ROOT_DIR}/src/misc/syscapabilities.cpp
-	)
-source_group(Misc FILES ${GHOUL_SOURCE_MISC})
-    
-set(GHOUL_SOURCE
-    ${GHOUL_SOURCE_CRC32}
-    ${GHOUL_SOURCE_FILESYSTEM}
-    ${GHOUL_SOURCE_LOG}
-    ${GHOUL_SOURCE_MISC}
-    ${GHOUL_SOURCE_OPENGL}
-    )
+set(SOURCE_ROOT_DIR ${GHOUL_ROOT_DIR}/src)
+set(HEADER_ROOT_DIR ${GHOUL_ROOT_DIR}/include/ghoul)
 
-######
-# Headers
-######
-set(GHOUL_HEADER_LOG
-    ${GHOUL_ROOT_DIR}/include/ghoul/logging/callbacklog.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/logging/consolelog.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/logging/htmllog.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/logging/logmanager.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/logging/logmanager.inl
-    ${GHOUL_ROOT_DIR}/include/ghoul/logging/log.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/logging/textlog.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/logging/streamlog.h)
-source_group(LogManager FILES ${GHOUL_HEADER_LOG})
-    
-set(GHOUL_HEADER_OPENGL
-    ${GHOUL_ROOT_DIR}/include/ghoul/opengl/ghoul_gl.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/opengl/programobject.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/opengl/shaderobject.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/opengl/shadermanager.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/opengl/texture.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/opengl/texture.inl
-    ${GHOUL_ROOT_DIR}/include/ghoul/opengl/texturemanager.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/opengl/texturereader.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/opengl/textureunit.h
-    )
-source_group(OpenGL FILES ${GHOUL_HEADER_OPENGL})    
+file(GLOB FILESYSTEM_SOURCE ${SOURCE_ROOT_DIR}/filesystem/*.cpp)
+file(GLOB FILESYSTEM_SOURCE_C ${SOURCE_ROOT_DIR}/filesystem/*.c)
+set(GHOUL_SOURCE ${GHOUL_SOURCE} ${FILESYSTEM_SOURCE} ${FILESYSTEM_SOURCE_C})
+file(GLOB FILESYSTEM_HEADER ${HEADER_ROOT_DIR}/filesystem/*.h)
+file(GLOB FILESYSTEM_HEADER_INL ${HEADER_ROOT_DIR}/filesystem/*.inl)
+set(GHOUL_HEADER ${GHOUL_HEADER} ${FILESYSTEM_HEADER} ${FILESYSTEM_HEADER_INL})
+source_group(FileSystem FILES ${FILESYSTEM_SOURCE} ${FILESYSTEM_SOURCE_C} ${FILESYSTEM_HEADER} ${FILESYSTEM_HEADER_INL})
 
-set(GHOUL_HEADER_FILESYSTEM
-    ${GHOUL_ROOT_DIR}/include/ghoul/filesystem/directory.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/filesystem/file.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/filesystem/filesystem.h
-    )
-source_group(FileSystem FILES ${GHOUL_HEADER_FILESYSTEM})
-    
-set(GHOUL_HEADER_MISC
-	${GHOUL_ROOT_DIR}/include/ghoul/glm.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/misc/bufferlog.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/misc/crc32.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/misc/sharedmemory.h
-    ${GHOUL_ROOT_DIR}/include/ghoul/misc/syscapabilities.h)
-source_group(Misc FILES ${GHOUL_HEADER_MISC})    
-    
-set(GHOUL_HEADER
-    ${GHOUL_HEADER_CRC32}
-    ${GHOUL_HEADER_FILESYSTEM}
-    ${GHOUL_HEADER_LOG}
-    ${GHOUL_HEADER_MISC}
-    ${GHOUL_HEADER_OPENGL}
-    )
+file(GLOB LOG_SOURCE ${SOURCE_ROOT_DIR}/logging/*.cpp)
+file(GLOB LOG_SOURCE_C ${SOURCE_ROOT_DIR}/logging/*.c)
+set(GHOUL_SOURCE ${GHOUL_SOURCE} ${LOG_SOURCE} ${LOG_SOURCE_C})
+file(GLOB LOG_HEADER ${HEADER_ROOT_DIR}/logging/*.h)
+file(GLOB LOG_HEADER_INL ${HEADER_ROOT_DIR}/logging/*.inl)
+set(GHOUL_HEADER ${GHOUL_HEADER} ${LOG_HEADER} ${LOG_HEADER_INL})
+source_group(LogManager FILES ${LOG_SOURCE} ${LOG_SOURCE_C} ${LOG_HEADER} ${LOG_HEADER_INL})
+
+file(GLOB LUA_SOURCE ${SOURCE_ROOT_DIR}/lua/*.cpp)
+file(GLOB LUA_SOURCE_C ${SOURCE_ROOT_DIR}/lua/*.c)
+set(GHOUL_SOURCE ${GHOUL_SOURCE} ${LUA_SOURCE} ${LUA_SOURCE_C})
+file(GLOB LUA_HEADER ${HEADER_ROOT_DIR}/lua/*.h)
+file(GLOB LUA_HEADER_INL ${HEADER_ROOT_DIR}/lua/*.inl)
+set(GHOUL_HEADER ${LUA_HEADER} ${LUA_HEADER_INL})
+source_group(Lua FILES ${LUA_SOURCE} ${LUA_SOURCE_C} ${LUA_HEADER} ${LUA_HEADER_INL})
+
+file(GLOB MISC_SOURCE ${SOURCE_ROOT_DIR}/misc/*.cpp)
+file(GLOB MISC_SOURCE_C ${SOURCE_ROOT_DIR}/misc/*.c)
+set(GHOUL_SOURCE ${GHOUL_SOURCE} ${MISC_SOURCE} ${MISC_SOURCE_C})
+file(GLOB MISC_HEADER ${HEADER_ROOT_DIR}/misc/*.h)
+file(GLOB MISC_HEADER_INL ${HEADER_ROOT_DIR}/misc/*.inl)
+set(MISC_HEADER ${MISC_HEADER}
+    ${GHOUL_ROOT_DIR}/include/ghoul/glm.h)
+set(GHOUL_HEADER ${GHOUL_HEADER} ${MISC_HEADER} ${MISC_HEADER_INL})
+source_group(Misc FILES ${MISC_SOURCE} ${MISC_SOURCE_C} ${MISC_HEADER} ${MISC_HEADER_INL})
+
+file(GLOB OPENGL_SOURCE ${SOURCE_ROOT_DIR}/opengl/*.cpp)
+file(GLOB OPENGL_SOURCE_C ${SOURCE_ROOT_DIR}/opengl/*.c)
+set(GHOUL_SOURCE ${GHOUL_SOURCE} ${OPENGL_SOURCE} ${OPENGL_SOURCE_C})
+file(GLOB OPENGL_HEADER ${HEADER_ROOT_DIR}/opengl/*.h)
+file(GLOB OPENGL_HEADER_INL ${HEADER_ROOT_DIR}/opengl/*.inl)
+set(GHOUL_HEADER ${GHOUL_HEADER} ${OPENGL_HEADER} ${OPENGL_HEADER_INL})
+source_group(OpenGL FILES ${OPENGL_SOURCE} ${OPENGL_SOURCE_C} ${OPENGL_HEADER} ${OPENGL_HEADER_INL})
+
 
 ######
 # Dependencies

@@ -92,7 +92,7 @@ bool SharedMemory::create(const std::string& name, size_t size) {
     size += sizeof(Header);
 #ifdef WIN32
     HANDLE handle = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
-                                      0, size, name.c_str());
+                                      0, static_cast<DWORD>(size), name.c_str());
     const DWORD error = GetLastError();
     if (handle == NULL) {
         const std::string&& errorMsg = lastErrorToString(error);

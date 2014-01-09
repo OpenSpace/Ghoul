@@ -1,3 +1,5 @@
+#if 0
+
 /**********************************************************************
  *                                                                    *
  * Voreen - The Volume Rendering Engine                               *
@@ -2567,3 +2569,4 @@ bool Variant::operator!= (const Variant& rhs) const throw () {
 }
 
 } // namespace
+#endif

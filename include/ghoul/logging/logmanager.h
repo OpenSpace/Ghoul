@@ -124,6 +124,8 @@ public:
     /**
      * The main method to log messages. If the <code>level</code> is >= the level this
      * LogManager was created with, the message will be passed to the stored \ref Logs.
+     * The category of the message will be an empty string, which causes it to be ignored
+     * by most Logs.
      * \param [in] level The level of the message that should be passed to the Logs
      * \param [in] message The message that will be passed to the Logs. May contain
      * control sequences.

@@ -193,7 +193,7 @@ bool BufferLog::log(unsigned long long int timestamp, const char* message) {
     strcpy(destination, message);
 #endif
     // Advance the empty pointer; +1 for the \0 terminator
-    h->firstEmptyByte += strlen(message) + 1;
+    h->firstEmptyByte += glm::detail::uint32(strlen(message) + 1);
     h->mutex.clear();
     return true;
 }

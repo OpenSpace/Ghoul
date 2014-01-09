@@ -75,6 +75,8 @@ if (GHOUL_USE_DEVIL)
     set(DEVIL_LIBRARIES ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
 endif ()
 
+include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
+
 #####
 # Platform-dependent Settings
 #####
