@@ -46,13 +46,14 @@ class StreamLog : public Log {
 public:
     /**
      * Constructor that calls Log::Log(bool, bool, bool, bool) constructor.
-     * \param [in] timeStamping Determines if the log should print the time when a message
+     * \param stream The initialized stream this Log should use
+     * \param timeStamping Determines if the log should print the time when a message
      * is logged in the log messages
-     * \param [in] dateStamping Determines if the log should print the time when a message
+     * \param dateStamping Determines if the log should print the time when a message
      * is logged in the log messages
-     * \param [in] categoryStamping Determines if the log should print the categories in
+     * \param categoryStamping Determines if the log should print the categories in
      * the log messages
-     * \param [in] logLevelStamping Determines if the log should print the log level in
+     * \param logLevelStamping Determines if the log should print the log level in
      * the log messages
      */
     StreamLog(std::ostream& stream, bool timeStamping = false, bool dateStamping = false,
@@ -60,10 +61,10 @@ public:
 
     /**
      * Method that logs a message with a given level and category to the stream.
-     * \param [in] level The log level with which the message shall be logged
-     * \param [in] category The category of this message. Can be used by each subclass
+     * \param level The log level with which the message shall be logged
+     * \param category The category of this message. Can be used by each subclass
      * individually
-     * \param [in] message The message body of the log message
+     * \param message The message body of the log message
      */
     virtual void log(LogManager::LogLevel level, const std::string& category,
                      const std::string& message);

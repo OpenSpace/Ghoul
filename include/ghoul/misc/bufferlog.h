@@ -180,7 +180,7 @@ protected:
      * This callback will be called when an incoming log message would exhaust the
      * available memory of the buffer. The callback has to either provide a new buffer
      * which will be used henceforth (\see setBuffer) or mark the current buffer as
-     * reusable (\resetBuffer)
+     * reusable (\see resetBuffer)
      */
     MemoryExhaustedCallback _callback;
     

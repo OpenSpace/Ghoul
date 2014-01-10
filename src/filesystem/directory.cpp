@@ -66,14 +66,14 @@ Directory::Directory(const char* path, bool isRawPath) {
         _directoryPath = FileSys.absolutePath(string(path));
 }
 
-Directory::Directory(const string& path, bool isRawPath) {
+Directory::Directory(const std::string& path, bool isRawPath) {
     if (isRawPath)
         _directoryPath = path.empty() ? "." : path;
     else
         _directoryPath = FileSys.absolutePath(path.empty() ? "." : path);
 }
 
-Directory::operator const string&() const {
+Directory::operator const std::string&() const {
     return _directoryPath;
 }
 
@@ -89,7 +89,7 @@ Directory Directory::parentDirectory(bool absolutePath) const {
                          !absolutePath);
 }
 
-vector<string> Directory::read(bool recursiveSearch, bool sort) const {
+std::vector<std::string> Directory::read(bool recursiveSearch, bool sort) const {
     vector<string> result;
     readDirectories(result, _directoryPath, recursiveSearch);
     readFiles(result, _directoryPath, recursiveSearch);
@@ -100,7 +100,7 @@ vector<string> Directory::read(bool recursiveSearch, bool sort) const {
     return result;
 }
 
-vector<string> Directory::readFiles(bool recursiveSearch, bool sort) const {
+std::vector<std::string> Directory::readFiles(bool recursiveSearch, bool sort) const {
     vector<string> result;
     readFiles(result, _directoryPath, recursiveSearch);
     if (sort)
@@ -108,8 +108,8 @@ vector<string> Directory::readFiles(bool recursiveSearch, bool sort) const {
     return result;
 }
 
-void Directory::readFiles(vector<string>& result,
-                          const string& path, bool recursiveSearch) const
+void Directory::readFiles(std::vector<std::string>& result,
+                          const std::string& path, bool recursiveSearch) const
 {
     std::stack<string> directories;
 #ifdef WIN32
@@ -152,8 +152,8 @@ void Directory::readFiles(vector<string>& result,
     }
 }
 
-vector<string> Directory::readDirectories(bool recursiveSearch, bool sort) const {
-    vector<string> result;
+std::vector<std::string> Directory::readDirectories(bool recursiveSearch, bool sort) const {
+    std::vector<std::string> result;
     readDirectories(result, _directoryPath, recursiveSearch);
     if (sort)
         std::sort(result.begin(), result.end());
@@ -161,8 +161,8 @@ vector<string> Directory::readDirectories(bool recursiveSearch, bool sort) const
 }
 
 void Directory::readDirectories(
-    vector<string>& result,
-    const string& path,
+    std::vector<std::string>& result,
+    const std::string& path,
     bool recursiveSearch) const
 {
     std::stack<string> directories;

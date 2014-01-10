@@ -37,25 +37,27 @@ namespace logging {
 class Log;
 
 /**
- * The central singleton class that is responsible for handling Logs and logging methods.
- * This singleton class provides methods to add new Logs, remove Logs, and relay messages
- * to all Logs added to the LogManager. A log message consists of a LogManager::LogLevel,
- * a category and a message. The category is mainly used as a prefix and/or grouping
- * within the log files and may have other meanings depending on Logs.
- * The LogManager instance has to be initialized with the LogManager::init(LogLevel, bool)
- * method and can be accessed using the LogManager::ref() method afterwards. Initializing
- * an instance twice or accessing an uninitialized LogManager will result in an assertion.
- * The logging is performed thread-safe.
+ * The central singleton class that is responsible for handling Log%s and logging methods.
+ * This singleton class provides methods to add new Log%s, remove Log%s, and relay
+ * messages to all Log%s added to the LogManager. A log message consists of a
+ * LogManager::LogLevel, a category and a message. The category is mainly used as a prefix
+ * and/or grouping within the log files and may have other meanings depending on Log%s.
+ * The LogManager instance has to be initialized with the #initialize method and can be
+ * accessed using the #ref method afterwards. Initializing an instance twice or accessing
+ * an uninitialized LogManager will result in an assertion. The logging is performed
+ * thread-safe.
  *
- * The different LogManager::LogLevel available are: Debug, Info, Warning, Error, Fatal.
- * If a LogManager was created with a LogLevel x, all messages with LogLevel y <= x will
- * be passed to Log handler.
+ * The different LogManager::LogLevel available are: LogManager::LogLevel::Debug,
+ * LogManager::LogLevel::Info, LogManager::LogLevel::Warning, LogManager::LogLevel::Error,
+ * LogManager::LogLevel::Fatal.
+ * If a LogManager was created with a LogManager::LogLevel x, all messages with
+ * LogManager::LogLevel y <= x will be passed to Log handler.
  *
- * Macros are defined to make logging messages easier. These macros are: LDEBUG, LDEBUGC,
- * LINFO, LINFOC, LWARNING, LWARNINGC, LERROR, LERRORC, LFATAL, LFATALC. The *C versions
- * of the macros requires the category and the message as a parameter. The versions
- * without the C require a variable named _loggerCat to be defined in the scope of the
- * macro "call"
+ * Macros are defined to make logging messages easier. These macros are: #LDEBUG,
+ * #LDEBUGC, #LINFO, #LINFOC, #LWARNING, #LWARNINGC, #LERROR, #LERRORC, #LFATAL, #LFATALC.
+ * The *C versions of the macros requires the category and the message as a parameter. The
+ * versions without the C require a variable named <code>_loggerCat</code> to be defined
+ * in the scope of the macro "call"
  */
 class LogManager {
 public:
@@ -75,9 +77,9 @@ public:
 
     /**
      * Creates and initializes an empty LogManager with the passed level.
-     * \param [in] level The lowest LogLevel that will be passed to the containing Logs.
+     * \param level The lowest LogLevel that will be passed to the containing Logs.
      * A LogLevel of Debug will never be passed along in a Release build.
-     * \param [in] immediateFlush Determines if all Logs will be flushed out immediately
+     * \param immediateFlush Determines if all Logs will be flushed out immediately
      * after a message was received. In the case of file-based logs, the files will be
      * written out to disk and in case of a console log, the console will be updated.
      * Passing <code>true</code> will slow down the execution but guarantees that a crash
@@ -112,10 +114,10 @@ public:
      * LogManager was created with, the message will be passed to the stored Logs. The
      * category will be used in different ways depending on the Log in question, but
      * examples are grouping or prepending to the message.
-     * \param [in] level The level of the message that should be passed to the Logs
-     * \param [in] category The category of the message, which will be used depending on
+     * \param level The level of the message that should be passed to the Logs
+     * \param category The category of the message, which will be used depending on
      * the Logs
-     * \param [in] message The message that will be passed to the Logs. May contain
+     * \param message The message that will be passed to the Logs. May contain
      * control sequences.
      */
     virtual void logMessage(LogManager::LogLevel level, const std::string& category,
@@ -123,11 +125,11 @@ public:
 
     /**
      * The main method to log messages. If the <code>level</code> is >= the level this
-     * LogManager was created with, the message will be passed to the stored \ref Logs.
+     * LogManager was created with, the message will be passed to the stored Logs.
      * The category of the message will be an empty string, which causes it to be ignored
      * by most Logs.
-     * \param [in] level The level of the message that should be passed to the Logs
-     * \param [in] message The message that will be passed to the Logs. May contain
+     * \param level The level of the message that should be passed to the Logs
+     * \param message The message that will be passed to the Logs. May contain
      * control sequences.
      */
     void logMessage(LogManager::LogLevel level, const std::string& message);
@@ -136,7 +138,7 @@ public:
      * Adds the passed log to the list of managed Logs. The ownership of the Log is passed
      * to the LogManager. The Log will be deleted when the LogManager is deinitialized.
      * Adding the same Log twice has no effect and is permitted.
-     * \param [in] log The log that should be added to this LogManager
+     * \param log The log that should be added to this LogManager
      */
     void addLog(Log* log);
 
@@ -144,7 +146,7 @@ public:
      * Removes the passed log from the list of managed Logs. This transfers the ownership
      * of the Log to the caller and he is responsible for deleting the Log. Trying to
      * remove a Log that is not part of this LogManager has no effect and is permitted.
-     * \param [in] log The Log that should be removed from this LogManager
+     * \param log The Log that should be removed from this LogManager
      */
     void removeLog(Log* log);
 

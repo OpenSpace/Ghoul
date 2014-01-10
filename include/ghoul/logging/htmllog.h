@@ -34,11 +34,12 @@ namespace logging {
 /**
  * A subclass of TextLog that logs the messages to a structured HTML file on hard disk.
  * The log will contain a table with the following format:
- * --------------------------------------------
- * | DATE | TIME | CATEGORY | LEVEL | MESSAGE |
- * |      |      |          |       |         |
- * |      |      |          |       |         |
- * ...
+ * \verbatim
+--------------------------------------------
+| DATE | TIME | CATEGORY | LEVEL | MESSAGE |
+|      |      |          |       |         |
+|      |      |          |       |         |
+\endverbatim
  * If a specific value should not be stamped, the according table entry will be missing
  * from the HTML file. The file will be opened in the constructor and closed in the
  * destructor of this class. A HTMLLog is always created anew and cannot be appended to.
@@ -46,19 +47,18 @@ namespace logging {
 class HTMLLog : public TextLog {
 public:
     /**
-    * Constructor that calls TextLog::TextLog(filename, bool, bool, bool, bool)
-    * constructor and opens the file that will log the messages. If the file does not
-    * exist, it will be created.
-    * \param [in] filename The path and filename of the file that will receive the log
+    * Constructor that calls TextLog constructor and opens the file that will log the
+    * messages. If the file does not exist, it will be created.
+    * \param filename The path and filename of the file that will receive the log
     * messages
-    * \param [in] timeStamping Determines if the log should print the time when a message
-    * is logged in the log messages
-    * \param [in] dateStamping Determines if the log should print the time when a message
-    * is logged in the log messages
-    * \param [in] categoryStamping Determines if the log should print the categories in
-    * the log messages
-    * \param [in] logLevelStamping Determines if the log should print the log level in the
+    * \param timeStamping Determines if the log should print the time when a message is
+    * logged in the log messages
+    * \param dateStamping Determines if the log should print the time when a message is
+    * logged in the log messages
+    * \param categoryStamping Determines if the log should print the categories in the
     * log messages
+    * \param logLevelStamping Determines if the log should print the log level in the log
+    * messages
     */
     HTMLLog(const std::string& filename, bool timeStamping = true,
             bool dateStamping = true, bool categoryStamping = true,
@@ -68,11 +68,12 @@ public:
     ~HTMLLog();
     
     /**
-     * Method that logs a message with a given level and category to the text file.
-     * \param [in] level The log level with which the message shall be logged
-     * \param [in] category The category of this message. Can be used by each subclass
+     * Method that logs a message with a given <code>level</code> and
+     * <code>category</code> to the text file.
+     * \param level The log level with which the message shall be logged
+     * \param category The category of this message. Can be used by each subclass
      * individually
-     * \param [in] message The message body of the log message
+     * \param message The message body of the log message
      */
     virtual void log(LogManager::LogLevel level, const std::string& category,
                      const std::string& message);
@@ -80,11 +81,11 @@ public:
 protected:
     /**
      * Returns a HTML color string for the passed color.
-     * Debug -> green
-     * Info -> white
-     * Warning -> yellow
-     * Error -> red
-     * Fatal -> cyan
+     * Debug -> green<br>
+     * Info -> white<br>
+     * Warning -> yellow<br>
+     * Error -> red<br>
+     * Fatal -> cyan<br>
      */
     static std::string colorForLevel(LogManager::LogLevel level);
 };

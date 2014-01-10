@@ -42,12 +42,12 @@ namespace filesystem {
 
 /**
  * This class is an abstract handle for a generic file on the file system. The main
- * functionality is to be able to extract parts of the path like the \see basename , the
- * \see directoryName , or the \see fileExtension . The second functionality of this class
+ * functionality is to be able to extract parts of the path like the #baseName, the
+ * #directoryName, or the #fileExtension. The second functionality of this class
  * is a platform-independent way of being notified of changes of the file. The constructor
- * or the \see setCallback methods expect an std::function object (possibly initialized
+ * or the #setCallback methods expect an std::function object (possibly initialized
  * using a lambda-expression) that will be called whenever the file changes on the
- * harddisk. The callback function has this object passed as a parameter. If many changes
+ * hard disk. The callback function has this object passed as a parameter. If many changes
  * of the file happen in quick succession, each change will trigger a separate call of the
  * callback. The file system is not polled, but the changes are pushed to the application,
  * so the changes are registered efficiently.
@@ -60,14 +60,16 @@ public:
     /**
      * This method constructs a new File object using a given <code>filename</code> as a
      * C string. <code>isRawPath</code> controls if the path is used without changes, or
-     * if tokens (\see FileSystem) should be converted first. <code>fileChangedCallback
-     * </code> will be called whenever the pointed file changes on the harddisk.
+     * if tokens should be converted first.
+     * <code>fileChangedCallback</code> will be called whenever the pointed file changes
+     * on the hard disk.
      * \param filename The path to the file this File object should point to
      * \param isRawPath If this value is <code>true</code>, the value of <code>filename
      * </code> is used as-is. If it is <code>false</code>, the path is converted into an
      * absolute path and any tokens, if present, are resolved
      * \param fileChangedCallback The callback function that is called once per change of
-     * the file on the filesystem.
+     * the file on the filesystem
+     * \see FileSystem
      */
     File(const char* filename, bool isRawPath = false,
          const FileChangedCallback& fileChangedCallback = FileChangedCallback());
@@ -75,14 +77,16 @@ public:
     /**
      * This method constructs a new File object using a given <code>filename</code> as an
      * std string. <code>isRawPath</code> controls if the path is used without changes, or
-     * if tokens (\see FileSystem) should be converted first. <code>fileChangedCallback
-     * </code> will be called whenever the pointed file changes on the harddisk.
+     * if tokens should be converted first.
+     * <code>fileChangedCallback</code> will be called whenever the pointed file changes
+     * on the hard disk.
      * \param filename The path to the file this File object should point to
-     * \param isRawPath If this value is <code>true</code>, the value of <code>filename
-     * </code> is used as-is. If it is <code>false</code>, the path is converted into an
-     * absolute path and any tokens, if present, are resolved
+     * \param isRawPath If this value is <code>true</code>, the value of
+     * <code>filename</code> is used as-is. If it is <code>false</code>, the path is
+     * converted into an absolute path and any tokens, if present, are resolved
      * \param fileChangedCallback The callback function that is called once per change of
-     * the file on the filesystem.
+     * the file on the filesystem
+     * \see FileSystem
      */
     File(const std::string& filename, bool isRawPath = false,
          const FileChangedCallback& fileChangedCallback = FileChangedCallback());
@@ -123,42 +127,42 @@ public:
     /**
      * Returns the filename part of the full path. The filename is defined as the part of
      * the path after the last path separator (<code>'/'</code> or <code>'\\\\'</code>)
-     * and including the extension. Example (<code>'/home/user/file.txt' -> 'file.txt'
-     * </code>)
+     * and including the extension. Example (
+     * <code>'/home/user/file.txt' -> 'file.txt'</code>)
      * \return The filename part of the full path
      */
     std::string filename() const;
     
     /**
-     * Returns the basename part of the full path. The basename is defined as the part of
-     * the path between the last path separator (<code>'/'</code> or <code>'\\\\'</code>)
-     * and the extension (separated by a '.' ; if existing). Example (<code>
-     * '/home/user/file.txt' -> 'file'</code>)
-     * \return The basename part of the full path
+     * Returns the base name part of the full path. The base name is defined as the part
+     * of the path between the last path separator (<code>'/'</code> or
+     * <code>'\\\\'</code>) and the extension (separated by a '.' ; if existing). Example
+     * (<code>'/home/user/file.txt' -> 'file'</code>)
+     * \return The base name part of the full path
      */
     std::string baseName() const;
     
     /**
-     * Returns the full basename of the path. The full basename is defined as the part of
-     * the path before the extension (if existing). Example (<code>'/home/user/file.txt'
-     * -> '/home/user/file'</code>)
-     * \return The full basename part of the path
+     * Returns the full base name of the path. The full base name is defined as the part
+     * of the path before the extension (if existing). Example (
+     * <code>'/home/user/file.txt' -> '/home/user/file'</code>)
+     * \return The full base name part of the path
      */
     std::string fullBaseName() const;
     
     /**
      * Returns the directory name of the path. The directory name is defined as the part
-     * of the path before the last path separator (<code>'/'</code> or <code>'\\\\'
-     * </code>) and does not include the separator itself. Example(<code>
-     * '/home/user/file.txt' -> '/home/user'>/code>)
+     * of the path before the last path separator (<code>'/'</code> or
+     * <code>'\\\\'</code>) and does not include the separator itself. Example(
+     * <code>'/home/user/file.txt' -> '/home/user'</code>)
      * \return The directory name of the path
      */
     std::string directoryName() const;
     
     /**
      * Returns the extension part of the full path. The extension is defined as the part
-     * of the path after the exension separator (<code>'.'</code>). Example (<code>
-     * '/home/user/file.txt' -> '/home/user/file'</code>).
+     * of the path after the extension separator (<code>'.'</code>). Example (
+     * <code>'/home/user/file.txt' -> '/home/user/file'</code>).
      * \return The extension part of the full path
      */
     std::string fileExtension() const;

@@ -33,28 +33,27 @@ namespace ghoul {
 namespace logging {
 
 /**
- * Abstract base class for all Logs that can be added to a LogManager. Base classes must
- * implement the Log::log(LogManager::LogLevel, std::string, std::string) and Log::flush()
- * methods. The log message will only be called with LogManager::LogLevel levels which
- * were filtered by the LogManager the Log belongs to. After finishing the Log::flush()
- * method, all previously written log messages should be stored/printed/transmitted even
- * if the program crashes.
+ * Abstract base class for all Log%s that can be added to a LogManager. Base classes must
+ * implement the #log and #flush methods. The log message will only be called with
+ * LogManager::LogLevel levels which were filtered by the LogManager the Log belongs to.
+ * After finishing the #flush method, all previously written log messages should be
+ * stored/printed/transmitted even if the program crashes.
  * All subclasses are usable without a LogManager as well by directly instantiating them.
  *
- * Available subclasses are: TextLog, ConsoleLog, StreamLog
+ * \see TextLog \see ConsoleLog \see StreamLog
  */
 class Log {
 public:
-    /// Virtual desctructor
+    /// Virtual destructor
     virtual ~Log();
 
     /**
      * Method that logs a message with a given level and category. The method of logging
      * is dependent on the explicit subclass.
-     * \param [in] level The log level with which the message shall be logged
-     * \param [in] category The category of this message. Can be used by each subclass
+     * \param level The log level with which the message shall be logged
+     * \param category The category of this message. Can be used by each subclass
      * individually
-     * \param [in] message The message body of the log message
+     * \param message The message body of the log message
      */
     virtual void log(LogManager::LogLevel level, const std::string& category,
                      const std::string& message) = 0;
@@ -68,13 +67,13 @@ public:
 protected:
     /**
      * Base constructor, which initializes the passed parameters.
-     * \param [in] timeStamping Determines if the log should print the time when a message
+     * \param timeStamping Determines if the log should print the time when a message
      * is logged in the log messages
-     * \param [in] dateStamping Determines if the log should print the time when a message
+     * \param dateStamping Determines if the log should print the time when a message
      * is logged in the log messages
-     * \param [in] categoryStamping Determines if the log should print the categories in
+     * \param categoryStamping Determines if the log should print the categories in
      * the log messages
-     * \param [in] logLevelStamping Determines if the log should print the log level in
+     * \param logLevelStamping Determines if the log should print the log level in
      * the log messages
      */
     Log(bool timeStamping = true, bool dateStamping = true, bool categoryStamping = true,

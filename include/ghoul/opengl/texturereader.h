@@ -35,8 +35,8 @@ class Texture;
 
 /**
  * Loads the texture located at <code>filename</code>, using the DevIL library, and 
- * creates a \see Texture object from it. For a list of supported image formats, see <url>
- * http://openil.sourceforge.net/features.php</url>. If an image can not be loaded, a null
+ * creates a \see Texture object from it. For a list of supported image formats, see 
+ * http://openil.sourceforge.net/features.php. If an image can not be loaded, a null
  * pointer is returned and an error is logged. Otherwise a \see Texture of appropriate 
  * format is created and returned. The ownership of the texture passes to the caller. The 
  * Texture will not automatically be uploaded to the graphics card.

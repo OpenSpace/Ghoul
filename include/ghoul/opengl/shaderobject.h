@@ -145,7 +145,7 @@ public:
     /**
      * Returns <code>true</code> if this ShaderObject has an internal name assigned to it,
      * <code>false</code> otherwise.
-     * \return <code>true</code if this ShaderObject has an internal name assigned to it,
+     * \return <code>true</code> if this ShaderObject has an internal name assigned to it,
      * <code>false</code> otherwise.
      */
     bool hasName() const;

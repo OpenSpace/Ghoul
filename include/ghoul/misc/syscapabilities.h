@@ -50,7 +50,7 @@ public:
          * <code>major.minor.release vendor-specific information</code> or
          * <code>major.minor vendor-specific information</code> and should normally be retrieved
          * using the <code>glGetString(GL_SHADING_LANGUAGE_VERSION)</code> method.
-         * \param [in] version The version as a formatted string 
+         * \param version The version as a formatted string 
          * \return <code>True</code> if the string could be successfully parsed; <code>false</code>
          * otherwise. If the parsing failed, the version parts will not be changed.
          */

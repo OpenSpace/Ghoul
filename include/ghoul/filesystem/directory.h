@@ -38,8 +38,8 @@ namespace filesystem {
  * Using the default constructor will create a Directory object pointing to the absolute
  * path of the current working directory. The other constructors can either create and
  * absolute path or use the provided path as-is.
- * The Directory has the possibility to list all files (\see read), or selectively only
- * read files (\see readFiles) or read directories (\see readDirectories)
+ * The Directory has the possibility to list all files (#read), or selectively only
+ * read files (#readFiles) or read directories (#readDirectories).
  * \todo Implement an operator so that a Directory object can be used in a stream.
  */
 class Directory {
@@ -55,7 +55,7 @@ public:
      * <code>isRawPath</code> is <code>true</code>, the <code>path</code> is used as-is
      * and not modified. If it is <code>false</code>, the default setting, the provided
      * <code>path</code> is automatically changed into the absolute path representation, 
-     * removing all tokens, if present, in the process
+     * removing all tokens, if present, in the process.
      * \param path The path this Directory should point to. Can contain tokens and be 
      * specified relative to the current working directory
      * \param isRawPath If <code>false</code> the <code>path</code> parameter is converted
@@ -114,9 +114,9 @@ public:
     
     /**
      * This method creates a list of all files and subdirectories in the current directory
-     * and returns the paths to each. If <code>recursiveSearch</code> is <code>true
-     * </code>, each subdirectory will be searched as well and all results will be 
-     * combined. The parameter <code>sort</code> determines if the end result will be
+     * and returns the paths to each. If <code>recursiveSearch</code> is
+     * <code>true</code>, each subdirectory will be searched as well and all results will
+     * be combined. The parameter <code>sort</code> determines if the end result will be
      * sorted by name.
      * \param recursiveSearch Determines if the subdirectories will be searched as well as
      * the current directory.
@@ -158,13 +158,14 @@ private:
     /**
      * Internal function that does the directory marching of all files that are in the
      * directory point to by <code>path</code>. It will combine all results in the <code>
-     * result</code> parameter and will, if <code>recursiveSearch</code> is <code>true
-     * </code> recursively call itself; thus reusing the <code>result</code> parameter.
+     * result</code> parameter and will, if <code>recursiveSearch</code> is
+     * <code>true</code> recursively call itself; thus reusing the <code>result</code>
+     * parameter.
      * \param result The result vector that will contain all files in the directory
      * \param path The path of the directory whose files should be listed
      * \param recursiveSearch If <code>true</code>, this method will be called recursively 
-     * for each directory in the current directory, combining all results in the <code>
-     * result</code> vector.
+     * for each directory in the current directory, combining all results in the
+     * <code>result</code> vector.
      */
      void readFiles(
         std::vector<std::string>& result,
@@ -174,14 +175,14 @@ private:
     /**
      * Internal function that does the directory marching of all subdirectories that are
      * in the directory point to by <code>path</code>. It will combine all results in the
-     * <code>result</code> parameter and will, if <code>recursiveSearch</code> is <code>
-     * true</code> recursively call itself; thus reusing the <code>result</code>
+     * <code>result</code> parameter and will, if <code>recursiveSearch</code> is
+     * <code>true</code> recursively call itself; thus reusing the <code>result</code>
      * parameter.
      * \param result The result vector that will contain all files in the directory
      * \param path The path of the directory whose files should be listed
      * \param recursiveSearch If <code>true</code>, this method will be called recursively 
-     * for each directory in the current directory, combining all results in the <code>
-     * result</code> vector.
+     * for each directory in the current directory, combining all results in the
+     * <code>result</code> vector.
      */
     void readDirectories(
         std::vector<std::string>& result,

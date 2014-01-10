@@ -71,7 +71,7 @@ File::File(const char* filename, bool isRawPath,
         installFileChangeListener();
 }
 
-File::File(const string& filename, bool isRawPath,
+File::File(const std::string& filename, bool isRawPath,
            const FileChangedCallback& fileChangedCallback)
     : _fileChangedCallback(fileChangedCallback)
 #ifdef WIN32
@@ -107,7 +107,7 @@ const File::FileChangedCallback& File::callback() const {
     return _fileChangedCallback;
 }
 
-File::operator const string&() const {
+File::operator const std::string&() const {
     return _filename;
 }
 
@@ -319,8 +319,8 @@ void File::completionHandler(
                              void *clientCallBackInfo,
                              size_t numEvents,
                              void *eventPaths,
-                             const FSEventStreamEventFlags*,
-                             const FSEventStreamEventId*)
+                             const FSEventStreamEventFlags[],
+                             const FSEventStreamEventId[])
 {
     File* fileObj = reinterpret_cast<File*>(clientCallBackInfo);
     char** paths = reinterpret_cast<char**>(eventPaths);

@@ -35,8 +35,8 @@ namespace logging {
 
 LogManager* LogManager::_manager = nullptr;
 
+/// \cond DEV
 /**
- * \intern
  * The LogManager_P is the private version of the LogManager and uses template
  * instantiation to increase the performance of the logging. Specifying the
  * LogManager::LogLevel as a template argument allows the compiler to optimize the check
@@ -98,6 +98,8 @@ void LogManager_P<LogManager::LogLevel::Debug,false>::logMessage(LogManager::Log
                                                                  const std::string&)
 {}
 #endif
+
+/// \endcond
 
 std::string LogManager::stringFromLevel(LogLevel level) {
     switch (level) {

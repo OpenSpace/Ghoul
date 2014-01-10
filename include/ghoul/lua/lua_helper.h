@@ -54,8 +54,8 @@ std::string lua_logTable(lua_State* state,logging::LogManager::LogLevel level =
  * </code> objects. For functions, merely the word <code>function</code> is logged. The
  * messages is writting in the the format:
  * <code>
- * 1: <entry>
- * 2: <entry>
+ * 1: \<entry\>
+ * 2: \<entry\>
  * ...
  * </code>
  * If the stack does not contain any values, an empty string is returned.

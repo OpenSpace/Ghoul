@@ -100,7 +100,7 @@ public:
      * Tests if a memory block with the given <code>name</code> has been created
      * previously or if the name is available.
      * \param name The name of the shared memory block that should be tested
-     * \return <code>true</code> if a shared memory block exists with the given <code
+     * \return <code>true</code> if a shared memory block exists with the given <code>
      * name</code>, <code>false</code> otherwise
      */
     static bool exists(const std::string& name);

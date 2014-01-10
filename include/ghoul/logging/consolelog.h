@@ -32,34 +32,36 @@ namespace ghoul {
 namespace logging {
 
 /**
- * A concrete subclass of Log that logs the messages to the console using the std::cout
- * stream. The formatting of the log messages depends on the stamping settings. The
- * various possibilities are:
- * "[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
- * "[DATE] CATEGORY (LEVEL) MESSAGE"
- * "[TIME] CATEGORY (LEVEL) MESSAGE"
- * And the remaining possibilities with CATEGORY and (LEVEL) missing.
- * A parameter in the constructor determines if the output text will be colored according
- * to the LogManager::LogLevel:
- * Debug -> Green
- * Info -> Default color scheme of the console
- * Warning -> Yellow
- * Error -> Red
- * Fatal -> Cyan
+ * A concrete subclass of Log that logs the messages to the console using the
+ * <code>std::cout</code> stream. The formatting of the log messages depends on the
+ * stamping settings. The various possibilities are:
+ * \verbatim
+ "[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
+ "[DATE] CATEGORY (LEVEL) MESSAGE"
+ "[TIME] CATEGORY (LEVEL) MESSAGE"
+ \endverbatim
+ * And the remaining possibilities with <code>CATEGORY</code> and <code>LEVEL</code>
+ * missing. A parameter in the constructor determines if the output text will be colored
+ * according to the LogManager::LogLevel:<br>
+ * LogManager::LogLevel::Debug -> Green<br>
+ * LogManager::LogLevel::Info -> Default color scheme of the console<br>
+ * LogManager::LogLevel::Warning -> Yellow<br>
+ * LogManager::LogLevel::Error -> Red<br>
+ * LogManager::LogLevel::Fatal -> Cyan<br>
  */
 
 class ConsoleLog : public StreamLog {
 public:
     /**
-    * Constructor that calls Log::Log(bool, bool, bool, bool) constructor.
-    * \param [in] colorOutput Determines if the lgo should printed in color
-    * \param [in] timeStamping Determines if the log should print the time when a message
+    * Constructor that calls Log constructor.
+    * \param colorOutput Determines if the log should printed in color
+    * \param timeStamping Determines if the log should print the time when a message
     * is logged in the log messages
-    * \param [in] dateStamping Determines if the log should print the time when a message
+    * \param dateStamping Determines if the log should print the time when a message
     * is logged in the log messages
-    * \param [in] categoryStamping Determines if the log should print the categories in
+    * \param categoryStamping Determines if the log should print the categories in
     * the log messages
-    * \param [in] logLevelStamping Determines if the log should print the log level in the
+    * \param logLevelStamping Determines if the log should print the log level in the
     * log messages
     */
     ConsoleLog(bool colorOutput = true, bool timeStamping = false,
@@ -68,10 +70,10 @@ public:
 
     /**
      * Method that logs a message with a given level and category to the console.
-     * \param [in] level The log level with which the message shall be logged
-     * \param [in] category The category of this message. Can be used by each subclass
+     * \param level The log level with which the message shall be logged
+     * \param category The category of this message. Can be used by each subclass
      * individually
-     * \param [in] message The message body of the log message
+     * \param message The message body of the log message
      */
     void log(LogManager::LogLevel level, const std::string& category,
              const std::string& message);
@@ -82,13 +84,13 @@ protected:
     ConsoleLog(const ConsoleLog&);
     /**
      * Prepares the console to print the next messages in the color according to the
-     * LogManager::LogLevel:
-     * Debug -> Green
-     * Info -> Default color scheme of the console
-     * Warning -> Yellow
-     * Error -> Red
-     * Fatal -> Cyan
-     * \param [in] level The level that determines the color scheme for the console
+     * LogManager::LogLevel:<br>
+     * LogManager::LogLevel::Debug -> Green<br>
+     * LogManager::LogLevel::Info -> Default color scheme of the console<br>
+     * LogManager::LogLevel::Warning -> Yellow<br>
+     * LogManager::LogLevel::Error -> Red<br>
+     * LogManager::LogLevel::Fatal -> Cyan<br>
+     * \param level The level that determines the color scheme for the console
      */
     void setColorForLevel(LogManager::LogLevel level);
 

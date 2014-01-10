@@ -85,7 +85,7 @@ ProgramObject::ProgramObject()
         LERROR_SAFE("glCreateProgram returned 0");
 }
 
-ProgramObject::ProgramObject(const string& name)
+ProgramObject::ProgramObject(const std::string& name)
     : _id(0)
     , _programName(name)
     , _loggerCat("ProgramObject('" + name + "')")
@@ -357,14 +357,14 @@ bool ProgramObject::ignoreUniformLocationError() const {
     return _ignoreUniformLocationError;
 }
 
-GLint ProgramObject::uniformLocation(const string& name) const {
+GLint ProgramObject::uniformLocation(const std::string& name) const {
     GLint location = glGetUniformLocation(_id, name.c_str());
     if (!_ignoreUniformLocationError && location == -1)
         LWARNING_SAFE("Failed to locate uniform location for: " + name);
     return location;
 }
 
-bool ProgramObject::setUniform(const string& name, bool value) {
+bool ProgramObject::setUniform(const std::string& name, bool value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -372,7 +372,7 @@ bool ProgramObject::setUniform(const string& name, bool value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, bool v1, bool v2) {
+bool ProgramObject::setUniform(const std::string& name, bool v1, bool v2) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -380,7 +380,7 @@ bool ProgramObject::setUniform(const string& name, bool v1, bool v2) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, bool v1, bool v2, bool v3) {
+bool ProgramObject::setUniform(const std::string& name, bool v1, bool v2, bool v3) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -388,7 +388,9 @@ bool ProgramObject::setUniform(const string& name, bool v1, bool v2, bool v3) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, bool v1, bool v2, bool v3, bool v4) {
+bool ProgramObject::setUniform(const std::string& name,
+                               bool v1, bool v2, bool v3, bool v4)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -396,7 +398,7 @@ bool ProgramObject::setUniform(const string& name, bool v1, bool v2, bool v3, bo
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const glm::bvec2& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::bvec2& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -404,7 +406,7 @@ bool ProgramObject::setUniform(const string& name, const glm::bvec2& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const glm::bvec3& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::bvec3& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -412,7 +414,7 @@ bool ProgramObject::setUniform(const string& name, const glm::bvec3& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const glm::bvec4& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::bvec4& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -420,7 +422,7 @@ bool ProgramObject::setUniform(const string& name, const glm::bvec4& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const bool* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, const bool* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -428,7 +430,7 @@ bool ProgramObject::setUniform(const string& name, const bool* values, int count
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, glm::bvec2* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::bvec2* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -436,7 +438,7 @@ bool ProgramObject::setUniform(const string& name, glm::bvec2* values, int count
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, glm::bvec3* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::bvec3* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -444,7 +446,7 @@ bool ProgramObject::setUniform(const string& name, glm::bvec3* values, int count
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, glm::bvec4* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::bvec4* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -452,7 +454,7 @@ bool ProgramObject::setUniform(const string& name, glm::bvec4* values, int count
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLuint value) {
+bool ProgramObject::setUniform(const std::string& name, GLuint value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -460,7 +462,7 @@ bool ProgramObject::setUniform(const string& name, GLuint value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLuint v1, GLuint v2) {
+bool ProgramObject::setUniform(const std::string& name, GLuint v1, GLuint v2) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -468,7 +470,7 @@ bool ProgramObject::setUniform(const string& name, GLuint v1, GLuint v2) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLuint v1, GLuint v2, GLuint v3) {
+bool ProgramObject::setUniform(const std::string& name, GLuint v1, GLuint v2, GLuint v3) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -476,7 +478,7 @@ bool ProgramObject::setUniform(const string& name, GLuint v1, GLuint v2, GLuint 
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name,
+bool ProgramObject::setUniform(const std::string& name,
                                GLuint v1, GLuint v2, GLuint v3, GLuint v4)
 {
     const GLint location = uniformLocation(name);
@@ -486,7 +488,7 @@ bool ProgramObject::setUniform(const string& name,
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const glm::uvec2& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::uvec2& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -494,7 +496,7 @@ bool ProgramObject::setUniform(const string& name, const glm::uvec2& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const glm::uvec3& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::uvec3& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -502,7 +504,7 @@ bool ProgramObject::setUniform(const string& name, const glm::uvec3& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const glm::uvec4& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::uvec4& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -510,7 +512,7 @@ bool ProgramObject::setUniform(const string& name, const glm::uvec4& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const GLuint* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, const GLuint* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -518,7 +520,7 @@ bool ProgramObject::setUniform(const string& name, const GLuint* values, int cou
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, glm::uvec2* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::uvec2* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -526,7 +528,7 @@ bool ProgramObject::setUniform(const string& name, glm::uvec2* values, int count
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, glm::uvec3* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::uvec3* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -534,7 +536,7 @@ bool ProgramObject::setUniform(const string& name, glm::uvec3* values, int count
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, glm::uvec4* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::uvec4* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -542,7 +544,7 @@ bool ProgramObject::setUniform(const string& name, glm::uvec4* values, int count
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLint value) {
+bool ProgramObject::setUniform(const std::string& name, GLint value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -550,7 +552,7 @@ bool ProgramObject::setUniform(const string& name, GLint value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLint v1, GLint v2) {
+bool ProgramObject::setUniform(const std::string& name, GLint v1, GLint v2) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -558,7 +560,7 @@ bool ProgramObject::setUniform(const string& name, GLint v1, GLint v2) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLint v1, GLint v2, GLint v3) {
+bool ProgramObject::setUniform(const std::string& name, GLint v1, GLint v2, GLint v3) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -566,7 +568,7 @@ bool ProgramObject::setUniform(const string& name, GLint v1, GLint v2, GLint v3)
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name,
+bool ProgramObject::setUniform(const std::string& name,
                                GLint v1, GLint v2, GLint v3, GLint v4)
 {
     const GLint location = uniformLocation(name);
@@ -576,7 +578,7 @@ bool ProgramObject::setUniform(const string& name,
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const glm::ivec2& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::ivec2& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -584,7 +586,7 @@ bool ProgramObject::setUniform(const string& name, const glm::ivec2& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const glm::ivec3& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::ivec3& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -592,7 +594,7 @@ bool ProgramObject::setUniform(const string& name, const glm::ivec3& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const glm::ivec4& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::ivec4& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -600,7 +602,7 @@ bool ProgramObject::setUniform(const string& name, const glm::ivec4& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const GLint* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, const GLint* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -608,7 +610,7 @@ bool ProgramObject::setUniform(const string& name, const GLint* values, int coun
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, glm::ivec2* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::ivec2* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -616,7 +618,7 @@ bool ProgramObject::setUniform(const string& name, glm::ivec2* values, int count
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, glm::ivec3* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::ivec3* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -624,7 +626,7 @@ bool ProgramObject::setUniform(const string& name, glm::ivec3* values, int count
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, glm::ivec4* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::ivec4* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -632,7 +634,7 @@ bool ProgramObject::setUniform(const string& name, glm::ivec4* values, int count
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLfloat value) {
+bool ProgramObject::setUniform(const std::string& name, GLfloat value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -640,7 +642,7 @@ bool ProgramObject::setUniform(const string& name, GLfloat value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLfloat v1, GLfloat v2) {
+bool ProgramObject::setUniform(const std::string& name, GLfloat v1, GLfloat v2) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -648,7 +650,9 @@ bool ProgramObject::setUniform(const string& name, GLfloat v1, GLfloat v2) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLfloat v1, GLfloat v2, GLfloat v3) {
+bool ProgramObject::setUniform(const std::string& name,
+                               GLfloat v1, GLfloat v2, GLfloat v3)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -656,7 +660,7 @@ bool ProgramObject::setUniform(const string& name, GLfloat v1, GLfloat v2, GLflo
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name,
+bool ProgramObject::setUniform(const std::string& name,
                                GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4)
 {
     const GLint location = uniformLocation(name);
@@ -666,7 +670,7 @@ bool ProgramObject::setUniform(const string& name,
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const vec2& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::vec2& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -674,7 +678,7 @@ bool ProgramObject::setUniform(const string& name, const vec2& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const vec3& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::vec3& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -682,7 +686,7 @@ bool ProgramObject::setUniform(const string& name, const vec3& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const vec4& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::vec4& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -690,7 +694,9 @@ bool ProgramObject::setUniform(const string& name, const vec4& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const GLfloat* values, int count) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const GLfloat* values, int count)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -698,7 +704,7 @@ bool ProgramObject::setUniform(const string& name, const GLfloat* values, int co
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, vec2* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::vec2* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -706,7 +712,7 @@ bool ProgramObject::setUniform(const string& name, vec2* values, int count) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, vec3* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::vec3* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -714,7 +720,7 @@ bool ProgramObject::setUniform(const string& name, vec3* values, int count) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, vec4* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::vec4* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -722,7 +728,7 @@ bool ProgramObject::setUniform(const string& name, vec4* values, int count) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLdouble value) {
+bool ProgramObject::setUniform(const std::string& name, GLdouble value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -730,7 +736,7 @@ bool ProgramObject::setUniform(const string& name, GLdouble value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLdouble v1, GLdouble v2) {
+bool ProgramObject::setUniform(const std::string& name, GLdouble v1, GLdouble v2) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -738,7 +744,8 @@ bool ProgramObject::setUniform(const string& name, GLdouble v1, GLdouble v2) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, GLdouble v1, GLdouble v2, GLdouble v3) {
+bool ProgramObject::setUniform(const std::string& name,
+                               GLdouble v1, GLdouble v2, GLdouble v3) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -746,7 +753,7 @@ bool ProgramObject::setUniform(const string& name, GLdouble v1, GLdouble v2, GLd
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name,
+bool ProgramObject::setUniform(const std::string& name,
                                GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4)
 {
     const GLint location = uniformLocation(name);
@@ -756,7 +763,7 @@ bool ProgramObject::setUniform(const string& name,
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const dvec2& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::dvec2& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -764,7 +771,7 @@ bool ProgramObject::setUniform(const string& name, const dvec2& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const dvec3& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::dvec3& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -772,7 +779,7 @@ bool ProgramObject::setUniform(const string& name, const dvec3& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const dvec4& value) {
+bool ProgramObject::setUniform(const std::string& name, const glm::dvec4& value) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -780,7 +787,9 @@ bool ProgramObject::setUniform(const string& name, const dvec4& value) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const GLdouble* values, int count) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const GLdouble* values, int count)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -788,7 +797,7 @@ bool ProgramObject::setUniform(const string& name, const GLdouble* values, int c
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, dvec2* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::dvec2* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -796,7 +805,7 @@ bool ProgramObject::setUniform(const string& name, dvec2* values, int count) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, dvec3* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::dvec3* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -804,7 +813,7 @@ bool ProgramObject::setUniform(const string& name, dvec3* values, int count) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, dvec4* values, int count) {
+bool ProgramObject::setUniform(const std::string& name, glm::dvec4* values, int count) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -812,7 +821,9 @@ bool ProgramObject::setUniform(const string& name, dvec4* values, int count) {
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const mat2x2& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::mat2x2& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -820,7 +831,9 @@ bool ProgramObject::setUniform(const string& name, const mat2x2& value, bool tra
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const mat2x3& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::mat2x3& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -828,7 +841,9 @@ bool ProgramObject::setUniform(const string& name, const mat2x3& value, bool tra
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const mat2x4& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::mat2x4& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -836,7 +851,9 @@ bool ProgramObject::setUniform(const string& name, const mat2x4& value, bool tra
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const mat3x2& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::mat3x2& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -844,7 +861,8 @@ bool ProgramObject::setUniform(const string& name, const mat3x2& value, bool tra
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const mat3x3& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::mat3x3& value, bool transpose) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -852,7 +870,9 @@ bool ProgramObject::setUniform(const string& name, const mat3x3& value, bool tra
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const mat3x4& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::mat3x4& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -860,7 +880,9 @@ bool ProgramObject::setUniform(const string& name, const mat3x4& value, bool tra
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const mat4x2& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::mat4x2& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -868,7 +890,8 @@ bool ProgramObject::setUniform(const string& name, const mat4x2& value, bool tra
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const mat4x3& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::mat4x3& value, bool transpose) {
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -876,7 +899,9 @@ bool ProgramObject::setUniform(const string& name, const mat4x3& value, bool tra
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const mat4x4& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::mat4x4& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -884,7 +909,9 @@ bool ProgramObject::setUniform(const string& name, const mat4x4& value, bool tra
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const dmat2x2& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::dmat2x2& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -892,7 +919,9 @@ bool ProgramObject::setUniform(const string& name, const dmat2x2& value, bool tr
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const dmat2x3& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::dmat2x3& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -900,7 +929,9 @@ bool ProgramObject::setUniform(const string& name, const dmat2x3& value, bool tr
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const dmat2x4& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::dmat2x4& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -908,7 +939,9 @@ bool ProgramObject::setUniform(const string& name, const dmat2x4& value, bool tr
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const dmat3x2& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::dmat3x2& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -916,7 +949,9 @@ bool ProgramObject::setUniform(const string& name, const dmat3x2& value, bool tr
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const dmat3x3& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::dmat3x3& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -924,7 +959,9 @@ bool ProgramObject::setUniform(const string& name, const dmat3x3& value, bool tr
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const dmat3x4& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::dmat3x4& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -932,7 +969,9 @@ bool ProgramObject::setUniform(const string& name, const dmat3x4& value, bool tr
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const dmat4x2& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::dmat4x2& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -940,7 +979,9 @@ bool ProgramObject::setUniform(const string& name, const dmat4x2& value, bool tr
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const dmat4x3& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::dmat4x3& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -948,7 +989,9 @@ bool ProgramObject::setUniform(const string& name, const dmat4x3& value, bool tr
     return true;
 }
 
-bool ProgramObject::setUniform(const string& name, const dmat4x4& value, bool transpose) {
+bool ProgramObject::setUniform(const std::string& name,
+                               const glm::dmat4x4& value, bool transpose)
+{
     const GLint location = uniformLocation(name);
     if (location == -1)
         return false;
@@ -1004,7 +1047,7 @@ void ProgramObject::setUniform(GLint location, bool v1, bool v2, bool v3, bool v
     }
 }
 
-void ProgramObject::setUniform(GLint location, const bvec2& value) {
+void ProgramObject::setUniform(GLint location, const glm::bvec2& value) {
     if (glProgramUniform2iv)
         glProgramUniform2iv(_id, location, 1, glm::value_ptr(glm::ivec2(value)));
     else {
@@ -1016,7 +1059,7 @@ void ProgramObject::setUniform(GLint location, const bvec2& value) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, const bvec3& value) {
+void ProgramObject::setUniform(GLint location, const glm::bvec3& value) {
     if (glProgramUniform3iv)
         glProgramUniform3iv(_id, location, 1, glm::value_ptr(glm::ivec3(value)));
     else {
@@ -1028,7 +1071,7 @@ void ProgramObject::setUniform(GLint location, const bvec3& value) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, const bvec4& value) {
+void ProgramObject::setUniform(GLint location, const glm::bvec4& value) {
     if (glProgramUniform4iv)
         glProgramUniform4iv(_id, location, 1, glm::value_ptr(glm::ivec4(value)));
     else {
@@ -1056,7 +1099,7 @@ void ProgramObject::setUniform(GLint location, const bool* values, int count) {
     delete[] castValues;
 }
 
-void ProgramObject::setUniform(GLint location, bvec2* values, int count) {
+void ProgramObject::setUniform(GLint location, glm::bvec2* values, int count) {
     GLint* castValues = new GLint[2 * count];
     for (int i = 0; i < count; ++i) {
         castValues[2 * i] = values[i].x;
@@ -1074,7 +1117,7 @@ void ProgramObject::setUniform(GLint location, bvec2* values, int count) {
     delete[] castValues;
 }
 
-void ProgramObject::setUniform(GLint location, bvec3* values, int count) {
+void ProgramObject::setUniform(GLint location, glm::bvec3* values, int count) {
     GLint* castValues = new GLint[3 * count];
     for (int i = 0; i < count; ++i) {
         castValues[3 * i] = values[i].x;
@@ -1093,7 +1136,7 @@ void ProgramObject::setUniform(GLint location, bvec3* values, int count) {
     delete[] castValues;
 }
 
-void ProgramObject::setUniform(GLint location, bvec4* values, int count /*= 1*/) {
+void ProgramObject::setUniform(GLint location, glm::bvec4* values, int count) {
     GLint* castValues = new GLint[4 * count];
     for (int i = 0; i < count; ++i) {
         castValues[4 * i] = values[i].x;
@@ -1163,7 +1206,7 @@ void ProgramObject::setUniform(GLint location,
     }
 }
 
-void ProgramObject::setUniform(GLint location, const uvec2& value) {
+void ProgramObject::setUniform(GLint location, const glm::uvec2& value) {
     if (glProgramUniform2uiv)
         glProgramUniform2uiv(_id, location, 1, value_ptr(value));
     else {
@@ -1175,7 +1218,7 @@ void ProgramObject::setUniform(GLint location, const uvec2& value) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, const uvec3& value) {
+void ProgramObject::setUniform(GLint location, const glm::uvec3& value) {
     if (glProgramUniform3uiv)
         glProgramUniform3uiv(_id, location, 1, value_ptr(value));
     else {
@@ -1187,7 +1230,7 @@ void ProgramObject::setUniform(GLint location, const uvec3& value) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, const uvec4& value) {
+void ProgramObject::setUniform(GLint location, const glm::uvec4& value) {
     if (glProgramUniform4uiv)
         glProgramUniform4uiv(_id, location, 1, value_ptr(value));
     else {
@@ -1211,7 +1254,7 @@ void ProgramObject::setUniform(GLint location, const GLuint* values, int count) 
     }
 }
 
-void ProgramObject::setUniform(GLint location, uvec2* values, int count) {
+void ProgramObject::setUniform(GLint location, glm::uvec2* values, int count) {
     if (glProgramUniform2uiv)
         glProgramUniform2uiv(_id, location, count,
                              reinterpret_cast<unsigned int*>(values));
@@ -1224,7 +1267,7 @@ void ProgramObject::setUniform(GLint location, uvec2* values, int count) {
     }
 }   
 
-void ProgramObject::setUniform(GLint location, uvec3* values, int count) {
+void ProgramObject::setUniform(GLint location, glm::uvec3* values, int count) {
     if (glProgramUniform3uiv)
         glProgramUniform3uiv(_id, location, count,
                              reinterpret_cast<unsigned int*>(values));
@@ -1237,7 +1280,7 @@ void ProgramObject::setUniform(GLint location, uvec3* values, int count) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, uvec4* values, int count) {
+void ProgramObject::setUniform(GLint location, glm::uvec4* values, int count) {
     if (glProgramUniform4uiv)
         glProgramUniform4uiv(_id, location, count,
                              reinterpret_cast<unsigned int*>(values));
@@ -1298,7 +1341,7 @@ void ProgramObject::setUniform(GLint location, GLint v1, GLint v2, GLint v3, GLi
     }
 }
 
-void ProgramObject::setUniform(GLint location, const ivec2& value) {
+void ProgramObject::setUniform(GLint location, const glm::ivec2& value) {
     if (glProgramUniform2iv)
         glProgramUniform2iv(_id, location, 1, value_ptr(value));
     else {
@@ -1310,7 +1353,7 @@ void ProgramObject::setUniform(GLint location, const ivec2& value) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, const ivec3& value) {
+void ProgramObject::setUniform(GLint location, const glm::ivec3& value) {
     if (glProgramUniform3iv)
         glProgramUniform3iv(_id, location, 1, value_ptr(value));
     else {
@@ -1322,7 +1365,7 @@ void ProgramObject::setUniform(GLint location, const ivec3& value) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, const ivec4& value) {
+void ProgramObject::setUniform(GLint location, const glm::ivec4& value) {
     if (glProgramUniform4iv)
         glProgramUniform4iv(_id, location, 1, value_ptr(value));
     else {
@@ -1346,7 +1389,7 @@ void ProgramObject::setUniform(GLint location, const GLint* values, int count) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, ivec2* values, int count) {
+void ProgramObject::setUniform(GLint location, glm::ivec2* values, int count) {
     if (glProgramUniform2iv)
         glProgramUniform2iv(_id, location, count, reinterpret_cast<int*>(values));
     else {
@@ -1358,7 +1401,7 @@ void ProgramObject::setUniform(GLint location, ivec2* values, int count) {
     }
 }   
 
-void ProgramObject::setUniform(GLint location, ivec3* values, int count) {
+void ProgramObject::setUniform(GLint location, glm::ivec3* values, int count) {
     if (glProgramUniform3iv)
         glProgramUniform3iv(_id, location, count, reinterpret_cast<int*>(values));
     else {
@@ -1370,7 +1413,7 @@ void ProgramObject::setUniform(GLint location, ivec3* values, int count) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, ivec4* values, int count) {
+void ProgramObject::setUniform(GLint location, glm::ivec4* values, int count) {
     if (glProgramUniform4iv)
         glProgramUniform4iv(_id, location, count, reinterpret_cast<int*>(values));
     else {
@@ -1432,7 +1475,7 @@ void ProgramObject::setUniform(GLint location,
     }
 }
 
-void ProgramObject::setUniform(GLint location, const vec2& value) {
+void ProgramObject::setUniform(GLint location, const glm::vec2& value) {
     if (glProgramUniform2fv)
         glProgramUniform2fv(_id, location, 1, value_ptr(value));
     else {
@@ -1444,7 +1487,7 @@ void ProgramObject::setUniform(GLint location, const vec2& value) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, const vec3& value) {
+void ProgramObject::setUniform(GLint location, const glm::vec3& value) {
     if (glProgramUniform3fv)
         glProgramUniform3fv(_id, location, 1, value_ptr(value));
     else {
@@ -1456,7 +1499,7 @@ void ProgramObject::setUniform(GLint location, const vec3& value) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, const vec4& value) {
+void ProgramObject::setUniform(GLint location, const glm::vec4& value) {
     if (glProgramUniform4fv)
         glProgramUniform4fv(_id, location, 1, value_ptr(value));
     else {
@@ -1480,7 +1523,7 @@ void ProgramObject::setUniform(GLint location, const GLfloat* values, int count)
     }
 }
 
-void ProgramObject::setUniform(GLint location, vec2* values, int count) {
+void ProgramObject::setUniform(GLint location, glm::vec2* values, int count) {
     if (glProgramUniform2fv)
         glProgramUniform2fv(_id, location, count, reinterpret_cast<float*>(values));
     else {
@@ -1492,7 +1535,7 @@ void ProgramObject::setUniform(GLint location, vec2* values, int count) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, vec3* values, int count /*= 1*/) {
+void ProgramObject::setUniform(GLint location, glm::vec3* values, int count /*= 1*/) {
     if (glProgramUniform3fv)
         glProgramUniform3fv(_id, location, count, reinterpret_cast<float*>(values));
     else {
@@ -1504,7 +1547,7 @@ void ProgramObject::setUniform(GLint location, vec3* values, int count /*= 1*/) 
     }
 }
 
-void ProgramObject::setUniform(GLint location, vec4* values, int count /*= 1*/) {
+void ProgramObject::setUniform(GLint location, glm::vec4* values, int count /*= 1*/) {
     if (glProgramUniform4fv)
         glProgramUniform4fv(_id, location, count, reinterpret_cast<float*>(values));
     else {
@@ -1566,7 +1609,7 @@ void ProgramObject::setUniform(GLint location,
     }
 }
 
-void ProgramObject::setUniform(GLint location, const dvec2& value) {
+void ProgramObject::setUniform(GLint location, const glm::dvec2& value) {
     if (glProgramUniform2dv)
         glProgramUniform2dv(_id, location, 1, value_ptr(value));
     else {
@@ -1578,7 +1621,7 @@ void ProgramObject::setUniform(GLint location, const dvec2& value) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, const dvec3& value) {
+void ProgramObject::setUniform(GLint location, const glm::dvec3& value) {
     if (glProgramUniform3dv)
         glProgramUniform3dv(_id, location, 1, value_ptr(value));
     else {
@@ -1590,7 +1633,7 @@ void ProgramObject::setUniform(GLint location, const dvec3& value) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, const dvec4& value) {
+void ProgramObject::setUniform(GLint location, const glm::dvec4& value) {
     if (glProgramUniform4dv)
         glProgramUniform4dv(_id, location, 1, value_ptr(value));
     else {
@@ -1614,7 +1657,9 @@ void ProgramObject::setUniform(GLint location, const GLdouble* values, int count
     }
 }
 
-void ProgramObject::setUniform(GLint location, dvec2* values, int count) {
+void ProgramObject::setUniform(GLint location,
+                               glm::dvec2* values, int count)
+{
     if (glProgramUniform2dv)
         glProgramUniform2dv(_id, location, count, reinterpret_cast<double*>(values));
     else {
@@ -1626,7 +1671,9 @@ void ProgramObject::setUniform(GLint location, dvec2* values, int count) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, dvec3* values, int count) {
+void ProgramObject::setUniform(GLint location,
+                               glm::dvec3* values, int count)
+{
     if (glProgramUniform3dv)
         glProgramUniform3dv(_id, location, count, reinterpret_cast<double*>(values));
     else {
@@ -1638,7 +1685,9 @@ void ProgramObject::setUniform(GLint location, dvec3* values, int count) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, dvec4* values, int count) {
+void ProgramObject::setUniform(GLint location,
+                               glm::dvec4* values, int count)
+{
     if (glProgramUniform4dv)
         glProgramUniform4dv(_id, location, count, reinterpret_cast<double*>(values));
     else {
@@ -1650,7 +1699,9 @@ void ProgramObject::setUniform(GLint location, dvec4* values, int count) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, const mat2x2& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::mat2x2& value, bool transpose)
+{
     if (glProgramUniformMatrix2fv)
         glProgramUniformMatrix2fv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1662,7 +1713,9 @@ void ProgramObject::setUniform(GLint location, const mat2x2& value, bool transpo
     }
 }
 
-void ProgramObject::setUniform(GLint location, const mat2x3& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::mat2x3& value, bool transpose)
+{
     if (glProgramUniformMatrix2x3fv)
         glProgramUniformMatrix2x3fv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1674,7 +1727,9 @@ void ProgramObject::setUniform(GLint location, const mat2x3& value, bool transpo
     }
 }
 
-void ProgramObject::setUniform(GLint location, const mat2x4& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::mat2x4& value, bool transpose)
+{
     if (glProgramUniformMatrix2x4fv)
         glProgramUniformMatrix2x4fv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1686,7 +1741,9 @@ void ProgramObject::setUniform(GLint location, const mat2x4& value, bool transpo
     }
 }
 
-void ProgramObject::setUniform(GLint location, const mat3x2& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::mat3x2& value, bool transpose)
+{
     if (glProgramUniformMatrix3x2fv)
         glProgramUniformMatrix3x2fv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1698,7 +1755,9 @@ void ProgramObject::setUniform(GLint location, const mat3x2& value, bool transpo
     }
 }
 
-void ProgramObject::setUniform(GLint location, const mat3x3& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::mat3x3& value, bool transpose)
+{
     if (glProgramUniformMatrix3fv)
         glProgramUniformMatrix3fv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1710,7 +1769,9 @@ void ProgramObject::setUniform(GLint location, const mat3x3& value, bool transpo
     }
 }
 
-void ProgramObject::setUniform(GLint location, const mat3x4& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::mat3x4& value, bool transpose)
+{
     if (glProgramUniformMatrix3x4fv)
         glProgramUniformMatrix3x4fv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1722,7 +1783,9 @@ void ProgramObject::setUniform(GLint location, const mat3x4& value, bool transpo
     }
 }
 
-void ProgramObject::setUniform(GLint location, const mat4x2& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::mat4x2& value, bool transpose)
+{
     if (glProgramUniformMatrix4x2fv)
         glProgramUniformMatrix4x2fv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1734,7 +1797,9 @@ void ProgramObject::setUniform(GLint location, const mat4x2& value, bool transpo
     }
 }
 
-void ProgramObject::setUniform(GLint location, const mat4x3& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::mat4x3& value, bool transpose)
+{
     if (glProgramUniformMatrix4x3fv)
         glProgramUniformMatrix4x3fv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1746,7 +1811,9 @@ void ProgramObject::setUniform(GLint location, const mat4x3& value, bool transpo
     }
 }
 
-void ProgramObject::setUniform(GLint location, const mat4x4& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::mat4x4& value, bool transpose)
+{
     if (glProgramUniformMatrix4fv)
         glProgramUniformMatrix4fv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1758,7 +1825,9 @@ void ProgramObject::setUniform(GLint location, const mat4x4& value, bool transpo
     }
 }
 
-void ProgramObject::setUniform(GLint location, const dmat2x2& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::dmat2x2& value, bool transpose)
+{
     if (glProgramUniformMatrix2dv)
         glProgramUniformMatrix2dv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1770,7 +1839,9 @@ void ProgramObject::setUniform(GLint location, const dmat2x2& value, bool transp
     }
 }
 
-void ProgramObject::setUniform(GLint location, const dmat2x3& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::dmat2x3& value, bool transpose)
+{
     if (glProgramUniformMatrix2x3dv)
         glProgramUniformMatrix2x3dv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1782,7 +1853,9 @@ void ProgramObject::setUniform(GLint location, const dmat2x3& value, bool transp
     }
 }
 
-void ProgramObject::setUniform(GLint location, const dmat2x4& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::dmat2x4& value, bool transpose)
+{
     if (glProgramUniformMatrix2x4dv)
         glProgramUniformMatrix2x4dv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1794,7 +1867,9 @@ void ProgramObject::setUniform(GLint location, const dmat2x4& value, bool transp
     }
 }
 
-void ProgramObject::setUniform(GLint location, const dmat3x2& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::dmat3x2& value, bool transpose)
+{
     if (glProgramUniformMatrix3x2dv)
         glProgramUniformMatrix3x2dv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1806,7 +1881,9 @@ void ProgramObject::setUniform(GLint location, const dmat3x2& value, bool transp
     }
 }
 
-void ProgramObject::setUniform(GLint location, const dmat3x3& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::dmat3x3& value, bool transpose)
+{
     if (glProgramUniformMatrix3dv)
         glProgramUniformMatrix3dv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1818,7 +1895,9 @@ void ProgramObject::setUniform(GLint location, const dmat3x3& value, bool transp
     }
 }
 
-void ProgramObject::setUniform(GLint location, const dmat3x4& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::dmat3x4& value, bool transpose)
+{
     if (glProgramUniformMatrix3x4dv)
         glProgramUniformMatrix3x4dv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1830,7 +1909,9 @@ void ProgramObject::setUniform(GLint location, const dmat3x4& value, bool transp
     }
 }
 
-void ProgramObject::setUniform(GLint location, const dmat4x2& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::dmat4x2& value, bool transpose)
+{
     if (glProgramUniformMatrix4x2dv)
         glProgramUniformMatrix4x2dv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1842,7 +1923,9 @@ void ProgramObject::setUniform(GLint location, const dmat4x2& value, bool transp
     }
 }
 
-void ProgramObject::setUniform(GLint location, const dmat4x3& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::dmat4x3& value, bool transpose)
+{
     if (glProgramUniformMatrix4x3dv)
         glProgramUniformMatrix4x3dv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1854,7 +1937,9 @@ void ProgramObject::setUniform(GLint location, const dmat4x3& value, bool transp
     }
 }
 
-void ProgramObject::setUniform(GLint location, const dmat4x4& value, bool transpose) {
+void ProgramObject::setUniform(GLint location,
+                               const glm::dmat4x4& value, bool transpose)
+{
     if (glProgramUniformMatrix4dv)
         glProgramUniformMatrix4dv(_id, location, 1, transpose, value_ptr(value));
     else {
@@ -1866,14 +1951,14 @@ void ProgramObject::setUniform(GLint location, const dmat4x4& value, bool transp
     }
 }
 
-GLint ProgramObject::attributeLocation(const string& name) const {
+GLint ProgramObject::attributeLocation(const std::string& name) const {
     const GLint location = glGetAttribLocation(_id, name.c_str());
     if (!_ignoreAttributeLocationError && location == -1)
         LWARNING_SAFE("Failed to locate attribute location for: " + name);
     return location;
 }
 
-void ProgramObject::bindAttributeLocation(const string& name, GLint index) {
+void ProgramObject::bindAttributeLocation(const std::string& name, GLint index) {
     glBindAttribLocation(_id, index, name.c_str());
 }
 
@@ -1885,7 +1970,7 @@ void ProgramObject::setIgnoreAttributeLocationError(bool ignoreError) {
     _ignoreAttributeLocationError = ignoreError;
 }
 
-bool ProgramObject::setAttribute(const string& name, bool value) {
+bool ProgramObject::setAttribute(const std::string& name, bool value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1893,7 +1978,7 @@ bool ProgramObject::setAttribute(const string& name, bool value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, bool v1, bool v2) {
+bool ProgramObject::setAttribute(const std::string& name, bool v1, bool v2) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1901,7 +1986,7 @@ bool ProgramObject::setAttribute(const string& name, bool v1, bool v2) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, bool v1, bool v2, bool v3) {
+bool ProgramObject::setAttribute(const std::string& name, bool v1, bool v2, bool v3) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1909,7 +1994,7 @@ bool ProgramObject::setAttribute(const string& name, bool v1, bool v2, bool v3) 
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, bool v1, bool v2, bool v3, bool v4) {
+bool ProgramObject::setAttribute(const std::string& name, bool v1, bool v2, bool v3, bool v4) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1917,7 +2002,7 @@ bool ProgramObject::setAttribute(const string& name, bool v1, bool v2, bool v3, 
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const bvec2& value) {
+bool ProgramObject::setAttribute(const std::string& name, const glm::bvec2& value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1925,7 +2010,7 @@ bool ProgramObject::setAttribute(const string& name, const bvec2& value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const bvec3& value) {
+bool ProgramObject::setAttribute(const std::string& name, const glm::bvec3& value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1933,7 +2018,7 @@ bool ProgramObject::setAttribute(const string& name, const bvec3& value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const bvec4& value) {
+bool ProgramObject::setAttribute(const std::string& name, const glm::bvec4& value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1941,7 +2026,7 @@ bool ProgramObject::setAttribute(const string& name, const bvec4& value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, GLint value) {
+bool ProgramObject::setAttribute(const std::string& name, GLint value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1949,7 +2034,7 @@ bool ProgramObject::setAttribute(const string& name, GLint value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, GLint v1, GLint v2) {
+bool ProgramObject::setAttribute(const std::string& name, GLint v1, GLint v2) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1957,7 +2042,7 @@ bool ProgramObject::setAttribute(const string& name, GLint v1, GLint v2) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, GLint v1, GLint v2, GLint v3) {
+bool ProgramObject::setAttribute(const std::string& name, GLint v1, GLint v2, GLint v3) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1965,7 +2050,7 @@ bool ProgramObject::setAttribute(const string& name, GLint v1, GLint v2, GLint v
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
+bool ProgramObject::setAttribute(const std::string& name,
                                  GLint v1, GLint v2, GLint v3, GLint v4)
 {
     const GLint location = attributeLocation(name);
@@ -1975,7 +2060,7 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const ivec2& value) {
+bool ProgramObject::setAttribute(const std::string& name, const glm::ivec2& value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1983,7 +2068,7 @@ bool ProgramObject::setAttribute(const string& name, const ivec2& value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const ivec3& value) {
+bool ProgramObject::setAttribute(const std::string& name, const glm::ivec3& value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1991,7 +2076,7 @@ bool ProgramObject::setAttribute(const string& name, const ivec3& value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const ivec4& value) {
+bool ProgramObject::setAttribute(const std::string& name, const glm::ivec4& value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -1999,7 +2084,7 @@ bool ProgramObject::setAttribute(const string& name, const ivec4& value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, GLfloat value) {
+bool ProgramObject::setAttribute(const std::string& name, GLfloat value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2007,7 +2092,7 @@ bool ProgramObject::setAttribute(const string& name, GLfloat value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, GLfloat v1, GLfloat v2) {
+bool ProgramObject::setAttribute(const std::string& name, GLfloat v1, GLfloat v2) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2015,7 +2100,7 @@ bool ProgramObject::setAttribute(const string& name, GLfloat v1, GLfloat v2) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, GLfloat v1, GLfloat v2, GLfloat v3) {
+bool ProgramObject::setAttribute(const std::string& name, GLfloat v1, GLfloat v2, GLfloat v3) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2023,7 +2108,7 @@ bool ProgramObject::setAttribute(const string& name, GLfloat v1, GLfloat v2, GLf
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
+bool ProgramObject::setAttribute(const std::string& name,
                                  GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4)
 {
     const GLint location = attributeLocation(name);
@@ -2033,7 +2118,7 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const vec2& value) {
+bool ProgramObject::setAttribute(const std::string& name, const glm::vec2& value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2041,7 +2126,7 @@ bool ProgramObject::setAttribute(const string& name, const vec2& value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const vec3& value) {
+bool ProgramObject::setAttribute(const std::string& name, const glm::vec3& value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2049,7 +2134,7 @@ bool ProgramObject::setAttribute(const string& name, const vec3& value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const vec4& value) {
+bool ProgramObject::setAttribute(const std::string& name, const glm::vec4& value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2057,7 +2142,7 @@ bool ProgramObject::setAttribute(const string& name, const vec4& value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, GLdouble value) {
+bool ProgramObject::setAttribute(const std::string& name, GLdouble value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2065,7 +2150,7 @@ bool ProgramObject::setAttribute(const string& name, GLdouble value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, GLdouble v1, GLdouble v2) {
+bool ProgramObject::setAttribute(const std::string& name, GLdouble v1, GLdouble v2) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2073,7 +2158,7 @@ bool ProgramObject::setAttribute(const string& name, GLdouble v1, GLdouble v2) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
+bool ProgramObject::setAttribute(const std::string& name,
                                  GLdouble v1, GLdouble v2, GLdouble v3)
 {
     const GLint location = attributeLocation(name);
@@ -2083,7 +2168,7 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
+bool ProgramObject::setAttribute(const std::string& name,
                                  GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4)
 {
     const GLint location = attributeLocation(name);
@@ -2093,7 +2178,7 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const dvec2& value) {
+bool ProgramObject::setAttribute(const std::string& name, const glm::dvec2& value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2101,7 +2186,7 @@ bool ProgramObject::setAttribute(const string& name, const dvec2& value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const dvec3& value) {
+bool ProgramObject::setAttribute(const std::string& name, const glm::dvec3& value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2109,7 +2194,7 @@ bool ProgramObject::setAttribute(const string& name, const dvec3& value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name, const dvec4& value) {
+bool ProgramObject::setAttribute(const std::string& name, const glm::dvec4& value) {
     const GLint location = attributeLocation(name);
     if (location == -1)
         return false;
@@ -2117,8 +2202,8 @@ bool ProgramObject::setAttribute(const string& name, const dvec4& value) {
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const mat2x2& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::mat2x2& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2127,8 +2212,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const mat2x3& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::mat2x3& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2137,8 +2222,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const mat2x4& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::mat2x4& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2147,8 +2232,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const mat3x2& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::mat3x2& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2157,8 +2242,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const mat3x3& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::mat3x3& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2167,8 +2252,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const mat3x4& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::mat3x4& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2177,8 +2262,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const mat4x2& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::mat4x2& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2187,8 +2272,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const mat4x3& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::mat4x3& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2197,8 +2282,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const mat4x4& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::mat4x4& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2207,8 +2292,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const dmat2x2& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::dmat2x2& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2217,8 +2302,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const dmat2x3& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::dmat2x3& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2227,8 +2312,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const dmat2x4& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::dmat2x4& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2237,8 +2322,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const dmat3x2& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::dmat3x2& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2247,8 +2332,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const dmat3x3& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::dmat3x3& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2257,8 +2342,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const dmat3x4& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::dmat3x4& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2267,8 +2352,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const dmat4x2& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::dmat4x2& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2277,8 +2362,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const dmat4x3& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::dmat4x3& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2287,8 +2372,8 @@ bool ProgramObject::setAttribute(const string& name,
     return true;
 }
 
-bool ProgramObject::setAttribute(const string& name,
-                                 const dmat4x4& value, bool transpose)
+bool ProgramObject::setAttribute(const std::string& name,
+                                 const glm::dmat4x4& value, bool transpose)
 {
     const GLint location = attributeLocation(name);
     if (location == -1)
@@ -2313,15 +2398,15 @@ void ProgramObject::setAttribute(GLint location, bool v1, bool v2, bool v3, bool
     glVertexAttribI4i(location, v1, v2, v3, v4);
 }
 
-void ProgramObject::setAttribute(GLint location, const bvec2& value) {
+void ProgramObject::setAttribute(GLint location, const glm::bvec2& value) {
     glVertexAttribI2iv(location, value_ptr(glm::ivec2(value)));
 }
 
-void ProgramObject::setAttribute(GLint location, const bvec3& value) {
+void ProgramObject::setAttribute(GLint location, const glm::bvec3& value) {
     glVertexAttribI3iv(location, value_ptr(glm::ivec3(value)));
 }
 
-void ProgramObject::setAttribute(GLint location, const bvec4& value) {
+void ProgramObject::setAttribute(GLint location, const glm::bvec4& value) {
     glVertexAttribI4iv(location, value_ptr(glm::ivec4(value)));
 }
 
@@ -2341,15 +2426,15 @@ void ProgramObject::setAttribute(GLint location, GLint v1, GLint v2, GLint v3, G
      glVertexAttribI4i(location, v1, v2, v3, v4);
 }
 
-void ProgramObject::setAttribute(GLint location, const ivec2& value) {
+void ProgramObject::setAttribute(GLint location, const glm::ivec2& value) {
     glVertexAttribI2iv(location, value_ptr(value));
 }
 
-void ProgramObject::setAttribute(GLint location, const ivec3& value) {
+void ProgramObject::setAttribute(GLint location, const glm::ivec3& value) {
     glVertexAttribI3iv(location, value_ptr(value));
 }
 
-void ProgramObject::setAttribute(GLint location, const ivec4& value) {
+void ProgramObject::setAttribute(GLint location, const glm::ivec4& value) {
     glVertexAttribI4iv(location, value_ptr(value));
 }
 
@@ -2371,15 +2456,15 @@ void ProgramObject::setAttribute(GLint location,
     glVertexAttrib4f(location, v1, v2, v3, v4);
 }
 
-void ProgramObject::setAttribute(GLint location, const vec2& value) {
+void ProgramObject::setAttribute(GLint location, const glm::vec2& value) {
     glVertexAttrib2fv(location, value_ptr(value));
 }
 
-void ProgramObject::setAttribute(GLint location, const vec3& value) {
+void ProgramObject::setAttribute(GLint location, const glm::vec3& value) {
     glVertexAttrib3fv(location, value_ptr(value));
 }
 
-void ProgramObject::setAttribute(GLint location, const vec4& value) {
+void ProgramObject::setAttribute(GLint location, const glm::vec4& value) {
     glVertexAttrib4fv(location, value_ptr(value));
 }
 
@@ -2401,19 +2486,21 @@ void ProgramObject::setAttribute(GLint location,
     glVertexAttribL4d(location, v1, v2, v3, v4);
 }
 
-void ProgramObject::setAttribute(GLint location, const dvec2& value) {
+void ProgramObject::setAttribute(GLint location, const glm::dvec2& value) {
     glVertexAttribL2dv(location, value_ptr(value));
 }
 
-void ProgramObject::setAttribute(GLint location, const dvec3& value) {
+void ProgramObject::setAttribute(GLint location, const glm::dvec3& value) {
     glVertexAttribL3dv(location, value_ptr(value));
 }
 
-void ProgramObject::setAttribute(GLint location, const dvec4& value) {
+void ProgramObject::setAttribute(GLint location, const glm::dvec4& value) {
     glVertexAttribL4dv(location, value_ptr(value));
 }
 
-void ProgramObject::setAttribute(GLint location, const mat2x2& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::mat2x2& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2422,7 +2509,9 @@ void ProgramObject::setAttribute(GLint location, const mat2x2& value, bool trans
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const mat2x3& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::mat2x3& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2431,7 +2520,9 @@ void ProgramObject::setAttribute(GLint location, const mat2x3& value, bool trans
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const mat2x4& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::mat2x4& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2440,7 +2531,9 @@ void ProgramObject::setAttribute(GLint location, const mat2x4& value, bool trans
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const mat3x2& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::mat3x2& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2450,7 +2543,9 @@ void ProgramObject::setAttribute(GLint location, const mat3x2& value, bool trans
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const mat3x3& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::mat3x3& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2460,7 +2555,9 @@ void ProgramObject::setAttribute(GLint location, const mat3x3& value, bool trans
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const mat3x4& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::mat3x4& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2470,7 +2567,9 @@ void ProgramObject::setAttribute(GLint location, const mat3x4& value, bool trans
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const mat4x2& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::mat4x2& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2481,7 +2580,9 @@ void ProgramObject::setAttribute(GLint location, const mat4x2& value, bool trans
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const mat4x3& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::mat4x3& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2492,7 +2593,9 @@ void ProgramObject::setAttribute(GLint location, const mat4x3& value, bool trans
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const mat4x4& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::mat4x4& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2503,7 +2606,9 @@ void ProgramObject::setAttribute(GLint location, const mat4x4& value, bool trans
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const dmat2x2& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::dmat2x2& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2512,7 +2617,9 @@ void ProgramObject::setAttribute(GLint location, const dmat2x2& value, bool tran
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const dmat2x3& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::dmat2x3& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2521,7 +2628,9 @@ void ProgramObject::setAttribute(GLint location, const dmat2x3& value, bool tran
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const dmat2x4& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::dmat2x4& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2530,7 +2639,9 @@ void ProgramObject::setAttribute(GLint location, const dmat2x4& value, bool tran
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const dmat3x2& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::dmat3x2& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2540,7 +2651,9 @@ void ProgramObject::setAttribute(GLint location, const dmat3x2& value, bool tran
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const dmat3x3& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::dmat3x3& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2550,7 +2663,9 @@ void ProgramObject::setAttribute(GLint location, const dmat3x3& value, bool tran
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const dmat3x4& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::dmat3x4& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2560,7 +2675,9 @@ void ProgramObject::setAttribute(GLint location, const dmat3x4& value, bool tran
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const dmat4x2& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::dmat4x2& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2571,7 +2688,9 @@ void ProgramObject::setAttribute(GLint location, const dmat4x2& value, bool tran
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const dmat4x3& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::dmat4x3& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2582,7 +2701,9 @@ void ProgramObject::setAttribute(GLint location, const dmat4x3& value, bool tran
     }
 }
 
-void ProgramObject::setAttribute(GLint location, const dmat4x4& value, bool transpose) {
+void ProgramObject::setAttribute(GLint location,
+                                 const glm::dmat4x4& value, bool transpose)
+{
     if (transpose)
         setAttribute(location, glm::transpose(value));
     else {
@@ -2684,7 +2805,7 @@ vector<string> ProgramObject::compatibleSubroutineNames(
 
 vector<string> ProgramObject::compatibleSubroutineNames(
                                                 ShaderObject::ShaderType shaderType,
-                                                const string& subroutineUniformName)
+                                                const std::string& subroutineUniformName)
 {
     const GLint index = subroutineUniformLocation(shaderType, subroutineUniformName);
     if (index == -1)
@@ -2694,7 +2815,7 @@ vector<string> ProgramObject::compatibleSubroutineNames(
 }
 
 bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
-                                          const vector<GLuint>& values)
+                                          const std::vector<GLuint>& values)
 {
 #ifdef GHL_DEBUG
     if (values.size() == 0) {
@@ -2718,7 +2839,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
 }
 
 bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
-                                          const map<string, string>& values)
+                                        const std::map<std::string, std::string>& values)
 {
 #ifdef GHL_DEBUG
     if (values.size() == 0) {

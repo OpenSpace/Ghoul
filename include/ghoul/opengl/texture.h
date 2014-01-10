@@ -39,19 +39,18 @@ namespace opengl {
  * generating (<code>glGenTextures</code>), binding (<code>glBindTexture</code>), enabling
  * <code>glEnable</code>) and others. A new texture can be created either from an image
  * file using the TextureManager or TextureReader class or using a pointer to the data. 
- * The data layout must be as specified bt the <code>glTexImageXD</code> functions (see 
+ * The data layout must be as specified by the <code>glTexImageXD</code> functions (see 
  * OpenGL reference). After creation a Texture must be uploaded (<code>uploadTexture
  * </code>) before it can be used in the graphics pipeline.
- * See <url>http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml</url> for detailed
- * information on the different arguments
+ * See http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for detailed information
+ * on the different arguments
  */
 class Texture {
 public:
     /**
      * This enum specifies the allowed formats for the Textures. These are directly mapped
      * to the appropriate OpenGL constants. See
-     * <url>http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml</url> for more
-     * information.
+     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for more information.
      */
     enum class Format : GLint {
         Red = GL_RED, ///< GL_RED
@@ -92,21 +91,21 @@ public:
      * necessary for the dimensions * bytesPerPixel (which is in turn dependent on the
      * dataType). The texture will be a 3D texture unless one or two of the components in
      * dimensions is 1.
-     * \param [in] dimensions The dimensions of the texture. A 3D texture will be created 
+     * \param dimensions The dimensions of the texture. A 3D texture will be created 
      * if all components are bigger than 1, a 2D texture will be created if the z 
      * component is equal to 1, while a 1D texture is created if the y and z component is 
      * equal to 1.
-     * \param [in] format Specifies the format of the data
-     * \param [in] internalFormat The internal format for the texture. See
-     * <url>http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml</url> Tables 1,2, 
-     * and 3 for concrete values. In addition, the S3TC_DXT formats can be used to support 
-     * hardware compression. See <url>http://www.opengl.org/wiki/Image_Format#S3TC.2FDXT
-     * </url> for more information.
-     * \param [in] dataType The data type of the pixel data. See
-     * <url>http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml</url> for a list of 
-     * possible values.
-     * \param [in] filter The FilterMode that will be used to interpolate between texels.
-     * \param [in] wrapping The WrappingMode that will be used to generate values on the 
+     * \param format Specifies the format of the data
+     * \param internalFormat The internal format for the texture. See
+     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1,2,  and 3 for
+     * concrete values. In addition, the S3TC_DXT formats can be used to support 
+     * hardware compression. See http://www.opengl.org/wiki/Image_Format#S3TC.2FDXT for
+     * more information.
+     * \param dataType The data type of the pixel data. See
+     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for a list of possible
+     * values.
+     * \param filter The FilterMode that will be used to interpolate between texels.
+     * \param wrapping The WrappingMode that will be used to generate values on the 
      * border of the texture
      */
     Texture(const glm::size3_t& dimensions, Format format = Format::RGBA,
@@ -119,28 +118,28 @@ public:
      * contain enough bytes to fill dimensions * bytesPerPixel (which is in turn dependent
      * on the dataType) pixel. The texture will be a 3D texture unless one or two of the 
      * components in dimensions is 1.
-     * \param [in] data The data from which to generate the Texture. The data must be in a 
+     * \param data The data from which to generate the Texture. The data must be in a 
      * linear format and (in 2D and 3D cases) aligned so that it can be accessed using the
      * following equations:
      * <code>(y * dimensions.x) + x</code> in the 2D case and 
      * <code>(z * dimensions.x * dimensions.y) + (y * dimensions.x) + x</code> in the 3D 
      * case. This Texture will take ownership of the data array and will delete it once 
      * this object is destroyed.
-     * \param [in] dimensions The dimensions of the texture. A 3D texture will be created 
+     * \param dimensions The dimensions of the texture. A 3D texture will be created 
      * if all components are bigger than 1, a 2D texture will be created if the z 
      * component is equal to 1, while a 1D texture is created if the y and z component is
      * equal to 1.
-     * \param [in] format Specifies the format of the data
-     * \param [in] internalFormat The internal format for the texture. See
-     * <url>http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml</url> Tables 1,2, 
-     * and 3 for concrete values. In addition, the S3TC_DXT formats can be used to support 
-     * hardware compression. See <url>http://www.opengl.org/wiki/Image_Format#S3TC.2FDXT
-     * </url> for more information.
-     * \param [in] dataType The data type of the pixel data. See
-     * <url>http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml</url> for a list of 
-     * possible values.
-     * \param [in] filter The FilterMode that will be used to interpolate between texels.
-     * \param [in] wrapping The WrappingMode that will be used to generate values on the
+     * \param format Specifies the format of the data
+     * \param internalFormat The internal format for the texture. See
+     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1,2, and 3 for
+     * concrete values. In addition, the S3TC_DXT formats can be used to support 
+     * hardware compression. See http://www.opengl.org/wiki/Image_Format#S3TC.2FDXT for
+     * more information.
+     * \param dataType The data type of the pixel data. See
+     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for a list of possible
+     * values.
+     * \param filter The FilterMode that will be used to interpolate between texels.
+     * \param wrapping The WrappingMode that will be used to generate values on the
      * border of the texture
      */
     Texture(void* data, const glm::size3_t& dimensions, Format format = Format::RGBA,
@@ -177,7 +176,7 @@ public:
      * Sets an (optional) name for this texture. The name is not used internally and is 
      * solely for external purposes. One possible use is the filename from which the 
      * texture was loaded.
-     * \param [in] name The name for this texture
+     * \param name The name for this texture
      */
     void setName(const std::string& name);
 
@@ -190,7 +189,7 @@ public:
 
     /**
      * Overrides the type of the texture that was automatically determined.
-     * \param [in] type The new type for the texture. This value can either be
+     * \param type The new type for the texture. This value can either be
      * GL_TEXTURE_1D, GL_TEXTURE_2D or GL_TEXTURE_3D.
      */
     void setType(GLenum type);
@@ -206,7 +205,7 @@ public:
     /**
      * Sets new dimensions for this texture. The texture is not automatically updated or 
      * uploaded to the graphics card. Solely the stored dimensions are changed.
-     * \param [in] dimensions The new dimensions for this texture
+     * \param dimensions The new dimensions for this texture
      */
     void setDimensions(const glm::size3_t& dimensions);
 
@@ -229,26 +228,26 @@ public:
      * Sets the format for this texture. This only updates the internal state and doesn't 
      * affect the texture on the graphics card. Call <code>uploadTexture</code> to apply 
      * changes.
-     * \param [in] format The new format for this texture.
+     * \param format The new format for this texture.
      */
     void setFormat(Format format);
 
     /** 
      * Returns the internal format for this texture. See
-     * <url>http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml</url> for more 
-     * information and the possible return values.
+     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for more information and
+     * the possible return values.
      */
     GLint internalFormat() const;
 
     /**
      * Sets the new internal format for this texture. This only updates the internal state
      * and doesn't affect the texture on the graphics card. Call <code>uploadTexture
-     * </code> to apply changes. See <url>
-     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml</url> for more
-     * information and possible parameter values.
-     * \param [in] internalFormat The new internal format. See
-     * <url>http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml</url> Tables 1, 2, 
-     * and 3 for possible values.
+     * </code> to apply changes. See
+     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for more information and
+     * possible parameter values.
+     * \param internalFormat The new internal format. See
+     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1, 2, and 3 for
+     * possible values.
      */
     void setInternalFormat(GLint internalFormat);
 
@@ -259,42 +258,47 @@ public:
      * Sets a new FilterMode for this Texture. The new FilterMode is applied immediately. 
      * If the filter is FilterMode::AnisotropicMipMap, the texture has to be uploaded 
      * before calling this method. Otherwise, the result is undefined.
-     * \param [in] filter The new FilterMode for this Texture
+     * \param filter The new FilterMode for this Texture
      */
     void setFilter(FilterMode filter);
 
     /**
      * Returns the storage data type for this Texture. For a complete list of available 
-     * return values see <url>http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml
-     * </url> for more information.
+     * return values see http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for
+     * more information.
      * \return The storage data type
      */
     GLenum dataType() const;
 
     /**
      * Sets a new storage data type for this Texture. For a complete list of available 
-     * parameters see <url>http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml
-     * </url>. The new data type is only stored internally and not updated immediately,
-     * although it will update the number of* bytes per pixel (see bytesPerPixel method).
-     * \param [in] dataType The new storage data type
+     * parameters see http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml. The new
+     * data type is only stored internally and not updated immediately, although it will
+     * update the number of* bytes per pixel (see bytesPerPixel method).
+     * \param dataType The new storage data type
      */
     void setDataType(GLenum dataType);
 
     /**
      * Returns the number of channels that are stored in this texture. If the format of
      * the Texture is not in the list of formats found at
-     * <url>http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml</url>, an assertion
-     * will be triggered.
+     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml, an assertion will be
+     * triggered.
+     * \return The number of channels that are stored in this texture
      */
     size_t numberOfChannels() const;
 
-    /// Returns the number of bytes each pixel stores
+    /*
+     * Returns the number of bytes each pixel stores.
+     * \return The number of bytes each pixel stores
+     */
     GLubyte bytesPerPixel() const;
 
     /**
      * Returns the stored data of the texture. If the memory is deleted, a new
      * (sufficiently) large memory block have been created or a segmentation fault might
      * occur!
+     * \return The stored data of the texture
      */
     const void* pixelData() const;
 
@@ -302,6 +306,8 @@ public:
      * Returns the size the pixel data should have according to the dimensionality and the
      * bytes per pixel. <code>dimensions.x * dimensions.y * dimensions.z * bpp</code>. The 
      * real size of the data can be different if it was set manually.
+     * \return The size of the pixel data according to the dimensionality and the bytes
+     * per pixel
      */
     size_t expectedPixelDataSize() const;
 
@@ -309,25 +315,31 @@ public:
      * Sets new data for the texture to use. If the dimensions are not updated and the new 
      * data has a different size, undefined behavior will occur. This Texture will take 
      * ownership of the data array.
-     * \param [in] pixels The pointer to the new data array that should be used.
-     * \param [in] takeOwnership Should this Texture take ownership of the data and delete
+     * \param pixels The pointer to the new data array that should be used.
+     * \param takeOwnership Should this Texture take ownership of the data and delete
      * it?
      */
     void setPixelData(void* pixels, bool takeOwnership = true);
 
-    /// Returns <code>true</code> if the OpenGL texture is resident in the GPU memory.
+    /**
+     * Returns <code>true</code> if the OpenGL texture is resident in the GPU memory.
+     * \return <code>true</code> if the OpenGL texture is resident
+     */
     bool isResident() const;
 
     /// Sets a new WrappingMode for this Texture. The new mode is applied immediately.
     void setWrapping(WrappingMode wrapping);
 
-    /// Returns the currently used Wrapping Mode for this texture
+    /**
+     * Returns the currently used WrappingMode for this texture.
+     * \return The currently used WrappingMode for this texture
+     */
     WrappingMode wrapping() const;
 
     /**
      * Sets the maximum number of MipMap levels to use. This is only valid when the
      * FilterMode::AnisotropicMipMap is selected. Defaults to 8 levels.
-     * \param [in] mipMapLevel The MipMap level that should be used in this texture.
+     * \param mipMapLevel The MipMap level that should be used in this texture.
      */
     void setMipMapLevel(int mipMapLevel);
 
@@ -335,7 +347,7 @@ public:
      * Sets the maximum anisotropy level that should be used. This is only valid when the
      * FilterMode::AnisotropicMipMap is selected. On default, the maximum anisotropy
      * supported by the graphics card is used.
-     * \param [in] anisotropyLevel The anisotropy level that should be used
+     * \param anisotropyLevel The anisotropy level that should be used
      */
     void setAnisotropyLevel(float anisotropyLevel);
 
@@ -355,7 +367,7 @@ public:
     /**
      * Changes (=grants/revokes) ownership of the stored data. Changing this will not 
      * change the underlying data.
-     * \param [in] hasOwnership <code>true</code> if this Texture should own the data in
+     * \param hasOwnership <code>true</code> if this Texture should own the data in
      * <code>_pixels</code>
      */
     void setDataOwnership(bool hasOwnership);

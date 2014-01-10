@@ -616,7 +616,9 @@ bool SystemCapabilities::isWMIinitialized() const {
     return ((_iwbemLocator != 0) && (_iwbemServices != 0));
 }
 
-VARIANT* SystemCapabilities::queryWMI(const string& wmiClass, const string& attribute) const {
+VARIANT* SystemCapabilities::queryWMI(const std::string& wmiClass,
+                                      const std::string& attribute) const
+{
     if (!isWMIinitialized()) {
         LERROR_SAFE("WMI is not initialized.");
         return 0;
@@ -667,9 +669,9 @@ VARIANT* SystemCapabilities::queryWMI(const string& wmiClass, const string& attr
 }
 
 bool SystemCapabilities::queryWMI(
-                                  const string& wmiClass,
-                                  const string& attribute,
-                                  string& value) const 
+                                  const std::string& wmiClass,
+                                  const std::string& attribute,
+                                  std::string& value) const 
 {
     VARIANT* variant = queryWMI(wmiClass, attribute);
     if (!variant)
@@ -682,8 +684,8 @@ bool SystemCapabilities::queryWMI(
 }
 
 bool SystemCapabilities::queryWMI(
-                                     const string& wmiClass,
-                                     const string& attribute,
+                                     const std::string& wmiClass,
+                                     const std::string& attribute,
                                      int& value) const
 {
     VARIANT* variant = queryWMI(wmiClass, attribute);

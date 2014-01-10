@@ -44,7 +44,7 @@ using std::numeric_limits;
 namespace ghoul {
 namespace opengl {
 
-Texture::Texture(const size3_t& dimensions, Format format, GLint internalFormat,
+Texture::Texture(const glm::size3_t& dimensions, Format format, GLint internalFormat,
                  GLenum dataType, FilterMode filter, WrappingMode wrapping)
     : _dimensions(dimensions)
     , _format(format)
@@ -60,7 +60,7 @@ Texture::Texture(const size3_t& dimensions, Format format, GLint internalFormat,
     initialize(true);
 }
 
-Texture::Texture(void* data, const size3_t& dimensions, Format format,
+Texture::Texture(void* data, const glm::size3_t& dimensions, Format format,
                  GLint internalFormat, GLenum dataType, FilterMode filter,
                  WrappingMode wrapping)
      : _dimensions(dimensions)
