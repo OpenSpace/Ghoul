@@ -32,37 +32,38 @@ namespace ghoul {
 namespace logging {
 
 /**
- * A concrete subclass of Log that logs the messages to a plain textfile on hard disk. The
- * formatting of the log messages depends on the stamping settings. The various
+ * A concrete subclass of Log that logs the messages to a plain text file on hard disk.
+ * The formatting of the log messages depends on the stamping settings. The various
  * possibilities are:
- * "[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
- * "[DATE] CATEGORY (LEVEL) MESSAGE"
- * "[TIME] CATEGORY (LEVEL) MESSAGE"
- * And the remaining possibilities with CATEGORY and (LEVEL) missing.
- * Only the TextLog::log(LogManager::LogLevel, std::string, std::string) method needs to
- * be overwritten in a subclass, if a different output format is required.
- * The file will be opened in the constructor and closed in the destructor of this class.
- * A parameter in the constructor controls of the file will be reset before writing the
- * first time.
+ * \verbatim
+"[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
+"[DATE] CATEGORY (LEVEL) MESSAGE"
+"[TIME] CATEGORY (LEVEL) MESSAGE"
+\endverbatim
+ * And the remaining possibilities with <code>CATEGORY</code> and <code>LEVEL</code>
+ * missing. Only the TextLog::log method needs to be overwritten in a subclass, if a
+ * different output format is required. The file will be opened in the constructor and
+ * closed in the destructor of this class. A parameter in the constructor controls of the
+ * file will be reset before writing the first time.
  */
 class TextLog : public Log {
 public:
     /**
-    * Constructor that calls Log::Log(bool, bool, bool, bool) constructor and opens the
-    * file that will log the messages. If the file does not exist, it will be created.
-    * \param [in] filename The path and filename of the file that will receive the log
+    * Constructor that calls Log constructor and opens the file that will log the
+    * messages. If the file does not exist, it will be created.
+    * \param filename The path and filename of the file that will receive the log
     * messages
-    * \param [in] writeToAppend If this is <code>true</code>, the log messages will be
-    * appended to the file. If it is <code>false</code> the file will be overwritten
-    * without a warning.
-    * \param [in] timeStamping Determines if the log should print the time when a message
-    * is logged in the log messages
-    * \param [in] dateStamping Determines if the log should print the time when a message
-    * is logged in the log messages
-    * \param [in] categoryStamping Determines if the log should print the categories in
-    * the log messages
-    * \param [in] logLevelStamping Determines if the log should print the log level in the
+    * \param writeToAppend If this is <code>true</code>, the log messages will be appended
+    * to the file. If it is <code>false</code> the file will be overwritten without a
+    * warning.
+    * \param timeStamping Determines if the log should print the time when a message is
+    * logged in the log messages
+    * \param dateStamping Determines if the log should print the time when a message is
+    * logged in the log messages
+    * \param categoryStamping Determines if the log should print the categories in the
     * log messages
+    * \param logLevelStamping Determines if the log should print the log level in the log
+    * messages
     */
     TextLog(const std::string& filename, bool writeToAppend = true,
             bool timeStamping = true, bool dateStamping = true,
@@ -73,10 +74,10 @@ public:
 
     /**
      * Method that logs a message with a given level and category to the text file.
-     * \param [in] level The log level with which the message shall be logged
-     * \param [in] category The category of this message. Can be used by each subclass
+     * \param level The log level with which the message shall be logged
+     * \param category The category of this message. Can be used by each subclass
      * individually
-     * \param [in] message The message body of the log message
+     * \param message The message body of the log message
      */
     virtual void log(LogManager::LogLevel level, const std::string& category,
                      const std::string& message);

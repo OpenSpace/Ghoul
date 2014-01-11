@@ -26,7 +26,7 @@
 #include <ghoul/opengl/textureunit.h>
 
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/syscapabilities.h>
+#include <ghoul/systemcapabilities/systemcapabilities.h>
 
 #include <exception>
 #include <stdexcept>

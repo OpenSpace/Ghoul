@@ -34,15 +34,16 @@ namespace ghoul {
 namespace lua {
 
 /**
- * Logs the Lua table that is located on the top of the stack in the passed <code>
- * state</code> with the passed LogLevel and returns the logged string. The key-value
- * pair for each entry in the table is printed, which might cause the function to be
+ * Logs the Lua table that is located on the top of the stack in the passed
+ * <code>state</code> with the passed LogLevel and returns the logged string. The key-
+ * value pair for each entry in the table is printed, which might cause the function to be
  * called recursively. The output will be written the format:
  * <code>{ key = value key = value ... }</code>. If the top of the stack does not
  * represent a Lua table, an empty string is returned
  * \param state The Lua state that contains the table to be logged
- * \param level The \see LogManager::LogLevel at which the table will be logged
- * \return The same string that was logged, or "" if the <code>state</code> was not valid
+ * \param level The logging::LogManager::LogLevel at which the table will be logged
+ * \return The same string that was logged, or <code>""</code> if the <code>state</code>
+ * was not valid
  */
 std::string lua_logTable(lua_State* state,logging::LogManager::LogLevel level = 
                          logging::LogManager::LogLevel::Info);
@@ -50,18 +51,21 @@ std::string lua_logTable(lua_State* state,logging::LogManager::LogLevel level =
 /**
  * Logs the stack of the Lua state that is passed into the function at the provided <code>
  * level</code> and returns the logged string. The values of each entry in the stack is
- * printed, which includes tables (printed recursively), but excludes <code>function
- * </code> objects. For functions, merely the word <code>function</code> is logged. The
- * messages is writting in the the format:
- * <code>
- * 1: \<entry\>
- * 2: \<entry\>
- * ...
- * </code>
+ * printed, which includes tables (printed recursively), but excludes
+ * <code>function</code> objects. For functions, merely the word <code>function</code> is
+ * logged. The messages is writing in the the format:
+ * \verbatim
+<code>
+1: \<entry\>
+2: \<entry\>
+...
+</code>
+\endverbatim
  * If the stack does not contain any values, an empty string is returned.
  * \param state The Lua state that will have its stack printed
- * \param level The \see LogManager::LogLevel at which the stack will be logged
- * \return The same strnig that was logged, or "" if the <code>state</code> was not valid
+ * \param level The logging::LogManager::LogLevel at which the stack will be logged
+ * \return The same string that was logged, or <code>""</code> if the <code>state</code>
+ * was not valid
  */
 std::string lua_logStack(lua_State* state, logging::LogManager::LogLevel level = 
                          logging::LogManager::LogLevel::Info);

@@ -21,6 +21,15 @@ project(Ghoul)
 #        ENDFOREACH()
 #    ENDIF()
 
+# Whole Program Optimization
+# Inline function expansion
+# omit frame pointer?
+# function level linking
+# enhanced instructed set
+# hotpatchable image?
+# precompiled header
+# linker: show progress
+
 mark_as_advanced(CMAKE_BACKWARDS_COMPATIBILITY)
 
 if (POLICY CMP0011)

@@ -37,25 +37,25 @@ namespace ghoul {
 
 /**
  * This class is a platform-independent implementation of a shared memory architecture.
- * It provides the possibility to create (\see create) and remove (\see remove) globally
- * visible blocks of memory that can be used across processes on the same machine for use
- * in inter-process communication. The workflow for this is as follows: One process has 
- * to \see create a SharedMemory block with a specific name and will keep the ownership
- * of that name. It does not have to create a SharedMemory object itself, but it is the
- * creating process' responsibility to \see remove the shared memory at the end of its
- * lifetime; then, many other processes can use the constructor with the same name to get
- * access to the shared memory. The overloaded \see operator void* makes the SharedMemory
- * usable just like a void pointer in the code. The size of the memory is accessible 
- * using the \see size method. Due to some necessary header information, the amount of
- * memory that is allocated will be slightly larger than the passed amount.
- * The allocated memory automatically provides storage for a thread-safe locking
- * mechanism. In the current implementation, this is a lock-free process, using an atomic
- * bool to provide thread-safeness. It is possible for a process to acquire exclusive
- * access to the shared memory by calling \see acquireLock and relinquish that access by
- * \see releaseLock. Please note that this is not a strong safeguard, as any process not
- * using those two methods to guard their access into the memory will not be stopped from
- * reading or writing into the memory. The \see acquireLock method will not return until
- * the lock has been acquired. THe \see releaseLock will return immediately.
+ * It provides the possibility to create (#create) and remove (#remove) globally visible
+ * blocks of memory that can be used across processes on the same machine for use in
+ * inter-process communication. The workflow for this is as follows: One process has to
+ * #create a SharedMemory block with a specific name and will keep the ownership of that
+ * name. It does not have to create a SharedMemory object itself, but it is the creating
+ * process` responsibility to #remove the shared memory at the end of its lifetime; then,
+ * many other processes can use the constructor with the same name to get access to the
+ * shared memory. The overloaded operator void* makes the SharedMemory usable just like a
+ * void pointer in the code. The size of the memory is accessible using the #size method.
+ * Due to some necessary header information, the amount of memory that is allocated will
+ * be slightly larger than the passed amount. The allocated memory automatically provides
+ * storage for a thread-safe locking mechanism. In the current implementation, this is a
+ * lock-free process, using an atomic bool to provide thread-safeness. It is possible for
+ * a process to acquire exclusive access to the shared memory by calling #acquireLock and
+ * relinquish that access by #releaseLock. Please note that this is not a strong
+ * safeguard, as any process not using those two methods to guard their access into the
+ * memory will not be stopped from reading or writing into the memory. The #acquireLock
+ * method will not return until the lock has been acquired. The #releaseLock will return
+ * immediately.
  */
 class SharedMemory {
 public:
@@ -68,7 +68,7 @@ public:
      * completely transparent and not accessible by the user of the memory block. The
      * process calling this method effectively has ownership of the memory, regardless if
      * it maps it into its own address space or not. That means that the process calling
-     * the create method has to be the one that will call \see remove at the end of its
+     * the create method has to be the one that will call #remove at the end of its
      * lifetime (if the ownership is not transferred in the meantime). A failure to call
      * that method will result in a <b>systemwide</b> memory leak. On Windows, the memory
      * mapped file that will be created is only accessible by the same terminal session
@@ -100,22 +100,22 @@ public:
      * Tests if a memory block with the given <code>name</code> has been created
      * previously or if the name is available.
      * \param name The name of the shared memory block that should be tested
-     * \return <code>true</code> if a shared memory block exists with the given <code>
-     * name</code>, <code>false</code> otherwise
+     * \return <code>true</code> if a shared memory block exists with the given
+     * <code>name</code>, <code>false</code> otherwise
      */
     static bool exists(const std::string& name);
     
     /**
      * Creates a SharedMemory object pointing to a previously created shared memory block
-     * (\see create). If <code>name</code> is a valid name for a shared memory block,
-     * the constructor will attach the memory into the calling process' address space,
-     * making it available through the \see operator void*. If an error occurrs either
-     * getting a valid handle on the memory mapped file or during mapping the memory into
-     * the address space, an invalid SharedMemory object will be created. An invalid
-     * object will always return <code>nullptr</code> in its \see operator void* method.
-     * It is possible for the same process to attach the same shared memory block
-     * multiple times. It is undefined if two SharedMemory objects with the same name
-     * will be attached to the same memory location.
+     * (#create). If <code>name</code> is a valid name for a shared memory block, the
+     * constructor will attach the memory into the calling process' address space, making
+     * it available through the operator void*. If an error occurrs either getting a
+     * valid handle on the memory mapped file or during mapping the memory into the
+     * address space, an invalid SharedMemory object will be created. An invalid object
+     * will always return <code>nullptr</code> in its operator void* method. It is
+     * possible for the same process to attach the same shared memory block multiple
+     * times. It is undefined if two SharedMemory objects with the same name will be
+     * attached to the same memory location.
      * \param name The name of the shared memory block to which this process wants to be
      * attached to
      */
@@ -132,14 +132,14 @@ public:
      * transparently handled Header is automatically skipped and is invisible to the
      * user. If this SharedMemory object is not valid (when an error occurred in the
      * constructor), a <code>nullptr</code> will be returned. Otherwise, the return value
-     * is a valid pointer into a memory block of the predefined size (\see size).
+     * is a valid pointer into a memory block of the predefined size (#size).
      */
     operator void*();
 
     /**
      * Returns the usable size of the memory block. The value here is the same which was
-     * specified in the creation of the shared memory block (\see create). The actual
-     * size of the memory will be slightly bigger due to header fields.
+     * specified in the creation of the shared memory block (#create). The actual size of
+     * the memory will be slightly bigger due to header fields.
      * \return The usable size of the memory block.
      */
     size_t size() const;
@@ -149,8 +149,8 @@ public:
      * the shared memory block. While one process owns the lock, any subsequent call to
      * this method will not return until the lock has been released. Please note that
      * this does not guarantee thread-safe execution if it is misused; if one process
-     * accesses the memory without surrounding the accesses with \see acquireLock, \see
-     * releaseLock methods, that process is not prevented from changing the memory while
+     * accesses the memory without surrounding the accesses with #acquireLock,
+     * #releaseLock methods, that process is not prevented from changing the memory while
      * a different thread has an exclusive, active lock on that memory. This method will
      * only return as soon as a lock has been successfully acquired.
      */
@@ -195,10 +195,10 @@ private:
     HANDLE _sharedMemoryHandle;
 
     /**
-     * Stores a mapping from name (as specified in the \see create method) to the
-     * acquired handle. This is necessary as each new CreateFileMapping call will create
-     * new HANDLE, making it impossible to acquire the HANDLE for a specific name
-     * otherwise.
+     * Stores a mapping from name (as specified in the #create method) to the acquired
+     * handle. This is necessary as each new CreateFileMapping call will create new
+     * <code>HANDLE</code>, making it impossible to acquire the <code>HANDLE</code> for a
+     * specific name otherwise.
      */
     static std::map<const std::string, HANDLE> _createdSections;
 #else

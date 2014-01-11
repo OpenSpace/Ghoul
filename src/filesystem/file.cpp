@@ -246,13 +246,13 @@ void CALLBACK File::completionHandler(DWORD /*dwErrorCode*/, DWORD,
 
     const string thisFilename = file->filename();
 
-    char* buffer = (char*)(&(file->_changeBuffer[currentBuffer][0]));
+    char* buffer = reinterpret_cast<char*>(&(file->_changeBuffer[currentBuffer][0]));
     // data might have queued up, so we need to check all changes
     while (true) {
         // extract the information which file has changed
         FILE_NOTIFY_INFORMATION& information = (FILE_NOTIFY_INFORMATION&)*buffer;
         char* currentFilenameBuffer = new char[information.FileNameLength];
-        // fix warning
+        // TODO fix warning
         std::wcstombs(currentFilenameBuffer,
                       information.FileName, information.FileNameLength);
         const string& currentFilename(currentFilenameBuffer);
@@ -284,7 +284,7 @@ void File::beginRead() {
     BOOL success = ReadDirectoryChangesW(
         _directoryHandle,
         &_changeBuffer[_activeBuffer][0],
-        _changeBuffer[_activeBuffer].size(),
+        static_cast<DWORD>(_changeBuffer[_activeBuffer].size()),
         false,
         FILE_NOTIFY_CHANGE_LAST_WRITE,
         &returnedBytes,

@@ -33,28 +33,30 @@ namespace ghoul {
 namespace logging {
 
 /**
- * A concrete subclass of Log that logs the messages to a given std::ostream. The
- * formatting of the log messages depends on the stamping settings. The various
+ * A concrete subclass of Log that logs the messages to a given <code>std::ostream</code>.
+ * The formatting of the log messages depends on the stamping settings. The various
  * possibilities are:
- * "[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
- * "[DATE] CATEGORY (LEVEL) MESSAGE"
- * "[TIME] CATEGORY (LEVEL) MESSAGE"
- * And the remaining possibilities with CATEGORY and (LEVEL) missing.
- * Ownership of the stream is not transferred.
+ * \verbatim
+"[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
+"[DATE] CATEGORY (LEVEL) MESSAGE"
+"[TIME] CATEGORY (LEVEL) MESSAGE"
+\endverbatim
+ * And the remaining possibilities with <code>CATEGORY</code> and <code>LEVEL</code>
+ * missing. Ownership of the stream is not transferred.
  */
 class StreamLog : public Log {
 public:
     /**
-     * Constructor that calls Log::Log(bool, bool, bool, bool) constructor.
+     * Constructor that calls Log constructor.
      * \param stream The initialized stream this Log should use
-     * \param timeStamping Determines if the log should print the time when a message
-     * is logged in the log messages
-     * \param dateStamping Determines if the log should print the time when a message
-     * is logged in the log messages
-     * \param categoryStamping Determines if the log should print the categories in
-     * the log messages
-     * \param logLevelStamping Determines if the log should print the log level in
-     * the log messages
+     * \param timeStamping Determines if the log should print the time when a message is
+     * logged in the log messages
+     * \param dateStamping Determines if the log should print the time when a message is
+     * logged in the log messages
+     * \param categoryStamping Determines if the log should print the categories in the
+     * log messages
+     * \param logLevelStamping Determines if the log should print the log level in the
+     * log messages
      */
     StreamLog(std::ostream& stream, bool timeStamping = false, bool dateStamping = false,
               bool categoryStamping = true, bool logLevelStamping = true);
@@ -73,7 +75,7 @@ public:
     void flush();
 
 protected:
-    // Not implemented on purpose; use should generate a linker error
+    /// Not implemented on purpose; use should generate a linker error
     StreamLog(const StreamLog& rhs);
     StreamLog& operator=(const StreamLog& rhs);
     std::ostream& _stream; ///< The stream to which the log messages will be sent

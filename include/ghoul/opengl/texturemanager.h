@@ -35,13 +35,12 @@ namespace opengl {
 class Texture;
 
 /**
- * This singleton class provides a central and efficient storage for \see Texture objects.
- * The Textures stored in this class belong to the TextureManager and should be deleted 
- * using \see unregisterTexture or their ownership taken be away from the TextureManager 
- * by using \see forgetTexture.
- * Textures can be registered (\see registerTexture), unregistered
- * (\see unregisterTexture), forgotten (\see forgetTexture), or retrieved (\see texture)
- * using either a string name, or a generated hash value which is more efficient to
+ * This singleton class provides a central and efficient storage for Texture objects. The
+ * Texture%s stored in this class belong to the TextureManager and should be deleted using
+ * #unregisterTexture or their ownership taken be away from the TextureManager by using
+ * #forgetTexture. Texture%s can be registered (#registerTexture), unregistered
+ * (#unregisterTexture), forgotten (#forgetTexture), or retrieved (#texture) using either
+ * an <code>std::string</code>name, or a generated hash value which is more efficient to
  * retrieve than a string.
  */
 class TextureManager {
@@ -55,9 +54,9 @@ public:
 
     /**
      * Static deinitializer that will remove all of the registered textures, that haven't 
-     * been either forgotten (\see forgetTexture) or unregistered (\see unregisterTexture,
-     * which will instead delete the texture). The manager will be deleted and will be 
-     * unavailable until it is re-initialized (\see initialize).
+     * been either forgotten (#forgetTexture) or unregistered (#unregisterTexture, which
+     * will instead delete the texture). The manager will be deleted and will be 
+     * unavailable until it is re-initialized (#initialize).
      */
     static void deinitialize();
 
@@ -68,22 +67,28 @@ public:
      */
     static TextureManager& ref();
 
+    /**
+     * This method will return the Texture that was registered with the passed hash.
+     * \param hashedName The hash of the Texture that is to be fetched
+     * \return The Texture that has been registered with the passed name
+     */
+
     Texture* texture(unsigned int hashedName);
 
     /**
-     * This method will return the \see Texture that was registered with the passed name. 
-     * This method will create the hash value from the passed string and will call the 
-     * \see texture method.
-     * \param name The name of the texture that is to be fetched
-     * \return The \see Texture that has been registered with the passed name
+     * This method will return the Texture that was registered with the passed name. This
+     * method will create the hash value from the passed string and will call the #texture
+     * method.
+     * \param name The name of the Texture that is to be fetched
+     * \return The Texture that has been registered with the passed name
      */
     Texture* texture(const std::string& name);
 
     /**
-     * Register the passed \see Texture under the passed name so that it can be retrieved 
+     * Register the passed Texture under the passed name so that it can be retrieved
      * either by the given name or by the hashed value that is equal to the hash value of
      * the passed name. The hashed value can later be retrieved by the function
-     * \see hashedNameForName. This method will transfer the ownership of the Texture to 
+     * #hashedNameForName. This method will transfer the ownership of the Texture to 
      * the TextureManager. If the manager already contains a hashed value equal to the 
      * hash value of the name, a warning is logged and <code>false</code> is returned.
      * \param name The name under which the Texture should be registered
@@ -95,13 +100,12 @@ public:
     bool registerTexture(const std::string& name, Texture* texture);
 
     /**
-     * Register the passed \see Texture under the passed name so that it can be retrieved
+     * Register the passed Texture under the passed name so that it can be retrieved
      * either by the given name or by the hashed value is returned in the third parameter 
      * of this function. The hashed value can later be retrieved by the function 
-     * \see hashedNameForName as well. This method will transfer the ownership of the 
-     * Texture to the TextureManager. If the manager already contains a hashed value equal
-     * to the hash value of the name, a warning is logged and <code>false</code> is
-     * returned.
+     * #hashedNameForName as well. This method will transfer the ownership of the Texture
+     * to the TextureManager. If the manager already contains a hashed value equal to the
+     * hash value of the name, a warning is logged and <code>false</code> is returned.
      * \param name The name under which the Texture should be registered
      * \param texture The Texture that should be registered
      * \param hashedName The hashed value that is generated from the <code>name</code>

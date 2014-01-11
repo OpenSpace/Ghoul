@@ -34,22 +34,21 @@ namespace opengl {
 
 /**
  * This class is a wrapper for an OpenGL shader object. It represents a single shader
- * object of the types declared in \see ShaderObject::ShaderType. All ShaderObjects must
- * be loaded from a file on disk. The shader will load the contents of the file in the 
- * contructor (if a constructor with a filename was chosen) or in the 
- * \see setShaderFilename method. If the file changes after it has been loaded, the 
- * ShaderObject will not change unless \see rebuildFromFile is called, which pulls the 
- * changes. Each object can have a name that will be used for a debug label (if available)
- * and for the logging. The type of the ShaderObject is selected in the constructor and 
- * cannot be changed afterwards. To use the ShaderObjects, they have to be attached to a 
- * \see ProgramObject first.
+ * object of the types declared in ShaderObject::ShaderType. All ShaderObject%s must be
+ * loaded from a file on disk. The shader will load the contents of the file in the 
+ * constructor (if a constructor with a filename was chosen) or in the #setShaderFilename
+ * method. If the file changes after it has been loaded, the ShaderObject will not change
+ * unless #rebuildFromFile is called, which pulls the changes. Each object can have a name
+ * that will be used for a debug label (if available) and for the logging. The type of the
+ * ShaderObject is selected in the constructor and cannot be changed afterwards. To use
+ * the ShaderObjects, they have to be attached to a ProgramObject first.
  */
 class ShaderObject {
 public:
     /**
      * An enum of the different types of shaders that can be used in OpenGL. They can be 
      * used interchangeably in native OpenGL calls, too. Compute shaders are only 
-     * available if OpenGL is available.
+     * available if OpenGL 4.3 is available.
      */
     enum ShaderType {
         ShaderTypeVertex = GL_VERTEX_SHADER
@@ -64,8 +63,8 @@ public:
 
     /**
      * This constructor creates a shader of the passed type with an empty source string. 
-     * Before this can be used, a shader must be loaded with \see setShaderFilename and it
-     * has to be compiled.
+     * Before this can be used, a shader must be loaded with #setShaderFilename and it has
+     * to be compiled.
      * \param shaderType The type of shader that this ShaderObject will represent
      */
     ShaderObject(ShaderType shaderType);
@@ -99,8 +98,8 @@ public:
      * A copy constructor that will copy all of the internal state, and the shader source,
      * but it will generate a new OpenGL name for the copied object. In addition, if the 
      * content of the specified file has changed between creating the <code>cpy</code>, 
-     * the copied Shader will use the changed file. I.e., a ShaderObject will not cache 
-     * the contents of the file inside.
+     * the copied Shader will use the changed file. That means a ShaderObject will not
+     * cache the contents of the file inside.
      * \param cpy The original object that will be copied
      */
     ShaderObject(const ShaderObject& cpy);
@@ -125,7 +124,7 @@ public:
      * <code>rhs</code>, the assigned Shader will use the changed file. I.e., a 
      * ShaderObject will not cache the contents of the file inside.
      * \param rhs The original right hand side that will be used to set this object
-     * \return A reference to <code>this</code> as suggested by C++ best practice
+     * \return A reference to <code>this</code>
      */
     ShaderObject& operator=(const ShaderObject& rhs);
 
