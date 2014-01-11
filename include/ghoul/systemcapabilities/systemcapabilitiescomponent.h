@@ -23,62 +23,67 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __SYSTEMCAPABILITIES_H__
-#define __SYSTEMCAPABILITIES_H__
-
-#include "systemcapabilities/cpucapabilitiescomponent.h"
-#include "systemcapabilities/openglcapabilitiescomponent.h"
+#ifndef __SYSTEMCAPABILITIESCOMPONENT_H__
+#define __SYSTEMCAPABILITIESCOMPONENT_H__
 
 #include <string>
-#include <vector>
+
+#ifdef GHOUL_USE_WMI
+#include <wbemidl.h>
+#include <comdef.h>
+#endif
 
 namespace ghoul {
 namespace systemcapabilities {
 
-/**
- * The SystemCapabilities class allows access to the functionality the system provides.
- * The class is composed of SystemCapabilityComponent%s with each component checking for a
- * specific kind of capabilities (for example OpenGLCapabilities or CPUCapabilities) and
- * provides access to the components with the templated #component method. The values are
- * not guaranteed to be constant over the lifetime of the application, but most values can
- * be considered to be static and cache-able.
- */
-
-class SystemCapabilities {
+class SystemCapabilitiesComponent {
 public:
-    SystemCapabilities();
-    ~SystemCapabilities();
+    enum class Verbosity {
+        Minimal,
+        Default,
+        Full
+    };
 
-    static void initialize();
-    static void deinitialize();
-    static SystemCapabilities& ref();
-    static bool isInitialized();
+    SystemCapabilitiesComponent(const std::string& componentName);
+    virtual ~SystemCapabilitiesComponent();
 
-    void detectCapabilities();
-    void logCapabilities() const;
+    virtual void initialize();
+    virtual void deinitialize();
 
-    void addComponent(SystemCapabilitiesComponent* component);
+    virtual void detectCapabilities();
+    virtual void clearCapabilities();
 
-    CPUCapabilitiesComponent* cpuCapabilitiesComponent();
-    OpenGLCapabilitiesComponent* openGLCapabilitiesComponent();
+    virtual std::string createCapabilitiesString(
+        const SystemCapabilitiesComponent::Verbosity& verbosity) const;
 
-    template <class T>
-    T* component(const std::string& name);
+    const std::string& name() const;
+
+protected:
+#ifdef GHOUL_USE_WMI
+    void initializeWMI();
+    void deinitializeWMI();
+    bool isWMIinitialized() const;
+
+    VARIANT* queryWMI(const std::string& wmiClass, const std::string& attribute) const;
+
+    bool queryWMI(const std::string& wmiClass,
+        const std::string& attribute, std::string& value) const;
+    bool queryWMI(const std::string& wmiClass, const std::string& attribute, int& value) const;
+    bool queryWMI(const std::string& wmiClass, const std::string& attribute,
+        unsigned int& value) const;
+    bool queryWMI(const std::string& wmiClass, const std::string& attribute,
+        unsigned long long& value) const;
+
+    IWbemLocator* _iwbemLocator;
+    IWbemServices* _iwbemServices;
+#endif
+
 
 private:
-    /// Not implemented, usage should create linker error
-    SystemCapabilities(const SystemCapabilities& rhs);
-
-    void clearCapabilities();
-
-    std::vector<SystemCapabilitiesComponent*> _components;
-
-    static SystemCapabilities* _systemCapabilities;  ///< singleton member
+    std::string _componentName;
 };
 
 } // namespace systemcapabilities
 } // namespace ghoul
 
-#define SysCap (ghoul::systemcapabilities::SystemCapabilities::ref())
-
-#endif // __SYSTEMCAPABILITIES_H__
+#endif // __SYSTEMCAPABILITIESCOMPONENT_H__

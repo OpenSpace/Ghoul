@@ -23,62 +23,36 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __SYSTEMCAPABILITIES_H__
-#define __SYSTEMCAPABILITIES_H__
+#ifndef __CPUCAPABILITIESCOMPONENT_H__
+#define __CPUCAPABILITIESCOMPONENT_H__
 
-#include "systemcapabilities/cpucapabilitiescomponent.h"
-#include "systemcapabilities/openglcapabilitiescomponent.h"
-
-#include <string>
-#include <vector>
+#include "systemcapabilities/systemcapabilitiescomponent.h"
 
 namespace ghoul {
 namespace systemcapabilities {
 
-/**
- * The SystemCapabilities class allows access to the functionality the system provides.
- * The class is composed of SystemCapabilityComponent%s with each component checking for a
- * specific kind of capabilities (for example OpenGLCapabilities or CPUCapabilities) and
- * provides access to the components with the templated #component method. The values are
- * not guaranteed to be constant over the lifetime of the application, but most values can
- * be considered to be static and cache-able.
- */
-
-class SystemCapabilities {
+class CPUCapabilitiesComponent : public SystemCapabilitiesComponent {
 public:
-    SystemCapabilities();
-    ~SystemCapabilities();
+    CPUCapabilitiesComponent();
+    ~CPUCapabilitiesComponent();
 
-    static void initialize();
-    static void deinitialize();
-    static SystemCapabilities& ref();
-    static bool isInitialized();
+    std::string createCapabilitiesString(
+        const SystemCapabilitiesComponent::Verbosity& verbosity) const override;
 
-    void detectCapabilities();
-    void logCapabilities() const;
+protected:
+    void detectCapabilities() override;
+    void clearCapabilities() override;
 
-    void addComponent(SystemCapabilitiesComponent* component);
 
-    CPUCapabilitiesComponent* cpuCapabilitiesComponent();
-    OpenGLCapabilitiesComponent* openGLCapabilitiesComponent();
+    void detectOS();
+    void detectMemory();
 
-    template <class T>
-    T* component(const std::string& name);
+    std::string _operatingSystem; ///< Information about the Operating system
+    unsigned int _installedMainMemory; ///< The amount of RAM that is installed on this machine
 
-private:
-    /// Not implemented, usage should create linker error
-    SystemCapabilities(const SystemCapabilities& rhs);
-
-    void clearCapabilities();
-
-    std::vector<SystemCapabilitiesComponent*> _components;
-
-    static SystemCapabilities* _systemCapabilities;  ///< singleton member
 };
 
 } // namespace systemcapabilities
 } // namespace ghoul
 
-#define SysCap (ghoul::systemcapabilities::SystemCapabilities::ref())
-
-#endif // __SYSTEMCAPABILITIES_H__
+#endif // __CPUCAPABILITIESCOMPONENT_H__
