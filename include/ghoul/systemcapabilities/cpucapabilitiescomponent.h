@@ -26,23 +26,58 @@
 #ifndef __CPUCAPABILITIESCOMPONENT_H__
 #define __CPUCAPABILITIESCOMPONENT_H__
 
-#include "systemcapabilities/systemcapabilitiescomponent.h"
+#include "systemcapabilitiescomponent.h"
 
 namespace ghoul {
 namespace systemcapabilities {
 
+/**
+ * This subclass of SystemCapabilitiesComponent detects CPU-related capabilities, like CPU
+ * information, main memory availability and other local, general hardware features. At
+ * the current time, only the Operating System and the main memory are implemented.
+ * \todo Implement CPU detection, feature detection
+ * \todo More features
+ */
 class CPUCapabilitiesComponent : public SystemCapabilitiesComponent {
 public:
     CPUCapabilitiesComponent();
     ~CPUCapabilitiesComponent();
 
-    std::string createCapabilitiesString(
+    std::vector<CapabilityInformation> capabilities(
         const SystemCapabilitiesComponent::Verbosity& verbosity) const override;
+
+    /**
+     * Returns the operating system as a parsed string. The exact format of the returned
+     * string is implementation and operating system-dependent but it should contain the
+     * manufacturer and the version. The default value is <code>""</code>.
+     * \return The operating system as a parsed string
+     */
+    const std::string& operatingSystem() const;
+
+    /**
+     * Returns the amount of available, installed main memory (RAM) on the system in MB.
+     * This value is retrieved using the Windows Management Instrumentation (if
+     * available). The default value is <code>-1</code>.
+     * \return The amount of available main memory
+     */
+    unsigned int installedMainMemory() const;
+
+    /**
+     * Returns the amount of available, installed main memory (as reported by
+     * #installedMainMemory) in a <code>string</code> with an <code>"MB"</code> suffix;
+     * \return The amount of available, installed main memory
+     */
+    std::string installedMainMemoryAsString() const;
+
+    /**
+     * Returns the <code>CPU</code> string.
+     * \return The <code>CPU</code> string
+     */
+    const std::string name() const override;
 
 protected:
     void detectCapabilities() override;
     void clearCapabilities() override;
-
 
     void detectOS();
     void detectMemory();

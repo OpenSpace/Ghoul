@@ -26,7 +26,7 @@
 #ifndef __OPENGLCAPABILITIESCOMPONENT_H__
 #define __OPENGLCAPABILITIESCOMPONENT_H__
 
-#include "systemcapabilities/systemcapabilitiescomponent.h"
+#include "systemcapabilitiescomponent.h"
 
 #include <string>
 #include <vector>
@@ -34,7 +34,11 @@
 namespace ghoul {
 namespace systemcapabilities {
 
-class OpenGLCapabilitiesComponent : public SystemCapabilitiesComponent{
+/**
+ * This subclass of SystemCapabilitiesComponent detects graphics and OpenGL-related
+ * capabilities, like the OpenGL version, supported extensions, the driver version.
+ */
+class OpenGLCapabilitiesComponent : public SystemCapabilitiesComponent {
 public:
     /**
      * This struct stores the detected version of the GLSL driver
@@ -46,11 +50,13 @@ public:
         /**
          * Parses the version string, which should be either of the format
          * <code>major.minor.release vendor-specific information</code> or
-         * <code>major.minor vendor-specific information</code> and should normally be retrieved
-         * using the <code>glGetString(GL_SHADING_LANGUAGE_VERSION)</code> method.
+         * <code>major.minor vendor-specific information</code> and should normally be
+         * retrieved using the <code>glGetString(GL_SHADING_LANGUAGE_VERSION)</code>
+         * method.
          * \param version The version as a formatted string 
-         * \return <code>True</code> if the string could be successfully parsed; <code>false</code>
-         * otherwise. If the parsing failed, the version parts will not be changed.
+         * \return <code>True</code> if the string could be successfully parsed;
+         * <code>false</code> otherwise. If the parsing failed, the version parts will not
+         * be changed.
          */
         bool parseGLSLString(const std::string& version);
 
@@ -68,39 +74,40 @@ public:
 
         /**
          * Returns true, if major, minor, or release version parts are different
-         * \return <code>True</code> if either major, minor, or release version is different
+         * \return <code>True</code> if either major, minor, or release version is
+         * different
          */
         bool operator!=(const Version& rhs) const;
 
         /**
-         * First compares major version against major version, then minor against minor and
-         * finally release against release
+         * First compares major version against major version, then minor against minor
+         * and finally release against release
          * \return <code>True</code> if <code>this</code> is a smaller version than
          * <code>rhs</code>
          */
         bool operator<(const Version& rhs) const;
 
         /**
-         * First compares major version against major version, then minor against minor and
-         * finally release against release
-         * \return <code>True</code> if <code>this</code> is a smaller or equal version than
-         * <code>rhs</code>
+         * First compares major version against major version, then minor against minor
+         * and finally release against release
+         * \return <code>True</code> if <code>this</code> is a smaller or equal version
+         * than <code>rhs</code>
          */
         bool operator<=(const Version& rhs) const;
 
         /**
-         * First compares major version against major version, then minor against minor and
-         * finally release against release
+         * First compares major version against major version, then minor against minor
+         * and finally release against release
          * \return <code>True</code> if <code>this</code> is a greater version than
          * <code>rhs</code>
          */
         bool operator>(const Version& rhs) const;
 
         /**
-         * First compares major version against major version, then minor against minor and
-         * finally release against release
-         * \return <code>True</code> if <code>this</code> is a greater or equal version than
-         * <code>rhs</code>
+         * First compares major version against major version, then minor against minor
+         * and finally release against release
+         * \return <code>True</code> if <code>this</code> is a greater or equal version
+         * than <code>rhs</code>
          */
         bool operator>=(const Version& rhs) const;
 
@@ -109,29 +116,72 @@ public:
         unsigned char _release; ///< The <code>release</code> part of the version
     };
 
-    
+    /// This enum stores the possible vendors of graphics cards that can be detected
     enum class Vendor {
-        Nvidia,
-        ATI,
-        Intel,
-        Other
+        Nvidia, ///< Nvidia
+        ATI, ///< AMD/ATI
+        Intel, ///< Intel
+        Other ///< vendor could not be detected
     };
 
     OpenGLCapabilitiesComponent();
     ~OpenGLCapabilitiesComponent();
 
-    std::string createCapabilitiesString(
+    std::vector<CapabilityInformation> capabilities(
         const SystemCapabilitiesComponent::Verbosity& verbosity) const override;
 
+    /**
+     * Returns the maximum OpenGL version that is supported on this platform. This means
+     * that all the lower version will be supported as well,
+     * \return The maximum OpenGL version
+     */
     const Version& openGLVersion() const;
-    const std::string& gpuVendorString() const;
-    const Vendor& gpuVendor() const;
-    std::string vendorString() const;
 
+    /**
+     * Returns the value of a call to <code>glGetString(GL_VENDOR)</code>. This will give
+     * detailed information about the vendor of the main graphics card. This string can be
+     * used if the automatic Vendor detection failed
+     * \return The value of a call to <code>glGetString(GL_VENDOR)</code>
+     */
+    const std::string& glslCompiler() const;
+
+    /**
+     * Returns the vendor of the main graphics card.
+     * \return The vendor of the main graphics card
+     */
+    const Vendor& gpuVendor() const;
+
+    /**
+     * Returns the vendor of the main graphics card converted into a string.
+     * \return The vendor of the main graphics card converted into a string
+     */
+    std::string gpuVendorString() const;
+
+    /**
+     * Returns all available extensions as a list of names.
+     * \return All available extensions as a list of names
+     */
     const std::vector<std::string>& extensions() const;
+
+    /**
+     * Checks is a specific <code>extension</code> is supported or not
+     * \return <code>true</code> if the <code>extension</code> is supported;
+     * <code>false</code> otherwise
+     */
     bool isExtensionSupported(const std::string& extension) const;
 
+    /**
+     * Returns the maximum number of texture units that are available on the main
+     * graphics card
+     * \return The maximum number of texture units
+     */
     int maximumNumberOfTextureUnits() const;
+
+    /**
+     * Returns the <code>OpenGL</code> string.
+     * \return The <code>OpenGL</code> string
+     */
+    const std::string name() const override;
 
 protected:
     void detectCapabilities() override;

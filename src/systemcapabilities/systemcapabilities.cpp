@@ -25,12 +25,13 @@
 
 #include "systemcapabilities/systemcapabilities.h"
 
+#include "logging/logmanager.h"
 #include "systemcapabilities/systemcapabilitiescomponent.h"
 #include "systemcapabilities/cpucapabilitiescomponent.h"
 #include "systemcapabilities/openglcapabilitiescomponent.h"
 
 #include <sstream>
-#include "logging/logmanager.h"
+#include <typeinfo>
 
 namespace {
     const std::string _loggerCat = "SystemCapabilities";
@@ -48,19 +49,19 @@ SystemCapabilities::~SystemCapabilities() {
         delete component;
 }
 
-void SystemCapabilities::initialize() {
-    assert(_systemCapabilities != nullptr);
+void SystemCapabilities::create() {
+    assert(_systemCapabilities == nullptr);
     if (_systemCapabilities == nullptr)
         _systemCapabilities = new SystemCapabilities;
 }
 
-void SystemCapabilities::deinitialize() {
-    assert(_systemCapabilities == nullptr);
+void SystemCapabilities::destroy() {
+    assert(_systemCapabilities != nullptr);
     delete _systemCapabilities;
     _systemCapabilities = nullptr;
 }
 
-bool SystemCapabilities::isInitialized() {
+bool SystemCapabilities::isCreated() {
     return (_systemCapabilities != nullptr);
 }
 
@@ -80,12 +81,29 @@ void SystemCapabilities::clearCapabilities() {
         component->clearCapabilities();
 }
 
-void SystemCapabilities::logCapabilities() const {
-    
+void SystemCapabilities::initializeComponents() {
+    for (SystemCapabilitiesComponent* c : _components) {
+        if (c->isInitialized())
+            c->deinitialize();
+        c->initialize();
+    }
+}
+
+void SystemCapabilities::logCapabilities(
+                                  SystemCapabilitiesComponent::Verbosity verbosity) const
+{
+    for (SystemCapabilitiesComponent* c : _components) {
+        const std::string _loggerCat = ::_loggerCat + "." + c->name();
+        std::vector<SystemCapabilitiesComponent::CapabilityInformation> cap = c->capabilities(verbosity);
+        for (SystemCapabilitiesComponent::CapabilityInformation c : cap) {
+            LINFO(c.first << ": " << c.second);
+        }
+    }
 }
 
 void SystemCapabilities::addComponent(SystemCapabilitiesComponent* component) {
 #ifdef GHL_DEBUG
+    //std::type_info i = typeid(*component);
     // TODO check typeid?
     if (std::find(
         _components.begin(), _components.end(), component) != _components.end())
@@ -96,27 +114,6 @@ void SystemCapabilities::addComponent(SystemCapabilitiesComponent* component) {
 #endif
     _components.push_back(component);
 }
-
-CPUCapabilitiesComponent* SystemCapabilities::cpuCapabilitiesComponent() {
-    for (SystemCapabilitiesComponent* c : _components) {
-        CPUCapabilitiesComponent* result = dynamic_cast<CPUCapabilitiesComponent*>(c);
-        if (result)
-            return result;
-    }
-    LWARNING("No CPUCapabilities component found");
-    return nullptr;
-}
-
-OpenGLCapabilitiesComponent* SystemCapabilities::openGLCapabilitiesComponent() {
-    for (SystemCapabilitiesComponent* c : _components) {
-        OpenGLCapabilitiesComponent* r = dynamic_cast<OpenGLCapabilitiesComponent*>(c);
-        if (r)
-            return r;
-    }
-    LWARNING("No OpenGLCapabilities component found");
-    return nullptr;
-}
-
 
 } // namespace systemcapabilities
 } // namespace ghoul

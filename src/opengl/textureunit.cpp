@@ -26,7 +26,7 @@
 #include <ghoul/opengl/textureunit.h>
 
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/systemcapabilities/systemcapabilities.h>
+#include <ghoul/systemcapabilities/systemcapabilities>
 
 #include <exception>
 #include <stdexcept>
@@ -116,8 +116,8 @@ void TextureUnit::assignUnit() {
 }
 
 void TextureUnit::initialize() {
-    if (systemcapabilities::SystemCapabilities::isInitialized())
-        _maxTexUnits = SysCap.openGLCapabilitiesComponent()->maximumNumberOfTextureUnits();
+    if (systemcapabilities::SystemCapabilities::isCreated())
+        _maxTexUnits = GpuCap.maximumNumberOfTextureUnits();
     else
         _maxTexUnits = 0;
     _busyUnits = std::vector<bool>(_maxTexUnits, false);

@@ -49,13 +49,20 @@ using std::wstring;
 
 namespace {
     const std::string _loggerCat = "OpenGLCapabilities";
+
+    template <class T>
+    std::string toString(T i) {
+        std::stringstream s;
+        s << i;
+        return s.str();
+    }
 }
 
 namespace ghoul {
 namespace systemcapabilities {
 
 OpenGLCapabilitiesComponent::OpenGLCapabilitiesComponent() 
-    : SystemCapabilitiesComponent("OpenGL")
+    : SystemCapabilitiesComponent()
 {
     clearCapabilities();
 }
@@ -65,7 +72,6 @@ OpenGLCapabilitiesComponent::~OpenGLCapabilitiesComponent() {
 }
 
 void OpenGLCapabilitiesComponent::detectCapabilities() {
-    SystemCapabilitiesComponent::detectCapabilities();
     clearCapabilities();
 
     detectGLSLVersion();
@@ -211,43 +217,49 @@ void OpenGLCapabilitiesComponent::clearCapabilities() {
 #endif
 }
 
-std::string OpenGLCapabilitiesComponent::createCapabilitiesString(
+std::vector<SystemCapabilitiesComponent::CapabilityInformation>
+    OpenGLCapabilitiesComponent::capabilities(
     const SystemCapabilitiesComponent::Verbosity& verbosity) const
 {
-    std::stringstream result;
-    result << "OpenGL Version:        " << _glslVersion.toString() << "\n";
-    result << "OpenGL Compiler:       " << _glslCompiler << "\n";
-    result << "OpenGL Renderer:       " << _glRenderer << "\n";
-    result << "GPU Vendor:            " << vendorString() << "\n";
-    result << "GLEW Version:          " << _glewVersion.toString() << "\n";
+    std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
+    std::stringstream conversion;
+    result.push_back(std::make_pair("OpenGL Version", _glslVersion.toString()));
+    result.push_back(std::make_pair("OpenGL Compiler", _glslCompiler));
+    result.push_back(std::make_pair("OpenGL Renderer", _glRenderer));
+    result.push_back(std::make_pair("GPU Vendor", gpuVendorString()));
+    result.push_back(std::make_pair("GLEW Version", _glewVersion.toString()));
 #ifdef GHOUL_USE_WMI
-    result << "GPU Name:              " << _adapterName << "\n";
-    result << "GPU Driver Version:    " << _driverVersion << "\n";
-    result << "GPU Driver Date:       " << _driverDate << "\n";
-    result << "GPU RAM:               " << _adapterRAM << " MB\n";
+    result.push_back(std::make_pair("GPU Name", _adapterName));
+    result.push_back(std::make_pair("GPU Driver Version", _driverVersion));
+    result.push_back(std::make_pair("GPU Driver Date", _driverDate));
+    result.push_back(std::make_pair("GPU RAM", toString(_adapterRAM)));
 #endif
 
     if (verbosity >= Verbosity::Default) {
-        result << "Max Texture Size:      " << _maxTextureSize << "\n";
-        result << "Max 3D Texture Size:   " << _maxTextureSize3D << "\n";
-        result << "Num of Texture Units:  " << _numTextureUnits << "\n";
-        result << "FBO Color Attachments: " << _maxFramebufferColorAttachments << "\n";
+        result.push_back(std::make_pair("Max Texture Size", toString(_maxTextureSize)));
+        result.push_back(
+            std::make_pair("Max 3D Texture Size", toString(_maxTextureSize3D)));
+        result.push_back(
+            std::make_pair("Num of Texture Units", toString(_numTextureUnits)));
+        result.push_back(
+            std::make_pair("FBO Color Attachments", toString(_maxFramebufferColorAttachments)));
     }
 
     if (verbosity >= Verbosity::Full) {
-        result << "Extensions:            ";
+        std::stringstream s;
         for (size_t i = 0; i < _extensions.size() - 1; ++i)
-            result << _extensions[i] << ", ";
-        result << _extensions[_extensions.size() - 1] << "\n";
+            s << _extensions[i] << ", ";
+        s << _extensions[_extensions.size() - 1] << "\n";
+        result.push_back(std::make_pair("Extensions", s.str()));
     }
-    return result.str();
+    return result;
 }
 
 const OpenGLCapabilitiesComponent::Version& OpenGLCapabilitiesComponent::openGLVersion() const {
     return _glslVersion;
 }
 
-const string& OpenGLCapabilitiesComponent::gpuVendorString() const {
+const string& OpenGLCapabilitiesComponent::glslCompiler() const {
     return _glslCompiler;
 }
 
@@ -269,7 +281,7 @@ int OpenGLCapabilitiesComponent::maximumNumberOfTextureUnits() const {
     return _numTextureUnits;
 }
 
-std::string OpenGLCapabilitiesComponent::vendorString() const {
+std::string OpenGLCapabilitiesComponent::gpuVendorString() const {
     switch (_vendor) {
         case Vendor::Nvidia:
             return "Nvidia";
@@ -280,6 +292,10 @@ std::string OpenGLCapabilitiesComponent::vendorString() const {
         default:
             return "other";
     }
+}
+
+const std::string OpenGLCapabilitiesComponent::name() const {
+    return "OpenGL";
 }
 
 /////////////////////////////

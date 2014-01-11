@@ -50,7 +50,7 @@ namespace ghoul {
 namespace systemcapabilities {
 
 CPUCapabilitiesComponent::CPUCapabilitiesComponent()
-    : SystemCapabilitiesComponent("CPU")
+    : SystemCapabilitiesComponent()
 {
     clearCapabilities();
 }
@@ -189,8 +189,8 @@ void CPUCapabilitiesComponent::detectOS() {
 
 void CPUCapabilitiesComponent::detectMemory() {
     std::string memory;
-    bool mainMemorySuccess = queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
-    if (!mainMemorySuccess)
+    bool success = queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
+    if (!success)
         LERROR_SAFE("Reading of main RAM failed.");
     else {
         std::stringstream convert;
@@ -201,13 +201,32 @@ void CPUCapabilitiesComponent::detectMemory() {
     }
 }
 
-std::string CPUCapabilitiesComponent::createCapabilitiesString(
+std::vector<SystemCapabilitiesComponent::CapabilityInformation>
+    CPUCapabilitiesComponent::capabilities(
                         const SystemCapabilitiesComponent::Verbosity& /*verbosity*/) const
 {
-    std::stringstream result;
-    result << "Operating System:      " << _operatingSystem << "\n";
-    result << "Main Memory:           " << _installedMainMemory;
-    return result.str();
+    std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
+    result.push_back(std::make_pair("Operating System", _operatingSystem));
+    result.push_back(std::make_pair("Main Memory", installedMainMemoryAsString()));
+    return result;
+}
+
+const std::string& CPUCapabilitiesComponent::operatingSystem() const {
+    return _operatingSystem;
+}
+
+unsigned int CPUCapabilitiesComponent::installedMainMemory() const {
+    return _installedMainMemory;
+}
+
+std::string CPUCapabilitiesComponent::installedMainMemoryAsString() const {
+    std::stringstream s;
+    s << _installedMainMemory << " MB";
+    return s.str();
+}
+
+const std::string CPUCapabilitiesComponent::name() const {
+    return "CPU";
 }
 
 } // namespace systemcapabilities

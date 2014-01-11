@@ -30,8 +30,9 @@
 namespace ghoul {
 namespace systemcapabilities {
 
-SystemCapabilitiesComponent::SystemCapabilitiesComponent(const std::string& componentName)
-    : _componentName(componentName)
+SystemCapabilitiesComponent::SystemCapabilitiesComponent()
+    : _isInitialized(false)
+    , _isInitializedWMI(false)
 #ifdef GHOUL_USE_WMI
     , _iwbemLocator(nullptr)
     , _iwbemServices(nullptr)
@@ -40,23 +41,23 @@ SystemCapabilitiesComponent::SystemCapabilitiesComponent(const std::string& comp
 
 SystemCapabilitiesComponent::~SystemCapabilitiesComponent() {}
 
-void SystemCapabilitiesComponent::initialize() {
-    initializeWMI();
+void SystemCapabilitiesComponent::initialize(bool initializeWMI) {
+    if (initializeWMI) {
+        SystemCapabilitiesComponent::initializeWMI();
+        _isInitializedWMI = true;
+    }
+    _isInitialized = true;
 }
 
 void SystemCapabilitiesComponent::deinitialize() {
-    deinitializeWMI();
+    if (_isInitializedWMI)
+        deinitializeWMI();
     clearCapabilities();
+    _isInitialized = false;
 }
 
-void SystemCapabilitiesComponent::detectCapabilities() {}
-
-void SystemCapabilitiesComponent::clearCapabilities() {}
-
-std::string SystemCapabilitiesComponent::createCapabilitiesString(
-                                     const SystemCapabilitiesComponent::Verbosity&) const
-{
-    return "";
+bool SystemCapabilitiesComponent::isInitialized() const {
+    return _isInitialized;
 }
 
 void SystemCapabilitiesComponent::initializeWMI() {
@@ -74,7 +75,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
     HRESULT hRes = CoInitializeEx(0, COINIT_APARTMENTTHREADED);
     if (FAILED(hRes)) {
         LERROR_SAFE("WMI initialization failed. 'CoInitializeEx' failed." 
-            << " Error Code: 0x" << hRes);
+            << " Error Code: " << hRes);
         return;
     }
     hRes = CoInitializeSecurity(
@@ -101,7 +102,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         reinterpret_cast<LPVOID*>(&_iwbemLocator));
     if (FAILED(hRes)) {
         LERROR_SAFE("WMI initialization failed. Failed to create IWbemLocator object." 
-            << " Error Code: 0x" << hRes);
+            << " Error Code: " << hRes);
         _iwbemLocator = 0;
         CoUninitialize();
         return;
@@ -121,7 +122,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         );
     if (FAILED(hRes)) {
         LERROR_SAFE("WMI initialization failed. Failed to connect to WMI server."
-            << " Error Code: 0x" << hRes);
+            << " Error Code: " << hRes);
         _iwbemLocator->Release();
         CoUninitialize();
         _iwbemLocator = 0;
@@ -206,11 +207,11 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
     const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
     if (!isWMIinitialized()) {
         LERROR_SAFE("WMI is not initialized.");
-        return 0;
+        return nullptr;
     }
 
-    VARIANT* result = 0;
-    IEnumWbemClassObject* enumerator = 0;
+    VARIANT* result = nullptr;
+    IEnumWbemClassObject* enumerator = nullptr;
     std::string query = "SELECT " + attribute + " FROM " + wmiClass;
     HRESULT hRes = _iwbemServices->ExecQuery(
         bstr_t("WQL"),
@@ -220,7 +221,7 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
         &enumerator);
     if (FAILED(hRes)) {
         LERROR_SAFE("WMI query failed. Error Code: 0x" << hRes);
-        return 0;
+        return nullptr;
     }
 
     IWbemClassObject* pclsObject = 0;
