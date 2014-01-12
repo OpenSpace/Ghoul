@@ -40,7 +40,7 @@ class Texture;
  * #unregisterTexture or their ownership taken be away from the TextureManager by using
  * #forgetTexture. Texture%s can be registered (#registerTexture), unregistered
  * (#unregisterTexture), forgotten (#forgetTexture), or retrieved (#texture) using either
- * an <code>std::string</code>name, or a generated hash value which is more efficient to
+ * an <code>std::string</code> name, or a generated hash value which is more efficient to
  * retrieve than a string.
  */
 class TextureManager {
@@ -68,7 +68,8 @@ public:
     static TextureManager& ref();
 
     /**
-     * This method will return the Texture that was registered with the passed hash.
+     * This method will return the Texture that was registered with the passed
+     * <code>hashedName</code>.
      * \param hashedName The hash of the Texture that is to be fetched
      * \return The Texture that has been registered with the passed name
      */
@@ -76,9 +77,9 @@ public:
     Texture* texture(unsigned int hashedName);
 
     /**
-     * This method will return the Texture that was registered with the passed name. This
-     * method will create the hash value from the passed string and will call the #texture
-     * method.
+     * This method will return the Texture that was registered with the passed
+     * <code>name</code>. This method will create the hash value from the passed string
+     * and will call the #texture method.
      * \param name The name of the Texture that is to be fetched
      * \return The Texture that has been registered with the passed name
      */
@@ -86,10 +87,10 @@ public:
 
     /**
      * Register the passed Texture under the passed name so that it can be retrieved
-     * either by the given name or by the hashed value that is equal to the hash value of
-     * the passed name. The hashed value can later be retrieved by the function
-     * #hashedNameForName. This method will transfer the ownership of the Texture to 
-     * the TextureManager. If the manager already contains a hashed value equal to the 
+     * either by the given <code>name</code> or by the hashed value that is equal to the
+     * hash value of the passed name. The hashed value can later be retrieved by the
+     * function #hashedNameForName. This method will transfer the ownership of the Texture
+     * to the TextureManager. If the manager already contains a hashed value equal to the 
      * hash value of the name, a warning is logged and <code>false</code> is returned.
      * \param name The name under which the Texture should be registered
      * \param texture The Texture that should be registered
@@ -101,11 +102,12 @@ public:
 
     /**
      * Register the passed Texture under the passed name so that it can be retrieved
-     * either by the given name or by the hashed value is returned in the third parameter 
-     * of this function. The hashed value can later be retrieved by the function 
-     * #hashedNameForName as well. This method will transfer the ownership of the Texture
-     * to the TextureManager. If the manager already contains a hashed value equal to the
-     * hash value of the name, a warning is logged and <code>false</code> is returned.
+     * either by the given <code>name</code> or by the hashed value is returned in the
+     * third parameter of this function. The hashed value can later be retrieved by the
+     * function #hashedNameForName as well. This method will transfer the ownership of the
+     * Texture to the TextureManager. If the manager already contains a hashed value equal
+     * to the hash value of the name, a warning is logged and <code>false</code> is
+     * returned.
      * \param name The name under which the Texture should be registered
      * \param texture The Texture that should be registered
      * \param hashedName The hashed value that is generated from the <code>name</code>
@@ -117,23 +119,24 @@ public:
                          Texture* texture, unsigned int& hashedName);
 
     /**
-     * This method will unregister the Texture that was registered under the passed name.
-     * The Texture will be removed from the manager and deleted.
+     * This method will unregister the Texture that was registered under the passed
+     * <code>name</code>. The Texture will be removed from the manager and deleted.
      * \param name The name under which the Texture was registered previously
      */
     void unregisterTexture(const std::string& name);
 
     /**
      * This method will unregister the Texture that was registered under a name whose hash 
-     * value is equal to the passed hashName. The Texture will be removed from the manager
-     * and deleted.
+     * value is equal to the passed <code>hashName</code>. The Texture will be removed
+     * from the manager and deleted.
      * \param hashedName The hash value which is used to refer to a previously stored 
      * Texture
      */
     void unregisterTexture(unsigned int hashedName);
 
     /**
-     * This method will unregister the Texture that was registered under the passed name.
+     * This method will unregister the Texture that was registered under the passed
+     * <code>name</code>.
      * The Texture will be removed from the manager, but it will not be automatically 
      * deleted. This means that the ownership of the Texture is transferred to the caller 
      * of this function.
@@ -143,9 +146,9 @@ public:
 
     /**
      * This method will unregister the Texture that was registered under a name whose hash 
-     * value is equal to the passed hashName. The Texture will be removed from the 
-     * manager, but it will not be automatically deleted. This means that the ownership of
-     * the Texture is transferred to the caller of this function.
+     * value is equal to the passed <code>hashName</code>. The Texture will be removed
+     * from the manager, but it will not be automatically deleted. This means that the
+     * ownership of the Texture is transferred to the caller of this function.
      * \param hashedName The hash value which is used to refer to a previously stored 
      * Texture
      */
@@ -162,6 +165,8 @@ public:
 
 private:
     TextureManager();
+
+    /// Not implemented on purpose, using this function should generate an error
     TextureManager(const TextureManager& c);
     
     ~TextureManager();

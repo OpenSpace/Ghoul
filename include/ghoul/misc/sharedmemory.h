@@ -109,10 +109,10 @@ public:
      * Creates a SharedMemory object pointing to a previously created shared memory block
      * (#create). If <code>name</code> is a valid name for a shared memory block, the
      * constructor will attach the memory into the calling process' address space, making
-     * it available through the operator void*. If an error occurrs either getting a
-     * valid handle on the memory mapped file or during mapping the memory into the
-     * address space, an invalid SharedMemory object will be created. An invalid object
-     * will always return <code>nullptr</code> in its operator void* method. It is
+     * it available through the operator <code>void*</code>. If an error occurrs either
+     * getting a valid handle on the memory mapped file or during mapping the memory into
+     * the address space, an invalid SharedMemory object will be created. An invalid
+     * object will always return <code>nullptr</code> in its operator void* method. It is
      * possible for the same process to attach the same shared memory block multiple
      * times. It is undefined if two SharedMemory objects with the same name will be
      * attached to the same memory location.
@@ -129,7 +129,7 @@ public:
     
     /**
      * Returns the pointer to the first usable address of the allocated memory. The
-     * transparently handled Header is automatically skipped and is invisible to the
+     * transparently handled header is automatically skipped and is invisible to the
      * user. If this SharedMemory object is not valid (when an error occurred in the
      * constructor), a <code>nullptr</code> will be returned. Otherwise, the return value
      * is a valid pointer into a memory block of the predefined size (#size).
@@ -164,8 +164,10 @@ public:
     void releaseLock();
     
 private:
-    // These methods are not implemented on purpose. Their use should result in an error
+    // This method is not implemented on purpose. Its use should result in an error
     SharedMemory(const SharedMemory& rhs);
+
+    // This method is not implemented on purpose. Its use should result in an error
     SharedMemory& operator=(const SharedMemory& rhs);
 
     /**

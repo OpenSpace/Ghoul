@@ -207,5 +207,9 @@ void Directory::readDirectories(
     }
 }
 
+std::ostream& operator<<(std::ostream& os, const Directory& d) {
+    return os << d.path();
+}
+
 } // filesystem
 } // ghoul

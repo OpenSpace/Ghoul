@@ -51,19 +51,20 @@ ShaderManager::~ShaderManager() {
 }
 
 void ShaderManager::initialize() {
+    assert(_manager == nullptr);
     if (_manager == nullptr)
         _manager = new ShaderManager;
     assert(_manager != nullptr);
 }
 
 void ShaderManager::deinitialize() {
+    assert(_manager != nullptr);
     delete _manager;
     _manager = nullptr;
 }
 
 ShaderManager& ShaderManager::ref() {
-    if (_manager == nullptr)
-        ShaderManager::initialize();
+    assert(_manager != nullptr);
     return *_manager;
 }
 

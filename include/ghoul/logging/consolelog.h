@@ -34,7 +34,7 @@ namespace logging {
 /**
  * A concrete subclass of Log that logs the messages to the console using the
  * <code>std::cout</code> stream. The formatting of the log messages depends on the
- * stamping settings. The various possibilities are:
+ * stamping settings. The different possibilities are:
  * \verbatim
  "[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
  "[DATE] CATEGORY (LEVEL) MESSAGE"
@@ -76,7 +76,7 @@ public:
      * \param message The message body of the log message
      */
     void log(LogManager::LogLevel level, const std::string& category,
-             const std::string& message);
+             const std::string& message) override;
 
 protected:
     // No defined on purpose. Using should throw linker error.

@@ -37,19 +37,23 @@ namespace logging {
  * implement the #log and #flush methods. The log message will only be called with
  * LogManager::LogLevel levels which were filtered by the LogManager the Log belongs to.
  * After finishing the #flush method, all previously written log messages should be
- * stored/printed/transmitted even if the program crashes.
+ * stored/printed/transmitted even if the program crashes immediately after the logging.
  * All subclasses are usable without a LogManager as well by directly instantiating them.
  *
- * \see TextLog \see ConsoleLog \see StreamLog
+ * \see CallbackLog A Log that will call a callback function for each logged message
+ * \see ConsoleLog A Log that logs all messages to the system console
+ * \see HTMLLog A Log that logs all messages into a structured HTML file on disk
+ * \see StreamLog A Log that logs all messages into an <code>std::ostream</code>
+ * \see TextLog A Log that logs all messages to a file on hard disk
  */
 class Log {
 public:
-    /// Virtual destructor
+    /// Empty virtual destructor.
     virtual ~Log();
 
     /**
-     * Method that logs a message with a given level and category. The method of logging
-     * is dependent on the explicit subclass.
+     * Method that logs a message with a given <code>level</code> and
+     * <code>category</code>. The method of logging is dependent on the explicit subclass.
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
      * individually
@@ -60,7 +64,7 @@ public:
 
     /**
      * Flushes the Log. This has different effects on different subclasses, but after this
-     * method finishes, the logs will be safe against a program crash.
+     * method finishes, the logs should be safe against a program crash.
      */
     virtual void flush();
 

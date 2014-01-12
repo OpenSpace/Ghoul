@@ -156,6 +156,7 @@ void LogManager::initialize(LogManager::LogLevel level, bool immediateFlush) {
 }
 
 void LogManager::deinitialize() {
+    assert(_manager != nullptr);
     delete _manager;
     _manager = nullptr;
 }

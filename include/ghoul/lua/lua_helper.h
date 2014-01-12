@@ -35,9 +35,9 @@ namespace lua {
 
 /**
  * Logs the Lua table that is located on the top of the stack in the passed
- * <code>state</code> with the passed LogLevel and returns the logged string. The key-
- * value pair for each entry in the table is printed, which might cause the function to be
- * called recursively. The output will be written the format:
+ * <code>state</code> with the passed ghoul::logging::LogManager::LogLevel and returns the
+ * logged string. The key-value pair for each entry in the table is printed, which might
+ * cause the function to be called recursively. The output will be written the format:
  * <code>{ key = value key = value ... }</code>. If the top of the stack does not
  * represent a Lua table, an empty string is returned
  * \param state The Lua state that contains the table to be logged
@@ -56,8 +56,8 @@ std::string lua_logTable(lua_State* state,logging::LogManager::LogLevel level =
  * logged. The messages is writing in the the format:
  * \verbatim
 <code>
-1: \<entry\>
-2: \<entry\>
+1: <entry>
+2: <entry>
 ...
 </code>
 \endverbatim

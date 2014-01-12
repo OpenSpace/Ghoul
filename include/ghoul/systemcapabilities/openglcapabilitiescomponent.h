@@ -36,7 +36,7 @@ namespace systemcapabilities {
 
 /**
  * This subclass of SystemCapabilitiesComponent detects graphics and OpenGL-related
- * capabilities, like the OpenGL version, supported extensions, the driver version.
+ * capabilities, like the OpenGL version, supported extensions, or the driver version.
  */
 class OpenGLCapabilitiesComponent : public SystemCapabilitiesComponent {
 public:
@@ -67,13 +67,15 @@ public:
         std::string toString() const;
 
         /**
-         * Returns true, if major, minor, and release version parts are the same
+         * Returns <code>true</code>, if major, minor, and release version parts are the
+         * same.
          * \return <code>True</code> if both versions are the same
          */
         bool operator==(const Version& rhs) const;
 
         /**
-         * Returns true, if major, minor, or release version parts are different
+         * Returns <code>true</code>, if major, minor, or release version parts are
+         * different.
          * \return <code>True</code> if either major, minor, or release version is
          * different
          */
@@ -81,7 +83,7 @@ public:
 
         /**
          * First compares major version against major version, then minor against minor
-         * and finally release against release
+         * and finally release against release.
          * \return <code>True</code> if <code>this</code> is a smaller version than
          * <code>rhs</code>
          */
@@ -89,7 +91,7 @@ public:
 
         /**
          * First compares major version against major version, then minor against minor
-         * and finally release against release
+         * and finally release against release.
          * \return <code>True</code> if <code>this</code> is a smaller or equal version
          * than <code>rhs</code>
          */
@@ -97,7 +99,7 @@ public:
 
         /**
          * First compares major version against major version, then minor against minor
-         * and finally release against release
+         * and finally release against release.
          * \return <code>True</code> if <code>this</code> is a greater version than
          * <code>rhs</code>
          */
@@ -105,7 +107,7 @@ public:
 
         /**
          * First compares major version against major version, then minor against minor
-         * and finally release against release
+         * and finally release against release.
          * \return <code>True</code> if <code>this</code> is a greater or equal version
          * than <code>rhs</code>
          */
@@ -187,11 +189,17 @@ protected:
     void detectCapabilities() override;
     void clearCapabilities() override;
 
+    /// Detect the maximum supported GLSL Version
     void detectGLSLVersion();
+    /// Detect the vendor of the main GPU
     void detectGPUVendor();
+    /// Get the vendor string from OpenGL
     void detectGLRenderer();
+    /// Detect all available extensions
     void detectExtensions();
+    /// Detect the available GLEW version
     void detectGLEWVersion();
+    /// Use WMI (on Windows) to retrieve information about the installed driver
     void detectDriverInformation();
 
     Version _glslVersion; ///< GLSL Version
@@ -209,10 +217,10 @@ protected:
     bool _supportTexturing3D; // GL_EXT_texture3D
 
 #ifdef GHOUL_USE_WMI
-    std::string _driverVersion;
-    std::string _driverDate;
-    unsigned int _adapterRAM;
-    std::string _adapterName;
+    std::string _driverVersion; ///< Stores the version of the installed driver
+    std::string _driverDate; ///< Stores the date of the installed driver
+    unsigned int _adapterRAM; ///< How many MB of memory is installed on the main GPU
+    std::string _adapterName; ///< The name of the main GPU
 #endif
 };
 

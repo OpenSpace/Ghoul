@@ -41,11 +41,11 @@ class Log;
  * This singleton class provides methods to add new Log%s, remove Log%s, and relay
  * messages to all Log%s added to the LogManager. A log message consists of a
  * LogManager::LogLevel, a category and a message. The category is mainly used as a prefix
- * and/or grouping within the log files and may have other meanings depending on Log%s.
- * The LogManager instance has to be initialized with the #initialize method and can be
- * accessed using the #ref method afterwards. Initializing an instance twice or accessing
- * an uninitialized LogManager will result in an assertion. The logging is performed
- * thread-safe.
+ * and/or grouping within the log files and may have other meanings depending on the
+ * specific Log%s. The LogManager instance has to be initialized with the #initialize
+ * method and can be accessed using the #ref method afterwards. Initializing an instance
+ * twice or accessing an uninitialized LogManager will result in an assertion. The logging
+ * is performed thread-safe.
  *
  * The different LogManager::LogLevel available are: LogManager::LogLevel::Debug,
  * LogManager::LogLevel::Info, LogManager::LogLevel::Warning, LogManager::LogLevel::Error,
@@ -56,8 +56,8 @@ class Log;
  * Macros are defined to make logging messages easier. These macros are: #LDEBUG,
  * #LDEBUGC, #LINFO, #LINFOC, #LWARNING, #LWARNINGC, #LERROR, #LERRORC, #LFATAL, #LFATALC.
  * The *C versions of the macros requires the category and the message as a parameter. The
- * versions without the C require a variable named <code>_loggerCat</code> to be defined
- * in the scope of the macro "call"
+ * versions without the C require an <code>std::string</code> variable named
+ * <code>_loggerCat</code> to be defined in the scope of the macro "call".
  */
 class LogManager {
 public:
@@ -68,31 +68,51 @@ public:
      * to be strictly ordered from least important to important.
      */
     enum class LogLevel {
-        Debug = 1 << 0, ///< Used for Debug output; will never be used in release
+        /**
+         * Used for Debug output; will never be used in release
+         */
+        Debug = 1 << 0,
+        /**
+         * Used for informational messages which can be ignored, but might be
+         * informative
+         */
         Info = 1 << 1,
+        /**
+         * Warnings which do not represent a problem in itself, but may hint to a wrong
+         * configuration
+         */
         Warning = 1 << 2,
+        /**
+         * Errors which will pose problems, but do not necessarily require the immediate
+         * end of the application
+         */
         Error = 1 << 3,
+        /**
+         * Error which will be so severe that the application cannot recover from them
+         */
         Fatal = 1 << 4
     };
 
     /**
-     * Creates and initializes an empty LogManager with the passed level.
-     * \param level The lowest LogLevel that will be passed to the containing Logs.
-     * A LogLevel of Debug will never be passed along in a Release build.
-     * \param immediateFlush Determines if all Logs will be flushed out immediately
-     * after a message was received. In the case of file-based logs, the files will be
+     * Creates and initializes an empty LogManager with the passed LogManager::LogLevel.
+     * \param level The lowest LogManager::LogLevel that will be passed to the containing
+     * Log%s. A LogManager::LogLevel of LogManager::LogLevel::Debug will never be passed
+     * along in a Release build.
+     * \param immediateFlush Determines if all Log%s will be flushed out immediately
+     * after a message was received. In the case of file-backed logs, the files will be
      * written out to disk and in case of a console log, the console will be updated.
      * Passing <code>true</code> will slow down the execution but guarantees that a crash
      * immediately after a log message won't lead to data loss.
-     * Calling init when the LogManager is already initialized will trigger an assertion.
+     * Calling #initialize when the LogManager is already initialized will trigger an
+     * assertion.
      */
     static void initialize(LogLevel level = LogLevel::Info, bool immediateFlush = false);
 
     /**
      * Deinitializes and deletes the LogManager. All the stored Logs in this LogManager
-     * will be deleted as well. After deinit() returns, the LogManager can be initialized
-     * again with different values. Calling deinit() on an uninitialized LogManager is
-     * allowed.
+     * will be deleted as well. After this method returns, the LogManager can be
+     * initialized again with different values. Calling this with an uninitialized
+     * LogManager will trigger an assertion.
      */
     static void deinitialize();
 
@@ -111,13 +131,13 @@ public:
 
     /**
      * The main method to log messages. If the <code>level</code> is >= the level this
-     * LogManager was created with, the message will be passed to the stored Logs. The
-     * category will be used in different ways depending on the Log in question, but
-     * examples are grouping or prepending to the message.
-     * \param level The level of the message that should be passed to the Logs
+     * LogManager was created with, the <code>message</code> will be passed to the stored
+     * Log%s. The <code>category</code> will be used in different ways depending on the
+     * Log in question, but examples are grouping or prepending to the message.
+     * \param level The level of the message that should be passed to the Log%s
      * \param category The category of the message, which will be used depending on
-     * the Logs
-     * \param message The message that will be passed to the Logs. May contain
+     * the Log%s
+     * \param message The message that will be passed to the Log%s. May contain
      * control sequences.
      */
     virtual void logMessage(LogManager::LogLevel level, const std::string& category,
@@ -125,43 +145,43 @@ public:
 
     /**
      * The main method to log messages. If the <code>level</code> is >= the level this
-     * LogManager was created with, the message will be passed to the stored Logs.
-     * The category of the message will be an empty string, which causes it to be ignored
-     * by most Logs.
-     * \param level The level of the message that should be passed to the Logs
-     * \param message The message that will be passed to the Logs. May contain
+     * LogManager was created with, the <code>message</code> will be passed to the stored
+     * Log%s. The <code>category</code> of the message will be an empty string, which
+     * causes it to be ignored by most Log%s.
+     * \param level The level of the message that should be passed to the Log%s
+     * \param message The message that will be passed to the Log%s. May contain
      * control sequences.
      */
     void logMessage(LogManager::LogLevel level, const std::string& message);
 
     /**
-     * Adds the passed log to the list of managed Logs. The ownership of the Log is passed
-     * to the LogManager. The Log will be deleted when the LogManager is deinitialized.
-     * Adding the same Log twice has no effect and is permitted.
-     * \param log The log that should be added to this LogManager
+     * Adds the passed log to the list of managed Log%s. The ownership of the Log is
+     * passed to the LogManager. The Log will be deleted when the LogManager is
+     * #deinitialize%d. Adding the same Log twice has no effect and is permitted.
+     * \param log The Log that should be added to this LogManager
      */
     void addLog(Log* log);
 
     /**
-     * Removes the passed log from the list of managed Logs. This transfers the ownership
-     * of the Log to the caller and he is responsible for deleting the Log. Trying to
+     * Removes the passed log from the list of managed Log%s. This transfers the ownership
+     * of the Log back to the caller and he is responsible for deleting the Log. Trying to
      * remove a Log that is not part of this LogManager has no effect and is permitted.
      * \param log The Log that should be removed from this LogManager
      */
     void removeLog(Log* log);
 
     /**
-     * Returns the string representation of the passed LogLevel. The name of each LogLevel
-     * is equal to its enum value.
-     * \return The string representation of the passed LogLevel.
+     * Returns the string representation of the passed LogManager::LogLevel. The name of
+     * each level is equal to its enum value.
+     * \return The string representation of the passed LogManager::LogLevel
      */
     static std::string stringFromLevel(LogLevel level);
 
 protected:
-    std::vector<Log*> _logs;  ///< stores the Logs which are managed by this LogManager
+    std::vector<Log*> _logs;  ///< Stores the Logs which are managed by this LogManager
 
 private:
-    static LogManager* _manager; ///< singleton member
+    static LogManager* _manager; ///< Singleton member
 };
 
 } // namespace logging

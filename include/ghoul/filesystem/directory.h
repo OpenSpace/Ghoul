@@ -27,6 +27,7 @@
 #define __DIRECTORY_H__
 
 #include <functional>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -34,13 +35,13 @@ namespace ghoul {
 namespace filesystem {
 
 /**
- * This class represents a directory in the file system. It is identified by its path. 
- * Using the default constructor will create a Directory object pointing to the absolute
- * path of the current working directory. The other constructors can either create and
- * absolute path or use the provided path as-is.
+ * This class represents a directory in the file system. The directory is identified by
+ * its path. Using the default constructor will create a Directory object pointing to the
+ * absolute path of the current working directory. The other constructors can either
+ * create and absolute path or use the provided path as-is.
  * The Directory has the possibility to list all files (#read), or selectively only
- * read files (#readFiles) or read directories (#readDirectories).
- * \todo Implement an operator so that a Directory object can be used in a stream.
+ * read files (#readFiles), read directories (#readDirectories), or get the parent
+ * (#parentDirectory).
  */
 class Directory {
 public:
@@ -122,34 +123,34 @@ public:
      * the current directory.
      * \param sort If <code>true</code> the final result will be sorted by name
      * \return The paths to all files and directories in the current directory (and
-     * subdirectories if <code>recursiveSearch</code> is <code>true</code>
+     * subdirectories if <code>recursiveSearch</code> is <code>true</code>)
      */
     std::vector<std::string> read(bool recursiveSearch = false, bool sort = false) const;
 
     /**
      * This method creates a list of all files in the current directory and returns the
-     * paths to each. If <code>recursiveSearch</code> is <code>true</code>, each
+     * path to each. If <code>recursiveSearch</code> is <code>true</code>, each
      * subdirectory will be searched as well and all results will be combined. The
-     * parameter <code>sort</code> determines if the endresult will be sorted by name.
+     * parameter <code>sort</code> determines if the end result will be sorted by name.
      * \param recursiveSearch Determines if the subdirectories will be searched as well as
      * the current directory.
      * \param sort If <code>true</code> the final result will be sorted by name
      * \return The paths to all files in the current directory (and subdirectories if
-     * <code>recursiveSearch</code> is <code>true</code>
+     * <code>recursiveSearch</code> is <code>true</code>)
      */
     std::vector<std::string> readFiles(bool recursiveSearch = false,
                                        bool sort = false) const;
 
     /**
      * This method creates a list of all subdirectories in the current directory and
-     * returns the paths to each. If <code>recursiveSearch</code> is <code>true</code>,
+     * returns the path to each. If <code>recursiveSearch</code> is <code>true</code>,
      * each subdirectory will be searched as well and all results will be combined. The
      * parameter <code>sort</code> determines if the end result will be sorted by name.
      * \param recursiveSearch Determines if the subdirectories will be searched as well as
      * the current directory.
      * \param sort If <code>true</code> the final result will be sorted by name
      * \return The paths to all directories in the current directory (and subdirectories
-     * if <code>recursiveSearch</code> is <code>true</code>
+     * if <code>recursiveSearch</code> is <code>true</code>)
      */
 std::vector<std::string> readDirectories(bool recursiveSearch = false,
                                          bool sort = false) const;
@@ -192,6 +193,15 @@ private:
     /// The path in the filesystem to this Directory object. May be absolute or relative
     std::string _directoryPath;
 };
+
+/**
+ * The stream operator that will stream the Directory%'s path to the output stream.
+ * \param os The stream that will be inserted into
+ * \param d The Directory which will be inserted into the stream
+ * \return The modified stream, used for cascading
+ * \memberof Directory
+ */
+std::ostream& operator<<(std::ostream& os, const Directory& d);
 
 } // namespace filesystem
 } // namespace ghoul

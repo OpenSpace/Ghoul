@@ -37,7 +37,7 @@ namespace ghoul {
 namespace filesystem {
 
 /**
- * The methods in this class are used to access platform-independent information about the
+ * The methods in this class are used to access platform-independent features of the
  * underlying filesystem. It is possible to convert relative paths into absolute paths
  * (#absolutePath()) and vice versa (#relativePath()). The current working directory
  * can be accessed and changed (#currentDirectory(), #setCurrentDirectory(), 
@@ -77,9 +77,9 @@ public:
     static FileSystem& ref();
     
     /**
-     * Returns the absolute path to the passed <code>path</code>, resolvinging any tokens
-     * (if present) in the process. The current working directory (#currentDirectory())
-     * is used as a base path for this.
+     * Returns the absolute path to the passed <code>path</code>, resolving any tokens (if
+     * present) in the process. The current working directory (#currentDirectory()) is
+     * used as a base path for this.
      * \param path The path that should be converted into an absolute path
      * \return The absolute path to the passed <code>path</code>
      */
@@ -114,8 +114,8 @@ public:
     void setCurrentDirectory(const Directory& directory) const;
 
     /**
-     * Checks if the file at the <code>path</code> exists or not. This method will return
-     * <code>false</code> if <code>path</code> points to a directory.
+     * Checks if the file at the <code>path</code> exists or not. This method will also
+     * return <code>false</code> if <code>path</code> points to a directory.
      * \param path The path that should be tested for existence
      * \return <code>true</code> if <code>path</code> points to an existing file,
      * <code>false</code> otherwise
@@ -152,8 +152,8 @@ public:
     
     /**
      * Registers the path token <code>token</code> with this FileSystem. Henceforth, every
-     * call to, for example, #absolutePath(), the constructors of File , or Directory,
-     * will replace the <code>token</code> with<code>path</code>. The tokens cannot be
+     * call to, for example, #absolutePath(), the constructors of File, or Directory,
+     * will replace the <code>token</code> with <code>path</code>. The tokens cannot be
      * removed or replaced afterwards, as this might lead to inconsistencies since some
      * files might have replaced the tokens while others have not.
      * \param token The token in the form <code>${...}</code>
@@ -161,10 +161,21 @@ public:
      */
     void registerPathToken(const std::string& token, const std::string& path);
 
+    /**
+     * Replaces the path tokens present in the <code>path</code> if any exist. If all 
+     * tokens could be replaced, the method returns <code>true</code>; if
+     * <code>false</code> is returned, one or more tokens could not be replaced. In this
+     * case, only part of the path is modified.
+     * \param path The path whose tokens should be replaced
+     * \return <code>true</code> if all tokens were replaced successfully,
+     * <code>false</code> otherwise
+     */
+    bool expandPathTokens(std::string& path) const;
+
 private:
     /**
      * This method cleans up a passed path by removing any double path separators and
-     * replacing all separators into the ones used by the local operating system. It also
+     * replacing all separators into the ones used by the operating system. It also
      * removes any trailing separators at the end of the path.
      * \param path The path that should be cleaned up
      * \return The cleaned path with correct separators
@@ -176,7 +187,8 @@ private:
      * <code>p2</code> are equal. After the returned position, the paths are diverging.
      * \param p1 The one path that is used for the comparison
      * \param p2 The other path that is used for the comparison
-     * \return The position until the paths <code>p1</code> and <code>p2</code> are equal
+     * \return The position until which the paths <code>p1</code> and <code>p2</code> are
+     * equal
      */
     size_t commonBasePathPosition(const std::string& p1, const std::string& p2) const;
 
@@ -186,17 +198,6 @@ private:
      * \return <code>true</code> if the <code>path</code> contains any tokens
      */
     bool hasTokens(const std::string& path) const;
-    
-    /**
-     * Replaces the path tokens present in the <code>path</code> if any exist. If all 
-     * tokens could be replaced, the method returns <code>true</code>; if
-     * <code>false</code> is returned, one or more tokens could not be replaced. In this
-     * case, only part of the path is modified.
-     * \param path The path whose tokens should be replaced
-     * \return <code>true</code> if all tokens were replaced successfully,
-     * <code>false</code> otherwise
-     */
-    bool expandPathTokens(std::string& path) const;
     
     /**
      * Returns true, if the <code>path</code> contains the token <code>token</code>.
@@ -214,20 +215,23 @@ private:
      */
     const std::string resolveToken(const std::string& token) const;
 
-    /*
+    /**
      * Empty constructor. In here as there should not be any local FileSystems around,
-     * but the static one
+     * but the static one.
      */
     FileSystem();
 
-    /// these methods are not implemented on purpose; using them should produce an error
+    /// This method is not implemented on purpose; using this should produce an error.
     FileSystem(const FileSystem& rhs);
+    
+    /// This method not implemented on purpose; using this should produce an error.
     FileSystem& operator=(const FileSystem& rhs);
     
-    /// This map stores all the tokens that are used in the FileSystem
+    /// This map stores all the tokens that are used in the FileSystem.
     std::map<std::string, std::string> _tokenMap;
+
     /// This member variable stores the static FileSystem. Has to be initialized and
-    /// deinitialized using the \see initialize and \see deinitialize methods
+    /// deinitialized using the #initialize and #deinitialize methods.
     static FileSystem* _fileSystem;
 };
 

@@ -82,8 +82,8 @@ protected:
     void detectOS();
     void detectMemory();
 
-    std::string _operatingSystem; ///< Information about the Operating system
-    unsigned int _installedMainMemory; ///< The amount of RAM that is installed on this machine
+    std::string _operatingSystem; ///< Information about the operating system
+    unsigned int _installedMainMemory; ///< The amount of RAM that is installed
 
 };
 

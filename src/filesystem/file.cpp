@@ -337,7 +337,12 @@ void File::completionHandler(
         }
     }
 }
+
 #endif
+
+std::ostream& operator<<(std::ostream& os, const File& f) {
+    return os << f.path();
+}
 
 } // namespace filesystem
 } // namespace ghoul

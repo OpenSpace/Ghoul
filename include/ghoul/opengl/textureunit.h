@@ -35,7 +35,7 @@ namespace opengl {
 
 /**
  * This class manages Texture Units and is a wrapper around <code>GL_TEXTURE0</code>, 
- * <code>GL_TEXTURE1</code>, ... . It manages which texture units are currently active and
+ * <code>GL_TEXTURE1</code>, ... It manages which texture units are currently active and
  * which units are free to use. To use a TextureUnit, it has to be #activate%d, the
  * Texture has to be bound, and then the #unitNumber can be retrieved so that it can be
  * used in a uniform. A unit number is assigned as soon as the first call to #activate,
@@ -96,7 +96,7 @@ public:
     static void setZeroUnit();
 
     /**
-     * Deinitializes all the used TextureUnits and marks them as free. In addition, the 
+     * Deinitializes all the used TextureUnit%s and marks them as free. In addition, the 
      * zero unit will be set as the active TextureUnit as by #setZeroUnit call. The total
      * number of used texture units after this call will be <code>0</code>.
      */
@@ -105,7 +105,8 @@ public:
     /**
      * This method returns the number texture units that have been marked as used by 
      * calling one of the methods #activate, #glEnum, or #unitNumber. The maximum number
-     * of supported texture units can be queried from the #ghoul::SystemCapabilities.
+     * of supported texture units can be queried from the
+     * #ghoul::systemcapabilities::SystemCapabilities.
      * \return The number of texture units in use
      */
     static int numberActiveUnits();
@@ -119,9 +120,9 @@ private:
     void assignUnit();
 
     /**
-     * Initializes the maximum number of texture units using #ghoul::SystemCapabilities
-     * and marks all texture units as unused. This method is called the first time a
-     * TextureUnit is created.
+     * Initializes the maximum number of texture units using
+     * #ghoul::systemcapabilities::SystemCapabilities and marks all texture units as
+     * unused. This method is called the first time a TextureUnit is created.
      */
     static void initialize();
 

@@ -33,7 +33,7 @@ namespace logging {
 
 /**
  * A concrete subclass of Log that logs the messages to a plain text file on hard disk.
- * The formatting of the log messages depends on the stamping settings. The various
+ * The formatting of the log messages depends on the stamping settings. The different
  * possibilities are:
  * \verbatim
 "[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
@@ -41,7 +41,7 @@ namespace logging {
 "[TIME] CATEGORY (LEVEL) MESSAGE"
 \endverbatim
  * And the remaining possibilities with <code>CATEGORY</code> and <code>LEVEL</code>
- * missing. Only the TextLog::log method needs to be overwritten in a subclass, if a
+ * missing. Only the #log method needs to be overwritten in a subclass, if a
  * different output format is required. The file will be opened in the constructor and
  * closed in the destructor of this class. A parameter in the constructor controls of the
  * file will be reset before writing the first time.
@@ -73,7 +73,8 @@ public:
     ~TextLog();
 
     /**
-     * Method that logs a message with a given level and category to the text file.
+     * Method that logs a <code>message</code> with a given <code>level</code> and
+     * <code>category</code> to the text file.
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
      * individually

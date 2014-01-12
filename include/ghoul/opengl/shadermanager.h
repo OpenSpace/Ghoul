@@ -48,22 +48,23 @@ class ShaderManager {
 public:
     /**
      * Static initializer that initializes the static member. This needs to be done before
-     * the ShaderManager can be used. If the manager has been already initialized, this
-     * results in a no op.
+     * the ShaderManager can be used. If the manager has been already initialized, an
+     * assertion will be triggered.
      */
     static void initialize();
     
     /**
-     * Static deinitializer that will remove all of the registered ShaderObjects, that 
+     * Static deinitializer that will remove all of the registered ShaderObject%s, that 
      * haven't been either forgotten (#forgetShaderObject) or unregistered ( 
      * #unregisterShaderObject, which will instead delete the shader). The manager will be 
-     * deleted and will be unavailable until it is re-initialized (#initialize).
+     * deleted and will be unavailable until it is re-initialized (#initialize). If there
+     * was no #initialize%d ShaderManager, an assertion will be triggered.
      */
     static void deinitialize();
     
     /**
      * This method returns a reference to the initialized ShaderManager. If the manager
-     * has not been initialized, it will be done so in the first call to this method.
+     * has not been initialized, an assertion will be triggered.
      * \return An initialized reference to the singleton manager
      */
     static ShaderManager& ref();
@@ -129,8 +130,8 @@ public:
     
     /**
      * This method will unregister the ShaderObject that was registered under a name whose
-     * hash value is equal to the passed hashName. The ShaderObject will be removed from 
-     * the manager and deleted.
+     * hash value is equal to the passed <code>hashName</code>. The ShaderObject will be
+     * removed from the manager and deleted.
      * \param hashedName The hash value which is used to refer to a previously stored
      * ShaderObject
      */
@@ -147,9 +148,9 @@ public:
 
     /**
      * This method will unregister the ShaderObject that was registered under a name whose 
-     * hash value is equal to the passed hashName. The ShaderObject will be removed from 
-     * the manager, but it will not be automatically deleted. This means that the 
-     * ownership of the ShaderObject is transferred to the caller of this function.
+     * hash value is equal to the passed <code>hashName</code>. The ShaderObject will be
+     * removed from the manager, but it will not be automatically deleted. This means that
+     * the ownership of the ShaderObject is transferred to the caller of this function.
      * \param hashedName The hash value which is used to refer to a previously stored
      * ShaderObject
      */
@@ -167,10 +168,16 @@ public:
     
 private:
     ShaderManager();
+
+    /// Not implemented on purpose, using this should result in an error
     ShaderManager(const ShaderManager& c);
+
+    /// Not implemented on purpose, using this should result in an error
     ~ShaderManager();
     
-    static ShaderManager* _manager; ///< singleton member
+    static ShaderManager* _manager; ///<Singleton member
+    
+    /// Map containing all the registered ShaderObject%s
     std::map<unsigned int, ShaderObject*> _objects;
 };
     

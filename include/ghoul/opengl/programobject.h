@@ -41,20 +41,20 @@ namespace opengl {
  * shaders. The usual restrictions for shader objects as described in the OpenGL and GLSL
  * language specifications apply. The ProgramObject can have a <code>name</code> that is 
  * used in the logging feature and as an OpenGL object label, if OpenGL > 4.3 is
- * available. Before the ProgramObject can be used, ShaderObjects have to be attached, the
- * ShaderObjects have to be compiled (#compileShaderObjects will compile all attached
- * ShaderObjects) and the ProgramObject has to be linked before it can be used (using
+ * available. Before the ProgramObject can be used, ShaderObject%s have to be attached,
+ * the ShaderObject%s have to be compiled (#compileShaderObjects will compile all attached
+ * ShaderObject%s) and the ProgramObject has to be linked before it can be used (using
  * #activate and #deactivate). If the OpenGL name of the ProgramObject is required, it is
  * available as an overloaded operator to an <code>GLuint</code> type. The copy
  * constructor and the assignment operation will perform deep copies of the attached
- * ShaderObjects. The ownership of the copies of the ShaderObjects will belong to the new
- * copy, while the ownership of original ShaderObjects will not change. When setting
+ * ShaderObject%s. The ownership of the copies of the ShaderObject%s will belong to the
+ * new copy, while the ownership of original ShaderObject%s will not change. When setting
  * uniforms, attributes, subroutines, and subroutine uniforms, a flag is available
  * (#setIgnoreUniformLocationError, #setIgnoreAttributeLocationError,
  * #setIgnoreSubroutineLocationError, and #setIgnoreSubroutineUniformLocationError) that
- * enables/disables the logging in case one of the resources was not found during its
+ * enables/disables the logging in case one of the resources was not found during the
  * function call. All other sanity checks will only be performed if the library is
- * compiled with the <code>GHL_DEBUG</code> macro defined.
+ * compiled with the <code>GHL_DEBUG</code> macro being defined.
  */
 class ProgramObject {
 public:
@@ -74,21 +74,21 @@ public:
     ProgramObject(const std::string& name);
 
     /**
-     * Copy constructor that will perform a deep copy of all the attached ShaderObjects
+     * Copy constructor that will perform a deep copy of all the attached ShaderObject%s
      * and copies the state of the location errors and internal (and debug) name. The
-     * copied ShaderObjects` ownership will belong to the newly created ProgramObject
+     * copied ShaderObject%s' ownership will belong to the newly created ProgramObject
      * while the original`s ownership will be unchanged.
      */
     ProgramObject(const ProgramObject& cpy);
 
     /**
-     * Destructor that will delete all the ShaderObjects whose ownership belong to this
+     * Destructor that will delete all the ShaderObject%s whose ownership belong to this
      * ProgramObject. It will also delete the OpenGL name that is attached to the
      * ProgramObject. Please note, while the lifetime of the ProgramObject ends after the
      * destructor finishes, the OpenGL name might still be in use and is only deleted if
      * the last (OpenGL internal) reference to the program object is removed. This means
-     * that the OpenGL name will leak and be unreachable if the destructor is called while
-     * the ProgramObject is still #activate%d.
+     * that the OpenGL name will leak and will be unreachable if the destructor is called
+     * while the ProgramObject is still #activate%d.
      */
     ~ProgramObject();
 
@@ -102,8 +102,8 @@ public:
 
     /**
      * Assignment operator that will copy all the internal state of the right hand side`s
-     * ProgramObject and will perform a deep copy of all the attached ShaderObjects. Each
-     * copy's ownership will belong to the left hand side, while the old ShaderObjects
+     * ProgramObject and will perform a deep copy of all the attached ShaderObject%s. Each
+     * copy's ownership will belong to the left hand side, while the old ShaderObject%s
      * will be deleted (depending on their respective ownerships).
      * \param rhs The assignment source
      */
@@ -150,15 +150,15 @@ public:
     void detachObject(ShaderObject* shaderObject);
 
     /**
-     * Compiles all the ShaderObjects that are attached to this ProgramObject. Will return
-     * the combined success of each individual compilation.
+     * Compiles all the ShaderObject%s that are attached to this ProgramObject. Will
+     * return the combined success of each individual compilation.
      * \return <code>true</code> if each attached ShaderObject was compiled successfully.
      * <code>false</code> otherwise
      */
     bool compileShaderObjects();
 
     /**
-     * Links all attached ShaderObjects into a program object. If an error occurs during
+     * Links all attached ShaderObject%s into a program object. If an error occurs during
      * the linking process, the linker log will be logged and <code>false</code> is
      * returned.
      * \return <code>true</code> if the linking succeeds, <code>false</code> otherwise
@@ -166,10 +166,10 @@ public:
     bool linkProgramObject();
 
     /**
-     * Reloads and rebuilds all the attached ShaderObjects from their respective files.
+     * Reloads and rebuilds all the attached ShaderObject%s from their respective files.
      * Will call ShaderObject::rebuildFromFile on each attached ShaderObject
      * regardless of ownership.
-     * \return <code>true</code> if the rebuilding of all ShaderObjects succeeds,
+     * \return <code>true</code> if the rebuilding of all ShaderObject%s succeeds,
      * <code>false</code> otherwise
      */
     bool rebuildFromFile();
@@ -208,7 +208,7 @@ public:
 
     /**
      * Returns the location of the uniform specified by <code>name</code>. If the uniform
-     * can not be found in any of the attached ShaderObjects, <code>-1</code> is returned
+     * can not be found in any of the attached ShaderObject%s, <code>-1</code> is returned
      * and (provided it is not disabled) a warning will be logged. Will call the OpenGL
      * function <code>glGetUniformLocation</code>.
      * \param name The name of the uniform for which the location should be fetched
@@ -221,7 +221,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns<code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform1i</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located, <code>false
      * </code> otherwise
@@ -233,7 +233,7 @@ public:
      * <code>v1</code> and <code>v2</code>. Returns <code>true</code> if the uniform could
      * be found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniform2i</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
@@ -246,7 +246,7 @@ public:
      * <code>v1</code>, <code>v2</code>, and <code>v3</code>. Returns <code>true</code> if
      * the uniform could be found; <code>false</code> otherwise. Will call the OpenGL
      * function <code>glProgramUniform3i</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
@@ -260,7 +260,7 @@ public:
      * <code>v1</code>, <code>v2</code>, <code>v3</code>, and <code>v4</code>. Returns
      * <code>true</code> if the uniform could be found; <code>false</code> otherwise. Will
      * call the OpenGL function <code>glProgramUniform4i</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObjects%
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
@@ -274,7 +274,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform2iv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -285,7 +285,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform3iv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -296,7 +296,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform4iv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -309,7 +309,7 @@ public:
      * values. Returns <code>true</code> if the uniform could be found;
      * <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniform1iv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -323,7 +323,7 @@ public:
      * values. Returns <code>true</code> if the uniform could be found;
      * <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniform2iv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -336,7 +336,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform3iv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -350,7 +350,7 @@ public:
      * values. Returns <code>true</code> if the uniform could be found;
      * <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniform4iv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -362,7 +362,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform1ui</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code>otherwise
@@ -374,7 +374,7 @@ public:
      * <code>v1</code> and <code>v2</code>. Returns <code>true</code> if the uniform could
      * be found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniform2ui</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
@@ -387,7 +387,7 @@ public:
      * <code>v1</code>, <code>v2</code>, and <code>v3</code>. Returns <code>true</code> if
      * the uniform could be found; <code>false</code> otherwise. Will call the OpenGL
      * function <code>glProgramUniform3ui</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
@@ -401,7 +401,7 @@ public:
      * <code>v1</code>, <code>v2</code>, <code>v3</code>, and <code>v4</code>. Returns
      * <code>true</code> if the uniform could be found; <code>false</code> otherwise. Will
      * call the OpenGL function <code>glProgramUniform4ui</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
@@ -415,7 +415,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform2uiv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -426,7 +426,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform3uiv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -437,7 +437,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform4uiv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -450,7 +450,7 @@ public:
      * values. Returns <code>true</code> if the uniform could be found;
      * <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniform1uiv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -464,7 +464,7 @@ public:
      * values. Returns <code>true</code> if the uniform could be found;
      * <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniform2uiv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -477,7 +477,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform3uiv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -490,7 +490,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform4uiv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -502,7 +502,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform1i</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -514,7 +514,7 @@ public:
      * <code>v1</code> and <code>v2</code>. Returns <code>true</code> if the uniform could
      * be found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniform2i</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
@@ -527,7 +527,7 @@ public:
      * <code>v1</code>, <code>v2</code>, and <code>v3</code>. Returns <code>true</code> if
      * the uniform could be found; <code>false</code> otherwise. Will call the OpenGL
      * function <code>glProgramUniform3i</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
@@ -541,7 +541,7 @@ public:
      * <code>v1</code>, <code>v2</code>, <code>v3</code>, and <code>v4</code>. Returns
      * <code>true</code> if the uniform could be found; <code>false</code> otherwise. Will
      * call the OpenGL function <code>glProgramUniform4i</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
@@ -555,7 +555,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform2iv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -577,7 +577,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform4iv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -589,7 +589,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform1iv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -602,7 +602,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform2iv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -615,7 +615,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform3iv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -628,7 +628,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform4iv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -640,7 +640,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform1f</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -652,7 +652,7 @@ public:
      * <code>v1</code> and <code>v2</code>. Returns <code>true</code> if the uniform could
      * be found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniform2f</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
@@ -665,7 +665,7 @@ public:
      * <code>v1</code>, <code>v2</code>, and <code>v3</code>. Returns <code>true</code> if
      * the uniform could be found; <code>false</code> otherwise. Will call the OpenGL
      * function <code>glProgramUniform3f</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
@@ -679,7 +679,7 @@ public:
      * <code>v1</code>, <code>v2</code>, <code>v3</code>, and <code>v4</code>. Returns
      * <code>true</code> if the uniform could be found; <code>false</code> otherwise. Will
      * call the OpenGL function <code>glProgramUniform4f</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
@@ -694,7 +694,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform2fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -705,7 +705,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform3fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -716,7 +716,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform4fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -728,7 +728,7 @@ public:
      * <code>values </code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform1fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -741,7 +741,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform2fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -754,7 +754,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform3fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -767,7 +767,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform4fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -779,7 +779,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform1d</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located, <code>false
      * </code> otherwise
@@ -791,7 +791,7 @@ public:
      * <code>v1</code> and <code>v2</code>. Returns <code>true</code> if the uniform could
      * be found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniform2d</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
@@ -804,7 +804,7 @@ public:
      * <code>v1</code>, <code>v2</code>, and <code>v3</code>. Returns <code>true</code> if
      * the uniform could be found; <code>false</code> otherwise. Will call the OpenGL
      * function <code>glProgramUniform3d</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
@@ -818,7 +818,7 @@ public:
      * <code>v1</code>, <code>v2</code>, <code>v3</code>, and <code>v4</code>. Returns
      * <code>true</code> if the uniform could be found; <code>false</code> otherwise. Will
      * call the OpenGL function <code>glProgramUniform4d</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
@@ -833,7 +833,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform2dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -844,7 +844,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform3dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -855,7 +855,7 @@ public:
      * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
      * Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform4dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      * <code>false</code> otherwise
@@ -867,7 +867,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform1dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -880,7 +880,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform2dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -893,7 +893,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform3dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -906,7 +906,7 @@ public:
      * <code>values</code>, where the array consists of <code>count</code> number of
      * values. Returns <code>true</code> if the uniform could be found; <code>false</code>
      * otherwise. Will call the OpenGL function <code>glProgramUniform4dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
@@ -919,7 +919,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix2fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -934,7 +934,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix2x3fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -949,7 +949,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix2x4fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -964,7 +964,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix3x2fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -979,7 +979,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix3fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -994,7 +994,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix3x4fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -1024,7 +1024,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix4x3fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -1039,7 +1039,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix4fv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -1054,7 +1054,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix2dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -1069,7 +1069,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix2x3dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -1084,7 +1084,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix2x4dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
@@ -1099,7 +1099,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix3x2dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
@@ -1114,7 +1114,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix3dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -1129,7 +1129,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix3x4dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -1144,7 +1144,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix4x2dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -1159,7 +1159,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix4x3dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -1174,7 +1174,7 @@ public:
      * <code>value</code>. Returns <code>true</code> if the initial uniform could be
      * found; <code>false</code> otherwise. Will call the OpenGL function
      * <code>glProgramUniformMatrix4dv</code>.
-     * \param name The name of the uniform in the ShaderObjects
+     * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
@@ -1952,9 +1952,9 @@ public:
 
     /**
      * Returns the location of the attribute specified by <code>name</code>. If the
-     * attribute can not be found in any of the attached ShaderObjects, <code>-1</code> is
-     * returned and (provided it is not disabled) a warning will be logged. Will call the
-     * OpenGL function <code>glGetAttribLocation</code>.
+     * attribute can not be found in any of the attached ShaderObject%s, <code>-1</code>
+     * is returned and (provided it is not disabled) a warning will be logged. Will call
+     * the OpenGL function <code>glGetAttribLocation</code>.
      * \param name The name of the attribute for which the location should be fetched
      * \return The location of the attribute, or <code>-1</code> if it could not be found
      */
@@ -3224,34 +3224,34 @@ public:
     void bindFragDataLocation(const std::string& name, GLuint colorNumber);
 
 private:
-    /// The OpenGL name of this program object
+    /// The OpenGL name of this program object.
     GLuint _id;
 
-    /// The internal name of this program name, used for the object label and logging
+    /// The internal name of this program name, used for the object label and logging.
     std::string _programName;
 
-    /// The logger category that will be used, if a name has been specified
+    /// The logger category that will be used, if a name has been specified.
     std::string _loggerCat;
 
-    /// <code>true</code> if uniform location errors should be ignored
+    /// <code>true</code> if uniform location errors should be ignored.
     bool _ignoreUniformLocationError;
 
-    /// <code>true</code> if attribute location errors should be ignored
+    /// <code>true</code> if attribute location errors should be ignored.
     bool _ignoreAttributeLocationError;
 
-    /// <code>true</code> if subroutine location errors should be ignored
+    /// <code>true</code> if subroutine location errors should be ignored.
     bool _ignoreSubroutineLocationError;
 
-    /// <code>true</code> if subroutine uniform location errors should be ignored
+    /// <code>true</code> if subroutine uniform location errors should be ignored.
     bool _ignoreSubroutineUniformLocationError;
 
-    /// A typedef for a ManagedShaderObject. Stores (Shader, ProgramOwnsShader)
+    /// A typedef for a managed shader object. Stores (Shader, ProgramOwnsShader).
     typedef std::pair<ShaderObject*, bool> ManagedShaderObject;
 
-    /// A typedef for a vector of ManagedShaderObjects
+    /// A typedef for an <code>std::vector</code> of ManagedShaderObject%s.
     typedef std::vector<ManagedShaderObject> ManagedShaderObjects;
 
-    /// All the ShaderObjects that are managed and attached to this ProgramObject
+    /// All the ShaderObjects that are managed and attached to this ProgramObject.
     ManagedShaderObjects _shaderObjects;
 };
 

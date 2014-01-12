@@ -41,16 +41,17 @@ namespace ghoul {
 namespace filesystem {
 
 /**
- * This class is an abstract handle for a generic file on the file system. The main
+ * This class is an abstract handle for a generic file in the file system. The main
  * functionality is to be able to extract parts of the path like the #baseName, the
  * #directoryName, or the #fileExtension. The second functionality of this class
  * is a platform-independent way of being notified of changes of the file. The constructor
- * or the #setCallback methods expect an std::function object (possibly initialized
- * using a lambda-expression) that will be called whenever the file changes on the
- * hard disk. The callback function has this object passed as a parameter. If many changes
- * of the file happen in quick succession, each change will trigger a separate call of the
- * callback. The file system is not polled, but the changes are pushed to the application,
- * so the changes are registered efficiently.
+ * or the #setCallback methods expect an <code>std::function</code> object (possibly
+ * initialized using a lambda-expression) that will be called whenever the file changes on
+ * the hard disk. The callback function has this object passed as a parameter. If many
+ * changes of the file happen in quick succession, each change will trigger a separate
+ * call of the callback. The file system is not polled, but the changes are pushed to the
+ * application, so the changes are registered efficiently and are solely impacted by the
+ * overhead of <code>std::function</code>.
  */
 class File {
 public:
@@ -60,16 +61,16 @@ public:
     /**
      * This method constructs a new File object using a given <code>filename</code> as a
      * C string. <code>isRawPath</code> controls if the path is used without changes, or
-     * if tokens should be converted first.
-     * <code>fileChangedCallback</code> will be called whenever the pointed file changes
-     * on the hard disk.
+     * if tokens should be converted into a proper path first. The token conversion is
+     * done using the #ghoul::filesystem::FileSystem. <code>fileChangedCallback</code>
+     * will be called whenever the pointed to file changes on the hard disk.
      * \param filename The path to the file this File object should point to
      * \param isRawPath If this value is <code>true</code>, the value of <code>filename
      * </code> is used as-is. If it is <code>false</code>, the path is converted into an
      * absolute path and any tokens, if present, are resolved
      * \param fileChangedCallback The callback function that is called once per change of
      * the file on the filesystem
-     * \see FileSystem
+     * \see ghoul::filesystem::FileSystem The system to register and use tokens
      */
     File(const char* filename, bool isRawPath = false,
          const FileChangedCallback& fileChangedCallback = FileChangedCallback());
@@ -77,22 +78,23 @@ public:
     /**
      * This method constructs a new File object using a given <code>filename</code> as an
      * std string. <code>isRawPath</code> controls if the path is used without changes, or
-     * if tokens should be converted first.
-     * <code>fileChangedCallback</code> will be called whenever the pointed file changes
-     * on the hard disk.
+     * if tokens should be converted first. The token conversion is
+     * done using the #ghoul::filesystem::FileSystem. <code>fileChangedCallback</code>
+     * will be called whenever the pointed file changes on the hard disk.
      * \param filename The path to the file this File object should point to
      * \param isRawPath If this value is <code>true</code>, the value of
      * <code>filename</code> is used as-is. If it is <code>false</code>, the path is
      * converted into an absolute path and any tokens, if present, are resolved
      * \param fileChangedCallback The callback function that is called once per change of
      * the file on the filesystem
-     * \see FileSystem
+     * \see ghoul::filesystem::FileSystem The system to register and use tokens
      */
     File(const std::string& filename, bool isRawPath = false,
          const FileChangedCallback& fileChangedCallback = FileChangedCallback());
 
     /**
-     * The destructor will automatically stop the filesystem evaluation of any file
+     * The destructor will automatically stop the notification of future changes in the 
+     * file system.
      */
     ~File();
 
@@ -106,21 +108,22 @@ public:
     void setCallback(const FileChangedCallback& callback);
     
     /**
-     * Returns the currently active std::function object. This object might be
-     * uninitialized if not callback has been registered previously.
-     * \return The currently active std::function object used as a callback function
+     * Returns the currently active <code>std::function</code> object. This object might
+     * be uninitialized if no callback has been registered previously.
+     * \return The currently active <code>std::function</code> object used as a callback
+     * function
      */
     const FileChangedCallback& callback() const;
 
     /**
-     * Returns the full path to the file as an std::string
-     * \return The full path to the file as an std::string
+     * Returns the full path to the file as an <code>std::string</code>.
+     * \return The full path to the file as an <code>std::string</code>
      */
     operator const std::string&() const;
 
     /**
-     * Returns the full path to the file as an std::string
-     * \return The full path to the file as an std::string
+     * Returns the full path to the file as an <code>std::string</code>.
+     * \return The full path to the file as an <code>std::string</code>
      */
     const std::string& path() const;
 
@@ -136,7 +139,7 @@ public:
     /**
      * Returns the base name part of the full path. The base name is defined as the part
      * of the path between the last path separator (<code>'/'</code> or
-     * <code>'\\\\'</code>) and the extension (separated by a '.' ; if existing). Example
+     * <code>'\\\\'</code>) and the extension (separated by a '.', if existing). Example
      * (<code>'/home/user/file.txt' -> 'file'</code>)
      * \return The base name part of the full path
      */
@@ -170,7 +173,7 @@ public:
 private:
     /**
      * Registers and starts the platform-dependent listener to file changes on disk. Will
-     * remove the old listener in the process
+     * remove and unregister the old listener in the process
      */
     void installFileChangeListener();
     
@@ -181,7 +184,11 @@ private:
     void removeFileChangeListener();
 
     std::string _filename; ///< The filename of this File
-    FileChangedCallback _fileChangedCallback; ///< The callback that is called
+    /**
+     * The callback that is called when the file changes on disk. Has no performance
+     * impact when it is not used
+     */
+    FileChangedCallback _fileChangedCallback;
 
 #ifdef WIN32
     void beginRead();
@@ -206,6 +213,15 @@ private:
     __darwin_time_t _lastModifiedTime; // typedef of 'long'
 #endif
 };
+
+/**
+ * The stream operator that will stream the File%'s path to the output stream.
+ * \param os The stream that will be inserted into
+ * \param f The File which will be inserted into the stream
+ * \return The modified stream, used for cascading
+ * \memberof File
+ */
+std::ostream& operator<<(std::ostream& os, const File& f);
 
 } // namespace filesystem
 } // namespace ghoul

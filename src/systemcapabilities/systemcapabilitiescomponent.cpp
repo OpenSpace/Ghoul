@@ -42,16 +42,20 @@ SystemCapabilitiesComponent::SystemCapabilitiesComponent()
 SystemCapabilitiesComponent::~SystemCapabilitiesComponent() {}
 
 void SystemCapabilitiesComponent::initialize(bool initializeWMI) {
+#ifdef GHOUL_USE_WMI
     if (initializeWMI) {
         SystemCapabilitiesComponent::initializeWMI();
         _isInitializedWMI = true;
     }
+#endif
     _isInitialized = true;
 }
 
 void SystemCapabilitiesComponent::deinitialize() {
+#ifdef GHOUL_USE_WMI
     if (_isInitializedWMI)
         deinitializeWMI();
+#endif
     clearCapabilities();
     _isInitialized = false;
 }
@@ -60,8 +64,8 @@ bool SystemCapabilitiesComponent::isInitialized() const {
     return _isInitialized;
 }
 
-void SystemCapabilitiesComponent::initializeWMI() {
 #ifdef GHOUL_USE_WMI
+void SystemCapabilitiesComponent::initializeWMI() {
     const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
     // This code is based on
     // http://msdn.microsoft.com/en-us/library/aa390423.aspx
@@ -153,11 +157,9 @@ void SystemCapabilitiesComponent::initializeWMI() {
         return;
     }
     LDEBUG_SAFE("WMI successfully initialized.");
-#endif
 }
 
 void SystemCapabilitiesComponent::deinitializeWMI() {
-#ifdef GHOUL_USE_WMI
     const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
     if (!isWMIinitialized()) {
         LWARNING_SAFE("WMI is not initialized.");
@@ -173,10 +175,8 @@ void SystemCapabilitiesComponent::deinitializeWMI() {
     _iwbemServices = 0;
 
     CoUninitialize();
-#endif
 }
 
-#ifdef GHOUL_USE_WMI
 std::wstring str2wstr(const std::string& str) {
     int stringLength = static_cast<int>(str.length() + 1);
     int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), stringLength, 0, 0); 

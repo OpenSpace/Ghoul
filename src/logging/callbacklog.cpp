@@ -28,7 +28,7 @@
 namespace ghoul {
 namespace logging {
 
-CallbackLog::CallbackLog(std::function<void (const std::string&)> callbackFunction,
+CallbackLog::CallbackLog(const CallbackFunction& callbackFunction,
                          bool timeStamping, bool dateStamping, bool categoryStamping,
                          bool logLevelStamping)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
@@ -55,6 +55,14 @@ void CallbackLog::log(LogManager::LogLevel level, const std::string& category,
         output += "\t";
     output += message;
     _callbackFunction(output);
+}
+
+void CallbackLog::setCallback(const CallbackFunction& callbackFunction) {
+    _callbackFunction = callbackFunction;
+}
+
+const CallbackLog::CallbackFunction& CallbackLog::callback() const {
+    return _callbackFunction;
 }
 
 } // namespace logging

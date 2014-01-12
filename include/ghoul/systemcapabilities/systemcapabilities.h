@@ -38,23 +38,17 @@ namespace systemcapabilities {
 
 /**
  * The SystemCapabilities class allows access to the functionality the system provides.
- * The class is composed of SystemCapabilityComponent%s with each component checking for a
- * specific kind of capabilities (for example OpenGLCapabilities or CPUCapabilities) and
- * provides access to the components with the templated #component method. The values are
- * not guaranteed to be constant over the lifetime of the application, but most values can
- * be considered to be static and cache-able. New components can be added using the
- * #addComponent and retrieved using the #component method. Each type of component can
- * only be added once to the SystemCapabilities. The second insertion will log a warning
- * if <code>GHL_DEBUG</code> is defined.
+ * The class is composed of SystemCapabilitiesComponent%s with each component checking for
+ * a specific kind of capabilities (for example OpenGLCapabilitiesComponent or
+ * CPUCapabilitiesComponent) and provides access to the components with the templated
+ * #component method. The values are not guaranteed to be constant over the lifetime of
+ * the application, but most values can be considered to be static and cache-able. New
+ * components can be added using the #addComponent and retrieved using the #component
+ * method. Each type of component can only be added once to the SystemCapabilities. The
+ * second insertion will log a warning if <code>GHL_DEBUG</code> is defined.
  */
 class SystemCapabilities {
 public:
-    enum class Verbosity {
-        Minimal,
-        Default,
-        Full
-    };
-
     /**
      * Initializes the static member variable and makes the global SystemCapabilities
      * available via the #ref method. Calling this method twice will trigger an assertion.
@@ -64,8 +58,9 @@ public:
     /**
      * Destroys the static member variable and cleans up all the
      * SystemCapabilitiesComponent%s that have been added to this SystemCapabilities
-     * (#addComponent). The #SystemCapabilitiesComponent::deinitialize methods will be
-     * called in the process. If this method is called and the SystemCapabilities is 
+     * (#addComponent). The
+     * #ghoul::systemcapabilities::SystemCapabilitiesComponent::deinitialize methods will
+     * be called in the process. If this method is called and the SystemCapabilities is 
      * already destroyed, an assertion will be triggered.
      */
     static void destroy();
@@ -85,17 +80,18 @@ public:
 
     /**
      * This method will initialize all registered of the SystemCapabilitiesComponent%s. If
-     * a component has been initialized before, it will be be deinitialized and then re-
-     * initialized.
+     * a component has been initialized before, it will be be deinitialized and then
+     * re-initialized.
      */
     void initializeComponents();
 
     /**
      * Calling this method will trigger the
-     * #SystemCapabilitiesComponent::detectCapabilities of all registered components 
-     * (#addComponent). If the capabilities have been detected previously and a new
-     * component is added, a following call will redetect the capabilities of all
-     * components, thus, multiple calls to this function will perform a full redetection.
+     * #ghoul::systemcapabilities::SystemCapabilitiesComponent::detectCapabilities of all
+     * registered components (#addComponent). If the capabilities have been detected
+     * previously and a new component is added, a following call will redetect the
+     * capabilities of all components, thus, multiple calls to this function will perform
+     * a full redetection.
      */
     void detectCapabilities();
 
@@ -103,8 +99,8 @@ public:
      * Logs all of the detected capabilities of the log, group by the individual
      * SystemCapabilitiesComponent%s. The verbosity of the log is controlled by the
      * <code>verbosity</code>. This method will, in turn, call the
-     * #SystemCapabilitiesComponent::createCapabilitiesString of all the registered
-     * SystemCapabilitiesCompoenent%s.
+     * #ghoul::systemcapabilities::SystemCapabilitiesComponent::capabilities of all the
+     * registered SystemCapabilitiesComponent%s.
      * \param verbosity The verbosity of the resulting log entries
      */
     void logCapabilities(SystemCapabilitiesComponent::Verbosity verbosity =
@@ -114,10 +110,11 @@ public:
      * Adds the passed <code>component</code> to this SystemCapabilities and assumes
      * ownership of this object. This method will not automatically initialize and/or
      * detect the capabilities in this component; this has to be done using the
-     * #SystemCapabilitiesComponent::initialize and
-     * #SystemCapabilitiesComponent::detectCapabilities methods. A specific subclass of
-     * SystemCapabilitiesComponent can only be added once to the SystemCapabilities. This
-     * requirement will only be tested if <code>GHL_DEBUG</code> is defined.
+     * #ghoul::systemcapabilities::SystemCapabilitiesComponent::initialize and
+     * #ghoul::systemcapabilities::SystemCapabilitiesComponent::detectCapabilities
+     * methods. A specific subclass of SystemCapabilitiesComponent can only be added once
+     * to the SystemCapabilities. This requirement will only be tested if
+     * <code>GHL_DEBUG</code> is defined.
      * \param component The component that will be added to this SystemCapabilities
      * object. This method call will transfer ownership of the component to this object
      * permanently.
@@ -136,12 +133,13 @@ public:
 private:
     /**
      * Creates an empty SystemCapabilities object. The constructor will be called by the
-     * static #initialize method.
+     * static #create method.
      */
     SystemCapabilities();
     /**
      * Destructor that will deinitialize and dispose of all the
-     * SystemCapabilityComponent%s that have been added to this SystemCapabilities object.
+     * SystemCapabilitiesComponent%s that have been added to this SystemCapabilities
+     * object.
      */
     ~SystemCapabilities();
 

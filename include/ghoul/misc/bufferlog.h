@@ -124,7 +124,7 @@ public:
      * Returns the number of bytes that have been used by this BufferLog, including the
      * information for the header fields. This value is guaranteed to be always less than
      * the value returned by #totalSize
-     *\ return The number of bytes that have been used by this BufferLog
+     * \return The number of bytes that have been used by this BufferLog
      */
     size_t usedSize() const;
     

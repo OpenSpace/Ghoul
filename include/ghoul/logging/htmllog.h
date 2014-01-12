@@ -33,7 +33,7 @@ namespace logging {
 
 /**
  * A subclass of TextLog that logs the messages to a structured HTML file on hard disk.
- * The log will contain a table with the following format:
+ * The log containing all components will contain a table with the following format:
  * \verbatim
 --------------------------------------------
 | DATE | TIME | CATEGORY | LEVEL | MESSAGE |
@@ -43,6 +43,7 @@ namespace logging {
  * If a specific value should not be stamped, the according table entry will be missing
  * from the HTML file. The file will be opened in the constructor and closed in the
  * destructor of this class. A HTMLLog is always created anew and cannot be appended to.
+ * That means that the user of this class has to perform log file rotation.
  */
 class HTMLLog : public TextLog {
 public:
@@ -64,7 +65,7 @@ public:
             bool dateStamping = true, bool categoryStamping = true,
             bool logLevelStamping = true);
 
-    /// Destructor that finalizes the HTML file
+    /// Destructor that closes and finalizes the HTML file
     ~HTMLLog();
     
     /**
@@ -76,16 +77,16 @@ public:
      * \param message The message body of the log message
      */
     virtual void log(LogManager::LogLevel level, const std::string& category,
-                     const std::string& message);
+                     const std::string& message) override;
 
 protected:
     /**
      * Returns a HTML color string for the passed color.
-     * Debug -> green<br>
-     * Info -> white<br>
-     * Warning -> yellow<br>
-     * Error -> red<br>
-     * Fatal -> cyan<br>
+     * LogManager::LogLevel::Debug -> Green<br>
+     * LogManager::LogLevel::Info -> Black<br>
+     * LogManager::LogLevel::Warning -> Yellow<br>
+     * LogManager::LogLevel::Error -> Red<br>
+     * LogManager::LogLevel::Fatal -> Cyan<br>
      */
     static std::string colorForLevel(LogManager::LogLevel level);
 };

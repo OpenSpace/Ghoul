@@ -45,8 +45,8 @@ namespace systemcapabilities {
  * constructor and should provide a descriptive name to this SystemCapabilitiesComponent`s
  * constructor, then, the #initialize function will be called, #detectCapabilities follows
  * and finally a call to #capabilities, which should return an <code>std::vector</code> of
- * <code>std::pair</code>`s with <code>{</code>description<code> , </code>value
- * <code>}</code>. Each SystemCapabilitiesComponent%`s #deinitialize function might be
+ * <code>std::pair</code>'s with <code>{</code>description<code>,</code>value
+ * <code>}</code>. Each SystemCapabilitiesComponent%'s #deinitialize function might be
  * called with a call to #initialize directly following and it should rescan all the
  * values and capabilities on the following #initialize function again to check for
  * changes.
@@ -55,11 +55,12 @@ class SystemCapabilitiesComponent {
 public:
     /// The verbosity that is used in the #capabilities method
     enum class Verbosity {
-        Minimal,
-        Default,
-        Full
+        Minimal, ///< The minimal verbosity presenting the absolute minimum information
+        Default, ///< The default verbosity
+        Full ///< Show all the available information
     };
 
+    /// Each piece of capability information is represented by an information and a value
     typedef std::pair<std::string, std::string> CapabilityInformation;
 
     /// The constructor will initialize all necessary values
@@ -110,7 +111,7 @@ public:
     virtual void clearCapabilities() = 0;
 
     /**
-     * This method returns pairs of <code>{</code>description<code> , </code> value
+     * This method returns pairs of <code>{</code>description<code>,</code> value
      * <code>}</code>, describing the features and capabilities the subclass is
      * responsible for. As a best-practice, the subclass should allow individual query for
      * each of the elements as well. The <code>verbosity</code> parameter should determine

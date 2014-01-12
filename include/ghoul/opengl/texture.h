@@ -29,7 +29,7 @@
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/glm.h>
 #include <glm/gtx/std_based_type.hpp>
-#include <string>
+#include <string> 
 
 namespace ghoul {
 namespace opengl {
@@ -38,7 +38,7 @@ namespace opengl {
  * This class is a wrapper for an OpenGL texture. It wraps the OpenGL method for
  * generating (<code>glGenTextures</code>), binding (<code>glBindTexture</code>, #bind),
  * enabling (<code>glEnable</code>, #enable) and others. A new texture can be created
- * either from an image file using the TextureManager or TextureReader class or using a
+ * either from an image file using the TextureManager or #loadTexture function or using a
  * pointer to the data. The data layout must be as specified by the
  * <code>glTexImageXD</code> functions (see OpenGL reference). After creation a Texture
  * must be uploaded (<code>uploadTexture</code>, #uploadTexture) before it can be used in
@@ -48,8 +48,8 @@ namespace opengl {
 class Texture {
 public:
     /**
-     * This enum specifies the allowed formats for the Textures. These are directly mapped
-     * to the appropriate OpenGL constants. See
+     * This enum specifies the allowed formats for the Texture%s. These are directly
+     * mapped to the appropriate OpenGL constants. See
      * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for more information.
      */
     enum class Format : GLint {
@@ -89,13 +89,13 @@ public:
     /**
      * This constructor will create storage internally to fit the amount of data that is
      * necessary for the <code>dimensions * bytesPerPixel</code> (which is in turn
-     * dependent on the dataType). The Texture will be a 3D texture unless one or two of
-     * the components in dimensions is <code>1</code>.
+     * dependent on the dataType). The Texture can be 1D, 2D, or 3D depending on how many
+     * components are equal to <code>1</code>.
      * \param dimensions The dimensions of the texture. A 3D texture will be created 
      * if all components are bigger than <code>1</code>, a 2D texture will be created if
      * the <code>z</code> component is equal to <code>1</code>, while a 1D texture is
      * created if the <code>y</code> and <code>z</code> component is equal to
-     * <code>1</code>.
+     * <code>1</code>
      * \param format Specifies the format of the data
      * \param internalFormat The internal format for the texture. See
      * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1,2,  and 3 for
@@ -105,9 +105,9 @@ public:
      * \param dataType The data type of the pixel data. See
      * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for a list of possible
      * values
-     * \param filter The FilterMode that will be used to interpolate between texels
-     * \param wrapping The WrappingMode that will be used to generate values on the 
-     * border of the texture
+     * \param filter The Texture::FilterMode that will be used to interpolate between texels
+     * \param wrapping The Texture::WrappingMode that will be used to generate values on
+     * the border of the texture
      */
     Texture(const glm::size3_t& dimensions, Format format = Format::RGBA,
             GLint internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
@@ -117,19 +117,19 @@ public:
     /**
      * This constructor will generate a Texture out of the passed data. The data should 
      * contain enough bytes to fill <code>dimensions * bytesPerPixel</code> (which is in
-     * turn dependent on the dataType) pixel. The texture will be a 3D texture unless one
-     * or two of the components in dimensions is <code>1</code>.
+     * turn dependent on the dataType) pixel. The Texture can be 1D, 2D, or 3D depending
+     * on how many components are equal to <code>1</code>.
      * \param data The data from which to generate the Texture. The data must be in a 
      * linear format and (in 2D and 3D cases) aligned so that it can be accessed using the
      * following equations: <code>(y * dimensions.x) + x</code> in the 2D case and 
      * <code>(z * dimensions.x * dimensions.y) + (y * dimensions.x) + x</code> in the 3D 
      * case. This Texture will take ownership of the data array and will delete it once 
-     * this object is destroyed.
+     * this object is destroyed
      * \param dimensions The dimensions of the texture. A 3D texture will be created 
      * if all components are bigger than <code>1</code>, a 2D texture will be created if
      * the <code>z</code> component is equal to <code>1</code>, while a 1D texture is
      * created if the <code>y</code> and <code>z</code> component is equal to
-     * <code>1</code>.
+     * <code>1</code>
      * \param format Specifies the format of the data
      * \param internalFormat The internal format for the texture. See
      * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1,2, and 3 for
@@ -139,9 +139,10 @@ public:
      * \param dataType The data type of the pixel data. See
      * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for a list of possible
      * values
-     * \param filter The FilterMode that will be used to interpolate between texels
-     * \param wrapping The WrappingMode that will be used to generate values on the
-     * border of the texture
+     * \param filter The Texture::FilterMode that will be used to interpolate between
+     * texels
+     * \param wrapping The Texture::WrappingMode that will be used to generate values on
+     * the border of the texture
      */
     Texture(void* data, const glm::size3_t& dimensions, Format format = Format::RGBA,
             GLint internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
@@ -254,14 +255,17 @@ public:
      */
     void setInternalFormat(GLint internalFormat);
 
-    /// Returns the FilterMode used by this texture
+    /**
+     * Returns the Texture::FilterMode used by this texture.
+     * \return The Texture::FilterMode used by this texture
+     */
     FilterMode filter() const;
 
     /**
-     * Sets a new FilterMode for this Texture. The new FilterMode is applied immediately. 
-     * If the filter is FilterMode::AnisotropicMipMap, the texture has to be uploaded 
-     * before calling this method. Otherwise, the result is undefined.
-     * \param filter The new FilterMode for this Texture
+     * Sets a new Texture::FilterMode for this Texture. The new Texture::FilterMode is
+     * applied immediately. If the filter is FilterMode::AnisotropicMipMap, the texture
+     * has to be uploaded before calling this method. Otherwise, the result is undefined.
+     * \param filter The new Texture::FilterMode for this Texture
      */
     void setFilter(FilterMode filter);
 
@@ -300,7 +304,7 @@ public:
     /**
      * Returns the stored data of the texture. If the memory is deleted, a new
      * (sufficiently) large memory block have been created or a segmentation fault might
-     * occur!
+     * occur.
      * \return The stored data of the texture
      */
     const void* pixelData() const;
@@ -330,12 +334,15 @@ public:
      */
     bool isResident() const;
 
-    /// Sets a new WrappingMode for this Texture. The new mode is applied immediately.
+    /** Sets a new Texture::WrappingMode for this Texture. The new mode is applied
+     * immediately.
+     * \param wrapping The new Texture::WrappingMode for this Texture
+     */
     void setWrapping(WrappingMode wrapping);
 
     /**
-     * Returns the currently used WrappingMode for this texture.
-     * \return The currently used WrappingMode for this texture
+     * Returns the currently used Texture::WrappingMode for this texture.
+     * \return The currently used Texture::WrappingMode for this texture
      */
     WrappingMode wrapping() const;
 

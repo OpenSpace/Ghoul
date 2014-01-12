@@ -34,7 +34,7 @@ namespace logging {
 
 /**
  * A concrete subclass of Log that logs the messages to a given <code>std::ostream</code>.
- * The formatting of the log messages depends on the stamping settings. The various
+ * The formatting of the log messages depends on the stamping settings. The different
  * possibilities are:
  * \verbatim
 "[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
@@ -62,14 +62,15 @@ public:
               bool categoryStamping = true, bool logLevelStamping = true);
 
     /**
-     * Method that logs a message with a given level and category to the stream.
+     * Method that logs a <code>message</code> with a given <code>level</code> and
+     * <code>category</code> to the stream.
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
      * individually
      * \param message The message body of the log message
      */
     virtual void log(LogManager::LogLevel level, const std::string& category,
-                     const std::string& message);
+                     const std::string& message) override;
 
     /// Flushes the stream and, thereby, all messages that are in the associated buffer
     void flush();
@@ -77,7 +78,10 @@ public:
 protected:
     /// Not implemented on purpose; use should generate a linker error
     StreamLog(const StreamLog& rhs);
+
+    /// Not implemented on purpose; use should generate a linker error
     StreamLog& operator=(const StreamLog& rhs);
+
     std::ostream& _stream; ///< The stream to which the log messages will be sent
 };
 
