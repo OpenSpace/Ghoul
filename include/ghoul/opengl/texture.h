@@ -52,7 +52,7 @@ public:
      * mapped to the appropriate OpenGL constants. See
      * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for more information.
      */
-    enum class Format : GLint {
+    enum Format {
         Red = GL_RED, ///< GL_RED
         RG = GL_RG, ///< GL_RG
         RGB = GL_RGB, ///< GL_RGB

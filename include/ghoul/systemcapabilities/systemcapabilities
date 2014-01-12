@@ -1,0 +1,3 @@
+#include "cpucapabilitiescomponent.h"
+#include "openglcapabilitiescomponent.h"
+#include "systemcapabilities.h"
