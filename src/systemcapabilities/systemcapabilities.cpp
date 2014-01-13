@@ -49,19 +49,19 @@ SystemCapabilities::~SystemCapabilities() {
         delete component;
 }
 
-void SystemCapabilities::create() {
+void SystemCapabilities::initialize() {
     assert(_systemCapabilities == nullptr);
     if (_systemCapabilities == nullptr)
         _systemCapabilities = new SystemCapabilities;
 }
 
-void SystemCapabilities::destroy() {
+void SystemCapabilities::deinitialize() {
     assert(_systemCapabilities != nullptr);
     delete _systemCapabilities;
     _systemCapabilities = nullptr;
 }
 
-bool SystemCapabilities::isCreated() {
+bool SystemCapabilities::isInitialized() {
     return (_systemCapabilities != nullptr);
 }
 
@@ -71,6 +71,10 @@ SystemCapabilities& SystemCapabilities::ref() {
 }
 
 void SystemCapabilities::detectCapabilities() {
+    for (SystemCapabilitiesComponent* c : _components) {
+        if (!c->isInitialized())
+            c->initialize();
+    }
     clearCapabilities();
     for (SystemCapabilitiesComponent* component : _components)
         component->detectCapabilities();
@@ -79,14 +83,6 @@ void SystemCapabilities::detectCapabilities() {
 void SystemCapabilities::clearCapabilities() {
     for (SystemCapabilitiesComponent* component : _components)
         component->clearCapabilities();
-}
-
-void SystemCapabilities::initializeComponents() {
-    for (SystemCapabilitiesComponent* c : _components) {
-        if (c->isInitialized())
-            c->deinitialize();
-        c->initialize();
-    }
 }
 
 void SystemCapabilities::logCapabilities(

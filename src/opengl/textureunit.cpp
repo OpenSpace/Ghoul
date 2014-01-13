@@ -116,7 +116,7 @@ void TextureUnit::assignUnit() {
 }
 
 void TextureUnit::initialize() {
-    if (systemcapabilities::SystemCapabilities::isCreated())
+    if (systemcapabilities::SystemCapabilities::isInitialized())
         _maxTexUnits = GpuCap.maximumNumberOfTextureUnits();
     else
         _maxTexUnits = 0;

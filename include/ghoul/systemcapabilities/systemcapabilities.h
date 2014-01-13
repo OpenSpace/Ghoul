@@ -53,7 +53,7 @@ public:
      * Initializes the static member variable and makes the global SystemCapabilities
      * available via the #ref method. Calling this method twice will trigger an assertion.
      */
-    static void create();
+    static void initialize();
 
     /**
      * Destroys the static member variable and cleans up all the
@@ -63,7 +63,7 @@ public:
      * be called in the process. If this method is called and the SystemCapabilities is 
      * already destroyed, an assertion will be triggered.
      */
-    static void destroy();
+    static void deinitialize();
 
     /**
      * Returns a reference to the global SystemCapabilities object. The system must have
@@ -76,14 +76,7 @@ public:
      * Returns the initialization state of the SystemCapabilities object. 
      * \return The initialization state of the SystemCapabilities object
      */
-    static bool isCreated();
-
-    /**
-     * This method will initialize all registered of the SystemCapabilitiesComponent%s. If
-     * a component has been initialized before, it will be be deinitialized and then
-     * re-initialized.
-     */
-    void initializeComponents();
+    static bool isInitialized();
 
     /**
      * Calling this method will trigger the
