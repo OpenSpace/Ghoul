@@ -30,22 +30,21 @@
 namespace ghoul {
 namespace systemcapabilities {
 
+#ifdef GHOUL_USE_WMI
+    IWbemLocator* SystemCapabilitiesComponent::_iwbemLocator = nullptr;
+    IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
+#endif
+
 SystemCapabilitiesComponent::SystemCapabilitiesComponent()
     : _isInitialized(false)
-    , _isInitializedWMI(false)
-#ifdef GHOUL_USE_WMI
-    , _iwbemLocator(nullptr)
-    , _iwbemServices(nullptr)
-#endif
 {}
 
 SystemCapabilitiesComponent::~SystemCapabilitiesComponent() {}
 
 void SystemCapabilitiesComponent::initialize(bool initializeWMI) {
 #ifdef GHOUL_USE_WMI
-    if (initializeWMI) {
+    if (initializeWMI && !isWMIinitialized()) {
         SystemCapabilitiesComponent::initializeWMI();
-        _isInitializedWMI = true;
     }
 #endif
     _isInitialized = true;
@@ -53,7 +52,7 @@ void SystemCapabilitiesComponent::initialize(bool initializeWMI) {
 
 void SystemCapabilitiesComponent::deinitialize() {
 #ifdef GHOUL_USE_WMI
-    if (_isInitializedWMI)
+    if (isWMIinitialized())
         deinitializeWMI();
 #endif
     clearCapabilities();
@@ -82,6 +81,9 @@ void SystemCapabilitiesComponent::initializeWMI() {
             << " Error Code: " << hRes);
         return;
     }
+    //if (hRes = S_FALSE)
+    //    // WMI was already initialized
+    //    return;
     hRes = CoInitializeSecurity(
         NULL, 
         -1,                          // COM authentication
@@ -197,12 +199,12 @@ std::string wstr2str(const std::wstring& wstr) {
     return r;
 }
 
-bool SystemCapabilitiesComponent::isWMIinitialized() const {
-    return ((_iwbemLocator != 0) && (_iwbemServices != 0));
+bool SystemCapabilitiesComponent::isWMIinitialized() {
+    return ((_iwbemLocator != nullptr) && (_iwbemServices != nullptr));
 }
 
 VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
-                                               const std::string& attribute) const
+                                               const std::string& attribute)
 {
     const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
     if (!isWMIinitialized()) {
@@ -257,7 +259,7 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
 bool SystemCapabilitiesComponent::queryWMI(
     const std::string& wmiClass,
     const std::string& attribute,
-    std::string& value) const 
+    std::string& value) 
 {
     VARIANT* variant = queryWMI(wmiClass, attribute);
     if (!variant)
@@ -272,7 +274,7 @@ bool SystemCapabilitiesComponent::queryWMI(
 bool SystemCapabilitiesComponent::queryWMI(
     const std::string& wmiClass,
     const std::string& attribute,
-    int& value) const
+    int& value)
 {
     VARIANT* variant = queryWMI(wmiClass, attribute);
     if (!variant)
@@ -285,7 +287,7 @@ bool SystemCapabilitiesComponent::queryWMI(
 }
 
 bool SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass, const std::string& attribute,
-                                           unsigned int& value) const
+                                           unsigned int& value)
 {
     VARIANT* variant = queryWMI(wmiClass, attribute);
     if (!variant)
@@ -298,7 +300,7 @@ bool SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass, const st
 }
 
 bool SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass, const std::string& attribute,
-                                           unsigned long long& value) const
+                                           unsigned long long& value)
 {
     VARIANT* variant = queryWMI(wmiClass, attribute);
     if (!variant)

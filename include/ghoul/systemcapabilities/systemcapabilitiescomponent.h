@@ -136,14 +136,14 @@ protected:
      * enabled, or the application is compiled on a non-Windows architecture, this method
      * is a no-op.
      */
-    void initializeWMI();
+    static void initializeWMI();
 
     /**
      * This method deinitializes the Windows Management Instrumentation. If the WMI is not
      * enabled, or the application is compiled on a non-Windows architecture, this method
      * is a no-op.
      */
-    void deinitializeWMI();
+    static void deinitializeWMI();
 
     /**
     * Returns if the Windows Management Instrumentation has been initialized before. If
@@ -151,7 +151,7 @@ protected:
     * architecture, this method is a no-op.
     * \return <code>true</code> if the WMI has been initialized
     */
-    bool isWMIinitialized() const;
+    static bool isWMIinitialized();
 
     /**
      * Queries the Windows Management Instrumentation for the <code>attribute</code>
@@ -163,7 +163,7 @@ protected:
      * occurred
      */
 
-    VARIANT* queryWMI(const std::string& wmiClass, const std::string& attribute) const;
+    static  VARIANT* queryWMI(const std::string& wmiClass, const std::string& attribute);
 
     /**
      * Helper function that queries the Windows Management Instrumentation for the
@@ -177,8 +177,8 @@ protected:
      * the attribute could be found and it is of type <code>string</code>)
      * \return <code>true</code> if the attribute was retrieved
      */
-    bool queryWMI(const std::string& wmiClass,
-        const std::string& attribute, std::string& value) const;
+    static bool queryWMI(const std::string& wmiClass,
+        const std::string& attribute, std::string& value);
 
     /**
      * Helper function that queries the Windows Management Instrumentation for the
@@ -192,7 +192,7 @@ protected:
      * the attribute could be found and it is of type <code>int</code>)
      * \return <code>true</code> if the attribute was retrieved
      */
-    bool queryWMI(const std::string& wmiClass, const std::string& attribute, int& value) const;
+    static bool queryWMI(const std::string& wmiClass, const std::string& attribute, int& value);
 
     /**
      * Helper function that queries the Windows Management Instrumentation for the
@@ -206,8 +206,8 @@ protected:
      * the attribute could be found and it is of type <code>unsigned int</code>)
      * \return <code>true</code> if the attribute was retrieved
      */
-    bool queryWMI(const std::string& wmiClass, const std::string& attribute,
-        unsigned int& value) const;
+    static bool queryWMI(const std::string& wmiClass, const std::string& attribute,
+        unsigned int& value);
 
     /**
      * Helper function that queries the Windows Management Instrumentation for the
@@ -221,25 +221,24 @@ protected:
      * the attribute could be found and it is of type <code>unsigned long long</code>)
      * \return <code>true</code> if the attribute was retrieved
      */
-    bool queryWMI(const std::string& wmiClass, const std::string& attribute,
-        unsigned long long& value) const;
+    static bool queryWMI(const std::string& wmiClass, const std::string& attribute,
+        unsigned long long& value);
 
     /**
      * The locator object that was used in the <code>CoCreateInstance</code> call in the
      * #initializeWMI call
      */
-    IWbemLocator* _iwbemLocator;
+    static IWbemLocator* _iwbemLocator;
 
     /**
      * The service object that was used in the <code>_iwbemLocator->ConnectServer</code>
      * call in the #initializeWMI call
      */
-    IWbemServices* _iwbemServices;
+    static IWbemServices* _iwbemServices;
 #endif
 
 private:
     bool _isInitialized;
-    bool _isInitializedWMI;
 };
 
 } // namespace systemcapabilities

@@ -216,12 +216,12 @@ protected:
     
     bool _supportTexturing3D; // GL_EXT_texture3D
 
-#ifdef GHOUL_USE_WMI
+//#ifdef GHOUL_USE_WMI
     std::string _driverVersion; ///< Stores the version of the installed driver
     std::string _driverDate; ///< Stores the date of the installed driver
     unsigned int _adapterRAM; ///< How many MB of memory is installed on the main GPU
     std::string _adapterName; ///< The name of the main GPU
-#endif
+//#endif
 };
 
 } // namespace systemcapabilities
