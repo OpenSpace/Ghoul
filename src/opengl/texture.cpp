@@ -198,19 +198,16 @@ void Texture::applyFilter() {
         case FilterMode::AnisotropicMipMap: {
                 glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
                 glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(_type, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
                 glGenerateMipmap(_type);
                 if (_anisotropyLevel == -1.f) {
                     GLfloat maxTextureAnisotropy = 1.0;
                     glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT,
-                                &maxTextureAnisotropy);
-                    glTexParameterf(_type, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-                                    maxTextureAnisotropy);
+                        &maxTextureAnisotropy);
+                    _anisotropyLevel = maxTextureAnisotropy;
                 }
-                else
-                    glTexParameterf(_type, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-                                    _anisotropyLevel);
+                glTexParameterf(_type, GL_TEXTURE_MAX_ANISOTROPY_EXT, _anisotropyLevel);
                 glTexParameteri(_type, GL_TEXTURE_BASE_LEVEL, 0);
-                glTexParameteri(_type, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
                 break;
             }
         default:

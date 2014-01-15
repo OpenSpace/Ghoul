@@ -232,7 +232,7 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
     result.push_back(std::make_pair("GPU Name", _adapterName));
     result.push_back(std::make_pair("GPU Driver Version", _driverVersion));
     result.push_back(std::make_pair("GPU Driver Date", _driverDate));
-    result.push_back(std::make_pair("GPU RAM", toString(_adapterRAM)));
+    result.push_back(std::make_pair("GPU RAM", toString(_adapterRAM) + " MB"));
 #endif
 
     if (verbosity >= Verbosity::Default) {
