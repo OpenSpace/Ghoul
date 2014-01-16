@@ -72,19 +72,19 @@ void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {
     WORD colorIndex = _originalConsoleColors;
     switch (level) {
      case LogManager::LogLevel::Debug:
-            colorIndex = 10;        // green
+            colorIndex = FOREGROUND_GREEN;
             break;
         case LogManager::LogLevel::Info:
             colorIndex = _originalConsoleColors;        // default color scheme
             break;
         case LogManager::LogLevel::Warning:
-            colorIndex = 14;        // yellow on black
+            colorIndex = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
             break;
         case LogManager::LogLevel::Error:
-            colorIndex = 12;        // red
+            colorIndex = FOREGROUND_RED | FOREGROUND_INTENSITY;
             break;
         case LogManager::LogLevel::Fatal:
-            colorIndex = 11;        // cyan
+            colorIndex = FOREGROUND_RED | FOREGROUND_BLUE| FOREGROUND_INTENSITY;
             break;
     }
     SetConsoleTextAttribute(hConsole, colorIndex);
