@@ -223,6 +223,7 @@ SharedMemory::SharedMemory(const std::string& name)
         const std::string&& errorMsg = lastErrorToString(error);
         LERROR_SAFE("Error occurred while accessing shared memory: " << errorMsg);
         _status |= STATUS_NOT_FOUND;
+        return;
     }
 
     _memory = MapViewOfFileEx(_sharedMemoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, 0, NULL);

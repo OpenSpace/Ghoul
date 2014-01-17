@@ -61,8 +61,8 @@ public:
     static void deinitialize();
 
     /**
-     * This method returns a reference to the initialized TextureManager. If the manager 
-     * has not been initialized, it will be done so in the first call to this method.
+     * This method returns a reference to the initialized TextureManager. The manager has
+     * to be initialized before it can be used, or an assertion will be triggered.
      * \return An initialized reference to the singleton manager
      */
     static TextureManager& ref();

@@ -64,12 +64,15 @@ namespace lua {
 
 std::string lua_logStack(lua_State* state, LogManager::LogLevel level) {
     std::stringstream result;
-    result << "Lua Stack\n";
     const int top = lua_gettop(state);
-    for (int i = 1; i <= top; ++i) {
-        result << i << ": ";
-        const int t = lua_type(state, i);
-        switch (t) {
+    if (top == 0)
+        result << "Lua Stack (empty)";
+    else {
+        result << "Lua Stack\n";
+        for (int i = 1; i <= top; ++i) {
+            result << i << ": ";
+            const int t = lua_type(state, i);
+            switch (t) {
             case LUA_TSTRING:
                 result << lua_tostring(state, i);
                 break;
@@ -88,8 +91,9 @@ std::string lua_logStack(lua_State* state, LogManager::LogLevel level) {
             default:
                 result << lua_typename(state, t);
                 break;
+            }
+            result << "\n";
         }
-        result << "\n";
     }
     const std::string& resultStr = result.str();
     LogMgr.logMessage(level, resultStr);

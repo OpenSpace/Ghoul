@@ -62,8 +62,7 @@ void TextureManager::deinitialize() {
 }
 
 TextureManager& TextureManager::ref() {
-    if (_manager == nullptr)
-        TextureManager::initialize();
+    assert(_manager != nullptr);
     return *_manager;
 }
 

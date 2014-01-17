@@ -95,7 +95,7 @@ void CPUCapabilitiesComponent::detectOS() {
         return;
     }
     PGNSI procedureGetNativeSystemInfo = (PGNSI) GetProcAddress(
-        GetModuleHandle(TEXT("kernel32.dll")),
+        module,
         "GetNativeSystemInfo");
     if (procedureGetNativeSystemInfo != 0)
         procedureGetNativeSystemInfo(&systemInfo);
