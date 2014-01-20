@@ -78,7 +78,7 @@ namespace {
             return error;
         }
         else {
-            LERRORC_SAFE("SharedMemory",
+            LERRORC("SharedMemory",
                 "Error constructing format message for error: " << error);
             return "";
         }
@@ -96,12 +96,12 @@ bool SharedMemory::create(const std::string& name, size_t size) {
     const DWORD error = GetLastError();
     if (handle == NULL) {
         const std::string&& errorMsg = lastErrorToString(error);
-        LERROR_SAFE("Error occurred while creating shared memory: " << errorMsg);
+        LERROR("Error occurred while creating shared memory: " << errorMsg);
         return false;
     }
     else { 
         if (error == ERROR_ALREADY_EXISTS) {
-            LERROR_SAFE("Error occurred while creating shared memory: " <<
+            LERROR("Error occurred while creating shared memory: " <<
                 "Section already exists");
             return false;
         }
@@ -110,7 +110,7 @@ bool SharedMemory::create(const std::string& name, size_t size) {
 
             if (memory == nullptr) {
                 const std::string&& errorMsg = lastErrorToString(error);
-                LERROR_SAFE("Error occurred while creating a view on shared memory: " <<
+                LERROR("Error occurred while creating a view on shared memory: " <<
                     errorMsg);
                 return false;
             }
@@ -128,7 +128,7 @@ bool SharedMemory::create(const std::string& name, size_t size) {
     const unsigned int h = hash(name);
     const int result = shmget(h, size, IPC_CREAT | IPC_EXCL | IPC_R | IPC_W | IPC_M);
     if (result == -1) {
-        LERROR_SAFE("Error occurred while creating shared memory: " << strerror(errno));
+        LERROR("Error occurred while creating shared memory: " << strerror(errno));
         return false;
     }
     void* memory = shmat(_sharedMemoryHandle, NULL, SHM_R | SHM_W);
@@ -144,7 +144,7 @@ bool SharedMemory::remove(const std::string& name) {
 #ifdef WIN32
 #ifdef GHL_DEBUG
     if (_createdSections.find(name) == _createdSections.end()) {
-        LERROR_SAFE("Shared memory section was not found");
+        LERROR("Shared memory section was not found");
         return false;
     }
 #endif
@@ -154,7 +154,7 @@ bool SharedMemory::remove(const std::string& name) {
     if (result == 0) {
         const DWORD error = GetLastError();
         const std::string&& errorMsg = lastErrorToString(error);
-        LERROR_SAFE("Error closing handle: " << errorMsg);
+        LERROR("Error closing handle: " << errorMsg);
         return false;
     }
     else
@@ -163,14 +163,14 @@ bool SharedMemory::remove(const std::string& name) {
     const unsigned int h = hash(name);
     int result = shmget(h, 0, IPC_R | IPC_W | IPC_M);
     if (result == -1) {
-        LERROR_SAFE("Error occurred while retrieving shared memory: " <<
+        LERROR("Error occurred while retrieving shared memory: " <<
                     strerror(errno));
         return false;
     }
     else {
         result = shmctl(result, IPC_RMID, nullptr);
         if (result == -1) {
-            LERROR_SAFE("Error occurred while removing shared memory: " <<
+            LERROR("Error occurred while removing shared memory: " <<
                         strerror(errno));
             return false;
         }
@@ -197,7 +197,7 @@ bool SharedMemory::exists(const std::string& name) {
             return false;
         else {
             const std::string&& errorMsg = lastErrorToString(error);
-            LERROR_SAFE("Error checking if shared memory existed: " << errorMsg);
+            LERROR("Error checking if shared memory existed: " << errorMsg);
             return true;
         }
     }
@@ -221,7 +221,7 @@ SharedMemory::SharedMemory(const std::string& name)
     if (_sharedMemoryHandle == NULL) {
         const DWORD error = GetLastError();
         const std::string&& errorMsg = lastErrorToString(error);
-        LERROR_SAFE("Error occurred while accessing shared memory: " << errorMsg);
+        LERROR("Error occurred while accessing shared memory: " << errorMsg);
         _status |= STATUS_NOT_FOUND;
         return;
     }
@@ -230,7 +230,7 @@ SharedMemory::SharedMemory(const std::string& name)
     if (_memory == nullptr) {
         const DWORD error = GetLastError();
         const std::string&& errorMsg = lastErrorToString(error);
-        LERROR_SAFE("Error occurred while creating view for shared memory: " <<
+        LERROR("Error occurred while creating view for shared memory: " <<
                     errorMsg);
         _status |= STATUS_NO_MAPPING;
         return;
@@ -239,7 +239,7 @@ SharedMemory::SharedMemory(const std::string& name)
     const unsigned int h = hash(name);
     _sharedMemoryHandle = shmget(h, 0, IPC_R | IPC_W | IPC_M);
     if (_sharedMemoryHandle == -1) {
-        LERROR_SAFE("Error occurred while accessing shared memory: " << strerror(errno));
+        LERROR("Error occurred while accessing shared memory: " << strerror(errno));
         _status |= STATUS_NOT_FOUND;
     }
     else {
@@ -262,7 +262,7 @@ SharedMemory::~SharedMemory() {
         if (result == 0) {
             const DWORD error = GetLastError();
             const std::string&& errorMsg = lastErrorToString(error);
-            LERROR_SAFE("Error closing handle: " << errorMsg);
+            LERROR("Error closing handle: " << errorMsg);
         }
     }
     if ((_status & STATUS_NO_MAPPING) != 0) {
@@ -270,7 +270,7 @@ SharedMemory::~SharedMemory() {
         if (result == 0) {
             const DWORD error = GetLastError();
             const std::string&& errorMsg = lastErrorToString(error);
-            LERROR_SAFE("Error unmapping view: " << errorMsg);
+            LERROR("Error unmapping view: " << errorMsg);
         }
     }
     _memory = nullptr;
@@ -278,7 +278,7 @@ SharedMemory::~SharedMemory() {
     if (_sharedMemoryHandle != -1) {
         const int result = shmdt(_memory);
         if (result == -1)
-            LERROR_SAFE("Error detaching shared memory: " << strerror(errno));
+            LERROR("Error detaching shared memory: " << strerror(errno));
         _memory = nullptr;
     }
 #endif

@@ -97,9 +97,9 @@ bool ShaderManager::registerShaderObject(const std::string& name,
     }
     else {
         if (_objects[hashedName] == shader)
-            LWARNING_SAFE("Name '" + name + "' is already registered.");
+            LWARNING("Name '" + name + "' is already registered.");
         else
-            LWARNING_SAFE("Name '" + name +
+            LWARNING("Name '" + name +
                           "' is already registered for a different ShaderObject");
         return false;
     }

@@ -82,7 +82,7 @@ ProgramObject::ProgramObject()
 {
     _id = glCreateProgram();
     if (_id == 0)
-        LERROR_SAFE("glCreateProgram returned 0");
+        LERROR("glCreateProgram returned 0");
 }
 
 ProgramObject::ProgramObject(const std::string& name)
@@ -96,7 +96,7 @@ ProgramObject::ProgramObject(const std::string& name)
 {
     _id = glCreateProgram();
     if (_id == 0)
-        LERROR_SAFE("glCreateProgram returned 0");
+        LERROR("glCreateProgram returned 0");
     if (glObjectLabel) {
         glObjectLabel(
                       GL_PROGRAM,
@@ -117,7 +117,7 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
 {
     _id = glCreateProgram();
     if (_id == 0)
-        LERROR_SAFE("glCreateProgram returned 0");
+        LERROR("glCreateProgram returned 0");
     if (glObjectLabel) {
         glObjectLabel(
                       GL_PROGRAM,
@@ -177,7 +177,7 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
 
         _id = glCreateProgram();
         if (_id == 0)
-            LERROR_SAFE("glCreateProgram returned 0");
+            LERROR("glCreateProgram returned 0");
         if (glObjectLabel) {
             glObjectLabel(
                           GL_PROGRAM,
@@ -224,7 +224,7 @@ bool ProgramObject::hasName() const {
 void ProgramObject::attachObject(ShaderObject* shaderObject, bool transferOwnership) {
     // Check for null pointer
     if (shaderObject == nullptr) {
-        LWARNING_SAFE("Passed ShaderObject is nullptr");
+        LWARNING("Passed ShaderObject is nullptr");
         return;
     }
 #ifdef GHL_DEBUG
@@ -233,10 +233,10 @@ void ProgramObject::attachObject(ShaderObject* shaderObject, bool transferOwners
         if (it->first == shaderObject) {
             if (it->first->hasName()) {
                 const std::string name = it->first->name();
-                LWARNING_SAFE("Shader object [" + name + "] already attached");
+                LWARNING("Shader object [" + name + "] already attached");
             }
             else
-                LWARNING_SAFE("ShaderObject already attached");
+                LWARNING("ShaderObject already attached");
             return;
         }
     }
@@ -248,7 +248,7 @@ void ProgramObject::attachObject(ShaderObject* shaderObject, bool transferOwners
 void ProgramObject::detachObject(ShaderObject* shaderObject) {
     // Check for null pointer
     if (shaderObject == nullptr) {
-        LWARNING_SAFE("Passed ShaderObject is nullptr");
+        LWARNING("Passed ShaderObject is nullptr");
         return;
     }
 
@@ -260,10 +260,10 @@ void ProgramObject::detachObject(ShaderObject* shaderObject) {
     }
     if (it == _shaderObjects.end()) {
         if (shaderObject->hasName())
-            LWARNING_SAFE("ShaderObject [" + shaderObject->name() + 
+            LWARNING("ShaderObject [" + shaderObject->name() + 
             "] not attached to ProgramObject");
         else
-            LWARNING_SAFE("ShaderObject not attached to ProgramObject");
+            LWARNING("ShaderObject not attached to ProgramObject");
         return;
     }
     else {
@@ -279,7 +279,7 @@ void ProgramObject::detachObject(ShaderObject* shaderObject) {
 bool ProgramObject::compileShaderObjects() {
 #ifdef GHL_DEBUG
     if (_shaderObjects.size() == 0) {
-        LWARNING_SAFE("No ShaderObjects present for compiling");
+        LWARNING("No ShaderObjects present for compiling");
         return false;
     }
 #endif
@@ -293,7 +293,7 @@ bool ProgramObject::compileShaderObjects() {
 bool ProgramObject::linkProgramObject() {
 #ifdef GHL_DEBUG
     if (_shaderObjects.size() == 0) {
-        LWARNING_SAFE("No ShaderObjects present while linking");
+        LWARNING("No ShaderObjects present while linking");
         return false;
     }
 #endif
@@ -306,7 +306,7 @@ bool ProgramObject::linkProgramObject() {
         glGetProgramiv(_id, GL_INFO_LOG_LENGTH, &logLength);
 
         if (logLength == 0) {
-            LERROR_SAFE("ProgramObject linking error: Unknown error");
+            LERROR("ProgramObject linking error: Unknown error");
             return false;
         }
 
@@ -314,7 +314,7 @@ bool ProgramObject::linkProgramObject() {
         glGetProgramInfoLog(_id, logLength, NULL, rawLog);
         string log(rawLog);
         delete[] rawLog;
-        LERROR_SAFE("ProgramObject linking error:\n" + log);
+        LERROR("ProgramObject linking error:\n" + log);
 
         return false;
     }
@@ -324,7 +324,7 @@ bool ProgramObject::linkProgramObject() {
 bool ProgramObject::rebuildFromFile() {
 #ifdef GHL_DEBUG
     if (_shaderObjects.size() == 0) {
-        LWARNING_SAFE("No ShaderObjects present while rebuilding");
+        LWARNING("No ShaderObjects present while rebuilding");
         return false;
     }
 #endif
@@ -338,7 +338,7 @@ bool ProgramObject::rebuildFromFile() {
 void ProgramObject::activate() {
 #ifdef GHL_DEBUG
     if (_shaderObjects.size() == 0) {
-        LWARNING_SAFE("No ShaderObjects present while activating");
+        LWARNING("No ShaderObjects present while activating");
         return;
     }
 #endif
@@ -360,7 +360,7 @@ bool ProgramObject::ignoreUniformLocationError() const {
 GLint ProgramObject::uniformLocation(const std::string& name) const {
     GLint location = glGetUniformLocation(_id, name.c_str());
     if (!_ignoreUniformLocationError && location == -1)
-        LWARNING_SAFE("Failed to locate uniform location for: " + name);
+        LWARNING("Failed to locate uniform location for: " + name);
     return location;
 }
 
@@ -1954,7 +1954,7 @@ void ProgramObject::setUniform(GLint location,
 GLint ProgramObject::attributeLocation(const std::string& name) const {
     const GLint location = glGetAttribLocation(_id, name.c_str());
     if (!_ignoreAttributeLocationError && location == -1)
-        LWARNING_SAFE("Failed to locate attribute location for: " + name);
+        LWARNING("Failed to locate attribute location for: " + name);
     return location;
 }
 
@@ -2735,7 +2735,7 @@ GLuint ProgramObject::subroutineIndex(ShaderObject::ShaderType shaderType,
 {
     const GLuint index = glGetSubroutineIndex(_id, shaderType, name.c_str());
     if (!_ignoreSubroutineLocationError && index == GL_INVALID_INDEX)
-        LWARNING_SAFE("Failed to locate subroutine index for: " + name);
+        LWARNING("Failed to locate subroutine index for: " + name);
     return index;
 }
 
@@ -2744,7 +2744,7 @@ GLint ProgramObject::subroutineUniformLocation(ShaderObject::ShaderType shaderTy
 {
     const GLint location = glGetSubroutineUniformLocation(_id, shaderType, name.c_str());
     if (!_ignoreSubroutineUniformLocationError && location == -1)
-        LWARNING_SAFE("Failed to locate subroutine uniform location for: " + name);
+        LWARNING("Failed to locate subroutine uniform location for: " + name);
     return location;
 }
 
@@ -2756,7 +2756,7 @@ vector<string> ProgramObject::activeSubroutineUniformNames(
     glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH,
                         &maximumUniformNameLength);
     if (maximumUniformNameLength > 1024)
-        LWARNING_SAFE("String buffer for Subroutine Uniform name (1024) is insufficient");
+        LWARNING("String buffer for Subroutine Uniform name (1024) is insufficient");
 #endif
     int countActiveSubroutineUniforms;
     char buffer[1024];
@@ -2780,7 +2780,7 @@ vector<string> ProgramObject::compatibleSubroutineNames(
     glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH,
                         &maximumUniformNameLength);
     if (maximumUniformNameLength > 1024)
-        LWARNING_SAFE("String buffer for Subroutine Uniform name (1024) is insufficient");
+        LWARNING("String buffer for Subroutine Uniform name (1024) is insufficient");
 #endif
 
     GLint numCompatibleSubroutines;
@@ -2819,7 +2819,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
 {
 #ifdef GHL_DEBUG
     if (values.size() == 0) {
-        LWARNING_SAFE("No values passed");
+        LWARNING("No values passed");
         return false;
     }
 
@@ -2827,7 +2827,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
     glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORMS,
                         &countActiveSubroutineUniforms);
     if (static_cast<size_t>(countActiveSubroutineUniforms) != values.size()) {
-        LWARNING_SAFE("Number of active subroutine uniform (" <<
+        LWARNING("Number of active subroutine uniform (" <<
             countActiveSubroutineUniforms <<
             ") is different from passed uniform subroutine indices (" << values.size() <<
             ")");
@@ -2843,7 +2843,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
 {
 #ifdef GHL_DEBUG
     if (values.size() == 0) {
-        LWARNING_SAFE("No values passed");
+        LWARNING("No values passed");
         return false;
     }
 
@@ -2851,7 +2851,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
     glGetProgramStageiv(_id, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORMS,
                         &countActiveSubroutineUniforms);
     if (static_cast<size_t>(countActiveSubroutineUniforms) != values.size()) {
-        LWARNING_SAFE("Number of active subroutine uniform (" <<
+        LWARNING("Number of active subroutine uniform (" <<
             countActiveSubroutineUniforms <<
             ") is different from passed uniform subroutine indices (" << values.size()
             << ")");
@@ -2866,7 +2866,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
         map<string,string>::const_iterator subroutine = values.find(uniformSubroutine);
 #ifdef GHL_DEBUG
         if (subroutine == values.end()) {
-            LWARNING_SAFE("Uniform subroutine name '" + uniformSubroutine +
+            LWARNING("Uniform subroutine name '" + uniformSubroutine +
                 "' was not present in map");
             return false;
         }
@@ -2875,7 +2875,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
         GLuint idxSubroutine = subroutineIndex(shaderType, nameSubroutine);
 #ifdef GHL_DEBUG
         if (idxSubroutine == GL_INVALID_INDEX) {
-            LWARNING_SAFE("Subroutine name '" + nameSubroutine +
+            LWARNING("Subroutine name '" + nameSubroutine +
                 "' was not found in shader object.");
             return false;
         }
@@ -2894,7 +2894,7 @@ void ProgramObject::bindFragDataLocation(const std::string& name, GLuint colorNu
     GLint maxBuffers;
     glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxBuffers);
     if (colorNumber >= static_cast<GLuint>(maxBuffers)) {
-        LWARNING_SAFE("ColorNumber '" << colorNumber <<
+        LWARNING("ColorNumber '" << colorNumber <<
             "' is bigger than the maximum of simultaneous outputs '" << maxBuffers << "'");
         return;
     }

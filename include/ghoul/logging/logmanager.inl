@@ -27,40 +27,64 @@
 #define LDEBUGC(__category__, __message__) \
     do { \
         std::ostringstream __tmp__; __tmp__ << __message__; \
-        LogMgr.logMessage( \
-            ghoul::logging::LogManager::LogLevel::Debug, __category__, __tmp__.str()); \
+        if (ghoul::logging::LogManager::isInitialized()) \
+            LogMgr.logMessage( \
+                ghoul::logging::LogManager::LogLevel::Debug, \
+                __category__, \
+                __tmp__.str() \
+            ); \
     } while (false)
 
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Info
 #define LINFOC(__category__, __message__) \
     do { \
         std::ostringstream __tmp__; __tmp__ << __message__; \
-        LogMgr.logMessage( \
-            ghoul::logging::LogManager::LogLevel::Info, __category__, __tmp__.str()); \
+        if (ghoul::logging::LogManager::isInitialized()) \
+            LogMgr.logMessage( \
+                ghoul::logging::LogManager::LogLevel::Info, \
+                __category__, \
+                __tmp__.str() \
+            ); \
     } while (false)
 
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Warning
 #define LWARNINGC(__category__, __message__) \
     do { \
         std::ostringstream __tmp__; __tmp__ << __message__; \
-        LogMgr.logMessage( \
-            ghoul::logging::LogManager::LogLevel::Warning, __category__, __tmp__.str()); \
+        if (ghoul::logging::LogManager::isInitialized()) \
+            LogMgr.logMessage( \
+                ghoul::logging::LogManager::LogLevel::Info, \
+                __category__, \
+                __tmp__.str() \
+            ); \
     } while (false)
 
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevelError
 #define LERRORC(__category__, __message__) \
     do { \
         std::ostringstream __tmp__; __tmp__ << __message__; \
-        LogMgr.logMessage( \
-            ghoul::logging::LogManager::LogLevel::Error, __category__, __tmp__.str()); \
+        if (ghoul::logging::LogManager::isInitialized()) \
+            LogMgr.logMessage( \
+                ghoul::logging::LogManager::LogLevel::Error, \
+                __category__, \
+                __tmp__.str() \
+            ); \
+        else \
+            std::cout << __category__ << ": " << __tmp__.str() << std::endl; \
     } while (false)
 
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevelFatal
 #define LFATALC(__category__, __message__) \
     do { \
         std::ostringstream __tmp__; __tmp__ << __message__; \
-        LogMgr.logMessage( \
-            ghoul::logging::LogManager::LogLevel::Fatal, __category__, __tmp__.str()); \
+        if (ghoul::logging::LogManager::isInitialized()) \
+            LogMgr.logMessage( \
+                ghoul::logging::LogManager::LogLevel::Error, \
+                __category__, \
+                __tmp__.str() \
+            ); \
+        else \
+            std::cout << __category__ << ": " << __tmp__.str() << std::endl; \
     } while (false)
 
 /**
@@ -98,128 +122,3 @@
  * _loggerCat needs to be defined and should contain the category.
  */
 #define LFATAL(__message__) LFATALC(_loggerCat, __message__)
-
-/**
- * Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Debug.
- * This method will not trigger an assertion when the LogManager has not been initialized
- * abut will print the message to the cout instead. If it has been initialized, it behaves
- * like the unsafe version.
- */
-#define LDEBUGC_SAFE(__category__, __message__) \
-    do { \
-        std::ostringstream tmp; tmp << __message__; \
-        if (ghoul::logging::LogManager::isInitialized()) \
-            LogMgr.logMessage( \
-                ghoul::logging::LogManager::LogLevel::Debug, __category__, tmp.str()); \
-        else \
-            std::cout << __category__ << ": " << tmp.str() << std::endl; \
-    } while (false)
-
-/**
- * Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Info.
- * This method will not trigger an assertion when the LogManager has not been initialized
- * but will print the message to the cout instead. If it has been initialized, it behaves
- * like the unsafe version.
- */
-#define LINFOC_SAFE(__category__, __message__) \
-    do { \
-        std::ostringstream tmp; tmp << __message__; \
-        if (ghoul::logging::LogManager::isInitialized()) \
-            LogMgr.logMessage( \
-                ghoul::logging::LogManager::LogLevel::Info, __category__, tmp.str()); \
-        else \
-            std::cout << __category__ << ": " << tmp.str() << std::endl; \
-    } while (false)
-
-/**
- * Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Warning.
- * This method will not trigger an assertion when the LogManager has not been initialized
- * but will print the message to the cout instead. If it has been initialized, it behaves
- * like the unsafe version.
- */
-#define LWARNINGC_SAFE(__category__, __message__) \
-    do { \
-        std::ostringstream tmp; tmp << __message__; \
-        if (ghoul::logging::LogManager::isInitialized()) \
-            LogMgr.logMessage( \
-                ghoul::logging::LogManager::LogLevel::Warning, __category__, tmp.str()); \
-        else \
-            std::cout << __category__ << ": " << tmp.str() << std::endl; \
-    } while (false)
-
-/**
- * Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Error.
- * This method will not trigger an assertion when the LogManager has not been initialized
- * but will print the message to the cout instead. If it has been initialized, it behaves
- * like the unsafe version.
- */
-#define LERRORC_SAFE(__category__, __message__) \
-    do { \
-        std::ostringstream tmp; tmp << __message__; \
-        if (ghoul::logging::LogManager::isInitialized()) \
-            LogMgr.logMessage( \
-                ghoul::logging::LogManager::LogLevel::Error, __category__, tmp.str()); \
-        else \
-            std::cout << __category__ << ": " << tmp.str() << std::endl; \
-    } while (false)
-
-/**
- * Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Fatal.
- * This method will not trigger an assertion when the LogManager has not been initialized
- * but will print the message to the cout instead. If it has been initialized, it behaves
- * like the unsafe version.
- */
-#define LFATALC_SAFE(__category__, __message__) \
-    do { \
-        std::ostringstream tmp; tmp << __message__; \
-        if (ghoul::logging::LogManager::isInitialized()) \
-            LogMgr.logMessage( \
-                ghoul::logging::LogManager::LogLevel::Fatal, __category__, tmp.str()); \
-        else \
-            std::cout << __category__ << ": " << tmp.str() << std::endl; \
-    } while (false)
-
-/**
- * Logs the 'message' with a level of LogManager::LogLevel::Debug. A variable called
- * _loggerCat needs to be defined and should contain the category. This method will not
- * trigger an assertion when the LogManager has not been initialized but will print the
- * message to the cout instead. If it has been initialized, it behaves like the unsafe
- * version.
- */
-#define LDEBUG_SAFE(__message__) LDEBUGC_SAFE(_loggerCat, __message__)
-
-/**
- * Logs the 'message' with a level of LogManager::LogLevel::Info. A variable called
- * _loggerCat needs to be defined and should contain the category. This method will not
- * trigger an assertion when the LogManager has not been initialized but will print the
- * message to the cout instead. If it has been initialized, it behaves like the unsafe
- * version.
- */
-#define LINFO_SAFE(__message__) LINFOC_SAFE(_loggerCat, __message__)
-
-/**
- * Logs the 'message' with a level of LogManager::LogLevel::Warning. A variable called
- * _loggerCat needs to be defined and should contain the category. This method will not
- * trigger an assertion when the LogManager has not been initialized but will print the
- * message to the cout instead. If it has been initialized, it behaves like the unsafe
- * version.
- */
-#define LWARNING_SAFE(__message__) LWARNINGC_SAFE(_loggerCat, __message__)
-
-/**
- * Logs the 'message' with a level of LogManager::LogLevel::Error. A variable called
- * _loggerCat needs to be defined and should contain the category. This method will not
- * trigger an assertion when the LogManager has not been initialized but will print the
- * message to the cout instead. If it has been initialized, it behaves like the unsafe
- * version.
- */
-#define LERROR_SAFE(__message__) LERRORC_SAFE(_loggerCat, __message__)
-
-/**
- * Logs the 'message' with a level of LogManager::LogLevel::Fatal. A variable called
- * _loggerCat needs to be defined and should contain the category. This method will not
- * trigger an assertion when the LogManager has not been initialized but will print the
- * message to the cout instead. If it has been initialized, it behaves like the unsafe
- * version.
- */
-#define LFATAL_SAFE(__message__) LFATALC_SAFE(_loggerCat, __message__)

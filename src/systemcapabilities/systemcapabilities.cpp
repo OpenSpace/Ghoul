@@ -30,6 +30,7 @@
 #include "systemcapabilities/cpucapabilitiescomponent.h"
 #include "systemcapabilities/openglcapabilitiescomponent.h"
 
+#include <assert.h>
 #include <sstream>
 #include <typeinfo>
 

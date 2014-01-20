@@ -108,7 +108,7 @@ string FileSystem::relativePath(const string& path,
                                 const Directory& baseDirectory) const
 {
     if (path.empty()) {
-        LERROR_SAFE("'path' must contain a path");
+        LERROR("'path' must contain a path");
         return path;
     }
     const string& pathAbsolute = cleanupPath(absolutePath(path));
@@ -165,7 +165,7 @@ Directory FileSystem::currentDirectory() const {
         if (errorBuffer != nullptr) {
             string error(errorBuffer);
             LocalFree(errorBuffer);
-            LERROR_SAFE("Error retrieving current directory: " << error);
+            LERROR("Error retrieving current directory: " << error);
         }
         return Directory();
     }
@@ -175,7 +175,7 @@ Directory FileSystem::currentDirectory() const {
     char* buffer = new char[MAXPATHLEN];
     char* result = getcwd(buffer, MAXPATHLEN);
     if (result == nullptr) {
-        LERROR_SAFE("Error retrieving current directory: " << errno);
+        LERROR("Error retrieving current directory: " << errno);
         return Directory();
     }
     currentDir = string(buffer);
@@ -203,13 +203,13 @@ void FileSystem::setCurrentDirectory(const Directory& directory) const {
         if (errorBuffer != nullptr) {
             string error(errorBuffer);
             LocalFree(errorBuffer);
-            LERROR_SAFE("Error setting current directory: " << error);
+            LERROR("Error setting current directory: " << error);
         }
     }
 #else
     const int success = chdir(directory.path().c_str());
     if (success != 0)
-        LERROR_SAFE("Error setting current directory: " << errno);
+        LERROR("Error setting current directory: " << errno);
 #endif
 }
 
@@ -232,7 +232,7 @@ bool FileSystem::fileExists(const File& path) const {
             if (errorBuffer != nullptr) {
                 string error(errorBuffer);
                 LocalFree(errorBuffer);
-                LERROR_SAFE("Error retrieving file attributes: " << error);
+                LERROR("Error retrieving file attributes: " << error);
             }
         }
         return false;
@@ -269,7 +269,7 @@ bool FileSystem::directoryExists(const Directory& path) const {
             if (errorBuffer != nullptr) {
                 string error(errorBuffer);
                 LocalFree(errorBuffer);
-                LERROR_SAFE("Error retrieving file attributes: " << error);
+                LERROR("Error retrieving file attributes: " << error);
             }
         }
         return false;
@@ -350,21 +350,21 @@ bool FileSystem::deleteDirectory(const Directory& path) const {
 void FileSystem::registerPathToken(const string& token, const string& path) {
 #ifdef GHL_DEBUG
     if (token.empty()) {
-        LERROR_SAFE("Token cannot not be empty");
+        LERROR("Token cannot not be empty");
         return;
     }
     
     const std::string beginning = token.substr(0, _tokenOpeningBraces.size());
     const std::string ending = token.substr(token.size() - _tokenClosingBraces.size());
     if ((beginning != _tokenOpeningBraces) || (ending != _tokenClosingBraces)) {
-        LERROR_SAFE("Token has to start with '" + _tokenOpeningBraces +
+        LERROR("Token has to start with '" + _tokenOpeningBraces +
                     "' and end with '" + _tokenClosingBraces + "'");
         return;
     }
     
     
     if (_fileSystem->_tokenMap.find(token) != _fileSystem->_tokenMap.end()) {
-        LERROR_SAFE("Token already bound to path '" +
+        LERROR("Token already bound to path '" +
                     _fileSystem->_tokenMap[token] + "'");
         return;
     }
@@ -471,7 +471,7 @@ bool FileSystem::hasToken(const std::string& path, const std::string& token) con
 const std::string FileSystem::resolveToken(const std::string& token) const {
     const std::map<std::string, std::string>::const_iterator it = _tokenMap.find(token);
     if (it == _tokenMap.end()) {
-        LERROR_SAFE("Token '" + token + "' could not be resolved");
+        LERROR("Token '" + token + "' could not be resolved");
         return token;
     }
     else

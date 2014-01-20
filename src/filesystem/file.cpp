@@ -171,7 +171,7 @@ void File::installFileChangeListener() {
         NULL);
 
     if (_directoryHandle == INVALID_HANDLE_VALUE) {
-        LERROR_SAFE("Directory handle for '" << _filename << "' could not be obtained");
+        LERROR("Directory handle for '" << _filename << "' could not be obtained");
         return;
     }
 
@@ -308,7 +308,7 @@ void File::beginRead() {
             LocalFree(errorBuffer);
         }
         else
-            LERROR_SAFE("Error reading directory changes: " << error);
+            LERROR("Error reading directory changes: " << error);
     }
 }
     

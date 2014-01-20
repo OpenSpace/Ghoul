@@ -51,87 +51,87 @@ namespace helper {
 ConfigurationManager::ConfigurationManager()
     : _state(nullptr)
 {
-    LDEBUG_SAFE("Creating ConfigurationManager");
+    LDEBUG("Creating ConfigurationManager");
 }
 
 ConfigurationManager::~ConfigurationManager() {
 #ifdef GHL_DEBUG
     if (_state != nullptr) {
-        LWARNING_SAFE("ConfigurationManager was not deinitialized");
+        LWARNING("ConfigurationManager was not deinitialized");
         deinitialize();
     }
 #endif
-    LDEBUG_SAFE("Destroying ConfigurationManager");
+    LDEBUG("Destroying ConfigurationManager");
 }
 
 bool ConfigurationManager::initialize(const std::string& configurationScript) {
     assert(_state == nullptr);
 
-    LDEBUG_SAFE("Create Lua state");
+    LDEBUG("Create Lua state");
     _state = luaL_newstate();
     if (_state == nullptr) {
         LFATAL("Error creating new Lua state: Memory allocation error");
         return false;
     }
-    LDEBUG_SAFE("Open libraries");
+    LDEBUG("Open libraries");
     luaL_openlibs(_state);
 
-    LDEBUG_SAFE("Loading configuration script '" << configurationScript << "'");
-    const int status = luaL_loadfile(_state, absPath(configurationScript).c_str());
+    const std::string absConfigurationScript = absPath(configurationScript);
+    LDEBUG("Loading configuration script '" << absConfigurationScript << "'");
+    const int status = luaL_loadfile(_state, absConfigurationScript.c_str());
     if (status != LUA_OK) {
-        LFATAL("Error loading configuration script: " << lua_tostring(_state, -1));
         deinitialize();
         return false;
     }
 
-    LDEBUG_SAFE("Executing configuration script");
+    LDEBUG("Executing configuration script");
     if (lua_pcall(_state, 0, LUA_MULTRET, 0)) {
-        LFATAL_SAFE("Error executing configuration script: " << lua_tostring(_state, -1));
+        LFATAL("Error executing configuration script: " << lua_tostring(_state, -1));
         deinitialize();
         return false;
     }
 
     // Sanity checks
-    LDEBUG_SAFE("Sanity check for 'loadConfiguration'");
+    LDEBUG("Sanity check for 'loadConfiguration'");
     lua_getglobal(_state, "loadConfiguration");
     if (!lua_isfunction(_state, -1)) {
-        LFATAL_SAFE("Could not find 'loadConfiguration' in configuration script");
+        LFATAL("Could not find 'loadConfiguration' in configuration script");
         deinitialize();
         return false;
     }
     lua_pop(_state, 1);
     
-    LDEBUG_SAFE("Sanity check for the configuration table");
+    LDEBUG("Sanity check for the configuration table");
     lua_getglobal(_state, _configurationTable);
     if (!lua_istable(_state, -1)) {
-        LERROR_SAFE("'" << _configurationTable << "' not found in configuration script");
+        LERROR("'" << _configurationTable << "' not found in configuration script");
         deinitialize();
         return false;
     }
     lua_pop(_state, 1);
 
-    LDEBUG_SAFE("Sanity check for 'getValue'");
+    LDEBUG("Sanity check for 'getValue'");
     lua_getglobal(_state, "getValue");
     if (!lua_isfunction(_state, -1)) {
-        LFATAL_SAFE("Could not find 'getValue' in configuration script");
+        LFATAL("Could not find 'getValue' in configuration script");
         deinitialize();
         return false;
     }
     lua_pop(_state, 1);
 
-    LDEBUG_SAFE("Sanity check for 'setValue'");
+    LDEBUG("Sanity check for 'setValue'");
     lua_getglobal(_state, "setValue");
     if (!lua_isfunction(_state, -1)) {
-        LFATAL_SAFE("Could not find 'setValue' in configuration script");
+        LFATAL("Could not find 'setValue' in configuration script");
         deinitialize();
         return false;
     }
     lua_pop(_state, 1);
 
-    LDEBUG_SAFE("Sanity check for 'getKeys'");
+    LDEBUG("Sanity check for 'getKeys'");
     lua_getglobal(_state, "getKeys");
     if (!lua_isfunction(_state, -1)) {
-        LFATAL_SAFE("Could not find 'getKeys' in configuration script");
+        LFATAL("Could not find 'getKeys' in configuration script");
         deinitialize();
         return false;
     }
@@ -142,7 +142,7 @@ bool ConfigurationManager::initialize(const std::string& configurationScript) {
 
 void ConfigurationManager::deinitialize() {
     assert(_state != nullptr);
-    LDEBUG_SAFE("Close Lua state");
+    LDEBUG("Close Lua state");
     lua_close(_state);
     _state = nullptr;
 }
@@ -157,7 +157,7 @@ void ConfigurationManager::loadConfiguration(const std::string& filename) {
 
     const int status = lua_pcall(_state, 1, 0, 0);
     if (status != LUA_OK) {
-        LERROR_SAFE("Error loading configuration: " << lua_tostring(_state, -1));
+        LERROR("Error loading configuration: " << lua_tostring(_state, -1));
         return;
     }
 }
@@ -173,7 +173,7 @@ void ConfigurationManager::setValue(const std::string& key, const bool& value) {
     lua_pushboolean(_state, static_cast<int>(value));
     const int status = lua_pcall(_state, 2, 0, NULL);
     if (status != LUA_OK)
-        LERROR_SAFE("Error setting value '" << key << "'. Error: " <<
+        LERROR("Error setting value '" << key << "'. Error: " <<
                                             lua_tostring(_state, -1));
 }
 
@@ -281,7 +281,7 @@ void ConfigurationManager::setValue(const std::string& key, const std::string& v
     lua_pushstring(_state, value.c_str());
     const int status = lua_pcall(_state, 2, 0, NULL);
     if (status != LUA_OK)
-        LERROR_SAFE("Error setting value '" << key << "'. Error: " <<
+        LERROR("Error setting value '" << key << "'. Error: " <<
                         lua_tostring(_state, -1));
 }
 
@@ -296,7 +296,7 @@ bool ConfigurationManager::getValue(const std::string& key, bool& value) {
     lua_pushstring(_state, key.c_str());
     const int status = lua_pcall(_state, 1, 1, NULL);
     if (status != LUA_OK) {
-        LERROR_SAFE("Error getting value '" << key << "'. Error: " <<
+        LERROR("Error getting value '" << key << "'. Error: " <<
                         lua_tostring(_state, -1));
         return false;
     }
@@ -454,7 +454,7 @@ bool ConfigurationManager::getValue(const std::string& key, std::string& value) 
     lua_pushstring(_state, key.c_str());
     const int status = lua_pcall(_state, 1, 1, NULL);
     if (status != LUA_OK) {
-        LERROR_SAFE("Error getting value '" << key << "'. Error: " <<
+        LERROR("Error getting value '" << key << "'. Error: " <<
                             lua_tostring(_state, -1));
         return false;
     }
@@ -476,7 +476,7 @@ std::vector<std::string> ConfigurationManager::keys(const std::string& location)
     lua_pushstring(_state, location.c_str());
     const int status = lua_pcall(_state, 1, 1, NULL);
     if (status != LUA_OK) {
-        LERROR_SAFE("Error getting keys from location '" << location<< "'." << 
+        LERROR("Error getting keys from location '" << location<< "'." << 
                 "Error: " << lua_tostring(_state, -1));
         return std::vector<std::string>();
     }
@@ -508,7 +508,7 @@ bool getValue(lua_State* state, const std::string& key, lua_Integer& value) {
     lua_pushstring(state, key.c_str());
     const int status = lua_pcall(state, 1, 1, NULL);
     if (status != LUA_OK) {
-        LERROR_SAFE("Error getting value '" << key << "'. Error: " <<
+        LERROR("Error getting value '" << key << "'. Error: " <<
                             lua_tostring(state, -1));
         return false;
     }
@@ -529,7 +529,7 @@ bool getValue(lua_State* state, const std::string& key, lua_Unsigned& value) {
     lua_pushstring(state, key.c_str());
     const int status = lua_pcall(state, 1, 1, NULL);
     if (status != LUA_OK) {
-        LERROR_SAFE("Error getting value '" << key << "'. Error: " <<
+        LERROR("Error getting value '" << key << "'. Error: " <<
                             lua_tostring(state, -1));
         return false;
     }
@@ -550,7 +550,7 @@ bool getValue(lua_State* state, const std::string& key, lua_Number& value) {
     lua_pushstring(state, key.c_str());
     const int status = lua_pcall(state, 1, 1, NULL);
     if (status != LUA_OK) {
-        LERROR_SAFE("Error getting value '" << key << "'. Error: " <<
+        LERROR("Error getting value '" << key << "'. Error: " <<
                             lua_tostring(state, -1));
         return false;
     }
@@ -572,7 +572,7 @@ void setValue(lua_State* state, const std::string& key, const lua_Integer& value
     lua_pushinteger(state, value);
     const int status = lua_pcall(state, 2, 0, NULL);
     if (status != LUA_OK)
-        LERROR_SAFE("Error setting value '" << key << "'. Error: " <<
+        LERROR("Error setting value '" << key << "'. Error: " <<
                             lua_tostring(state, -1));
 }
 
@@ -584,7 +584,7 @@ void setValue(lua_State* state, const std::string& key, const lua_Unsigned& valu
     lua_pushunsigned(state, value);
     const int status = lua_pcall(state, 2, 0, NULL);
     if (status != LUA_OK)
-        LERROR_SAFE("Error setting value '" << key << "'. Error: " <<
+        LERROR("Error setting value '" << key << "'. Error: " <<
                             lua_tostring(state, -1));
 }
 
@@ -596,7 +596,7 @@ void setValue(lua_State* state, const std::string& key, const lua_Number& value)
     lua_pushnumber(state, value);
     const int status = lua_pcall(state, 2, 0, NULL);
     if (status != LUA_OK)
-        LERROR_SAFE("Error setting value '" << key << "'. Error: " <<
+        LERROR("Error setting value '" << key << "'. Error: " <<
                             lua_tostring(state, -1));
 }
 

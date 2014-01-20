@@ -71,13 +71,13 @@ void SystemCapabilitiesComponent::initializeWMI() {
     // All rights remain with their original copyright owners
 
     if (isWMIinitialized()) {
-        LWARNING_SAFE("The WMI initialization has already been initialized.");
+        LWARNING("The WMI initialization has already been initialized.");
         return;
     }
 
     HRESULT hRes = CoInitializeEx(0, COINIT_APARTMENTTHREADED);
     if (FAILED(hRes)) {
-        LERROR_SAFE("WMI initialization failed. 'CoInitializeEx' failed." 
+        LERROR("WMI initialization failed. 'CoInitializeEx' failed." 
             << " Error Code: " << hRes);
         return;
     }
@@ -96,9 +96,9 @@ void SystemCapabilitiesComponent::initializeWMI() {
         NULL                         // Reserved
         );
     if (FAILED(hRes))
-        LDEBUG_SAFE("CoInitializeSecurity failed with error code: 0x" << hRes);
+        LDEBUG("CoInitializeSecurity failed with error code: 0x" << hRes);
     else
-        LDEBUG_SAFE("CoInitializeSecurity successful.");
+        LDEBUG("CoInitializeSecurity successful.");
 
     hRes = CoCreateInstance(
         CLSID_WbemLocator,
@@ -107,14 +107,14 @@ void SystemCapabilitiesComponent::initializeWMI() {
         IID_IWbemLocator,
         reinterpret_cast<LPVOID*>(&_iwbemLocator));
     if (FAILED(hRes)) {
-        LERROR_SAFE("WMI initialization failed. Failed to create IWbemLocator object." 
+        LERROR("WMI initialization failed. Failed to create IWbemLocator object." 
             << " Error Code: " << hRes);
         _iwbemLocator = 0;
         CoUninitialize();
         return;
     }
 
-    LDEBUG_SAFE("IWbemLocator object successfully created.");
+    LDEBUG("IWbemLocator object successfully created.");
 
     hRes = _iwbemLocator->ConnectServer(
         _bstr_t(L"ROOT\\CIMV2"), // Object path of WMI namespace
@@ -127,7 +127,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         &_iwbemServices          // pointer to IWbemServices proxy
         );
     if (FAILED(hRes)) {
-        LERROR_SAFE("WMI initialization failed. Failed to connect to WMI server."
+        LERROR("WMI initialization failed. Failed to connect to WMI server."
             << " Error Code: " << hRes);
         _iwbemLocator->Release();
         CoUninitialize();
@@ -136,7 +136,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         return;
     }
 
-    LDEBUG_SAFE("Connected to ROOT\\CIMV2 WMI namespace.");
+    LDEBUG("Connected to ROOT\\CIMV2 WMI namespace.");
 
     hRes = CoSetProxyBlanket(
         _iwbemServices,              // Indicates the proxy to set
@@ -149,7 +149,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         EOAC_NONE                    // proxy capabilities 
         );
     if (FAILED(hRes)) {
-        LERROR_SAFE("WMI initialization failed. Could not set proxy blanket. Error Code: 0x"
+        LERROR("WMI initialization failed. Could not set proxy blanket. Error Code: 0x"
             << hRes);
         _iwbemServices->Release();
         _iwbemServices = 0;
@@ -158,17 +158,17 @@ void SystemCapabilitiesComponent::initializeWMI() {
         CoUninitialize();
         return;
     }
-    LDEBUG_SAFE("WMI successfully initialized.");
+    LDEBUG("WMI successfully initialized.");
 }
 
 void SystemCapabilitiesComponent::deinitializeWMI() {
     const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
     if (!isWMIinitialized()) {
-        LWARNING_SAFE("WMI is not initialized.");
+        LWARNING("WMI is not initialized.");
         return;
     }
 
-    LDEBUG_SAFE("Deinitializing WMI.");
+    LDEBUG("Deinitializing WMI.");
     if (_iwbemLocator)
         _iwbemLocator->Release();
     _iwbemLocator = 0;
@@ -208,7 +208,7 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
 {
     const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
     if (!isWMIinitialized()) {
-        LERROR_SAFE("WMI is not initialized.");
+        LERROR("WMI is not initialized.");
         return nullptr;
     }
 
@@ -222,7 +222,7 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
         NULL,
         &enumerator);
     if (FAILED(hRes)) {
-        LERROR_SAFE("WMI query failed. Error Code: 0x" << hRes);
+        LERROR("WMI query failed. Error Code: 0x" << hRes);
         return nullptr;
     }
 
@@ -246,7 +246,7 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
     }
 
     if (!result)
-        LINFO_SAFE("No WMI query result.");
+        LINFO("No WMI query result.");
 
     if (enumerator)
         enumerator->Release();

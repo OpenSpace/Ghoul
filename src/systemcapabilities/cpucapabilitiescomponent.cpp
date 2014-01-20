@@ -84,14 +84,14 @@ void CPUCapabilitiesComponent::detectOS() {
     BOOL osVersionInfoEx = GetVersionEx((OSVERSIONINFO*) &osVersionInfo);
 
     if (osVersionInfoEx == 0) {
-        LERROR_SAFE("Retrieving OS version failed. 'GetVersionEx' returned 0.");
-        LERROR_SAFE("Last Error: " << GetLastError());
+        LERROR("Retrieving OS version failed. 'GetVersionEx' returned 0.");
+        LERROR("Last Error: " << GetLastError());
         return;
     }
     HMODULE module = GetModuleHandle(TEXT("kernel32.dll"));
     if (module == 0) {
-        LERROR_SAFE("Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0.");
-        LERROR_SAFE("Last Error: " << GetLastError());
+        LERROR("Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0.");
+        LERROR("Last Error: " << GetLastError());
         return;
     }
     PGNSI procedureGetNativeSystemInfo = (PGNSI) GetProcAddress(
@@ -176,7 +176,7 @@ void CPUCapabilitiesComponent::detectOS() {
 #else
     utsname name;
     if (uname(&name) != 0) {
-        LERROR_SAFE("OS detection failed. 'uname' returned non-null value");
+        LERROR("OS detection failed. 'uname' returned non-null value");
         return;
     }
     stringstream resultStream;
@@ -191,7 +191,7 @@ void CPUCapabilitiesComponent::detectMemory() {
     std::string memory;
     bool success = queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
     if (!success)
-        LERROR_SAFE("Reading of main RAM failed.");
+        LERROR("Reading of main RAM failed.");
     else {
         std::stringstream convert;
         convert << memory;

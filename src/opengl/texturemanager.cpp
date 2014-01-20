@@ -95,9 +95,9 @@ bool TextureManager::registerTexture(const std::string& name,
     }
     else {
         if (_textures[hashedName] == texture)
-            LWARNING_SAFE("Name '" + name + "' is already registered in TextureManager.");
+            LWARNING("Name '" + name + "' is already registered in TextureManager.");
         else
-            LWARNING_SAFE("Name '" + name +
+            LWARNING("Name '" + name +
             "' is already registered for a different Texture in TextureManager");
         return false;
     }

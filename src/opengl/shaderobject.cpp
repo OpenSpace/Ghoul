@@ -49,7 +49,7 @@ ShaderObject::ShaderObject(ShaderType shaderType)
 {
     _id = glCreateShader(_type);
     if (_id == 0)
-        LERROR_SAFE("glCreateShader returned 0");
+        LERROR("glCreateShader returned 0");
 }
 
 ShaderObject::ShaderObject(ShaderType shaderType, const std::string& filename) 
@@ -61,12 +61,12 @@ ShaderObject::ShaderObject(ShaderType shaderType, const std::string& filename)
 {
 #ifdef DEBUG
     if (filename == "")
-        LWARNING_SAFE("Filename is empty");
+        LWARNING("Filename is empty");
 #endif
 
     _id = glCreateShader(_type);
     if (_id == 0)
-        LERROR_SAFE("glCreateShader returned 0");
+        LERROR("glCreateShader returned 0");
     setShaderFilename(filename);
 }
 
@@ -80,7 +80,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, const std::string& filename,
 {
     _id = glCreateShader(_type);
     if (_id == 0)
-        LERROR_SAFE("glCreateShader returned 0");
+        LERROR("glCreateShader returned 0");
 #ifdef GL_VERSION_4_3
     if (glObjectLabel)
         glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1),
@@ -98,7 +98,7 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
 {
     _id = glCreateShader(_type);
     if (_id == 0)
-        LERROR_SAFE("glCreateShader returned 0");
+        LERROR("glCreateShader returned 0");
 #ifdef GL_VERSION_4_3
     if (glObjectLabel)
         glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1),
@@ -126,7 +126,7 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
         glDeleteShader(_id);
         _id = glCreateShader(_type);
         if (_id == 0)
-            LERROR_SAFE("glCreateShader returned 0");
+            LERROR("glCreateShader returned 0");
 #ifdef GL_VERSION_4_3
         if (glObjectLabel)
             glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1)
@@ -165,7 +165,7 @@ bool ShaderObject::setShaderFilename(const std::string& filename) {
 
     // Can the file be opened?
     if (!shaderFile.is_open()) {
-        LERROR_SAFE("Could not open " + typeAsString() + " file: " + filename);
+        LERROR("Could not open " + typeAsString() + " file: " + filename);
         return false;
     }
             
@@ -175,7 +175,7 @@ bool ShaderObject::setShaderFilename(const std::string& filename) {
     shaderFile.seekg(0, std::ios_base::beg);
 
     if (fileLength == 0) {
-        LERROR_SAFE("Could not load " + typeAsString()
+        LERROR("Could not load " + typeAsString()
         + " file '" + filename + "': File is empty");
         return false;
     }
@@ -197,7 +197,7 @@ bool ShaderObject::setShaderFilename(const std::string& filename) {
     for (size_t i = 0; i < shaderSource.size(); ++i)
         delete[] shaderSource[i];
 
-    LINFO_SAFE("Loaded " + typeAsString() + ": '" + filename + "'");
+    LINFO("Loaded " + typeAsString() + ": '" + filename + "'");
     return true;
 }
 
@@ -220,13 +220,13 @@ bool ShaderObject::compile() {
         glGetShaderiv(_id, GL_INFO_LOG_LENGTH, &logLength);
 
         if (logLength == 0) {
-            LERROR_SAFE(typeAsString() + " compile error: Unknown error");
+            LERROR(typeAsString() + " compile error: Unknown error");
             return false;
         }
 
         GLchar* log = new GLchar[logLength];
         glGetShaderInfoLog(_id, logLength, NULL, log);
-        LERROR_SAFE(typeAsString() + " compile error:\n" + log);
+        LERROR(typeAsString() + " compile error:\n" + log);
         delete[] log;
 
         return false;

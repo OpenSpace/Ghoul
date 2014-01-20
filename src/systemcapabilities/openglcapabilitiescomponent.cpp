@@ -102,11 +102,11 @@ void OpenGLCapabilitiesComponent::detectGLSLVersion() {
     if (glslVersion) {
         bool success = _glslVersion.parseGLSLString(string(glslVersion));
         if (!success)
-            LERROR_SAFE("Detection of the GLSL version failed. Detected version: '" 
+            LERROR("Detection of the GLSL version failed. Detected version: '" 
             << string(glslVersion) << "'");
     }
     else
-        LERROR_SAFE("Detection the GLSL version failed. 'glGetString' returned 0.");
+        LERROR("Detection the GLSL version failed. 'glGetString' returned 0.");
 }
 
 void OpenGLCapabilitiesComponent::detectGPUVendor() {
@@ -115,7 +115,7 @@ void OpenGLCapabilitiesComponent::detectGPUVendor() {
     if (vendor)
         _glslCompiler = string(vendor);
     else
-        LERROR_SAFE("Detection the GPU Vendor failed. 'glGetString' returned 0.");
+        LERROR("Detection the GPU Vendor failed. 'glGetString' returned 0.");
 
     if (_glslCompiler.find("NVIDIA") != string::npos)
         _vendor = Vendor::Nvidia;
@@ -127,7 +127,7 @@ void OpenGLCapabilitiesComponent::detectGPUVendor() {
         _vendor = Vendor::Intel;
     }
     else {
-        LINFO_SAFE("Vendor of graphics card is not in the enum 'Vendor'. Vendor information: "
+        LINFO("Vendor of graphics card is not in the enum 'Vendor'. Vendor information: "
             << _glslCompiler);
         _vendor = Vendor::Other;
     }
@@ -157,14 +157,14 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
 #ifdef GHOUL_USE_WMI
     bool versionSuccess = queryWMI("Win32_VideoController", "DriverVersion", _driverVersion);
     if (!versionSuccess) {
-        LERROR_SAFE("Reading of video controller driver version failed.");
+        LERROR("Reading of video controller driver version failed.");
         _driverVersion = "";
     }
 
     string driverDateFull;
     bool dateSuccess = queryWMI("Win32_VideoController", "DriverDate", driverDateFull);
     if (!dateSuccess)
-        LERROR_SAFE("Reading of video controller driver date failed.");
+        LERROR("Reading of video controller driver date failed.");
     else {
         stringstream dateStream;
         dateStream << driverDateFull.substr(0,4) << "-"
@@ -175,7 +175,7 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
 
     bool adapterRAMSuccess = queryWMI("Win32_VideoController", "AdapterRAM", _adapterRAM);
     if (!adapterRAMSuccess) {
-        LERROR_SAFE("Reading of video controller RAM failed.");
+        LERROR("Reading of video controller RAM failed.");
         _adapterRAM = 0;
     }
     else {
@@ -185,7 +185,7 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
 
     bool nameSucess = queryWMI("Win32_VideoController", "Name", _adapterName);
     if (!nameSucess) {
-        LERROR_SAFE("Reading of video controller's name failed.");
+        LERROR("Reading of video controller's name failed.");
         _adapterName = "";
     }
 #endif

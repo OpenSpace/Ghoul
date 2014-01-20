@@ -168,14 +168,14 @@ bool BufferLog::log(unsigned long long int timestamp, const char* message) {
             _inCallbackStack = false;
             if (h->firstEmptyByte + fullSize > _totalSize) {
                 // The callback failed to clear the memory
-                LERROR_SAFE("Memory log is full. Callback has to clear enough memory");
+                LERROR("Memory log is full. Callback has to clear enough memory");
                 h->mutex.clear();
                 return false;
             }
         }
         else {
             // We have to fail if there is no callback
-            LERROR_SAFE("Memory log is full");
+            LERROR("Memory log is full");
             h->mutex.clear();
             return false;
         }
@@ -231,7 +231,7 @@ void BufferLog::setBuffer(void* buffer, size_t totalSize) {
 void BufferLog::writeToDisk(const std::string& filename) {
     std::ofstream file(filename);
     if (!file.good())
-        LERROR_SAFE("Error opening file '" + filename + "'");
+        LERROR("Error opening file '" + filename + "'");
     else {
         Header* h = header(_buffer);
         std::cout << h->firstEmptyByte << std::endl;

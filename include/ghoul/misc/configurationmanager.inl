@@ -28,14 +28,14 @@ namespace ghoul {
 template <typename T>
 bool ConfigurationManager::getValue(const std::string& key, T& value) {
     // If none of the specializations fit, we don't know what to do
-    LERROR_SAFE("Unsupported type for key '" << key << "'");
+    LERRORC("ConfigurationManager", "Unsupported type for key '" << key << "'");
     return false;
 }
 
 template <typename T>
 void ConfigurationManager::setValue(const std::string& key, const T& value) {
     // If none of the specializations fit, we don't know what to do
-    LERROR_SAFE("Unsupported type for key '" << key << "'");
+    LERRORC("ConfigurationManager", "Unsupported type for key '" << key << "'");
 }
 
 extern template void ConfigurationManager::setValue<>(

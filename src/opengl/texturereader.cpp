@@ -45,27 +45,27 @@ Texture* loadTexture(const std::string& filename, bool useCompression) {
     if (!loadSuccess) {
         ILenum error = ilGetError();
         if (error == IL_COULD_NOT_OPEN_FILE)
-            LERROR_SAFE("Could not open image file '" << filename <<
+            LERROR("Could not open image file '" << filename <<
                         "'. File did not exist.");
         else if (error == IL_ILLEGAL_OPERATION)
-            LERROR_SAFE("Could not open image file '" << filename <<
+            LERROR("Could not open image file '" << filename <<
                         "'. Illegal operation.");
         else if (error == IL_INVALID_EXTENSION)
-            LERROR_SAFE("Could not open image file '" << filename <<
+            LERROR("Could not open image file '" << filename <<
                         "'. The file could not be loaded based on extension or header.");
         else if (error == IL_INVALID_PARAM)
-            LERROR_SAFE("Could not open image file '" << filename <<
+            LERROR("Could not open image file '" << filename <<
                         "'. FileName was not valid. It was most likely NULL.");
         else if (error == IL_OUT_OF_MEMORY)
-            LERROR_SAFE("Could not allocate enough memory for '" << filename << "'.");
+            LERROR("Could not allocate enough memory for '" << filename << "'.");
         else if (error == IL_NO_ERROR)
-            LERROR_SAFE("Could not open image file '" << filename <<
+            LERROR("Could not open image file '" << filename <<
                         "'. No error reported.");
         else if (error == IL_UNKNOWN_ERROR)
-            LERROR_SAFE("Could not open image file '" << filename <<
+            LERROR("Could not open image file '" << filename <<
                         "'. Unknown reported.");
         else
-            LERROR_SAFE("Could not open/read image file '" << filename <<
+            LERROR("Could not open/read image file '" << filename <<
                         "'. Error message: " << error);
         return nullptr;
     }
@@ -97,7 +97,7 @@ Texture* loadTexture(const std::string& filename, bool useCompression) {
             format = Texture::Format::BGRA;
             break;
         default:
-            LERROR_SAFE("Could not read image file '" << filename << "' of format: '" <<
+            LERROR("Could not read image file '" << filename << "' of format: '" <<
                         imageFormat << "'");
             return nullptr;
     }
@@ -127,7 +127,7 @@ Texture* loadTexture(const std::string& filename, bool useCompression) {
             type = GL_FLOAT;
             break;
         default:
-            LERROR_SAFE("Could not read image file '" << filename <<
+            LERROR("Could not read image file '" << filename <<
                         "' of data type: '" << imageType << "'");
             return nullptr;
     }
@@ -144,7 +144,7 @@ Texture* loadTexture(const std::string& filename, bool useCompression) {
                                      GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, type);
                 break;
             default:
-                LERROR_SAFE("Could not assign compressed format for: '" <<
+                LERROR("Could not assign compressed format for: '" <<
                     GLint(format) << "'. Using no compression instead");
                 result = new Texture(data, size, format, static_cast<int>(format), type);
                 break;
