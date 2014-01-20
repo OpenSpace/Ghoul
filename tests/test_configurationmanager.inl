@@ -40,6 +40,9 @@ namespace {
 
     // More complicated configuration file with nested tables
     const std::string _configuration3 = "${TEST_DIR}/configurationmanager/test3.cfg";
+
+    // Deeply nested configuration file with 12 level
+    const std::string _configuration4 = "${TEST_DIR}/configurationmanager/test4.cfg";
 }
 
 /*
@@ -51,10 +54,11 @@ Test checklist:
 +++ getValue: overriding previous configuration
 +++ getValue: function does not change passed value on error
 +++ getValue: nested keys
---- getValue: deep nesting of keys
---- getValue: correct values returned for each type
---- getValue: all basic types implemented
++++ getValue: deep nesting of keys
++++ getValue: correct values returned for each type
++++ getValue: are all basic types implemented
 --- getValue: glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4 implemented
++++ getValue: valid conversions
 --- setValue: all types implemented
 --- setValue: create subtables on the way
 --- setValue: value gets set correctly for each type
@@ -98,6 +102,8 @@ TEST_F(ConfigurationManagerTest, LoadConfigurationTest) {
     ASSERT_EQ(success2, true) << "Loading of configuration file 'test2.cfg'";
     const bool success3 = _m->loadConfiguration(_configuration3);
     ASSERT_EQ(success3, true) << "Loading of configuration file 'test3.cfg'";
+    const bool success4 = _m->loadConfiguration(_configuration4);
+    ASSERT_EQ(success4, true) << "Loading of configuration file 'test4.cfg'";
 }
 
 TEST_F(ConfigurationManagerTest, KeysFunction) {
@@ -118,6 +124,21 @@ TEST_F(ConfigurationManagerTest, KeysFunction) {
 
     nKeys = _m->keys("s.3").size();
     EXPECT_EQ(nKeys, 2) << "s.3: test1 + test3";
+
+    _m->loadConfiguration(_configuration4);
+
+    const char* keys[] = {
+        "a", "a.a", "a.a.a", "a.a.a.a", "a.a.a.a.a", "a.a.a.a.a.a", "a.a.a.a.a.a.a",
+        "a.a.a.a.a.a.a.a", "a.a.a.a.a.a.a.a.a", "a.a.a.a.a.a.a.a.a.a",
+        "a.a.a.a.a.a.a.a.a.a.a", "a.a.a.a.a.a.a.a.a.a.a.a"
+    };
+
+    for (int i = 0; i < 12; ++i) {
+        nKeys = _m->keys(keys[i]).size();
+        EXPECT_EQ(nKeys, 2) << keys[i] <<": test1 + test3";
+    }
+
+    //nKeys = _
 }
 
 TEST_F(ConfigurationManagerTest, GetValueFunction) {
@@ -158,6 +179,67 @@ TEST_F(ConfigurationManagerTest, GetValueFunction) {
     std::vector<int> testVec;
     success = _m->getValue("key", testVec);
     EXPECT_EQ(success, false) << "test1+test3: Vector access";
+}
+
+template <class T>
+void correctnessHelperGetValue(ghoul::ConfigurationManager* m, const std::string& key) {
+    T value = T(0);
+    const bool success = m->getValue(key, value);
+    EXPECT_EQ(success, true) << "Type: " << typeid(T).name();
+    EXPECT_EQ(value, T(1)) << "Type: " << typeid(T).name();
+}
+
+TEST_F(ConfigurationManagerTest, GetValueCorrectness) {
+    _m->loadConfiguration(_configuration1);
+
+    correctnessHelperGetValue<bool>(_m, "t");
+    correctnessHelperGetValue<char>(_m, "t");
+    correctnessHelperGetValue<signed char>(_m, "t");
+    correctnessHelperGetValue<unsigned char>(_m, "t");
+    correctnessHelperGetValue<wchar_t>(_m, "t");
+    correctnessHelperGetValue<short>(_m, "t");
+    correctnessHelperGetValue<unsigned short>(_m, "t");
+    correctnessHelperGetValue<int>(_m, "t");
+    correctnessHelperGetValue<unsigned int>(_m, "t");
+    correctnessHelperGetValue<long>(_m, "t");
+    correctnessHelperGetValue<unsigned long>(_m, "t");
+    correctnessHelperGetValue<long long>(_m, "t");
+    correctnessHelperGetValue<unsigned long long>(_m, "t");
+    correctnessHelperGetValue<float>(_m, "t");
+    correctnessHelperGetValue<double>(_m, "t");
+    correctnessHelperGetValue<long double>(_m, "t");
+
+    std::string value;
+    const bool success = _m->getValue("t", value);
+    EXPECT_EQ(success, true) << "Type: " << typeid(std::string).name();
+    EXPECT_STREQ(value.c_str(), "1") << "Type: " << typeid(std::string).name();
+}
+
+TEST_F(ConfigurationManagerTest, GetValueConversions) {
+    // converting from 1 -> all types is done in GetValueCorrectness
+    _m->loadConfiguration(_configuration2);
+
+    correctnessHelperGetValue<bool>(_m, "s.a1");
+    correctnessHelperGetValue<char>(_m, "s.a1");
+    correctnessHelperGetValue<signed char>(_m, "s.a1");
+    correctnessHelperGetValue<unsigned char>(_m, "s.a1");
+    correctnessHelperGetValue<wchar_t>(_m, "s.a1");
+    correctnessHelperGetValue<short>(_m, "s.a1");
+    correctnessHelperGetValue<unsigned short>(_m, "s.a1");
+    correctnessHelperGetValue<int>(_m, "s.a1");
+    correctnessHelperGetValue<unsigned int>(_m, "s.a1");
+    correctnessHelperGetValue<long>(_m, "s.a1");
+    correctnessHelperGetValue<unsigned long>(_m, "s.a1");
+    correctnessHelperGetValue<long long>(_m, "s.a1");
+    correctnessHelperGetValue<unsigned long long>(_m, "s.a1");
+    correctnessHelperGetValue<float>(_m, "s.a1");
+    correctnessHelperGetValue<double>(_m, "s.a1");
+    correctnessHelperGetValue<long double>(_m, "s.a1");
+
+    std::string value;
+    const bool success = _m->getValue("s.a1", value);
+    EXPECT_EQ(success, true) << "Type: " << typeid(std::string).name();
+    EXPECT_STREQ(value.c_str(), "1") << "Type: " << typeid(std::string).name();
 
 }
 
