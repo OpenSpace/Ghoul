@@ -25,9 +25,22 @@
 
 #include "gtest/gtest.h"
 
+#include <ghoul/filesystem/filesystem>
+#include <ghoul/logging/logging>
+
 #include "tests/test_configurationmanager.inl"
 
+using namespace ghoul::filesystem;
+using namespace ghoul::logging;
+
 int main(int argc, char** argv) {
+    FileSystem::initialize();
+    FileSys.registerPathToken("${SCRIPTS}", "../../../ext/ghoul/scripts");
+    FileSys.registerPathToken("${TEST_DIR}" , "../../../ext/ghoul/tests");
+
+    LogManager::initialize(LogManager::LogLevel::None);
+    LogMgr.addLog(new ConsoleLog);
+
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

@@ -122,6 +122,7 @@ if (GHOUL_HAVE_TESTS)
     
     include_directories("${GHOUL_ROOT_DIR}/ext/gtest/include")
     include_directories("${GHOUL_ROOT_DIR}")
+    include_directories("${GHOUL_ROOT_DIR}/include")
     file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
     
     add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})
