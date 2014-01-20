@@ -113,6 +113,23 @@ if (GHOUL_USE_DEVIL)
     set(DEVIL_LIBRARIES ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
 endif ()
 
+option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
+if (GHOUL_HAVE_TESTS)
+    add_definitions(-DGHOUL_HAVE_TESTS)
+    add_definitions(-DGTEST_HAS_TR1_TUPLE=0)
+    add_definitions(-DGTEST_HAS_GLOBAL_STRING=0)
+    add_subdirectory(${GHOUL_ROOT_DIR}/ext/gtest)
+    
+    include_directories("${GHOUL_ROOT_DIR}/ext/gtest/include")
+    include_directories("${GHOUL_ROOT_DIR}")
+    file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
+    
+    add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})
+    target_link_libraries(GhoulTest gtest Ghoul Lua)
+    # set_target_properties(
+endif ()
+
+
 include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
 
 #####

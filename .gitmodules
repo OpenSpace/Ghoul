@@ -1,3 +1,6 @@
 [submodule "ext/lua"]
 	path = ext/lua
 	url = git@openspace.itn.liu.se:/lua
+[submodule "ext/gtest"]
+	path = ext/gtest
+	url = git@openspace.itn.liu.se:/gtest
