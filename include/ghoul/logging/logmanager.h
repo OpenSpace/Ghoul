@@ -90,7 +90,11 @@ public:
         /**
          * Error which will be so severe that the application cannot recover from them
          */
-        Fatal = 1 << 4
+        Fatal = 1 << 4,
+        /**
+         * Used as a placeholder to inhibit all LogMessages
+         */
+        None = 1 << 5
     };
 
     /**

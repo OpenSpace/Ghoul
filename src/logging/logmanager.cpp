@@ -151,6 +151,12 @@ void LogManager::initialize(LogManager::LogLevel level, bool immediateFlush) {
             else
                 _manager = new LogManager_P<LogLevel::Fatal, false>();
             break;
+        case LogLevel::None:
+            if (immediateFlush)
+                _manager = new LogManager_P<LogLevel::None, true>();
+            else
+                _manager = new LogManager_P<LogLevel::None, false>();
+            break;
     }
     assert(_manager != 0);
 }
