@@ -99,6 +99,10 @@ function getKeys(location, t)
     end
 end
 
+function hasKey(key, t)
+    return getValue(key, config)
+end
+
 function getValue(key, t)
     t = t or config -- default value of 'config'
     pos = key:find('[.]')

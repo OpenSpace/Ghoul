@@ -59,7 +59,8 @@ namespace ghoul {
  * All commands accept nested identifiers, like <code>general.color.r</code> and will
  * resolve the recursion efficiently. The #setValue method will generate all intermediate
  * tables automatically should they not exist. The #keys method returns for a specific
- * location all available settings.
+ * location all available settings, while the #hasKey method can check for existance of 
+ * individual keys.
  *
  * The allowed types which can be stored (#setValue) and requested (#getValue) in the
  * configuration are:
@@ -118,6 +119,8 @@ public:
      *   <code>getValue</code> calls.
      * - A function <code>getKeys</code>, called with a string location, must return a
      *   table containing the available keys for the settings pointed to by the location.
+     * - A function <code>hasKey</code>, called with a string key that checks if the
+     *   designated key exists in the configuration.
      * \param configurationScript The script containing the main script that handles all
      * the interaction to the Lua state. The filename to the script will automatically be
      * converted using the #FileSystem::absolutePath method
@@ -144,8 +147,10 @@ public:
      * \param filename The path to the configuration script that is to be loaded.The
      * filename will automatically be converted using the #FileSystem::absolutePath
      * method
+     * \return <code>true</code> if the configuration was successfully loaded;
+     * <code>false</code> if an error occurred
      */
-    void loadConfiguration(const std::string& filename);
+    bool loadConfiguration(const std::string& filename);
 
     /**
      * This method returns all the keys that are available at a certain
@@ -161,6 +166,17 @@ public:
      * \return The available keys at the provided <code>location</code>
      */
     std::vector<std::string> keys(const std::string& location = "");
+
+    /**
+     * This method checks if a non-nil value for the <code>key</code> is available. The
+     * method, like #setValue and #getvalue accepts nested identifiers and will return
+     * <code>false</code> if one of the subtables does not exist. Returns
+     * <code>true</code> if the value at the <code>key</code> exists.
+     * \param key The key that is to be tested. Can be a nested identifier
+     * \return <code>true</code> if the value pointed to by <code>key</code> is non-nil.
+     * <code>false</code> otherwise
+     */
+    bool hasKey(const std::string& key);
 
     /**
      * Sets the <code>value</code> for the <code>key</code>, generating all necessary

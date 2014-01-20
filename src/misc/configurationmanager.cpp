@@ -147,19 +147,23 @@ void ConfigurationManager::deinitialize() {
     _state = nullptr;
 }
 
-void ConfigurationManager::loadConfiguration(const std::string& filename) {
+bool ConfigurationManager::loadConfiguration(const std::string& filename) {
     assert(_state != nullptr);
 
     const std::string& absFilename = absPath(filename);
+    LDEBUG("Loading configuration: " << absFilename);
 
     lua_getglobal(_state, "loadConfiguration");
     lua_pushstring(_state, absFilename.c_str());
 
+    LDEBUG("Calling loadConfiguration function");
     const int status = lua_pcall(_state, 1, 0, 0);
     if (status != LUA_OK) {
         LERROR("Error loading configuration: " << lua_tostring(_state, -1));
-        return;
+        return false;
     }
+
+    return true;
 }
 
 // TODO: We can replace this by using type_traits in a smart way
@@ -476,7 +480,7 @@ std::vector<std::string> ConfigurationManager::keys(const std::string& location)
     lua_pushstring(_state, location.c_str());
     const int status = lua_pcall(_state, 1, 1, NULL);
     if (status != LUA_OK) {
-        LERROR("Error getting keys from location '" << location<< "'." << 
+        LERROR("Error getting keys from location '" << location << "'." << 
                 "Error: " << lua_tostring(_state, -1));
         return std::vector<std::string>();
     }
@@ -493,6 +497,21 @@ std::vector<std::string> ConfigurationManager::keys(const std::string& location)
         lua_pop(_state, -1);
         return result;
     }
+}
+
+bool ConfigurationManager::hasKey(const std::string& key) {
+    assert(_state != nullptr);
+
+    lua_getglobal(_state, "hasKey");
+    lua_pushstring(_state, key.c_str());
+    const int status = lua_pcall(_state, 1, 1, NULL);
+    if (status != LUA_OK) {
+        LERROR("Error getting keys from location '" << key << "'." << 
+            "Error: " << lua_tostring(_state, -1));
+        return false;
+    }
+    const int result = lua_toboolean(_state, -1);
+    return (result == 1);
 }
 
 //
