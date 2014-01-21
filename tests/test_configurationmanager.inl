@@ -120,7 +120,7 @@ TEST_F(ConfigurationManagerTest, KeysFunction) {
 
     _m->loadConfiguration(_configuration3);
     nKeys = _m->keys().size();
-    EXPECT_EQ(nKeys, 2) << "base: test1 + test3";
+    EXPECT_EQ(nKeys, 3) << "base: test1 + test3";
 
     nKeys = _m->keys("s").size();
     EXPECT_EQ(nKeys, 3) << "s: test1 + test3";
@@ -162,20 +162,20 @@ TEST_F(ConfigurationManagerTest, GetValueFunction) {
     success = _m->getValue("s.a", test);
     EXPECT_EQ(success, false) << "test1+test3 (s.a)";
 
-    success = _m->getValue("s.1", test);
+    success = _m->getValue("s[\"1\"]", test);
     EXPECT_EQ(success, true) << "test1+test3 (s.1)";
 
-    success = _m->getValue("s.1.a", test);
+    success = _m->getValue("s[\"1\"].a", test);
     EXPECT_EQ(success, false) << "test1+test3 (s.1.a)";
 
-    success = _m->getValue("s.3.a", test);
+    success = _m->getValue("s[\"3\"].a", test);
     EXPECT_EQ(success, true) << "test1+test3 (s.3.a)";
 
-    success = _m->getValue("s.1", testInt);
+    success = _m->getValue("s[\"1\"]", testInt);
     EXPECT_EQ(success, true) << "test1+test3 (s.1)";
     EXPECT_EQ(testInt, 1) << "test1+test3 (s.1)";
 
-    success = _m->getValue("s.2", testInt);
+    success = _m->getValue("s[\"2\"]", testInt);
     EXPECT_EQ(success, true) << "test1+test3 (s.2)";
     EXPECT_EQ(testInt, 2) << "test1+test3 (s.2)";
 
@@ -243,7 +243,19 @@ TEST_F(ConfigurationManagerTest, GetValueConversions) {
     const bool success = _m->getValue("s.a1", value);
     EXPECT_EQ(success, true) << "Type: " << typeid(std::string).name();
     EXPECT_STREQ(value.c_str(), "1") << "Type: " << typeid(std::string).name();
+}
 
+TEST_F(ConfigurationManagerTest, StringKeyVsIntKey) {
+    _m->loadConfiguration(_configuration3);
+
+    int v = 0;
+     bool success = _m->getValue("tt[\"1\"]", v);
+    ASSERT_EQ(success, true) << "tt.1";
+    EXPECT_EQ(v, 2) << "tt.1";
+
+    success = _m->getValue("tt[1]", v);
+    ASSERT_EQ(success, true) << "tt[1]";
+    EXPECT_EQ(v, 1) << "tt[1]";
 }
 
 TEST_F(ConfigurationManagerTest, InvalidKeyAccessInvariant) {
@@ -305,104 +317,170 @@ TEST_F(ConfigurationManagerTest, MultipleKeyLoadOverwrite) {
 
 template <class T>
 void vectorClassHelper(ghoul::ConfigurationManager* m, const std::string& key) {
-    T value;
+    T value = T(0);
     const bool success = m->getValue(key, value);
-    EXPECT_EQ(success, true) << "Type: " << typeid(T).name();
-    EXPECT_EQ(value, T(glm::vec4(5, 6, 7, 8))) << "Type: " << typeid(T).name();
+    EXPECT_EQ(success, true) << "Type: " << typeid(T).name() << " | Key: " << key;
+    EXPECT_EQ(value, T(glm::vec4(5, 6, 7, 8))) << "Type: " << typeid(T).name()  <<
+        " | Key: " << key;
 }
 
 template <>
 void vectorClassHelper<glm::bvec2>(ghoul::ConfigurationManager* m, const std::string& key) {
     glm::bvec2 value = glm::bvec2(false);
     const bool success = m->getValue(key, value);
-    EXPECT_EQ(success, true) << "Type: bvec2";
-    EXPECT_EQ(value.x, true) << "Type: bvec2";
-    EXPECT_EQ(value.y, true) << "Type: bvec2";
+    EXPECT_EQ(success, true) << "Type: bvec2 | Key: " << key;
+    EXPECT_EQ(value.x, true) << "Type: bvec2 | Key: " << key;
+    EXPECT_EQ(value.y, true) << "Type: bvec2 | Key: " << key;
 }
 
 template <>
 void vectorClassHelper<glm::bvec3>(ghoul::ConfigurationManager* m, const std::string& key) {
     glm::bvec3 value = glm::bvec3(false);
     const bool success = m->getValue(key, value);
-    EXPECT_EQ(success, true) << "Type: bvec3";
-    EXPECT_EQ(value.x, true) << "Type: bvec3";
-    EXPECT_EQ(value.y, true) << "Type: bvec3";
-    EXPECT_EQ(value.z, true) << "Type: bvec3";
+    EXPECT_EQ(success, true) << "Type: bvec3 | Key: " << key;
+    EXPECT_EQ(value.x, true) << "Type: bvec3 | Key: " << key;
+    EXPECT_EQ(value.y, true) << "Type: bvec3 | Key: " << key;
+    EXPECT_EQ(value.z, true) << "Type: bvec3 | Key: " << key;
 }
 
 template <>
 void vectorClassHelper<glm::bvec4>(ghoul::ConfigurationManager* m, const std::string& key) {
     glm::bvec4 value = glm::bvec4(false);
     const bool success = m->getValue(key, value);
-    EXPECT_EQ(success, true) << "Type: bvec4";
-    EXPECT_EQ(value.x, true) << "Type: bvec4";
-    EXPECT_EQ(value.y, true) << "Type: bvec4";
-    EXPECT_EQ(value.z, true) << "Type: bvec4";
-    EXPECT_EQ(value.w, true) << "Type: bvec4";
+    EXPECT_EQ(success, true) << "Type: bvec4 | Key: " << key;
+    EXPECT_EQ(value.x, true) << "Type: bvec4 | Key: " << key;
+    EXPECT_EQ(value.y, true) << "Type: bvec4 | Key: " << key;
+    EXPECT_EQ(value.z, true) << "Type: bvec4 | Key: " << key;
+    EXPECT_EQ(value.w, true) << "Type: bvec4 | Key: " << key;
 }
 
 TEST_F(ConfigurationManagerTest, VectorClasses) {
     _m->loadConfiguration(_configuration5);
+    vectorClassHelper<glm::vec2>(_m, "n2");
     vectorClassHelper<glm::vec2>(_m, "num2");
     vectorClassHelper<glm::vec2>(_m, "xy");
     vectorClassHelper<glm::vec2>(_m, "rg");
     vectorClassHelper<glm::vec2>(_m, "st");
+    vectorClassHelper<glm::dvec2>(_m, "n2");
     vectorClassHelper<glm::dvec2>(_m, "num2");
     vectorClassHelper<glm::dvec2>(_m, "xy");
     vectorClassHelper<glm::dvec2>(_m, "rg");
     vectorClassHelper<glm::dvec2>(_m, "st");
+    vectorClassHelper<glm::ivec2>(_m, "n2");
     vectorClassHelper<glm::ivec2>(_m, "num2");
     vectorClassHelper<glm::ivec2>(_m, "xy");
     vectorClassHelper<glm::ivec2>(_m, "rg");
     vectorClassHelper<glm::ivec2>(_m, "st");
+    vectorClassHelper<glm::uvec2>(_m, "n2");
     vectorClassHelper<glm::uvec2>(_m, "num2");
     vectorClassHelper<glm::uvec2>(_m, "xy");
     vectorClassHelper<glm::uvec2>(_m, "rg");
     vectorClassHelper<glm::uvec2>(_m, "st");
+    vectorClassHelper<glm::bvec2>(_m, "n2");
     vectorClassHelper<glm::bvec2>(_m, "num2");
     vectorClassHelper<glm::bvec2>(_m, "xy");
     vectorClassHelper<glm::bvec2>(_m, "rg");
     vectorClassHelper<glm::bvec2>(_m, "st");
 
+    vectorClassHelper<glm::vec3>(_m, "n3");
     vectorClassHelper<glm::vec3>(_m, "num3");
     vectorClassHelper<glm::vec3>(_m, "xyz");
     vectorClassHelper<glm::vec3>(_m, "rgb");
     vectorClassHelper<glm::vec3>(_m, "stp");
+    vectorClassHelper<glm::dvec3>(_m, "n3");
     vectorClassHelper<glm::dvec3>(_m, "num3");
     vectorClassHelper<glm::dvec3>(_m, "xyz");
     vectorClassHelper<glm::dvec3>(_m, "rgb");
     vectorClassHelper<glm::dvec3>(_m, "stp");
+    vectorClassHelper<glm::ivec3>(_m, "n3");
     vectorClassHelper<glm::ivec3>(_m, "num3");
     vectorClassHelper<glm::ivec3>(_m, "xyz");
     vectorClassHelper<glm::ivec3>(_m, "rgb");
     vectorClassHelper<glm::ivec3>(_m, "stp");
+    vectorClassHelper<glm::uvec3>(_m, "n3");
     vectorClassHelper<glm::uvec3>(_m, "num3");
     vectorClassHelper<glm::uvec3>(_m, "xyz");
     vectorClassHelper<glm::uvec3>(_m, "rgb");
     vectorClassHelper<glm::uvec3>(_m, "stp");
+    vectorClassHelper<glm::bvec3>(_m, "n3");
     vectorClassHelper<glm::bvec3>(_m, "num3");
     vectorClassHelper<glm::bvec3>(_m, "xyz");
     vectorClassHelper<glm::bvec3>(_m, "rgb");
     vectorClassHelper<glm::bvec3>(_m, "stp");
 
+    vectorClassHelper<glm::vec4>(_m, "n4");
     vectorClassHelper<glm::vec4>(_m, "num4");
     vectorClassHelper<glm::vec4>(_m, "xyzw");
     vectorClassHelper<glm::vec4>(_m, "rgba");
     vectorClassHelper<glm::vec4>(_m, "stpq");
+    vectorClassHelper<glm::dvec4>(_m, "n4");
     vectorClassHelper<glm::dvec4>(_m, "num4");
     vectorClassHelper<glm::dvec4>(_m, "xyzw");
     vectorClassHelper<glm::dvec4>(_m, "rgba");
     vectorClassHelper<glm::dvec4>(_m, "stpq");
     vectorClassHelper<glm::ivec4>(_m, "num4");
+    vectorClassHelper<glm::ivec4>(_m, "n4");
     vectorClassHelper<glm::ivec4>(_m, "xyzw");
     vectorClassHelper<glm::ivec4>(_m, "rgba");
     vectorClassHelper<glm::ivec4>(_m, "stpq");
     vectorClassHelper<glm::uvec4>(_m, "num4");
+    vectorClassHelper<glm::uvec4>(_m, "n4");
     vectorClassHelper<glm::uvec4>(_m, "xyzw");
     vectorClassHelper<glm::uvec4>(_m, "rgba");
     vectorClassHelper<glm::uvec4>(_m, "stpq");
     vectorClassHelper<glm::bvec4>(_m, "num4");
+    vectorClassHelper<glm::bvec4>(_m, "n4");
     vectorClassHelper<glm::bvec4>(_m, "xyzw");
     vectorClassHelper<glm::bvec4>(_m, "rgba");
     vectorClassHelper<glm::bvec4>(_m, "stpq");
+
+    glm::mat4 f(1.0);
+    glm::mat2 g = glm::mat2(f);
+
+    glm::vec3 value = glm::vec3(0.f);
+    const bool success = _m->getValue("mix", value);
+    EXPECT_EQ(success, false) << "Type: mixed";
+    EXPECT_EQ(value, glm::vec3(0.f)) << "Type: mixed";
 }
+
+template <class T, typename U>
+void matrixClassHelper(ghoul::ConfigurationManager* m, const std::string& key) {
+    T value = T(0);
+    const bool success = m->getValue(key, value);
+    EXPECT_EQ(success, true) << "Type: " << typeid(T).name();
+
+    const glm::detail::tmat4x4<U> res4 = glm::detail::tmat4x4<U>(
+        5.0,  6.0, 7.0, 8.0,
+        9.0, 10.0,11.0,12.0,
+        13.0,14.0,15.0,16.0,
+        17.0,18.0,19.0,20.0
+        );
+
+    const T res = T(res4);
+    
+    EXPECT_EQ(value, res) << "Type: " << typeid(T).name();
+}
+
+TEST_F(ConfigurationManagerTest, MatrixClasses) {
+    _m->loadConfiguration(_configuration5);
+    matrixClassHelper<glm::mat2x2, float>(_m, "m2x2");
+    matrixClassHelper<glm::mat2x3, float>(_m, "m2x3");
+    matrixClassHelper<glm::mat2x4, float>(_m, "m2x4");
+    matrixClassHelper<glm::mat3x2, float>(_m, "m3x2");
+    matrixClassHelper<glm::mat3x3, float>(_m, "m3x3");
+    matrixClassHelper<glm::mat3x4, float>(_m, "m3x4");
+    matrixClassHelper<glm::mat4x2, float>(_m, "m4x2");
+    matrixClassHelper<glm::mat4x3, float>(_m, "m4x3");
+    matrixClassHelper<glm::mat4x4, float>(_m, "m4x4");
+
+    matrixClassHelper<glm::dmat2x2, double>(_m, "m2x2");
+    matrixClassHelper<glm::dmat2x3, double>(_m, "m2x3");
+    matrixClassHelper<glm::dmat2x4, double>(_m, "m2x4");
+    matrixClassHelper<glm::dmat3x2, double>(_m, "m3x2");
+    matrixClassHelper<glm::dmat3x3, double>(_m, "m3x3");
+    matrixClassHelper<glm::dmat3x4, double>(_m, "m3x4");
+    matrixClassHelper<glm::dmat4x2, double>(_m, "m4x2");
+    matrixClassHelper<glm::dmat4x3, double>(_m, "m4x3");
+    matrixClassHelper<glm::dmat4x4, double>(_m, "m4x4");
+}
+

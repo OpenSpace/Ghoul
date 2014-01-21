@@ -37,17 +37,21 @@ function merge(t1, t2)
 end
 
 
--- function printTable(t, i)
-    -- i = i or ""
-    -- for k,v in pairs(t) do
-        -- if (type(v) == "table") then
-            -- print(i .. k)
-            -- printTable(v, i .. " ")
-        -- else
-            -- print(i ..k .. ' , ' .. v)
-        -- end
-    -- end
--- end
+function printTable(t, i)
+    i = i or ""
+    for k,v in pairs(t) do
+        if (type(v) == "table") then
+            print(i .. k)
+            printTable(v, i .. " ")
+        else
+            if (type(k) == "string") then
+                print(i .. '["' .. k .. '"]' .. ' , ' .. v)
+            else
+                print(i .. k .. ' , ' .. v)
+            end
+        end
+    end
+end
 
 
 function loadConfiguration(file)
@@ -57,6 +61,8 @@ function loadConfiguration(file)
     settings = assert(load(source))()
     
     merge(config, settings or {})
+    
+    -- printTable(config)
 end
 
 function getKeys(location, t)
@@ -104,18 +110,7 @@ function hasKey(key, t)
 end
 
 function getValue(key, t)
-    t = t or config -- default value of 'config'
-    pos = key:find('[.]')
-    if (not pos) then
-        return t[key]
-    else
-        newTable = t[key:sub(0, pos - 1)]
-        if (not newTable) then
-            return nil
-        else
-            return getValue(key:sub(pos + 1), newTable)
-        end
-    end
+    return assert(load("return config." .. key))()
 end
 
 function setValue(key, v, t)

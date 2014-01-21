@@ -139,5 +139,42 @@ extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, glm::bvec3& value);
 extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, glm::bvec4& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::mat2x2& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::mat2x3& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::mat2x4& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::mat3x2& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::mat3x3& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::mat3x4& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::mat4x2& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::mat4x3& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::mat4x4& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dmat2x2& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dmat2x3& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dmat2x4& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dmat3x2& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dmat3x3& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dmat3x4& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dmat4x2& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dmat4x3& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dmat4x4& value);
+
 
 } // namespace ghoul

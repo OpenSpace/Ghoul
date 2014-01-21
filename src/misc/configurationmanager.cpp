@@ -29,6 +29,7 @@
 #include <ghoul/filesystem/filesystem>
 #include <ghoul/logging/logging>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <assert.h>
 #include <fstream>
@@ -81,6 +82,7 @@ bool ConfigurationManager::initialize(const std::string& configurationScript) {
     LDEBUG("Loading configuration script '" << absConfigurationScript << "'");
     const int status = luaL_loadfile(_state, absConfigurationScript.c_str());
     if (status != LUA_OK) {
+        LFATAL("Error loading configuration script" << lua_tostring(_state, -1));
         deinitialize();
         return false;
     }
@@ -477,8 +479,13 @@ bool ConfigurationManager::getValue(const std::string& key, std::string& value) 
 template <>
 bool ConfigurationManager::getValue(const std::string& key, glm::dvec2& value) {
     lua_Number x,y;
-    bool xSuccess = helper::getValue(_state, key + ".1", x);
-    bool ySuccess = helper::getValue(_state, key + ".2", y);
+    bool xSuccess = helper::getValue(_state, key + "[1]", x);
+    bool ySuccess = helper::getValue(_state, key + "[2]", y);
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + "[\"1\"]", x);
+        ySuccess = helper::getValue(_state, key + "[\"2\"]", y);
+    }
 
     if (!(xSuccess && ySuccess)) {
         xSuccess = helper::getValue(_state, key + ".x", x);
@@ -506,9 +513,15 @@ bool ConfigurationManager::getValue(const std::string& key, glm::dvec2& value) {
 template <>
 bool ConfigurationManager::getValue(const std::string& key, glm::dvec3& value) {
     lua_Number x,y,z;
-    bool xSuccess = helper::getValue(_state, key + ".1", x);
-    bool ySuccess = helper::getValue(_state, key + ".2", y);
-    bool zSuccess = helper::getValue(_state, key + ".3", z);
+    bool xSuccess = helper::getValue(_state, key + "[1]", x);
+    bool ySuccess = helper::getValue(_state, key + "[2]", y);
+    bool zSuccess = helper::getValue(_state, key + "[3]", z);
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + "[\"1\"]", x);
+        ySuccess = helper::getValue(_state, key + "[\"2\"]", y);
+        zSuccess = helper::getValue(_state, key + "[\"3\"]", z);
+    }
 
     if (!(xSuccess && ySuccess)) {
         xSuccess = helper::getValue(_state, key + ".x", x);
@@ -539,10 +552,17 @@ bool ConfigurationManager::getValue(const std::string& key, glm::dvec3& value) {
 template <>
 bool ConfigurationManager::getValue(const std::string& key, glm::dvec4& value) {
     lua_Number x,y,z,w;
-    bool xSuccess = helper::getValue(_state, key + ".1", x);
-    bool ySuccess = helper::getValue(_state, key + ".2", y);
-    bool zSuccess = helper::getValue(_state, key + ".3", z);
-    bool wSuccess = helper::getValue(_state, key + ".4", w);
+    bool xSuccess = helper::getValue(_state, key + "[1]", x);
+    bool ySuccess = helper::getValue(_state, key + "[2]", y);
+    bool zSuccess = helper::getValue(_state, key + "[3]", z);
+    bool wSuccess = helper::getValue(_state, key + "[4]", w);
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + "[\"1\"]", x);
+        ySuccess = helper::getValue(_state, key + "[\"2\"]", y);
+        zSuccess = helper::getValue(_state, key + "[\"3\"]", z);
+        wSuccess = helper::getValue(_state, key + "[\"4\"]", w);
+    }
 
     if (!(xSuccess && ySuccess)) {
         xSuccess = helper::getValue(_state, key + ".x", x);
@@ -572,7 +592,6 @@ bool ConfigurationManager::getValue(const std::string& key, glm::dvec4& value) {
         return true;
     }
 }
-
 
 template <>
 bool ConfigurationManager::getValue(const std::string& key, glm::vec2& value) {
@@ -688,6 +707,249 @@ bool ConfigurationManager::getValue(const std::string& key, glm::bvec4& value) {
         value.z = v.z != 0.0;
         value.w = v.w != 0.0;
     }
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::dmat2x2& value) {
+    lua_Number values[4];
+    bool success = helper::getValue(_state, key + "[1]", values[0]);
+    success &= helper::getValue(_state, key + "[2]", values[1]);
+    success &= helper::getValue(_state, key + "[3]", values[2]);
+    success &= helper::getValue(_state, key + "[4]", values[3]);
+
+    if (success)
+        value = glm::make_mat2x2(values);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::dmat2x3& value) {
+    lua_Number values[6];
+    bool success = helper::getValue(_state, key + "[1]", values[0]);
+    success &= helper::getValue(_state, key + "[2]", values[1]);
+    success &= helper::getValue(_state, key + "[3]", values[2]);
+    success &= helper::getValue(_state, key + "[4]", values[3]);
+    success &= helper::getValue(_state, key + "[5]", values[4]);
+    success &= helper::getValue(_state, key + "[6]", values[5]);
+
+    if (success)
+        value = glm::make_mat2x3(values);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::dmat2x4& value) {
+    lua_Number values[8];
+    bool success = helper::getValue(_state, key + "[1]", values[0]);
+    success &= helper::getValue(_state, key + "[2]", values[1]);
+    success &= helper::getValue(_state, key + "[3]", values[2]);
+    success &= helper::getValue(_state, key + "[4]", values[3]);
+    success &= helper::getValue(_state, key + "[5]", values[4]);
+    success &= helper::getValue(_state, key + "[6]", values[5]);
+    success &= helper::getValue(_state, key + "[7]", values[6]);
+    success &= helper::getValue(_state, key + "[8]", values[7]);
+
+    if (success)
+        value = glm::make_mat2x4(values);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::dmat3x2& value) {
+    lua_Number values[6];
+    bool success = helper::getValue(_state, key + "[1]", values[0]);
+    success &= helper::getValue(_state, key + "[2]", values[1]);
+    success &= helper::getValue(_state, key + "[3]", values[2]);
+    success &= helper::getValue(_state, key + "[4]", values[3]);
+    success &= helper::getValue(_state, key + "[5]", values[4]);
+    success &= helper::getValue(_state, key + "[6]", values[5]);
+
+    if (success)
+        value = glm::make_mat3x2(values);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::dmat3x3& value) {
+    lua_Number values[9];
+    bool success = helper::getValue(_state, key + "[1]", values[0]);
+    success &= helper::getValue(_state, key + "[2]", values[1]);
+    success &= helper::getValue(_state, key + "[3]", values[2]);
+    success &= helper::getValue(_state, key + "[4]", values[3]);
+    success &= helper::getValue(_state, key + "[5]", values[4]);
+    success &= helper::getValue(_state, key + "[6]", values[5]);
+    success &= helper::getValue(_state, key + "[7]", values[6]);
+    success &= helper::getValue(_state, key + "[8]", values[7]);
+    success &= helper::getValue(_state, key + "[9]", values[8]);
+
+    if (success)
+        value = glm::make_mat3x3(values);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::dmat3x4& value) {
+    lua_Number values[12];
+    bool success = helper::getValue(_state, key + "[1]", values[0]);
+    success &= helper::getValue(_state, key + "[2]", values[1]);
+    success &= helper::getValue(_state, key + "[3]", values[2]);
+    success &= helper::getValue(_state, key + "[4]", values[3]);
+    success &= helper::getValue(_state, key + "[5]", values[4]);
+    success &= helper::getValue(_state, key + "[6]", values[5]);
+    success &= helper::getValue(_state, key + "[7]", values[6]);
+    success &= helper::getValue(_state, key + "[8]", values[7]);
+    success &= helper::getValue(_state, key + "[9]", values[8]);
+    success &= helper::getValue(_state, key + "[10]", values[9]);
+    success &= helper::getValue(_state, key + "[11]", values[10]);
+    success &= helper::getValue(_state, key + "[12]", values[11]);
+
+    if (success)
+        value = glm::make_mat3x4(values);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::dmat4x2& value) {
+    lua_Number values[8];
+    bool success = helper::getValue(_state, key + "[1]", values[0]);
+    success &= helper::getValue(_state, key + "[2]", values[1]);
+    success &= helper::getValue(_state, key + "[3]", values[2]);
+    success &= helper::getValue(_state, key + "[4]", values[3]);
+    success &= helper::getValue(_state, key + "[5]", values[4]);
+    success &= helper::getValue(_state, key + "[6]", values[5]);
+    success &= helper::getValue(_state, key + "[7]", values[6]);
+    success &= helper::getValue(_state, key + "[8]", values[7]);
+
+    if (success)
+        value = glm::make_mat4x2(values);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::dmat4x3& value) {
+    lua_Number values[12];
+    bool success = helper::getValue(_state, key + "[1]", values[0]);
+    success &= helper::getValue(_state, key + "[2]", values[1]);
+    success &= helper::getValue(_state, key + "[3]", values[2]);
+    success &= helper::getValue(_state, key + "[4]", values[3]);
+    success &= helper::getValue(_state, key + "[5]", values[4]);
+    success &= helper::getValue(_state, key + "[6]", values[5]);
+    success &= helper::getValue(_state, key + "[7]", values[6]);
+    success &= helper::getValue(_state, key + "[8]", values[7]);
+    success &= helper::getValue(_state, key + "[9]", values[8]);
+    success &= helper::getValue(_state, key + "[10]", values[9]);
+    success &= helper::getValue(_state, key + "[11]", values[10]);
+    success &= helper::getValue(_state, key + "[12]", values[11]);
+
+    if (success)
+        value = glm::make_mat4x3(values);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::dmat4x4& value) {
+    lua_Number values[16];
+    bool success = helper::getValue(_state, key + "[1]", values[0]);
+    success &= helper::getValue(_state, key + "[2]", values[1]);
+    success &= helper::getValue(_state, key + "[3]", values[2]);
+    success &= helper::getValue(_state, key + "[4]", values[3]);
+    success &= helper::getValue(_state, key + "[5]", values[4]);
+    success &= helper::getValue(_state, key + "[6]", values[5]);
+    success &= helper::getValue(_state, key + "[7]", values[6]);
+    success &= helper::getValue(_state, key + "[8]", values[7]);
+    success &= helper::getValue(_state, key + "[9]", values[8]);
+    success &= helper::getValue(_state, key + "[10]", values[9]);
+    success &= helper::getValue(_state, key + "[11]", values[10]);
+    success &= helper::getValue(_state, key + "[12]", values[11]);
+    success &= helper::getValue(_state, key + "[13]", values[12]);
+    success &= helper::getValue(_state, key + "[14]", values[13]);
+    success &= helper::getValue(_state, key + "[15]", values[14]);
+    success &= helper::getValue(_state, key + "[16]", values[15]);
+
+    if (success)
+        value = glm::make_mat4x4(values);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::mat2x2& value) {
+    glm::dmat2x2 v;
+    const bool success = getValue(key, v);
+    if (success)
+        value = v;
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::mat2x3& value) {
+    glm::dmat2x3 v;
+    const bool success = getValue(key, v);
+    if (success)
+        value = v;
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::mat2x4& value) {
+    glm::dmat2x4 v;
+    const bool success = getValue(key, v);
+    if (success)
+        value = v;
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::mat3x2& value) {
+    glm::dmat3x2 v;
+    const bool success = getValue(key, v);
+    if (success)
+        value = v;
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::mat3x3& value) {
+    glm::dmat3x3 v;
+    const bool success = getValue(key, v);
+    if (success)
+        value = v;
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::mat3x4& value) {
+    glm::dmat3x4 v;
+    const bool success = getValue(key, v);
+    if (success)
+        value = v;
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::mat4x2& value) {
+    glm::dmat4x2 v;
+    const bool success = getValue(key, v);
+    if (success)
+        value = v;
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::mat4x3& value) {
+    glm::dmat4x3 v;
+    const bool success = getValue(key, v);
+    if (success)
+        value = v;
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::mat4x4& value) {
+    glm::dmat4x4 v;
+    const bool success = getValue(key, v);
+    if (success)
+        value = v;
     return success;
 }
 

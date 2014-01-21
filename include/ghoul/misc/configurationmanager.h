@@ -81,6 +81,17 @@ namespace ghoul {
  * - <code>double</code>
  * - <code>long double</code> (will currently be truncated to <code>double</code>)
  * - <code>std::string</code>
+ * - <code>glm::vec2</code>, <code>glm::vec3</code>, <code>glm::vec4</code>
+ * - <code>glm::dvec2</code>, <code>glm::dvec3</code>, <code>glm::dvec4</code>
+ * - <code>glm::ivec2</code>, <code>glm::ivec3</code>, <code>glm::ivec4</code>
+ * - <code>glm::uvec2</code>, <code>glm::uvec3</code>, <code>glm::uvec4</code>
+ * - <code>glm::bvec2</code>, <code>glm::bvec3</code>, <code>glm::bvec4</code>
+ * - <code>glm::mat2x2</code>, <code>glm::mat2x3</code>, <code>glm::mat2x4</code>
+ * - <code>glm::mat3x2</code>, <code>glm::mat3x3</code>, <code>glm::mat3x4</code>
+ * - <code>glm::mat4x2</code>, <code>glm::mat4x3</code>, <code>glm::mat4x4</code>
+ * - <code>glm::dmat2x2</code>, <code>glm::dmat2x3</code>, <code>glm::dmat2x4</code>
+ * - <code>glm::dmat3x2</code>, <code>glm::dmat3x3</code>, <code>glm::dmat3x4</code>
+ * - <code>glm::dmat4x2</code>, <code>glm::dmat4x3</code>, <code>glm::dmat4x4</code>
  * A call to #getValue using an invalid type will return <code>false</code> and log an
  * error message. A call to #setValue using an invalid type will just log an error.
  */
