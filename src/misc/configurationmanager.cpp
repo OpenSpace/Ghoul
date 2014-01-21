@@ -628,6 +628,69 @@ bool ConfigurationManager::getValue(const std::string& key, glm::ivec4& value) {
     return success;
 }
 
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::uvec2& value) {
+    glm::dvec2 v;
+    const bool success = getValue(key, v);
+    if (success) 
+        value = glm::uvec2(v);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::uvec3& value) {
+    glm::dvec3 v;
+    const bool success = getValue(key, v);
+    if (success) 
+        value = glm::uvec3(v);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::uvec4& value) {
+    glm::dvec4 v;
+    const bool success = getValue(key, v);
+    if (success) 
+        value = glm::uvec4(v);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::bvec2& value) {
+    glm::dvec2 v;
+    const bool success = getValue(key, v);
+    if (success) { 
+        value.x = v.x != 0.0;
+        value.y = v.y != 0.0;
+    }
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::bvec3& value) {
+    glm::dvec3 v;
+    const bool success = getValue(key, v);
+    if (success) { 
+        value.x = v.x != 0.0;
+        value.y = v.y != 0.0;
+        value.z = v.z != 0.0;
+    }
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::bvec4& value) {
+    glm::dvec4 v;
+    const bool success = getValue(key, v);
+    if (success) { 
+        value.x = v.x != 0.0;
+        value.y = v.y != 0.0;
+        value.z = v.z != 0.0;
+        value.w = v.w != 0.0;
+    }
+    return success;
+}
+
 std::vector<std::string> ConfigurationManager::keys(const std::string& location) {
     assert(_state != nullptr);
 

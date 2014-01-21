@@ -43,6 +43,9 @@ namespace {
 
     // Deeply nested configuration file with 12 level
     const std::string _configuration4 = "${TEST_DIR}/configurationmanager/test4.cfg";
+
+    // Testfile with glm::vecX, glm::matX
+    const std::string _configuration5 = "${TEST_DIR}/configurationmanager/test5.cfg";
 }
 
 /*
@@ -57,7 +60,7 @@ Test checklist:
 +++ getValue: deep nesting of keys
 +++ getValue: correct values returned for each type
 +++ getValue: are all basic types implemented
---- getValue: glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4 implemented
++++ getValue: glm::vec2, glm::vec3, glm::vec4 implemented
 +++ getValue: valid conversions
 --- setValue: all types implemented
 --- setValue: create subtables on the way
@@ -298,4 +301,108 @@ TEST_F(ConfigurationManagerTest, MultipleKeyLoadOverwrite) {
     // configuration2 should overwrite the value t in configuration1
     _m->getValue("t", value);
     EXPECT_EQ(value, 2);
+}
+
+template <class T>
+void vectorClassHelper(ghoul::ConfigurationManager* m, const std::string& key) {
+    T value;
+    const bool success = m->getValue(key, value);
+    EXPECT_EQ(success, true) << "Type: " << typeid(T).name();
+    EXPECT_EQ(value, T(glm::vec4(5, 6, 7, 8))) << "Type: " << typeid(T).name();
+}
+
+template <>
+void vectorClassHelper<glm::bvec2>(ghoul::ConfigurationManager* m, const std::string& key) {
+    glm::bvec2 value = glm::bvec2(false);
+    const bool success = m->getValue(key, value);
+    EXPECT_EQ(success, true) << "Type: bvec2";
+    EXPECT_EQ(value.x, true) << "Type: bvec2";
+    EXPECT_EQ(value.y, true) << "Type: bvec2";
+}
+
+template <>
+void vectorClassHelper<glm::bvec3>(ghoul::ConfigurationManager* m, const std::string& key) {
+    glm::bvec3 value = glm::bvec3(false);
+    const bool success = m->getValue(key, value);
+    EXPECT_EQ(success, true) << "Type: bvec3";
+    EXPECT_EQ(value.x, true) << "Type: bvec3";
+    EXPECT_EQ(value.y, true) << "Type: bvec3";
+    EXPECT_EQ(value.z, true) << "Type: bvec3";
+}
+
+template <>
+void vectorClassHelper<glm::bvec4>(ghoul::ConfigurationManager* m, const std::string& key) {
+    glm::bvec4 value = glm::bvec4(false);
+    const bool success = m->getValue(key, value);
+    EXPECT_EQ(success, true) << "Type: bvec4";
+    EXPECT_EQ(value.x, true) << "Type: bvec4";
+    EXPECT_EQ(value.y, true) << "Type: bvec4";
+    EXPECT_EQ(value.z, true) << "Type: bvec4";
+    EXPECT_EQ(value.w, true) << "Type: bvec4";
+}
+
+TEST_F(ConfigurationManagerTest, VectorClasses) {
+    _m->loadConfiguration(_configuration5);
+    vectorClassHelper<glm::vec2>(_m, "num2");
+    vectorClassHelper<glm::vec2>(_m, "xy");
+    vectorClassHelper<glm::vec2>(_m, "rg");
+    vectorClassHelper<glm::vec2>(_m, "st");
+    vectorClassHelper<glm::dvec2>(_m, "num2");
+    vectorClassHelper<glm::dvec2>(_m, "xy");
+    vectorClassHelper<glm::dvec2>(_m, "rg");
+    vectorClassHelper<glm::dvec2>(_m, "st");
+    vectorClassHelper<glm::ivec2>(_m, "num2");
+    vectorClassHelper<glm::ivec2>(_m, "xy");
+    vectorClassHelper<glm::ivec2>(_m, "rg");
+    vectorClassHelper<glm::ivec2>(_m, "st");
+    vectorClassHelper<glm::uvec2>(_m, "num2");
+    vectorClassHelper<glm::uvec2>(_m, "xy");
+    vectorClassHelper<glm::uvec2>(_m, "rg");
+    vectorClassHelper<glm::uvec2>(_m, "st");
+    vectorClassHelper<glm::bvec2>(_m, "num2");
+    vectorClassHelper<glm::bvec2>(_m, "xy");
+    vectorClassHelper<glm::bvec2>(_m, "rg");
+    vectorClassHelper<glm::bvec2>(_m, "st");
+
+    vectorClassHelper<glm::vec3>(_m, "num3");
+    vectorClassHelper<glm::vec3>(_m, "xyz");
+    vectorClassHelper<glm::vec3>(_m, "rgb");
+    vectorClassHelper<glm::vec3>(_m, "stp");
+    vectorClassHelper<glm::dvec3>(_m, "num3");
+    vectorClassHelper<glm::dvec3>(_m, "xyz");
+    vectorClassHelper<glm::dvec3>(_m, "rgb");
+    vectorClassHelper<glm::dvec3>(_m, "stp");
+    vectorClassHelper<glm::ivec3>(_m, "num3");
+    vectorClassHelper<glm::ivec3>(_m, "xyz");
+    vectorClassHelper<glm::ivec3>(_m, "rgb");
+    vectorClassHelper<glm::ivec3>(_m, "stp");
+    vectorClassHelper<glm::uvec3>(_m, "num3");
+    vectorClassHelper<glm::uvec3>(_m, "xyz");
+    vectorClassHelper<glm::uvec3>(_m, "rgb");
+    vectorClassHelper<glm::uvec3>(_m, "stp");
+    vectorClassHelper<glm::bvec3>(_m, "num3");
+    vectorClassHelper<glm::bvec3>(_m, "xyz");
+    vectorClassHelper<glm::bvec3>(_m, "rgb");
+    vectorClassHelper<glm::bvec3>(_m, "stp");
+
+    vectorClassHelper<glm::vec4>(_m, "num4");
+    vectorClassHelper<glm::vec4>(_m, "xyzw");
+    vectorClassHelper<glm::vec4>(_m, "rgba");
+    vectorClassHelper<glm::vec4>(_m, "stpq");
+    vectorClassHelper<glm::dvec4>(_m, "num4");
+    vectorClassHelper<glm::dvec4>(_m, "xyzw");
+    vectorClassHelper<glm::dvec4>(_m, "rgba");
+    vectorClassHelper<glm::dvec4>(_m, "stpq");
+    vectorClassHelper<glm::ivec4>(_m, "num4");
+    vectorClassHelper<glm::ivec4>(_m, "xyzw");
+    vectorClassHelper<glm::ivec4>(_m, "rgba");
+    vectorClassHelper<glm::ivec4>(_m, "stpq");
+    vectorClassHelper<glm::uvec4>(_m, "num4");
+    vectorClassHelper<glm::uvec4>(_m, "xyzw");
+    vectorClassHelper<glm::uvec4>(_m, "rgba");
+    vectorClassHelper<glm::uvec4>(_m, "stpq");
+    vectorClassHelper<glm::bvec4>(_m, "num4");
+    vectorClassHelper<glm::bvec4>(_m, "xyzw");
+    vectorClassHelper<glm::bvec4>(_m, "rgba");
+    vectorClassHelper<glm::bvec4>(_m, "stpq");
 }

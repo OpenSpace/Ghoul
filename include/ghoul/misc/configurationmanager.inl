@@ -112,19 +112,32 @@ extern template bool ConfigurationManager::getValue<>(
 extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, glm::vec2& value);
 extern template bool ConfigurationManager::getValue<>(
-                            const std::string& key, glm::dvec2& value);
-extern template bool ConfigurationManager::getValue<>(
-                            const std::string& key, glm::ivec2& value);
-extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, glm::vec3& value);
-extern template bool ConfigurationManager::getValue<>(
-                            const std::string& key, glm::dvec3& value);
-extern template bool ConfigurationManager::getValue<>(
-                            const std::string& key, glm::ivec3& value);
 extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, glm::vec4& value);
 extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dvec2& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dvec3& value);
+extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, glm::dvec4& value);
 extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::ivec2& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::ivec3& value);
+extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, glm::ivec4& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::uvec2& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::uvec3& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::uvec4& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::bvec2& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::bvec3& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::bvec4& value);
+
 } // namespace ghoul
