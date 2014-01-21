@@ -28,6 +28,7 @@
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/filesystem/filesystem>
 #include <ghoul/logging/logging>
+#include <glm/glm.hpp>
 
 #include <assert.h>
 #include <fstream>
@@ -471,6 +472,160 @@ bool ConfigurationManager::getValue(const std::string& key, std::string& value) 
         lua_pop(_state, 1);
         return true;
     }
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::dvec2& value) {
+    lua_Number x,y;
+    bool xSuccess = helper::getValue(_state, key + ".1", x);
+    bool ySuccess = helper::getValue(_state, key + ".2", y);
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".x", x);
+        ySuccess = helper::getValue(_state, key + ".y", y);
+    }
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".r", x);
+        ySuccess = helper::getValue(_state, key + ".g", y);
+    }
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".s", x);
+        ySuccess = helper::getValue(_state, key + ".t", y);
+    }
+
+    if (!(xSuccess && ySuccess))
+        return false;
+    else {
+        value = glm::dvec2(x, y);
+        return true;
+    }
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::dvec3& value) {
+    lua_Number x,y,z;
+    bool xSuccess = helper::getValue(_state, key + ".1", x);
+    bool ySuccess = helper::getValue(_state, key + ".2", y);
+    bool zSuccess = helper::getValue(_state, key + ".3", z);
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".x", x);
+        ySuccess = helper::getValue(_state, key + ".y", y);
+        zSuccess = helper::getValue(_state, key + ".z", z);
+    }
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".r", x);
+        ySuccess = helper::getValue(_state, key + ".g", y);
+        zSuccess = helper::getValue(_state, key + ".b", z);
+    }
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".s", x);
+        ySuccess = helper::getValue(_state, key + ".t", y);
+        zSuccess = helper::getValue(_state, key + ".p", z);
+    }
+
+    if (!(xSuccess && ySuccess))
+        return false;
+    else {
+        value = glm::dvec3(x, y, z);
+        return true;
+    }
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::dvec4& value) {
+    lua_Number x,y,z,w;
+    bool xSuccess = helper::getValue(_state, key + ".1", x);
+    bool ySuccess = helper::getValue(_state, key + ".2", y);
+    bool zSuccess = helper::getValue(_state, key + ".3", z);
+    bool wSuccess = helper::getValue(_state, key + ".4", w);
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".x", x);
+        ySuccess = helper::getValue(_state, key + ".y", y);
+        zSuccess = helper::getValue(_state, key + ".z", z);
+        wSuccess = helper::getValue(_state, key + ".w", w);
+    }
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".r", x);
+        ySuccess = helper::getValue(_state, key + ".g", y);
+        zSuccess = helper::getValue(_state, key + ".b", z);
+        wSuccess = helper::getValue(_state, key + ".a", w);
+    }
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".s", x);
+        ySuccess = helper::getValue(_state, key + ".t", y);
+        zSuccess = helper::getValue(_state, key + ".p", z);
+        wSuccess = helper::getValue(_state, key + ".q", w);
+    }
+
+    if (!(xSuccess && ySuccess))
+        return false;
+    else {
+        value = glm::dvec4(x, y, z, w);
+        return true;
+    }
+}
+
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::vec2& value) {
+    glm::dvec2 v;
+    const bool success = getValue(key, v);
+    if (success) 
+        value = glm::vec2(v);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::vec3& value) {
+    glm::dvec3 v;
+    const bool success = getValue(key, v);
+    if (success) 
+        value = glm::vec3(v);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::vec4& value) {
+    glm::dvec4 v;
+    const bool success = getValue(key, v);
+    if (success) 
+        value = glm::vec4(v);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::ivec2& value) {
+    glm::dvec2 v;
+    const bool success = getValue(key, v);
+    if (success) 
+        value = glm::ivec2(v);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::ivec3& value) {
+    glm::dvec3 v;
+    const bool success = getValue(key, v);
+    if (success) 
+        value = glm::ivec3(v);
+    return success;
+}
+
+template <>
+bool ConfigurationManager::getValue(const std::string& key, glm::ivec4& value) {
+    glm::dvec4 v;
+    const bool success = getValue(key, v);
+    if (success) 
+        value = glm::ivec4(v);
+    return success;
 }
 
 std::vector<std::string> ConfigurationManager::keys(const std::string& location) {

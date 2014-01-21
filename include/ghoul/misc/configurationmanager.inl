@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <glm/glm.hpp>
+
 namespace ghoul {
 
 template <typename T>
@@ -107,5 +109,22 @@ extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, long double& value);
 extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, std::string& value);
-
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::vec2& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dvec2& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::ivec2& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::vec3& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dvec3& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::ivec3& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::vec4& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::dvec4& value);
+extern template bool ConfigurationManager::getValue<>(
+                            const std::string& key, glm::ivec4& value);
 } // namespace ghoul
