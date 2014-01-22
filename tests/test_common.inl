@@ -26,7 +26,30 @@
 #ifdef WIN32
 #define START_TIMER(__name__, __stream__, __num__) \
     __stream__ << #__name__; \
-    for (int __i__ = 0; __i__ < __num__; ++__i__) { \
+    double __name__##Total = 0.0; \
+    unsigned int __name__##Num = 0; \
+    for (__name__##Num = 0; __name__##Num < __num__; ++__name__##Num) { \
+        resetManager(); \
+        LARGE_INTEGER __name__##Start; \
+        LARGE_INTEGER __name__##End; \
+        QueryPerformanceCounter(&__name__##Start)
+
+#define START_TIMER_NO_RESET(__name__, __stream__, __num__) \
+    __stream__ << #__name__; \
+    double __name__##Total = 0.0; \
+    unsigned int __name__##Num = 0; \
+    for (__name__##Num = 0; __name__##Num < __num__; ++__name__##Num) { \
+        LARGE_INTEGER __name__##Start; \
+        LARGE_INTEGER __name__##End; \
+        QueryPerformanceCounter(&__name__##Start)
+
+#define START_TIMER_PREPARE(__name__, __stream__, __num__, __prepare__) \
+    __stream__ << #__name__; \
+    double __name__##Total = 0.0; \
+    unsigned int __name__##Num = 0; \
+    for (__name__##Num = 0; __name__##Num < __num__; ++__name__##Num) { \
+        resetManager(); \
+        __prepare__; \
         LARGE_INTEGER __name__##Start; \
         LARGE_INTEGER __name__##End; \
         QueryPerformanceCounter(&__name__##Start)
@@ -36,10 +59,10 @@
         LARGE_INTEGER freq; \
         QueryPerformanceFrequency(&freq); \
         const double freqD = double(freq.QuadPart) / 1000000.0; \
-        __stream__ << '\t' << \
-        ((__name__##End.QuadPart - __name__##Start.QuadPart) / freqD) << "us"; \
+        const double res = ((__name__##End.QuadPart - __name__##Start.QuadPart) / freqD);\
+        __name__##Total += res; \
     } \
-    __stream__ << '\n';
+    __stream__ << '\t' << __name__##Total / __name__##Num << "us\n";
 
 #else
 #include <chrono>

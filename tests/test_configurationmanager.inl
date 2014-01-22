@@ -75,7 +75,7 @@ Test checklist:
 +++ hasKeys: subtables on the way do not exist
 +++ hasKeys: correct values for all types
 +++ hasKeys: nestedKeys
---- timing
++++ timing
 */
 
 class ConfigurationManagerTest : public testing::Test {
@@ -93,6 +93,13 @@ protected:
         }
     }
 
+    void resetManager() {
+        _m->deinitialize();
+        delete _m;
+        _m = new ghoul::ConfigurationManager;
+        _m->initialize();
+    }
+
     ghoul::ConfigurationManager* _m;
 };
 
@@ -102,18 +109,362 @@ TEST_F(ConfigurationManagerTest, TimingTest) {
     _m->deinitialize();
     FINISH_TIMER(deinitialize, logFile);
 
-    START_TIMER(initialize, logFile, 1);
+    //_m->deinitialize();
+    START_TIMER_NO_RESET(initialize, logFile, 1);
     _m->initialize();
     FINISH_TIMER(initialize, logFile);
 
-    START_TIMER(setValueLevel0Int, logFile, 5);
+    START_TIMER(setValueLevel0Int, logFile, 25);
     _m->setValue("t", 1);
     FINISH_TIMER(setValueLevel0Int, logFile);
 
-    int i;
-    START_TIMER(getValueLevel0Int, logFile, 5);
-    _m->getValue("t", i);
-    FINISH_TIMER(getValueLevel0Int, logFile);
+    START_TIMER(setValueLevel1Int, logFile, 25);
+    _m->setValue("t.t", 1);
+    FINISH_TIMER(setValueLevel1Int, logFile);
+
+    START_TIMER(setValueLevel10Int, logFile, 25);
+    _m->setValue("t.t.t.t.t.t.t.t.t.t", 1);
+    FINISH_TIMER(setValueLevel10Int, logFile);
+
+    START_TIMER(setValueLevel0dvec4, logFile, 25);
+    _m->setValue("t", glm::dvec4(1.0));
+    FINISH_TIMER(setValueLevel0dvec4, logFile);
+
+    START_TIMER(setValueLevel0dmat4, logFile, 25);
+    _m->setValue("t", glm::dmat4(1.0));
+    FINISH_TIMER(setValueLevel0dmat4, logFile);
+    
+    {
+        int i;
+        START_TIMER_PREPARE(getValueLevel0Int, logFile, 25, {_m->setValue("t", 1);});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel0Int, logFile);
+
+        START_TIMER(getValueLevel0IntEmpty, logFile, 25);
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel0IntEmpty, logFile);
+
+        START_TIMER_PREPARE(getValueLevel1Int, logFile, 25, {_m->setValue("t.t", 1);});
+        _m->getValue("t.t", i);
+        FINISH_TIMER(getValueLevel1Int, logFile);
+
+        START_TIMER_PREPARE(getValueLevel10Int, logFile, 25,
+        {_m->setValue("t.t.t.t.t.t.t.t.t.t", 1);});
+        _m->getValue("t.t.t.t.t.t.t.t.t.t", i);
+        FINISH_TIMER(getValueLevel10Int, logFile);
+
+        START_TIMER(getValueLevel10IntEmpty, logFile, 25);
+        _m->getValue("t.t.t.t.t.t.t.t.t.t", i);
+        FINISH_TIMER(getValueLevel10IntEmpty, logFile);
+    }
+
+    {
+        START_TIMER(setValueLevel1vec2, logFile, 25);
+        _m->setValue("t", glm::vec2(1.0));
+        FINISH_TIMER(setValueLevel1vec2, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1vec3, logFile, 25);
+        _m->getValue("t", glm::vec3(1.0));
+        FINISH_TIMER(setValueLevel1vec3, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1vec4, logFile, 25);
+        _m->getValue("t", glm::vec4(1.0));
+        FINISH_TIMER(setValueLevel1vec4, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1dvec2, logFile, 25);
+        _m->getValue("t", glm::dvec2(1.0));
+        FINISH_TIMER(setValueLevel1dvec2, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1dvec3, logFile, 25);
+        _m->getValue("t", glm::dvec3(1.0));
+        FINISH_TIMER(setValueLevel1dvec3, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1dvec4, logFile, 25);
+        _m->getValue("t", glm::dvec4(1.0));
+        FINISH_TIMER(setValueLevel1dvec4, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1ivec2, logFile, 25);
+        _m->getValue("t", glm::ivec2(1.0));
+        FINISH_TIMER(setValueLevel1ivec2, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1ivec3, logFile, 25);
+        _m->getValue("t", glm::ivec3(1.0));
+        FINISH_TIMER(setValueLevel1ivec3, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1ivec4, logFile, 25);
+        _m->getValue("t", glm::ivec4(1.0));
+        FINISH_TIMER(setValueLevel1ivec4, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1bvec2, logFile, 25);
+        _m->getValue("t", glm::bvec2(true));
+        FINISH_TIMER(setValueLevel1bvec2, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1bvec3, logFile, 25);
+        _m->getValue("t", glm::bvec3(true));
+        FINISH_TIMER(setValueLevel1bvec3, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1bvec4, logFile, 25);
+        _m->getValue("t", glm::bvec4(true));
+        FINISH_TIMER(setValueLevel1bvec4, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1uvec2, logFile, 25);
+        _m->getValue("t", glm::uvec2(1.0));
+        FINISH_TIMER(setValueLevel1uvec2, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1uvec3, logFile, 25);
+        _m->getValue("t", glm::uvec3(1.0));
+        FINISH_TIMER(setValueLevel1uvec3, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1uvec4, logFile, 25);
+        _m->getValue("t", glm::uvec4(1.0));
+        FINISH_TIMER(setValueLevel1uvec4, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1dmat2x4, logFile, 25);
+        _m->getValue("t", glm::dmat2x4(1.0));
+        FINISH_TIMER(setValueLevel1dmat2x4, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1dmat2x3, logFile, 25);
+        _m->getValue("t", glm::dmat2x3(1.0));
+        FINISH_TIMER(setValueLevel1dmat2x3, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1dmat2, logFile, 25);
+        _m->getValue("t", glm::dmat2(1.0));
+        FINISH_TIMER(setValueLevel1dmat2, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1dmat3x2, logFile, 25);
+        _m->getValue("t", glm::dmat3x2(1.0));
+        FINISH_TIMER(setValueLevel1dmat3x2, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1dmat3x4, logFile, 25);
+        _m->getValue("t", glm::dmat3x4(1.0));
+        FINISH_TIMER(setValueLevel1dmat3x4, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1dmat3, logFile, 25);
+        _m->getValue("t", glm::dmat3(1.0));
+        FINISH_TIMER(setValueLevel1dmat3, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1dmat4x2, logFile, 25);
+        _m->setValue("t", glm::dmat4x3(1.0));
+        FINISH_TIMER(setValueLevel1dmat4x2, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1dmat4x3, logFile, 25);
+        _m->setValue("t", glm::dmat4x3(1.0));
+        FINISH_TIMER(setValueLevel1dmat4x3, logFile);
+    }
+    {
+        START_TIMER(setValueLevel1dmat4, logFile, 25);
+        _m->setValue("t", glm::dmat4(1.0));
+        FINISH_TIMER(setValueLevel1dmat4, logFile);
+    }
+
+    {
+        glm::vec2 i;
+        START_TIMER_PREPARE(getValueLevel1vec2, logFile, 25,
+        {_m->setValue("t", glm::vec2(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1vec2, logFile);
+    }
+    {
+        glm::vec3 i;
+        START_TIMER_PREPARE(getValueLevel1vec3, logFile, 25,
+        {_m->setValue("t", glm::vec3(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1vec3, logFile);
+    }
+    {
+        glm::vec4 i;
+        START_TIMER_PREPARE(getValueLevel1vec4, logFile, 25,
+        {_m->setValue("t", glm::vec4(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1vec4, logFile);
+    }
+    {
+        glm::dvec2 i;
+        START_TIMER_PREPARE(getValueLevel1dvec2, logFile, 25,
+        {_m->setValue("t", glm::dvec2(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1dvec2, logFile);
+    }
+    {
+        glm::dvec3 i;
+        START_TIMER_PREPARE(getValueLevel1dvec3, logFile, 25,
+        {_m->setValue("t", glm::dvec3(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1dvec3, logFile);
+    }
+    {
+        glm::dvec4 i;
+        START_TIMER_PREPARE(getValueLevel1dvec4, logFile, 25,
+        {_m->setValue("t", glm::dvec4(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1dvec4, logFile);
+    }
+    {
+        glm::ivec2 i;
+        START_TIMER_PREPARE(getValueLevel1ivec2, logFile, 25,
+        {_m->setValue("t", glm::ivec2(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1ivec2, logFile);
+    }
+    {
+        glm::ivec3 i;
+        START_TIMER_PREPARE(getValueLevel1ivec3, logFile, 25,
+        {_m->setValue("t", glm::ivec3(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1ivec3, logFile);
+    }
+    {
+        glm::ivec4 i;
+        START_TIMER_PREPARE(getValueLevel1ivec4, logFile, 25,
+        {_m->setValue("t", glm::ivec4(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1ivec4, logFile);
+    }
+    {
+        glm::bvec2 i;
+        START_TIMER_PREPARE(getValueLevel1bvec2, logFile, 25,
+        {_m->setValue("t", glm::bvec2(true));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1bvec2, logFile);
+    }
+    {
+        glm::bvec3 i;
+        START_TIMER_PREPARE(getValueLevel1bvec3, logFile, 25,
+        {_m->setValue("t", glm::bvec3(true));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1bvec3, logFile);
+    }
+    {
+        glm::bvec4 i;
+        START_TIMER_PREPARE(getValueLevel1bvec4, logFile, 25,
+        {_m->setValue("t", glm::bvec4(true));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1bvec4, logFile);
+    }
+    {
+        glm::uvec2 i;
+        START_TIMER_PREPARE(getValueLevel1uvec2, logFile, 25,
+        {_m->setValue("t", glm::uvec2(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1uvec2, logFile);
+    }
+    {
+        glm::uvec3 i;
+        START_TIMER_PREPARE(getValueLevel1uvec3, logFile, 25,
+        {_m->setValue("t", glm::uvec3(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1uvec3, logFile);
+    }
+    {
+        glm::uvec4 i;
+        START_TIMER_PREPARE(getValueLevel1uvec4, logFile, 25,
+        {_m->setValue("t", glm::uvec4(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1uvec4, logFile);
+    }
+    {
+        glm::dmat2x4 i;
+        START_TIMER_PREPARE(getValueLevel1dmat2x4, logFile, 25,
+        {_m->setValue("t", glm::dmat2x4(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1dmat2x4, logFile);
+    }
+    {
+        glm::dmat2x3 i;
+        START_TIMER_PREPARE(getValueLevel1dmat2x3, logFile, 25,
+        {_m->setValue("t", glm::dmat2x3(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1dmat2x3, logFile);
+    }
+    {
+        glm::dmat2 i;
+        START_TIMER_PREPARE(getValueLevel1dmat2, logFile, 25,
+        {_m->setValue("t", glm::dmat2(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1dmat2, logFile);
+    }
+    {
+        glm::dmat3x2 i;
+        START_TIMER_PREPARE(getValueLevel1dmat3x2, logFile, 25,
+        {_m->setValue("t", glm::dmat3x2(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1dmat3x2, logFile);
+    }
+    {
+        glm::dmat3x4 i;
+        START_TIMER_PREPARE(getValueLevel1dmat3x4, logFile, 25,
+        {_m->setValue("t", glm::dmat3x4(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1dmat3x4, logFile);
+    }
+    {
+        glm::dmat3 i;
+        START_TIMER_PREPARE(getValueLevel1dmat3, logFile, 25,
+        {_m->setValue("t", glm::dmat3(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1dmat3, logFile);
+    }
+    {
+        glm::dmat4x2 i;
+        START_TIMER_PREPARE(getValueLevel1dmat4x2, logFile, 25,
+        {_m->setValue("t", glm::dmat4x2(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1dmat4x2, logFile);
+    }
+    {
+        glm::dmat4x3 i;
+        START_TIMER_PREPARE(getValueLevel1dmat4x3, logFile, 25,
+        {_m->setValue("t", glm::dmat4x3(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1dmat4x3, logFile);
+    }
+    {
+        glm::dmat4 i;
+        START_TIMER_PREPARE(getValueLevel1dmat4, logFile, 25,
+        {_m->setValue("t", glm::dmat4(1.0));});
+        _m->getValue("t", i);
+        FINISH_TIMER(getValueLevel1dmat4, logFile);
+    }
+
+    START_TIMER(hasKeyLevel0Empty, logFile, 25);
+    _m->hasKey("t");
+    FINISH_TIMER(hasKeyLevel0Empty, logFile);
+
+    START_TIMER(hasKeyLevel10Empty, logFile, 25);
+    _m->hasKey("t.t.t.t.t.t.t.t.t.t");
+    FINISH_TIMER(hasKeyLevel10Empty, logFile);
+
+    START_TIMER_PREPARE(hasKeyLevel0, logFile, 25, {_m->setValue("t", 1);});
+    _m->hasKey("t");
+    FINISH_TIMER(hasKeyLevel0, logFile);
+
+    START_TIMER_PREPARE(hasKeyLevel10, logFile, 25,
+                            {_m->setValue("t.t.t.t.t.t.t.t.t.t", 1);});
+    _m->hasKey("t.t.t.t.t.t.t.t.t.t");
+    FINISH_TIMER(hasKeyLevel10, logFile);
+
 }
 
 TEST_F(ConfigurationManagerTest, DeinitDeath) {
@@ -729,7 +1080,11 @@ TEST_F(ConfigurationManagerTest, MatrixClassSet) {
     _m->setValue("d.m3x4", glm::dmat3x4(5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16));
     _m->setValue("d.m4x2", glm::dmat4x2(5, 6, 9, 10, 13, 14, 17, 18));
     _m->setValue("d.m4x3", glm::dmat4x3(5, 6, 7, 9, 10, 11, 13, 14, 15, 17, 18, 19));
-    _m->setValue("d.m4x4", glm::dmat4x4(5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20));
+    _m->setValue("d.m4x4", glm::dmat4x4(
+                                        5,   6,  7,  8,
+                                        9,  10, 11, 12,
+                                        13, 14, 15, 16,
+                                        17, 18, 19, 20));
 
 
     matrixClassHelper<glm::dmat2x2, double>(_m, "d.m2x2");

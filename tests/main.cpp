@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     FileSys.registerPathToken("${SCRIPTS}", "../../../ext/ghoul/scripts");
     FileSys.registerPathToken("${TEST_DIR}" , "../../../ext/ghoul/tests");
 
-    LogManager::initialize(LogManager::LogLevel::Info);
+    LogManager::initialize(LogManager::LogLevel::None);
     LogMgr.addLog(new ConsoleLog);
 
     testing::InitGoogleTest(&argc, argv);
