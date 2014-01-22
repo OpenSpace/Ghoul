@@ -61,13 +61,14 @@ Test checklist:
 +++ getValue: correct values returned for each type
 +++ getValue: are all basic types implemented
 +++ getValue: glm::vec2, glm::vec3, glm::vec4 implemented
++++ getValue: glm::matXxY implemented
 +++ getValue: valid conversions
---- setValue: all types implemented
---- setValue: create subtables on the way
---- setValue: value gets set correctly for each type
---- setValue: value overwrites setting in configuration file
---- setValue: deep nesting of keys
---- setValue: nested keys
++++ setValue: all types implemented
++++ setValue: create subtables on the way
++++ setValue: value gets set correctly for each type
++++ setValue: value overwrites setting in configuration file
++++ setValue: deep nesting of keys
++++ setValue: nested keys
 --- setValue: glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4 implemented
 --- hasKeys: deep nesting of keys
 --- hasKeys: subtables on the way do not exist
@@ -141,7 +142,14 @@ TEST_F(ConfigurationManagerTest, KeysFunction) {
         EXPECT_EQ(nKeys, 2) << keys[i] <<": test1 + test3";
     }
 
-    //nKeys = _
+    const char* keysB[] = {
+        "b", "b.b", "b.b.b", "b.b.b.b", "b.b.b.b.b", "b.b.b.b.b.b", "b.b.b.b.b.b.b",
+        "b.b.b.b.b.b.b.b", "b.b.b.b.b.b.b.b.b", "b.b.b.b.b.b.b.b.b.b",
+        "b.b.b.b.b.b.b.b.b.b.b", "b.b.b.b.b.b.b.b.b.b.b.b"
+    };
+    _m->setValue(keysB[11], int(0));
+    for (int i = 0; i < 12; ++i)
+        EXPECT_EQ(_m->hasKey(keysB[i]), true) << keysB[i] <<": test1 + test3";
 }
 
 TEST_F(ConfigurationManagerTest, GetValueFunction) {
@@ -216,6 +224,71 @@ TEST_F(ConfigurationManagerTest, GetValueCorrectness) {
     const bool success = _m->getValue("t", value);
     EXPECT_EQ(success, true) << "Type: " << typeid(std::string).name();
     EXPECT_STREQ(value.c_str(), "1") << "Type: " << typeid(std::string).name();
+}
+
+TEST_F(ConfigurationManagerTest, SetValueRecursive) {
+    _m->setValue("t.a.b.c", 1);
+    EXPECT_EQ(_m->hasKey("t"), true);
+    EXPECT_EQ(_m->hasKey("t.a"), true);
+    EXPECT_EQ(_m->hasKey("t.a.b"), true);
+    EXPECT_EQ(_m->hasKey("t.a.b.c"), true);
+}
+
+TEST_F(ConfigurationManagerTest, SetValueCorrectness) {
+    _m->setValue("t.bool", bool(1));
+    _m->setValue("t.char", char(1));
+    _m->setValue("t.unsignedchar", unsigned char(1));
+    _m->setValue("t.signedchar", signed char(1));
+    _m->setValue("t.wchar", wchar_t(1));
+    _m->setValue("t.short", short(1));
+    _m->setValue("t.unsignedshort", unsigned short(1));
+    _m->setValue("t.int", int(1));
+    _m->setValue("t.unsignedint", unsigned int(1));
+    _m->setValue("t.long", long(1));
+    _m->setValue("t.unsignedlong", unsigned long(1));
+    _m->setValue("t.longlong", long long(1));
+    _m->setValue("t.unsignedlonglong", unsigned long long(1));
+    _m->setValue("t.float", float(1));
+    _m->setValue("t.double", double(1));
+    _m->setValue("t.longdouble", long double(1));
+
+    _m->setValue("t.string", "1");
+
+
+    correctnessHelperGetValue<bool>(_m, "t.bool");
+    correctnessHelperGetValue<char>(_m, "t.char");
+    correctnessHelperGetValue<signed char>(_m, "t.unsignedchar");
+    correctnessHelperGetValue<unsigned char>(_m, "t.signedchar");
+    correctnessHelperGetValue<wchar_t>(_m, "t.wchar");
+    correctnessHelperGetValue<short>(_m, "t.short");
+    correctnessHelperGetValue<unsigned short>(_m, "t.unsignedshort");
+    correctnessHelperGetValue<int>(_m, "t.int");
+    correctnessHelperGetValue<unsigned int>(_m, "t.unsignedint");
+    correctnessHelperGetValue<long>(_m, "t.long");
+    correctnessHelperGetValue<unsigned long>(_m, "t.unsignedlong");
+    correctnessHelperGetValue<long long>(_m, "t.longlong");
+    correctnessHelperGetValue<unsigned long long>(_m, "t.unsignedlonglong");
+    correctnessHelperGetValue<float>(_m, "t.float");
+    correctnessHelperGetValue<double>(_m, "t.double");
+    correctnessHelperGetValue<long double>(_m, "t.longdouble");
+
+    std::string value;
+    const bool success = _m->getValue("t.string", value);
+    EXPECT_EQ(success, true) << "Type: " << typeid(std::string).name();
+    EXPECT_STREQ(value.c_str(), "1") << "Type: " << typeid(std::string).name();
+}
+
+TEST_F(ConfigurationManagerTest, SetValueOverridesConfiguration) {
+    _m->loadConfiguration(_configuration1);
+    int v = 0;
+    bool success = _m->getValue<int>("t", v);
+    ASSERT_EQ(success, true) << "t";
+    ASSERT_EQ(v, 1) << "t";
+
+    _m->setValue("t", int(2));
+    success = _m->getValue<int>("t", v);
+    ASSERT_EQ(success, true) << "t";
+    ASSERT_EQ(v, 2) << "t";
 }
 
 TEST_F(ConfigurationManagerTest, GetValueConversions) {
@@ -354,7 +427,7 @@ void vectorClassHelper<glm::bvec4>(ghoul::ConfigurationManager* m, const std::st
     EXPECT_EQ(value.w, true) << "Type: bvec4 | Key: " << key;
 }
 
-TEST_F(ConfigurationManagerTest, VectorClasses) {
+TEST_F(ConfigurationManagerTest, VectorClassesGet) {
     _m->loadConfiguration(_configuration5);
     vectorClassHelper<glm::vec2>(_m, "n2");
     vectorClassHelper<glm::vec2>(_m, "num2");
@@ -441,6 +514,15 @@ TEST_F(ConfigurationManagerTest, VectorClasses) {
     const bool success = _m->getValue("mix", value);
     EXPECT_EQ(success, false) << "Type: mixed";
     EXPECT_EQ(value, glm::vec3(0.f)) << "Type: mixed";
+}
+
+TEST_F(ConfigurationManagerTest, VectorClassesSet) {
+    LINFOC("a", "VectorClassesSet");
+    _m->setValue("t.dvec4", glm::dvec4(1.0, 2.0, 3.0, 4.0));
+    glm::dvec4 res(0.0);
+    bool success = _m->getValue("t.dvec4", res);
+    success;
+
 }
 
 template <class T, typename U>

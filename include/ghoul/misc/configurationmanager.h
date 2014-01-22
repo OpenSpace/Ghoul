@@ -202,6 +202,16 @@ public:
     void setValue(const std::string& key, const T& value);
 
     /**
+     * Sets the <code>value</code> for the <code>key</code>, generating all necessary
+     * intermediate steps in the process. If a value already exists at the provided key,
+     * the old value is silently overwritten. This is a specialized variant from 
+     * #setValue to deal with constant strings
+     * \param key The key under which the <code>value</code> is to be stored
+     * \param value The value which should be stored at the provided location
+     */
+    void setValue(const std::string& key, const char* value);
+
+    /**
      * Gets the <code>value</code> for the provided <code>key</code>. The value at the
      * location has to agree with the type of the template parameter <code>T</code>. If
      * it is not possible to convert the stored type to the requested type, the value is

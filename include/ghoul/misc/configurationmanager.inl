@@ -37,7 +37,8 @@ bool ConfigurationManager::getValue(const std::string& key, T& value) {
 template <typename T>
 void ConfigurationManager::setValue(const std::string& key, const T& value) {
     // If none of the specializations fit, we don't know what to do
-    LERRORC("ConfigurationManager", "Unsupported type for key '" << key << "'");
+    LERRORC("ConfigurationManager", "Unsupported type for key '" << key << "': " <<
+        typeid(T).name());
 }
 
 extern template void ConfigurationManager::setValue<>(
@@ -74,6 +75,74 @@ extern template void ConfigurationManager::setValue<>(
                             const std::string& key, const long double& value);
 extern template void ConfigurationManager::setValue<>(
                             const std::string& key, const std::string& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const std::string& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::vec2& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::vec3& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::vec4& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::dvec2& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::dvec3& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::dvec4& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::ivec2& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::ivec3& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::ivec4& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::uvec2& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::uvec3& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::uvec4& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::bvec2& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::bvec3& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::bvec4& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::mat2x2& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::mat2x3& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::mat2x4& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::mat3x2& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::mat3x3& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::mat3x4& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::mat4x2& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::mat4x3& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::mat4x4& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::dmat2x2& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::dmat2x3& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::dmat2x4& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::dmat3x2& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::dmat3x3& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::dmat3x4& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::dmat4x2& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::dmat4x3& value);
+extern template void ConfigurationManager::setValue<>(
+                            const std::string& key, const glm::dmat4x4& value);
 
 extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, bool& value);

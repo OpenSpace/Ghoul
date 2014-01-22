@@ -292,6 +292,21 @@ void ConfigurationManager::setValue(const std::string& key, const std::string& v
                         lua_tostring(_state, -1));
 }
 
+void ConfigurationManager::setValue(const std::string& key, const char* value) {
+    const std::string v(value);
+    setValue(key, v);
+}
+
+
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::dvec4& value) {
+    setValue(key + "[\"0\"]", value.x);
+    setValue(key + "[\"1\"]", value.y);
+    setValue(key + "[\"2\"]", value.z);
+    setValue(key + "[\"3\"]", value.w);
+}
+
 //
 // Get
 //

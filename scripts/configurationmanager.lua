@@ -36,6 +36,33 @@ function merge(t1, t2)
     return t1
 end
 
+function createTables(key, t)
+    pos = key:find('[.]')
+    if (not pos) then
+        -- print("notpos", t, key, pos)
+        pos = key:find('[[]')
+        if (pos) then
+            key = key:sub(0,pos-1)
+            -- print("modkey", key)
+        end
+        if (not t[key]) then
+            t[key] = {}
+        end
+    else
+        newKey = key:sub(0, pos - 1)
+        newTable = t[newKey]
+        -- print("newKey,newTable", newKey, newTable)
+        if (not newTable) then
+            newTable = {}
+            t[newKey] = newTable
+            createTables(key:sub(pos + 1), newTable)
+        end
+        -- print("rec")
+        -- print("key:sub", key:sub(pos + 1))
+        -- print("newTable", newTable)
+    end
+
+end
 
 function printTable(t, i)
     i = i or ""
@@ -114,6 +141,7 @@ function getValue(key, t)
 end
 
 function setValue(key, v, t)
+    createTables(key, config)
     t = t or config -- default value of 'config'
     pos = key:find('[.]')
     if (not pos) then
