@@ -23,25 +23,36 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "gtest/gtest.h"
+#ifdef WIN32
+#define START_TIMER(__name__, __stream__, __num__) \
+    __stream__ << #__name__; \
+    for (int __i__ = 0; __i__ < __num__; ++__i__) { \
+        LARGE_INTEGER __name__##Start; \
+        LARGE_INTEGER __name__##End; \
+        QueryPerformanceCounter(&__name__##Start)
 
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
+#define FINISH_TIMER(__name__, __stream__) \
+        QueryPerformanceCounter(&__name__##End); \
+        LARGE_INTEGER freq; \
+        QueryPerformanceFrequency(&freq); \
+        const double freqD = double(freq.QuadPart) / 1000000.0; \
+        __stream__ << '\t' << \
+        ((__name__##End.QuadPart - __name__##Start.QuadPart) / freqD) << "us"; \
+    } \
+    __stream__ << '\n';
 
-#include "tests/test_common.inl"
-#include "tests/test_configurationmanager.inl"
+#else
+#include <chrono>
 
-using namespace ghoul::filesystem;
-using namespace ghoul::logging;
+#define START_TIMER(__name__) \
+        std::chrono::high_resolution_clock::time_point __name__##Start = \
+        std::chrono::high_resolution_clock::now() \
 
-int main(int argc, char** argv) {
-    FileSystem::initialize();
-    FileSys.registerPathToken("${SCRIPTS}", "../../../ext/ghoul/scripts");
-    FileSys.registerPathToken("${TEST_DIR}" , "../../../ext/ghoul/tests");
-
-    LogManager::initialize(LogManager::LogLevel::Info);
-    LogMgr.addLog(new ConsoleLog);
-
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+#define FINISH_TIMER(__name__, __stream__) \
+    do { \
+        std::chrono::high_resolution_clock::time_point __name__##End = \
+        std::chrono::high_resolution_clock::now(); \
+        std::chrono::microseconds d = __name__##End - __name__##Start; \
+        __stream__ << #__name__ << '\t' << d.count() << char(230) << "s" << '\n'; \
+    } while (false)
+#endif

@@ -26,6 +26,7 @@
 #include "gtest\gtest.h"
 #include <ghoul/misc/configurationmanager.h>
 #include <glm/glm.hpp>
+#include <fstream>
 #include <random>
 
 namespace {
@@ -70,9 +71,9 @@ Test checklist:
 +++ setValue: deep nesting of keys
 +++ setValue: nested keys
 +++ setValue: glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4 implemented
---- hasKeys: deep nesting of keys
---- hasKeys: subtables on the way do not exist
---- hasKeys: correct values for all types
++++ hasKeys: deep nesting of keys
++++ hasKeys: subtables on the way do not exist
++++ hasKeys: correct values for all types
 +++ hasKeys: nestedKeys
 --- timing
 */
@@ -94,6 +95,26 @@ protected:
 
     ghoul::ConfigurationManager* _m;
 };
+
+TEST_F(ConfigurationManagerTest, TimingTest) {
+    std::ofstream logFile("ConfigurationManagerTest.timing");
+    START_TIMER(deinitialize, logFile, 1);
+    _m->deinitialize();
+    FINISH_TIMER(deinitialize, logFile);
+
+    START_TIMER(initialize, logFile, 1);
+    _m->initialize();
+    FINISH_TIMER(initialize, logFile);
+
+    START_TIMER(setValueLevel0Int, logFile, 5);
+    _m->setValue("t", 1);
+    FINISH_TIMER(setValueLevel0Int, logFile);
+
+    int i;
+    START_TIMER(getValueLevel0Int, logFile, 5);
+    _m->getValue("t", i);
+    FINISH_TIMER(getValueLevel0Int, logFile);
+}
 
 TEST_F(ConfigurationManagerTest, DeinitDeath) {
     // Accessing the ConfigurationManager after it has been deinitialized gets an assert
@@ -156,6 +177,12 @@ TEST_F(ConfigurationManagerTest, KeysFunction) {
         EXPECT_EQ(2, nKeys) << keys[i] <<": test1 + test3";
     }
 
+    for (int i = 0; i < 12; ++i) {
+        const bool hasKey = _m->hasKey(keys[i]);
+        EXPECT_EQ(true, hasKey) << keys[i] <<": test1 + test3";
+    }
+
+
     const char* keysB[] = {
         "b", "b.b", "b.b.b", "b.b.b.b", "b.b.b.b.b", "b.b.b.b.b.b", "b.b.b.b.b.b.b",
         "b.b.b.b.b.b.b.b", "b.b.b.b.b.b.b.b.b", "b.b.b.b.b.b.b.b.b.b",
@@ -164,6 +191,76 @@ TEST_F(ConfigurationManagerTest, KeysFunction) {
     _m->setValue(keysB[11], int(0));
     for (int i = 0; i < 12; ++i)
         EXPECT_EQ(true, _m->hasKey(keysB[i])) << keysB[i] <<": test1 + test3";
+}
+
+TEST_F(ConfigurationManagerTest, HasKeySubtable) {
+    _m->loadConfiguration(_configuration1);
+    const bool tSuccess = _m->hasKey("t");
+    ASSERT_EQ(true, tSuccess) << "t";
+
+    const bool tsSuccess = _m->hasKey("t.s");
+    EXPECT_EQ(false, tsSuccess) << "t.s";
+
+    const bool sSuccess = _m->hasKey("s");
+    EXPECT_EQ(false, sSuccess) << "s";
+
+    const bool sxSuccess = _m->hasKey("s.x");
+    EXPECT_EQ(false, sxSuccess) << "s.x";
+}
+
+TEST_F(ConfigurationManagerTest, HasKeyTypes) {
+    _m->setValue("t.bool", bool(1));
+    _m->setValue("t.char", char(1));
+    _m->setValue("t.unsignedchar", unsigned char(1));
+    _m->setValue("t.signedchar", signed char(1));
+    _m->setValue("t.wchar", wchar_t(1));
+    _m->setValue("t.short", short(1));
+    _m->setValue("t.unsignedshort", unsigned short(1));
+    _m->setValue("t.int", int(1));
+    _m->setValue("t.unsignedint", unsigned int(1));
+    _m->setValue("t.long", long(1));
+    _m->setValue("t.unsignedlong", unsigned long(1));
+    _m->setValue("t.longlong", long long(1));
+    _m->setValue("t.unsignedlonglong", unsigned long long(1));
+    _m->setValue("t.float", float(1));
+    _m->setValue("t.double", double(1));
+    _m->setValue("t.longdouble", long double(1));
+    _m->setValue("t.string", "1");
+
+    bool success = _m->hasKey("t.bool");
+    EXPECT_EQ(true, success) << "t.bool";
+    success = _m->hasKey("t.char");
+    EXPECT_EQ(true, success) << "t.char";
+    success = _m->hasKey("t.unsignedchar");
+    EXPECT_EQ(true, success) << "t.unsignedchar";
+    success = _m->hasKey("t.signedchar");
+    EXPECT_EQ(true, success) << "t.signedchar";
+    success = _m->hasKey("t.wchar");
+    EXPECT_EQ(true, success) << "t.wchar";
+    success = _m->hasKey("t.short");
+    EXPECT_EQ(true, success) << "t.short";
+    success = _m->hasKey("t.unsignedshort");
+    EXPECT_EQ(true, success) << "t.unsignedshort";
+    success = _m->hasKey("t.int");
+    EXPECT_EQ(true, success) << "t.int";
+    success = _m->hasKey("t.unsignedint");
+    EXPECT_EQ(true, success) << "t.unsignedint";
+    success = _m->hasKey("t.long");
+    EXPECT_EQ(true, success) << "t.long";
+    success = _m->hasKey("t.unsignedlong");
+    EXPECT_EQ(true, success) << "t.unsignedlong";
+    success = _m->hasKey("t.longlong");
+    EXPECT_EQ(true, success) << "t.longlong";
+    success = _m->hasKey("t.unsignedlonglong");
+    EXPECT_EQ(true, success) << "t.unsignedlonglong";
+    success = _m->hasKey("t.float");
+    EXPECT_EQ(true, success) << "t.float";
+    success = _m->hasKey("t.double");
+    EXPECT_EQ(true, success) << "t.double";
+    success = _m->hasKey("t.longdouble");
+    EXPECT_EQ(true, success) << "t.longdouble";
+    success = _m->hasKey("t.string");
+    EXPECT_EQ(true, success) << "t.string";
 }
 
 TEST_F(ConfigurationManagerTest, GetValueFunction) {
@@ -265,9 +362,7 @@ TEST_F(ConfigurationManagerTest, SetValueCorrectness) {
     _m->setValue("t.float", float(1));
     _m->setValue("t.double", double(1));
     _m->setValue("t.longdouble", long double(1));
-
     _m->setValue("t.string", "1");
-
 
     correctnessHelperGetValue<bool>(_m, "t.bool");
     correctnessHelperGetValue<char>(_m, "t.char");
