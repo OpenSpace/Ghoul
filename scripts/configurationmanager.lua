@@ -55,11 +55,11 @@ function createTables(key, t)
         if (not newTable) then
             newTable = {}
             t[newKey] = newTable
-            createTables(key:sub(pos + 1), newTable)
         end
         -- print("rec")
         -- print("key:sub", key:sub(pos + 1))
         -- print("newTable", newTable)
+        createTables(key:sub(pos + 1), newTable)
     end
 
 end
@@ -67,15 +67,11 @@ end
 function printTable(t, i)
     i = i or ""
     for k,v in pairs(t) do
-        if (type(v) == "table") then
+        if (type(v) ~= "table") then
+            print(i .. k .. ' , ' .. tostring(v))
+        else
             print(i .. k)
             printTable(v, i .. " ")
-        else
-            if (type(k) == "string") then
-                print(i .. '["' .. k .. '"]' .. ' , ' .. v)
-            else
-                print(i .. k .. ' , ' .. v)
-            end
         end
     end
 end
@@ -142,6 +138,9 @@ end
 
 function setValue(key, v, t)
     createTables(key, config)
+    assert(load("local x=... config." .. key .. " = x"))(v)
+
+    --[[
     t = t or config -- default value of 'config'
     pos = key:find('[.]')
     if (not pos) then
@@ -155,4 +154,5 @@ function setValue(key, v, t)
         end
         setValue(key:sub(pos + 1), v, newTable)
     end
+    ]]
 end

@@ -42,6 +42,7 @@ namespace {
 namespace ghoul {
 
 namespace helper {
+    bool getValue(lua_State* state, const std::string& key, int& value);
     bool getValue(lua_State* state, const std::string& key, lua_Integer& value);
     bool getValue(lua_State* state, const std::string& key, lua_Unsigned& value);
     bool getValue(lua_State* state, const std::string& key, lua_Number& value);
@@ -297,14 +298,361 @@ void ConfigurationManager::setValue(const std::string& key, const char* value) {
     setValue(key, v);
 }
 
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::vec2& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+}
 
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::vec3& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+    setValue(key + "[3]", value.z);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::vec4& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+    setValue(key + "[3]", value.z);
+    setValue(key + "[4]", value.w);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::dvec2& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::dvec3& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+    setValue(key + "[3]", value.z);
+}
 
 template <>
 void ConfigurationManager::setValue(const std::string& key, const glm::dvec4& value) {
-    setValue(key + "[\"0\"]", value.x);
-    setValue(key + "[\"1\"]", value.y);
-    setValue(key + "[\"2\"]", value.z);
-    setValue(key + "[\"3\"]", value.w);
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+    setValue(key + "[3]", value.z);
+    setValue(key + "[4]", value.w);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::ivec2& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::ivec3& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+    setValue(key + "[3]", value.z);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::ivec4& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+    setValue(key + "[3]", value.z);
+    setValue(key + "[4]", value.w);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::uvec2& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::uvec3& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+    setValue(key + "[3]", value.z);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::uvec4& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+    setValue(key + "[3]", value.z);
+    setValue(key + "[4]", value.w);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::bvec2& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::bvec3& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+    setValue(key + "[3]", value.z);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::bvec4& value) {
+    setValue(key + "[1]", value.x);
+    setValue(key + "[2]", value.y);
+    setValue(key + "[3]", value.z);
+    setValue(key + "[4]", value.w);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::mat2x2& value) {
+    const float* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::mat2x3& value) {
+    const float* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::mat2x4& value) {
+    const float* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+    setValue(key + "[7]", v[6]);
+    setValue(key + "[8]", v[7]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::mat3x2& value) {
+    const float* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::mat3x3& value) {
+    const float* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+    setValue(key + "[7]", v[6]);
+    setValue(key + "[8]", v[7]);
+    setValue(key + "[9]", v[8]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::mat3x4& value) {
+    const float* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+    setValue(key + "[7]", v[6]);
+    setValue(key + "[8]", v[7]);
+    setValue(key + "[9]", v[8]);
+    setValue(key + "[10]", v[9]);
+    setValue(key + "[11]", v[10]);
+    setValue(key + "[12]", v[11]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::mat4x2& value) {
+    const float* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+    setValue(key + "[7]", v[6]);
+    setValue(key + "[8]", v[7]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::mat4x3& value) {
+    const float* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+    setValue(key + "[7]", v[6]);
+    setValue(key + "[8]", v[7]);
+    setValue(key + "[9]", v[8]);
+    setValue(key + "[10]", v[9]);
+    setValue(key + "[11]", v[10]);
+    setValue(key + "[12]", v[11]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::mat4x4& value) {
+    const float* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+    setValue(key + "[7]", v[6]);
+    setValue(key + "[8]", v[7]);
+    setValue(key + "[9]", v[8]);
+    setValue(key + "[10]", v[9]);
+    setValue(key + "[11]", v[10]);
+    setValue(key + "[12]", v[11]);
+    setValue(key + "[13]", v[12]);
+    setValue(key + "[14]", v[13]);
+    setValue(key + "[15]", v[14]);
+    setValue(key + "[16]", v[15]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::dmat2x2& value) {
+    const double* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::dmat2x3& value) {
+    const double* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::dmat2x4& value) {
+    const double* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+    setValue(key + "[7]", v[6]);
+    setValue(key + "[8]", v[7]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::dmat3x2& value) {
+    const double* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::dmat3x3& value) {
+    const double* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+    setValue(key + "[7]", v[6]);
+    setValue(key + "[8]", v[7]);
+    setValue(key + "[9]", v[8]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::dmat3x4& value) {
+    const double* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+    setValue(key + "[7]", v[6]);
+    setValue(key + "[8]", v[7]);
+    setValue(key + "[9]", v[8]);
+    setValue(key + "[10]", v[9]);
+    setValue(key + "[11]", v[10]);
+    setValue(key + "[12]", v[11]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::dmat4x2& value) {
+    const double* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+    setValue(key + "[7]", v[6]);
+    setValue(key + "[8]", v[7]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::dmat4x3& value) {
+    const double* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+    setValue(key + "[7]", v[6]);
+    setValue(key + "[8]", v[7]);
+    setValue(key + "[9]", v[8]);
+    setValue(key + "[10]", v[9]);
+    setValue(key + "[11]", v[10]);
+    setValue(key + "[12]", v[11]);
+}
+
+template <>
+void ConfigurationManager::setValue(const std::string& key, const glm::dmat4x4& value) {
+    const double* v = glm::value_ptr(value);
+    setValue(key + "[1]", v[0]);
+    setValue(key + "[2]", v[1]);
+    setValue(key + "[3]", v[2]);
+    setValue(key + "[4]", v[3]);
+    setValue(key + "[5]", v[4]);
+    setValue(key + "[6]", v[5]);
+    setValue(key + "[7]", v[6]);
+    setValue(key + "[8]", v[7]);
+    setValue(key + "[9]", v[8]);
+    setValue(key + "[10]", v[9]);
+    setValue(key + "[11]", v[10]);
+    setValue(key + "[12]", v[11]);
+    setValue(key + "[13]", v[12]);
+    setValue(key + "[14]", v[13]);
+    setValue(key + "[15]", v[14]);
+    setValue(key + "[16]", v[15]);
 }
 
 //
@@ -691,38 +1039,119 @@ bool ConfigurationManager::getValue(const std::string& key, glm::uvec4& value) {
 
 template <>
 bool ConfigurationManager::getValue(const std::string& key, glm::bvec2& value) {
-    glm::dvec2 v;
-    const bool success = getValue(key, v);
-    if (success) { 
-        value.x = v.x != 0.0;
-        value.y = v.y != 0.0;
+    int x,y;
+    bool xSuccess = helper::getValue(_state, key + "[1]", x);
+    bool ySuccess = helper::getValue(_state, key + "[2]", y);
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + "[\"1\"]", x);
+        ySuccess = helper::getValue(_state, key + "[\"2\"]", y);
     }
-    return success;
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".x", x);
+        ySuccess = helper::getValue(_state, key + ".y", y);
+    }
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".r", x);
+        ySuccess = helper::getValue(_state, key + ".g", y);
+    }
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".s", x);
+        ySuccess = helper::getValue(_state, key + ".t", y);
+    }
+
+    if (!(xSuccess && ySuccess))
+        return false;
+    else {
+        value = glm::bvec2(x != 0, y != 0);
+        return true;
+    }
 }
 
 template <>
 bool ConfigurationManager::getValue(const std::string& key, glm::bvec3& value) {
-    glm::dvec3 v;
-    const bool success = getValue(key, v);
-    if (success) { 
-        value.x = v.x != 0.0;
-        value.y = v.y != 0.0;
-        value.z = v.z != 0.0;
+    int x,y,z;
+    bool xSuccess = helper::getValue(_state, key + "[1]", x);
+    bool ySuccess = helper::getValue(_state, key + "[2]", y);
+    bool zSuccess = helper::getValue(_state, key + "[3]", z);
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + "[\"1\"]", x);
+        ySuccess = helper::getValue(_state, key + "[\"2\"]", y);
+        zSuccess = helper::getValue(_state, key + "[\"3\"]", z);
     }
-    return success;
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".x", x);
+        ySuccess = helper::getValue(_state, key + ".y", y);
+        zSuccess = helper::getValue(_state, key + ".z", z);
+    }
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".r", x);
+        ySuccess = helper::getValue(_state, key + ".g", y);
+        zSuccess = helper::getValue(_state, key + ".b", z);
+    }
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".s", x);
+        ySuccess = helper::getValue(_state, key + ".t", y);
+        zSuccess = helper::getValue(_state, key + ".p", z);
+    }
+
+    if (!(xSuccess && ySuccess))
+        return false;
+    else {
+        value = glm::bvec3(x != 0, y != 0, z != 0);
+        return true;
+    }
 }
 
 template <>
 bool ConfigurationManager::getValue(const std::string& key, glm::bvec4& value) {
-    glm::dvec4 v;
-    const bool success = getValue(key, v);
-    if (success) { 
-        value.x = v.x != 0.0;
-        value.y = v.y != 0.0;
-        value.z = v.z != 0.0;
-        value.w = v.w != 0.0;
+    int x,y,z,w;
+    bool xSuccess = helper::getValue(_state, key + "[1]", x);
+    bool ySuccess = helper::getValue(_state, key + "[2]", y);
+    bool zSuccess = helper::getValue(_state, key + "[3]", z);
+    bool wSuccess = helper::getValue(_state, key + "[4]", w);
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + "[\"1\"]", x);
+        ySuccess = helper::getValue(_state, key + "[\"2\"]", y);
+        zSuccess = helper::getValue(_state, key + "[\"3\"]", z);
+        wSuccess = helper::getValue(_state, key + "[\"4\"]", w);
     }
-    return success;
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".x", x);
+        ySuccess = helper::getValue(_state, key + ".y", y);
+        zSuccess = helper::getValue(_state, key + ".z", z);
+        wSuccess = helper::getValue(_state, key + ".w", w);
+    }
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".r", x);
+        ySuccess = helper::getValue(_state, key + ".g", y);
+        zSuccess = helper::getValue(_state, key + ".b", z);
+        wSuccess = helper::getValue(_state, key + ".a", w);
+    }
+
+    if (!(xSuccess && ySuccess)) {
+        xSuccess = helper::getValue(_state, key + ".s", x);
+        ySuccess = helper::getValue(_state, key + ".t", y);
+        zSuccess = helper::getValue(_state, key + ".p", z);
+        wSuccess = helper::getValue(_state, key + ".q", w);
+    }
+
+    if (!(xSuccess && ySuccess))
+        return false;
+    else {
+        value = glm::bvec4(x != 0, y != 0, z != 0, w != 0);
+        return true;
+    }
 }
 
 template <>
@@ -1014,6 +1443,27 @@ bool ConfigurationManager::hasKey(const std::string& key) {
 //
 
 namespace helper {
+
+bool getValue(lua_State* state, const std::string& key, int& value) {
+    assert(state != nullptr);
+
+    lua_getglobal(state, "getValue");
+    lua_pushstring(state, key.c_str());
+    const int status = lua_pcall(state, 1, 1, NULL);
+    if (status != LUA_OK) {
+        LERROR("Error getting value '" << key << "'. Error: " <<
+            lua_tostring(state, -1));
+        return false;
+    }
+    if (lua_isnil(state, -1)) {
+        lua_pop(state, 1);
+        return false;
+    } else {
+        value = lua_toboolean(state, -1);
+        lua_pop(state, 1);
+        return true;
+    }
+}
 
 bool getValue(lua_State* state, const std::string& key, lua_Integer& value) {
     assert(state != nullptr);
