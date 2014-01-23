@@ -25,7 +25,7 @@
 
 #include <ghoul/cmdparser/commandlineparser.h>
 #include <ghoul/cmdparser/commandlinecommand.h>
-
+#include <ghoul/logging/logmanager.h>
 #include <exception>
 #include <map>
 #include <stdlib.h>
@@ -37,6 +37,8 @@ using std::pair;
 using std::string;
 
 namespace {
+
+    const std::string _loggerCat = "CommandlineParser";
 
 /**
  * Extracts multiple arguments from a single list. <br>
@@ -72,9 +74,8 @@ namespace ghoul {
 namespace cmdparser {
 
 CommandlineParser::CommandlineParser(const std::string& programName)
-  : _commandForNamelessArguments(0)
+  : _commandForNamelessArguments(nullptr)
   , _programName(programName)
-  , _verbosity(false)
 {}
 
 CommandlineParser::~CommandlineParser() {
@@ -83,12 +84,8 @@ CommandlineParser::~CommandlineParser() {
     _commands.clear();
 }
 
-std::string CommandlineParser::getProgramPath() const {
+const std::string& CommandlineParser::programPath() const {
     return _programPath;
-}
-
-void CommandlineParser::setVerbosity(const bool verbosity) {
-    _verbosity = verbosity;
 }
 
 void CommandlineParser::setCommandLine(int argc, char** argv) {
@@ -105,22 +102,6 @@ void CommandlineParser::setCommandLine(int argc, char** argv) {
     // Just add the arguments to the vector
     for (int i = 1; i < argc; ++i)
         _arguments.push_back(argv[i]);
-}
-
-void CommandlineParser::setCommandLine(std::vector<std::string> arguments) {
-    // argv[0] = program name
-    // argv[i] = i-th argument
-    if (arguments.size() > 0)
-        _programPath = arguments[0];
-    else
-        _programPath = "";
-
-    // Might be possible that someone calls us multiple times
-    _arguments.clear();
-
-    // Just add the arguments to the vector
-    for (size_t i = 1; i < arguments.size(); ++i)
-        _arguments.push_back(arguments[i]);
 }
 
 void CommandlineParser::execute() {
@@ -179,6 +160,8 @@ void CommandlineParser::execute() {
     }
 
     // Second-and-a-halfs step: Display pairs for (command,argument) if verbosity is wanted
+    // TODO replace by LDEBUG
+    /*
     if (_verbosity) {
         std::cout << "Verbosity output:" << std::endl;
         // First the nameless command
@@ -201,6 +184,7 @@ void CommandlineParser::execute() {
         }
         std::cout << std::endl;
     }
+    */
 
     // Third step: Execute the nameless command if there are any arguments available
     if (!argumentsForNameless.empty()) {
@@ -220,29 +204,33 @@ void CommandlineParser::execute() {
     }
 }
 
-void CommandlineParser::addCommand(CommandlineCommand* cmd) {
-    // Check, if either the name or the shortname is already assigned in the parser
-    if (getCommand(cmd->name()) == 0 && ((getCommand(cmd->shortName()) == 0) || (cmd->shortName() == "")))
-        _commands.push_back(cmd);
-    else {
-        // One of the names existed, so throw an exception
-        //throw std::exception(cmd->getName() + " or " + cmd->getShortName() + " was already assigned in this parser");
+bool CommandlineParser::addCommand(CommandlineCommand* cmd) {
+    // Check, if either the name or the shortname is already present in the parser
+    const bool nameValid = getCommand(cmd->name()) == nullptr;
+    if (!nameValid) {
+        LERROR("The name for the command '" << cmd->name() << "' already existed");
+        return false;
     }
+    const bool hasShortname = cmd->shortName() != "";
+    const bool shortNameValid = getCommand(cmd->shortName()) != nullptr;
+    if (hasShortname && !shortNameValid) {
+        LERROR("The short name for the command '" << cmd->name() << "' already existed");
+        return false;
+    }
+
+    // If we got this far, the names are valid
+    // We don't need to check for duplicate entries as the names would be duplicate, too
+    _commands.push_back(cmd);
+    return true;
 }
 
 void CommandlineParser::addCommandForNamelessArguments(CommandlineCommand* cmd) {
-    if (_commandForNamelessArguments == 0) {
-        // The command for nameless arguments wasn't already set
-        if (cmd->allowsMultipleCalls())
-            throw std::exception("Nameless command mustn't be allowed to be called multiple times");
-        else
-            _commandForNamelessArguments = cmd;
-    }
-    else
-        throw std::exception("There was already a nameless command assigned to this parser");
+    if (_commandForNamelessArguments != nullptr)
+        delete _commandForNamelessArguments;
+    _commandForNamelessArguments = cmd;
 }
 
-void CommandlineParser::displayUsage(const std::string& command) {
+void CommandlineParser::displayUsage(const std::string& command, std::ostream& stream) {
     string usageString = "Usage: ";
 
     if (command.empty()) {
@@ -265,25 +253,27 @@ void CommandlineParser::displayUsage(const std::string& command) {
     }
 
     // Display via the std-out because no Logger-Prefix is wanted with the output
-    std::cout << usageString << std::endl;
+    stream << usageString << std::endl;
 }
 
-void CommandlineParser::displayHelp() {
+void CommandlineParser::displayHelp(std::ostream& stream) {
     displayUsage();
-    std::cout << std::endl << std::endl << "Help:" << std::endl << "-----" << std::endl;
+    stream << std::endl << std::endl << "Help:" << std::endl << "-----" << std::endl;
 
     for (CommandlineCommand* it : _commands)
-        std::cout << it->help() << std::endl;
+        stream << it->help() << std::endl;
 
     exit(EXIT_FAILURE);
 }
 
 CommandlineCommand* CommandlineParser::getCommand(const std::string& shortOrLongName) {
+    if (shortOrLongName == "")
+        return nullptr;
     for (CommandlineCommand* it : _commands) {
         if ((it->name() == shortOrLongName) || (it->shortName() == shortOrLongName))
             return it;
     }
-    return 0;
+    return nullptr;
 }
 
 void CommandlineParser::exitWithError(const std::string& msg, const std::string& command) {

@@ -26,6 +26,7 @@
 #ifndef __CMDLINEPARSER_H__
 #define __CMDLINEPARSER_H__
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -60,37 +61,68 @@ public:
      * Parses the command-line (#setCommandLine), evaluates all the commands
      * (#CommandlineCommand::checkParameters) and executes (#CommandlineCommand::execute)
      * them. The nameless command (#addCommandForNamelessArguments) will be checked last,
-     * but executed first. The order of other CommandlineCommands are undefined.
+     * but executed first. The execution order of other CommandlineCommands is undefined.
      */
     void execute();
 
     /**
-     * Add a new command to the parser.
-     * \param cmd The new command
+     * Add a new command to the parser. This method transfers ownership of the
+     * CommandlineCommand from the caller to the CommandlineParser, which will delete the
+     * command upon destruction.
+     * \param cmd The new command that is added to the CommandlineParser. The
+     * #CommandlineCommand::name and #CommandlineCommand::shortName have to unique to the
+     * CommandlineParser and must not be <code>Nameless</code> or the addition will fail.
+     * Furthermore, if the <code>cmd</code> already has been added to the
+     * CommandlineParser, this method will fail. In both cases, <code>false</code> is
+     * returned.
+     * \param cmd The command that is to be added. The ownership of the CommandlineCommand
+     * will be transferred to the CommandlineParser
+     * \return <code>true</code> if the command was added successfully; <code>false</code>
+     * if it either already existed or the #CommandlineCommand::name or
+     * #CommandlineCommand::shortName were not unique.
      */
-    void addCommand(CommandlineCommand* cmd);
+    bool addCommand(CommandlineCommand* cmd);
 
     /**
-     * Add a new command to take care of the nameless arguments
+     * Add a new command to take care of the nameless arguments. Nameless arguments do not
+     * have a name or a short name. This method transfers ownership of the
+     * CommandlineCommand from the caller to the CommandlineParser, which will delete the
+     * command upon destruction. If there already is an CommandlineCommand present for
+     * nameless argument, it will be replaced by <code>cmd</code>.
      * \param cmd The command responsible for those arguments
      */
     void addCommandForNamelessArguments(CommandlineCommand* cmd);
 
     /// Returns the first commandline argument containing the path and the executable name
-    std::string getProgramPath() const;
-
-    /// Sets the verbosity of the commandline parser. When set, each (command,argument) pair will be
-    /// printed to std::cout
-    void setVerbosity(const bool verbosity);
+    /**
+     * Returns the first command-line argument containing the path and the executable of
+     * the running program.
+     * \return The full path to the running program
+     */
+    const std::string& programPath() const;
 
     /**
-     * Prints the usage information to the std::cout.
-     * \param command Show information for this command only, show all if empty.
+     * Prints usage information to the provided <code>stream</code>. If the argument
+     * <code>command</code> is empty, the usage information for all registered commands
+     * is printed. Otherwise only the information for the CommandlineCommand with the
+     * #CommandlineCommand::name or #CommandlineCommand::shortName equal to 
+     * <code>command</code> will be printed. <code>Nameless</code> is a placeholder name
+     * for the nameless command (#addCommandForNamelessArguments).
+     * \param command Show information for the command with the #CommandlineCommand::name
+     * or #CommandlineCommand::shortName only. If <code>command</code> is empty, the
+     * usage information for all commands is printed; if <code>command = "Nameless"</code>
+     * the usage information for the nameless argument is logged
+     * \param stream The stream to which the usage information should be printed
      */
-    void displayUsage(const std::string& command = "");
+    void displayUsage(const std::string& command = "", std::ostream& stream = std::cout);
 
-    /// Print the full help text to the std::cout
-    void displayHelp();
+    /**
+     * Print the full help test to the provided <code>stream</code>. It consists of the
+     * usage information (#displayUsage) followed by the help text for each
+     * CommandlineCommand (#CommandlineCommand::help).
+     * \param stream The stream to which the help information should be printed
+     */
+    void displayHelp(std::ostream& stream = std::cout);
 
 
 protected:
@@ -118,9 +150,6 @@ protected:
 
     /// The name of the program used in the \sa usage method
     std::string _programName;
-
-    /// Controls the verbosity of the commandline parser in regard to execution
-    bool _verbosity;
 };
 
 } // namespace cmdparser
