@@ -134,12 +134,12 @@ public:
      *   designated key exists in the configuration.
      * \param configurationScript The script containing the main script that handles all
      * the interaction to the Lua state. The filename to the script will automatically be
-     * converted using the #FileSystem::absolutePath method
+     * converted using the #FileSystem::absolutePath method. If no configuration script
+     * is provided, a hard-coded default script will be used instead
      * \return <code>true</code> if it script was successfully compiled and tested and the
      * ConfigurationManager is ready to be used. <code>false</code> otherwise
      */
-    bool initialize(const std::string& configurationScript = 
-                                "${SCRIPTS}/configurationmanager.lua");
+    bool initialize(const std::string& configurationScript = "");
     
     /**
      * Cleans up the Lua state and makes the ConfigurationManager ready to be destroyed
