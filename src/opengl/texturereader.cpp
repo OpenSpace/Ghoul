@@ -30,6 +30,7 @@
 #include "glm/glm.hpp"
 
 #include <IL/il.h>
+#include <IL/ilu.h>
 
 namespace ghoul {
 namespace opengl {
@@ -44,29 +45,8 @@ Texture* loadTexture(const std::string& filename, bool useCompression) {
     ILboolean loadSuccess = ilLoadImage(filename.c_str());
     if (!loadSuccess) {
         ILenum error = ilGetError();
-        if (error == IL_COULD_NOT_OPEN_FILE)
-            LERROR("Could not open image file '" << filename <<
-                        "'. File did not exist.");
-        else if (error == IL_ILLEGAL_OPERATION)
-            LERROR("Could not open image file '" << filename <<
-                        "'. Illegal operation.");
-        else if (error == IL_INVALID_EXTENSION)
-            LERROR("Could not open image file '" << filename <<
-                        "'. The file could not be loaded based on extension or header.");
-        else if (error == IL_INVALID_PARAM)
-            LERROR("Could not open image file '" << filename <<
-                        "'. FileName was not valid. It was most likely NULL.");
-        else if (error == IL_OUT_OF_MEMORY)
-            LERROR("Could not allocate enough memory for '" << filename << "'.");
-        else if (error == IL_NO_ERROR)
-            LERROR("Could not open image file '" << filename <<
-                        "'. No error reported.");
-        else if (error == IL_UNKNOWN_ERROR)
-            LERROR("Could not open image file '" << filename <<
-                        "'. Unknown reported.");
-        else
-            LERROR("Could not open/read image file '" << filename <<
-                        "'. Error message: " << error);
+        LERROR("Error while loading image '" << filename << "': " <<
+                    iluErrorString(error));
         return nullptr;
     }
     ILint imageFormat = ilGetInteger(IL_IMAGE_FORMAT);
