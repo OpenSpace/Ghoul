@@ -36,10 +36,10 @@ using namespace ghoul::logging;
 
 int main(int argc, char** argv) {
     FileSystem::initialize();
-    FileSys.registerPathToken("${SCRIPTS}", "../../../ext/ghoul/scripts");
-    FileSys.registerPathToken("${TEST_DIR}" , "../../../ext/ghoul/tests");
+    FileSys.registerPathToken("${SCRIPTS}", "../scripts");
+    FileSys.registerPathToken("${TEST_DIR}" , "../tests");
 
-    LogManager::initialize(LogManager::LogLevel::None);
+    LogManager::initialize(LogManager::LogLevel::Fatal);
     LogMgr.addLog(new ConsoleLog);
 
     testing::InitGoogleTest(&argc, argv);
