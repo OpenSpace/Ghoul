@@ -107,22 +107,22 @@ protected:
     void exitWithError(const std::string& msg, const std::string& command = "");
 
     /// The stored commands
-    std::vector<CommandlineCommand*> commands_;
+    std::vector<CommandlineCommand*> _commands;
 
     /// The command we want to use for nameless arguments
-    CommandlineCommand* commandForNamelessArguments_;
+    CommandlineCommand* _commandForNamelessArguments;
 
     /// All the arguments passed onto this parser
-    std::vector<std::string> arguments_;
+    std::vector<std::string> _arguments;
 
     /// The path to the program + filename
-    std::string programPath_;
+    std::string _programPath;
 
     /// The name of the program used in the \sa usage method
-    std::string programName_;
+    std::string _programName;
 
     /// Controls the verbosity of the commandline parser in regard to execution
-    bool verbosity_;
+    bool _verbosity;
 };
 
 } // namespace cmdparser

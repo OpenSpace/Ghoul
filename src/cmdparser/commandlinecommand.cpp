@@ -23,84 +23,88 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "voreen/core/utils/cmdparser/command.h"
+#include <ghoul/cmdparser/commandlinecommand.h>
 
 #include <sstream>
 
-namespace voreen {
+namespace ghoul {
+namespace cmdparser {
 
-Command::Command(const std::string& name, const std::string& shortName, const std::string& infoText,
+CommandlineCommand::CommandlineCommand(const std::string& name, const std::string& shortName, const std::string& infoText,
                  const std::string& parameterList, const int argumentNum, const bool allowMultipleCalls)
-    : name_(name)
-    , shortName_(shortName)
-    , infoText_(infoText)
-    , parameterList_(parameterList)
-    , argumentNum_(argumentNum)
-    , allowMultipleCalls_(allowMultipleCalls)
-    , errorMsg_("")
+    : _name(name)
+    , _shortName(shortName)
+    , _infoText(infoText)
+    , _parameterList(parameterList)
+    , _argumentNum(argumentNum)
+    , _allowsMultipleCalls(allowMultipleCalls)
+    , _errorMsg("")
 {}
 
-Command::~Command() {}
+CommandlineCommand::~CommandlineCommand() {}
 
-const std::string Command::getName() {
-    return name_;
+const std::string& CommandlineCommand::name() const {
+    return _name;
 }
 
-const std::string Command::getShortName() {
-    return shortName_;
+const std::string& CommandlineCommand::shortName() const {
+    return _shortName;
 }
 
-const std::string Command::getParameterList() {
-    return parameterList_;
+const std::string& CommandlineCommand::parameterList() const {
+    return _parameterList;
 }
 
-const std::string Command::getInfoText() {
-    return infoText_;
+const std::string& CommandlineCommand::infoText() const {
+    return _infoText;
 }
 
-int Command::getArgumentNumber() {
-    return argumentNum_;
+int CommandlineCommand::argumentNumber() const {
+    return _argumentNum;
 }
 
-bool Command::getAllowMultipleCalls() {
-    return allowMultipleCalls_;
+bool CommandlineCommand::allowsMultipleCalls() const {
+    return _allowsMultipleCalls;
 }
 
-const std::string Command::usage() {
+std::string CommandlineCommand::usage() const {
     std::string result = "[";
-    if (getShortName() != "")
-        result = result + "<" + getShortName() + "|" + getName() + ">";
+    if (shortName() != "")
+        result = result + "<" + shortName() + "|" + name() + ">";
     else
-        result += getName();
+        result += name();
 
-    if (getParameterList() != "")
-        result = result + " " + getParameterList();
+    if (parameterList() != "")
+        result = result + " " + parameterList();
 
     result += "]";
 
     return result;
 }
 
-const std::string Command::help() {
+std::string CommandlineCommand::help() const {
     std::string result;
-    if (getShortName() != "")
-        result = getShortName() + "|" + getName() + ": \t" + getInfoText();
+    if (shortName() != "")
+        result = shortName() + "|" + name() + ": \t" + infoText();
     else
-        result = getName() + ": \t" + getInfoText();
+        result = name() + ": \t" + infoText();
 
     return result;
 }
 
-const std::string Command::getErrorMessage() {
-    return errorMsg_;
+const std::string& CommandlineCommand::errorMessage() const {
+    return _errorMsg;
 }
 
-bool Command::checkParameters(const std::vector<std::string>& parameters) {
-    return (parameters.size() == static_cast<size_t>(getArgumentNumber()));
+bool CommandlineCommand::checkParameters(const std::vector<std::string>& parameters) {
+    return (parameters.size() == static_cast<size_t>(argumentNumber()));
 }
 
-bool Command::isValueInSet(const std::string& value, const std::set<std::string>& set) {
+bool CommandlineCommand::isValueInSet(const std::string& value, 
+                                      const std::set<std::string>& set)
+{
     return (set.find(value) != set.end());
 }
 
-}   //namespace voreen
+} // namespace cmdparser
+} // namespace ghoul

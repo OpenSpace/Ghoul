@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __COMMAND_H__
-#define __COMMAND_H__
+#ifndef __COMMANDLINECOMMAND_H__
+#define __COMMANDLINECOMMAND_H__
 
 #include <exception>
 #include <sstream>
@@ -32,157 +32,171 @@
 #include <vector>
 #include <set>
 
-#include "voreen/core/voreencoredefine.h"
-#include "voreen/core/utils/exception.h"
-
-namespace voreen {
+namespace ghoul {
+namespace cmdparser {
 
 /**
- * A command is a functionality which can be called via commandline on program startup. As this
- * class is virtual, you have to derive from it and add it (in the program) to a commandline parser.
- * In the parser, the command's <code>name</code> and <code>shortName</code> must be unique.
+ * A command is an operation that can be called via command line arguments on program
+ * startup. As this class is virtual, it has to be derived from with the #execute method
+ * implemented. The CommandlineCommand are used by adding them to the CommandlineParser,
+ * using the method #CommandlineParser::addCommand. The common way of using the commands
+ * is to pass a variable of appropriate type to the CommandlineCommand by reference, which
+ * gets set to the correct value when the command is executed.
+ * Within the parser, the command's <code>name</code> and <code>shortName</code> must be
+ * unique.
  *
- * There are other convenience classes to use, for example \sa Command_Boolean , \sa Command_Float ,
- * \sa Command_TwoFloat , \sa Command_Integer , \sa Command_TwoInteger , \sa Command_String,
- * \sa Command_TwoString which accept one or two of the listed parameter-types.
+ * There exist a number of defined convenience classes to use, for example
+ * CommandlineCommandBoolean, CommandlineCommandFloat, CommandlineCommandTwoFloat,
+ * CommadnlineCommandInteger, CommandlineCommandTwoInteger, CommandlineCommandString,
+ * CommandlineCommandTwoString that accept one or two of the listed parameter-types.
  *
- * If -for example- you want to add a class which accepts one float value and one bool value,
- * you would create a new class Command_FloatBool which derives from Command and implement some methods:
- * <code>Command_FloatBool(float* fp, bool* bp, const std::string& name, const std::string& shortName = ""
- * , const std::string& infoText = "", const std::string& parameterList = "")</code> and call the Command
- * constructor with the arguments <code> (name, shortName, infoText, parameterList, 2, false) </code>
- * If you want to be able to put the command multiple times on the commandline it would look like this:
- * <code>Command_FloatBool(std::vector<float>* fp, std::vector<bool>* bp, const std::string& name,
- * const std::string& shortName = "" , const std::string& infoText = "", const std::string& parameterList = "")
- * </code> and the last argument for the super-ctor would be true.
- * If you don't provide a vector as return value, you'll (obviously) get only one value back. This value will be
- * the result of the latest call of the command.
- *
- * If the <code>argumentNum</code> is equal to -1, the remaining parameters of the commandline will be used.
- * Of course, only one of those commands can be used reasonably.
- *
- * At least you have to write the methode \sa execute in which you do something with the passed values. For
- * example just parse them and write them back to the member variables.
- * If you want to do something fancy with \sa checkParameters , you have to write this too, because the version
- * of this class only checks the parameters for the right count.
+ * For generic use, see the templated classes SingleCommandlineCommand and
+ * MultipleCommandlineCommand which are capable of setting basic types that are
+ * convertible from string using a <code>std::stringstream</code>.
  */
-class VRN_CORE_API Command {
+class CommandlineCommand {
 public:
     /**
-     * The constructor which just saves the arguments to out own member variables.
-     * \param name The (long) name of the parameter. e.g. --command1
-     * \param shortName The abbriviated name of the parameter. e.g. -c
-     * \param infoText A short text (preferably one line) explaining what the command does. Used in the
-     * \sa displayHelp() method from the commandlineparser
-     * \param parameterList A description which parameters are used. In the example with one float and
-     * one bool value, this would be <float value> <bool value>. This is used in the \sa displayUsage()
-     * and \sa displayHelp() methods.
+     * The constructor which saves the arguments to own member variables.
+     * \param name The (long) name of the parameter. For example <code>--command1</code>
+     * \param shortName The abbreviated name of the parameter. For example <code>-c</code>
+     * \param infoText A short text (preferably one line) explaining what the command
+     * does. Used in the #CommandlineParser::displayHelp method
+     * \param parameterList A user-readable description which parameters are used and
+     * supported. This is used in the #CommandlineParser::displayUsage and
+     * #CommandlineParser::displayHelp methods
      * \param argumentNum The number of arguments this command accepts
-     * \param allowMultipleCalls If is possible to have more than one instance of this command in one
-     * commandline? E.g. program1 -a dosomething -b somethingelse -a doitagain.
+     * \param allowMultipleCalls If this argument is <code>true</code> it signals the
+     * CommandlineParser that it should allow multiple instances of this
+     * CommandlineCommand in a single command line
      */
-    Command(const std::string& name, const std::string& shortName = "", const std::string& infoText = "",
+    CommandlineCommand(const std::string& name, const std::string& shortName = "", const std::string& infoText = "",
         const std::string& parameterList = "", const int argumentNum = 1, const bool allowMultipleCalls = false);
-    virtual ~Command();
+    virtual ~CommandlineCommand();
 
-    /// Returns the name of this command
-    const std::string getName();
+    /**
+     * Return the full name of this command.
+     * \return The full name of this command
+     */
+    const std::string& name() const;
 
-    /// Returns the short name of this command
-    const std::string getShortName();
+    /**
+     * Returns the short name of this command.
+     * \return The short name of this command
+     */
+    const std::string& shortName() const;
 
-    /// Returns the parameter list necessary for the <code>usage</code> method
-    const std::string getParameterList();
+    /**
+     * Returns the parameter list necessary for the #usage method
+     * \return The parameter list this command expects
+     */
+    const std::string& parameterList() const;
 
-    /// Returns a short description used for the <code>--help</code> command
-    const std::string getInfoText();
+    /**
+     * Returns a short description used in the #CommandlineParser::displayHelp and
+     * #CommandlineParser::displayUsage methods
+     * \return A short description of this command
+     */
+    const std::string& infoText() const;
 
     /// Returns the number of accepted arguments for this command
-    int getArgumentNumber();
+    int argumentNumber() const;
 
     /// Returns if the command can be called more than once in a single command line
-    bool getAllowMultipleCalls();
+    bool allowsMultipleCalls() const;
 
     /**
-     * Returns a message describing the error reported by checkParameters(),
-     * or an empty string, if no error has occurred.
+     * Returns a message describing the error reported by #checkParameters, or an empty
+     * string, if no error has occurred.
      */
-    const std::string getErrorMessage();
+    const std::string& errorMessage() const;
 
     /**
-     * Executes this command with the given parameters
-     * \param parameters The parameters needed for the execution of this command.
-     * \return true, if the execution was successful, false otherwise
+     * Executes this command with the given parameters. Each subclass must implement this
+     * abstract method and perform all actions within it.
+     * \param parameters The parameters needed for the execution of this command. By the
+     * time this method is called, the parameters have already been verified by the
+     * #checkParameters method
+     * \return This method should return <code>true</code>, if the execution was
+     * successful, <code>false</code> otherwise and log possible errors
      */
     virtual bool execute(const std::vector<std::string>& parameters) = 0;
 
     /**
-     * Checks the parameters for consistency and number. This version only tests for the number
-     * of parameters. If you want to test for other conditions, overwrite this method in a derived
-     * class
+     * Checks the parameters for consistency and correct amount. The basic implementation
+     * only checks for the correct number of parameters. If you want to test for other
+     * conditions (for example type), overwrite this method in the derived class.
      * \param parameters The parameters which should be tested
-     * \return true, if the parameters are correct
+     * \return <code>true</code>, if the parameters are correct, <code>false</code>
+     * otherwise
      */
     virtual bool checkParameters(const std::vector<std::string>& parameters);
 
-    ///Returns the usage-part for a command. Used in the usage()-method from the commandlineparser
-    virtual const std::string usage();
+    /**
+     * Returns the usage part for the help of this CommandlineCommand. Used in the
+     * #CommandlineParser::usage method.
+     * \return The usage part for the help of this command
+     */
+    virtual std::string usage() const;
 
     /// Returns the help-part for a command. Used in the help()-method from the commandlineparser
-    virtual const std::string help();
+    virtual std::string help() const;
 
 protected:
     /**
-     * Trys to cast the string value s to the templated parameter T
-     * if this fails, an std::exception will be thrown
-     * The conversion is done via an std::istringstream so it can only
-     * cast those types supported by the stream
+     * Tries to cast the string value <code>s</code> to the templated parameter T. If this
+     * succeeds, <code>true</code> is returned; otherwise <code>false</code>. The
+     * conversion is done via an <code>std::stringstream</code> so it can only cast those
+     * types supported by the stream.
+     * \tparam T The type of the value which should be converted
+     * \param s The <code>std::string</code> representation of the value
+     * \param t The reference which will store the converted value
+     * \return <code>true</code> if the conversion was successful, <code>false</code>
+     * otherwise
      */
     template <class T>
-    T cast(const std::string& s) throw (std::exception) {
+    bool cast(const std::string& s, T& t) {
         std::istringstream iss(s);
-        T t;
-        if ((iss >> std::dec >> t).fail())
-            throw VoreenException("Cast failed in Command");
-        else
-            return t;
+        iss >> std::dev >> t;
+        return !(iss.fail());
     }
 
     /**
-     * Checks if there is a corresponding value from the string value s to the
-     * template type T. As the method tries to convert the value, only those types
-     * are possible, which are supported by the std::istringstream
+     * Checks if the string value <code>s</code> can be cast into the type <code>T</code>.
+     * It only returns <code>true</code> for those values that can be converted using an
+     * <code>std::stringstream</code>
+     * \tparam T The type of the value which should be converted
+     * \param s The <code>std::string</code> representation of the value
+     * \return <code>true</code> if the value can be converted, <code>false</code>
+     * otherwise
      */
     template <class T>
     bool is(const std::string& s) {
         std::istringstream iss(s);
         T t;
-        return (iss >> std::dec >> t);
+        iss >> std::dev >> t;
+        return !(iss.fail());
     }
 
-    /**
-     * Tests, if the 'value' is present in the given array.
-     */
-    bool isValueInSet(const std::string& value, const std::set<std::string>& set);
-
-    /// Name of the command used on commandline level
-    std::string name_;
-    /// The short name of this command (usually an abbreviation
-    std::string shortName_;
-     /// A description of the command; used in the <code>help</code> method
-     std::string infoText_;
-    /// The parameter list necessary for the <code>usage</code> method
-    std::string parameterList_;
+    /// Name of the command used on command-line level
+    std::string _name;
+    /// The short name of this command which is also usable (usually an abbreviation)
+    std::string _shortName;
+     /// A description of the command; used in the #help method
+     std::string _infoText;
+    /// The parameter list necessary for the #usage method
+    std::string _parameterList;
     /// Name used as a prefix for logging
-    std::string loggerCat_;
+    std::string _loggerCat;
     /// Stores the number of arguments this command accepts
-    int argumentNum_;
-    /// Stores, if the command can be called multiple times in a single commandline
-    bool allowMultipleCalls_;
+    int _argumentNum;
+    /// Stores, if the command can be called multiple times in a single command line
+    bool _allowsMultipleCalls;
     /// Error message set by checkParameters().
-    std::string errorMsg_;
+    std::string _errorMsg;
 };
 
-}   //namespace voreen
+} // namespace cmdparser
+} // namespace ghoul
 
-#endif //VRN_COMMAND_H
+#endif //__COMMANDLINECOMMAND_H__

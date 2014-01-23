@@ -26,8 +26,10 @@
 #include <ghoul/cmdparser/commandlineparser.h>
 #include <ghoul/cmdparser/commandlinecommand.h>
 
+#include <exception>
 #include <map>
 #include <stdlib.h>
+#include <iostream>
 
 using std::vector;
 using std::multimap;
@@ -70,60 +72,60 @@ namespace ghoul {
 namespace cmdparser {
 
 CommandlineParser::CommandlineParser(const std::string& programName)
-  : commandForNamelessArguments_(0)
-  , programName_(programName)
-  , verbosity_(false)
+  : _commandForNamelessArguments(0)
+  , _programName(programName)
+  , _verbosity(false)
 {}
 
 CommandlineParser::~CommandlineParser() {
-    for (CommandlineCommand* i : commands_)
-        delete *i;
-    commands_.clear();
+    for (CommandlineCommand* i : _commands)
+        delete i;
+    _commands.clear();
 }
 
 std::string CommandlineParser::getProgramPath() const {
-    return programPath_;
+    return _programPath;
 }
 
 void CommandlineParser::setVerbosity(const bool verbosity) {
-    verbosity_ = verbosity;
+    _verbosity = verbosity;
 }
 
 void CommandlineParser::setCommandLine(int argc, char** argv) {
     // argv[0] = program name
     // argv[i] = i-th argument
     if (argc > 0 && argv && argv[0])
-        programPath_ = argv[0];
+        _programPath = argv[0];
     else
-        programPath_ = "";
+        _programPath = "";
 
     // Might be possible that someone calls us multiple times
-    arguments_.clear();
+    _arguments.clear();
 
     // Just add the arguments to the vector
     for (int i = 1; i < argc; ++i)
-        arguments_.push_back(argv[i]);
+        _arguments.push_back(argv[i]);
 }
 
 void CommandlineParser::setCommandLine(std::vector<std::string> arguments) {
     // argv[0] = program name
     // argv[i] = i-th argument
     if (arguments.size() > 0)
-        programPath_ = arguments[0];
+        _programPath = arguments[0];
     else
-        programPath_ = "";
+        _programPath = "";
 
     // Might be possible that someone calls us multiple times
-    arguments_.clear();
+    _arguments.clear();
 
     // Just add the arguments to the vector
     for (size_t i = 1; i < arguments.size(); ++i)
-        arguments_.push_back(arguments[i]);
+        _arguments.push_back(arguments[i]);
 }
 
 void CommandlineParser::execute() {
     // There is only one argument and this is either "-h" or "--help" ; so display the help
-    if ((arguments_.size() == 1) && ((arguments_[0] == "-h") || (arguments_[0] == "--help")))
+    if ((_arguments.size() == 1) && ((_arguments[0] == "-h") || (_arguments[0] == "--help")))
         displayHelp();
 
     vector<string> argumentsForNameless;
@@ -132,52 +134,52 @@ void CommandlineParser::execute() {
     // commandline again
     multimap<CommandlineCommand*, vector<string> > parameterMap;
 
-    for (size_t i = 0 ; i < arguments_.size(); ++i) {
+    for (size_t i = 0 ; i < _arguments.size(); ++i) {
         // In the beginning we assume that we just started the loop or finished reading parameters for
         // one command
 
         // So test if the next argument is a command or a parameter for a nameless argument
-        if (arguments_[i][0] != '-') {
-            int number = extractArguments(arguments_, &argumentsForNameless, i, -2);
+        if (_arguments[i][0] != '-') {
+            int number = extractArguments(_arguments, &argumentsForNameless, i, -2);
             i += (number - 1);
         }
         else {
             // We have found a command
-            CommandlineCommand* currentCommand = getCommand(arguments_[i]);
+            CommandlineCommand* currentCommand = getCommand(_arguments[i]);
 
             // currentCommand = 0, if there wasn't a command with that specific name or shortName
             if (currentCommand == 0)
-                exitWithError(arguments_[i] + " is not a valid command");
+                exitWithError(_arguments[i] + " is not a valid command");
 
             vector<string> parameters;
-            int number = extractArguments(arguments_, &parameters, i, currentCommand->getArgumentNumber());
+            int number = extractArguments(_arguments, &parameters, i, currentCommand->argumentNumber());
             i += number;
 
             // don't insert if the command doesn't allow multiple calls and already is in the map
-            if (!currentCommand->getAllowMultipleCalls() && parameterMap.find(currentCommand) != parameterMap.end())
-                exitWithError(currentCommand->getName() + " doesn't allow multiple calls in a single line",
-                              currentCommand->getName());
+            if (!currentCommand->allowsMultipleCalls() && parameterMap.find(currentCommand) != parameterMap.end())
+                exitWithError(currentCommand->name() + " doesn't allow multiple calls in a single line",
+                              currentCommand->name());
 
-            parameterMap.insert(pair<Command*, vector<string> >(currentCommand, parameters));
+            parameterMap.insert(pair<CommandlineCommand*, vector<string> >(currentCommand, parameters));
         }
     }
     // We now have all the commands with the respective parameters stored in the map and all the parameters for
     // the nameless command is avaiable as well.
 
     // First step: Test, if we have nameless arguments even if we don't have a nameless command. Otherwise bail out
-    if (!argumentsForNameless.empty() && (commandForNamelessArguments_ == 0))
+    if (!argumentsForNameless.empty() && (_commandForNamelessArguments == 0))
         exitWithError("No appropriate command avaiable for nameless parameters");
 
     // Second step: Check if every command is happy with the parameters assigned to it
     for (multimap<CommandlineCommand*, vector<string> >::iterator it = parameterMap.begin(); it != parameterMap.end(); ++it) {
         bool correct = (*it).first->checkParameters((*it).second);
         if (!correct)
-            exitWithError("Failed to parse arguments for " + (*it).first->getName() + ": " + (*it).first->getErrorMessage(),
-                          (*it).first->getName());
+            exitWithError("Failed to parse arguments for " + (*it).first->name() + ": " + (*it).first->errorMessage(),
+                          (*it).first->name());
     }
 
     // Second-and-a-halfs step: Display pairs for (command,argument) if verbosity is wanted
-    if (verbosity_) {
+    if (_verbosity) {
         std::cout << "Verbosity output:" << std::endl;
         // First the nameless command
         std::cout << "(Nameless command,";
@@ -188,8 +190,8 @@ void CommandlineParser::execute() {
         std::cout << ")" << std::endl;
 
         // Then the rest
-        for (multimap<Command*, vector<string> >::iterator it = parameterMap.begin(); it != parameterMap.end(); ++it) {
-            std::cout << "(" << (*it).first->getName() << ",";
+        for (multimap<CommandlineCommand*, vector<string> >::iterator it = parameterMap.begin(); it != parameterMap.end(); ++it) {
+            std::cout << "(" << (*it).first->name() << ",";
 
             for (vector<string>::iterator iter = (*it).second.begin();
                 iter != (*it).second.end();
@@ -202,10 +204,10 @@ void CommandlineParser::execute() {
 
     // Third step: Execute the nameless command if there are any arguments available
     if (!argumentsForNameless.empty()) {
-        bool correct = commandForNamelessArguments_->checkParameters(argumentsForNameless);
+        bool correct = _commandForNamelessArguments->checkParameters(argumentsForNameless);
 
         if (correct)
-            commandForNamelessArguments_->execute(argumentsForNameless);
+            _commandForNamelessArguments->execute(argumentsForNameless);
         else
             exitWithError("One of the parameters for the nameless command was not correct");
     }
@@ -214,50 +216,50 @@ void CommandlineParser::execute() {
     for (multimap<CommandlineCommand*, vector<string> >::iterator it = parameterMap.begin(); it != parameterMap.end(); ++it) {
         bool correct = (*it).first->execute((*it).second);
         if (!correct)
-            exitWithError("The execution for " + (*it).first->getName() + " failed", (*it).first->getName());
+            exitWithError("The execution for " + (*it).first->name() + " failed", (*it).first->name());
     }
 }
 
-void CommandlineParser::addCommand(CommandlineCommand* cmd) throw (VoreenException) {
+void CommandlineParser::addCommand(CommandlineCommand* cmd) {
     // Check, if either the name or the shortname is already assigned in the parser
-    if (getCommand(cmd->getName()) == 0 && ((getCommand(cmd->getShortName()) == 0) || (cmd->getShortName() == "")))
-        commands_.push_back(cmd);
+    if (getCommand(cmd->name()) == 0 && ((getCommand(cmd->shortName()) == 0) || (cmd->shortName() == "")))
+        _commands.push_back(cmd);
     else {
         // One of the names existed, so throw an exception
-        throw VoreenException(cmd->getName() + " or " + cmd->getShortName() + " was already assigned in this parser");
+        //throw std::exception(cmd->getName() + " or " + cmd->getShortName() + " was already assigned in this parser");
     }
 }
 
-void CommandlineParser::addCommandForNamelessArguments(CommandlineCommand* cmd) throw (VoreenException) {
-    if (commandForNamelessArguments_ == 0) {
+void CommandlineParser::addCommandForNamelessArguments(CommandlineCommand* cmd) {
+    if (_commandForNamelessArguments == 0) {
         // The command for nameless arguments wasn't already set
-        if (cmd->getAllowMultipleCalls())
-            throw VoreenException("Nameless command mustn't be allowed to be called multiple times");
+        if (cmd->allowsMultipleCalls())
+            throw std::exception("Nameless command mustn't be allowed to be called multiple times");
         else
-            commandForNamelessArguments_ = cmd;
+            _commandForNamelessArguments = cmd;
     }
     else
-        throw VoreenException("There was already a nameless command assigned to this parser");
+        throw std::exception("There was already a nameless command assigned to this parser");
 }
 
 void CommandlineParser::displayUsage(const std::string& command) {
     string usageString = "Usage: ";
 
     if (command.empty()) {
-        if (programName_ != "")
-            usageString += programName_ + " ";
+        if (_programName != "")
+            usageString += _programName + " ";
 
-        if (commandForNamelessArguments_ != 0)
-            usageString += commandForNamelessArguments_->usage() + " ";
+        if (_commandForNamelessArguments != 0)
+            usageString += _commandForNamelessArguments->usage() + " ";
 
-        for (CommandlineCommand* it : commands_)
-            if (*it)
-                usageString += "\n" + (*it)->usage() + " ";
+        for (CommandlineCommand* it : _commands) {
+            if (it)
+                usageString += "\n" + it->usage() + " ";
         }
     } else {
-        for (CommandlineCommand* it : commands_) {
-            if (*it && ((*it)->getName() == command || (*it)->getShortName() == command)) {
-                usageString += "\n" + (*it)->usage() + " ";
+        for (CommandlineCommand* it : _commands) {
+            if (it && (it->name() == command || it->shortName() == command)) {
+                usageString += "\n" + it->usage() + " ";
             }
         }
     }
@@ -270,16 +272,16 @@ void CommandlineParser::displayHelp() {
     displayUsage();
     std::cout << std::endl << std::endl << "Help:" << std::endl << "-----" << std::endl;
 
-    for (CommandlineCommand* it : commands_)
-        std::cout << (*it)->help() << std::endl;
+    for (CommandlineCommand* it : _commands)
+        std::cout << it->help() << std::endl;
 
     exit(EXIT_FAILURE);
 }
 
 CommandlineCommand* CommandlineParser::getCommand(const std::string& shortOrLongName) {
-    for (CommandlineCommand* it : commands_) {
-        if (((*it)->getName() == shortOrLongName) || ((*it)->getShortName() == shortOrLongName))
-            return (*it);
+    for (CommandlineCommand* it : _commands) {
+        if ((it->name() == shortOrLongName) || (it->shortName() == shortOrLongName))
+            return it;
     }
     return 0;
 }
