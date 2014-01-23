@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "gtest\gtest.h"
+#include "gtest/gtest.h"
 #include <ghoul/misc/configurationmanager.h>
 #include <glm/glm.hpp>
 #include <fstream>
@@ -607,20 +607,20 @@ TEST_F(ConfigurationManagerTest, HasKeySubtable) {
 TEST_F(ConfigurationManagerTest, HasKeyTypes) {
     _m->setValue("t.bool", bool(1));
     _m->setValue("t.char", char(1));
-    _m->setValue("t.unsignedchar", unsigned char(1));
-    _m->setValue("t.signedchar", signed char(1));
+    _m->setValue("t.unsignedchar", (unsigned char)(1));
+    _m->setValue("t.signedchar", (signed char)(1));
     _m->setValue("t.wchar", wchar_t(1));
     _m->setValue("t.short", short(1));
-    _m->setValue("t.unsignedshort", unsigned short(1));
+    _m->setValue("t.unsignedshort", (unsigned short)(1));
     _m->setValue("t.int", int(1));
-    _m->setValue("t.unsignedint", unsigned int(1));
+    _m->setValue("t.unsignedint", (unsigned int)(1));
     _m->setValue("t.long", long(1));
-    _m->setValue("t.unsignedlong", unsigned long(1));
-    _m->setValue("t.longlong", long long(1));
-    _m->setValue("t.unsignedlonglong", unsigned long long(1));
+    _m->setValue("t.unsignedlong", (unsigned long)(1));
+    _m->setValue("t.longlong", (long long)(1));
+    _m->setValue("t.unsignedlonglong", (unsigned long long)(1));
     _m->setValue("t.float", float(1));
     _m->setValue("t.double", double(1));
-    _m->setValue("t.longdouble", long double(1));
+    _m->setValue("t.longdouble", (long double)(1));
     _m->setValue("t.string", "1");
 
     bool success = _m->hasKey("t.bool");
@@ -744,20 +744,20 @@ TEST_F(ConfigurationManagerTest, SetValueRecursive) {
 TEST_F(ConfigurationManagerTest, SetValueCorrectness) {
     _m->setValue("t.bool", bool(1));
     _m->setValue("t.char", char(1));
-    _m->setValue("t.unsignedchar", unsigned char(1));
-    _m->setValue("t.signedchar", signed char(1));
+    _m->setValue("t.unsignedchar", (unsigned char)(1));
+    _m->setValue("t.signedchar", (signed char)(1));
     _m->setValue("t.wchar", wchar_t(1));
     _m->setValue("t.short", short(1));
-    _m->setValue("t.unsignedshort", unsigned short(1));
+    _m->setValue("t.unsignedshort", (unsigned short)(1));
     _m->setValue("t.int", int(1));
-    _m->setValue("t.unsignedint", unsigned int(1));
+    _m->setValue("t.unsignedint", (unsigned int)(1));
     _m->setValue("t.long", long(1));
-    _m->setValue("t.unsignedlong", unsigned long(1));
-    _m->setValue("t.longlong", long long(1));
-    _m->setValue("t.unsignedlonglong", unsigned long long(1));
+    _m->setValue("t.unsignedlong", (unsigned long)(1));
+    _m->setValue("t.longlong", (long long)(1));
+    _m->setValue("t.unsignedlonglong", (unsigned long long)(1));
     _m->setValue("t.float", float(1));
     _m->setValue("t.double", double(1));
-    _m->setValue("t.longdouble", long double(1));
+    _m->setValue("t.longdouble", (long double)(1));
     _m->setValue("t.string", "1");
 
     correctnessHelperGetValue<bool>(_m, "t.bool");
@@ -1012,15 +1012,12 @@ TEST_F(ConfigurationManagerTest, VectorClassesGet) {
     vectorClassHelper<glm::bvec4>(_m, "rgba");
     vectorClassHelper<glm::bvec4>(_m, "stpq");
 
-    glm::mat4 f(1.0);
-    glm::mat2 g = glm::mat2(f);
-
     glm::vec3 value = glm::vec3(0.f);
     const bool success = _m->getValue("mix", value);
     EXPECT_EQ(false, success) << "Type: mixed";
     EXPECT_EQ(glm::vec3(0.f), value) << "Type: mixed";
 }
-#include "ghoul/lua/ghoul_lua.h"
+
 TEST_F(ConfigurationManagerTest, VectorClassesSet) {
     _m->setValue("t.vec2", glm::vec2(5,6));
     _m->setValue("t.vec3", glm::vec3(5,6,7));

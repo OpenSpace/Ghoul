@@ -113,6 +113,8 @@ std::string LogManager::stringFromLevel(LogLevel level) {
             return "Error";
         case LogLevel::Fatal:
             return "Fatal";
+        case LogLevel::None:
+            return "None";
     }
     assert(false);
     return "";

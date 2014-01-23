@@ -131,9 +131,9 @@ bool SharedMemory::create(const std::string& name, size_t size) {
         LERROR("Error occurred while creating shared memory: " << strerror(errno));
         return false;
     }
-    void* memory = shmat(_sharedMemoryHandle, NULL, SHM_R | SHM_W);
-    Header* h = header(memory);
-    h->mutex.clear();
+    void* memory = shmat(result, NULL, SHM_R | SHM_W);
+    Header* memoryHeader = header(memory);
+    memoryHeader->mutex.clear();
     shmdt(memory);
     return true;
 #endif
@@ -181,8 +181,8 @@ bool SharedMemory::remove(const std::string& name) {
 }
     
 bool SharedMemory::exists(const std::string& name) {
-    const std::string&& _loggerCat = "SharedMemory(" + name + ")";
 #ifdef WIN32
+    const std::string&& _loggerCat = "SharedMemory(" + name + ")";
     HANDLE handle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, name.c_str());
     if (handle != NULL) {
         // the file exists, so we have to close it immediately to not leak the handle

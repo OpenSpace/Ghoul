@@ -157,7 +157,7 @@ protected:
     template <class T>
     bool cast(const std::string& s, T& t) {
         std::istringstream iss(s);
-        iss >> std::dev >> t;
+        iss >> std::dec >> t;
         return !(iss.fail());
     }
 
@@ -174,7 +174,7 @@ protected:
     bool is(const std::string& s) {
         std::istringstream iss(s);
         T t;
-        iss >> std::dev >> t;
+        iss >> std::dec >> t;
         return !(iss.fail());
     }
 

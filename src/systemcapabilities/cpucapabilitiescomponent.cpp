@@ -179,7 +179,7 @@ void CPUCapabilitiesComponent::detectOS() {
         LERROR("OS detection failed. 'uname' returned non-null value");
         return;
     }
-    stringstream resultStream;
+    std::stringstream resultStream;
     resultStream << name.sysname << " " << name.release << " "
         << name.version << " " << name.machine;
 
@@ -188,6 +188,7 @@ void CPUCapabilitiesComponent::detectOS() {
 }
 
 void CPUCapabilitiesComponent::detectMemory() {
+#ifdef WIN32
     std::string memory;
     bool success = queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
     if (!success)
@@ -199,6 +200,7 @@ void CPUCapabilitiesComponent::detectMemory() {
         convert >> value;
         _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
     }
+#endif
 }
 
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>

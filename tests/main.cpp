@@ -36,8 +36,13 @@ using namespace ghoul::logging;
 
 int main(int argc, char** argv) {
     FileSystem::initialize();
+#ifdef WIN32
     FileSys.registerPathToken("${SCRIPTS}", "../scripts");
     FileSys.registerPathToken("${TEST_DIR}" , "../tests");
+#else
+    FileSys.registerPathToken("${SCRIPTS}", "../../scripts");
+    FileSys.registerPathToken("${TEST_DIR}" , "../../tests");
+#endif
 
     LogManager::initialize(LogManager::LogLevel::Fatal);
     LogMgr.addLog(new ConsoleLog);

@@ -23,24 +23,25 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <glm/glm.hpp>
+#include <ghoul/glm.h>
 
 namespace ghoul {
 
 template <typename T>
-bool ConfigurationManager::getValue(const std::string& key, T& value) {
+bool ConfigurationManager::getValue(const std::string& key, T&) {
     // If none of the specializations fit, we don't know what to do
     LERRORC("ConfigurationManager", "Unsupported type for key '" << key << "'");
     return false;
 }
 
 template <typename T>
-void ConfigurationManager::setValue(const std::string& key, const T& value) {
+void ConfigurationManager::setValue(const std::string& key, const T&) {
     // If none of the specializations fit, we don't know what to do
     LERRORC("ConfigurationManager", "Unsupported type for key '" << key << "': " <<
         typeid(T).name());
 }
 
+/*
 extern template void ConfigurationManager::setValue<>(
                             const std::string& key, const bool& value);
 extern template void ConfigurationManager::setValue<>(
@@ -244,6 +245,6 @@ extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, glm::dmat4x3& value);
 extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, glm::dmat4x4& value);
-
+*/
 
 } // namespace ghoul
