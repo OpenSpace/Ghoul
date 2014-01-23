@@ -109,10 +109,55 @@ TEST_F(ConfigurationManagerTest, TimingTest) {
     _m->deinitialize();
     FINISH_TIMER(deinitialize, logFile);
 
-    //_m->deinitialize();
     START_TIMER_NO_RESET(initialize, logFile, 1);
     _m->initialize();
     FINISH_TIMER(initialize, logFile);
+
+    START_TIMER(loadConfiguration1, logFile, 25);
+    _m->loadConfiguration(_configuration1);
+    FINISH_TIMER(loadConfiguration1, logFile);
+
+    START_TIMER(loadConfiguration2, logFile, 25);
+    _m->loadConfiguration(_configuration2);
+    FINISH_TIMER(loadConfiguration2, logFile);
+
+    START_TIMER(loadConfiguration3, logFile, 25);
+    _m->loadConfiguration(_configuration3);
+    FINISH_TIMER(loadConfiguration3, logFile);
+
+    START_TIMER(loadConfiguration4, logFile, 25);
+    _m->loadConfiguration(_configuration4);
+    FINISH_TIMER(loadConfiguration4, logFile);
+
+    START_TIMER(loadConfiguration5, logFile, 25);
+    _m->loadConfiguration(_configuration5);
+    FINISH_TIMER(loadConfiguration5, logFile);
+
+    START_TIMER(loadConfiguration12, logFile, 25);
+    _m->loadConfiguration(_configuration1);
+    _m->loadConfiguration(_configuration2);
+    FINISH_TIMER(loadConfiguration12, logFile);
+
+    START_TIMER(loadConfiguration123, logFile, 25);
+    _m->loadConfiguration(_configuration1);
+    _m->loadConfiguration(_configuration2);
+    _m->loadConfiguration(_configuration3);
+    FINISH_TIMER(loadConfiguration123, logFile);
+
+    START_TIMER(loadConfiguration1234, logFile, 25);
+    _m->loadConfiguration(_configuration1);
+    _m->loadConfiguration(_configuration2);
+    _m->loadConfiguration(_configuration3);
+    _m->loadConfiguration(_configuration4);
+    FINISH_TIMER(loadConfiguration1234, logFile);
+
+    START_TIMER(loadConfiguration12345, logFile, 25);
+    _m->loadConfiguration(_configuration1);
+    _m->loadConfiguration(_configuration2);
+    _m->loadConfiguration(_configuration3);
+    _m->loadConfiguration(_configuration4);
+    _m->loadConfiguration(_configuration5);
+    FINISH_TIMER(loadConfiguration12345, logFile);
 
     START_TIMER(setValueLevel0Int, logFile, 25);
     _m->setValue("t", 1);
