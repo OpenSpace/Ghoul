@@ -62,8 +62,12 @@ public:
      * (#CommandlineCommand::checkParameters) and executes (#CommandlineCommand::execute)
      * them. The nameless command (#addCommandForNamelessArguments) will be checked last,
      * but executed first. The execution order of other CommandlineCommands is undefined.
+     * \return <code>true</code> if the execution passed successfully; <code>false</code>
+     * is returned if either the execution failed or the user requested the help. If the
+     * execution fails, parts of the commands may have been already executed, thus leaving
+     * the application in an half-initialized state
      */
-    void execute();
+    bool execute();
 
     /**
      * Add a new command to the parser. This method transfers ownership of the
@@ -71,7 +75,8 @@ public:
      * command upon destruction.
      * \param cmd The new command that is added to the CommandlineParser. The
      * #CommandlineCommand::name and #CommandlineCommand::shortName have to unique to the
-     * CommandlineParser and must not be <code>Nameless</code> or the addition will fail.
+     * CommandlineParser, must not be <code>Nameless</code> and have to start with at
+     * least one <code>-</code> or the addition will fail.
      * Furthermore, if the <code>cmd</code> already has been added to the
      * CommandlineParser, this method will fail. In both cases, <code>false</code> is
      * returned.
@@ -126,15 +131,15 @@ public:
 
 
 protected:
-    /// Returns the command with a specific <code>shortName</code> or <code>name</code>. If no such
-    /// command exists, 0 is returned
-    CommandlineCommand* getCommand(const std::string& shortOrLongName);
-
-    /**
-     * Bail out, display the message <code>msg</code> and display the usage
-     * \param command Command with which the error happened.
+    /** Returns the CommandlineCommand with a specific #CommandlineCommand::shortName or
+     * #CommandlineCommand::name from the list of stored commands. If no such command
+     * exists <code>nullptr</code> will be returned.
+     * \param shortOrLongName Either the #CommandlineCommand::name or
+     * #CommandlineCommand::shortName of the command that should be fetched
+     * \return The command that respond to the given name or short name, or
+     * <code>nullptr</code> if no such CommandlineCommand exists
      */
-    void exitWithError(const std::string& msg, const std::string& command = "");
+    CommandlineCommand* getCommand(const std::string& shortOrLongName);
 
     /// The stored commands
     std::vector<CommandlineCommand*> _commands;
