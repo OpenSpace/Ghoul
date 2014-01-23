@@ -23,72 +23,151 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef VRN_SINGLECOMMAND_H
-#define VRN_SINGLECOMMAND_H
+#ifndef __SINGLECOMMAND_H__
+#define __SINGLECOMMAND_H__
 
-#include "voreen/core/utils/cmdparser/command.h"
+#include <ghoul/cmdparser/commandlinecommand.h>
+#include <ghoul/logging/logmanager.h>
 
-namespace voreen {
+namespace ghoul {
+namespace cmdparser {
 
 /**
- * This class represents a command which can occur only once in a given commandline and can have
- * 1-4 arguments of types T, U, V and U.
- * This class simply tries to convert the parameters to the appropriate values and stores them in it
- * The template must be usable within a stringstream (necessary for conversion)
+ * This class represents a command that can occur only once in a given commandline and can
+ * have up to 4 arguments of respective types <code>T</code>, <code>U</code>,
+ * <code>V</code>, and <code>U</code>. The concrete amount of variables is determined by
+ * the constructor used. The command tries to convert the parameters to the appropriate
+ * types and stores them. The template classes <code>T</code>, <code>U</code>,
+ * <code>V</code>, and <code>U</code> must be convertable using an
+ * <code>std::stringstream</code>.
+ * \tparam T The typename of the first argument type
+ * \tparam U The typename of the second argument type, defaulting to <code>T</code>
+ * \tparam V The typename of the third argument type, defaulting to <code>U</code>
+ * \tparam W The typename of the fourth argument type, defaulting to <code>V>/code>
  * \sa SingleCommandZeroArguments
  */
-template<class T, class U = T, class V = U, class W = V>
-class SingleCommand : public Command {
+template<typename T, typename U = T, typename V = U, typename W = V>
+class SingleCommand : public CommandlineCommand {
 public:
+    /**
+     * This constructor uses the one parameter. The command does not take ownership of the
+     * passed value.
+     * \param ptr1 The pointer to the parameter that will be set when this command is
+     * executed
+     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * order to be valid
+     * \param shortName The (optional) short name for this command. If it is provided, it 
+     * has to start with a <code>-</code> in order to be valid
+     * \param infoText The info text that will be presented to the user if it is requested
+     * by the CommandlineParser
+     * \param parameterList The explanation of the parameters that this command expects.
+     * Is presented to the user upon request by the CommandlineParser
+     */
     SingleCommand(T* ptr1,
-        const std::string& name, const std::string& shortName = "", const std::string& infoText = "",
-        const std::string parameterList = "")
-        : Command(name, shortName, infoText, parameterList, 1, false)
-        , ptr1_(ptr1)
-        , ptr2_(0)
-        , ptr3_(0)
-        , ptr4_(0)
+                  const std::string& name, const std::string& shortName = "",
+                  const std::string& infoText = "", const std::string parameterList = "")
+        : CommandlineCommand(name, shortName, infoText, parameterList, 1, false)
+        , _ptr1(ptr1)
+        , _ptr2(nullptr)
+        , _ptr3(nullptr)
+        , _ptr4(nullptr)
     {}
 
+    /**
+     * This constructor uses two parameters. These can be of the same or different types.
+     * The command does not take ownership of the value.
+     * \param ptr1 The pointer to the parameter that will be set when this command is
+     * executed
+     * \param ptr2 The pointer to the second parameter that will be set when this command
+     * is executed
+     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * order to be valid
+     * \param shortName The (optional) short name for this command. If it is provided, it
+     * has to start with a <code>-</code> in order to be valid
+     * \param infoText The info text that will be presented to the user if it is requested
+     * by the CommandlineParser
+     * \param parameterList The explanation of the parameters that this command expects.
+     * Is presented to the user upon request by the CommandlineParser
+     */
     SingleCommand(T* ptr1, U* ptr2,
-        const std::string& name, const std::string& shortName = "", const std::string& infoText = "",
-        const std::string parameterList = "")
-        : Command(name, shortName, infoText, parameterList, 2, false)
-        , ptr1_(ptr1)
-        , ptr2_(ptr2)
-        , ptr3_(0)
-        , ptr4_(0)
+                  const std::string& name, const std::string& shortName = "",
+                  const std::string& infoText = "", const std::string parameterList = "")
+        : CommandlineCommand(name, shortName, infoText, parameterList, 2, false)
+        , _ptr1(ptr1)
+        , _ptr2(ptr2)
+        , _ptr3(nullptr)
+        , _ptr4(nullptr)
     {}
 
+    /**
+     * This constructor uses three parameters. These can be of the same or different
+     * types. The command does not take ownership of the value.
+     * \param ptr1 The pointer to the parameter that will be set when this command is
+     * executed
+     * \param ptr2 The pointer to the second parameter that will be set when this command
+     * is executed
+     * \param ptr3 The pointer to the third parameter that will be set when this command
+     * is executed
+     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * order to be valid
+     * \param shortName The (optional) short name for this command. If it is provided, it
+     * has to start with a <code>-</code> in order to be valid
+     * \param infoText The info text that will be presented to the user if it is requested
+     * by the CommandlineParser
+     * \param parameterList The explanation of the parameters that this command expects.
+     * Is presented to the user upon request by the CommandlineParser
+     */
     SingleCommand(T* ptr1, U* ptr2, V* ptr3,
-        const std::string& name, const std::string& shortName = "", const std::string& infoText = "",
-        const std::string parameterList = "")
-        : Command(name, shortName, infoText, parameterList, 3, false)
-        , ptr1_(ptr1)
-        , ptr2_(ptr2)
-        , ptr3_(ptr3)
-        , ptr4_(0)
+                  const std::string& name, const std::string& shortName = "",
+                  const std::string& infoText = "", const std::string parameterList = "")
+        : CommandlineCommand(name, shortName, infoText, parameterList, 3, false)
+        , _ptr1(ptr1)
+        , _ptr2(ptr2)
+        , _ptr3(ptr3)
+        , _ptr4(nullptr)
     {}
 
+    /**
+     * This constructor uses all four parameters. These can be of the same or different
+     * types. The command does not take ownership of the value.
+     * \param ptr1 The pointer to the parameter that will be set when this command is
+     * executed
+     * \param ptr2 The pointer to the second parameter that will be set when this command
+     * is executed
+     * \param ptr3 The pointer to the third parameter that will be set when this command
+     * is executed
+     * \param ptr4 The pointer to the fourth parameter that will be set when this command
+     * is executed
+     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * order to be valid
+     * \param shortName The (optional) short name for this command. If it is provided, it
+     * has to start with a <code>-</code> in order to be valid
+     * \param infoText The info text that will be presented to the user if it is requested
+     * by the CommandlineParser
+     * \param parameterList The explanation of the parameters that this command expects.
+     * Is presented to the user upon request by the CommandlineParser
+     */
     SingleCommand(T* ptr1, U* ptr2, V* ptr3, W* ptr4,
-        const std::string& name, const std::string& shortName = "", const std::string& infoText = "",
-        const std::string parameterList = "")
-        : Command(name, shortName, infoText, parameterList, 4, false)
-        , ptr1_(ptr1)
-        , ptr2_(ptr2)
-        , ptr3_(ptr3)
-        , ptr4_(ptr4)
+                  const std::string& name, const std::string& shortName = "",
+                  const std::string& infoText = "", const std::string parameterList = "")
+        : CommandlineCommand(name, shortName, infoText, parameterList, 4, false)
+        , _ptr1(ptr1)
+        , _ptr2(ptr2)
+        , _ptr3(ptr3)
+        , _ptr4(ptr4)
     {}
 
-    ~SingleCommand() {}
+    
     bool execute(const std::vector<std::string>& parameters) {
-        *ptr1_ = cast<T>(parameters[0]);
-        if (ptr2_ != 0)
-            *ptr2_ = cast<U>(parameters[1]);
-        if (ptr3_ != 0)
-            *ptr3_ = cast<V>(parameters[2]);
-        if (ptr4_ != 0)
-            *ptr4_ = cast<W>(parameters[3]);
+        cast(parameters[0], *_ptr1);
+        if (_ptr2 != nullptr) {
+            cast(parameters[1], *_ptr2);
+        }
+        if (_ptr3 != nullptr) {
+            cast(parameters[2], *_ptr3);
+        }
+        if (_ptr4 != nullptr)
+            cast(parameters[3], *_ptr4);
 
         return true;
     }
@@ -96,11 +175,11 @@ public:
     bool checkParameters(const std::vector<std::string>& parameters) {
         std::ostringstream errorStr;
 
-        bool result = parameters.size() == static_cast<size_t>(argumentNum_);
+        bool result = parameters.size() == static_cast<size_t>(_argumentNum);
         if (!result) {
             errorStr << "Invalid number of parameters: " << parameters.size();
-            errorStr << ", expected: " << argumentNum_;
-            errorMsg_ = errorStr.str();
+            errorStr << ", expected: " << _argumentNum;
+            _errorMsg = errorStr.str();
             return false;
         }
 
@@ -108,61 +187,62 @@ public:
         if (!result)
             errorStr << "First parameter invalid";
 
-        if (result && ptr2_) {
+        if (result && (_ptr2 != nullptr)) {
             result &= is<U>(parameters[1]);
             if (!result)
                 errorStr << "Second parameter invalid";
         }
 
-        if (result && ptr3_) {
+        if (result && (_ptr3 != nullptr)) {
             result &= is<V>(parameters[2]);
             if (!result)
                 errorStr << "Third parameter invalid";
         }
 
-        if (result && ptr4_) {
+        if (result && (_ptr4 != nullptr)) {
             result &= is<W>(parameters[3]);
             if (!result)
                 errorStr << "Fourth parameter invalid";
         }
 
         if (!result)
-            errorMsg_ = errorStr.str();
+            _errorMsg = errorStr.str();
 
         return result;
     }
 
 protected:
-    T* ptr1_;
-    U* ptr2_;
-    V* ptr3_;
-    W* ptr4_;
+    T* _ptr1;
+    U* _ptr2;
+    V* _ptr3;
+    W* _ptr4;
 };
 
 
 /**
- * This class represents a command with zero arguments which can only occur once in a given commandline.
- * The pointer will be set to "true", if the command is executed
- * The template must be usable within a stringstream (necessary for conversion)
- * \sa SingleCommand
+ * This class represents a command with zero arguments that can only occur once in a given
+ * commandline. The bool pointer will be set to <code>true</code>, if the command is
+ * executed
  */
-class SingleCommandZeroArguments : public Command {
+class SingleCommandZeroArguments : public CommandlineCommand {
 public:
-    SingleCommandZeroArguments(bool* ptr, const std::string& name, const std::string& shortName = "",
-        const std::string& infoText = "")
-        : Command(name, shortName, infoText, "", 0, false)
-        , ptr_(ptr)
+    SingleCommandZeroArguments(bool* ptr, const std::string& name,
+                               const std::string& shortName = "",
+                               const std::string& infoText = "")
+        : CommandlineCommand(name, shortName, infoText, "", 0, false)
+        , _ptr(ptr)
     {}
 
     bool execute(const std::vector<std::string>& /*parameters*/) {
-        *ptr_ = true;
+        *_ptr = true;
         return true;
     }
 
 protected:
-    bool* ptr_;
+    bool* _ptr;
 };
 
-} // namespace
+} // namespace cmdparser
+} // namespace ghoul
 
 #endif // VRN_SINGLECOMMAND_H

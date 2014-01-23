@@ -23,120 +23,147 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef VRN_MULTIPLECOMMAND_H
-#define VRN_MULTIPLECOMMAND_H
+#ifndef __MULTIPLECOMMAND_H__
+#define __MULTIPLECOMMAND_H__
+
+#include <ghoul/cmdparser/commandlinecommand.h>
 
 #include <vector>
-#include "voreen/core/utils/cmdparser/command.h"
 
-namespace voreen {
+namespace ghoul {
+namespace cmdparser {
 
 /**
- * This class represents a command which can be called multiple times in a given commandline and
- * can have 1-4 arguments of types T, U, V and U.
- * This class simply tries to convert the parameters to the appropriate values and stores them in it
- * The template must be usable within a stringstream (necessary for conversion)
+ * This class represents a command that can called multiple times in a given commandline
+ * and can have up to 4 arguments of respective types <code>T</code>, <code>U</code>,
+ * <code>V</code>, and <code>U</code>. Each time the command is called, the converted
+ * value is appended to a vector that has been passed in the constructor. The concrete
+ * amount of variables is determined by the constructor used. The command tries to convert
+ * the parameters to the appropriate types and stores them. The template classes
+ * <code>T</code>, <code>U</code>, <code>V</code>, and <code>U</code> must be convertable
+ * using an <code>std::stringstream</code>.
+ * \tparam T The typename of the first argument type
+ * \tparam U The typename of the second argument type, defaulting to <code>T</code>
+ * \tparam V The typename of the third argument type, defaulting to <code>U</code>
+ * \tparam W The typename of the fourth argument type, defaulting to <code>V>/code>
  * \sa MultipleCommandZeroArguments
  */
 template<class T, class U = T, class V = U, class W = V>
-class MultipleCommand : public Command {
+class MultipleCommand : public CommandlineCommand {
 public:
-    MultipleCommand(std::vector<T>* ptr1,
-        const std::string& name, const std::string& shortName = "", const std::string& infoText = "",
-        const std::string parameterList = "")
-        : Command(name, shortName, infoText, parameterList, 1, true)
-        , ptr1_(ptr1)
-        , ptr2_(0)
-        , ptr3_(0)
-        , ptr4_(0)
+    MultipleCommand(std::vector<T>* ptr1, const std::string& name,
+                    const std::string& shortName = "", const std::string& infoText = "",
+                    const std::string parameterList = "")
+        : CommandlineCommand(name, shortName, infoText, parameterList, 1, true)
+        , _ptr1(ptr1)
+        , _ptr2(nullptr)
+        , _ptr3(nullptr)
+        , _ptr4(nullptr)
     {}
 
     MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2,
-        const std::string& name, const std::string& shortName = "", const std::string& infoText = "",
-        const std::string parameterList = "")
-        : Command(name, shortName, infoText, parameterList, 2, true)
-        , ptr1_(ptr1)
-        , ptr2_(ptr2)
-        , ptr3_(0)
-        , ptr4_(0)
+                    const std::string& name, const std::string& shortName = "",
+                    const std::string& infoText = "",
+                    const std::string parameterList = "")
+        : CommandlineCommand(name, shortName, infoText, parameterList, 2, true)
+        , _ptr1(ptr1)
+        , _ptr2(ptr2)
+        , _ptr3(nullptr)
+        , _ptr4(nullptr)
     {}
 
     MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2, std::vector<V>* ptr3,
-        const std::string& name, const std::string& shortName = "", const std::string& infoText = "",
-        const std::string parameterList = "")
-        : Command(name, shortName, infoText, parameterList, 3, true)
-        , ptr1_(ptr1)
-        , ptr2_(ptr2)
-        , ptr3_(ptr3)
-        , ptr4_(0)
+        const std::string& name, const std::string& shortName = "",
+                    const std::string& infoText = "",
+                    const std::string parameterList = "")
+        : CommandlineCommand(name, shortName, infoText, parameterList, 3, true)
+        , _ptr1(ptr1)
+        , _ptr2(ptr2)
+        , _ptr3(ptr3)
+        , _ptr4(nullptr)
     {}
 
-    MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2, std::vector<V>* ptr3, std::vector<W>* ptr4,
-        const std::string& name, const std::string& shortName = "", const std::string& infoText = "",
-        const std::string parameterList = "")
-        : Command(name, shortName, infoText, parameterList, 4, true)
-        , ptr1_(ptr1)
-        , ptr2_(ptr2)
-        , ptr3_(ptr3)
-        , ptr4_(ptr4)
+    MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2, std::vector<V>* ptr3,
+                    std::vector<W>* ptr4, const std::string& name,
+                    const std::string& shortName = "", const std::string& infoText = "",
+                    const std::string parameterList = "")
+        : CommandlineCommand(name, shortName, infoText, parameterList, 4, true)
+        , _ptr1(ptr1)
+        , _ptr2(ptr2)
+        , _ptr3(ptr3)
+        , _ptr4(ptr4)
     {}
 
     bool execute(const std::vector<std::string>& parameters) {
-        ptr1_->push_back(cast<T>(parameters[0]));
-        if (ptr2_ != 0)
-            ptr2_->push_back(cast<U>(parameters[1]));
-        if (ptr3_ != 0)
-            ptr3_->push_back(cast<V>(parameters[2]));
-        if (ptr4_ != 0)
-            ptr4_->push_back(cast<W>(parameters[3]));
+        T v1;
+        cast(parameters[0], v1);
+        _ptr1->push_back(v1);
+        if (_ptr2 != nullptr) {
+            U v2;
+            cast<U>(parameters[1], v2);
+            _ptr2->push_back(v2);
+        }
+        if (_ptr3 != nullptr) {
+            V v3;
+            cast<V>(parameters[2], v3);
+            _ptr3->push_back(v3);
+        }
+        if (_ptr4 != nullptr) {
+            W v4;
+            cast<W>(parameters[3], v4);
+            _ptr4->push_back(v4);
+        }
 
         return true;
     }
 
     bool checkParameters(const std::vector<std::string>& parameters) {
-        bool result = parameters.size() == static_cast<size_t>(argumentNum_);
+        bool result = parameters.size() == static_cast<size_t>(_argumentNum);
 
         result &= is<T>(parameters[0]);
-        if (ptr2_ != 0)
+        if (_ptr2 != nullptr)
             result &= is<U>(parameters[1]);
-        if (ptr3_ != 0)
+        if (_ptr3 != nullptr)
             result &= is<V>(parameters[2]);
-        if (ptr4_ != 0)
+        if (_ptr4 != nullptr)
             result &= is<W>(parameters[3]);
 
         return result;
     }
 
 protected:
-    std::vector<T>* ptr1_;
-    std::vector<U>* ptr2_;
-    std::vector<V>* ptr3_;
-    std::vector<W>* ptr4_;
+    std::vector<T>* _ptr1;
+    std::vector<U>* _ptr2;
+    std::vector<V>* _ptr3;
+    std::vector<W>* _ptr4;
 };
 
 /**
- * This class represents a command with zero arguments which can be called multiple times in a given commandline.
- * The pointer will be set to "true", if the command is executed
- * The template must be usable within a stringstream (necessary for conversion)
+ * This class represents a command with zero arguments which can be called multiple times
+ * in a given commandline. The <code>int</code> pointer will contain the number of how
+ * often the command was present in the command-line.
  * \sa MultipleCommand
  */
-class MultipleCommandZeroArguments : public Command {
+class MultipleCommandZeroArguments : public CommandlineCommand {
 public:
-    MultipleCommandZeroArguments(std::vector<bool>* ptr, const std::string& name, const std::string& shortName = "",
+    MultipleCommandZeroArguments(int* ptr, const std::string& name, const std::string& shortName = "",
         const std::string& infoText = "")
-        : Command(name, shortName, infoText, "", 0, true)
-        , ptr_(ptr)
-    {}
+        : CommandlineCommand(name, shortName, infoText, "", 0, true)
+        , _ptr(ptr)
+    {
+        _ptr = 0;
+    }
 
     bool execute(const std::vector<std::string>& /*parameters*/) {
-        ptr_->push_back(true);
+        ++_ptr;
         return true;
     }
 
 protected:
-    std::vector<bool>* ptr_;
+    int* _ptr;
 };
 
-} // namespace
+} // namespace cmdparser
+} // namespace ghoul
 
-#endif // VRN_MULTIPLECOMMAND_H
+#endif // __MULTIPLECOMMAND_H__
