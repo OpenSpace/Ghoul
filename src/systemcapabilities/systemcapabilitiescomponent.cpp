@@ -41,11 +41,13 @@ SystemCapabilitiesComponent::SystemCapabilitiesComponent()
 
 SystemCapabilitiesComponent::~SystemCapabilitiesComponent() {}
 
-void SystemCapabilitiesComponent::initialize(bool initializeWMI) {
 #ifdef GHOUL_USE_WMI
+void SystemCapabilitiesComponent::initialize(bool initializeWMI) {
     if (initializeWMI && !isWMIinitialized()) {
         SystemCapabilitiesComponent::initializeWMI();
     }
+#else
+void SystemCapabilitiesComponent::initialize(bool) {
 #endif
     _isInitialized = true;
 }
