@@ -210,102 +210,102 @@ TEST_F(ConfigurationManagerTest, TimingTest) {
     }
     {
         START_TIMER(setValueLevel1vec3, logFile, 25);
-        _m->getValue("t", glm::vec3(1.0));
+        _m->setValue("t", glm::vec3(1.0));
         FINISH_TIMER(setValueLevel1vec3, logFile);
     }
     {
         START_TIMER(setValueLevel1vec4, logFile, 25);
-        _m->getValue("t", glm::vec4(1.0));
+        _m->setValue("t", glm::vec4(1.0));
         FINISH_TIMER(setValueLevel1vec4, logFile);
     }
     {
         START_TIMER(setValueLevel1dvec2, logFile, 25);
-        _m->getValue("t", glm::dvec2(1.0));
+        _m->setValue("t", glm::dvec2(1.0));
         FINISH_TIMER(setValueLevel1dvec2, logFile);
     }
     {
         START_TIMER(setValueLevel1dvec3, logFile, 25);
-        _m->getValue("t", glm::dvec3(1.0));
+        _m->setValue("t", glm::dvec3(1.0));
         FINISH_TIMER(setValueLevel1dvec3, logFile);
     }
     {
         START_TIMER(setValueLevel1dvec4, logFile, 25);
-        _m->getValue("t", glm::dvec4(1.0));
+        _m->setValue("t", glm::dvec4(1.0));
         FINISH_TIMER(setValueLevel1dvec4, logFile);
     }
     {
         START_TIMER(setValueLevel1ivec2, logFile, 25);
-        _m->getValue("t", glm::ivec2(1.0));
+        _m->setValue("t", glm::ivec2(1.0));
         FINISH_TIMER(setValueLevel1ivec2, logFile);
     }
     {
         START_TIMER(setValueLevel1ivec3, logFile, 25);
-        _m->getValue("t", glm::ivec3(1.0));
+        _m->setValue("t", glm::ivec3(1.0));
         FINISH_TIMER(setValueLevel1ivec3, logFile);
     }
     {
         START_TIMER(setValueLevel1ivec4, logFile, 25);
-        _m->getValue("t", glm::ivec4(1.0));
+        _m->setValue("t", glm::ivec4(1.0));
         FINISH_TIMER(setValueLevel1ivec4, logFile);
     }
     {
         START_TIMER(setValueLevel1bvec2, logFile, 25);
-        _m->getValue("t", glm::bvec2(true));
+        _m->setValue("t", glm::bvec2(true));
         FINISH_TIMER(setValueLevel1bvec2, logFile);
     }
     {
         START_TIMER(setValueLevel1bvec3, logFile, 25);
-        _m->getValue("t", glm::bvec3(true));
+        _m->setValue("t", glm::bvec3(true));
         FINISH_TIMER(setValueLevel1bvec3, logFile);
     }
     {
         START_TIMER(setValueLevel1bvec4, logFile, 25);
-        _m->getValue("t", glm::bvec4(true));
+        _m->setValue("t", glm::bvec4(true));
         FINISH_TIMER(setValueLevel1bvec4, logFile);
     }
     {
         START_TIMER(setValueLevel1uvec2, logFile, 25);
-        _m->getValue("t", glm::uvec2(1.0));
+        _m->setValue("t", glm::uvec2(1.0));
         FINISH_TIMER(setValueLevel1uvec2, logFile);
     }
     {
         START_TIMER(setValueLevel1uvec3, logFile, 25);
-        _m->getValue("t", glm::uvec3(1.0));
+        _m->setValue("t", glm::uvec3(1.0));
         FINISH_TIMER(setValueLevel1uvec3, logFile);
     }
     {
         START_TIMER(setValueLevel1uvec4, logFile, 25);
-        _m->getValue("t", glm::uvec4(1.0));
+        _m->setValue("t", glm::uvec4(1.0));
         FINISH_TIMER(setValueLevel1uvec4, logFile);
     }
     {
         START_TIMER(setValueLevel1dmat2x4, logFile, 25);
-        _m->getValue("t", glm::dmat2x4(1.0));
+        _m->setValue("t", glm::dmat2x4(1.0));
         FINISH_TIMER(setValueLevel1dmat2x4, logFile);
     }
     {
         START_TIMER(setValueLevel1dmat2x3, logFile, 25);
-        _m->getValue("t", glm::dmat2x3(1.0));
+        _m->setValue("t", glm::dmat2x3(1.0));
         FINISH_TIMER(setValueLevel1dmat2x3, logFile);
     }
     {
         START_TIMER(setValueLevel1dmat2, logFile, 25);
-        _m->getValue("t", glm::dmat2(1.0));
+        _m->setValue("t", glm::dmat2(1.0));
         FINISH_TIMER(setValueLevel1dmat2, logFile);
     }
     {
         START_TIMER(setValueLevel1dmat3x2, logFile, 25);
-        _m->getValue("t", glm::dmat3x2(1.0));
+        _m->setValue("t", glm::dmat3x2(1.0));
         FINISH_TIMER(setValueLevel1dmat3x2, logFile);
     }
     {
         START_TIMER(setValueLevel1dmat3x4, logFile, 25);
-        _m->getValue("t", glm::dmat3x4(1.0));
+        _m->setValue("t", glm::dmat3x4(1.0));
         FINISH_TIMER(setValueLevel1dmat3x4, logFile);
     }
     {
         START_TIMER(setValueLevel1dmat3, logFile, 25);
-        _m->getValue("t", glm::dmat3(1.0));
+        _m->setValue("t", glm::dmat3(1.0));
         FINISH_TIMER(setValueLevel1dmat3, logFile);
     }
     {
