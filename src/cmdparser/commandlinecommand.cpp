@@ -30,8 +30,12 @@
 namespace ghoul {
 namespace cmdparser {
 
-CommandlineCommand::CommandlineCommand(const std::string& name, const std::string& shortName, const std::string& infoText,
-                 const std::string& parameterList, const int argumentNum, const bool allowMultipleCalls)
+CommandlineCommand::CommandlineCommand(const std::string& name,
+                                       const std::string& shortName,
+                                       const std::string& infoText,
+                                       const std::string& parameterList,
+                                       const int argumentNum,
+                                       const bool allowMultipleCalls)
     : _name(name)
     , _shortName(shortName)
     , _infoText(infoText)
@@ -70,7 +74,7 @@ bool CommandlineCommand::allowsMultipleCalls() const {
 std::string CommandlineCommand::usage() const {
     std::string result = "[";
     if (shortName() != "")
-        result = result + "<" + shortName() + "|" + name() + ">";
+        result += "<" + shortName() + "|" + name() + ">";
     else
         result += name();
 
@@ -98,12 +102,6 @@ const std::string& CommandlineCommand::errorMessage() const {
 
 bool CommandlineCommand::checkParameters(const std::vector<std::string>& parameters) {
     return (parameters.size() == static_cast<size_t>(argumentNumber()));
-}
-
-bool CommandlineCommand::isValueInSet(const std::string& value, 
-                                      const std::set<std::string>& set)
-{
-    return (set.find(value) != set.end());
 }
 
 } // namespace cmdparser

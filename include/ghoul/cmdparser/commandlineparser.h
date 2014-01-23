@@ -37,32 +37,30 @@ class CommandlineCommand;
 class CommandlineParser {
 public:
     /**
-     * Default constructor which does nothing fancy at all
-     * \param programName The name of the program. Used in the \sa displayUsage and \sa displayHelp methods
+     * Default constructor.
+     * \param programName The name of the program. Used in the #displayUsage and
+     * #displayHelp methods
      */
     CommandlineParser(const std::string& programName = "");
 
     /**
-     * The destructor will also delete all the contained classes within
+     * The destructor will also delete all the contained commands within.
      */
     ~CommandlineParser();
 
     /**
-     * Sets the commandline given from the main method.
+     * Sets the command-line given from the main function.
+     * \TODO Make variables into references so the commandline parser can change them
      * \param argc The number of arguments
-     * \param argv The arguments themself
+     * \param argv The arguments themselves
      */
     void setCommandLine(int argc, char** argv);
 
     /**
-     * Sets the commandline given from the main method.
-     * \param arguments The arguments
-     */
-    void setCommandLine(std::vector<std::string> arguments);
-
-    /**
-     * Parses the commandline, evaluates all the commands and executes them. The nameless command
-     * will be checked last, but executed first. Other executions might be somewhat random
+     * Parses the command-line (#setCommandLine), evaluates all the commands
+     * (#CommandlineCommand::checkParameters) and executes (#CommandlineCommand::execute)
+     * them. The nameless command (#addCommandForNamelessArguments) will be checked last,
+     * but executed first. The order of other CommandlineCommands are undefined.
      */
     void execute();
 
