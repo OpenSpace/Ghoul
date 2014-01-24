@@ -53,7 +53,7 @@
         std::ostringstream __tmp__; __tmp__ << __message__; \
         if (ghoul::logging::LogManager::isInitialized()) \
             LogMgr.logMessage( \
-                ghoul::logging::LogManager::LogLevel::Info, \
+                ghoul::logging::LogManager::LogLevel::Warning, \
                 __category__, \
                 __tmp__.str() \
             ); \
@@ -79,7 +79,7 @@
         std::ostringstream __tmp__; __tmp__ << __message__; \
         if (ghoul::logging::LogManager::isInitialized()) \
             LogMgr.logMessage( \
-                ghoul::logging::LogManager::LogLevel::Error, \
+                ghoul::logging::LogManager::LogLevel::Fatal, \
                 __category__, \
                 __tmp__.str() \
             ); \
