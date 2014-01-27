@@ -82,6 +82,14 @@ CommandlineParser::~CommandlineParser() {
         delete i;
     _commands.clear();
 }
+    
+void CommandlineParser::setAllowUnknownCommands(bool allowUnknownCommands) {
+    _allowUnknownCommands = allowUnknownCommands;
+}
+
+bool CommandlineParser::allowsUnknownCommands() const {
+    return _allowUnknownCommands;
+}
 
 const std::string& CommandlineParser::programPath() const {
     return _programPath;
@@ -159,7 +167,7 @@ bool CommandlineParser::execute() {
                     const int number = extractArguments(_arguments, arguments, i, -2);
                     for (const std::string& arg : arguments)
                         _remainingArguments->push_back(arg);                    
-                    i += number;
+                    i += (number - 1);
                 }
             }
         }

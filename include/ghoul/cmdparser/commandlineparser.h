@@ -53,6 +53,29 @@ public:
      * The destructor will also delete all the contained commands within.
      */
     ~CommandlineParser();
+    
+    /**
+     * Sets if this Commandline parser allows command-line arguments that do not belong to
+     * any registered CommandlineCommand. If this is set to <code>true</code>, a receiving
+     * <code>std::vector</code> has to be provided in the #setCommandline method which
+     * will contain all command-line arguments that were not consumed by this parser.
+     * Warning: This method is only valid to be called before #setCommmandLine. Calling it
+     * after the command-line has been set results in undefined behaviour.
+     * \param allowUnknownCommands If set to <code>true</code> this parser allows unknown
+     * arguments without a corresponding CommandlineCommand. If <code>false</code> this
+     * will lead to logging of errors and #execute will return <code>false</code> if any
+     * unknown commands are encountered during execution
+     */
+    void setAllowUnknownCommands(bool allowUnknownCommands);
+    
+    /**
+     * Returns if this CommandlineParser allows unknown commands, which do not have a
+     * CommandlineCommand associated with them, in the command-line set by
+     * #setCommandline.
+     * \return <code>true</code> if unknown command-line arguments are allowed by this
+     * CommandlineParser; <code>false</code> otherwise
+     */
+    bool allowsUnknownCommands() const;
 
     /**
      * Sets the command-line given from the main function.
