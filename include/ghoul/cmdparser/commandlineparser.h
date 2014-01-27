@@ -41,8 +41,13 @@ public:
      * Default constructor.
      * \param programName The name of the program. Used in the #displayUsage and
      * #displayHelp methods
+     * \param allowUnknownCommands If this is set to <code>true</code> the
+     * CommandlineParser will ignore commands it did not recognize and extract only the
+     * used commands from the passed command-line, leaving the unknown commands untouched.
+     * This allows other parts of the program to deal with command-line arguments as well.
      */
-    CommandlineParser(const std::string& programName = "");
+    CommandlineParser(const std::string& programName = "",
+                      bool allowUnknownCommands = false);
 
     /**
      * The destructor will also delete all the contained commands within.
@@ -51,11 +56,17 @@ public:
 
     /**
      * Sets the command-line given from the main function.
-     * \TODO Make variables into references so the commandline parser can change them
      * \param argc The number of arguments
      * \param argv The arguments themselves
+     * \param remainingArguments A pointer to the vector which will contain all the
+     * command-line arguments which have not been consumed by this CommandlineParser. In
+     * order for this parameter to be used, the <code>allowUnknownCommands</code>
+     * parameter in #CommandlineParser::CommandlineParser has to be set to
+     * <code>true<code> and <code>remainingArguments</code> must point to a valid instance
+     * of <code>std::vector<std::string></code>
      */
-    void setCommandLine(int argc, char** argv);
+    void setCommandLine(int argc, char** argv,
+                        std::vector<std::string>* remainingArguments = nullptr);
 
     /**
      * Parses the command-line (#setCommandLine), evaluates all the commands
@@ -140,6 +151,16 @@ protected:
      * <code>nullptr</code> if no such CommandlineCommand exists
      */
     CommandlineCommand* getCommand(const std::string& shortOrLongName);
+    
+    /**
+     * This method returns <code>true</code> if unknown commands should be stored in the
+     * #CommandlineParser::_remainingArguments vector. This method checks if that vector
+     * is not <code>nullptr</code> and #CommandlineParser::_allowUnknownCommands has been
+     * set to <code>true</code>
+     * \return <code>true</code> if the CommandlineParser should (and is capable of) store
+     * unknown commands in the #CommandlineParser::_remainingArguments vector
+     */
+    bool storeUnknownCommands() const;
 
     /// The stored commands
     std::vector<CommandlineCommand*> _commands;
@@ -149,12 +170,19 @@ protected:
 
     /// All the arguments passed onto this parser
     std::vector<std::string> _arguments;
+    
+    /// The pointer to the vector that will store all the arguments which have not been
+    /// consumed by the CommandlineParser
+    std::vector<std::string>* _remainingArguments;
 
     /// The path to the program + filename
     std::string _programPath;
 
     /// The name of the program used in the \sa usage method
     std::string _programName;
+    
+    /// Should the CommandlineParser allow unknown commands or throw an error in that case
+    bool _allowUnknownCommands;
 };
 
 } // namespace cmdparser

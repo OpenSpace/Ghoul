@@ -25,6 +25,9 @@
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 
+#include <ghoul/cmdparser/singlecommand.h>
+#include <ghoul/cmdparser/multiplecommand.h>
+
 #include <sstream>
 
 namespace ghoul {

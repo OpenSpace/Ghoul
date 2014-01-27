@@ -11,7 +11,7 @@
  * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to    *
  * permit persons to whom the Software is furnished to do so, subject to the following   *
  * conditions:                                                                           *
- *                                                                                       *
+ *                                 argumentsForNameless                                                      *
  * The above copyright notice and this permission notice shall be included in all copies *
  * or substantial portions of the Software.                                              *
  *                                                                                       *
@@ -69,9 +69,12 @@ int extractArguments(const std::vector<std::string> in, std::vector<std::string>
 namespace ghoul {
 namespace cmdparser {
 
-CommandlineParser::CommandlineParser(const std::string& programName)
-  : _commandForNamelessArguments(nullptr)
-  , _programName(programName)
+CommandlineParser::CommandlineParser(const std::string& programName,
+                                     bool allowUnknownCommands)
+    : _commandForNamelessArguments(nullptr)
+    , _remainingArguments(nullptr)
+    , _programName(programName)
+    , _allowUnknownCommands(allowUnknownCommands)
 {}
 
 CommandlineParser::~CommandlineParser() {
@@ -84,7 +87,21 @@ const std::string& CommandlineParser::programPath() const {
     return _programPath;
 }
 
-void CommandlineParser::setCommandLine(int argc, char** argv) {
+void CommandlineParser::setCommandLine(int argc, char** argv,
+                                       std::vector<std::string>* remainingArguments)
+{
+    if (_allowUnknownCommands && (remainingArguments == nullptr)) {
+        LERROR("Unknown commands are allowed, but no vector which will contain the " <<
+                 "commands has been specified. Additional commands will cause the " <<
+                 "CommmandlineParser to fail");
+    }
+    if (!_allowUnknownCommands && (remainingArguments != nullptr)) {
+        LERROR("Unkonwn commands are not allowed, but a vector which would receive " <<
+                 "the additional commands has been specified. Additional commands " <<
+                 "will cause the CommandlineParser to fail");
+    }
+        
+    
     // argv[0] = program name
     // argv[i] = i-th argument
     if (argc > 0 && argv && argv[0])
@@ -94,6 +111,8 @@ void CommandlineParser::setCommandLine(int argc, char** argv) {
 
     // Might be possible that someone calls us multiple times
     _arguments.clear();
+    
+    _remainingArguments = remainingArguments;
 
     // Just add the arguments to the vector
     for (int i = 1; i < argc; ++i)
@@ -101,6 +120,8 @@ void CommandlineParser::setCommandLine(int argc, char** argv) {
 }
 
 bool CommandlineParser::execute() {
+    if (_arguments.size() == 0)
+        return true;
     // There is only one argument and this is either "-h" or "--help"
     // so display the help
     const bool isHelpArgument = ((_arguments[0] == "-h") || (_arguments[0] == "--help"));
@@ -123,8 +144,24 @@ bool CommandlineParser::execute() {
         // The restriction for '-' is enforced in the #addCommand method
         if (_arguments[i][0] != '-') {
             // The rest of the commands until the next '-' are for the nameless command
-            const int number = extractArguments(_arguments, argumentsForNameless, i, -2);
-            i += (number - 1);
+            // if we have one
+            if (_commandForNamelessArguments != nullptr) {
+                const int number = extractArguments(_arguments,
+                                                    argumentsForNameless, i, -2);
+                i += (number - 1);
+            }
+            else {
+                // if we do not have a command for nameless arguments, but we have a place
+                // to store them; we do not need to check if the nameless command is
+                // available as this is done later
+                if (storeUnknownCommands()) {
+                    std::vector<std::string> arguments;
+                    const int number = extractArguments(_arguments, arguments, i, -2);
+                    for (const std::string& arg : arguments)
+                        _remainingArguments->push_back(arg);                    
+                    i += number;
+                }
+            }
         }
         else {
             // We have found a command
@@ -132,10 +169,22 @@ bool CommandlineParser::execute() {
 
             // currentCommand = nullptr, if there wasn't a command with that specific
             // name or shortName
-            if (currentCommand == 0) {
-                LFATAL(_arguments[i] + " is not a valid command");
-                displayUsage();
-                return false;
+            if (currentCommand == nullptr) {
+                if (storeUnknownCommands()) {
+                    // Extract the rest of the arguments
+                    std::vector<std::string> arguments;
+                    const int number = extractArguments(_arguments, arguments, i, -2);
+                    _remainingArguments->push_back(_arguments[i]);
+                    for (const std::string& arg : arguments)
+                        _remainingArguments->push_back(arg);
+                    i += number;
+                    continue;
+                }
+                else {
+                    LFATAL(_arguments[i] + " is not a valid command");
+                    displayUsage();
+                    return false;
+                }
             }
 
             std::vector<std::string> parameters;
@@ -161,9 +210,15 @@ bool CommandlineParser::execute() {
     // First step: Test, if we have nameless arguments even if we don't have a nameless
     // command. If so, bail out
     if (!argumentsForNameless.empty() && (_commandForNamelessArguments == nullptr)) {
-        LFATAL("No appropriate command available for nameless parameters");
-        displayUsage();
-        return false;
+        if (storeUnknownCommands()) {
+            for (const std::string& arg : argumentsForNameless)
+                _remainingArguments->push_back(arg);
+        }
+        else {
+            LFATAL("No appropriate command available for nameless parameters");
+            displayUsage();
+            return false;
+        }
     }
 
     // Second step: Check if every command is happy with the parameters assigned to it
@@ -177,7 +232,7 @@ bool CommandlineParser::execute() {
         }
     }
 
-    // Second-and-a-halfs step: Display pairs for (command,argument) if verbosity is wanted
+    // Second-and-a-halfs step: Display pairs for (command,argument) in debug level
     std::stringstream s;
     for (const std::string& arg : argumentsForNameless)
         s << " " << arg;
@@ -207,11 +262,15 @@ bool CommandlineParser::execute() {
     // until now)
     for (auto it = parameterMap.begin(); it != parameterMap.end(); ++it) {
         bool correct = it->first->execute(it->second);
-        if (!correct) {
+        if (correct) {
+            
+        }
+        else {
             LFATAL("The execution for " + (*it).first->name() + " failed");
             displayUsage();
             return false;
         }
+        
     }
     
     // If we made it this far it means that all commands have been executed successfully
@@ -302,5 +361,9 @@ CommandlineCommand* CommandlineParser::getCommand(const std::string& shortOrLong
     return nullptr;
 }
 
+bool CommandlineParser::storeUnknownCommands() const {
+    return _allowUnknownCommands && (_remainingArguments != nullptr);
+}
+    
 } // namespace cmdparser
 } // namespace voreen
