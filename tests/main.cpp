@@ -30,7 +30,7 @@
 #include <ghoul/logging/logging>
 
 #include "tests/test_common.inl"
-//#include "tests/test_configurationmanager.inl"
+#include "tests/test_configurationmanager.inl"
 #include "tests/test_commandlineparser.inl"
 
 using namespace ghoul::cmdparser;
