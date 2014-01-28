@@ -41,7 +41,7 @@ void ConfigurationManager::setValue(const std::string& key, const T&) {
         typeid(T).name());
 }
 
-/*
+#ifdef WIN32
 extern template void ConfigurationManager::setValue<>(
                             const std::string& key, const bool& value);
 extern template void ConfigurationManager::setValue<>(
@@ -245,6 +245,6 @@ extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, glm::dmat4x3& value);
 extern template bool ConfigurationManager::getValue<>(
                             const std::string& key, glm::dmat4x4& value);
-*/
+#endif
 
 } // namespace ghoul
