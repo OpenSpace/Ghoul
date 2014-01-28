@@ -120,13 +120,23 @@ if (GHOUL_HAVE_TESTS)
     add_definitions(-DGTEST_HAS_GLOBAL_STRING=0)
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/gtest)
     
-    include_directories("${GHOUL_ROOT_DIR}/ext/gtest/include")
+    if (APPLE)
+		include_directories(/Developer/Headers/FlatCarbon)
+		find_library(CARBON_LIBRARY Carbon)
+		find_library(COCOA_LIBRARY Carbon)
+		find_library(APP_SERVICES_LIBRARY ApplicationServices)
+		mark_as_advanced(CARBON_LIBRARY COCOA_LIBRARY APP_SERVICES_LIBRARY)
+    	set(EXTRA_LIBS ${CARBON_LIBRARY} ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})
+	endif()
+
+    
+	include_directories("${GHOUL_ROOT_DIR}/ext/gtest/include")
     include_directories("${GHOUL_ROOT_DIR}")
     include_directories("${GHOUL_ROOT_DIR}/include")
     file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
     
     add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})
-    target_link_libraries(GhoulTest gtest Ghoul Lua)
+    target_link_libraries(GhoulTest gtest Ghoul Lua ${EXTRA_LIBS})
     # set_target_properties(
 endif ()
 

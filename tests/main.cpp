@@ -25,22 +25,32 @@
 
 #include "gtest/gtest.h"
 
+#include <ghoul/cmdparser/cmdparser>
 #include <ghoul/filesystem/filesystem>
 #include <ghoul/logging/logging>
 
 #include "tests/test_common.inl"
 #include "tests/test_configurationmanager.inl"
+#include "tests/test_commandlineparser.inl"
 
+using namespace ghoul::cmdparser;
 using namespace ghoul::filesystem;
 using namespace ghoul::logging;
 
 int main(int argc, char** argv) {
-    FileSystem::initialize();
-    FileSys.registerPathToken("${SCRIPTS}", "../scripts");
-    FileSys.registerPathToken("${TEST_DIR}" , "../tests");
-
-    LogManager::initialize(LogManager::LogLevel::Fatal);
+    LogManager::initialize(LogManager::LogLevel::Info);
     LogMgr.addLog(new ConsoleLog);
+
+    FileSystem::initialize();
+
+    const bool extDir = FileSys.directoryExists("../../../ext/ghoul/tests");
+    if (extDir) {
+        FileSys.registerPathToken("${SCRIPTS_DIR}", "../../../ext/ghoul/scripts");
+        FileSys.registerPathToken("${TEST_DIR}", "../../../ext/ghoul/tests");
+    }
+    else {
+        LFATALC("main", "Fix me");
+    }
 
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

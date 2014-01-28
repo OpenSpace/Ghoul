@@ -77,7 +77,7 @@ std::string lua_logStack(lua_State* state, LogManager::LogLevel level) {
                 result << lua_tostring(state, i);
                 break;
             case LUA_TBOOLEAN:
-                result << lua_toboolean(state, i) ? "true" : "false";
+                result << (lua_toboolean(state, i) ? "true" : "false");
                 break;
             case LUA_TNUMBER:
                 result << lua_tonumber(state, i);

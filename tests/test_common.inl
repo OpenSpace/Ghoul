@@ -65,17 +65,43 @@
     __stream__ << '\t' << __name__##Total / __name__##Num << "us\n";
 
 #else
+
 #include <chrono>
 
-#define START_TIMER(__name__) \
+#define START_TIMER(__name__, __stream__, __num__) \
+    __stream__ << #__name__; \
+    std::chrono::nanoseconds __name__##Total = std::chrono::nanoseconds(0); \
+    unsigned int __name__##Num = 0; \
+    for (__name__##Num = 0; __name__##Num < __num__; ++__name__##Num) { \
+        resetManager(); \
+        std::chrono::high_resolution_clock::time_point __name__##End; \
         std::chrono::high_resolution_clock::time_point __name__##Start = \
-        std::chrono::high_resolution_clock::now() \
+        std::chrono::high_resolution_clock::now()
+
+#define START_TIMER_NO_RESET(__name__, __stream__, __num__) \
+    __stream__ << #__name__; \
+    std::chrono::nanoseconds __name__##Total = std::chrono::nanoseconds(0); \
+    unsigned int __name__##Num = 0; \
+    for (__name__##Num = 0; __name__##Num < __num__; ++__name__##Num) { \
+        std::chrono::high_resolution_clock::time_point __name__##End; \
+        std::chrono::high_resolution_clock::time_point __name__##Start = \
+        std::chrono::high_resolution_clock::now()
+
+#define START_TIMER_PREPARE(__name__, __stream__, __num__, __prepare__) \
+    __stream__ << #__name__; \
+    std::chrono::nanoseconds __name__##Total = std::chrono::nanoseconds(0); \
+    unsigned int __name__##Num = 0; \
+    for (__name__##Num = 0; __name__##Num < __num__; ++__name__##Num) { \
+        resetManager(); \
+        __prepare__; \
+        std::chrono::high_resolution_clock::time_point __name__##End; \
+        std::chrono::high_resolution_clock::time_point __name__##Start = \
+        std::chrono::high_resolution_clock::now()
 
 #define FINISH_TIMER(__name__, __stream__) \
-    do { \
-        std::chrono::high_resolution_clock::time_point __name__##End = \
-        std::chrono::high_resolution_clock::now(); \
-        std::chrono::microseconds d = __name__##End - __name__##Start; \
-        __stream__ << #__name__ << '\t' << d.count() << char(230) << "s" << '\n'; \
-    } while (false)
+        __name__##End = std::chrono::high_resolution_clock::now(); \
+        const std::chrono::nanoseconds d = __name__##End - __name__##Start; \
+        __name__##Total += d; \
+    } \
+    __stream__ << #__name__ << '\t' << __name__##Total.count() / 1000.0 <<  "us" << '\n';
 #endif

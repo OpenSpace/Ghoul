@@ -82,9 +82,9 @@ string FileSystem::absolutePath(const string& path) const {
     string result = path;
     expandPathTokens(result);
 
+    static const int PATH_BUFFER_SIZE = 4096;
     char* buffer = nullptr;
 #ifdef WIN32
-    static const int PATH_BUFFER_SIZE = 4096;
     buffer = new char[PATH_BUFFER_SIZE];
     const DWORD success = GetFullPathName(result.c_str(), PATH_BUFFER_SIZE, buffer, 0);
     if (success == 0) {
@@ -92,12 +92,19 @@ string FileSystem::absolutePath(const string& path) const {
         buffer = nullptr;
     }
 #else
-    buffer = realpath(result.c_str(), 0);
+    char errorBuffer[PATH_BUFFER_SIZE];
+    buffer = realpath(result.c_str(), errorBuffer);
+    if (buffer == NULL) {
+        LERROR("Error resolving the real path. Problem part: '" << errorBuffer << "'");
+        return result;
+    }
 #endif
 
     if (buffer) {
         result = string(buffer);
+#ifdef WIN32
         delete[] buffer;
+#endif
         return result;
     }
 
