@@ -95,7 +95,8 @@ public:
      * Parses the command-line (#setCommandLine), evaluates all the commands
      * (#CommandlineCommand::checkParameters) and executes (#CommandlineCommand::execute)
      * them. The nameless command (#addCommandForNamelessArguments) will be checked last,
-     * but executed first. The execution order of other CommandlineCommands is undefined.
+     * but executed first. The execution order of other CommandlineCommands occurs in the
+     * order they appear in the command-line passed in #setCommandLine.
      * \return <code>true</code> if the execution passed successfully; <code>false</code>
      * is returned if either the execution failed or the user requested the help. If the
      * execution fails, parts of the commands may have been already executed, thus leaving

@@ -151,11 +151,11 @@ public:
         : CommandlineCommand(name, shortName, infoText, "", 0, true)
         , _ptr(ptr)
     {
-        _ptr = 0;
+        *_ptr = 0;
     }
 
     bool execute(const std::vector<std::string>& /*parameters*/) {
-        ++_ptr;
+        ++(*_ptr);
         return true;
     }
 
