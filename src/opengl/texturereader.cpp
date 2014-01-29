@@ -39,6 +39,8 @@ Texture* loadTexture(const std::string& filename, bool useCompression) {
     std::string _loggerCat = "loadTexture";
 
     ilInit();
+    iluInit();
+    
     //ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
     //ilEnable(IL_ORIGIN_SET);
 

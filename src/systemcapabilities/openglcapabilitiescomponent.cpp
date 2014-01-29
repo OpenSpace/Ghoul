@@ -247,9 +247,11 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
 
     if (verbosity >= Verbosity::Full) {
         std::stringstream s;
-        for (size_t i = 0; i < _extensions.size() - 1; ++i)
-            s << _extensions[i] << ", ";
-        s << _extensions[_extensions.size() - 1] << "\n";
+        if (_extensions.size() > 0) {
+            for (size_t i = 0; i < _extensions.size() - 1; ++i)
+                s << _extensions[i] << ", ";
+            s << _extensions[_extensions.size() - 1] << "\n";
+        }
         result.push_back(std::make_pair("Extensions", s.str()));
     }
     return result;
