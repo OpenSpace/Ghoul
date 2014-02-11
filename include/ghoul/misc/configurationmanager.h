@@ -162,6 +162,19 @@ public:
      * <code>false</code> if an error occurred
      */
     bool loadConfiguration(const std::string& filename);
+    
+    /**
+     * Load the configuration provided as a Lua source code into the local store. Each new
+     * configuration will be merged with the current state, which will overwrite duplicate
+     * settings. The configuration has to be provided as a semi-valid Lua script, i.e., a
+     * chunk that is made valid by adding a <code>return</code> in front of it. All
+     * default Lua libraries are available in the configuration script and will
+     * automatically be loaded in the #initialize step.
+     * \param filename The source of the configuration script that is to be loaded
+     * \return <code>true</code> if the configuration was successfully loaded;
+     * <code>false</code> if an error occurred
+     */
+    bool loadConfigurationSource(const std::string& source);
 
     /**
      * This method returns all the keys that are available at a certain
