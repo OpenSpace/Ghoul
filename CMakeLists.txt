@@ -113,7 +113,9 @@ if (GHOUL_USE_DEVIL)
     set(DEVIL_LIBRARIES ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
 endif ()
 
-    
+include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
+include_directories(${GHOUL_ROOT_DIR}/ext/boost)
+
 if (APPLE)
 	include_directories(/Developer/Headers/FlatCarbon)
 	find_library(COREFOUNDATION_LIBRARY CoreFoundation)
@@ -146,9 +148,6 @@ if (GHOUL_HAVE_TESTS)
     target_link_libraries(GhoulTest gtest Ghoul Lua ${MAC_LIBS})
     # set_target_properties(
 endif ()
-
-
-include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
 
 #####
 # Platform-dependent Settings
