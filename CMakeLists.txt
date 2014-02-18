@@ -154,8 +154,14 @@ include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
 # Platform-dependent Settings
 #####
 if (APPLE)
-	add_definitions(-D__gl_h_)
-#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-gnu")
+    add_definitions(-D__gl_h_)
+#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-gnu")
+    find_library(FRAMEWORK_CoreServices
+    NAMES CoreServices
+    PATHS ${CMAKE_OSX_SYSROOT}/System/Library
+    PATH_SUFFIXES Frameworks
+    NO_DEFAULT_PATH)
+    set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${FRAMEWORK_CoreServices})
 endif ()
 
 add_subdirectory(src)
