@@ -38,7 +38,7 @@ namespace ghoul {
 const std::vector<const string> Dictionary::keys(const string& location) const {
 	if (location.empty()) {
 		std::vector<const string> result;
-		for (auto it : _map)
+		for (auto it : *this)
 			result.push_back(it.first);
 		return result;
 	}
@@ -47,8 +47,8 @@ const std::vector<const string> Dictionary::keys(const string& location) const {
 	std::string rest;
 	splitKey(location, first, rest);
 
-	const std::map<string, boost::any>::const_iterator keyIt = _map.find(first);
-	if (keyIt == _map.cend()) {
+	const std::map<string, boost::any>::const_iterator keyIt = find(first);
+	if (keyIt == cend()) {
 		LERROR("Key '" << first << "' was not found in dictionary");
 		return std::vector<const string>();
 	}
@@ -64,16 +64,16 @@ const std::vector<const string> Dictionary::keys(const string& location) const {
 }
 
 bool Dictionary::hasKey(const string& key) const {
-	std::map<string, boost::any>::const_iterator it = _map.find(key);
-	if (it != _map.cend())
+	std::map<string, boost::any>::const_iterator it = find(key);
+	if (it != cend())
 		return true;
 
 	std::string first;
 	std::string rest;
 	splitKey(key, first, rest);
 
-	const std::map<string, boost::any>::const_iterator keyIt = _map.find(first);
-	if (keyIt == _map.cend())
+	const std::map<string, boost::any>::const_iterator keyIt = find(first);
+	if (keyIt == cend())
 		return false;
 
 	const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
@@ -83,7 +83,7 @@ bool Dictionary::hasKey(const string& key) const {
 }
 
 size_t Dictionary::size() const {
-	return _map.size();
+	return size();
 }
 
 bool Dictionary::splitKey(const string& key, string& first, string& rest) const {
@@ -98,6 +98,27 @@ bool Dictionary::splitKey(const string& key, string& first, string& rest) const 
 		rest = key.substr(l + 1);
 		return true;
 	}
+}
+
+const std::type_info& Dictionary::type(const std::string& key) const {
+	const std::map<std::string, boost::any>::const_iterator it = find(key);
+	if (it != cend())
+		return it->second.type();
+
+	std::string first;
+	std::string rest;
+	splitKey(key, first, rest);
+
+	const std::map<std::string, boost::any>::const_iterator keyIt = find(first);
+	if (keyIt == cend())
+		return typeid(void);
+
+	const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
+	if (dict == nullptr)
+		return typeid(void);
+	
+	// Proper tail-recursion
+	return dict->type(rest);
 }
 
 } // namespace ghoul
