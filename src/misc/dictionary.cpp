@@ -35,10 +35,10 @@ namespace {
 
 namespace ghoul {
 
-const std::vector<const string> Dictionary::keys(const string& location) const {
+const std::vector<string> Dictionary::keys(const string& location) const {
 	if (location.empty()) {
-		std::vector<const string> result;
-		for (auto it : *this)
+		std::vector<string> result;
+		for (const std::pair<string, boost::any>& it : *this)
 			result.push_back(it.first);
 		return result;
 	}
@@ -50,14 +50,14 @@ const std::vector<const string> Dictionary::keys(const string& location) const {
 	const std::map<string, boost::any>::const_iterator keyIt = find(first);
 	if (keyIt == cend()) {
 		LERROR("Key '" << first << "' was not found in dictionary");
-		return std::vector<const string>();
+		return std::vector<string>();
 	}
 
 	const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
 	if (dict == nullptr) {
 		LERROR("Error converting key '" << first << "' to type 'Dictionary', was '" <<
 			keyIt->second.type().name() << "'");
-		return std::vector<const string>();
+		return std::vector<string>();
 	}
 	// proper tail-recursion
 	return dict->keys(rest);

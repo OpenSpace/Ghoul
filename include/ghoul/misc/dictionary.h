@@ -44,7 +44,7 @@ namespace ghoul {
 class Dictionary : private std::map<std::string, boost::any> {
 public:
 	// recusive
-	const std::vector<const std::string> keys(const std::string& location = "") const;
+	const std::vector<std::string> keys(const std::string& location = "") const;
 
 	// recusive
 	bool hasKey(const std::string& key) const;
