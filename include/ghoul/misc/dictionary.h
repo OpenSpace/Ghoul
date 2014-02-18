@@ -29,26 +29,35 @@
 #include <boost/any.hpp>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace ghoul {
 
 class Dictionary {
 public:
-    Dictionary();
+	const std::vector<const std::string> keys(const std::string& location = "") const;
+	bool hasKey(const std::string& key) const;
 
     template <typename T>
     bool setValue(const std::string& key, T&& value);
 
     template <typename T>
-    bool getValue(const std::string& key, T& value);
+    bool getValue(const std::string& key, T& value) const;
+
+	template <typename T>
+	bool hasValue(const std::string& key) const;
 
     size_t size() const;
 
-private:
-    std::map<std::string, boost::any> _map;
+//private:
+	// returns if there is a rest
+	bool splitKey(const std::string& key, std::string& first, std::string& rest) const;
 
+    std::map<std::string, boost::any> _map;
 };
 
 } // namespace ghoul
+
+#include "dictionary.inl"
 
 #endif

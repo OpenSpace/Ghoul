@@ -25,10 +25,79 @@
 
 #include "misc/dictionary.h"
 
+#include <ghoul/logging/logmanager.h>
+
+using std::string;
+
+namespace {
+	const std::string _loggerCat = "Dictionary";
+}
+
 namespace ghoul {
 
-Dictionary::Dictionary() {
+const std::vector<const string> Dictionary::keys(const string& location) const {
+	if (location.empty()) {
+		std::vector<const string> result;
+		for (auto it : _map)
+			result.push_back(it.first);
+		return result;
+	}
 
+	std::string first;
+	std::string rest;
+	splitKey(location, first, rest);
+
+	const std::map<string, boost::any>::const_iterator keyIt = _map.find(first);
+	if (keyIt == _map.cend()) {
+		LERROR("Key '" << first << "' was not found in dictionary");
+		return std::vector<const string>();
+	}
+
+	const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
+	if (dict == nullptr) {
+		LERROR("Error converting key '" << first << "' to type 'Dictionary', was '" <<
+			keyIt->second.type().name() << "'");
+		return std::vector<const string>();
+	}
+	// proper tail-recursion
+	return dict->keys(rest);
+}
+
+bool Dictionary::hasKey(const string& key) const {
+	std::map<string, boost::any>::const_iterator it = _map.find(key);
+	if (it != _map.cend())
+		return true;
+
+	std::string first;
+	std::string rest;
+	splitKey(key, first, rest);
+
+	const std::map<string, boost::any>::const_iterator keyIt = _map.find(first);
+	if (keyIt == _map.cend())
+		return false;
+
+	const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
+	if (dict == nullptr)
+		return false;
+	return dict->hasKey(rest);
+}
+
+size_t Dictionary::size() const {
+	return _map.size();
+}
+
+bool Dictionary::splitKey(const string& key, string& first, string& rest) const {
+	const string::size_type l = key.find('.');
+
+	if (l == string::npos) {
+		first = key;
+		return false;
+	}
+	else {
+		first = key.substr(0, l);
+		rest = key.substr(l + 1);
+		return true;
+	}
 }
 
 } // namespace ghoul

@@ -37,11 +37,11 @@ file(GLOB CMDPARSER_HEADER_INL ${HEADER_ROOT_DIR}/cmdparser.inl)
 set(CMDPARSER_GLOB_HEADER ${HEADER_ROOT_DIR}/cmdparser/cmdparser)
 set(GHOUL_HEADER ${GHOUL_HEADER} ${CMDPARSER_HEADER} ${CMDPARSER_HEADER_INL})
 source_group(CmdParser FILES
-				${CMDPARSER_SOURCE}
-				${CMDPARSER_SOURCE_C}
-				${CMDPARSER_GLOB_HEADER}
-				${CMDPARSER_HEADER}
-				${CMDPARSER_HEADER_INL})
+                ${CMDPARSER_SOURCE}
+                ${CMDPARSER_SOURCE_C}
+                ${CMDPARSER_GLOB_HEADER}
+                ${CMDPARSER_HEADER}
+                ${CMDPARSER_HEADER_INL})
 
 file(GLOB FILESYSTEM_SOURCE ${SOURCE_ROOT_DIR}/filesystem/*.cpp)
 file(GLOB FILESYSTEM_SOURCE_C ${SOURCE_ROOT_DIR}/filesystem/*.c)
@@ -51,11 +51,11 @@ file(GLOB FILESYSTEM_HEADER_INL ${HEADER_ROOT_DIR}/filesystem/*.inl)
 set(FILESYSTEM_GLOB_HEADER ${HEADER_ROOT_DIR}/filesystem/filesystem)
 set(GHOUL_HEADER ${GHOUL_HEADER} ${FILESYSTEM_HEADER} ${FILESYSTEM_HEADER_INL})
 source_group(FileSystem FILES
-				${FILESYSTEM_SOURCE}
-				${FILESYSTEM_SOURCE_C}
-				${FILESYSTEM_GLOB_HEADER}
-				${FILESYSTEM_HEADER}
-				${FILESYSTEM_HEADER_INL})
+                ${FILESYSTEM_SOURCE}
+                ${FILESYSTEM_SOURCE_C}
+                ${FILESYSTEM_GLOB_HEADER}
+                ${FILESYSTEM_HEADER}
+                ${FILESYSTEM_HEADER_INL})
 
 file(GLOB LOG_SOURCE ${SOURCE_ROOT_DIR}/logging/*.cpp)
 file(GLOB LOG_SOURCE_C ${SOURCE_ROOT_DIR}/logging/*.c)
@@ -65,11 +65,11 @@ file(GLOB LOG_HEADER_INL ${HEADER_ROOT_DIR}/logging/*.inl)
 set(LOG_GLOB_HEADER ${HEADER_ROOT_DIR}/logging/logging)
 set(GHOUL_HEADER ${GHOUL_HEADER} ${LOG_HEADER} ${LOG_HEADER_INL})
 source_group(LogManager FILES
-				${LOG_SOURCE}
-				${LOG_SOURCE_C}
-				${LOG_GLOB_HEADER}
-				${LOG_HEADER}
-				${LOG_HEADER_INL})
+                ${LOG_SOURCE}
+                ${LOG_SOURCE_C}
+                ${LOG_GLOB_HEADER}
+                ${LOG_HEADER}
+                ${LOG_HEADER_INL})
 
 file(GLOB LUA_SOURCE ${SOURCE_ROOT_DIR}/lua/*.cpp)
 file(GLOB LUA_SOURCE_C ${SOURCE_ROOT_DIR}/lua/*.c)
@@ -97,11 +97,11 @@ file(GLOB OPENGL_HEADER_INL ${HEADER_ROOT_DIR}/opengl/*.inl)
 set(OPENGL_GLOB_HEADER ${HEADER_ROOT_DIR}/opengl/opengl)
 set(GHOUL_HEADER ${GHOUL_HEADER} ${OPENGL_HEADER} ${OPENGL_HEADER_INL})
 source_group(OpenGL FILES
-				${OPENGL_SOURCE}
-				${OPENGL_SOURCE_C}
-				${OPENGL_GLOB_HEADER}
-				${OPENGL_HEADER}
-				${OPENGL_HEADER_INL})
+                ${OPENGL_SOURCE}
+                ${OPENGL_SOURCE_C}
+                ${OPENGL_GLOB_HEADER}
+                ${OPENGL_HEADER}
+                ${OPENGL_HEADER_INL})
 
 file(GLOB SYSTEMCAPABILITIES_SOURCE ${SOURCE_ROOT_DIR}/systemcapabilities/*.cpp)
 file(GLOB SYSTEMCAPABILITIES_SOURCE_C ${SOURCE_ROOT_DIR}/systemcapabilities/*.c)
@@ -111,11 +111,11 @@ file(GLOB SYSTEMCAPABILITIES_HEADER_INL ${HEADER_ROOT_DIR}/systemcapabilities/*.
 set(SYSTEMCAPABILITIES_GLOB_HEADER ${HEADER_ROOT_DIR}/systemcapabilities/systemcapabilities)
 set(GHOUL_HEADER ${GHOUL_HEADER} ${SYSTEMCAPABILITIES_HEADER} ${SYSTEMCAPABILITIES_HEADER_INL})
 source_group(SystemCapabilities FILES
-				${SYSTEMCAPABILITIES_SOURCE}
-				${SYSTEMCAPABILITIES_SOURCE_C}
-				${SYSTEMCAPABILITIES_GLOB_HEADER}
-				${SYSTEMCAPABILITIES_HEADER}
-				${SYSTEMCAPABILITIES_HEADER_INL})
+                ${SYSTEMCAPABILITIES_SOURCE}
+                ${SYSTEMCAPABILITIES_SOURCE_C}
+                ${SYSTEMCAPABILITIES_GLOB_HEADER}
+                ${SYSTEMCAPABILITIES_HEADER}
+                ${SYSTEMCAPABILITIES_HEADER_INL})
 
 set(GHOUL_HEADER ${GHOUL_HEADER} ${HEADER_ROOT_DIR}/glm.h)
 
@@ -132,7 +132,7 @@ if (CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake)")
     if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
         string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
     else ()
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3")
     endif ()
     # C4201: nonstandard extension used : nameless struct/union    # Extension is ubiquitous
     # C4127: 'if' or 'while' loop evaluates to a constant          # Used for 'swallowing the semicolon" idiom
