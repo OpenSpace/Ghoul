@@ -35,29 +35,30 @@ namespace ghoul {
 
 /*
  * TODO:
- * - constructor with initializer list
- * - write UnitTests
  * - documentation
  */
 
 
 class Dictionary : private std::map<std::string, boost::any> {
 public:
-	// recusive
+	Dictionary();
+	Dictionary(std::initializer_list<std::pair<std::string, boost::any>> l);
+
+	// recursive
 	const std::vector<std::string> keys(const std::string& location = "") const;
 
-	// recusive
+	// recursive
 	bool hasKey(const std::string& key) const;
 
-	// recusive
+	// recursive (if intermediates exist)
     template <typename T>
     bool setValue(const std::string& key, T&& value);
 
-	// recusive
+	// recursive
     template <typename T>
     bool getValue(const std::string& key, T& value) const;
 
-	// recusive
+	// recursive
 	template <typename T>
 	bool hasValue(const std::string& key) const;
 

@@ -35,6 +35,13 @@ namespace {
 
 namespace ghoul {
 
+Dictionary::Dictionary() {}
+
+Dictionary::Dictionary(std::initializer_list<std::pair<std::string, boost::any>> l) {
+	for (const std::pair<string, boost::any>& p : l)
+		(*this)[p.first] = p.second;
+}
+
 const std::vector<string> Dictionary::keys(const string& location) const {
 	if (location.empty()) {
 		std::vector<string> result;
@@ -83,7 +90,7 @@ bool Dictionary::hasKey(const string& key) const {
 }
 
 size_t Dictionary::size() const {
-	return size();
+	return std::map<std::string, boost::any>::size();
 }
 
 bool Dictionary::splitKey(const string& key, string& first, string& rest) const {
