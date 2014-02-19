@@ -155,7 +155,7 @@ include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
 #####
 if (APPLE)
     add_definitions(-D__gl_h_)
-#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-gnu")
+    add_definitions(-Wno-write-strings)
     find_library(FRAMEWORK_CoreServices
     NAMES CoreServices
     PATHS ${CMAKE_OSX_SYSROOT}/System/Library
