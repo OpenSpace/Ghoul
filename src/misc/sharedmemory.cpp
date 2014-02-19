@@ -29,8 +29,16 @@
 #include <ghoul/misc/crc32.h>
 #include <atomic>
 
-#ifndef WIN32
+#ifdef WIN32
 #include <sys/shm.h>
+#else
+#include <sys/shm.h>
+#include <string.h>
+/* Common access type bits, used with ipcperm(). */
+#define IPC_R       000400  /* read permission */
+#define IPC_W       000200  /* write/alter permission */
+#define IPC_M       010000  /* permission to change control info */
+
 #endif
 
 namespace ghoul {

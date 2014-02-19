@@ -30,6 +30,7 @@
 #include <atomic>
 #include <cassert>
 #include <fstream>
+#include <string.h>
 
 //todo semaphore
 

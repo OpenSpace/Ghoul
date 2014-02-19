@@ -33,6 +33,7 @@
 #include <assert.h>
 #include <sstream>
 #include <typeinfo>
+#include <algorithm>
 
 namespace {
     const std::string _loggerCat = "SystemCapabilities";

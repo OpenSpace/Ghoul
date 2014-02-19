@@ -39,6 +39,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/param.h>
+#include <sys/stat.h>
 #endif
 
 using std::string;
