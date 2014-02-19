@@ -93,7 +93,7 @@ protected:
         }
     }
 
-    void resetManager() {
+    void reset() {
         _m->deinitialize();
         delete _m;
         _m = new ghoul::ConfigurationManager;

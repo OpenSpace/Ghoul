@@ -29,7 +29,7 @@
     double __name__##Total = 0.0; \
     unsigned int __name__##Num = 0; \
     for (__name__##Num = 0; __name__##Num < __num__; ++__name__##Num) { \
-        resetManager(); \
+        reset(); \
         LARGE_INTEGER __name__##Start; \
         LARGE_INTEGER __name__##End; \
         QueryPerformanceCounter(&__name__##Start)
@@ -48,7 +48,7 @@
     double __name__##Total = 0.0; \
     unsigned int __name__##Num = 0; \
     for (__name__##Num = 0; __name__##Num < __num__; ++__name__##Num) { \
-        resetManager(); \
+        reset(); \
         __prepare__; \
         LARGE_INTEGER __name__##Start; \
         LARGE_INTEGER __name__##End; \
@@ -73,7 +73,7 @@
     std::chrono::nanoseconds __name__##Total = std::chrono::nanoseconds(0); \
     unsigned int __name__##Num = 0; \
     for (__name__##Num = 0; __name__##Num < __num__; ++__name__##Num) { \
-        resetManager(); \
+        reset(); \
         std::chrono::high_resolution_clock::time_point __name__##End; \
         std::chrono::high_resolution_clock::time_point __name__##Start = \
         std::chrono::high_resolution_clock::now()
@@ -92,7 +92,7 @@
     std::chrono::nanoseconds __name__##Total = std::chrono::nanoseconds(0); \
     unsigned int __name__##Num = 0; \
     for (__name__##Num = 0; __name__##Num < __num__; ++__name__##Num) { \
-        resetManager(); \
+        reset(); \
         __prepare__; \
         std::chrono::high_resolution_clock::time_point __name__##End; \
         std::chrono::high_resolution_clock::time_point __name__##Start = \

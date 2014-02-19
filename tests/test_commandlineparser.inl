@@ -52,7 +52,7 @@ protected:
     ~CommandlineParserTest() {
     }
 
-    void resetParser() {
+    void reset() {
         delete _p;
         _p = new ghoul::cmdparser::CommandlineParser;
     }

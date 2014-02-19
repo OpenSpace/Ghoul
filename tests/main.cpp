@@ -32,13 +32,17 @@
 #include "tests/test_common.inl"
 #include "tests/test_configurationmanager.inl"
 #include "tests/test_commandlineparser.inl"
+#include "tests/test_dictionary.inl"
+
+#include <ghoul/misc/dictionary.h>
+#include <iostream>
 
 using namespace ghoul::cmdparser;
 using namespace ghoul::filesystem;
 using namespace ghoul::logging;
 
 int main(int argc, char** argv) {
-    LogManager::initialize(LogManager::LogLevel::Info);
+    LogManager::initialize(LogManager::LogLevel::None);
     LogMgr.addLog(new ConsoleLog);
 
     FileSystem::initialize();
