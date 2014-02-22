@@ -37,7 +37,7 @@ namespace ghoul {
 
 Dictionary::Dictionary() {}
 
-Dictionary::Dictionary(std::initializer_list<std::pair<std::string, boost::any>> l) {
+Dictionary::Dictionary(const std::initializer_list<std::pair<string, boost::any>>& l) {
 	for (const std::pair<string, boost::any>& p : l)
 		(*this)[p.first] = p.second;
 }

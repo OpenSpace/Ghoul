@@ -128,11 +128,11 @@ include_directories(
     ${GHOUL_ROOT_DIR}/include
     ${GHOUL_ROOT_DIR}/include/ghoul)
     
-if (CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake)")
+if (CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake|MSBuild)")
     if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
         string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
     else ()
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
     endif ()
     # C4201: nonstandard extension used : nameless struct/union    # Extension is ubiquitous
     # C4127: 'if' or 'while' loop evaluates to a constant          # Used for 'swallowing the semicolon" idiom
