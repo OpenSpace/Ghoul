@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012 Alexander Bock                                                     *
+ * Copyright (c) 2012-2014                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -52,7 +52,7 @@ protected:
     ~CommandlineParserTest() {
     }
 
-    void resetParser() {
+    void reset() {
         delete _p;
         _p = new ghoul::cmdparser::CommandlineParser;
     }

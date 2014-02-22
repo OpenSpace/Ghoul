@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012 Alexander Bock                                                     *
+ * Copyright (c) 2012-2014                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -32,13 +32,17 @@
 #include "tests/test_common.inl"
 #include "tests/test_configurationmanager.inl"
 #include "tests/test_commandlineparser.inl"
+#include "tests/test_dictionary.inl"
+
+#include <ghoul/misc/dictionary.h>
+#include <iostream>
 
 using namespace ghoul::cmdparser;
 using namespace ghoul::filesystem;
 using namespace ghoul::logging;
 
 int main(int argc, char** argv) {
-    LogManager::initialize(LogManager::LogLevel::Info);
+    LogManager::initialize(LogManager::LogLevel::None);
     LogMgr.addLog(new ConsoleLog);
 
     FileSystem::initialize();
