@@ -26,6 +26,7 @@
 #ifndef __CONFIGURATIONMANAGER_H__
 #define __CONFIGURATIONMANAGER_H__
 
+#include <ghoul/misc/dictionary.h>
 #include <ghoul/logging/logmanager.h>
 #include <string>
 #include <vector>
@@ -233,6 +234,7 @@ public:
 private:
     /// Stores the Lua state including the main script and the table containing the config
     lua_State* _state;
+    Dictionary* _dictionary;
 };
 
 } // namespace ghoul

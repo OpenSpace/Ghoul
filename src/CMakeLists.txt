@@ -143,6 +143,11 @@ else()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-long-long -pedantic -Wextra")
     endif(UNIX)
 endif ()
-    
+
+# Create the Ghoul library
 add_library(Ghoul ${GHOUL_SOURCE} ${GHOUL_HEADER})
+
+# Adding debug flags for the debug build
+set_target_properties(Ghoul PROPERTIES COMPILE_DEFINITIONS_DEBUG "_DEBUG GHL_DEBUG")
+
 target_link_libraries(Ghoul Lua ${GHOUL_DEPENDENCIES})

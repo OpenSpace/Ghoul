@@ -24,6 +24,7 @@
  ****************************************************************************************/
 
 #include <ghoul/glm.h>
+#include <ghoul/logging/logmanager.h>
 
 namespace ghoul {
 

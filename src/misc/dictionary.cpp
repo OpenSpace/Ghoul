@@ -25,8 +25,6 @@
 
 #include "misc/dictionary.h"
 
-#include <ghoul/logging/logmanager.h>
-
 using std::string;
 
 namespace {
