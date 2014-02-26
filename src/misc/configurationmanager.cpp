@@ -42,12 +42,6 @@ namespace ghoul {
 
 namespace helper {
     void populateDictionary(lua_State* L, Dictionary* D);
-#ifndef NDEBUG
-    std::string getValueAsString(Dictionary* D, std::string key);
-    void printDictionary(Dictionary* D);
-    void _printDictionaryWithDotStyle(Dictionary* D, std::string preName);
-#endif
-    
 } // namespace helper
     
 
@@ -173,7 +167,7 @@ bool ConfigurationManager::loadConfiguration(const std::string& filename, bool i
 #ifndef NDEBUG
     // Print the keys
     LDEBUG("_dictionary contains the following");
-    helper::printDictionary(_dictionary);
+    LDEBUG(std::endl << _dictionary->serializeToLuaString());
 #endif
 
     return true;
@@ -238,60 +232,5 @@ void helper::populateDictionary(lua_State* L, Dictionary* D) {
         lua_pop(L, 1);
     }
 }
-#ifndef NDEBUG
-std::string helper::getValueAsString(Dictionary* D, std::string key) {
-    if(D->type(key) == typeid(std::string)) {
-        std::string value;
-        if (D->getValue(key, value)) {
-            return value;
-        }
-    }
-    std::stringstream stringvalue;
-    if(D->type(key) == typeid(double)) {
-        double value;
-        if (D->getValue(key, value)) {
-            stringvalue << value;
-        }
-    } else if(D->type(key) == typeid(int)) {
-        int value;
-        if (D->getValue(key, value)) {
-            stringvalue << value;
-        }
-    } else if(D->type(key) == typeid(bool)) {
-        bool value;
-        if (D->getValue(key, value)) {
-            stringvalue << std::boolalpha << value;
-        }
-    }
-    return stringvalue.str();
-}
-    
-void helper::_printDictionaryWithDotStyle(Dictionary* D, std::string preName) {
-    auto keys = D->keys();
-    for (auto name: keys) {
-        if(D->type(name) == typeid(Dictionary*)) {
-            Dictionary *next;
-            D->getValue<Dictionary*>(name, next);
-            _printDictionaryWithDotStyle(next, preName + name + ".");
-        } else {
-            LDEBUG(preName << name << ": " << getValueAsString(D, name));
-        }
-    }
-}
-    
-void helper::printDictionary(Dictionary* D) {
-    auto keys = D->keys();
-    for (auto name: keys) {
-        if(D->type(name) == typeid(Dictionary*)) {
-            Dictionary *next;
-            D->getValue<Dictionary*>(name, next);
-            _printDictionaryWithDotStyle(next, name + ".");
-        } else {
-            LDEBUG(name << ": " << getValueAsString(D, name));
-        }
-    }
-}
-#endif
-
 
 } // namespace ghoul
