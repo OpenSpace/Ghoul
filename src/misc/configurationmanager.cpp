@@ -52,9 +52,11 @@ namespace helper {
     
 
 ConfigurationManager::ConfigurationManager()
-    : _state(nullptr)
+    : _state(nullptr), _dictionary(nullptr)
 {
     LDEBUG("Creating ConfigurationManager");
+    
+    _dictionary = new Dictionary;
 }
 
 ConfigurationManager::~ConfigurationManager() {
@@ -65,13 +67,12 @@ ConfigurationManager::~ConfigurationManager() {
     }
 #endif
     LDEBUG("Destroying ConfigurationManager");
+    delete _dictionary;
 }
 
 bool ConfigurationManager::initialize(const std::string& configurationScript) {
     assert(_state == nullptr);
     
-    LDEBUG("Initializing dictionary");
-    _dictionary = new Dictionary;
 
     LDEBUG("Create Lua state");
     _state = luaL_newstate();
@@ -82,27 +83,60 @@ bool ConfigurationManager::initialize(const std::string& configurationScript) {
     LDEBUG("Open libraries");
     luaL_openlibs(_state);
     
+    if (configurationScript == "") {
+        return true;
+    }
+    
     return loadConfiguration(configurationScript);
 }
 
 void ConfigurationManager::deinitialize() {
     assert(_state != nullptr);
+    
     LDEBUG("Close Lua state");
     lua_close(_state);
     _state = nullptr;
 }
 
-bool ConfigurationManager::loadConfiguration(const std::string& filename) {
+bool ConfigurationManager::loadConfiguration(const std::string& filename, bool isConfiguration) {
     assert(_state != nullptr);
 
-    if (filename == "")
+    if (filename == "") {
+        LWARNING("Tried to load empty filepath. Aborting.");
         return false;
+    }
     
-    LDEBUG("Loading configuration script '" << filename << "'");
-    const int status = luaL_loadfile(_state, filename.c_str());
+    if( ! ghoul::filesystem::FileSystem::ref().fileExists(filename)) {
+        LWARNING("Tried to load '" << filename << "'. File does not exist, aborting!");
+        return false;
+    }
+    
+    int status;
+    if (isConfiguration) {
+        LDEBUG("Loading configuration '" << filename << "'");
+        
+        // load the file into a string and prepend to give the following format
+        // configuration={
+        //     key1="string",
+        //     key2=2
+        // }
+        std::ifstream t(filename);
+        std::string lua_source((std::istreambuf_iterator<char>(t)),
+                        std::istreambuf_iterator<char>());
+        lua_source = "configuration="+lua_source;
+        status = luaL_loadstring(_state, lua_source.c_str());
+    } else {
+        LDEBUG("Loading configuration script '" << filename << "'");
+        
+        // The file is a standalone script and can be loaded directly
+        status = luaL_loadfile(_state, filename.c_str());
+    }
+    
     if (status != LUA_OK) {
-        LFATAL("Error loading configuration script" << lua_tostring(_state, -1));
-        deinitialize();
+        LFATAL("Error loading configuration script: " << lua_tostring(_state, -1));
+        
+        // Do we have to deinitialize?
+        //deinitialize();
         return false;
     }
     
@@ -117,7 +151,7 @@ bool ConfigurationManager::loadConfiguration(const std::string& filename) {
     for (auto var: dictionary_names) {
         lua_getglobal(_state, var.c_str());
         if (lua_istable(_state, -1)) {
-            LDEBUG("Using variable \""<< var << "\" as dictionary");
+            LDEBUG("Using '"<< var << "' as dictionary");
             break;
         }
     }
@@ -125,9 +159,11 @@ bool ConfigurationManager::loadConfiguration(const std::string& filename) {
     // check if any of the config names succeeded
     if (!lua_istable(_state, -1)) {
         std::stringstream dictionary_list;
-        std::copy(dictionary_names.begin(), dictionary_names.end(), std::ostream_iterator<std::string>(dictionary_list,", "));
-        LFATAL("Could not find configuration variable. Possible alternatives is: " << dictionary_list.str() << " aborting!");
-        deinitialize();
+        std::copy(dictionary_names.begin(), dictionary_names.end(), std::ostream_iterator<std::string>(dictionary_list," "));
+        LFATAL("Could not find configuration variable. Possible alternatives is: '" << dictionary_list.str() << "'");
+        
+        // Do we have to deinitialize?
+        //deinitialize();
         return false;
     }
     
@@ -148,42 +184,13 @@ bool ConfigurationManager::loadConfiguration(const std::string& filename) {
 std::vector<std::string> ConfigurationManager::keys(const std::string& location) {
     assert(_state != nullptr);
 
-    lua_getglobal(_state, "getKeys");
-    lua_pushstring(_state, location.c_str());
-    const int status = lua_pcall(_state, 1, 1, NULL);
-    if (status != LUA_OK) {
-        LERROR("Error getting keys from location '" << location << "'." << 
-                "Error: " << lua_tostring(_state, -1));
-        return std::vector<std::string>();
-    }
-    if (lua_isnil(_state, -1)) {
-        lua_pop(_state, 1);
-        return std::vector<std::string>();
-    } else {
-        std::vector<std::string> result;
-        lua_pushnil(_state);
-        while (lua_next(_state, -2) != 0) {
-            result.push_back(lua_tostring(_state, -1));
-            lua_pop(_state, 1);
-        }
-        lua_pop(_state, -1);
-        return result;
-    }
+    return _dictionary->keys(location);
 }
 
 bool ConfigurationManager::hasKey(const std::string& key) {
     assert(_state != nullptr);
 
-    lua_getglobal(_state, "hasKey");
-    lua_pushstring(_state, key.c_str());
-    const int status = lua_pcall(_state, 1, 1, NULL);
-    if (status != LUA_OK) {
-        LERROR("Error getting keys from location '" << key << "'." << 
-            "Error: " << lua_tostring(_state, -1));
-        return false;
-    }
-    const int result = lua_toboolean(_state, -1);
-    return (result == 1);
+    return _dictionary->hasKey(key);
 }
     
 void ConfigurationManager::setValue(const std::string& key, const char* value) {
@@ -191,7 +198,9 @@ void ConfigurationManager::setValue(const std::string& key, const char* value) {
     setValue(key, v);
 }
 
-    
+//
+// Helpers
+//
 void helper::populateDictionary(lua_State* L, Dictionary* D) {
     lua_pushnil(L);
         

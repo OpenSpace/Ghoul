@@ -162,7 +162,7 @@ public:
      * \return <code>true</code> if the configuration was successfully loaded;
      * <code>false</code> if an error occurred
      */
-    bool loadConfiguration(const std::string& filename);
+    bool loadConfiguration(const std::string& filename, bool isConfiguration = true);
 
     /**
      * This method returns all the keys that are available at a certain

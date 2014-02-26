@@ -65,18 +65,18 @@ protected:
 		_d = new ghoul::Dictionary({
 			{ "bool", false },
 			{ "char", char(0) },
-			{ "signed char", signed char(0) },
-			{ "unsigned char", unsigned char(0) },
+			{ "signed char", static_cast<signed char>(0) },
+			{ "unsigned char", static_cast<unsigned char>(0) },
 			{ "wchar_t", wchar_t(0) },
 			{ "short", short(0) },
-			{ "unsigned short", unsigned short(0) },
+			{ "unsigned short", static_cast<unsigned short>(0) },
 			{ "int", int(0) },
-			{ "unsigned int", unsigned int(0) },
-			{ "long long", long long(0) },
-			{ "unsigned long long", unsigned long long(0) },
+			{ "unsigned int", static_cast<unsigned int>(0) },
+			{ "long long", static_cast<long long>(0) },
+			{ "unsigned long long", static_cast<unsigned long long>(0) },
 			{ "float", float(0) },
 			{ "double", double(0) },
-			{ "long double", long double(0) },
+			{ "long double", static_cast<long double>(0) },
 			{ "dictionary", dict },
 			{ "vec2", glm::vec2(0) },
 			{ "dvec2", glm::dvec2(0) },
@@ -496,13 +496,13 @@ TEST_F(DictionaryTest, GetValue) {
 		signed char value;
 		const bool success = _d->getValue("signed char", value);
 		EXPECT_EQ(true, success) << "success 'signed char'";
-		EXPECT_EQ(signed char(0), value) << "value 'signed char'";
+		EXPECT_EQ(static_cast<signed char>(0), value) << "value 'signed char'";
 	}
 	{
 		unsigned char value;
 		const bool success = _d->getValue("unsigned char", value);
 		EXPECT_EQ(true, success) << "success 'unsigned char'";
-		EXPECT_EQ(unsigned char(0), value) << "value 'unsigned char'";
+		EXPECT_EQ(static_cast<unsigned char>(0), value) << "value 'unsigned char'";
 	}
 	{
 		wchar_t value;
@@ -520,7 +520,7 @@ TEST_F(DictionaryTest, GetValue) {
 		unsigned short value;
 		const bool success = _d->getValue("unsigned short", value);
 		EXPECT_EQ(true, success) << "success 'unsigned short'";
-		EXPECT_EQ(unsigned short(0), value) << "value 'unsigned short'";
+		EXPECT_EQ(static_cast<unsigned short>(0), value) << "value 'unsigned short'";
 	}
 	{
 		int value;
@@ -532,19 +532,19 @@ TEST_F(DictionaryTest, GetValue) {
 		unsigned int value;
 		const bool success = _d->getValue("unsigned int", value);
 		EXPECT_EQ(true, success) << "success 'unsigned int'";
-		EXPECT_EQ(unsigned int(0), value) << "value 'unsigned int'";
+		EXPECT_EQ(static_cast<unsigned int>(0), value) << "value 'unsigned int'";
 	}
 	{
 		long long value;
 		const bool success = _d->getValue("long long", value);
 		EXPECT_EQ(true, success) << "success 'long long'";
-		EXPECT_EQ(long long(0), value) << "value 'long long'";
+		EXPECT_EQ(static_cast<long long>(0), value) << "value 'long long'";
 	}
 	{
 		unsigned long long value;
 		const bool success = _d->getValue("unsigned long long", value);
 		EXPECT_EQ(true, success) << "success 'unsigned long long'";
-		EXPECT_EQ(unsigned long long(0), value) << "value 'unsigned long long'";
+		EXPECT_EQ(static_cast<unsigned long long>(0), value) << "value 'unsigned long long'";
 	}
 	{
 		float value;
@@ -562,7 +562,7 @@ TEST_F(DictionaryTest, GetValue) {
 		long double value;
 		const bool success = _d->getValue("long double", value);
 		EXPECT_EQ(true, success) << "success 'long double'";
-		EXPECT_EQ(long double(0), value) << "value 'long double'";
+		EXPECT_EQ(static_cast<long double>(0), value) << "value 'long double'";
 	}
 	{
 		glm::vec2 value;
@@ -786,24 +786,24 @@ TEST_F(DictionaryTest, SetValue) {
 	{
 		EXPECT_EQ(false, _d->hasValue<signed char>("signed char")) << 
 			"!hasValue 'signed char'";
-		_d->setValue("signed char", signed char(0));
+		_d->setValue("signed char", static_cast<signed char>(0));
 		EXPECT_EQ(true, _d->hasValue<signed char>("signed char")) << 
 			"hasValue 'signed char'";
 		signed char value;
 		const bool success = _d->getValue("signed char", value);
 		EXPECT_EQ(true, success) << "success 'signed char'";
-		EXPECT_EQ(signed char(0), value) << "value 'signed char'";
+		EXPECT_EQ(static_cast<signed char>(0), value) << "value 'signed char'";
 	}
 	{
 		EXPECT_EQ(false, _d->hasValue<unsigned char>("unsigned char")) <<
 			"!hasValue 'unsigned char'";
-		_d->setValue("unsigned char", unsigned char(0));
+		_d->setValue("unsigned char", static_cast<unsigned char>(0));
 		EXPECT_EQ(true, _d->hasValue<unsigned char>("unsigned char")) <<
 			"hasValue 'unsigned char'";
 		unsigned char value;
 		const bool success = _d->getValue("unsigned char", value);
 		EXPECT_EQ(true, success) << "success 'unsigned char'";
-		EXPECT_EQ(unsigned char(0), value) << "value 'unsigned char'";
+		EXPECT_EQ(static_cast<unsigned char>(0), value) << "value 'unsigned char'";
 	}
 	{
 		EXPECT_EQ(false, _d->hasValue<wchar_t>("wchar_t")) << "!hasValue 'wchar_t'";
@@ -826,13 +826,13 @@ TEST_F(DictionaryTest, SetValue) {
 	{
 		EXPECT_EQ(false, _d->hasValue<unsigned short>("unsigned short")) <<
 			"!hasValue 'unsigned short'";
-		_d->setValue("unsigned short", unsigned short(0));
+		_d->setValue("unsigned short", static_cast<unsigned short>(0));
 		EXPECT_EQ(true, _d->hasValue<unsigned short>("unsigned short")) <<
 			"hasValue 'unsigned short'";
 		unsigned short value;
 		const bool success = _d->getValue("unsigned short", value);
 		EXPECT_EQ(true, success) << "success 'unsigned short'";
-		EXPECT_EQ(unsigned short(0), value) << "value 'unsigned short'";
+		EXPECT_EQ(static_cast<unsigned short>(0), value) << "value 'unsigned short'";
 	}
 	{
 		EXPECT_EQ(false, _d->hasValue<int>("int")) << "!hasValue 'int'";
@@ -846,33 +846,33 @@ TEST_F(DictionaryTest, SetValue) {
 	{
 		EXPECT_EQ(false, _d->hasValue<unsigned int>("unsigned int")) <<
 			"!hasValue 'unsigned int'";
-		_d->setValue("unsigned int", unsigned int(0));
+		_d->setValue("unsigned int", static_cast<unsigned int>(0));
 		EXPECT_EQ(true, _d->hasValue<unsigned int>("unsigned int")) <<
 			"hasValue 'unsigned int'";
 		unsigned int value;
 		const bool success = _d->getValue("unsigned int", value);
 		EXPECT_EQ(true, success) << "success 'unsigned int'";
-		EXPECT_EQ(unsigned int(0), value) << "value 'unsigned int'";
+		EXPECT_EQ(static_cast<unsigned int>(0), value) << "value 'unsigned int'";
 	}
 	{
 		EXPECT_EQ(false, _d->hasValue<long long>("long long")) << "!hasValue 'long long'";
-		_d->setValue("long long", long long(0));
+		_d->setValue("long long", static_cast<long long>(0));
 		EXPECT_EQ(true, _d->hasValue<long long>("long long")) << "hasValue 'long long'";
 		long long value;
 		const bool success = _d->getValue("long long", value);
 		EXPECT_EQ(true, success) << "success 'long long'";
-		EXPECT_EQ(long long(0), value) << "value 'long long'";
+		EXPECT_EQ(static_cast<long long>(0), value) << "value 'long long'";
 	}
 	{
 		EXPECT_EQ(false, _d->hasValue<unsigned long long>("unsigned long long")) <<
 			"!hasValue 'unsigned long long'";
-		_d->setValue("unsigned long long", unsigned long long(0));
+		_d->setValue("unsigned long long", static_cast<unsigned long long>(0));
 		EXPECT_EQ(true, _d->hasValue<unsigned long long>("unsigned long long")) <<
 			"hasValue 'unsigned long long'";
 		unsigned long long value;
 		const bool success = _d->getValue("unsigned long long", value);
 		EXPECT_EQ(true, success) << "success 'unsigned long long'";
-		EXPECT_EQ(unsigned long long(0), value) << "value 'unsigned long long'";
+		EXPECT_EQ(static_cast<unsigned long long>(0), value) << "value 'unsigned long long'";
 	}
 	{
 		EXPECT_EQ(false, _d->hasValue<float>("float")) << "!hasValue 'float'";
@@ -895,13 +895,13 @@ TEST_F(DictionaryTest, SetValue) {
 	{
 		EXPECT_EQ(false, _d->hasValue<long double>("long double")) <<
 			"!hasValue 'long double'";
-		_d->setValue("long double", long double(0));
+		_d->setValue("long double", static_cast<long double>(0));
 		EXPECT_EQ(true, _d->hasValue<long double>("long double")) <<
 			"hasValue 'long double'";
 		long double value;
 		const bool success = _d->getValue("long double", value);
 		EXPECT_EQ(true, success) << "success 'long double'";
-		EXPECT_EQ(long double(0), value) << "value 'long double'";
+		EXPECT_EQ(static_cast<long double>(0), value) << "value 'long double'";
 	}
 	{
 		EXPECT_EQ(false, _d->hasValue<glm::vec2>("vec2")) <<
