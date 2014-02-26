@@ -71,6 +71,16 @@ public:
      * that should be added to the Dictionary
 	 */
 	Dictionary(const std::initializer_list<std::pair<std::string, boost::any>>& l);
+    
+    /**
+     * Serializes the Dictionary to a string
+     */
+    std::string serializeToLuaString();
+    
+    /**
+     * Serializes the Dictionary using serializeToLuaString and prints to file.
+     */
+    bool serializeToFile(const std::string& filename);
 
     /**
      * Returns all of the keys that are stored in the dictionary at a given

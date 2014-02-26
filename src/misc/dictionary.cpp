@@ -24,6 +24,8 @@
  ****************************************************************************************/
 
 #include "misc/dictionary.h"
+#include <fstream>
+#include <iostream>
 
 using std::string;
 
@@ -33,11 +35,35 @@ namespace {
 
 namespace ghoul {
 
+namespace dictionaryhelper {
+    std::string getValueAsString(Dictionary* D, std::string key);
+    std::string lua_serializer(Dictionary* D, const std::string indentation = "");
+} // namespace helper
+    
 Dictionary::Dictionary() {}
 
 Dictionary::Dictionary(const std::initializer_list<std::pair<string, boost::any>>& l) {
 	for (const std::pair<string, boost::any>& p : l)
 		(*this)[p.first] = p.second;
+}
+    
+std::string Dictionary::serializeToLuaString(){
+    return dictionaryhelper::lua_serializer(this, "");
+}
+
+bool Dictionary::serializeToFile(const std::string& filename) {
+    
+    // Serialize to lua configuration string
+    std::string luaConfig = serializeToLuaString();
+    
+    std::ofstream out(filename.c_str());
+    
+    if(! out.is_open())
+        return false;
+    
+    out << luaConfig;
+    out.close();
+    return true;
 }
 
 const std::vector<string> Dictionary::keys(const string& location) const {
@@ -124,6 +150,58 @@ const std::type_info& Dictionary::type(const std::string& key) const {
 	
 	// Proper tail-recursion
 	return dict->type(rest);
+}
+    
+//
+// Helpers
+//
+std::string dictionaryhelper::getValueAsString(Dictionary* D, std::string key) {
+    if(D->type(key) == typeid(std::string)) {
+        std::string value;
+        if (D->getValue(key, value)) {
+            return "\"" + value + "\"";
+        }
+    }
+    std::stringstream stringvalue;
+    if(D->type(key) == typeid(double)) {
+        double value;
+        if (D->getValue(key, value)) {
+            stringvalue << value;
+        }
+    } else if(D->type(key) == typeid(int)) {
+        int value;
+        if (D->getValue(key, value)) {
+            stringvalue << value;
+        }
+    } else if(D->type(key) == typeid(bool)) {
+        bool value;
+        if (D->getValue(key, value)) {
+            stringvalue << std::boolalpha << value;
+        }
+    }
+    return stringvalue.str();
+}
+    
+std::string dictionaryhelper::lua_serializer(Dictionary* D, const std::string indentation) {
+    
+    std::string content;
+    const std::string indentationLevel = "    ";
+    std::string internalIndentation = indentation + indentationLevel;
+    
+    content += "{\n";
+    
+    auto keys = D->keys();
+    for (auto name: keys) {
+        if(D->type(name) == typeid(Dictionary*)) {
+            Dictionary *next;
+            D->getValue<Dictionary*>(name, next);
+            content += internalIndentation + name +" = "+lua_serializer(next, internalIndentation) + ",\n";
+        } else {
+            content += internalIndentation + name +" = " + getValueAsString(D, name) + ",\n";
+        }
+    }
+    content += indentation + "}";
+    return content;
 }
 
 } // namespace ghoul
