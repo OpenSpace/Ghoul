@@ -166,14 +166,12 @@ bool ConfigurationManager::loadConfiguration(const std::string& filename, bool i
     
 #ifndef NDEBUG
     // Print the keys
-    LDEBUG("_dictionary contains the following");
-    LDEBUG(std::endl << _dictionary->serializeToLuaString());
+    //LDEBUG("_dictionary contains the following");
+    //LDEBUG(std::endl << _dictionary->serializeToLuaString());
 #endif
 
     return true;
 }
-
-
 
 std::vector<std::string> ConfigurationManager::keys(const std::string& location) {
     assert(_state != nullptr);

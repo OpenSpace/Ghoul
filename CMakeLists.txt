@@ -98,6 +98,12 @@ add_definitions(-DGLM_SWIZZLE)
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
+find_package(OpenCL REQUIRED)
+if(OPENCL_FOUND)
+    include_directories(${OPENCL_INCLUDE_DIR})
+    set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${OPENCL_LIBRARIES})
+endif(OPENCL_FOUND)
+
 find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
 if (NOT GHOUL_USE_DYNAMIC_GLEW)
