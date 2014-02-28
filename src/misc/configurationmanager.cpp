@@ -33,6 +33,7 @@
 
 #include <assert.h>
 #include <fstream>
+#include <iterator>
 
 namespace {
     const std::string _loggerCat = "ConfigurationManager";
