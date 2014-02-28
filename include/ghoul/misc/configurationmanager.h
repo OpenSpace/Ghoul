@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012 Alexander Bock                                                     *
+ * Copyright (c) 2012-2014                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,6 +26,7 @@
 #ifndef __CONFIGURATIONMANAGER_H__
 #define __CONFIGURATIONMANAGER_H__
 
+#include <ghoul/misc/dictionary.h>
 #include <ghoul/logging/logmanager.h>
 #include <string>
 #include <vector>
@@ -161,20 +162,7 @@ public:
      * \return <code>true</code> if the configuration was successfully loaded;
      * <code>false</code> if an error occurred
      */
-    bool loadConfiguration(const std::string& filename);
-    
-    /**
-     * Load the configuration provided as a Lua source code into the local store. Each new
-     * configuration will be merged with the current state, which will overwrite duplicate
-     * settings. The configuration has to be provided as a semi-valid Lua script, i.e., a
-     * chunk that is made valid by adding a <code>return</code> in front of it. All
-     * default Lua libraries are available in the configuration script and will
-     * automatically be loaded in the #initialize step.
-     * \param filename The source of the configuration script that is to be loaded
-     * \return <code>true</code> if the configuration was successfully loaded;
-     * <code>false</code> if an error occurred
-     */
-    bool loadConfigurationSource(const std::string& source);
+    bool loadConfiguration(const std::string& filename, bool isConfiguration = true);
 
     /**
      * This method returns all the keys that are available at a certain
@@ -246,6 +234,7 @@ public:
 private:
     /// Stores the Lua state including the main script and the table containing the config
     lua_State* _state;
+    Dictionary* _dictionary;
 };
 
 } // namespace ghoul

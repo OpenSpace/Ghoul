@@ -113,21 +113,23 @@ if (GHOUL_USE_DEVIL)
     set(DEVIL_LIBRARIES ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
 endif ()
 
-    
+include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
+include_directories(${GHOUL_ROOT_DIR}/ext/boost)
+
 if (APPLE)
-	include_directories(/Developer/Headers/FlatCarbon)
-	find_library(COREFOUNDATION_LIBRARY CoreFoundation)
-	find_library(CARBON_LIBRARY Carbon)
-	find_library(COCOA_LIBRARY Carbon)
-	find_library(APP_SERVICES_LIBRARY ApplicationServices)
-	mark_as_advanced(CARBON_LIBRARY COCOA_LIBRARY APP_SERVICES_LIBRARY)
-	set(MAC_LIBS
-		${CARBON_LIBRARY}
-		${COREFOUNDATION_LIBRARY}
-		${COCOA_LIBRARY}
-		${APP_SERVICES_LIBRARY})
+    include_directories(/Developer/Headers/FlatCarbon)
+    find_library(COREFOUNDATION_LIBRARY CoreFoundation)
+    find_library(CARBON_LIBRARY Carbon)
+    find_library(COCOA_LIBRARY Carbon)
+    find_library(APP_SERVICES_LIBRARY ApplicationServices)
+    mark_as_advanced(CARBON_LIBRARY COCOA_LIBRARY APP_SERVICES_LIBRARY)
+    set(MAC_LIBS
+        ${CARBON_LIBRARY}
+        ${COREFOUNDATION_LIBRARY}
+        ${COCOA_LIBRARY}
+        ${APP_SERVICES_LIBRARY})
 endif()
-	
+
 option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
 if (GHOUL_HAVE_TESTS)
     add_definitions(-DGHOUL_HAVE_TESTS)
@@ -137,7 +139,7 @@ if (GHOUL_HAVE_TESTS)
 
 
     
-	include_directories("${GHOUL_ROOT_DIR}/ext/gtest/include")
+    include_directories("${GHOUL_ROOT_DIR}/ext/gtest/include")
     include_directories("${GHOUL_ROOT_DIR}")
     include_directories("${GHOUL_ROOT_DIR}/include")
     file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
@@ -147,21 +149,12 @@ if (GHOUL_HAVE_TESTS)
     # set_target_properties(
 endif ()
 
-
-include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
-
 #####
 # Platform-dependent Settings
 #####
 if (APPLE)
     add_definitions(-D__gl_h_)
     add_definitions(-Wno-write-strings)
-    find_library(FRAMEWORK_CoreServices
-    NAMES CoreServices
-    PATHS ${CMAKE_OSX_SYSROOT}/System/Library
-    PATH_SUFFIXES Frameworks
-    NO_DEFAULT_PATH)
-    set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${FRAMEWORK_CoreServices})
 endif ()
 
 add_subdirectory(src)
