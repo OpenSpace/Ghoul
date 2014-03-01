@@ -23,33 +23,49 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOULCL_H__
-#define __GHOULCL_H__
+#ifndef __PLATFORM_H__
+#define __PLATFORM_H__
 
-#if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenGL/OpenGL.h>
-    #include <OpenCL/opencl.h>
-    #include <libkern/OSAtomic.h>
-#else
-    #include <GL/gl.h>
-    #include <CL/opencl.h>
-#endif // !__APPLE__
+#include <ghoul/opencl/ghoul_cl.h>
 
-namespace cl {
-    class Platform;
-    class Device;
-}
-/*
-namespace cl {
-    class Platform {
-    private:
-        Platform();
-    };
-    class Device {
-    private:
-        Device();
-    };
-}
-*/
+#include <string>
+
+namespace ghoul {
+namespace opencl {
+
+class Platform {
+public:
+    Platform(cl::Platform* platform);
+    ~Platform();
+    
+    bool isInitialized() const;
+    
+    void fetchInformation();
+    void clearInformation();
+    
+    Platform& operator=(const Platform& rhs);
+    Platform& operator=(const cl::Platform& rhs);
+    cl_platform_id operator()() const;
+    cl_platform_id& operator()();
+    
+    std::string profile() const;
+    std::string version() const;
+    std::string name() const;
+    std::string vendor() const;
+    std::string extensions() const;
+    
+protected:
+    
+private:
+    cl::Platform* _platform;
+    
+    bool _isInitialized;
+    
+    std::string _profile, _version, _name, _vendor, _extensions;
+
+};
+
+} // namepsace opencl
+} // namespace ghoul
 
 #endif

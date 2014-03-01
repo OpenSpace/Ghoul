@@ -26,9 +26,16 @@
 #include "systemcapabilities/openclcapabilitiescomponent.h"
 
 #include <ghoul/opencl/ghoul_cl.h>
+#include <ghoul/opencl/device.h>
+#include <ghoul/opencl/platform.h>
+#include <ghoul/opencl/cl.hpp>
+
+
 #include <algorithm>
 #include <cassert>
 #include <sstream>
+#include <vector>
+#include <type_traits>
 #include "logging/logmanager.h"
 
 #define MAX_NAME_LEN 1000
@@ -56,53 +63,82 @@ OpenCLCapabilitiesComponent::OpenCLCapabilitiesComponent()
 OpenCLCapabilitiesComponent::~OpenCLCapabilitiesComponent() {
     deinitialize();
 }
+    
+template<class T>
+std::string datatostring(T data) {
+    std::stringstream ss;
+    ss << data;
+    return ss.str();
+}
+template<bool>
+std::string datatostring(bool data) {
+    if (data) {
+        return "true";
+    }
+    return "false";
+}
+template<cl_ulong>
+std::string datatostring(cl_ulong data) {
+    std::stringstream ss;
+    ss << data;
+    return ss.str();
+}
+template<cl_uint>
+std::string datatostring(cl_uint data) {
+    std::stringstream ss;
+    ss << data;
+    return ss.str();
+}
+template<size_t>
+std::string datatostring(size_t data) {
+    std::stringstream ss;
+    ss << data;
+    return ss.str();
+}
+template<cl_device_id>
+std::string datatostring(cl_device_id data) {
+    std::stringstream ss;
+    ss << data;
+    return ss.str();
+}
+template<cl_platform_id>
+std::string datatostring(cl_platform_id data) {
+    std::stringstream ss;
+    ss << data;
+    return ss.str();
+}
+
+
 
 void OpenCLCapabilitiesComponent::detectCapabilities() {
     clearCapabilities();
     
-    // get number of platforms
-    cl_uint plat_count;
-    cl_int status_code;
+    std::vector<cl::Platform> platforms;
+    if(cl::Platform::get(&platforms) != CL_SUCCESS)
+        return;
     
-    status_code = clGetPlatformIDs(0, NULL, &plat_count);
-    
-    // allocate memory, get list of platforms
-    cl_platform_id *platforms = new cl_platform_id[plat_count];
-    
-    status_code =clGetPlatformIDs(plat_count, platforms, NULL);
-    
-    // iterate over platforms
-    for (cl_uint i = 0; i < plat_count; ++i) {
-        // get platform vendor name
-        char buf[MAX_NAME_LEN];
-        status_code =clGetPlatformInfo(platforms[i], CL_PLATFORM_VENDOR, sizeof(buf), buf, NULL);
-        LDEBUG("platform " << i << ": vendor '" << buf << "'");
+    for (auto platform: platforms) {
+        ghoul::opencl::Platform* gPlatform = new ghoul::opencl::Platform(&platform);
+        std::vector<ghoul::opencl::Device*> gDevices;
         
-        // get number of devices in platform
-        cl_uint dev_count;
-        status_code = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 0, NULL, &dev_count);
-        cl_device_id *devices = new cl_device_id[dev_count];
+        gPlatform->fetchInformation();
         
-        // get list of devices in platform
-        status_code =clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL,
-                                    dev_count, devices, NULL);
-        // iterate over devices
-        for (cl_uint j = 0; j < dev_count; ++j) {
-            char buf[MAX_NAME_LEN];
-            status_code = clGetDeviceInfo(devices[j], CL_DEVICE_NAME, sizeof(buf), buf, NULL);
-            LDEBUG("  device " << j << ": '" << buf << "'");
+        std::vector<cl::Device> devices;
+        platform.getDevices(CL_DEVICE_TYPE_ALL, &devices);
+        
+        for(auto device: devices) {
+            ghoul::opencl::Device* gDevice = new ghoul::opencl::Device(&device);
+            gDevice->fetchInformation();
+            gDevices.push_back(gDevice);
+            
         }
-        
-        delete[] devices;
+        _data.push_back(PlatformAndDevices{gPlatform, gDevices});
     }
-    
-    delete[] platforms;
 }
 
 void OpenCLCapabilitiesComponent::clearCapabilities() {
-    _clVersion._major = 0;
-    _clVersion._minor = 0;
-    _clVersion._release =0;
+    
+    _data.erase(_data.begin(), _data.end());
 }
     
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
@@ -110,79 +146,39 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
         const SystemCapabilitiesComponent::Verbosity& verbosity) const
 {
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
+    std::stringstream ss;
+    
+    if (verbosity >= Verbosity::Default) {
+        for (size_t i = 0; i < _data.size(); ++i) {
+            ss <<"Platform[" << i << "] Name";
+            ghoul::opencl::Platform* p  = _data.at(i).platform;
+            
+            result.push_back(std::make_pair(ss.str() , p->name()));
+            for (size_t j = 0; j < _data.at(i).devices.size(); ++j) {
+                ghoul::opencl::Device* d  = _data.at(i).devices.at(j);
+                ss.str("");
+                ss <<"    Device[" << j << "] Name";
+                result.push_back(std::make_pair(ss.str() , d->name()));
+                result.push_back(std::make_pair("        Vendor" , d->vendor()));
+                result.push_back(std::make_pair("        Version" , d->version()));
+                result.push_back(std::make_pair("        Max Compute Units" , datatostring(d->maxComputeUnits())));
+                result.push_back(std::make_pair("        Max Samplers" , datatostring(d->maxSamplers())));
+                result.push_back(std::make_pair("        Max Work Group Size" , datatostring(d->maxWorkGroupSize())));
+                result.push_back(std::make_pair("        Global Memory Size" , datatostring(d->globalMemSize())));
+                result.push_back(std::make_pair("        Local Memory Type" , datatostring(d->localMemType())));
+                result.push_back(std::make_pair("        Local Memory Size" , datatostring(d->localMemSize())));
+                if (verbosity >= Verbosity::Full) {
+                    result.push_back(std::make_pair("        Build in kernels" , d->builtInKernels()));
+                    result.push_back(std::make_pair("        Extensions" , d->extensions()));
+                }
+            }
+        }
+    }
     return result;
 }
     
 const std::string OpenCLCapabilitiesComponent::name() const {
-    return "OpenGL";
-}
-
-    
-/////////////////////////////
-/// OpenCLVersion
-/////////////////////////////
-    
-unsigned int packVersion(unsigned char major, unsigned char minor, unsigned char release);
-    
-unsigned int packVersion(unsigned char major,
-                             unsigned char minor,
-                             unsigned char release)
-{
-    // safe since: 2^8 * 1000 * 1000 < 2^32
-    return
-    major * 1000 * 1000 +
-    minor * 1000        +
-    release;
-}
-    
-OpenCLCapabilitiesComponent::Version::Version(int major, int minor, int release)
-    : _major(static_cast<unsigned char>(major))
-    , _minor(static_cast<unsigned char>(minor))
-    , _release(static_cast<unsigned char>(release))
-{}
-
-bool OpenCLCapabilitiesComponent::Version::operator==(const Version& rhs) const {
-    return (_major == rhs._major) && (_minor == rhs._minor) && (_release == rhs._release);
-}
-
-bool OpenCLCapabilitiesComponent::Version::operator!=(const Version& rhs) const {
-    return !(*this == rhs);
-}
-
-bool OpenCLCapabilitiesComponent::Version::operator<(const Version& rhs) const {
-    const unsigned int numThis = packVersion(_major, _minor, _release);
-    const unsigned int numRhs = packVersion(rhs._major, rhs._minor, rhs._release);
-
-    return numThis < numRhs;
-}
-
-bool OpenCLCapabilitiesComponent::Version::operator<=(const Version& rhs) const {
-    const unsigned int numThis = packVersion(_major, _minor, _release);
-    const unsigned int numRhs = packVersion(rhs._major, rhs._minor, rhs._release);
-
-    return numThis <= numRhs;
-}
-
-bool OpenCLCapabilitiesComponent::Version::operator>(const Version& rhs) const {
-    const unsigned int numThis = packVersion(_major, _minor, _release);
-    const unsigned int numRhs = packVersion(rhs._major, rhs._minor, rhs._release);
-
-    return numThis > numRhs;
-}
-
-bool OpenCLCapabilitiesComponent::Version::operator>=(const Version& rhs) const {
-    const unsigned int numThis = packVersion(_major, _minor, _release);
-    const unsigned int numRhs = packVersion(rhs._major, rhs._minor, rhs._release);
-
-    return numThis >= numRhs;
-}
-
-std::string OpenCLCapabilitiesComponent::Version::toString() const {
-    std::stringstream stream;
-    stream << static_cast<int>(_major) << "." << static_cast<int>(_minor);
-    if (_release != 0)
-        stream << "." << static_cast<int>(_release);
-    return stream.str();
+    return "OpenCL";
 }
 
 } // namespace ghoul

@@ -23,54 +23,103 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __OPENCLCAPABILITIESCOMPONENT_H__
-#define __OPENCLCAPABILITIESCOMPONENT_H__
-
-#include "systemcapabilitiescomponent.h"
-
-#include <ghoul/opencl/platform.h>
-#include <ghoul/opencl/device.h>
-
-#include <string>
-#include <vector>
+#include "opencl/platform.h"
+#include "opencl/cl.hpp"
 
 namespace ghoul {
-namespace systemcapabilities {
+namespace opencl {
 
-/**
- * This subclass of SystemCapabilitiesComponent detects OpenCL-related capabilities, like available
- * platforms and devices. The most important device variables can be logged.
- */
-class OpenCLCapabilitiesComponent : public SystemCapabilitiesComponent {
-public:
+Platform::Platform(cl::Platform* platform) {
+    _platform = platform;
+}
+Platform::~Platform() {}
 
-    OpenCLCapabilitiesComponent();
-    ~OpenCLCapabilitiesComponent();
+bool Platform::isInitialized() const {
+    return _isInitialized;
+}
 
-    std::vector<CapabilityInformation> capabilities(
-        const SystemCapabilitiesComponent::Verbosity& verbosity) const override;
-    
-    /**
-     * Returns the <code>OpenCL</code> string.
-     * \return The <code>OpenCL</code> string
-     */
-    const std::string name() const override;
-    
-protected:
-    void detectCapabilities() override;
-    void clearCapabilities() override;
-    
-    // Internal struct used for detecting capabilities
-    struct PlatformAndDevices {
-        ghoul::opencl::Platform* platform;
-        std::vector<ghoul::opencl::Device*> devices;
-    };
-    
-    std::vector<PlatformAndDevices> _data;
-    
-};
+void Platform::fetchInformation() {
+    if (isInitialized()) {
+        clearInformation();
+    }
+    std::string tmp_string;
 
-} // namespace systemcapabilities
-} // namespace ghoul
+    if(_platform->getInfo(CL_PLATFORM_PROFILE, &tmp_string) == CL_SUCCESS)
+        _profile = tmp_string;
+    if(_platform->getInfo(CL_PLATFORM_VERSION, &tmp_string) == CL_SUCCESS)
+        _version = tmp_string;
+    if(_platform->getInfo(CL_PLATFORM_NAME, &tmp_string) == CL_SUCCESS)
+        _name = tmp_string;
+    if(_platform->getInfo(CL_PLATFORM_VENDOR, &tmp_string) == CL_SUCCESS)
+        _vendor = tmp_string;
+    if(_platform->getInfo(CL_PLATFORM_EXTENSIONS, &tmp_string) == CL_SUCCESS)
+        _extensions = tmp_string;
 
-#endif // __OPENCLCAPABILITIESCOMPONENT_H__
+    _isInitialized = true;
+}
+void Platform::clearInformation() {
+    _profile = "";
+    _version = "";
+    _name = "";
+    _vendor = "";
+    _extensions = "";
+    
+    _isInitialized = false;
+}
+
+//
+// operators
+//
+Platform& Platform::operator=(const Platform& rhs) {
+    if (this != &rhs) // protect against invalid self-assignment
+    {
+        *_platform = *rhs._platform;
+        
+        // Ugly version that refetches all information
+        clearInformation();
+        if(rhs.isInitialized())
+            fetchInformation();
+    }
+    return *this;
+}
+
+Platform& Platform::operator=(const cl::Platform& rhs) {
+    *_platform = rhs;
+    
+    // Ugly version that refetches all information
+    clearInformation();
+    if(isInitialized())
+        fetchInformation();
+    
+    return *this;
+}
+
+cl_platform_id Platform::operator()() const {
+    return _platform->operator()();
+}
+
+cl_platform_id& Platform::operator()() {
+    return _platform->operator()();
+}
+
+//
+// GET
+//
+std::string Platform::profile() const {
+    return _profile;
+}
+std::string Platform::version() const {
+    return _version;
+}
+std::string Platform::name() const {
+    return _name;
+}
+std::string Platform::vendor() const {
+    return _vendor;
+}
+std::string Platform::extensions() const {
+    return _extensions;
+}
+
+}
+}

@@ -29,9 +29,7 @@
 #include "systemcapabilitiescomponent.h"
 #include "cpucapabilitiescomponent.h"
 #include "openglcapabilitiescomponent.h"
-#ifdef GHL_OPENCL
-    #include "openclcapabilitiescomponent.h"
-#endif
+#include "openclcapabilitiescomponent.h"
 
 #include <string>
 #include <vector>
