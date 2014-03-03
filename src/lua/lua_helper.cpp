@@ -134,7 +134,7 @@ void luaPrivate_populateDictionary(lua_State* L, Dictionary* D) {
                 D->setValue(key, value);
             }
         } else if (lua_isboolean(L, -1)) {
-            bool value = lua_toboolean(L, -1);
+            bool value = (lua_toboolean(L, -1) == 1);
             D->setValue(key, value);
         } else if (lua_isstring(L, -1)) {
             std::string value = lua_tostring(L, -1);
