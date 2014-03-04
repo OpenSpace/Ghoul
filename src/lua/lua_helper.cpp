@@ -113,38 +113,66 @@ std::string lua_logTable(lua_State* state, LogManager::LogLevel level) {
     return message;
 }
     
-    
+
+#define KEY -2
+#define VAL -1
 void luaPrivate_populateDictionary(lua_State* L, Dictionary* D) {
     lua_pushnil(L);
     
-    while(lua_next(L, -2) != 0)
+    while(lua_next(L, KEY) != 0)
     {
-        // get the key name
-        std::string key = lua_tostring(L, -2);
         
-        // check type and add to dictionary
-        if(lua_isnumber(L, -1)) {
-            double value =lua_tonumber(L, -1);
-            double intpart;
-            double floatpart = std::modf(value, &intpart);
-            if (floatpart == 0.0) {
-                int int_value = static_cast<int>(value);
-                D->setValue(key, int_value);
-            } else {
+        // get the key name
+        std::string key;
+        switch (lua_type(L, KEY)) {
+            case LUA_TNUMBER:
+                {
+                    std::stringstream ss;
+                    unsigned int ikey = lua_tounsigned(L,KEY);
+                    //lua_pop(L, 1);
+                    ss << ikey;
+                    key = ss.str();
+                }
+                break;
+            case LUA_TSTRING:
+                key = lua_tostring(L,KEY);
+                break;
+        }
+        
+        // get the value
+        switch (lua_type(L, VAL)) {
+            case LUA_TNUMBER:
+            {
+                double value =lua_tonumber(L, VAL);
+                double intpart;
+                double floatpart = std::modf(value, &intpart);
+                if (floatpart == 0.0) {
+                    int int_value = static_cast<int>(value);
+                    D->setValue(key, int_value);
+                } else {
+                    D->setValue(key, value);
+                }
+            }
+                break;
+            case LUA_TBOOLEAN:
+            {
+                bool value = lua_toboolean(L, VAL);
                 D->setValue(key, value);
             }
-        } else if (lua_isboolean(L, -1)) {
-            bool value = lua_toboolean(L, -1);
-            D->setValue(key, value);
-        } else if (lua_isstring(L, -1)) {
-            std::string value = lua_tostring(L, -1);
-            D->setValue(key, value);
-            
-            // It is a table, recurivly add more dictionaries
-        } else if (lua_istable(L, -1)) {
-            Dictionary* d = new Dictionary;
-            luaPrivate_populateDictionary(L, d);
-            D->setValue(key, d);
+                break;
+            case LUA_TSTRING:
+            {
+                std::string value = lua_tostring(L, VAL);
+                D->setValue(key, value);
+            }
+                break;
+            case LUA_TTABLE:
+            {
+                Dictionary* d = new Dictionary;
+                luaPrivate_populateDictionary(L, d);
+                D->setValue(key, d);
+            }
+                break;
         }
         
         // get back up one level
