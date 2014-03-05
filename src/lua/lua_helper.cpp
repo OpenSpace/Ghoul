@@ -30,6 +30,7 @@
 
 #include <sstream>
 #include <fstream>
+#include <iterator>
 
 using namespace ghoul::logging;
 
