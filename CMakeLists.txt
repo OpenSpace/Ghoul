@@ -143,8 +143,6 @@ if (GHOUL_HAVE_TESTS)
     add_definitions(-DGTEST_HAS_TR1_TUPLE=0)
     add_definitions(-DGTEST_HAS_GLOBAL_STRING=0)
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/gtest)
-
-
     
     include_directories("${GHOUL_ROOT_DIR}/ext/gtest/include")
     include_directories("${GHOUL_ROOT_DIR}")
