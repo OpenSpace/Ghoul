@@ -43,19 +43,17 @@ if (APPLE)
     )
     set(OPENCL_LIBRARY ${FRAMEWORK_OpenCL})
 endif(APPLE)
-if(LINUX)
-	find_path( NAMES CL/cl.h OpenCL/cl.h
-	HINTS ENV OPENCL_DIR
-	PATHS 	"/usr/include"
+if(UNIX AND NOT APPLE)
+	find_path( OPENCL_INCLUDES CL/cl.h
+		HINTS 	"/usr/include"
 			"/usr/local/include")
 	find_library(	OPENCL_LIBRARY
-					NAMES OpenCL
-					HINTS ENV OPENCL_DIR
-					PATHS 	"/lib"
+		NAMES ${CMAKE_DYNAMIC_LIBRARY_PREFIX}OpenCL${CMAKE_DYNAMIC_LIBRARY_SUFFIX}
+					HINTS 	"/lib"
 							"/usr/lib"
 							"/usr/local/lib"
 	)
-endif(LINUX)
+endif(UNIX AND NOT APPLE)
 
 MARK_AS_ADVANCED(OPENCL_INCLUDES OPENCL_LIBRARY)
 
@@ -65,11 +63,11 @@ set(OPENCL_LIBRARIES ${OPENCL_LIBRARY} ${OPENCL_DEPENDENCIES})
 
 # handle the QUIETLY and REQUIRED arguments and set OPENCL_FOUND to TRUE
 # if all listed variables are TRUE
-find_package_handle_standard_args(OpenCL  DEFAULT_MSG
+find_package_handle_standard_args(OPENCL  DEFAULT_MSG
                                   OPENCL_LIBRARY OPENCL_INCLUDES)
 
-if(OpenCL_FOUND) 
+if(OPENCL_FOUND) 
     MESSAGE(STATUS "OpenCL found: ${OPENCL_INCLUDE_DIRECTORIES}/sgct.h")
 else()
     MESSAGE(FATAL_ERROR "OpenCL not found!")
-endif(OpenCL_FOUND)
+endif(OPENCL_FOUND)

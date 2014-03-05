@@ -139,11 +139,6 @@ void Device::fetchInformation() {
         _hostUnifiedMemory = tmp_bool;
     
     
-    if(_device->getInfo(CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, &tmp_size_t) == CL_SUCCESS)
-        _imageMaxArraySize = tmp_size_t;
-    if(_device->getInfo(CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, &tmp_size_t) == CL_SUCCESS)
-        _imageMaxBufferSize = tmp_size_t;
-    
     if(_device->getInfo(CL_DEVICE_IMAGE_SUPPORT, &tmp_bool) == CL_SUCCESS)
         _imageSupport = tmp_bool;
     if(_device->getInfo(CL_DEVICE_IMAGE2D_MAX_WIDTH, &tmp_size_t) == CL_SUCCESS)
@@ -198,27 +193,35 @@ void Device::fetchInformation() {
     
     if(_device->getInfo(CL_DEVICE_OPENCL_C_VERSION, &tmp_string) == CL_SUCCESS)
         _openCLCVersion = tmp_string;
-    if(_device->getInfo(CL_DEVICE_PARENT_DEVICE, &tmp_device_id) == CL_SUCCESS)
-        _parentDevice = tmp_device_id;
     
     if(_device->getInfo(CL_DEVICE_PLATFORM, &tmp_platform_id) == CL_SUCCESS)
         _platform = tmp_platform_id;
     
-    if(_device->getInfo(CL_DEVICE_PRINTF_BUFFER_SIZE, &tmp_size_t) == CL_SUCCESS)
-        _printfBufferSize = tmp_size_t;
     
     if(_device->getInfo(CL_DEVICE_QUEUE_PROPERTIES, &tmp_command_queue_properties) == CL_SUCCESS)
         _queueProperties = tmp_command_queue_properties;
     
-    if(_device->getInfo(CL_DEVICE_REFERENCE_COUNT, &tmp_uint) == CL_SUCCESS)
-        _referenceCount = tmp_uint;
     
     if(_device->getInfo(CL_DEVICE_VENDOR_ID, &tmp_uint) == CL_SUCCESS)
         _vendorId = tmp_uint;
     
     if(_device->getInfo(CL_DEVICE_VERSION, &tmp_string) == CL_SUCCESS)
         _version = tmp_string;
-    
+
+	// OpenCL 1.2 specifics
+#ifdef CL_VERSION_1_2
+    if(_device->getInfo(CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, &tmp_size_t) == CL_SUCCESS)
+        _imageMaxArraySize = tmp_size_t;
+	if(_device->getInfo(CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, &tmp_size_t) == CL_SUCCESS)
+        _imageMaxBufferSize = tmp_size_t;
+	if(_device->getInfo(CL_DEVICE_PARENT_DEVICE, &tmp_device_id) == CL_SUCCESS)
+        _parentDevice = tmp_device_id;
+	if(_device->getInfo(CL_DEVICE_PRINTF_BUFFER_SIZE, &tmp_size_t) == CL_SUCCESS)
+        _printfBufferSize = tmp_size_t;
+    if(_device->getInfo(CL_DEVICE_REFERENCE_COUNT, &tmp_uint) == CL_SUCCESS)
+        _referenceCount = tmp_uint;
+#endif	
+
     _isInitialized = true;
 }
 void Device::clearInformation() {

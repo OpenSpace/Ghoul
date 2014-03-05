@@ -89,12 +89,12 @@ std::string datatostring(cl_uint data) {
     ss << data;
     return ss.str();
 }
-template<size_t>
-std::string datatostring(size_t data) {
-    std::stringstream ss;
-    ss << data;
-    return ss.str();
-}
+
+
+
+
+
+
 template<cl_device_id>
 std::string datatostring(cl_device_id data) {
     std::stringstream ss;

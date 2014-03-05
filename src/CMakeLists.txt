@@ -164,6 +164,13 @@ endif ()
 add_library(Ghoul ${GHOUL_SOURCE} ${GHOUL_HEADER})
 
 # Adding debug flags for the debug build
-set_target_properties(Ghoul PROPERTIES COMPILE_DEFINITIONS_DEBUG "_DEBUG GHL_DEBUG")
+if(UNIX AND NOT APPLE)
+	if(CMAKE_BUILD_TYPE MATCHES Debug)
+		add_definitions(-DGHL_DEBUG)
+		add_definitions(-D_DEBUG)
+	endif(CMAKE_BUILD_TYPE MATCHES Debug)
+else()
+	set_target_properties(Ghoul PROPERTIES COMPILE_DEFINITIONS_DEBUG "_DEBUG GHL_DEBUG")
+endif(UNIX AND NOT APPLE)
 
 target_link_libraries(Ghoul Lua ${GHOUL_DEPENDENCIES})
