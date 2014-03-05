@@ -24,6 +24,7 @@
  ****************************************************************************************/
 
 #include <type_traits>
+#include <ghoul/logging/logmanager.h>
 
 namespace ghoul {
 
@@ -39,7 +40,7 @@ template <typename BaseClass>
 BaseClass* TemplateFactory<BaseClass>::create(const std::string& className) const {
     typename std::map<std::string, FactoryFuncPtr>::const_iterator it = _map.find(className);
     if (it == _map.end()) {
-        LERRORC("TemplateFactory", "Factory did not a class named '" << className << "'");
+        LERRORC("TemplateFactory", "Factory did not find a class named '" << className << "'");
         return nullptr;
     }
     else
