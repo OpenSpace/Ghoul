@@ -19,3 +19,48 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, *
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.        *
  *************************************************************************************************/
+
+#ifndef __FRAMEBUFFEROBJECT_H__
+#define __FRAMEBUFFEROBJECT_H__
+
+#include <ghoul/opengl/texture.h>
+#include <map>
+
+namespace ghoul {
+namespace opengl {
+
+class FramebufferObject {
+public:
+	FramebufferObject();
+	~FramebufferObject();
+
+	void activate();
+	static void deactivate();
+
+	bool isComplete() const;
+	bool isActive();
+
+	void attachTexture(Texture* texture,
+					   GLenum attachment = GL_COLOR_ATTACHMENT0,
+					   int mipLevel 	 = 0,
+					   int zSlice		 = 0);
+
+	void detachTexture(GLenum attachment);
+	void detachAll();
+
+	Texture* getTexture(GLenum attachment = GL_COLOR_ATTACHMENT0);
+	static GLuint getActiveObject();
+
+private:
+	GLuint generateId();
+
+	GLuint _id;
+	std::map<GLenum, Texture*> _attachedTextures;
+
+	static const std::string _loggerCat;
+};
+
+} // namespace opengl
+} // namespace ghoul
+
+#endif // __FRAMEBUFFEROBJECT_H__

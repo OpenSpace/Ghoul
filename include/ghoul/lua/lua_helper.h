@@ -27,6 +27,7 @@
 #define __LUAHELPER_H__
 
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/dictionary.h>
 
 struct lua_State;
 
@@ -69,6 +70,13 @@ std::string lua_logTable(lua_State* state,logging::LogManager::LogLevel level =
  */
 std::string lua_logStack(lua_State* state, logging::LogManager::LogLevel level = 
                          logging::LogManager::LogLevel::Info);
+
+/**
+ * Loads a Lua configuration or Lua configuration script into the given ghoul::Dictionary
+ */
+bool lua_loadIntoDictionary(lua_State* state, ghoul::Dictionary* D,
+                            const std::string& filename, bool isConfiguration = true);
+
 
 
 } // namespace lua

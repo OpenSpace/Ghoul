@@ -23,99 +23,44 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "misc/configurationmanager.h"
-
 #include <type_traits>
-
-#include <ghoul/lua/ghoul_lua.h>
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
-
-#include <assert.h>
-#include <fstream>
-#include <iostream>
-#include <iterator>
-
-namespace {
-    const std::string _loggerCat = "ConfigurationManager";
-}
+#include <ghoul/logging/logmanager.h>
 
 namespace ghoul {
 
-ConfigurationManager::ConfigurationManager()
-    : _state(nullptr), _dictionary(nullptr)
-{
-    LDEBUG("Creating ConfigurationManager");
-    
-    _dictionary = new Dictionary;
-}
-
-ConfigurationManager::~ConfigurationManager() {
-#ifdef GHL_DEBUG
-    if (_state != nullptr) {
-        LWARNING("ConfigurationManager was not deinitialized");
-        deinitialize();
+namespace {
+    /// This should not be used outside, as it is fairly useless on its own
+    template <typename T, typename U>
+    U* createType() {
+        return new T;
     }
-#endif
-    LDEBUG("Destroying ConfigurationManager");
-    delete _dictionary;
 }
 
-bool ConfigurationManager::initialize(const std::string& configurationScript) {
-    assert(_state == nullptr);
-    
-
-    LDEBUG("Create Lua state");
-    _state = luaL_newstate();
-    if (_state == nullptr) {
-        LFATAL("Error creating new Lua state: Memory allocation error");
-        return false;
+template <typename BaseClass>
+BaseClass* TemplateFactory<BaseClass>::create(const std::string& className) const {
+    typename std::map<std::string, FactoryFuncPtr>::const_iterator it = _map.find(className);
+    if (it == _map.end()) {
+        LERRORC("TemplateFactory", "Factory did not find a class named '" << className << "'");
+        return nullptr;
     }
-    LDEBUG("Open libraries");
-    luaL_openlibs(_state);
-    
-    if (configurationScript == "") {
-        return true;
-    }
-    
-    return loadConfiguration(configurationScript);
+    else
+        // If 'className' is a valid name, we can use the stored functionpointer to create
+        // the class using the 'createType' method
+        return it->second();
 }
 
-void ConfigurationManager::deinitialize() {
-    assert(_state != nullptr);
-    
-    LDEBUG("Close Lua state");
-    lua_close(_state);
-    _state = nullptr;
+template <typename BaseClass>
+template <typename Class>
+void TemplateFactory<BaseClass>::registerClass(const std::string& className) {
+    static_assert(std::is_base_of<BaseClass, Class>::value,
+        "BaseClass must be the base class of Class");
+    FactoryFuncPtr function = &createType<Class>;
+    _map.insert({ className, function });
 }
 
-bool ConfigurationManager::loadConfiguration(const std::string& filename, bool isConfiguration) {
-    assert(_state != nullptr);
-    
-    if ( ! lua::lua_loadIntoDictionary(_state, _dictionary, filename, isConfiguration)) {
-        deinitialize();
-        initialize();
-        return false;
-    }
-    return true;
+template <typename BaseClass>
+bool TemplateFactory<BaseClass>::hasClass(const std::string& className) const {
+    return (_map.find(className) != _map.end());
 }
 
-std::vector<std::string> ConfigurationManager::keys(const std::string& location) {
-    assert(_state != nullptr);
-
-    return _dictionary->keys(location);
 }
-
-bool ConfigurationManager::hasKey(const std::string& key) {
-    assert(_state != nullptr);
-
-    return _dictionary->hasKey(key);
-}
-    
-void ConfigurationManager::setValue(const std::string& key, const char* value) {
-    const std::string v(value);
-    setValue(key, v);
-}
-
-
-} // namespace ghoul

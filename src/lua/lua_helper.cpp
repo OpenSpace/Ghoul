@@ -24,10 +24,12 @@
  ****************************************************************************************/
 
 #include "lua/lua_helper.h"
-
 #include "lua/ghoul_lua.h"
 
+#include <ghoul/filesystem/filesystem.h>
+
 #include <sstream>
+#include <fstream>
 
 using namespace ghoul::logging;
 
@@ -109,6 +111,150 @@ std::string lua_logTable(lua_State* state, LogManager::LogLevel level) {
     }
     LogMgr.logMessage(level, message);
     return message;
+}
+    
+
+#define KEY -2
+#define VAL -1
+void luaPrivate_populateDictionary(lua_State* L, Dictionary* D) {
+    lua_pushnil(L);
+    
+    while(lua_next(L, KEY) != 0)
+    {
+        
+        // get the key name
+        std::string key;
+        switch (lua_type(L, KEY)) {
+            case LUA_TNUMBER:
+                {
+                    std::stringstream ss;
+                    unsigned int ikey = lua_tounsigned(L,KEY);
+                    //lua_pop(L, 1);
+                    ss << ikey;
+                    key = ss.str();
+                }
+                break;
+            case LUA_TSTRING:
+                key = lua_tostring(L,KEY);
+                break;
+        }
+        
+        // get the value
+        switch (lua_type(L, VAL)) {
+            case LUA_TNUMBER:
+            {
+                double value =lua_tonumber(L, VAL);
+                double intpart;
+                double floatpart = std::modf(value, &intpart);
+                if (floatpart == 0.0) {
+                    int int_value = static_cast<int>(value);
+                    D->setValue(key, int_value);
+                } else {
+                    D->setValue(key, value);
+                }
+            }
+                break;
+            case LUA_TBOOLEAN:
+            {
+                bool value = lua_toboolean(L, VAL);
+                D->setValue(key, value);
+            }
+                break;
+            case LUA_TSTRING:
+            {
+                std::string value = lua_tostring(L, VAL);
+                D->setValue(key, value);
+            }
+                break;
+            case LUA_TTABLE:
+            {
+                Dictionary* d = new Dictionary;
+                luaPrivate_populateDictionary(L, d);
+                D->setValue(key, d);
+            }
+                break;
+        }
+        
+        // get back up one level
+        lua_pop(L, 1);
+    }
+}
+
+bool lua_loadIntoDictionary(lua_State* state, ghoul::Dictionary* D, const std::string& filename, bool isConfiguration) {
+    assert(state != nullptr);
+    
+    if (filename == "") {
+        LWARNINGC("lua_loadIntoDictionary","Tried to load empty filepath. Aborting.");
+        return false;
+    }
+    
+    if( ! ghoul::filesystem::FileSystem::ref().fileExists(filename)) {
+        LWARNINGC("lua_loadIntoDictionary","Tried to load '" << filename << "'. File does not exist, aborting!");
+        return false;
+    }
+    
+    int status;
+    if (isConfiguration) {
+        LDEBUGC("lua_loadIntoDictionary","Loading configuration '" << filename << "'");
+        
+        // load the file into a string and prepend to give the following format
+        // configuration={
+        //     key1="string",
+        //     key2=2
+        // }
+        std::ifstream t(filename);
+        std::string lua_source((std::istreambuf_iterator<char>(t)),
+                               std::istreambuf_iterator<char>());
+        lua_source = "configuration="+lua_source;
+        status = luaL_loadstring(state, lua_source.c_str());
+    } else {
+        LDEBUGC("lua_loadIntoDictionary","Loading configuration script '" << filename << "'");
+        
+        // The file is a standalone script and can be loaded directly
+        status = luaL_loadfile(state, filename.c_str());
+    }
+    
+    if (status != LUA_OK) {
+        LFATALC("lua_loadIntoDictionary","Error loading configuration script: " << lua_tostring(state, -1));
+        return false;
+    }
+    
+    LDEBUGC("lua_loadIntoDictionary","Executing configuration script");
+    if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
+        LFATALC("lua_loadIntoDictionary","Error executing configuration script: " << lua_tostring(state, -1));
+        return false;
+    }
+    
+    std::vector<std::string> dictionary_names = {"configuration", "config", "conf", "cfg", "c", "out", "dictionary", "dict"};
+    for (auto var: dictionary_names) {
+        lua_getglobal(state, var.c_str());
+        if (lua_istable(state, -1)) {
+            LDEBUGC("lua_loadIntoDictionary","Using '"<< var << "' as dictionary");
+            break;
+        }
+    }
+    
+    // check if any of the config names succeeded
+    if (!lua_istable(state, -1)) {
+        std::stringstream dictionary_list;
+        std::copy(dictionary_names.begin(), dictionary_names.end(), std::ostream_iterator<std::string>(dictionary_list," "));
+        LFATALC("lua_loadIntoDictionary","Could not find configuration variable. Possible alternatives is: '" << dictionary_list.str() << "'");
+        
+        // Do we have to deinitialize?
+        //deinitialize();
+        return false;
+    }
+    
+    // Populate the dictionary
+    luaPrivate_populateDictionary(state, D);
+    
+#ifndef NDEBUG
+    // Print the keys
+    LDEBUGC("lua_loadIntoDictionary","_dictionary contains the following");
+    LDEBUGC("lua_loadIntoDictionary",std::endl << D->serializeToLuaString());
+#endif
+    
+    return true;
 }
 
 } // namespace lua
