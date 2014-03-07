@@ -57,6 +57,20 @@ source_group(FileSystem FILES
                 ${FILESYSTEM_HEADER}
                 ${FILESYSTEM_HEADER_INL})
 
+file(GLOB IO_SOURCE ${SOURCE_ROOT_DIR}/io/*.cpp)
+file(GLOB IO_SOURCE_C ${SOURCE_ROOT_DIR}/io/*.c)
+set(GHOUL_SOURCE ${GHOUL_SOURCE} ${IO_SOURCE} ${IO_SOURCE_C})
+file(GLOB IO_HEADER ${HEADER_ROOT_DIR}/io/*.h)
+file(GLOB IO_HEADER_INL ${HEADER_ROOT_DIR}/io/*.inl)
+set(IO_GLOB_HEADER ${HEADER_ROOT_DIR}/io/io)
+set(GHOUL_HEADER ${GHOUL_HEADER} ${IO_HEADER} ${IO_HEADER_INL})
+source_group(IO FILES
+                ${IO_SOURCE}
+                ${IO_SOURCE_C}
+                ${IO_GLOB_HEADER}
+                ${IO_HEADER}
+                ${IO_HEADER_INL})
+                
 file(GLOB LOG_SOURCE ${SOURCE_ROOT_DIR}/logging/*.cpp)
 file(GLOB LOG_SOURCE_C ${SOURCE_ROOT_DIR}/logging/*.c)
 set(GHOUL_SOURCE ${GHOUL_SOURCE} ${LOG_SOURCE} ${LOG_SOURCE_C})
@@ -109,29 +123,26 @@ if(OPENCL_FOUND)
     set(GHOUL_SOURCE ${GHOUL_SOURCE} ${OPENCL_SOURCE} ${OPENCL_SOURCE_C})
     file(GLOB OPENCL_HEADER ${HEADER_ROOT_DIR}/opencl/*.h)
     file(GLOB OPENCL_HEADER_INL ${HEADER_ROOT_DIR}/opencl/*.inl)
-    set(OPENCL_GLOB_HEADER ${HEADER_ROOT_DIR}/opengl/opencl)
     set(GHOUL_HEADER ${GHOUL_HEADER} ${OPENCL_HEADER} ${OPENCL_HEADER_INL})
     source_group(OpenCL FILES
                     ${OPENCL_SOURCE}
                     ${OPENCL_SOURCE_C}
-                    ${OPENCL_GLOB_HEADER}
                     ${OPENCL_HEADER}
                     ${OPENCL_HEADER_INL})
 endif(OPENCL_FOUND)
 
-file(GLOB IO_SOURCE ${SOURCE_ROOT_DIR}/io/*.cpp)
-file(GLOB IO_SOURCE_C ${SOURCE_ROOT_DIR}/io/*.c)
-set(GHOUL_SOURCE ${GHOUL_SOURCE} ${IO_SOURCE} ${IO_SOURCE_C})
-file(GLOB IO_HEADER ${HEADER_ROOT_DIR}/io/*.h)
-file(GLOB IO_HEADER_INL ${HEADER_ROOT_DIR}/io/*.inl)
-set(IO_GLOB_HEADER ${HEADER_ROOT_DIR}/io/io)
-set(GHOUL_HEADER ${GHOUL_HEADER} ${IO_HEADER} ${IO_HEADER_INL})
-source_group(IO FILES
-                ${IO_SOURCE}
-                ${IO_SOURCE_C}
-                ${IO_GLOB_HEADER}
-                ${IO_HEADER}
-                ${IO_HEADER_INL})
+file(GLOB SYSTEMCAPABILITIES_SOURCE ${SOURCE_ROOT_DIR}/systemcapabilities/*.cpp)
+file(GLOB SYSTEMCAPABILITIES_SOURCE_C ${SOURCE_ROOT_DIR}/systemcapabilities/*.c)
+set(GHOUL_SOURCE ${GHOUL_SOURCE} ${SYSTEMCAPABILITIES_SOURCE} ${SYSTEMCAPABILITIES_SOURCE_C})
+file(GLOB SYSTEMCAPABILITIES_HEADER ${HEADER_ROOT_DIR}/systemcapabilities/*.h)
+file(GLOB SYSTEMCAPABILITIES_HEADER_INL ${HEADER_ROOT_DIR}/systemcapabilities/*.inl)
+set(GHOUL_HEADER ${GHOUL_HEADER} ${SYSTEMCAPABILITIES_HEADER} ${SYSTEMCAPABILITIES_HEADER_INL})
+source_group(SystemCapabilities FILES
+                ${SYSTEMCAPABILITIES_SOURCE}
+                ${SYSTEMCAPABILITIES_SOURCE_C}
+                ${SYSTEMCAPABILITIES_HEADER}
+                ${SYSTEMCAPABILITIES_HEADER_INL})
+
 
 set(GHOUL_HEADER ${GHOUL_HEADER} ${HEADER_ROOT_DIR}/glm.h)
 
