@@ -100,8 +100,8 @@ include_directories(${OPENGL_INCLUDE_DIR})
 
 find_package(OpenCL)
 if(OPENCL_FOUND)
-	add_definitions(-DGHL_OPENCL)
-    include_directories(${OPENCL_INCLUDE_DIR})
+    add_definitions(-DGHL_OPENCL)
+    include_directories(${OPENCL_INCLUDE_DIRS})
     set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${OPENCL_LIBRARIES})
 endif(OPENCL_FOUND)
 
