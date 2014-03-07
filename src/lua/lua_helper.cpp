@@ -157,7 +157,7 @@ void luaPrivate_populateDictionary(lua_State* L, Dictionary* D) {
                 break;
             case LUA_TBOOLEAN:
             {
-                bool value = lua_toboolean(L, VAL);
+                bool value = (lua_toboolean(L, VAL) == 1);
                 D->setValue(key, value);
             }
                 break;
