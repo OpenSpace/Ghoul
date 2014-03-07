@@ -26,13 +26,13 @@
 #ifndef __GHOULCL_H__
 #define __GHOULCL_H__
 
+#include <ghoul/opengl/ghoul_gl.h>
+
 #if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenGL/OpenGL.h>
     #include <OpenCL/opencl.h>
     #include <libkern/OSAtomic.h>
 #else
-    #include <GL/gl.h>
-    #include <CL/opencl.h>
+    #include <CL/cl.h>
 #endif // !__APPLE__
 
 namespace cl {
