@@ -42,12 +42,13 @@ namespace {
  * argument. Instead, a helper class 'CreateHelper' has to be created as partial template
  * specialization is allowed for classes. 'CreateHelper' has a single method that returns
  * either a 'create' or a 'createWithDictionary' function pointer, depending on the third
- * parameter Constructor; this parameter are determined at compile-timein the
- * registerClass
+ * parameter Constructor; this parameter is determined at compile-time in the
+ * registerClass by using the constant values DEFAULT_CONSTRUCTOR with
+ * std::has_default_constructor and DICTIONARY_CONSTRUCTOR with std::is_convertible
  */
 
-#define DEFAULT_CONSTRUCTOR 1
-#define DICTIONARY_CONSTRUCTOR 2
+const int DEFAULT_CONSTRUCTOR = 1;
+const int DICTIONARY_CONSTRUCTOR = 2;
 
 /// Create Class using only the default constructor
 template <typename BaseClass, typename Class>
@@ -152,9 +153,6 @@ void TemplateFactory<BaseClass>::registerClass(const std::string& className) {
         std::has_default_constructor<Class>::value |
         std::is_convertible<Dictionary, Class>::value,
         "Class needs a default or Dictionary constructor");
-
-    bool foo = std::has_default_constructor<Class>::value;
-    bool foo2 = std::is_convertible<Dictionary, Class>::value;
 
     // Use the correct CreateHelper struct to create a functionpointer that we can store
     // for later usage. std::is_convertible<>::value returns a boolean that checks at
