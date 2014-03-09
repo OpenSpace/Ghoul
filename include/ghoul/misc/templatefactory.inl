@@ -47,8 +47,13 @@ namespace {
  * is a compile-time constant check if 'Class' can be constructed using a Dictionary.
  */
 
+#define DEFAULT_CONSTRUCTOR 1
+#define DICTIONARY_CONSTRUCTOR 2
+
+#define GHL_DEBUG
+
 template <typename BaseClass, typename Class>
-BaseClass* create(bool useDictionary, const Dictionary& dict) {
+BaseClass* createDefault(bool useDictionary, const Dictionary& dict) {
 #ifdef GHL_DEBUG
     if (useDictionary || dict.size() != 0)
         LERRORC("TemplateFactory", "Class '" << typeid(Class).name() << "' does not " <<
@@ -59,38 +64,49 @@ BaseClass* create(bool useDictionary, const Dictionary& dict) {
 }
 
 template <typename BaseClass, typename Class>
-BaseClass* createWithDictionary(bool useDictionary, const Dictionary& dict) {
+BaseClass* createDefaultAndDictionary(bool useDictionary, const Dictionary& dict) {
     if (useDictionary)
         return new Class(dict);
     else
         return new Class;
 }
 
-template <typename BaseClass, typename Class, bool DICT>
+template <typename BaseClass, typename Class>
+BaseClass* createDictionary(bool useDictionary, const Dictionary& dict) {
+    if (!useDictionary)
+        LERRORC("TemplateFactory", "Class '" << typeid(Class).name() << "' does only " <<
+        "provide a Dictionary constructor but was called requesting the default " <<
+        "constructor");
+    return new Class(dict);
+}
+
+template <typename BaseClass, typename Class, int Constructor>
 struct CreateHelper {
     typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
     FactoryFuncPtr createFunction();
 };
 
-// If the DICT parameter is 'true', we can create the Class using a Dictionary as well,
-// so we want to return the function pointer that will do the test and all the correct
-// constructor
-template<typename BaseClass, typename Class>
-struct CreateHelper<BaseClass, Class, true> {
+template <typename BaseClass, typename Class>
+struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR | DICTIONARY_CONSTRUCTOR> {
     typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
     FactoryFuncPtr createFunction() {
-        return &createWithDictionary<BaseClass, Class>;
+        return &createDefaultAndDictionary<BaseClass, Class>;
     }
 };
 
-// If the DICT parameter is 'false', we can only create the Class using the default
-// constructor. So this helper function has to return the function pointer that will do
-// that
-template<typename BaseClass, typename Class>
-struct CreateHelper<BaseClass, Class, false> {
+template <typename BaseClass, typename Class>
+struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR> {
     typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
     FactoryFuncPtr createFunction() {
-        return &create<BaseClass, Class>;
+        return &createDefault<BaseClass, Class>;
+    }
+};
+
+template <typename BaseClass, typename Class>
+struct CreateHelper<BaseClass, Class, DICTIONARY_CONSTRUCTOR> {
+    typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
+    FactoryFuncPtr createFunction() {
+        return &createDictionary<BaseClass, Class>;
     }
 };
 
@@ -129,13 +145,22 @@ template <typename Class>
 void TemplateFactory<BaseClass>::registerClass(const std::string& className) {
     static_assert(std::is_base_of<BaseClass, Class>::value,
         "BaseClass must be the base class of Class");
+    static_assert(
+        std::has_default_constructor<Class>::value |
+        std::is_convertible<Dictionary, Class>::value,
+        "Class needs a default or Dictionary constructor");
+
+    bool foo = std::has_default_constructor<Class>::value;
+    bool foo2 = std::is_convertible<Dictionary, Class>::value;
 
     // Use the correct CreateHelper struct to create a functionpointer that we can store
     // for later usage. std::is_convertible<>::value returns a boolean that checks at
     // run-time if it is possible to convert a Dictionary into a Class (thereby implicitly
     // checking if there is a proper constructor for it)
     FactoryFuncPtr function = CreateHelper<BaseClass, Class,
-        std::is_convertible<Dictionary, Class>::value>().createFunction();
+        (std::has_default_constructor<Class>::value * DEFAULT_CONSTRUCTOR) |
+        (std::is_convertible<Dictionary, Class>::value * DICTIONARY_CONSTRUCTOR)
+    >().createFunction();
 
     _map.insert({ className, function });
 }

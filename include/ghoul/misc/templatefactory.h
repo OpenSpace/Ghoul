@@ -50,8 +50,11 @@ namespace ghoul {
  * which takes the <code>className</code> as well as the #Dictionary with which to
  * instantiate the class. If this method is used and the class does not provide a
  * #Dictionary constructor, an error is logged (if the source was compiled with
- * <code>GHL_DEBUG</code>). In any case, the #Dictionary is silently ignored. #hasClass
- * tests if a specific <code>className</code> was registered previously. For example:
+ * <code>GHL_DEBUG</code>). In any case, the #Dictionary is silently ignored. Likewise, if
+ * the registered class does not provide a default constructor and is called with the
+ * first #create method, a similar error is logged (and the object is constructed using an
+ * empty #Dictionary instead).  #hasClass tests if a specific <code>className</code> was
+ * registered previously. For example:
  * \verbatim
 class A {};
 class B : public A {};
