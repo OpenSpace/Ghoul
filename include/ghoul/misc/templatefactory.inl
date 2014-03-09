@@ -42,9 +42,8 @@ namespace {
  * argument. Instead, a helper class 'CreateHelper' has to be created as partial template
  * specialization is allowed for classes. 'CreateHelper' has a single method that returns
  * either a 'create' or a 'createWithDictionary' function pointer, depending on the third
- * paramter DICT; if this is true, the class has a constructor that can take a Dictionary.
- * The third parameter is set by using std::is_convertible<Dictionary, Class>::value which
- * is a compile-time constant check if 'Class' can be constructed using a Dictionary.
+ * parameter Constructor; this parameter are determined at compile-timein the
+ * registerClass
  */
 
 #define DEFAULT_CONSTRUCTOR 1
