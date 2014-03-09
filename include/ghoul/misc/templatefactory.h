@@ -136,8 +136,6 @@ private:
      */
     typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
 
-    //typedef std::function<BaseClass*(bool, const ghoul::Dictionary&)> FactoryFuncPtr;
-
     /// The map storing all the associations from <code>className</code> to classes
     std::map<std::string, FactoryFuncPtr> _map;
 };

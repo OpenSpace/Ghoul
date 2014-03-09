@@ -50,11 +50,12 @@ namespace {
 #define DEFAULT_CONSTRUCTOR 1
 #define DICTIONARY_CONSTRUCTOR 2
 
-#define GHL_DEBUG
-
+/// Create Class using only the default constructor
 template <typename BaseClass, typename Class>
 BaseClass* createDefault(bool useDictionary, const Dictionary& dict) {
 #ifdef GHL_DEBUG
+    // We don't have a dictionary constructor, but the user tried to create it with a
+    // Dictionary
     if (useDictionary || dict.size() != 0)
         LERRORC("TemplateFactory", "Class '" << typeid(Class).name() << "' does not " <<
         "provide a constructor receiving a Dictionary; the provided dictionary is " <<
@@ -63,6 +64,7 @@ BaseClass* createDefault(bool useDictionary, const Dictionary& dict) {
     return new Class;
 }
 
+// Create Class using the default constructor or the Dictionary
 template <typename BaseClass, typename Class>
 BaseClass* createDefaultAndDictionary(bool useDictionary, const Dictionary& dict) {
     if (useDictionary)
@@ -71,9 +73,11 @@ BaseClass* createDefaultAndDictionary(bool useDictionary, const Dictionary& dict
         return new Class;
 }
 
+// Create Class using only the Dictionary constructor
 template <typename BaseClass, typename Class>
 BaseClass* createDictionary(bool useDictionary, const Dictionary& dict) {
     if (!useDictionary)
+        // We don't have a default constructor, but the user tried to use it
         LERRORC("TemplateFactory", "Class '" << typeid(Class).name() << "' does only " <<
         "provide a Dictionary constructor but was called requesting the default " <<
         "constructor");
