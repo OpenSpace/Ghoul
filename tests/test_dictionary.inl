@@ -31,14 +31,14 @@
 
 /*
 Test checklist:
---- getValue
----  basic types
----  advanced types
---- setValues
----  basic types
----  advanced types
---- nested dictionaries
---- timing
++++ getValue
++++  basic types
++++  advanced types
++++ setValues
++++  basic types
++++  advanced types
++++ nested dictionaries
++++ timing
 */
 
 class DictionaryTest : public testing::Test {
