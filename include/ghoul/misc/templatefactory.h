@@ -79,6 +79,18 @@ template <typename BaseClass>
 class TemplateFactory {
 public:
     /**
+    * This is a function pointer that is called when a new subclass is to be created and
+    * must return the new-allocated class. The function pointer is stored in the
+    * #TemplateFactory.
+    * \param useDictionary <code>true</code> if the class was called with a provided
+    * #Dictionary and the Dictionary should be used.
+    * \param dict The Dictionary that should be used to initialize the subclass. If
+    * <code>useDictionary</code> is <code>false</code>, this is the empty Dictionary.
+    * \return The initialized subclass of type <code>BaseClass</code>
+    */
+    typedef BaseClass* (*FactoryFuncPtr)(bool useDictionary, const Dictionary& dict);
+
+    /**
      * Creates an instance of the class which was registered under the provided
      * <code>className</code>. This creation uses the parameterless default constructor of
      * the class. If <code>className</code> does not name a registered class, a
@@ -119,6 +131,41 @@ public:
     void registerClass(const std::string& className);
 
     /**
+     * Registers a class with the provided <code>className</code> and the user-defined
+     * #FactoryFuncPtr. The <code>factoryFunction</code> must return a valid subclass of
+     * <code>BaseClass</code> when is it called in the #create methods of
+     * #TemplateFactory. The function pointer is stored inside an <b>no</b> closure will
+     * be constructed. This means that it is the callers responsibility that the factory
+     * function returns a valid type for each call of #create.
+     * \param className The class name, which will be registered with the provided
+     * factory function
+     * \param factoryFunction The function pointer that will be called if the
+     * TemplateFactory is asked to create a class of type <code>className</code>. The
+     * first argument of the function pointer is <code>true</code> if the #create method
+     * was called with a #Dictionary as an additional parameter, implying that the
+     * subclass should be constructed using the #Dictionary provided as the second
+     * argument. The factory function is free to ignore this request.
+     */
+    void registerClass(const std::string& className, FactoryFuncPtr factoryFunction);
+
+    /**
+    * Registers a class with the provided <code>className</code> and the user-defined
+    * #FactoryFuncPtr. The <code>factoryFunction</code> must return a valid subclass of
+    * <code>BaseClass</code> when is it called in the #create methods of
+    * #TemplateFactory. The <code>std::function</code> object is stored inside. 
+    * \param className The class name, which will be registered with the provided
+    * factory function
+    * \param factoryFunction The <code>std::function</code> that will be called if the
+    * TemplateFactory is asked to create a class of type <code>className</code>. The
+    * first argument of the function pointer is <code>true</code> if the #create method
+    * was called with a #Dictionary as an additional parameter, implying that the
+    * subclass should be constructed using the #Dictionary provided as the second
+    * argument. The factory function is free to ignore this request.
+    */
+    void registerClass(const std::string& className, 
+        std::function<BaseClass*(bool, const ghoul::Dictionary&)> factoryFunction);
+
+    /**
      * Checks if any class has been registered under the provided <code>className</code>.
      * As any invalid class will create a compile-time error, if a class has been
      * registered, it is guaranteed that the <code>className</code> can be used to
@@ -130,14 +177,10 @@ public:
     bool hasClass(const std::string& className) const;
 
 private:
-    /**
-     * The function pointer that is stored in the map. This pointer points to a templated
-     * function, which is templated by the destination type.
-     */
-    typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
+    typedef std::function<BaseClass*(bool, const ghoul::Dictionary&)> FactoryFunction;
 
     /// The map storing all the associations from <code>className</code> to classes
-    std::map<std::string, FactoryFuncPtr> _map;
+    std::map<std::string, FactoryFunction> _map;
 };
 
 }

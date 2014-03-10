@@ -163,7 +163,23 @@ void TemplateFactory<BaseClass>::registerClass(const std::string& className) {
         (std::is_convertible<Dictionary, Class>::value * DICTIONARY_CONSTRUCTOR)
     >().createFunction();
 
-    _map.insert({ className, function });
+    registerClass(className, function);
+}
+
+
+template <typename BaseClass>
+void TemplateFactory<BaseClass>::registerClass(const std::string& className,
+                                               FactoryFuncPtr factoryFunction)
+{
+    FactoryFunction functor(factoryFunction);
+    registerClass(className, functor);
+}
+
+template <typename BaseClass>
+void TemplateFactory<BaseClass>::registerClass(const std::string& className,
+            std::function<BaseClass*(bool, const ghoul::Dictionary&)> factoryFunction)
+{
+    _map.insert({ className, factoryFunction });
 }
 
 template <typename BaseClass>
