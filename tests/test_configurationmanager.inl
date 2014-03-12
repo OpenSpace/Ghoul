@@ -103,6 +103,8 @@ protected:
     ghoul::ConfigurationManager* _m;
 };
 
+#ifdef GHL_TIMING_TESTS
+
 TEST_F(ConfigurationManagerTest, TimingTest) {
     std::ofstream logFile("ConfigurationManagerTest.timing");
     START_TIMER(deinitialize, logFile, 1);
@@ -509,8 +511,9 @@ TEST_F(ConfigurationManagerTest, TimingTest) {
                             {_m->setValue("t.t.t.t.t.t.t.t.t.t", 1);});
     _m->hasKey("t.t.t.t.t.t.t.t.t.t");
     FINISH_TIMER(hasKeyLevel10, logFile);
-
 }
+
+#endif // GHL_TIMING_TESTS
 
 TEST_F(ConfigurationManagerTest, DeinitDeath) {
     // Accessing the ConfigurationManager after it has been deinitialized gets an assert

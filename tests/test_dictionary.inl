@@ -117,6 +117,8 @@ protected:
     ghoul::Dictionary* _d;
 };
 
+#ifdef GHL_TIMING_TESTS
+
 TEST_F(DictionaryTest, TimingTest) {
 	std::ofstream logFile("DictionaryTest.timing");
 
@@ -313,6 +315,8 @@ TEST_F(DictionaryTest, TimingTest) {
 	_d->getValue("a750", value);
 	FINISH_TIMER(getValueNumber1000a750, logFile);
 }
+
+#endif // GHL_TIMING_TESTS
 
 TEST_F(DictionaryTest, EmptyTest) {
     EXPECT_EQ(0, _d->size());

@@ -41,7 +41,6 @@ Test checklist:
  +++ Correctness for 'hasClass'
  +++ Custom factory function pointer
  +++ Custom factory std::function
- --- Timing test
 */
 
 namespace {
@@ -134,8 +133,6 @@ protected:
 
     ghoul::TemplateFactory<BaseClass>* factory;
 };
-
-TEST_F(TemplateFactoryTest, TimingTest) {}
 
 TEST_F(TemplateFactoryTest, CorrectnessDirectSublass) {
     factory->registerClass<SubClassDefault>("SubClassDefault");

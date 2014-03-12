@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#ifdef GHL_TIMING_TESTS
+
 #ifdef WIN32
 #define START_TIMER(__name__, __stream__, __num__) \
     __stream__ << #__name__; \
@@ -105,3 +107,5 @@
     } \
     __stream__ << #__name__ << '\t' << __name__##Total.count() / 1000.0 <<  "us" << '\n';
 #endif
+
+#endif // GHL_TIMING_TESTS
