@@ -141,17 +141,15 @@ void luaPrivate_populateDictionary(lua_State* L, Dictionary* D) {
         
         // get the value
         switch (lua_type(L, VAL)) {
+            case LUA_TNIL:
+            {
+                D->setValue(key, nullptr);
+            }
+                break;
             case LUA_TNUMBER:
             {
-                double value =lua_tonumber(L, VAL);
-                double intpart;
-                double floatpart = std::modf(value, &intpart);
-                if (floatpart == 0.0) {
-                    int int_value = static_cast<int>(value);
-                    D->setValue(key, int_value);
-                } else {
-                    D->setValue(key, value);
-                }
+                double value = lua_tonumber(L, VAL);
+                D->setValue(key, value);
             }
                 break;
             case LUA_TBOOLEAN:
@@ -168,9 +166,9 @@ void luaPrivate_populateDictionary(lua_State* L, Dictionary* D) {
                 break;
             case LUA_TTABLE:
             {
-                Dictionary* d = new Dictionary;
-                luaPrivate_populateDictionary(L, d);
-                D->setValue(key, d);
+                Dictionary d;
+                luaPrivate_populateDictionary(L, &d);
+                D->setValue(key, std::move(d));
             }
                 break;
         }
@@ -250,8 +248,8 @@ bool lua_loadIntoDictionary(lua_State* state, ghoul::Dictionary* D, const std::s
     
 #ifndef NDEBUG
     // Print the keys
-    LDEBUGC("lua_loadIntoDictionary","_dictionary contains the following");
-    LDEBUGC("lua_loadIntoDictionary",std::endl << D->serializeToLuaString());
+    //LDEBUGC("lua_loadIntoDictionary","_dictionary contains the following");
+    //LDEBUGC("lua_loadIntoDictionary",std::endl << D->serializeToLuaString());
 #endif
     
     return true;

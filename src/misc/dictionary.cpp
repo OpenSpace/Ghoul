@@ -192,10 +192,10 @@ std::string dictionaryhelper::lua_serializer(Dictionary* D, const std::string in
     
     auto keys = D->keys();
     for (auto name: keys) {
-        if(D->type(name) == typeid(Dictionary*)) {
-            Dictionary *next;
-            D->getValue<Dictionary*>(name, next);
-            content += internalIndentation + name +" = "+lua_serializer(next, internalIndentation) + ",\n";
+        if(D->type(name) == typeid(Dictionary)) {
+            Dictionary next;
+            D->getValue<Dictionary>(name, next);
+            content += internalIndentation + name +" = "+lua_serializer(&next, internalIndentation) + ",\n";
         } else {
             content += internalIndentation + name +" = " + getValueAsString(D, name) + ",\n";
         }
