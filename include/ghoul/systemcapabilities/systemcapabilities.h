@@ -29,6 +29,7 @@
 #include "systemcapabilitiescomponent.h"
 #include "cpucapabilitiescomponent.h"
 #include "openglcapabilitiescomponent.h"
+#include "openclcapabilitiescomponent.h"
 
 #include <string>
 #include <vector>

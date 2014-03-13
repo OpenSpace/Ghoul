@@ -38,6 +38,10 @@
     #pragma comment(lib, "Kernel32.lib")
     typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
     typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD);
+
+    // This is for the 'warning C4996: 'GetVersionExA': was declared deprecated' which
+    // is a known bug for VS2013
+    #pragma warning(disable: 4996)
 #else
     #include <sys/utsname.h>
 #endif

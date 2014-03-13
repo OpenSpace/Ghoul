@@ -23,99 +23,103 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "misc/configurationmanager.h"
-
-#include <type_traits>
-
-#include <ghoul/lua/ghoul_lua.h>
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
-
-#include <assert.h>
-#include <fstream>
-#include <iostream>
-#include <iterator>
-
-namespace {
-    const std::string _loggerCat = "ConfigurationManager";
-}
+#include "opencl/platform.h"
+#include "opencl/cl.hpp"
 
 namespace ghoul {
+namespace opencl {
 
-ConfigurationManager::ConfigurationManager()
-    : _state(nullptr), _dictionary(nullptr)
-{
-    LDEBUG("Creating ConfigurationManager");
-    
-    _dictionary = new Dictionary;
+Platform::Platform(cl::Platform* platform) {
+    _platform = platform;
+}
+Platform::~Platform() {}
+
+bool Platform::isInitialized() const {
+    return _isInitialized;
 }
 
-ConfigurationManager::~ConfigurationManager() {
-#ifdef GHL_DEBUG
-    if (_state != nullptr) {
-        LWARNING("ConfigurationManager was not deinitialized");
-        deinitialize();
+void Platform::fetchInformation() {
+    if (isInitialized()) {
+        clearInformation();
     }
-#endif
-    LDEBUG("Destroying ConfigurationManager");
-    delete _dictionary;
+    std::string tmp_string;
+
+    if(_platform->getInfo(CL_PLATFORM_PROFILE, &tmp_string) == CL_SUCCESS)
+        _profile = tmp_string;
+    if(_platform->getInfo(CL_PLATFORM_VERSION, &tmp_string) == CL_SUCCESS)
+        _version = tmp_string;
+    if(_platform->getInfo(CL_PLATFORM_NAME, &tmp_string) == CL_SUCCESS)
+        _name = tmp_string;
+    if(_platform->getInfo(CL_PLATFORM_VENDOR, &tmp_string) == CL_SUCCESS)
+        _vendor = tmp_string;
+    if(_platform->getInfo(CL_PLATFORM_EXTENSIONS, &tmp_string) == CL_SUCCESS)
+        _extensions = tmp_string;
+
+    _isInitialized = true;
+}
+void Platform::clearInformation() {
+    _profile = "";
+    _version = "";
+    _name = "";
+    _vendor = "";
+    _extensions = "";
+    
+    _isInitialized = false;
 }
 
-bool ConfigurationManager::initialize(const std::string& configurationScript) {
-    assert(_state == nullptr);
-    
-
-    LDEBUG("Create Lua state");
-    _state = luaL_newstate();
-    if (_state == nullptr) {
-        LFATAL("Error creating new Lua state: Memory allocation error");
-        return false;
+//
+// operators
+//
+Platform& Platform::operator=(const Platform& rhs) {
+    if (this != &rhs) // protect against invalid self-assignment
+    {
+        *_platform = *rhs._platform;
+        
+        // Ugly version that refetches all information
+        clearInformation();
+        if(rhs.isInitialized())
+            fetchInformation();
     }
-    LDEBUG("Open libraries");
-    luaL_openlibs(_state);
+    return *this;
+}
+
+Platform& Platform::operator=(const cl::Platform& rhs) {
+    *_platform = rhs;
     
-    if (configurationScript == "") {
-        return true;
-    }
+    // Ugly version that refetches all information
+    clearInformation();
+    if(isInitialized())
+        fetchInformation();
     
-    return loadConfiguration(configurationScript);
+    return *this;
 }
 
-void ConfigurationManager::deinitialize() {
-    assert(_state != nullptr);
-    
-    LDEBUG("Close Lua state");
-    lua_close(_state);
-    _state = nullptr;
+cl_platform_id Platform::operator()() const {
+    return _platform->operator()();
 }
 
-bool ConfigurationManager::loadConfiguration(const std::string& filename, bool isConfiguration) {
-    assert(_state != nullptr);
-    
-    if ( ! lua::lua_loadIntoDictionary(_state, _dictionary, filename, isConfiguration)) {
-        deinitialize();
-        initialize();
-        return false;
-    }
-    return true;
+cl_platform_id& Platform::operator()() {
+    return _platform->operator()();
 }
 
-std::vector<std::string> ConfigurationManager::keys(const std::string& location) {
-    assert(_state != nullptr);
-
-    return _dictionary->keys(location);
+//
+// GET
+//
+std::string Platform::profile() const {
+    return _profile;
+}
+std::string Platform::version() const {
+    return _version;
+}
+std::string Platform::name() const {
+    return _name;
+}
+std::string Platform::vendor() const {
+    return _vendor;
+}
+std::string Platform::extensions() const {
+    return _extensions;
 }
 
-bool ConfigurationManager::hasKey(const std::string& key) {
-    assert(_state != nullptr);
-
-    return _dictionary->hasKey(key);
 }
-    
-void ConfigurationManager::setValue(const std::string& key, const char* value) {
-    const std::string v(value);
-    setValue(key, v);
 }
-
-
-} // namespace ghoul

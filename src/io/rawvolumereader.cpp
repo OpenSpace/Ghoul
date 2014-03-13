@@ -23,99 +23,56 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "misc/configurationmanager.h"
-
-#include <type_traits>
-
-#include <ghoul/lua/ghoul_lua.h>
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
-
-#include <assert.h>
-#include <fstream>
+#include <ghoul/io/rawvolumereader.h>
 #include <iostream>
-#include <iterator>
-
-namespace {
-    const std::string _loggerCat = "ConfigurationManager";
-}
 
 namespace ghoul {
 
-ConfigurationManager::ConfigurationManager()
-    : _state(nullptr), _dictionary(nullptr)
-{
-    LDEBUG("Creating ConfigurationManager");
-    
-    _dictionary = new Dictionary;
+RawVolumeReader::ReadHints::ReadHints(glm::ivec3 dimensions) : _dimensions(dimensions) {
 }
 
-ConfigurationManager::~ConfigurationManager() {
-#ifdef GHL_DEBUG
-    if (_state != nullptr) {
-        LWARNING("ConfigurationManager was not deinitialized");
-        deinitialize();
-    }
-#endif
-    LDEBUG("Destroying ConfigurationManager");
-    delete _dictionary;
+RawVolumeReader::RawVolumeReader() {
+	_hints = ReadHints();
 }
 
-bool ConfigurationManager::initialize(const std::string& configurationScript) {
-    assert(_state == nullptr);
-    
-
-    LDEBUG("Create Lua state");
-    _state = luaL_newstate();
-    if (_state == nullptr) {
-        LFATAL("Error creating new Lua state: Memory allocation error");
-        return false;
-    }
-    LDEBUG("Open libraries");
-    luaL_openlibs(_state);
-    
-    if (configurationScript == "") {
-        return true;
-    }
-    
-    return loadConfiguration(configurationScript);
+RawVolumeReader::RawVolumeReader(const ReadHints& hints) {
+	_hints = hints;
 }
 
-void ConfigurationManager::deinitialize() {
-    assert(_state != nullptr);
-    
-    LDEBUG("Close Lua state");
-    lua_close(_state);
-    _state = nullptr;
+RawVolumeReader::~RawVolumeReader() {
 }
 
-bool ConfigurationManager::loadConfiguration(const std::string& filename, bool isConfiguration) {
-    assert(_state != nullptr);
-    
-    if ( ! lua::lua_loadIntoDictionary(_state, _dictionary, filename, isConfiguration)) {
-        deinitialize();
-        initialize();
-        return false;
-    }
-    return true;
+void RawVolumeReader::setReadHints(glm::ivec3 dimension) {
+	_hints._dimensions = dimension;
 }
 
-std::vector<std::string> ConfigurationManager::keys(const std::string& location) {
-    assert(_state != nullptr);
-
-    return _dictionary->keys(location);
+void RawVolumeReader::setReadHints(const ReadHints& hints) {
+	_hints = hints;
 }
 
-bool ConfigurationManager::hasKey(const std::string& key) {
-    assert(_state != nullptr);
+opengl::Texture* RawVolumeReader::read(std::string filename) {
+	if (_hints._dimensions != glm::ivec3(0)) {
+		int size = _hints._dimensions.x*_hints._dimensions.y*_hints._dimensions.z;
+		GLubyte *data = new GLubyte[size];
 
-    return _dictionary->hasKey(key);
-}
-    
-void ConfigurationManager::setValue(const std::string& key, const char* value) {
-    const std::string v(value);
-    setValue(key, v);
-}
+		if( FILE *fin = fopen(filename.c_str(), "rb") ){
+			fread(data, sizeof(unsigned char), size, fin);
+			fclose(fin);
+		} else {
+			fprintf( stderr, "Could not open file '%s'\n", filename.c_str() );
+		}
 
+		opengl::Texture* texture = new opengl::Texture(data, glm::size3_t(_hints._dimensions),
+				_hints._format, _hints._internalFormat, GL_UNSIGNED_BYTE,
+				opengl::Texture::FilterMode::Linear, opengl::Texture::WrappingMode::ClampToBorder);
+		texture->uploadTexture();
+
+		delete []data;
+		return texture;
+	} else {
+		std::cout << "Error. Volume dimensions not set" << std::endl;
+		return nullptr;
+	}
+}
 
 } // namespace ghoul

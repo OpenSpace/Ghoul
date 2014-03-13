@@ -29,24 +29,119 @@
 namespace ghoul {
 
 namespace {
-    /// This should not be used outside, as it is fairly useless on its own
-    template <typename T, typename U>
-    U* createType() {
-        return new T;
+    
+/*
+ * The working principle is as follows: There are two methods which can create subclasses,
+ * 'create' and 'createWithDictionary'. The first one will create the subclass using the
+ * default constructor while the second can use the default constructor or a constructor
+ * using a ghoul::Dictionary as an input. Since both methods adhere to the same function
+ * prototype 'BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&)', they can be stored
+ * in the same TemplateFactory's '_map' without the TemplateFactory knowing which of the
+ * two functions it is. If C++ would support partial template specialization, two separate
+ * methods wouldn't be necessary and could instead be split up by a single template
+ * argument. Instead, a helper class 'CreateHelper' has to be created as partial template
+ * specialization is allowed for classes. 'CreateHelper' has a single method that returns
+ * either a 'create' or a 'createWithDictionary' function pointer, depending on the third
+ * parameter Constructor; this parameter is determined at compile-time in the
+ * registerClass by using the constant values DEFAULT_CONSTRUCTOR with
+ * std::has_default_constructor and DICTIONARY_CONSTRUCTOR with std::is_convertible
+ */
+
+const int DEFAULT_CONSTRUCTOR = 1;
+const int DICTIONARY_CONSTRUCTOR = 2;
+
+/// Create Class using only the default constructor
+template <typename BaseClass, typename Class>
+BaseClass* createDefault(bool useDictionary, const Dictionary& dict) {
+#ifdef GHL_DEBUG
+    // We don't have a dictionary constructor, but the user tried to create it with a
+    // Dictionary
+    if (useDictionary || dict.size() != 0)
+        LERRORC("TemplateFactory", "Class '" << typeid(Class).name() << "' does not " <<
+        "provide a constructor receiving a Dictionary; the provided dictionary is " <<
+        "silently ignored");
+#endif
+    return new Class;
+}
+
+// Create Class using the default constructor or the Dictionary
+template <typename BaseClass, typename Class>
+BaseClass* createDefaultAndDictionary(bool useDictionary, const Dictionary& dict) {
+    if (useDictionary)
+        return new Class(dict);
+    else
+        return new Class;
+}
+
+// Create Class using only the Dictionary constructor
+template <typename BaseClass, typename Class>
+BaseClass* createDictionary(bool useDictionary, const Dictionary& dict) {
+    if (!useDictionary)
+        // We don't have a default constructor, but the user tried to use it
+        LERRORC("TemplateFactory", "Class '" << typeid(Class).name() << "' does only " <<
+        "provide a Dictionary constructor but was called requesting the default " <<
+        "constructor");
+    return new Class(dict);
+}
+
+template <typename BaseClass, typename Class, int Constructor>
+struct CreateHelper {
+    typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
+    FactoryFuncPtr createFunction();
+};
+
+template <typename BaseClass, typename Class>
+struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR | DICTIONARY_CONSTRUCTOR> {
+    typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
+    FactoryFuncPtr createFunction() {
+        return &createDefaultAndDictionary<BaseClass, Class>;
     }
+};
+
+template <typename BaseClass, typename Class>
+struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR> {
+    typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
+    FactoryFuncPtr createFunction() {
+        return &createDefault<BaseClass, Class>;
+    }
+};
+
+template <typename BaseClass, typename Class>
+struct CreateHelper<BaseClass, Class, DICTIONARY_CONSTRUCTOR> {
+    typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
+    FactoryFuncPtr createFunction() {
+        return &createDictionary<BaseClass, Class>;
+    }
+};
+
 }
 
 template <typename BaseClass>
 BaseClass* TemplateFactory<BaseClass>::create(const std::string& className) const {
-    typename std::map<std::string, FactoryFuncPtr>::const_iterator it = _map.find(className);
+    auto it = _map.find(className);
     if (it == _map.end()) {
-        LERRORC("TemplateFactory", "Factory did not find a class named '" << className << "'");
+        LERRORC("TemplateFactory", "Factory did not have a class '" <<className << "'");
         return nullptr;
     }
     else
         // If 'className' is a valid name, we can use the stored functionpointer to create
         // the class using the 'createType' method
-        return it->second();
+        return it->second(false, {});
+}
+
+template <typename BaseClass>
+BaseClass* TemplateFactory<BaseClass>::create(const std::string& className,
+                                              const Dictionary& dictionary) const
+{
+    auto it = _map.find(className);
+    if (it == _map.end()) {
+        LERRORC("TemplateFactory", "Factory did not have a class '" << className << "'");
+        return nullptr;
+    }
+    else
+        // If 'className' is a valid name, we can use the stored functionpointer to create
+        // the class using the 'createType' method
+        return it->second(true, dictionary);
 }
 
 template <typename BaseClass>
@@ -54,8 +149,37 @@ template <typename Class>
 void TemplateFactory<BaseClass>::registerClass(const std::string& className) {
     static_assert(std::is_base_of<BaseClass, Class>::value,
         "BaseClass must be the base class of Class");
-    FactoryFuncPtr function = &createType<Class>;
-    _map.insert({ className, function });
+    static_assert(
+        std::has_default_constructor<Class>::value |
+        std::is_convertible<Dictionary, Class>::value,
+        "Class needs a default or Dictionary constructor");
+
+    // Use the correct CreateHelper struct to create a functionpointer that we can store
+    // for later usage. std::is_convertible<>::value returns a boolean that checks at
+    // run-time if it is possible to convert a Dictionary into a Class (thereby implicitly
+    // checking if there is a proper constructor for it)
+    FactoryFuncPtr function = CreateHelper<BaseClass, Class,
+        (std::has_default_constructor<Class>::value * DEFAULT_CONSTRUCTOR) |
+        (std::is_convertible<Dictionary, Class>::value * DICTIONARY_CONSTRUCTOR)
+    >().createFunction();
+
+    registerClass(className, function);
+}
+
+
+template <typename BaseClass>
+void TemplateFactory<BaseClass>::registerClass(const std::string& className,
+                                               FactoryFuncPtr factoryFunction)
+{
+    FactoryFunction functor(factoryFunction);
+    registerClass(className, functor);
+}
+
+template <typename BaseClass>
+void TemplateFactory<BaseClass>::registerClass(const std::string& className,
+            std::function<BaseClass*(bool, const ghoul::Dictionary&)> factoryFunction)
+{
+    _map.insert({ className, factoryFunction });
 }
 
 template <typename BaseClass>

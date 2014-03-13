@@ -57,6 +57,20 @@ source_group(FileSystem FILES
                 ${FILESYSTEM_HEADER}
                 ${FILESYSTEM_HEADER_INL})
 
+file(GLOB IO_SOURCE ${SOURCE_ROOT_DIR}/io/*.cpp)
+file(GLOB IO_SOURCE_C ${SOURCE_ROOT_DIR}/io/*.c)
+set(GHOUL_SOURCE ${GHOUL_SOURCE} ${IO_SOURCE} ${IO_SOURCE_C})
+file(GLOB IO_HEADER ${HEADER_ROOT_DIR}/io/*.h)
+file(GLOB IO_HEADER_INL ${HEADER_ROOT_DIR}/io/*.inl)
+set(IO_GLOB_HEADER ${HEADER_ROOT_DIR}/io/io)
+set(GHOUL_HEADER ${GHOUL_HEADER} ${IO_HEADER} ${IO_HEADER_INL})
+source_group(IO FILES
+                ${IO_SOURCE}
+                ${IO_SOURCE_C}
+                ${IO_GLOB_HEADER}
+                ${IO_HEADER}
+                ${IO_HEADER_INL})
+                
 file(GLOB LOG_SOURCE ${SOURCE_ROOT_DIR}/logging/*.cpp)
 file(GLOB LOG_SOURCE_C ${SOURCE_ROOT_DIR}/logging/*.c)
 set(GHOUL_SOURCE ${GHOUL_SOURCE} ${LOG_SOURCE} ${LOG_SOURCE_C})
@@ -103,19 +117,32 @@ source_group(OpenGL FILES
                 ${OPENGL_HEADER}
                 ${OPENGL_HEADER_INL})
 
+if(OPENCL_FOUND)
+    file(GLOB OPENCL_SOURCE ${SOURCE_ROOT_DIR}/opencl/*.cpp)
+    file(GLOB OPENCL_SOURCE_C ${SOURCE_ROOT_DIR}/opencl/*.c)
+    set(GHOUL_SOURCE ${GHOUL_SOURCE} ${OPENCL_SOURCE} ${OPENCL_SOURCE_C})
+    file(GLOB OPENCL_HEADER ${HEADER_ROOT_DIR}/opencl/*.h)
+    file(GLOB OPENCL_HEADER_INL ${HEADER_ROOT_DIR}/opencl/*.inl)
+    set(GHOUL_HEADER ${GHOUL_HEADER} ${OPENCL_HEADER} ${OPENCL_HEADER_INL})
+    source_group(OpenCL FILES
+                    ${OPENCL_SOURCE}
+                    ${OPENCL_SOURCE_C}
+                    ${OPENCL_HEADER}
+                    ${OPENCL_HEADER_INL})
+endif(OPENCL_FOUND)
+
 file(GLOB SYSTEMCAPABILITIES_SOURCE ${SOURCE_ROOT_DIR}/systemcapabilities/*.cpp)
 file(GLOB SYSTEMCAPABILITIES_SOURCE_C ${SOURCE_ROOT_DIR}/systemcapabilities/*.c)
 set(GHOUL_SOURCE ${GHOUL_SOURCE} ${SYSTEMCAPABILITIES_SOURCE} ${SYSTEMCAPABILITIES_SOURCE_C})
 file(GLOB SYSTEMCAPABILITIES_HEADER ${HEADER_ROOT_DIR}/systemcapabilities/*.h)
 file(GLOB SYSTEMCAPABILITIES_HEADER_INL ${HEADER_ROOT_DIR}/systemcapabilities/*.inl)
-set(SYSTEMCAPABILITIES_GLOB_HEADER ${HEADER_ROOT_DIR}/systemcapabilities/systemcapabilities)
 set(GHOUL_HEADER ${GHOUL_HEADER} ${SYSTEMCAPABILITIES_HEADER} ${SYSTEMCAPABILITIES_HEADER_INL})
 source_group(SystemCapabilities FILES
                 ${SYSTEMCAPABILITIES_SOURCE}
                 ${SYSTEMCAPABILITIES_SOURCE_C}
-                ${SYSTEMCAPABILITIES_GLOB_HEADER}
                 ${SYSTEMCAPABILITIES_HEADER}
                 ${SYSTEMCAPABILITIES_HEADER_INL})
+
 
 set(GHOUL_HEADER ${GHOUL_HEADER} ${HEADER_ROOT_DIR}/glm.h)
 
@@ -148,6 +175,13 @@ endif ()
 add_library(Ghoul ${GHOUL_SOURCE} ${GHOUL_HEADER})
 
 # Adding debug flags for the debug build
-set_target_properties(Ghoul PROPERTIES COMPILE_DEFINITIONS_DEBUG "_DEBUG GHL_DEBUG")
+if(UNIX AND NOT APPLE)
+	if(CMAKE_BUILD_TYPE MATCHES Debug)
+		add_definitions(-DGHL_DEBUG)
+		add_definitions(-D_DEBUG)
+	endif(CMAKE_BUILD_TYPE MATCHES Debug)
+else()
+	set_target_properties(Ghoul PROPERTIES COMPILE_DEFINITIONS_DEBUG "_DEBUG GHL_DEBUG")
+endif(UNIX AND NOT APPLE)
 
 target_link_libraries(Ghoul Lua ${GHOUL_DEPENDENCIES})

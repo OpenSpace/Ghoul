@@ -23,99 +23,49 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "misc/configurationmanager.h"
+#ifndef __PLATFORM_H__
+#define __PLATFORM_H__
 
-#include <type_traits>
+#include <ghoul/opencl/ghoul_cl.h>
 
-#include <ghoul/lua/ghoul_lua.h>
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
-
-#include <assert.h>
-#include <fstream>
-#include <iostream>
-#include <iterator>
-
-namespace {
-    const std::string _loggerCat = "ConfigurationManager";
-}
+#include <string>
 
 namespace ghoul {
+namespace opencl {
 
-ConfigurationManager::ConfigurationManager()
-    : _state(nullptr), _dictionary(nullptr)
-{
-    LDEBUG("Creating ConfigurationManager");
+class Platform {
+public:
+    Platform(cl::Platform* platform);
+    ~Platform();
     
-    _dictionary = new Dictionary;
-}
-
-ConfigurationManager::~ConfigurationManager() {
-#ifdef GHL_DEBUG
-    if (_state != nullptr) {
-        LWARNING("ConfigurationManager was not deinitialized");
-        deinitialize();
-    }
-#endif
-    LDEBUG("Destroying ConfigurationManager");
-    delete _dictionary;
-}
-
-bool ConfigurationManager::initialize(const std::string& configurationScript) {
-    assert(_state == nullptr);
+    bool isInitialized() const;
     
-
-    LDEBUG("Create Lua state");
-    _state = luaL_newstate();
-    if (_state == nullptr) {
-        LFATAL("Error creating new Lua state: Memory allocation error");
-        return false;
-    }
-    LDEBUG("Open libraries");
-    luaL_openlibs(_state);
+    void fetchInformation();
+    void clearInformation();
     
-    if (configurationScript == "") {
-        return true;
-    }
+    Platform& operator=(const Platform& rhs);
+    Platform& operator=(const cl::Platform& rhs);
+    cl_platform_id operator()() const;
+    cl_platform_id& operator()();
     
-    return loadConfiguration(configurationScript);
-}
-
-void ConfigurationManager::deinitialize() {
-    assert(_state != nullptr);
+    std::string profile() const;
+    std::string version() const;
+    std::string name() const;
+    std::string vendor() const;
+    std::string extensions() const;
     
-    LDEBUG("Close Lua state");
-    lua_close(_state);
-    _state = nullptr;
-}
-
-bool ConfigurationManager::loadConfiguration(const std::string& filename, bool isConfiguration) {
-    assert(_state != nullptr);
+protected:
     
-    if ( ! lua::lua_loadIntoDictionary(_state, _dictionary, filename, isConfiguration)) {
-        deinitialize();
-        initialize();
-        return false;
-    }
-    return true;
-}
-
-std::vector<std::string> ConfigurationManager::keys(const std::string& location) {
-    assert(_state != nullptr);
-
-    return _dictionary->keys(location);
-}
-
-bool ConfigurationManager::hasKey(const std::string& key) {
-    assert(_state != nullptr);
-
-    return _dictionary->hasKey(key);
-}
+private:
+    cl::Platform* _platform;
     
-void ConfigurationManager::setValue(const std::string& key, const char* value) {
-    const std::string v(value);
-    setValue(key, v);
-}
+    bool _isInitialized;
+    
+    std::string _profile, _version, _name, _vendor, _extensions;
 
+};
 
+} // namepsace opencl
 } // namespace ghoul
+
+#endif

@@ -98,6 +98,13 @@ add_definitions(-DGLM_SWIZZLE)
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
+find_package(OpenCL)
+if(OPENCL_FOUND)
+    add_definitions(-DGHL_OPENCL)
+    include_directories(${OPENCL_INCLUDE_DIRS})
+    set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${OPENCL_LIBRARIES})
+endif(OPENCL_FOUND)
+
 find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
 if (NOT GHOUL_USE_DYNAMIC_GLEW)
@@ -136,8 +143,6 @@ if (GHOUL_HAVE_TESTS)
     add_definitions(-DGTEST_HAS_TR1_TUPLE=0)
     add_definitions(-DGTEST_HAS_GLOBAL_STRING=0)
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/gtest)
-
-
     
     include_directories("${GHOUL_ROOT_DIR}/ext/gtest/include")
     include_directories("${GHOUL_ROOT_DIR}")

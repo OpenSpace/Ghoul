@@ -23,99 +23,54 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "misc/configurationmanager.h"
+#ifndef __OPENCLCAPABILITIESCOMPONENT_H__
+#define __OPENCLCAPABILITIESCOMPONENT_H__
 
-#include <type_traits>
+#include "systemcapabilitiescomponent.h"
 
-#include <ghoul/lua/ghoul_lua.h>
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
+#include <ghoul/opencl/platform.h>
+#include <ghoul/opencl/device.h>
 
-#include <assert.h>
-#include <fstream>
-#include <iostream>
-#include <iterator>
-
-namespace {
-    const std::string _loggerCat = "ConfigurationManager";
-}
+#include <string>
+#include <vector>
 
 namespace ghoul {
+namespace systemcapabilities {
 
-ConfigurationManager::ConfigurationManager()
-    : _state(nullptr), _dictionary(nullptr)
-{
-    LDEBUG("Creating ConfigurationManager");
+/**
+ * This subclass of SystemCapabilitiesComponent detects OpenCL-related capabilities, like available
+ * platforms and devices. The most important device variables can be logged.
+ */
+class OpenCLCapabilitiesComponent : public SystemCapabilitiesComponent {
+public:
+
+    OpenCLCapabilitiesComponent();
+    ~OpenCLCapabilitiesComponent();
+
+    std::vector<CapabilityInformation> capabilities(
+        const SystemCapabilitiesComponent::Verbosity& verbosity) const override;
     
-    _dictionary = new Dictionary;
-}
-
-ConfigurationManager::~ConfigurationManager() {
-#ifdef GHL_DEBUG
-    if (_state != nullptr) {
-        LWARNING("ConfigurationManager was not deinitialized");
-        deinitialize();
-    }
-#endif
-    LDEBUG("Destroying ConfigurationManager");
-    delete _dictionary;
-}
-
-bool ConfigurationManager::initialize(const std::string& configurationScript) {
-    assert(_state == nullptr);
+    /**
+     * Returns the <code>OpenCL</code> string.
+     * \return The <code>OpenCL</code> string
+     */
+    const std::string name() const override;
     
-
-    LDEBUG("Create Lua state");
-    _state = luaL_newstate();
-    if (_state == nullptr) {
-        LFATAL("Error creating new Lua state: Memory allocation error");
-        return false;
-    }
-    LDEBUG("Open libraries");
-    luaL_openlibs(_state);
+protected:
+    void detectCapabilities() override;
+    void clearCapabilities() override;
     
-    if (configurationScript == "") {
-        return true;
-    }
+    // Internal struct used for detecting capabilities
+    struct PlatformAndDevices {
+        ghoul::opencl::Platform* platform;
+        std::vector<ghoul::opencl::Device*> devices;
+    };
     
-    return loadConfiguration(configurationScript);
-}
-
-void ConfigurationManager::deinitialize() {
-    assert(_state != nullptr);
+    std::vector<PlatformAndDevices> _data;
     
-    LDEBUG("Close Lua state");
-    lua_close(_state);
-    _state = nullptr;
-}
+};
 
-bool ConfigurationManager::loadConfiguration(const std::string& filename, bool isConfiguration) {
-    assert(_state != nullptr);
-    
-    if ( ! lua::lua_loadIntoDictionary(_state, _dictionary, filename, isConfiguration)) {
-        deinitialize();
-        initialize();
-        return false;
-    }
-    return true;
-}
-
-std::vector<std::string> ConfigurationManager::keys(const std::string& location) {
-    assert(_state != nullptr);
-
-    return _dictionary->keys(location);
-}
-
-bool ConfigurationManager::hasKey(const std::string& key) {
-    assert(_state != nullptr);
-
-    return _dictionary->hasKey(key);
-}
-    
-void ConfigurationManager::setValue(const std::string& key, const char* value) {
-    const std::string v(value);
-    setValue(key, v);
-}
-
-
+} // namespace systemcapabilities
 } // namespace ghoul
+
+#endif // __OPENCLCAPABILITIESCOMPONENT_H__
