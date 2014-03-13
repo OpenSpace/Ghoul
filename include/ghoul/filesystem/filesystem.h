@@ -115,7 +115,8 @@ public:
 
     /**
      * Checks if the file at the <code>path</code> exists or not. This method will also
-     * return <code>false</code> if <code>path</code> points to a directory.
+     * return <code>false</code> if <code>path</code> points to a directory. This method
+     * will not expand any tokens that are passed to it.
      * \param path The path that should be tested for existence
      * \return <code>true</code> if <code>path</code> points to an existing file,
      * <code>false</code> otherwise
