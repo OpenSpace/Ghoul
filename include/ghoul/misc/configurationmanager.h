@@ -31,8 +31,6 @@
 #include <string>
 #include <vector>
 
-struct lua_State;
-
 namespace ghoul {
 
 /**
@@ -100,54 +98,11 @@ namespace ghoul {
 class ConfigurationManager {
 public:
     /**
-     * Empty constructor initializing the necessary Lua state to nullptr. #initialize has
-     * to be called before the ConfigurationManager can be used.
+     * Clears the internal state of the ConfigurationMangager. After this method returns
+     * the ConfigurationManager is in the same state as if it would have just been
+     * created.
      */
-    ConfigurationManager();
-
-    /**
-     * The #deinitialize method has to be called before the destructor will be executed to
-     * release the Lua state and prevent memory leaks. If the code is compiled with 
-     * <code>GHL_DEBUG</code> defined, a warning will be logged if the
-     * ConfigurationManager was not #deinitialize%d before.
-     */
-    ~ConfigurationManager();
-
-    /**
-     * Initializes the ConfigurationManager with the <code>configurationScript</code>.
-     * This method can only be called once for each ConfigurationManager and will load,
-     * compile, and test the passed script. It will perform checks if all necessary
-     * functions and tables are available in the script. If any error occurs during the
-     * loading, compilation, or testing, <code>false</code> will be returned and the error
-     * is logged. If everything passes, <code>true</code> is returned. The main script 
-     * has to adhere to the following interface:
-     * - A function <code>loadFunction</code>, called with a filename as paramenter, has
-     *   to add the contents of the pointed file to the current configuration state.
-     * - A function <code>getValue</code>, called with a string key, has to return the
-     *   current value of the configuration of that key or <code>nil</code> if the key was
-     *   not present in the list.
-     * - A function <code>setValue</code>, called with a string key and the value to be
-     *   set, must store the passed value so that it will be available to future
-     *   <code>getValue</code> calls.
-     * - A function <code>getKeys</code>, called with a string location, must return a
-     *   table containing the available keys for the settings pointed to by the location.
-     * - A function <code>hasKey</code>, called with a string key that checks if the
-     *   designated key exists in the configuration.
-     * \param configurationScript The script containing the main script that handles all
-     * the interaction to the Lua state. The filename to the script will automatically be
-     * converted using the #FileSystem::absolutePath method. If no configuration script
-     * is provided, a hard-coded default script will be used instead
-     * \return <code>true</code> if it script was successfully compiled and tested and the
-     * ConfigurationManager is ready to be used. <code>false</code> otherwise
-     */
-    bool initialize(const std::string& configurationScript = "");
-    
-    /**
-     * Cleans up the Lua state and makes the ConfigurationManager ready to be destroyed
-     * or re%initialize%d again later. If it is reinitialized, all previous values have
-     * been lost.
-     */
-    void deinitialize();
+    void clear();
 
     /**
      * Load the configuration at the <code>filename</code> into the local store. Each new
@@ -162,7 +117,7 @@ public:
      * \return <code>true</code> if the configuration was successfully loaded;
      * <code>false</code> if an error occurred
      */
-    bool loadConfiguration(const std::string& filename, bool isConfiguration = true);
+    bool loadConfiguration(const std::string& filename);
 
     /**
      * This method returns all the keys that are available at a certain
@@ -198,9 +153,16 @@ public:
      * as described in the class overview
      * \param key The key under which the <code>value</code> is to be stored
      * \param value The value which should be stored at the provided location
+     * \param createIntermediate If <code>true</code> all intermediate levels in the
+     * ConfigurationManager will be automatically created along the way, if the provided
+     * <code>key</code> contains a nested location. If <code>false</code> the method will
+     * fail and return <code>false</code> if a missing intermediate level is encountered.
+     * \return <code>true</code> if the value was stored successfully, <code>false</code>
+     * otherwise
      */
     template <typename T>
-    void setValue(const std::string& key, const T& value);
+    bool setValue(const std::string& key, const T& value,
+                  bool createIntermediate = false);
 
     /**
      * Sets the <code>value</code> for the <code>key</code>, generating all necessary
@@ -209,8 +171,15 @@ public:
      * #setValue to deal with constant strings
      * \param key The key under which the <code>value</code> is to be stored
      * \param value The value which should be stored at the provided location
+     * \param createIntermediate If <code>true</code> all intermediate levels in the
+     * ConfigurationManager will be automatically created along the way, if the provided
+     * <code>key</code> contains a nested location. If <code>false</code> the method will
+     * fail and return <code>false</code> if a missing intermediate level is encountered.
+     * \return <code>true</code> if the value was stored successfully, <code>false</code>
+     * otherwise
      */
-    void setValue(const std::string& key, const char* value);
+    bool setValue(const std::string& key, const char* value,
+                  bool createIntermediate = false);
 
     /**
      * Gets the <code>value</code> for the provided <code>key</code>. The value at the
@@ -232,9 +201,7 @@ public:
     bool getValue(const std::string& key, T& value);
 
 private:
-    /// Stores the Lua state including the main script and the table containing the config
-    lua_State* _state;
-    Dictionary* _dictionary;
+    Dictionary _dictionary;
 };
 
 } // namespace ghoul

@@ -64,7 +64,7 @@ bool Dictionary::setValue(const std::string& key, T&& value, bool createIntermed
 		return false;
 	}
 	// Proper tail-recursion
-	return dict->setValue(rest, value);
+	return dict->setValue(rest, value, createIntermediate);
 }
 	
 template <typename T>

@@ -24,10 +24,10 @@
  ****************************************************************************************/
 
 #include "gtest/gtest.h"
-#include <ghoul/misc/configurationmanager.h>
 #include <glm/glm.hpp>
 #include <fstream>
 #include <random>
+#include <ghoul/misc/configurationmanager.h>
 
 namespace {
     // A non-existing configuration file
@@ -51,53 +51,48 @@ namespace {
 
 /*
 Test checklist:
-+++ loadConfiguration: existing file
-+++ loadConfiguration: non-existing file
-+++ getValue: key does not exist
-+++ getValue: subtable does not exist
-+++ getValue: overriding previous configuration
-+++ getValue: function does not change passed value on error
-+++ getValue: nested keys
-+++ getValue: deep nesting of keys
-+++ getValue: correct values returned for each type
-+++ getValue: are all basic types implemented
-+++ getValue: glm::vec2, glm::vec3, glm::vec4 implemented
-+++ getValue: glm::matXxY implemented
-+++ getValue: valid conversions
-+++ setValue: all types implemented
-+++ setValue: create subtables on the way
-+++ setValue: value gets set correctly for each type
-+++ setValue: value overwrites setting in configuration file
-+++ setValue: deep nesting of keys
-+++ setValue: nested keys
-+++ setValue: glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4 implemented
-+++ hasKeys: deep nesting of keys
-+++ hasKeys: subtables on the way do not exist
-+++ hasKeys: correct values for all types
-+++ hasKeys: nestedKeys
-+++ timing
+--- loadConfiguration: existing file
+--- loadConfiguration: non-existing file
+--- getValue: key does not exist
+--- getValue: subtable does not exist
+--- getValue: overriding previous configuration
+--- getValue: function does not change passed value on error
+--- getValue: nested keys
+--- getValue: deep nesting of keys
+--- getValue: correct values returned for each type
+--- getValue: are all basic types implemented
+--- getValue: glm::vec2, glm::vec3, glm::vec4 implemented
+--- getValue: glm::matXxY implemented
+--- getValue: valid conversions
+--- setValue: all types implemented
+--- setValue: create subtables on the way
+--- setValue: value gets set correctly for each type
+--- setValue: value overwrites setting in configuration file
+--- setValue: deep nesting of keys
+--- setValue: nested keys
+--- setValue: glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4 implemented
+--- hasKeys: deep nesting of keys
+--- hasKeys: subtables on the way do not exist
+--- hasKeys: correct values for all types
+--- hasKeys: nestedKeys
+--- timing
 */
 
 class ConfigurationManagerTest : public testing::Test {
 protected:
     ConfigurationManagerTest() {
         _m = new ghoul::ConfigurationManager;
-        _m->initialize();
     }
 
     ~ConfigurationManagerTest() {
         if (_m) {
-            _m->deinitialize();
             delete _m;
             _m = nullptr;
         }
     }
 
     void reset() {
-        _m->deinitialize();
-        delete _m;
-        _m = new ghoul::ConfigurationManager;
-        _m->initialize();
+        _m->clear();
     }
 
     ghoul::ConfigurationManager* _m;
@@ -515,18 +510,9 @@ TEST_F(ConfigurationManagerTest, TimingTest) {
 
 #endif // GHL_TIMING_TESTS
 
-TEST_F(ConfigurationManagerTest, DeinitDeath) {
-    // Accessing the ConfigurationManager after it has been deinitialized gets an assert
-    _m->deinitialize();
-    EXPECT_DEATH(_m->keys();, "");
-    delete _m;
-    _m = nullptr;
-}
-
 TEST_F(ConfigurationManagerTest, ReinitTest) {
     _m->setValue("t", int(2));
-    _m->deinitialize();
-    _m->initialize();
+    _m->clear();
     const bool success = _m->hasKey("t");
     EXPECT_EQ(false, success);
 } 
@@ -587,7 +573,7 @@ TEST_F(ConfigurationManagerTest, KeysFunction) {
         "b.b.b.b.b.b.b.b", "b.b.b.b.b.b.b.b.b", "b.b.b.b.b.b.b.b.b.b",
         "b.b.b.b.b.b.b.b.b.b.b", "b.b.b.b.b.b.b.b.b.b.b.b"
     };
-    _m->setValue(keysB[11], int(0));
+    _m->setValue(keysB[11], int(0), true);
     for (int i = 0; i < 12; ++i)
         EXPECT_EQ(true, _m->hasKey(keysB[i])) << keysB[i] <<": test1 + test3";
 }
@@ -608,6 +594,7 @@ TEST_F(ConfigurationManagerTest, HasKeySubtable) {
 }
 
 TEST_F(ConfigurationManagerTest, HasKeyTypes) {
+    _m->setValue("t", ghoul::Dictionary());
     _m->setValue("t.bool", bool(1));
     _m->setValue("t.char", char(1));
     _m->setValue("t.unsignedchar", (unsigned char)(1));
@@ -663,7 +650,7 @@ TEST_F(ConfigurationManagerTest, HasKeyTypes) {
 }
 
 TEST_F(ConfigurationManagerTest, GetValueFunction) {
-    bool test;
+    std::string test;
     bool success = _m->getValue("key", test);
     EXPECT_EQ(false, success) << "Empty configuration";
 
@@ -680,22 +667,14 @@ TEST_F(ConfigurationManagerTest, GetValueFunction) {
     success = _m->getValue("s.a", test);
     EXPECT_EQ(false, success) << "test1+test3 (s.a)";
 
-    success = _m->getValue("s[\"1\"]", test);
+    success = _m->getValue("s.1", test);
     EXPECT_EQ(true, success) << "test1+test3 (s.1)";
 
-    success = _m->getValue("s[\"1\"].a", test);
+    success = _m->getValue("s.1.a", test);
     EXPECT_EQ(false, success) << "test1+test3 (s.1.a)";
 
-    success = _m->getValue("s[\"3\"].a", test);
+    success = _m->getValue("s.3.a", test);
     EXPECT_EQ(true, success) << "test1+test3 (s.3.a)";
-
-    success = _m->getValue("s[\"1\"]", testInt);
-    EXPECT_EQ(true, success) << "test1+test3 (s.1)";
-    EXPECT_EQ(1, testInt) << "test1+test3 (s.1)";
-
-    success = _m->getValue("s[\"2\"]", testInt);
-    EXPECT_EQ(true, success) << "test1+test3 (s.2)";
-    EXPECT_EQ(2, testInt) << "test1+test3 (s.2)";
 
     std::vector<int> testVec;
     success = _m->getValue("key", testVec);

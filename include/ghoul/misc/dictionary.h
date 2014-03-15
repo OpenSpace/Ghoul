@@ -73,16 +73,6 @@ public:
 	Dictionary(const std::initializer_list<std::pair<std::string, boost::any>>& l);
     
     /**
-     * Serializes the Dictionary to a string
-     */
-    std::string serializeToLuaString();
-    
-    /**
-     * Serializes the Dictionary using serializeToLuaString and prints to file.
-     */
-    bool serializeToFile(const std::string& filename);
-
-    /**
      * Returns all of the keys that are stored in the dictionary at a given
      * <code>location</code>. This location specifier can be recursive to inspect the keys
      * at deeper levels.
@@ -184,7 +174,13 @@ public:
      */
     size_t size() const;
 
-private:
+    /**
+     * Clears the Dictionary and leaves it in the same state as if it would just have been
+     * created.
+     */
+    void clear();
+
+protected:
     /**
      * Splits the provided <code>key</code> into a <code>first</code> part and the
      * <code>rest</code>. Provided a key <code>a.b.c</code>, <code>first</code> will be

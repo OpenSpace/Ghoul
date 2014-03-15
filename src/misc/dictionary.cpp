@@ -35,41 +35,41 @@ namespace {
 
 namespace ghoul {
 
-namespace dictionaryhelper {
-    std::string getValueAsString(Dictionary* D, std::string key);
-    std::string lua_serializer(Dictionary* D, const std::string indentation = "");
-} // namespace helper
+//namespace dictionaryhelper {
+//    std::string getValueAsString(Dictionary* D, std::string key);
+//    std::string lua_serializer(Dictionary* D, const std::string indentation = "");
+//} // namespace helper
     
 Dictionary::Dictionary() {}
 
 Dictionary::Dictionary(const std::initializer_list<std::pair<string, boost::any>>& l) {
-	for (const std::pair<string, boost::any>& p : l)
+	for (const auto& p : l)
 		(*this)[p.first] = p.second;
 }
     
-std::string Dictionary::serializeToLuaString(){
-    return dictionaryhelper::lua_serializer(this, "");
-}
-
-bool Dictionary::serializeToFile(const std::string& filename) {
-    
-    // Serialize to lua configuration string
-    std::string luaConfig = serializeToLuaString();
-    
-    std::ofstream out(filename.c_str());
-    
-    if(! out.is_open())
-        return false;
-    
-    out << luaConfig;
-    out.close();
-    return true;
-}
+//std::string Dictionary::serializeToLuaString(){
+//    return dictionaryhelper::lua_serializer(this, "");
+//}
+//
+//bool Dictionary::serializeToFile(const std::string& filename) {
+//    
+//    // Serialize to lua configuration string
+//    std::string luaConfig = serializeToLuaString();
+//    
+//    std::ofstream out(filename.c_str());
+//    
+//    if(! out.is_open())
+//        return false;
+//    
+//    out << luaConfig;
+//    out.close();
+//    return true;
+//}
 
 const std::vector<string> Dictionary::keys(const string& location) const {
 	if (location.empty()) {
 		std::vector<string> result;
-		for (const std::pair<string, boost::any>& it : *this)
+		for (const auto& it : *this)
 			result.push_back(it.first);
 		return result;
 	}
@@ -78,14 +78,14 @@ const std::vector<string> Dictionary::keys(const string& location) const {
 	std::string rest;
 	splitKey(location, first, rest);
 
-	const std::map<string, boost::any>::const_iterator keyIt = find(first);
+	auto keyIt = find(first);
 	if (keyIt == cend()) {
 		LERROR("Key '" << first << "' was not found in dictionary");
 		return std::vector<string>();
 	}
 
 	const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
-	if (dict == nullptr) {
+	if (!dict) {
 		LERROR("Error converting key '" << first << "' to type 'Dictionary', was '" <<
 			keyIt->second.type().name() << "'");
 		return std::vector<string>();
@@ -95,7 +95,7 @@ const std::vector<string> Dictionary::keys(const string& location) const {
 }
 
 bool Dictionary::hasKey(const string& key) const {
-	std::map<string, boost::any>::const_iterator it = find(key);
+	auto it = find(key);
 	if (it != cend())
 		return true;
 
@@ -103,18 +103,22 @@ bool Dictionary::hasKey(const string& key) const {
 	std::string rest;
 	splitKey(key, first, rest);
 
-	const std::map<string, boost::any>::const_iterator keyIt = find(first);
+	auto keyIt = find(first);
 	if (keyIt == cend())
 		return false;
 
 	const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
-	if (dict == nullptr)
+	if (!dict)
 		return false;
 	return dict->hasKey(rest);
 }
 
 size_t Dictionary::size() const {
 	return std::map<std::string, boost::any>::size();
+}
+
+void Dictionary::clear() {
+    return std::map<std::string, boost::any>::clear();
 }
 
 bool Dictionary::splitKey(const string& key, string& first, string& rest) const {
@@ -132,7 +136,7 @@ bool Dictionary::splitKey(const string& key, string& first, string& rest) const 
 }
 
 const std::type_info& Dictionary::type(const std::string& key) const {
-	const std::map<std::string, boost::any>::const_iterator it = find(key);
+	auto it = find(key);
 	if (it != cend())
 		return it->second.type();
 
@@ -140,12 +144,12 @@ const std::type_info& Dictionary::type(const std::string& key) const {
 	std::string rest;
 	splitKey(key, first, rest);
 
-	const std::map<std::string, boost::any>::const_iterator keyIt = find(first);
+	auto keyIt = find(first);
 	if (keyIt == cend())
 		return typeid(void);
 
 	const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
-	if (dict == nullptr)
+	if (!dict)
 		return typeid(void);
 	
 	// Proper tail-recursion
@@ -155,53 +159,53 @@ const std::type_info& Dictionary::type(const std::string& key) const {
 //
 // Helpers
 //
-std::string dictionaryhelper::getValueAsString(Dictionary* D, std::string key) {
-    if(D->type(key) == typeid(std::string)) {
-        std::string value;
-        if (D->getValue(key, value)) {
-            return "\"" + value + "\"";
-        }
-    }
-    std::stringstream stringvalue;
-    if(D->type(key) == typeid(double)) {
-        double value;
-        if (D->getValue(key, value)) {
-            stringvalue << value;
-        }
-    } else if(D->type(key) == typeid(int)) {
-        int value;
-        if (D->getValue(key, value)) {
-            stringvalue << value;
-        }
-    } else if(D->type(key) == typeid(bool)) {
-        bool value;
-        if (D->getValue(key, value)) {
-            stringvalue << std::boolalpha << value;
-        }
-    }
-    return stringvalue.str();
-}
-    
-std::string dictionaryhelper::lua_serializer(Dictionary* D, const std::string indentation) {
-    
-    std::string content;
-    const std::string indentationLevel = "    ";
-    std::string internalIndentation = indentation + indentationLevel;
-    
-    content += "{\n";
-    
-    auto keys = D->keys();
-    for (auto name: keys) {
-        if(D->type(name) == typeid(Dictionary*)) {
-            Dictionary *next;
-            D->getValue<Dictionary*>(name, next);
-            content += internalIndentation + name +" = "+lua_serializer(next, internalIndentation) + ",\n";
-        } else {
-            content += internalIndentation + name +" = " + getValueAsString(D, name) + ",\n";
-        }
-    }
-    content += indentation + "}";
-    return content;
-}
+//std::string dictionaryhelper::getValueAsString(Dictionary* D, std::string key) {
+//    if(D->type(key) == typeid(std::string)) {
+//        std::string value;
+//        if (D->getValue(key, value)) {
+//            return "\"" + value + "\"";
+//        }
+//    }
+//    std::stringstream stringvalue;
+//    if(D->type(key) == typeid(double)) {
+//        double value;
+//        if (D->getValue(key, value)) {
+//            stringvalue << value;
+//        }
+//    } else if(D->type(key) == typeid(int)) {
+//        int value;
+//        if (D->getValue(key, value)) {
+//            stringvalue << value;
+//        }
+//    } else if(D->type(key) == typeid(bool)) {
+//        bool value;
+//        if (D->getValue(key, value)) {
+//            stringvalue << std::boolalpha << value;
+//        }
+//    }
+//    return stringvalue.str();
+//}
+//    
+//std::string dictionaryhelper::lua_serializer(Dictionary* D, const std::string indentation) {
+//    
+//    std::string content;
+//    const std::string indentationLevel = "    ";
+//    std::string internalIndentation = indentation + indentationLevel;
+//    
+//    content += "{\n";
+//    
+//    auto keys = D->keys();
+//    for (auto name: keys) {
+//        if(D->type(name) == typeid(Dictionary*)) {
+//            Dictionary *next;
+//            D->getValue<Dictionary*>(name, next);
+//            content += internalIndentation + name +" = "+lua_serializer(next, internalIndentation) + ",\n";
+//        } else {
+//            content += internalIndentation + name +" = " + getValueAsString(D, name) + ",\n";
+//        }
+//    }
+//    content += indentation + "}";
+//    return content;
+//}
 
 } // namespace ghoul

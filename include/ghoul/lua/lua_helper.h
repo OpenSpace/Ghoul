@@ -29,10 +29,17 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/dictionary.h>
 
+#include <exception>
+
 struct lua_State;
 
 namespace ghoul {
 namespace lua {
+
+class LuaFormattingException : public std::runtime_error {
+public:
+    LuaFormattingException(const std::string&);
+};
 
 /**
  * Logs the Lua table that is located on the top of the stack in the passed
@@ -46,7 +53,7 @@ namespace lua {
  * \return The same string that was logged, or <code>""</code> if the <code>state</code>
  * was not valid
  */
-std::string lua_logTable(lua_State* state,logging::LogManager::LogLevel level = 
+std::string logTable(lua_State* state,logging::LogManager::LogLevel level = 
                          logging::LogManager::LogLevel::Info);
 
 /**
@@ -68,16 +75,16 @@ std::string lua_logTable(lua_State* state,logging::LogManager::LogLevel level =
  * \return The same string that was logged, or <code>""</code> if the <code>state</code>
  * was not valid
  */
-std::string lua_logStack(lua_State* state, logging::LogManager::LogLevel level = 
+std::string logStack(lua_State* state, logging::LogManager::LogLevel level = 
                          logging::LogManager::LogLevel::Info);
+
 
 /**
  * Loads a Lua configuration or Lua configuration script into the given ghoul::Dictionary
  */
-bool lua_loadIntoDictionary(lua_State* state, ghoul::Dictionary* D,
-                            const std::string& filename, bool isConfiguration = true);
-
-
+//bool lua_loadIntoDictionary(lua_State* state, ghoul::Dictionary* D,
+//                            const std::string& filename, bool isConfiguration = true);
+bool loadDictionary(const std::string& filename, ghoul::Dictionary& dictionary);
 
 } // namespace lua
 } // namespace ghoul
