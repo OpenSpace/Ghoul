@@ -339,60 +339,6 @@ TEST_F(DictionaryTest, NestedDictionaries) {
 	EXPECT_EQ(2, e.size());
 }
 
-TEST_F(DictionaryTest, TypeInfo) {
-	createDefaultDictionary();
-	ASSERT_EQ(48, _d->size());
-	EXPECT_EQ(typeid(bool), _d->type("bool")) << "bool";
-	EXPECT_EQ(typeid(char), _d->type("char")) << "char";
-	EXPECT_EQ(typeid(signed char), _d->type("signed char")) << "signed char";
-	EXPECT_EQ(typeid(unsigned char), _d->type("unsigned char")) << "unsigned char";
-	EXPECT_EQ(typeid(wchar_t), _d->type("wchar_t")) << "wchar_t";
-	EXPECT_EQ(typeid(short), _d->type("short")) << "short";
-	EXPECT_EQ(typeid(unsigned short), _d->type("unsigned short")) << "unsigned short";
-	EXPECT_EQ(typeid(int), _d->type("int")) << "int";
-	EXPECT_EQ(typeid(unsigned int), _d->type("unsigned int")) << "unsigned int";
-	EXPECT_EQ(typeid(long long), _d->type("long long")) << "long long";
-	EXPECT_EQ(typeid(unsigned long long), _d->type("unsigned long long")) << 
-		"unsigned long long";
-	EXPECT_EQ(typeid(float), _d->type("float")) << "float";
-	EXPECT_EQ(typeid(double), _d->type("double")) << "double";
-	EXPECT_EQ(typeid(long double), _d->type("long double")) << "long double";
-	EXPECT_EQ(typeid(ghoul::Dictionary), _d->type("dictionary")) << "Dictionary";
-	EXPECT_EQ(typeid(glm::vec2), _d->type("vec2")) << "vec2";
-	EXPECT_EQ(typeid(glm::dvec2), _d->type("dvec2")) << "dvec2";
-	EXPECT_EQ(typeid(glm::ivec2), _d->type("ivec2")) << "ivec2";
-	EXPECT_EQ(typeid(glm::uvec2), _d->type("uvec2")) << "uvec2";
-	EXPECT_EQ(typeid(glm::bvec2), _d->type("bvec2")) << "bvec2";
-	EXPECT_EQ(typeid(glm::vec3), _d->type("vec3")) << "vec3";
-	EXPECT_EQ(typeid(glm::dvec3), _d->type("dvec3")) << "dvec3";
-	EXPECT_EQ(typeid(glm::ivec3), _d->type("ivec3")) << "ivec3";
-	EXPECT_EQ(typeid(glm::uvec3), _d->type("uvec3")) << "uvec3";
-	EXPECT_EQ(typeid(glm::bvec3), _d->type("bvec3")) << "bvec3";
-	EXPECT_EQ(typeid(glm::vec4), _d->type("vec4")) << "vec4";
-	EXPECT_EQ(typeid(glm::dvec4), _d->type("dvec4")) << "dvec4";
-	EXPECT_EQ(typeid(glm::ivec4), _d->type("ivec4")) << "ivec4";
-	EXPECT_EQ(typeid(glm::uvec4), _d->type("uvec4")) << "uvec4";
-	EXPECT_EQ(typeid(glm::bvec4), _d->type("bvec4")) << "bvec4";
-	EXPECT_EQ(typeid(glm::mat2x2), _d->type("mat2x2")) << "mat2x2";
-	EXPECT_EQ(typeid(glm::mat2x3), _d->type("mat2x3")) << "mat2x3";
-	EXPECT_EQ(typeid(glm::mat2x4), _d->type("mat2x4")) << "mat2x4";
-	EXPECT_EQ(typeid(glm::mat3x2), _d->type("mat3x2")) << "mat3x2";
-	EXPECT_EQ(typeid(glm::mat3x3), _d->type("mat3x3")) << "mat3x3";
-	EXPECT_EQ(typeid(glm::mat3x4), _d->type("mat3x4")) << "mat3x4";
-	EXPECT_EQ(typeid(glm::mat4x2), _d->type("mat4x2")) << "mat4x2";
-	EXPECT_EQ(typeid(glm::mat4x3), _d->type("mat4x3")) << "mat4x3";
-	EXPECT_EQ(typeid(glm::mat4x4), _d->type("mat4x4")) << "mat4x4";
-	EXPECT_EQ(typeid(glm::dmat2x2), _d->type("dmat2x2")) << "dmat2x2";
-	EXPECT_EQ(typeid(glm::dmat2x3), _d->type("dmat2x3")) << "dmat2x3";
-	EXPECT_EQ(typeid(glm::dmat2x4), _d->type("dmat2x4")) << "dmat2x4";
-	EXPECT_EQ(typeid(glm::dmat3x2), _d->type("dmat3x2")) << "dmat3x2";
-	EXPECT_EQ(typeid(glm::dmat3x3), _d->type("dmat3x3")) << "dmat3x3";
-	EXPECT_EQ(typeid(glm::dmat3x4), _d->type("dmat3x4")) << "dmat3x4";
-	EXPECT_EQ(typeid(glm::dmat4x2), _d->type("dmat4x2")) << "dmat4x2";
-	EXPECT_EQ(typeid(glm::dmat4x3), _d->type("dmat4x3")) << "dmat4x3";
-	EXPECT_EQ(typeid(glm::dmat4x4), _d->type("dmat4x4")) << "dmat4x4";
-}
-
 TEST_F(DictionaryTest, AssignmentOperator) {
 	ghoul::Dictionary d = { { "a", 1 }, { "b", 2 } };
 	ghoul::Dictionary e = d;

@@ -29,7 +29,7 @@
 namespace ghoul {
 
 template <typename T>
-bool Dictionary::setValue(const std::string& key, T&& value, bool createIntermediate) {
+bool Dictionary::setValue(std::string key, T value, bool createIntermediate) {
 	std::string first;
 	std::string rest;
 	const bool hasRestPath = splitKey(key, first, rest);
@@ -132,5 +132,235 @@ bool Dictionary::hasValue(const std::string& key) const {
 	// Proper tail-recursion
 	return dict->hasValue<T>(rest);
 }
+
+extern template bool Dictionary::setValue<bool>(std::string key, bool value,
+                                                bool createIntermediate);
+extern template bool Dictionary::setValue<char>(std::string key, char value,
+                                                bool createIntermediate);
+extern template bool Dictionary::setValue<signed char>(std::string key, signed char value,
+                                                       bool createIntermediate);
+extern template bool Dictionary::setValue<unsigned char>(std::string key,
+                                                         unsigned char value,
+                                                         bool createIntermediate);
+extern template bool Dictionary::setValue<wchar_t>(std::string key, wchar_t value,
+                                                   bool createIntermediate);
+extern template bool Dictionary::setValue<short>(std::string key, short value,
+                                                 bool createIntermediate);
+extern template bool Dictionary::setValue<unsigned short>(std::string key,
+                                                          unsigned short value,
+                                                          bool createIntermediate);
+extern template bool Dictionary::setValue<int>(std::string key, int value,
+                                               bool createIntermediate);
+extern template bool Dictionary::setValue<unsigned int>(std::string key,
+                                                        unsigned int value,
+                                                        bool createIntermediate);
+extern template bool Dictionary::setValue<float>(std::string key, float value,
+                                                 bool createIntermediate);
+extern template bool Dictionary::setValue<glm::vec2>(std::string key, glm::vec2 value,
+                                                     bool createIntermediate);
+extern template bool Dictionary::setValue<glm::dvec2>(std::string key, glm::dvec2 value,
+                                                      bool createIntermediate);
+extern template bool Dictionary::setValue<glm::ivec2>(std::string key, glm::ivec2 value,
+                                                      bool createIntermediate);
+extern template bool Dictionary::setValue<glm::uvec2>(std::string key, glm::uvec2 value,
+                                                      bool createIntermediate);
+extern template bool Dictionary::setValue<glm::bvec2>(std::string key, glm::bvec2 value,
+                                                      bool createIntermediate);
+extern template bool Dictionary::setValue<glm::vec3>(std::string key, glm::vec3 value,
+                                                     bool createIntermediate);
+extern template bool Dictionary::setValue<glm::dvec3>(std::string key, glm::dvec3 value,
+                                                      bool createIntermediate);
+extern template bool Dictionary::setValue<glm::ivec3>(std::string key, glm::ivec3 value,
+                                                      bool createIntermediate);
+extern template bool Dictionary::setValue<glm::uvec3>(std::string key, glm::uvec3 value,
+                                                      bool createIntermediate);
+extern template bool Dictionary::setValue<glm::bvec3>(std::string key, glm::bvec3 value,
+                                                      bool createIntermediate);
+extern template bool Dictionary::setValue<glm::vec4>(std::string key, glm::vec4 value,
+                                                     bool createIntermediate);
+extern template bool Dictionary::setValue<glm::dvec4>(std::string key, glm::dvec4 value,
+                                                      bool createIntermediate);
+extern template bool Dictionary::setValue<glm::ivec4>(std::string key, glm::ivec4 value,
+                                                      bool createIntermediate);
+extern template bool Dictionary::setValue<glm::uvec4>(std::string key, glm::uvec4 value,
+                                                      bool createIntermediate);
+extern template bool Dictionary::setValue<glm::bvec4>(std::string key, glm::bvec4 value,
+                                                      bool createIntermediate);
+extern template bool Dictionary::setValue<glm::mat2x2>(std::string key, glm::mat2x2 value,
+                                                       bool createIntermediate);
+extern template bool Dictionary::setValue<glm::mat2x3>(std::string key, glm::mat2x3 value,
+                                                       bool createIntermediate);
+extern template bool Dictionary::setValue<glm::mat2x4>(std::string key, glm::mat2x4 value,
+                                                       bool createIntermediate);
+extern template bool Dictionary::setValue<glm::mat3x2>(std::string key, glm::mat3x2 value,
+                                                       bool createIntermediate);
+extern template bool Dictionary::setValue<glm::mat3x3>(std::string key, glm::mat3x3 value,
+                                                       bool createIntermediate);
+extern template bool Dictionary::setValue<glm::mat3x4>(std::string key, glm::mat3x4 value,
+                                                       bool createIntermediate);
+extern template bool Dictionary::setValue<glm::mat4x2>(std::string key, glm::mat4x2 value,
+                                                       bool createIntermediate);
+extern template bool Dictionary::setValue<glm::mat4x3>(std::string key, glm::mat4x3 value,
+                                                       bool createIntermediate);
+extern template bool Dictionary::setValue<glm::mat4x4>(std::string key, glm::mat4x4 value,
+                                                       bool createIntermediate);
+extern template bool Dictionary::setValue<glm::dmat2x2>(std::string key,
+                                                        glm::dmat2x2 value,
+                                                        bool createIntermediate);
+extern template bool Dictionary::setValue<glm::dmat2x3>(std::string key,
+                                                        glm::dmat2x3 value,
+                                                        bool createIntermediate);
+extern template bool Dictionary::setValue<glm::dmat2x4>(std::string key,
+                                                        glm::dmat2x4 value,
+                                                        bool createIntermediate);
+extern template bool Dictionary::setValue<glm::dmat3x2>(std::string key,
+                                                        glm::dmat3x2 value,
+                                                        bool createIntermediate);
+extern template bool Dictionary::setValue<glm::dmat3x3>(std::string key,
+                                                        glm::dmat3x3 value,
+                                                        bool createIntermediate);
+extern template bool Dictionary::setValue<glm::dmat3x4>(std::string key,
+                                                        glm::dmat3x4 value,
+                                                        bool createIntermediate);
+extern template bool Dictionary::setValue<glm::dmat4x2>(std::string key,
+                                                        glm::dmat4x2 value,
+                                                        bool createIntermediate);
+extern template bool Dictionary::setValue<glm::dmat4x3>(std::string key,
+                                                        glm::dmat4x3 value,
+                                                        bool createIntermediate);
+extern template bool Dictionary::setValue<glm::dmat4x4>(std::string key,
+                                                        glm::dmat4x4 value,
+                                                        bool createIntermediate);
+
+extern template bool Dictionary::getValue<bool>(const std::string& key,
+                                                bool& value) const;
+extern template bool Dictionary::getValue<char>(const std::string& key,
+                                                char& value) const;
+extern template bool Dictionary::getValue<signed char>(const std::string& key,
+                                                       signed char& value) const;
+extern template bool Dictionary::getValue<unsigned char>(const std::string& key,
+                                                         unsigned char& value) const;
+extern template bool Dictionary::getValue<wchar_t>(const std::string& key,
+                                                   wchar_t& value) const;
+extern template bool Dictionary::getValue<short>(const std::string& key,
+                                                 short& value) const;
+extern template bool Dictionary::getValue<unsigned short>(const std::string& key,
+                                                          unsigned short& value) const;
+extern template bool Dictionary::getValue<int>(const std::string& key, int& value) const;
+extern template bool Dictionary::getValue<unsigned int>(const std::string& key,
+                                                        unsigned int& value) const;
+extern template bool Dictionary::getValue<float>(const std::string& key,
+                                                 float& value) const;
+extern template bool Dictionary::getValue<glm::vec2>(const std::string& key,
+                                                     glm::vec2& value) const;
+extern template bool Dictionary::getValue<glm::dvec2>(const std::string& key,
+                                                      glm::dvec2& value) const;
+extern template bool Dictionary::getValue<glm::ivec2>(const std::string& key,
+                                                      glm::ivec2& value) const;
+extern template bool Dictionary::getValue<glm::uvec2>(const std::string& key,
+                                                      glm::uvec2& value) const;
+extern template bool Dictionary::getValue<glm::bvec2>(const std::string& key,
+                                                      glm::bvec2& value) const;
+extern template bool Dictionary::getValue<glm::vec3>(const std::string& key,
+                                                     glm::vec3& value) const;
+extern template bool Dictionary::getValue<glm::dvec3>(const std::string& key,
+                                                      glm::dvec3& value) const;
+extern template bool Dictionary::getValue<glm::ivec3>(const std::string& key,
+                                                      glm::ivec3& value) const;
+extern template bool Dictionary::getValue<glm::uvec3>(const std::string& key,
+                                                      glm::uvec3& value) const;
+extern template bool Dictionary::getValue<glm::bvec3>(const std::string& key,
+                                                      glm::bvec3& value) const;
+extern template bool Dictionary::getValue<glm::vec4>(const std::string& key,
+                                                     glm::vec4& value) const;
+extern template bool Dictionary::getValue<glm::dvec4>(const std::string& key,
+                                                      glm::dvec4& value) const;
+extern template bool Dictionary::getValue<glm::ivec4>(const std::string& key,
+                                                      glm::ivec4& value) const;
+extern template bool Dictionary::getValue<glm::uvec4>(const std::string& key,
+                                                      glm::uvec4& value) const;
+extern template bool Dictionary::getValue<glm::bvec4>(const std::string& key,
+                                                      glm::bvec4& value) const;
+extern template bool Dictionary::getValue<glm::mat2x2>(const std::string& key,
+                                                       glm::mat2x2& value) const;
+extern template bool Dictionary::getValue<glm::mat2x3>(const std::string& key,
+                                                       glm::mat2x3& value) const;
+extern template bool Dictionary::getValue<glm::mat2x4>(const std::string& key,
+                                                       glm::mat2x4& value) const;
+extern template bool Dictionary::getValue<glm::mat3x2>(const std::string& key,
+                                                       glm::mat3x2& value) const;
+extern template bool Dictionary::getValue<glm::mat3x3>(const std::string& key,
+                                                       glm::mat3x3& value) const;
+extern template bool Dictionary::getValue<glm::mat3x4>(const std::string& key,
+                                                       glm::mat3x4& value) const;
+extern template bool Dictionary::getValue<glm::mat4x2>(const std::string& key,
+                                                       glm::mat4x2& value) const;
+extern template bool Dictionary::getValue<glm::mat4x3>(const std::string& key,
+                                                       glm::mat4x3& value) const;
+extern template bool Dictionary::getValue<glm::mat4x4>(const std::string& key,
+                                                       glm::mat4x4& value) const;
+extern template bool Dictionary::getValue<glm::dmat2x2>(const std::string& key,
+                                                        glm::dmat2x2& value) const;
+extern template bool Dictionary::getValue<glm::dmat2x3>(const std::string& key,
+                                                        glm::dmat2x3& value) const;
+extern template bool Dictionary::getValue<glm::dmat2x4>(const std::string& key,
+                                                        glm::dmat2x4& value) const;
+extern template bool Dictionary::getValue<glm::dmat3x2>(const std::string& key,
+                                                        glm::dmat3x2& value) const;
+extern template bool Dictionary::getValue<glm::dmat3x3>(const std::string& key,
+                                                        glm::dmat3x3& value) const;
+extern template bool Dictionary::getValue<glm::dmat3x4>(const std::string& key,
+                                                        glm::dmat3x4& value) const;
+extern template bool Dictionary::getValue<glm::dmat4x2>(const std::string& key,
+                                                        glm::dmat4x2& value) const;
+extern template bool Dictionary::getValue<glm::dmat4x3>(const std::string& key,
+                                                        glm::dmat4x3& value) const;
+extern template bool Dictionary::getValue<glm::dmat4x4>(const std::string& key,
+                                                        glm::dmat4x4& value) const;
+
+extern template bool Dictionary::hasValue<bool>(const std::string& key) const;
+extern template bool Dictionary::hasValue<char>(const std::string& key) const;
+extern template bool Dictionary::hasValue<signed char>(const std::string& key) const;
+extern template bool Dictionary::hasValue<unsigned char>(const std::string& key) const;
+extern template bool Dictionary::hasValue<wchar_t>(const std::string& key) const;
+extern template bool Dictionary::hasValue<short>(const std::string& key) const;
+extern template bool Dictionary::hasValue<unsigned short>(const std::string& key) const;
+extern template bool Dictionary::hasValue<int>(const std::string& key) const;
+extern template bool Dictionary::hasValue<unsigned int>(const std::string& key) const;
+extern template bool Dictionary::hasValue<float>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::vec2>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::dvec2>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::ivec2>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::uvec2>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::bvec2>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::vec3>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::dvec3>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::ivec3>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::uvec3>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::bvec3>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::vec4>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::dvec4>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::ivec4>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::uvec4>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::bvec4>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::mat2x2>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::mat2x3>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::mat2x4>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::mat3x2>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::mat3x3>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::mat3x4>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::mat4x2>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::mat4x3>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::mat4x4>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::dmat2x2>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::dmat2x3>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::dmat2x4>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::dmat3x2>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::dmat3x3>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::dmat3x4>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::dmat4x2>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::dmat4x3>(const std::string& key) const;
+extern template bool Dictionary::hasValue<glm::dmat4x4>(const std::string& key) const;
+
 
 } // namespace ghoul
