@@ -121,7 +121,9 @@ if (GHOUL_USE_DEVIL)
 endif ()
 
 include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
-include_directories(${GHOUL_ROOT_DIR}/ext/boost)
+# include_directories(${GHOUL_ROOT_DIR}/ext/boost)
+find_package(Boost COMPONENTS timer system REQUIRED)
+set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${Boost_LIBRARIES})
 
 if (APPLE)
     include_directories(/Developer/Headers/FlatCarbon)

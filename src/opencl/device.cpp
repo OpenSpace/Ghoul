@@ -24,7 +24,8 @@
  ****************************************************************************************/
 
 #include "opencl/device.h"
-#include "opencl/cl.hpp"
+//#include "opencl/cl.hpp"
+#include <CL/cl.hpp>
 
 namespace ghoul {
 namespace opencl {
