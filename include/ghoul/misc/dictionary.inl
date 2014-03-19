@@ -23,115 +23,133 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+// Removes a warning that occurs when trying to convert int directly to bool values in the
+// glm::bvecX template specializations
+#ifdef WIN32
+#pragma warning(disable : 4800)
+#endif
+
 #include <ghoul/glm.h>
+
+#ifdef WIN32
+#pragma warning(default : 4800)
+#endif
+
 #include <ghoul/logging/logmanager.h>
 
 namespace ghoul {
 
 template <typename T>
 bool Dictionary::setValue(std::string key, T value, bool createIntermediate) {
-	std::string first;
-	std::string rest;
-	const bool hasRestPath = splitKey(key, first, rest);
-	if (!hasRestPath) {
-        // if no rest exists,  key == first
-        // and we can just insert the value
-		(*this)[key] = value;
-		return true;
-	}
+    std::string first;
+    std::string rest;
+    const bool hasRestPath = splitKey(key, first, rest);
+    if (!hasRestPath) {
+        // if no rest exists, key == first and we can just insert the value
+        (*this)[key] = value;
+        return true;
+    }
 
     // if we get to this point, the 'key' did contain a nested key
     // so we have to find the correct Dictionary (or create it if it doesn't exist)
-	std::map<std::string, boost::any>::iterator keyIt = find(first);
-	if (keyIt == cend()) {
+    std::map<std::string, boost::any>::iterator keyIt = find(first);
+    if (keyIt == cend()) {
         // didn't find the Dictionary
         if (createIntermediate) {
             ghoul::Dictionary intermediate;
             (*this)[first] = intermediate;
             keyIt = find(first);
-        }
-        else {
+        } else {
             LERRORC("Dictionary", "Key '" << first << "' was not found in dictionary");
             return false;
         }
-	}
+    }
 
     // See if it is actually a Dictionary at this location
-	Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
-	if (dict == nullptr) {
-		LERRORC("Dictionary", "Error converting key '" << first <<
-			"' to type 'Dictionary', was '" << keyIt->second.type().name() << "'");
-		return false;
-	}
-	// Proper tail-recursion
-	return dict->setValue(rest, value, createIntermediate);
+    Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
+    if (dict == nullptr) {
+        LERRORC("Dictionary", "Error converting key '"
+                              << first << "' to type 'Dictionary', was '"
+                              << keyIt->second.type().name() << "'");
+        return false;
+    }
+    // Proper tail-recursion
+    return dict->setValue(rest, value, createIntermediate);
 }
-	
+
 template <typename T>
 bool Dictionary::getValue(const std::string& key, T& value) const {
     // If we can find the key directly, we can return it immediately
-	const std::map<std::string, boost::any>::const_iterator it = find(key);
-	if (it != cend()) {
-		const T* const v = boost::any_cast<T>(&(it->second));
+    const std::map<std::string, boost::any>::const_iterator it = find(key);
+    if (it != cend()) {
+        const T* const v = boost::any_cast<T>(&(it->second));
         // See if it has the correct type
-		if (v == nullptr) {
-			LERRORC("Dictionary", "Wrong type of key '" << key << "': Expected '" <<
-				typeid(T).name() << "', got '" << it->second.type().name() << "'");
-			return false;
-		}
-		value = *v;
-		return true;
-	}
+        if (v == nullptr) {
+            LERRORC("Dictionary", "Wrong type of key '"
+                                  << key << "': Expected '" << typeid(T).name()
+                                  << "', got '" << it->second.type().name() << "'");
+            return false;
+        }
+        value = *v;
+        return true;
+    }
 
     // if we get to this point, the 'key' did contain a nested key
     // so we have to find the correct Dictionary (or create it if it doesn't exist)
-	std::string first;
-	std::string rest;
-	splitKey(key, first, rest);
+    std::string first;
+    std::string rest;
+    splitKey(key, first, rest);
 
-	const std::map<std::string, boost::any>::const_iterator keyIt = find(first);
-	if (keyIt == cend()) {
-		LERRORC("Dictionary", "Key '" << first << "' was not found in dictionary");
-		return false;
-	}
+    const std::map<std::string, boost::any>::const_iterator keyIt = find(first);
+    if (keyIt == cend()) {
+        LERRORC("Dictionary", "Key '" << first << "' was not found in dictionary");
+        return false;
+    }
 
-	const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
+    const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
     // See if it is actually a Dictionary at this location
-	if (dict == nullptr) {
-		LERRORC("Dictionary", "Error converting key '" << first << 
-			"' to type 'Dictionary', was '" << keyIt->second.type().name() << "'");
-		return false;
-	}
-	// Proper tail-recursion
-	return dict->getValue<T>(rest, value);
+    if (dict == nullptr) {
+        LERRORC("Dictionary", "Error converting key '"
+                              << first << "' to type 'Dictionary', was '"
+                              << keyIt->second.type().name() << "'");
+        return false;
+    }
+    // Proper tail-recursion
+    return dict->getValue<T>(rest, value);
 }
 
 template <typename T>
 bool Dictionary::hasValue(const std::string& key) const {
-	const std::map<std::string, boost::any>::const_iterator it = find(key);
+    const std::map<std::string, boost::any>::const_iterator it = find(key);
     if (it != cend()) {
         // If we can find the key directly, we can check the types and return
         const bool typeCorrect = (it->second.type() == typeid(T));
         return typeCorrect;
     }
 
-	std::string first;
-	std::string rest;
-	splitKey(key, first, rest);
+    std::string first;
+    std::string rest;
+    splitKey(key, first, rest);
 
-	const std::map<std::string, boost::any>::const_iterator keyIt = find(first);
-	if (keyIt == cend())
+    const std::map<std::string, boost::any>::const_iterator keyIt = find(first);
+    if (keyIt == cend())
         // If we can't find the first part of nested key, there is no need to continue
-		return false;
+        return false;
 
-	const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
-	if (dict == nullptr)
+    const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
+    if (dict == nullptr)
         // If it is not a Dictionary, the value can't be found and no recursion necessary
-		return false;
+        return false;
 
-	// Proper tail-recursion
-	return dict->hasValue<T>(rest);
+    // Proper tail-recursion
+    return dict->hasValue<T>(rest);
 }
+
+// Make extern template definitions so that the compiler won't try to instantiate each
+// member function individually whenever it is encountered. This way, we promise the
+// compiler that they will be instantiated somewhere else. This is done in the
+// dictionary.cpp compilation unit; if a new template specialization is added, it must be
+// included here and in the dictionary.cpp file
 
 #define DEF_EXT_TEMPLATES(TYPE)                                                          \
     extern template bool Dictionary::setValue<TYPE>(std::string key, TYPE value,         \
@@ -186,4 +204,4 @@ DEF_EXT_TEMPLATES(glm::dmat4x4)
 
 #undef DEF_EXT_TEMPLATES
 
-} // namespace ghoul
+}  // namespace ghoul
