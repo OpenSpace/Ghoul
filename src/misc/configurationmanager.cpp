@@ -42,80 +42,33 @@ namespace {
 
 namespace ghoul {
 
-ConfigurationManager::ConfigurationManager()
-    : _state(nullptr), _dictionary(nullptr)
-{
-    LDEBUG("Creating ConfigurationManager");
-    
-    _dictionary = new Dictionary;
+void ConfigurationManager::clear() {
+    _dictionary.clear();
 }
 
-ConfigurationManager::~ConfigurationManager() {
-#ifdef GHL_DEBUG
-    if (_state != nullptr) {
-        LWARNING("ConfigurationManager was not deinitialized");
-        deinitialize();
+bool ConfigurationManager::loadConfiguration(const std::string& filename) {
+    try {
+        return lua::loadDictionary(absPath(filename), _dictionary);
     }
-#endif
-    LDEBUG("Destroying ConfigurationManager");
-    delete _dictionary;
-}
-
-bool ConfigurationManager::initialize(const std::string& configurationScript) {
-    assert(_state == nullptr);
-    
-
-    LDEBUG("Create Lua state");
-    _state = luaL_newstate();
-    if (_state == nullptr) {
-        LFATAL("Error creating new Lua state: Memory allocation error");
+    catch (lua::LuaFormattingException& e) {
+        LERROR("Error loading configuration from file '" << filename
+                                                         << "': " << e.what());
         return false;
     }
-    LDEBUG("Open libraries");
-    luaL_openlibs(_state);
-    
-    if (configurationScript == "") {
-        return true;
-    }
-    
-    return loadConfiguration(configurationScript);
-}
-
-void ConfigurationManager::deinitialize() {
-    assert(_state != nullptr);
-    
-    LDEBUG("Close Lua state");
-    lua_close(_state);
-    _state = nullptr;
-}
-
-bool ConfigurationManager::loadConfiguration(const std::string& filename, bool isConfiguration) {
-    assert(_state != nullptr);
-    
-    if ( ! lua::lua_loadIntoDictionary(_state, _dictionary, filename, isConfiguration)) {
-        deinitialize();
-        initialize();
-        return false;
-    }
-    return true;
 }
 
 std::vector<std::string> ConfigurationManager::keys(const std::string& location) {
-    assert(_state != nullptr);
-
-    return _dictionary->keys(location);
+    return _dictionary.keys(location);
 }
 
 bool ConfigurationManager::hasKey(const std::string& key) {
-    assert(_state != nullptr);
-
-    return _dictionary->hasKey(key);
+    return _dictionary.hasKey(key);
 }
-    
-void ConfigurationManager::setValue(const std::string& key, const char* value) {
+
+bool ConfigurationManager::setValue(const std::string& key, const char* value,
+                                    bool createIntermediate) {
     const std::string v(value);
-    setValue(key, v);
+    return setValue(key, v, createIntermediate);
 }
-
 
 } // namespace ghoul

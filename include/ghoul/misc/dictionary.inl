@@ -29,7 +29,7 @@
 namespace ghoul {
 
 template <typename T>
-bool Dictionary::setValue(const std::string& key, T&& value, bool createIntermediate) {
+bool Dictionary::setValue(std::string key, T value, bool createIntermediate) {
 	std::string first;
 	std::string rest;
 	const bool hasRestPath = splitKey(key, first, rest);
@@ -64,7 +64,7 @@ bool Dictionary::setValue(const std::string& key, T&& value, bool createIntermed
 		return false;
 	}
 	// Proper tail-recursion
-	return dict->setValue(rest, value);
+	return dict->setValue(rest, value, createIntermediate);
 }
 	
 template <typename T>
@@ -132,5 +132,62 @@ bool Dictionary::hasValue(const std::string& key) const {
 	// Proper tail-recursion
 	return dict->hasValue<T>(rest);
 }
+
+#ifdef WIN32
+
+#define DEF_EXT_TEMPLATES(TYPE)                                                          \
+    extern template bool Dictionary::setValue<TYPE>(std::string key, TYPE value,         \
+                                                    bool createIntermediate);            \
+    extern template bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) \
+          const;                                                                         \
+    extern template bool Dictionary::hasValue<TYPE>(const std::string& key) const;
+
+DEF_EXT_TEMPLATES(bool)
+DEF_EXT_TEMPLATES(char)
+DEF_EXT_TEMPLATES(signed char)
+DEF_EXT_TEMPLATES(unsigned char)
+DEF_EXT_TEMPLATES(wchar_t)
+DEF_EXT_TEMPLATES(short)
+DEF_EXT_TEMPLATES(unsigned short)
+DEF_EXT_TEMPLATES(int)
+DEF_EXT_TEMPLATES(unsigned int)
+DEF_EXT_TEMPLATES(float)
+DEF_EXT_TEMPLATES(glm::vec2)
+DEF_EXT_TEMPLATES(glm::dvec2)
+DEF_EXT_TEMPLATES(glm::ivec2)
+DEF_EXT_TEMPLATES(glm::uvec2)
+DEF_EXT_TEMPLATES(glm::bvec2)
+DEF_EXT_TEMPLATES(glm::vec3)
+DEF_EXT_TEMPLATES(glm::dvec3)
+DEF_EXT_TEMPLATES(glm::ivec3)
+DEF_EXT_TEMPLATES(glm::uvec3)
+DEF_EXT_TEMPLATES(glm::bvec3)
+DEF_EXT_TEMPLATES(glm::vec4)
+DEF_EXT_TEMPLATES(glm::dvec4)
+DEF_EXT_TEMPLATES(glm::ivec4)
+DEF_EXT_TEMPLATES(glm::uvec4)
+DEF_EXT_TEMPLATES(glm::bvec4)
+DEF_EXT_TEMPLATES(glm::mat2x2)
+DEF_EXT_TEMPLATES(glm::mat2x3)
+DEF_EXT_TEMPLATES(glm::mat2x4)
+DEF_EXT_TEMPLATES(glm::mat3x2)
+DEF_EXT_TEMPLATES(glm::mat3x3)
+DEF_EXT_TEMPLATES(glm::mat3x4)
+DEF_EXT_TEMPLATES(glm::mat4x2)
+DEF_EXT_TEMPLATES(glm::mat4x3)
+DEF_EXT_TEMPLATES(glm::mat4x4)
+DEF_EXT_TEMPLATES(glm::dmat2x2)
+DEF_EXT_TEMPLATES(glm::dmat2x3)
+DEF_EXT_TEMPLATES(glm::dmat2x4)
+DEF_EXT_TEMPLATES(glm::dmat3x2)
+DEF_EXT_TEMPLATES(glm::dmat3x3)
+DEF_EXT_TEMPLATES(glm::dmat3x4)
+DEF_EXT_TEMPLATES(glm::dmat4x2)
+DEF_EXT_TEMPLATES(glm::dmat4x3)
+DEF_EXT_TEMPLATES(glm::dmat4x4)
+
+#undef DEF_EXT_TEMPLATES
+
+#endif
 
 } // namespace ghoul

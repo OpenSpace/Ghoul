@@ -73,16 +73,6 @@ public:
 	Dictionary(const std::initializer_list<std::pair<std::string, boost::any>>& l);
     
     /**
-     * Serializes the Dictionary to a string
-     */
-    std::string serializeToLuaString();
-    
-    /**
-     * Serializes the Dictionary using serializeToLuaString and prints to file.
-     */
-    bool serializeToFile(const std::string& filename);
-
-    /**
      * Returns all of the keys that are stored in the dictionary at a given
      * <code>location</code>. This location specifier can be recursive to inspect the keys
      * at deeper levels.
@@ -125,7 +115,7 @@ public:
      * otherwise
      */
     template <typename T>
-    bool setValue(const std::string& key, T&& value, bool createIntermediate = false);
+    bool setValue( std::string key, T value, bool createIntermediate = false);
 
     /**
      * Returns the value stored at location with a given <code>key</code>. This key can be
@@ -162,19 +152,6 @@ public:
 	template <typename T>
 	bool hasValue(const std::string& key) const;
 
-    /** 
-     * Returns the type of the value stored at the provided <code>key</code>. This key can
-     * be nested and the method will automatically traverse the sub-Dictionaries. If any
-     * of the nested levels or the <code>key</code> itself does not exist,
-     * <code>typeid(void)</code> will be returned. 
-     * \param The, potentially nested, key pointing to the value that type of which should
-     * be returned
-     * \return The <code>std::type_info</code> of the value stored at the provided
-     * <code>key</code>, or <code>typeid(void)</code> if the key points to an invalid
-     * location
-     */
-	const std::type_info& type(const std::string& key) const;
-
     /**
      * Returns the total number of keys stored in this Dictionary. This method will not
      * recurse into sub-Dictionaries, but will only return the top-level keys for the
@@ -184,7 +161,13 @@ public:
      */
     size_t size() const;
 
-private:
+    /**
+     * Clears the Dictionary and leaves it in the same state as if it would just have been
+     * created.
+     */
+    void clear();
+
+protected:
     /**
      * Splits the provided <code>key</code> into a <code>first</code> part and the
      * <code>rest</code>. Provided a key <code>a.b.c</code>, <code>first</code> will be
@@ -198,6 +181,12 @@ private:
      */
 	// returns if there exists a rest
 	bool splitKey(const std::string& key, std::string& first, std::string& rest) const;
+
+    void setValueHelper(std::string key, boost::any value);
+
+    typedef long long IntegralType;
+    typedef unsigned long long UnsignedIntegralType;
+    typedef double FloatingType;
 };
 
 } // namespace ghoul

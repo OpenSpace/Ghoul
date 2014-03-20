@@ -31,30 +31,55 @@
 
 #include "tests/test_common.inl"
 #include "tests/test_configurationmanager.inl"
-#include "tests/test_commandlineparser.inl"
-#include "tests/test_dictionary.inl"
+//#include "tests/test_commandlineparser.inl"
+//#include "tests/test_dictionary.inl"
 
 #include <ghoul/misc/dictionary.h>
 #include <iostream>
+#include <ghoul/lua/ghoul_lua.h>
+#include <ghoul/misc/configurationmanager.h>
 
 using namespace ghoul::cmdparser;
 using namespace ghoul::filesystem;
 using namespace ghoul::logging;
 
+#ifndef GHOUL_ROOT_DIR
+#define GHOUL_ROOT_DIR "../../../ext/ghoul"
+#endif
+
 int main(int argc, char** argv) {
-    LogManager::initialize(LogManager::LogLevel::None);
+    LogManager::initialize(LogManager::LogLevel::Info);
     LogMgr.addLog(new ConsoleLog);
 
     FileSystem::initialize();
+    
+    const std::string root = GHOUL_ROOT_DIR;
+    const std::string testdir = root + "/tests";
+    const std::string scriptdir = root + "/scripts";
 
-    const bool extDir = FileSys.directoryExists("../../../ext/ghoul/tests");
+    const bool extDir = FileSys.directoryExists(testdir);
     if (extDir) {
-        FileSys.registerPathToken("${SCRIPTS_DIR}", "../../../ext/ghoul/scripts");
-        FileSys.registerPathToken("${TEST_DIR}", "../../../ext/ghoul/tests");
+        FileSys.registerPathToken("${SCRIPTS_DIR}", scriptdir);
+        FileSys.registerPathToken("${TEST_DIR}", testdir);
     }
     else {
         LFATALC("main", "Fix me");
+        return 0;
     }
+
+    //ghoul::ConfigurationManager m;
+    //m.loadConfiguration("${TEST_DIR}/configurationmanager/test1.cfg");
+
+
+
+    //ghoul::Dictionary d, e, f;
+    //bool b;
+    //b = ghoul::lua::loadDictionary(absPath("${TEST_DIR}/configurationmanager/test1.cfg"), d);
+    //b = ghoul::lua::loadDictionary(absPath("${TEST_DIR}/configurationmanager/test2.cfg"), e);
+    //b = ghoul::lua::loadDictionary(absPath("${TEST_DIR}/configurationmanager/test3.cfg"), f);
+    //b = ghoul::lua::loadDictionary(absPath("${TEST_DIR}/configurationmanager/test4.cfg"), d);
+    //b = ghoul::lua::loadDictionary(absPath("${TEST_DIR}/configurationmanager/test5.cfg"), d);
+
 
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
