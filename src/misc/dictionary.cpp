@@ -44,104 +44,206 @@ const std::string _loggerCat = "Dictionary";
 typedef long long IntegralType;
 typedef unsigned long long UnsignedIntegralType;
 typedef double FloatingType;
+
+template <typename InputType>
+struct StorageTypeConverter {};
+
+#define DEF_STORAGE_CONVERTER(T, U, S)                                                   \
+    template <>                                                                          \
+    struct StorageTypeConverter<T> {                                                     \
+        typedef U type;                                                                  \
+        static const size_t size = S;                                                    \
+    };
+
+DEF_STORAGE_CONVERTER(bool, IntegralType, 1)
+DEF_STORAGE_CONVERTER(char, IntegralType, 1)
+DEF_STORAGE_CONVERTER(signed char, IntegralType, 1)
+DEF_STORAGE_CONVERTER(unsigned char, UnsignedIntegralType, 1)
+DEF_STORAGE_CONVERTER(wchar_t, IntegralType, 1)
+DEF_STORAGE_CONVERTER(short, IntegralType, 1)
+DEF_STORAGE_CONVERTER(unsigned short, UnsignedIntegralType, 1)
+DEF_STORAGE_CONVERTER(int, IntegralType, 1)
+DEF_STORAGE_CONVERTER(unsigned int, UnsignedIntegralType, 1)
+DEF_STORAGE_CONVERTER(long long, IntegralType, 1)
+DEF_STORAGE_CONVERTER(unsigned long long, UnsignedIntegralType, 1)
+DEF_STORAGE_CONVERTER(float, FloatingType, 1)
+DEF_STORAGE_CONVERTER(double, FloatingType, 1)
+DEF_STORAGE_CONVERTER(glm::vec2, FloatingType, 2)
+DEF_STORAGE_CONVERTER(glm::dvec2, FloatingType, 2)
+DEF_STORAGE_CONVERTER(glm::ivec2, IntegralType, 2)
+DEF_STORAGE_CONVERTER(glm::uvec2, UnsignedIntegralType, 2)
+DEF_STORAGE_CONVERTER(glm::bvec2, IntegralType, 2)
+DEF_STORAGE_CONVERTER(glm::vec3, FloatingType, 3)
+DEF_STORAGE_CONVERTER(glm::dvec3, FloatingType, 3)
+DEF_STORAGE_CONVERTER(glm::ivec3, IntegralType, 3)
+DEF_STORAGE_CONVERTER(glm::uvec3, UnsignedIntegralType, 3)
+DEF_STORAGE_CONVERTER(glm::bvec3, IntegralType, 3)
+DEF_STORAGE_CONVERTER(glm::vec4, FloatingType, 4)
+DEF_STORAGE_CONVERTER(glm::dvec4, FloatingType, 4)
+DEF_STORAGE_CONVERTER(glm::ivec4, IntegralType, 4)
+DEF_STORAGE_CONVERTER(glm::uvec4, UnsignedIntegralType, 4)
+DEF_STORAGE_CONVERTER(glm::bvec4, IntegralType, 4)
+DEF_STORAGE_CONVERTER(glm::mat2x2, FloatingType, 4)
+DEF_STORAGE_CONVERTER(glm::mat2x3, FloatingType, 6)
+DEF_STORAGE_CONVERTER(glm::mat2x4, FloatingType, 8)
+DEF_STORAGE_CONVERTER(glm::mat3x2, FloatingType, 6)
+DEF_STORAGE_CONVERTER(glm::mat3x3, FloatingType, 9)
+DEF_STORAGE_CONVERTER(glm::mat3x4, FloatingType, 12)
+DEF_STORAGE_CONVERTER(glm::mat4x2, FloatingType, 8)
+DEF_STORAGE_CONVERTER(glm::mat4x3, FloatingType, 12)
+DEF_STORAGE_CONVERTER(glm::mat4x4, FloatingType, 16)
+DEF_STORAGE_CONVERTER(glm::dmat2x2, FloatingType, 4)
+DEF_STORAGE_CONVERTER(glm::dmat2x3, FloatingType, 6)
+DEF_STORAGE_CONVERTER(glm::dmat2x4, FloatingType, 8)
+DEF_STORAGE_CONVERTER(glm::dmat3x2, FloatingType, 6)
+DEF_STORAGE_CONVERTER(glm::dmat3x3, FloatingType, 9)
+DEF_STORAGE_CONVERTER(glm::dmat3x4, FloatingType, 12)
+DEF_STORAGE_CONVERTER(glm::dmat4x2, FloatingType, 8)
+DEF_STORAGE_CONVERTER(glm::dmat4x3, FloatingType, 12)
+DEF_STORAGE_CONVERTER(glm::dmat4x4, FloatingType, 16)
+
+#undef DEF_STORAGE_CONVERTER
+
 }
 
 namespace ghoul {
 
 #ifdef WIN32
-#pragma warning ( disable : 4800 )
+#pragma warning(disable : 4800)
 #endif
-    
-    template <typename SOURCE, typename TARGET, size_t SIZE>
-    std::array<TARGET, SIZE> createArray(const SOURCE* const src) {
-        std::array<TARGET, SIZE> v;
-        for (size_t i = 0; i < SIZE; ++i)
-            v[i] = static_cast<TARGET>(src[i]);
-        return v;
+
+template <typename SOURCE, typename TARGET, size_t SIZE>
+std::array<TARGET, SIZE> createArray(const SOURCE* const src) {
+    std::array<TARGET, SIZE> v;
+    for (size_t i = 0; i < SIZE; ++i)
+        v[i] = static_cast<TARGET>(src[i]);
+    return v;
+}
+
+template <typename TargetType>
+bool isConvertible(const Dictionary& dict) {
+    const bool correctSize = dict.size() == StorageTypeConverter<TargetType>::size;
+    if (!correctSize)
+        return false;
+
+    const std::vector<std::string>& keys = dict.keys();
+    for (size_t i = 0; i < StorageTypeConverter<TargetType>::size; ++i) {
+        const std::string& key = keys[i];
+        const bool correctType = dict.hasValue<StorageTypeConverter<TargetType>::type>(
+                                       key) || dict.hasValue<TargetType>(key);
+        if (!correctType)
+            return false;
     }
-    
-#define DEF_SPEC_TEMPLATE(TYPE, STORAGETYPE)                                             \
+    return true;
+}
+
+template <typename TargetType>
+void convertGLM(const Dictionary& dict, TargetType& target) {
+    const std::vector<std::string>& keys = dict.keys();
+    for (size_t i = 0; i < StorageTypeConverter<TargetType>::size; ++i) {
+        const std::string& key = keys[i];
+        dict.getValue(key, glm::value_ptr(target)[i]);
+    }
+}
+
+template <typename TargetType>
+void convert(const Dictionary& dict, TargetType& target) {
+    static_assert(StorageTypeConverter<TargetType>::size == 1,
+                  "Wrong function call. StorageType::size > 1");
+    const std::vector<std::string>& keys = dict.keys();
+    for (size_t i = 0; i < StorageTypeConverter<TargetType>::size; ++i) {
+        const std::string& key = keys[i];
+        dict.getValue(key, target);
+    }
+}
+
+#define DEF_SPEC_TEMPLATE(TYPE)                                                          \
     template <>                                                                          \
     bool Dictionary::setValue<TYPE>(std::string key, TYPE value,                         \
                                     bool createIntermediate) {                           \
-        return setValue(std::move(key), STORAGETYPE(value), createIntermediate);         \
+        return setValue(std::move(key), StorageTypeConverter<TYPE>::type(value),         \
+                        createIntermediate);                                             \
     }                                                                                    \
     template <>                                                                          \
     bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) const {         \
-        STORAGETYPE v;                                                                   \
+        StorageTypeConverter<TYPE>::type v;                                              \
         const bool success = getValue(key, v);                                           \
         value = static_cast<TYPE>(v);                                                    \
         return success;                                                                  \
     }                                                                                    \
     template <>                                                                          \
     bool Dictionary::hasValue<TYPE>(const std::string& key) const {                      \
-        return hasValue<STORAGETYPE>(key);                                               \
-}
-    
-#define DEF_SPEC_TEMPLATE_GLM(TYPE, STORAGETYPE, SIZE, CREATE)                           \
+        return hasValue<StorageTypeConverter<TYPE>::type>(key);                          \
+    }
+
+#define DEF_SPEC_TEMPLATE_GLM(TYPE, CREATE)                           \
     template <>                                                                          \
     bool Dictionary::setValue<TYPE>(std::string key, TYPE value,                         \
                                     bool createIntermediate) {                           \
         auto v                                                                           \
-              = createArray<TYPE::value_type, STORAGETYPE, SIZE>(glm::value_ptr(value)); \
+              = createArray<TYPE::value_type, StorageTypeConverter<TYPE>::type, StorageTypeConverter<TYPE>::size>(glm::value_ptr(value)); \
         return setValue(std::move(key), std::move(v), createIntermediate);               \
     }                                                                                    \
     template <>                                                                          \
     bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) const {         \
-        std::array<STORAGETYPE, SIZE> v;                                                 \
-        const bool success = getValue(key, v);                                           \
- value = CREATE(v.data());                                                               \
-        return success;                                                                  \
+        std::array<StorageTypeConverter<TYPE>::type, StorageTypeConverter<TYPE>::size> v;                                                 \
+        bool success = getValue(key, v);                                           \
+        if (success) {                                                                   \
+            value = CREATE(v.data());                                                    \
+            return success;                                                              \
+        } else { success = hasValue<Dictionary>(key); \
+        }                                                                                \
     }                                                                                    \
     template <>                                                                          \
     bool Dictionary::hasValue<TYPE>(const std::string& key) const {                      \
-        return hasValue<std::array<STORAGETYPE, SIZE>>(key);                             \
+    return hasValue<std::array<StorageTypeConverter<TYPE>::type, StorageTypeConverter<TYPE>::size>>(key);                             \
+    \
 }
-    
-    DEF_SPEC_TEMPLATE(bool, IntegralType)
-    DEF_SPEC_TEMPLATE(char, IntegralType)
-    DEF_SPEC_TEMPLATE(signed char, IntegralType)
-    DEF_SPEC_TEMPLATE(unsigned char, UnsignedIntegralType)
-    DEF_SPEC_TEMPLATE(wchar_t, IntegralType)
-    DEF_SPEC_TEMPLATE(short, IntegralType)
-    DEF_SPEC_TEMPLATE(unsigned short, UnsignedIntegralType)
-    DEF_SPEC_TEMPLATE(int, IntegralType)
-    DEF_SPEC_TEMPLATE(unsigned int, UnsignedIntegralType)
-    DEF_SPEC_TEMPLATE(float, FloatingType)
-    DEF_SPEC_TEMPLATE_GLM(glm::vec2, FloatingType, 2, glm::make_vec2)
-    DEF_SPEC_TEMPLATE_GLM(glm::dvec2, FloatingType, 2, glm::make_vec2)
-    DEF_SPEC_TEMPLATE_GLM(glm::ivec2, IntegralType, 2, glm::make_vec2)
-    DEF_SPEC_TEMPLATE_GLM(glm::uvec2, UnsignedIntegralType, 2, glm::make_vec2)
-    DEF_SPEC_TEMPLATE_GLM(glm::bvec2, IntegralType, 2, glm::make_vec2)
-    DEF_SPEC_TEMPLATE_GLM(glm::vec3, FloatingType, 3, glm::make_vec3)
-    DEF_SPEC_TEMPLATE_GLM(glm::dvec3, FloatingType, 3, glm::make_vec3)
-    DEF_SPEC_TEMPLATE_GLM(glm::ivec3, IntegralType, 3, glm::make_vec3)
-    DEF_SPEC_TEMPLATE_GLM(glm::uvec3, UnsignedIntegralType, 3, glm::make_vec3)
-    DEF_SPEC_TEMPLATE_GLM(glm::bvec3, IntegralType, 3, glm::make_vec3)
-    DEF_SPEC_TEMPLATE_GLM(glm::vec4, FloatingType, 4, glm::make_vec4)
-    DEF_SPEC_TEMPLATE_GLM(glm::dvec4, FloatingType, 4, glm::make_vec4)
-    DEF_SPEC_TEMPLATE_GLM(glm::ivec4, IntegralType, 4, glm::make_vec4)
-    DEF_SPEC_TEMPLATE_GLM(glm::uvec4, UnsignedIntegralType, 4, glm::make_vec4)
-    DEF_SPEC_TEMPLATE_GLM(glm::bvec4, IntegralType, 4, glm::make_vec4)
-    DEF_SPEC_TEMPLATE_GLM(glm::mat2x2, FloatingType, 4, glm::make_mat2x2)
-    DEF_SPEC_TEMPLATE_GLM(glm::mat2x3, FloatingType, 6, glm::make_mat2x3)
-    DEF_SPEC_TEMPLATE_GLM(glm::mat2x4, FloatingType, 8, glm::make_mat2x4)
-    DEF_SPEC_TEMPLATE_GLM(glm::mat3x2, FloatingType, 6, glm::make_mat3x2)
-    DEF_SPEC_TEMPLATE_GLM(glm::mat3x3, FloatingType, 9, glm::make_mat3x3)
-    DEF_SPEC_TEMPLATE_GLM(glm::mat3x4, FloatingType, 12, glm::make_mat3x4)
-    DEF_SPEC_TEMPLATE_GLM(glm::mat4x2, FloatingType, 8, glm::make_mat4x2)
-    DEF_SPEC_TEMPLATE_GLM(glm::mat4x3, FloatingType, 12, glm::make_mat4x3)
-    DEF_SPEC_TEMPLATE_GLM(glm::mat4x4, FloatingType, 16, glm::make_mat4x4)
-    DEF_SPEC_TEMPLATE_GLM(glm::dmat2x2, FloatingType, 4, glm::make_mat2x2)
-    DEF_SPEC_TEMPLATE_GLM(glm::dmat2x3, FloatingType, 6, glm::make_mat2x3)
-    DEF_SPEC_TEMPLATE_GLM(glm::dmat2x4, FloatingType, 8, glm::make_mat2x4)
-    DEF_SPEC_TEMPLATE_GLM(glm::dmat3x2, FloatingType, 6, glm::make_mat3x2)
-    DEF_SPEC_TEMPLATE_GLM(glm::dmat3x3, FloatingType, 9, glm::make_mat3x3)
-    DEF_SPEC_TEMPLATE_GLM(glm::dmat3x4, FloatingType, 12, glm::make_mat3x4)
-    DEF_SPEC_TEMPLATE_GLM(glm::dmat4x2, FloatingType, 8, glm::make_mat4x2)
-    DEF_SPEC_TEMPLATE_GLM(glm::dmat4x3, FloatingType, 12, glm::make_mat4x3)
-    DEF_SPEC_TEMPLATE_GLM(glm::dmat4x4, FloatingType, 16, glm::make_mat4x4)
-    
+
+DEF_SPEC_TEMPLATE(bool)
+DEF_SPEC_TEMPLATE(char)
+DEF_SPEC_TEMPLATE(signed char)
+DEF_SPEC_TEMPLATE(unsigned char)
+DEF_SPEC_TEMPLATE(wchar_t)
+DEF_SPEC_TEMPLATE(short)
+DEF_SPEC_TEMPLATE(unsigned short)
+DEF_SPEC_TEMPLATE(int)
+DEF_SPEC_TEMPLATE(unsigned int)
+DEF_SPEC_TEMPLATE(float)
+DEF_SPEC_TEMPLATE_GLM(glm::vec2, glm::make_vec2)
+DEF_SPEC_TEMPLATE_GLM(glm::dvec2, glm::make_vec2)
+DEF_SPEC_TEMPLATE_GLM(glm::ivec2, glm::make_vec2)
+DEF_SPEC_TEMPLATE_GLM(glm::uvec2, glm::make_vec2)
+DEF_SPEC_TEMPLATE_GLM(glm::bvec2, glm::make_vec2)
+DEF_SPEC_TEMPLATE_GLM(glm::vec3, glm::make_vec3)
+DEF_SPEC_TEMPLATE_GLM(glm::dvec3, glm::make_vec3)
+DEF_SPEC_TEMPLATE_GLM(glm::ivec3, glm::make_vec3)
+DEF_SPEC_TEMPLATE_GLM(glm::uvec3, glm::make_vec3)
+DEF_SPEC_TEMPLATE_GLM(glm::bvec3, glm::make_vec3)
+DEF_SPEC_TEMPLATE_GLM(glm::vec4, glm::make_vec4)
+DEF_SPEC_TEMPLATE_GLM(glm::dvec4, glm::make_vec4)
+DEF_SPEC_TEMPLATE_GLM(glm::ivec4,  glm::make_vec4)
+DEF_SPEC_TEMPLATE_GLM(glm::uvec4, glm::make_vec4)
+DEF_SPEC_TEMPLATE_GLM(glm::bvec4, glm::make_vec4)
+DEF_SPEC_TEMPLATE_GLM(glm::mat2x2, glm::make_mat2x2)
+DEF_SPEC_TEMPLATE_GLM(glm::mat2x3, glm::make_mat2x3)
+DEF_SPEC_TEMPLATE_GLM(glm::mat2x4, glm::make_mat2x4)
+DEF_SPEC_TEMPLATE_GLM(glm::mat3x2, glm::make_mat3x2)
+DEF_SPEC_TEMPLATE_GLM(glm::mat3x3, glm::make_mat3x3)
+DEF_SPEC_TEMPLATE_GLM(glm::mat3x4, glm::make_mat3x4)
+DEF_SPEC_TEMPLATE_GLM(glm::mat4x2, glm::make_mat4x2)
+DEF_SPEC_TEMPLATE_GLM(glm::mat4x3, glm::make_mat4x3)
+DEF_SPEC_TEMPLATE_GLM(glm::mat4x4, glm::make_mat4x4)
+DEF_SPEC_TEMPLATE_GLM(glm::dmat2x2, glm::make_mat2x2)
+DEF_SPEC_TEMPLATE_GLM(glm::dmat2x3, glm::make_mat2x3)
+DEF_SPEC_TEMPLATE_GLM(glm::dmat2x4, glm::make_mat2x4)
+DEF_SPEC_TEMPLATE_GLM(glm::dmat3x2, glm::make_mat3x2)
+DEF_SPEC_TEMPLATE_GLM(glm::dmat3x3, glm::make_mat3x3)
+DEF_SPEC_TEMPLATE_GLM(glm::dmat3x4, glm::make_mat3x4)
+DEF_SPEC_TEMPLATE_GLM(glm::dmat4x2, glm::make_mat4x2)
+DEF_SPEC_TEMPLATE_GLM(glm::dmat4x3, glm::make_mat4x3)
+DEF_SPEC_TEMPLATE_GLM(glm::dmat4x4, glm::make_mat4x4)
+
 #undef DEF_SPEC_TEMPLATE
 #undef DEF_SPEC_TEMPLATE_GLM
     
@@ -153,6 +255,22 @@ namespace ghoul {
 Dictionary::Dictionary(const std::initializer_list<std::pair<std::string, boost::any>>& l) {
     for (const auto& p : l)
         setValueHelper(std::move(p.first), std::move(p.second));
+
+
+    Dictionary d;
+    d.setValue("a", FloatingType(1.f));
+    d.setValue("b", FloatingType(2.f));
+    d.setValue("c", FloatingType(3.f));
+    d.setValue("d", FloatingType(4.f));
+
+    bool f = isConvertible<glm::vec4>(d);
+
+    glm::vec4 r;
+    convertGLM(d, r);
+    float s = r.x;
+    float t = r.y;
+    float u = r.z;
+    float v = r.w;
 }
 
 std::vector<string> Dictionary::keys(const string& location) const {
