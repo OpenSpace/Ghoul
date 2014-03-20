@@ -145,6 +145,8 @@ bool Dictionary::hasValue(const std::string& key) const {
     return dict->hasValue<T>(rest);
 }
 
+#ifdef WIN32
+
 // Make extern template definitions so that the compiler won't try to instantiate each
 // member function individually whenever it is encountered. This way, we promise the
 // compiler that they will be instantiated somewhere else. This is done in the
@@ -204,4 +206,6 @@ DEF_EXT_TEMPLATES(glm::dmat4x4)
 
 #undef DEF_EXT_TEMPLATES
 
-}  // namespace ghoul
+#endif
+
+} // namespace ghoul

@@ -24,6 +24,7 @@
  ****************************************************************************************/
 
 #include "misc/dictionary.h"
+
 #include <glm/gtc/type_ptr.hpp>
 
 #include <algorithm>
@@ -47,8 +48,109 @@ typedef double FloatingType;
 
 namespace ghoul {
 
-Dictionary::Dictionary(
-      const std::initializer_list<std::pair<std::string, boost::any>>& l) {
+#ifdef WIN32
+#pragma warning ( disable : 4800 )
+#endif
+    
+    template <typename SOURCE, typename TARGET, size_t SIZE>
+    std::array<TARGET, SIZE> createArray(const SOURCE* const src) {
+        std::array<TARGET, SIZE> v;
+        for (size_t i = 0; i < SIZE; ++i)
+            v[i] = static_cast<TARGET>(src[i]);
+        return v;
+    }
+    
+#define DEF_SPEC_TEMPLATE(TYPE, STORAGETYPE)                                             \
+    template <>                                                                          \
+    bool Dictionary::setValue<TYPE>(std::string key, TYPE value,                         \
+                                    bool createIntermediate) {                           \
+        return setValue(std::move(key), STORAGETYPE(value), createIntermediate);         \
+    }                                                                                    \
+    template <>                                                                          \
+    bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) const {         \
+        STORAGETYPE v;                                                                   \
+        const bool success = getValue(key, v);                                           \
+        value = static_cast<TYPE>(v);                                                    \
+        return success;                                                                  \
+    }                                                                                    \
+    template <>                                                                          \
+    bool Dictionary::hasValue<TYPE>(const std::string& key) const {                      \
+        return hasValue<STORAGETYPE>(key);                                               \
+}
+    
+#define DEF_SPEC_TEMPLATE_GLM(TYPE, STORAGETYPE, SIZE, CREATE)                           \
+    template <>                                                                          \
+    bool Dictionary::setValue<TYPE>(std::string key, TYPE value,                         \
+                                    bool createIntermediate) {                           \
+        auto v                                                                           \
+              = createArray<TYPE::value_type, STORAGETYPE, SIZE>(glm::value_ptr(value)); \
+        return setValue(std::move(key), std::move(v), createIntermediate);               \
+    }                                                                                    \
+    template <>                                                                          \
+    bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) const {         \
+        std::array<STORAGETYPE, SIZE> v;                                                 \
+        const bool success = getValue(key, v);                                           \
+ value = CREATE(v.data());                                                               \
+        return success;                                                                  \
+    }                                                                                    \
+    template <>                                                                          \
+    bool Dictionary::hasValue<TYPE>(const std::string& key) const {                      \
+        return hasValue<std::array<STORAGETYPE, SIZE>>(key);                             \
+}
+    
+    DEF_SPEC_TEMPLATE(bool, IntegralType)
+    DEF_SPEC_TEMPLATE(char, IntegralType)
+    DEF_SPEC_TEMPLATE(signed char, IntegralType)
+    DEF_SPEC_TEMPLATE(unsigned char, UnsignedIntegralType)
+    DEF_SPEC_TEMPLATE(wchar_t, IntegralType)
+    DEF_SPEC_TEMPLATE(short, IntegralType)
+    DEF_SPEC_TEMPLATE(unsigned short, UnsignedIntegralType)
+    DEF_SPEC_TEMPLATE(int, IntegralType)
+    DEF_SPEC_TEMPLATE(unsigned int, UnsignedIntegralType)
+    DEF_SPEC_TEMPLATE(float, FloatingType)
+    DEF_SPEC_TEMPLATE_GLM(glm::vec2, FloatingType, 2, glm::make_vec2)
+    DEF_SPEC_TEMPLATE_GLM(glm::dvec2, FloatingType, 2, glm::make_vec2)
+    DEF_SPEC_TEMPLATE_GLM(glm::ivec2, IntegralType, 2, glm::make_vec2)
+    DEF_SPEC_TEMPLATE_GLM(glm::uvec2, UnsignedIntegralType, 2, glm::make_vec2)
+    DEF_SPEC_TEMPLATE_GLM(glm::bvec2, IntegralType, 2, glm::make_vec2)
+    DEF_SPEC_TEMPLATE_GLM(glm::vec3, FloatingType, 3, glm::make_vec3)
+    DEF_SPEC_TEMPLATE_GLM(glm::dvec3, FloatingType, 3, glm::make_vec3)
+    DEF_SPEC_TEMPLATE_GLM(glm::ivec3, IntegralType, 3, glm::make_vec3)
+    DEF_SPEC_TEMPLATE_GLM(glm::uvec3, UnsignedIntegralType, 3, glm::make_vec3)
+    DEF_SPEC_TEMPLATE_GLM(glm::bvec3, IntegralType, 3, glm::make_vec3)
+    DEF_SPEC_TEMPLATE_GLM(glm::vec4, FloatingType, 4, glm::make_vec4)
+    DEF_SPEC_TEMPLATE_GLM(glm::dvec4, FloatingType, 4, glm::make_vec4)
+    DEF_SPEC_TEMPLATE_GLM(glm::ivec4, IntegralType, 4, glm::make_vec4)
+    DEF_SPEC_TEMPLATE_GLM(glm::uvec4, UnsignedIntegralType, 4, glm::make_vec4)
+    DEF_SPEC_TEMPLATE_GLM(glm::bvec4, IntegralType, 4, glm::make_vec4)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat2x2, FloatingType, 4, glm::make_mat2x2)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat2x3, FloatingType, 6, glm::make_mat2x3)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat2x4, FloatingType, 8, glm::make_mat2x4)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat3x2, FloatingType, 6, glm::make_mat3x2)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat3x3, FloatingType, 9, glm::make_mat3x3)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat3x4, FloatingType, 12, glm::make_mat3x4)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat4x2, FloatingType, 8, glm::make_mat4x2)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat4x3, FloatingType, 12, glm::make_mat4x3)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat4x4, FloatingType, 16, glm::make_mat4x4)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat2x2, FloatingType, 4, glm::make_mat2x2)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat2x3, FloatingType, 6, glm::make_mat2x3)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat2x4, FloatingType, 8, glm::make_mat2x4)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat3x2, FloatingType, 6, glm::make_mat3x2)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat3x3, FloatingType, 9, glm::make_mat3x3)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat3x4, FloatingType, 12, glm::make_mat3x4)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat4x2, FloatingType, 8, glm::make_mat4x2)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat4x3, FloatingType, 12, glm::make_mat4x3)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat4x4, FloatingType, 16, glm::make_mat4x4)
+    
+#undef DEF_SPEC_TEMPLATE
+#undef DEF_SPEC_TEMPLATE_GLM
+    
+    
+#ifdef WIN32
+#pragma warning ( default : 4800 )
+#endif
+
+Dictionary::Dictionary(const std::initializer_list<std::pair<std::string, boost::any>>& l) {
     for (const auto& p : l)
         setValueHelper(std::move(p.first), std::move(p.second));
 }
@@ -120,107 +222,6 @@ bool Dictionary::splitKey(const string& key, string& first, string& rest) const 
         return true;
     }
 }
-
-#ifdef WIN32
-#pragma warning(disable : 4800)
-#endif
-
-template <typename SOURCE, typename TARGET, size_t SIZE>
-std::array<TARGET, SIZE> createArray(const SOURCE* const src) {
-    std::array<TARGET, SIZE> v;
-    for (size_t i = 0; i < SIZE; ++i)
-        v[i] = static_cast<TARGET>(src[i]);
-    return v;
-}
-
-#define DEF_SPEC_TEMPLATE(TYPE, STORAGETYPE)                                             \
-    template <>                                                                          \
-    bool Dictionary::setValue<TYPE>(std::string key, TYPE value,                         \
-                                    bool createIntermediate) {                           \
-        return setValue(std::move(key), STORAGETYPE(value), createIntermediate);         \
-    }                                                                                    \
-    template <>                                                                          \
-    bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) const {         \
-        STORAGETYPE v;                                                                   \
-        const bool success = getValue(key, v);                                           \
-        value = static_cast<TYPE>(v);                                                    \
-        return success;                                                                  \
-    }                                                                                    \
-    template <>                                                                          \
-    bool Dictionary::hasValue<TYPE>(const std::string& key) const {                      \
-        return hasValue<STORAGETYPE>(key);                                               \
-    }
-
-#define DEF_SPEC_TEMPLATE_GLM(TYPE, STORAGETYPE, SIZE, CREATE)                           \
-    template <>                                                                          \
-    bool Dictionary::setValue<TYPE>(std::string key, TYPE value,                         \
-                                    bool createIntermediate) {                           \
-        auto v                                                                           \
-              = createArray<TYPE::value_type, STORAGETYPE, SIZE>(glm::value_ptr(value)); \
-        return setValue(std::move(key), std::move(v), createIntermediate);               \
-    }                                                                                    \
-    template <>                                                                          \
-    bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) const {         \
-        std::array<STORAGETYPE, SIZE> v;                                                 \
-        const bool success = getValue(key, v);                                           \
-        value = CREATE(v.data());                                                        \
-        return success;                                                                  \
-    }                                                                                    \
-    template <>                                                                          \
-    bool Dictionary::hasValue<TYPE>(const std::string& key) const {                      \
-        return hasValue<std::array<STORAGETYPE, SIZE>>(key);                             \
-    }
-
-DEF_SPEC_TEMPLATE(bool, IntegralType)
-DEF_SPEC_TEMPLATE(char, IntegralType)
-DEF_SPEC_TEMPLATE(signed char, IntegralType)
-DEF_SPEC_TEMPLATE(unsigned char, UnsignedIntegralType)
-DEF_SPEC_TEMPLATE(wchar_t, IntegralType)
-DEF_SPEC_TEMPLATE(short, IntegralType)
-DEF_SPEC_TEMPLATE(unsigned short, UnsignedIntegralType)
-DEF_SPEC_TEMPLATE(int, IntegralType)
-DEF_SPEC_TEMPLATE(unsigned int, UnsignedIntegralType)
-DEF_SPEC_TEMPLATE(float, FloatingType)
-DEF_SPEC_TEMPLATE_GLM(glm::vec2, FloatingType, 2, glm::make_vec2)
-DEF_SPEC_TEMPLATE_GLM(glm::dvec2, FloatingType, 2, glm::make_vec2)
-DEF_SPEC_TEMPLATE_GLM(glm::ivec2, IntegralType, 2, glm::make_vec2)
-DEF_SPEC_TEMPLATE_GLM(glm::uvec2, UnsignedIntegralType, 2, glm::make_vec2)
-DEF_SPEC_TEMPLATE_GLM(glm::bvec2, IntegralType, 2, glm::make_vec2)
-DEF_SPEC_TEMPLATE_GLM(glm::vec3, FloatingType, 3, glm::make_vec3)
-DEF_SPEC_TEMPLATE_GLM(glm::dvec3, FloatingType, 3, glm::make_vec3)
-DEF_SPEC_TEMPLATE_GLM(glm::ivec3, IntegralType, 3, glm::make_vec3)
-DEF_SPEC_TEMPLATE_GLM(glm::uvec3, UnsignedIntegralType, 3, glm::make_vec3)
-DEF_SPEC_TEMPLATE_GLM(glm::bvec3, IntegralType, 3, glm::make_vec3)
-DEF_SPEC_TEMPLATE_GLM(glm::vec4, FloatingType, 4, glm::make_vec4)
-DEF_SPEC_TEMPLATE_GLM(glm::dvec4, FloatingType, 4, glm::make_vec4)
-DEF_SPEC_TEMPLATE_GLM(glm::ivec4, IntegralType, 4, glm::make_vec4)
-DEF_SPEC_TEMPLATE_GLM(glm::uvec4, UnsignedIntegralType, 4, glm::make_vec4)
-DEF_SPEC_TEMPLATE_GLM(glm::bvec4, IntegralType, 4, glm::make_vec4)
-DEF_SPEC_TEMPLATE_GLM(glm::mat2x2, FloatingType, 4, glm::make_mat2x2)
-DEF_SPEC_TEMPLATE_GLM(glm::mat2x3, FloatingType, 6, glm::make_mat2x3)
-DEF_SPEC_TEMPLATE_GLM(glm::mat2x4, FloatingType, 8, glm::make_mat2x4)
-DEF_SPEC_TEMPLATE_GLM(glm::mat3x2, FloatingType, 6, glm::make_mat3x2)
-DEF_SPEC_TEMPLATE_GLM(glm::mat3x3, FloatingType, 9, glm::make_mat3x3)
-DEF_SPEC_TEMPLATE_GLM(glm::mat3x4, FloatingType, 12, glm::make_mat3x4)
-DEF_SPEC_TEMPLATE_GLM(glm::mat4x2, FloatingType, 8, glm::make_mat4x2)
-DEF_SPEC_TEMPLATE_GLM(glm::mat4x3, FloatingType, 12, glm::make_mat4x3)
-DEF_SPEC_TEMPLATE_GLM(glm::mat4x4, FloatingType, 16, glm::make_mat4x4)
-DEF_SPEC_TEMPLATE_GLM(glm::dmat2x2, FloatingType, 4, glm::make_mat2x2)
-DEF_SPEC_TEMPLATE_GLM(glm::dmat2x3, FloatingType, 6, glm::make_mat2x3)
-DEF_SPEC_TEMPLATE_GLM(glm::dmat2x4, FloatingType, 8, glm::make_mat2x4)
-DEF_SPEC_TEMPLATE_GLM(glm::dmat3x2, FloatingType, 6, glm::make_mat3x2)
-DEF_SPEC_TEMPLATE_GLM(glm::dmat3x3, FloatingType, 9, glm::make_mat3x3)
-DEF_SPEC_TEMPLATE_GLM(glm::dmat3x4, FloatingType, 12, glm::make_mat3x4)
-DEF_SPEC_TEMPLATE_GLM(glm::dmat4x2, FloatingType, 8, glm::make_mat4x2)
-DEF_SPEC_TEMPLATE_GLM(glm::dmat4x3, FloatingType, 12, glm::make_mat4x3)
-DEF_SPEC_TEMPLATE_GLM(glm::dmat4x4, FloatingType, 16, glm::make_mat4x4)
-
-#undef DEF_SPEC_TEMPLATE
-#undef DEF_SPEC_TEMPLATE_GLM
-
-#ifdef WIN32
-#pragma warning(default : 4800)
-#endif
 
 void Dictionary::setValueHelper(std::string key, boost::any value) {
     // Ugly if-else statement is necessary as 'type' cannot be not constexpr
