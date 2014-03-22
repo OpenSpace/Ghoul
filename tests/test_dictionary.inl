@@ -8532,6 +8532,7 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
     ASSERT_EQ(true, success) << "hasValue<mat3x4>(\"12float\")";
     {
         mat3x4 value;
+        mat3x4 s = mat3x4(1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f);
         success = d.getValue("12float", value);
         ASSERT_EQ(true, success) << "success getValue<mat3x4>";
         EXPECT_EQ(mat3x4(1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f),

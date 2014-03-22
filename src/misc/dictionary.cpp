@@ -139,7 +139,15 @@ bool isConvertible(const Dictionary& dict) {
 
 template <typename TargetType>
 void convertGLM(const Dictionary& dict, TargetType& target) {
-    const std::vector<std::string>& keys = dict.keys();
+    std::vector<std::string>&& keys = dict.keys();
+    // sort numerically rather than by ASCII value
+    std::sort(keys.begin(), keys.end(), [](const std::string& k1, const std::string& k2) {
+        try {
+            return std::stoi(k1) < std::stoi(k2);
+        } catch (std::invalid_argument&) {
+            return k1 < k2;
+        }
+    });
     for (size_t i = 0; i < StorageTypeConverter<TargetType>::size; ++i) {
         const std::string& key = keys[i];
         dict.getValue(key, glm::value_ptr(target)[i]);
