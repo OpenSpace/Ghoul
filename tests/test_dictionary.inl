@@ -7928,132 +7928,839 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
     ghoul::Dictionary d = {
         { "1int", dict1ElemInteger },
         { "1uint", dict1ElemUnsignedInteger },
-        { "1flt", dict1ElemFloat},
+        { "1float", dict1ElemFloat},
         { "2int", dict2ElemInteger },
         { "2uint", dict2ElemUnsignedInteger },
-        { "2flt", dict2ElemFloat },
+        { "2float", dict2ElemFloat },
         { "3int", dict3ElemInteger },
         { "3uint", dict3ElemUnsignedInteger },
-        { "3flt", dict3ElemFloat },
+        { "3float", dict3ElemFloat },
         { "4int", dict4ElemInteger },
         { "4uint", dict4ElemUnsignedInteger },
-        { "4flt", dict4ElemFloat },
+        { "4float", dict4ElemFloat },
         { "6int", dict6ElemInteger },
         { "6uint", dict6ElemUnsignedInteger },
-        { "6flt", dict6ElemFloat },
+        { "6float", dict6ElemFloat },
         { "8int", dict8ElemInteger },
         { "8uint", dict8ElemUnsignedInteger },
-        { "8flt", dict8ElemFloat },
+        { "8float", dict8ElemFloat },
         { "9int", dict9ElemInteger },
         { "9uint", dict9ElemUnsignedInteger },
-        { "9flt", dict9ElemFloat },
+        { "9float", dict9ElemFloat },
         { "12int", dict12ElemInteger },
         { "12uint", dict12ElemUnsignedInteger },
-        { "12flt", dict12ElemFloat },
+        { "12float", dict12ElemFloat },
         { "16int", dict16ElemInteger },
         { "16uint", dict16ElemUnsignedInteger },
-        { "16flt", dict16ElemFloat }
+        { "16float", dict16ElemFloat }
     };
 
     bool success;
     success = d.hasValue<bool>("1int");
-    EXPECT_EQ(true, success) << "hasValue<bool>(\"1int\")";
+    ASSERT_EQ(true, success) << "hasValue<bool>(\"1int\")";
     success = d.hasValue<bool>("1uint");
     EXPECT_EQ(false, success) << "hasValue<bool>(\"1uint\")";
     success = d.hasValue<bool>("1float");
     EXPECT_EQ(false, success) << "hasValue<bool>(\"1float\")";
     success = d.hasValue<bool>("2int");
     EXPECT_EQ(false, success) << "hasValue<bool>(\"2int\")";
+    {
+        bool value;
+        success = d.getValue("1int", value);
+        ASSERT_EQ(true, success) << "success getValue<bool>";
+        EXPECT_EQ(true, value) << "correct getValue<bool>";
+    }
 
     success = d.hasValue<char>("1int");
-    EXPECT_EQ(true, success) << "hasValue<char>(\"1int\")";
+    ASSERT_EQ(true, success) << "hasValue<char>(\"1int\")";
     success = d.hasValue<char>("1uint");
     EXPECT_EQ(false, success) << "hasValue<char>(\"1uint\")";
     success = d.hasValue<char>("1float");
     EXPECT_EQ(false, success) << "hasValue<char>(\"1float\")";
     success = d.hasValue<char>("2int");
     EXPECT_EQ(false, success) << "hasValue<char>(\"2int\")";
+    {
+        char value;
+        success = d.getValue("1int", value);
+        ASSERT_EQ(true, success) << "success getValue<char>";
+        EXPECT_EQ(char(1), value) << "correct getValue<char>";
+    }
 
     success = d.hasValue<signed char>("1int");
-    EXPECT_EQ(true, success) << "hasValue<signed char>(\"1int\")";
+    ASSERT_EQ(true, success) << "hasValue<signed char>(\"1int\")";
     success = d.hasValue<signed char>("1uint");
     EXPECT_EQ(false, success) << "hasValue<signed char>(\"1uint\")";
     success = d.hasValue<signed char>("1float");
     EXPECT_EQ(false, success) << "hasValue<signed char>(\"1float\")";
     success = d.hasValue<signed char>("2int");
     EXPECT_EQ(false, success) << "hasValue<signed char>(\"2int\")";
-
+    {
+        signed char value;
+        success = d.getValue("1int", value);
+        ASSERT_EQ(true, success) << "success getValue<signed char>";
+        EXPECT_EQ(signed char(1), value) << "correct getValue<signed char>";
+    }
     success = d.hasValue<unsigned char>("1int");
     EXPECT_EQ(false, success) << "hasValue<unsigned char>(\"1int\")";
     success = d.hasValue<unsigned char>("1uint");
-    EXPECT_EQ(true, success) << "hasValue<unsigned char>(\"1uint\")";
+    ASSERT_EQ(true, success) << "hasValue<unsigned char>(\"1uint\")";
     success = d.hasValue<unsigned char>("1float");
     EXPECT_EQ(false, success) << "hasValue<unsigned char>(\"1float\")";
     success = d.hasValue<unsigned char>("2int");
     EXPECT_EQ(false, success) << "hasValue<unsigned char>(\"2int\")";
+    {
+        unsigned char value;
+        success = d.getValue("1uint", value);
+        ASSERT_EQ(true, success) << "success getValue<unsigned char>";
+        EXPECT_EQ(unsigned char(1), value)
+              << "correct getValue<unsigned char>";
+    }
 
     success = d.hasValue<wchar_t>("1int");
-    EXPECT_EQ(true, success) << "hasValue<wchar_t>(\"1int\")";
+    ASSERT_EQ(true, success) << "hasValue<wchar_t>(\"1int\")";
     success = d.hasValue<wchar_t>("1uint");
     EXPECT_EQ(false, success) << "hasValue<wchar_t>(\"1uint\")";
     success = d.hasValue<wchar_t>("1float");
     EXPECT_EQ(false, success) << "hasValue<wchar_t>(\"1float\")";
     success = d.hasValue<wchar_t>("2int");
     EXPECT_EQ(false, success) << "hasValue<wchar_t>(\"2int\")";
+    {
+        wchar_t value;
+        success = d.getValue("1int", value);
+        ASSERT_EQ(true, success) << "success getValue<wchar_t>";
+        EXPECT_EQ(wchar_t(1), value)
+            << "correct getValue<wchar_t>";
+    }
 
     success = d.hasValue<short>("1int");
-    EXPECT_EQ(true, success) << "hasValue<short>(\"1int\")";
+    ASSERT_EQ(true, success) << "hasValue<short>(\"1int\")";
     success = d.hasValue<short>("1uint");
     EXPECT_EQ(false, success) << "hasValue<short>(\"1uint\")";
     success = d.hasValue<short>("1float");
     EXPECT_EQ(false, success) << "hasValue<short>(\"1float\")";
     success = d.hasValue<short>("2int");
     EXPECT_EQ(false, success) << "hasValue<short>(\"2int\")";
+    {
+        short value;
+        success = d.getValue("1int", value);
+        ASSERT_EQ(true, success) << "success getValue<short>";
+        EXPECT_EQ(short(1), value)
+            << "correct getValue<short>";
+    }
 
     success = d.hasValue<unsigned short>("1int");
     EXPECT_EQ(false, success) << "hasValue<unsigned short>(\"1int\")";
     success = d.hasValue<unsigned short>("1uint");
-    EXPECT_EQ(true, success) << "hasValue<unsigned short>(\"1uint\")";
+    ASSERT_EQ(true, success) << "hasValue<unsigned short>(\"1uint\")";
     success = d.hasValue<unsigned short>("1float");
     EXPECT_EQ(false, success) << "hasValue<unsigned short>(\"1float\")";
     success = d.hasValue<unsigned short>("2int");
     EXPECT_EQ(false, success) << "hasValue<unsigned short>(\"2int\")";
+    {
+        unsigned short value;
+        success = d.getValue("1uint", value);
+        ASSERT_EQ(true, success) << "success getValue<unsigned short>";
+        EXPECT_EQ(unsigned short(1), value)
+            << "correct getValue<unsigned short>";
+    }
 
     success = d.hasValue<int>("1int");
-    EXPECT_EQ(true, success) << "hasValue<int>(\"1int\")";
+    ASSERT_EQ(true, success) << "hasValue<int>(\"1int\")";
     success = d.hasValue<int>("1uint");
     EXPECT_EQ(false, success) << "hasValue<int>(\"1uint\")";
     success = d.hasValue<int>("1float");
     EXPECT_EQ(false, success) << "hasValue<int>(\"1float\")";
     success = d.hasValue<int>("2int");
     EXPECT_EQ(false, success) << "hasValue<int>(\"2int\")";
+    {
+        int value;
+        success = d.getValue("1int", value);
+        ASSERT_EQ(true, success) << "success getValue<int>";
+        EXPECT_EQ(int(1), value)
+            << "correct getValue<int>";
+    }
 
     success = d.hasValue<unsigned int>("1int");
     EXPECT_EQ(false, success) << "hasValue<unsigned int>(\"1int\")";
     success = d.hasValue<unsigned int>("1uint");
-    EXPECT_EQ(true, success) << "hasValue<unsigned int>(\"1uint\")";
+    ASSERT_EQ(true, success) << "hasValue<unsigned int>(\"1uint\")";
     success = d.hasValue<unsigned int>("1float");
     EXPECT_EQ(false, success) << "hasValue<unsigned int>(\"1float\")";
     success = d.hasValue<unsigned int>("2int");
     EXPECT_EQ(false, success) << "hasValue<unsigned int>(\"2int\")";
+    {
+        unsigned int value;
+        success = d.getValue("1uint", value);
+        ASSERT_EQ(true, success) << "success getValue<unsigned int>";
+        EXPECT_EQ(unsigned int(1), value)
+            << "correct getValue<unsigned int>";
+    }
 
     success = d.hasValue<long long>("1int");
-    EXPECT_EQ(true, success) << "hasValue<long long>(\"1int\")";
+    ASSERT_EQ(true, success) << "hasValue<long long>(\"1int\")";
     success = d.hasValue<long long>("1uint");
     EXPECT_EQ(false, success) << "hasValue<long long>(\"1uint\")";
     success = d.hasValue<long long>("1float");
     EXPECT_EQ(false, success) << "hasValue<long long>(\"1float\")";
     success = d.hasValue<long long>("2int");
     EXPECT_EQ(false, success) << "hasValue<long long>(\"2int\")";
+    {
+        long long value;
+        success = d.getValue("1int", value);
+        ASSERT_EQ(true, success) << "success getValue<long long>";
+        EXPECT_EQ(long long(1), value)
+            << "correct getValue<long long>";
+    }
 
     success = d.hasValue<unsigned long long>("1int");
     EXPECT_EQ(false, success) << "hasValue<unsigned long long>(\"1int\")";
     success = d.hasValue<unsigned long long>("1uint");
-    EXPECT_EQ(true, success) << "hasValue<unsigned long long>(\"1uint\")";
+    ASSERT_EQ(true, success) << "hasValue<unsigned long long>(\"1uint\")";
     success = d.hasValue<unsigned long long>("1float");
     EXPECT_EQ(false, success) << "hasValue<unsigned long long>(\"1float\")";
     success = d.hasValue<unsigned long long>("2int");
     EXPECT_EQ(false, success) << "hasValue<unsigned long long>(\"2int\")";
+    {
+        unsigned long long value;
+        success = d.getValue("1uint", value);
+        ASSERT_EQ(true, success) << "success getValue<unsigned long long>";
+        EXPECT_EQ(unsigned long long(1), value)
+            << "correct getValue<unsigned long long>";
+    }
+
+    success = d.hasValue<float>("1int");
+    EXPECT_EQ(false, success) << "hasValue<float>(\"1int\")";
+    success = d.hasValue<float>("1uint");
+    EXPECT_EQ(false, success) << "hasValue<float>(\"1uint\")";
+    success = d.hasValue<float>("1float");
+    ASSERT_EQ(true, success) << "hasValue<float>(\"1float\")";
+    success = d.hasValue<float>("2int");
+    EXPECT_EQ(false, success) << "hasValue<float>(\"2int\")";
+    {
+        float value;
+        success = d.getValue("1float", value);
+        ASSERT_EQ(true, success) << "success getValue<float>";
+        EXPECT_EQ(float(1), value)
+            << "correct getValue<float>";
+    }
+
+    success = d.hasValue<double>("1int");
+    EXPECT_EQ(false, success) << "hasValue<double>(\"1int\")";
+    success = d.hasValue<double>("1uint");
+    EXPECT_EQ(false, success) << "hasValue<double>(\"1uint\")";
+    success = d.hasValue<double>("1float");
+    ASSERT_EQ(true, success) << "hasValue<double>(\"1float\")";
+    success = d.hasValue<double>("2int");
+    EXPECT_EQ(false, success) << "hasValue<double>(\"2int\")";
+    {
+        double value;
+        success = d.getValue("1float", value);
+        ASSERT_EQ(true, success) << "success getValue<double>";
+        EXPECT_EQ(double(1), value)
+            << "correct getValue<double>";
+    }
+
+    using glm::vec2;
+
+    success = d.hasValue<vec2>("1float");
+    EXPECT_EQ(false, success) << "hasValue<vec2>(\"1float\")";
+    success = d.hasValue<vec2>("2int");
+    EXPECT_EQ(false, success) << "hasValue<vec2>(\"2int\")";
+    success = d.hasValue<vec2>("2uint");
+    EXPECT_EQ(false, success) << "hasValue<vec2>(\"2uint\")";
+    success = d.hasValue<vec2>("2float");
+    ASSERT_EQ(true, success) << "hasValue<vec2>(\"2float\")";
+    {
+        vec2 value;
+        success = d.getValue("2float", value);
+        ASSERT_EQ(true, success) << "success getValue<vec2>";
+        EXPECT_EQ(vec2(1.f, 2.f), value)
+            << "correct getValue<vec2>";
+    }
+
+    using glm::dvec2;
+
+    success = d.hasValue<dvec2>("1float");
+    EXPECT_EQ(false, success) << "hasValue<dvec2>(\"1float\")";
+    success = d.hasValue<dvec2>("2int");
+    EXPECT_EQ(false, success) << "hasValue<dvec2>(\"2int\")";
+    success = d.hasValue<dvec2>("2uint");
+    EXPECT_EQ(false, success) << "hasValue<dvec2>(\"2uint\")";
+    success = d.hasValue<dvec2>("2float");
+    ASSERT_EQ(true, success) << "hasValue<dvec2>(\"2float\")";
+    {
+        dvec2 value;
+        success = d.getValue("2float", value);
+        ASSERT_EQ(true, success) << "success getValue<dvec2>";
+        EXPECT_EQ(dvec2(1.0, 2.0), value)
+            << "correct getValue<dvec2>";
+    }
+
+    using glm::ivec2;
+
+    success = d.hasValue<ivec2>("1float");
+    EXPECT_EQ(false, success) << "hasValue<ivec2>(\"1float\")";
+    success = d.hasValue<ivec2>("2int");
+    ASSERT_EQ(true, success) << "hasValue<ivec2>(\"2int\")";
+    success = d.hasValue<ivec2>("2uint");
+    EXPECT_EQ(false, success) << "hasValue<ivec2>(\"2uint\")";
+    success = d.hasValue<ivec2>("2float");
+    EXPECT_EQ(false, success) << "hasValue<ivec2>(\"2float\")";
+    {
+        ivec2 value;
+        success = d.getValue("2int", value);
+        ASSERT_EQ(true, success) << "success getValue<ivec2>";
+        EXPECT_EQ(ivec2(1, 2), value)
+            << "correct getValue<ivec2>";
+    }
+
+    using glm::uvec2;
+
+    success = d.hasValue<uvec2>("1float");
+    EXPECT_EQ(false, success) << "hasValue<uvec2>(\"1float\")";
+    success = d.hasValue<uvec2>("2int");
+    EXPECT_EQ(false, success) << "hasValue<uvec2>(\"2int\")";
+    success = d.hasValue<uvec2>("2uint");
+    ASSERT_EQ(true, success) << "hasValue<uvec2>(\"2uint\")";
+    success = d.hasValue<uvec2>("2float");
+    EXPECT_EQ(false, success) << "hasValue<uvec2>(\"2float\")";
+    {
+        uvec2 value;
+        success = d.getValue("2uint", value);
+        ASSERT_EQ(true, success) << "success getValue<uvec2>";
+        EXPECT_EQ(uvec2(1, 2), value)
+            << "correct getValue<uvec2>";
+    }
+
+    using glm::bvec2;
+
+    success = d.hasValue<bvec2>("1float");
+    EXPECT_EQ(false, success) << "hasValue<bvec2>(\"1float\")";
+    success = d.hasValue<bvec2>("2int");
+    ASSERT_EQ(true, success) << "hasValue<bvec2>(\"2int\")";
+    success = d.hasValue<bvec2>("2uint");
+    EXPECT_EQ(false, success) << "hasValue<bvec2>(\"2uint\")";
+    success = d.hasValue<bvec2>("2float");
+    EXPECT_EQ(false, success) << "hasValue<bvec2>(\"2float\")";
+    {
+        bvec2 value;
+        success = d.getValue("2int", value);
+        ASSERT_EQ(true, success) << "success getValue<bvec2>";
+        EXPECT_EQ(bvec2(true, true), value)
+            << "correct getValue<bvec2>";
+    }
+
+    using glm::vec3;
+
+    success = d.hasValue<vec3>("1float");
+    EXPECT_EQ(false, success) << "hasValue<vec3>(\"1float\")";
+    success = d.hasValue<vec3>("3int");
+    EXPECT_EQ(false, success) << "hasValue<vec3>(\"3int\")";
+    success = d.hasValue<vec3>("3uint");
+    EXPECT_EQ(false, success) << "hasValue<vec3>(\"3uint\")";
+    success = d.hasValue<vec3>("3float");
+    ASSERT_EQ(true, success) << "hasValue<vec3>(\"3float\")";
+    {
+        vec3 value;
+        success = d.getValue("3float", value);
+        ASSERT_EQ(true, success) << "success getValue<vec3>";
+        EXPECT_EQ(vec3(1.f, 2.f, 3.f), value)
+            << "correct getValue<vec3>";
+    }
+
+    using glm::dvec3;
+
+    success = d.hasValue<dvec3>("1float");
+    EXPECT_EQ(false, success) << "hasValue<dvec3>(\"1float\")";
+    success = d.hasValue<dvec3>("3int");
+    EXPECT_EQ(false, success) << "hasValue<dvec3>(\"3int\")";
+    success = d.hasValue<dvec3>("3uint");
+    EXPECT_EQ(false, success) << "hasValue<dvec3>(\"3uint\")";
+    success = d.hasValue<dvec3>("3float");
+    ASSERT_EQ(true, success) << "hasValue<dvec3>(\"3float\")";
+    {
+        dvec3 value;
+        success = d.getValue("3float", value);
+        ASSERT_EQ(true, success) << "success getValue<dvec3>";
+        EXPECT_EQ(dvec3(1.0, 2.0, 3.0), value)
+            << "correct getValue<dvec3>";
+    }
+
+    using glm::ivec3;
+
+    success = d.hasValue<ivec3>("1float");
+    EXPECT_EQ(false, success) << "hasValue<ivec3>(\"1float\")";
+    success = d.hasValue<ivec3>("3int");
+    ASSERT_EQ(true, success) << "hasValue<ivec3>(\"3int\")";
+    success = d.hasValue<ivec3>("3uint");
+    EXPECT_EQ(false, success) << "hasValue<ivec3>(\"3uint\")";
+    success = d.hasValue<ivec3>("3float");
+    EXPECT_EQ(false, success) << "hasValue<ivec3>(\"3float\")";
+    {
+        ivec3 value;
+        success = d.getValue("3int", value);
+        ASSERT_EQ(true, success) << "success getValue<ivec3>";
+        EXPECT_EQ(ivec3(1, 2, 3), value)
+            << "correct getValue<ivec3>";
+    }
+
+    using glm::uvec3;
+
+    success = d.hasValue<uvec3>("1float");
+    EXPECT_EQ(false, success) << "hasValue<uvec3>(\"1float\")";
+    success = d.hasValue<uvec3>("3int");
+    EXPECT_EQ(false, success) << "hasValue<uvec3>(\"3int\")";
+    success = d.hasValue<uvec3>("3uint");
+    ASSERT_EQ(true, success) << "hasValue<uvec3>(\"3uint\")";
+    success = d.hasValue<uvec3>("3float");
+    EXPECT_EQ(false, success) << "hasValue<uvec3>(\"3float\")";
+    {
+        uvec3 value;
+        success = d.getValue("3uint", value);
+        ASSERT_EQ(true, success) << "success getValue<uvec3>";
+        EXPECT_EQ(uvec3(1, 2, 3), value)
+            << "correct getValue<uvec3>";
+    }
+
+    using glm::bvec3;
+
+    success = d.hasValue<bvec3>("1float");
+    EXPECT_EQ(false, success) << "hasValue<bvec3>(\"1float\")";
+    success = d.hasValue<bvec3>("3int");
+    ASSERT_EQ(true, success) << "hasValue<bvec3>(\"3int\")";
+    success = d.hasValue<bvec3>("3uint");
+    EXPECT_EQ(false, success) << "hasValue<bvec3>(\"3uint\")";
+    success = d.hasValue<bvec3>("3float");
+    EXPECT_EQ(false, success) << "hasValue<bvec3>(\"3float\")";
+    {
+        bvec3 value;
+        success = d.getValue("3int", value);
+        ASSERT_EQ(true, success) << "success getValue<bvec3>";
+        EXPECT_EQ(bvec3(true, true, true), value)
+            << "correct getValue<bvec3>";
+    }
+
+    using glm::vec4;
+
+    success = d.hasValue<vec4>("1float");
+    EXPECT_EQ(false, success) << "hasValue<vec4>(\"1float\")";
+    success = d.hasValue<vec4>("4int");
+    EXPECT_EQ(false, success) << "hasValue<vec4>(\"4int\")";
+    success = d.hasValue<vec4>("4uint");
+    EXPECT_EQ(false, success) << "hasValue<vec4>(\"4uint\")";
+    success = d.hasValue<vec4>("4float");
+    ASSERT_EQ(true, success) << "hasValue<vec4>(\"4float\")";
+    {
+        vec4 value;
+        success = d.getValue("4float", value);
+        ASSERT_EQ(true, success) << "success getValue<vec4>";
+        EXPECT_EQ(vec4(1.f, 2.f, 3.f, 4.f), value)
+            << "correct getValue<vec4>";
+    }
+
+    using glm::dvec4;
+
+    success = d.hasValue<dvec4>("1float");
+    EXPECT_EQ(false, success) << "hasValue<dvec4>(\"1float\")";
+    success = d.hasValue<dvec4>("4int");
+    EXPECT_EQ(false, success) << "hasValue<dvec4>(\"4int\")";
+    success = d.hasValue<dvec4>("4uint");
+    EXPECT_EQ(false, success) << "hasValue<dvec4>(\"4uint\")";
+    success = d.hasValue<dvec4>("4float");
+    ASSERT_EQ(true, success) << "hasValue<dvec4>(\"4float\")";
+    {
+        dvec4 value;
+        success = d.getValue("4float", value);
+        ASSERT_EQ(true, success) << "success getValue<dvec4>";
+        EXPECT_EQ(dvec4(1.0, 2.0, 3.0, 4.0), value)
+            << "correct getValue<dvec4>";
+    }
+
+    using glm::ivec4;
+
+    success = d.hasValue<ivec4>("1float");
+    EXPECT_EQ(false, success) << "hasValue<ivec4>(\"1float\")";
+    success = d.hasValue<ivec4>("4int");
+    ASSERT_EQ(true, success) << "hasValue<ivec4>(\"4int\")";
+    success = d.hasValue<ivec4>("4uint");
+    EXPECT_EQ(false, success) << "hasValue<ivec4>(\"4uint\")";
+    success = d.hasValue<ivec4>("4float");
+    EXPECT_EQ(false, success) << "hasValue<ivec4>(\"4float\")";
+    {
+        ivec4 value;
+        success = d.getValue("4int", value);
+        ASSERT_EQ(true, success) << "success getValue<ivec4>";
+        EXPECT_EQ(ivec4(1, 2, 3, 4), value)
+            << "correct getValue<ivec4>";
+    }
+
+    using glm::uvec4;
+
+    success = d.hasValue<uvec4>("1float");
+    EXPECT_EQ(false, success) << "hasValue<uvec4>(\"1float\")";
+    success = d.hasValue<uvec4>("4int");
+    EXPECT_EQ(false, success) << "hasValue<uvec4>(\"4int\")";
+    success = d.hasValue<uvec4>("4uint");
+    ASSERT_EQ(true, success) << "hasValue<uvec4>(\"4uint\")";
+    success = d.hasValue<uvec4>("4float");
+    EXPECT_EQ(false, success) << "hasValue<uvec4>(\"4float\")";
+    {
+        uvec4 value;
+        success = d.getValue("4uint", value);
+        ASSERT_EQ(true, success) << "success getValue<uvec4>";
+        EXPECT_EQ(uvec4(1, 2, 3, 4), value)
+            << "correct getValue<uvec4>";
+    }
+
+    using glm::bvec4;
+
+    success = d.hasValue<bvec4>("1float");
+    EXPECT_EQ(false, success) << "hasValue<bvec4>(\"1float\")";
+    success = d.hasValue<bvec4>("4int");
+    ASSERT_EQ(true, success) << "hasValue<bvec4>(\"4int\")";
+    success = d.hasValue<bvec4>("4uint");
+    EXPECT_EQ(false, success) << "hasValue<bvec4>(\"4uint\")";
+    success = d.hasValue<bvec4>("4float");
+    EXPECT_EQ(false, success) << "hasValue<bvec4>(\"4float\")";
+    {
+        bvec4 value;
+        success = d.getValue("4int", value);
+        ASSERT_EQ(true, success) << "success getValue<bvec4>";
+        EXPECT_EQ(bvec4(true, true, true, true), value)
+            << "correct getValue<bvec4>";
+    }
+
+    using glm::mat2x2;
+
+    success = d.hasValue<mat2x2>("1float");
+    EXPECT_EQ(false, success) << "hasValue<mat2x2>(\"1float\")";
+    success = d.hasValue<mat2x2>("4int");
+    EXPECT_EQ(false, success) << "hasValue<mat2x2>(\"4int\")";
+    success = d.hasValue<mat2x2>("4uint");
+    EXPECT_EQ(false, success) << "hasValue<mat2x2>(\"4uint\")";
+    success = d.hasValue<mat2x2>("4float");
+    ASSERT_EQ(true, success) << "hasValue<mat2x2>(\"4float\")";
+    {
+        mat2x2 value;
+        success = d.getValue("4float", value);
+        ASSERT_EQ(true, success) << "success getValue<mat2x2>";
+        EXPECT_EQ(mat2x2(1.f, 2.f, 3.f, 4.f), value)
+            << "correct getValue<mat2x2>";
+    }
+
+    using glm::mat2x3;
+
+    success = d.hasValue<mat2x3>("1float");
+    EXPECT_EQ(false, success) << "hasValue<mat2x3>(\"1float\")";
+    success = d.hasValue<mat2x3>("6int");
+    EXPECT_EQ(false, success) << "hasValue<mat2x3>(\"6int\")";
+    success = d.hasValue<mat2x3>("6uint");
+    EXPECT_EQ(false, success) << "hasValue<mat2x3>(\"6uint\")";
+    success = d.hasValue<mat2x3>("6float");
+    ASSERT_EQ(true, success) << "hasValue<mat2x3>(\"6float\")";
+    {
+        mat2x3 value;
+        success = d.getValue("6float", value);
+        ASSERT_EQ(true, success) << "success getValue<mat2x3>";
+        EXPECT_EQ(mat2x3(1.f, 2.f, 3.f, 4.f, 5.f, 6.f), value)
+            << "correct getValue<mat2x3>";
+    }
+
+    using glm::mat2x4;
+
+    success = d.hasValue<mat2x4>("1float");
+    EXPECT_EQ(false, success) << "hasValue<mat2x4>(\"1float\")";
+    success = d.hasValue<mat2x4>("8int");
+    EXPECT_EQ(false, success) << "hasValue<mat2x4>(\"8int\")";
+    success = d.hasValue<mat2x4>("8uint");
+    EXPECT_EQ(false, success) << "hasValue<mat2x4>(\"8uint\")";
+    success = d.hasValue<mat2x4>("8float");
+    ASSERT_EQ(true, success) << "hasValue<mat2x4>(\"8float\")";
+    {
+        mat2x4 value;
+        success = d.getValue("8float", value);
+        ASSERT_EQ(true, success) << "success getValue<mat2x4>";
+        EXPECT_EQ(mat2x4(1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f), value)
+            << "correct getValue<mat2x4>";
+    }
+
+    using glm::mat3x2;
+
+    success = d.hasValue<mat3x2>("1float");
+    EXPECT_EQ(false, success) << "hasValue<mat2x2>(\"1float\")";
+    success = d.hasValue<mat3x2>("6int");
+    EXPECT_EQ(false, success) << "hasValue<mat3x2>(\"6int\")";
+    success = d.hasValue<mat3x2>("6uint");
+    EXPECT_EQ(false, success) << "hasValue<mat3x2>(\"6uint\")";
+    success = d.hasValue<mat3x2>("6float");
+    ASSERT_EQ(true, success) << "hasValue<mat3x2>(\"6float\")";
+    {
+        mat3x2 value;
+        success = d.getValue("6float", value);
+        ASSERT_EQ(true, success) << "success getValue<mat3x2>";
+        EXPECT_EQ(mat3x2(1.f, 2.f, 3.f, 4.f, 5.f, 6.f), value)
+            << "correct getValue<mat3x2>";
+    }
+
+    using glm::mat3x3;
+
+    success = d.hasValue<mat3x3>("1float");
+    EXPECT_EQ(false, success) << "hasValue<mat3x3>(\"1float\")";
+    success = d.hasValue<mat3x3>("9int");
+    EXPECT_EQ(false, success) << "hasValue<mat3x3>(\"9int\")";
+    success = d.hasValue<mat3x3>("9uint");
+    EXPECT_EQ(false, success) << "hasValue<mat3x3>(\"9uint\")";
+    success = d.hasValue<mat3x3>("9float");
+    ASSERT_EQ(true, success) << "hasValue<mat3x3>(\"9float\")";
+    {
+        mat3x3 value;
+        success = d.getValue("9float", value);
+        ASSERT_EQ(true, success) << "success getValue<mat3x3>";
+        EXPECT_EQ(mat3x3(1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f), value)
+            << "correct getValue<mat3x2>";
+    }
+
+    using glm::mat3x4;
+
+    success = d.hasValue<mat3x4>("1float");
+    EXPECT_EQ(false, success) << "hasValue<mat3x4>(\"1float\")";
+    success = d.hasValue<mat3x4>("12int");
+    EXPECT_EQ(false, success) << "hasValue<mat3x4>(\"12int\")";
+    success = d.hasValue<mat3x4>("12uint");
+    EXPECT_EQ(false, success) << "hasValue<mat3x4>(\"12uint\")";
+    success = d.hasValue<mat3x4>("12float");
+    ASSERT_EQ(true, success) << "hasValue<mat3x4>(\"12float\")";
+    {
+        mat3x4 value;
+        success = d.getValue("12float", value);
+        ASSERT_EQ(true, success) << "success getValue<mat3x4>";
+        EXPECT_EQ(mat3x4(1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f),
+                  value)
+              << "correct getValue<mat3x4>";
+    }
+
+    using glm::mat4x2;
+
+    success = d.hasValue<mat4x2>("1float");
+    EXPECT_EQ(false, success) << "hasValue<mat4x2>(\"1float\")";
+    success = d.hasValue<mat4x2>("8int");
+    EXPECT_EQ(false, success) << "hasValue<mat4x2>(\"8int\")";
+    success = d.hasValue<mat4x2>("8uint");
+    EXPECT_EQ(false, success) << "hasValue<mat4x2>(\"8uint\")";
+    success = d.hasValue<mat4x2>("8float");
+    ASSERT_EQ(true, success) << "hasValue<mat4x2>(\"8float\")";
+    {
+        mat4x2 value;
+        success = d.getValue("8float", value);
+        ASSERT_EQ(true, success) << "success getValue<mat4x2>";
+        EXPECT_EQ(mat4x2(1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f), value)
+            << "correct getValue<mat4x2>";
+    }
+
+    using glm::mat4x3;
+
+    success = d.hasValue<mat4x3>("1float");
+    EXPECT_EQ(false, success) << "hasValue<mat4x3>(\"1float\")";
+    success = d.hasValue<mat4x3>("12int");
+    EXPECT_EQ(false, success) << "hasValue<mat4x3>(\"12int\")";
+    success = d.hasValue<mat4x3>("12uint");
+    EXPECT_EQ(false, success) << "hasValue<mat4x3>(\"12uint\")";
+    success = d.hasValue<mat4x3>("12float");
+    ASSERT_EQ(true, success) << "hasValue<mat4x3>(\"12float\")";
+    {
+        mat4x3 value;
+        success = d.getValue("12float", value);
+        ASSERT_EQ(true, success) << "success getValue<mat4x3>";
+        EXPECT_EQ(mat4x3(1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f),
+                  value)
+              << "correct getValue<mat4x3>";
+    }
+
+    using glm::mat4x4;
+
+    success = d.hasValue<mat4x4>("1float");
+    EXPECT_EQ(false, success) << "hasValue<mat4x4>(\"1float\")";
+    success = d.hasValue<mat4x4>("16int");
+    EXPECT_EQ(false, success) << "hasValue<mat4x4>(\"16int\")";
+    success = d.hasValue<mat4x4>("16uint");
+    EXPECT_EQ(false, success) << "hasValue<mat4x4>(\"16uint\")";
+    success = d.hasValue<mat4x4>("16float");
+    ASSERT_EQ(true, success) << "hasValue<mat4x4>(\"16float\")";
+    {
+        mat4x4 value;
+        success = d.getValue("16float", value);
+        ASSERT_EQ(true, success) << "success getValue<mat4x4>";
+        EXPECT_EQ(mat4x4(1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f,
+                         13.f, 14.f, 15.f, 16.f),
+                  value)
+              << "correct getValue<mat4x4>";
+    }
+
+    using glm::dmat2x2;
+
+    success = d.hasValue<dmat2x2>("1float");
+    EXPECT_EQ(false, success) << "hasValue<dmat2x2>(\"1float\")";
+    success = d.hasValue<dmat2x2>("4int");
+    EXPECT_EQ(false, success) << "hasValue<dmat2x2>(\"4int\")";
+    success = d.hasValue<dmat2x2>("4uint");
+    EXPECT_EQ(false, success) << "hasValue<dmat2x2>(\"4uint\")";
+    success = d.hasValue<dmat2x2>("4float");
+    ASSERT_EQ(true, success) << "hasValue<dmat2x2>(\"4float\")";
+    {
+        dmat2x2 value;
+        success = d.getValue("4float", value);
+        ASSERT_EQ(true, success) << "success getValue<dmat2x2>";
+        EXPECT_EQ(dmat2x2(1.0, 2.0, 3.0, 4.0), value) << "correct getValue<dmat2x2>";
+    }
+
+    using glm::dmat2x3;
+
+    success = d.hasValue<dmat2x3>("1float");
+    EXPECT_EQ(false, success) << "hasValue<dmat2x3>(\"1float\")";
+    success = d.hasValue<dmat2x3>("6int");
+    EXPECT_EQ(false, success) << "hasValue<dmat2x3>(\"6int\")";
+    success = d.hasValue<dmat2x3>("6uint");
+    EXPECT_EQ(false, success) << "hasValue<dmat2x3>(\"6uint\")";
+    success = d.hasValue<dmat2x3>("6float");
+    ASSERT_EQ(true, success) << "hasValue<dmat2x3>(\"6float\")";
+    {
+        dmat2x3 value;
+        success = d.getValue("6float", value);
+        ASSERT_EQ(true, success) << "success getValue<dmat2x3>";
+        EXPECT_EQ(dmat2x3(1.0, 2.0, 3.0, 4.0, 5.0, 6.0), value)
+              << "correct getValue<dmat2x3>";
+    }
+
+    using glm::dmat2x4;
+
+    success = d.hasValue<dmat2x4>("1float");
+    EXPECT_EQ(false, success) << "hasValue<dmat2x4>(\"1float\")";
+    success = d.hasValue<dmat2x4>("8int");
+    EXPECT_EQ(false, success) << "hasValue<dmat2x4>(\"8int\")";
+    success = d.hasValue<mat2x4>("8uint");
+    EXPECT_EQ(false, success) << "hasValue<dmat2x4>(\"8uint\")";
+    success = d.hasValue<dmat2x4>("8float");
+    ASSERT_EQ(true, success) << "hasValue<dmat2x4>(\"8float\")";
+    {
+        dmat2x4 value;
+        success = d.getValue("8float", value);
+        ASSERT_EQ(true, success) << "success getValue<dmat2x4>";
+        EXPECT_EQ(dmat2x4(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0), value)
+            << "correct getValue<dmat2x4>";
+    }
+
+    using glm::dmat3x2;
+
+    success = d.hasValue<dmat3x2>("1float");
+    EXPECT_EQ(false, success) << "hasValue<dmat2x2>(\"1float\")";
+    success = d.hasValue<dmat3x2>("6int");
+    EXPECT_EQ(false, success) << "hasValue<dmat3x2>(\"6int\")";
+    success = d.hasValue<dmat3x2>("6uint");
+    EXPECT_EQ(false, success) << "hasValue<dmat3x2>(\"6uint\")";
+    success = d.hasValue<dmat3x2>("6float");
+    ASSERT_EQ(true, success) << "hasValue<dmat3x2>(\"6float\")";
+    {
+        dmat3x2 value;
+        success = d.getValue("6float", value);
+        ASSERT_EQ(true, success) << "success getValue<dmat3x2>";
+        EXPECT_EQ(dmat3x2(1.0, 2.0, 3.0, 4.0, 5.0, 6.0), value)
+            << "correct getValue<dmat3x2>";
+    }
+
+    using glm::dmat3x3;
+
+    success = d.hasValue<dmat3x3>("1float");
+    EXPECT_EQ(false, success) << "hasValue<dmat3x3>(\"1float\")";
+    success = d.hasValue<dmat3x3>("9int");
+    EXPECT_EQ(false, success) << "hasValue<dmat3x3>(\"9int\")";
+    success = d.hasValue<dmat3x3>("9uint");
+    EXPECT_EQ(false, success) << "hasValue<dmat3x3>(\"9uint\")";
+    success = d.hasValue<dmat3x3>("9float");
+    ASSERT_EQ(true, success) << "hasValue<dmat3x3>(\"9float\")";
+    {
+        dmat3x3 value;
+        success = d.getValue("9float", value);
+        ASSERT_EQ(true, success) << "success getValue<dmat3x3>";
+        EXPECT_EQ(dmat3x3(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0), value)
+            << "correct getValue<dmat3x3>";
+    }
+
+    using glm::dmat3x4;
+
+    success = d.hasValue<dmat3x4>("1float");
+    EXPECT_EQ(false, success) << "hasValue<dmat3x4>(\"1float\")";
+    success = d.hasValue<dmat3x4>("12int");
+    EXPECT_EQ(false, success) << "hasValue<dmat3x4>(\"12int\")";
+    success = d.hasValue<dmat3x4>("12uint");
+    EXPECT_EQ(false, success) << "hasValue<dmat3x4>(\"12uint\")";
+    success = d.hasValue<dmat3x4>("12float");
+    ASSERT_EQ(true, success) << "hasValue<dmat3x4>(\"12float\")";
+    {
+        dmat3x4 value;
+        success = d.getValue("12float", value);
+        ASSERT_EQ(true, success) << "success getValue<dmat3x4>";
+        EXPECT_EQ(dmat3x4(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0),
+                  value)
+              << "correct getValue<dmat3x4>";
+    }
+
+    using glm::dmat4x2;
+
+    success = d.hasValue<dmat4x2>("1float");
+    EXPECT_EQ(false, success) << "hasValue<dmat4x2>(\"1float\")";
+    success = d.hasValue<dmat4x2>("8int");
+    EXPECT_EQ(false, success) << "hasValue<dmat4x2>(\"8int\")";
+    success = d.hasValue<dmat4x2>("8uint");
+    EXPECT_EQ(false, success) << "hasValue<dmat4x2>(\"8uint\")";
+    success = d.hasValue<dmat4x2>("8float");
+    ASSERT_EQ(true, success) << "hasValue<dmat4x2>(\"8float\")";
+    {
+        dmat4x2 value;
+        success = d.getValue("8float", value);
+        ASSERT_EQ(true, success) << "success getValue<dmat4x2>";
+        EXPECT_EQ(dmat4x2(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0),
+            value)
+            << "correct getValue<dmat4x2>";
+    }
+
+    using glm::dmat4x3;
+
+    success = d.hasValue<dmat4x3>("1float");
+    EXPECT_EQ(false, success) << "hasValue<dmat4x3>(\"1float\")";
+    success = d.hasValue<dmat4x3>("12int");
+    EXPECT_EQ(false, success) << "hasValue<dmat4x3>(\"12int\")";
+    success = d.hasValue<dmat4x3>("12uint");
+    EXPECT_EQ(false, success) << "hasValue<dmat4x3>(\"12uint\")";
+    success = d.hasValue<dmat4x3>("12float");
+    ASSERT_EQ(true, success) << "hasValue<dmat4x3>(\"12float\")";
+    {
+        dmat4x3 value;
+        success = d.getValue("12float", value);
+        ASSERT_EQ(true, success) << "success getValue<dmat4x3>";
+        EXPECT_EQ(dmat4x3(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0),
+            value)
+            << "correct getValue<dmat4x3>";
+    }
+
+    using glm::dmat4x4;
+
+    success = d.hasValue<dmat4x4>("1float");
+    EXPECT_EQ(false, success) << "hasValue<dmat4x4>(\"1float\")";
+    success = d.hasValue<dmat4x4>("16int");
+    EXPECT_EQ(false, success) << "hasValue<dmat4x4>(\"16int\")";
+    success = d.hasValue<dmat4x4>("16uint");
+    EXPECT_EQ(false, success) << "hasValue<dmat4x4>(\"16uint\")";
+    success = d.hasValue<dmat4x4>("16float");
+    ASSERT_EQ(true, success) << "hasValue<dmat4x4>(\"16float\")";
+    {
+        dmat4x4 value;
+        success = d.getValue("16float", value);
+        ASSERT_EQ(true, success) << "success getValue<dmat4x4>";
+        EXPECT_EQ(dmat4x4(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0,
+                          13.0, 14.0, 15.0, 16.0),
+                  value)
+              << "correct getValue<dmat4x4>";
+    }
 }
 
 TEST_F(DictionaryTest, RecursiveAccessHasValue) {

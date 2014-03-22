@@ -247,10 +247,16 @@ protected:
      * \param key The key under which the <code>value</code> is stored
      * \param value The value that should be stored under the provided key
      */
-    void setValueHelper(std::string key, boost::any value);
+    void setValueAnyHelper(std::string key, boost::any value);
+
+    template <typename T>
+    bool setValueHelper(std::string key, T value, bool createIntermediate);
 
     template <typename T>
     bool getValueHelper(const std::string& key, T& value) const;
+
+    template <typename T>
+    bool hasValueHelper(const std::string& key) const;
 };
 
 }  // namespace ghoul

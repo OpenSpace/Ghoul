@@ -40,7 +40,8 @@
 namespace ghoul {
 
 template <typename T>
-bool Dictionary::setValue(std::string key, T value, bool createIntermediate) {
+bool ghoul::Dictionary::setValueHelper(std::string key, T value,
+                                       bool createIntermediate) {
     std::string first;
     std::string rest;
     const bool hasRestPath = splitKey(key, first, rest);
@@ -59,7 +60,8 @@ bool Dictionary::setValue(std::string key, T value, bool createIntermediate) {
             ghoul::Dictionary intermediate;
             (*this)[first] = intermediate;
             keyIt = find(first);
-        } else {
+        }
+        else {
             LERRORC("Dictionary", "Key '" << first << "' was not found in dictionary");
             return false;
         }
@@ -69,8 +71,8 @@ bool Dictionary::setValue(std::string key, T value, bool createIntermediate) {
     Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
     if (dict == nullptr) {
         LERRORC("Dictionary", "Error converting key '"
-                              << first << "' to type 'Dictionary', was '"
-                              << keyIt->second.type().name() << "'");
+            << first << "' to type 'Dictionary', was '"
+            << keyIt->second.type().name() << "'");
         return false;
     }
     // Proper tail-recursion
@@ -78,7 +80,13 @@ bool Dictionary::setValue(std::string key, T value, bool createIntermediate) {
 }
 
 template <typename T>
-bool Dictionary::getValue(const std::string& key, T& value) const {
+bool Dictionary::setValue(std::string key, T value, bool createIntermediate) {
+    return setValueHelper(std::move(key), std::move(value), createIntermediate);
+}
+
+
+template <typename T>
+bool ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
     // If we can find the key directly, we can return it immediately
     const std::map<std::string, boost::any>::const_iterator it = find(key);
     if (it != cend()) {
@@ -86,8 +94,8 @@ bool Dictionary::getValue(const std::string& key, T& value) const {
         // See if it has the correct type
         if (v == nullptr) {
             LERRORC("Dictionary", "Wrong type of key '"
-                                  << key << "': Expected '" << typeid(T).name()
-                                  << "', got '" << it->second.type().name() << "'");
+                << key << "': Expected '" << typeid(T).name()
+                << "', got '" << it->second.type().name() << "'");
             return false;
         }
         value = *v;
@@ -110,8 +118,8 @@ bool Dictionary::getValue(const std::string& key, T& value) const {
     // See if it is actually a Dictionary at this location
     if (dict == nullptr) {
         LERRORC("Dictionary", "Error converting key '"
-                              << first << "' to type 'Dictionary', was '"
-                              << keyIt->second.type().name() << "'");
+            << first << "' to type 'Dictionary', was '"
+            << keyIt->second.type().name() << "'");
         return false;
     }
     // Proper tail-recursion
@@ -119,7 +127,12 @@ bool Dictionary::getValue(const std::string& key, T& value) const {
 }
 
 template <typename T>
-bool Dictionary::hasValue(const std::string& key) const {
+bool Dictionary::getValue(const std::string& key, T& value) const {
+    return getValueHelper(key, value);
+}
+
+template <typename T>
+bool ghoul::Dictionary::hasValueHelper(const std::string& key) const {
     const std::map<std::string, boost::any>::const_iterator it = find(key);
     if (it != cend()) {
         // If we can find the key directly, we can check the types and return
@@ -145,10 +158,10 @@ bool Dictionary::hasValue(const std::string& key) const {
     return dict->hasValue<T>(rest);
 }
 
-//template <typename T>
-//bool ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
-//
-//}
+template <typename T>
+bool Dictionary::hasValue(const std::string& key) const {
+    return hasValueHelper<T>(key);
+}
 
 #ifdef WIN32
 
@@ -174,7 +187,10 @@ DEF_EXT_TEMPLATES(short)
 DEF_EXT_TEMPLATES(unsigned short)
 DEF_EXT_TEMPLATES(int)
 DEF_EXT_TEMPLATES(unsigned int)
+DEF_EXT_TEMPLATES(long long)
+DEF_EXT_TEMPLATES(unsigned long long)
 DEF_EXT_TEMPLATES(float)
+DEF_EXT_TEMPLATES(double)
 DEF_EXT_TEMPLATES(glm::vec2)
 DEF_EXT_TEMPLATES(glm::dvec2)
 DEF_EXT_TEMPLATES(glm::ivec2)
