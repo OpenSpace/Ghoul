@@ -23,52 +23,52 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "misc/configurationmanager.h"
-
-#include <type_traits>
-
-#include <ghoul/lua/ghoul_lua.h>
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
-
-#include <assert.h>
-#include <fstream>
-#include <iostream>
-#include <iterator>
-
-namespace {
-    const std::string _loggerCat = "ConfigurationManager";
-}
-
-namespace ghoul {
-
-void ConfigurationManager::clear() {
-    _dictionary.clear();
-}
-
-bool ConfigurationManager::loadConfiguration(const std::string& filename) {
-    try {
-        return lua::loadDictionary(absPath(filename), _dictionary);
-    }
-    catch (lua::LuaFormattingException& e) {
-        LERROR("Error loading configuration from file '" << filename
-                                                         << "': " << e.what());
-        return false;
-    }
-}
-
-std::vector<std::string> ConfigurationManager::keys(const std::string& location) {
-    return _dictionary.keys(location);
-}
-
-bool ConfigurationManager::hasKey(const std::string& key) {
-    return _dictionary.hasKey(key);
-}
-
-bool ConfigurationManager::setValue(const std::string& key, const char* value,
-                                    bool createIntermediate) {
-    const std::string v(value);
-    return setValue(key, v, createIntermediate);
-}
-
-} // namespace ghoul
+//#include "misc/configurationmanager.h"
+//
+//#include <type_traits>
+//
+//#include <ghoul/lua/ghoul_lua.h>
+//#include <ghoul/filesystem/filesystem>
+//#include <ghoul/logging/logging>
+//
+//#include <assert.h>
+//#include <fstream>
+//#include <iostream>
+//#include <iterator>
+//
+//namespace {
+//    const std::string _loggerCat = "ConfigurationManager";
+//}
+//
+//namespace ghoul {
+//
+//void ConfigurationManager::clear() {
+//    _dictionary.clear();
+//}
+//
+//bool ConfigurationManager::loadConfiguration(const std::string& filename) {
+//    try {
+//        return lua::loadDictionary(absPath(filename), _dictionary);
+//    }
+//    catch (lua::LuaFormattingException& e) {
+//        LERROR("Error loading configuration from file '" << filename
+//                                                         << "': " << e.what());
+//        return false;
+//    }
+//}
+//
+//std::vector<std::string> ConfigurationManager::keys(const std::string& location) {
+//    return _dictionary.keys(location);
+//}
+//
+//bool ConfigurationManager::hasKey(const std::string& key) {
+//    return _dictionary.hasKey(key);
+//}
+//
+//bool ConfigurationManager::setValue(const std::string& key, const char* value,
+//                                    bool createIntermediate) {
+//    const std::string v(value);
+//    return setValue(key, v, createIntermediate);
+//}
+//
+//} // namespace ghoul

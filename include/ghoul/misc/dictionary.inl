@@ -145,6 +145,11 @@ bool Dictionary::hasValue(const std::string& key) const {
     return dict->hasValue<T>(rest);
 }
 
+//template <typename T>
+//bool ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
+//
+//}
+
 #ifdef WIN32
 
 // Make extern template definitions so that the compiler won't try to instantiate each

@@ -36,9 +36,9 @@ struct lua_State;
 namespace ghoul {
 namespace lua {
 
-class LuaFormattingException : public std::runtime_error {
+class FormattingException : public std::runtime_error {
 public:
-    LuaFormattingException(const std::string&);
+    FormattingException(const std::string&);
 };
 
 /**
@@ -80,11 +80,20 @@ std::string logStack(lua_State* state, logging::LogManager::LogLevel level =
 
 
 /**
- * Loads a Lua configuration or Lua configuration script into the given ghoul::Dictionary
+ * Loads a Lua configuration into the given #ghoul::Dictionary%, extending the passed
+ * dictionary. This method will overwrite value with the same keys, but will not remove
+ * any other keys from the dictionary. The script contained in the file must return a
+ * single table, which is then parsed and included into the #ghoul::Dictionary. The single
+ * restriction on the script is that it can only contain a pure array-style table (= only
+ * indexed by numbers) or a pure dictionary-style table (= no numbering indices).
+ * \param filename The filename pointing to the script that is executed
+ * \param dictionary The #ghoul::Dictionary into which the values from the script are
+ * added
+ * \return Returns <code>true</code> if the loading succeeded; <code>false</code>
+ * otherwise.
+ * \throws #ghoul::lua::FormattingException If 
  */
-//bool lua_loadIntoDictionary(lua_State* state, ghoul::Dictionary* D,
-//                            const std::string& filename, bool isConfiguration = true);
-bool loadDictionary(const std::string& filename, ghoul::Dictionary& dictionary);
+bool loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dictionary);
 
 } // namespace lua
 } // namespace ghoul

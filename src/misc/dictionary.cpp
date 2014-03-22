@@ -159,6 +159,23 @@ void convert(const Dictionary& dict, TargetType& target) {
 
 #define DEF_SPEC_TEMPLATE(TYPE)                                                          \
     template <>                                                                          \
+    bool Dictionary::hasValue<TYPE>(const std::string& key) const {                      \
+        const bool val = hasValue<StorageTypeConverter<TYPE>::type>(key);                \
+        if (val)                                                                         \
+            return true;                                                                 \
+        else {                                                                           \
+            const bool hasDictionary = hasValue<Dictionary>(key);                        \
+            if (hasDictionary) {                                                         \
+                Dictionary dict;                                                         \
+                getValue(key, dict);                                                     \
+                const bool canConvert = isConvertible<TYPE>(dict);                       \
+                if (canConvert)                                                          \
+                    return true;                                                         \
+            }                                                                            \
+            return false;                                                                \
+        }                                                                                \
+    }                                                                                    \
+    template <>                                                                          \
     bool Dictionary::setValue<TYPE>(std::string key, TYPE value,                         \
                                     bool createIntermediate) {                           \
         return setValue(std::move(key), StorageTypeConverter<TYPE>::type(value),         \
@@ -167,38 +184,61 @@ void convert(const Dictionary& dict, TargetType& target) {
     template <>                                                                          \
     bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) const {         \
         StorageTypeConverter<TYPE>::type v;                                              \
-        const bool success = getValue(key, v);                                           \
-        value = static_cast<TYPE>(v);                                                    \
-        return success;                                                                  \
-    }                                                                                    \
-    template <>                                                                          \
-    bool Dictionary::hasValue<TYPE>(const std::string& key) const {                      \
-        return hasValue<StorageTypeConverter<TYPE>::type>(key);                          \
+        const bool success = hasValue<TYPE>(key);                                        \
+        if (success) {                                                                   \
+            getValue(key, v);                                                            \
+            value = static_cast<TYPE>(v);                                                \
+            return success;                                                              \
+        } else {                                                                         \
+            const bool hasDictionary = hasValue<Dictionary>(key);                        \
+            if (hasDictionary) {                                                         \
+                Dictionary dict;                                                         \
+                getValue(key, dict);                                                     \
+                const bool canConvert = isConvertible<TYPE>(dict);                       \
+                if (canConvert) {                                                        \
+                    convert(dict, value);                                                \
+                    return true;                                                         \
+                }                                                                        \
+            }                                                                            \
+        }                                                                                \
+        return false;                                                                    \
     }
 
-#define DEF_SPEC_TEMPLATE_GLM(TYPE, CREATE)                           \
+#define DEF_SPEC_TEMPLATE_GLM(TYPE, CREATE)                                              \
+    template <>                                                                          \
+    bool Dictionary::hasValue<TYPE>(const std::string& key) const {                      \
+        return hasValue<std::array<StorageTypeConverter<TYPE>::type,                     \
+                                   StorageTypeConverter<TYPE>::size>>(key);              \
+    }                                                                                    \
     template <>                                                                          \
     bool Dictionary::setValue<TYPE>(std::string key, TYPE value,                         \
                                     bool createIntermediate) {                           \
-        auto v                                                                           \
-              = createArray<TYPE::value_type, StorageTypeConverter<TYPE>::type, StorageTypeConverter<TYPE>::size>(glm::value_ptr(value)); \
+        auto v = createArray<TYPE::value_type, StorageTypeConverter<TYPE>::type,         \
+                             StorageTypeConverter<TYPE>::size>(glm::value_ptr(value));   \
         return setValue(std::move(key), std::move(v), createIntermediate);               \
     }                                                                                    \
     template <>                                                                          \
     bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) const {         \
-        std::array<StorageTypeConverter<TYPE>::type, StorageTypeConverter<TYPE>::size> v;                                                 \
-        bool success = getValue(key, v);                                           \
+        std::array<StorageTypeConverter<TYPE>::type, StorageTypeConverter<TYPE>::size>   \
+              v;                                                                         \
+        bool success = getValue(key, v);                                                 \
         if (success) {                                                                   \
             value = CREATE(v.data());                                                    \
             return success;                                                              \
-        } else { success = hasValue<Dictionary>(key); \
+        } else {                                                                         \
+            const bool hasDictionary = hasValue<Dictionary>(key);                        \
+            if (hasDictionary) {                                                         \
+                Dictionary dict;                                                         \
+                getValue<Dictionary>(key, dict);                                         \
+                const bool canConvert = isConvertible<TYPE>(dict);                       \
+                if (canConvert) {                                                        \
+                    convertGLM(dict, value);                                             \
+                    return true;                                                         \
+                }                                                                        \
+            }                                                                            \
         }                                                                                \
-    }                                                                                    \
-    template <>                                                                          \
-    bool Dictionary::hasValue<TYPE>(const std::string& key) const {                      \
-    return hasValue<std::array<StorageTypeConverter<TYPE>::type, StorageTypeConverter<TYPE>::size>>(key);                             \
-    \
-}
+        return false;                                                                    \
+    }
 
 DEF_SPEC_TEMPLATE(bool)
 DEF_SPEC_TEMPLATE(char)
@@ -252,25 +292,9 @@ DEF_SPEC_TEMPLATE_GLM(glm::dmat4x4, glm::make_mat4x4)
 #pragma warning ( default : 4800 )
 #endif
 
-Dictionary::Dictionary(const std::initializer_list<std::pair<std::string, boost::any>>& l) {
+Dictionary::Dictionary(std::initializer_list<std::pair<std::string, boost::any>> l) {
     for (const auto& p : l)
         setValueHelper(std::move(p.first), std::move(p.second));
-
-
-    Dictionary d;
-    d.setValue("a", FloatingType(1.f));
-    d.setValue("b", FloatingType(2.f));
-    d.setValue("c", FloatingType(3.f));
-    d.setValue("d", FloatingType(4.f));
-
-    bool f = isConvertible<glm::vec4>(d);
-
-    glm::vec4 r;
-    convertGLM(d, r);
-    float s = r.x;
-    float t = r.y;
-    float u = r.z;
-    float v = r.w;
 }
 
 std::vector<string> Dictionary::keys(const string& location) const {

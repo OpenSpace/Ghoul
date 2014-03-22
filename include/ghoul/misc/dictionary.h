@@ -127,7 +127,7 @@ public:
  * \param l The <code>std::initializer_list</code> that contains all of the values
  * that should be added to the Dictionary
      */
-    Dictionary(const std::initializer_list<std::pair<std::string, boost::any>>& l);
+    Dictionary(std::initializer_list<std::pair<std::string, boost::any>> l);
 
     /**
      * Returns all of the keys that are stored in the dictionary at a given
@@ -248,6 +248,9 @@ protected:
      * \param value The value that should be stored under the provided key
      */
     void setValueHelper(std::string key, boost::any value);
+
+    template <typename T>
+    bool getValueHelper(const std::string& key, T& value) const;
 };
 
 }  // namespace ghoul

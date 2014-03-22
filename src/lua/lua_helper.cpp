@@ -37,7 +37,7 @@ using namespace ghoul::logging;
 namespace ghoul {
 namespace lua {
 
-LuaFormattingException::LuaFormattingException(const std::string& msg)
+FormattingException::FormattingException(const std::string& msg)
     : std::runtime_error(msg) {
 }
 
@@ -85,7 +85,7 @@ std::string luaTableToString(lua_State* state, bool& success) {
     return result.str();
 }
 
-void populateDictionary(lua_State* state, Dictionary& dict) {
+void populateDictionary(lua_State* state, Dictionary& dict, bool& isPureArrayWithNumbers) {
     static const int KEY = -2;
     static const int VAL = -1;
 
@@ -94,6 +94,8 @@ void populateDictionary(lua_State* state, Dictionary& dict) {
         Map = 3,        // 010
         Array = 5       // 101
     };
+
+    isPureArrayWithNumbers = true;
 
     TableType type = TableType::Undefined;
 
@@ -105,16 +107,17 @@ void populateDictionary(lua_State* state, Dictionary& dict) {
         switch (keyType) {
             case LUA_TNUMBER:
                 if (type == TableType::Map)
-                     throw LuaFormattingException(
+                     throw FormattingException(
                     "Dictionary can only contain a pure map or a pure array");
                 type = TableType::Array;
                 key = std::to_string(lua_tointeger(state, KEY));
                 break;
             case LUA_TSTRING:
                 if (type == TableType::Array)
-                     throw LuaFormattingException(
+                     throw FormattingException(
                           "Dictionary can only contain a pure map or a pure array");
                 type = TableType::Map;
+                isPureArrayWithNumbers = false;
                 key = lua_tostring(state, KEY);
                 break;
             default:
@@ -131,31 +134,41 @@ void populateDictionary(lua_State* state, Dictionary& dict) {
                 if (floatpart == 0.0) {
                     int int_value = static_cast<int>(value);
                     dict.setValue(key, int_value);
-                } else {
+                } else 
                     dict.setValue(key, value);
-                }
+                isPureArrayWithNumbers &= true;
             } break;
             case LUA_TBOOLEAN: {
                 bool value = (lua_toboolean(state, VAL) == 1);
                 dict.setValue(key, value);
+                isPureArrayWithNumbers &= true;
             } break;
             case LUA_TSTRING: {
                 std::string value = lua_tostring(state, VAL);
                 dict.setValue(key, value);
+                isPureArrayWithNumbers = false;
             } break;
             case LUA_TTABLE: {
+                isPureArrayWithNumbers = false;
                 Dictionary d;
-                populateDictionary(state, d);
+                bool pureArray;
+                populateDictionary(state, d, pureArray);
                 dict.setValue(key, d);
             } break;
             default:
-                throw LuaFormattingException("Unknown type: " + std::to_string(lua_type(state, VAL)));
+                throw FormattingException("Unknown type: " + std::to_string(lua_type(state, VAL)));
         }
 
         // get back up one level
         lua_pop(state, 1);
     }
 }
+
+void populateDictionary(lua_State* state, Dictionary& dict) {
+    bool ignore;
+    populateDictionary(state, dict, ignore);
+}
+
 }
 
 std::string logStack(lua_State* state, LogManager::LogLevel level) {
@@ -195,7 +208,7 @@ std::string logStack(lua_State* state, LogManager::LogLevel level) {
     return resultStr;
 }
 
-bool loadDictionary(const std::string& filename, ghoul::Dictionary& dictionary) {
+bool loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dictionary) {
     const static std::string _loggerCat = "lua_loadDictionary";
     static lua_State* state = nullptr;
 
