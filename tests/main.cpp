@@ -30,14 +30,9 @@
 #include <ghoul/logging/logging>
 
 #include "tests/test_common.inl"
-#include "tests/test_configurationmanager.inl"
-//#include "tests/test_commandlineparser.inl"
-//#include "tests/test_dictionary.inl"
-
-#include <ghoul/misc/dictionary.h>
-#include <iostream>
-#include <ghoul/lua/ghoul_lua.h>
-#include <ghoul/misc/configurationmanager.h>
+#include "tests/test_luatodictionary.inl"
+#include "tests/test_commandlineparser.inl"
+#include "tests/test_dictionary.inl"
 
 using namespace ghoul::cmdparser;
 using namespace ghoul::filesystem;
@@ -57,20 +52,6 @@ int main(int argc, char** argv) {
     else {
         LFATALC("main", "Fix me");
     }
-
-    //ghoul::ConfigurationManager m;
-    //m.loadConfiguration("${TEST_DIR}/configurationmanager/test1.cfg");
-
-
-
-    //ghoul::Dictionary d, e, f;
-    //bool b;
-    //b = ghoul::lua::loadDictionary(absPath("${TEST_DIR}/configurationmanager/test1.cfg"), d);
-    //b = ghoul::lua::loadDictionary(absPath("${TEST_DIR}/configurationmanager/test2.cfg"), e);
-    //b = ghoul::lua::loadDictionary(absPath("${TEST_DIR}/configurationmanager/test3.cfg"), f);
-    //b = ghoul::lua::loadDictionary(absPath("${TEST_DIR}/configurationmanager/test4.cfg"), d);
-    //b = ghoul::lua::loadDictionary(absPath("${TEST_DIR}/configurationmanager/test5.cfg"), d);
-
 
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
