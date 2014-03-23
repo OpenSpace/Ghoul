@@ -80,7 +80,7 @@ std::string logStack(lua_State* state, logging::LogManager::LogLevel level =
 
 
 /**
- * Loads a Lua configuration into the given #ghoul::Dictionary%, extending the passed
+ * Loads a Lua configuration into the given #ghoul::Dictionary%, extending the passed in
  * dictionary. This method will overwrite value with the same keys, but will not remove
  * any other keys from the dictionary. The script contained in the file must return a
  * single table, which is then parsed and included into the #ghoul::Dictionary. The single
@@ -91,9 +91,27 @@ std::string logStack(lua_State* state, logging::LogManager::LogLevel level =
  * added
  * \return Returns <code>true</code> if the loading succeeded; <code>false</code>
  * otherwise.
- * \throws #ghoul::lua::FormattingException If 
+ * \throws #ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
+ * keys of both type <code>string</code> and type <code>number</code>
  */
 bool loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dictionary);
+
+/**
+* Loads a Lua configuration into the given #ghoul::Dictionary%, extending the passed in
+* dictionary. This method will overwrite value with the same keys, but will not remove
+* any other keys from the dictionary. The script contained in the file must return a
+* single table, which is then parsed and included into the #ghoul::Dictionary. The single
+* restriction on the script is that it can only contain a pure array-style table (= only
+* indexed by numbers) or a pure dictionary-style table (= no numbering indices).
+* \param script The source code of the script that is executed
+* \param dictionary The #ghoul::Dictionary into which the values from the script are
+* added
+* \return Returns <code>true</code> if the loading succeeded; <code>false</code>
+* otherwise.
+* \throws #ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
+* keys of both type <code>string</code> and type <code>number</code>
+*/
+bool loadDictionaryFromString(const std::string& script, ghoul::Dictionary& dictionary);
 
 } // namespace lua
 } // namespace ghoul

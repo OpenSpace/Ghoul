@@ -267,6 +267,225 @@ TEST_F(LuaToDictionaryTest, LoadTest4Cfg) {
     glm::mat4x4 mat4x4Value;
     success = _d.getValue("m4x4", mat4x4Value);
     EXPECT_EQ(true, success);
+}
+
+TEST_F(LuaToDictionaryTest, LoadTest1CfgDirect) {
+    const std::string script = R"script(
+    return {
+        t = 1
+    }
+    )script";
+
+    _d.clear();
+    bool success = ghoul::lua::loadDictionaryFromString(script, _d);
+    ASSERT_EQ(true, success);
+    EXPECT_EQ(1, _d.size());
+
+    double value;
+    success = _d.getValue("t", value);
+    ASSERT_EQ(true, success);
+    EXPECT_EQ(1.0, value);
+}
+
+TEST_F(LuaToDictionaryTest, LoadTest2CfgDirect) {
+    const std::string script = R"script(
+        return{
+            t = 2,
+            s = { a = "a", b = "b", a1 = "1" }
+        }
+    )script";
+    // test2.cfg
+    //return{
+    //    t = 2,
+    //    s = { a = "a", b = "b", a1 = "1" }
+    //}
+
+    _d.clear();
+    bool success = ghoul::lua::loadDictionaryFromString(script, _d);
+    ASSERT_EQ(true, success);
+    EXPECT_EQ(2, _d.size());
+
+    double value;
+    success = _d.getValue("t", value);
+    ASSERT_EQ(true, success);
+    EXPECT_EQ(2.0, value);
+
+    ghoul::Dictionary dict;
+    success = _d.getValue("s", dict);
+    ASSERT_EQ(true, success);
+    ASSERT_EQ(3, dict.size());
+
+    std::string strValue;
+    success = dict.getValue("a", strValue);
+    ASSERT_EQ(true, success);
+    EXPECT_EQ("a", strValue);
+
+    success = dict.getValue("b", strValue);
+    ASSERT_EQ(true, success);
+    EXPECT_EQ("b", strValue);
+
+    success = dict.getValue("a1", strValue);
+    ASSERT_EQ(true, success);
+    EXPECT_EQ("1", strValue);
+}
+
+TEST_F(LuaToDictionaryTest, LoadTest3CfgDirect) {
+    const std::string script = R"script(
+        return {
+            s = {
+                ["1"] = "1",
+                ["2"] = "2",
+                ["3"] = {
+                    a = "3a",
+                    b = "3b"
+                }
+            },
+            tt = {
+                        ["1"] = 2
+                    }
+                    -- int = { 1, "1" = 2 }
+        }
+    )script";
+
+    _d.clear();
+    bool success = ghoul::lua::loadDictionaryFromString(script, _d);
+    ASSERT_EQ(true, success);
+    EXPECT_EQ(2, _d.size());
+
+    ghoul::Dictionary dict;
+    success = _d.getValue("s", dict);
+    ASSERT_EQ(true, success);
+    ASSERT_EQ(3, dict.size());
+    std::string strValue;
+    success = dict.getValue("1", strValue);
+    ASSERT_EQ(true, success);
+    EXPECT_EQ("1", strValue);
+    success = dict.getValue("2", strValue);
+    ASSERT_EQ(true, success);
+    EXPECT_EQ("2", strValue);
+
+    ghoul::Dictionary dict2;
+    success = dict.getValue("3", dict2);
+    ASSERT_EQ(true, success);
+    ASSERT_EQ(2, dict2.size());
+
+    success = dict2.getValue("a", strValue);
+    ASSERT_EQ(true, success);
+    EXPECT_EQ("3a", strValue);
+    success = dict2.getValue("b", strValue);
+    ASSERT_EQ(true, success);
+    EXPECT_EQ("3b", strValue);
+}
+
+TEST_F(LuaToDictionaryTest, LoadTest4CfgDirect) {
+    const std::string script = R"script(
+        return {
+            n2 = { 5, 6 },
+            n3 = { 5, 6, 7 },
+            n4 = { 5, 6, 7, 8 },
+            num2 = { ["1"] = 5, ["2"] = 6 },
+            num3 = { ["1"] = 5, ["2"] = 6, ["3"] = 7 },
+            num4 = { ["1"] = 5, ["2"] = 6, ["3"] = 7, ["4"] = 8 },
+            xy = { x = 5, y = 6 },
+            xyz = { x = 5, y = 6, z = 7 },
+            xyzw = { x = 5, y = 6, z = 7, w = 8 },
+            rg = { r = 5, g = 6 },
+            rgb = { r = 5, g = 6, b = 7 },
+            rgba = { r = 5, g = 6, b = 7, a = 8 },
+            st = { s = 5, t = 6 },
+            stp = { s = 5, t = 6, p = 7 },
+            stpq = { s = 5, t = 6, p = 7, q = 8 },
+            mix = { x = 1, g = 2, p = 3 },
+            m2x2 = { 5, 6, 9, 10 },
+            m2x3 = { 5, 6, 7, 9, 10, 11 },
+            m2x4 = { 5, 6, 7, 8, 9, 10, 11, 12 },
+            m3x2 = { 5, 6, 9, 10, 13, 14 },
+            m3x3 = { 5, 6, 7, 9, 10, 11, 13, 14, 15 },
+            m3x4 = { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            m4x2 = { 5, 6, 9, 10, 13, 14, 17, 18 },
+            m4x3 = { 5, 6, 7, 9, 10, 11, 13, 14, 15, 17, 18, 19 },
+            m4x4 = { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }
+        }
+    )script";
+
+    _d.clear();
+    bool success = ghoul::lua::loadDictionaryFromString(script, _d);
+    ASSERT_EQ(true, success);
+    ASSERT_EQ(25, _d.size());
+
+    glm::vec2 vec2Value;
+    success = _d.getValue("n2", vec2Value);
+    EXPECT_EQ(true, success);
+    success = _d.getValue("num2", vec2Value);
+    EXPECT_EQ(true, success);
+    success = _d.getValue("xy", vec2Value);
+    EXPECT_EQ(true, success);
+    success = _d.getValue("rg", vec2Value);
+    EXPECT_EQ(true, success);
+    success = _d.getValue("st", vec2Value);
+    EXPECT_EQ(true, success);
+
+    glm::vec3 vec3Value;
+    success = _d.getValue("n3", vec3Value);
+    EXPECT_EQ(true, success);
+    success = _d.getValue("num3", vec3Value);
+    EXPECT_EQ(true, success);
+    success = _d.getValue("xyz", vec3Value);
+    EXPECT_EQ(true, success);
+    success = _d.getValue("rgb", vec3Value);
+    EXPECT_EQ(true, success);
+    success = _d.getValue("stp", vec3Value);
+    EXPECT_EQ(true, success);
+    success = _d.getValue("mix", vec3Value);
+    EXPECT_EQ(true, success);
+
+    glm::vec4 vec4Value;
+    success = _d.getValue("n4", vec4Value);
+    EXPECT_EQ(true, success);
+    success = _d.getValue("num4", vec4Value);
+    EXPECT_EQ(true, success);
+    success = _d.getValue("xyzw", vec4Value);
+    EXPECT_EQ(true, success);
+    success = _d.getValue("rgba", vec4Value);
+    EXPECT_EQ(true, success);
+    success = _d.getValue("stpq", vec4Value);
+    EXPECT_EQ(true, success);
+
+    glm::mat2x2 mat2x2Value;
+    success = _d.getValue("m2x2", mat2x2Value);
+    EXPECT_EQ(true, success);
+
+    glm::mat2x3 mat2x3Value;
+    success = _d.getValue("m2x3", mat2x3Value);
+    EXPECT_EQ(true, success);
+
+    glm::mat2x4 mat2x4Value;
+    success = _d.getValue("m2x4", mat2x4Value);
+    EXPECT_EQ(true, success);
+
+    glm::mat3x2 mat3x2Value;
+    success = _d.getValue("m3x2", mat3x2Value);
+    EXPECT_EQ(true, success);
+
+    glm::mat3x3 mat3x3Value;
+    success = _d.getValue("m3x3", mat3x3Value);
+    EXPECT_EQ(true, success);
+
+    glm::mat3x4 mat3x4Value;
+    success = _d.getValue("m3x4", mat3x4Value);
+    EXPECT_EQ(true, success);
+
+    glm::mat4x2 mat4x2Value;
+    success = _d.getValue("m4x2", mat4x2Value);
+    EXPECT_EQ(true, success);
+
+    glm::mat4x3 mat4x3Value;
+    success = _d.getValue("m4x3", mat4x3Value);
+    EXPECT_EQ(true, success);
+
+    glm::mat4x4 mat4x4Value;
+    success = _d.getValue("m4x4", mat4x4Value);
+    EXPECT_EQ(true, success);
 
 
 

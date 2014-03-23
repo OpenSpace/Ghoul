@@ -39,7 +39,7 @@ using namespace ghoul::filesystem;
 using namespace ghoul::logging;
 
 int main(int argc, char** argv) {
-    LogManager::initialize(LogManager::LogLevel::Info);
+    LogManager::initialize(LogManager::LogLevel::None);
     LogMgr.addLog(new ConsoleLog);
 
     FileSystem::initialize();
