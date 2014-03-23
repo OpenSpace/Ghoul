@@ -226,7 +226,7 @@ bool FileSystem::fileExists(const File& path) const {
     const DWORD attributes = GetFileAttributes(path.path().c_str());
     if (attributes == INVALID_FILE_ATTRIBUTES) {
         const DWORD error = GetLastError();
-        if (error != ERROR_FILE_NOT_FOUND) {
+        if ((error != ERROR_FILE_NOT_FOUND) && (error != ERROR_PATH_NOT_FOUND)) {
             LPTSTR errorBuffer = nullptr;
             FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
                 FORMAT_MESSAGE_ALLOCATE_BUFFER |
@@ -263,7 +263,7 @@ bool FileSystem::directoryExists(const Directory& path) const {
     const DWORD attributes = GetFileAttributes(path.path().c_str());
     if (attributes == INVALID_FILE_ATTRIBUTES) {
         const DWORD error = GetLastError();
-        if (error != ERROR_FILE_NOT_FOUND) {
+        if ((error != ERROR_FILE_NOT_FOUND) && (error != ERROR_PATH_NOT_FOUND)) {
             LPTSTR errorBuffer = nullptr;
             FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
                 FORMAT_MESSAGE_ALLOCATE_BUFFER |
