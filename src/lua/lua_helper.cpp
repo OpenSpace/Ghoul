@@ -85,7 +85,7 @@ std::string luaTableToString(lua_State* state, bool& success) {
     return result.str();
 }
 
-void populateDictionary(lua_State* state, Dictionary& dict, bool& isPureArrayWithNumbers) {
+void populateDictionary(lua_State* state, Dictionary& dict) {
     static const int KEY = -2;
     static const int VAL = -1;
 
@@ -94,8 +94,6 @@ void populateDictionary(lua_State* state, Dictionary& dict, bool& isPureArrayWit
         Map = 3,        // 010
         Array = 5       // 101
     };
-
-    isPureArrayWithNumbers = true;
 
     TableType type = TableType::Undefined;
 
@@ -117,7 +115,6 @@ void populateDictionary(lua_State* state, Dictionary& dict, bool& isPureArrayWit
                      throw FormattingException(
                           "Dictionary can only contain a pure map or a pure array");
                 type = TableType::Map;
-                isPureArrayWithNumbers = false;
                 key = lua_tostring(state, KEY);
                 break;
             default:
@@ -129,30 +126,19 @@ void populateDictionary(lua_State* state, Dictionary& dict, bool& isPureArrayWit
         switch (lua_type(state, VAL)) {
             case LUA_TNUMBER: {
                 double value = lua_tonumber(state, VAL);
-                double intpart;
-                double floatpart = std::modf(value, &intpart);
-                if (floatpart == 0.0) {
-                    int int_value = static_cast<int>(value);
-                    dict.setValue(key, int_value);
-                } else 
-                    dict.setValue(key, value);
-                isPureArrayWithNumbers &= true;
+                dict.setValue(key, value);
             } break;
             case LUA_TBOOLEAN: {
                 bool value = (lua_toboolean(state, VAL) == 1);
                 dict.setValue(key, value);
-                isPureArrayWithNumbers &= true;
             } break;
             case LUA_TSTRING: {
                 std::string value = lua_tostring(state, VAL);
                 dict.setValue(key, value);
-                isPureArrayWithNumbers = false;
             } break;
             case LUA_TTABLE: {
-                isPureArrayWithNumbers = false;
                 Dictionary d;
-                bool pureArray;
-                populateDictionary(state, d, pureArray);
+                populateDictionary(state, d);
                 dict.setValue(key, d);
             } break;
             default:
@@ -164,10 +150,10 @@ void populateDictionary(lua_State* state, Dictionary& dict, bool& isPureArrayWit
     }
 }
 
-void populateDictionary(lua_State* state, Dictionary& dict) {
-    bool ignore;
-    populateDictionary(state, dict, ignore);
-}
+//void populateDictionary(lua_State* state, Dictionary& dict) {
+//    bool ignore;
+//    populateDictionary(state, dict, ignore);
+//}
 
 }
 
@@ -234,7 +220,7 @@ bool loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
     }
 
     LDEBUG("Loading dictionary script '" << filename << "'");
-    int status = luaL_loadfile(state, filename.c_str());
+    int status = luaL_loadfile(state, absPath(filename).c_str());
     if (status != LUA_OK) {
         LERROR("Error loading script: '" << lua_tostring(state, -1) << "'");
         return false;

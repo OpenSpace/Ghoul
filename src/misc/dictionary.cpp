@@ -316,8 +316,19 @@ DEF_SPEC_TEMPLATE_GLM(glm::dmat4x4, glm::make_mat4x4)
 
 #undef DEF_SPEC_TEMPLATE
 #undef DEF_SPEC_TEMPLATE_GLM
-    
-    
+
+template <>
+bool Dictionary::getValue<Dictionary>(const std::string& key, Dictionary& value) const {
+    if (&value == this) {
+        LERROR(
+              "The argument in the 'getValue' methods cannot be the same Dictionary as "
+              "the method is called on");
+        return false;
+    }
+    assert(&value != this);
+    return getValueHelper(key, value);
+}
+
 #ifdef WIN32
 #pragma warning ( default : 4800 )
 #endif

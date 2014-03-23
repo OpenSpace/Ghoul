@@ -225,6 +225,9 @@ DEF_EXT_TEMPLATES(glm::dmat4x2)
 DEF_EXT_TEMPLATES(glm::dmat4x3)
 DEF_EXT_TEMPLATES(glm::dmat4x4)
 
+extern template bool Dictionary::getValue<Dictionary>(const std::string& key,
+                                                      Dictionary& value) const;
+
 #undef DEF_EXT_TEMPLATES
 
 #endif

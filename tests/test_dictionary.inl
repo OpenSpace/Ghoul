@@ -327,6 +327,13 @@ TEST_F(DictionaryTest, EmptyTest) {
     EXPECT_EQ(0, _d->size());
 }
 
+TEST_F(DictionaryTest, ClearTest) {
+    _d->setValue("a", 1);
+    EXPECT_EQ(1, _d->size());
+    _d->clear();
+    EXPECT_EQ(0, _d->size());
+}
+
 TEST_F(DictionaryTest, InitializerLists) {
 	ghoul::Dictionary d = { { "a", 1 } };
 	ghoul::Dictionary d2 = { { "a", 1 }, { "b", 2 } };
