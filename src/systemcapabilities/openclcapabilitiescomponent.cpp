@@ -26,11 +26,9 @@
 #include "systemcapabilities/openclcapabilitiescomponent.h"
 
 #include <ghoul/opencl/ghoul_cl.h>
+#include <ghoul/opencl/ghoul_cl.hpp>
 #include <ghoul/opencl/device.h>
 #include <ghoul/opencl/platform.h>
-//#include <ghoul/opencl/cl.hpp>
-#include <CL/cl.hpp>
-
 
 #include <algorithm>
 #include <cassert>
@@ -91,11 +89,6 @@ std::string datatostring(cl_uint data) {
     return ss.str();
 }
 
-
-
-
-
-
 template<cl_device_id>
 std::string datatostring(cl_device_id data) {
     std::stringstream ss;
@@ -108,8 +101,6 @@ std::string datatostring(cl_platform_id data) {
     ss << data;
     return ss.str();
 }
-
-
 
 void OpenCLCapabilitiesComponent::detectCapabilities() {
     clearCapabilities();

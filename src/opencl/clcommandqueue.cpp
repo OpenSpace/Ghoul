@@ -23,104 +23,84 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "opencl/platform.h"
+#include <ghoul/opencl/clcommandqueue.h>
 
 #include <ghoul/opencl/ghoul_cl.hpp>
+#include <ghoul/opencl/platform.h>
+#include <ghoul/opencl/device.h>
+#include <ghoul/opencl/clkernel.h>
+#include <ghoul/opencl/clutil.h>
+#include <ghoul/opencl/clworksize.h>
+
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/filesystem/filesystem.h>
+
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <cassert>
+
+namespace {
+    std::string _loggerCat = "CLCommands";
+}
 
 namespace ghoul {
 namespace opencl {
 
-Platform::Platform(cl::Platform* platform): _platform(platform) {
-    clearInformation();
-}
-Platform::~Platform() {}
-
-bool Platform::isInitialized() const {
-    return _isInitialized;
-}
-
-void Platform::fetchInformation() {
-    if (isInitialized()) {
-        clearInformation();
+CLCommandQueue::CLCommandQueue(cl_context context, cl_device_id device): _commands(0) {
+    int err = 0;
+    _commands = clCreateCommandQueue(context, device, 0, &err);
+    
+    if (err != 0) {
+        LFATAL("Could not create program queue: " << getErrorString(err));
+        _commands = 0;
     }
-    std::string tmp_string;
-
-    if(_platform->getInfo(CL_PLATFORM_PROFILE, &tmp_string) == CL_SUCCESS)
-        _profile = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_VERSION, &tmp_string) == CL_SUCCESS)
-        _version = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_NAME, &tmp_string) == CL_SUCCESS)
-        _name = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_VENDOR, &tmp_string) == CL_SUCCESS)
-        _vendor = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_EXTENSIONS, &tmp_string) == CL_SUCCESS)
-        _extensions = tmp_string;
-
-    _isInitialized = true;
-}
-void Platform::clearInformation() {
-    _profile = "";
-    _version = "";
-    _name = "";
-    _vendor = "";
-    _extensions = "";
-    
-    _isInitialized = false;
 }
 
-//
-// operators
-//
-Platform& Platform::operator=(const Platform& rhs) {
-    if (this != &rhs) // protect against invalid self-assignment
-    {
-        *_platform = *rhs._platform;
-        
-        // Ugly version that refetches all information
-        clearInformation();
-        if(rhs.isInitialized())
-            fetchInformation();
+CLCommandQueue::~CLCommandQueue() {
+    clReleaseCommandQueue(_commands);
+}
+
+void CLCommandQueue::enqueueKernelBlocking(const CLKernel& kernel, const CLWorkSize& ws)  {
+    int err = 0;
+    err = clEnqueueNDRangeKernel(_commands, kernel(), ws.dimensions(), NULL, ws.global(), ws.local(), 0, NULL, NULL);
+    if (err != 0) {
+        LFATAL("Could not run kernel: " << getErrorString(err));
     }
-    return *this;
 }
 
-Platform& Platform::operator=(const cl::Platform& rhs) {
-    *_platform = rhs;
-    
-    // Ugly version that refetches all information
-    clearInformation();
-    if(isInitialized())
-        fetchInformation();
-    
-    return *this;
+void CLCommandQueue::enqueueReadBufferBlocking(cl_mem buffer, size_t size, void* data) {
+    int err = 0;
+    err = clEnqueueReadBuffer( _commands, buffer, CL_TRUE, 0, size, data, 0, NULL, NULL );
+    if (err != 0) {
+        LFATAL("Could not read buffer: " << getErrorString(err));
+    }
 }
 
-cl_platform_id Platform::operator()() const {
-    return _platform->operator()();
+cl_event CLCommandQueue::enqueueKernelNonBlocking(const CLKernel& kernel, const CLWorkSize& ws)  {
+    int err = 0;
+    cl_event event = 0;
+    err = clEnqueueNDRangeKernel(_commands, kernel(), ws.dimensions(), NULL, ws.global(), ws.local(), 0, NULL, &event);
+    if (err != 0) {
+        LFATAL("Could not run kernel: " << getErrorString(err));
+    }
+    return event;
 }
 
-cl_platform_id& Platform::operator()() {
-    return _platform->operator()();
+cl_event CLCommandQueue::enqueueReadBufferNonBlocking(cl_mem buffer, size_t size, void* data) {
+    int err = 0;
+    cl_event event = 0;
+    err = clEnqueueReadBuffer( _commands, buffer, CL_FALSE, 0, size, data, 0, NULL, &event );
+    if (err != 0) {
+        LFATAL("Could not read buffer: " << getErrorString(err));
+    }
+    return event;
 }
 
-//
-// GET
-//
-std::string Platform::profile() const {
-    return _profile;
+void CLCommandQueue::finish() {
+    clFinish(_commands);
 }
-std::string Platform::version() const {
-    return _version;
-}
-std::string Platform::name() const {
-    return _name;
-}
-std::string Platform::vendor() const {
-    return _vendor;
-}
-std::string Platform::extensions() const {
-    return _extensions;
-}
+
 
 }
 }

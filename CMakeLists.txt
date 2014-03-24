@@ -123,6 +123,7 @@ endif ()
 include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
 # include_directories(${GHOUL_ROOT_DIR}/ext/boost)
 find_package(Boost COMPONENTS timer system REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
 set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${Boost_LIBRARIES})
 
 if (APPLE)

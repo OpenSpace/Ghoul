@@ -23,21 +23,11 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOULCL_H__
-#define __GHOULCL_H__
+#ifndef __CL_UTIL_H__
+#define __CL_UTIL_H__
 
-#include <ghoul/opengl/ghoul_gl.h>
+#include <string>
 
-#if defined(__APPLE__) || defined(__MACOSX)
-    #include <OpenCL/opencl.h>
-    #include <libkern/OSAtomic.h>
-#else
-    #include <CL/cl.h>
-#endif // !__APPLE__
-
-namespace cl {
-    class Platform;
-    class Device;
-}
+std::string getErrorString(int error);
 
 #endif

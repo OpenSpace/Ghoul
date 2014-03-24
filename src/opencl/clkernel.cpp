@@ -23,103 +23,44 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "opencl/platform.h"
+#include <ghoul/opencl/clkernel.h>
 
-#include <ghoul/opencl/ghoul_cl.hpp>
+#include <ghoul/opencl/clprogram.h>
+
+#include <cassert>
 
 namespace ghoul {
 namespace opencl {
-
-Platform::Platform(cl::Platform* platform): _platform(platform) {
-    clearInformation();
-}
-Platform::~Platform() {}
-
-bool Platform::isInitialized() const {
-    return _isInitialized;
-}
-
-void Platform::fetchInformation() {
-    if (isInitialized()) {
-        clearInformation();
-    }
-    std::string tmp_string;
-
-    if(_platform->getInfo(CL_PLATFORM_PROFILE, &tmp_string) == CL_SUCCESS)
-        _profile = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_VERSION, &tmp_string) == CL_SUCCESS)
-        _version = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_NAME, &tmp_string) == CL_SUCCESS)
-        _name = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_VENDOR, &tmp_string) == CL_SUCCESS)
-        _vendor = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_EXTENSIONS, &tmp_string) == CL_SUCCESS)
-        _extensions = tmp_string;
-
-    _isInitialized = true;
-}
-void Platform::clearInformation() {
-    _profile = "";
-    _version = "";
-    _name = "";
-    _vendor = "";
-    _extensions = "";
     
-    _isInitialized = false;
+CLKernel::CLKernel(CLProgram* program, const std::string& name): _kernel(0) {
+    
+    int err = 0;
+    _kernel = clCreateKernel(program->operator()(), name.c_str(), &err);
+    
 }
 
-//
-// operators
-//
-Platform& Platform::operator=(const Platform& rhs) {
-    if (this != &rhs) // protect against invalid self-assignment
-    {
-        *_platform = *rhs._platform;
-        
-        // Ugly version that refetches all information
-        clearInformation();
-        if(rhs.isInitialized())
-            fetchInformation();
+CLKernel::~CLKernel() {}
+
+bool CLKernel::isValidKernel() const {
+    return _kernel != 0;
+}
+
+int CLKernel::setArgument(unsigned int index, cl_mem* input) {
+    assert(isValidKernel());
+    return clSetKernelArg(_kernel, index, sizeof(cl_mem), input);
+}
+
+CLKernel& CLKernel::operator=(const CLKernel& rhs) {
+    if (this != &rhs) {
+        _kernel = rhs._kernel;
     }
     return *this;
 }
-
-Platform& Platform::operator=(const cl::Platform& rhs) {
-    *_platform = rhs;
-    
-    // Ugly version that refetches all information
-    clearInformation();
-    if(isInitialized())
-        fetchInformation();
-    
-    return *this;
+cl_kernel CLKernel::operator()() const {
+    return _kernel;
 }
-
-cl_platform_id Platform::operator()() const {
-    return _platform->operator()();
-}
-
-cl_platform_id& Platform::operator()() {
-    return _platform->operator()();
-}
-
-//
-// GET
-//
-std::string Platform::profile() const {
-    return _profile;
-}
-std::string Platform::version() const {
-    return _version;
-}
-std::string Platform::name() const {
-    return _name;
-}
-std::string Platform::vendor() const {
-    return _vendor;
-}
-std::string Platform::extensions() const {
-    return _extensions;
+cl_kernel& CLKernel::operator()() {
+    return _kernel;
 }
 
 }
