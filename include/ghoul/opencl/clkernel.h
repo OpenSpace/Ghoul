@@ -37,12 +37,17 @@ class CLProgram;
 
 class CLKernel {
 public:
+    CLKernel();
     CLKernel(CLProgram* program, const std::string& name);
     ~CLKernel();
     
+    bool initialize(CLProgram* program, const std::string& name);
     bool isValidKernel() const;
     
     int setArgument(unsigned int index, cl_mem* input);
+    
+    template<typename T>
+    int setArgument(unsigned int index, T input);
     
     CLKernel& operator=(const CLKernel& rhs);
     cl_kernel operator()() const;
@@ -55,5 +60,11 @@ private:
 }
     
 } // namespace ghoul
+
+template<typename T>
+int ghoul::opencl::CLKernel::setArgument(unsigned int index, T input) {
+    static_assert(std::is_fundamental<T>::value, "T must be a fundemental type");
+    return clSetKernelArg(_kernel, index, sizeof(T), &input);
+}
 
 #endif

@@ -47,14 +47,23 @@ namespace {
 namespace ghoul {
 namespace opencl {
 
+CLCommandQueue::CLCommandQueue(): _commands(0) {}
+
 CLCommandQueue::CLCommandQueue(cl_context context, cl_device_id device): _commands(0) {
+    if( ! initialize(context, device))
+        LWARNING("Command queue not initialized");
+}
+
+bool CLCommandQueue::initialize(cl_context context, cl_device_id device) {
     int err = 0;
     _commands = clCreateCommandQueue(context, device, 0, &err);
     
     if (err != 0) {
         LFATAL("Could not create program queue: " << getErrorString(err));
         _commands = 0;
+        return false;
     }
+    return true;
 }
 
 CLCommandQueue::~CLCommandQueue() {

@@ -26,13 +26,15 @@
 #ifndef __CLCONTEXT_H__
 #define __CLCONTEXT_H__
 
-#include <ghoul/opencl/device.h>
 #include <ghoul/opencl/ghoul_cl.h>
+#include <ghoul/opencl/device.h>
+#include <ghoul/opengl/texture.h>
 
 namespace ghoul {
 namespace opencl {
-
+    
 class CLCommandQueue;
+class CLProgram;
 
 class CLContext {
 public:
@@ -40,14 +42,18 @@ public:
     ~CLContext();
     
     bool createContextFromDevice(Device* device);
-    bool createContextGLContext();
+    bool createContextFromGLContext();
     
     bool isValidContext() const;
     
     CLCommandQueue createCommandQueue();
+    CLProgram createProgram(const std::string& filename);
+    
     cl_mem createBuffer(cl_mem_flags memFlags, size_t size, void *data = NULL);
+    cl_mem createTextureFromGLTexture(cl_mem_flags memFlags, ghoul::opengl::Texture& texture);
     
     CLContext& operator=(const CLContext& rhs);
+    operator cl_context() const;
     cl_context operator()() const;
     cl_context& operator()();
     

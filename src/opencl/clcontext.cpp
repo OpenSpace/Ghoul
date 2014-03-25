@@ -34,6 +34,7 @@
 #include <ghoul/opencl/platform.h>
 #include <ghoul/opencl/device.h>
 #include <ghoul/opencl/clcommandqueue.h>
+#include <ghoul/opencl/clprogram.h>
 #include <ghoul/opencl/clutil.h>
 
 #include <ghoul/logging/logmanager.h>
@@ -47,7 +48,11 @@ namespace ghoul {
 namespace opencl {
     
 CLContext::CLContext(): _context(0), _platform(0), _device(0) {}
-CLContext::~CLContext() {}
+CLContext::~CLContext() {
+    if (_context != 0) {
+        clReleaseContext(_context);
+    }
+}
     
 bool CLContext::createContextFromDevice(Device* device) {
     
@@ -64,7 +69,7 @@ bool CLContext::createContextFromDevice(Device* device) {
     return false;
 }
 
-bool CLContext::createContextGLContext() {
+bool CLContext::createContextFromGLContext() {
     
     LDEBUG("From start " << _platform << " " << _device);
     std::vector<cl::Platform> platforms;
@@ -144,11 +149,24 @@ CLCommandQueue CLContext::createCommandQueue() {
     return CLCommandQueue(_context,_device);
 }
 
+CLProgram CLContext::createProgram(const std::string& filename) {
+    return CLProgram(this,filename);
+}
+
 cl_mem CLContext::createBuffer(cl_mem_flags memFlags, size_t size, void *data) {
     int err = 0;
     cl_mem mem = clCreateBuffer(_context, memFlags, size, data, &err);
     if (err != 0) {
         LERROR("Could not create buffer: " << getErrorString(err));
+    }
+    return mem;
+}
+
+cl_mem CLContext::createTextureFromGLTexture(cl_mem_flags memFlags, ghoul::opengl::Texture& texture) {
+    int err = 0;
+    cl_mem mem = clCreateFromGLTexture(_context, memFlags, texture.type(), 0, texture, &err);
+    if (err != 0) {
+        LERROR("Could not create texture: " << getErrorString(err));
     }
     return mem;
 }
@@ -160,6 +178,10 @@ CLContext& CLContext::operator=(const CLContext& rhs) {
         _platform = rhs._platform;
     }
     return *this;
+}
+
+CLContext::operator cl_context() const {
+    return _context;
 }
     
 cl_context CLContext::operator()() const {

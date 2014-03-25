@@ -37,8 +37,11 @@ class CLWorkSize;
 class CLCommandQueue {
 
 public:
+    CLCommandQueue();
 	CLCommandQueue(cl_context context, cl_device_id device);
     ~CLCommandQueue();
+    
+    bool initialize(cl_context context, cl_device_id device);
     
     // Blocking calls
     void enqueueKernelBlocking(const CLKernel& kernel, const CLWorkSize& ws);

@@ -28,9 +28,14 @@
 #include <ghoul/opencl/clprogram.h>
 
 #include <cassert>
+#include <type_traits>
 
 namespace ghoul {
 namespace opencl {
+
+CLKernel::CLKernel(): _kernel(0) {
+    
+}
     
 CLKernel::CLKernel(CLProgram* program, const std::string& name): _kernel(0) {
     
@@ -41,6 +46,13 @@ CLKernel::CLKernel(CLProgram* program, const std::string& name): _kernel(0) {
 
 CLKernel::~CLKernel() {}
 
+bool CLKernel::initialize(CLProgram* program, const std::string& name) {
+    assert( ! isValidKernel());
+    int err = 0;
+    _kernel = clCreateKernel(program->operator()(), name.c_str(), &err);
+    return true;
+}
+
 bool CLKernel::isValidKernel() const {
     return _kernel != 0;
 }
@@ -49,6 +61,8 @@ int CLKernel::setArgument(unsigned int index, cl_mem* input) {
     assert(isValidKernel());
     return clSetKernelArg(_kernel, index, sizeof(cl_mem), input);
 }
+
+
 
 CLKernel& CLKernel::operator=(const CLKernel& rhs) {
     if (this != &rhs) {
