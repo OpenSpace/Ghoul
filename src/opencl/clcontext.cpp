@@ -25,7 +25,8 @@
 
 #include <ghoul/opencl/clcontext.h>
 
-
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/filesystem/filesystem.h>
 #include <sgct.h>
 
 #include <ghoul/opengl/ghoul_gl.h>
@@ -75,7 +76,8 @@ bool CLContext::createContextFromGLContext() {
     std::vector<cl::Platform> platforms;
     if(cl::Platform::get(&platforms) != CL_SUCCESS)
         return false;
-    
+   
+	std::string vendor("NVIDIA");
     for (auto clplatform: platforms) {
         ghoul::opencl::Platform platform(&clplatform);
         platform.fetchInformation();
@@ -87,7 +89,7 @@ bool CLContext::createContextFromGLContext() {
             device.fetchInformation();
             
             
-            if (device.vendor() == "NVIDIA") {
+            if (device.vendor().compare(0,vendor.length(), vendor) == 0) {
                 _platform = platform.operator()();
                 _device = device.operator()();
                 LDEBUG("Choosing " << _platform << " " << _device);
