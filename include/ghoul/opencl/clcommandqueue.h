@@ -28,6 +28,8 @@
 
 #include <ghoul/opencl/ghoul_cl.h>
 
+#include <memory>
+
 namespace ghoul {
 namespace opencl {
 
@@ -54,9 +56,12 @@ public:
     // wait for cl calls to finish
     void finish();
     
+    operator cl_command_queue();
+    
+    
     
 private:
-    cl_command_queue _commands;
+    std::shared_ptr<cl_command_queue> _commands;
 
 };
 

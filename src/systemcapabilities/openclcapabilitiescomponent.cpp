@@ -142,10 +142,13 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
     
     if (verbosity >= Verbosity::Default) {
         for (size_t i = 0; i < _data.size(); ++i) {
-            ss <<"Platform[" << i << "] Name";
+            ss <<"Platform[" << i << "] ";
             ghoul::opencl::Platform* p  = _data.at(i).platform;
             
-            result.push_back(std::make_pair(ss.str() , p->name()));
+            result.push_back(std::make_pair(ss.str() + "Name" , p->name()));
+            result.push_back(std::make_pair(ss.str() + "Vendor", p->vendor()));
+            result.push_back(std::make_pair(ss.str() + "Profile", p->profile()));
+            result.push_back(std::make_pair(ss.str() + "Version", p->version()));
             for (size_t j = 0; j < _data.at(i).devices.size(); ++j) {
                 ghoul::opencl::Device* d  = _data.at(i).devices.at(j);
                 ss.str("");

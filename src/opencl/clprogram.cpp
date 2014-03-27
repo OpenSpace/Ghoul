@@ -46,19 +46,6 @@ namespace {
 namespace ghoul {
 namespace opencl {
 
-const char *KernelSource = "\n" \
-"__kernel void hello(              \n" \
-"   __global char* a,          \n" \
-"   __global char* b,          \n" \
-"   __global char* c,          \n" \
-"   const unsigned int count)  \n" \
-"{                             \n" \
-"   int i = get_global_id(0);  \n" \
-"   if(i < count)              \n" \
-"       c[i] = a[i] + b[i];   \n" \
-"}                             \n" \
-"\n";
-
 CLProgram::CLProgram(CLContext* context, const std::string& filename): _program(0) {
     
     int err = 0;
@@ -67,11 +54,8 @@ CLProgram::CLProgram(CLContext* context, const std::string& filename): _program(
     if (ghoul::filesystem::FileSystem::ref().fileExists(filename)) {
         
         std::string contents = readFile(filename);
-        //LDEBUG("contents: " << contents);
         const char* constContents = contents.c_str();
         _program = clCreateProgramWithSource(_context->operator()(), 1, (const char **) &constContents, NULL, &err);
-        //cl_context c = _context->operator()();
-        //_program = clCreateProgramWithSource(c, 1, &KernelSource, NULL, &err);
     }
     
     if (err != 0) {

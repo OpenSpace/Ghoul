@@ -29,6 +29,7 @@
 #include <ghoul/opencl/ghoul_cl.h>
 #include <ghoul/opencl/device.h>
 #include <ghoul/opengl/texture.h>
+#include <memory> 
 
 namespace ghoul {
 namespace opencl {
@@ -46,6 +47,9 @@ public:
     
     bool isValidContext() const;
     
+    cl_platform_id platform() const;
+    cl_device_id device() const;
+    
     CLCommandQueue createCommandQueue();
     CLProgram createProgram(const std::string& filename);
     
@@ -58,7 +62,8 @@ public:
     cl_context& operator()();
     
 private:
-    cl_context _context;
+    std::shared_ptr<cl_context> _context;
+    //cl_context _context;
     cl_platform_id _platform;
     cl_device_id _device;
     

@@ -31,7 +31,6 @@
     #undef __gl_h_
     #include <GL/glew.h>
     #include <OpenGL/gl3.h>
-//    #include <OpenGL/gl.h>
     #include <OpenGL/glu.h>
 #else
     #include <GL/glew.h>

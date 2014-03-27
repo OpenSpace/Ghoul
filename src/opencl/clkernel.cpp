@@ -29,7 +29,11 @@
 
 #include <cassert>
 #include <type_traits>
+#include <ghoul/logging/logmanager.h>
 
+namespace {
+    std::string _loggerCat = "CLKernel";
+}
 namespace ghoul {
 namespace opencl {
 
@@ -39,17 +43,21 @@ CLKernel::CLKernel(): _kernel(0) {
     
 CLKernel::CLKernel(CLProgram* program, const std::string& name): _kernel(0) {
     
-    int err = 0;
-    _kernel = clCreateKernel(program->operator()(), name.c_str(), &err);
+    if(! initialize(program, name))
+        LERROR("Could not create CLKernel '"<< name << "'");
     
 }
 
-CLKernel::~CLKernel() {}
+CLKernel::~CLKernel() {
+    if (_kernel != 0 && _kernel.unique()) {
+        clReleaseKernel(*_kernel);
+    }
+}
 
 bool CLKernel::initialize(CLProgram* program, const std::string& name) {
     assert( ! isValidKernel());
     int err = 0;
-    _kernel = clCreateKernel(program->operator()(), name.c_str(), &err);
+    _kernel = std::make_shared<cl_kernel>(clCreateKernel(program->operator()(), name.c_str(), &err));
     return true;
 }
 
@@ -59,22 +67,22 @@ bool CLKernel::isValidKernel() const {
 
 int CLKernel::setArgument(unsigned int index, cl_mem* input) {
     assert(isValidKernel());
-    return clSetKernelArg(_kernel, index, sizeof(cl_mem), input);
+    return clSetKernelArg(*_kernel, index, sizeof(cl_mem), input);
 }
 
 
 
 CLKernel& CLKernel::operator=(const CLKernel& rhs) {
     if (this != &rhs) {
-        _kernel = rhs._kernel;
+        _kernel = {rhs._kernel};
     }
     return *this;
 }
 cl_kernel CLKernel::operator()() const {
-    return _kernel;
+    return *_kernel;
 }
 cl_kernel& CLKernel::operator()() {
-    return _kernel;
+    return *_kernel;
 }
 
 }

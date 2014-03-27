@@ -56,7 +56,7 @@ CLCommandQueue::CLCommandQueue(cl_context context, cl_device_id device): _comman
 
 bool CLCommandQueue::initialize(cl_context context, cl_device_id device) {
     int err = 0;
-    _commands = clCreateCommandQueue(context, device, 0, &err);
+    _commands = std::make_shared<cl_command_queue>(clCreateCommandQueue(context, device, 0, &err));
     
     if (err != 0) {
         LFATAL("Could not create program queue: " << getErrorString(err));
@@ -67,12 +67,14 @@ bool CLCommandQueue::initialize(cl_context context, cl_device_id device) {
 }
 
 CLCommandQueue::~CLCommandQueue() {
-    clReleaseCommandQueue(_commands);
+    if (_commands != 0 && _commands.unique()) {
+        clReleaseCommandQueue(*_commands);
+    }
 }
 
 void CLCommandQueue::enqueueKernelBlocking(const CLKernel& kernel, const CLWorkSize& ws)  {
     int err = 0;
-    err = clEnqueueNDRangeKernel(_commands, kernel(), ws.dimensions(), NULL, ws.global(), ws.local(), 0, NULL, NULL);
+    err = clEnqueueNDRangeKernel(*_commands, kernel(), ws.dimensions(), NULL, ws.global(), ws.local(), 0, NULL, NULL);
     if (err != 0) {
         LFATAL("Could not run kernel: " << getErrorString(err));
     }
@@ -80,7 +82,7 @@ void CLCommandQueue::enqueueKernelBlocking(const CLKernel& kernel, const CLWorkS
 
 void CLCommandQueue::enqueueReadBufferBlocking(cl_mem buffer, size_t size, void* data) {
     int err = 0;
-    err = clEnqueueReadBuffer( _commands, buffer, CL_TRUE, 0, size, data, 0, NULL, NULL );
+    err = clEnqueueReadBuffer(*_commands, buffer, CL_TRUE, 0, size, data, 0, NULL, NULL );
     if (err != 0) {
         LFATAL("Could not read buffer: " << getErrorString(err));
     }
@@ -89,7 +91,7 @@ void CLCommandQueue::enqueueReadBufferBlocking(cl_mem buffer, size_t size, void*
 cl_event CLCommandQueue::enqueueKernelNonBlocking(const CLKernel& kernel, const CLWorkSize& ws)  {
     int err = 0;
     cl_event event = 0;
-    err = clEnqueueNDRangeKernel(_commands, kernel(), ws.dimensions(), NULL, ws.global(), ws.local(), 0, NULL, &event);
+    err = clEnqueueNDRangeKernel(*_commands, kernel(), ws.dimensions(), NULL, ws.global(), ws.local(), 0, NULL, &event);
     if (err != 0) {
         LFATAL("Could not run kernel: " << getErrorString(err));
     }
@@ -99,7 +101,7 @@ cl_event CLCommandQueue::enqueueKernelNonBlocking(const CLKernel& kernel, const 
 cl_event CLCommandQueue::enqueueReadBufferNonBlocking(cl_mem buffer, size_t size, void* data) {
     int err = 0;
     cl_event event = 0;
-    err = clEnqueueReadBuffer( _commands, buffer, CL_FALSE, 0, size, data, 0, NULL, &event );
+    err = clEnqueueReadBuffer(*_commands, buffer, CL_FALSE, 0, size, data, 0, NULL, &event );
     if (err != 0) {
         LFATAL("Could not read buffer: " << getErrorString(err));
     }
@@ -107,7 +109,11 @@ cl_event CLCommandQueue::enqueueReadBufferNonBlocking(cl_mem buffer, size_t size
 }
 
 void CLCommandQueue::finish() {
-    clFinish(_commands);
+    clFinish(*_commands);
+}
+
+CLCommandQueue::operator cl_command_queue() {
+    return *_commands;
 }
 
 

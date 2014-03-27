@@ -29,6 +29,7 @@
 #include <ghoul/opencl/ghoul_cl.h>
 
 #include <string>
+#include <memory>
 
 namespace ghoul {
 namespace opencl {
@@ -55,7 +56,7 @@ public:
     
     
 private:
-    cl_kernel _kernel;
+    std::shared_ptr<cl_kernel> _kernel;
 }; // class CLKernel
 }
     
