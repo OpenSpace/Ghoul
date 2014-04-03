@@ -129,7 +129,7 @@ bool isConvertible(const Dictionary& dict) {
     const std::vector<std::string>& keys = dict.keys();
     for (size_t i = 0; i < StorageTypeConverter<TargetType>::size; ++i) {
         const std::string& key = keys[i];
-        const bool correctType = dict.hasValue<StorageTypeConverter<TargetType>::type>(
+        const bool correctType = dict.hasValue<typename StorageTypeConverter<TargetType>::type>(
                                        key) || dict.hasValue<TargetType>(key);
         if (!correctType)
             return false;
