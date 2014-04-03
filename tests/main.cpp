@@ -38,19 +38,28 @@ using namespace ghoul::cmdparser;
 using namespace ghoul::filesystem;
 using namespace ghoul::logging;
 
+#ifndef GHOUL_ROOT_DIR
+#define GHOUL_ROOT_DIR "../../../ext/ghoul"
+#endif
+
 int main(int argc, char** argv) {
     LogManager::initialize(LogManager::LogLevel::None);
     LogMgr.addLog(new ConsoleLog);
 
     FileSystem::initialize();
+    
+    const std::string root = GHOUL_ROOT_DIR;
+    const std::string testdir = root + "/tests";
+    const std::string scriptdir = root + "/scripts";
 
-    const bool extDir = FileSys.directoryExists("../../../ext/ghoul/tests");
+    const bool extDir = FileSys.directoryExists(testdir);
     if (extDir) {
-        FileSys.registerPathToken("${SCRIPTS_DIR}", "../../../ext/ghoul/scripts");
-        FileSys.registerPathToken("${TEST_DIR}", "../../../ext/ghoul/tests");
+        FileSys.registerPathToken("${SCRIPTS_DIR}", scriptdir);
+        FileSys.registerPathToken("${TEST_DIR}", testdir);
     }
     else {
         LFATALC("main", "Fix me");
+        return 0;
     }
 
     testing::InitGoogleTest(&argc, argv);

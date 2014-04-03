@@ -25,6 +25,7 @@
 cmake_minimum_required(VERSION 2.8.0)
 project(Ghoul)
 
+
 #SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix, usually d on windows")
 #SET(CMAKE_RELEASE_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
 #SET(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "add a postfix, usually empty on windows")
@@ -63,6 +64,8 @@ endif (POLICY CMP0011)
 if (NOT GHOUL_ROOT_DIR)
     set(GHOUL_ROOT_DIR ${PROJECT_SOURCE_DIR})
 endif ()
+
+add_definitions(-DGHOUL_ROOT_DIR="${GHOUL_ROOT_DIR}")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/ext)
 
