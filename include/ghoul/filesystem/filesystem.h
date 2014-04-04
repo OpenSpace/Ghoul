@@ -107,6 +107,12 @@ public:
     Directory currentDirectory() const;
     
     /**
+     * Returns current users home directory
+     * \return The current users home directory
+     */
+    Directory homeDirectory() const;
+    
+    /**
      * Changes the current working directory of this process. Please note that this will
      * have an effect on all relative paths which are used henceforth.
      * \param directory The path that will be used as the new working directory

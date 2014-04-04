@@ -88,8 +88,6 @@ bool CLContext::createContextFromGLContext() {
     std::vector<cl::Platform> platforms;
     if(cl::Platform::get(&platforms) != CL_SUCCESS)
         return false;
-    
-    //cl::Platform p = cl::getPla
    
     std::vector<cl::Device> allDevices;
 	std::string vendor("NVIDIA");
@@ -119,6 +117,8 @@ bool CLContext::createContextFromGLContext() {
         LFATAL("Could not find suitable devices");
         return false;
     }
+    
+    int err = 0;
 
 // Windows
 #ifdef __WIN32__
@@ -128,6 +128,7 @@ bool CLContext::createContextFromGLContext() {
         CL_CONTEXT_PLATFORM, (cl_context_properties)_platform,
         0
     };
+    _context = std::make_shared<cl_context>(clCreateContext(contextProperties, 1, &_device, NULL, NULL, &err));
     
 // OS X
 #elif __APPLE__
@@ -137,6 +138,7 @@ bool CLContext::createContextFromGLContext() {
         CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)kCGLShareGroup,
         0
     };
+    _context = std::make_shared<cl_context>(clCreateContext(contextProperties, 0, 0, NULL, NULL, &err));
     
 // Linux
 #else
@@ -146,13 +148,9 @@ bool CLContext::createContextFromGLContext() {
         CL_CONTEXT_PLATFORM, (cl_context_properties)_platform,
         0
     };
-#endif
-
-    int err = 0;
-    //cl::Context cnt(CL_DEVICE_TYPE_GPU, contextProperties);
-    
-    
     _context = std::make_shared<cl_context>(clCreateContext(contextProperties, 1, &_device, NULL, NULL, &err));
+    
+#endif
 
     if (err == CL_SUCCESS) {
         LDEBUG("Successfully created CL context from GL context");
