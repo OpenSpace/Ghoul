@@ -24,184 +24,301 @@
  ****************************************************************************************/
 
 #include "misc/dictionary.h"
-#include <fstream>
-#include <iostream>
+
+#include <glm/gtc/type_ptr.hpp>
+
+#include <algorithm>
+#include <array>
 
 using std::string;
 
+/**
+ * The reason for the unified storage space is the easy conversion between similar types.
+ * The Dictionary should not be used for high-performance code anyway, so the additional
+ * storage requirement is a valid trade-off.
+ */
+
 namespace {
-	const std::string _loggerCat = "Dictionary";
+const std::string _loggerCat = "Dictionary";
+
+typedef long long IntegralType;
+typedef unsigned long long UnsignedIntegralType;
+typedef double FloatingType;
 }
 
 namespace ghoul {
 
-namespace dictionaryhelper {
-    std::string getValueAsString(Dictionary* D, std::string key);
-    std::string lua_serializer(Dictionary* D, const std::string indentation = "");
-} // namespace helper
+#ifdef WIN32
+#pragma warning ( disable : 4800 )
+#endif
     
-Dictionary::Dictionary() {}
-
-Dictionary::Dictionary(const std::initializer_list<std::pair<string, boost::any>>& l) {
-	for (const std::pair<string, boost::any>& p : l)
-		(*this)[p.first] = p.second;
+    template <typename SOURCE, typename TARGET, size_t SIZE>
+    std::array<TARGET, SIZE> createArray(const SOURCE* const src) {
+        std::array<TARGET, SIZE> v;
+        for (size_t i = 0; i < SIZE; ++i)
+            v[i] = static_cast<TARGET>(src[i]);
+        return v;
+    }
+    
+#define DEF_SPEC_TEMPLATE(TYPE, STORAGETYPE)                                             \
+    template <>                                                                          \
+    bool Dictionary::setValue<TYPE>(std::string key, TYPE value,                         \
+                                    bool createIntermediate) {                           \
+        return setValue(std::move(key), STORAGETYPE(value), createIntermediate);         \
+    }                                                                                    \
+    template <>                                                                          \
+    bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) const {         \
+        STORAGETYPE v;                                                                   \
+        const bool success = getValue(key, v);                                           \
+        value = static_cast<TYPE>(v);                                                    \
+        return success;                                                                  \
+    }                                                                                    \
+    template <>                                                                          \
+    bool Dictionary::hasValue<TYPE>(const std::string& key) const {                      \
+        return hasValue<STORAGETYPE>(key);                                               \
 }
     
-std::string Dictionary::serializeToLuaString(){
-    return dictionaryhelper::lua_serializer(this, "");
+#define DEF_SPEC_TEMPLATE_GLM(TYPE, STORAGETYPE, SIZE, CREATE)                           \
+    template <>                                                                          \
+    bool Dictionary::setValue<TYPE>(std::string key, TYPE value,                         \
+                                    bool createIntermediate) {                           \
+        auto v                                                                           \
+              = createArray<TYPE::value_type, STORAGETYPE, SIZE>(glm::value_ptr(value)); \
+        return setValue(std::move(key), std::move(v), createIntermediate);               \
+    }                                                                                    \
+    template <>                                                                          \
+    bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) const {         \
+        std::array<STORAGETYPE, SIZE> v;                                                 \
+        const bool success = getValue(key, v);                                           \
+ value = CREATE(v.data());                                                               \
+        return success;                                                                  \
+    }                                                                                    \
+    template <>                                                                          \
+    bool Dictionary::hasValue<TYPE>(const std::string& key) const {                      \
+        return hasValue<std::array<STORAGETYPE, SIZE>>(key);                             \
+}
+    
+    DEF_SPEC_TEMPLATE(bool, IntegralType)
+    DEF_SPEC_TEMPLATE(char, IntegralType)
+    DEF_SPEC_TEMPLATE(signed char, IntegralType)
+    DEF_SPEC_TEMPLATE(unsigned char, UnsignedIntegralType)
+    DEF_SPEC_TEMPLATE(wchar_t, IntegralType)
+    DEF_SPEC_TEMPLATE(short, IntegralType)
+    DEF_SPEC_TEMPLATE(unsigned short, UnsignedIntegralType)
+    DEF_SPEC_TEMPLATE(int, IntegralType)
+    DEF_SPEC_TEMPLATE(unsigned int, UnsignedIntegralType)
+    DEF_SPEC_TEMPLATE(float, FloatingType)
+    DEF_SPEC_TEMPLATE_GLM(glm::vec2, FloatingType, 2, glm::make_vec2)
+    DEF_SPEC_TEMPLATE_GLM(glm::dvec2, FloatingType, 2, glm::make_vec2)
+    DEF_SPEC_TEMPLATE_GLM(glm::ivec2, IntegralType, 2, glm::make_vec2)
+    DEF_SPEC_TEMPLATE_GLM(glm::uvec2, UnsignedIntegralType, 2, glm::make_vec2)
+    DEF_SPEC_TEMPLATE_GLM(glm::bvec2, IntegralType, 2, glm::make_vec2)
+    DEF_SPEC_TEMPLATE_GLM(glm::vec3, FloatingType, 3, glm::make_vec3)
+    DEF_SPEC_TEMPLATE_GLM(glm::dvec3, FloatingType, 3, glm::make_vec3)
+    DEF_SPEC_TEMPLATE_GLM(glm::ivec3, IntegralType, 3, glm::make_vec3)
+    DEF_SPEC_TEMPLATE_GLM(glm::uvec3, UnsignedIntegralType, 3, glm::make_vec3)
+    DEF_SPEC_TEMPLATE_GLM(glm::bvec3, IntegralType, 3, glm::make_vec3)
+    DEF_SPEC_TEMPLATE_GLM(glm::vec4, FloatingType, 4, glm::make_vec4)
+    DEF_SPEC_TEMPLATE_GLM(glm::dvec4, FloatingType, 4, glm::make_vec4)
+    DEF_SPEC_TEMPLATE_GLM(glm::ivec4, IntegralType, 4, glm::make_vec4)
+    DEF_SPEC_TEMPLATE_GLM(glm::uvec4, UnsignedIntegralType, 4, glm::make_vec4)
+    DEF_SPEC_TEMPLATE_GLM(glm::bvec4, IntegralType, 4, glm::make_vec4)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat2x2, FloatingType, 4, glm::make_mat2x2)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat2x3, FloatingType, 6, glm::make_mat2x3)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat2x4, FloatingType, 8, glm::make_mat2x4)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat3x2, FloatingType, 6, glm::make_mat3x2)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat3x3, FloatingType, 9, glm::make_mat3x3)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat3x4, FloatingType, 12, glm::make_mat3x4)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat4x2, FloatingType, 8, glm::make_mat4x2)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat4x3, FloatingType, 12, glm::make_mat4x3)
+    DEF_SPEC_TEMPLATE_GLM(glm::mat4x4, FloatingType, 16, glm::make_mat4x4)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat2x2, FloatingType, 4, glm::make_mat2x2)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat2x3, FloatingType, 6, glm::make_mat2x3)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat2x4, FloatingType, 8, glm::make_mat2x4)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat3x2, FloatingType, 6, glm::make_mat3x2)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat3x3, FloatingType, 9, glm::make_mat3x3)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat3x4, FloatingType, 12, glm::make_mat3x4)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat4x2, FloatingType, 8, glm::make_mat4x2)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat4x3, FloatingType, 12, glm::make_mat4x3)
+    DEF_SPEC_TEMPLATE_GLM(glm::dmat4x4, FloatingType, 16, glm::make_mat4x4)
+    
+#undef DEF_SPEC_TEMPLATE
+#undef DEF_SPEC_TEMPLATE_GLM
+    
+    
+#ifdef WIN32
+#pragma warning ( default : 4800 )
+#endif
+
+Dictionary::Dictionary(const std::initializer_list<std::pair<std::string, boost::any>>& l) {
+    for (const auto& p : l)
+        setValueHelper(std::move(p.first), std::move(p.second));
 }
 
-bool Dictionary::serializeToFile(const std::string& filename) {
-    
-    // Serialize to lua configuration string
-    std::string luaConfig = serializeToLuaString();
-    
-    std::ofstream out(filename.c_str());
-    
-    if(! out.is_open())
-        return false;
-    
-    out << luaConfig;
-    out.close();
-    return true;
-}
+std::vector<string> Dictionary::keys(const string& location) const {
+    if (location.empty()) {
+        std::vector<string> result;
+        for (const auto& it : *this)
+            result.emplace_back(it.first);
+        return result;
+    }
 
-const std::vector<string> Dictionary::keys(const string& location) const {
-	if (location.empty()) {
-		std::vector<string> result;
-		for (const std::pair<string, boost::any>& it : *this)
-			result.push_back(it.first);
-		return result;
-	}
+    std::string first;
+    std::string rest;
+    splitKey(location, first, rest);
 
-	std::string first;
-	std::string rest;
-	splitKey(location, first, rest);
+    auto keyIt = find(first);
+    if (keyIt == cend()) {
+        LERROR("Key '" << first << "' was not found in dictionary");
+        return std::vector<string>();
+    }
 
-	const std::map<string, boost::any>::const_iterator keyIt = find(first);
-	if (keyIt == cend()) {
-		LERROR("Key '" << first << "' was not found in dictionary");
-		return std::vector<string>();
-	}
-
-	const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
-	if (dict == nullptr) {
-		LERROR("Error converting key '" << first << "' to type 'Dictionary', was '" <<
-			keyIt->second.type().name() << "'");
-		return std::vector<string>();
-	}
-	// proper tail-recursion
-	return dict->keys(rest);
+    const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
+    if (!dict) {
+        LERROR("Error converting key '" << first << "' to type 'Dictionary', was '"
+                                        << keyIt->second.type().name() << "'");
+        return std::vector<string>();
+    }
+    // proper tail-recursion
+    return dict->keys(rest);
 }
 
 bool Dictionary::hasKey(const string& key) const {
-	std::map<string, boost::any>::const_iterator it = find(key);
-	if (it != cend())
-		return true;
+    auto it = find(key);
+    if (it != cend())
+        return true;
 
-	std::string first;
-	std::string rest;
-	splitKey(key, first, rest);
+    std::string first;
+    std::string rest;
+    splitKey(key, first, rest);
 
-	const std::map<string, boost::any>::const_iterator keyIt = find(first);
-	if (keyIt == cend())
-		return false;
+    auto keyIt = find(first);
+    if (keyIt == cend())
+        return false;
 
-	const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
-	if (dict == nullptr)
-		return false;
-	return dict->hasKey(rest);
+    const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
+    if (!dict)
+        return false;
+    return dict->hasKey(rest);
 }
 
 size_t Dictionary::size() const {
-	return std::map<std::string, boost::any>::size();
+    return std::map<std::string, boost::any>::size();
+}
+
+void Dictionary::clear() {
+    return std::map<std::string, boost::any>::clear();
 }
 
 bool Dictionary::splitKey(const string& key, string& first, string& rest) const {
-	const string::size_type l = key.find('.');
+    const string::size_type l = key.find('.');
 
-	if (l == string::npos) {
-		first = key;
-		return false;
-	}
-	else {
-		first = key.substr(0, l);
-		rest = key.substr(l + 1);
-		return true;
-	}
-}
-
-const std::type_info& Dictionary::type(const std::string& key) const {
-	const std::map<std::string, boost::any>::const_iterator it = find(key);
-	if (it != cend())
-		return it->second.type();
-
-	std::string first;
-	std::string rest;
-	splitKey(key, first, rest);
-
-	const std::map<std::string, boost::any>::const_iterator keyIt = find(first);
-	if (keyIt == cend())
-		return typeid(void);
-
-	const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
-	if (dict == nullptr)
-		return typeid(void);
-	
-	// Proper tail-recursion
-	return dict->type(rest);
-}
-    
-//
-// Helpers
-//
-std::string dictionaryhelper::getValueAsString(Dictionary* D, std::string key) {
-    if(D->type(key) == typeid(std::string)) {
-        std::string value;
-        if (D->getValue(key, value)) {
-            return "\"" + value + "\"";
-        }
+    if (l == string::npos) {
+        first = key;
+        return false;
+    } else {
+        first = key.substr(0, l);
+        rest = key.substr(l + 1);
+        return true;
     }
-    std::stringstream stringvalue;
-    if(D->type(key) == typeid(double)) {
-        double value;
-        if (D->getValue(key, value)) {
-            stringvalue << value;
-        }
-    } else if(D->type(key) == typeid(int)) {
-        int value;
-        if (D->getValue(key, value)) {
-            stringvalue << value;
-        }
-    } else if(D->type(key) == typeid(bool)) {
-        bool value;
-        if (D->getValue(key, value)) {
-            stringvalue << std::boolalpha << value;
-        }
-    }
-    return stringvalue.str();
-}
-    
-std::string dictionaryhelper::lua_serializer(Dictionary* D, const std::string indentation) {
-    
-    std::string content;
-    const std::string indentationLevel = "    ";
-    std::string internalIndentation = indentation + indentationLevel;
-    
-    content += "{\n";
-    
-    auto keys = D->keys();
-    for (auto name: keys) {
-        if(D->type(name) == typeid(Dictionary*)) {
-            Dictionary *next;
-            D->getValue<Dictionary*>(name, next);
-            content += internalIndentation + name +" = "+lua_serializer(next, internalIndentation) + ",\n";
-        } else {
-            content += internalIndentation + name +" = " + getValueAsString(D, name) + ",\n";
-        }
-    }
-    content += indentation + "}";
-    return content;
 }
 
-} // namespace ghoul
+void Dictionary::setValueHelper(std::string key, boost::any value) {
+    // Ugly if-else statement is necessary as 'type' cannot be not constexpr
+    const std::type_info& type = value.type();
+
+    if (type == typeid(bool))
+        setValue(std::move(key), std::move(boost::any_cast<bool>(value)));
+    else if (type == typeid(char))
+        setValue(std::move(key), std::move(boost::any_cast<char>(value)));
+    else if (type == typeid(signed char))
+        setValue(std::move(key), std::move(boost::any_cast<signed char>(value)));
+    else if (type == typeid(unsigned char))
+        setValue(std::move(key), std::move(boost::any_cast<unsigned char>(value)));
+    else if (type == typeid(wchar_t))
+        setValue(std::move(key), std::move(boost::any_cast<wchar_t>(value)));
+    else if (type == typeid(short))
+        setValue(std::move(key), std::move(boost::any_cast<short>(value)));
+    else if (type == typeid(unsigned short))
+        setValue(std::move(key), std::move(boost::any_cast<unsigned short>(value)));
+    else if (type == typeid(int))
+        setValue(std::move(key), std::move(boost::any_cast<int>(value)));
+    else if (type == typeid(unsigned int))
+        setValue(std::move(key), std::move(boost::any_cast<unsigned int>(value)));
+    else if (type == typeid(long long))
+        setValue(std::move(key), std::move(boost::any_cast<long long>(value)));
+    else if (type == typeid(unsigned long long))
+        setValue(std::move(key), std::move(boost::any_cast<unsigned long long>(value)));
+    else if (type == typeid(float))
+        setValue(std::move(key), std::move(boost::any_cast<float>(value)));
+    else if (type == typeid(glm::vec2))
+        setValue(std::move(key), std::move(boost::any_cast<glm::vec2>(value)));
+    else if (type == typeid(glm::dvec2))
+        setValue(std::move(key), std::move(boost::any_cast<glm::dvec2>(value)));
+    else if (type == typeid(glm::ivec2))
+        setValue(std::move(key), std::move(boost::any_cast<glm::ivec2>(value)));
+    else if (type == typeid(glm::uvec2))
+        setValue(std::move(key), std::move(boost::any_cast<glm::uvec2>(value)));
+    else if (type == typeid(glm::bvec2))
+        setValue(std::move(key), std::move(boost::any_cast<glm::bvec2>(value)));
+    else if (type == typeid(glm::vec3))
+        setValue(std::move(key), std::move(boost::any_cast<glm::vec3>(value)));
+    else if (type == typeid(glm::dvec3))
+        setValue(std::move(key), std::move(boost::any_cast<glm::dvec3>(value)));
+    else if (type == typeid(glm::ivec3))
+        setValue(std::move(key), std::move(boost::any_cast<glm::ivec3>(value)));
+    else if (type == typeid(glm::uvec3))
+        setValue(std::move(key), std::move(boost::any_cast<glm::uvec3>(value)));
+    else if (type == typeid(glm::bvec3))
+        setValue(std::move(key), std::move(boost::any_cast<glm::bvec3>(value)));
+    else if (type == typeid(glm::vec4))
+        setValue(std::move(key), std::move(boost::any_cast<glm::vec4>(value)));
+    else if (type == typeid(glm::dvec4))
+        setValue(std::move(key), std::move(boost::any_cast<glm::dvec4>(value)));
+    else if (type == typeid(glm::ivec4))
+        setValue(std::move(key), std::move(boost::any_cast<glm::ivec4>(value)));
+    else if (type == typeid(glm::uvec4))
+        setValue(std::move(key), std::move(boost::any_cast<glm::uvec4>(value)));
+    else if (type == typeid(glm::bvec4))
+        setValue(std::move(key), std::move(boost::any_cast<glm::bvec4>(value)));
+    else if (type == typeid(glm::mat2x2))
+        setValue(std::move(key), std::move(boost::any_cast<glm::mat2x2>(value)));
+    else if (type == typeid(glm::mat2x3))
+        setValue(std::move(key), std::move(boost::any_cast<glm::mat2x3>(value)));
+    else if (type == typeid(glm::mat2x4))
+        setValue(std::move(key), std::move(boost::any_cast<glm::mat2x4>(value)));
+    else if (type == typeid(glm::mat3x2))
+        setValue(std::move(key), std::move(boost::any_cast<glm::mat3x2>(value)));
+    else if (type == typeid(glm::mat3x3))
+        setValue(std::move(key), std::move(boost::any_cast<glm::mat3x3>(value)));
+    else if (type == typeid(glm::mat3x4))
+        setValue(std::move(key), std::move(boost::any_cast<glm::mat3x4>(value)));
+    else if (type == typeid(glm::mat4x2))
+        setValue(std::move(key), std::move(boost::any_cast<glm::mat4x2>(value)));
+    else if (type == typeid(glm::mat4x3))
+        setValue(std::move(key), std::move(boost::any_cast<glm::mat4x3>(value)));
+    else if (type == typeid(glm::mat4x4))
+        setValue(std::move(key), std::move(boost::any_cast<glm::mat4x4>(value)));
+    else if (type == typeid(glm::dmat2x2))
+        setValue(std::move(key), std::move(boost::any_cast<glm::dmat2x2>(value)));
+    else if (type == typeid(glm::dmat2x3))
+        setValue(std::move(key), std::move(boost::any_cast<glm::dmat2x3>(value)));
+    else if (type == typeid(glm::dmat2x4))
+        setValue(std::move(key), std::move(boost::any_cast<glm::dmat2x4>(value)));
+    else if (type == typeid(glm::dmat3x2))
+        setValue(std::move(key), std::move(boost::any_cast<glm::dmat3x2>(value)));
+    else if (type == typeid(glm::dmat3x3))
+        setValue(std::move(key), std::move(boost::any_cast<glm::dmat3x3>(value)));
+    else if (type == typeid(glm::dmat3x4))
+        setValue(std::move(key), std::move(boost::any_cast<glm::dmat3x4>(value)));
+    else if (type == typeid(glm::dmat4x2))
+        setValue(std::move(key), std::move(boost::any_cast<glm::dmat4x2>(value)));
+    else if (type == typeid(glm::dmat4x3))
+        setValue(std::move(key), std::move(boost::any_cast<glm::dmat4x3>(value)));
+    else if (type == typeid(glm::dmat4x4))
+        setValue(std::move(key), std::move(boost::any_cast<glm::dmat4x4>(value)));
+    else
+        setValue(key, value, false);
+}
+
+}  // namespace ghoul

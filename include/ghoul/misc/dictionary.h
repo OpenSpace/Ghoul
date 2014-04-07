@@ -37,50 +37,97 @@ namespace ghoul {
  * The Dictionary is a class to generically store arbitrary items associated with and
  * accessible using an <code>std::string</code>%s. It has the abilitiy to store and
  * retrieve these items by unique <code>std::string</code>-typed keys. The items that can
- * be stored have to be compatible with the <code>boost::any</code> type. This means that
- * there is no automatic type conversion performed and value have to be retrieved with
- * the same type they were constructed with.
+ * be stored have to be compatible with the <code>boost::any</code> type. For a select
+ * list of types an automatic conversion is performed, so that simple type conversions are
+ * possible. The following table is a complete listing of all types that are automatically
+ * converted. Each type has a <code>StorageType</code> that is used to store the type
+ * internally. Each type with the same number of values and the same
+ * <code>StorageType</code> will be converted automatically. For example a value can be
+ * stored as an <code>int</code> and can be retrieved as a <code>short</code>. The table
+ * of all types is:
+ * | <code>Type</code>               | <code>StorageType</code>  | <code>#Values</code> |
+ * |:-------------------------------:|:-------------------------:|:--------------------:|
+ * | <code>bool</code>               | <code>IntegralType</code>         |  1           |
+ * | <code>char</code>               | <code>IntegralType</code>         |  1           |
+ * | <code>signed char</code>        | <code>IntegralType</code>         |  1           |
+ * | <code>unsigned char</code>      | <code>UnsignedIntegralType</code> |  1           |
+ * | <code>wchar_t</code>            | <code>IntegralType</code>         |  1           |
+ * | <code>short</code>              | <code>IntegralType</code>         |  1           |
+ * | <code>unsigned short</code>     | <code>UnsignedIntegralType</code> |  1           |
+ * | <code>int</code>                | <code>IntegralType</code>         |  1           |
+ * | <code>unsigned int</code>       | <code>UnsignedIntegralType</code> |  1           |
+ * | <code>long long</code>          | <code>IntegralType</code>         |  1           |
+ * | <code>unsigned long long</code> | <code>UnsignedIntegralType</code> |  1           |
+ * | <code>float</code>              | <code>FloatingType</code>         |  1           |
+ * | <code>double</code>             | <code>FloatingType</code>         |  1           |
+ * | <code>glm::vec2</code>          | <code>FloatingType</code>         |  2           |
+ * | <code>glm::dvec2</code>         | <code>FloatingType</code>         |  2           |
+ * | <code>glm::ivec2</code>         | <code>IntegralType</code>         |  2           |
+ * | <code>glm::uvec2</code>         | <code>UnsignedIntegralType</code> |  2           |
+ * | <code>glm::bvec2</code>         | <code>IntegralType</code>         |  2           |
+ * | <code>glm::vec3</code>          | <code>FloatingType</code>         |  3           |
+ * | <code>glm::dvec3</code>         | <code>FloatingType</code>         |  3           |
+ * | <code>glm::ivec3</code>         | <code>IntegralType</code>         |  3           |
+ * | <code>glm::uvec3</code>         | <code>UnsignedIntegralType</code> |  3           |
+ * | <code>glm::bvec3</code>         | <code>IntegralType</code>         |  3           |
+ * | <code>glm::vec4</code>          | <code>FloatingType</code>         |  4           |
+ * | <code>glm::dvec4</code>         | <code>FloatingType</code>         |  4           |
+ * | <code>glm::ivec4</code>         | <code>IntegralType</code>         |  4           |
+ * | <code>glm::uvec4</code>         | <code>UnsignedIntegralType</code> |  4           |
+ * | <code>glm::bvec4</code>         | <code>IntegralType</code>         |  4           |
+ * | <code>glm::mat2x2</code>        | <code>FloatingType</code>         |  4           |
+ * | <code>glm::mat2x3</code>        | <code>FloatingType</code>         |  6           |
+ * | <code>glm::mat2x4</code>        | <code>FloatingType</code>         |  8           |
+ * | <code>glm::mat3x2</code>        | <code>FloatingType</code>         |  6           |
+ * | <code>glm::mat3x3</code>        | <code>FloatingType</code>         |  9           |
+ * | <code>glm::mat3x4</code>        | <code>FloatingType</code>         | 12           |
+ * | <code>glm::mat4x2</code>        | <code>FloatingType</code>         |  8           |
+ * | <code>glm::mat4x3</code>        | <code>FloatingType</code>         | 12           |
+ * | <code>glm::mat4x4</code>        | <code>FloatingType</code>         | 16           |
+ * | <code>glm::dmat2x2</code>       | <code>FloatingType</code>         |  4           |
+ * | <code>glm::dmat2x3</code>       | <code>FloatingType</code>         |  6           |
+ * | <code>glm::dmat2x4</code>       | <code>FloatingType</code>         |  8           |
+ * | <code>glm::dmat3x2</code>       | <code>FloatingType</code>         |  6           |
+ * | <code>glm::dmat3x3</code>       | <code>FloatingType</code>         |  9           |
+ * | <code>glm::dmat3x4</code>       | <code>FloatingType</code>         | 12           |
+ * | <code>glm::dmat4x2</code>       | <code>FloatingType</code>         |  8           |
+ * | <code>glm::dmat4x3</code>       | <code>FloatingType</code>         | 12           |
+ * | <code>glm::dmat4x4</code>       | <code>FloatingType</code>         | 16           |
+ *
+ * The explicit type of <code>IntegralType</code>, <code>UnsignedIntegralType</code>, and
+ * <code>FloatingType</code> is undefined, but all three are using 8 bytes for storage.
+ * This means that even storing a single <code>bool</code> will take up 8 bytes in the
+ * Dictionary.
+ *
  * Values can be added using the <code>std::initializer_list</code> constructor or can be
  * added using the #setValue method. #hasKey will check if the Dictionary has any kind of
  * value for a provided key, regardless of its type. #hasValue will perform the same check
  * but will only return <code>true</code> if the stored type agrees with the template
- * parameter. #type returns the <code>std::type_info</code> for the item stored at a given
- * location, or will return <code>typeid(void)</code> if no such key exists. All methods
- * accept recursively defined keys which use <code>.</code> as a separator. The key
- * <code>a.b</code> will first search for a Dictionary entry at the key <code>a</code> and
- * then try to find a key <code>b</code> in this second Dictionary and checks, sets, or
- * gets the corresponding value. The single exception to this is the #setValue method,
- * which has an additional parameter that controls if each individual level of the
- * Dictionary is created on-the-fly or not. None of the method will throw an exception of
- * their own, but might pass exceptions from the unterlying systems, for example
- * <code>boost::any</code>.
+ * parameter, including possible conversions. All methods accept recursively defined keys
+ * which use <code>.</code> as a separator. The key <code>a.b</code> will first search for
+ * a Dictionary entry at the key <code>a</code> and then try to find a key <code>b</code>
+ * in this second Dictionary and checks, sets, or gets the corresponding value. The single
+ *  exception to this is the #setValue method, which has an additional parameter that
+ * controls if each individual level of the Dictionary is created on-the-fly or not. None
+ * of the method will throw an exception of their own, but might pass exceptions from
+ * the underlying systems, for example <code>boost::any</code>.
  */
 class Dictionary : private std::map<std::string, boost::any> {
 public:
-	/**
-	 * Creates an empty Dictionary
-	 */
-	Dictionary();
+    /**
+     * Creates an empty Dictionary
+     */
+    Dictionary() = default;
 
-	/**
-	 * Creates a Dictionary out of the provided <code>std::initializer_list</code>. This
-	 * initializer list can be, for example, of the format
-	 * <code>{ { "a", 1 }, { "b", 2 } }</code> and it will add all of the
-	 * <code>std::pair</code>%s provided to the Dictionary.
-     * \param l The <code>std::initializer_list</code> that contains all of the values
-     * that should be added to the Dictionary
-	 */
-	Dictionary(const std::initializer_list<std::pair<std::string, boost::any>>& l);
-    
     /**
-     * Serializes the Dictionary to a string
+     * Creates a Dictionary out of the provided <code>std::initializer_list</code>. This
+     * initializer list can be, for example, of the format
+     * <code>{ { "a", 1 }, { "b", 2 } }</code> and it will add all of the
+     * <code>std::pair</code>%s provided to the Dictionary.
+ * \param l The <code>std::initializer_list</code> that contains all of the values
+ * that should be added to the Dictionary
      */
-    std::string serializeToLuaString();
-    
-    /**
-     * Serializes the Dictionary using serializeToLuaString and prints to file.
-     */
-    bool serializeToFile(const std::string& filename);
+    Dictionary(const std::initializer_list<std::pair<std::string, boost::any>>& l);
 
     /**
      * Returns all of the keys that are stored in the dictionary at a given
@@ -90,7 +137,7 @@ public:
      * \return A list of all keys that are stored in the Dictionary for the provided
      * location
      */
-	const std::vector<std::string> keys(const std::string& location = "") const;
+    std::vector<std::string> keys(const std::string& location = "") const;
 
     /**
      * Returns <code>true</code> if there is a specific key in the Dictionary, regardless
@@ -100,7 +147,7 @@ public:
      * \return <code>true</code> if the provided key exists in the Dictionary,
      * <code>false</code> otherwise
      */
-	bool hasKey(const std::string& key) const;
+    bool hasKey(const std::string& key) const;
 
     /**
      * Adds the <code>value</code> for a given location at <code>key</code>. If a value
@@ -125,7 +172,7 @@ public:
      * otherwise
      */
     template <typename T>
-    bool setValue(const std::string& key, T&& value, bool createIntermediate = false);
+    bool setValue(std::string key, T value, bool createIntermediate = false);
 
     /**
      * Returns the value stored at location with a given <code>key</code>. This key can be
@@ -159,21 +206,8 @@ public:
      * <code>key</code> with the correct type <code>T</code>. Will return
      * <code>false</code> otherwise
      */
-	template <typename T>
-	bool hasValue(const std::string& key) const;
-
-    /** 
-     * Returns the type of the value stored at the provided <code>key</code>. This key can
-     * be nested and the method will automatically traverse the sub-Dictionaries. If any
-     * of the nested levels or the <code>key</code> itself does not exist,
-     * <code>typeid(void)</code> will be returned. 
-     * \param The, potentially nested, key pointing to the value that type of which should
-     * be returned
-     * \return The <code>std::type_info</code> of the value stored at the provided
-     * <code>key</code>, or <code>typeid(void)</code> if the key points to an invalid
-     * location
-     */
-	const std::type_info& type(const std::string& key) const;
+    template <typename T>
+    bool hasValue(const std::string& key) const;
 
     /**
      * Returns the total number of keys stored in this Dictionary. This method will not
@@ -184,7 +218,13 @@ public:
      */
     size_t size() const;
 
-private:
+    /**
+     * Clears the Dictionary and leaves it in the same state as if it would just have been
+     * created.
+     */
+    void clear();
+
+protected:
     /**
      * Splits the provided <code>key</code> into a <code>first</code> part and the
      * <code>rest</code>. Provided a key <code>a.b.c</code>, <code>first</code> will be
@@ -196,11 +236,21 @@ private:
      * \return <code>true</code> if there was a rest of the key, <code>false</code> if no
      * separator could be found
      */
-	// returns if there exists a rest
-	bool splitKey(const std::string& key, std::string& first, std::string& rest) const;
+    bool splitKey(const std::string& key, std::string& first, std::string& rest) const;
+
+    /**
+     * A helper function that is used by the <code>std::initializer_list</code>
+     * constructor. Will determine the type in the <code>boost::any</code> and call the
+     * correct version of #setValue%, which will do the conversion to the unified storage
+     * format. Any type that is not explicitly handled here, is just passed on to the
+     * #setValue function unchanged.
+     * \param key The key under which the <code>value</code> is stored
+     * \param value The value that should be stored under the provided key
+     */
+    void setValueHelper(std::string key, boost::any value);
 };
 
-} // namespace ghoul
+}  // namespace ghoul
 
 #include "dictionary.inl"
 

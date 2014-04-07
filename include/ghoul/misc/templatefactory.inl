@@ -150,7 +150,7 @@ void TemplateFactory<BaseClass>::registerClass(const std::string& className) {
     static_assert(std::is_base_of<BaseClass, Class>::value,
         "BaseClass must be the base class of Class");
     static_assert(
-        std::has_default_constructor<Class>::value |
+        std::is_default_constructible<Class>::value |
         std::is_convertible<Dictionary, Class>::value,
         "Class needs a default or Dictionary constructor");
 
@@ -159,7 +159,7 @@ void TemplateFactory<BaseClass>::registerClass(const std::string& className) {
     // run-time if it is possible to convert a Dictionary into a Class (thereby implicitly
     // checking if there is a proper constructor for it)
     FactoryFuncPtr function = CreateHelper<BaseClass, Class,
-        (std::has_default_constructor<Class>::value * DEFAULT_CONSTRUCTOR) |
+        (std::is_default_constructible<Class>::value * DEFAULT_CONSTRUCTOR) |
         (std::is_convertible<Dictionary, Class>::value * DICTIONARY_CONSTRUCTOR)
     >().createFunction();
 
