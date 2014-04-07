@@ -39,6 +39,16 @@ class CLKernel;
     
 class CLProgram {
 public:
+
+    enum class Option {
+        SinglePrecisionConstant, DenormsAreZero, OptDisable, StrictAliasing, MadEnable,
+        NoSignedZero, UnsafeMathOptimizations, FiniteMathOnly, FastRelaxedMath
+    };
+    
+    enum class Warnings {
+        None, Default, WarningsIntoErrors
+    };
+
     CLProgram(CLContext* context, const std::string& filename);
     ~CLProgram();
     
@@ -46,6 +56,12 @@ public:
     void addDefinition(const std::string& definition, const std::string& value);
     void addDefinition(const std::string& definition, int value);
     void addIncludeDirectory(const std::string& directory);
+    bool option(const Option o) const;
+    void setOption(const Option o, bool b);
+    Warnings warningLevel() const;
+    void setWarningLevel(Warnings w);
+    
+    void clearOptions();
     
     bool build();
     
@@ -64,6 +80,11 @@ private:
     std::string _options;
     
     std::string readFile(const std::string& filename);
+    
+    bool _singlePrecisionConstant, _denormAreZero, _optDisable, _strictAliasing, _madEnable,
+         _noSignedZero, _unsafeMathOptimizations, _finiteMathOnly,_fastRelaxedMath;
+    
+    Warnings _warningLevel;
     
 }; // class CLProgram
 }

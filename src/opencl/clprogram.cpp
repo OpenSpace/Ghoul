@@ -46,7 +46,9 @@ namespace {
 namespace ghoul {
 namespace opencl {
 
-CLProgram::CLProgram(CLContext* context, const std::string& filename): _program(0) {
+CLProgram::CLProgram(CLContext* context, const std::string& filename): _program(0), _warningLevel(Warnings::Default) {
+    
+    clearOptions();
     
     int err = 0;
     _context = context;
@@ -89,10 +91,129 @@ void CLProgram::addIncludeDirectory(const std::string& directory) {
     }
 }
 
+bool CLProgram::option(const Option o) const{
+    switch (o) {
+        case Option::SinglePrecisionConstant:
+            return _singlePrecisionConstant;
+        case Option::DenormsAreZero:
+            return _denormAreZero;
+        case Option::OptDisable:
+            return _optDisable;
+        case Option::StrictAliasing:
+            return _strictAliasing;
+        case Option::MadEnable:
+            return _madEnable;
+        case Option::NoSignedZero:
+            return _noSignedZero;
+        case Option::UnsafeMathOptimizations:
+            return _unsafeMathOptimizations;
+        case Option::FiniteMathOnly:
+            return _finiteMathOnly;
+        case Option::FastRelaxedMath:
+            return _fastRelaxedMath;
+        default:
+            LDEBUG("Unrecognized option");
+            return false;
+    }
+}
+
+void CLProgram::setOption(const Option o, bool b) {
+    switch (o) {
+        case Option::SinglePrecisionConstant:
+            _singlePrecisionConstant = b;
+            break;
+        case Option::DenormsAreZero:
+            _denormAreZero = b;
+            break;
+        case Option::OptDisable:
+            _optDisable = b;
+            break;
+        case Option::StrictAliasing:
+            _strictAliasing = b;
+            break;
+        case Option::MadEnable:
+            _madEnable = b;
+            break;
+        case Option::NoSignedZero:
+            _noSignedZero = b;
+            break;
+        case Option::UnsafeMathOptimizations:
+            _unsafeMathOptimizations = b;
+            break;
+        case Option::FiniteMathOnly:
+            _finiteMathOnly = b;
+            break;
+        case Option::FastRelaxedMath:
+            _fastRelaxedMath = b;
+            break;
+        default:
+            LDEBUG("Unrecognized option");
+    }
+}
+
+void CLProgram::clearOptions() {
+    _singlePrecisionConstant = false;
+    _denormAreZero = false;
+    _optDisable = false;
+    _strictAliasing = false;
+    _madEnable = false;
+    _noSignedZero = false;
+    _unsafeMathOptimizations = false;
+    _finiteMathOnly = false;
+    _fastRelaxedMath = false;
+}
+    
+CLProgram::Warnings CLProgram::warningLevel() const {
+    return _warningLevel;
+}
+
+void CLProgram::setWarningLevel(Warnings w) {
+    _warningLevel = w;
+}
+
 bool CLProgram::build() {
     assert(_program != 0);
     
-    int err = clBuildProgram(_program, 0, NULL, _options.c_str(), NULL, NULL);
+    std::string options = _options;
+    
+    if (_singlePrecisionConstant)
+        options += " -cl-single-precision-constant";
+    
+    if (_denormAreZero)
+        options += " -cl-denorms-are-zero";
+    
+    if (_optDisable)
+        options += " -cl-opt-disable";
+    
+    if (_strictAliasing)
+        options += " -cl-strict-aliasing";
+    
+    if (_madEnable)
+        options += " -cl-mad-enable";
+    
+    if (_noSignedZero)
+        options += " -cl-no-signed-zeros";
+    
+    if (_unsafeMathOptimizations)
+        options += " -cl-unsafe-math-optimizations";
+    
+    if (_finiteMathOnly)
+        options += " -cl-finite-math-only";
+    
+    if (_fastRelaxedMath)
+        options += " -cl-fast-relaxed-math";
+    
+    switch (_warningLevel) {
+        case Warnings::None:
+            options += " -w";
+            break;
+        case Warnings::WarningsIntoErrors:
+            options += " -Werror";
+        default:
+            break;
+    }
+    
+    int err = clBuildProgram(_program, 0, NULL, options.c_str(), NULL, NULL);
     
     if (err != 0) {
         LFATAL("Could not build program: " << getErrorString(err));
