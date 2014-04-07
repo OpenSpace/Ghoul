@@ -46,7 +46,7 @@ public:
     };
     
     enum class Warnings {
-        None, Default, WarningsIntoErrors
+        NONE, DEFAULT, PEDANTIC
     };
 
     CLProgram(CLContext* context, const std::string& filename);

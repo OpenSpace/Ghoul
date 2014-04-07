@@ -46,7 +46,7 @@ namespace {
 namespace ghoul {
 namespace opencl {
 
-CLProgram::CLProgram(CLContext* context, const std::string& filename): _program(0), _warningLevel(Warnings::Default) {
+CLProgram::CLProgram(CLContext* context, const std::string& filename): _program(0), _warningLevel(Warnings::DEFAULT) {
     
     clearOptions();
     
@@ -204,10 +204,10 @@ bool CLProgram::build() {
         options += " -cl-fast-relaxed-math";
     
     switch (_warningLevel) {
-        case Warnings::None:
+        case Warnings::NONE:
             options += " -w";
             break;
-        case Warnings::WarningsIntoErrors:
+        case Warnings::PEDANTIC:
             options += " -Werror";
         default:
             break;
