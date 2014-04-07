@@ -86,26 +86,25 @@ if (WIN32)
         )
     endif ()
 else ()
-    find_library(ILU_LIBRARIES
-    NAMES ILU
-    PATHS ${CMAKE_MODULE_PATH}/il
-    PATH_SUFFIXES lib64 lib lib32 lib/win32 lib/win64
-    DOC "The file that corresponds to the il utility library."
-    )
+    if(DevIL_USE_STATIC_LIBS)
+        set(DevIL_PREFIX ${CMAKE_STATIC_LIBRARY_PREFIX})
+        set(DevIL_SUFFIX ${CMAKE_STATIC_LIBRARY_SUFFIX})
+    else ()
+        set(DevIL_PREFIX ${CMAKE_SHARED_LIBRARY_PREFIX})
+        set(DevIL_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
+    endif(DevIL_USE_STATIC_LIBS)
 
-    find_library(IL_LIBRARIES
-    NAMES IL DEVIL
-    PATHS ${CMAKE_MODULE_PATH}/il
-    PATH_SUFFIXES lib64 lib lib32 lib/win32 lib/win64
-    DOC "The file that corresponds to the base il library."
-    )
+    set(DevIL_FOLDERS "opt/local/lib /usr/local/lib /usr/lib")
 
-    find_library(ILUT_LIBRARIES
-    NAMES ILUT
-    PATHS ${CMAKE_MODULE_PATH}/il
-    PATH_SUFFIXES lib64 lib lib32 lib/win32 lib/win64
-    DOC "The file that corresponds to the il (system?) utility library."
-    )
+    find_library(ILU_LIBRARIES NAMES ${DevIL_PREFIX}ILU${DevIL_SUFFIX}
+                 HINTS ${DevIL_FOLDERS}
+                 DOC "The file that corresponds to the il utility library.")
+    find_library(IL_LIBRARIES NAMES ${DevIL_PREFIX}IL${DevIL_SUFFIX} ${DevIL_PREFIX}DEVIL${DevIL_SUFFIX}
+                 HINTS ${DevIL_FOLDERS}
+                 DOC "The file that corresponds to the base il library.")
+    find_library(ILUT_LIBRARIES NAMES ${DevIL_PREFIX}ILUT${DevIL_SUFFIX}
+                 HINTS ${DevIL_FOLDERS}
+                 DOC "The file that corresponds to the il (system?) utility library.")
 endif ()
 
 # message("IL_LIBRARIES is ${IL_LIBRARIES}")
