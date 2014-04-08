@@ -58,7 +58,7 @@ bool CLCommandQueue::initialize(cl_context context, cl_device_id device) {
     int err = 0;
     _commands = std::make_shared<cl_command_queue>(clCreateCommandQueue(context, device, 0, &err));
     
-    if (err != 0) {
+    if (err != CL_SUCCESS) {
         LFATAL("Could not create program queue: " << getErrorString(err));
         _commands = 0;
         return false;

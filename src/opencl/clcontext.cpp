@@ -36,6 +36,7 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/opengl/texture.h>
 
 // Windows
 #ifdef __WIN32__
@@ -103,12 +104,88 @@ bool CLContext::createContextFromGLContext() {
             ghoul::opencl::Device device(&cldevice);
             device.fetchInformation();
             
+            int err = 0;
+            cl_context context = 0;
+            cl_device_id did = device.operator()();
+            cl_platform_id pid = platform.operator()();
+            // Windows
+#ifdef __WIN32__
+            cl_context_properties contextProperties[] = {
+                CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
+                CL_WGL_HDC_KHR, (cl_context_properties)wglGetCurrentDC(),
+                CL_CONTEXT_PLATFORM, (cl_context_properties)pid,
+                0
+            };
+            context = clCreateContext(contextProperties, 1, &did, NULL, NULL, &err);
+            
+            // OS X
+#elif __APPLE__
+            CGLContextObj kCGLContext = CGLGetCurrentContext();
+            CGLShareGroupObj kCGLShareGroup = CGLGetShareGroup(kCGLContext);
+            cl_context_properties contextProperties[] = {
+                CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)kCGLShareGroup,
+                0
+            };
+            context = clCreateContext(contextProperties, 0, 0, NULL, NULL, &err);
+            
+            // Linux
+#else
+            cl_context_properties contextProperties[] = {
+                CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
+                CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
+                CL_CONTEXT_PLATFORM, (cl_context_properties)pid,
+                0
+            };
+            context = clCreateContext(contextProperties, 1, &did, NULL, NULL, &err);
+            
+#endif
+            
+            bool successCreateContext = false;
+            if (err == CL_SUCCESS) {
+                ghoul::opengl::Texture* t = new ghoul::opengl::Texture(glm::size3_t(128,128,1),
+                    ghoul::opengl::Texture::Format::RGBA, GL_RGBA, GL_FLOAT);
+                if(t) {
+                    t->uploadTexture();
+                    err = 0;
+                    cl_mem m;
+#ifdef CL_VERSION_1_2
+                    m = clCreateFromGLTexture(context, CL_MEM_READ_WRITE, t->type(), 0, *t, &err);
+#else
+                    if(texture.type() == GL_TEXTURE_2D) {
+                        m = clCreateFromGLTexture2D(context, CL_MEM_READ_WRITE, t->type(), 0, *t, &err);
+                    } else if(texture.type() == GL_TEXTURE_3D) {
+                        m = clCreateFromGLTexture3D(context, CL_MEM_READ_WRITE, t->type(), 0, *t, &err);
+                    }else {
+                        LERROR("Texture is not a supported format");
+                        mem = 0;
+                        err = -1;
+                    }
+#endif
+                    clReleaseMemObject(m);
+                    delete t;
+                    
+                    CLCommandQueue commands;
+                    if(err == CL_SUCCESS && commands.initialize(context, did)) {
+                        _context = std::make_shared<cl_context>(context);
+                        _device = did;
+                        _platform = pid;
+                        successCreateContext = true;
+                    }
+                }
+                
+            }
+            
+            if( ! successCreateContext) {
+                clReleaseContext(context);
+            }
+            /*
             if (device.vendor().compare(0,vendor.length(), vendor) == 0) {
                 _platform = platform.operator()();
                 _device = device.operator()();
                 LDEBUG("Choosing " << _platform << " " << _device);
                 LDEBUG("Vendor: " << device.vendor());
             }
+            */
         }
         
     }
@@ -119,39 +196,7 @@ bool CLContext::createContextFromGLContext() {
     }
     
     int err = 0;
-
-// Windows
-#ifdef __WIN32__
-    cl_context_properties contextProperties[] = {
-        CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
-        CL_WGL_HDC_KHR, (cl_context_properties)wglGetCurrentDC(),
-        CL_CONTEXT_PLATFORM, (cl_context_properties)_platform,
-        0
-    };
-    _context = std::make_shared<cl_context>(clCreateContext(contextProperties, 1, &_device, NULL, NULL, &err));
     
-// OS X
-#elif __APPLE__
-    CGLContextObj kCGLContext = CGLGetCurrentContext();
-    CGLShareGroupObj kCGLShareGroup = CGLGetShareGroup(kCGLContext);
-    cl_context_properties contextProperties[] = {
-        CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)kCGLShareGroup,
-        0
-    };
-    _context = std::make_shared<cl_context>(clCreateContext(contextProperties, 0, 0, NULL, NULL, &err));
-    
-// Linux
-#else
-    cl_context_properties contextProperties[] = {
-        CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
-        CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
-        CL_CONTEXT_PLATFORM, (cl_context_properties)_platform,
-        0
-    };
-    _context = std::make_shared<cl_context>(clCreateContext(contextProperties, 1, &_device, NULL, NULL, &err));
-    
-#endif
-
     if (err == CL_SUCCESS) {
         LDEBUG("Successfully created CL context from GL context");
         return true;
@@ -194,7 +239,7 @@ cl_mem CLContext::createBuffer(cl_mem_flags memFlags, size_t size, void *data) {
 
 cl_mem CLContext::createTextureFromGLTexture(cl_mem_flags memFlags, ghoul::opengl::Texture& texture) {
     int err = 0;
-    cl_mem mem;
+    cl_mem mem = 0;
 #ifdef CL_VERSION_1_2
     mem = clCreateFromGLTexture(*_context, memFlags, texture.type(), 0, texture, &err);
 #else
@@ -210,6 +255,7 @@ cl_mem CLContext::createTextureFromGLTexture(cl_mem_flags memFlags, ghoul::openg
 #endif
     if (err != 0) {
         LERROR("Could not create texture: " << getErrorString(err));
+        mem = 0;
     }
     return mem;
 }
