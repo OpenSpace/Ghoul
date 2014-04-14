@@ -151,13 +151,13 @@ bool CLContext::createContextFromGLContext() {
 #ifdef CL_VERSION_1_2
                     m = clCreateFromGLTexture(context, CL_MEM_READ_WRITE, t->type(), 0, *t, &err);
 #else
-                    if(texture.type() == GL_TEXTURE_2D) {
+                    if(t->type() == GL_TEXTURE_2D) {
                         m = clCreateFromGLTexture2D(context, CL_MEM_READ_WRITE, t->type(), 0, *t, &err);
-                    } else if(texture.type() == GL_TEXTURE_3D) {
+                    } else if(t->type() == GL_TEXTURE_3D) {
                         m = clCreateFromGLTexture3D(context, CL_MEM_READ_WRITE, t->type(), 0, *t, &err);
                     }else {
                         LERROR("Texture is not a supported format");
-                        mem = 0;
+                        m = 0;
                         err = -1;
                     }
 #endif
