@@ -31,6 +31,7 @@
 #include <ghoul/opencl/clcontext.h>
 
 #include <string>
+#include <memory>
 
 namespace ghoul {
 namespace opencl {
@@ -49,8 +50,11 @@ public:
         NONE, DEFAULT, PEDANTIC
     };
 
+    CLProgram();
     CLProgram(CLContext* context, const std::string& filename);
     ~CLProgram();
+    
+    bool initialize(CLContext* context, const std::string& filename);
     
     void addDefinition(const std::string& definition);
     void addDefinition(const std::string& definition, const std::string& value);
@@ -64,6 +68,7 @@ public:
     void clearOptions();
     
     bool build();
+    std::string buildLog();
     
     bool isValidProgram() const;
     
@@ -74,7 +79,7 @@ public:
     cl_program& operator()();
     
 private:
-    cl_program _program;
+    std::shared_ptr<cl_program> _program;
     CLContext* _context;
     
     std::string _options;

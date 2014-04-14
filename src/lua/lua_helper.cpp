@@ -126,14 +126,7 @@ void populateDictionary(lua_State* state, Dictionary& dict) {
         switch (lua_type(state, VAL)) {
             case LUA_TNUMBER: {
                 double value = lua_tonumber(state, VAL);
-                double intpart;
-                double floatpart = std::modf(value, &intpart);
-                if (floatpart == 0.0) {
-                    int int_value = static_cast<int>(value);
-                    dict.setValue(key, int_value);
-                } else {
-                    dict.setValue(key, value);
-                }
+                dict.setValue(key, value);
             } break;
             case LUA_TBOOLEAN: {
                 bool value = (lua_toboolean(state, VAL) == 1);

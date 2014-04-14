@@ -69,6 +69,7 @@ CLContext::~CLContext() {
 }
     
 bool CLContext::createContextFromDevice(Device* device) {
+    assert(_context == 0);
     
     int err = 0;
     _context = std::make_shared<cl_context>(clCreateContext(0, 1, &device->operator()(), NULL, NULL, &err));
@@ -84,14 +85,15 @@ bool CLContext::createContextFromDevice(Device* device) {
 }
 
 bool CLContext::createContextFromGLContext() {
+    assert(_context == 0);
     
-    LDEBUG("From start " << _platform << " " << _device);
+    //LDEBUG("From start " << _platform << " " << _device);
     std::vector<cl::Platform> platforms;
     if(cl::Platform::get(&platforms) != CL_SUCCESS)
         return false;
    
     std::vector<cl::Device> allDevices;
-	std::string vendor("NVIDIA");
+    bool successCreateContext = false;
     for (auto clplatform: platforms) {
         ghoul::opencl::Platform platform(&clplatform);
         platform.fetchInformation();
@@ -101,6 +103,7 @@ bool CLContext::createContextFromGLContext() {
         allDevices.insert(allDevices.end(), devices.begin(), devices.end());
         
         for (auto cldevice: devices) {
+            successCreateContext = false;
             ghoul::opencl::Device device(&cldevice);
             device.fetchInformation();
             
@@ -108,6 +111,7 @@ bool CLContext::createContextFromGLContext() {
             cl_context context = 0;
             cl_device_id did = device.operator()();
             cl_platform_id pid = platform.operator()();
+            
             // Windows
 #ifdef __WIN32__
             cl_context_properties contextProperties[] = {
@@ -126,7 +130,7 @@ bool CLContext::createContextFromGLContext() {
                 CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)kCGLShareGroup,
                 0
             };
-            context = clCreateContext(contextProperties, 0, 0, NULL, NULL, &err);
+            context = clCreateContext(contextProperties, 1, &did, NULL, NULL, &err);
             
             // Linux
 #else
@@ -140,7 +144,6 @@ bool CLContext::createContextFromGLContext() {
             
 #endif
             
-            bool successCreateContext = false;
             if (err == CL_SUCCESS) {
                 ghoul::opengl::Texture* t = new ghoul::opengl::Texture(glm::size3_t(128,128,1),
                     ghoul::opengl::Texture::Format::RGBA, GL_RGBA, GL_FLOAT);
@@ -151,62 +154,54 @@ bool CLContext::createContextFromGLContext() {
 #ifdef CL_VERSION_1_2
                     m = clCreateFromGLTexture(context, CL_MEM_READ_WRITE, t->type(), 0, *t, &err);
 #else
-                    if(texture.type() == GL_TEXTURE_2D) {
+                    if(t->type() == GL_TEXTURE_2D) {
                         m = clCreateFromGLTexture2D(context, CL_MEM_READ_WRITE, t->type(), 0, *t, &err);
-                    } else if(texture.type() == GL_TEXTURE_3D) {
+                    } else if(t->type() == GL_TEXTURE_3D) {
                         m = clCreateFromGLTexture3D(context, CL_MEM_READ_WRITE, t->type(), 0, *t, &err);
                     }else {
-                        LERROR("Texture is not a supported format");
-                        mem = 0;
+                        LERROR("Texture is not a supported format for '"<< device.vendor() << "'");
+                        m = 0;
                         err = -1;
                     }
 #endif
                     clReleaseMemObject(m);
                     delete t;
                     
+                    if (err != CL_SUCCESS) {
+                        LDEBUG("Could not create texture for '"<< device.vendor() << "'");
+                    }
+                    
                     CLCommandQueue commands;
-                    if(err == CL_SUCCESS && commands.initialize(context, did)) {
+                    if(commands.initialize(context, did)) {
+                        LDEBUG("Could initialize commands for '"<< device.vendor() << "'");
                         _context = std::make_shared<cl_context>(context);
                         _device = did;
                         _platform = pid;
                         successCreateContext = true;
+                        break;
+                    } else {
+                        LDEBUG("Could not initialize commands for '"<< device.vendor() << "'");
                     }
                 }
                 
+            } else {
+                LDEBUG("Could not create context: " << getErrorString(err));
             }
             
             if( ! successCreateContext) {
                 clReleaseContext(context);
             }
-            /*
-            if (device.vendor().compare(0,vendor.length(), vendor) == 0) {
-                _platform = platform.operator()();
-                _device = device.operator()();
-                LDEBUG("Choosing " << _platform << " " << _device);
-                LDEBUG("Vendor: " << device.vendor());
-            }
-            */
         }
         
     }
     
-    if (_platform == 0 || _device == 0) {
+    if ( ! successCreateContext) {
         LFATAL("Could not find suitable devices");
         return false;
     }
     
-    int err = 0;
-    
-    if (err == CL_SUCCESS) {
-        LDEBUG("Successfully created CL context from GL context");
-        return true;
-    }
-    
-    // TODO: HANDLE AND PRINT ERROR
-    _context = 0;
-    LDEBUG("Could not create context: " << getErrorString(err));
-    
-    return false;
+    LDEBUG("Successfully created CL context from GL context");
+    return true;
 }
 
 bool CLContext::isValidContext() const {

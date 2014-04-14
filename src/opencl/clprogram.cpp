@@ -46,26 +46,49 @@ namespace {
 namespace ghoul {
 namespace opencl {
 
+CLProgram::CLProgram(): _program(nullptr), _context(nullptr), _warningLevel(Warnings::DEFAULT) {
+    
+}
+
 CLProgram::CLProgram(CLContext* context, const std::string& filename): _program(0), _warningLevel(Warnings::DEFAULT) {
+    if( ! initialize(context, filename)) {
+        LERROR("CLProgram not initialized!");
+    }
+}
+CLProgram::~CLProgram() {
+    if(_program != 0 && _program.unique()) {
+        clReleaseProgram(*_program);
+    }
+}
+
+bool CLProgram::initialize(CLContext* context, const std::string& filename) {
+    if(context == nullptr) {
+        LERROR("Could not initialize program, context is nullptr");
+        return false;
+    }
+    
+    if( ! ghoul::filesystem::FileSystem::ref().fileExists(filename)) {
+        LERROR("Could not initialize program, file does not exist");
+        return false;
+    }
     
     clearOptions();
     
     int err = 0;
     _context = context;
-    
-    if (ghoul::filesystem::FileSystem::ref().fileExists(filename)) {
-        
-        std::string contents = readFile(filename);
-        const char* constContents = contents.c_str();
-        _program = clCreateProgramWithSource(_context->operator()(), 1, (const char **) &constContents, NULL, &err);
-    }
-    
+    std::string contents = readFile(filename);
+    const char* constContents = contents.c_str();
+    _program = std::make_shared<cl_program>(
+                    clCreateProgramWithSource(_context->operator()(), 1,
+                                              (const char **) &constContents,
+                                              NULL, &err));
     if (err != 0) {
         LFATAL("Could not load program source: " << getErrorString(err));
+        _context = 0;
         _program = 0;
     }
+    return true;
 }
-CLProgram::~CLProgram() {}
 
 void CLProgram::addDefinition(const std::string& definition) {
     if (definition != "") {
@@ -213,15 +236,29 @@ bool CLProgram::build() {
             break;
     }
     
-    int err = clBuildProgram(_program, 0, NULL, options.c_str(), NULL, NULL);
+    LDEBUG("Buildning with options: '" << options << "'");
+    const char* coptions = options.c_str();
+    int err = clBuildProgram(*_program, 0, NULL, coptions, NULL, NULL);
     
     if (err != 0) {
         LFATAL("Could not build program: " << getErrorString(err));
-        _program = 0;
+        LDEBUG("Build log: \n" << buildLog());
+        //_program = 0;
         return false;
     }
     
     return true;
+}
+
+std::string CLProgram::buildLog() {
+    size_t len;
+    char *buffer;
+    clGetProgramBuildInfo(*_program, _context->device(), CL_PROGRAM_BUILD_LOG, NULL, NULL, &len);
+    buffer = new char[len];
+    clGetProgramBuildInfo(*_program, _context->device(), CL_PROGRAM_BUILD_LOG, len*sizeof(char), buffer, &len);
+    std::string sb = buffer;
+    delete[] buffer;
+    return sb;
 }
 
 bool CLProgram::isValidProgram() const {
@@ -235,17 +272,29 @@ CLKernel CLProgram::createKernel(const std::string& name) {
 CLProgram& CLProgram::operator=(const CLProgram& rhs) {
     if (this != &rhs) // protect against invalid self-assignment
     {
-        _program = rhs._program;
+        _program = {rhs._program};
+        _context = {rhs._context};
+        _options = {rhs._options};
+        _singlePrecisionConstant = rhs._singlePrecisionConstant;
+        _denormAreZero = rhs._denormAreZero;
+        _optDisable = rhs._optDisable;
+        _strictAliasing = rhs._strictAliasing;
+        _madEnable = rhs._madEnable;
+        _noSignedZero = rhs._noSignedZero;
+        _unsafeMathOptimizations = rhs._unsafeMathOptimizations;
+        _finiteMathOnly = rhs._finiteMathOnly;
+        _fastRelaxedMath = rhs._fastRelaxedMath;
+        _warningLevel = rhs._warningLevel;
     }
     return *this;
 }
 
 cl_program CLProgram::operator()() const {
-    return _program;
+    return *_program;
 }
 
 cl_program& CLProgram::operator()() {
-    return _program;
+    return *_program;
 }
     
 std::string CLProgram::readFile(const std::string& filename) {
