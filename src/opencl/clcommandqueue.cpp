@@ -87,6 +87,14 @@ void CLCommandQueue::enqueueReadBufferBlocking(cl_mem buffer, size_t size, void*
         LFATAL("Could not read buffer: " << getErrorString(err));
     }
 }
+    
+void CLCommandQueue::enqueueWriteBufferBlocking(cl_mem buffer, size_t size, void* data) {
+    int err = 0;
+    err = clEnqueueWriteBuffer(*_commands, buffer, CL_TRUE, 0, size, data, 0, NULL, NULL);
+    if (err != 0) {
+        LFATAL("Could not write buffer: " << getErrorString(err));
+    }
+}
 
 cl_event CLCommandQueue::enqueueKernelNonBlocking(const CLKernel& kernel, const CLWorkSize& ws)  {
     int err = 0;

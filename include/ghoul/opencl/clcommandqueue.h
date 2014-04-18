@@ -48,6 +48,7 @@ public:
     // Blocking calls
     void enqueueKernelBlocking(const CLKernel& kernel, const CLWorkSize& ws);
     void enqueueReadBufferBlocking(cl_mem buffer, size_t size, void* data);
+    void enqueueWriteBufferBlocking(cl_mem buffer, size_t size, void* data);
     
     // non blocking calls
     cl_event enqueueKernelNonBlocking(const CLKernel& kernel, const CLWorkSize& ws);

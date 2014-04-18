@@ -248,7 +248,7 @@ cl_mem CLContext::createTextureFromGLTexture(cl_mem_flags memFlags, ghoul::openg
         err = -1;
     }
 #endif
-    if (err != 0) {
+    if (err != CL_SUCCESS) {
         LERROR("Could not create texture: " << getErrorString(err));
         mem = 0;
     }

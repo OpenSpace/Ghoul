@@ -43,7 +43,7 @@ public:
 
     enum class Option {
         SinglePrecisionConstant, DenormsAreZero, OptDisable, StrictAliasing, MadEnable,
-        NoSignedZero, UnsafeMathOptimizations, FiniteMathOnly, FastRelaxedMath
+        NoSignedZero, UnsafeMathOptimizations, FiniteMathOnly, FastRelaxedMath, KernelArgInfo
     };
     
     enum class Warnings {
@@ -87,7 +87,7 @@ private:
     std::string readFile(const std::string& filename);
     
     bool _singlePrecisionConstant, _denormAreZero, _optDisable, _strictAliasing, _madEnable,
-         _noSignedZero, _unsafeMathOptimizations, _finiteMathOnly,_fastRelaxedMath;
+         _noSignedZero, _unsafeMathOptimizations, _finiteMathOnly,_fastRelaxedMath, _kernelArgInfo;
     
     Warnings _warningLevel;
     

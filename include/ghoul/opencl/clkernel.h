@@ -27,6 +27,7 @@
 #define __CLKERNEL_H__
 
 #include <ghoul/opencl/ghoul_cl.h>
+#include <glm/glm.hpp>
 
 #include <string>
 #include <memory>
@@ -38,6 +39,11 @@ class CLProgram;
 
 class CLKernel {
 public:
+    
+    enum class AddressQualifier {GLOBAL, LOCAL, CONSTANT, PRIVATE, ERROR};
+    enum class AccessQualifier {READ_ONLY, WRITE_ONLY, READ_WRITE, NONE, ERROR};
+    enum class TypeQualifier {CONST, RESTRICT, VOLATILE, NONE, ERROR};
+
     CLKernel();
     CLKernel(CLProgram* program, const std::string& name);
     ~CLKernel();
@@ -46,14 +52,24 @@ public:
     bool isValidKernel() const;
     
     int setArgument(unsigned int index, cl_mem* input);
+    int setArgument(unsigned int index, const glm::mat4& matrix);
     
     template<typename T>
     int setArgument(unsigned int index, T input);
+    
+    AddressQualifier argumentAddressQualifier(size_t argumentIndex);
+    AccessQualifier argumentAccessQualifier(size_t argumentIndex);
+    TypeQualifier argumentTypeQualifier(size_t argumentIndex);
+    std::string argumentTypeName(size_t argumentIndex);
+    std::string argumentName(size_t argumentIndex);
     
     CLKernel& operator=(const CLKernel& rhs);
     cl_kernel operator()() const;
     cl_kernel& operator()();
     
+    static std::string AddressQualifierName(AddressQualifier q);
+    static std::string AccessQualifierName(AccessQualifier q);
+    static std::string TypeQualifierName(TypeQualifier q);
     
 private:
     std::shared_ptr<cl_kernel> _kernel;

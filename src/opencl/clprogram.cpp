@@ -169,6 +169,12 @@ void CLProgram::setOption(const Option o, bool b) {
         case Option::FastRelaxedMath:
             _fastRelaxedMath = b;
             break;
+        case Option::KernelArgInfo:
+            _kernelArgInfo = b;
+#ifndef CL_VERSION_1_2
+            LWARNING("OpenCL 1.2 specific option. Some of the following functions might not return expected values.");
+#endif
+            break;
         default:
             LDEBUG("Unrecognized option");
     }
@@ -184,6 +190,7 @@ void CLProgram::clearOptions() {
     _unsafeMathOptimizations = false;
     _finiteMathOnly = false;
     _fastRelaxedMath = false;
+    _kernelArgInfo = false;
 }
     
 CLProgram::Warnings CLProgram::warningLevel() const {
@@ -225,6 +232,11 @@ bool CLProgram::build() {
     
     if (_fastRelaxedMath)
         options += " -cl-fast-relaxed-math";
+    
+#ifdef CL_VERSION_1_2
+    if(_kernelArgInfo)
+        options += " -cl-kernel-arg-info";
+#endif
     
     switch (_warningLevel) {
         case Warnings::NONE:
