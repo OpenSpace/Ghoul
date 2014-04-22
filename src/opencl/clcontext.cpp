@@ -238,7 +238,10 @@ cl_mem CLContext::createTextureFromGLTexture(cl_mem_flags memFlags, ghoul::openg
 #ifdef CL_VERSION_1_2
     mem = clCreateFromGLTexture(*_context, memFlags, texture.type(), 0, texture, &err);
 #else
-    if(texture.type() == GL_TEXTURE_2D) {
+    if(texture.type() == GL_TEXTURE_1D) { // OpenCL <1.2 doesn't support 1D textures,
+    									  // trick it with   this hack   (sorry).
+        mem = clCreateFromGLTexture2D(*_context, memFlags, GL_TEXTURE_2D, 0, texture, &err);
+    } else if(texture.type() == GL_TEXTURE_2D) {
         mem = clCreateFromGLTexture2D(*_context, memFlags, texture.type(), 0, texture, &err);
     } else if(texture.type() == GL_TEXTURE_3D) {
         mem = clCreateFromGLTexture3D(*_context, memFlags, texture.type(), 0, texture, &err);
