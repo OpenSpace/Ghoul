@@ -116,6 +116,52 @@ cl_event CLCommandQueue::enqueueReadBufferNonBlocking(cl_mem buffer, size_t size
     return event;
 }
 
+cl_event CLCommandQueue::enqueueAcquireGLObjects(cl_mem glObject) {
+	int err = 0;
+	cl_event event = 0;
+	err = clEnqueueAcquireGLObjects(*_commands, 1, &glObject, 0, NULL, &event);
+	if (err != 0) {
+		LFATAL("Could not aquire GL object: " << getErrorString(err));
+	}
+	return event;
+}
+
+cl_event CLCommandQueue::enqueueReleaseGLObjects(cl_mem glObject) {
+	int err = 0;
+	cl_event event = 0;
+	err = clEnqueueReleaseGLObjects(*_commands, 1, &glObject, 0, NULL, &event);
+	if (err != 0) {
+		LFATAL("Could not release GL object: " << getErrorString(err));
+	}
+	return event;
+}
+
+cl_event CLCommandQueue::enqueueAcquireGLObjects(std::vector<cl_mem> glObjects) {
+	int err = 0;
+	cl_event event = 0;
+
+	if (glObjects.size() > 0) {
+		err = clEnqueueAcquireGLObjects(*_commands, glObjects.size(), &glObjects[0], 0, NULL, &event);
+		if (err != 0) {
+			LFATAL("Could not aquire GL object: " << getErrorString(err));
+		}
+	}
+	return event;
+}
+
+cl_event CLCommandQueue::enqueueReleaseGLObjects(std::vector<cl_mem> glObjects) {
+	int err = 0;
+	cl_event event = 0;
+
+	if (glObjects.size() > 0) {
+		err = clEnqueueReleaseGLObjects(*_commands, glObjects.size(), &glObjects[0], 0, NULL, &event);
+		if (err != 0) {
+			LFATAL("Could not aquire GL object: " << getErrorString(err));
+		}
+	}
+	return event;
+}
+
 void CLCommandQueue::finish() {
     clFinish(*_commands);
 }

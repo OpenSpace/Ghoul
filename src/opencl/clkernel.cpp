@@ -77,6 +77,7 @@ int CLKernel::setArgument(unsigned int index, const glm::mat4& matrix) {
 }
     
 CLKernel::AddressQualifier CLKernel::argumentAddressQualifier(size_t argumentIndex) {
+#ifdef CL_VERSION_1_2
     cl_kernel_arg_info arginfo = CL_KERNEL_ARG_ADDRESS_QUALIFIER;
     cl_int err;
     
@@ -101,8 +102,13 @@ CLKernel::AddressQualifier CLKernel::argumentAddressQualifier(size_t argumentInd
             return AddressQualifier::PRIVATE;
             break;
     }
+#else
+    LWARNING("CL_KERNEL_ARG_ADDRESS_QUALIFIER not supported in OpenCL <1.2. Skipping option.");
+    return AddressQualifier::ERROR;
+#endif
 }
 CLKernel::AccessQualifier CLKernel::argumentAccessQualifier(size_t argumentIndex) {
+#ifdef CL_VERSION_1_2
     cl_kernel_arg_info arginfo = CL_KERNEL_ARG_ACCESS_QUALIFIER;
     cl_int err;
     
@@ -127,12 +133,17 @@ CLKernel::AccessQualifier CLKernel::argumentAccessQualifier(size_t argumentIndex
             return AccessQualifier::NONE;
             break;
     }
+#else
+    LWARNING("CL_KERNEL_ARG_ACCESS_QUALIFIER not supported in OpenCL <1.2. Skipping option.");
+    return AccessQualifier::ERROR;
+#endif
 }
 CLKernel::TypeQualifier CLKernel::argumentTypeQualifier(size_t argumentIndex) {
-    cl_kernel_arg_info arginfo = CL_KERNEL_ARG_ACCESS_QUALIFIER;
+#ifdef CL_VERSION_1_2
+    cl_kernel_arg_info arginfo = CL_KERNEL_ARG_TYPE_QUALIFIER;
     cl_int err;
     
-    cl_kernel_arg_access_qualifier returnval;
+    cl_kernel_arg_type_qualifier returnval;
     size_t length;
     
     err = clGetKernelArgInfo(*_kernel, argumentIndex, arginfo, sizeof(returnval), &returnval, &length);
@@ -153,8 +164,13 @@ CLKernel::TypeQualifier CLKernel::argumentTypeQualifier(size_t argumentIndex) {
             return TypeQualifier::NONE;
             break;
     }
+#else
+    LWARNING("CL_KERNEL_ARG_ACCESS_QUALIFIER not supported in OpenCL <1.2. Skipping option.");
+    return TypeQualifier::ERROR;
+#endif
 }
 std::string CLKernel::argumentTypeName(size_t argumentIndex) {
+#ifdef CL_VERSION_1_2
     cl_kernel_arg_info arginfo = CL_KERNEL_ARG_TYPE_NAME;
     cl_int err;
     
@@ -180,8 +196,13 @@ std::string CLKernel::argumentTypeName(size_t argumentIndex) {
     delete[] buffer;
     
     return returnString;
+#else
+    LWARNING("CL_KERNEL_ARG_TYPE_NAME not supported in OpenCL <1.2. Skipping option.");
+    return "";
+#endif
 }
 std::string CLKernel::argumentName(size_t argumentIndex) {
+#ifdef CL_VERSION_1_2
     cl_kernel_arg_info arginfo = CL_KERNEL_ARG_NAME;
     cl_int err;
     
@@ -207,6 +228,10 @@ std::string CLKernel::argumentName(size_t argumentIndex) {
     delete[] buffer;
     
     return returnString;
+#else
+    LWARNING("CL_KERNEL_ARG_NAME not supported in OpenCL <1.2. Skipping option.");
+    return "";
+#endif
 }
 
 

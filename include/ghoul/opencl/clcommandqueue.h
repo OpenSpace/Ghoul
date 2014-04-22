@@ -29,6 +29,7 @@
 #include <ghoul/opencl/ghoul_cl.h>
 
 #include <memory>
+#include <vector>
 
 namespace ghoul {
 namespace opencl {
@@ -53,6 +54,11 @@ public:
     // non blocking calls
     cl_event enqueueKernelNonBlocking(const CLKernel& kernel, const CLWorkSize& ws);
     cl_event enqueueReadBufferNonBlocking(cl_mem buffer, size_t size, void* data);
+
+    cl_event enqueueAcquireGLObjects(cl_mem glObject);
+    cl_event enqueueReleaseGLObjects(cl_mem glObject);
+    cl_event enqueueAcquireGLObjects(std::vector<cl_mem> glObjects);
+    cl_event enqueueReleaseGLObjects(std::vector<cl_mem> glObjects);
     
     // wait for cl calls to finish
     void finish();
