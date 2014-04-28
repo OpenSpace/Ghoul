@@ -90,14 +90,10 @@ bool CLProgram::initialize(CLContext* context, const std::string& filename) {
     return true;
 }
 
-void CLProgram::addDefinition(const std::string& definition) {
-    if (definition != "") {
-        _options += "-D " + definition + " ";
-    }
-}
+
 void CLProgram::addDefinition(const std::string& definition, const std::string& value) {
-    if (definition != "" && value != "") {
-        _options += "-D " + definition + "="+value + " ";
+    if (definition != "") {
+        _definitions.push_back(std::make_pair(definition, value));
     }
     
 }
@@ -105,13 +101,23 @@ void CLProgram::addDefinition(const std::string& definition, int value) {
     if (definition != "") {
         std::stringstream ss;
         ss << value;
-        _options += "-D " + definition + "="+ss.str() + " ";
+        _definitions.push_back(std::make_pair(definition, ss.str()));
+    }
+}
+void CLProgram::addDefinition(const std::string& definition, float value) {
+    if (definition != "") {
+        std::stringstream ss;
+        ss << value;
+        _definitions.push_back(std::make_pair(definition, ss.str()));
     }
 }
 void CLProgram::addIncludeDirectory(const std::string& directory) {
-    if (ghoul::filesystem::FileSystem::ref().directoryExists(directory)) {
-        _options += "-I " + directory + " ";
-    }
+    _includeDirectories.push_back(directory);
+}
+
+void CLProgram::addIncludeDirectory(const std::vector<std::string>& directories) {
+    for(auto directory: directories)
+        _includeDirectories.push_back(directory);
 }
 
 bool CLProgram::option(const Option o) const{
@@ -204,7 +210,18 @@ void CLProgram::setWarningLevel(Warnings w) {
 bool CLProgram::build() {
     assert(_program != 0);
     
-    std::string options = _options;
+    std::string options;
+    
+    for(auto definition: _definitions) {
+        if (definition.second == "") {
+            options += "-D " + definition.first + " ";
+        } else {
+            options += "-D " + definition.first + "=" + definition.second + " ";
+        }
+    }
+    
+    for(auto directory: _includeDirectories)
+        options += "-I " + directory + " ";
     
     if (_singlePrecisionConstant)
         options += " -cl-single-precision-constant";
@@ -286,7 +303,8 @@ CLProgram& CLProgram::operator=(const CLProgram& rhs) {
     {
         _program = {rhs._program};
         _context = {rhs._context};
-        _options = {rhs._options};
+        _includeDirectories = {rhs._includeDirectories};
+        _definitions = {rhs._definitions};
         _singlePrecisionConstant = rhs._singlePrecisionConstant;
         _denormAreZero = rhs._denormAreZero;
         _optDisable = rhs._optDisable;

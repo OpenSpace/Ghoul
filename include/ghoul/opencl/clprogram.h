@@ -32,6 +32,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 namespace ghoul {
 namespace opencl {
@@ -56,10 +57,12 @@ public:
     
     bool initialize(CLContext* context, const std::string& filename);
     
-    void addDefinition(const std::string& definition);
-    void addDefinition(const std::string& definition, const std::string& value);
+    void addDefinition(const std::string& definition, const std::string& value = "");
     void addDefinition(const std::string& definition, int value);
+    void addDefinition(const std::string& definition, float value);
+    
     void addIncludeDirectory(const std::string& directory);
+    void addIncludeDirectory(const std::vector<std::string>& directories);
     bool option(const Option o) const;
     void setOption(const Option o, bool b);
     Warnings warningLevel() const;
@@ -82,7 +85,8 @@ private:
     std::shared_ptr<cl_program> _program;
     CLContext* _context;
     
-    std::string _options;
+    std::vector<std::string> _includeDirectories;
+    std::vector<std::pair<std::string,std::string> > _definitions;
     
     std::string readFile(const std::string& filename);
     
