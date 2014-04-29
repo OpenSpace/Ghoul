@@ -30,6 +30,7 @@
 #include <ghoul/misc/dictionary.h>
 
 #include <exception>
+#include <stdexcept>
 
 struct lua_State;
 

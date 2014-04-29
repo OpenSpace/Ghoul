@@ -40,6 +40,7 @@
 #include <unistd.h>
 #include <sys/param.h>
 #include <sys/stat.h>
+#include <pwd.h>
 #endif
 
 using std::string;
@@ -190,6 +191,29 @@ Directory FileSystem::currentDirectory() const {
     delete[] buffer;
 #endif
     return Directory(currentDir);
+}
+    
+/**
+ * Returns home Directory
+ */
+Directory FileSystem::homeDirectory() const {
+    string homeDir;
+#ifdef WIN32
+    WCHAR path[1024];
+    if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, path)) {
+        homedir = path;
+    }
+#else
+    const char *chomeDir = getenv("HOME");
+    if (!chomeDir) {
+        struct passwd* pwd = getpwuid(getuid());
+        if (pwd)
+            homeDir = pwd->pw_dir;
+    } else {
+        homeDir = chomeDir;
+    }
+#endif
+    return Directory(homeDir);
 }
     
 void FileSystem::setCurrentDirectory(const Directory& directory) const {

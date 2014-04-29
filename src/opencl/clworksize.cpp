@@ -23,103 +23,50 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "opencl/platform.h"
+#include <ghoul/opencl/clworksize.h>
 
-#include <ghoul/opencl/ghoul_cl.hpp>
+#include <ghoul/logging/logmanager.h>
+
+#include <cassert>
+
+namespace {
+    std::string _loggerCat = "CLWorkSize";
+}
+
 
 namespace ghoul {
 namespace opencl {
 
-Platform::Platform(cl::Platform* platform): _platform(platform) {
-    clearInformation();
-}
-Platform::~Platform() {}
-
-bool Platform::isInitialized() const {
-    return _isInitialized;
-}
-
-void Platform::fetchInformation() {
-    if (isInitialized()) {
-        clearInformation();
+CLWorkSize::CLWorkSize(std::initializer_list<size_t> global, std::initializer_list<size_t> local): _dimensions(0), _global(0), _local(0) {
+    assert(global.size() == local.size());
+    _dimensions = global.size();
+    assert(_dimensions >= 1 && _dimensions <= 3);
+    
+    _global = new size_t[_dimensions];
+    _local = new size_t[_dimensions];
+    
+    for (unsigned int i = 0; i < _dimensions; ++i) {
+        _global[i] = *(global.begin() + i);
+        _local[i] = *(local.begin() + i);
     }
-    std::string tmp_string;
-
-    if(_platform->getInfo(CL_PLATFORM_PROFILE, &tmp_string) == CL_SUCCESS)
-        _profile = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_VERSION, &tmp_string) == CL_SUCCESS)
-        _version = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_NAME, &tmp_string) == CL_SUCCESS)
-        _name = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_VENDOR, &tmp_string) == CL_SUCCESS)
-        _vendor = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_EXTENSIONS, &tmp_string) == CL_SUCCESS)
-        _extensions = tmp_string;
-
-    _isInitialized = true;
-}
-void Platform::clearInformation() {
-    _profile = "";
-    _version = "";
-    _name = "";
-    _vendor = "";
-    _extensions = "";
-    
-    _isInitialized = false;
 }
 
-//
-// operators
-//
-Platform& Platform::operator=(const Platform& rhs) {
-    if (this != &rhs) // protect against invalid self-assignment
-    {
-        *_platform = *rhs._platform;
-        
-        // Ugly version that refetches all information
-        clearInformation();
-        if(rhs.isInitialized())
-            fetchInformation();
-    }
-    return *this;
+CLWorkSize::~CLWorkSize() {
+    delete _global;
+    delete _local;
 }
 
-Platform& Platform::operator=(const cl::Platform& rhs) {
-    *_platform = rhs;
-    
-    // Ugly version that refetches all information
-    clearInformation();
-    if(isInitialized())
-        fetchInformation();
-    
-    return *this;
+unsigned int CLWorkSize::dimensions() const {
+    return _dimensions;
 }
-
-cl_platform_id Platform::operator()() const {
-    return _platform->operator()();
+size_t* CLWorkSize::globalOffset() const {
+    return NULL;
 }
-
-cl_platform_id& Platform::operator()() {
-    return _platform->operator()();
+size_t* CLWorkSize::global() const {
+    return _global;
 }
-
-//
-// GET
-//
-std::string Platform::profile() const {
-    return _profile;
-}
-std::string Platform::version() const {
-    return _version;
-}
-std::string Platform::name() const {
-    return _name;
-}
-std::string Platform::vendor() const {
-    return _vendor;
-}
-std::string Platform::extensions() const {
-    return _extensions;
+size_t* CLWorkSize::local() const {
+    return _local;
 }
 
 }

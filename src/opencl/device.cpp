@@ -24,13 +24,14 @@
  ****************************************************************************************/
 
 #include "opencl/device.h"
-#include "opencl/cl.hpp"
+
+#include <ghoul/opencl/ghoul_cl.hpp>
 
 namespace ghoul {
 namespace opencl {
 
-Device::Device(cl::Device* device) {
-    _device = device;
+Device::Device(cl::Device* device): _device(device) {
+    clearInformation();
 }
 Device::~Device() {}
     

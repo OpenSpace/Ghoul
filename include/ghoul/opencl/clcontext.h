@@ -23,104 +23,53 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "opencl/platform.h"
+#ifndef __CLCONTEXT_H__
+#define __CLCONTEXT_H__
 
-#include <ghoul/opencl/ghoul_cl.hpp>
+#include <ghoul/opencl/ghoul_cl.h>
+#include <ghoul/opencl/device.h>
+#include <ghoul/opengl/texture.h>
+#include <memory> 
 
 namespace ghoul {
 namespace opencl {
-
-Platform::Platform(cl::Platform* platform): _platform(platform) {
-    clearInformation();
-}
-Platform::~Platform() {}
-
-bool Platform::isInitialized() const {
-    return _isInitialized;
-}
-
-void Platform::fetchInformation() {
-    if (isInitialized()) {
-        clearInformation();
-    }
-    std::string tmp_string;
-
-    if(_platform->getInfo(CL_PLATFORM_PROFILE, &tmp_string) == CL_SUCCESS)
-        _profile = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_VERSION, &tmp_string) == CL_SUCCESS)
-        _version = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_NAME, &tmp_string) == CL_SUCCESS)
-        _name = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_VENDOR, &tmp_string) == CL_SUCCESS)
-        _vendor = tmp_string;
-    if(_platform->getInfo(CL_PLATFORM_EXTENSIONS, &tmp_string) == CL_SUCCESS)
-        _extensions = tmp_string;
-
-    _isInitialized = true;
-}
-void Platform::clearInformation() {
-    _profile = "";
-    _version = "";
-    _name = "";
-    _vendor = "";
-    _extensions = "";
     
-    _isInitialized = false;
-}
+class CLCommandQueue;
+class CLProgram;
 
-//
-// operators
-//
-Platform& Platform::operator=(const Platform& rhs) {
-    if (this != &rhs) // protect against invalid self-assignment
-    {
-        *_platform = *rhs._platform;
-        
-        // Ugly version that refetches all information
-        clearInformation();
-        if(rhs.isInitialized())
-            fetchInformation();
-    }
-    return *this;
-}
-
-Platform& Platform::operator=(const cl::Platform& rhs) {
-    *_platform = rhs;
+class CLContext {
+public:
+    CLContext();
+    ~CLContext();
     
-    // Ugly version that refetches all information
-    clearInformation();
-    if(isInitialized())
-        fetchInformation();
+    bool createContextFromDevice(Device* device);
+    bool createContextFromGLContext();
     
-    return *this;
-}
+    bool isValidContext() const;
+    
+    cl_platform_id platform() const;
+    cl_device_id device() const;
+    
+    CLCommandQueue createCommandQueue();
+    CLProgram createProgram(const std::string& filename);
+    
+    cl_mem createBuffer(cl_mem_flags memFlags, size_t size, void *data = NULL);
+    cl_mem createTextureFromGLTexture(cl_mem_flags memFlags, ghoul::opengl::Texture& texture);
+    
+    CLContext& operator=(const CLContext& rhs);
+    operator cl_context() const;
+    cl_context operator()() const;
+    cl_context& operator()();
+    
+private:
+    std::shared_ptr<cl_context> _context;
+    //cl_context _context;
+    cl_platform_id _platform;
+    cl_device_id _device;
+    
+}; // class CLContext
+    
+} // namespace opencl
+} // namespace ghoul
 
-cl_platform_id Platform::operator()() const {
-    return _platform->operator()();
-}
-
-cl_platform_id& Platform::operator()() {
-    return _platform->operator()();
-}
-
-//
-// GET
-//
-std::string Platform::profile() const {
-    return _profile;
-}
-std::string Platform::version() const {
-    return _version;
-}
-std::string Platform::name() const {
-    return _name;
-}
-std::string Platform::vendor() const {
-    return _vendor;
-}
-std::string Platform::extensions() const {
-    return _extensions;
-}
-
-}
-}
+#endif
