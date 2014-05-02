@@ -174,7 +174,7 @@ else()
 endif ()
 
 # Create the Ghoul library
-add_library(Ghoul ${GHOUL_SOURCE} ${GHOUL_HEADER})
+add_library(Ghoul STATIC ${GHOUL_SOURCE} ${GHOUL_HEADER})
 
 # Adding debug flags for the debug build
 if(MSVC OR XCODE)
