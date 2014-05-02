@@ -26,10 +26,10 @@
 #ifndef __GHOUL_CL_HPP__
 #define __GHOUL_CL_HPP__
 
-#if defined(__APPLE__) || defined(__MACOSX)
-    #include <ghoul/opencL/cl.hpp>
-#else
-    #include <CL/cl.hpp>
-#endif // !__APPLE__
+//#if defined(__APPLE__) || defined(__MACOSX)
+    #include <ghoul/opencl/cl.hpp>
+//#else
+    //#include <CL/cl.hpp>
+//#endif // !__APPLE__
 
 #endif

@@ -73,7 +73,7 @@ int CLKernel::setArgument(unsigned int index, cl_mem* input) {
 
     
 int CLKernel::setArgument(unsigned int index, const glm::mat4& matrix) {
-    
+    return 0;
 }
     
 CLKernel::AddressQualifier CLKernel::argumentAddressQualifier(size_t argumentIndex) {
@@ -92,19 +92,19 @@ CLKernel::AddressQualifier CLKernel::argumentAddressQualifier(size_t argumentInd
     
     switch(returnval) {
         case CL_KERNEL_ARG_ADDRESS_CONSTANT:
-            return AddressQualifier::CONSTANT;
+            return AddressQualifier::Constant;
         case CL_KERNEL_ARG_ADDRESS_GLOBAL:
-            return AddressQualifier::GLOBAL;
+            return AddressQualifier::Global;
         case CL_KERNEL_ARG_ADDRESS_LOCAL:
-            return AddressQualifier::LOCAL;
+            return AddressQualifier::Local;
         case CL_KERNEL_ARG_ADDRESS_PRIVATE:
         default:
-            return AddressQualifier::PRIVATE;
+            return AddressQualifier::Private;
             break;
     }
 #else
     LWARNING("CL_KERNEL_ARG_ADDRESS_QUALIFIER not supported in OpenCL <1.2. Skipping option.");
-    return AddressQualifier::ERROR;
+    return AddressQualifier::Error;
 #endif
 }
 CLKernel::AccessQualifier CLKernel::argumentAccessQualifier(size_t argumentIndex) {
@@ -123,19 +123,19 @@ CLKernel::AccessQualifier CLKernel::argumentAccessQualifier(size_t argumentIndex
     
     switch(returnval) {
         case CL_KERNEL_ARG_ACCESS_READ_ONLY:
-            return AccessQualifier::READ_ONLY;
+            return AccessQualifier::ReadOnly;
         case CL_KERNEL_ARG_ACCESS_WRITE_ONLY:
-            return AccessQualifier::WRITE_ONLY;
+            return AccessQualifier::WriteOnly;
         case CL_KERNEL_ARG_ACCESS_READ_WRITE:
-            return AccessQualifier::READ_WRITE;
+            return AccessQualifier::ReadWrite;
         case CL_KERNEL_ARG_ACCESS_NONE:
         default:
-            return AccessQualifier::NONE;
+            return AccessQualifier::None;
             break;
     }
 #else
     LWARNING("CL_KERNEL_ARG_ACCESS_QUALIFIER not supported in OpenCL <1.2. Skipping option.");
-    return AccessQualifier::ERROR;
+    return AccessQualifier::Error;
 #endif
 }
 CLKernel::TypeQualifier CLKernel::argumentTypeQualifier(size_t argumentIndex) {
@@ -154,19 +154,19 @@ CLKernel::TypeQualifier CLKernel::argumentTypeQualifier(size_t argumentIndex) {
     
     switch(returnval) {
         case CL_KERNEL_ARG_TYPE_CONST:
-            return TypeQualifier::CONST;
+            return TypeQualifier::Const;
         case CL_KERNEL_ARG_TYPE_RESTRICT:
-            return TypeQualifier::RESTRICT;
+            return TypeQualifier::Restrict;
         case CL_KERNEL_ARG_TYPE_VOLATILE:
-            return TypeQualifier::VOLATILE;
+            return TypeQualifier::Volatile;
         case CL_KERNEL_ARG_TYPE_NONE:
         default:
-            return TypeQualifier::NONE;
+            return TypeQualifier::None;
             break;
     }
 #else
     LWARNING("CL_KERNEL_ARG_ACCESS_QUALIFIER not supported in OpenCL <1.2. Skipping option.");
-    return TypeQualifier::ERROR;
+    return TypeQualifier::Error;
 #endif
 }
 std::string CLKernel::argumentTypeName(size_t argumentIndex) {
@@ -250,13 +250,13 @@ cl_kernel& CLKernel::operator()() {
     
 std::string CLKernel::AddressQualifierName(CLKernel::AddressQualifier q) {
     switch(q) {
-        case CLKernel::AddressQualifier::GLOBAL:
+        case CLKernel::AddressQualifier::Global:
             return "GLOBAL";
-        case CLKernel::AddressQualifier::LOCAL:
+        case CLKernel::AddressQualifier::Local:
             return "LOCAL";
-        case CLKernel::AddressQualifier::PRIVATE:
+        case CLKernel::AddressQualifier::Private:
             return "PRIVATE";
-        case CLKernel::AddressQualifier::CONSTANT:
+        case CLKernel::AddressQualifier::Constant:
             return "CONSTANT";
         default:
             return "ERROR";
@@ -265,13 +265,13 @@ std::string CLKernel::AddressQualifierName(CLKernel::AddressQualifier q) {
 }
 std::string CLKernel::AccessQualifierName(CLKernel::AccessQualifier q) {
     switch(q) {
-        case CLKernel::AccessQualifier::READ_ONLY:
+        case CLKernel::AccessQualifier::ReadOnly:
             return "READ_ONLY";
-        case CLKernel::AccessQualifier::WRITE_ONLY:
+        case CLKernel::AccessQualifier::WriteOnly:
             return "WRITE_ONLY";
-        case CLKernel::AccessQualifier::READ_WRITE:
+        case CLKernel::AccessQualifier::ReadWrite:
             return "READ_WRITE";
-        case CLKernel::AccessQualifier::NONE:
+        case CLKernel::AccessQualifier::None:
             return "NONE";
         default:
             return "ERROR";
@@ -280,13 +280,13 @@ std::string CLKernel::AccessQualifierName(CLKernel::AccessQualifier q) {
 }
 std::string CLKernel::TypeQualifierName(CLKernel::TypeQualifier q) {
     switch(q) {
-        case CLKernel::TypeQualifier::CONST:
+        case CLKernel::TypeQualifier::Const:
             return "CONST";
-        case CLKernel::TypeQualifier::NONE:
+        case CLKernel::TypeQualifier::None:
             return "NONE";
-        case CLKernel::TypeQualifier::RESTRICT:
+        case CLKernel::TypeQualifier::Restrict:
             return "RESTRICT";
-        case CLKernel::TypeQualifier::VOLATILE:
+        case CLKernel::TypeQualifier::Volatile:
             return "VOLATILE";
         default:
             return "ERROR";

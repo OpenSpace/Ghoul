@@ -40,9 +40,9 @@ class CLProgram;
 class CLKernel {
 public:
     
-    enum class AddressQualifier {GLOBAL, LOCAL, CONSTANT, PRIVATE, ERROR};
-    enum class AccessQualifier {READ_ONLY, WRITE_ONLY, READ_WRITE, NONE, ERROR};
-    enum class TypeQualifier {CONST, RESTRICT, VOLATILE, NONE, ERROR};
+    enum class AddressQualifier {Global, Local, Constant, Private, Error};
+    enum class AccessQualifier {ReadOnly, WriteOnly, ReadWrite, None, Error};
+    enum class TypeQualifier {Const, Restrict, Volatile, None, Error};
 
     CLKernel();
     CLKernel(CLProgram* program, const std::string& name);
