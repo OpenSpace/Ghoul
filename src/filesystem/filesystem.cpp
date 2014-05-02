@@ -35,6 +35,7 @@
 #ifdef WIN32
 #include <direct.h>
 #include <windows.h>
+#include <Shlobj.h>
 #else
 #include <dirent.h>
 #include <unistd.h>
@@ -199,9 +200,9 @@ Directory FileSystem::currentDirectory() const {
 Directory FileSystem::homeDirectory() const {
     string homeDir;
 #ifdef WIN32
-    WCHAR path[1024];
-    if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, path)) {
-        homedir = path;
+    CHAR path[1024];
+    if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, path))) {
+        homeDir = path;
     }
 #else
     const char *chomeDir = getenv("HOME");

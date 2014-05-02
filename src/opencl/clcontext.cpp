@@ -39,7 +39,7 @@
 #include <ghoul/opengl/texture.h>
 
 // Windows
-#ifdef __WIN32__
+#ifdef WIN32
     #include <Windows.h>
     #include <WinUser.h>
 
@@ -113,7 +113,7 @@ bool CLContext::createContextFromGLContext() {
             cl_platform_id pid = platform.operator()();
             
             // Windows
-#ifdef __WIN32__
+#ifdef WIN32
             cl_context_properties contextProperties[] = {
                 CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
                 CL_WGL_HDC_KHR, (cl_context_properties)wglGetCurrentDC(),

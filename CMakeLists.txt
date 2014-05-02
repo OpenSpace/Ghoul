@@ -125,8 +125,9 @@ if (GHOUL_USE_DEVIL)
 endif ()
 
 include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
+set(BOOST_ROOT "${GHOUL_ROOT_DIR}/ext/boost")
 set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost COMPONENTS timer system chrono REQUIRED)
+find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${Boost_LIBRARIES})
 
