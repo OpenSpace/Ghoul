@@ -47,21 +47,19 @@
 using std::string;
 namespace {
     const string _loggerCat = "FileSystem";
-
-    const string _tokenOpeningBraces = "${";
-    const string _tokenClosingBraces = "}";
-
-#ifdef WIN32
-    const char pathSeparator = '\\';
-#else
-    const char pathSeparator = '/';
-#endif
 }
 
 namespace ghoul {
 namespace filesystem {
 
 FileSystem* FileSystem::_fileSystem = nullptr;
+const std::string FileSystem::TokenOpeningBraces = "${";
+const std::string FileSystem::TokenClosingBraces = "}";
+#ifdef WIN32
+const char FileSystem::PathSeparator = '\\';
+#else
+const char FileSystem::PathSeparator = '/';
+#endif
 
 FileSystem::FileSystem() {}
 
@@ -136,18 +134,18 @@ string FileSystem::relativePath(const string& path,
     size_t commonBasePosition = commonBasePathPosition(pathAbsolute, directoryAbsolute);
     const string& directoryRemainder = directoryAbsolute.substr(commonBasePosition);
     string relativePath = pathAbsolute.substr(commonBasePosition);
-    if (relativePath[0] == pathSeparator)
+    if (relativePath[0] == PathSeparator)
         relativePath = relativePath.substr(1);
 
     // Construct the relative path by iteratively subtracting the additional folders from
     // 'directoryRemainder'
-    size_t position = directoryRemainder.find(pathSeparator);
+    size_t position = directoryRemainder.find(PathSeparator);
     while (position != string::npos) {
         if (relativePath.empty())
             relativePath = "..";
         else
-            relativePath = ".." + (pathSeparator + relativePath);
-        position = directoryRemainder.find(pathSeparator, position + 1);
+            relativePath = ".." + (PathSeparator + relativePath);
+        position = directoryRemainder.find(PathSeparator, position + 1);
     }
     return relativePath;
 }
@@ -422,15 +420,15 @@ string FileSystem::cleanupPath(const string& path) const {
     size_t position = 0;
     while (position != string::npos) {
         char dualSeparator[2];
-        dualSeparator[0] = pathSeparator;
-        dualSeparator[1] = pathSeparator;
+        dualSeparator[0] = PathSeparator;
+        dualSeparator[1] = PathSeparator;
         position = localPath.find(dualSeparator);
         if (position != string::npos)
             localPath = localPath.substr(0, position) + localPath.substr(position + 1);
     }
     
     // Remove trailing separator
-    if (localPath[localPath.size() - 1] == pathSeparator)
+    if (localPath[localPath.size() - 1] == PathSeparator)
         localPath = localPath.substr(0, localPath.size() - 1);
     
     return localPath;
@@ -442,12 +440,12 @@ size_t FileSystem::commonBasePathPosition(const string& p1, const string& p2) co
     // 'currentPosition' is replaced by this. At the end of the loop 'currentPosition'
     // contains the last position until which both paths are the same
     size_t currentPosition = 0;
-    size_t nextPosition = p1.find(pathSeparator);
+    size_t nextPosition = p1.find(PathSeparator);
     while (nextPosition != string::npos) {
         const int result = p1.compare(0, nextPosition, p2, 0 , nextPosition);
         if (result == 0) {
             currentPosition = nextPosition;
-            nextPosition = p1.find(pathSeparator, nextPosition + 1);
+            nextPosition = p1.find(PathSeparator, nextPosition + 1);
         }
         else
             break;
@@ -459,16 +457,16 @@ size_t FileSystem::commonBasePathPosition(const string& p1, const string& p2) co
 }
     
 bool FileSystem::hasTokens(const string& path) const {
-    const bool hasOpeningBrace = path.find(_tokenOpeningBraces) != string::npos;
-    const bool hasClosingBrace = path.find(_tokenClosingBraces) != string::npos;
+    const bool hasOpeningBrace = path.find(TokenOpeningBraces) != string::npos;
+    const bool hasClosingBrace = path.find(TokenClosingBraces) != string::npos;
     return hasOpeningBrace && hasClosingBrace;
 }
 
 bool FileSystem::expandPathTokens(std::string& path) const {
     while (hasTokens(path)) {
-        string::size_type beginning = path.find(_tokenOpeningBraces);
-        string::size_type closing = path.find(_tokenClosingBraces);
-        string::size_type closingLocation = closing + _tokenClosingBraces.size();
+        string::size_type beginning = path.find(TokenOpeningBraces);
+        string::size_type closing = path.find(TokenClosingBraces);
+        string::size_type closingLocation = closing + TokenClosingBraces.size();
         const std::string currentToken = path.substr(beginning, closingLocation);
         const std::string& replacement = resolveToken(currentToken);
         if (replacement == currentToken) {
@@ -476,7 +474,7 @@ bool FileSystem::expandPathTokens(std::string& path) const {
             // be found;  resolveToken will print an error in that case
             return false;
         }
-        path.replace(beginning, closing + _tokenClosingBraces.size() - beginning, replacement);
+        path.replace(beginning, closing + TokenClosingBraces.size() - beginning, replacement);
     }
     return true;
 }
@@ -485,16 +483,16 @@ bool FileSystem::hasToken(const std::string& path, const std::string& token) con
     if (!hasTokens(path))
         return false;
     else {
-        string::size_type beginning = path.find(_tokenOpeningBraces);
-        string::size_type closing = path.find(_tokenClosingBraces);
+        string::size_type beginning = path.find(TokenOpeningBraces);
+        string::size_type closing = path.find(TokenClosingBraces);
         while ((beginning != string::npos) && (closing != string::npos)) {
-            string::size_type closingLocation = closing + _tokenClosingBraces.size();
+            string::size_type closingLocation = closing + TokenClosingBraces.size();
             const std::string currentToken = path.substr(beginning, closingLocation);
             if (currentToken == token)
                 return true;
             else {
-                beginning = path.find(_tokenOpeningBraces, closing);
-                closing = path.find(_tokenClosingBraces, beginning);
+                beginning = path.find(TokenOpeningBraces, closing);
+                closing = path.find(TokenClosingBraces, beginning);
             }
         }
         return false;

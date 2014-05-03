@@ -54,6 +54,10 @@ namespace filesystem {
  */
 class FileSystem {
 public:
+    static const char PathSeparator;
+    static const std::string TokenOpeningBraces;
+    static const std::string TokenClosingBraces;
+
     /**
      * Initializes the singleton object. This method triggers an assert if the FileSystem
      * already has been initialized before without being deinitialized in between
