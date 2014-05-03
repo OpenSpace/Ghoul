@@ -84,7 +84,7 @@ void LogManager_P<LEVEL,IMMEDIATEFLUSH>::logMessage(LogManager::LogLevel level,
     }
 }
 
-#if !defined _DEBUG
+#ifndef _DEBUG
 // ignore logging of Debug messages in Debug mode
 template<>
 void LogManager_P<LogManager::LogLevel::Debug,true>::logMessage(LogManager::LogLevel,
