@@ -342,7 +342,7 @@ std::vector<string> Dictionary::keys(const string& location) const {
     if (location.empty()) {
         std::vector<string> result;
         for (const auto& it : *this)
-            result.emplace_back(it.first);
+            result.push_back(it.first);
         return result;
     }
 
