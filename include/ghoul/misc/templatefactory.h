@@ -34,6 +34,11 @@
 
 namespace ghoul {
 
+class TemplateFactoryBase {
+public:
+    virtual const std::type_info& baseClassType() const = 0;
+};
+
 /**
  * This class implements a generic Factory pattern that can be used for any class as long
  * as a default constructor and/or constructor taking a #Dictionary is available for the
@@ -76,7 +81,7 @@ i = factory.create("B", { }); // will log an error as B does not have a Dictiona
  * using this factory
  */
 template <typename BaseClass>
-class TemplateFactory {
+class TemplateFactory : public TemplateFactoryBase {
 public:
     /**
     * This is a function pointer that is called when a new subclass is to be created and
@@ -176,6 +181,8 @@ public:
      */
     bool hasClass(const std::string& className) const;
 
+    const std::type_info& baseClassType() const override;
+
 private:
     typedef std::function<BaseClass*(bool, const ghoul::Dictionary&)> FactoryFunction;
 
@@ -183,7 +190,7 @@ private:
     std::map<std::string, FactoryFunction> _map;
 };
 
-}
+} // namespace ghoul
 
 #include "ghoul/misc/templatefactory.inl"
 

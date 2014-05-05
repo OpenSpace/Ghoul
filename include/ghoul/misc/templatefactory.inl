@@ -188,3 +188,10 @@ bool TemplateFactory<BaseClass>::hasClass(const std::string& className) const {
 }
 
 }
+
+template <typename BaseClass>
+const std::type_info& ghoul::TemplateFactory<BaseClass>::baseClassType() const
+{
+    return typeid(BaseClass);
+}
+
