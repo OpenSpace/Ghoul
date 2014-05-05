@@ -87,7 +87,7 @@ CLKernel::AddressQualifier CLKernel::argumentAddressQualifier(size_t argumentInd
     err = clGetKernelArgInfo(*_kernel, argumentIndex, arginfo, sizeof(returnval), &returnval, &length);
     if(err != CL_SUCCESS) {
         LERROR("Error when fetching argument information: " << getErrorString(err));
-        return AddressQualifier::ERROR;
+        return AddressQualifier::Error;
     }
     
     switch(returnval) {
@@ -118,7 +118,7 @@ CLKernel::AccessQualifier CLKernel::argumentAccessQualifier(size_t argumentIndex
     err = clGetKernelArgInfo(*_kernel, argumentIndex, arginfo, sizeof(returnval), &returnval, &length);
     if(err != CL_SUCCESS) {
         LERROR("Error when fetching argument information: " << getErrorString(err));
-        return AccessQualifier::ERROR;
+        return AccessQualifier::Error;
     }
     
     switch(returnval) {
@@ -149,7 +149,7 @@ CLKernel::TypeQualifier CLKernel::argumentTypeQualifier(size_t argumentIndex) {
     err = clGetKernelArgInfo(*_kernel, argumentIndex, arginfo, sizeof(returnval), &returnval, &length);
     if(err != CL_SUCCESS) {
         LERROR("Error when fetching argument information: " << getErrorString(err));
-        return TypeQualifier::ERROR;
+        return TypeQualifier::Error;
     }
     
     switch(returnval) {
