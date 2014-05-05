@@ -385,11 +385,11 @@ void FileSystem::registerPathToken(const string& token, const string& path) {
         return;
     }
     
-    const std::string beginning = token.substr(0, _tokenOpeningBraces.size());
-    const std::string ending = token.substr(token.size() - _tokenClosingBraces.size());
-    if ((beginning != _tokenOpeningBraces) || (ending != _tokenClosingBraces)) {
-        LERROR("Token has to start with '" + _tokenOpeningBraces +
-                    "' and end with '" + _tokenClosingBraces + "'");
+    const std::string beginning = token.substr(0, TokenOpeningBraces.size());
+    const std::string ending = token.substr(token.size() - TokenClosingBraces.size());
+    if ((beginning != TokenOpeningBraces) || (ending != TokenClosingBraces)) {
+        LERROR("Token has to start with '" + TokenOpeningBraces +
+                    "' and end with '" + TokenClosingBraces + "'");
         return;
     }
     

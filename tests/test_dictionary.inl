@@ -8005,7 +8005,7 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
         signed char value;
         success = d.getValue("1int", value);
         ASSERT_EQ(true, success) << "success getValue<signed char>";
-        EXPECT_EQ(signed char(1), value) << "correct getValue<signed char>";
+        EXPECT_EQ(static_cast<signed char>(1), value) << "correct getValue<signed char>";
     }
     success = d.hasValue<unsigned char>("1int");
     EXPECT_EQ(false, success) << "hasValue<unsigned char>(\"1int\")";
@@ -8019,7 +8019,7 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
         unsigned char value;
         success = d.getValue("1uint", value);
         ASSERT_EQ(true, success) << "success getValue<unsigned char>";
-        EXPECT_EQ(unsigned char(1), value)
+        EXPECT_EQ(static_cast<unsigned char>(1), value)
               << "correct getValue<unsigned char>";
     }
 
@@ -8067,7 +8067,7 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
         unsigned short value;
         success = d.getValue("1uint", value);
         ASSERT_EQ(true, success) << "success getValue<unsigned short>";
-        EXPECT_EQ(unsigned short(1), value)
+        EXPECT_EQ(static_cast<unsigned short>(1), value)
             << "correct getValue<unsigned short>";
     }
 
@@ -8099,7 +8099,7 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
         unsigned int value;
         success = d.getValue("1uint", value);
         ASSERT_EQ(true, success) << "success getValue<unsigned int>";
-        EXPECT_EQ(unsigned int(1), value)
+        EXPECT_EQ(static_cast<unsigned int>(1), value)
             << "correct getValue<unsigned int>";
     }
 
@@ -8115,7 +8115,7 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
         long long value;
         success = d.getValue("1int", value);
         ASSERT_EQ(true, success) << "success getValue<long long>";
-        EXPECT_EQ(long long(1), value)
+        EXPECT_EQ(static_cast<long long>(1), value)
             << "correct getValue<long long>";
     }
 
@@ -8131,7 +8131,7 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
         unsigned long long value;
         success = d.getValue("1uint", value);
         ASSERT_EQ(true, success) << "success getValue<unsigned long long>";
-        EXPECT_EQ(unsigned long long(1), value)
+        EXPECT_EQ(static_cast<unsigned long long>(1), value)
             << "correct getValue<unsigned long long>";
     }
 
