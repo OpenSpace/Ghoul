@@ -69,6 +69,10 @@ void LogManager_P<LEVEL,IMMEDIATEFLUSH>::logMessage(LogManager::LogLevel level,
                                                     const std::string& category,
                                                     const std::string& message)
 {
+#ifndef _DEBUG
+    if (level == LogManager::LogLevel::Debug)
+        return;
+#endif
     if (level >= LEVEL) {
         // Acquire lock
         while (_mutex.test_and_set()) {}
@@ -83,21 +87,6 @@ void LogManager_P<LEVEL,IMMEDIATEFLUSH>::logMessage(LogManager::LogLevel level,
         _mutex.clear();
     }
 }
-
-#ifndef _DEBUG
-// ignore logging of Debug messages in Debug mode
-template<>
-void LogManager_P<LogManager::LogLevel::Debug,true>::logMessage(LogManager::LogLevel,
-                                                                const std::string&,
-                                                                const std::string&)
-{}
-
-template<>
-void LogManager_P<LogManager::LogLevel::Debug,false>::logMessage(LogManager::LogLevel,
-                                                                 const std::string&,
-                                                                 const std::string&)
-{}
-#endif
 
 /// \endcond
 
