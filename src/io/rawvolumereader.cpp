@@ -65,9 +65,7 @@ opengl::Texture* RawVolumeReader::read(std::string filename) {
 		opengl::Texture* texture = new opengl::Texture(data, glm::size3_t(_hints._dimensions),
 				_hints._format, _hints._internalFormat, GL_UNSIGNED_BYTE,
 				opengl::Texture::FilterMode::Linear, opengl::Texture::WrappingMode::ClampToBorder);
-		texture->uploadTexture();
-
-		delete []data;
+		//texture->uploadTexture();
 		return texture;
 	} else {
 		std::cout << "Error. Volume dimensions not set" << std::endl;
