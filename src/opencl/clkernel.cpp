@@ -70,11 +70,6 @@ int CLKernel::setArgument(unsigned int index, cl_mem* input) {
     assert(isValidKernel());
     return clSetKernelArg(*_kernel, index, sizeof(cl_mem), input);
 }
-
-    
-int CLKernel::setArgument(unsigned int index, const glm::mat4& matrix) {
-    return 0;
-}
     
 CLKernel::AddressQualifier CLKernel::argumentAddressQualifier(size_t argumentIndex) {
 #ifdef CL_VERSION_1_2

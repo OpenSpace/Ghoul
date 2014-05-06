@@ -37,6 +37,7 @@ namespace ghoul {
 class TemplateFactoryBase {
 public:
     virtual const std::type_info& baseClassType() const = 0;
+    virtual ~TemplateFactoryBase();
 };
 
 /**
