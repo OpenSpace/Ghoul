@@ -26,12 +26,14 @@
 #include <ghoul/cmdparser/commandlineparser.h>
 #include <ghoul/cmdparser/commandlinecommand.h>
 #include <ghoul/logging/logmanager.h>
+
+#include <assert.h>
 #include <map>
 #include <iostream>
 
 namespace {
 
-    const std::string _loggerCat = "CommandlineParser";
+const std::string _loggerCat = "CommandlineParser";
 
 /**
  * Extracts multiple arguments from a single list. <br>
@@ -42,7 +44,7 @@ namespace {
  * If <code>count</code> is <code>> 0</code>, that many arguments will be extracted and
  * returned.
  */
-int extractArguments(const std::vector<std::string> in, std::vector<std::string>& out,
+int extractArguments(const std::vector<std::string>& in, std::vector<std::string>& out,
                      const size_t begin, const int count)
 {
     int num = 0;
@@ -69,13 +71,12 @@ int extractArguments(const std::vector<std::string> in, std::vector<std::string>
 namespace ghoul {
 namespace cmdparser {
 
-CommandlineParser::CommandlineParser(const std::string& programName,
-                                     bool allowUnknownCommands)
+CommandlineParser::CommandlineParser(std::string programName, bool allowUnknownCommands)
     : _commandForNamelessArguments(nullptr)
     , _remainingArguments(nullptr)
-    , _programName(programName)
-    , _allowUnknownCommands(allowUnknownCommands)
-{}
+    , _programName(std::move(programName))
+    , _allowUnknownCommands(allowUnknownCommands) {
+}
 
 CommandlineParser::~CommandlineParser() {
     for (CommandlineCommand* i : _commands)
@@ -98,6 +99,8 @@ const std::string& CommandlineParser::programPath() const {
 void CommandlineParser::setCommandLine(int argc, char** argv,
                                        std::vector<std::string>* remainingArguments)
 {
+    assert(argv != nullptr);
+
     if (_allowUnknownCommands && (remainingArguments == nullptr)) {
         LERROR("Unknown commands are allowed, but no vector which will contain the " <<
                  "commands has been specified. Additional commands will cause the " <<
@@ -142,7 +145,7 @@ bool CommandlineParser::execute() {
 
     // We store the commands and parameters in a map to be able to execute them without
     // parsing the commandline again
-    std::multimap<CommandlineCommand*, std::vector<std::string> > parameterMap;
+    std::multimap<CommandlineCommand*, std::vector<std::string>> parameterMap;
 
     for (size_t i = 0 ; i < _arguments.size(); ++i) {
         // In the beginning we assume that we just started the loop or finished reading
@@ -196,7 +199,8 @@ bool CommandlineParser::execute() {
             }
 
             std::vector<std::string> parameters;
-            int number = extractArguments(_arguments, parameters, i, currentCommand->argumentNumber());
+            int number = extractArguments(_arguments, parameters, i,
+                                          currentCommand->argumentNumber());
             i += number;
 
             // don't insert if the command doesn't allow multiple calls and already is in the map
@@ -209,17 +213,17 @@ bool CommandlineParser::execute() {
                 return false;
             }
 
-            parameterMap.insert(std::make_pair(currentCommand, parameters));
+            parameterMap.emplace(currentCommand, parameters);
         }
     }
     // We now have all the commands with the respective parameters stored in the map and
-    // all the parameters for the nameless command is avaiable as well.
+    // all the parameters for the nameless command is available as well.
 
     // First step: Test, if we have nameless arguments even if we don't have a nameless
     // command. If so, bail out
     if (!argumentsForNameless.empty() && (_commandForNamelessArguments == nullptr)) {
         if (storeUnknownCommands()) {
-            for (const std::string& arg : argumentsForNameless)
+            for (std::string arg : argumentsForNameless)
                 _remainingArguments->push_back(arg);
         }
         else {
@@ -240,7 +244,7 @@ bool CommandlineParser::execute() {
         }
     }
 
-    // Second-and-a-halfs step: Display pairs for (command,argument) in debug level
+    // Second-and-a-half step: Display pairs for (command,argument) in debug level
     std::stringstream s;
     for (const std::string& arg : argumentsForNameless)
         s << " " << arg;
@@ -270,10 +274,7 @@ bool CommandlineParser::execute() {
     // until now)
     for (auto it = parameterMap.begin(); it != parameterMap.end(); ++it) {
         bool correct = it->first->execute(it->second);
-        if (correct) {
-            
-        }
-        else {
+        if (!correct) {
             LFATAL("The execution for " + (*it).first->name() + " failed");
             displayUsage();
             return false;
@@ -286,6 +287,8 @@ bool CommandlineParser::execute() {
 }
 
 bool CommandlineParser::addCommand(CommandlineCommand* cmd) {
+    assert(cmd != nullptr);
+
     const bool nameFormatCorrect = cmd->name()[0] == '-';
     if (!nameFormatCorrect) {
         LFATAL("The name for a command has to start with an -");
@@ -298,7 +301,7 @@ bool CommandlineParser::addCommand(CommandlineCommand* cmd) {
         LERROR("The name for the command '" << cmd->name() << "' already existed");
         return false;
     }
-    const bool hasShortname = cmd->shortName() != "";
+    const bool hasShortname = !cmd->shortName().empty();
     if (hasShortname) {
         const bool shortNameExists = getCommand(cmd->shortName()) != nullptr;
         if (shortNameExists) {
@@ -316,12 +319,12 @@ bool CommandlineParser::addCommand(CommandlineCommand* cmd) {
     }
 
     // If we got this far, the names are valid
-    // We don't need to check for duplicate entries as the names would be duplicate, too
     _commands.push_back(cmd);
     return true;
 }
 
 void CommandlineParser::addCommandForNamelessArguments(CommandlineCommand* cmd) {
+    assert(cmd);
     delete _commandForNamelessArguments;
     _commandForNamelessArguments = cmd;
 }
@@ -330,7 +333,7 @@ void CommandlineParser::displayUsage(const std::string& command, std::ostream& s
     std::string usageString = "Usage: ";
 
     if (command.empty()) {
-        if (_programName != "")
+        if (!_programName.empty())
             usageString += _programName + " ";
 
         if (_commandForNamelessArguments != 0)
@@ -360,7 +363,7 @@ void CommandlineParser::displayHelp(std::ostream& stream) {
 }
 
 CommandlineCommand* CommandlineParser::getCommand(const std::string& shortOrLongName) {
-    if (shortOrLongName == "")
+    if (shortOrLongName.empty())
         return nullptr;
     for (CommandlineCommand* const it : _commands) {
         if ((it->name() == shortOrLongName) || (it->shortName() == shortOrLongName))
@@ -374,4 +377,4 @@ bool CommandlineParser::storeUnknownCommands() const {
 }
     
 } // namespace cmdparser
-} // namespace voreen
+} // namespace ghoul

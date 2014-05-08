@@ -160,12 +160,10 @@ public:
     
     bool execute(const std::vector<std::string>& parameters) {
         cast(parameters[0], *_ptr1);
-        if (_ptr2 != nullptr) {
+        if (_ptr2 != nullptr)
             cast(parameters[1], *_ptr2);
-        }
-        if (_ptr3 != nullptr) {
+        if (_ptr3 != nullptr)
             cast(parameters[2], *_ptr3);
-        }
         if (_ptr4 != nullptr)
             cast(parameters[3], *_ptr4);
 
@@ -226,10 +224,10 @@ protected:
  */
 class SingleCommandZeroArguments : public CommandlineCommand {
 public:
-    SingleCommandZeroArguments(bool* ptr, const std::string& name,
-                               const std::string& shortName = "",
-                               const std::string& infoText = "")
-        : CommandlineCommand(name, shortName, infoText, "", 0, false)
+    SingleCommandZeroArguments(bool* ptr, std::string name,
+                               std::string shortName = "",
+                               std::string infoText = "")
+        : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), "", 0, false)
         , _ptr(ptr)
     {}
 

@@ -79,48 +79,47 @@ FileSystem& FileSystem::ref() {
     return *_fileSystem;
 }
 
-string FileSystem::absolutePath(const string& path) const {
-    string result = path;
-    expandPathTokens(result);
+string FileSystem::absolutePath(string path) const {
+    expandPathTokens(path);
 
     static const int PATH_BUFFER_SIZE = 4096;
     char* buffer = nullptr;
 #ifdef WIN32
     buffer = new char[PATH_BUFFER_SIZE];
-    const DWORD success = GetFullPathName(result.c_str(), PATH_BUFFER_SIZE, buffer, 0);
+    const DWORD success = GetFullPathName(path.c_str(), PATH_BUFFER_SIZE, buffer, 0);
     if (success == 0) {
         delete[] buffer;
         buffer = nullptr;
     }
 #else
     char errorBuffer[PATH_BUFFER_SIZE];
-    buffer = realpath(result.c_str(), errorBuffer);
+    buffer = realpath(path.c_str(), errorBuffer);
     if (buffer == NULL) {
         LERROR("Error resolving the real path. Problem part: '" << errorBuffer << "'");
-        return result;
+        return path;
     }
 #endif
 
     if (buffer) {
-        result = string(buffer);
+        path = string(buffer);
 #ifdef WIN32
         delete[] buffer;
 #endif
-        return result;
+        return path;
     }
 
-    return result;
+    return path;
 }
 
-string FileSystem::relativePath(const string& path,
+string FileSystem::relativePath(string path,
                                 const Directory& baseDirectory) const
 {
     if (path.empty()) {
         LERROR("'path' must contain a path");
         return path;
     }
-    const string& pathAbsolute = cleanupPath(absolutePath(path));
-    const string& directoryAbsolute = cleanupPath(absolutePath(baseDirectory));
+    string&& pathAbsolute = cleanupPath(absolutePath(path));
+    string&& directoryAbsolute = cleanupPath(absolutePath(baseDirectory));
 
     // Return identity path if absolutes are equal
     if (pathAbsolute == directoryAbsolute)
@@ -132,7 +131,7 @@ string FileSystem::relativePath(const string& path,
 
     // Find the common part in the 'path' and 'baseDirectory'
     size_t commonBasePosition = commonBasePathPosition(pathAbsolute, directoryAbsolute);
-    const string& directoryRemainder = directoryAbsolute.substr(commonBasePosition);
+    string&& directoryRemainder = directoryAbsolute.substr(commonBasePosition);
     string relativePath = pathAbsolute.substr(commonBasePosition);
     if (relativePath[0] == PathSeparator)
         relativePath = relativePath.substr(1);
@@ -151,7 +150,6 @@ string FileSystem::relativePath(const string& path,
 }
     
 Directory FileSystem::currentDirectory() const {
-    string currentDir;
 #ifdef WIN32
     // Get the size of the directory
     DWORD size = GetCurrentDirectory(0, NULL);
@@ -177,7 +175,7 @@ Directory FileSystem::currentDirectory() const {
         }
         return Directory();
     }
-    currentDir = string(buffer);
+    string&& currentDir = std::move(string(buffer));
     delete[] buffer;
 #else
     char* buffer = new char[MAXPATHLEN];
@@ -186,33 +184,10 @@ Directory FileSystem::currentDirectory() const {
         LERROR("Error retrieving current directory: " << errno);
         return Directory();
     }
-    currentDir = string(buffer);
+    string&& currentDir = std::move(string(buffer));
     delete[] buffer;
 #endif
     return Directory(currentDir);
-}
-    
-/**
- * Returns home Directory
- */
-Directory FileSystem::homeDirectory() const {
-    string homeDir;
-#ifdef WIN32
-    CHAR path[1024];
-    if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, path))) {
-        homeDir = path;
-    }
-#else
-    const char *chomeDir = getenv("HOME");
-    if (!chomeDir) {
-        struct passwd* pwd = getpwuid(getuid());
-        if (pwd)
-            homeDir = pwd->pw_dir;
-    } else {
-        homeDir = chomeDir;
-    }
-#endif
-    return Directory(homeDir);
 }
     
 void FileSystem::setCurrentDirectory(const Directory& directory) const {
@@ -378,15 +353,15 @@ bool FileSystem::deleteDirectory(const Directory& path) const {
 #endif
 }
 
-void FileSystem::registerPathToken(const string& token, const string& path) {
+void FileSystem::registerPathToken(string token, string path) {
 #ifdef GHL_DEBUG
     if (token.empty()) {
         LERROR("Token cannot not be empty");
         return;
     }
     
-    const std::string beginning = token.substr(0, TokenOpeningBraces.size());
-    const std::string ending = token.substr(token.size() - TokenClosingBraces.size());
+    std::string&& beginning = token.substr(0, TokenOpeningBraces.size());
+    std::string&& ending = token.substr(token.size() - TokenClosingBraces.size());
     if ((beginning != TokenOpeningBraces) || (ending != TokenClosingBraces)) {
         LERROR("Token has to start with '" + TokenOpeningBraces +
                     "' and end with '" + TokenClosingBraces + "'");
@@ -400,38 +375,37 @@ void FileSystem::registerPathToken(const string& token, const string& path) {
         return;
     }
 #endif
-    _fileSystem->_tokenMap[token] = path;
+    _fileSystem->_tokenMap.emplace(token, path);
 }
     
-string FileSystem::cleanupPath(const string& path) const {
-    string localPath = path;
+string FileSystem::cleanupPath(string path) const {
 #ifdef WIN32
     // In Windows, replace all '/' by '\\' for conformity
-    std::replace(localPath.begin(), localPath.end(), '/', '\\');
-    const std::string& drivePart = localPath.substr(0,3);
-    const std::regex& driveRegex = std::regex("([[:lower:]][\\:][\\\\])");
-    const bool hasCorrectSize = localPath.size() >= 3;
+    std::replace(path.begin(), path.end(), '/', '\\');
+    std::string&& drivePart = path.substr(0, 3);
+    std::regex&& driveRegex = std::regex("([[:lower:]][\\:][\\\\])");
+    const bool hasCorrectSize = path.size() >= 3;
     if (hasCorrectSize && std::regex_match(drivePart, driveRegex))
-        std::transform(localPath.begin(), localPath.begin() + 1,
-                       localPath.begin(), toupper);
+        std::transform(path.begin(), path.begin() + 1,
+                        path.begin(), toupper);
+#else
+    // Remove all double separators (will automatically be done on Windows)
 #endif
-    
-    // Remove all double separators
     size_t position = 0;
     while (position != string::npos) {
         char dualSeparator[2];
         dualSeparator[0] = PathSeparator;
         dualSeparator[1] = PathSeparator;
-        position = localPath.find(dualSeparator);
+        position = path.find(dualSeparator);
         if (position != string::npos)
-            localPath = localPath.substr(0, position) + localPath.substr(position + 1);
+            path = std::move(path.substr(0, position) + path.substr(position + 1));
     }
     
     // Remove trailing separator
-    if (localPath[localPath.size() - 1] == PathSeparator)
-        localPath = localPath.substr(0, localPath.size() - 1);
+    if (path[path.size() - 1] == PathSeparator)
+        path = std::move(path.substr(0, path.size() - 1));
     
-    return localPath;
+    return path;
 }
     
 size_t FileSystem::commonBasePathPosition(const string& p1, const string& p2) const {
@@ -499,7 +473,7 @@ bool FileSystem::hasToken(const std::string& path, const std::string& token) con
     }
 }
     
-const std::string FileSystem::resolveToken(const std::string& token) const {
+std::string FileSystem::resolveToken(const std::string& token) const {
     const std::map<std::string, std::string>::const_iterator it = _tokenMap.find(token);
     if (it == _tokenMap.end()) {
         LERROR("Token '" + token + "' could not be resolved");

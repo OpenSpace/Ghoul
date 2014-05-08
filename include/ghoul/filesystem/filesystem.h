@@ -87,7 +87,7 @@ public:
      * \param path The path that should be converted into an absolute path
      * \return The absolute path to the passed <code>path</code>
      */
-    std::string absolutePath(const std::string& path) const;
+    std::string absolutePath(std::string path) const;
     
     /**
      * Returns the relative path of the passed <code>path</code> relative to the passed
@@ -101,7 +101,7 @@ public:
      * \return The relative path leading from the <code>baseDirectory</code> to the
      * <code>path</code>
      */
-    std::string relativePath(const std::string& path,
+    std::string relativePath(std::string path,
                              const Directory& baseDirectory = Directory()) const;
 
     /**
@@ -109,12 +109,6 @@ public:
      * \return The current working directory of this process
      */
     Directory currentDirectory() const;
-    
-    /**
-     * Returns current users home directory
-     * \return The current users home directory
-     */
-    Directory homeDirectory() const;
     
     /**
      * Changes the current working directory of this process. Please note that this will
@@ -170,7 +164,7 @@ public:
      * \param token The token in the form <code>${...}</code>
      * \param path The path the token should point to
      */
-    void registerPathToken(const std::string& token, const std::string& path);
+    void registerPathToken(std::string token, std::string path);
 
     /**
      * Replaces the path tokens present in the <code>path</code> if any exist. If all 
@@ -191,7 +185,7 @@ private:
      * \param path The path that should be cleaned up
      * \return The cleaned path with correct separators
      */
-    std::string cleanupPath(const std::string& path) const;
+    std::string cleanupPath(std::string path) const;
     
     /**
      * This method returns the position until both paths <code>p1</code> and
@@ -224,7 +218,7 @@ private:
      * \param token The token whose replacement is looked up
      * \return The replacement string for the token
      */
-    const std::string resolveToken(const std::string& token) const;
+    std::string resolveToken(const std::string& token) const;
 
     /**
      * Empty constructor. In here as there should not be any local FileSystems around,

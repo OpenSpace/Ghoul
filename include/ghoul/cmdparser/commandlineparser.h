@@ -46,8 +46,7 @@ public:
      * used commands from the passed command-line, leaving the unknown commands untouched.
      * This allows other parts of the program to deal with command-line arguments as well.
      */
-    CommandlineParser(const std::string& programName = "",
-                      bool allowUnknownCommands = false);
+    CommandlineParser(std::string programName = "", bool allowUnknownCommands = false);
 
     /**
      * The destructor will also delete all the contained commands within.

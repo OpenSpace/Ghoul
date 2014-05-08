@@ -51,10 +51,10 @@ namespace cmdparser {
 template<class T, class U = T, class V = U, class W = V>
 class MultipleCommand : public CommandlineCommand {
 public:
-    MultipleCommand(std::vector<T>* ptr1, const std::string& name,
-                    const std::string& shortName = "", const std::string& infoText = "",
-                    const std::string parameterList = "")
-        : CommandlineCommand(name, shortName, infoText, parameterList, 1, true)
+    MultipleCommand(std::vector<T>* ptr1, std::string name,
+                    std::string shortName = "", std::string infoText = "",
+                    std::string parameterList = "")
+        : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), std::move(parameterList), 1, true)
         , _ptr1(ptr1)
         , _ptr2(nullptr)
         , _ptr3(nullptr)
@@ -62,10 +62,10 @@ public:
     {}
 
     MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2,
-                    const std::string& name, const std::string& shortName = "",
-                    const std::string& infoText = "",
-                    const std::string parameterList = "")
-        : CommandlineCommand(name, shortName, infoText, parameterList, 2, true)
+                    std::string name, std::string shortName = "",
+                    std::string infoText = "",
+                    std::string parameterList = "")
+        : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), std::move(parameterList), 2, true)
         , _ptr1(ptr1)
         , _ptr2(ptr2)
         , _ptr3(nullptr)
@@ -73,10 +73,10 @@ public:
     {}
 
     MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2, std::vector<V>* ptr3,
-        const std::string& name, const std::string& shortName = "",
-                    const std::string& infoText = "",
-                    const std::string parameterList = "")
-        : CommandlineCommand(name, shortName, infoText, parameterList, 3, true)
+        std::string name, std::string shortName = "",
+                    std::string infoText = "",
+                    std::string parameterList = "")
+        : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), std::move(parameterList), 3, true)
         , _ptr1(ptr1)
         , _ptr2(ptr2)
         , _ptr3(ptr3)
@@ -84,10 +84,10 @@ public:
     {}
 
     MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2, std::vector<V>* ptr3,
-                    std::vector<W>* ptr4, const std::string& name,
-                    const std::string& shortName = "", const std::string& infoText = "",
-                    const std::string parameterList = "")
-        : CommandlineCommand(name, shortName, infoText, parameterList, 4, true)
+                    std::vector<W>* ptr4, std::string name,
+                    std::string shortName = "", std::string infoText = "",
+                    std::string parameterList = "")
+        : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), std::move(parameterList), 4, true)
         , _ptr1(ptr1)
         , _ptr2(ptr2)
         , _ptr3(ptr3)
@@ -146,9 +146,9 @@ protected:
  */
 class MultipleCommandZeroArguments : public CommandlineCommand {
 public:
-    MultipleCommandZeroArguments(int* ptr, const std::string& name, const std::string& shortName = "",
-        const std::string& infoText = "")
-        : CommandlineCommand(name, shortName, infoText, "", 0, true)
+    MultipleCommandZeroArguments(int* ptr, std::string name, std::string shortName = "",
+        std::string infoText = "")
+        : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), "", 0, true)
         , _ptr(ptr)
     {
         *_ptr = 0;

@@ -70,8 +70,9 @@ public:
      * CommandlineParser that it should allow multiple instances of this
      * CommandlineCommand in a single command line
      */
-    CommandlineCommand(const std::string& name, const std::string& shortName = "", const std::string& infoText = "",
-        const std::string& parameterList = "", const int argumentNum = 1, const bool allowMultipleCalls = false);
+    CommandlineCommand(std::string name, std::string shortName = "",
+                       std::string infoText = "", std::string parameterList = "",
+                       int argumentNum = 1, bool allowMultipleCalls = false);
     virtual ~CommandlineCommand();
 
     /**
@@ -139,7 +140,8 @@ public:
      */
     virtual std::string usage() const;
 
-    /// Returns the help-part for a command. Used in the help()-method from the commandlineparser
+    /// Returns the help-part for a command. Used in the help()-method from the
+    /// commandlineparser
     virtual std::string help() const;
 
 protected:
@@ -182,8 +184,8 @@ protected:
     std::string _name;
     /// The short name of this command which is also usable (usually an abbreviation)
     std::string _shortName;
-     /// A description of the command; used in the #help method
-     std::string _infoText;
+    /// A description of the command; used in the #help method
+    std::string _infoText;
     /// The parameter list necessary for the #usage method
     std::string _parameterList;
     /// Name used as a prefix for logging
@@ -196,7 +198,7 @@ protected:
     std::string _errorMsg;
 };
 
-} // namespace cmdparser
-} // namespace ghoul
+}  // namespace cmdparser
+}  // namespace ghoul
 
-#endif //__COMMANDLINECOMMAND_H__
+#endif  //__COMMANDLINECOMMAND_H__

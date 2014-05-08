@@ -178,7 +178,7 @@ add_library(Ghoul STATIC ${GHOUL_SOURCE} ${GHOUL_HEADER})
 
 # Adding debug flags for the debug build
 if(MSVC OR XCODE)
-    set_target_properties(Ghoul PROPERTIES COMPILE_DEFINITIONS_DEBUG "_DEBUG GHL_DEBUG")
+    set_target_properties(Ghoul PROPERTIES COMPILE_DEFINITIONS_DEBUG "GHL_DEBUG")
 else() 
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         add_definitions(-DGHL_DEBUG)

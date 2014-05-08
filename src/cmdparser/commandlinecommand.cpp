@@ -33,20 +33,25 @@
 namespace ghoul {
 namespace cmdparser {
 
-CommandlineCommand::CommandlineCommand(const std::string& name,
-                                       const std::string& shortName,
-                                       const std::string& infoText,
-                                       const std::string& parameterList,
-                                       const int argumentNum,
-                                       const bool allowMultipleCalls)
-    : _name(name)
-    , _shortName(shortName)
-    , _infoText(infoText)
-    , _parameterList(parameterList)
+CommandlineCommand::CommandlineCommand(std::string name,
+                                       std::string shortName,
+                                       std::string infoText,
+                                       std::string parameterList,
+                                       int argumentNum,
+                                       bool allowMultipleCalls)
+    : _name(std::move(name))
+    , _shortName(std::move(shortName))
+    , _infoText(std::move(infoText))
+    , _parameterList(std::move(parameterList))
     , _argumentNum(argumentNum)
     , _allowsMultipleCalls(allowMultipleCalls)
     , _errorMsg("")
-{}
+{
+#ifdef GHL_DEBUG
+    if (name.empty())
+        LERRORC("CommandlineCommand", "Every CommandlineCommand needs a name");
+#endif
+}
 
 CommandlineCommand::~CommandlineCommand() {}
 
