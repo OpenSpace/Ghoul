@@ -221,16 +221,13 @@ private:
     std::string resolveToken(const std::string& token) const;
 
     /**
-     * Empty constructor. In here as there should not be any local FileSystems around,
+     * Empty constructor. Private as there should not be any local FileSystems around,
      * but the static one.
      */
     FileSystem();
 
-    /// This method is not implemented on purpose; using this should produce an error.
-    FileSystem(const FileSystem& rhs);
-    
-    /// This method not implemented on purpose; using this should produce an error.
-    FileSystem& operator=(const FileSystem& rhs);
+    FileSystem(const FileSystem& rhs) = delete;
+    FileSystem& operator=(const FileSystem& rhs) = delete;
     
     /// This map stores all the tokens that are used in the FileSystem.
     std::map<std::string, std::string> _tokenMap;

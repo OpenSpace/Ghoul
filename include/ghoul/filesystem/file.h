@@ -73,7 +73,7 @@ public:
      * \see ghoul::filesystem::FileSystem The system to register and use tokens
      */
     File(const char* filename, bool isRawPath = false,
-         const FileChangedCallback& fileChangedCallback = FileChangedCallback());
+         FileChangedCallback fileChangedCallback = FileChangedCallback());
 
     /**
      * This method constructs a new File object using a given <code>filename</code> as an
@@ -89,8 +89,8 @@ public:
      * the file on the filesystem
      * \see ghoul::filesystem::FileSystem The system to register and use tokens
      */
-    File(const std::string& filename, bool isRawPath = false,
-         const FileChangedCallback& fileChangedCallback = FileChangedCallback());
+    File(std::string filename, bool isRawPath = false,
+         FileChangedCallback fileChangedCallback = FileChangedCallback());
 
     /**
      * The destructor will automatically stop the notification of future changes in the 
@@ -105,7 +105,7 @@ public:
      * condition might appear if a file is changed in the file system at the same time.
      * \param callback The new callback function that will be used in this File object
      */
-    void setCallback(const FileChangedCallback& callback);
+    void setCallback(FileChangedCallback callback);
     
     /**
      * Returns the currently active <code>std::function</code> object. This object might

@@ -66,11 +66,11 @@ Directory::Directory(const char* path, bool isRawPath) {
         _directoryPath = FileSys.absolutePath(string(path));
 }
 
-Directory::Directory(const std::string& path, bool isRawPath) {
+Directory::Directory(std::string path, bool isRawPath) {
     if (isRawPath)
-        _directoryPath = path.empty() ? "." : path;
+        _directoryPath = path.empty() ? "." : std::move(path);
     else
-        _directoryPath = FileSys.absolutePath(path.empty() ? "." : path);
+        _directoryPath = std::move(FileSys.absolutePath(path.empty() ? "." : path));
 }
 
 Directory::operator const std::string&() const {
@@ -93,10 +93,8 @@ std::vector<std::string> Directory::read(bool recursiveSearch, bool sort) const 
     vector<string> result;
     readDirectories(result, _directoryPath, recursiveSearch);
     readFiles(result, _directoryPath, recursiveSearch);
-
     if (sort)
         std::sort(result.begin(), result.end());
-
     return result;
 }
 

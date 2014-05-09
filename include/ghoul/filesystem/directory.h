@@ -79,7 +79,7 @@ public:
      * the path is used as-is without changes. This might make the Directory object
      * outdated if the current working directory is subsequently changed.
      */
-    Directory(const std::string& path, bool isRawPath = false);
+    Directory(std::string path, bool isRawPath = false);
 
     /**
      * Operator that returns the path this directory points to. This can, depending on the

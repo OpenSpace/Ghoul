@@ -52,8 +52,8 @@ namespace {
 
     
 File::File(const char* filename, bool isRawPath,
-           const FileChangedCallback& fileChangedCallback)
-    : _fileChangedCallback(fileChangedCallback)
+           FileChangedCallback fileChangedCallback)
+    : _fileChangedCallback(std::move(fileChangedCallback))
 #ifdef WIN32
     , _directoryHandle(nullptr)
     , _activeBuffer(0)
@@ -71,9 +71,9 @@ File::File(const char* filename, bool isRawPath,
         installFileChangeListener();
 }
 
-File::File(const std::string& filename, bool isRawPath,
-           const FileChangedCallback& fileChangedCallback)
-    : _fileChangedCallback(fileChangedCallback)
+File::File(std::string filename, bool isRawPath,
+           FileChangedCallback fileChangedCallback)
+    : _fileChangedCallback(std::move(fileChangedCallback))
 #ifdef WIN32
     , _directoryHandle(nullptr)
     , _activeBuffer(0)
@@ -83,9 +83,9 @@ File::File(const std::string& filename, bool isRawPath,
 #endif
 {
     if (isRawPath)
-        _filename = filename;
+        _filename = std::move(filename);
     else
-        _filename = FileSys.absolutePath(filename);
+        _filename = std::move(FileSys.absolutePath(filename));
 
     if (_fileChangedCallback)
         installFileChangeListener();
@@ -95,10 +95,10 @@ File::~File() {
     removeFileChangeListener();
 }
 
-void File::setCallback(const FileChangedCallback& callback) {
+void File::setCallback(FileChangedCallback callback) {
     if (_fileChangedCallback)
         removeFileChangeListener();
-    _fileChangedCallback = callback;
+    _fileChangedCallback = std::move(callback);
     if (_fileChangedCallback)
         installFileChangeListener();
 }
@@ -244,7 +244,7 @@ void CALLBACK File::completionHandler(DWORD /*dwErrorCode*/, DWORD,
     // Restart change listener as soon as possible
     file->beginRead();
 
-    const string thisFilename = file->filename();
+    string&& thisFilename = file->filename();
 
     char* buffer = reinterpret_cast<char*>(&(file->_changeBuffer[currentBuffer][0]));
     // data might have queued up, so we need to check all changes
@@ -252,9 +252,11 @@ void CALLBACK File::completionHandler(DWORD /*dwErrorCode*/, DWORD,
         // extract the information which file has changed
         FILE_NOTIFY_INFORMATION& information = (FILE_NOTIFY_INFORMATION&)*buffer;
         char* currentFilenameBuffer = new char[information.FileNameLength];
-        // TODO fix warning
-        std::wcstombs(currentFilenameBuffer,
-                      information.FileName, information.FileNameLength);
+        size_t i;
+        wcstombs_s(&i, currentFilenameBuffer, information.FileNameLength,
+            information.FileName, information.FileNameLength);
+        //std::wcstombs(currentFilenameBuffer,
+                      //information.FileName, information.FileNameLength);
         const string& currentFilename(currentFilenameBuffer);
         delete[] currentFilenameBuffer;
 
@@ -286,7 +288,7 @@ void File::beginRead() {
         &_changeBuffer[_activeBuffer][0],
         static_cast<DWORD>(_changeBuffer[_activeBuffer].size()),
         false,
-        FILE_NOTIFY_CHANGE_LAST_WRITE,
+        FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE,
         &returnedBytes,
         &_overlappedBuffer,
         &completionHandler);
