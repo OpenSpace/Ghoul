@@ -137,8 +137,7 @@ private:
      */
     ~SystemCapabilities();
 
-    /// Not implemented, usage should create linker error
-    SystemCapabilities(const SystemCapabilities& rhs);
+    SystemCapabilities(const SystemCapabilities& rhs) = delete;
 
     void clearCapabilities();
 

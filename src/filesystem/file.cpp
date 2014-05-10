@@ -35,22 +35,21 @@ namespace ghoul {
 namespace filesystem {
 
 namespace {
-    const string _loggerCat = "File";
+const string _loggerCat = "File";
 #ifdef WIN32
-    const char pathSeparator = '\\';
-    const unsigned int changeBufferSize = 16384u;
+const char pathSeparator = '\\';
+const unsigned int changeBufferSize = 16384u;
 
 #define _CRT_SECURE_NO_WARNINGS
 #elif __APPLE__
-    const char pathSeparator = '/';
-    // the maximum latency allowed before a changed is registered
-    const CFAbsoluteTime latency = 3.0;
+const char pathSeparator = '/';
+// the maximum latency allowed before a changed is registered
+const CFAbsoluteTime latency = 3.0;
 #else
-    const char pathSeparator = '/';
+const char pathSeparator = '/';
 #endif
 }
 
-    
 File::File(const char* filename, bool isRawPath,
            FileChangedCallback fileChangedCallback)
     : _fileChangedCallback(std::move(fileChangedCallback))
@@ -85,7 +84,7 @@ File::File(std::string filename, bool isRawPath,
     if (isRawPath)
         _filename = std::move(filename);
     else
-        _filename = std::move(FileSys.absolutePath(filename));
+        _filename = std::move(FileSys.absolutePath(std::move(filename)));
 
     if (_fileChangedCallback)
         installFileChangeListener();
@@ -124,7 +123,7 @@ std::string File::filename() const {
 }
 
 string File::baseName() const {
-    const string& fileName = filename();
+    string&& fileName = filename();
     string::size_type dot = fileName.rfind(".");
     if (dot != string::npos)
         return fileName.substr(0, dot);
@@ -158,7 +157,7 @@ string File::fileExtension() const {
     
 void File::installFileChangeListener() {
     removeFileChangeListener();
-    const string& directory = directoryName();
+    string&& directory = directoryName();
 #ifdef WIN32
     // Create a handle to the directory that is non-blocking
     _directoryHandle = CreateFile(

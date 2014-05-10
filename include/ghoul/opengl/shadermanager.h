@@ -168,12 +168,9 @@ public:
     
 private:
     ShaderManager();
-
-    /// Not implemented on purpose, using this should result in an error
-    ShaderManager(const ShaderManager& c);
-
-    /// Not implemented on purpose, using this should result in an error
     ~ShaderManager();
+
+    ShaderManager(const ShaderManager& c) = delete;
     
     static ShaderManager* _manager; ///<Singleton member
     

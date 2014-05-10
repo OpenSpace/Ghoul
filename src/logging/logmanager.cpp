@@ -159,10 +159,8 @@ void LogManager::deinitialize() {
 }
 
 LogManager::~LogManager() {
-    std::vector<Log*>::iterator it = _logs.begin();
-    for (; it != _logs.end(); ++it) {
+    for (std::vector<Log*>::iterator it = _logs.begin(); it != _logs.end(); ++it)
         delete (*it);
-    }
     _logs.clear();
 }
 

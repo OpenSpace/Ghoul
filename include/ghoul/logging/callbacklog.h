@@ -64,7 +64,7 @@ public:
     * \param categoryStamping Determines if the log should print the categories
     * \param logLevelStamping Determines if the log should print the log level
     */
-    CallbackLog(const CallbackFunction& callbackFunction,
+    CallbackLog(CallbackFunction callbackFunction,
                 bool timeStamping = true, bool dateStamping = true,
                 bool categoryStamping = true, bool logLevelStamping = true);
 
@@ -84,7 +84,7 @@ public:
      * object is callable.
      * \param callbackFunction The new callback function that will be called henceforth
      */
-    void setCallback(const CallbackFunction& callbackFunction);
+    void setCallback(CallbackFunction callbackFunction);
 
     /**
      * Returns the callback function that is used in this CallbackLog.

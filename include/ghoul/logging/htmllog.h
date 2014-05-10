@@ -61,7 +61,7 @@ public:
     * \param logLevelStamping Determines if the log should print the log level in the log
     * messages
     */
-    HTMLLog(const std::string& filename, bool timeStamping = true,
+    HTMLLog(std::string filename, bool timeStamping = true,
             bool dateStamping = true, bool categoryStamping = true,
             bool logLevelStamping = true);
 

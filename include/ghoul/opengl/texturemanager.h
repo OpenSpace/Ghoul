@@ -165,11 +165,9 @@ public:
 
 private:
     TextureManager();
-
-    /// Not implemented on purpose, using this function should generate an error
-    TextureManager(const TextureManager& c);
-    
     ~TextureManager();
+
+    TextureManager(const TextureManager& c) = delete;
 
     static TextureManager* _manager; ///< singleton member
     std::map<unsigned int, Texture*> _textures;

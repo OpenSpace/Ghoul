@@ -121,9 +121,8 @@ protected:
     std::string getDateString() const;
 
 protected:
-    // Not defined on purpose. Using should throw linker error.
-    Log& operator=(const Log&);
-    Log(const Log&);
+    Log& operator=(const Log&) = delete;
+    Log(const Log&) = delete;
     
 private:
     bool _timeStamping; ///< Is the log printing the time?

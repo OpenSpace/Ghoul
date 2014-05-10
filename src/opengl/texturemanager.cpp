@@ -41,7 +41,6 @@ namespace opengl {
 TextureManager* TextureManager::_manager = nullptr;
 
 TextureManager::TextureManager() {}
-TextureManager::TextureManager(const TextureManager&){}
 
 TextureManager::~TextureManager() {
     std::map<unsigned int, Texture*>::iterator it = _textures.begin();

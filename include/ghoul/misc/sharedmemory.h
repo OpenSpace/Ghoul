@@ -164,11 +164,8 @@ public:
     void releaseLock();
     
 private:
-    // This method is not implemented on purpose. Its use should result in an error
-    SharedMemory(const SharedMemory& rhs);
-
-    // This method is not implemented on purpose. Its use should result in an error
-    SharedMemory& operator=(const SharedMemory& rhs);
+    SharedMemory(const SharedMemory& rhs) = delete;
+    SharedMemory& operator=(const SharedMemory& rhs) = delete;
 
     /**
      * This pointer points to the location in local address space where the shared memory
