@@ -78,7 +78,7 @@ public:
      * \param filename The name of the file that will be used to load the source of this 
      * shader
      */
-    ShaderObject(ShaderType shaderType, const std::string& filename);
+    ShaderObject(ShaderType shaderType, std::string filename);
 
     /**
      * This constructor creates a shader of the passed type and loads the shader source 
@@ -92,7 +92,7 @@ public:
      * \param name The human readable name of this ShaderObject
      */
     ShaderObject(ShaderType shaderType,
-                 const std::string& filename, const std::string& name);
+                 std::string filename, std::string name);
 
     /**
      * A copy constructor that will copy all of the internal state, and the shader source,
@@ -133,7 +133,7 @@ public:
      * incorporating the name and (if available) set the object label.
      * \param name The new internal name that will be used for this ShaderObject
      */
-    void setName(const std::string& name);
+    void setName(std::string name);
 
     /**
      * Returns the internal name of this ShaderObject
@@ -158,7 +158,7 @@ public:
      * \param filename The name of the file that will be used to load this shader
      * \return <code>true</code>, if the load was successful, <code>false</code> otherwise
      */
-    bool setShaderFilename(const std::string& filename);
+    bool setShaderFilename(std::string filename);
 
     /**
      * This method will mark the OpenGL name as unused. Because of the way the OpenGL

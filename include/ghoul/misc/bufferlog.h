@@ -68,7 +68,7 @@ public:
      * responsibility to either clear the buffer (#resetBuffer) or provide a new buffer
      * that is used instead (#setBuffer)
      */
-    BufferLog(void* address, const size_t totalSize, const MemoryExhaustedCallback& callback);
+    BufferLog(void* address, const size_t totalSize, MemoryExhaustedCallback callback);
 
     /**
      * Constructor that registers a MemoryExhausedCallback that will be used. The
@@ -89,7 +89,7 @@ public:
      * (#setBuffer) that is used instead.
      * \param callback The callback that will be used to handle out-of-memory situations
      */
-    void setCallback(const MemoryExhaustedCallback& callback);
+    void setCallback(MemoryExhaustedCallback callback);
     
     /**
      * Logs a <code>message</code> with a particular <code>timestamp</code>. The unit of

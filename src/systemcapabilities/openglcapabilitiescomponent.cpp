@@ -223,26 +223,24 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
 {
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
     std::stringstream conversion;
-    result.push_back(std::make_pair("OpenGL Version", _glslVersion.toString()));
-    result.push_back(std::make_pair("OpenGL Compiler", _glslCompiler));
-    result.push_back(std::make_pair("OpenGL Renderer", _glRenderer));
-    result.push_back(std::make_pair("GPU Vendor", gpuVendorString()));
-    result.push_back(std::make_pair("GLEW Version", _glewVersion.toString()));
+    result.emplace_back("OpenGL Version", _glslVersion.toString());
+    result.emplace_back("OpenGL Compiler", _glslCompiler);
+    result.emplace_back("OpenGL Renderer", _glRenderer);
+    result.emplace_back("GPU Vendor", gpuVendorString());
+    result.emplace_back("GLEW Version", _glewVersion.toString());
 #ifdef GHOUL_USE_WMI
-    result.push_back(std::make_pair("GPU Name", _adapterName));
-    result.push_back(std::make_pair("GPU Driver Version", _driverVersion));
-    result.push_back(std::make_pair("GPU Driver Date", _driverDate));
-    result.push_back(std::make_pair("GPU RAM", toString(_adapterRAM) + " MB"));
+    result.emplace_back("GPU Name", _adapterName);
+    result.emplace_back("GPU Driver Version", _driverVersion);
+    result.emplace_back("GPU Driver Date", _driverDate);
+    result.emplace_back("GPU RAM", toString(_adapterRAM) + " MB");
 #endif
 
     if (verbosity >= Verbosity::Default) {
-        result.push_back(std::make_pair("Max Texture Size", toString(_maxTextureSize)));
-        result.push_back(
-            std::make_pair("Max 3D Texture Size", toString(_maxTextureSize3D)));
-        result.push_back(
-            std::make_pair("Num of Texture Units", toString(_numTextureUnits)));
-        result.push_back(
-            std::make_pair("FBO Color Attachments", toString(_maxFramebufferColorAttachments)));
+        result.emplace_back("Max Texture Size", toString(_maxTextureSize));
+        result.emplace_back("Max 3D Texture Size", toString(_maxTextureSize3D));
+        result.emplace_back("Num of Texture Units", toString(_numTextureUnits));
+        result.emplace_back(
+			"FBO Color Attachments", toString(_maxFramebufferColorAttachments));
     }
 
     if (verbosity >= Verbosity::Full) {
@@ -252,7 +250,7 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
                 s << _extensions[i] << ", ";
             s << _extensions[_extensions.size() - 1] << "\n";
         }
-        result.push_back(std::make_pair("Extensions", s.str()));
+        result.emplace_back("Extensions", s.str());
     }
     return result;
 }
@@ -296,7 +294,7 @@ std::string OpenGLCapabilitiesComponent::gpuVendorString() const {
     }
 }
 
-const std::string OpenGLCapabilitiesComponent::name() const {
+std::string OpenGLCapabilitiesComponent::name() const {
     return "OpenGL";
 }
 

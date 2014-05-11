@@ -40,8 +40,6 @@ namespace opengl {
         
 ShaderManager* ShaderManager::_manager = nullptr;
     
-ShaderManager::ShaderManager() {}
-
 ShaderManager::~ShaderManager() {
     std::map<unsigned int, ShaderObject*>::iterator it = _objects.begin();
     for (; it != _objects.end(); ++it)

@@ -151,7 +151,8 @@ private:
 
 #define SysCap (ghoul::systemcapabilities::SystemCapabilities::ref())
 #define CpuCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::CPUCapabilitiesComponent>()))
-#define GpuCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::OpenGLCapabilitiesComponent>()))
+#define OpenGLCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::OpenGLCapabilitiesComponent>()))
+#define OpenCLCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::OpenCLCapabilitiesComponent>()))
 
 #include "systemcapabilities.inl"
 

@@ -52,10 +52,10 @@ ShaderObject::ShaderObject(ShaderType shaderType)
         LERROR("glCreateShader returned 0");
 }
 
-ShaderObject::ShaderObject(ShaderType shaderType, const std::string& filename) 
+ShaderObject::ShaderObject(ShaderType shaderType, std::string filename) 
     : _id(0)
     , _type(shaderType)
-    , _fileName(filename)
+    , _fileName(std::move(filename))
     , _shaderName("")
     , _loggerCat("ShaderObject")
 {
@@ -67,16 +67,16 @@ ShaderObject::ShaderObject(ShaderType shaderType, const std::string& filename)
     _id = glCreateShader(_type);
     if (_id == 0)
         LERROR("glCreateShader returned 0");
-    setShaderFilename(filename);
+    setShaderFilename(_fileName);
 }
 
-ShaderObject::ShaderObject(ShaderType shaderType, const std::string& filename,
-                           const std::string& name)
+ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
+                           std::string name)
     : _id(0)
     , _type(shaderType)
-    , _fileName(filename)
-    , _shaderName(name)
-    , _loggerCat("ShaderObject('" + name + "')")
+    , _fileName(std::move(filename))
+    , _shaderName(std::move(name))
+    , _loggerCat("ShaderObject('" + _shaderName + "')")
 {
     _id = glCreateShader(_type);
     if (_id == 0)
@@ -137,9 +137,9 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
     return *this;
 }
 
-void ShaderObject::setName(const std::string& name) {
-    _shaderName = name;
-    _loggerCat = "ShaderObject['" + name + "']";
+void ShaderObject::setName(std::string name) {
+    _shaderName = std::move(name);
+    _loggerCat = "ShaderObject['" + _shaderName + "']";
 #ifdef GL_VERSION_4_3
     if (glObjectLabel)
         glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1),
@@ -155,17 +155,18 @@ bool ShaderObject::hasName() const {
     return !_shaderName.empty();
 }
 
-bool ShaderObject::setShaderFilename(const std::string& filename) {
-    if (filename == "") {
+bool ShaderObject::setShaderFilename(std::string filename) {
+	_fileName = std::move(filename);
+    if (_fileName == "") {
         deleteShader();
         return true;
     }
     
-    std::ifstream shaderFile(filename.c_str());
+    std::ifstream shaderFile(_fileName.c_str());
 
     // Can the file be opened?
     if (!shaderFile.is_open()) {
-        LERROR("Could not open " + typeAsString() + " file: " + filename);
+        LERROR("Could not open " + typeAsString() + " file: " + _fileName);
         return false;
     }
             
@@ -176,7 +177,7 @@ bool ShaderObject::setShaderFilename(const std::string& filename) {
 
     if (fileLength == 0) {
         LERROR("Could not load " + typeAsString()
-        + " file '" + filename + "': File is empty");
+        + " file '" + _fileName + "': File is empty");
         return false;
     }
 
@@ -197,7 +198,7 @@ bool ShaderObject::setShaderFilename(const std::string& filename) {
     for (size_t i = 0; i < shaderSource.size(); ++i)
         delete[] shaderSource[i];
 
-    LINFO("Loaded " + typeAsString() + ": '" + filename + "'");
+    LINFO("Loaded " + typeAsString() + ": '" + _fileName + "'");
     return true;
 }
 

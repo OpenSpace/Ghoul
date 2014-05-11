@@ -212,8 +212,8 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
                         const SystemCapabilitiesComponent::Verbosity& /*verbosity*/) const
 {
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
-    result.push_back(std::make_pair("Operating System", _operatingSystem));
-    result.push_back(std::make_pair("Main Memory", installedMainMemoryAsString()));
+    result.emplace_back("Operating System", _operatingSystem);
+    result.emplace_back("Main Memory", installedMainMemoryAsString());
     return result;
 }
 
@@ -231,7 +231,7 @@ std::string CPUCapabilitiesComponent::installedMainMemoryAsString() const {
     return s.str();
 }
 
-const std::string CPUCapabilitiesComponent::name() const {
+std::string CPUCapabilitiesComponent::name() const {
     return "CPU";
 }
 

@@ -61,11 +61,15 @@ private:
     
     bool _isInitialized;
     
-    std::string _profile, _version, _name, _vendor, _extensions;
+    std::string _profile;
+	std::string _version;
+	std::string _name;
+	std::string _vendor;
+	std::string _extensions;
 
 };
 
-} // namepsace opencl
+} // namespace opencl
 } // namespace ghoul
 
-#endif
+#endif // __PLATFORM_H__

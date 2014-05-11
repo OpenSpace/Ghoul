@@ -31,33 +31,28 @@
 
 #include "misc/crc32.h"
 
+#include <algorithm>
 #include <cassert>
 
-#define CRCPOLY 0x82f63b78 // reversed 0x1EDC6F41
-#define CRCINIT 0xFFFFFFFF
-
-#ifndef min
-#define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif
-
-namespace ghoul {
-
 namespace {
+	const int CRCPOLY = 0x82f63b78;
+	const int CRCINIT = 0xFFFFFFFF;
+
     unsigned int _crcLookup[8][256];
     bool _isInitialized = false;
 
     void initializeLookupTable() {
         assert(!_isInitialized);
-        for (unsigned int i = 0; i <= 0xFF; i++) {
+        for (int i = 0; i <= 0xFF; ++i) {
             unsigned int x = i;
-            for (unsigned int j = 0; j < 8; j++)
+            for (int j = 0; j < 8; ++j)
                 x = (x>>1) ^ (CRCPOLY & (-(int)(x & 1)));
             _crcLookup[0][i] = x;
         }
         
-        for (unsigned int i = 0; i <= 0xFF; i++) {
+        for (int i = 0; i <= 0xFF; ++i) {
             unsigned int c = _crcLookup[0][i];
-            for (unsigned int j = 1; j < 8; j++) {
+            for (int j = 1; j < 8; ++j) {
                 c = _crcLookup[0][c & 0xFF] ^ (c >> 8);
                 _crcLookup[j][i] = c;
             }
@@ -66,8 +61,8 @@ namespace {
         _isInitialized = true;
     }
 }
-    // dword unsigned long
-    // res unsigned int
+
+namespace ghoul {
 
 unsigned int hashCRC32(const char* s, size_t len) {
     if (!_isInitialized)
@@ -76,13 +71,13 @@ unsigned int hashCRC32(const char* s, size_t len) {
     unsigned int crc = 0xFFFFFFFF;
     // Align to DWORD boundary
     size_t align = (sizeof(unsigned long) - (size_t)s) & (sizeof(unsigned long) - 1);
-    align = min(align, len);
+    align = std::min(align, len);
     len -= align;
     for (; align; align--)
         crc = _crcLookup[0][(crc ^ *s++) & 0xFF] ^ (crc >> 8);
 
 #if 0
-    // TODO: reliable check for architecture needed here
+    // TODO: reliable check for architecture needed here (ab)
     // hardware acceleration only available on newer Core i5/i7
     SIZE_T ndwords = len / sizeof(unsigned long);
     for (; ndwords; ndwords--) {

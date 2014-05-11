@@ -134,7 +134,7 @@ public:
      * <code>className</code>
      */
     template <typename Class>
-    void registerClass(const std::string& className);
+    void registerClass(std::string className);
 
     /**
      * Registers a class with the provided <code>className</code> and the user-defined
@@ -152,7 +152,7 @@ public:
      * subclass should be constructed using the #Dictionary provided as the second
      * argument. The factory function is free to ignore this request.
      */
-    void registerClass(const std::string& className, FactoryFuncPtr factoryFunction);
+    void registerClass(std::string className, FactoryFuncPtr factoryFunction);
 
     /**
     * Registers a class with the provided <code>className</code> and the user-defined
@@ -168,7 +168,7 @@ public:
     * subclass should be constructed using the #Dictionary provided as the second
     * argument. The factory function is free to ignore this request.
     */
-    void registerClass(const std::string& className, 
+    void registerClass(std::string className, 
         std::function<BaseClass*(bool, const ghoul::Dictionary&)> factoryFunction);
 
     /**

@@ -63,53 +63,14 @@ OpenCLCapabilitiesComponent::~OpenCLCapabilitiesComponent() {
     deinitialize();
 }
     
-template<class T>
-std::string datatostring(T data) {
-    std::stringstream ss;
-    ss << data;
-    return ss.str();
-}
-template<bool>
-std::string datatostring(bool data) {
-    if (data) {
-        return "true";
-    }
-    return "false";
-}
-template<cl_ulong>
-std::string datatostring(cl_ulong data) {
-    std::stringstream ss;
-    ss << data;
-    return ss.str();
-}
-template<cl_uint>
-std::string datatostring(cl_uint data) {
-    std::stringstream ss;
-    ss << data;
-    return ss.str();
-}
-
-template<cl_device_id>
-std::string datatostring(cl_device_id data) {
-    std::stringstream ss;
-    ss << data;
-    return ss.str();
-}
-template<cl_platform_id>
-std::string datatostring(cl_platform_id data) {
-    std::stringstream ss;
-    ss << data;
-    return ss.str();
-}
-
 void OpenCLCapabilitiesComponent::detectCapabilities() {
     clearCapabilities();
     
     std::vector<cl::Platform> platforms;
-    if(cl::Platform::get(&platforms) != CL_SUCCESS)
+    if (cl::Platform::get(&platforms) != CL_SUCCESS)
         return;
     
-    for (auto platform: platforms) {
+    for (cl::Platform platform : platforms) {
         ghoul::opencl::Platform* gPlatform = new ghoul::opencl::Platform(&platform);
         std::vector<ghoul::opencl::Device*> gDevices;
         
@@ -118,7 +79,7 @@ void OpenCLCapabilitiesComponent::detectCapabilities() {
         std::vector<cl::Device> devices;
         platform.getDevices(CL_DEVICE_TYPE_ALL, &devices);
         
-        for(auto device: devices) {
+        for (cl::Device device : devices) {
             ghoul::opencl::Device* gDevice = new ghoul::opencl::Device(&device);
             gDevice->fetchInformation();
             gDevices.push_back(gDevice);
@@ -129,8 +90,12 @@ void OpenCLCapabilitiesComponent::detectCapabilities() {
 }
 
 void OpenCLCapabilitiesComponent::clearCapabilities() {
-    
-    _data.erase(_data.begin(), _data.end());
+	for (PlatformAndDevices& data : _data) {
+		delete data.platform;
+		for (ghoul::opencl::Device* d : data.devices)
+			delete d;
+	}
+	_data.clear();
 }
     
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
@@ -142,29 +107,29 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
     
     if (verbosity >= Verbosity::Default) {
         for (size_t i = 0; i < _data.size(); ++i) {
-            ss <<"Platform[" << i << "] ";
+            ss << "Platform[" << i << "] ";
             ghoul::opencl::Platform* p  = _data.at(i).platform;
             
-            result.push_back(std::make_pair(ss.str() + "Name" , p->name()));
-            result.push_back(std::make_pair(ss.str() + "Vendor", p->vendor()));
-            result.push_back(std::make_pair(ss.str() + "Profile", p->profile()));
-            result.push_back(std::make_pair(ss.str() + "Version", p->version()));
+            result.emplace_back(ss.str() + "Name" , p->name());
+            result.emplace_back(ss.str() + "Vendor", p->vendor());
+            result.emplace_back(ss.str() + "Profile", p->profile());
+            result.emplace_back(ss.str() + "Version", p->version());
             for (size_t j = 0; j < _data.at(i).devices.size(); ++j) {
                 ghoul::opencl::Device* d  = _data.at(i).devices.at(j);
                 ss.str("");
-                ss <<"    Device[" << j << "] Name";
-                result.push_back(std::make_pair(ss.str() , d->name()));
-                result.push_back(std::make_pair("        Vendor" , d->vendor()));
-                result.push_back(std::make_pair("        Version" , d->version()));
-                result.push_back(std::make_pair("        Max Compute Units" , datatostring(d->maxComputeUnits())));
-                result.push_back(std::make_pair("        Max Samplers" , datatostring(d->maxSamplers())));
-                result.push_back(std::make_pair("        Max Work Group Size" , datatostring(d->maxWorkGroupSize())));
-                result.push_back(std::make_pair("        Global Memory Size" , datatostring(d->globalMemSize())));
-                result.push_back(std::make_pair("        Local Memory Type" , datatostring(d->localMemType())));
-                result.push_back(std::make_pair("        Local Memory Size" , datatostring(d->localMemSize())));
+                ss << "    Device[" << j << "] Name";
+                result.emplace_back(ss.str() , d->name());
+                result.emplace_back("        Vendor" , d->vendor());
+                result.emplace_back("        Version" , d->version());
+                result.emplace_back("        Max Compute Units" , toString(d->maxComputeUnits()));
+                result.emplace_back("        Max Samplers" , toString(d->maxSamplers()));
+                result.emplace_back("        Max Work Group Size" , toString(d->maxWorkGroupSize()));
+                result.emplace_back("        Global Memory Size" , toString(d->globalMemSize()));
+                result.emplace_back("        Local Memory Type" , toString(d->localMemType()));
+                result.emplace_back("        Local Memory Size" , toString(d->localMemSize()));
                 if (verbosity >= Verbosity::Full) {
-                    result.push_back(std::make_pair("        Build in kernels" , d->builtInKernels()));
-                    result.push_back(std::make_pair("        Extensions" , d->extensions()));
+                    result.emplace_back("        Build in kernels" , d->builtInKernels());
+                    result.emplace_back("        Extensions" , d->extensions());
                 }
             }
         }
@@ -172,7 +137,7 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
     return result;
 }
     
-const std::string OpenCLCapabilitiesComponent::name() const {
+std::string OpenCLCapabilitiesComponent::name() const {
     return "OpenCL";
 }
 

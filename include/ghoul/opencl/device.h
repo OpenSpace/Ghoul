@@ -144,30 +144,32 @@ private:
     
     bool _isInitialized;
     
-    std::string _name,
-                _vendor,
-                _profile,
-                _type;
-    cl_uint _nativeVectorWidthChar,
-            _nativeVectorWidthInt,
-            _nativeVectorWidthLong,
-            _nativeVectorWidthShort,
-            _nativeVectorWidthDouble,
-            _nativeVectorWidthHalf,
-            _nativeVectorWidthFloat;
+    std::string _name;
+	std::string _vendor;
+	std::string _profile;
+	std::string _type;
+    cl_uint _nativeVectorWidthChar;
+    cl_uint _nativeVectorWidthInt;
+    cl_uint _nativeVectorWidthLong;
+    cl_uint _nativeVectorWidthShort;
+    cl_uint _nativeVectorWidthDouble;
+    cl_uint _nativeVectorWidthHalf;
+    cl_uint _nativeVectorWidthFloat;
     
-    cl_uint _preferredVectorWidthChar,
-            _preferredVectorWidthInt,
-            _preferredVectorWidthLong,
-            _preferredVectorWidthShort,
-            _preferredVectorWidthDouble,
-            _preferredVectorWidthHalf,
-            _preferredVectorWidthFloat;
+    cl_uint _preferredVectorWidthChar;
+    cl_uint _preferredVectorWidthInt;
+    cl_uint _preferredVectorWidthLong;
+    cl_uint _preferredVectorWidthShort;
+    cl_uint _preferredVectorWidthDouble;
+    cl_uint _preferredVectorWidthHalf;
+    cl_uint _preferredVectorWidthFloat;
     
     cl_uint _addressBits;
     std::string _builtInKernels;
     cl_bool _compilerAvailable;
-    cl_device_fp_config _doubleFpConfig, _halfFpConfig, _singleFpConfig;
+    cl_device_fp_config _doubleFpConfig;
+	cl_device_fp_config _halfFpConfig;
+	cl_device_fp_config _singleFpConfig;
     
     cl_bool _endianLittle;
     std::string _extensions;
@@ -176,22 +178,29 @@ private:
     
     cl_ulong _globalMemCacheSize;
     cl_device_mem_cache_type _globalMemCacheType;
-    cl_ulong _globalMemCacheCachelineSize, _globalMemSize;
+    cl_ulong _globalMemCacheCachelineSize;
+	cl_ulong _globalMemSize;
     
     cl_bool _hostUnifiedMemory;
     
-    size_t _imageMaxArraySize, _imageMaxBufferSize;
+    size_t _imageMaxArraySize;
+	size_t _imageMaxBufferSize;
     
     cl_bool _imageSupport;
-    size_t  _image2dMaxWidth, _image2dMaxHeight,
-            _image3dMaxWidth, _image3dMaxHeight, _image3dMaxDepth;
+    size_t  _image2dMaxWidth;
+	size_t _image2dMaxHeight;
+	size_t _image3dMaxWidth;
+	size_t _image3dMaxHeight;
+	size_t _image3dMaxDepth;
     
     cl_device_local_mem_type _localMemType;
     cl_ulong _localMemSize;
     
-    cl_uint _maxReadImageArgs, _maxWriteImageArgs;
+    cl_uint _maxReadImageArgs;
+	cl_uint _maxWriteImageArgs;
     
-    cl_uint _maxClockFrequency, _maxComputeUnits;
+    cl_uint _maxClockFrequency;
+	cl_uint _maxComputeUnits;
     
     cl_uint _maxConstantArgs;
     cl_ulong _maxConstantBufferSize;
@@ -237,7 +246,7 @@ private:
     */
 };
     
-} // namepsace opencl
+} // namespace opencl
 } // namespace ghoul
 
-#endif
+#endif // __DEVICE_H__

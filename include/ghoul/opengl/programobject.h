@@ -71,7 +71,7 @@ public:
      * passed <code>name</code>. The default state for all location errors is that they
      * will be logged.
      */
-    ProgramObject(const std::string& name);
+    ProgramObject(std::string name);
 
     /**
      * Copy constructor that will perform a deep copy of all the attached ShaderObject%s
@@ -114,7 +114,7 @@ public:
      * label for this ProgramObject. Besides this, the name is not used internally.
      * \param name The human readable name of this ProgramObject
      */
-    void setName(const std::string& name);
+    void setName(std::string name);
 
     /**
      * Returns the (human readable) name for this ProgramObject.

@@ -167,12 +167,12 @@ public:
     
     
 private:
-    ShaderManager();
+    ShaderManager() = default;
     ~ShaderManager();
 
     ShaderManager(const ShaderManager& c) = delete;
     
-    static ShaderManager* _manager; ///<Singleton member
+    static ShaderManager* _manager; ///< Singleton member
     
     /// Map containing all the registered ShaderObject%s
     std::map<unsigned int, ShaderObject*> _objects;

@@ -54,7 +54,7 @@ public:
      * Returns the <code>OpenCL</code> string.
      * \return The <code>OpenCL</code> string
      */
-    const std::string name() const override;
+    std::string name() const override;
     
 protected:
     void detectCapabilities() override;

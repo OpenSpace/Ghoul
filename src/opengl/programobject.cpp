@@ -85,10 +85,10 @@ ProgramObject::ProgramObject()
         LERROR("glCreateProgram returned 0");
 }
 
-ProgramObject::ProgramObject(const std::string& name)
+ProgramObject::ProgramObject(std::string name)
     : _id(0)
-    , _programName(name)
-    , _loggerCat("ProgramObject('" + name + "')")
+    , _programName(std::move(name))
+    , _loggerCat("ProgramObject('" + _programName + "')")
     , _ignoreUniformLocationError(false)
     , _ignoreAttributeLocationError(false)
     , _ignoreSubroutineLocationError(false)
@@ -130,7 +130,7 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
         if (it->second) {
             // ProgramObject owns ShaderObjects
             ShaderObject* shaderCopy = new ShaderObject(*(it->first));
-            _shaderObjects.push_back(std::make_pair(shaderCopy, true));
+			_shaderObjects.emplace_back(shaderCopy, true);
         }
         else
             _shaderObjects.push_back(*it);
@@ -192,7 +192,7 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
             if (it->second) {
                 // ProgramObject owns ShaderObjects
                 ShaderObject* shaderCopy = new ShaderObject(*(it->first));
-                _shaderObjects.push_back(std::make_pair(shaderCopy, true));
+				_shaderObjects.emplace_back(shaderCopy, true);
             }
             else
                 _shaderObjects.push_back(*it);
@@ -201,9 +201,9 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
     return *this;
 }
 
-void ProgramObject::setName(const string& name) {
-    _programName = name;
-    _loggerCat = "ProgramObject['" + name + "']";
+void ProgramObject::setName(string name) {
+    _programName = std::move(name);
+    _loggerCat = "ProgramObject['" + _programName + "']";
     if (glObjectLabel) {
         glObjectLabel(
                       GL_PROGRAM,
@@ -232,7 +232,7 @@ void ProgramObject::attachObject(ShaderObject* shaderObject, bool transferOwners
     for (auto it = _shaderObjects.begin(); it != _shaderObjects.end(); ++it) {
         if (it->first == shaderObject) {
             if (it->first->hasName()) {
-                const std::string name = it->first->name();
+                const std::string& name = it->first->name();
                 LWARNING("Shader object [" + name + "] already attached");
             }
             else
@@ -242,7 +242,7 @@ void ProgramObject::attachObject(ShaderObject* shaderObject, bool transferOwners
     }
 #endif
     glAttachShader(_id, *shaderObject);
-    _shaderObjects.push_back(std::make_pair(shaderObject, transferOwnership));
+	_shaderObjects.emplace_back(shaderObject, transferOwnership);
 }
 
 void ProgramObject::detachObject(ShaderObject* shaderObject) {

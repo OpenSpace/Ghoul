@@ -183,7 +183,7 @@ public:
      * Returns the <code>OpenGL</code> string.
      * \return The <code>OpenGL</code> string
      */
-    const std::string name() const override;
+    std::string name() const override;
 
 protected:
     void detectCapabilities() override;

@@ -111,10 +111,10 @@ BufferLog::BufferLog(void* address, const size_t totalSize)
 }
     
 BufferLog::BufferLog(void* address, const size_t totalSize,
-                     const MemoryExhaustedCallback& callback)
+                     MemoryExhaustedCallback callback)
     : _buffer(address)
     , _totalSize(totalSize)
-    , _callback(callback)
+    , _callback(std::move(callback))
     , _inCallbackStack(false)
 {
     initializeBuffer();
@@ -130,8 +130,8 @@ void BufferLog::initializeBuffer() {
     h->firstEmptyByte = 0;
 }
     
-void BufferLog::setCallback(const MemoryExhaustedCallback& callback) {
-    _callback = callback;
+void BufferLog::setCallback(MemoryExhaustedCallback callback) {
+    _callback = std::move(callback);
 }
     
 void BufferLog::resetBuffer() {

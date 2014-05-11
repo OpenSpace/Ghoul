@@ -109,7 +109,7 @@ public:
      * \param wrapping The Texture::WrappingMode that will be used to generate values on
      * the border of the texture
      */
-    Texture(const glm::size3_t& dimensions, Format format = Format::RGBA,
+    Texture(glm::size3_t dimensions, Format format = Format::RGBA,
             GLint internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
             FilterMode filter = FilterMode::Linear,
             WrappingMode wrapping = WrappingMode::Repeat);
@@ -144,7 +144,7 @@ public:
      * \param wrapping The Texture::WrappingMode that will be used to generate values on
      * the border of the texture
      */
-    Texture(void* data, const glm::size3_t& dimensions, Format format = Format::RGBA,
+    Texture(void* data, glm::size3_t dimensions, Format format = Format::RGBA,
             GLint internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
             FilterMode filter = FilterMode::Linear,
             WrappingMode wrapping = WrappingMode::Repeat);
@@ -180,7 +180,7 @@ public:
      * texture was loaded.
      * \param name The name for this texture
      */
-    void setName(const std::string& name);
+    void setName(std::string name);
 
     /**
      * Returns the type for this texture.
@@ -212,7 +212,7 @@ public:
      * uploaded to the graphics card. Solely the stored dimensions are changed.
      * \param dimensions The new dimensions for this texture
      */
-    void setDimensions(const glm::size3_t& dimensions);
+    void setDimensions(glm::size3_t dimensions);
 
     /// Returns the width of the stored texture
     size_t width() const;

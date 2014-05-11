@@ -73,7 +73,7 @@ public:
      * Returns the <code>CPU</code> string.
      * \return The <code>CPU</code> string
      */
-    const std::string name() const override;
+    std::string name() const override;
 
 protected:
     void detectCapabilities() override;

@@ -44,9 +44,9 @@ using std::numeric_limits;
 namespace ghoul {
 namespace opengl {
 
-Texture::Texture(const glm::size3_t& dimensions, Format format, GLint internalFormat,
+Texture::Texture(glm::size3_t dimensions, Format format, GLint internalFormat,
                  GLenum dataType, FilterMode filter, WrappingMode wrapping)
-    : _dimensions(dimensions)
+    : _dimensions(std::move(dimensions))
     , _format(format)
     , _internalFormat(internalFormat)
     , _dataType(dataType)
@@ -60,10 +60,10 @@ Texture::Texture(const glm::size3_t& dimensions, Format format, GLint internalFo
     initialize(true);
 }
 
-Texture::Texture(void* data, const glm::size3_t& dimensions, Format format,
+Texture::Texture(void* data, glm::size3_t dimensions, Format format,
                  GLint internalFormat, GLenum dataType, FilterMode filter,
                  WrappingMode wrapping)
-     : _dimensions(dimensions)
+     : _dimensions(std::move(dimensions))
      , _format(format)
      , _internalFormat(internalFormat)
      , _dataType(dataType)
@@ -101,7 +101,7 @@ void Texture::allocateMemory() {
 }
 
 void Texture::destroyMemory() {
-    delete[] (GLubyte*)_pixels;
+    delete[] _pixels;
     _pixels = 0;
 }
 
@@ -130,8 +130,8 @@ const std::string& Texture::getName() const {
     return _name;
 }
 
-void Texture::setName(const std::string& name) {
-    _name = name;
+void Texture::setName(std::string name) {
+    _name = std::move(name);
 }
 
 GLenum Texture::type() const {
@@ -142,8 +142,8 @@ const glm::size3_t& Texture::dimensions() const {
     return _dimensions;
 }
 
-void Texture::setDimensions(const size3_t& dimensions) {
-    _dimensions = dimensions;
+void Texture::setDimensions(size3_t dimensions) {
+    _dimensions = std::move(dimensions);
 }
 
 size_t Texture::width() const {
