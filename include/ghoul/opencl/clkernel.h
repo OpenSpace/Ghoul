@@ -32,6 +32,10 @@
 #include <string>
 #include <memory>
 
+#ifdef __unix__
+	#undef None
+#endif //__unix__
+
 namespace ghoul {
 namespace opencl {
     
