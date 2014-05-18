@@ -26,7 +26,7 @@
 #ifndef __GHOUL_CL_HPP__
 #define __GHOUL_CL_HPP__
 
-#if defined(__APPLE__) || defined(__MACOSX)
+#if defined(__APPLE__) || defined(WIN32)
     #include <ghoul/opencl/cl.hpp>
 #else
     #include <CL/cl.hpp>
