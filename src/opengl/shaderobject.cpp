@@ -37,6 +37,74 @@
 #pragma warning(disable:4996)
 #endif
 
+namespace {
+
+    std::string _loggerCat = "ShaderObject";
+
+    // trim from start
+    static inline std::string &ltrim(std::string &s) {
+            s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+            return s;
+    }
+
+    // trim from end
+    static inline std::string &rtrim(std::string &s) {
+            s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+            return s;
+    }
+
+    // trim from both ends
+    static inline std::string &trim(std::string &s) {
+            return ltrim(rtrim(s));
+    }
+
+    std::string readFile(const std::string& fileName) {
+        std::ifstream file(fileName.c_str());
+
+        // Can the file be opened?
+        if (!file.is_open()) {
+            LERROR("Could not open file: " + fileName);
+            return "";
+        }
+                
+        // Make sure the file is not empty
+        file.seekg(0, std::ios_base::end);
+        std::streamoff fileLength = file.tellg();
+        file.seekg(0, std::ios_base::beg);
+
+        if (fileLength == 0) {
+            LERROR("Could not load file '" + fileName + "': File is empty");
+            return "";
+        }
+
+        //Read shader source line by line
+        std::string fileContents;
+        while (file.good()) {
+            std::string currentLine;
+            std::getline(file, currentLine);
+
+            std::string includeString = "#include";
+            std::string trimmedLine = trim(currentLine);
+            if( trimmedLine.length() > includeString.length() &&
+                trimmedLine.substr(0, includeString.length()) == includeString) {
+                std::string path = trimmedLine.substr(includeString.length(), trimmedLine.length() - includeString.length());
+                std::string newfile = trim(path);
+                newfile = newfile.substr(1,newfile.length()-2);
+
+                unsigned found = fileName.find_last_of("/\\");
+                newfile = fileName.substr(0,found+1)+newfile;
+                LDEBUG("Include file: " << newfile);
+                fileContents += readFile(newfile) + "\n";
+            } else {
+                fileContents += currentLine + "\n";
+            }
+        }
+        file.close();
+
+        return fileContents;
+    }
+}
+
 namespace ghoul {
 namespace opengl {
 
@@ -161,7 +229,8 @@ bool ShaderObject::setShaderFilename(std::string filename) {
         deleteShader();
         return true;
     }
-    
+    std::string contents = readFile(_fileName);
+    /*
     std::ifstream shaderFile(_fileName.c_str());
 
     // Can the file be opened?
@@ -169,7 +238,7 @@ bool ShaderObject::setShaderFilename(std::string filename) {
         LERROR("Could not open " + typeAsString() + " file: " + _fileName);
         return false;
     }
-            
+    
     // Make sure the file is not empty
     shaderFile.seekg(0, std::ios_base::end);
     std::streamoff fileLength = shaderFile.tellg();
@@ -192,11 +261,11 @@ bool ShaderObject::setShaderFilename(std::string filename) {
         shaderSource.push_back(cstr);
     }
     shaderFile.close();
+    */
+    //LDEBUG(contents);
+    const char* contentPtr =  contents.c_str();
+    glShaderSource(_id, 1, &contentPtr, NULL);
 
-    glShaderSource(_id, GLsizei(shaderSource.size()), &shaderSource[0], NULL);
-
-    for (size_t i = 0; i < shaderSource.size(); ++i)
-        delete[] shaderSource[i];
 
     LINFO("Loaded " + typeAsString() + ": '" + _fileName + "'");
     return true;
