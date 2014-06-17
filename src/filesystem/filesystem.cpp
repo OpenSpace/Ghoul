@@ -44,6 +44,13 @@
 #include <pwd.h>
 #endif
 
+#if !defined(WIN32) && !defined(__APPLE__)
+#include <sys/inotify.h>
+#define EVENT_SIZE  ( sizeof (struct inotify_event) )
+#define BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
+ const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW | IN_UNMOUNT | IN_ISDIR;
+#endif
+
 using std::string;
 namespace {
     const string _loggerCat = "FileSystem";
@@ -67,10 +74,20 @@ void FileSystem::initialize() {
     assert(_fileSystem == nullptr);
     if (_fileSystem == nullptr)
         _fileSystem = new FileSystem;
+
+#if !defined(WIN32) && !defined(__APPLE__)
+    _fileSystem->_inotifyHandle = inotify_init();
+    _fileSystem->_keepGoing = true;
+    _fileSystem->_t = std::thread(inotifyWatcher);
+#endif
 }
 
 void FileSystem::deinitialize() {
     assert(_fileSystem != nullptr);
+    _fileSystem->_keepGoing = false;
+    if(_fileSystem->_t.joinable())
+        _fileSystem->_t.join();
+    close( _fileSystem->_inotifyHandle );
     delete _fileSystem;
 }
 
@@ -184,7 +201,7 @@ Directory FileSystem::currentDirectory() const {
         LERROR("Error retrieving current directory: " << errno);
         return Directory();
     }
-    string&& currentDir = std::move(string(buffer));
+    string currentDir = string(buffer);
     delete[] buffer;
 #endif
     return Directory(currentDir);
@@ -453,6 +470,12 @@ bool FileSystem::expandPathTokens(std::string& path) const {
     return true;
 }
 
+#if !defined(WIN32) && !defined(__APPLE__)
+int FileSystem::inotifyHandle() {
+    return _inotifyHandle;
+}
+#endif
+
 bool FileSystem::hasToken(const std::string& path, const std::string& token) const {
     if (!hasTokens(path))
         return false;
@@ -482,6 +505,90 @@ std::string FileSystem::resolveToken(const std::string& token) const {
     else
         return it->second;
 }
+
+void FileSystem::inotifyAddListener(File* fileobject) {
+    const std::string filename = fileobject->path();
+    LDEBUGC("inotifyWatcher", "Wathcing: " << filename);
+    int wd = inotify_add_watch( _inotifyHandle, filename.c_str(), mask);
+    _inotifyFiles.insert ( std::pair<int,File*>(wd,fileobject) );
+}
+void FileSystem::inotifyRemoveListener(File* fileobject) {
+    std::map<int,File*>::iterator it;
+    for(it = _inotifyFiles.begin();it != _inotifyFiles.end(); it++) {
+        if(it->second == fileobject) {
+            ( void ) inotify_rm_watch( _inotifyHandle, it->first );
+            _inotifyFiles.erase (it);
+            break;
+        }
+    }
+}
+
+void FileSystem::inotifyWatcher() {
+
+    int fd = FileSys.inotifyHandle();
+    char buffer[BUF_LEN];
+    struct timeval tv;
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
+    fd_set rfds;
+    while(FileSys._keepGoing) {
+        FD_ZERO (&rfds);
+        FD_SET (fd, &rfds);
+        if(select (FD_SETSIZE, &rfds, NULL, NULL, &tv) < 1) continue; 
+        
+        int length = read( fd, buffer, BUF_LEN );
+        if ( length < 0 ) continue;
+        
+        int offset = 0;
+        while (offset < length) {
+            struct inotify_event *event = (inotify_event*)(buffer + offset);
+            switch (event->mask )
+            {
+
+                case IN_MODIFY:
+                case IN_ATTRIB:
+                {
+                    int wd = event->wd;
+                    //printf ("Calling _fileChangedCallback, %i, %i\n", fd, wd);
+                    std::map<int,File*>::iterator it;
+                    it = FileSys._inotifyFiles.find(wd);
+                    if(it != FileSys._inotifyFiles.end()) {
+                        File* fileobject = it->second;
+                        fileobject->_fileChangedCallback(*fileobject);
+                    }
+                    
+                }
+                    //printf ("IN_MODIFY\n");
+                    //printf ("IN_ATTRIB\n");
+
+                    break;
+
+                case IN_IGNORED:
+                {
+                    int wd = event->wd;
+                    //printf ("Calling _fileChangedCallback, %i, %i\n", fd, wd);
+                    std::map<int,File*>::iterator it;
+                    it = FileSys._inotifyFiles.find(wd);
+                    if(it != FileSys._inotifyFiles.end()) {
+                        File* fileobject = it->second;
+                        FileSys._inotifyFiles.erase (wd);
+                        ( void ) inotify_rm_watch( fd, wd );
+                        wd = inotify_add_watch( fd, fileobject->path().c_str(), mask);
+                        FileSys._inotifyFiles.insert ( std::pair<int,File*>(wd,fileobject) );
+                        
+                    }
+                    
+                }
+                    //printf ("IN_IGNORED\n");
+                    break;
+                default:
+                    break;
+            }
+            offset += EVENT_SIZE + event->len;
+        }
+    }
+}
+
 
 } // namespace filesystem
 } // namespace ghoul

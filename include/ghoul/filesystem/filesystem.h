@@ -29,6 +29,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <thread>
 
 #include <ghoul/filesystem/directory.h>
 #include <ghoul/filesystem/file.h>
@@ -177,6 +178,12 @@ public:
      */
     bool expandPathTokens(std::string& path) const;
 
+#if !defined(WIN32) && !defined(__APPLE__)
+    int inotifyHandle();
+    void inotifyAddListener(File* fileobject);
+    void inotifyRemoveListener(File* fileobject);
+#endif
+
 private:
     /**
      * This method cleans up a passed path by removing any double path separators and
@@ -231,6 +238,14 @@ private:
     
     /// This map stores all the tokens that are used in the FileSystem.
     std::map<std::string, std::string> _tokenMap;
+
+#if !defined(WIN32) && !defined(__APPLE__)
+    int _inotifyHandle;
+    bool _keepGoing;
+    std::thread _t;
+    std::map<int, File*> _inotifyFiles;
+    static void inotifyWatcher();
+#endif
 
     /// This member variable stores the static FileSystem. Has to be initialized and
     /// deinitialized using the #initialize and #deinitialize methods.
