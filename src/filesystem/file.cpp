@@ -31,6 +31,8 @@
 using std::function;
 using std::string;
 
+
+
 namespace ghoul {
 namespace filesystem {
 
@@ -210,6 +212,8 @@ void File::installFileChangeListener() {
                                      kCFRunLoopDefaultMode);
     // Start monitoring
     FSEventStreamStart(_eventStream);
+#else // Linux
+    FileSys.inotifyAddListener(this);
 #endif
 }
 
@@ -227,6 +231,8 @@ void File::removeFileChangeListener() {
         FSEventStreamRelease(_eventStream);
         _eventStream = nullptr;
     }
+#else
+    FileSys.inotifyRemoveListener(this);
 #endif
 }
 
@@ -338,6 +344,7 @@ void File::completionHandler(
         }
     }
 }
+#else // Linux
 
 #endif
 

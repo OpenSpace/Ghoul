@@ -35,10 +35,14 @@
 #elif __APPLE__
 #include <CoreServices/CoreServices.h>
 #include <sys/stat.h>
+#else
+#include <thread>
 #endif
 
 namespace ghoul {
 namespace filesystem {
+
+class FileSystem;
 
 /**
  * This class is an abstract handle for a generic file in the file system. The main
@@ -211,6 +215,8 @@ private:
     
     FSEventStreamRef _eventStream;
     __darwin_time_t _lastModifiedTime; // typedef of 'long'
+#else // Linux
+    friend class FileSystem;
 #endif
 };
 
