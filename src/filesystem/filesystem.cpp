@@ -84,10 +84,12 @@ void FileSystem::initialize() {
 
 void FileSystem::deinitialize() {
     assert(_fileSystem != nullptr);
+#if !defined(WIN32) && !defined(__APPLE__)
     _fileSystem->_keepGoing = false;
     if(_fileSystem->_t.joinable())
         _fileSystem->_t.join();
     close( _fileSystem->_inotifyHandle );
+#endif
     delete _fileSystem;
 }
 
@@ -506,6 +508,7 @@ std::string FileSystem::resolveToken(const std::string& token) const {
         return it->second;
 }
 
+#if !defined(WIN32) && !defined(__APPLE__)
 void FileSystem::inotifyAddListener(File* fileobject) {
     const std::string filename = fileobject->path();
     LDEBUGC("inotifyWatcher", "Wathcing: " << filename);
@@ -589,6 +592,7 @@ void FileSystem::inotifyWatcher() {
     }
 }
 
+#endif
 
 } // namespace filesystem
 } // namespace ghoul
