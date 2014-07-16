@@ -372,7 +372,7 @@ bool FileSystem::deleteDirectory(const Directory& path) const {
 #endif
 }
 
-void FileSystem::registerPathToken(string token, string path) {
+void FileSystem::registerPathToken(string token, string path, bool override) {
 #ifdef GHL_DEBUG
     if (token.empty()) {
         LERROR("Token cannot not be empty");
@@ -388,13 +388,19 @@ void FileSystem::registerPathToken(string token, string path) {
     }
     
     
-    if (_fileSystem->_tokenMap.find(token) != _fileSystem->_tokenMap.end()) {
-        LERROR("Token already bound to path '" +
-                    _fileSystem->_tokenMap[token] + "'");
-        return;
-    }
+	if (!override) {
+		if (_fileSystem->_tokenMap.find(token) != _fileSystem->_tokenMap.end()) {
+			LERROR("Token already bound to path '" +
+						_fileSystem->_tokenMap[token] + "'");
+			return;
+		}
+	}
 #endif
-    _fileSystem->_tokenMap.emplace(token, path);
+	if (override) {
+		auto it = _fileSystem->_tokenMap.find(token);
+		_fileSystem->_tokenMap.erase(it);
+	}
+	_fileSystem->_tokenMap.emplace(token, path);
 }
     
 string FileSystem::cleanupPath(string path) const {

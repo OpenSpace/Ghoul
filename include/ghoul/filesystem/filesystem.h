@@ -164,8 +164,9 @@ public:
      * files might have replaced the tokens while others have not.
      * \param token The token in the form <code>${...}</code>
      * \param path The path the token should point to
+	 * \param override If <code>true</code> an existing token will be silently overriden
      */
-    void registerPathToken(std::string token, std::string path);
+    void registerPathToken(std::string token, std::string path, bool override = false);
 
     /**
      * Replaces the path tokens present in the <code>path</code> if any exist. If all 
