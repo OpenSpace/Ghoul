@@ -101,7 +101,7 @@ void Texture::allocateMemory() {
 }
 
 void Texture::destroyMemory() {
-    delete[] _pixels;
+    delete[] static_cast<GLubyte*>(_pixels);
     _pixels = 0;
 }
 
