@@ -48,7 +48,7 @@ CommandlineCommand::CommandlineCommand(std::string name,
     , _errorMsg("")
 {
 #ifdef GHL_DEBUG
-    if (name.empty())
+    if (_name.empty())
         LERRORC("CommandlineCommand", "Every CommandlineCommand needs a name");
 #endif
 }
