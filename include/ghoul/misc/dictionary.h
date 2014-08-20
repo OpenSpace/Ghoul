@@ -208,6 +208,18 @@ public:
      */
     template <typename T>
     bool hasValue(const std::string& key) const;
+    
+    /**
+     * Returns <code>true</code> if the Dictionary contains a value for the specified
+     * <code>key</code> and the value that is stored is of the type <code>T</code>. This
+     * method calls the Dictionary::hasKey and Dictionary::hasValue methods.
+     * \tparam T The type of the value that should be tested
+     * \param key The key that should be tested
+     * \return <code>true</code> if the Dictionary contains a value for the
+     * <code>key</code> and the value is of type <code>T</code>
+     */
+    template <typename T>
+    bool hasKeyAndValue(const std::string& key) const;
 
     /**
      * Returns the total number of keys stored in this Dictionary. This method will not

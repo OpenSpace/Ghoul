@@ -162,6 +162,13 @@ template <typename T>
 bool Dictionary::hasValue(const std::string& key) const {
     return hasValueHelper<T>(key);
 }
+    
+template <typename T>
+bool Dictionary::hasKeyAndValue(const std::string& key) const {
+    // Short-circut evaluation is used to guard the 'hasValue' function from non-existing
+    // keys
+    return (hasKey(key) && hasValue<T>(key));
+}
 
 #ifdef WIN32
 
