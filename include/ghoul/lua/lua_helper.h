@@ -114,6 +114,25 @@ bool loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
 */
 bool loadDictionaryFromString(const std::string& script, ghoul::Dictionary& dictionary);
 
+/**
+ * Converts the Lua type to a human-readable string. The supported types are:
+ * \verbatim
+ * LUA_TNONE: None
+ * LUA_TNIL: Nil
+ * LUA_TBOOLEAN: Boolean
+ * LUA_TLIGHTUSERDATA: Light UserData
+ * LUA_TNUMBER: Number
+ * LUA_TSTRING: String
+ * LUA_TTABLE: Table
+ * LUA_TFUNCTION: Function
+ * LUA_TUSERDATA: UserData
+ * LUA_TTHREAD: Thread
+ * \param type A Lua type that should be converted to a string
+ * \return The converted string or <code>""</code> if <code>type</code> was an illegal
+ * type
+ */
+std::string luaTypeToString(int type);
+
 } // namespace lua
 } // namespace ghoul
 
