@@ -23,69 +23,45 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-/// Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Debug
-#define LDEBUGC(__category__, __message__) \
+/// Logs the 'message' with the 'category' at a level of 'logLevel'
+#define LOGC(__loglevel__, __category__, __message__) \
     do { \
         std::ostringstream __tmp__; __tmp__ << __message__; \
         if (ghoul::logging::LogManager::isInitialized()) \
             LogMgr.logMessage( \
-                ghoul::logging::LogManager::LogLevel::Debug, \
-                __category__, \
+                (__loglevel__), \
+                (__category__), \
                 __tmp__.str() \
             ); \
+        else { \
+            std::cout << (__category__) << " (" << \
+            ghoul::logging::LogManager::stringFromLevel(__loglevel__) << \
+            ") : " << __tmp__.str() << std::endl; \
+        } \
     } while (false)
+
+
+/// Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Debug
+#define LDEBUGC(__category__, __message__) \
+    LOGC(ghoul::logging::LogManager::LogLevel::Debug, __category__, __message__)
 
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Info
 #define LINFOC(__category__, __message__) \
-    do { \
-        std::ostringstream __tmp__; __tmp__ << __message__; \
-        if (ghoul::logging::LogManager::isInitialized()) \
-            LogMgr.logMessage( \
-                ghoul::logging::LogManager::LogLevel::Info, \
-                __category__, \
-                __tmp__.str() \
-            ); \
-    } while (false)
+    LOGC(ghoul::logging::LogManager::LogLevel::Info, __category__, __message__)
 
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevel::Warning
 #define LWARNINGC(__category__, __message__) \
-    do { \
-        std::ostringstream __tmp__; __tmp__ << __message__; \
-        if (ghoul::logging::LogManager::isInitialized()) \
-            LogMgr.logMessage( \
-                ghoul::logging::LogManager::LogLevel::Warning, \
-                __category__, \
-                __tmp__.str() \
-            ); \
-    } while (false)
+    LOGC(ghoul::logging::LogManager::LogLevel::Warning, __category__, __message__)
 
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevelError
 #define LERRORC(__category__, __message__) \
-    do { \
-        std::ostringstream __tmp__; __tmp__ << __message__; \
-        if (ghoul::logging::LogManager::isInitialized()) \
-            LogMgr.logMessage( \
-                ghoul::logging::LogManager::LogLevel::Error, \
-                __category__, \
-                __tmp__.str() \
-            ); \
-        else \
-            std::cout << __category__ << ": " << __tmp__.str() << std::endl; \
-    } while (false)
+    LOGC(ghoul::logging::LogManager::LogLevel::Error, __category__, __message__)
 
 /// Logs the 'message' with the 'category' at a level of LogManager::LogLevelFatal
 #define LFATALC(__category__, __message__) \
-    do { \
-        std::ostringstream __tmp__; __tmp__ << __message__; \
-        if (ghoul::logging::LogManager::isInitialized()) \
-            LogMgr.logMessage( \
-                ghoul::logging::LogManager::LogLevel::Fatal, \
-                __category__, \
-                __tmp__.str() \
-            ); \
-        else \
-            std::cout << __category__ << ": " << __tmp__.str() << std::endl; \
-    } while (false)
+    LOGC(ghoul::logging::LogManager::LogLevel::Fatal, __category__, __message__)
+
+#define LOG(__loglevel__, __message__) LOGC(__loglevel__, _loggerCat, __message__)
 
 /**
  * Logs the 'message' with a level of LogManager::LogLevel::Debug. A variable called
