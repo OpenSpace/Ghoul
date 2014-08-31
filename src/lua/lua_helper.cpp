@@ -88,76 +88,6 @@ std::string luaTableToString(lua_State* state, bool& success) {
     return result.str();
 }
 
-void populateDictionary(lua_State* state, Dictionary& dict) {
-    static const int KEY = -2;
-    static const int VAL = -1;
-
-    enum class TableType {
-        Undefined = 1,  // 001
-        Map = 3,        // 010
-        Array = 5       // 101
-    };
-
-    TableType type = TableType::Undefined;
-
-    lua_pushnil(state);
-    while (lua_next(state, KEY) != 0) {
-        // get the key name
-        std::string key;
-        const int keyType = lua_type(state, KEY);
-        switch (keyType) {
-            case LUA_TNUMBER:
-                if (type == TableType::Map)
-                     throw FormattingException(
-                    "Dictionary can only contain a pure map or a pure array");
-                type = TableType::Array;
-                key = std::to_string(lua_tointeger(state, KEY));
-                break;
-            case LUA_TSTRING:
-                if (type == TableType::Array)
-                     throw FormattingException(
-                          "Dictionary can only contain a pure map or a pure array");
-                type = TableType::Map;
-                key = lua_tostring(state, KEY);
-                break;
-            default:
-                LERRORC("luaTableToString", "Missing type: " << keyType);
-                break;
-        }
-
-        // get the value
-        switch (lua_type(state, VAL)) {
-            case LUA_TNUMBER: {
-                double value = lua_tonumber(state, VAL);
-                dict.setValue(key, value);
-            } break;
-            case LUA_TBOOLEAN: {
-                bool value = (lua_toboolean(state, VAL) == 1);
-                dict.setValue(key, value);
-            } break;
-            case LUA_TSTRING: {
-                std::string value = lua_tostring(state, VAL);
-                dict.setValue(key, value);
-            } break;
-            case LUA_TTABLE: {
-                Dictionary d;
-                populateDictionary(state, d);
-                dict.setValue(key, d);
-            } break;
-            default:
-                throw FormattingException("Unknown type: " + std::to_string(lua_type(state, VAL)));
-        }
-
-        // get back up one level
-        lua_pop(state, 1);
-    }
-}
-
-//void populateDictionary(lua_State* state, Dictionary& dict) {
-//    bool ignore;
-//    populateDictionary(state, dict, ignore);
-//}
-
 }
 
 std::string logStack(lua_State* state, LogManager::LogLevel level) {
@@ -323,6 +253,76 @@ std::string luaTypeToString(int type) {
             return "Thread";
         default:
             return "";
+    }
+}
+
+void populateDictionary(lua_State* state, Dictionary& dict)
+{
+    static const int KEY = -2;
+    static const int VAL = -1;
+
+    enum class TableType {
+        Undefined = 1,  // 001
+        Map = 3,        // 010
+        Array = 5       // 101
+    };
+
+    TableType type = TableType::Undefined;
+
+    lua_pushnil(state);
+    while (lua_next(state, KEY) != 0) {
+        // get the key name
+        std::string key;
+        const int keyType = lua_type(state, KEY);
+        switch (keyType) {
+            case LUA_TNUMBER:
+                if (type == TableType::Map)
+                    throw FormattingException(
+                          "Dictionary can only contain a pure map or a pure "
+                          "array");
+
+                type = TableType::Array;
+                key = std::to_string(lua_tointeger(state, KEY));
+                break;
+            case LUA_TSTRING:
+                if (type == TableType::Array)
+                    throw FormattingException(
+                          "Dictionary can only contain a pure map or a pure "
+                          "array");
+                type = TableType::Map;
+                key = lua_tostring(state, KEY);
+                break;
+            default:
+                LERRORC("luaTableToString", "Missing type: " << keyType);
+                break;
+        }
+
+        // get the value
+        switch (lua_type(state, VAL)) {
+            case LUA_TNUMBER: {
+                double value = lua_tonumber(state, VAL);
+                dict.setValue(key, value);
+            } break;
+            case LUA_TBOOLEAN: {
+                bool value = (lua_toboolean(state, VAL) == 1);
+                dict.setValue(key, value);
+            } break;
+            case LUA_TSTRING: {
+                std::string value = lua_tostring(state, VAL);
+                dict.setValue(key, value);
+            } break;
+            case LUA_TTABLE: {
+                Dictionary d;
+                populateDictionary(state, d);
+                dict.setValue(key, d);
+            } break;
+            default:
+                throw FormattingException("Unknown type: "
+                                          + std::to_string(lua_type(state, VAL)));
+        }
+
+        // get back up one level
+        lua_pop(state, 1);
     }
 }
 

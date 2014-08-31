@@ -133,6 +133,9 @@ bool loadDictionaryFromString(const std::string& script, ghoul::Dictionary& dict
  */
 std::string luaTypeToString(int type);
 
+
+void populateDictionary(lua_State* L, ghoul::Dictionary& d);
+
 } // namespace lua
 } // namespace ghoul
 
