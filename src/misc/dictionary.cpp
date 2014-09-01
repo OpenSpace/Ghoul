@@ -341,6 +341,7 @@ Dictionary::Dictionary(std::initializer_list<std::pair<std::string, boost::any>>
 std::vector<string> Dictionary::keys(const string& location) const {
     if (location.empty()) {
         std::vector<string> result;
+		result.reserve(size());
         for (const auto& it : *this)
             result.push_back(it.first);
         return result;

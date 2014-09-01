@@ -174,7 +174,7 @@ bool loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
         return false;
     }
 
-    populateDictionary(_state, dictionary);
+    luaDictionaryFromState(_state, dictionary);
 
     // Clean up after ourselves by cleaning the stack
     lua_settop(_state, 0);
@@ -221,7 +221,7 @@ bool loadDictionaryFromString(const std::string& script, ghoul::Dictionary& dict
         return false;
     }
 
-    populateDictionary(_state, dictionary);
+    luaDictionaryFromState(_state, dictionary);
 
     // Clean up after ourselves by cleaning the stack
     lua_settop(_state, 0);
@@ -256,7 +256,7 @@ std::string luaTypeToString(int type) {
     }
 }
 
-void populateDictionary(lua_State* state, Dictionary& dict)
+void luaDictionaryFromState(lua_State* state, Dictionary& dict)
 {
     static const int KEY = -2;
     static const int VAL = -1;
@@ -313,7 +313,7 @@ void populateDictionary(lua_State* state, Dictionary& dict)
             } break;
             case LUA_TTABLE: {
                 Dictionary d;
-                populateDictionary(state, d);
+                luaDictionaryFromState(state, d);
                 dict.setValue(key, d);
             } break;
             default:
