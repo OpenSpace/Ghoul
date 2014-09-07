@@ -100,7 +100,7 @@ FILE_PATTERNS          = *.c \
 RECURSIVE              = YES
 EXCLUDE                =
 EXCLUDE_SYMLINKS       = NO
-EXCLUDE_PATTERNS       = /ext/* bin/*
+EXCLUDE_PATTERNS       = /ext/* bin/* build/*
 EXCLUDE_SYMBOLS        =
 
 #---------------------------------------------------------------------------
