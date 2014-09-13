@@ -46,12 +46,12 @@ FormattingException::FormattingException(const std::string& msg)
 
 namespace {
 
-std::string luaTableToString(lua_State* state, bool& success) {
+std::string luaTableToString(lua_State* state, bool& success, int tableLocation = -2) {
     static const int KEY = -2;
     static const int VAL = -1;
 
     success = true;
-    if (!lua_istable(state, -1)) {
+    if (!lua_istable(state, tableLocation)) {
         success = false;
         return "";
     }
@@ -60,7 +60,7 @@ std::string luaTableToString(lua_State* state, bool& success) {
     lua_pushnil(state);
 
     result << "{ ";
-    while ((lua_next(state, KEY) != 0) && success) {
+    while ((lua_next(state, tableLocation) != 0) && success) {
         const int keyType = lua_type(state, KEY);
         switch (keyType) {
             case LUA_TNUMBER:
@@ -80,8 +80,10 @@ std::string luaTableToString(lua_State* state, bool& success) {
         else if (lua_isnumber(state, VAL))
             result << lua_tonumber(state, VAL);
         else if (lua_istable(state, VAL))
-            result << luaTableToString(state, success);
-        result << " ";
+            result << luaTableToString(state, success, -1);
+		else 
+			result << luaTypeToString(lua_type(state, VAL));
+		result << "  ";
         lua_pop(state, 1);
     }
     result << "}";
@@ -112,8 +114,14 @@ std::string logStack(lua_State* state, LogManager::LogLevel level) {
                     break;
                 case LUA_TTABLE: {
                     bool success;
-                    result << luaTableToString(state, success);
+                    result << luaTableToString(state, success, i);
                     break;
+				case LUA_TTHREAD:
+				case LUA_TUSERDATA:
+				case LUA_TLIGHTUSERDATA:
+				case LUA_TFUNCTION:
+					result << luaTypeToString(t);
+					break;
                 }
                 default:
                     result << lua_typename(state, t);
