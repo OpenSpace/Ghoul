@@ -33,25 +33,11 @@
 namespace ghoul {
 namespace logging {
 
-#ifdef WIN32
-namespace {
-    WORD _originalConsoleColors; ///< storing the original colors to be able to reset them
-}
-#endif
-
 ConsoleLog::ConsoleLog(bool colorOutput, bool timeStamping, bool dateStamping,
                        bool categoryStamping, bool logLevelStamping)
     : StreamLog(std::cout, timeStamping, dateStamping, categoryStamping, logLevelStamping)
     , _colorOutput(colorOutput)
 {
-#ifdef WIN32
-    // retrieve the current color scheme of the console and store it
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO* consoleInfo = new CONSOLE_SCREEN_BUFFER_INFO;
-    GetConsoleScreenBufferInfo(hConsole, consoleInfo);
-    _originalConsoleColors = consoleInfo->wAttributes;
-    delete consoleInfo;
-#endif
 }
 
 void ConsoleLog::log(LogManager::LogLevel level, const std::string& category,
@@ -69,13 +55,13 @@ void ConsoleLog::log(LogManager::LogLevel level, const std::string& category,
 void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {
 #ifdef WIN32
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    WORD colorIndex = _originalConsoleColors;
+    WORD colorIndex;
     switch (level) {
      case LogManager::LogLevel::Debug:
             colorIndex = FOREGROUND_GREEN;
             break;
         case LogManager::LogLevel::Info:
-            colorIndex = _originalConsoleColors;        // default color scheme
+            colorIndex = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN;
             break;
         case LogManager::LogLevel::Warning:
             colorIndex = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
