@@ -68,7 +68,7 @@ unsigned int hashCRC32(const char* s, size_t len) {
     if (!_isInitialized)
         initializeLookupTable();
 
-    unsigned int crc = CRCINIT;
+    int crc = CRCINIT;
     // Align to DWORD boundary
     size_t align = (sizeof(unsigned long) - (size_t)s) & (sizeof(unsigned long) - 1);
     align = std::min(align, len);
