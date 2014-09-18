@@ -132,6 +132,28 @@ bool Dictionary::getValue(const std::string& key, T& value) const {
 }
 
 template <typename T>
+bool ghoul::Dictionary::getValueSafe(const std::string& key,
+									 T& value,
+									 T defaultValue) const
+{
+	const bool hasKeyValue = hasKeyAndValue<T>(key);
+	if (hasKeyValue) {
+		const bool success = getValueHelper(key, value);
+		assert(success);
+		return true;
+	}
+	else {
+		value = std::move(defaultValue);
+		return false;
+	}
+}
+
+template <typename T>
+bool ghoul::Dictionary::getValueSafe(const std::string& key, T& value) const {
+	return getValueSafe(key, value, T());
+}
+
+template <typename T>
 bool ghoul::Dictionary::hasValueHelper(const std::string& key) const {
     const std::map<std::string, boost::any>::const_iterator it = find(key);
     if (it != cend()) {
@@ -165,7 +187,7 @@ bool Dictionary::hasValue(const std::string& key) const {
     
 template <typename T>
 bool Dictionary::hasKeyAndValue(const std::string& key) const {
-    // Short-circut evaluation is used to guard the 'hasValue' function from non-existing
+    // Short-circuit evaluation is used to guard the 'hasValue' function from non-existing
     // keys
     return (hasKey(key) && hasValue<T>(key));
 }
@@ -183,6 +205,11 @@ bool Dictionary::hasKeyAndValue(const std::string& key) const {
                                                     bool createIntermediate);            \
     extern template bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) \
           const;                                                                         \
+	extern template bool Dictionary::getValueSafe<TYPE>(const std::string& key,          \
+														TYPE& value) const;			     \
+	extern template bool Dictionary::getValueSafe<TYPE>(const std::string& key,          \
+														TYPE& value,                     \
+														TYPE defaultValue) const;        \
     extern template bool Dictionary::hasValue<TYPE>(const std::string& key) const;
 
 DEF_EXT_TEMPLATES(bool)
@@ -234,6 +261,11 @@ DEF_EXT_TEMPLATES(glm::dmat4x4)
 
 extern template bool Dictionary::getValue<Dictionary>(const std::string& key,
                                                       Dictionary& value) const;
+extern template bool Dictionary::getValueSafe<Dictionary>(const std::string& key,
+                                                      Dictionary& value) const;
+extern template bool Dictionary::getValueSafe<Dictionary>(const std::string& key,
+                                                      Dictionary& value,
+													  Dictionary defaultValue) const;
 
 #undef DEF_EXT_TEMPLATES
 

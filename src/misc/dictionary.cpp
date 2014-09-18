@@ -210,7 +210,28 @@ void convert(const Dictionary& dict, TargetType& target) {
             }                                                                            \
         }                                                                                \
         return false;                                                                    \
-    }
+    }																					 \
+	template <>																			 \
+	bool Dictionary::getValueSafe<TYPE>(const std::string& key, TYPE& value,			 \
+										TYPE defaultValue) const {						 \
+		const bool hasV = hasValue<TYPE>(key);											 \
+		if (hasV) {																		 \
+			getValue<TYPE>(key, value);											         \
+			return true;																 \
+		}																				 \
+		else {																			 \
+			value = std::move(defaultValue);											 \
+			return false;																 \
+		}																			     \
+	}																					 \
+	template <>																			 \
+	bool Dictionary::getValueSafe<TYPE>(const std::string& key, TYPE& value) const {     \
+		return getValueSafe<TYPE>(key, value, TYPE());									 \
+	}
+
+
+
+
 
 #define DEF_SPEC_TEMPLATE_GLM(TYPE, CREATE)                                              \
     template <>                                                                          \
@@ -263,7 +284,25 @@ void convert(const Dictionary& dict, TargetType& target) {
             }                                                                            \
         }                                                                                \
         return false;                                                                    \
-    }
+    }\
+	template <>																			 \
+	bool Dictionary::getValueSafe<TYPE>(const std::string& key, TYPE& value,			 \
+										TYPE defaultValue) const {						 \
+		const bool hasV = hasValue<TYPE>(key);											 \
+		if (hasV) {																		 \
+			getValue<TYPE>(key, value);											         \
+			return true;																 \
+		}																				 \
+		else {																			 \
+			value = std::move(defaultValue);											 \
+			return false;																 \
+		}																			     \
+	}\
+	template <>\
+	bool Dictionary::getValueSafe<TYPE>(const std::string& key, TYPE& value) const {\
+		return getValueSafe(key, value, TYPE());\
+	}
+		
 
 // Storage types
 DEF_SPEC_TEMPLATE(double)
@@ -325,8 +364,33 @@ bool Dictionary::getValue<Dictionary>(const std::string& key, Dictionary& value)
               "the method is called on");
         return false;
     }
-    assert(&value != this);
     return getValueHelper(key, value);
+}
+
+template <>
+bool Dictionary::getValueSafe<Dictionary>(const std::string& key, Dictionary& value,
+										 Dictionary defaultValue) const
+{
+    if (&value == this) {
+        LERROR(
+              "The argument in the 'getValueSafe' methods cannot be the same Dictionary "
+			  "as the method is called on");
+        return false;
+    }
+	const bool hasV = hasValue<Dictionary>(key);											 
+	if (hasV) {																		 
+		getValue<Dictionary>(key, value);											 
+		return true;																 
+	}																				 
+	else {																			 
+		value = std::move(defaultValue);											 
+		return false;																 
+	}																			     
+}
+
+template <>
+bool Dictionary::getValueSafe<Dictionary>(const std::string& key, Dictionary& value) const {
+	return getValueSafe(key, value, Dictionary());
 }
 
 #ifdef WIN32

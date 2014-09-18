@@ -194,6 +194,44 @@ public:
     template <typename T>
     bool getValue(const std::string& key, T& value) const;
 
+	/**
+	 * This method provides a safe interface for the Dictionary::getValue method which
+	 * checks if the key and value exist before accessing it. In case the key exists and
+	 * has the correct type, the value is retrieved used the Dictionary::getValue method
+	 * and <code>true</code> is returned. If the key does not exist or it has the wrong
+	 * type, <code>false</code> is returned and the <code>value</code> is set to the
+	 * <code>defaultValue</code>. Under no circumstances, errors are logged.
+     * \tparam The type of the value that should be tested.
+	 * \param key The, potentially nested, key for which the stored value should be
+	 * returned
+	 * \param value A reference to the value where the value will be copied to
+	 * \return <code>true</code> if the value was successfully retrieved from the
+	 * Dictionary, <code>false</code> otherwise and the <code>defaultValue</code> had to
+	 * be used
+	 */
+	template <typename T>
+	bool getValueSafe(const std::string& key, T& value) const;
+
+	/**
+	 * This method provides a safe interface for the Dictionary::getValue method which
+	 * checks if the key and value exist before accessing it. In case the key exists and
+	 * has the correct type, the value is retrieved used the Dictionary::getValue method
+	 * and <code>true</code> is returned. If the key does not exist or it has the wrong
+	 * type, <code>false</code> is returned and the <code>value</code> is set to the
+	 * <code>defaultValue</code>. Under no circumstances, errors are logged.
+     * \tparam The type of the value that should be tested.
+	 * \param key The, potentially nested, key for which the stored value should be
+	 * returned
+	 * \param value A reference to the value where the value will be copied to
+	 * \param defaultValue The default value that will be used in case the key does not
+	 * exist or it does not have the correct type
+	 * \return <code>true</code> if the value was successfully retrieved from the
+	 * Dictionary, <code>false</code> otherwise and the <code>defaultValue</code> had to
+	 * be used
+	 */
+	template <typename T>
+	bool getValueSafe(const std::string& key, T& value, T defaultValue) const;
+
     /**
      * Returns <code>true</code> if the Dictionary stores a value at the provided
      * <code>key</code> and the stored type agrees with the provided template parameter.
