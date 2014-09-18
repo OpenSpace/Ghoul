@@ -55,7 +55,7 @@ void ConsoleLog::log(LogManager::LogLevel level, const std::string& category,
 void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {
 #ifdef WIN32
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    WORD colorIndex;
+    WORD colorIndex = 0;
     switch (level) {
      case LogManager::LogLevel::Debug:
             colorIndex = FOREGROUND_GREEN;
