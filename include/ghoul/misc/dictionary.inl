@@ -132,25 +132,15 @@ bool Dictionary::getValue(const std::string& key, T& value) const {
 }
 
 template <typename T>
-bool ghoul::Dictionary::getValueSafe(const std::string& key,
-									 T& value,
-									 T defaultValue) const
-{
+bool ghoul::Dictionary::getValueSafe(const std::string& key, T& value) const {
 	const bool hasKeyValue = hasKeyAndValue<T>(key);
 	if (hasKeyValue) {
 		const bool success = getValueHelper(key, value);
 		assert(success);
 		return true;
 	}
-	else {
-		value = std::move(defaultValue);
+	else
 		return false;
-	}
-}
-
-template <typename T>
-bool ghoul::Dictionary::getValueSafe(const std::string& key, T& value) const {
-	return getValueSafe(key, value, T());
 }
 
 template <typename T>
@@ -207,9 +197,6 @@ bool Dictionary::hasKeyAndValue(const std::string& key) const {
           const;                                                                         \
 	extern template bool Dictionary::getValueSafe<TYPE>(const std::string& key,          \
 														TYPE& value) const;			     \
-	extern template bool Dictionary::getValueSafe<TYPE>(const std::string& key,          \
-														TYPE& value,                     \
-														TYPE defaultValue) const;        \
     extern template bool Dictionary::hasValue<TYPE>(const std::string& key) const;
 
 DEF_EXT_TEMPLATES(bool)
@@ -263,9 +250,6 @@ extern template bool Dictionary::getValue<Dictionary>(const std::string& key,
                                                       Dictionary& value) const;
 extern template bool Dictionary::getValueSafe<Dictionary>(const std::string& key,
                                                       Dictionary& value) const;
-extern template bool Dictionary::getValueSafe<Dictionary>(const std::string& key,
-                                                      Dictionary& value,
-													  Dictionary defaultValue) const;
 
 #undef DEF_EXT_TEMPLATES
 
