@@ -286,6 +286,7 @@ void File::beginRead() {
     _overlappedBuffer.hEvent = this;
 
     _changeBuffer[_activeBuffer].resize(changeBufferSize);
+	ZeroMemory(&(_changeBuffer[_activeBuffer][0]), changeBufferSize);
 
     DWORD returnedBytes;
     BOOL success = ReadDirectoryChangesW(
