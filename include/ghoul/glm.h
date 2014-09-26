@@ -31,7 +31,13 @@
 // files as system headers, all warnings are ignored
 #pragma clang diagnostic push
 #pragma clang system_header
-#endif
+#endif // __APPLE__
+
+
+#ifdef __unix__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#endif // __unix__
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -39,5 +45,9 @@
 #ifdef __APPLE__
 #pragma clang diagnostic pop
 #endif
+
+#ifdef __unix__
+#pragma GCC diagnostic pop
+#endif // __unix__
 
 #endif // __GLM_H__

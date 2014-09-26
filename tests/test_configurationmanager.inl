@@ -24,7 +24,7 @@
  ****************************************************************************************/
 
 #include "gtest/gtest.h"
-#include <glm/glm.hpp>
+#include <ghoul/glm.h>
 #include <fstream>
 #include <random>
 #include <ghoul/misc/configurationmanager.h>

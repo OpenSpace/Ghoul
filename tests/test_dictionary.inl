@@ -25,7 +25,7 @@
 
 #include "gtest/gtest.h"
 #include <ghoul/misc/dictionary.h>
-#include <glm/glm.hpp>
+#include <ghoul/glm.h>
 #include <fstream>
 #include <sstream>
 

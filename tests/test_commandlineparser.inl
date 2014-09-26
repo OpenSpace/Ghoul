@@ -30,7 +30,10 @@
 // GCC throws a lot of unnecessary
 // warning: deprecated conversion from string constant to ‘char*’
 // warnings
+#ifdef __unix__
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wwrite-strings"
+#endif //__unix__
 
 /*
 Test checklist:
@@ -5699,4 +5702,6 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     }
 }
 
+#ifdef __unix__
 #pragma GCC diagnostic pop
+#endif // __unix__

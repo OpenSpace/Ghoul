@@ -27,7 +27,7 @@
 
 #include <ghoul/opengl/texture.h>
 #include <ghoul/logging/logmanager.h>
-#include "glm/glm.hpp"
+#include <ghoul/glm.h>
 
 #include <IL/il.h>
 #include <IL/ilu.h>
