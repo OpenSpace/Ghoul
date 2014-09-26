@@ -72,6 +72,9 @@ void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {
         case LogManager::LogLevel::Fatal:
             colorIndex = FOREGROUND_RED | FOREGROUND_BLUE| FOREGROUND_INTENSITY;
             break;
+		default:
+			colorIndex = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN;
+			break;
     }
     SetConsoleTextAttribute(hConsole, colorIndex);
 #elif __unix__
@@ -91,6 +94,9 @@ void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {
         case LogManager::LogLevel::Fatal:
             _stream << "\033[22;34m";   // blue
             break;
+		default:
+			_stream << "\033[0m";       // white
+			break;
     }
 #elif __APPLE__
 #pragma unused(level)

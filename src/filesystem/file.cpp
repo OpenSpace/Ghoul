@@ -159,8 +159,8 @@ string File::fileExtension() const {
     
 void File::installFileChangeListener() {
     removeFileChangeListener();
-    string&& directory = directoryName();
 #ifdef WIN32
+	string&& directory = directoryName();
     // Create a handle to the directory that is non-blocking
     _directoryHandle = CreateFile(
         directory.c_str(),
@@ -178,6 +178,7 @@ void File::installFileChangeListener() {
 
     beginRead();
 #elif __APPLE__
+	string&& directory = directoryName();
     // Get the current last-modified time
     struct stat fileinfo;
     stat(_filename.c_str(), &fileinfo);
