@@ -27,6 +27,11 @@
 
 #include <ghoul/cmdparser/cmdparser>
 
+// GCC throws a lot of unnecessary
+// warning: deprecated conversion from string constant to ‘char*’
+// warnings
+#pragma GCC diagnostic ignored "-Wwrite-strings"
+
 /*
 Test checklist:
 +++ SingleCommand, MultipleCommand
@@ -5693,3 +5698,5 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         ASSERT_EQ(1.f, v4[1]) << "1 1 1 1 | 1 1 1 1";
     }
 }
+
+#pragma GCC diagnostic pop
