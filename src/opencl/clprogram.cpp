@@ -282,7 +282,7 @@ bool CLProgram::build() {
 std::string CLProgram::buildLog() {
     size_t len;
     char *buffer;
-    clGetProgramBuildInfo(*_program, _context->device(), CL_PROGRAM_BUILD_LOG, NULL, NULL, &len);
+    clGetProgramBuildInfo(*_program, _context->device(), CL_PROGRAM_BUILD_LOG, 0, NULL, &len);
     buffer = new char[len];
     clGetProgramBuildInfo(*_program, _context->device(), CL_PROGRAM_BUILD_LOG, len*sizeof(char), buffer, &len);
     std::string sb = buffer;

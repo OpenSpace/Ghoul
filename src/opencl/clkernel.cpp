@@ -205,7 +205,7 @@ std::string CLKernel::argumentName(size_t argumentIndex) {
     std::string returnString;
     char *buffer;
     
-    err = clGetKernelArgInfo(*_kernel, argumentIndex, arginfo, NULL, NULL, &length);
+    err = clGetKernelArgInfo(*_kernel, argumentIndex, arginfo, 0, NULL, &length);
     if(err != CL_SUCCESS) {
         LERROR("Error when fetching argument information: " << getErrorString(err));
         return "";
