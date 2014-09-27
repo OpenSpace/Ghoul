@@ -168,6 +168,12 @@ string FileSystem::relativePath(string path,
     return relativePath;
 }
     
+std::string FileSystem::pathByAppendingComponent(std::string path,
+												 std::string component) const
+{
+	return path + PathSeparator + component;
+}
+
 Directory FileSystem::currentDirectory() const {
 #ifdef WIN32
     // Get the size of the directory

@@ -124,8 +124,8 @@ public:
      * initializer list can be, for example, of the format
      * <code>{ { "a", 1 }, { "b", 2 } }</code> and it will add all of the
      * <code>std::pair</code>%s provided to the Dictionary.
- * \param l The <code>std::initializer_list</code> that contains all of the values
- * that should be added to the Dictionary
+	 * \param l The <code>std::initializer_list</code> that contains all of the values
+	 * that should be added to the Dictionary
      */
     Dictionary(std::initializer_list<std::pair<std::string, boost::any>> l);
 

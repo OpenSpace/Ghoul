@@ -105,6 +105,17 @@ public:
     std::string relativePath(std::string path,
                              const Directory& baseDirectory = Directory()) const;
 
+	/**
+	 * Appends the <code>component</code> to the <code>path</code> by using the
+	 * appropriate path separator and returns the complete path. This method does not
+	 * check if the full path refers to a valid file/directory in the system.
+	 * \param path The base path to which the <code>component</code> will be added
+	 * \param component The path component that should be added to the <code>path</code>
+	 * \return The full path composed of the <code>path</code> + the
+	 * <code>component</code>
+	 */
+	std::string pathByAppendingComponent(std::string path, std::string component) const;
+
     /**
      * Returns the current working directory of this process.
      * \return The current working directory of this process
