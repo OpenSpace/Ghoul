@@ -183,7 +183,8 @@ public:
      * the key does not exist or the type does not agree, <code>false</code> is returned
      * and the <code>value</code> is unchanged. Only if the type of the key and the
 	 * requested type <code>T</code> disagree, an error is logged. If the key does not
-	 * exist in the dictionary, the error is silently ignored.
+	 * exist in the dictionary, the error is silently ignored if the code was compiled
+	 * with GHL_DEBUG.
      * \tparam The type of the value that should be tested. The <code>typeid</code> of
      * this type has to be equal to the typeid of the value that is to be retrieved
      * \param key The, potentially nested, key for which the stored value should be
@@ -237,6 +238,18 @@ public:
      * created.
      */
     void clear();
+
+	/**
+	 * Removes key and value pair stored under the, potentially nested, <code>key</code>.
+	 * If the <code>key</code> was found and successfully removed, <code>true</code> is
+	 * returned, otherwise the method returns <code>false</code>. Under no circumstances
+	 * an error is logged.
+	 * \param key The, potentially nested, key pointing to the object that should be
+	 * deleted
+	 * \return Returns <code>true</code> if the key was successfully found and removed,
+	 * <code>false</code> otherwise
+	 */
+	bool removeKey(const std::string& key);
 
 protected:
     /**

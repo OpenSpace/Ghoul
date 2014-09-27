@@ -109,8 +109,12 @@ bool ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
     splitKey(key, first, rest);
 
     const std::map<std::string, boost::any>::const_iterator keyIt = find(first);
-    if (keyIt == cend())
+    if (keyIt == cend()) {
+#ifdef GHL_DEBUG
+		LERRORC("Dictionary", "Could not find key '" << first << "' in Dictionary");
+#endif
         return false;
+	}
 
     const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
     // See if it is actually a Dictionary at this location

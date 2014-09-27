@@ -393,6 +393,11 @@ void Dictionary::clear() {
     return std::map<std::string, boost::any>::clear();
 }
 
+bool Dictionary::removeKey(const std::string& key) {
+	std::map<std::string, boost::any>::size_type res = erase(key);
+	return (res == 1);
+}
+
 bool Dictionary::splitKey(const string& key, string& first, string& rest) const {
     const string::size_type l = key.find('.');
 
