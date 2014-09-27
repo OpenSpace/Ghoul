@@ -181,7 +181,9 @@ public:
      * type agrees with the template parameter, the value will be copied into the provided
      * reference <code>value</code> and the method returns <code>true</code>. If either
      * the key does not exist or the type does not agree, <code>false</code> is returned
-     * and the <code>value</code> is unchanged.
+     * and the <code>value</code> is unchanged. Only if the type of the key and the
+	 * requested type <code>T</code> disagree, an error is logged. If the key does not
+	 * exist in the dictionary, the error is silently ignored.
      * \tparam The type of the value that should be tested. The <code>typeid</code> of
      * this type has to be equal to the typeid of the value that is to be retrieved
      * \param key The, potentially nested, key for which the stored value should be
@@ -193,24 +195,6 @@ public:
      */
     template <typename T>
     bool getValue(const std::string& key, T& value) const;
-
-	/**
-	 * This method provides a safe interface for the Dictionary::getValue method which
-	 * checks if the key and value exist before accessing it. In case the key exists and
-	 * has the correct type, the value is retrieved used the Dictionary::getValue method
-	 * and <code>true</code> is returned. If the key does not exist or it has the wrong
-	 * type, <code>false</code> is returned and the <code>value</code> remains unchanged.
-	 * Under no circumstances, errors are logged.
-     * \tparam The type of the value that should be tested.
-	 * \param key The, potentially nested, key for which the stored value should be
-	 * returned
-	 * \param value A reference to the value where the value will be copied to
-	 * \return <code>true</code> if the value was successfully retrieved from the
-	 * Dictionary, <code>false</code> otherwise and the <code>value</code> remains
-	 * unchanged
-	 */
-	template <typename T>
-	bool getValueSafe(const std::string& key, T& value) const;
 
     /**
      * Returns <code>true</code> if the Dictionary stores a value at the provided

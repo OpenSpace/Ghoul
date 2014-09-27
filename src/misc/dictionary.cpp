@@ -210,18 +210,7 @@ void convert(const Dictionary& dict, TargetType& target) {
             }                                                                            \
         }                                                                                \
         return false;                                                                    \
-    }																					 \
-	template <>																			 \
-	bool Dictionary::getValueSafe<TYPE>(const std::string& key, TYPE& value) const {     \
-		const bool hasV = hasValue<TYPE>(key);											 \
-		if (hasV) {																		 \
-			getValue<TYPE>(key, value);											         \
-			return true;																 \
-		}																				 \
-		else {																			 \
-			return false;																 \
-		}																			     \
-	}																					 
+    }
 
 #define DEF_SPEC_TEMPLATE_GLM(TYPE, CREATE)                                              \
     template <>                                                                          \
@@ -274,18 +263,7 @@ void convert(const Dictionary& dict, TargetType& target) {
             }                                                                            \
         }                                                                                \
         return false;                                                                    \
-    }																					 \
-	template <>																			 \
-	bool Dictionary::getValueSafe<TYPE>(const std::string& key, TYPE& value) const {	 \
-		const bool hasV = hasValue<TYPE>(key);											 \
-		if (hasV) {																		 \
-			getValue<TYPE>(key, value);											         \
-			return true;																 \
-		}																				 \
-		else {																			 \
-			return false;																 \
-		}																			     \
-	}
+    }
 
 // Storage types
 DEF_SPEC_TEMPLATE(double)
@@ -348,25 +326,6 @@ bool Dictionary::getValue<Dictionary>(const std::string& key, Dictionary& value)
         return false;
     }
     return getValueHelper(key, value);
-}
-
-template <>
-bool Dictionary::getValueSafe<Dictionary>(const std::string& key, Dictionary& value) const
-{
-    if (&value == this) {
-        LERROR(
-              "The argument in the 'getValueSafe' methods cannot be the same Dictionary "
-			  "as the method is called on");
-        return false;
-    }
-	const bool hasV = hasValue<Dictionary>(key);											 
-	if (hasV) {																		 
-		getValue<Dictionary>(key, value);											 
-		return true;																 
-	}																				 
-	else {																			 
-		return false;																 
-	}																			     
 }
 
 #ifdef WIN32
