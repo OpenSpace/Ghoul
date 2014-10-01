@@ -26,6 +26,7 @@
 #include <ghoul/opengl/shaderobject.h>
 
 #include <ghoul/logging/log.h>
+#include <ghoul/filesystem/filesystem>
 
 #include <algorithm>
 #include <cassert>
@@ -33,6 +34,7 @@
 #include <cstring>
 #include <fstream>
 #include <functional>
+#include <regex>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -40,103 +42,32 @@
 #endif
 
 namespace {
-
 const std::string _loggerCat = "ShaderObject";
-
-// trim from start
-static inline std::string& ltrim(std::string& s)
-{
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-                                    std::not1(std::ptr_fun<int, int>(std::isspace))));
-    return s;
-}
-
-// trim from end
-static inline std::string& rtrim(std::string& s)
-{
-    s.erase(std::find_if(s.rbegin(), s.rend(),
-                         std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
-            s.end());
-    return s;
-}
-
-// trim from both ends
-static inline std::string& trim(std::string& s)
-{
-    return ltrim(rtrim(s));
-}
-
-std::string readFile(const std::string& fileName)
-{
-    std::ifstream file(fileName.c_str());
-
-    // Can the file be opened?
-    if (!file.is_open()) {
-        LERROR("Could not open file: " + fileName);
-        return "";
-    }
-
-    // Make sure the file is not empty
-    file.seekg(0, std::ios_base::end);
-    std::streamoff fileLength = file.tellg();
-    file.seekg(0, std::ios_base::beg);
-
-    if (fileLength == 0) {
-        LERROR("Could not load file '" + fileName + "': File is empty");
-        return "";
-    }
-
-    // Read shader source line by line
-    std::string fileContents;
-    while (file.good()) {
-		static const std::string includeString = "#include";
-
-		std::string currentLine;
-        std::getline(file, currentLine);
-        const std::string trimmedLine = trim(currentLine);
-
-        if (trimmedLine.length() > includeString.length()
-            && trimmedLine.substr(0, includeString.length()) == includeString)
-		{
-            std::string path = trimmedLine.substr(
-                  includeString.length(), trimmedLine.length() - includeString.length());
-            trim(path);
-            path = path.substr(1, path.length() - 2);
-
-            size_t found = fileName.find_last_of("/\\");
-            path = fileName.substr(0, found + 1) + path;
-            LDEBUG("Include file: " << path);
-            fileContents += readFile(path) + "\n";
-        } else
-            fileContents += currentLine + "\n";
-    }
-    file.close();
-
-    return fileContents;
-}
 }
 
 namespace ghoul {
 namespace opengl {
 
-ShaderObject::ShaderObject(ShaderType shaderType)
+ShaderObject::ShaderObject(ShaderType shaderType, ShaderObjectCallback changeCallback)
     : _id(0)
     , _type(shaderType)
     , _fileName("")
     , _shaderName("")
-    , _loggerCat("ShaderObject")
+	, _loggerCat("ShaderObject")
+	, _onChangeCallback(changeCallback)
 {
     _id = glCreateShader(_type);
     if (_id == 0)
         LERROR("glCreateShader returned 0");
 }
 
-ShaderObject::ShaderObject(ShaderType shaderType, std::string filename) 
+ShaderObject::ShaderObject(ShaderType shaderType, std::string filename, ShaderObjectCallback changeCallback)
     : _id(0)
     , _type(shaderType)
     , _fileName(std::move(filename))
     , _shaderName("")
-    , _loggerCat("ShaderObject")
+	, _loggerCat("ShaderObject")
+	, _onChangeCallback(changeCallback)
 {
 #ifdef DEBUG
     if (filename == "")
@@ -150,12 +81,13 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename)
 }
 
 ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
-                           std::string name)
+						   std::string name, ShaderObjectCallback changeCallback)
     : _id(0)
     , _type(shaderType)
     , _fileName(std::move(filename))
     , _shaderName(std::move(name))
-    , _loggerCat("ShaderObject('" + _shaderName + "')")
+	, _loggerCat("ShaderObject('" + _shaderName + "')")
+	, _onChangeCallback(changeCallback)
 {
     _id = glCreateShader(_type);
     if (_id == 0)
@@ -172,8 +104,9 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
     : _id(0)
     , _type(cpy._type)
     , _fileName(cpy._fileName)
-    , _shaderName(cpy._shaderName)
-    , _loggerCat(cpy._loggerCat)
+	, _shaderName(cpy._shaderName)
+	, _loggerCat(cpy._loggerCat)
+	, _onChangeCallback(cpy._onChangeCallback)
 {
     _id = glCreateShader(_type);
     if (_id == 0)
@@ -200,7 +133,8 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
         _type = rhs._type;
         _fileName = rhs._fileName;
         _shaderName = rhs._shaderName;
-        _loggerCat = rhs._loggerCat;
+		_loggerCat = rhs._loggerCat;
+		_onChangeCallback = rhs._onChangeCallback;
 
         glDeleteShader(_id);
         _id = glCreateShader(_type);
@@ -234,13 +168,31 @@ bool ShaderObject::hasName() const {
     return !_shaderName.empty();
 }
 
+std::string ShaderObject::filename() {
+	return _fileName;
+}
+
 bool ShaderObject::setShaderFilename(std::string filename) {
 	_fileName = std::move(filename);
     if (_fileName == "") {
         deleteShader();
         return true;
     }
-    const std::string contents = readFile(_fileName);
+
+	// Clear tracked files, this might have changed since last time
+	for (auto f : _trackedFiles)
+		delete f.second;
+	_trackedFiles.erase(_trackedFiles.begin(), _trackedFiles.end());
+
+	std::string contents;
+	contents.reserve(8192);
+	if (!readFile(_fileName, contents))
+		return false;
+
+	// TODO: Some other solution for outputting the source as human readable for debugging
+	std::ofstream os(_fileName + ".OpenSpaceGenerated.glsl");
+	os.close();
+
     const char* contentPtr =  contents.c_str();
     glShaderSource(_id, 1, &contentPtr, NULL);
 
@@ -307,6 +259,67 @@ std::string ShaderObject::stringForShaderType(ShaderType type) {
     }
 }
 
+bool ShaderObject::readFile(const std::string& filename, std::string& content) {
+	// check that the file exists
+	if (!FileSys.fileExists(filename)) {
+		LWARNING("Shader '" << _shaderName << "' could not find '" << filename << "'");
+		return false;
+	}
+
+	// Check that the file is currently not in _trackedFiles
+	auto s = _trackedFiles.find(filename);
+	if (s != _trackedFiles.end()) {
+		LWARNING("Shader '" << _shaderName << "' already including '" << filename << "'");
+		return false;
+	}
+
+	// Check that file can be opened
+	std::ifstream f(filename, std::ifstream::in);
+	if (!f.is_open()) {
+		LWARNING("Shader '" << _shaderName << "' could not open '" << filename << "'");
+		return false;
+	}
+
+	// Construct a file object
+	using namespace ghoul::filesystem;
+	
+	// CODE FOR DEBUG PURPOSE
+	//filesystem::File::FileChangedCallback c = nullptr;
+	//c = [ this](const filesystem::File&){
+	//	LDEBUG("Update fired from " << name());
+	//	if (_onChangeCallback)
+	//		_onChangeCallback;
+	//};
+	
+	File* fileObject = new File(filename, false, _onChangeCallback);
+	_trackedFiles[filename] = fileObject;
+
+	// Ready to start parsing
+	std::string line;
+	std::regex e1(R"(^\s*#include \"(.+)\"\s*)");	// Regex to match relative paths
+	std::regex e2(R"(^\s*#include <(.+)>\s*)");		// Regex to match ghoul absPath
+	while (std::getline(f, line)) {
+		std::smatch m;
+		if (std::regex_search(line, m, e1)) {
+			std::string includeFilename = fileObject->directoryName() + FileSystem::PathSeparator + std::string(m[1]);
+			content += "// Including '" + includeFilename + "'\n";
+			if (!readFile(includeFilename, content))
+				content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
+		}
+		else if (std::regex_search(line, m, e2)) {
+			std::string includeFilename = absPath(m[1]);
+			content += "// Including '" + includeFilename + "'\n";
+			if (!readFile(includeFilename, content))
+				content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
+		}
+		else {
+			content += line + "\n";
+		}
+	}
+
+	f.close();
+	return true;
+}
 
 } // namespace opengl
 } // namespace ghoul

@@ -28,6 +28,7 @@
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/shaderobject.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/filesystem/filesystem>
 #include <glm/gtc/type_ptr.hpp>
 
 using std::map;
@@ -126,22 +127,25 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
                       _programName.c_str());
     }
 
-    for (auto it = _shaderObjects.cbegin(); it != _shaderObjects.cend(); ++it) {
+	for (auto it = cpy._shaderObjects.cbegin(); it != cpy._shaderObjects.cend(); ++it) {
         if (it->second) {
             // ProgramObject owns ShaderObjects
-            ShaderObject* shaderCopy = new ShaderObject(*(it->first));
+			ShaderObject* shaderCopy = new ShaderObject(*(it->first));
+			glAttachShader(_id, *shaderCopy);
 			_shaderObjects.emplace_back(shaderCopy, true);
         }
-        else
-            _shaderObjects.push_back(*it);
+		else {
+			glAttachShader(_id, *(it->first));
+			_shaderObjects.push_back(*it);
+		}
     }
 }
 
 ProgramObject::~ProgramObject() {
-    for (auto it = _shaderObjects.begin(); it != _shaderObjects.end(); ++it) {
+	for (auto it: _shaderObjects) {
         // Only delete ShaderObjects that belong to this ProgramObject
-        if (it->second)
-            delete it->first;
+        if (it.second)
+            delete it.first;
     }
     _shaderObjects.clear();
     glDeleteProgram(_id);
@@ -152,7 +156,7 @@ ProgramObject::operator GLuint() const {
 }
 
 ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
-    if (this != &rhs) {
+	if (this != &rhs) {
         _programName = rhs._programName;
         if (glObjectLabel) {
             glObjectLabel(
@@ -188,17 +192,52 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
 
         for (auto it = rhs._shaderObjects.cbegin();
              it != rhs._shaderObjects.end(); ++it)
-        {
+		{
             if (it->second) {
                 // ProgramObject owns ShaderObjects
-                ShaderObject* shaderCopy = new ShaderObject(*(it->first));
+				ShaderObject* shaderCopy = new ShaderObject(*(it->first));
+				glAttachShader(_id, *shaderCopy);
 				_shaderObjects.emplace_back(shaderCopy, true);
             }
-            else
-                _shaderObjects.push_back(*it);
+			else {
+				glAttachShader(_id, *(it->first));
+				_shaderObjects.push_back(*it);
+			}
         }
     }
     return *this;
+}
+
+ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) {
+	if (this != &rhs) {
+		glDeleteProgram(_id);
+		_id = rhs._id;
+		rhs._id = 0;
+
+		_programName = std::move(rhs._programName);
+		if (glObjectLabel) {
+			glObjectLabel(
+				GL_PROGRAM,
+				_id,
+				static_cast<GLsizei>(_programName.length() + 1),
+				_programName.c_str());
+		}
+		_loggerCat = std::move(rhs._loggerCat);
+		_ignoreUniformLocationError = rhs._ignoreUniformLocationError;
+		_ignoreAttributeLocationError = rhs._ignoreAttributeLocationError;
+		_ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
+		_ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
+
+		for (auto it = _shaderObjects.begin(); it != _shaderObjects.end(); ++it) {
+			// Only delete ShaderObjects that belong to this ProgramObject
+			if (it->second)
+				delete it->first;
+		}
+		_shaderObjects.clear();
+		_shaderObjects = std::move(rhs._shaderObjects);
+		_onChangeCallback = rhs._onChangeCallback;
+	}
+	return *this;
 }
 
 void ProgramObject::setName(string name) {
@@ -328,11 +367,20 @@ bool ProgramObject::rebuildFromFile() {
         return false;
     }
 #endif
-    bool success = true;
-    for (auto it = _shaderObjects.cbegin(); it != _shaderObjects.cend(); ++it)
-        success &= it->first->rebuildFromFile();
 
-    return success;
+	ProgramObject p(*this);
+	if (!p.compileShaderObjects()) {
+		LWARNING("Could not recompile ShaderObjects");
+		return false;
+	}
+
+	if (!p.linkProgramObject()) {
+		LWARNING("Could not link ProgramObject");
+		return false;
+	}
+
+	*this = std::move(p);
+	return true;
 }
 
 void ProgramObject::activate() {
@@ -2903,6 +2951,105 @@ void ProgramObject::bindFragDataLocation(const std::string& name, GLuint colorNu
     glBindFragDataLocation(_id, colorNumber, name.c_str());
 }
 
+ProgramObject* ProgramObject::Build(const std::string& name,
+	const std::string& vpath,
+	const std::string& fpath,
+	ProgramObjectCallback callback)
+{
+	const ShaderObject::ShaderType vsType = ShaderObject::ShaderType::ShaderTypeVertex;
+	const ShaderObject::ShaderType fsType = ShaderObject::ShaderType::ShaderTypeFragment;
+
+	filesystem::File::FileChangedCallback c = nullptr;
+	ProgramObject* program = new ProgramObject(name);
+	if (callback) {
+		c = [program, callback](const filesystem::File&){
+			callback(program);
+		};
+	}
+	ShaderObject*  vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex", c);
+	ShaderObject*  fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment", c);
+	program->attachObject(vs);
+	program->attachObject(fs);
+
+	if (program->compileShaderObjects() && program->linkProgramObject())
+		return program;
+
+	// unsuccessful compilation, cleanup and return nullptr
+	delete program;
+	return nullptr;
+}
+
+ProgramObject* ProgramObject::Build(const std::string& name,
+	const std::string& vpath,
+	const std::string& fpath,
+	const std::string& gpath,
+	ProgramObjectCallback callback)
+{
+	const ShaderObject::ShaderType vsType = ShaderObject::ShaderType::ShaderTypeVertex;
+	const ShaderObject::ShaderType fsType = ShaderObject::ShaderType::ShaderTypeFragment;
+	const ShaderObject::ShaderType gsType = ShaderObject::ShaderType::ShaderTypeGeometry;
+
+	filesystem::File::FileChangedCallback c = nullptr;
+	ProgramObject* program = new ProgramObject(name);
+	if (callback) {
+		c = [program, callback](const filesystem::File&){
+			callback(program);
+		};
+	}
+	ShaderObject*  vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex", c);
+	ShaderObject*  fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment", c);
+	ShaderObject*  gs = new ShaderObject(gsType, absPath(gpath), name + " Geometry", c);
+	program->attachObject(vs);
+	program->attachObject(fs);
+	program->attachObject(gs);
+
+	if (program->compileShaderObjects() && program->linkProgramObject())
+		return program;
+
+	// unsuccessful compilation, cleanup and return nullptr
+	delete program;
+	return nullptr;
+}
+
+ProgramObject* ProgramObject::Build(const std::string& name,
+	const std::string& vpath,
+	const std::string& fpath,
+	const std::string& gpath,
+	const std::string& tepath,
+	const std::string& tcpath,
+	ProgramObjectCallback callback)
+{
+	const ShaderObject::ShaderType vsType = ShaderObject::ShaderType::ShaderTypeVertex;
+	const ShaderObject::ShaderType fsType = ShaderObject::ShaderType::ShaderTypeFragment;
+	const ShaderObject::ShaderType gsType = ShaderObject::ShaderType::ShaderTypeGeometry;
+	const ShaderObject::ShaderType teType = ShaderObject::ShaderType::ShaderTypeTesselationEvaluation;
+	const ShaderObject::ShaderType tcType = ShaderObject::ShaderType::ShaderTypeTesselationControl;
+
+	filesystem::File::FileChangedCallback c = nullptr;
+	ProgramObject* program = new ProgramObject(name);
+	if (callback) {
+		c = [program, callback](const filesystem::File&){
+			callback(program);
+		};
+	}
+	ShaderObject*  vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex", c);
+	ShaderObject*  fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment", c);
+	ShaderObject*  gs = new ShaderObject(gsType, absPath(gpath), name + " Geometry", c);
+	ShaderObject*  te = new ShaderObject(teType, absPath(tepath), name + " Tessellation Evaluation", c);
+	ShaderObject*  tc = new ShaderObject(tcType, absPath(tcpath), name + " Tessellation Control", c);
+	program->attachObject(vs);
+	program->attachObject(fs);
+	program->attachObject(gs);
+	program->attachObject(te);
+	program->attachObject(tc);
+
+	if (program->compileShaderObjects() && program->linkProgramObject())
+		return program;
+
+	// unsuccessful compilation, cleanup and return nullptr
+	delete program;
+	return nullptr;
+}
 
 } // namespace opengl
 } // namespace ghoul

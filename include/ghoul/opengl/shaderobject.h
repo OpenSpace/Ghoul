@@ -27,9 +27,16 @@
 #define __SHADEROBJECT_H__
 
 #include <ghoul/opengl/ghoul_gl.h>
+//#include <ghoul/filesystem/file.h>
+
 #include <string>
+#include <map>
+#include <functional>
 
 namespace ghoul {
+	namespace filesystem {
+		class File;
+	}
 namespace opengl {
 
 /**
@@ -61,13 +68,20 @@ public:
 #endif
     };
 
+
+	/**
+	* A type definition for a callback function that is called if any of
+	* the tracked files is changed.
+	*/
+	typedef std::function<void(const filesystem::File&)> ShaderObjectCallback;
+
     /**
      * This constructor creates a shader of the passed type with an empty source string. 
      * Before this can be used, a shader must be loaded with #setShaderFilename and it has
      * to be compiled.
      * \param shaderType The type of shader that this ShaderObject will represent
      */
-    ShaderObject(ShaderType shaderType);
+	ShaderObject(ShaderType shaderType, ShaderObjectCallback changeCallback = nullptr);
 
     /**
      * This constructor creates a shader of the passed type and loads the shader source 
@@ -78,7 +92,8 @@ public:
      * \param filename The name of the file that will be used to load the source of this 
      * shader
      */
-    ShaderObject(ShaderType shaderType, std::string filename);
+    ShaderObject(ShaderType shaderType, std::string filename, 
+		ShaderObjectCallback changeCallback = nullptr);
 
     /**
      * This constructor creates a shader of the passed type and loads the shader source 
@@ -92,7 +107,8 @@ public:
      * \param name The human readable name of this ShaderObject
      */
     ShaderObject(ShaderType shaderType,
-                 std::string filename, std::string name);
+				std::string filename, std::string name, 
+				ShaderObjectCallback changeCallback = nullptr);
 
     /**
      * A copy constructor that will copy all of the internal state, and the shader source,
@@ -148,6 +164,12 @@ public:
      * <code>false</code> otherwise.
      */
     bool hasName() const;
+
+    /**
+     * Returns the filepath for the shader object file
+     * \return The filename
+     */
+	std::string filename();
 
     /**
      * (Re)sets the filename this ShaderObject is based on. It will load the contents of
@@ -211,6 +233,17 @@ private:
 
     /// The logger category that will be used for logging of ShaderObject methods
     std::string _loggerCat;
+
+	/// The callback function if any of the tracked files are changed.
+	ShaderObjectCallback _onChangeCallback;
+
+	/// Recursively #included files
+	std::map<std::string, ghoul::filesystem::File*> _trackedFiles;
+
+	/**
+	 * Recursive file loading
+	 */
+	bool readFile(const std::string& filename, std::string& content);
 };
 
 } // namespace opengl

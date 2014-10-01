@@ -58,6 +58,13 @@ namespace opengl {
  */
 class ProgramObject {
 public:
+
+	/**
+	* A type definition for a callback function that is called if any of
+	* the tracked files is changed.
+	*/
+	typedef std::function<void(ProgramObject*)> ProgramObjectCallback;
+
     /**
      * Constructor that will automatically create a new OpenGL name for the new
      * ProgramObject. The internal name will be initialized as empty and the default state
@@ -108,6 +115,13 @@ public:
      * \param rhs The assignment source
      */
     ProgramObject& operator=(const ProgramObject& rhs);
+
+    /**
+     * Assignment operator that will move all the internal state of the right hand side`s
+     * ProgramObject and will invalidate the right hand side`s object.
+     * \param rhs The assignment source
+     */
+    ProgramObject& operator=(ProgramObject&& rhs);
 
     /**
      * Sets the (human readable) name (used for logging) and (if available) the object
@@ -3223,6 +3237,65 @@ public:
      */
     void bindFragDataLocation(const std::string& name, GLuint colorNumber);
 
+	/**
+	 * Constructs and links a ProgramObject
+	 * \param name The human readable name of this ProgramObject
+	 * \param vpath The name of the vertex shader file that will be used to load the 
+	 * source of this shader
+	 * \param fpath The name of the vertex shader file that will be used to load the 
+	 * source of this shader
+	 * \param callback The callback function if any of the included source files changes
+	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
+	 * unsuccessfull
+	 */
+	static ProgramObject* Build(const std::string& name,
+								const std::string& vpath,
+								const std::string& fpath,
+								ProgramObjectCallback callback = nullptr);
+
+	/**
+	 * Constructs and links a ProgramObject
+	 * \param name The human readable name of this ProgramObject
+	 * \param vpath The name of the vertex shader file that will be used to load the
+	 * source of this shader
+	 * \param fpath The name of the vertex shader file that will be used to load the
+	 * source of this shader
+	 * \param gpath The name of the geometry shader file that will be used to load the
+	 * source of this shader
+	 * \param callback The callback function if any of the included source files changes
+	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
+	 * unsuccessfull
+	*/
+	static ProgramObject* Build(const std::string& name, 
+								const std::string& vpath, 
+								const std::string& fpath, 
+								const std::string& gpath,
+								ProgramObjectCallback callback = nullptr);
+	/**
+	 * Constructs and links a ProgramObject
+	 * \param name The human readable name of this ProgramObject
+	 * \param vpath The name of the vertex shader file that will be used to load the
+	 * source of this shader
+	 * \param fpath The name of the fragment shader file that will be used to load the
+	 * source of this shader
+	 * \param gpath The name of the geometry shader file that will be used to load the
+	 * source of this shader
+	 * \param tepath The name of the tessellation evaluation shader file that will be used to load the
+	 * source of this shader
+	 * \param tcpath The name of the tessellation control shader file that will be used to load the
+	 * source of this shader
+	 * \param callback The callback function if any of the included source files changes
+	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
+	 * unsuccessfull
+	 */
+	static ProgramObject* Build(const std::string& name,
+								const std::string& vpath,
+								const std::string& fpath,
+								const std::string& gpath,
+								const std::string& tepath,
+								const std::string& tcpath,
+								ProgramObjectCallback callback = nullptr);
+
 private:
     /// The OpenGL name of this program object.
     GLuint _id;
@@ -3253,6 +3326,9 @@ private:
 
     /// All the ShaderObjects that are managed and attached to this ProgramObject.
     ManagedShaderObjects _shaderObjects;
+
+	/// The user provided callback if any of the ShadeObjects tracked files is changed
+	ProgramObjectCallback _onChangeCallback;
 };
 
 } // namespace opengl
