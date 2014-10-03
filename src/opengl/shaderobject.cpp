@@ -186,12 +186,15 @@ bool ShaderObject::setShaderFilename(std::string filename) {
 
 	std::string contents;
 	contents.reserve(8192);
-	if (!readFile(_fileName, contents))
-		return false;
 
+	bool success = readFile(_fileName, contents);
 	// TODO: Some other solution for outputting the source as human readable for debugging
 	std::ofstream os(_fileName + ".OpenSpaceGenerated.glsl");
+	os << contents;
 	os.close();
+
+	if (!success)
+		return false;
 
     const char* contentPtr =  contents.c_str();
     glShaderSource(_id, 1, &contentPtr, NULL);
