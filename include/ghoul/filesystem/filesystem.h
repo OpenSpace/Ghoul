@@ -157,6 +157,20 @@ public:
      */
     bool deleteFile(const File& path) const;
 
+	/**
+	 * Creates the directory pointed to by <code>path</code>. The method will return
+	 * <code>true</code> if the directory was created successfully. If
+	 * <code>recursive</code> is <code>true</code> all directories leading to the
+	 * <code>path</code> will be created a well.
+	 * \param path The directory that is to be created
+	 * \param recursive If <code>true</code> all directories leading to the
+	 * <code>path</code> will be created; if <code>false</code> and the leading
+	 * directories do not exist, the method will fail and return <code>false</code>
+	 * \return <code>true</code> if the directory was created successfully;
+	 * <code>false</code> otherwise
+	 */
+	bool createDirectory(const Directory& path, bool recursive = false) const;
+
     /**
      * Deletes the directory pointed to by <code>path</code>. The method will return
      * <code>true</code> if the file was deleted successfully, <code>false</code>
