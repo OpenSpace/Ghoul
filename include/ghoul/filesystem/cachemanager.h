@@ -26,44 +26,42 @@
 #ifndef __CACHEMANAGER_H__
 #define __CACHEMANAGER_H__
 
+#include <ghoul/filesystem/directory.h>
+
 #include <map>
 #include <string>
 
 namespace ghoul {
+namespace filesystem {
 
-	// hash unique string
 class CacheManager {
 public:
-	static void initialize(std::string cacheDirectory);
-	static void deinitialize();
-	static CacheManager& ref();
+	CacheManager(std::string directory);
+	~CacheManager();
 
-	std::string cacheDirectory() const;
-
-	bool cacheFile(std::string file, const std::string& hash,
-		bool isPersistent = false);
-	bool hasCachedFile(const std::string& hash) const;
-	bool getFile(const std::string& hash, std::string& filename) const; 
-	//bool invalidateCache(const std::string& identifier);
-	void clearCache();
+	bool getCachedFile(std::string file, std::string information,
+		std::string& cachedFileName, bool isPersistent = false);
+	bool hasCachedFile(const std::string& file, const std::string& information) const;
 
 protected:
 	struct CacheInformation {
-		std::string filename;
+		std::string file;
+		std::string information;
 		bool isPersistent;
 	};
 
-	CacheManager(std::string cacheDirectory);
-	~CacheManager();
+	unsigned int generateHash(std::string file, std::string information) const;
+	void cleanDirectory(const Directory& dir) const;
+
 	CacheManager(const CacheManager& c) = delete;
 	CacheManager(CacheManager&& m) = delete;
 	CacheManager& operator=(const CacheManager& rhs) = delete;
 
-	static CacheManager* _manager; ///< Singleton member
-	std::string _cacheDirectory;
-	std::map<std::string, CacheInformation> _cachedFiles;
+	Directory _directory;
+	std::map<unsigned int, CacheInformation> _files;
 };
 
+} // namespace filesystem
 } // namespace ghoul
 
 #endif // __CACHEMANAGER_H__

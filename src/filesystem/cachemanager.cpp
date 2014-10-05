@@ -26,117 +26,128 @@
 #include <ghoul/filesystem/cachemanager.h>
 
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/crc32.h>
 
+#include <algorithm>
 #include <assert.h>
 #include <fstream>
 
 namespace {
 	const std::string _loggerCat = "CacheManager";
 	const std::string _cacheFile = "cache";
+	const char _hashDelimiter = '|'; // something that cannot occur in the filesystem
 }
 
 namespace ghoul {
+namespace filesystem {
 
-CacheManager* CacheManager::_manager = nullptr;
-
-void CacheManager::initialize(std::string cacheDirectory) {
-	assert(_manager == nullptr);
-	_manager = new CacheManager(cacheDirectory);
-	assert(_manager != nullptr);
-}
-
-void CacheManager::deinitialize() {
-	assert(_manager != nullptr);
-	delete _manager;
-	_manager = nullptr;
-}
-
-CacheManager& CacheManager::ref() {
-	assert(_manager);
-	return *_manager;
-}
-
-CacheManager::CacheManager(std::string cacheDirectory)
-	: _cacheDirectory(cacheDirectory)
+CacheManager::CacheManager(std::string directory)
+	: _directory(directory)
 {
-	std::string&& path = FileSys.pathByAppendingComponent(_cacheDirectory, _cacheFile);
+	std::string&& path = FileSys.pathByAppendingComponent(_directory, _cacheFile);
 	std::ifstream file(path);
-	std::string line;
-	while (std::getline(file, line)) {
-		std::stringstream s(line);
-		std::string hash;
-		CacheInformation info;
-		s >> hash;
-		s >> info.filename;
-		info.isPersistent = true;
-		_cachedFiles.emplace(hash, info);
+	if (file.good()) {
+		std::string line;
+		while (std::getline(file, line)) {
+			std::stringstream s(line);
+
+			unsigned int hash;
+			s >> hash;
+
+			CacheInformation info;
+			std::getline(file, info.file);
+			std::getline(file, info.information);
+			info.isPersistent = true;
+			_files.emplace(hash, info);
+		}
 	}
 }
 
 CacheManager::~CacheManager() {
-	std::string&& path = FileSys.pathByAppendingComponent(_cacheDirectory, _cacheFile);
+	std::string&& path = FileSys.pathByAppendingComponent(_directory, _cacheFile);
 	std::ofstream file(path, std::ofstream::out);
-	// Delete all the non-persistent files
-	// Save the persistent files in a cache file
-	for (auto p : _cachedFiles) {
-		if (!p.second.isPersistent)
-			FileSys.deleteFile(p.second.filename);
-		else
-			file << p.first << "\t" << p.second.filename << std::endl; 
-	}
-}
-
-
-bool CacheManager::cacheFile(std::string file, const std::string& hash,
-	bool isPersistent)
-{
-	auto it = _cachedFiles.find(hash);
-	if (it != _cachedFiles.end()) {
-		const CacheInformation& info = it->second;
-		
-		if (info.filename == file && info.isPersistent == isPersistent)
-			return true;
-		else {
-			LERROR("A cached file for hash '" << hash << "' was already registered with "
-				"a different file and/or persistency: Stored: {" << info.filename <<
-				", " << std::boolalpha << info.isPersistent << "}, passed: {" <<
-				file << ", " << isPersistent << "}");
-			return false;
+	if (file.good()) {
+		// Delete all the non-persistent files
+		// Save the persistent files in a cache file
+		for (auto p : _files) {
+			if (!p.second.isPersistent) {
+				if (FileSys.fileExists(p.second.file))
+					FileSys.deleteFile(p.second.file);
+			}
+			else
+				file << p.first << std::endl <<
+						p.second.file << std::endl <<
+						p.second.information << std::endl; 
 		}
 	}
-	else {
-		CacheInformation i = {std::move(file), isPersistent};
-		_cachedFiles.emplace(hash, i);
+	else
+		LERROR("Could not open file '" << path << "' for writing permanent cache files");
+
+	cleanDirectory(_directory);
+}
+
+bool CacheManager::getCachedFile(std::string file, std::string information,
+	std::string& cachedFileName, bool isPersistent)
+{
+	unsigned int hash = generateHash(file, information);
+
+	auto it = _files.find(hash);
+	if (it != _files.end()) {
+		cachedFileName = it->second.file;
 		return true;
 	}
+	
+	File isPer(file);
+	std::string filename = isPer.filename();
+	std::string destinationBase = FileSys.pathByAppendingComponent(_directory, filename);
+
+	if (!FileSys.directoryExists(destinationBase))
+		FileSys.createDirectory(destinationBase);
+
+	std::string destination = FileSys.pathByAppendingComponent(destinationBase,
+		std::to_string(hash));
+	if (!FileSys.directoryExists(destination))
+		FileSys.createDirectory(destination);
+
+	cachedFileName = FileSys.pathByAppendingComponent(destination, filename);
+
+	CacheInformation info = {
+		cachedFileName,
+		information,
+		isPersistent
+	};
+	_files.emplace(hash, info);
+	return true;
 }
 
-bool CacheManager::hasCachedFile(const std::string& hash) const
+bool CacheManager::hasCachedFile(const std::string& file,
+	const std::string& information) const
 {
-	return _cachedFiles.find(hash) != _cachedFiles.end();
+	unsigned int hash = generateHash(file, information);
+	return (_files.find(hash) != _files.end());
 }
 
-bool CacheManager::getFile(const std::string& hash, std::string& filename) const
+unsigned int CacheManager::generateHash(std::string file, std::string information) const
 {
-	auto it = _cachedFiles.find(hash);
-	if (it == _cachedFiles.end())
-		return false;
-	else {
-		filename = it->second.filename;
-		return true;
+	std::string hashString = file + _hashDelimiter + information;
+	unsigned int hash = hashCRC32(hashString);
+
+	return hash;
+}
+
+void CacheManager::cleanDirectory(const Directory& dir) const {
+	std::vector<std::string> contents = dir.read();
+	for (auto content : contents) {
+		if (FileSys.directoryExists(content))
+			cleanDirectory(content);
 	}
+
+	contents = dir.read();
+	if (contents.size() == 0)
+		FileSys.deleteDirectory(dir);
 }
 
-void CacheManager::clearCache() {
-	// Delete all files
-	for (auto p : _cachedFiles) {
-		FileSys.deleteFile(p.second.filename);
-	}
-}
-
-std::string CacheManager::cacheDirectory() const {
-	return _cacheDirectory;
-}
-
+} // namespace filesystem
 } // namespace ghoul
