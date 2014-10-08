@@ -265,21 +265,21 @@ std::string ShaderObject::stringForShaderType(ShaderType type) {
 bool ShaderObject::readFile(const std::string& filename, std::string& content) {
 	// check that the file exists
 	if (!FileSys.fileExists(filename)) {
-		LWARNING("Shader '" << _shaderName << "' could not find '" << filename << "'");
+		LWARNING("Could not find '" << filename << "'");
 		return false;
 	}
 
 	// Check that the file is currently not in _trackedFiles
 	auto s = _trackedFiles.find(filename);
 	if (s != _trackedFiles.end()) {
-		LWARNING("Shader '" << _shaderName << "' already including '" << filename << "'");
+		LWARNING("Already including '" << filename << "'");
 		return false;
 	}
 
 	// Check that file can be opened
 	std::ifstream f(filename, std::ifstream::in);
 	if (!f.is_open()) {
-		LWARNING("Shader '" << _shaderName << "' could not open '" << filename << "'");
+		LWARNING("Could not open '" << filename << "': " << strerror(errno));
 		return false;
 	}
 
@@ -301,8 +301,8 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content) {
 	std::string line;
 	std::regex e1(R"(^\s*#include \"(.+)\"\s*)");	// Regex to match relative paths
 	std::regex e2(R"(^\s*#include <(.+)>\s*)");		// Regex to match ghoul absPath
+	std::smatch m;
 	while (std::getline(f, line)) {
-		std::smatch m;
 		if (std::regex_search(line, m, e1)) {
 			std::string includeFilename = fileObject->directoryName() + FileSystem::PathSeparator + std::string(m[1]);
 			content += "// Including '" + includeFilename + "'\n";
