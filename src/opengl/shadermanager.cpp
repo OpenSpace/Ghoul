@@ -49,8 +49,7 @@ ShaderManager::~ShaderManager() {
 
 void ShaderManager::initialize() {
     assert(_manager == nullptr);
-    if (_manager == nullptr)
-        _manager = new ShaderManager;
+    _manager = new ShaderManager;
     assert(_manager != nullptr);
 }
 

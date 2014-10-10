@@ -41,6 +41,7 @@
 #include <unistd.h>
 #include <sys/param.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <pwd.h>
 #endif
 
@@ -328,6 +329,76 @@ bool FileSystem::deleteFile(const File& path) const {
         return false;
 }
     
+bool FileSystem::createDirectory(const Directory& path, bool recursive) const {
+	if (recursive) {
+		std::vector<Directory> directories;
+		Directory d = path;
+		while (!FileSys.directoryExists(d)) {
+			directories.push_back(d);
+			d = d.parentDirectory();
+		}
+
+		bool success = true;
+		std::for_each(
+			directories.rbegin(),
+			directories.rend(),
+			[&success, this](const Directory& d)
+			   {
+				if (!success)
+					return;
+				else
+					success = createDirectory(d, false);
+				});
+
+		return success;
+	}
+	else {
+#ifdef WIN32
+		BOOL success = CreateDirectory(path.path().c_str(), NULL);
+		if (success)
+			return true;
+		else {
+			DWORD error = GetLastError();
+			if (ERROR == ERROR_ALREADY_EXISTS)
+				return true;
+			else {
+				LPTSTR errorBuffer = nullptr;
+				FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+							  FORMAT_MESSAGE_ALLOCATE_BUFFER |
+							  FORMAT_MESSAGE_IGNORE_INSERTS,
+							  NULL,
+							  error,
+							  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+							  (LPTSTR)&errorBuffer,
+							  0,
+							  NULL);
+				if (errorBuffer != nullptr) {
+					string error(errorBuffer);
+					LocalFree(errorBuffer);
+					LERROR("Error creating directory '" << path << "': " << error);
+				}
+				else 
+					LERROR("Error creating directory '" << path << "'");
+
+				return false;
+			}
+		}
+#else
+		int success = mkdir(path.path().c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+		if (success == 0)
+			return true;
+		else {
+			if (errno == EEXIST)
+				return true;
+			else {
+				LERROR("Error creating directory '" << path << "': " << errno);
+				return false;
+			}
+		}
+#endif
+	}
+}
+
 bool FileSystem::deleteDirectory(const Directory& path) const {
     const bool isDir = directoryExists(path);
     if (!isDir)
@@ -482,6 +553,14 @@ bool FileSystem::expandPathTokens(std::string& path) const {
         path.replace(beginning, closing + TokenClosingBraces.size() - beginning, replacement);
     }
     return true;
+}
+
+std::vector<std::string> FileSystem::tokens() const {
+	std::vector<std::string> tokens;
+	for (auto token : _tokenMap) {
+		tokens.push_back(token.first);
+	}
+	return tokens;
 }
 
 #if !defined(WIN32) && !defined(__APPLE__)

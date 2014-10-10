@@ -230,8 +230,9 @@ ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) {
 
 		for (auto it = _shaderObjects.begin(); it != _shaderObjects.end(); ++it) {
 			// Only delete ShaderObjects that belong to this ProgramObject
-			if (it->second)
+			if (it->second) {
 				delete it->first;
+			}
 		}
 		_shaderObjects.clear();
 		_shaderObjects = std::move(rhs._shaderObjects);
