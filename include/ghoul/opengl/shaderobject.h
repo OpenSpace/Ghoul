@@ -243,7 +243,7 @@ private:
 	/**
 	 * Recursive file loading
 	 */
-	bool readFile(const std::string& filename, std::string& content);
+	bool readFile(const std::string& filename, std::string& content, bool track = true);
 };
 
 } // namespace opengl

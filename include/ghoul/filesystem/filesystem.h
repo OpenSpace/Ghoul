@@ -137,7 +137,7 @@ public:
      * \return <code>true</code> if <code>path</code> points to an existing file,
      * <code>false</code> otherwise
      */
-    bool fileExists(const File& path) const;
+	bool fileExists(const File& path) const;
     
     /**
      * Checks if the directory at the <code>path</code> exists or not. This method will
@@ -203,6 +203,12 @@ public:
      * <code>false</code> otherwise
      */
     bool expandPathTokens(std::string& path) const;
+
+	/**
+	 * Returns a vector of all registered path tokens
+	 * \return A Vector of tokens
+	 */
+	std::vector<std::string> tokens() const;
 
 #if !defined(WIN32) && !defined(__APPLE__)
     int inotifyHandle();

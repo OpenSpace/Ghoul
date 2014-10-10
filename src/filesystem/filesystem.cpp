@@ -555,6 +555,14 @@ bool FileSystem::expandPathTokens(std::string& path) const {
     return true;
 }
 
+std::vector<std::string> FileSystem::tokens() const {
+	std::vector<std::string> tokens;
+	for (auto token : _tokenMap) {
+		tokens.push_back(token.first);
+	}
+	return tokens;
+}
+
 #if !defined(WIN32) && !defined(__APPLE__)
 int FileSystem::inotifyHandle() {
     return _inotifyHandle;
