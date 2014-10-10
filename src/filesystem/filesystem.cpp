@@ -25,6 +25,7 @@
 
 #include <ghoul/filesystem/filesystem.h>
 
+#include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/logging/logmanager.h>
 
 #include <algorithm>
@@ -69,7 +70,9 @@ const char FileSystem::PathSeparator = '\\';
 const char FileSystem::PathSeparator = '/';
 #endif
 
-FileSystem::FileSystem() {}
+FileSystem::FileSystem()
+    : _cacheManager(nullptr)
+{}
 
 void FileSystem::initialize() {
     assert(_fileSystem == nullptr);
@@ -562,7 +565,30 @@ std::vector<std::string> FileSystem::tokens() const {
 	}
 	return tokens;
 }
+    
+bool FileSystem::createCacheManager(const Directory& cacheDirectory) {
+    if (!_fileSystem->directoryExists(cacheDirectory)) {
+        LERROR("Requested cache directory '" << cacheDirectory << "' did not exist");
+        return false;
+    }
+    
+    if (_fileSystem->_cacheManager != nullptr) {
+        LERROR("CacheManager was already created");
+        return false;
+    }
+    
+    _fileSystem->_cacheManager = new CacheManager(cacheDirectory);
+    assert(_fileSystem->_cacheManager);
+    return true;
+}
 
+void FileSystem::destroyCacheManager() {
+    assert(_fileSystem->_cacheManager);
+    
+    delete _fileSystem->_cacheManager;
+    _fileSystem->_cacheManager = nullptr;
+}
+    
 #if !defined(WIN32) && !defined(__APPLE__)
 int FileSystem::inotifyHandle() {
     return _inotifyHandle;
