@@ -51,8 +51,7 @@ CacheManager::CacheManager(std::string directory)
     // Under normal operation, the resulting vector should be of size == 0, but if the
     // last execution of the application crashed, the directory was not cleaned up
     // properly
-    std::vector<std::pair<unsigned int, std::string>> cacheState =
-                                                cacheInformationFromDirectory(_directory);
+    std::vector<LoadedCacheInfo> cacheState = cacheInformationFromDirectory(_directory);
 
 	std::string&& path = FileSys.pathByAppendingComponent(_directory, _cacheFile);
 	std::ifstream file(path);
@@ -80,7 +79,7 @@ CacheManager::CacheManager(std::string directory)
             // If the current hash + file is contained in the cache state, we have to
             // remove it
             cacheState.erase(std::remove_if(cacheState.begin(), cacheState.end(),
-                            [&info, hash](const std::pair<unsigned int, std::string>& i) {
+                            [&info, hash](const LoadedCacheInfo& i) {
                                 return hash == i.first && info.file == i.second;
                             }), cacheState.end());
 		}
@@ -182,6 +181,23 @@ bool CacheManager::getCachedFile(const std::string& baseName,
 	_files.emplace(hash, info);
 	return true;
 }
+    
+bool CacheManager::hasCachedFile(const File& file, const std::string& information) const {
+    return hasCachedFile(file.filename(), information);
+}
+
+bool CacheManager::hasCachedFile(const std::string& baseName,
+                                 const std::string& information) const
+{
+    size_t pos = baseName.find_first_of("/\\?%*:|\"<>.");
+    if (pos != std::string::npos) {
+        LERROR("Base name '" << baseName << "' consists of illegal character");
+        return false;
+    }
+    
+    unsigned int hash = generateHash(baseName, information);    
+    return _files.find(hash) != _files.end();
+}
 
 void CacheManager::removeCacheFile(const File& file, const std::string& information) {
     removeCacheFile(file.filename(), information);
@@ -242,10 +258,10 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
     }
 }
     
-std::vector<std::pair<unsigned int, std::string>> CacheManager::cacheInformationFromDirectory(
+std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDirectory(
     const Directory& dir) const
 {
-    std::vector<std::pair<unsigned int, std::string>> result;
+    std::vector<LoadedCacheInfo> result;
     std::vector<std::string> directories = dir.readDirectories(false);
     for (auto directory : directories) {
         Directory d(directory);

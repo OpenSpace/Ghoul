@@ -139,6 +139,32 @@ public:
 		std::string& cachedFileName, bool isPersistent = false);
     
     /**
+     * This method checks if a cached <code>file</code> has been registered before in this
+     * application run (persistent and non-persistent files) or in a previous run
+     * (persistent cache files only) with the provided <code>information</code>. Note that
+     * this only checks if a file has been requested before, not if the cached file has
+     * actually been used.
+     * \param file The file for which the cached file should be searched
+     * \param information The identifying information for the file
+     * \return <code>true</code> if a cached file was requested before; <code>false</code>
+     * otherwise
+     */
+    bool hasCachedFile(const File& file, const std::string& information) const;
+
+    /**
+     * This method checks if a cached file has been registered before in this
+     * application run (persistent and non-persistent files) or in a previous run
+     * (persistent cache files only) with the provided <code>baseName</code> and 
+     * <code>information</code>. Note that this only checks if a file has been requested
+     * before, not if the cached file has actually been used.
+     * \param baseName The base name for which the cache file should be searched
+     * \param information The identifying information for the file
+     * \return <code>true</code> if a cached file was requested before; <code>false</code>
+     * otherwise
+     */
+    bool hasCachedFile(const std::string& baseName, const std::string& information) const;
+    
+    /**
      * Removes the cached file and deleted the entry from the CacheManager. If the
      * <code>file</code> has not previously been used to request a cache entry, no error
      * will be signaled.
@@ -157,7 +183,7 @@ public:
      * \param information The detailed information identifying the cached file that
      * should be deleted
      */
-void removeCacheFile(const std::string& baseName,
+    void removeCacheFile(const std::string& baseName,
                          const std::string& information);
     
 protected:
@@ -166,10 +192,12 @@ protected:
         std::string file; ///< The path to the cached file
         bool isPersistent; ///< if the cached entry should be automatically deleted
 	};
+    
+    typedef std::pair<unsigned int, std::string> LoadedCacheInfo;
 
 	unsigned int generateHash(std::string file, std::string information) const;
 	void cleanDirectory(const Directory& dir) const;
-    std::vector<std::pair<unsigned int, std::string>> cacheInformationFromDirectory(
+    std::vector<LoadedCacheInfo> cacheInformationFromDirectory(
                                                             const Directory& dir) const;
 
 	CacheManager(const CacheManager& c) = delete;
