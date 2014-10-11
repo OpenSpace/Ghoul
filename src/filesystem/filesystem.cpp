@@ -175,7 +175,7 @@ string FileSystem::relativePath(string path,
 std::string FileSystem::pathByAppendingComponent(std::string path,
 												 std::string component) const
 {
-	return path + PathSeparator + component;
+	return std::move(path) + PathSeparator + std::move(component);
 }
 
 Directory FileSystem::currentDirectory() const {
