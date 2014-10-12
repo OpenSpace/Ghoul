@@ -28,7 +28,11 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 
+#ifndef WIN32
 #include <ctime>
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
 
 using std::function;
 using std::string;
