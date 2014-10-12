@@ -28,10 +28,10 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 
+#include <ctime>
+
 using std::function;
 using std::string;
-
-
 
 namespace ghoul {
 namespace filesystem {
