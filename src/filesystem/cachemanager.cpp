@@ -120,6 +120,14 @@ CacheManager::~CacheManager() {
 	cleanDirectory(_directory);
 }
 
+bool CacheManager::getCachedFile(const File& file, std::string& cachedFileName,
+	bool isPersistent)
+{
+	std::string lastModifiedTime = file.lastModifiedDate();
+	return getCachedFile(file, lastModifiedTime, cachedFileName, isPersistent);
+}
+
+
 bool CacheManager::getCachedFile(const File& file, const std::string& information,
                                  std::string &cachedFileName, bool isPersistent)
 {
@@ -181,7 +189,12 @@ bool CacheManager::getCachedFile(const std::string& baseName,
 	_files.emplace(hash, info);
 	return true;
 }
-    
+
+bool CacheManager::hasCachedFile(const File& file) const {
+	std::string lastModifiedTime = file.lastModifiedDate();
+	return hasCachedFile(file, lastModifiedTime);
+}
+
 bool CacheManager::hasCachedFile(const File& file, const std::string& information) const {
     return hasCachedFile(file.filename(), information);
 }
@@ -197,6 +210,11 @@ bool CacheManager::hasCachedFile(const std::string& baseName,
     
     unsigned int hash = generateHash(baseName, information);    
     return _files.find(hash) != _files.end();
+}
+
+void CacheManager::removeCacheFile(const File& file) {
+	std::string lastModifiedTime = file.lastModifiedDate();
+	removeCacheFile(file, lastModifiedTime);
 }
 
 void CacheManager::removeCacheFile(const File& file, const std::string& information) {
@@ -223,7 +241,7 @@ void CacheManager::removeCacheFile(const std::string& baseName,
         _files.erase(it);
     }
 }
-    
+
 unsigned int CacheManager::generateHash(std::string file, std::string information) const
 {
 	std::string hashString = file + _hashDelimiter + information;

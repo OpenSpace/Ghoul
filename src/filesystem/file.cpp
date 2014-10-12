@@ -157,6 +157,67 @@ string File::fileExtension() const {
         return _filename;
 }
     
+std::string File::lastModifiedDate() const {
+	if (!FileSys.fileExists(_filename)) {
+		LERROR("Error retrieving last-modified date for file '" << _filename << "'." <<
+			"File did not exist");
+		return "";
+	}
+#ifdef WIN32
+	HANDLE fileHandle = CreateFile(
+		_filename.c_str(),
+		GENERIC_READ,
+		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		NULL,
+		OPEN_EXISTING,
+		NULL,
+		NULL);
+    if (fileHandle == INVALID_HANDLE_VALUE) {
+        LERROR("File handle for '" << _filename << "' could not be obtained");
+        return "";
+    }
+
+	LPFILETIME lastWriteTime = NULL;
+	BOOL success = GetFileTime(fileHandle, NULL, NULL, lastWriteTime);
+    if (success == 0) {
+        const DWORD error = GetLastError();
+        LPTSTR errorBuffer = nullptr;
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            error,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR)&errorBuffer,
+            0,
+            NULL);
+        if (errorBuffer != nullptr) {
+            std::string error(errorBuffer);
+			LERROR("Could not retrieve last-modified date for file '" << _filename <<
+				"':" << error);
+            LocalFree(errorBuffer);
+        }
+		return "";
+    }
+	else {
+		LPSYSTEMTIME time = NULL;
+		FileTimeToSystemTime(lastWriteTime, time);
+		return std::to_string(time->wYear) + "-" + std::to_string(time->wMonth) + "-" +
+			std::to_string(time->wDay) + "T" + std::to_string(time->wHour) + ":" +
+			std::to_string(time->wMinute) + ":" + std::to_string(time->wSecond) + "." +
+			std::to_string(time->wMilliseconds);
+	}
+#else
+	struct stat attrib;
+	stat(_filename.c_str(), &attrib);
+	struct tm* time = gmtime(&(attrib.st_ctime));
+	char buffer[128];
+	strftime(buffer, 128, "%Y-%m-%dT%H:%M:%S");
+	return buffer;
+#endif
+}
+
+
 void File::installFileChangeListener() {
     removeFileChangeListener();
 #ifdef WIN32
@@ -314,10 +375,9 @@ void File::beginRead() {
             NULL);
         if (errorBuffer != nullptr) {
             std::string error(errorBuffer);
+            LERROR("Error reading directory changes: " << error);
             LocalFree(errorBuffer);
         }
-        else
-            LERROR("Error reading directory changes: " << error);
     }
 }
     

@@ -74,7 +74,31 @@ public:
 
     /**
      * Returns the path to a storage location for the cached file. Depending on the
-     * persistency (<code>isPersistent</code>), the directory and files will automatically
+     * persistence (<code>isPersistent</code>), the directory and files will automatically
+     * be cleaned on application end or be made available automatically on the next
+     * application run. The method will use the date of last modification as a unique
+	 * identifier for the file. Subsequent calls (in the same run or different) with the
+	 * same <code>file</code> will consistently produce the same file path until the
+	 * last-modified date changes. If the cached file was created before, the
+	 * <code>isPersistent</code> parameter is silently ignored.
+     * \param file The file name of the file for which the cached entry is to be retrieved
+     * \param cachedFileName The output file name pointing to the cached file that can be
+     * used by the caller to store the results
+     * \param isPersistent This parameter will only be used if the cached file is used for
+     * the first time and determines if the CacheManager should automatically delete the
+     * file when the application closes (<code>false</code>) or if the file should be kept
+     * and automatically be re-added to the CacheManager on the next application run
+     * (<code>true</code>). If the cached file has been created before, this parameter is
+     * silently ignored.
+     * \return <code>true</code> if a file name was returned successfully,
+     * <code>false</code> otherwise
+     */
+	bool getCachedFile(const File& file, std::string& cachedFileName,
+		bool isPersistent = false);
+
+    /**
+     * Returns the path to a storage location for the cached file. Depending on the
+     * persistence (<code>isPersistent</code>), the directory and files will automatically
      * be cleaned on application end or be made available automatically on the next
      * application run. Subsequent calls (in the same run or different) with the same
      * <code>file</code> and <code>information</code> will consistently produce the same
@@ -102,7 +126,7 @@ public:
 
     /**
      * Returns the path to a storage location for the cached file. Depending on the
-     * persistency (<code>isPersistent</code>), the directory and files will automatically
+     * persistence (<code>isPersistent</code>), the directory and files will automatically
      * be cleaned on application end or be made available automatically on the next
      * application run. Subsequent calls (in the same run or different) with the same
      * <code>baseName</code> and <code>information</code> will consistently produce the
@@ -137,7 +161,19 @@ public:
      */
     bool getCachedFile(const std::string& baseName, const std::string& information,
 		std::string& cachedFileName, bool isPersistent = false);
-    
+
+	/**
+     * This method checks if a cached <code>file</code> has been registered before in this
+     * application run (persistent and non-persistent files) or in a previous run
+     * (persistent cache files only). Note that this only checks if a file has been
+	 * requested before, not if the cached file has actually been used. The method will
+	 * use the date of last modification as a unique identifier for the file.
+     * \param file The file for which the cached file should be searched
+     * \return <code>true</code> if a cached file was requested before; <code>false</code>
+     * otherwise
+     */
+	bool hasCachedFile(const File& file) const;
+
     /**
      * This method checks if a cached <code>file</code> has been registered before in this
      * application run (persistent and non-persistent files) or in a previous run
@@ -163,7 +199,16 @@ public:
      * otherwise
      */
     bool hasCachedFile(const std::string& baseName, const std::string& information) const;
-    
+
+	/**
+     * Removes the cached file and deleted the entry from the CacheManager. If the
+     * <code>file</code> has not previously been used to request a cache entry, no error
+     * will be signaled. The method will use the date of last modification as a unique
+	 * identifier for the file.
+     * \param file The file for which the cache file should be deleted
+     */
+	void removeCacheFile(const File& file);
+
     /**
      * Removes the cached file and deleted the entry from the CacheManager. If the
      * <code>file</code> has not previously been used to request a cache entry, no error
