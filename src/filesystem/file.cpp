@@ -216,7 +216,7 @@ std::string File::lastModifiedDate() const {
 	stat(_filename.c_str(), &attrib);
 	struct tm* time = gmtime(&(attrib.st_ctime));
 	char buffer[128];
-	strftime(buffer, 128, "%Y-%m-%dT%H:%M:%S");
+	strftime(buffer, 128, "%Y-%m-%dT%H:%M:%S", time);
 	return buffer;
 #endif
 }
