@@ -239,6 +239,72 @@ extern template bool Dictionary::getValue<Dictionary>(const std::string& key,
 
 #undef DEF_EXT_TEMPLATES
 
+#else // Linux template definitions
+
+// Make template definitions so that the compiler won't try to instantiate each
+// member function individually whenever it is encountered. This way, we promise the
+// compiler that they will be instantiated somewhere else. This is done in the
+// dictionary.cpp compilation unit; if a new template specialization is added, it must be
+// included here and in the dictionary.cpp file
+
+#define DEF_EXT_TEMPLATES(TYPE)                                                          \
+    template<> bool Dictionary::setValue<TYPE>(std::string key, TYPE value,         \
+                                                    bool createIntermediate);            \
+    template<> bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) \
+          const;                                                                         \
+    template<> bool Dictionary::hasValue<TYPE>(const std::string& key) const;
+
+DEF_EXT_TEMPLATES(bool)
+DEF_EXT_TEMPLATES(char)
+DEF_EXT_TEMPLATES(signed char)
+DEF_EXT_TEMPLATES(unsigned char)
+DEF_EXT_TEMPLATES(wchar_t)
+DEF_EXT_TEMPLATES(short)
+DEF_EXT_TEMPLATES(unsigned short)
+DEF_EXT_TEMPLATES(int)
+DEF_EXT_TEMPLATES(unsigned int)
+DEF_EXT_TEMPLATES(long long)
+DEF_EXT_TEMPLATES(unsigned long long)
+DEF_EXT_TEMPLATES(float)
+DEF_EXT_TEMPLATES(double)
+DEF_EXT_TEMPLATES(glm::vec2)
+DEF_EXT_TEMPLATES(glm::dvec2)
+DEF_EXT_TEMPLATES(glm::ivec2)
+DEF_EXT_TEMPLATES(glm::uvec2)
+DEF_EXT_TEMPLATES(glm::bvec2)
+DEF_EXT_TEMPLATES(glm::vec3)
+DEF_EXT_TEMPLATES(glm::dvec3)
+DEF_EXT_TEMPLATES(glm::ivec3)
+DEF_EXT_TEMPLATES(glm::uvec3)
+DEF_EXT_TEMPLATES(glm::bvec3)
+DEF_EXT_TEMPLATES(glm::vec4)
+DEF_EXT_TEMPLATES(glm::dvec4)
+DEF_EXT_TEMPLATES(glm::ivec4)
+DEF_EXT_TEMPLATES(glm::uvec4)
+DEF_EXT_TEMPLATES(glm::bvec4)
+DEF_EXT_TEMPLATES(glm::mat2x2)
+DEF_EXT_TEMPLATES(glm::mat2x3)
+DEF_EXT_TEMPLATES(glm::mat2x4)
+DEF_EXT_TEMPLATES(glm::mat3x2)
+DEF_EXT_TEMPLATES(glm::mat3x3)
+DEF_EXT_TEMPLATES(glm::mat3x4)
+DEF_EXT_TEMPLATES(glm::mat4x2)
+DEF_EXT_TEMPLATES(glm::mat4x3)
+DEF_EXT_TEMPLATES(glm::mat4x4)
+DEF_EXT_TEMPLATES(glm::dmat2x2)
+DEF_EXT_TEMPLATES(glm::dmat2x3)
+DEF_EXT_TEMPLATES(glm::dmat2x4)
+DEF_EXT_TEMPLATES(glm::dmat3x2)
+DEF_EXT_TEMPLATES(glm::dmat3x3)
+DEF_EXT_TEMPLATES(glm::dmat3x4)
+DEF_EXT_TEMPLATES(glm::dmat4x2)
+DEF_EXT_TEMPLATES(glm::dmat4x3)
+DEF_EXT_TEMPLATES(glm::dmat4x4)
+
+template<> bool Dictionary::getValue<Dictionary>(const std::string& key,
+                                                      Dictionary& value) const;
+
+#undef DEF_EXT_TEMPLATES
 #endif
 
 } // namespace ghoul
