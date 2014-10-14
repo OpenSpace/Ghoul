@@ -262,24 +262,24 @@ std::string ShaderObject::stringForShaderType(ShaderType type) {
     }
 }
 
-bool ShaderObject::readFile(const std::string& filename, std::string& content) {
+bool ShaderObject::readFile(const std::string& filename, std::string& content, bool track) {
 	// check that the file exists
 	if (!FileSys.fileExists(filename)) {
-		LWARNING("Shader '" << _shaderName << "' could not find '" << filename << "'");
+		LWARNING("Could not find '" << filename << "'");
 		return false;
 	}
 
 	// Check that the file is currently not in _trackedFiles
 	auto s = _trackedFiles.find(filename);
 	if (s != _trackedFiles.end()) {
-		LWARNING("Shader '" << _shaderName << "' already including '" << filename << "'");
+		LWARNING("Already including '" << filename << "'");
 		return false;
 	}
 
 	// Check that file can be opened
 	std::ifstream f(filename, std::ifstream::in);
 	if (!f.is_open()) {
-		LWARNING("Shader '" << _shaderName << "' could not open '" << filename << "'");
+		LWARNING("Could not open '" << filename << "': " << strerror(errno));
 		return false;
 	}
 
@@ -294,30 +294,38 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content) {
 	//		_onChangeCallback;
 	//};
 	
-	File* fileObject = new File(filename, false, _onChangeCallback);
-	_trackedFiles[filename] = fileObject;
+	File* fileObject = new File(filename, false);
+	if (track) {
+		fileObject->setCallback(_onChangeCallback);
+		_trackedFiles[filename] = fileObject;
+	}
 
 	// Ready to start parsing
 	std::string line;
-	std::regex e1(R"(^\s*#include \"(.+)\"\s*)");	// Regex to match relative paths
-	std::regex e2(R"(^\s*#include <(.+)>\s*)");		// Regex to match ghoul absPath
+	std::smatch m;
+	std::regex e1(R"(^\s*#include \"(.+)\"\s*(:notrack)?\s*)");	// Regex to match relative paths
+	std::regex e2(R"(^\s*#include <(.+)>\s*(:notrack)?\s*)");		// Regex to match ghoul absPath
 	while (std::getline(f, line)) {
-		std::smatch m;
 		if (std::regex_search(line, m, e1)) {
 			std::string includeFilename = fileObject->directoryName() + FileSystem::PathSeparator + std::string(m[1]);
-			content += "// Including '" + includeFilename + "'\n";
-			if (!readFile(includeFilename, content))
+			content += "// Begin including '" + includeFilename + "'\n";
+			if (!readFile(includeFilename, content, track && m[2] == ""))
 				content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
+			content += "// End including '" + includeFilename + "'\n";
 		}
 		else if (std::regex_search(line, m, e2)) {
 			std::string includeFilename = absPath(m[1]);
 			content += "// Including '" + includeFilename + "'\n";
-			if (!readFile(includeFilename, content))
+			if (!readFile(includeFilename, content, track && m[2] == ""))
 				content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
+			content += "// End including '" + includeFilename + "'\n";
 		}
 		else {
 			content += line + "\n";
 		}
+	}
+	if (!track) {
+		delete fileObject;
 	}
 
 	f.close();

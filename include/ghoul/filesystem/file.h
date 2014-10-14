@@ -174,6 +174,12 @@ public:
      */
     std::string fileExtension() const;
 
+	/**
+	 * This method returns the last-modified date of the file as an ISO 8601 string.
+	 * \return The last-modified date of the file as an ISO 8601 string
+	 */
+	std::string lastModifiedDate() const;
+
 private:
     /**
      * Registers and starts the platform-dependent listener to file changes on disk. Will
