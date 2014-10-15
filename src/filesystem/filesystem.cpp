@@ -57,6 +57,21 @@ namespace {
     const string _loggerCat = "FileSystem";
 }
 
+namespace {
+#ifdef WIN32
+	const char pathSeparator = '\\';
+	const unsigned int changeBufferSize = 16384u;
+
+#define _CRT_SECURE_NO_WARNINGS
+#elif __APPLE__
+	const char pathSeparator = '/';
+	// the maximum latency allowed before a changed is registered
+	const CFAbsoluteTime latency = 3.0;
+#else
+	const char pathSeparator = '/';
+#endif
+}
+
 namespace ghoul {
 namespace filesystem {
 
@@ -85,11 +100,25 @@ void FileSystem::initialize() {
 
 void FileSystem::deinitialize() {
     assert(_fileSystem != nullptr);
-#if !defined(WIN32) && !defined(__APPLE__)
-    _fileSystem->_keepGoing = false;
-    if(_fileSystem->_t.joinable())
-        _fileSystem->_t.join();
-    close( _fileSystem->_inotifyHandle );
+#ifdef WIN32
+	for (auto d : _fileSystem->_directories) {
+		DirectoryHandle* dh = d.second;
+		CancelIo(dh->_handle);
+		CloseHandle(dh->_handle);
+		delete dh;
+	}
+#elif __APPLE__
+	if (_eventStream != nullptr) {
+		FSEventStreamStop(_eventStream);
+		FSEventStreamInvalidate(_eventStream);
+		FSEventStreamRelease(_eventStream);
+		_eventStream = nullptr;
+	}
+#else
+	_fileSystem->_keepGoing = false;
+	if (_fileSystem->_t.joinable())
+		_fileSystem->_t.join();
+	close( _fileSystem->_inotifyHandle );
 #endif
     delete _fileSystem;
 }
@@ -246,39 +275,44 @@ void FileSystem::setCurrentDirectory(const Directory& directory) const {
 }
 
 bool FileSystem::fileExists(const File& path) const {
+	return fileExists(path.path(),true);
+}
+
+bool FileSystem::fileExists(std::string path, bool isRawPath) const {
+	if (!isRawPath)
+		path = absPath(path);
 #ifdef WIN32
-    const DWORD attributes = GetFileAttributes(path.path().c_str());
-    if (attributes == INVALID_FILE_ATTRIBUTES) {
-        const DWORD error = GetLastError();
-        if ((error != ERROR_FILE_NOT_FOUND) && (error != ERROR_PATH_NOT_FOUND)) {
-            LPTSTR errorBuffer = nullptr;
-            FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-                FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL,
-                error,
-                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                (LPTSTR)&errorBuffer,
-                0,
-                NULL);
-            if (errorBuffer != nullptr) {
-                string error(errorBuffer);
-                LocalFree(errorBuffer);
-                LERROR("Error retrieving file attributes: " << error);
-            }
-        }
-        return false;
-    }
-    else
-        return (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
+	const DWORD attributes = GetFileAttributes(path.c_str());
+	if (attributes == INVALID_FILE_ATTRIBUTES) {
+		const DWORD error = GetLastError();
+		if ((error != ERROR_FILE_NOT_FOUND) && (error != ERROR_PATH_NOT_FOUND)) {
+			LPTSTR errorBuffer = nullptr;
+			FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+				FORMAT_MESSAGE_ALLOCATE_BUFFER |
+				FORMAT_MESSAGE_IGNORE_INSERTS,
+				NULL,
+				error,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+				(LPTSTR)&errorBuffer,
+				0,
+				NULL);
+			if (errorBuffer != nullptr) {
+				string error(errorBuffer);
+				LocalFree(errorBuffer);
+				LERROR("Error retrieving file attributes: " << error);
+			}
+		}
+		return false;
+	}
+	else
+		return (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
 #else
-    const string& filePath = path.path();
-    struct stat buffer;
-    const int statResult = stat(filePath.c_str(), &buffer);
-    if (statResult != 0)
-        return false;
-    const int isFile = S_ISREG(buffer.st_mode);
-    return (isFile != 0);
+	struct stat buffer;
+	const int statResult = stat(path.c_str(), &buffer);
+	if (statResult != 0)
+		return false;
+	const int isFile = S_ISREG(buffer.st_mode);
+	return (isFile != 0);
 #endif
 }
 
@@ -563,11 +597,134 @@ std::vector<std::string> FileSystem::tokens() const {
 	return tokens;
 }
 
-#if !defined(WIN32) && !defined(__APPLE__)
-int FileSystem::inotifyHandle() {
-    return _inotifyHandle;
-}
+void FileSystem::addFileListener(File* file) {
+	assert(file != nullptr);
+#if defined(WIN32)			// Windows
+	//LDEBUG("Trying to insert  " << file);
+	std::string d = file->directoryName();
+	auto f = _directories.find(d);
+	if (f == _directories.end()) {
+		LDEBUG("started watching: " << d);
+		DirectoryHandle* handle = new DirectoryHandle;
+		handle->_activeBuffer = 0;
+		handle->_handle = nullptr;
+
+		handle->_handle = CreateFile(
+			d.c_str(),
+			FILE_LIST_DIRECTORY,
+			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+			NULL,
+			OPEN_EXISTING,
+			FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
+			NULL);
+
+		if (handle->_handle == INVALID_HANDLE_VALUE) {
+			LERROR("Directory handle for '" << d << "' could not be obtained");
+			return;
+		}
+
+		_directories[d] = handle;
+		beginRead(handle);
+	}
+
+#ifdef GHL_DEBUG
+	auto eqRange = _trackedFiles.equal_range(file->path());
+	// Erase (b,15) pair
+	for (auto it = eqRange.first; it != eqRange.second; ++it) {
+		if (it->second == file) {
+			LERROR("Already tracking fileobject");
+			return;
+		}
+	}
 #endif
+
+	//_lock.lock();
+	_trackedFiles.insert({ file->path(), file });
+	//_lock.unlock();
+
+#elif defined(__APPLE__)	// OS X
+
+#else						// Linux
+	const std::string filename = fileobject->path();
+	LDEBUGC("inotifyWatcher", "Wathcing: " << filename);
+	int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
+	_inotifyFiles.insert(std::pair<int, File*>(wd, fileobject));
+#endif
+}
+
+void FileSystem::removeFileListener(File* file) {
+	assert(file != nullptr);
+#if defined(WIN32)			// Windows
+
+
+	//_lock.lock();
+	/*
+	typedef std::multimap<std::string, File*>::iterator iterator;
+	std::pair<iterator, iterator> iterpair = _trackedFiles.equal_range(file->path());
+	iterator it = iterpair.first;
+	//LDEBUG("bsize: " << _trackedFiles.size());
+	//LDEBUG("bsize: ");
+	//size_t before = _trackedFiles.size();
+	for (; it != iterpair.second; ++it) {
+		//LDEBUG("comparing for removal, " << file << "==" << it->second);
+		if (it->second == file) {
+			LWARNING("Removing tracking of " << file);
+			_trackedFiles.erase(it);
+			//it = _trackedFiles.end();
+			return;
+		}
+	}
+	*/
+	auto eqRange = _trackedFiles.equal_range(file->path());
+	for (auto it = eqRange.first; it != eqRange.second; ++it) {
+		//LDEBUG("comparing for removal, " << file << "==" << it->second);
+		if (it->second == file) {
+			//LWARNING("Removing tracking of " << file);
+			_trackedFiles.erase(it);
+			return;
+		}
+	}
+	LWARNING("Could not find tracked '" << file <<"' for path '"<<file->path()<<"'");
+	//_lock.unlock();
+	/*
+	if (_trackedFiles.size() == before) {
+		LDEBUG("Failed to delete");
+	}
+	*/
+	//LDEBUG("asize: " << _trackedFiles.size());
+	/*
+	auto eqRange = _trackedFiles.equal_range(file->path());
+	// Erase (b,15) pair
+	for (auto it = eqRange.first; it != eqRange.second; ++it) {
+		LDEBUG("comparing for removal, " << file << "==" << it->second);
+		if (it->second == file) { 
+			LWARNING("Removing tracking of " << file->path());
+			_trackedFiles.erase(it);
+			break;
+		}
+	}
+	*/
+#elif defined(__APPLE__)	// OS X
+
+#else						// Linux
+	std::map<int,File*>::iterator it;
+	for(it = _inotifyFiles.begin();it != _inotifyFiles.end(); it++) {
+		if(it->second == fileobject) {
+			( void ) inotify_rm_watch( _inotifyHandle, it->first );
+			_inotifyFiles.erase(it);
+			break;
+		}
+	}
+#endif
+}
+
+void FileSystem::triggerFilesystemEvents() {
+#ifdef WIN32
+	// Sleeping for 0 milliseconds will trigger any pending asynchronous procedure calls 
+	SleepEx(0, TRUE);
+#endif
+}
+
 
 bool FileSystem::hasToken(const std::string& path, const std::string& token) const {
     if (!hasTokens(path))
@@ -599,27 +756,154 @@ std::string FileSystem::resolveToken(const std::string& token) const {
         return it->second;
 }
 
-#if !defined(WIN32) && !defined(__APPLE__)
-void FileSystem::inotifyAddListener(File* fileobject) {
-    const std::string filename = fileobject->path();
-    LDEBUGC("inotifyWatcher", "Wathcing: " << filename);
-    int wd = inotify_add_watch( _inotifyHandle, filename.c_str(), mask);
-    _inotifyFiles.insert ( std::pair<int,File*>(wd,fileobject) );
+#ifdef WIN32
+void CALLBACK FileSystem::completionHandler(
+	DWORD /*dwErrorCode*/, 
+	DWORD /*dwNumberOfBytesTransferred*/,
+	LPOVERLAPPED lpOverlapped)
+{
+	//File* file = static_cast<File*>(lpOverlapped->hEvent);
+	DirectoryHandle* directoryHandle = static_cast<DirectoryHandle*>(lpOverlapped->hEvent);
+
+	unsigned char currentBuffer = directoryHandle->_activeBuffer;
+
+	// Change active buffer (ping-pong buffering)
+	directoryHandle->_activeBuffer = (directoryHandle->_activeBuffer + 1) % 2;
+	// Restart change listener as soon as possible
+	FileSys.beginRead(directoryHandle);
+
+	char* buffer = reinterpret_cast<char*>(&(directoryHandle->_changeBuffer[currentBuffer][0]));
+	// data might have queued up, so we need to check all changes
+	//LERROR("callback");
+	while (true) {
+		// extract the information which file has changed
+		FILE_NOTIFY_INFORMATION& information = (FILE_NOTIFY_INFORMATION&)*buffer;
+		char* currentFilenameBuffer = new char[information.FileNameLength];
+		size_t i;
+		wcstombs_s(&i, currentFilenameBuffer, information.FileNameLength,
+			information.FileName, information.FileNameLength);
+		//std::wcstombs(currentFilenameBuffer,
+		//information.FileName, information.FileNameLength);
+		const string& currentFilename(currentFilenameBuffer);
+		delete[] currentFilenameBuffer;
+		//LDEBUG("callback: " << currentFilename);
+
+		std::string fullPath;
+		for (auto d : FileSys._directories) {
+			if (d.second == directoryHandle)
+				fullPath = d.first + pathSeparator + currentFilename;
+		}
+		//LDEBUG("callback: " << fullPath);
+
+		size_t n = FileSys._trackedFiles.count(fullPath);
+		if (n > 0) {
+			/*
+			LWARNING("Tracked files");
+			for (auto ff : FileSys._trackedFiles) {
+				LDEBUG(ff.first);
+			}
+			*/
+			//LDEBUG("Loop for " << fullPath);
+			auto eqRange = FileSys._trackedFiles.equal_range(fullPath);
+			for (auto it = eqRange.first; it != eqRange.second; ++it) {
+				File* f = (*it).second;
+				f->_fileChangedCallback(*f);
+				//LWARNING("calling for: " << f);
+			}
+			//LDEBUG("end Loop for " << fullPath);
+			break;
+		}
+		else {
+			if (!information.NextEntryOffset)
+				// we are done with all entries and didn't find our file
+				break;
+			else
+				//continue with the next entry
+				buffer += information.NextEntryOffset;
+		}
+
+	}
 }
-void FileSystem::inotifyRemoveListener(File* fileobject) {
-    std::map<int,File*>::iterator it;
-    for(it = _inotifyFiles.begin();it != _inotifyFiles.end(); it++) {
-        if(it->second == fileobject) {
-            ( void ) inotify_rm_watch( _inotifyHandle, it->first );
-            _inotifyFiles.erase (it);
-            break;
-        }
-    }
+
+void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
+
+
+	HANDLE handle = directoryHandle->_handle;
+	unsigned char activeBuffer = directoryHandle->_activeBuffer;
+	std::vector<BYTE>* changeBuffer = directoryHandle->_changeBuffer;
+	OVERLAPPED* overlappedBuffer = &directoryHandle->_overlappedBuffer;
+
+	ZeroMemory(overlappedBuffer, sizeof(OVERLAPPED));
+	overlappedBuffer->hEvent = directoryHandle;
+
+	changeBuffer[activeBuffer].resize(changeBufferSize);
+	ZeroMemory(&(changeBuffer[activeBuffer][0]), changeBufferSize);
+
+	DWORD returnedBytes;
+	BOOL success = ReadDirectoryChangesW(
+		handle,
+		&changeBuffer[activeBuffer][0],
+		static_cast<DWORD>(changeBuffer[activeBuffer].size()),
+		false,
+		FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE,
+		&returnedBytes,
+		overlappedBuffer,
+		&completionHandler);
+
+	if (success == 0) {
+		LERROR("no begin read");
+		const DWORD error = GetLastError();
+		LPTSTR errorBuffer = nullptr;
+		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			error,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPTSTR)&errorBuffer,
+			0,
+			NULL);
+		if (errorBuffer != nullptr) {
+			std::string errorString(errorBuffer);
+			LocalFree(errorBuffer);
+			LERROR("Error reading directory changes: " << errorString);
+		}
+		else {
+			LERROR("Error reading directory changes: " << error);
+		}
+	}
 }
+
+#elif __APPLE__
+
+void File::completionHandler(
+	ConstFSEventStreamRef,
+	void *clientCallBackInfo,
+	size_t numEvents,
+	void *eventPaths,
+	const FSEventStreamEventFlags[],
+	const FSEventStreamEventId[])
+{
+	File* fileObj = reinterpret_cast<File*>(clientCallBackInfo);
+	char** paths = reinterpret_cast<char**>(eventPaths);
+	for (size_t i = 0; i<numEvents; i++) {
+		const string path = string(paths[i]);
+		const string directory = fileObj->directoryName() + '/';
+		if (path == directory) {
+			struct stat fileinfo;
+			stat(fileObj->_filename.c_str(), &fileinfo);
+			if (fileinfo.st_mtimespec.tv_sec != fileObj->_lastModifiedTime) {
+				fileObj->_lastModifiedTime = fileinfo.st_atimespec.tv_sec;
+				fileObj->_fileChangedCallback(*fileObj);
+			}
+		}
+	}
+}
+#else // Linux
 
 void FileSystem::inotifyWatcher() {
 
-    int fd = FileSys.inotifyHandle();
+	int fd = FileSys._inotifyHandle;
     char buffer[BUF_LEN];
     struct timeval tv;
     tv.tv_sec = 1;

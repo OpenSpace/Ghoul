@@ -52,32 +52,10 @@ const char pathSeparator = '/';
 #endif
 }
 
-File::File(const char* filename, bool isRawPath,
-           FileChangedCallback fileChangedCallback)
-    : _fileChangedCallback(std::move(fileChangedCallback))
-#ifdef WIN32
-    , _directoryHandle(nullptr)
-    , _activeBuffer(0)
-#elif __APPLE__
-    , _eventStream(nullptr)
-    , _lastModifiedTime(0)
-#endif
-{
-    if (isRawPath)
-        _filename = string(filename);
-    else
-        _filename = FileSys.absolutePath(string(filename));
-
-    if (_fileChangedCallback)
-        installFileChangeListener();
-}
-
 File::File(std::string filename, bool isRawPath,
            FileChangedCallback fileChangedCallback)
     : _fileChangedCallback(std::move(fileChangedCallback))
 #ifdef WIN32
-    , _directoryHandle(nullptr)
-    , _activeBuffer(0)
 #elif __APPLE__
     , _eventStream(nullptr)
     , _lastModifiedTime(0)
@@ -93,11 +71,12 @@ File::File(std::string filename, bool isRawPath,
 }
     
 File::~File() {
-    removeFileChangeListener();
+	if (_fileChangedCallback)
+		removeFileChangeListener();
 }
 
 void File::setCallback(FileChangedCallback callback) {
-    if (_fileChangedCallback)
+	if (_fileChangedCallback)
         removeFileChangeListener();
     _fileChangedCallback = std::move(callback);
     if (_fileChangedCallback)
@@ -158,7 +137,8 @@ string File::fileExtension() const {
 }
     
 void File::installFileChangeListener() {
-    removeFileChangeListener();
+	FileSys.addFileListener(this);
+	/*
 #ifdef WIN32
 	string&& directory = directoryName();
     // Create a handle to the directory that is non-blocking
@@ -216,9 +196,12 @@ void File::installFileChangeListener() {
 #else // Linux
     FileSys.inotifyAddListener(this);
 #endif
+	*/
 }
 
 void File::removeFileChangeListener() {
+	FileSys.removeFileListener(this);
+	/*
 #ifdef WIN32
     if (_directoryHandle != nullptr) {
         CancelIo(_directoryHandle);
@@ -235,91 +218,10 @@ void File::removeFileChangeListener() {
 #else
     FileSys.inotifyRemoveListener(this);
 #endif
+	*/
 }
 
 #ifdef WIN32
-void CALLBACK File::completionHandler(DWORD /*dwErrorCode*/, DWORD,
-                                      LPOVERLAPPED lpOverlapped)
-{
-    File* file = static_cast<File*>(lpOverlapped->hEvent);
-
-    unsigned char currentBuffer = file->_activeBuffer;
-
-    // Change active buffer (ping-pong buffering)
-    file->_activeBuffer = (file->_activeBuffer + 1) % 2;
-    // Restart change listener as soon as possible
-    file->beginRead();
-
-    string&& thisFilename = file->filename();
-
-    char* buffer = reinterpret_cast<char*>(&(file->_changeBuffer[currentBuffer][0]));
-    // data might have queued up, so we need to check all changes
-    while (true) {
-        // extract the information which file has changed
-        FILE_NOTIFY_INFORMATION& information = (FILE_NOTIFY_INFORMATION&)*buffer;
-        char* currentFilenameBuffer = new char[information.FileNameLength];
-        size_t i;
-        wcstombs_s(&i, currentFilenameBuffer, information.FileNameLength,
-            information.FileName, information.FileNameLength);
-        //std::wcstombs(currentFilenameBuffer,
-                      //information.FileName, information.FileNameLength);
-        const string& currentFilename(currentFilenameBuffer);
-        delete[] currentFilenameBuffer;
-
-        if (currentFilename == thisFilename) {
-            // if it is the file we are interested in, call the callback
-            file->_fileChangedCallback(*file);
-            break;
-        }
-        else {
-            if (!information.NextEntryOffset)
-                // we are done with all entries and didn't find our file
-                break;
-            else
-                //continue with the next entry
-                buffer += information.NextEntryOffset;
-        }
-    }
-}
-
-void File::beginRead() {
-    ZeroMemory(&_overlappedBuffer, sizeof(OVERLAPPED));
-    _overlappedBuffer.hEvent = this;
-
-    _changeBuffer[_activeBuffer].resize(changeBufferSize);
-	ZeroMemory(&(_changeBuffer[_activeBuffer][0]), changeBufferSize);
-
-    DWORD returnedBytes;
-    BOOL success = ReadDirectoryChangesW(
-        _directoryHandle,
-        &_changeBuffer[_activeBuffer][0],
-        static_cast<DWORD>(_changeBuffer[_activeBuffer].size()),
-        false,
-        FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE,
-        &returnedBytes,
-        &_overlappedBuffer,
-        &completionHandler);
-
-    if (success == 0) {
-        const DWORD error = GetLastError();
-        LPTSTR errorBuffer = nullptr;
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_ALLOCATE_BUFFER |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
-            error,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer,
-            0,
-            NULL);
-        if (errorBuffer != nullptr) {
-            std::string error(errorBuffer);
-            LocalFree(errorBuffer);
-        }
-        else
-            LERROR("Error reading directory changes: " << error);
-    }
-}
     
 #elif __APPLE__
 
@@ -346,8 +248,6 @@ void File::completionHandler(
         }
     }
 }
-#else // Linux
-
 #endif
 
 std::ostream& operator<<(std::ostream& os, const File& f) {

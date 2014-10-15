@@ -118,7 +118,13 @@ public:
      * cache the contents of the file inside.
      * \param cpy The original object that will be copied
      */
-    ShaderObject(const ShaderObject& cpy);
+	ShaderObject(const ShaderObject& cpy);
+
+	/**
+	 * A move constructor that will move all of the internal state, and the shader source,
+	 * but it will leave the other object in an invalid state
+	 */
+	ShaderObject(ShaderObject&& rhs);
 
     /**
      * The destructor will mark the OpenGL name as unused again. Because of the way the
@@ -142,7 +148,13 @@ public:
      * \param rhs The original right hand side that will be used to set this object
      * \return A reference to <code>this</code>
      */
-    ShaderObject& operator=(const ShaderObject& rhs);
+	ShaderObject& operator=(const ShaderObject& rhs);
+
+	/**
+	 * A move assignment that will move all of the internal state, and the shader source,
+	 * but it will leave the other object in an invalid state
+	 */
+	ShaderObject& operator=(ShaderObject&& rhs);
 
     /**
      * Sets the internal name of this ShaderObject that changes the logging category by

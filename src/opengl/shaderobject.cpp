@@ -119,9 +119,27 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
     setShaderFilename(_fileName);
 }
 
+ShaderObject::ShaderObject(ShaderObject&& rhs) {
+	if (this != &rhs) {
+		glDeleteShader(_id);
+		_id = rhs._id;
+		rhs._id = 0;
+
+		_type = rhs._type;
+		_fileName = std::move(rhs._fileName);
+		_shaderName = std::move(rhs._shaderName);
+		_loggerCat = std::move(rhs._loggerCat);
+		_onChangeCallback = rhs._onChangeCallback;
+		_trackedFiles = std::move(rhs._trackedFiles);
+
+	}
+}
+
 ShaderObject::~ShaderObject() {
     glDeleteShader(_id);
-    _id = 0;
+	_id = 0;
+	for (auto f : _trackedFiles)
+		delete f.second;
 }
 
 ShaderObject::operator GLuint() const {
@@ -150,13 +168,30 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
     return *this;
 }
 
+ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) {
+	if (this != &rhs) {
+		glDeleteShader(_id);
+		_id = rhs._id;
+		rhs._id = 0;
+
+		_type = rhs._type;
+		_fileName = std::move(rhs._fileName);
+		_shaderName = std::move(rhs._shaderName);
+		_loggerCat = std::move(rhs._loggerCat);
+		_onChangeCallback = rhs._onChangeCallback;
+		_trackedFiles = std::move(rhs._trackedFiles);
+	
+	}
+	return *this;
+}
+
 void ShaderObject::setName(std::string name) {
-    _shaderName = std::move(name);
-    _loggerCat = "ShaderObject['" + _shaderName + "']";
+	_shaderName = std::move(name);
+	_loggerCat = "ShaderObject['" + _shaderName + "']";
 #ifdef GL_VERSION_4_3
-    if (glObjectLabel)
-        glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1),
-_shaderName.c_str());
+	if (glObjectLabel)
+		glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1),
+		_shaderName.c_str());
 #endif
 }
 

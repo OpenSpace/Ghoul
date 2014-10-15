@@ -29,16 +29,6 @@
 #include <functional>
 #include <string>
 
-#ifdef WIN32
-#include <vector>
-#include <windows.h>
-#elif __APPLE__
-#include <CoreServices/CoreServices.h>
-#include <sys/stat.h>
-#else
-#include <thread>
-#endif
-
 namespace ghoul {
 namespace filesystem {
 
@@ -61,23 +51,6 @@ class File {
 public:
     /// The type of the std::function that is used as the prototype for the callback
     typedef std::function<void (const File&)> FileChangedCallback;
-    
-    /**
-     * This method constructs a new File object using a given <code>filename</code> as a
-     * C string. <code>isRawPath</code> controls if the path is used without changes, or
-     * if tokens should be converted into a proper path first. The token conversion is
-     * done using the #ghoul::filesystem::FileSystem. <code>fileChangedCallback</code>
-     * will be called whenever the pointed to file changes on the hard disk.
-     * \param filename The path to the file this File object should point to
-     * \param isRawPath If this value is <code>true</code>, the value of <code>filename
-     * </code> is used as-is. If it is <code>false</code>, the path is converted into an
-     * absolute path and any tokens, if present, are resolved
-     * \param fileChangedCallback The callback function that is called once per change of
-     * the file on the filesystem
-     * \see ghoul::filesystem::FileSystem The system to register and use tokens
-     */
-    File(const char* filename, bool isRawPath = false,
-         FileChangedCallback fileChangedCallback = FileChangedCallback());
 
     /**
      * This method constructs a new File object using a given <code>filename</code> as an
@@ -195,16 +168,6 @@ private:
     FileChangedCallback _fileChangedCallback;
 
 #ifdef WIN32
-    void beginRead();
-    static void CALLBACK completionHandler(
-        DWORD dwErrorCode,
-        DWORD dwNumberOfBytesTransferred,
-        LPOVERLAPPED lpOverlapped);		
-
-    HANDLE _directoryHandle;
-    unsigned char _activeBuffer;
-    std::vector<BYTE> _changeBuffer[2];
-    OVERLAPPED _overlappedBuffer;
 #elif __APPLE__
     static void completionHandler(ConstFSEventStreamRef streamRef,
                                   void *clientCallBackInfo,
@@ -215,9 +178,8 @@ private:
     
     FSEventStreamRef _eventStream;
     __darwin_time_t _lastModifiedTime; // typedef of 'long'
-#else // Linux
-    friend class FileSystem;
 #endif
+	friend class FileSystem;
 };
 
 /**

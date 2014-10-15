@@ -30,9 +30,23 @@
 #include <string>
 #include <vector>
 #include <thread>
+#include <functional>
+
+#ifdef WIN32
+#include <vector>
+#include <windows.h>
+#elif __APPLE__
+#include <CoreServices/CoreServices.h>
+#include <sys/stat.h>
+#else
+#include <thread>
+#endif
+
 
 #include <ghoul/filesystem/directory.h>
 #include <ghoul/filesystem/file.h>
+
+
 
 namespace ghoul {
 namespace filesystem {
@@ -138,6 +152,16 @@ public:
      * <code>false</code> otherwise
      */
 	bool fileExists(const File& path) const;
+
+	/**
+     * Checks if the file at the <code>path</code> exists or not. This method will also
+     * return <code>false</code> if <code>path</code> points to a directory. This method
+     * will not expand any tokens that are passed to it.
+     * \param path The path that should be tested for existence
+     * \return <code>true</code> if <code>path</code> points to an existing file,
+     * <code>false</code> otherwise
+     */
+	bool fileExists(std::string path, bool isRawPath = false) const;
     
     /**
      * Checks if the directory at the <code>path</code> exists or not. This method will
@@ -210,11 +234,9 @@ public:
 	 */
 	std::vector<std::string> tokens() const;
 
-#if !defined(WIN32) && !defined(__APPLE__)
-    int inotifyHandle();
-    void inotifyAddListener(File* fileobject);
-    void inotifyRemoveListener(File* fileobject);
-#endif
+	void addFileListener(File* file);
+	void removeFileListener(File* file);
+	void triggerFilesystemEvents();
 
 private:
     /**
@@ -271,7 +293,34 @@ private:
     /// This map stores all the tokens that are used in the FileSystem.
     std::map<std::string, std::string> _tokenMap;
 
-#if !defined(WIN32) && !defined(__APPLE__)
+#ifdef WIN32
+	struct DirectoryHandle {
+		HANDLE _handle; 
+		unsigned char _activeBuffer;
+		std::vector<BYTE> _changeBuffer[2];
+		OVERLAPPED _overlappedBuffer;
+	};
+
+	std::multimap<std::string, File*> _trackedFiles;
+	std::map<std::string, DirectoryHandle*> _directories;
+
+	void beginRead(DirectoryHandle* directoryHandle);
+	static void CALLBACK completionHandler(
+		DWORD dwErrorCode,
+		DWORD dwNumberOfBytesTransferred,
+		LPOVERLAPPED lpOverlapped);		
+
+#elif __APPLE__
+	static void completionHandler(ConstFSEventStreamRef streamRef,
+		void *clientCallBackInfo,
+		size_t numEvents,
+		void *eventPaths,
+		const FSEventStreamEventFlags eventFlags[],
+		const FSEventStreamEventId eventIds[]);
+
+	FSEventStreamRef _eventStream;
+	__darwin_time_t _lastModifiedTime; // typedef of 'long'
+#else // Linux
     int _inotifyHandle;
     bool _keepGoing;
     std::thread _t;
