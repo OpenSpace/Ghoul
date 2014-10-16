@@ -66,7 +66,7 @@ namespace {
 #elif __APPLE__
 	const char pathSeparator = '/';
 	// the maximum latency allowed before a changed is registered
-	const CFAbsoluteTime latency = 3.0;
+	const CFAbsoluteTime latency = 1.0;
 #else
 	const char pathSeparator = '/';
 #endif
@@ -91,7 +91,9 @@ void FileSystem::initialize() {
     if (_fileSystem == nullptr)
         _fileSystem = new FileSystem;
 
-#if !defined(WIN32) && !defined(__APPLE__)
+#if defined(WIN32)
+#elif defined(__APPLE__)
+#else
     _fileSystem->_inotifyHandle = inotify_init();
     _fileSystem->_keepGoing = true;
     _fileSystem->_t = std::thread(inotifyWatcher);
@@ -108,12 +110,13 @@ void FileSystem::deinitialize() {
 		delete dh;
 	}
 #elif __APPLE__
-	if (_eventStream != nullptr) {
-		FSEventStreamStop(_eventStream);
-		FSEventStreamInvalidate(_eventStream);
-		FSEventStreamRelease(_eventStream);
-		_eventStream = nullptr;
-	}
+    for (auto d : _fileSystem->_directories) {
+        DirectoryHandle* dh = d.second;
+        FSEventStreamStop(dh->_eventStream);
+        FSEventStreamInvalidate(dh->_eventStream);
+        FSEventStreamRelease(dh->_eventStream);
+        delete dh;
+    }
 #else
 	_fileSystem->_keepGoing = false;
 	if (_fileSystem->_t.joinable())
@@ -367,7 +370,8 @@ bool FileSystem::createDirectory(const Directory& path, bool recursive) const {
 	if (recursive) {
 		std::vector<Directory> directories;
 		Directory d = path;
-		while (!FileSys.directoryExists(d)) {
+        while (!FileSys.directoryExists(d)) {
+            //LERROR("Adding path to v: " << d.path());
 			directories.push_back(d);
 			d = d.parentDirectory();
 		}
@@ -439,6 +443,7 @@ bool FileSystem::deleteDirectory(const Directory& path) const {
         return false;
 #ifdef WIN32
     const int rmDirResult = _rmdir(path.path().c_str());
+    auto dirs =
     return rmDirResult != -1;
 #else
     const string& dirPath = path;
@@ -637,13 +642,69 @@ void FileSystem::addFileListener(File* file) {
 		}
 	}
 #endif
-
-	//_lock.lock();
 	_trackedFiles.insert({ file->path(), file });
-	//_lock.unlock();
 
 #elif defined(__APPLE__)	// OS X
-
+    //LDEBUG("Trying to insert  " << file);
+    std::string d = file->directoryName();
+    auto f = _directories.find(d);
+    if (f == _directories.end()) {
+    
+        bool alreadyTrackingParent = false;
+        for(auto dir: _directories) {
+            if (d.length() > dir.first.length() && d.find_first_of(dir.first) == 0) {
+                alreadyTrackingParent = true;
+                break;
+            }
+        }
+        if(!alreadyTrackingParent) {
+            LDEBUG("started watching: " << d);
+            DirectoryHandle* handle = new DirectoryHandle;
+            
+            // Create the FSEventStream responsible for this directory (Apple's callback system
+            // only works on the granularity of the directory)
+            CFStringRef path = CFStringCreateWithCString(NULL,
+                                                         d.c_str(),
+                                                         kCFStringEncodingASCII);
+            CFArrayRef pathsToWatch = CFArrayCreate(NULL, (const void **)&path, 1, NULL);
+            FSEventStreamContext callbackInfo;
+            callbackInfo.version = 0;
+            callbackInfo.info = nullptr;
+            callbackInfo.release = NULL;
+            callbackInfo.retain = NULL;
+            callbackInfo.copyDescription = NULL;
+            
+            handle->_eventStream = FSEventStreamCreate(
+                                                       NULL,
+                                                       &completionHandler,
+                                                       &callbackInfo,
+                                                       pathsToWatch,
+                                                       kFSEventStreamEventIdSinceNow,
+                                                       latency,
+                                                       kFSEventStreamCreateFlagFileEvents);
+            
+            // Add checking the event stream to the current run loop
+            // If there is a performance bottleneck, this could be done on a separate thread?
+            FSEventStreamScheduleWithRunLoop( handle->_eventStream,
+                                             CFRunLoopGetCurrent(),
+                                             kCFRunLoopDefaultMode);
+            // Start monitoring
+            FSEventStreamStart( handle->_eventStream);
+            _directories[d] = handle;
+        }
+    }
+    
+#ifdef GHL_DEBUG
+    auto eqRange = _trackedFiles.equal_range(file->path());
+    // Erase (b,15) pair
+    for (auto it = eqRange.first; it != eqRange.second; ++it) {
+        if (it->second == file) {
+            LERROR("Already tracking fileobject");
+            return;
+        }
+    }
+#endif
+    _trackedFiles.insert({ file->path(), file });
 #else						// Linux
 	const std::string filename = fileobject->path();
 	LDEBUGC("inotifyWatcher", "Wathcing: " << filename);
@@ -654,27 +715,7 @@ void FileSystem::addFileListener(File* file) {
 
 void FileSystem::removeFileListener(File* file) {
 	assert(file != nullptr);
-#if defined(WIN32)			// Windows
-
-
-	//_lock.lock();
-	/*
-	typedef std::multimap<std::string, File*>::iterator iterator;
-	std::pair<iterator, iterator> iterpair = _trackedFiles.equal_range(file->path());
-	iterator it = iterpair.first;
-	//LDEBUG("bsize: " << _trackedFiles.size());
-	//LDEBUG("bsize: ");
-	//size_t before = _trackedFiles.size();
-	for (; it != iterpair.second; ++it) {
-		//LDEBUG("comparing for removal, " << file << "==" << it->second);
-		if (it->second == file) {
-			LWARNING("Removing tracking of " << file);
-			_trackedFiles.erase(it);
-			//it = _trackedFiles.end();
-			return;
-		}
-	}
-	*/
+#if defined(WIN32) || defined(__APPLE__)
 	auto eqRange = _trackedFiles.equal_range(file->path());
 	for (auto it = eqRange.first; it != eqRange.second; ++it) {
 		//LDEBUG("comparing for removal, " << file << "==" << it->second);
@@ -684,27 +725,6 @@ void FileSystem::removeFileListener(File* file) {
 			return;
 		}
 	}
-	LWARNING("Could not find tracked '" << file <<"' for path '"<<file->path()<<"'");
-	//_lock.unlock();
-	/*
-	if (_trackedFiles.size() == before) {
-		LDEBUG("Failed to delete");
-	}
-	*/
-	//LDEBUG("asize: " << _trackedFiles.size());
-	/*
-	auto eqRange = _trackedFiles.equal_range(file->path());
-	// Erase (b,15) pair
-	for (auto it = eqRange.first; it != eqRange.second; ++it) {
-		LDEBUG("comparing for removal, " << file << "==" << it->second);
-		if (it->second == file) { 
-			LWARNING("Removing tracking of " << file->path());
-			_trackedFiles.erase(it);
-			break;
-		}
-	}
-	*/
-#elif defined(__APPLE__)	// OS X
 
 #else						// Linux
 	std::map<int,File*>::iterator it;
@@ -712,16 +732,26 @@ void FileSystem::removeFileListener(File* file) {
 		if(it->second == fileobject) {
 			( void ) inotify_rm_watch( _inotifyHandle, it->first );
 			_inotifyFiles.erase(it);
-			break;
+			return;
 		}
 	}
 #endif
+    LWARNING("Could not find tracked '" << file <<"' for path '"<< file->path() << "'");
 }
 
 void FileSystem::triggerFilesystemEvents() {
 #ifdef WIN32
 	// Sleeping for 0 milliseconds will trigger any pending asynchronous procedure calls 
 	SleepEx(0, TRUE);
+#endif
+#if defined(__APPLE__)
+    //osxPollEvents();
+    
+    for(auto d: _directories) {
+        FSEventStreamFlushSync(d.second->_eventStream);
+        //FSEventStreamFlushAsync(d.second->_eventStream);
+    }
+    
 #endif
 }
 
@@ -876,29 +906,86 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
 
 #elif __APPLE__
 
-void File::completionHandler(
-	ConstFSEventStreamRef,
-	void *clientCallBackInfo,
+void FileSystem::completionHandler(
+	ConstFSEventStreamRef ,//streamRef,
+	void * ,//clientCallBackInfo,
 	size_t numEvents,
 	void *eventPaths,
-	const FSEventStreamEventFlags[],
-	const FSEventStreamEventId[])
+	const FSEventStreamEventFlags eventFlags[],
+	const FSEventStreamEventId[] )//eventIds[])
 {
-	File* fileObj = reinterpret_cast<File*>(clientCallBackInfo);
-	char** paths = reinterpret_cast<char**>(eventPaths);
-	for (size_t i = 0; i<numEvents; i++) {
-		const string path = string(paths[i]);
-		const string directory = fileObj->directoryName() + '/';
-		if (path == directory) {
-			struct stat fileinfo;
-			stat(fileObj->_filename.c_str(), &fileinfo);
-			if (fileinfo.st_mtimespec.tv_sec != fileObj->_lastModifiedTime) {
-				fileObj->_lastModifiedTime = fileinfo.st_atimespec.tv_sec;
-				fileObj->_fileChangedCallback(*fileObj);
-			}
-		}
-	}
+    char **paths = reinterpret_cast<char**>(eventPaths);
+    for (size_t i=0; i<numEvents; i++) {
+        //std::string ename = EventEnumToName(static_cast<Events>(eventFlags[i]));
+        
+        //printf("%s\n%s\n", path.c_str(), ename.c_str());
+        if(! eventFlags[i] & Events::kFSEventStreamEventFlagItemModified)
+            continue;
+        
+        if(! eventFlags[i] & Events::kFSEventStreamEventFlagItemIsFile)
+            continue;
+        
+        std::string path = paths[i];
+        size_t n = FileSys._trackedFiles.count(path);
+        if (n == 0)
+            continue;
+        
+        auto eqRange = FileSys._trackedFiles.equal_range(path);
+        for (auto it = eqRange.first; it != eqRange.second; ++it) {
+            File* f = (*it).second;
+            f->_fileChangedCallback(*f);
+        }
+    }
 }
+std::string FileSystem::EventEnumToName(Events e) {
+    std::string name;
+    if(e & kFSEventStreamEventFlagMustScanSubDirs)
+        name += "| kFSEventStreamEventFlagMustScanSubDirs";
+    if(e & kFSEventStreamEventFlagUserDropped)
+        name += "| kFSEventStreamEventFlagUserDropped";
+    if(e & kFSEventStreamEventFlagKernelDropped)
+        name += "| kFSEventStreamEventFlagKernelDropped";
+    if(e & kFSEventStreamEventFlagEventIdsWrapped)
+        name += "| kFSEventStreamEventFlagEventIdsWrapped";
+    if(e & kFSEventStreamEventFlagHistoryDone)
+        name += "| kFSEventStreamEventFlagHistoryDone";
+    if(e & kFSEventStreamEventFlagRootChanged)
+        name += "| kFSEventStreamEventFlagRootChanged";
+    if(e & kFSEventStreamEventFlagMount)
+        name += "| kFSEventStreamEventFlagMount";
+    if(e & kFSEventStreamEventFlagUnmount)
+        name += "| kFSEventStreamEventFlagUnmount";
+    
+    
+    if(e & kFSEventStreamEventFlagItemCreated)
+        name += "| kFSEventStreamEventFlagItemCreated";
+    if(e & kFSEventStreamEventFlagItemRemoved)
+        name += "| kFSEventStreamEventFlagItemRemoved";
+    if(e & kFSEventStreamEventFlagItemInodeMetaMod)
+        name += "| kFSEventStreamEventFlagItemInodeMetaMod";
+    if(e & kFSEventStreamEventFlagItemRenamed)
+        name += "| kFSEventStreamEventFlagItemRenamed";
+    if(e & kFSEventStreamEventFlagItemModified)
+        name += "| kFSEventStreamEventFlagItemModified";
+    if(e & kFSEventStreamEventFlagItemFinderInfoMod)
+        name += "| kFSEventStreamEventFlagItemFinderInfoMod";
+    if(e & kFSEventStreamEventFlagItemChangeOwner)
+        name += "| kFSEventStreamEventFlagItemChangeOwner";
+    if(e & kFSEventStreamEventFlagItemXattrMod)
+        name += "| kFSEventStreamEventFlagItemXattrMod";
+    if(e & kFSEventStreamEventFlagItemIsFile)
+        name += "| kFSEventStreamEventFlagItemIsFile";
+    if(e & kFSEventStreamEventFlagItemIsDir)
+        name += "| kFSEventStreamEventFlagItemIsDir";
+    if(e & kFSEventStreamEventFlagItemIsSymlink)
+        name += "| kFSEventStreamEventFlagItemIsSymlink";
+    
+    if (name.length() > 2) {
+        name = name.substr(2);
+    }
+    return name;
+}
+
 #else // Linux
 
 void FileSystem::inotifyWatcher() {

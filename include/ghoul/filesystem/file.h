@@ -167,18 +167,6 @@ private:
      */
     FileChangedCallback _fileChangedCallback;
 
-#ifdef WIN32
-#elif __APPLE__
-    static void completionHandler(ConstFSEventStreamRef streamRef,
-                                  void *clientCallBackInfo,
-                                  size_t numEvents,
-                                  void *eventPaths,
-                                  const FSEventStreamEventFlags eventFlags[],
-                                  const FSEventStreamEventId eventIds[]);
-    
-    FSEventStreamRef _eventStream;
-    __darwin_time_t _lastModifiedTime; // typedef of 'long'
-#endif
 	friend class FileSystem;
 };
 

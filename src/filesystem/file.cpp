@@ -45,8 +45,6 @@ const unsigned int changeBufferSize = 16384u;
 #define _CRT_SECURE_NO_WARNINGS
 #elif __APPLE__
 const char pathSeparator = '/';
-// the maximum latency allowed before a changed is registered
-const CFAbsoluteTime latency = 3.0;
 #else
 const char pathSeparator = '/';
 #endif
@@ -55,11 +53,6 @@ const char pathSeparator = '/';
 File::File(std::string filename, bool isRawPath,
            FileChangedCallback fileChangedCallback)
     : _fileChangedCallback(std::move(fileChangedCallback))
-#ifdef WIN32
-#elif __APPLE__
-    , _eventStream(nullptr)
-    , _lastModifiedTime(0)
-#endif
 {
     if (isRawPath)
         _filename = std::move(filename);
@@ -138,117 +131,11 @@ string File::fileExtension() const {
     
 void File::installFileChangeListener() {
 	FileSys.addFileListener(this);
-	/*
-#ifdef WIN32
-	string&& directory = directoryName();
-    // Create a handle to the directory that is non-blocking
-    _directoryHandle = CreateFile(
-        directory.c_str(),
-        FILE_LIST_DIRECTORY,
-        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-        NULL,
-        OPEN_EXISTING,
-        FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
-        NULL);
-
-    if (_directoryHandle == INVALID_HANDLE_VALUE) {
-        LERROR("Directory handle for '" << _filename << "' could not be obtained");
-        return;
-    }
-
-    beginRead();
-#elif __APPLE__
-	string&& directory = directoryName();
-    // Get the current last-modified time
-    struct stat fileinfo;
-    stat(_filename.c_str(), &fileinfo);
-    _lastModifiedTime = fileinfo.st_mtimespec.tv_sec;
-    
-    // Create the FSEventStream responsible for this directory (Apple's callback system
-    // only works on the granularity of the directory)
-    CFStringRef path = CFStringCreateWithCString(NULL,
-                                                 directory.c_str(),
-                                                 kCFStringEncodingASCII);
-    CFArrayRef pathsToWatch = CFArrayCreate(NULL, (const void **)&path, 1, NULL);
-    FSEventStreamContext callbackInfo;
-    callbackInfo.version = 0;
-    callbackInfo.info = this;
-    callbackInfo.release = NULL;
-    callbackInfo.retain = NULL;
-    callbackInfo.copyDescription = NULL;
-    
-    _eventStream = FSEventStreamCreate(
-                    NULL,
-                    &completionHandler,
-                    &callbackInfo,
-                    pathsToWatch,
-                    kFSEventStreamEventIdSinceNow,
-                    latency,
-                    kFSEventStreamEventFlagItemModified);
-
-    // Add checking the event stream to the current run loop
-    // If there is a performance bottleneck, this could be done on a separate thread?
-    FSEventStreamScheduleWithRunLoop(_eventStream,
-                                     CFRunLoopGetCurrent(),
-                                     kCFRunLoopDefaultMode);
-    // Start monitoring
-    FSEventStreamStart(_eventStream);
-#else // Linux
-    FileSys.inotifyAddListener(this);
-#endif
-	*/
 }
 
 void File::removeFileChangeListener() {
 	FileSys.removeFileListener(this);
-	/*
-#ifdef WIN32
-    if (_directoryHandle != nullptr) {
-        CancelIo(_directoryHandle);
-        CloseHandle(_directoryHandle);
-        _directoryHandle = nullptr;
-    }
-#elif __APPLE__
-    if (_eventStream != nullptr) {
-        FSEventStreamStop(_eventStream);
-        FSEventStreamInvalidate(_eventStream);
-        FSEventStreamRelease(_eventStream);
-        _eventStream = nullptr;
-    }
-#else
-    FileSys.inotifyRemoveListener(this);
-#endif
-	*/
 }
-
-#ifdef WIN32
-    
-#elif __APPLE__
-
-void File::completionHandler(
-                             ConstFSEventStreamRef,
-                             void *clientCallBackInfo,
-                             size_t numEvents,
-                             void *eventPaths,
-                             const FSEventStreamEventFlags[],
-                             const FSEventStreamEventId[])
-{
-    File* fileObj = reinterpret_cast<File*>(clientCallBackInfo);
-    char** paths = reinterpret_cast<char**>(eventPaths);
-    for (size_t i=0; i<numEvents; i++) {
-        const string path = string(paths[i]);
-        const string directory = fileObj->directoryName() + '/';
-        if (path == directory) {
-            struct stat fileinfo;
-            stat(fileObj->_filename.c_str(), &fileinfo);
-            if (fileinfo.st_mtimespec.tv_sec != fileObj->_lastModifiedTime) {
-                fileObj->_lastModifiedTime = fileinfo.st_atimespec.tv_sec;
-                fileObj->_fileChangedCallback(*fileObj);
-            }
-        }
-    }
-}
-#endif
 
 std::ostream& operator<<(std::ostream& os, const File& f) {
     return os << f.path();
