@@ -443,7 +443,6 @@ bool FileSystem::deleteDirectory(const Directory& path) const {
         return false;
 #ifdef WIN32
     const int rmDirResult = _rmdir(path.path().c_str());
-    auto dirs =
     return rmDirResult != -1;
 #else
     const string& dirPath = path;
