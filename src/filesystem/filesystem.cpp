@@ -25,6 +25,7 @@
 
 #include <ghoul/filesystem/filesystem.h>
 
+#include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/logging/logmanager.h>
 
 #include <algorithm>
@@ -84,7 +85,9 @@ const char FileSystem::PathSeparator = '\\';
 const char FileSystem::PathSeparator = '/';
 #endif
 
-FileSystem::FileSystem() {}
+FileSystem::FileSystem()
+    : _cacheManager(nullptr)
+{}
 
 void FileSystem::initialize() {
     assert(_fileSystem == nullptr);
@@ -204,7 +207,7 @@ string FileSystem::relativePath(string path,
 std::string FileSystem::pathByAppendingComponent(std::string path,
 												 std::string component) const
 {
-	return path + PathSeparator + component;
+	return std::move(path) + PathSeparator + std::move(component);
 }
 
 Directory FileSystem::currentDirectory() const {
@@ -599,6 +602,36 @@ std::vector<std::string> FileSystem::tokens() const {
 		tokens.push_back(token.first);
 	}
 	return tokens;
+}
+    
+bool FileSystem::createCacheManager(const Directory& cacheDirectory) {
+    if (!_fileSystem->directoryExists(cacheDirectory)) {
+        LERROR("Requested cache directory '" << cacheDirectory << "' did not exist");
+        return false;
+    }
+    
+    if (_fileSystem->_cacheManager != nullptr) {
+        LERROR("CacheManager was already created");
+        return false;
+    }
+    
+    _fileSystem->_cacheManager = new CacheManager(cacheDirectory);
+    assert(_fileSystem->_cacheManager);
+    return true;
+}
+
+void FileSystem::destroyCacheManager() {
+	assert(_fileSystem->_cacheManager);
+
+	delete _fileSystem->_cacheManager;
+	_fileSystem->_cacheManager = nullptr;
+}
+
+CacheManager* FileSystem::cacheManager() {
+#ifdef GHL_DEBUG
+	assert(_cacheManager);
+#endif
+	return _cacheManager;
 }
 
 void FileSystem::addFileListener(File* file) {

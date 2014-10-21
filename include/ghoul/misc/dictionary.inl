@@ -172,20 +172,18 @@ bool Dictionary::hasKeyAndValue(const std::string& key) const {
     return (hasKey(key) && hasValue<T>(key));
 }
 
-#ifdef WIN32
-
-// Make extern template definitions so that the compiler won't try to instantiate each
+// Make template definitions so that the compiler won't try to instantiate each
 // member function individually whenever it is encountered. This way, we promise the
 // compiler that they will be instantiated somewhere else. This is done in the
 // dictionary.cpp compilation unit; if a new template specialization is added, it must be
 // included here and in the dictionary.cpp file
 
 #define DEF_EXT_TEMPLATES(TYPE)                                                          \
-    extern template bool Dictionary::setValue<TYPE>(std::string key, TYPE value,         \
+    template<> bool Dictionary::setValue<TYPE>(std::string key, TYPE value,         \
                                                     bool createIntermediate);            \
-    extern template bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) \
+    template<> bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) \
           const;                                                                         \
-    extern template bool Dictionary::hasValue<TYPE>(const std::string& key) const;
+    template<> bool Dictionary::hasValue<TYPE>(const std::string& key) const;
 
 DEF_EXT_TEMPLATES(bool)
 DEF_EXT_TEMPLATES(char)
@@ -234,11 +232,9 @@ DEF_EXT_TEMPLATES(glm::dmat4x2)
 DEF_EXT_TEMPLATES(glm::dmat4x3)
 DEF_EXT_TEMPLATES(glm::dmat4x4)
 
-extern template bool Dictionary::getValue<Dictionary>(const std::string& key,
+template<> bool Dictionary::getValue<Dictionary>(const std::string& key,
                                                       Dictionary& value) const;
 
 #undef DEF_EXT_TEMPLATES
-
-#endif
 
 } // namespace ghoul

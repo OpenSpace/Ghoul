@@ -49,6 +49,8 @@
 
 namespace ghoul {
 namespace filesystem {
+    
+class CacheManager;
 
 /**
  * The methods in this class are used to access platform-independent features of the
@@ -75,7 +77,7 @@ public:
     /**
      * Initializes the singleton object. This method triggers an assert if the FileSystem
      * already has been initialized before without being deinitialized in between
-     * (#initialize()).
+     * (#initialize()). 
      */
     static void initialize();
     
@@ -232,6 +234,33 @@ public:
 	 * \return A Vector of tokens
 	 */
 	std::vector<std::string> tokens() const;
+    
+    /**
+     * Creates a CacheManager for this FileSystem. If a CacheManager already exists, this
+     * method will fail and log an error. The passed <code>cacheDirectory</code> has to be
+     * a valid and existing Directory.
+     * \param cacheDirectory The directory in which all cached files will be stored. Has
+     * to be an existing directory with proper read/write access.
+     * \return <code>true</code> if the CacheManager was created successfully;
+     * <code>false</code> otherwise. Causes for failure are, among others, a non-existing
+     * directory, missing read/write rights, or if the CacheManager was created previously
+     * without destroying it in between (destroyCacheManager)
+     */
+    bool createCacheManager(const Directory& cacheDirectory);
+    
+    /**
+     * Destroys the previously created CacheManager. The destruction of the CacheManager
+     * will trigger a cleanup of the cache directory via the CacheManager destructor.
+     * After this method returns, a new CacheManager can be reinitialized with a new
+     * cache directory
+     */
+    void destroyCacheManager();
+    
+    /**
+     * Returns the CacheManager or <code>nullptr</code> if it has not been initialized.
+     * \return The CacheManager or <code>nullptr</code> if it has not been initialized
+     */
+    CacheManager* cacheManager();
 
 	void addFileListener(File* file);
 	void removeFileListener(File* file);
@@ -357,6 +386,8 @@ private:
     std::map<int, File*> _inotifyFiles;
     static void inotifyWatcher();
 #endif
+    
+    CacheManager* _cacheManager;
 
     /// This member variable stores the static FileSystem. Has to be initialized and
     /// deinitialized using the #initialize and #deinitialize methods.
