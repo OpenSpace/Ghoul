@@ -82,19 +82,19 @@ const std::string& Directory::path() const {
 }
 
 Directory Directory::parentDirectory(bool absolutePath) const {
-#if defined(__APPLE__)
+#ifdef WIN32
+    if (_directoryPath.back() == pathSeparator)
+        return Directory(_directoryPath + "..", !absolutePath);
+    else
+        return Directory(_directoryPath + pathSeparator + "..",
+                         !absolutePath);
+#else 
     size_t length = _directoryPath.length();
     size_t position = _directoryPath.find_last_of(pathSeparator);
     if(position == length && length > 1)
         position = _directoryPath.find_last_of(pathSeparator, length-1);
     
     return Directory(_directoryPath.substr(0, position));
-#else
-    if (_directoryPath.back() == pathSeparator)
-        return Directory(_directoryPath + "..", !absolutePath);
-    else
-        return Directory(_directoryPath + pathSeparator + "..",
-                         !absolutePath);
 #endif
 }
 

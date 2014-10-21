@@ -738,10 +738,10 @@ void FileSystem::addFileListener(File* file) {
 #endif
     _trackedFiles.insert({ file->path(), file });
 #else						// Linux
-	const std::string filename = fileobject->path();
+	const std::string filename = file->path();
 	LDEBUGC("inotifyWatcher", "Wathcing: " << filename);
 	int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
-	_inotifyFiles.insert(std::pair<int, File*>(wd, fileobject));
+	_inotifyFiles.insert(std::pair<int, File*>(wd, file));
 #endif
 }
 
@@ -761,7 +761,7 @@ void FileSystem::removeFileListener(File* file) {
 #else						// Linux
 	std::map<int,File*>::iterator it;
 	for(it = _inotifyFiles.begin();it != _inotifyFiles.end(); it++) {
-		if(it->second == fileobject) {
+		if(it->second == file) {
 			( void ) inotify_rm_watch( _inotifyHandle, it->first );
 			_inotifyFiles.erase(it);
 			return;
