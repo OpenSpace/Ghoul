@@ -637,7 +637,6 @@ CacheManager* FileSystem::cacheManager() {
 void FileSystem::addFileListener(File* file) {
 	assert(file != nullptr);
 #if defined(WIN32)			// Windows
-	//LDEBUG("Trying to insert  " << file);
 	std::string d = file->directoryName();
 	auto f = _directories.find(d);
 	if (f == _directories.end()) {
@@ -677,7 +676,6 @@ void FileSystem::addFileListener(File* file) {
 	_trackedFiles.insert({ file->path(), file });
 
 #elif defined(__APPLE__)	// OS X
-    //LDEBUG("Trying to insert  " << file);
     std::string d = file->directoryName();
     auto f = _directories.find(d);
     if (f == _directories.end()) {
@@ -750,9 +748,7 @@ void FileSystem::removeFileListener(File* file) {
 #if defined(WIN32) || defined(__APPLE__)
 	auto eqRange = _trackedFiles.equal_range(file->path());
 	for (auto it = eqRange.first; it != eqRange.second; ++it) {
-		//LDEBUG("comparing for removal, " << file << "==" << it->second);
 		if (it->second == file) {
-			//LWARNING("Removing tracking of " << file);
 			_trackedFiles.erase(it);
 			return;
 		}
@@ -777,13 +773,9 @@ void FileSystem::triggerFilesystemEvents() {
 	SleepEx(0, TRUE);
 #endif
 #if defined(__APPLE__)
-    //osxPollEvents();
-    
     for(auto d: _directories) {
         FSEventStreamFlushSync(d.second->_eventStream);
-        //FSEventStreamFlushAsync(d.second->_eventStream);
     }
-    
 #endif
 }
 
@@ -835,8 +827,8 @@ void CALLBACK FileSystem::completionHandler(
 	FileSys.beginRead(directoryHandle);
 
 	char* buffer = reinterpret_cast<char*>(&(directoryHandle->_changeBuffer[currentBuffer][0]));
+
 	// data might have queued up, so we need to check all changes
-	//LERROR("callback");
 	while (true) {
 		// extract the information which file has changed
 		FILE_NOTIFY_INFORMATION& information = (FILE_NOTIFY_INFORMATION&)*buffer;
@@ -848,31 +840,20 @@ void CALLBACK FileSystem::completionHandler(
 		//information.FileName, information.FileNameLength);
 		const string& currentFilename(currentFilenameBuffer);
 		delete[] currentFilenameBuffer;
-		//LDEBUG("callback: " << currentFilename);
 
 		std::string fullPath;
 		for (auto d : FileSys._directories) {
 			if (d.second == directoryHandle)
 				fullPath = d.first + pathSeparator + currentFilename;
 		}
-		//LDEBUG("callback: " << fullPath);
 
 		size_t n = FileSys._trackedFiles.count(fullPath);
 		if (n > 0) {
-			/*
-			LWARNING("Tracked files");
-			for (auto ff : FileSys._trackedFiles) {
-				LDEBUG(ff.first);
-			}
-			*/
-			//LDEBUG("Loop for " << fullPath);
 			auto eqRange = FileSys._trackedFiles.equal_range(fullPath);
 			for (auto it = eqRange.first; it != eqRange.second; ++it) {
 				File* f = (*it).second;
 				f->_fileChangedCallback(*f);
-				//LWARNING("calling for: " << f);
 			}
-			//LDEBUG("end Loop for " << fullPath);
 			break;
 		}
 		else {
@@ -948,9 +929,6 @@ void FileSystem::completionHandler(
 {
     char **paths = reinterpret_cast<char**>(eventPaths);
     for (size_t i=0; i<numEvents; i++) {
-        //std::string ename = EventEnumToName(static_cast<Events>(eventFlags[i]));
-        
-        //printf("%s\n%s\n", path.c_str(), ename.c_str());
         if(! eventFlags[i] & Events::kFSEventStreamEventFlagItemModified)
             continue;
         
