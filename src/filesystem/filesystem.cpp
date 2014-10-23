@@ -31,7 +31,7 @@
 #include <algorithm>
 #include <cassert>
 #include <regex>
-#include <stdio.h>
+#include <cstdio>
 
 #ifdef WIN32
 #include <direct.h>

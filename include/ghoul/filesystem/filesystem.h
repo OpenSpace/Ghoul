@@ -34,7 +34,9 @@
 
 #ifdef WIN32
 #include <vector>
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#undef WIN32_LEAN_AND_MEAN
 #elif __APPLE__
 #include <CoreServices/CoreServices.h>
 #include <sys/stat.h>
