@@ -77,13 +77,19 @@ TEST(FileSystemTest, OnChangeCallback) {
 	f.open(path);
 	f << "tmp";
 	f.close();
-	bool b = false;
-	auto c = [&b](const File& f) {
-		b = true;
+	bool b1 = false;
+	bool b2 = false;
+
+	auto c1 = [&b1](const File& f) {
+		b1 = true;
+	};
+	auto c2 = [&b2](const File& f) {
+		b2 = true;
 	};
 
-	File* f1 = new File(path, false, c);
-	File* f2 = new File(path, false, c);
+	File* f1 = new File(path, false, c1);
+	File* f2 = new File(path, false, c1);
+	File* f3 = new File(path, false, c2);
 
 	// Check that the file exists
 	EXPECT_EQ(FileSys.fileExists(cpath, false), true);
@@ -93,7 +99,8 @@ TEST(FileSystemTest, OnChangeCallback) {
 	f2->setCallback(nullptr);
 
 	// Check that b still is false so no callback has been fired
-	EXPECT_EQ(b, false);
+	EXPECT_EQ(b1, false);
+	EXPECT_EQ(b2, false);
 
 	// overwrite the file
 	f.open(path);
@@ -105,20 +112,22 @@ TEST(FileSystemTest, OnChangeCallback) {
 	const int seconds = 4;
 #ifdef WIN32
 	int count = 0;
-	while (b == false && count < 100 * seconds) {
+	while ((b1 == false || b2 == false) && count < 100 * seconds) {
 		Sleep(10);
 		++count;
 	}
 #else
 	int count = 0;
-	while (b == false && count < 10000 * seconds) {
+	while ((b1 == false || b2 == false) && count < 10000 * seconds) {
 		usleep(100);
 		FileSys.triggerFilesystemEvents();
 		++count;
 	}
 #endif
-	EXPECT_EQ(b, true);
+	EXPECT_EQ(b1, true);
+	EXPECT_EQ(b2, true);
 
+	delete f3;
 	delete f2;
 	delete f1;
 

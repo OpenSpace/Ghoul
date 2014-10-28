@@ -385,7 +385,7 @@ private:
     int _inotifyHandle;
     bool _keepGoing;
     std::thread _t;
-    std::map<int, File*> _inotifyFiles;
+    std::multimap<int, File*> _trackedFiles;
     static void inotifyWatcher();
 #endif
     
