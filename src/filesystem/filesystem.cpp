@@ -36,17 +36,6 @@
 #ifdef WIN32
 #include <direct.h>
 #include <windows.h>
-#include <Shlobj.h>
-namespace ghoul {
-namespace filesystem {
-	struct DirectoryHandle {
-		HANDLE _handle;
-		unsigned char _activeBuffer;
-		std::vector<BYTE> _changeBuffer[2];
-		OVERLAPPED _overlappedBuffer;
-	};
-}
-}
 #else
 #include <dirent.h>
 #include <unistd.h>
@@ -56,36 +45,10 @@ namespace filesystem {
 #include <pwd.h>
 #endif
 
-#if !defined(WIN32) && !defined(__APPLE__)
-#include <sys/inotify.h>
-#define EVENT_SIZE  ( sizeof (struct inotify_event) )
-#define BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
- const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW | IN_UNMOUNT | IN_ISDIR;
-#endif
-
 using std::string;
+
 namespace {
     const string _loggerCat = "FileSystem";
-
-	void CALLBACK completionHandler(
-		DWORD dwErrorCode,
-		DWORD dwNumberOfBytesTransferred,
-		LPOVERLAPPED lpOverlapped);
-}
-
-namespace {
-#ifdef WIN32
-	const char pathSeparator = '\\';
-	const unsigned int changeBufferSize = 16384u;
-
-#define _CRT_SECURE_NO_WARNINGS
-#elif __APPLE__
-	const char pathSeparator = '/';
-	// the maximum latency allowed before a changed is registered
-	const CFAbsoluteTime latency = 1.0;
-#else
-	const char pathSeparator = '/';
-#endif
 }
 
 namespace ghoul {
@@ -109,37 +72,19 @@ void FileSystem::initialize() {
     if (_fileSystem == nullptr)
         _fileSystem = new FileSystem;
 
-#if defined(WIN32)
-#elif defined(__APPLE__)
-#else
-    _fileSystem->_inotifyHandle = inotify_init();
-    _fileSystem->_keepGoing = true;
-    _fileSystem->_t = std::thread(inotifyWatcher);
+#if !defined(WIN32) && !defined(__APPLE__)
+	_fileSystem->linuxInitialize();
 #endif
 }
 
 void FileSystem::deinitialize() {
     assert(_fileSystem != nullptr);
 #ifdef WIN32
-	for (auto d : _fileSystem->_directories) {
-		DirectoryHandle* dh = d.second;
-		CancelIo(dh->_handle);
-		CloseHandle(dh->_handle);
-		delete dh;
-	}
+	_fileSystem->windowsDeinitialize();
 #elif __APPLE__
-    for (auto d : _fileSystem->_directories) {
-        DirectoryHandle* dh = d.second;
-        FSEventStreamStop(dh->_eventStream);
-        FSEventStreamInvalidate(dh->_eventStream);
-        FSEventStreamRelease(dh->_eventStream);
-        delete dh;
-    }
+	_fileSystem->appleDeinitialize();
 #else
-	_fileSystem->_keepGoing = false;
-	if (_fileSystem->_t.joinable())
-		_fileSystem->_t.join();
-	close( _fileSystem->_inotifyHandle );
+	_fileSystem->linuxDeinitialize();
 #endif
     delete _fileSystem;
 }
@@ -649,169 +594,18 @@ CacheManager* FileSystem::cacheManager() {
 	return _cacheManager;
 }
 
-void FileSystem::addFileListener(File* file) {
-	assert(file != nullptr);
-#if defined(WIN32)			// Windows
-	//LDEBUG("Trying to insert  " << file);
-	std::string d = file->directoryName();
-	auto f = _directories.find(d);
-	if (f == _directories.end()) {
-		LDEBUG("started watching: " << d);
-		DirectoryHandle* handle = new DirectoryHandle;
-		handle->_activeBuffer = 0;
-		handle->_handle = nullptr;
-
-		handle->_handle = CreateFile(
-			d.c_str(),
-			FILE_LIST_DIRECTORY,
-			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-			NULL,
-			OPEN_EXISTING,
-			FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
-			NULL);
-
-		if (handle->_handle == INVALID_HANDLE_VALUE) {
-			LERROR("Directory handle for '" << d << "' could not be obtained");
-			return;
-		}
-
-		_directories[d] = handle;
-		beginRead(handle);
-	}
-
-#ifdef GHL_DEBUG
-	auto eqRange = _trackedFiles.equal_range(file->path());
-	// Erase (b,15) pair
-	for (auto it = eqRange.first; it != eqRange.second; ++it) {
-		if (it->second == file) {
-			LERROR("Already tracking fileobject");
-			return;
-		}
-	}
-#endif
-	_trackedFiles.insert({ file->path(), file });
-
-#elif defined(__APPLE__)	// OS X
-    //LDEBUG("Trying to insert  " << file);
-    std::string d = file->directoryName();
-    auto f = _directories.find(d);
-    if (f == _directories.end()) {
-    
-        bool alreadyTrackingParent = false;
-        for(auto dir: _directories) {
-            if (d.length() > dir.first.length() && d.find_first_of(dir.first) == 0) {
-                alreadyTrackingParent = true;
-                break;
-            }
-        }
-        if(!alreadyTrackingParent) {
-            LDEBUG("started watching: " << d);
-            DirectoryHandle* handle = new DirectoryHandle;
-            
-            // Create the FSEventStream responsible for this directory (Apple's callback system
-            // only works on the granularity of the directory)
-            CFStringRef path = CFStringCreateWithCString(NULL,
-                                                         d.c_str(),
-                                                         kCFStringEncodingASCII);
-            CFArrayRef pathsToWatch = CFArrayCreate(NULL, (const void **)&path, 1, NULL);
-            FSEventStreamContext callbackInfo;
-            callbackInfo.version = 0;
-            callbackInfo.info = nullptr;
-            callbackInfo.release = NULL;
-            callbackInfo.retain = NULL;
-            callbackInfo.copyDescription = NULL;
-            
-            handle->_eventStream = FSEventStreamCreate(
-                                                       NULL,
-                                                       &completionHandler,
-                                                       &callbackInfo,
-                                                       pathsToWatch,
-                                                       kFSEventStreamEventIdSinceNow,
-                                                       latency,
-                                                       kFSEventStreamCreateFlagFileEvents);
-            
-            // Add checking the event stream to the current run loop
-            // If there is a performance bottleneck, this could be done on a separate thread?
-            FSEventStreamScheduleWithRunLoop( handle->_eventStream,
-                                             CFRunLoopGetCurrent(),
-                                             kCFRunLoopDefaultMode);
-            // Start monitoring
-            FSEventStreamStart( handle->_eventStream);
-            _directories[d] = handle;
-        }
-    }
-    
-#ifdef GHL_DEBUG
-    auto eqRange = _trackedFiles.equal_range(file->path());
-    // Erase (b,15) pair
-    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        if (it->second == file) {
-            LERROR("Already tracking fileobject");
-            return;
-        }
-    }
-#endif
-    _trackedFiles.insert({ file->path(), file });
-#else						// Linux
-	const std::string filename = file->path();
-	int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
-    auto eqRange = _trackedFiles.equal_range(wd);
-    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        if (it->second == file) {
-            LERROR("Already tracking fileobject");
-            return;
-        }
-    }
-	_trackedFiles.emplace(wd, file);
-#endif
-}
-
-void FileSystem::removeFileListener(File* file) {
-	assert(file != nullptr);
-#if defined(WIN32) || defined(__APPLE__)
-	auto eqRange = _trackedFiles.equal_range(file->path());
-	for (auto it = eqRange.first; it != eqRange.second; ++it) {
-		//LDEBUG("comparing for removal, " << file << "==" << it->second);
-		if (it->second == file) {
-			//LWARNING("Removing tracking of " << file);
-			_trackedFiles.erase(it);
-			return;
-		}
-	}
-
-#else						// Linux
-    const std::string filename = file->path();
-    int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
-    int count = _trackedFiles.count(wd);
-    auto eqRange = _trackedFiles.equal_range(wd);
-    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        if (it->second == file) {
-            if(count == 1)
-                ( void ) inotify_rm_watch( _inotifyHandle, it->first );
-            _trackedFiles.erase(it);
-            return;
-        }
-    }
-#endif
-    LWARNING("Could not find tracked '" << file <<"' for path '"<< file->path() << "'");
-}
-
 void FileSystem::triggerFilesystemEvents() {
 #ifdef WIN32
 	// Sleeping for 0 milliseconds will trigger any pending asynchronous procedure calls 
 	SleepEx(0, TRUE);
 #endif
 #if defined(__APPLE__)
-    //osxPollEvents();
-    
     for(auto d: _directories) {
         FSEventStreamFlushSync(d.second->_eventStream);
-        //FSEventStreamFlushAsync(d.second->_eventStream);
     }
     
 #endif
 }
-
 
 bool FileSystem::hasToken(const std::string& path, const std::string& token) const {
     if (!hasTokens(path))
@@ -842,282 +636,6 @@ std::string FileSystem::resolveToken(const std::string& token) const {
     else
         return it->second;
 }
-
-#ifdef WIN32
-
-void FileSystem::callbackHandler(DirectoryHandle* directoryHandle, const std::string& file) {
-	std::string fullPath;
-	for (auto d : FileSys._directories) {
-		if (d.second == directoryHandle)
-			fullPath = d.first + pathSeparator + file;
-	}
-
-	size_t n = FileSys._trackedFiles.count(fullPath);
-	if (n > 0) {
-		auto eqRange = FileSys._trackedFiles.equal_range(fullPath);
-		for (auto it = eqRange.first; it != eqRange.second; ++it) {
-			File* f = (*it).second;
-			f->_fileChangedCallback(*f);
-		}
-	}
-}
-
-void callbackHandler(DirectoryHandle* directoryHandle, const std::string& file) {
-	FileSys.callbackHandler(directoryHandle, file);
-}
-
-void readStarter(DirectoryHandle* directoryHandle) {
-	FileSys.beginRead(directoryHandle);
-}
-void CALLBACK completionHandler(
-	DWORD /*dwErrorCode*/, 
-	DWORD /*dwNumberOfBytesTransferred*/,
-	LPOVERLAPPED lpOverlapped)
-{
-	DirectoryHandle* directoryHandle = static_cast<DirectoryHandle*>(lpOverlapped->hEvent);
-
-	unsigned char currentBuffer = directoryHandle->_activeBuffer;
-
-	// Change active buffer (ping-pong buffering)
-	directoryHandle->_activeBuffer = (directoryHandle->_activeBuffer + 1) % 2;
-
-	// Restart change listener as soon as possible
-	readStarter(directoryHandle);
-
-	char* buffer = reinterpret_cast<char*>(&(directoryHandle->_changeBuffer[currentBuffer][0]));
-
-	// data might have queued up, so we need to check all changes
-	while (true) {
-		// extract the information which file has changed
-		FILE_NOTIFY_INFORMATION& information = (FILE_NOTIFY_INFORMATION&)*buffer;
-		char* currentFilenameBuffer = new char[information.FileNameLength];
-		size_t i;
-		wcstombs_s(&i, currentFilenameBuffer, information.FileNameLength,
-			information.FileName, information.FileNameLength);
-		//std::wcstombs(currentFilenameBuffer,
-		//information.FileName, information.FileNameLength);
-		const string& currentFilename(currentFilenameBuffer);
-		delete[] currentFilenameBuffer;
-
-		callbackHandler(directoryHandle, currentFilename);
-		if (!information.NextEntryOffset)
-			// we are done with all entries and didn't find our file
-			break;
-		else
-			//continue with the next entry
-			buffer += information.NextEntryOffset;
-	}
-}
-
-void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
-
-
-	HANDLE handle = directoryHandle->_handle;
-	unsigned char activeBuffer = directoryHandle->_activeBuffer;
-	std::vector<BYTE>* changeBuffer = directoryHandle->_changeBuffer;
-	OVERLAPPED* overlappedBuffer = &directoryHandle->_overlappedBuffer;
-
-	ZeroMemory(overlappedBuffer, sizeof(OVERLAPPED));
-	overlappedBuffer->hEvent = directoryHandle;
-
-	changeBuffer[activeBuffer].resize(changeBufferSize);
-	ZeroMemory(&(changeBuffer[activeBuffer][0]), changeBufferSize);
-	
-	DWORD returnedBytes;
-	BOOL success = ReadDirectoryChangesW(
-		handle,
-		&changeBuffer[activeBuffer][0],
-		static_cast<DWORD>(changeBuffer[activeBuffer].size()),
-		false,
-		FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE,
-		&returnedBytes,
-		overlappedBuffer,
-		&completionHandler);
-
-	if (success == 0) {
-		LERROR("no begin read");
-		const DWORD error = GetLastError();
-		LPTSTR errorBuffer = nullptr;
-		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,
-			error,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			(LPTSTR)&errorBuffer,
-			0,
-			NULL);
-		if (errorBuffer != nullptr) {
-			std::string errorString(errorBuffer);
-			LocalFree(errorBuffer);
-			LERROR("Error reading directory changes: " << errorString);
-		}
-		else {
-			LERROR("Error reading directory changes: " << error);
-		}
-	}
-}
-
-#elif __APPLE__
-
-void FileSystem::completionHandler(
-	ConstFSEventStreamRef ,//streamRef,
-	void * ,//clientCallBackInfo,
-	size_t numEvents,
-	void *eventPaths,
-	const FSEventStreamEventFlags eventFlags[],
-	const FSEventStreamEventId[] )//eventIds[])
-{
-    char **paths = reinterpret_cast<char**>(eventPaths);
-    for (size_t i=0; i<numEvents; i++) {
-        //std::string ename = EventEnumToName(static_cast<Events>(eventFlags[i]));
-        
-        //printf("%s\n%s\n", path.c_str(), ename.c_str());
-        if(! eventFlags[i] & Events::kFSEventStreamEventFlagItemModified)
-            continue;
-        
-        if(! eventFlags[i] & Events::kFSEventStreamEventFlagItemIsFile)
-            continue;
-        
-        std::string path = paths[i];
-        size_t n = FileSys._trackedFiles.count(path);
-        if (n == 0)
-            continue;
-        
-        auto eqRange = FileSys._trackedFiles.equal_range(path);
-        for (auto it = eqRange.first; it != eqRange.second; ++it) {
-            File* f = (*it).second;
-            f->_fileChangedCallback(*f);
-        }
-    }
-}
-std::string FileSystem::EventEnumToName(Events e) {
-    std::string name;
-    if(e & kFSEventStreamEventFlagMustScanSubDirs)
-        name += "| kFSEventStreamEventFlagMustScanSubDirs";
-    if(e & kFSEventStreamEventFlagUserDropped)
-        name += "| kFSEventStreamEventFlagUserDropped";
-    if(e & kFSEventStreamEventFlagKernelDropped)
-        name += "| kFSEventStreamEventFlagKernelDropped";
-    if(e & kFSEventStreamEventFlagEventIdsWrapped)
-        name += "| kFSEventStreamEventFlagEventIdsWrapped";
-    if(e & kFSEventStreamEventFlagHistoryDone)
-        name += "| kFSEventStreamEventFlagHistoryDone";
-    if(e & kFSEventStreamEventFlagRootChanged)
-        name += "| kFSEventStreamEventFlagRootChanged";
-    if(e & kFSEventStreamEventFlagMount)
-        name += "| kFSEventStreamEventFlagMount";
-    if(e & kFSEventStreamEventFlagUnmount)
-        name += "| kFSEventStreamEventFlagUnmount";
-    
-    
-    if(e & kFSEventStreamEventFlagItemCreated)
-        name += "| kFSEventStreamEventFlagItemCreated";
-    if(e & kFSEventStreamEventFlagItemRemoved)
-        name += "| kFSEventStreamEventFlagItemRemoved";
-    if(e & kFSEventStreamEventFlagItemInodeMetaMod)
-        name += "| kFSEventStreamEventFlagItemInodeMetaMod";
-    if(e & kFSEventStreamEventFlagItemRenamed)
-        name += "| kFSEventStreamEventFlagItemRenamed";
-    if(e & kFSEventStreamEventFlagItemModified)
-        name += "| kFSEventStreamEventFlagItemModified";
-    if(e & kFSEventStreamEventFlagItemFinderInfoMod)
-        name += "| kFSEventStreamEventFlagItemFinderInfoMod";
-    if(e & kFSEventStreamEventFlagItemChangeOwner)
-        name += "| kFSEventStreamEventFlagItemChangeOwner";
-    if(e & kFSEventStreamEventFlagItemXattrMod)
-        name += "| kFSEventStreamEventFlagItemXattrMod";
-    if(e & kFSEventStreamEventFlagItemIsFile)
-        name += "| kFSEventStreamEventFlagItemIsFile";
-    if(e & kFSEventStreamEventFlagItemIsDir)
-        name += "| kFSEventStreamEventFlagItemIsDir";
-    if(e & kFSEventStreamEventFlagItemIsSymlink)
-        name += "| kFSEventStreamEventFlagItemIsSymlink";
-    
-    if (name.length() > 2) {
-        name = name.substr(2);
-    }
-    return name;
-}
-
-#else // Linux
-
-void FileSystem::inotifyWatcher() {
-
-	int fd = FileSys._inotifyHandle;
-    char buffer[BUF_LEN];
-    struct timeval tv;
-    tv.tv_sec = 1;
-    tv.tv_usec = 0;
-    fd_set rfds;
-    while(FileSys._keepGoing) {
-        FD_ZERO (&rfds);
-        FD_SET (fd, &rfds);
-        if(select (FD_SETSIZE, &rfds, NULL, NULL, &tv) < 1) continue; 
-        
-        int length = read( fd, buffer, BUF_LEN );
-        if ( length < 0 ) continue;
-        
-        int offset = 0;
-        while (offset < length) {
-            struct inotify_event *event = (inotify_event*)(buffer + offset);
-            switch (event->mask )
-            {
-
-                case IN_MODIFY:
-                case IN_ATTRIB:
-                {
-                    int wd = event->wd;
-                    auto eqRange = FileSys._trackedFiles.equal_range(wd);
-                    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-                        File* fileobject = it->second;
-                        fileobject->_fileChangedCallback(*fileobject);
-                    }
-                    
-                }
-
-                    break;
-
-                case IN_IGNORED:
-                {
-                    int wd = event->wd;
-
-                    auto eqRange = FileSys._trackedFiles.equal_range(wd);
-                    auto it = eqRange.first;
-
-                    // remove tracking of the removed descriptor
-                    ( void ) inotify_rm_watch( fd, wd );
-
-                    // if there are files tracking
-                    if(it != eqRange.second) {
-                        // add new tracking
-                        int new_wd = inotify_add_watch( fd, it->second->path().c_str(), mask);
-
-                        // save all files
-                        std::vector<File*> v;
-                        for (;it != eqRange.second; ++it) {
-                            v.push_back(it->second);
-                        }
-
-                        // erase all previous files and add them again
-                        FileSys._trackedFiles.erase(eqRange.first, eqRange.second);
-                        for(auto f: v) {
-                            FileSys._trackedFiles.emplace(new_wd, f);
-                        }
-                    }
-                    
-                }
-                    //printf ("IN_IGNORED\n");
-                    break;
-                default:
-                    break;
-            }
-            offset += EVENT_SIZE + event->len;
-        }
-    }
-}
-
-#endif
 
 } // namespace filesystem
 } // namespace ghoul

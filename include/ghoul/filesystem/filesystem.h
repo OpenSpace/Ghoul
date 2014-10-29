@@ -34,13 +34,6 @@
 
 #ifdef WIN32
 #include <vector>
-namespace ghoul {
-namespace filesystem {
-	struct DirectoryHandle;
-	void readStarter(DirectoryHandle* directoryHandle);
-	void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
-}
-}
 #elif __APPLE__
 #include <CoreServices/CoreServices.h>
 #include <sys/stat.h>
@@ -51,11 +44,15 @@ namespace filesystem {
 #include <ghoul/filesystem/directory.h>
 #include <ghoul/filesystem/file.h>
 
-
-
 namespace ghoul {
 namespace filesystem {
 
+// Forward declare to minimize dependencies
+#ifdef WIN32
+	struct DirectoryHandle;
+	void readStarter(DirectoryHandle* directoryHandle);
+	void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
+#endif
 class CacheManager;
 
 /**
@@ -327,15 +324,50 @@ private:
     /// This map stores all the tokens that are used in the FileSystem.
     std::map<std::string, std::string> _tokenMap;
 
+
+	CacheManager* _cacheManager;
+
+	/// This member variable stores the static FileSystem. Has to be initialized and
+	/// deinitialized using the #initialize and #deinitialize methods.
+	static FileSystem* _fileSystem;
+
 #ifdef WIN32
+
+	/**
+	 * Windows specific deinitialize function
+	 */
+	void windowsDeinitialize();
+
+	/**
+	 * Starts watching a directory 
+	 */
+	void beginRead(DirectoryHandle* directoryHandle);
+
+	/**
+	 * Handles the callback for a directory for the local file path
+	 */
+	static void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
+	
+	/**
+	 * External function that calls beginRead 
+	 */
+	friend void readStarter(DirectoryHandle* directoryHandle);
+
+	/**
+	 * External function that calls callbackHandler 
+	 */
+	friend void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
+
 	std::multimap<std::string, File*> _trackedFiles;
 	std::map<std::string, DirectoryHandle*> _directories;
 
-	void beginRead(DirectoryHandle* directoryHandle);
-	friend void readStarter(DirectoryHandle* directoryHandle);
-	friend void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
-	static void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
 #elif __APPLE__
+
+	/**
+	* OS X specific deinitialize function
+	*/
+	void appleDeinitialize();
+
     struct DirectoryHandle {
         FSEventStreamRef _eventStream;
     };
@@ -377,18 +409,28 @@ private:
     
     static std::string EventEnumToName(Events e);
 #else // Linux
+
+	/**
+	 * Linux specific initialize function
+	 */
+	void linuxInitialize();
+
+	/**
+	 * Linux specific deinitialize function
+	 */
+	void linuxDeinitialize();
+
+	/**
+	 * Function that run by the watcher thread
+	 */
+	static void inotifyWatcher();
+
     int _inotifyHandle;
     bool _keepGoing;
     std::thread _t;
     std::multimap<int, File*> _trackedFiles;
-    static void inotifyWatcher();
-#endif
     
-    CacheManager* _cacheManager;
-
-    /// This member variable stores the static FileSystem. Has to be initialized and
-    /// deinitialized using the #initialize and #deinitialize methods.
-    static FileSystem* _fileSystem;
+#endif
 };
 
 #define FileSys (ghoul::filesystem::FileSystem::ref())
