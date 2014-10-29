@@ -62,7 +62,7 @@ namespace filesystem {
 		OVERLAPPED _overlappedBuffer;
 	};
 
-void FileSystem::windowsDeinitialize() {
+void FileSystem::deinitializeInternalWindows() {
 	for (auto d : _fileSystem->_directories) {
 		DirectoryHandle* dh = d.second;
 		CancelIo(dh->_handle);

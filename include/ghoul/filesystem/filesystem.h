@@ -35,8 +35,6 @@
 #ifdef WIN32
 #include <vector>
 #elif __APPLE__
-#include <CoreServices/CoreServices.h>
-#include <sys/stat.h>
 #else
 #include <thread>
 #endif
@@ -52,6 +50,9 @@ namespace filesystem {
 	struct DirectoryHandle;
 	void readStarter(DirectoryHandle* directoryHandle);
 	void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
+#elif defined(__APPLE__)
+    struct DirectoryHandle;
+    void callbackHandler(const std::string& path);
 #endif
 class CacheManager;
 
@@ -265,8 +266,20 @@ public:
      */
     CacheManager* cacheManager();
 
+    /**
+     * Listen to file file for changes. When file is changed the File callback will 
+     * be called.
+     */
 	void addFileListener(File* file);
+    
+    /**
+     * Stops tracking changes for a file
+     */
 	void removeFileListener(File* file);
+    
+    /**
+     * Triggers callbacks on filesystem. May not be needed depending on environment.
+     */
 	void triggerFilesystemEvents();
 
 private:
@@ -336,7 +349,7 @@ private:
 	/**
 	 * Windows specific deinitialize function
 	 */
-	void windowsDeinitialize();
+	void deinitializeInternalWindows();
 
 	/**
 	 * Starts watching a directory 
@@ -362,63 +375,42 @@ private:
 	std::map<std::string, DirectoryHandle*> _directories;
 
 #elif __APPLE__
-
-	/**
-	* OS X specific deinitialize function
-	*/
-	void appleDeinitialize();
-
-    struct DirectoryHandle {
-        FSEventStreamRef _eventStream;
-    };
+    
+    /**
+     * OS X specific deinitialize function
+     */
+    void deinitializeInternalApple();
+    
+    /**
+     * OS X specific triggerfil
+     */
+    void triggerFilesystemEventsInternalApple();
+    
+    /**
+     * OS X callback handler
+     */
+    static void callbackHandler(const std::string& path);
+    
+    /**
+     * Friend callback handler calling the static callback handler
+     */
+    friend void callbackHandler(const std::string& path);
+    
     std::multimap<std::string, File*> _trackedFiles;
     std::map<std::string, DirectoryHandle*> _directories;
-
-
-	static void completionHandler(ConstFSEventStreamRef streamRef,
-		void *clientCallBackInfo,
-		size_t numEvents,
-		void *eventPaths,
-		const FSEventStreamEventFlags eventFlags[],
-		const FSEventStreamEventId eventIds[]);
     
-    enum Events {
-        kFSEventStreamEventFlagNone = 0x00000000,
-        kFSEventStreamEventFlagMustScanSubDirs = 0x00000001,
-        kFSEventStreamEventFlagUserDropped = 0x00000002,
-        kFSEventStreamEventFlagKernelDropped = 0x00000004,
-        kFSEventStreamEventFlagEventIdsWrapped = 0x00000008,
-        kFSEventStreamEventFlagHistoryDone = 0x00000010,
-        kFSEventStreamEventFlagRootChanged = 0x00000020,
-        kFSEventStreamEventFlagMount = 0x00000040,
-        kFSEventStreamEventFlagUnmount = 0x00000080,
-        // These flags are only set if you specified the FileEvents
-        // flags when creating the stream.
-        kFSEventStreamEventFlagItemCreated = 0x00000100,
-        kFSEventStreamEventFlagItemRemoved = 0x00000200,
-        kFSEventStreamEventFlagItemInodeMetaMod = 0x00000400,
-        kFSEventStreamEventFlagItemRenamed = 0x00000800,
-        kFSEventStreamEventFlagItemModified = 0x00001000,
-        kFSEventStreamEventFlagItemFinderInfoMod = 0x00002000,
-        kFSEventStreamEventFlagItemChangeOwner = 0x00004000,
-        kFSEventStreamEventFlagItemXattrMod = 0x00008000,
-        kFSEventStreamEventFlagItemIsFile = 0x00010000,
-        kFSEventStreamEventFlagItemIsDir = 0x00020000,
-        kFSEventStreamEventFlagItemIsSymlink = 0x00040000
-    };
     
-    static std::string EventEnumToName(Events e);
 #else // Linux
 
 	/**
 	 * Linux specific initialize function
 	 */
-	void linuxInitialize();
+	void initializeInternalLinux();
 
 	/**
 	 * Linux specific deinitialize function
 	 */
-	void linuxDeinitialize();
+	void deinitializeInternalLinux();
 
 	/**
 	 * Function that run by the watcher thread

@@ -53,13 +53,13 @@ namespace {
 namespace ghoul {
 namespace filesystem {
 
-void FileSystem::linuxInitialize() {
+void FileSystem::initializeInternalLinux() {
     _inotifyHandle = inotify_init();
     _keepGoing = true;
     _t = std::thread(inotifyWatcher);
 }
 
-void FileSystem::linuxDeinitialize() {
+void FileSystem::deinitializeInternalLinux() {
 	_keepGoing = false;
 	if (_t.joinable())
 		_t.join();

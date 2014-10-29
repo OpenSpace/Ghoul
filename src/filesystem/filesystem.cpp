@@ -73,18 +73,18 @@ void FileSystem::initialize() {
         _fileSystem = new FileSystem;
 
 #if !defined(WIN32) && !defined(__APPLE__)
-	_fileSystem->linuxInitialize();
+	_fileSystem->initializeInternalLinux();
 #endif
 }
 
 void FileSystem::deinitialize() {
     assert(_fileSystem != nullptr);
 #ifdef WIN32
-	_fileSystem->windowsDeinitialize();
+	_fileSystem->deinitializeInternalWindows();
 #elif __APPLE__
-	_fileSystem->appleDeinitialize();
+	_fileSystem->deinitializeInternalApple();
 #else
-	_fileSystem->linuxDeinitialize();
+	_fileSystem->deinitializeInternalLinux();
 #endif
     delete _fileSystem;
 }
@@ -600,10 +600,7 @@ void FileSystem::triggerFilesystemEvents() {
 	SleepEx(0, TRUE);
 #endif
 #if defined(__APPLE__)
-    for(auto d: _directories) {
-        FSEventStreamFlushSync(d.second->_eventStream);
-    }
-    
+    triggerFilesystemEventsInternalApple();
 #endif
 }
 
