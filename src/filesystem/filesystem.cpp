@@ -31,12 +31,22 @@
 #include <algorithm>
 #include <cassert>
 #include <regex>
-#include <stdio.h>
+#include <cstdio>
 
 #ifdef WIN32
 #include <direct.h>
 #include <windows.h>
 #include <Shlobj.h>
+namespace ghoul {
+namespace filesystem {
+	struct DirectoryHandle {
+		HANDLE _handle;
+		unsigned char _activeBuffer;
+		std::vector<BYTE> _changeBuffer[2];
+		OVERLAPPED _overlappedBuffer;
+	};
+}
+}
 #else
 #include <dirent.h>
 #include <unistd.h>
@@ -56,6 +66,11 @@
 using std::string;
 namespace {
     const string _loggerCat = "FileSystem";
+
+	void CALLBACK completionHandler(
+		DWORD dwErrorCode,
+		DWORD dwNumberOfBytesTransferred,
+		LPOVERLAPPED lpOverlapped);
 }
 
 namespace {
@@ -829,24 +844,49 @@ std::string FileSystem::resolveToken(const std::string& token) const {
 }
 
 #ifdef WIN32
-void CALLBACK FileSystem::completionHandler(
+
+void FileSystem::callbackHandler(DirectoryHandle* directoryHandle, const std::string& file) {
+	std::string fullPath;
+	for (auto d : FileSys._directories) {
+		if (d.second == directoryHandle)
+			fullPath = d.first + pathSeparator + file;
+	}
+
+	size_t n = FileSys._trackedFiles.count(fullPath);
+	if (n > 0) {
+		auto eqRange = FileSys._trackedFiles.equal_range(fullPath);
+		for (auto it = eqRange.first; it != eqRange.second; ++it) {
+			File* f = (*it).second;
+			f->_fileChangedCallback(*f);
+		}
+	}
+}
+
+void callbackHandler(DirectoryHandle* directoryHandle, const std::string& file) {
+	FileSys.callbackHandler(directoryHandle, file);
+}
+
+void readStarter(DirectoryHandle* directoryHandle) {
+	FileSys.beginRead(directoryHandle);
+}
+void CALLBACK completionHandler(
 	DWORD /*dwErrorCode*/, 
 	DWORD /*dwNumberOfBytesTransferred*/,
 	LPOVERLAPPED lpOverlapped)
 {
-	//File* file = static_cast<File*>(lpOverlapped->hEvent);
 	DirectoryHandle* directoryHandle = static_cast<DirectoryHandle*>(lpOverlapped->hEvent);
 
 	unsigned char currentBuffer = directoryHandle->_activeBuffer;
 
 	// Change active buffer (ping-pong buffering)
 	directoryHandle->_activeBuffer = (directoryHandle->_activeBuffer + 1) % 2;
+
 	// Restart change listener as soon as possible
-	FileSys.beginRead(directoryHandle);
+	readStarter(directoryHandle);
 
 	char* buffer = reinterpret_cast<char*>(&(directoryHandle->_changeBuffer[currentBuffer][0]));
+
 	// data might have queued up, so we need to check all changes
-	//LERROR("callback");
 	while (true) {
 		// extract the information which file has changed
 		FILE_NOTIFY_INFORMATION& information = (FILE_NOTIFY_INFORMATION&)*buffer;
@@ -858,42 +898,14 @@ void CALLBACK FileSystem::completionHandler(
 		//information.FileName, information.FileNameLength);
 		const string& currentFilename(currentFilenameBuffer);
 		delete[] currentFilenameBuffer;
-		//LDEBUG("callback: " << currentFilename);
 
-		std::string fullPath;
-		for (auto d : FileSys._directories) {
-			if (d.second == directoryHandle)
-				fullPath = d.first + pathSeparator + currentFilename;
-		}
-		//LDEBUG("callback: " << fullPath);
-
-		size_t n = FileSys._trackedFiles.count(fullPath);
-		if (n > 0) {
-			/*
-			LWARNING("Tracked files");
-			for (auto ff : FileSys._trackedFiles) {
-				LDEBUG(ff.first);
-			}
-			*/
-			//LDEBUG("Loop for " << fullPath);
-			auto eqRange = FileSys._trackedFiles.equal_range(fullPath);
-			for (auto it = eqRange.first; it != eqRange.second; ++it) {
-				File* f = (*it).second;
-				f->_fileChangedCallback(*f);
-				//LWARNING("calling for: " << f);
-			}
-			//LDEBUG("end Loop for " << fullPath);
+		callbackHandler(directoryHandle, currentFilename);
+		if (!information.NextEntryOffset)
+			// we are done with all entries and didn't find our file
 			break;
-		}
-		else {
-			if (!information.NextEntryOffset)
-				// we are done with all entries and didn't find our file
-				break;
-			else
-				//continue with the next entry
-				buffer += information.NextEntryOffset;
-		}
-
+		else
+			//continue with the next entry
+			buffer += information.NextEntryOffset;
 	}
 }
 
@@ -910,7 +922,7 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
 
 	changeBuffer[activeBuffer].resize(changeBufferSize);
 	ZeroMemory(&(changeBuffer[activeBuffer][0]), changeBufferSize);
-
+	
 	DWORD returnedBytes;
 	BOOL success = ReadDirectoryChangesW(
 		handle,

@@ -34,9 +34,13 @@
 
 #ifdef WIN32
 #include <vector>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#undef WIN32_LEAN_AND_MEAN
+namespace ghoul {
+namespace filesystem {
+	struct DirectoryHandle;
+	void readStarter(DirectoryHandle* directoryHandle);
+	void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
+}
+}
 #elif __APPLE__
 #include <CoreServices/CoreServices.h>
 #include <sys/stat.h>
@@ -51,7 +55,7 @@
 
 namespace ghoul {
 namespace filesystem {
-    
+
 class CacheManager;
 
 /**
@@ -324,22 +328,13 @@ private:
     std::map<std::string, std::string> _tokenMap;
 
 #ifdef WIN32
-	struct DirectoryHandle {
-		HANDLE _handle; 
-		unsigned char _activeBuffer;
-		std::vector<BYTE> _changeBuffer[2];
-		OVERLAPPED _overlappedBuffer;
-	};
-
 	std::multimap<std::string, File*> _trackedFiles;
 	std::map<std::string, DirectoryHandle*> _directories;
 
 	void beginRead(DirectoryHandle* directoryHandle);
-	static void CALLBACK completionHandler(
-		DWORD dwErrorCode,
-		DWORD dwNumberOfBytesTransferred,
-		LPOVERLAPPED lpOverlapped);		
-
+	friend void readStarter(DirectoryHandle* directoryHandle);
+	friend void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
+	static void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
 #elif __APPLE__
     struct DirectoryHandle {
         FSEventStreamRef _eventStream;

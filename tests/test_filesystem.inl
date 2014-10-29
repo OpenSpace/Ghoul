@@ -28,6 +28,10 @@
 #include <iostream>
 #include <fstream>
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 TEST(FileSystemTest, HasTestDirectory) {
 	//EXPECT_EQ(FileSys.directoryExists("${TEST_DIR}"), true);
 }
