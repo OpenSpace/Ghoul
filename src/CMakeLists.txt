@@ -117,7 +117,7 @@ source_group(OpenGL FILES
                 ${OPENGL_HEADER}
                 ${OPENGL_HEADER_INL})
 
-if(OPENCL_FOUND)
+if(GHOUL_USE_OPENCL)
     file(GLOB OPENCL_SOURCE ${SOURCE_ROOT_DIR}/opencl/*.cpp)
     file(GLOB OPENCL_SOURCE_C ${SOURCE_ROOT_DIR}/opencl/*.c)
     set(GHOUL_SOURCE ${GHOUL_SOURCE} ${OPENCL_SOURCE} ${OPENCL_SOURCE_C})
@@ -131,7 +131,7 @@ if(OPENCL_FOUND)
                     ${OPENCL_HEADER}
                     ${OPENCL_HEADER_HPP}
                     ${OPENCL_HEADER_INL})
-endif(OPENCL_FOUND)
+endif(GHOUL_USE_OPENCL)
 
 file(GLOB SYSTEMCAPABILITIES_SOURCE ${SOURCE_ROOT_DIR}/systemcapabilities/*.cpp)
 file(GLOB SYSTEMCAPABILITIES_SOURCE_C ${SOURCE_ROOT_DIR}/systemcapabilities/*.c)

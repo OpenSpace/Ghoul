@@ -29,13 +29,9 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <thread>
 #include <functional>
 
-#ifdef WIN32
-#include <vector>
-#elif __APPLE__
-#else
+#if !defined(WIN32) && !defined(__APPLE__)
 #include <thread>
 #endif
 
