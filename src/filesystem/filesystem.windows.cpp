@@ -168,17 +168,54 @@ void CALLBACK completionHandler(
 	// data might have queued up, so we need to check all changes
 	while (true) {
 		// extract the information which file has changed
-		FILE_NOTIFY_INFORMATION& information = (FILE_NOTIFY_INFORMATION&)*buffer;
-		char* currentFilenameBuffer = new char[information.FileNameLength];
-		size_t i;
-		wcstombs_s(&i, currentFilenameBuffer, information.FileNameLength,
-			information.FileName, information.FileNameLength);
-		//std::wcstombs(currentFilenameBuffer,
-		//information.FileName, information.FileNameLength);
-		const string& currentFilename(currentFilenameBuffer);
-		delete[] currentFilenameBuffer;
+		FILE_NOTIFY_INFORMATION& information = 
+			reinterpret_cast<FILE_NOTIFY_INFORMATION&>(*buffer);
+		
+		if (information.Action == FILE_ACTION_MODIFIED) {
 
-		callbackHandler(directoryHandle, currentFilename);
+			// The size of DWORD is 2bytes
+			const size_t currentFilenameLength = 
+				information.FileNameLength / sizeof(information.FileName) + 1;
+
+			char* currentFilenameBuffer = new char[currentFilenameLength];
+
+			// Convert from DWORD to char*
+			size_t i;
+			wcstombs_s(&i, currentFilenameBuffer, information.FileNameLength,
+				information.FileName, information.FileNameLength);
+
+			// make sure the last char is string terminating
+			currentFilenameBuffer[currentFilenameLength-1] = '\0';
+			const string currentFilename(currentFilenameBuffer, currentFilenameLength);
+			delete[] currentFilenameBuffer;
+
+			//switch (information.Action) {
+			//case FILE_ACTION_ADDED:
+			//	LDEBUG("Action:                 FILE_ACTION_ADDED");
+			//	break;
+			//case FILE_ACTION_REMOVED:
+			//	LDEBUG("Action:                 FILE_ACTION_REMOVED");
+			//	break;
+			//case FILE_ACTION_MODIFIED:
+			//	LDEBUG("Action:                 FILE_ACTION_MODIFIED");
+			//	break;
+			//case FILE_ACTION_RENAMED_OLD_NAME:
+			//	LDEBUG("Action:                 FILE_ACTION_RENAMED_OLD_NAME");
+			//	break;
+			//case FILE_ACTION_RENAMED_NEW_NAME:
+			//	LDEBUG("Action:                 FILE_ACTION_RENAMED_NEW_NAME");
+			//	break;
+			//default:
+			//	LDEBUG("Action:                 UNKNOWN");
+			//	break;
+			//}
+			//LDEBUG("FileNameLength:         " << information.FileNameLength);
+			//LDEBUG("file:                   " << currentFilename);
+			//LDEBUG("currentFilenamelength:  " << currentFilename.length());
+			//LDEBUG("NextEntryOffset:        " << information.NextEntryOffset);
+
+			callbackHandler(directoryHandle, currentFilename);
+		}
 		if (!information.NextEntryOffset)
 			// we are done with all entries and didn't find our file
 			break;
@@ -186,6 +223,7 @@ void CALLBACK completionHandler(
 			//continue with the next entry
 			buffer += information.NextEntryOffset;
 	}
+	//LWARNING("================");
 }
 
 void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
@@ -208,7 +246,8 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
 		&changeBuffer[activeBuffer][0],
 		static_cast<DWORD>(changeBuffer[activeBuffer].size()),
 		false,
-		FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE,
+		FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE | 
+		FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_CREATION,
 		&returnedBytes,
 		overlappedBuffer,
 		&completionHandler);
