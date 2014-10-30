@@ -46,7 +46,10 @@
 #define EVENT_SIZE  ( sizeof (struct inotify_event) )
 #define BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
 
+using std::string;
+
 namespace {
+    const string _loggerCat = "FileSystem";
 	const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW | IN_UNMOUNT | IN_ISDIR;
 }
 
