@@ -492,13 +492,13 @@ bool FileSystem::deleteDirectory(const Directory& path, bool recursive) const {
 }
 
 bool FileSystem::emptyDirectory(const Directory& path) const {
+    const string& dirPath = path;
 #ifdef WIN32
-	const string& dirPath = path;
 	return PathIsDirectoryEmpty(dirPath.c_str());
 #else
 	int n = 0;
 	struct dirent *d;
-	DIR *dir = opendir(path.c_str());
+	DIR *dir = opendir(dirPath.c_str());
 	if (dir == NULL) //Not a directory or doesn't exist
 		return false;
 	while ((d = readdir(dir)) != NULL) {
