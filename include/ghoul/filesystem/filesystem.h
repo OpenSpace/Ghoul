@@ -198,13 +198,24 @@ public:
 
     /**
      * Deletes the directory pointed to by <code>path</code>. The method will return
-     * <code>true</code> if the file was deleted successfully, <code>false</code>
-     * otherwise.
-     * \param path The file that should be deleted
+     * <code>true</code> if the directory was deleted successfully, <code>false</code>
+     * otherwise. If recursive is true the content will be deleted as well.
+     * \param path The directory that should be deleted
+     * \param recursive  True if content should be removed as well, default is false
      * \return <code>true</code> if the file was deleted successfully, <code>false</code>
      * otherwise
      */
-    bool deleteDirectory(const Directory& path) const;
+    bool deleteDirectory(const Directory& path, bool recursive = false) const;
+
+	/**
+     * Checks if the directory with <code>path</code> is empty. The method will return
+     * <code>true</code> if the directory is empty, <code>false</code>
+     * otherwise. 
+     * \param path The directory that should be checked
+     * \return <code>true</code> if the directory is empty, <code>false</code>
+     * otherwise
+     */
+    bool emptyDirectory(const Directory& path) const;
     
     /**
      * Registers the path token <code>token</code> with this FileSystem. Henceforth, every

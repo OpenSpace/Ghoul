@@ -148,6 +148,10 @@ if (APPLE)
         ${APP_SERVICES_LIBRARY})
 endif()
 
+if(WIN32)
+    set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} shlwapi)
+endif()
+
 option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
 if (GHOUL_HAVE_TESTS)
     add_definitions(-DGHOUL_HAVE_TESTS)

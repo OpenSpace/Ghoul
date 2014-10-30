@@ -36,6 +36,7 @@
 #ifdef WIN32
 #include <direct.h>
 #include <windows.h>
+#include <Shlwapi.h>
 #else
 #include <dirent.h>
 #include <unistd.h>
@@ -400,13 +401,53 @@ bool FileSystem::createDirectory(const Directory& path, bool recursive) const {
 	}
 }
 
-bool FileSystem::deleteDirectory(const Directory& path) const {
+bool FileSystem::deleteDirectory(const Directory& path, bool recursive) const {
     const bool isDir = directoryExists(path);
     if (!isDir)
         return false;
+
+	if (!recursive && !emptyDirectory(path))
+		return false;
+
 #ifdef WIN32
-    const int rmDirResult = _rmdir(path.path().c_str());
-    return rmDirResult != -1;
+	const string& dirPath = path;
+	bool success = true;
+	
+	WIN32_FIND_DATA FindFileData;
+	HANDLE hFind;
+	DWORD Attributes; 
+
+	const std::string dirWildcard = dirPath + PathSeparator + "*";
+
+	//List files
+	hFind = FindFirstFile(dirWildcard.c_str(), &FindFileData);
+	do{
+		const std::string p = FindFileData.cFileName;
+		if (p == "." || p == "..")
+			continue;
+
+		const std::string fullPath = dirPath + PathSeparator + p;
+		if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			bool rmDirResult = deleteDirectory(fullPath, recursive);
+			if (!rmDirResult)
+				success = false;
+		}
+		else
+		{
+			const int rmFileResult = remove(fullPath.c_str());
+			if (rmFileResult != 0)
+				success = false;
+		}
+	}while(FindNextFile(hFind, &FindFileData));
+	FindClose(hFind);
+
+	if (!success)
+		return false;
+
+	const int rmDirResult = _rmdir(dirPath.c_str());
+	return rmDirResult != -1;
+    
 #else
     const string& dirPath = path;
     DIR* directory = opendir(dirPath.c_str());
@@ -447,6 +488,28 @@ bool FileSystem::deleteDirectory(const Directory& path) const {
     }
     
     return success;
+#endif
+}
+
+bool FileSystem::emptyDirectory(const Directory& path) const {
+#ifdef WIN32
+	const string& dirPath = path;
+	return PathIsDirectoryEmpty(dirPath.c_str());
+#else
+	int n = 0;
+	struct dirent *d;
+	DIR *dir = opendir(path.c_str());
+	if (dir == NULL) //Not a directory or doesn't exist
+		return false;
+	while ((d = readdir(dir)) != NULL) {
+		if (++n > 2)
+			break;
+	}
+	closedir(dir);
+	if (n <= 2) //Directory Empty
+		return true;
+	else
+		return false;
 #endif
 }
 

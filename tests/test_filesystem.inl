@@ -33,7 +33,7 @@
 #endif
 
 TEST(FileSystemTest, HasTestDirectory) {
-	//EXPECT_EQ(FileSys.directoryExists("${TEST_DIR}"), true);
+	EXPECT_EQ(FileSys.directoryExists("${TEST_DIR}"), true);
 }
 
 TEST(FileSystemTest, CreateRemoveDirectory) {
@@ -45,12 +45,10 @@ TEST(FileSystemTest, CreateRemoveDirectory) {
 	EXPECT_EQ(FileSys.createDirectory(tmpRecursive2), false);
 	EXPECT_EQ(FileSys.createDirectory(tmpRecursive2, true), true);
 
-#ifdef WIN32
 	EXPECT_EQ(FileSys.deleteDirectory(tmp), false);
-#endif
 	EXPECT_EQ(FileSys.deleteDirectory(tmpRecursive2), true);
-	EXPECT_EQ(FileSys.deleteDirectory(tmpRecursive1), true);
-	EXPECT_EQ(FileSys.deleteDirectory(tmp), true);
+	EXPECT_EQ(FileSys.deleteDirectory(tmp), false);
+	EXPECT_EQ(FileSys.deleteDirectory(tmp, true), true);
 }
 
 TEST(FileSystemTest, Path) {

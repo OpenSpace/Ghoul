@@ -109,7 +109,7 @@ void FileSystem::addFileListener(File* file) {
 		}
 	}
 #endif
-	_trackedFiles.insert({ file->path(), file });
+	_trackedFiles.emplace(file->path(), file);
 }
 
 void FileSystem::removeFileListener(File* file) {
@@ -173,11 +173,7 @@ void CALLBACK completionHandler(
 		
 		if (information.Action == FILE_ACTION_MODIFIED) {
 
-			// The size of DWORD is 2bytes
-			const size_t currentFilenameLength = 
-				information.FileNameLength / sizeof(information.FileName) + 1;
-
-			char* currentFilenameBuffer = new char[currentFilenameLength];
+			char* currentFilenameBuffer = new char[information.FileNameLength];
 
 			// Convert from DWORD to char*
 			size_t i;
@@ -185,8 +181,8 @@ void CALLBACK completionHandler(
 				information.FileName, information.FileNameLength);
 
 			// make sure the last char is string terminating
-			currentFilenameBuffer[currentFilenameLength-1] = '\0';
-			const string currentFilename(currentFilenameBuffer, currentFilenameLength);
+			currentFilenameBuffer[i - 1] = '\0';
+			const string currentFilename(currentFilenameBuffer, i - 1);
 			delete[] currentFilenameBuffer;
 
 			//switch (information.Action) {
