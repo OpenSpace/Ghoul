@@ -179,38 +179,39 @@ void CALLBACK completionHandler(
 			size_t i;
 			wcstombs_s(&i, currentFilenameBuffer, information.FileNameLength,
 				information.FileName, information.FileNameLength);
+			if (i > 0) {
+				// make sure the last char is string terminating
+				currentFilenameBuffer[i - 1] = '\0';
+				const string currentFilename(currentFilenameBuffer, i - 1);
 
-			// make sure the last char is string terminating
-			currentFilenameBuffer[i - 1] = '\0';
-			const string currentFilename(currentFilenameBuffer, i - 1);
+				//switch (information.Action) {
+				//case FILE_ACTION_ADDED:
+				//	LDEBUG("Action:                 FILE_ACTION_ADDED");
+				//	break;
+				//case FILE_ACTION_REMOVED:
+				//	LDEBUG("Action:                 FILE_ACTION_REMOVED");
+				//	break;
+				//case FILE_ACTION_MODIFIED:
+				//	LDEBUG("Action:                 FILE_ACTION_MODIFIED");
+				//	break;
+				//case FILE_ACTION_RENAMED_OLD_NAME:
+				//	LDEBUG("Action:                 FILE_ACTION_RENAMED_OLD_NAME");
+				//	break;
+				//case FILE_ACTION_RENAMED_NEW_NAME:
+				//	LDEBUG("Action:                 FILE_ACTION_RENAMED_NEW_NAME");
+				//	break;
+				//default:
+				//	LDEBUG("Action:                 UNKNOWN");
+				//	break;
+				//}
+				//LDEBUG("FileNameLength:         " << information.FileNameLength);
+				//LDEBUG("file:                   " << currentFilename);
+				//LDEBUG("currentFilenamelength:  " << currentFilename.length());
+				//LDEBUG("NextEntryOffset:        " << information.NextEntryOffset);
+
+				callbackHandler(directoryHandle, currentFilename);
+			}
 			delete[] currentFilenameBuffer;
-
-			//switch (information.Action) {
-			//case FILE_ACTION_ADDED:
-			//	LDEBUG("Action:                 FILE_ACTION_ADDED");
-			//	break;
-			//case FILE_ACTION_REMOVED:
-			//	LDEBUG("Action:                 FILE_ACTION_REMOVED");
-			//	break;
-			//case FILE_ACTION_MODIFIED:
-			//	LDEBUG("Action:                 FILE_ACTION_MODIFIED");
-			//	break;
-			//case FILE_ACTION_RENAMED_OLD_NAME:
-			//	LDEBUG("Action:                 FILE_ACTION_RENAMED_OLD_NAME");
-			//	break;
-			//case FILE_ACTION_RENAMED_NEW_NAME:
-			//	LDEBUG("Action:                 FILE_ACTION_RENAMED_NEW_NAME");
-			//	break;
-			//default:
-			//	LDEBUG("Action:                 UNKNOWN");
-			//	break;
-			//}
-			//LDEBUG("FileNameLength:         " << information.FileNameLength);
-			//LDEBUG("file:                   " << currentFilename);
-			//LDEBUG("currentFilenamelength:  " << currentFilename.length());
-			//LDEBUG("NextEntryOffset:        " << information.NextEntryOffset);
-
-			callbackHandler(directoryHandle, currentFilename);
 		}
 		if (!information.NextEntryOffset)
 			// we are done with all entries and didn't find our file
