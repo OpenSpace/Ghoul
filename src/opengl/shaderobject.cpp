@@ -27,6 +27,8 @@
 
 #include <ghoul/logging/log.h>
 #include <ghoul/filesystem/filesystem>
+#include <ghoul/filesystem/cachemanager.h>
+#include <ghoul/filesystem/file.h>
 
 #include <algorithm>
 #include <cassert>
@@ -222,11 +224,44 @@ bool ShaderObject::setShaderFilename(std::string filename) {
 	std::string contents;
 	contents.reserve(8192);
 
+	int versionMajor;
+	int versionMinor;
+	int profileMask;
+	glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
+	glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
+	glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profileMask);
+	std::stringstream ss;
+	ss << "#version " << versionMajor << versionMinor << "0" << // version is set
+		(profileMask & GL_CONTEXT_CORE_PROFILE_BIT ? " core" :
+		(profileMask & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT ? " compatibility" : "")) 
+		<< "\n"; // end of line
+	
+	// TODO: Uncomment when implementation is ready
+	//contents += ss.str();
+
 	bool success = readFile(_fileName, contents);
-	// TODO: Some other solution for outputting the source as human readable for debugging
-	std::ofstream os(_fileName + ".OpenSpaceGenerated.glsl");
+
+	// If in debug mode, output the source to file
+#ifndef NDEBUG
+	std::string generatedFilename;
+	ghoul::filesystem::File ghlFile(_fileName);
+	if (!FileSys.cacheManager() || 
+		!FileSys.cacheManager()->getCachedFile(
+			ghlFile.baseName(), 
+			"GhoulGenerated", 
+			generatedFilename, 
+			true)
+		)
+	{
+		// Either the cachemanager wasn't initialized or the
+		// filename could not be fetched
+		generatedFilename += ".GhoulGenerated.glsl";
+	}
+	
+	std::ofstream os(generatedFilename);
 	os << contents;
 	os.close();
+#endif
 
 	if (!success)
 		return false;
