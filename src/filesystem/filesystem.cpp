@@ -68,6 +68,11 @@ FileSystem::FileSystem()
     : _cacheManager(nullptr)
 {}
 
+FileSystem::~FileSystem() {
+    if(_cacheManager)
+        delete _cacheManager;
+}
+
 void FileSystem::initialize() {
     assert(_fileSystem == nullptr);
     if (_fileSystem == nullptr)

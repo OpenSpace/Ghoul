@@ -337,6 +337,11 @@ private:
      * but the static one.
      */
     FileSystem();
+    
+    /**
+     * Private destructor
+     */
+    ~FileSystem();
 
     FileSystem(const FileSystem& rhs) = delete;
     FileSystem& operator=(const FileSystem& rhs) = delete;
