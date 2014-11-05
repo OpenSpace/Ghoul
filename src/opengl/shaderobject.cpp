@@ -36,7 +36,6 @@
 #include <cstring>
 #include <fstream>
 #include <functional>
-#include <regex>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -147,7 +146,6 @@ ShaderObject::ShaderObject(ShaderObject&& rhs) {
 		_loggerCat = std::move(rhs._loggerCat);
 		_onChangeCallback = rhs._onChangeCallback;
 		_trackedFiles = std::move(rhs._trackedFiles);
-
 	}
 }
 
@@ -196,7 +194,6 @@ ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) {
 		_loggerCat = std::move(rhs._loggerCat);
 		_onChangeCallback = rhs._onChangeCallback;
 		_trackedFiles = std::move(rhs._trackedFiles);
-	
 	}
 	return *this;
 }
@@ -235,8 +232,10 @@ bool ShaderObject::setShaderFilename(std::string filename) {
 		delete f.second;
 	_trackedFiles.erase(_trackedFiles.begin(), _trackedFiles.end());
 
-	std::string contents;
-	contents.reserve(8192);
+	// No need to alocate a new contents string for every shader
+	// This makes ShaderObjects not thread safe
+	static std::string contents;
+	contents = "";
 
 	bool success = readFile(_fileName, contents);
 	
@@ -262,7 +261,6 @@ bool ShaderObject::setShaderFilename(std::string filename) {
 	os.close();
 #endif
 	
-
 	if (!success)
 		return false;
 
@@ -372,11 +370,11 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 
 	// Ready to start parsing
 	// ugly slightly more efficient version, 3-4x faster
-	std::string line;
-	const std::string ws = " \n\r\t";
-	const std::string includeString = "#include";
-	const std::string notrackString = ":notrack";
-	const std::string versionString = "#version __CONTEXT__";
+	static std::string line;
+	static const std::string ws = " \n\r\t";
+	static const std::string includeString = "#include";
+	static const std::string notrackString = ":notrack";
+	static const std::string versionString = "#version __CONTEXT__";
 	while (std::getline(f, line)) {
 		size_t start_pos = line.find_first_not_of(ws);
 		if (start_pos == std::string::npos)
@@ -388,10 +386,6 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 			end_pos += 1;
 
 		const size_t length = end_pos - start_pos;
-
-		//LDEBUG(line.substr(start_pos, end_pos));
-		//LDEBUG(line.length());
-		//LDEBUG(length);
 
 		// If begins with #include
 		if (length > 11 && line.substr(start_pos, includeString.length()) == includeString) {
@@ -449,41 +443,6 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 			content += line + "\n";
 		}
 	}
-
-	/*
-	std::string line;
-	std::smatch m;
-	static std::regex e1(R"(^\s*#include \"(.+)\"\s*(:notrack)?\s*)", std::regex_constants::optimize);	// Regex to match relative paths
-	static std::regex e2(R"(^\s*#include <(.+)>\s*(:notrack)?\s*)", std::regex_constants::optimize);		// Regex to match ghoul absPath
-	static std::regex e3(R"(^\s*#version __CONTEXT__\s*)", std::regex_constants::optimize);		// Regex to match glsl version
-	while (std::getline(f, line)) {
-		if (std::regex_search(line, m, e1)) {
-			std::string includeFilename = fileObject->directoryName() + FileSystem::PathSeparator + std::string(m[1]);
-			content += "// Begin including '" + includeFilename + "'\n";
-			if (!readFile(includeFilename, content, track && m[2] == ""))
-				content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
-			content += "// End including '" + includeFilename + "'\n";
-		}
-		else if (std::regex_search(line, m, e2)) {
-			std::string includeFilename = absPath(m[1]);
-			content += "// Including '" + includeFilename + "'\n";
-			if (!readFile(includeFilename, content, track && m[2] == ""))
-				content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
-			content += "// End including '" + includeFilename + "'\n";
-		}
-		else if (std::regex_search(line, m, e3)) {
-			static std::string versionString = glslVersionString();
-			content += versionString + "\n";
-		}
-		else if (std::regex_search(line, m, e3)) {
-		}
-		else if (std::regex_search(line, m, e3)) {
-		}
-		else {
-			content += line + "\n";
-		}
-	}
-	*/
 
 	if (!track) {
 		delete fileObject;
