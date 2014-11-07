@@ -52,8 +52,8 @@ CacheManager::CacheManager(std::string directory)
     // last execution of the application crashed, the directory was not cleaned up
     // properly
     std::vector<LoadedCacheInfo> cacheState = cacheInformationFromDirectory(_directory);
-
 	std::string&& path = FileSys.pathByAppendingComponent(_directory, _cacheFile);
+
 	std::ifstream file(path);
 	if (file.good()) {
 		std::string line;
@@ -65,7 +65,6 @@ CacheManager::CacheManager(std::string directory)
             // for each file:
             //   hash number\n
             //   filepath\n
-            //   information\n
 			std::stringstream s(line);
 
 			unsigned int hash;
@@ -75,13 +74,13 @@ CacheManager::CacheManager(std::string directory)
 			std::getline(file, info.file);
 			info.isPersistent = true;
 			_files.emplace(hash, info);
-            
+
             // If the current hash + file is contained in the cache state, we have to
             // remove it
-            cacheState.erase(std::remove_if(cacheState.begin(), cacheState.end(),
-                            [&info, hash](const LoadedCacheInfo& i) {
-                                return hash == i.first && info.file == i.second;
-                            }), cacheState.end());
+			cacheState.erase(std::remove_if(cacheState.begin(), cacheState.end(), 
+				[hash, &info](const LoadedCacheInfo& i) {
+					return hash == i.first && info.file == i.second;
+				}), cacheState.end());
 		}
 	}
     
@@ -113,10 +112,10 @@ CacheManager::~CacheManager() {
 				file << p.first << std::endl <<
 						p.second.file << std::endl;
 		}
+		file.close();
 	}
 	else
 		LERROR("Could not open file '" << path << "' for writing permanent cache files");
-
 	cleanDirectory(_directory);
 }
 
@@ -138,7 +137,7 @@ bool CacheManager::getCachedFile(const std::string& baseName,
                                  const std::string& information,
                                  std::string& cachedFileName, bool isPersistent)
 {
-    size_t pos = baseName.find_first_of("/\\?%*:|\"<>.");
+    size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         LERROR("Base name '" << baseName << "' consists of illegal character");
         return false;
@@ -308,7 +307,8 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
 					hash << "' contains a file with name '" << filename <<
 					"instead of the expected '" << directoryName << "'");
 				else
-					result.push_back({ std::stoul(hashName), files[0] });
+					// Adding the absPath to normalize all / and \ for Windows 
+					result.emplace_back(std::stoul(hashName), absPath(files[0]));
             }
         }
     }
