@@ -26,6 +26,8 @@
 #ifndef __GHOULCL_H__
 #define __GHOULCL_H__
 
+#ifdef GHL_OPENCL
+
 #include <ghoul/opengl/ghoul_gl.h>
 
 #if defined(__APPLE__) || defined(__MACOSX)
@@ -39,5 +41,7 @@ namespace cl {
     class Platform;
     class Device;
 }
+
+#endif
 
 #endif

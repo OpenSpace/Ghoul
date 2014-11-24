@@ -28,13 +28,17 @@
 
 #include "systemcapabilitiescomponent.h"
 
-#include <ghoul/opencl/platform.h>
-#include <ghoul/opencl/device.h>
-
 #include <string>
 #include <vector>
 
 namespace ghoul {
+
+// Forward declare to minimize dependencies
+namespace opencl {
+class Platform;
+class Device;
+} // namespace opencl
+
 namespace systemcapabilities {
 
 /**

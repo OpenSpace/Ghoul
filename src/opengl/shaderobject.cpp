@@ -27,6 +27,8 @@
 
 #include <ghoul/logging/log.h>
 #include <ghoul/filesystem/filesystem>
+#include <ghoul/filesystem/cachemanager.h>
+#include <ghoul/filesystem/file.h>
 
 #include <algorithm>
 #include <cassert>
@@ -34,7 +36,6 @@
 #include <cstring>
 #include <fstream>
 #include <functional>
-#include <regex>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -43,6 +44,20 @@
 
 namespace {
 const std::string _loggerCat = "ShaderObject";
+
+std::string glslVersionString() {
+	int versionMajor;
+	int versionMinor;
+	int profileMask;
+	glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
+	glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
+	glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profileMask);
+	std::stringstream ss;
+	ss << "#version " << versionMajor << versionMinor << "0" << // version is set
+		(profileMask & GL_CONTEXT_CORE_PROFILE_BIT ? " core" :
+		(profileMask & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT ? " compatibility" : ""));
+	return ss.str();
+}
 }
 
 namespace ghoul {
@@ -131,7 +146,6 @@ ShaderObject::ShaderObject(ShaderObject&& rhs) {
 		_loggerCat = std::move(rhs._loggerCat);
 		_onChangeCallback = rhs._onChangeCallback;
 		_trackedFiles = std::move(rhs._trackedFiles);
-
 	}
 }
 
@@ -180,7 +194,6 @@ ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) {
 		_loggerCat = std::move(rhs._loggerCat);
 		_onChangeCallback = rhs._onChangeCallback;
 		_trackedFiles = std::move(rhs._trackedFiles);
-	
 	}
 	return *this;
 }
@@ -219,15 +232,35 @@ bool ShaderObject::setShaderFilename(std::string filename) {
 		delete f.second;
 	_trackedFiles.erase(_trackedFiles.begin(), _trackedFiles.end());
 
-	std::string contents;
-	contents.reserve(8192);
+	// No need to alocate a new contents string for every shader
+	// This makes ShaderObjects not thread safe
+	static std::string contents;
+	contents = "";
 
 	bool success = readFile(_fileName, contents);
-	// TODO: Some other solution for outputting the source as human readable for debugging
-	std::ofstream os(_fileName + ".OpenSpaceGenerated.glsl");
+	
+	// If in debug mode, output the source to file
+#ifndef NDEBUG
+	std::string generatedFilename;
+	ghoul::filesystem::File ghlFile(_fileName);
+	if (!FileSys.cacheManager() || 
+		!FileSys.cacheManager()->getCachedFile(
+			ghlFile.baseName(), 
+			"GhoulGenerated", 
+			generatedFilename, 
+			true)
+		)
+	{
+		// Either the cachemanager wasn't initialized or the
+		// filename could not be fetched
+		generatedFilename += ".GhoulGenerated.glsl";
+	}
+	
+	std::ofstream os(generatedFilename);
 	os << contents;
 	os.close();
-
+#endif
+	
 	if (!success)
 		return false;
 
@@ -336,29 +369,81 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 	}
 
 	// Ready to start parsing
-	std::string line;
-	std::smatch m;
-	std::regex e1(R"(^\s*#include \"(.+)\"\s*(:notrack)?\s*)");	// Regex to match relative paths
-	std::regex e2(R"(^\s*#include <(.+)>\s*(:notrack)?\s*)");		// Regex to match ghoul absPath
+	// ugly slightly more efficient version, 3-4x faster
+	static std::string line;
+	static const std::string ws = " \n\r\t";
+	static const std::string includeString = "#include";
+	static const std::string notrackString = ":notrack";
+	static const std::string versionString = "#version __CONTEXT__";
 	while (std::getline(f, line)) {
-		if (std::regex_search(line, m, e1)) {
-			std::string includeFilename = fileObject->directoryName() + FileSystem::PathSeparator + std::string(m[1]);
-			content += "// Begin including '" + includeFilename + "'\n";
-			if (!readFile(includeFilename, content, track && m[2] == ""))
-				content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
-			content += "// End including '" + includeFilename + "'\n";
+		size_t start_pos = line.find_first_not_of(ws);
+		if (start_pos == std::string::npos)
+			start_pos = 0;
+		size_t end_pos = line.find_last_not_of(ws);
+		if (end_pos == std::string::npos)
+			end_pos = line.length();
+		else
+			end_pos += 1;
+
+		const size_t length = end_pos - start_pos;
+
+		// If begins with #include
+		if (length > 11 && line.substr(start_pos, includeString.length()) == includeString) {
+			bool success = false;
+
+			size_t p1 = line.find_first_not_of(ws, start_pos + includeString.length());
+			size_t p2 = std::string::npos;
+			if (p1 != std::string::npos) {
+				if (line.at(p1) == '\"') {
+					p2 = line.find_first_of("\"", p1 + 1);
+					if (p2 != std::string::npos) {
+						std::string includeFilename = fileObject->directoryName() + FileSystem::PathSeparator + line.substr(p1 + 1, p2 - p1 - 1);
+
+						size_t remaining = end_pos - p2;
+						bool keepTrack = true;
+						if (remaining > notrackString.length()) {
+							if (line.find_first_of(notrackString, p2) != std::string::npos)
+								keepTrack = false;
+						}
+						content += "// Begin including '" + includeFilename + "'\n";
+						if (!readFile(includeFilename, content, track && keepTrack))
+							content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
+						content += "// End including '" + includeFilename + "'\n";
+						success = true;
+					}
+				}
+				else if (line.at(p1) == '<') {
+					p2 = line.find_first_of(">", p1 + 1);
+					if (p2 != std::string::npos) {
+						std::string includeFilename = absPath(line.substr(p1 + 1, p2 - p1 - 1));
+
+						size_t remaining = end_pos - p2;
+						bool keepTrack = true;
+						if (remaining > notrackString.length()) {
+							if (line.find_first_of(notrackString, p2) != std::string::npos)
+								keepTrack = false;
+						}
+						content += "// Begin including '" + includeFilename + "'\n";
+						if (!readFile(includeFilename, content, track && keepTrack))
+							content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
+						content += "// End including '" + includeFilename + "'\n";
+						success = true;
+					}
+				}
+			}
+			if (!success) {
+				content += "// Error in #include pattern!\n";
+			}
 		}
-		else if (std::regex_search(line, m, e2)) {
-			std::string includeFilename = absPath(m[1]);
-			content += "// Including '" + includeFilename + "'\n";
-			if (!readFile(includeFilename, content, track && m[2] == ""))
-				content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
-			content += "// End including '" + includeFilename + "'\n";
+		else if (line == versionString) {
+			static std::string versionString = glslVersionString();
+			content += versionString + "\n";
 		}
-		else {
+		else{
 			content += line + "\n";
 		}
 	}
+
 	if (!track) {
 		delete fileObject;
 	}

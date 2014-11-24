@@ -29,27 +29,27 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <thread>
 #include <functional>
 
-#ifdef WIN32
-#include <vector>
-#include <windows.h>
-#elif __APPLE__
-#include <CoreServices/CoreServices.h>
-#include <sys/stat.h>
-#else
+#if !defined(WIN32) && !defined(__APPLE__)
 #include <thread>
 #endif
 
 #include <ghoul/filesystem/directory.h>
 #include <ghoul/filesystem/file.h>
 
-
-
 namespace ghoul {
 namespace filesystem {
-    
+
+// Forward declare to minimize dependencies
+#ifdef WIN32
+	struct DirectoryHandle;
+	void readStarter(DirectoryHandle* directoryHandle);
+	void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
+#elif defined(__APPLE__)
+    struct DirectoryHandle;
+    void callbackHandler(const std::string& path);
+#endif
 class CacheManager;
 
 /**
@@ -198,13 +198,24 @@ public:
 
     /**
      * Deletes the directory pointed to by <code>path</code>. The method will return
-     * <code>true</code> if the file was deleted successfully, <code>false</code>
-     * otherwise.
-     * \param path The file that should be deleted
+     * <code>true</code> if the directory was deleted successfully, <code>false</code>
+     * otherwise. If recursive is true the content will be deleted as well.
+     * \param path The directory that should be deleted
+     * \param recursive  True if content should be removed as well, default is false
      * \return <code>true</code> if the file was deleted successfully, <code>false</code>
      * otherwise
      */
-    bool deleteDirectory(const Directory& path) const;
+    bool deleteDirectory(const Directory& path, bool recursive = false) const;
+
+	/**
+     * Checks if the directory with <code>path</code> is empty. The method will return
+     * <code>true</code> if the directory is empty, <code>false</code>
+     * otherwise. 
+     * \param path The directory that should be checked
+     * \return <code>true</code> if the directory is empty, <code>false</code>
+     * otherwise
+     */
+    bool emptyDirectory(const Directory& path) const;
     
     /**
      * Registers the path token <code>token</code> with this FileSystem. Henceforth, every
@@ -262,8 +273,20 @@ public:
      */
     CacheManager* cacheManager();
 
+    /**
+     * Listen to file file for changes. When file is changed the File callback will 
+     * be called.
+     */
 	void addFileListener(File* file);
+    
+    /**
+     * Stops tracking changes for a file
+     */
 	void removeFileListener(File* file);
+    
+    /**
+     * Triggers callbacks on filesystem. May not be needed depending on environment.
+     */
 	void triggerFilesystemEvents();
 
 private:
@@ -314,6 +337,11 @@ private:
      * but the static one.
      */
     FileSystem();
+    
+    /**
+     * Private destructor
+     */
+    ~FileSystem();
 
     FileSystem(const FileSystem& rhs) = delete;
     FileSystem& operator=(const FileSystem& rhs) = delete;
@@ -321,77 +349,92 @@ private:
     /// This map stores all the tokens that are used in the FileSystem.
     std::map<std::string, std::string> _tokenMap;
 
+
+	CacheManager* _cacheManager;
+
+	/// This member variable stores the static FileSystem. Has to be initialized and
+	/// deinitialized using the #initialize and #deinitialize methods.
+	static FileSystem* _fileSystem;
+
 #ifdef WIN32
-	struct DirectoryHandle {
-		HANDLE _handle; 
-		unsigned char _activeBuffer;
-		std::vector<BYTE> _changeBuffer[2];
-		OVERLAPPED _overlappedBuffer;
-	};
+
+	/**
+	 * Windows specific deinitialize function
+	 */
+	void deinitializeInternalWindows();
+
+	/**
+	 * Starts watching a directory 
+	 */
+	void beginRead(DirectoryHandle* directoryHandle);
+
+	/**
+	 * Handles the callback for a directory for the local file path
+	 */
+	static void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
+	
+	/**
+	 * External function that calls beginRead 
+	 */
+	friend void readStarter(DirectoryHandle* directoryHandle);
+
+	/**
+	 * External function that calls callbackHandler 
+	 */
+	friend void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
 
 	std::multimap<std::string, File*> _trackedFiles;
 	std::map<std::string, DirectoryHandle*> _directories;
 
-	void beginRead(DirectoryHandle* directoryHandle);
-	static void CALLBACK completionHandler(
-		DWORD dwErrorCode,
-		DWORD dwNumberOfBytesTransferred,
-		LPOVERLAPPED lpOverlapped);		
-
 #elif __APPLE__
-    struct DirectoryHandle {
-        FSEventStreamRef _eventStream;
-    };
+    
+    /**
+     * OS X specific deinitialize function
+     */
+    void deinitializeInternalApple();
+    
+    /**
+     * OS X specific triggerfil
+     */
+    void triggerFilesystemEventsInternalApple();
+    
+    /**
+     * OS X callback handler
+     */
+    static void callbackHandler(const std::string& path);
+    
+    /**
+     * Friend callback handler calling the static callback handler
+     */
+    friend void callbackHandler(const std::string& path);
+    
     std::multimap<std::string, File*> _trackedFiles;
     std::map<std::string, DirectoryHandle*> _directories;
-
-
-	static void completionHandler(ConstFSEventStreamRef streamRef,
-		void *clientCallBackInfo,
-		size_t numEvents,
-		void *eventPaths,
-		const FSEventStreamEventFlags eventFlags[],
-		const FSEventStreamEventId eventIds[]);
     
-    enum Events {
-        kFSEventStreamEventFlagNone = 0x00000000,
-        kFSEventStreamEventFlagMustScanSubDirs = 0x00000001,
-        kFSEventStreamEventFlagUserDropped = 0x00000002,
-        kFSEventStreamEventFlagKernelDropped = 0x00000004,
-        kFSEventStreamEventFlagEventIdsWrapped = 0x00000008,
-        kFSEventStreamEventFlagHistoryDone = 0x00000010,
-        kFSEventStreamEventFlagRootChanged = 0x00000020,
-        kFSEventStreamEventFlagMount = 0x00000040,
-        kFSEventStreamEventFlagUnmount = 0x00000080,
-        // These flags are only set if you specified the FileEvents
-        // flags when creating the stream.
-        kFSEventStreamEventFlagItemCreated = 0x00000100,
-        kFSEventStreamEventFlagItemRemoved = 0x00000200,
-        kFSEventStreamEventFlagItemInodeMetaMod = 0x00000400,
-        kFSEventStreamEventFlagItemRenamed = 0x00000800,
-        kFSEventStreamEventFlagItemModified = 0x00001000,
-        kFSEventStreamEventFlagItemFinderInfoMod = 0x00002000,
-        kFSEventStreamEventFlagItemChangeOwner = 0x00004000,
-        kFSEventStreamEventFlagItemXattrMod = 0x00008000,
-        kFSEventStreamEventFlagItemIsFile = 0x00010000,
-        kFSEventStreamEventFlagItemIsDir = 0x00020000,
-        kFSEventStreamEventFlagItemIsSymlink = 0x00040000
-    };
     
-    static std::string EventEnumToName(Events e);
 #else // Linux
+
+	/**
+	 * Linux specific initialize function
+	 */
+	void initializeInternalLinux();
+
+	/**
+	 * Linux specific deinitialize function
+	 */
+	void deinitializeInternalLinux();
+
+	/**
+	 * Function that run by the watcher thread
+	 */
+	static void inotifyWatcher();
+
     int _inotifyHandle;
     bool _keepGoing;
     std::thread _t;
-    std::map<int, File*> _inotifyFiles;
-    static void inotifyWatcher();
-#endif
+    std::multimap<int, File*> _trackedFiles;
     
-    CacheManager* _cacheManager;
-
-    /// This member variable stores the static FileSystem. Has to be initialized and
-    /// deinitialized using the #initialize and #deinitialize methods.
-    static FileSystem* _fileSystem;
+#endif
 };
 
 #define FileSys (ghoul::filesystem::FileSystem::ref())

@@ -25,10 +25,14 @@
 
 #include "systemcapabilities/openclcapabilitiescomponent.h"
 
+#ifdef GHL_OPENCL
+#include <ghoul/opencl/platform.h>
+#include <ghoul/opencl/device.h>
 #include <ghoul/opencl/ghoul_cl.h>
 #include <ghoul/opencl/ghoul_cl.hpp>
 #include <ghoul/opencl/device.h>
 #include <ghoul/opencl/platform.h>
+#endif
 
 #include <algorithm>
 #include <cassert>
@@ -65,6 +69,8 @@ OpenCLCapabilitiesComponent::~OpenCLCapabilitiesComponent() {
     
 void OpenCLCapabilitiesComponent::detectCapabilities() {
     clearCapabilities();
+
+#ifdef GHL_OPENCL
     
     std::vector<cl::Platform> platforms;
     if (cl::Platform::get(&platforms) != CL_SUCCESS)
@@ -87,14 +93,17 @@ void OpenCLCapabilitiesComponent::detectCapabilities() {
         }
         _data.push_back(PlatformAndDevices{gPlatform, gDevices});
     }
+#endif
 }
 
 void OpenCLCapabilitiesComponent::clearCapabilities() {
+#ifdef GHL_OPENCL
 	for (PlatformAndDevices& data : _data) {
 		delete data.platform;
 		for (ghoul::opencl::Device* d : data.devices)
 			delete d;
 	}
+#endif
 	_data.clear();
 }
     
@@ -104,7 +113,8 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
 {
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
     std::stringstream ss;
-    
+
+#ifdef GHL_OPENCL
     if (verbosity >= Verbosity::Default) {
         for (size_t i = 0; i < _data.size(); ++i) {
             ss << "Platform[" << i << "] ";
@@ -134,6 +144,7 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
             }
         }
     }
+#endif
     return result;
 }
     
