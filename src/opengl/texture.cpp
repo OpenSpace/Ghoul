@@ -306,6 +306,8 @@ void Texture::applyWrapping() {
         case GL_TEXTURE_3D:
             glTexParameteri(_type, GL_TEXTURE_WRAP_R, wrapping);
         case GL_TEXTURE_2D:
+			//glTexParameteri(_type, GL_TEXTURE_WRAP_R, wrapping);
+			glTexParameteri(_type, GL_TEXTURE_WRAP_S, wrapping);
             glTexParameteri(_type, GL_TEXTURE_WRAP_T, wrapping);
         case GL_TEXTURE_1D:
             glTexParameteri(_type, GL_TEXTURE_WRAP_S, wrapping);
