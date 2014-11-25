@@ -142,48 +142,41 @@ std::string File::lastModifiedDate() const {
 		return "";
 	}
 #ifdef WIN32
-	HANDLE fileHandle = CreateFile(
+	WIN32_FILE_ATTRIBUTE_DATA infoData;
+	BOOL success = GetFileAttributesEx(
 		_filename.c_str(),
-		GENERIC_READ,
-		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-		NULL,
-		OPEN_EXISTING,
-		NULL,
-		NULL);
-    if (fileHandle == INVALID_HANDLE_VALUE) {
-        LERROR("File handle for '" << _filename << "' could not be obtained");
-        return "";
-    }
-
-	LPFILETIME lastWriteTime = NULL;
-	BOOL success = GetFileTime(fileHandle, NULL, NULL, lastWriteTime);
-    if (success == 0) {
-        const DWORD error = GetLastError();
-        LPTSTR errorBuffer = nullptr;
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_ALLOCATE_BUFFER |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
-            error,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer,
-            0,
-            NULL);
-        if (errorBuffer != nullptr) {
-            std::string error(errorBuffer);
+		GetFileExInfoStandard,
+		&infoData
+		);
+	if (success == 0) {
+		const DWORD error = GetLastError();
+		LPTSTR errorBuffer = nullptr;
+		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			error,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPTSTR)&errorBuffer,
+			0,
+			NULL);
+		if (errorBuffer != nullptr) {
+			std::string error(errorBuffer);
 			LERROR("Could not retrieve last-modified date for file '" << _filename <<
 				"':" << error);
-            LocalFree(errorBuffer);
-        }
+			LocalFree(errorBuffer);
+		}
 		return "";
-    }
+	}
 	else {
-		LPSYSTEMTIME time = NULL;
-		FileTimeToSystemTime(lastWriteTime, time);
-		return std::to_string(time->wYear) + "-" + std::to_string(time->wMonth) + "-" +
-			std::to_string(time->wDay) + "T" + std::to_string(time->wHour) + ":" +
-			std::to_string(time->wMinute) + ":" + std::to_string(time->wSecond) + "." +
-			std::to_string(time->wMilliseconds);
+		FILETIME lastWriteTime = infoData.ftLastWriteTime;
+		SYSTEMTIME time;
+		//LPSYSTEMTIME time = NULL;
+		FileTimeToSystemTime(&lastWriteTime, &time);
+		return std::to_string(time.wYear) + "-" + std::to_string(time.wMonth) + "-" +
+			std::to_string(time.wDay) + "T" + std::to_string(time.wHour) + ":" +
+			std::to_string(time.wMinute) + ":" + std::to_string(time.wSecond) + "." +
+			std::to_string(time.wMilliseconds);
 	}
 #else
 	struct stat attrib;

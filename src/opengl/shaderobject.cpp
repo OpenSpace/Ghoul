@@ -245,9 +245,8 @@ bool ShaderObject::setShaderFilename(std::string filename) {
 	ghoul::filesystem::File ghlFile(_fileName);
 	if (!FileSys.cacheManager() || 
 		!FileSys.cacheManager()->getCachedFile(
-			ghlFile.baseName(), 
-			"GhoulGenerated", 
-			generatedFilename, 
+			_fileName,
+			generatedFilename,
 			true)
 		)
 	{
