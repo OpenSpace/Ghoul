@@ -152,7 +152,7 @@ void TemplateFactory<BaseClass>::registerClass(std::string className) {
     static_assert(
         std::is_default_constructible<Class>::value |
         std::is_convertible<Dictionary, Class>::value,
-        "Class needs a default or Dictionary constructor");
+        "Class needs a public default or Dictionary constructor");
 
     // Use the correct CreateHelper struct to create a function pointer that we can store
     // for later usage. std::is_convertible<>::value returns a boolean that checks at
