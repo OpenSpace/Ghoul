@@ -145,14 +145,6 @@ bool CacheManager::getCachedFile(const std::string& baseName,
     
 	unsigned int hash = generateHash(baseName, information);
 
-	auto it = _files.find(hash);
-	if (it != _files.end()) {
-        // If we find the hash, it has been created before and we can just return the
-        // file name to the caller
-		cachedFileName = it->second.file;
-		return true;
-	}
-	
     // If we couldn't find the file, we have to generate a directory with the name of the
     // hash and return the full path containing of the cache path + requested filename +
     // hash value
@@ -171,11 +163,14 @@ bool CacheManager::getCachedFile(const std::string& baseName,
     // in the map and non-persistent entries should have been deleted on application close
 	if (!FileSys.directoryExists(destination))
 		FileSys.createDirectory(destination);
-    else {
-        LERROR("Cache directory '" << destination << "' already existed even though it "
-               "was not registered before");
-        return false;
-    }
+
+	auto it = _files.find(hash);
+	if (it != _files.end()) {
+		// If we find the hash, it has been created before and we can just return the
+		// file name to the caller
+		cachedFileName = it->second.file;
+		return true;
+	}
 
     // Generate and output the newly generated cache name
 	cachedFileName = FileSys.pathByAppendingComponent(destination, baseName);
