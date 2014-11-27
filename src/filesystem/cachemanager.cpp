@@ -196,7 +196,7 @@ bool CacheManager::hasCachedFile(const File& file, const std::string& informatio
 bool CacheManager::hasCachedFile(const std::string& baseName,
                                  const std::string& information) const
 {
-    size_t pos = baseName.find_first_of("/\\?%*:|\"<>.");
+    size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         LERROR("Base name '" << baseName << "' consists of illegal character");
         return false;
@@ -218,7 +218,7 @@ void CacheManager::removeCacheFile(const File& file, const std::string& informat
 void CacheManager::removeCacheFile(const std::string& baseName,
                          const std::string& information)
 {
-    size_t pos = baseName.find_first_of("/\\?%*:|\"<>.");
+    size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         LERROR("Base name '" << baseName << "' consists of illegal character");
         return;
