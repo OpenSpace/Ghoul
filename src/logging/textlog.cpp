@@ -27,6 +27,11 @@
 
 #include <cstdio>
 
+namespace {
+	const std::string keyFileName = "FileName";
+	const std::string keyWriteToAppend = "Append";
+}
+
 namespace ghoul {
 namespace logging {
 
@@ -35,21 +40,25 @@ TextLog::TextLog(const std::string& filename, bool writeToAppend, bool timeStamp
                  bool dateStamping, bool categoryStamping, bool logLevelStamping)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
     , _printFooter(writeToAppend)
-    , _file(nullptr)
 {
-    const char* writeMode;
-    if (writeToAppend)
-        writeMode = "a";
-    else
-        writeMode = "w";
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)
-        errno_t error = fopen_s(&_file, filename.c_str(), writeMode);
-        if (error != 0)
-            _file = 0;
-#else
-        _file = fopen(filename.c_str(), writeMode);
-#endif
+	initialize(filename, writeToAppend);
+}
 
+TextLog::TextLog(const Dictionary& dictionary)
+	: Log(dictionary)
+{
+	std::string fileName;
+	if (dictionary.hasKeyAndValue<std::string>(keyFileName))
+		dictionary.getValue(keyFileName, fileName);
+	else {
+		LERRORC("TextLog", "TextLog constructor did not contain a file name");
+		return;
+	}
+
+	if (dictionary.hasKeyAndValue<bool>(keyWriteToAppend))
+		dictionary.getValue(keyWriteToAppend, _printFooter);
+
+	initialize(fileName, _printFooter);
 }
 
 TextLog::~TextLog() {
@@ -58,6 +67,21 @@ TextLog::~TextLog() {
             fputs("--------\n", _file);
         fclose(_file);
     }
+}
+
+void TextLog::initialize(const std::string& filename, bool writeToAppend) {
+	const char* writeMode;
+	if (writeToAppend)
+		writeMode = "a";
+	else
+		writeMode = "w";
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
+	errno_t error = fopen_s(&_file, filename.c_str(), writeMode);
+	if (error != 0)
+		_file = 0;
+#else
+	_file = fopen(filename.c_str(), writeMode);
+#endif
 }
 
 void TextLog::log(LogManager::LogLevel level, const std::string& category,

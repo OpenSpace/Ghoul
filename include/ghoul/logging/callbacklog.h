@@ -68,6 +68,17 @@ public:
                 bool timeStamping = true, bool dateStamping = true,
                 bool categoryStamping = true, bool logLevelStamping = true);
 
+	/**
+	 * Constructor that will extract the relevant variables for other constructor from the
+	 * <code>dictionary</code>. The available keys for this dictionary are:
+	 * <code>TimeStamping</code>, <code>DateStamping</code>,
+	 * <code>CategoryStamping</code>, and <code>LogLevelStamping</code>, each storing one
+	 * boolean value. The values are passed to the Log(bool, bool, bool, bool) constructor
+	 * and use the default values if a key does not exist.
+	 * \param dictionary The dictionary from which the values are extracted
+	 */
+	CallbackLog(CallbackFunction callbackFunction, const Dictionary& dictionary);
+
     /**
      * Method that logs a message with a given level and category to the console.
      * \param level The log level with which the message shall be logged

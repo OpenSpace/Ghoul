@@ -34,6 +34,11 @@ StreamLog::StreamLog(std::ostream& stream, bool timeStamping, bool dateStamping,
     , _stream(stream)
 {}
 
+StreamLog::StreamLog(std::ostream& stream, const Dictionary& dictionary)
+	: Log(dictionary)
+	, _stream(stream)
+{}
+
 void StreamLog::log(LogManager::LogLevel level, const std::string& category,
                     const std::string& message) {
     std::string output;

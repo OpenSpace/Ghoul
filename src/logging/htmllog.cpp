@@ -35,32 +35,13 @@ HTMLLog::HTMLLog(std::string filename, bool timeStamping, bool dateStamping,
     : TextLog(std::move(filename), false, timeStamping, dateStamping, categoryStamping,
               logLevelStamping)
 {
-    if (hasValidFile()) {
-        std::string output = \
-            "<html>\n\
-            \t<head>\n\
-            \t\t<title>Log File</title>\n\
-            \t</head>\n\
-            \t<body>\n\
-            \n\
-            \t<table cellpadding=3 cellspacing=0 border=1>\n\
-            \t\t<CAPTION>Log File</CAPTION>\n\
-            \n\
-            \t\t<THEAD>\n\
-            \t\t\t<TR>\n";
-        if (isDateStamping())
-            output += "\t\t\t\t<th>Date</th>\n";
-        if (isTimeStamping())
-            output += "\t\t\t\t<th>Time</th>\n";
-        if (isCategoryStamping())
-            output += "\t\t\t\t<th>Category</th>\n";
-        if (isLogLevelStamping())
-            output += "\t\t\t\t<th>Level</th>\n";
-        output += "\t\t\t\t<th>Message</th>\n\
-                  \t\t\t</tr>\n\
-                  \t\t<tbody>\n";
-        writeLine(output);
-    }
+	writeHtmlHeader();
+}
+
+HTMLLog::HTMLLog(const Dictionary& dictionary)
+	: TextLog(dictionary)
+{
+	writeHtmlHeader();
 }
 
 HTMLLog::~HTMLLog() {
@@ -74,6 +55,32 @@ HTMLLog::~HTMLLog() {
     }
 }
 
+void HTMLLog::writeHtmlHeader() {
+	if (hasValidFile()) {
+		std::string output = \
+			"<html>\n \
+			\t<head>\n\
+			\t\t<title>Log File</title>\n\
+			\t</head>\n\
+			\t<body>\n\
+			\n\
+			\t<table cellpadding=3 cellspacing=0 border=1>\n\
+			\t\t<CAPTION>Log File</CAPTION>\n\
+			\n\
+			\t\t<THEAD>\n\
+			\t\t\t<TR>\n";
+		if (isDateStamping())
+			output += "\t\t\t\t<th>Date</th>\n";
+		if (isTimeStamping())
+			output += "\t\t\t\t<th>Time</th>\n";
+		if (isCategoryStamping())
+			output += "\t\t\t\t<th>Category</th>\n";
+		if (isLogLevelStamping())
+			output += "\t\t\t\t<th>Level</th>\n";
+		output += "\t\t\t\t<th>Message</th>\n\t\t\t</tr>\n\\t\t<tbody>\n";
+		writeLine(output);
+	}
+}
 
 void HTMLLog::log(LogManager::LogLevel level, const std::string& category,
                   const std::string& message)
