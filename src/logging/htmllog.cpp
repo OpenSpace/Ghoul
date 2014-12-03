@@ -30,10 +30,10 @@
 namespace ghoul {
 namespace logging {
 
-HTMLLog::HTMLLog(std::string filename, bool timeStamping, bool dateStamping,
-                 bool categoryStamping, bool logLevelStamping)
-    : TextLog(std::move(filename), false, timeStamping, dateStamping, categoryStamping,
-              logLevelStamping)
+HTMLLog::HTMLLog(std::string filename, bool writeToAppend, bool timeStamping,
+				bool dateStamping, bool categoryStamping, bool logLevelStamping)
+    : TextLog(std::move(filename), writeToAppend, timeStamping, dateStamping,
+				categoryStamping, logLevelStamping)
 {
     if (hasValidFile()) {
         std::string output = \
