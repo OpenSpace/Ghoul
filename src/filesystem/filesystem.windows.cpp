@@ -79,7 +79,7 @@ void FileSystem::addFileListener(File* file) {
 	std::string d = file->directoryName();
 	auto f = _directories.find(d);
 	if (f == _directories.end()) {
-		LDEBUG("started watching: " << d);
+		LDEBUG("Started watching: " << d);
 		DirectoryHandle* handle = new DirectoryHandle;
 		handle->_activeBuffer = 0;
 		handle->_handle = nullptr;
