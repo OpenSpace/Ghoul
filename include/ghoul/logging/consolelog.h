@@ -68,19 +68,6 @@ public:
                bool dateStamping = false, bool categoryStamping = true,
                bool logLevelStamping = true);
 
-	/**
-	 * Constructor that will extract the relevant variables for other constructor from the
-	 * <code>dictionary</code>. The available keys for this dictionary are:
-	 * <code>ColorOutput</code>, <code>TimeStamping</code>, <code>DateStamping</code>,
-	 * <code>CategoryStamping</code>, and <code>LogLevelStamping</code>, each storing one
-	 * boolean value. The values are passed to the
-	 * ConsoleLog(bool, bool, bool, bool, bool) constructor and use the default values if
-	 * a key does not exist.
-	 * \param dictionary The dictionary from which the values are extracted
-	 */
-
-	ConsoleLog(const Dictionary& dictionary);
-
     /**
      * Method that logs a message with a given level and category to the console.
      * \param level The log level with which the message shall be logged
@@ -113,7 +100,7 @@ protected:
      */
     void resetColor();
 
-    bool _colorOutput = true; ///< Is the log printed in color?
+    const bool _colorOutput; ///< Is the log printed in color?
 };
 
 } // namespace logging

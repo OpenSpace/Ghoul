@@ -52,6 +52,9 @@ public:
     * messages. If the file does not exist, it will be created.
     * \param filename The path and filename of the file that will receive the log
     * messages
+	* \param writeToAppend If this is <code>true</code>, the log messages will be appended
+	* to the file. If it is <code>false</code> the file will be overwritten without a
+	* warning.
     * \param timeStamping Determines if the log should print the time when a message is
     * logged in the log messages
     * \param dateStamping Determines if the log should print the time when a message is
@@ -61,22 +64,9 @@ public:
     * \param logLevelStamping Determines if the log should print the log level in the log
     * messages
     */
-    HTMLLog(std::string filename, bool timeStamping = true,
+    HTMLLog(std::string filename, bool writeToAppend = true, bool timeStamping = true,
             bool dateStamping = true, bool categoryStamping = true,
             bool logLevelStamping = true);
-
-	/**
-	 * Constructor that will extract the relevant variables for other constructor from the
-	 * <code>dictionary</code>. The available keys for this dictionary are:
-	 * <code>FileName</code>, <code>Append</code>, <code>TimeStamping</code>,
-	 * <code>DateStamping</code>, <code>CategoryStamping</code>,
-	 * and <code>LogLevelStamping</code>, with <code>FileName<code> storing a string and
-	 * each other storing one boolean value. The values are passed to the
-	 * Log(bool, bool, bool, bool) constructor and use the default values if a key does
-	 * not exist.
-	 * \param dictionary The dictionary from which the values are extracted
-	 */
-	HTMLLog(const Dictionary& dictionary);
 
     /// Destructor that closes and finalizes the HTML file
     ~HTMLLog();
@@ -93,11 +83,6 @@ public:
                      const std::string& message) override;
 
 protected:
-	/**
-	 * Writes the HTML header that defines the output table
-	 */
-	void writeHtmlHeader();
-
     /**
      * Returns a HTML color string for the passed color.
      * LogManager::LogLevel::Debug -> Green<br>

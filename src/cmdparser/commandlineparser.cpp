@@ -34,6 +34,8 @@
 namespace {
 
 const std::string _loggerCat = "CommandlineParser";
+const std::string shortHelpCommand = "-h";
+const std::string longHelpCommand = "--help";
 
 /**
  * Extracts multiple arguments from a single list. <br>
@@ -135,7 +137,9 @@ bool CommandlineParser::execute() {
         return true;
     // There is only one argument and this is either "-h" or "--help"
     // so display the help
-    const bool isHelpArgument = ((_arguments[0] == "-h") || (_arguments[0] == "--help"));
+    const bool isHelpArgument = (
+		(_arguments[0] == shortHelpCommand) || (_arguments[0] == longHelpCommand)
+		);
     if ((_arguments.size() == 1) && isHelpArgument) {
         displayHelp();
         return false;

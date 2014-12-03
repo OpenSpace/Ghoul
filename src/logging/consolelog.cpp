@@ -30,10 +30,6 @@
 #include <windows.h>
 #endif
 
-namespace {
-	const std::string keyColorOutput = "ColorOutput";
-}
-
 namespace ghoul {
 namespace logging {
 
@@ -42,13 +38,6 @@ ConsoleLog::ConsoleLog(bool colorOutput, bool timeStamping, bool dateStamping,
     : StreamLog(std::cout, timeStamping, dateStamping, categoryStamping, logLevelStamping)
     , _colorOutput(colorOutput)
 {
-}
-
-ConsoleLog::ConsoleLog(const Dictionary& dictionary)
-	: StreamLog(std::cout, dictionary)
-{
-	if (dictionary.hasKeyAndValue<bool>(keyColorOutput))
-		dictionary.getValue(keyColorOutput, _colorOutput);
 }
 
 void ConsoleLog::log(LogManager::LogLevel level, const std::string& category,

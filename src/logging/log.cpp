@@ -25,16 +25,8 @@
 
 #include "logging/log.h"
 #include "logging/logmanager.h"
-
 #include <ctime>
 #include <stdio.h>
-
-namespace {
-	const std::string keyTimeStamping = "TimeStamping";
-	const std::string keyDateStamping = "DateStamping";
-	const std::string keyCategoryStamping = "CategoryStamping";
-	const std::string keyLogLevelStamping = "LogLevelStamping";
-}
 
 namespace ghoul {
 namespace logging {
@@ -46,18 +38,6 @@ Log::Log(bool timeStamping, bool dateStamping, bool categoryStamping,
     , _categoryStamping(categoryStamping)
     , _logLevelStamping(logLevelStamping)
 {}
-
-Log::Log(const Dictionary& dictionary) {
-	// Only override the values if a key exists in the dictionary
-	if (dictionary.hasKeyAndValue<bool>(keyTimeStamping))
-		dictionary.getValue(keyTimeStamping, _timeStamping);
-	if (dictionary.hasKeyAndValue<bool>(keyDateStamping))
-		dictionary.getValue(keyDateStamping, _dateStamping);
-	if (dictionary.hasKeyAndValue<bool>(keyCategoryStamping))
-		dictionary.getValue(keyCategoryStamping, _categoryStamping);
-	if (dictionary.hasKeyAndValue<bool>(keyLogLevelStamping))
-		dictionary.getValue(keyLogLevelStamping, _logLevelStamping);
-}
 
 Log::~Log() {}
 
