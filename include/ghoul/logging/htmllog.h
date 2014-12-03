@@ -65,19 +65,6 @@ public:
             bool dateStamping = true, bool categoryStamping = true,
             bool logLevelStamping = true);
 
-	/**
-	 * Constructor that will extract the relevant variables for other constructor from the
-	 * <code>dictionary</code>. The available keys for this dictionary are:
-	 * <code>FileName</code>, <code>Append</code>, <code>TimeStamping</code>,
-	 * <code>DateStamping</code>, <code>CategoryStamping</code>,
-	 * and <code>LogLevelStamping</code>, with <code>FileName<code> storing a string and
-	 * each other storing one boolean value. The values are passed to the
-	 * Log(bool, bool, bool, bool) constructor and use the default values if a key does
-	 * not exist.
-	 * \param dictionary The dictionary from which the values are extracted
-	 */
-	HTMLLog(const Dictionary& dictionary);
-
     /// Destructor that closes and finalizes the HTML file
     ~HTMLLog();
     
@@ -93,11 +80,6 @@ public:
                      const std::string& message) override;
 
 protected:
-	/**
-	 * Writes the HTML header that defines the output table
-	 */
-	void writeHtmlHeader();
-
     /**
      * Returns a HTML color string for the passed color.
      * LogManager::LogLevel::Debug -> Green<br>

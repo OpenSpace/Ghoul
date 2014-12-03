@@ -27,7 +27,6 @@
 #define __LOG_H__
 
 #include "logmanager.h"
-#include "ghoul/misc/dictionary.h"
 #include <string>
 
 namespace ghoul {
@@ -84,18 +83,7 @@ protected:
     Log(bool timeStamping = true, bool dateStamping = true, bool categoryStamping = true,
         bool logLevelStamping = true);
 
-	/**
-	 * Constructor that will extract the relevant variables for other constructor from the
-	 * <code>dictionary</code>. The available keys for this dictionary are:
-	 * <code>TimeStamping</code>, <code>DateStamping</code>,
-	 * <code>CategoryStamping</code>, and <code>LogLevelStamping</code>, each storing one
-	 * boolean value. The values are passed to the Log(bool, bool, bool, bool) constructor
-	 * and use the default values if a key does not exist.
-	 * \param dictionary The dictionary from which the values are extracted
-	 */
-	Log(const Dictionary& dictionary);
-
-	/// Is the log printing the logging time?
+    /// Is the log printing the logging time?
     bool isTimeStamping() const;
 
     /// Set the log printing of the time
@@ -137,10 +125,10 @@ protected:
     Log(const Log&) = delete;
     
 private:
-    bool _timeStamping = true; ///< Is the log printing the time?
-    bool _dateStamping = true; ///< Is the log printing the date?
-    bool _categoryStamping = true; ///< Is the log printing the category?
-    bool _logLevelStamping = true; ///< Is the log printing the log level?
+    bool _timeStamping; ///< Is the log printing the time?
+    bool _dateStamping; ///< Is the log printing the date?
+    bool _categoryStamping; ///< Is the log printing the category?
+    bool _logLevelStamping; ///< Is the log printing the log level?
 };
 
 } // namespace logging

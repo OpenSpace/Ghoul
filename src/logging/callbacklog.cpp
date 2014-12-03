@@ -35,11 +35,6 @@ CallbackLog::CallbackLog(CallbackFunction callbackFunction,
     , _callbackFunction(std::move(callbackFunction))
 {}
 
-CallbackLog::CallbackLog(CallbackFunction callbackFunction, const Dictionary& dictionary)
-	: Log(dictionary),
-	_callbackFunction(std::move(callbackFunction))
-{}
-
 
 void CallbackLog::log(LogManager::LogLevel level, const std::string& category,
                       const std::string& message)

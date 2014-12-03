@@ -68,19 +68,6 @@ public:
     TextLog(const std::string& filename, bool writeToAppend = true,
             bool timeStamping = true, bool dateStamping = true,
             bool categoryStamping = true, bool logLevelStamping = true);
-
-	/**
-	 * Constructor that will extract the relevant variables for other constructor from the
-	 * <code>dictionary</code>. The available keys for this dictionary are:
-	 * <code>FileName</code>, <code>Append</code>, <code>TimeStamping</code>,
-	 * <code>DateStamping</code>, <code>CategoryStamping</code>,
-	 * and <code>LogLevelStamping</code>, with <code>FileName<code> storing a string and
-	 * each other storing one boolean value. The values are passed to the
-	 * Log(bool, bool, bool, bool) constructor and use the default values if a key does
-	 * not exist.
-	 * \param dictionary The dictionary from which the values are extracted
-	 */
-	TextLog(const Dictionary& dictionary);
     
     /// Destructor closing and releasing the file handle
     ~TextLog();
@@ -100,11 +87,6 @@ public:
     void flush();
 
 protected:
-	/**
-	 * Initializes the file object used to writing out the text log
-	 */
-	void initialize(const std::string& filename, bool writeToAppend);
-
     /**
      * Returns true if this TextLog has a valid file descriptor, i.e., it is possible to
      * write logs to this Log.
@@ -119,11 +101,10 @@ protected:
      */
     void writeLine(const std::string& line);
 
-	/// Should a line be printed at the end after the file is closed?
-    bool _printFooter = true;
+    bool _printFooter; ///< Should a line be printed at the end after the file is closed?
 
 private:
-    FILE* _file = nullptr; ///< The file to which the log messages will be sent
+    FILE* _file; ///< The file to which the log messages will be sent
 };
 
 } // namespace logging
