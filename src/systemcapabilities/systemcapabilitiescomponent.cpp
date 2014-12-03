@@ -228,15 +228,15 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
         return nullptr;
     }
 
-    IWbemClassObject* pclsObject = 0;
-    ULONG returnValue;
+    IWbemClassObject* pclsObject = nullptr;
+    ULONG returnValue = 0;
     if (enumerator) {
         HRESULT hr = enumerator->Next(
             WBEM_INFINITE,
             1,
             &pclsObject,
             &returnValue);
-        if (returnValue) {
+        if (!FAILED(hRes) && returnValue) {
             result = new VARIANT;
             hr = pclsObject->Get(
                 LPCWSTR(str2wstr(attribute).c_str()),
@@ -247,8 +247,10 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
         }
     }
 
-    if (!result)
+    if (!result) {
         LINFO("No WMI query result.");
+		return nullptr;
+	}
 
     if (enumerator)
         enumerator->Release();

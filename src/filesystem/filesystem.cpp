@@ -186,7 +186,7 @@ Directory FileSystem::currentDirectory() const {
         // Log error
         DWORD error = GetLastError();
         LPTSTR errorBuffer = nullptr;
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+        DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
                       FORMAT_MESSAGE_ALLOCATE_BUFFER |
                       FORMAT_MESSAGE_IGNORE_INSERTS,
                       NULL,
@@ -195,7 +195,7 @@ Directory FileSystem::currentDirectory() const {
                       (LPTSTR)&errorBuffer,
                       0,
                       NULL);
-        if (errorBuffer != nullptr) {
+        if ((nValues > 0) && (errorBuffer != nullptr)) {
             string error(errorBuffer);
             LocalFree(errorBuffer);
             LERROR("Error retrieving current directory: " << error);
@@ -224,7 +224,7 @@ void FileSystem::setCurrentDirectory(const Directory& directory) const {
         // Log error
         DWORD error = GetLastError();
         LPTSTR errorBuffer = nullptr;
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+        DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
                       FORMAT_MESSAGE_ALLOCATE_BUFFER |
                       FORMAT_MESSAGE_IGNORE_INSERTS,
                       NULL,
@@ -233,7 +233,7 @@ void FileSystem::setCurrentDirectory(const Directory& directory) const {
                       (LPTSTR)&errorBuffer,
                       0,
                       NULL);
-        if (errorBuffer != nullptr) {
+		if ((nValues > 0) && (errorBuffer != nullptr)) {
             string error(errorBuffer);
             LocalFree(errorBuffer);
             LERROR("Error setting current directory: " << error);
@@ -259,7 +259,7 @@ bool FileSystem::fileExists(std::string path, bool isRawPath) const {
 		const DWORD error = GetLastError();
 		if ((error != ERROR_FILE_NOT_FOUND) && (error != ERROR_PATH_NOT_FOUND)) {
 			LPTSTR errorBuffer = nullptr;
-			FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+			DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
 				FORMAT_MESSAGE_ALLOCATE_BUFFER |
 				FORMAT_MESSAGE_IGNORE_INSERTS,
 				NULL,
@@ -268,7 +268,7 @@ bool FileSystem::fileExists(std::string path, bool isRawPath) const {
 				(LPTSTR)&errorBuffer,
 				0,
 				NULL);
-			if (errorBuffer != nullptr) {
+			if ((nValues > 0) && (errorBuffer != nullptr)) {
 				string error(errorBuffer);
 				LocalFree(errorBuffer);
 				LERROR("Error retrieving file attributes: " << error);
@@ -295,7 +295,7 @@ bool FileSystem::directoryExists(const Directory& path) const {
         const DWORD error = GetLastError();
         if ((error != ERROR_FILE_NOT_FOUND) && (error != ERROR_PATH_NOT_FOUND)) {
             LPTSTR errorBuffer = nullptr;
-            FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+            DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
                 FORMAT_MESSAGE_ALLOCATE_BUFFER |
                 FORMAT_MESSAGE_IGNORE_INSERTS,
                 NULL,
@@ -304,7 +304,7 @@ bool FileSystem::directoryExists(const Directory& path) const {
                 (LPTSTR)&errorBuffer,
                 0,
                 NULL);
-            if (errorBuffer != nullptr) {
+			if ((nValues > 0) && (errorBuffer != nullptr)) {
                 string error(errorBuffer);
                 LocalFree(errorBuffer);
                 LERROR("Error retrieving file attributes: " << error);
@@ -370,7 +370,7 @@ bool FileSystem::createDirectory(const Directory& path, bool recursive) const {
 				return true;
 			else {
 				LPTSTR errorBuffer = nullptr;
-				FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+				DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
 							  FORMAT_MESSAGE_ALLOCATE_BUFFER |
 							  FORMAT_MESSAGE_IGNORE_INSERTS,
 							  NULL,
@@ -379,7 +379,7 @@ bool FileSystem::createDirectory(const Directory& path, bool recursive) const {
 							  (LPTSTR)&errorBuffer,
 							  0,
 							  NULL);
-				if (errorBuffer != nullptr) {
+				if ((nValues > 0) && (errorBuffer != nullptr)) {
 					string error(errorBuffer);
 					LocalFree(errorBuffer);
 					LERROR("Error creating directory '" << path << "': " << error);

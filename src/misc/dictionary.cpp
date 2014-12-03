@@ -129,8 +129,17 @@ bool isConvertible(const Dictionary& dict) {
     const std::vector<std::string>& keys = dict.keys();
     for (size_t i = 0; i < StorageTypeConverter<TargetType>::size; ++i) {
         const std::string& key = keys[i];
-        const bool correctType = dict.hasValue<typename StorageTypeConverter<TargetType>::type>(
+#ifdef WIN32
+#pragma warning(push)
+	// Suppress the warning C2684 (Redundant test) that occurs if
+	// StorageTypeConverter<TargetType>::type == TargetType
+#pragma warning(suppress: 6287)
+#endif // WIN32
+		const bool correctType = dict.hasValue<typename StorageTypeConverter<TargetType>::type>(
                                        key) || dict.hasValue<TargetType>(key);
+#ifdef WIN32
+#pragma warning(pop)
+#endif // WIN32
         if (!correctType)
             return false;
     }

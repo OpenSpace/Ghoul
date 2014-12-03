@@ -65,8 +65,10 @@ namespace filesystem {
 void FileSystem::deinitializeInternalWindows() {
 	for (auto d : _fileSystem->_directories) {
 		DirectoryHandle* dh = d.second;
-		CancelIo(dh->_handle);
-		CloseHandle(dh->_handle);
+		if (dh != nullptr && dh->_handle != nullptr) {
+			CancelIo(dh->_handle);
+			CloseHandle(dh->_handle);
+		}
 		delete dh;
 	}
 }

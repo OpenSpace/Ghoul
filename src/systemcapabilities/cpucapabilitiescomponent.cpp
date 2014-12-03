@@ -39,9 +39,12 @@
     typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
     typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD);
 
-    // This is for the 'warning C4996: 'GetVersionExA': was declared deprecated' which
+    // These is for the 'warning C4996: 'GetVersionExA': was declared deprecated' which
     // is a known bug for VS2013
+	#pragma warning(push)
     #pragma warning(disable: 4996)
+	#pragma warning(suppress: 28159)
+
 #else
     #include <sys/utsname.h>
 #endif
@@ -237,3 +240,7 @@ std::string CPUCapabilitiesComponent::name() const {
 
 } // namespace systemcapabilities
 } // namespace ghoul
+
+#ifdef WIN32
+#pragma warning(pop)
+#endif // WIN32

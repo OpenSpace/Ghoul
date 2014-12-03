@@ -68,7 +68,7 @@ namespace {
 #ifdef WIN32
     std::string lastErrorToString(DWORD error) {
         LPTSTR errorBuffer = nullptr;
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+        DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
             FORMAT_MESSAGE_ALLOCATE_BUFFER |
             FORMAT_MESSAGE_IGNORE_INSERTS,
             NULL,
@@ -77,7 +77,7 @@ namespace {
             (LPTSTR)&errorBuffer,
             0,
             NULL);
-        if (errorBuffer != nullptr) {
+        if ((nValues > 0) && (errorBuffer != nullptr)) {
             std::string error(errorBuffer);
             LocalFree(errorBuffer);
             return error;

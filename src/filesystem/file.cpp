@@ -148,7 +148,7 @@ std::string File::lastModifiedDate() const {
 		GetFileExInfoStandard,
 		&infoData
 		);
-	if (success == 0) {
+	if (!success) {
 		const DWORD error = GetLastError();
 		LPTSTR errorBuffer = nullptr;
 		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
@@ -172,11 +172,33 @@ std::string File::lastModifiedDate() const {
 		FILETIME lastWriteTime = infoData.ftLastWriteTime;
 		SYSTEMTIME time;
 		//LPSYSTEMTIME time = NULL;
-		FileTimeToSystemTime(&lastWriteTime, &time);
-		return std::to_string(time.wYear) + "-" + std::to_string(time.wMonth) + "-" +
-			std::to_string(time.wDay) + "T" + std::to_string(time.wHour) + ":" +
-			std::to_string(time.wMinute) + ":" + std::to_string(time.wSecond) + "." +
-			std::to_string(time.wMilliseconds);
+		BOOL success = FileTimeToSystemTime(&lastWriteTime, &time);
+		if (!success) {
+			const DWORD error = GetLastError();
+			LPTSTR errorBuffer = nullptr;
+			DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+				FORMAT_MESSAGE_ALLOCATE_BUFFER |
+				FORMAT_MESSAGE_IGNORE_INSERTS,
+				NULL,
+				error,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+				(LPTSTR)&errorBuffer,
+				0,
+				NULL);
+			if ((nValues > 0) && (errorBuffer != nullptr)) {
+				std::string error(errorBuffer);
+				LERROR("'FileTimeToSystemTime' failed for file '" << _filename <<
+					"':" << error);
+				LocalFree(errorBuffer);
+			}
+			return "";
+		}
+		else {
+			return std::to_string(time.wYear) + "-" + std::to_string(time.wMonth) + "-" +
+				std::to_string(time.wDay) + "T" + std::to_string(time.wHour) + ":" +
+				std::to_string(time.wMinute) + ":" + std::to_string(time.wSecond) + "." +
+				std::to_string(time.wMilliseconds);
+		}
 	}
 #else
 	struct stat attrib;
