@@ -257,6 +257,15 @@ const string& ProgramObject::name() const{
     return _programName;
 }
 
+void ProgramObject::setProgramObjectCallback(ProgramObjectCallback changeCallback) {
+	filesystem::File::FileChangedCallback c = [this, changeCallback](const filesystem::File&){
+		changeCallback(this);
+	};
+	for (auto shaderObject : _shaderObjects) {
+		shaderObject.first->setShaderObjectCallback(c);
+	}
+}
+
 bool ProgramObject::hasName() const {
     return !_programName.empty();
 }
@@ -2954,21 +2963,14 @@ void ProgramObject::bindFragDataLocation(const std::string& name, GLuint colorNu
 
 ProgramObject* ProgramObject::Build(const std::string& name,
 	const std::string& vpath,
-	const std::string& fpath,
-	ProgramObjectCallback callback)
+	const std::string& fpath)
 {
 	const ShaderObject::ShaderType vsType = ShaderObject::ShaderType::ShaderTypeVertex;
 	const ShaderObject::ShaderType fsType = ShaderObject::ShaderType::ShaderTypeFragment;
 
-	filesystem::File::FileChangedCallback c = nullptr;
 	ProgramObject* program = new ProgramObject(name);
-	if (callback) {
-		c = [program, callback](const filesystem::File&){
-			callback(program);
-		};
-	}
-	ShaderObject*  vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex", c);
-	ShaderObject*  fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment", c);
+	ShaderObject*  vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex");
+	ShaderObject*  fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment");
 	program->attachObject(vs);
 	program->attachObject(fs);
 
@@ -2983,23 +2985,16 @@ ProgramObject* ProgramObject::Build(const std::string& name,
 ProgramObject* ProgramObject::Build(const std::string& name,
 	const std::string& vpath,
 	const std::string& fpath,
-	const std::string& gpath,
-	ProgramObjectCallback callback)
+	const std::string& gpath)
 {
 	const ShaderObject::ShaderType vsType = ShaderObject::ShaderType::ShaderTypeVertex;
 	const ShaderObject::ShaderType fsType = ShaderObject::ShaderType::ShaderTypeFragment;
 	const ShaderObject::ShaderType gsType = ShaderObject::ShaderType::ShaderTypeGeometry;
 
-	filesystem::File::FileChangedCallback c = nullptr;
 	ProgramObject* program = new ProgramObject(name);
-	if (callback) {
-		c = [program, callback](const filesystem::File&){
-			callback(program);
-		};
-	}
-	ShaderObject*  vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex", c);
-	ShaderObject*  fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment", c);
-	ShaderObject*  gs = new ShaderObject(gsType, absPath(gpath), name + " Geometry", c);
+	ShaderObject*  vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex");
+	ShaderObject*  fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment");
+	ShaderObject*  gs = new ShaderObject(gsType, absPath(gpath), name + " Geometry");
 	program->attachObject(vs);
 	program->attachObject(fs);
 	program->attachObject(gs);
@@ -3017,8 +3012,7 @@ ProgramObject* ProgramObject::Build(const std::string& name,
 	const std::string& fpath,
 	const std::string& gpath,
 	const std::string& tepath,
-	const std::string& tcpath,
-	ProgramObjectCallback callback)
+	const std::string& tcpath)
 {
 	const ShaderObject::ShaderType vsType = ShaderObject::ShaderType::ShaderTypeVertex;
 	const ShaderObject::ShaderType fsType = ShaderObject::ShaderType::ShaderTypeFragment;
@@ -3026,18 +3020,12 @@ ProgramObject* ProgramObject::Build(const std::string& name,
 	const ShaderObject::ShaderType teType = ShaderObject::ShaderType::ShaderTypeTesselationEvaluation;
 	const ShaderObject::ShaderType tcType = ShaderObject::ShaderType::ShaderTypeTesselationControl;
 
-	filesystem::File::FileChangedCallback c = nullptr;
 	ProgramObject* program = new ProgramObject(name);
-	if (callback) {
-		c = [program, callback](const filesystem::File&){
-			callback(program);
-		};
-	}
-	ShaderObject*  vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex", c);
-	ShaderObject*  fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment", c);
-	ShaderObject*  gs = new ShaderObject(gsType, absPath(gpath), name + " Geometry", c);
-	ShaderObject*  te = new ShaderObject(teType, absPath(tepath), name + " Tessellation Evaluation", c);
-	ShaderObject*  tc = new ShaderObject(tcType, absPath(tcpath), name + " Tessellation Control", c);
+	ShaderObject*  vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex");
+	ShaderObject*  fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment");
+	ShaderObject*  gs = new ShaderObject(gsType, absPath(gpath), name + " Geometry");
+	ShaderObject*  te = new ShaderObject(teType, absPath(tepath), name + " Tessellation Evaluation");
+	ShaderObject*  tc = new ShaderObject(tcType, absPath(tcpath), name + " Tessellation Control");
 	program->attachObject(vs);
 	program->attachObject(fs);
 	program->attachObject(gs);

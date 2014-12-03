@@ -136,6 +136,13 @@ public:
      */
     const std::string& name() const;
 
+	/**
+     * Sets the shader object callback
+     * \param callback object
+     */
+	void setProgramObjectCallback(ProgramObjectCallback changeCallback);
+	
+
     /**
      * Returns <code>true</code> if this ProgramObject has a human readable name assigned
      * to it.
@@ -3248,10 +3255,10 @@ public:
 	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
 	 * unsuccessfull
 	 */
+	
 	static ProgramObject* Build(const std::string& name,
 								const std::string& vpath,
-								const std::string& fpath,
-								ProgramObjectCallback callback = nullptr);
+								const std::string& fpath);
 
 	/**
 	 * Constructs and links a ProgramObject
@@ -3269,8 +3276,7 @@ public:
 	static ProgramObject* Build(const std::string& name, 
 								const std::string& vpath, 
 								const std::string& fpath, 
-								const std::string& gpath,
-								ProgramObjectCallback callback = nullptr);
+								const std::string& gpath);
 	/**
 	 * Constructs and links a ProgramObject
 	 * \param name The human readable name of this ProgramObject
@@ -3293,8 +3299,7 @@ public:
 								const std::string& fpath,
 								const std::string& gpath,
 								const std::string& tepath,
-								const std::string& tcpath,
-								ProgramObjectCallback callback = nullptr);
+								const std::string& tcpath);
 
 private:
     /// The OpenGL name of this program object.

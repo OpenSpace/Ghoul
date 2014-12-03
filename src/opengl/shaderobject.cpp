@@ -63,26 +63,26 @@ std::string glslVersionString() {
 namespace ghoul {
 namespace opengl {
 
-ShaderObject::ShaderObject(ShaderType shaderType, ShaderObjectCallback changeCallback)
+ShaderObject::ShaderObject(ShaderType shaderType)
     : _id(0)
     , _type(shaderType)
     , _fileName("")
     , _shaderName("")
 	, _loggerCat("ShaderObject")
-	, _onChangeCallback(changeCallback)
+	, _onChangeCallback(nullptr)
 {
     _id = glCreateShader(_type);
     if (_id == 0)
         LERROR("glCreateShader returned 0");
 }
 
-ShaderObject::ShaderObject(ShaderType shaderType, std::string filename, ShaderObjectCallback changeCallback)
+ShaderObject::ShaderObject(ShaderType shaderType, std::string filename)
     : _id(0)
     , _type(shaderType)
     , _fileName(std::move(filename))
     , _shaderName("")
 	, _loggerCat("ShaderObject")
-	, _onChangeCallback(changeCallback)
+	, _onChangeCallback(nullptr)
 {
 #ifdef DEBUG
     if (filename == "")
@@ -96,13 +96,13 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename, ShaderOb
 }
 
 ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
-						   std::string name, ShaderObjectCallback changeCallback)
+						   std::string name)
     : _id(0)
     , _type(shaderType)
     , _fileName(std::move(filename))
     , _shaderName(std::move(name))
 	, _loggerCat("ShaderObject('" + _shaderName + "')")
-	, _onChangeCallback(changeCallback)
+	, _onChangeCallback(nullptr)
 {
     _id = glCreateShader(_type);
     if (_id == 0)
@@ -210,6 +210,10 @@ void ShaderObject::setName(std::string name) {
 
 const std::string& ShaderObject::name() const {
     return _shaderName;
+}
+
+void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) {
+	_onChangeCallback = changeCallback;
 }
 
 bool ShaderObject::hasName() const {

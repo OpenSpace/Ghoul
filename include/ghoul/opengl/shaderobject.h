@@ -81,7 +81,7 @@ public:
      * to be compiled.
      * \param shaderType The type of shader that this ShaderObject will represent
      */
-	ShaderObject(ShaderType shaderType, ShaderObjectCallback changeCallback = nullptr);
+	ShaderObject(ShaderType shaderType);
 
     /**
      * This constructor creates a shader of the passed type and loads the shader source 
@@ -92,8 +92,7 @@ public:
      * \param filename The name of the file that will be used to load the source of this 
      * shader
      */
-    ShaderObject(ShaderType shaderType, std::string filename, 
-		ShaderObjectCallback changeCallback = nullptr);
+    ShaderObject(ShaderType shaderType, std::string filename);
 
     /**
      * This constructor creates a shader of the passed type and loads the shader source 
@@ -106,9 +105,7 @@ public:
      * shader
      * \param name The human readable name of this ShaderObject
      */
-    ShaderObject(ShaderType shaderType,
-				std::string filename, std::string name, 
-				ShaderObjectCallback changeCallback = nullptr);
+    ShaderObject(ShaderType shaderType, std::string filename, std::string name);
 
     /**
      * A copy constructor that will copy all of the internal state, and the shader source,
@@ -168,6 +165,12 @@ public:
      * \return The internal name of this ShaderObject
      */
     const std::string& name() const;
+
+	/**
+     * Sets the shader object callback
+     * \param callback object
+     */
+	void setShaderObjectCallback(ShaderObjectCallback changeCallback);
 
     /**
      * Returns <code>true</code> if this ShaderObject has an internal name assigned to it,
