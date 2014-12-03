@@ -1,4 +1,5 @@
 #include "logmanager.h"
+#include "callbacklog.h"
 #include "consolelog.h"
 #include "htmllog.h"
 #include "log.h"
