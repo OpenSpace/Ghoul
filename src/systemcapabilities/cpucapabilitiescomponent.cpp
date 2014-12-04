@@ -404,7 +404,9 @@ void CPUCapabilitiesComponent::detectCPU() {
 	SYSTEM_INFO systemInfo;
 	GetNativeSystemInfo(&systemInfo);
 	_cores = systemInfo.dwNumberOfProcessors;
-#else
+#endif
+
+#ifdef __APPLE__
     int mib[2];
     size_t len;
     char *p;
