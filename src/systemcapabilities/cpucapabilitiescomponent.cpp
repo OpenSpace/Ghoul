@@ -70,11 +70,18 @@ void CPUCapabilitiesComponent::detectCapabilities() {
     clearCapabilities();
     detectOS();
     detectMemory();
+	detectCPU();
 }
 
 void CPUCapabilitiesComponent::clearCapabilities() {
     _operatingSystem = "";
     _installedMainMemory = 0;
+	_cpu = "";
+	_cores = 0;
+	_cacheLineSize = 0;
+	_L2Associativity = 0;
+	_cacheSize = 0;
+	_extensions = "";
 }
 
 void CPUCapabilitiesComponent::detectOS() {
@@ -210,13 +217,189 @@ void CPUCapabilitiesComponent::detectMemory() {
 #endif
 }
 
+void CPUCapabilitiesComponent::detectCPU() {
+#ifdef WIN32
+	const char* szFeatures[] =
+	{
+		"x87 FPU On Chip",
+		"Virtual-8086 Mode Enhancement",
+		"Debugging Extensions",
+		"Page Size Extensions",
+		"Time Stamp Counter",
+		"RDMSR and WRMSR Support",
+		"Physical Address Extensions",
+		"Machine Check Exception",
+		"CMPXCHG8B Instruction",
+		"APIC On Chip",
+		"Unknown1",
+		"SYSENTER and SYSEXIT",
+		"Memory Type Range Registers",
+		"PTE Global Bit",
+		"Machine Check Architecture",
+		"Conditional Move/Compare Instruction",
+		"Page Attribute Table",
+		"Page Size Extension",
+		"Processor Serial Number",
+		"CFLUSH Extension",
+		"Unknown2",
+		"Debug Store",
+		"Thermal Monitor and Clock Ctrl",
+		"MMX Technology",
+		"FXSAVE/FXRSTOR",
+		"SSE Extensions",
+		"SSE2 Extensions",
+		"Self Snoop",
+		"Hyper-threading Technology",
+		"Thermal Monitor",
+		"Unknown4",
+		"Pend. Brk. EN."
+	};
+
+	char CPUString[0x20];
+	char CPUBrandString[0x40];
+	int CPUInfo[4] = { -1 };
+	int nSteppingID = 0;
+	int nModel = 0;
+	int nFamily = 0;
+	int nProcessorType = 0;
+	int nExtendedmodel = 0;
+	int nExtendedfamily = 0;
+	int nBrandIndex = 0;
+	int nCLFLUSHcachelinesize = 0;
+	int nAPICPhysicalID = 0;
+	int nFeatureInfo = 0;
+	int nCacheLineSize = 0;
+	int nL2Associativity = 0;
+	int nCacheSizeK = 0;
+	int nRet = 0;
+	unsigned    nIds, nExIds, i;
+	bool    bSSE3NewInstructions = false;
+	bool    bMONITOR_MWAIT = false;
+	bool    bCPLQualifiedDebugStore = false;
+	bool    bThermalMonitor2 = false;
+
+
+	// __cpuid with an InfoType argument of 0 returns the number of
+	// valid Ids in CPUInfo[0] and the CPU identification string in
+	// the other three array elements. The CPU identification string is
+	// not in linear order. The code below arranges the information 
+	// in a human readable form.
+	__cpuid(CPUInfo, 0);
+	nIds = CPUInfo[0];
+	memset(CPUString, 0, sizeof(CPUString));
+	*((int*)CPUString) = CPUInfo[1];
+	*((int*)(CPUString + 4)) = CPUInfo[3];
+	*((int*)(CPUString + 8)) = CPUInfo[2];
+
+	// Get the information associated with each valid Id
+	for (i = 0; i <= nIds; ++i)
+	{
+		__cpuid(CPUInfo, i);
+
+		// Interpret CPU feature information.
+		if (i == 1)
+		{
+			nSteppingID = CPUInfo[0] & 0xf;
+			nModel = (CPUInfo[0] >> 4) & 0xf;
+			nFamily = (CPUInfo[0] >> 8) & 0xf;
+			nProcessorType = (CPUInfo[0] >> 12) & 0x3;
+			nExtendedmodel = (CPUInfo[0] >> 16) & 0xf;
+			nExtendedfamily = (CPUInfo[0] >> 20) & 0xff;
+			nBrandIndex = CPUInfo[1] & 0xff;
+			nCLFLUSHcachelinesize = ((CPUInfo[1] >> 8) & 0xff) * 8;
+			nAPICPhysicalID = (CPUInfo[1] >> 24) & 0xff;
+			bSSE3NewInstructions = (CPUInfo[2] & 0x1) || false;
+			bMONITOR_MWAIT = (CPUInfo[2] & 0x8) || false;
+			bCPLQualifiedDebugStore = (CPUInfo[2] & 0x10) || false;
+			bThermalMonitor2 = (CPUInfo[2] & 0x100) || false;
+			nFeatureInfo = CPUInfo[3];
+		}
+	}
+
+	// Calling __cpuid with 0x80000000 as the InfoType argument
+	// gets the number of valid extended IDs.
+	__cpuid(CPUInfo, 0x80000000);
+	nExIds = CPUInfo[0];
+	memset(CPUBrandString, 0, sizeof(CPUBrandString));
+
+	// Get the information associated with each extended ID.
+	for (i = 0x80000000; i <= nExIds; ++i)
+	{
+		__cpuid(CPUInfo, i);
+
+		// Interpret CPU brand string and cache information.
+		if (i == 0x80000002)
+			memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+		else if (i == 0x80000003)
+			memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+		else if (i == 0x80000004)
+			memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+		else if (i == 0x80000006)
+		{
+			_cacheLineSize = CPUInfo[2] & 0xff;
+			_L2Associativity = (CPUInfo[2] >> 12) & 0xf;
+			_cacheSize = (CPUInfo[2] >> 16) & 0xffff;
+		}
+	}
+
+	// Get extensions list
+	std::stringstream extensions;
+	if (nFeatureInfo || bSSE3NewInstructions ||
+		bMONITOR_MWAIT || bCPLQualifiedDebugStore ||
+		bThermalMonitor2)
+	{
+		if (bSSE3NewInstructions)
+			extensions << "SSE3 New Instructions, ";
+		if (bMONITOR_MWAIT)
+			extensions << "MONITOR/MWAIT, ";
+		if (bCPLQualifiedDebugStore)
+			extensions << "Qualified Debug Store, ";
+		if (bThermalMonitor2)
+			extensions << "Thermal Monitor 2, ";
+
+		i = 0;
+		nIds = 1;
+		while (i < (sizeof(szFeatures) / sizeof(const char*)))
+		{
+			if (nFeatureInfo & nIds)
+			{
+				extensions << szFeatures[i] << ", ";
+			}
+
+			nIds <<= 1;
+			++i;
+		}
+	}
+
+	// Set CPU name
+	_cpu = CPUBrandString;
+
+	// Set extensions and remove trailing ", "
+	_extensions = extensions.str();
+	if (_extensions.length() > 2)
+		_extensions = _extensions.substr(0, _extensions.length()-2);
+
+	// Get the cores
+	SYSTEM_INFO systemInfo;
+	GetNativeSystemInfo(&systemInfo);
+	_cores = systemInfo.dwNumberOfProcessors;
+
+#endif
+}
+
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
     CPUCapabilitiesComponent::capabilities(
                         const SystemCapabilitiesComponent::Verbosity& /*verbosity*/) const
 {
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
-    result.emplace_back("Operating System", _operatingSystem);
-    result.emplace_back("Main Memory", installedMainMemoryAsString());
+	result.emplace_back("Operating System", _operatingSystem);
+	result.emplace_back("CPU", _cpu);
+	result.emplace_back("Cores", coresAsString());
+	result.emplace_back("Cache line size", cacheLineSizeAsString());
+	result.emplace_back("L2 Associativity", L2AssiciativityAsString());
+	result.emplace_back("Cache size", cacheSizeAsString());
+	result.emplace_back("Extensions", _extensions);
+	result.emplace_back("Main Memory", installedMainMemoryAsString());
     return result;
 }
 
@@ -232,6 +415,50 @@ std::string CPUCapabilitiesComponent::installedMainMemoryAsString() const {
     std::stringstream s;
     s << _installedMainMemory << " MB";
     return s.str();
+}
+
+unsigned int CPUCapabilitiesComponent::cores() const {
+	return _cores;
+}
+
+unsigned int CPUCapabilitiesComponent::cacheLineSize() const {
+	return _cacheLineSize;
+}
+
+unsigned int CPUCapabilitiesComponent::L2Assiciativity() const {
+	return _L2Associativity;
+}
+
+unsigned int CPUCapabilitiesComponent::cacheSize() const {
+	return _cacheSize;
+}
+
+std::string CPUCapabilitiesComponent::coresAsString() const {
+	std::stringstream s;
+	s << _cores;
+	return s.str();
+}
+
+std::string CPUCapabilitiesComponent::cacheLineSizeAsString() const {
+	std::stringstream s;
+	s << _cacheLineSize;
+	return s.str();
+}
+
+std::string CPUCapabilitiesComponent::L2AssiciativityAsString() const {
+	std::stringstream s;
+	s << _L2Associativity;
+	return s.str();
+}
+
+std::string CPUCapabilitiesComponent::cacheSizeAsString() const {
+	std::stringstream s;
+	s << _cacheSize << " K";
+	return s.str();
+}
+
+std::string CPUCapabilitiesComponent::extensions() const {
+	return _extensions;
 }
 
 std::string CPUCapabilitiesComponent::name() const {
