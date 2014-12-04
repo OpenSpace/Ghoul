@@ -214,6 +214,12 @@ const std::string& ShaderObject::name() const {
 
 void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) {
 	_onChangeCallback = changeCallback;
+
+	if (_onChangeCallback) {
+		ghoul::filesystem::File* fileObject = new ghoul::filesystem::File(_fileName, false);
+		fileObject->setCallback(_onChangeCallback);
+		_trackedFiles[_fileName] = fileObject;
+	}
 }
 
 bool ShaderObject::hasName() const {
