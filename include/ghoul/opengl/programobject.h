@@ -3251,7 +3251,6 @@ public:
 	 * source of this shader
 	 * \param fpath The name of the vertex shader file that will be used to load the 
 	 * source of this shader
-	 * \param callback The callback function if any of the included source files changes
 	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
 	 * unsuccessfull
 	 */
@@ -3269,7 +3268,6 @@ public:
 	 * source of this shader
 	 * \param gpath The name of the geometry shader file that will be used to load the
 	 * source of this shader
-	 * \param callback The callback function if any of the included source files changes
 	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
 	 * unsuccessfull
 	*/
@@ -3290,7 +3288,6 @@ public:
 	 * source of this shader
 	 * \param tcpath The name of the tessellation control shader file that will be used to load the
 	 * source of this shader
-	 * \param callback The callback function if any of the included source files changes
 	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
 	 * unsuccessfull
 	 */

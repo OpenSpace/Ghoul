@@ -240,8 +240,22 @@ protected:
     
     typedef std::pair<unsigned int, std::string> LoadedCacheInfo;
 
+	/**
+	 * Generates a hash number from the file path and information string
+	 * \return A hash number
+	 */
 	unsigned int generateHash(std::string file, std::string information) const;
+
+	/**
+	 * Cleans a directory from files not flagged as persistent and removes 
+	 */
 	void cleanDirectory(const Directory& dir) const;
+
+	/**
+	 * Reads informations from a directory about the content and transofrms it to a
+	 * vector of content. This vector is compared with the cache description file
+	 * and used as a foundation for cleaning directories.
+	 */
     std::vector<LoadedCacheInfo> cacheInformationFromDirectory(
                                                             const Directory& dir) const;
 
@@ -249,7 +263,10 @@ protected:
 	CacheManager(CacheManager&& m) = delete;
 	CacheManager& operator=(const CacheManager& rhs) = delete;
 
+	/// The cache directory
 	Directory _directory;
+
+	/// A map containing file hashes and file information
 	std::map<unsigned int, CacheInformation> _files;
 };
 

@@ -159,6 +159,7 @@ public:
      * return <code>false</code> if <code>path</code> points to a directory. This method
      * will not expand any tokens that are passed to it.
      * \param path The path that should be tested for existence
+	 * \param isRawPath A flag definition if the path is raw or have path tokens
      * \return <code>true</code> if <code>path</code> points to an existing file,
      * <code>false</code> otherwise
      */
@@ -242,7 +243,7 @@ public:
 
 	/**
 	 * Returns a vector of all registered path tokens
-	 * \return A Vector of tokens
+	 * \return A vector of all registered path tokens
 	 */
 	std::vector<std::string> tokens() const;
     
@@ -274,13 +275,15 @@ public:
     CacheManager* cacheManager();
 
     /**
-     * Listen to file file for changes. When file is changed the File callback will 
+     * Listen to file for changes. When file is changed the File callback will 
      * be called.
+	 * \param file The file object to be tracked.
      */
 	void addFileListener(File* file);
     
     /**
-     * Stops tracking changes for a file
+     * Removes the file object from tracking lists. The file on the filesystem may
+	 * still be tracked and other File objects may still have callbacks registered.
      */
 	void removeFileListener(File* file);
     
@@ -339,7 +342,7 @@ private:
     FileSystem();
     
     /**
-     * Private destructor
+     * Private destructor, called by deinitialize
      */
     ~FileSystem();
 
@@ -349,7 +352,7 @@ private:
     /// This map stores all the tokens that are used in the FileSystem.
     std::map<std::string, std::string> _tokenMap;
 
-
+	/// The cache manager object, only allocated if createCacheManager is called
 	CacheManager* _cacheManager;
 
 	/// This member variable stores the static FileSystem. Has to be initialized and

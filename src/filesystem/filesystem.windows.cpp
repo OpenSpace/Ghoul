@@ -150,11 +150,9 @@ void callbackHandler(DirectoryHandle* directoryHandle, const std::string& file) 
 void readStarter(DirectoryHandle* directoryHandle) {
 	FileSys.beginRead(directoryHandle);
 }
-void CALLBACK completionHandler(
-	DWORD /*dwErrorCode*/, 
-	DWORD /*dwNumberOfBytesTransferred*/,
-	LPOVERLAPPED lpOverlapped)
-{
+
+void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
+
 	DirectoryHandle* directoryHandle = static_cast<DirectoryHandle*>(lpOverlapped->hEvent);
 
 	unsigned char currentBuffer = directoryHandle->_activeBuffer;
@@ -186,31 +184,6 @@ void CALLBACK completionHandler(
 				currentFilenameBuffer[i - 1] = '\0';
 				const string currentFilename(currentFilenameBuffer, i - 1);
 
-				//switch (information.Action) {
-				//case FILE_ACTION_ADDED:
-				//	LDEBUG("Action:                 FILE_ACTION_ADDED");
-				//	break;
-				//case FILE_ACTION_REMOVED:
-				//	LDEBUG("Action:                 FILE_ACTION_REMOVED");
-				//	break;
-				//case FILE_ACTION_MODIFIED:
-				//	LDEBUG("Action:                 FILE_ACTION_MODIFIED");
-				//	break;
-				//case FILE_ACTION_RENAMED_OLD_NAME:
-				//	LDEBUG("Action:                 FILE_ACTION_RENAMED_OLD_NAME");
-				//	break;
-				//case FILE_ACTION_RENAMED_NEW_NAME:
-				//	LDEBUG("Action:                 FILE_ACTION_RENAMED_NEW_NAME");
-				//	break;
-				//default:
-				//	LDEBUG("Action:                 UNKNOWN");
-				//	break;
-				//}
-				//LDEBUG("FileNameLength:         " << information.FileNameLength);
-				//LDEBUG("file:                   " << currentFilename);
-				//LDEBUG("currentFilenamelength:  " << currentFilename.length());
-				//LDEBUG("NextEntryOffset:        " << information.NextEntryOffset);
-
 				callbackHandler(directoryHandle, currentFilename);
 			}
 			delete[] currentFilenameBuffer;
@@ -222,7 +195,6 @@ void CALLBACK completionHandler(
 			//continue with the next entry
 			buffer += information.NextEntryOffset;
 	}
-	//LWARNING("================");
 }
 
 void FileSystem::beginRead(DirectoryHandle* directoryHandle) {

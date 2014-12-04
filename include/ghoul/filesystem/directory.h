@@ -152,8 +152,9 @@ public:
      * \return The paths to all directories in the current directory (and subdirectories
      * if <code>recursiveSearch</code> is <code>true</code>)
      */
-std::vector<std::string> readDirectories(bool recursiveSearch = false,
-                                         bool sort = false) const;
+    std::vector<std::string> readDirectories(
+		bool recursiveSearch = false,
+		bool sort = false) const;
 
 private:
     /**
@@ -168,9 +169,9 @@ private:
      * for each directory in the current directory, combining all results in the
      * <code>result</code> vector.
      */
-     void readFiles(
-        std::vector<std::string>& result,
-        const std::string& path,
+    void readFiles(
+		std::vector<std::string>& result, 
+		const std::string& path,
         bool recursiveSearch = false) const;
 
     /**
