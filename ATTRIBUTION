@@ -1,0 +1,54 @@
+Ghoul is using the following libraries:
+
+Boost
+=====
+Webpage: http://www.boost.org
+License: Boost Software License, Version 1.0 (http://www.boost.org/LICENSE_1_0.txt)
+
+
+DevIL
+=====
+Webpage: http://openil.sourceforge.net
+License: LGPL, Version 2.1 (http://openil.sourceforge.net/lgpl.txt)
+
+
+FreeImage
+=========
+Webpage: http://freeimage.sourceforge.net
+License: FIPL, version 1.0 (http://freeimage.sourceforge.net/freeimage-license.txt)
+
+
+GLM
+===
+Copyright (c) 2005 - 2014 G-Truc Creation
+
+Webpage: http://glm.g-truc.net/
+License: MIT License (http://glm.g-truc.net/copying.txt)
+
+
+GLEW
+====
+Copyright (C) 2002-2008, Milan Ikits <milan ikits[]ieee org>
+Copyright (C) 2002-2008, Marcelo E. Magallon <mmagallo[]debian org>
+Copyright (C) 2002, Lev Povalahev
+All rights reserved.
+
+Webpage: http://glew.sourceforge.net
+License: 3-clause BSD License (http://glew.sourceforge.net/glew.txt)
+
+
+googletest
+=====
+Copyright 2008, Google Inc.
+All rights reserved.
+
+Webpage: https://code.google.com/p/googletest/
+License: BSD License (http://opensource.org/licenses/BSD-3-Clause)
+
+
+Lua
+===
+Copyright © 1994–2014 Lua.org, PUC-Rio.
+
+Webpage: http://www.lua.org
+License: MIT license (http://opensource.org/licenses/mit-license.html)
