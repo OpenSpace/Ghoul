@@ -101,23 +101,12 @@ add_definitions(-DGLM_SWIZZLE)
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
-find_package(OpenCL)
-if(OPENCL_FOUND)
-    option(GHOUL_USE_OPENCL "Build OpenCL modules" ON)
-    if(GHOUL_USE_OPENCL)
-        add_definitions(-DGHL_OPENCL)
-        include_directories(${OPENCL_INCLUDE_DIRS})
-        set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${OPENCL_LIBRARIES})
-    endif(GHOUL_USE_OPENCL)
-endif(OPENCL_FOUND)
-
 find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
 if (NOT GHOUL_USE_DYNAMIC_GLEW)
     message("Using GLEW as a static library")
     add_definitions(-DGLEW_STATIC)
 endif ()
-
 
 find_package(DevIL)
 if(IL_FOUND)
