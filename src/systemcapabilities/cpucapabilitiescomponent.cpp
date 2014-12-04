@@ -46,11 +46,15 @@
 	#pragma warning(suppress: 28159)
 
 #else
-    #include <sys/utsname.h>
-#endif
+    #ifdef __APPLE__
+        #include <sys/sysctl.h>
+    #else
+        #include <sys/types.h>
+        #include <sys/sysinfo.h>
+        #include <cstring>
+    #endif
 
-#ifdef __APPLE__
-    #include <sys/sysctl.h>
+    #include <sys/utsname.h>
 #endif
 
 namespace {
@@ -206,7 +210,7 @@ void CPUCapabilitiesComponent::detectOS() {
 }
 
 void CPUCapabilitiesComponent::detectMemory() {
-#ifdef WIN32
+#if defined(WIN32)
     std::string memory;
     bool success = queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
     if (!success)
@@ -218,9 +222,7 @@ void CPUCapabilitiesComponent::detectMemory() {
         convert >> value;
         _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
     }
-#endif
-
-#ifdef __APPLE__
+#elif defined(__APPLE__)
     
     int mib[2];
     size_t len;
@@ -235,46 +237,96 @@ void CPUCapabilitiesComponent::detectMemory() {
     std::memcpy(&value, p, sizeof(int64_t));
     _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
     delete[] p;
+#else
+    struct sysinfo memInfo;
+    sysinfo (&memInfo);
+    _installedMainMemory = static_cast<unsigned int>((memInfo.totalram / 1024) / 1024);
 #endif
 }
 
 void CPUCapabilitiesComponent::detectCPU() {
-#ifdef WIN32
+#if defined(WIN32)
+    // names from Linux extension flags
+    /*
+    fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts 
+    acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts 
+    rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx est 
+    tm2 ssse3 cx16 xtpr pdcm pcid sse4_1 sse4_2 popcnt tsc_deadline_timer aes xsave avx f16c rdrand 
+    lahf_lm ida arat epb xsaveopt pln pts dtherm tpr_shadow vnmi flexpriority ept vpid fsgsbase smep erms
+    */
 	const char* szFeatures[] =
 	{
-		"x87 FPU On Chip",
-		"Virtual-8086 Mode Enhancement",
-		"Debugging Extensions",
-		"Page Size Extensions",
-		"Time Stamp Counter",
+		"fpu",
+		"vme",
+		"de",
+		"pse",
+		"tsc",
 		"RDMSR and WRMSR Support",
-		"Physical Address Extensions",
-		"Machine Check Exception",
-		"CMPXCHG8B Instruction",
-		"APIC On Chip",
+		"pae",
+		"mce",
+		"cx8",
+		"apic",
 		"Unknown1",
 		"SYSENTER and SYSEXIT",
-		"Memory Type Range Registers",
+		"mtrr",
 		"PTE Global Bit",
-		"Machine Check Architecture",
+		"mca",
 		"Conditional Move/Compare Instruction",
-		"Page Attribute Table",
-		"Page Size Extension",
+		"pat",
+		"pse36",
 		"Processor Serial Number",
 		"CFLUSH Extension",
 		"Unknown2",
-		"Debug Store",
+		"ds",
 		"Thermal Monitor and Clock Ctrl",
-		"MMX Technology",
+		"mmx",
 		"FXSAVE/FXRSTOR",
-		"SSE Extensions",
-		"SSE2 Extensions",
-		"Self Snoop",
-		"Hyper-threading Technology",
-		"Thermal Monitor",
+		"sse",
+		"sse2",
+		"ss",
+		"ht",
+		"tm",
 		"Unknown4",
-		"Pend. Brk. EN."
+		"pbe"
 	};
+    /*
+    // Names from Windows example web page
+    const char* szFeatures[] =
+    {
+        "x87 FPU On Chip",
+        "Virtual-8086 Mode Enhancement",
+        "Debugging Extensions",
+        "Page Size Extensions",
+        "Time Stamp Counter",
+        "RDMSR and WRMSR Support",
+        "Physical Address Extensions",
+        "Machine Check Exception",
+        "CMPXCHG8B Instruction",
+        "APIC On Chip",
+        "Unknown1",
+        "SYSENTER and SYSEXIT",
+        "Memory Type Range Registers",
+        "PTE Global Bit",
+        "Machine Check Architecture",
+        "Conditional Move/Compare Instruction",
+        "Page Attribute Table",
+        "Page Size Extension",
+        "Processor Serial Number",
+        "CFLUSH Extension",
+        "Unknown2",
+        "Debug Store",
+        "Thermal Monitor and Clock Ctrl",
+        "MMX Technology",
+        "FXSAVE/FXRSTOR",
+        "SSE Extensions",
+        "SSE2 Extensions",
+        "Self Snoop",
+        "Hyper-threading Technology",
+        "Thermal Monitor",
+        "Unknown4",
+        "Pend. Brk. EN."
+    };
+    */
 
 	char CPUString[0x20];
 	char CPUBrandString[0x40];
@@ -369,6 +421,16 @@ void CPUCapabilitiesComponent::detectCPU() {
 		bMONITOR_MWAIT || bCPLQualifiedDebugStore ||
 		bThermalMonitor2)
 	{
+
+        if (bSSE3NewInstructions)
+            extensions << "sse3, ";
+        if (bMONITOR_MWAIT)
+            extensions << "MONITOR/MWAIT, ";
+        if (bCPLQualifiedDebugStore)
+            extensions << "Qualified Debug Store, ";
+        if (bThermalMonitor2)
+            extensions << "tm2, ";
+        /*
 		if (bSSE3NewInstructions)
 			extensions << "SSE3 New Instructions, ";
 		if (bMONITOR_MWAIT)
@@ -377,6 +439,7 @@ void CPUCapabilitiesComponent::detectCPU() {
 			extensions << "Qualified Debug Store, ";
 		if (bThermalMonitor2)
 			extensions << "Thermal Monitor 2, ";
+            */
 
 		i = 0;
 		nIds = 1;
@@ -404,9 +467,7 @@ void CPUCapabilitiesComponent::detectCPU() {
 	SYSTEM_INFO systemInfo;
 	GetNativeSystemInfo(&systemInfo);
 	_cores = systemInfo.dwNumberOfProcessors;
-#endif
-
-#ifdef __APPLE__
+#elif defined(__APPLE__)
     int mib[2];
     size_t len;
     char *p;
@@ -471,7 +532,50 @@ void CPUCapabilitiesComponent::detectCPU() {
     std::memcpy(&intValue, p, sizeof(int));
     _L2Associativity = static_cast<unsigned int>(intValue);
     delete[] p;
+#else
+    FILE* file;
+    const unsigned int maxSize = 2048;
+    char line[maxSize];
 
+    // We must use c-style file opening because /proc is no ordinary filesystem
+    file = fopen("/proc/cpuinfo", "r");
+    if(file) {
+        while(fgets(line, maxSize, file) != NULL){
+            if (strncmp(line, "processor", 9) == 0) ++_cores;
+            if (strncmp(line, "model name", 10) == 0) {
+                _cpu = line;
+                _cpu = _cpu.substr(18, _cpu.length()-19);
+            }
+            if (strncmp(line, "cache size", 10) == 0) {
+                std::string tmp = line;
+                tmp = tmp.substr(13, tmp.length() - 14);
+                _cacheSize = static_cast<unsigned int>(strtol(tmp.c_str(), NULL, 0));
+
+            }
+            if (strncmp(line, "flags", 5) == 0) {
+                _extensions = line;
+                _extensions = _extensions.substr(9, _extensions.length() - 10);
+            }
+            memset(line, 0, maxSize);
+        }
+        fclose(file);
+    }
+
+    file = fopen("/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size", "r");
+    if(file) {
+        if(fgets(line, maxSize, file) != NULL){
+            _cacheLineSize = static_cast<unsigned int>(strtol(line, NULL, 0));
+        }
+        fclose(file);
+    }
+
+    file = fopen("/sys/devices/system/cpu/cpu0/cache/index0/ways_of_associativity", "r");
+    if(file) {
+        if(fgets(line, maxSize, file) != NULL){
+            _L2Associativity = static_cast<unsigned int>(strtol(line, NULL, 0));
+        }
+        fclose(file);
+    }
 #endif
 }
 
