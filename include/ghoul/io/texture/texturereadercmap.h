@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __TEXTUREREADERDEVIL_H__
-#define __TEXTUREREADERDEVIL_H__
+#ifndef __TEXTUREREADERCMAP_H__
+#define __TEXTUREREADERCMAP_H__
 
 #include <ghoul/io/texture/texturereaderbase.h>
 
@@ -33,10 +33,9 @@ namespace io {
 namespace impl {
 
 /**
- * Loads the texture using the DevIL library. For a list of supported image formats, see 
- * http://openil.sourceforge.net/features.php.
+ * Reads the cmap file that is used in AMNH's Digital Universe data package.
  */
-class TextureReaderDevIL : public TextureReaderBase {
+class TextureReaderCMAP : public TextureReaderBase {
 public:
 	opengl::Texture* loadTexture(const std::string& filename) const override;
 	std::set<std::string> supportedExtensions() const override;
@@ -46,4 +45,4 @@ public:
 } // namespace io
 } // namespace ghoul
 
-#endif // __TEXTUREREADERDEVIL_H__
+#endif // __TEXTUREREADERCMAP_H__

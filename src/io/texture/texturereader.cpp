@@ -50,8 +50,10 @@ opengl::Texture* TextureReader::loadTexture(const std::string& filename) {
 	TextureReaderBase* reader = readerForExtension(extension);
 	if (reader)
 		return reader->loadTexture(filename);
-	else
+	else {
+		LERROR("No reader was found for extension '" << extension << "'");
 		return nullptr;
+	}
 }
 
 void TextureReader::addReader(TextureReaderBase* reader) {

@@ -23,27 +23,85 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __TEXTUREREADERDEVIL_H__
-#define __TEXTUREREADERDEVIL_H__
+#include <ghoul/io/texture/texturereadercmap.h>
 
-#include <ghoul/io/texture/texturereaderbase.h>
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/opengl/texture.h>
+
+#include <fstream>
+#include <sstream>
+#include <stdint.h>
+
+namespace {
+	const std::string _loggerCat = "TextureReaderCMAP";
+}
 
 namespace ghoul {
 namespace io {
 namespace impl {
 
-/**
- * Loads the texture using the DevIL library. For a list of supported image formats, see 
- * http://openil.sourceforge.net/features.php.
- */
-class TextureReaderDevIL : public TextureReaderBase {
-public:
-	opengl::Texture* loadTexture(const std::string& filename) const override;
-	std::set<std::string> supportedExtensions() const override;
-};
+opengl::Texture* TextureReaderCMAP::loadTexture(const std::string& filename) const {
+	std::ifstream file(filename);
+	if (!file.good()) {
+		LERROR("Could not open file '" << filename << "' for loading");
+		return nullptr;
+	}
+
+	int width = -1; // Width of the texture
+	uint8_t* values;
+
+	std::string line;
+	int i = 0;
+	while (file.good()) {
+		std::getline(file, line);
+		// Skip empty lines
+		if (line.empty())
+			continue;
+		// # defines a comment
+		if (line[0] == '#')
+			continue;
+
+		std::stringstream s(line);
+		if (width == -1) {
+			// Width hasn't been set yet and we have a value, so it has to be the width
+			s >> width;
+			values = new uint8_t[width * 4];
+			continue;
+		}
+
+		float r,g,b,a;
+
+		s >> r;
+		s >> g;
+		s >> b;
+		s >> a;
+
+		values[i++] = static_cast<uint8_t>(r * 255);
+		values[i++] = static_cast<uint8_t>(g * 255);
+		values[i++] = static_cast<uint8_t>(b * 255);
+		values[i++] = static_cast<uint8_t>(a * 255);
+	}
+
+	if ((width * 4) != i) {
+		LERROR("Header assured " << width << " values, but " << i / 4.f <<
+			"were found");
+		return nullptr;
+	}
+
+	using opengl::Texture;
+	Texture* texture = new Texture(
+		values,							// data
+		glm::size3_t(width, 1, 1),		// dimensions
+		Texture::Format::RGBA			// Format
+	);
+
+	return texture;
+}
+
+std::set<std::string> TextureReaderCMAP::supportedExtensions() const {
+	return { "cmap" };
+}
 
 } // namespace impl
 } // namespace io
 } // namespace ghoul
-
-#endif // __TEXTUREREADERDEVIL_H__
