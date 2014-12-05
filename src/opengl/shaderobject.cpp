@@ -351,28 +351,21 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 		return false;
 	}
 
-	// Check that file can be opened
-	std::ifstream f(filename, std::ifstream::in);
-	if (!f.is_open()) {
-		LWARNING("Could not open '" << filename << "': " << strerror(errno));
-		return false;
-	}
-
-	// Construct a file object
+	// Construct a file object, track the current file 
+	// even if we cannot open the file
 	using namespace ghoul::filesystem;
-	
-	// CODE FOR DEBUG PURPOSE
-	//filesystem::File::FileChangedCallback c = nullptr;
-	//c = [ this](const filesystem::File&){
-	//	LDEBUG("Update fired from " << name());
-	//	if (_onChangeCallback)
-	//		_onChangeCallback;
-	//};
-	
 	File* fileObject = new File(filename, false);
 	if (track) {
 		fileObject->setCallback(_onChangeCallback);
 		_trackedFiles[filename] = fileObject;
+	}
+
+	// Check that file can be opened
+	std::ifstream f(filename, std::ifstream::in);
+	if (!f.good()) {
+		LWARNING("Could not open '" << filename << "': " << strerror(errno));
+		f.close();
+		return false;
 	}
 
 	// Ready to start parsing
