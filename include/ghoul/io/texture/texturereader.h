@@ -26,6 +26,7 @@
 #ifndef __TEXTUREREADER_H__
 #define __TEXTUREREADER_H__
 
+#include <string>
 #include <vector>
 
 namespace ghoul {
