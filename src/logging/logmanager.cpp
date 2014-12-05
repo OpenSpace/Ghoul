@@ -28,6 +28,7 @@
 #include <cassert>
 #include <algorithm>
 #include <atomic>
+#include <map>
 #include <vector>
 
 namespace ghoul {
@@ -108,6 +109,23 @@ std::string LogManager::stringFromLevel(LogLevel level) {
     assert(false);
     return "";
 }
+
+LogManager::LogLevel LogManager::levelFromString(const std::string& level) {
+	std::map<std::string, LogLevel> levels = {
+		{ "Debug"  , LogLevel::Debug },
+		{ "Info"   , LogLevel::Info },
+		{ "Warning", LogLevel::Warning },
+		{ "Error"  , LogLevel::Error },
+		{ "Fatal"  , LogLevel::Fatal },
+		{ "None"   , LogLevel::None }
+	};
+
+	auto it = levels.find(level);
+	assert(it != levels.end());
+	return it->second;
+}
+
+
 
 void LogManager::initialize(LogManager::LogLevel level, bool immediateFlush) {
     assert(_manager == nullptr);

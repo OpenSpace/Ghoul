@@ -181,6 +181,13 @@ public:
      */
     static std::string stringFromLevel(LogLevel level);
 
+	/**
+     * Returns the LogManager::LogLevel for the passed string representation. The name of
+     * each level is equal to its enum value.
+     * \return The the LogManager::LogLevel for the passed string representation
+     */
+	static LogLevel levelFromString(const std::string& level);
+
 protected:
     std::vector<Log*> _logs;  ///< Stores the Logs which are managed by this LogManager
 

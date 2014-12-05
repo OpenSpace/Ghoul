@@ -656,9 +656,7 @@ void FileSystem::destroyCacheManager() {
 }
 
 CacheManager* FileSystem::cacheManager() {
-#ifdef GHL_DEBUG
 	assert(_cacheManager);
-#endif
 	return _cacheManager;
 }
 
