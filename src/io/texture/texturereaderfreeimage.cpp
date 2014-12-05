@@ -25,6 +25,8 @@
 
 #include <ghoul/io/texture/texturereaderfreeimage.h>
 
+#ifndef GHOUL_USE_DEVIL
+
 #include <ghoul/opengl/texture.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/glm.h>
@@ -195,3 +197,5 @@ std::set<std::string> TextureReaderFreeImage::supportedExtensions() const {
 } // namespace impl
 } // namespace opengl
 } // namespace ghoul
+
+#endif // GHOUL_USE_DEVIL

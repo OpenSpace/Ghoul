@@ -25,6 +25,8 @@
 
 #include <ghoul/io/texture/texturereaderdevil.h>
 
+#ifdef GHOUL_USE_DEVIL
+
 #include <ghoul/opengl/texture.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/glm.h>
@@ -174,3 +176,5 @@ std::set<std::string> TextureReaderDevIL::supportedExtensions() const {
 } // namespace impl
 } // namespace opengl
 } // namespace ghoul
+
+#endif // GHOUL_USE_DEVIL
