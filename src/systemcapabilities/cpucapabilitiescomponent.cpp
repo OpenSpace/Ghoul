@@ -490,6 +490,13 @@ void CPUCapabilitiesComponent::detectCPU() {
     _cpu = p;
     delete[] p;
     
+    // CPU features/extensions
+    sysctlbyname( "machdep.cpu.features", NULL, &len, NULL, 0 );
+    p = new char[len];
+    sysctlbyname( "machdep.cpu.features", p, &len, NULL, 0 );
+    _extensions = p;
+    delete[] p;
+    
     // It works using reinterpret_cast<char*>(&intValue) directly
     // since the expected size is an integer. But to avoid risks
     // of memory corruption I have chosen the C-style detection
