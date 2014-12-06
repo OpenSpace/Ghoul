@@ -34,6 +34,8 @@ namespace ghoul {
 namespace io {
 namespace impl {
 
+#ifdef GHOUL_USE_FREEIMAGE
+
 /**
  * Loads the texture using the FreeImage library and creates a Texture object from it.
  */
@@ -42,6 +44,9 @@ public:
 	opengl::Texture* loadTexture(const std::string& filename) const override;
 	std::set<std::string> supportedExtensions() const override;
 };
+#else
+	namespace { char silenceLNK4221; };
+#endif // GHOUL_USE_FREEIMAGE
 
 } // namespace impl
 } // namespace io

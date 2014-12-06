@@ -25,7 +25,7 @@
 
 #include <ghoul/io/texture/texturereaderfreeimage.h>
 
-#ifndef GHOUL_USE_DEVIL
+#ifdef GHOUL_USE_FREEIMAGE
 
 #include <ghoul/opengl/texture.h>
 #include <ghoul/logging/logmanager.h>

@@ -32,6 +32,8 @@ namespace ghoul {
 namespace io {
 namespace impl {
 
+#ifdef GHOUL_USE_DEVIL
+
 /**
  * Loads the texture using the DevIL library. For a list of supported image formats, see 
  * http://openil.sourceforge.net/features.php.
@@ -41,6 +43,12 @@ public:
 	opengl::Texture* loadTexture(const std::string& filename) const override;
 	std::set<std::string> supportedExtensions() const override;
 };
+
+#else
+
+	namespace { char silenceLNK4221; };
+
+#endif // GHOUL_USE_DEVIL
 
 } // namespace impl
 } // namespace io
