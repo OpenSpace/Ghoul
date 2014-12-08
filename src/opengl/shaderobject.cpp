@@ -29,6 +29,7 @@
 #include <ghoul/filesystem/filesystem>
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/filesystem/file.h>
+#include <ghoul/misc/crc32.h>
 
 #include <algorithm>
 #include <cassert>
@@ -153,7 +154,7 @@ ShaderObject::~ShaderObject() {
     glDeleteShader(_id);
 	_id = 0;
 	for (auto f : _trackedFiles)
-		delete f.second;
+		delete f;
 }
 
 ShaderObject::operator GLuint() const {
@@ -216,7 +217,7 @@ void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) 
 	_onChangeCallback = changeCallback;
 
 	for (auto fileObject : _trackedFiles) {
-		fileObject.second->setCallback(_onChangeCallback);
+		fileObject->setCallback(_onChangeCallback);
 	}
 }
 
@@ -237,7 +238,7 @@ bool ShaderObject::setShaderFilename(std::string filename) {
 
 	// Clear tracked files, this might have changed since last time
 	for (auto f : _trackedFiles)
-		delete f.second;
+		delete f;
 	_trackedFiles.erase(_trackedFiles.begin(), _trackedFiles.end());
 
 	// No need to alocate a new contents string for every shader
@@ -253,7 +254,10 @@ bool ShaderObject::setShaderFilename(std::string filename) {
 	ghoul::filesystem::File ghlFile(_fileName);
 	if (!FileSys.cacheManager() || 
 		!FileSys.cacheManager()->getCachedFile(
-			_fileName,
+			// we use the .baseName() version because otherwise we get a new file 
+			// every time we reload the shader
+			ghlFile.baseName(), 
+			"",
 			generatedFilename,
 			true)
 		)
@@ -301,9 +305,18 @@ bool ShaderObject::compile() {
             return false;
         }
 
+		std::string filedefs = "";
+		size_t filehash = 0;
+		for (auto file : _trackedFiles) {
+			const std::string& path = file->path();
+			filedefs += std::to_string(filehash) + ": " + path + "\n";
+			++filehash;
+		}
+
         GLchar* log = new GLchar[logLength];
         glGetShaderInfoLog(_id, logLength, NULL, log);
-        LERROR(typeAsString() + " compile error:\n" + log);
+		LERROR(typeAsString() << " compile error:\n" << log << std::endl << filedefs);
+
         delete[] log;
 
         return false;
@@ -345,19 +358,22 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 	}
 
 	// Check that the file is currently not in _trackedFiles
-	auto s = _trackedFiles.find(filename);
-	if (s != _trackedFiles.end()) {
-		LWARNING("Already including '" << filename << "'");
-		return false;
+	for (const auto f : _trackedFiles) {
+		if (f->path() == filename) {
+			LWARNING("Already including '" << filename << "'");
+			return false;
+		}
 	}
 
 	// Construct a file object, track the current file 
 	// even if we cannot open the file
 	using namespace ghoul::filesystem;
 	File* fileObject = new File(filename, false);
+	int fileHash = -1;
 	if (track) {
 		fileObject->setCallback(_onChangeCallback);
-		_trackedFiles[filename] = fileObject;
+		fileHash = static_cast<int>(_trackedFiles.size());
+		_trackedFiles.push_back( fileObject);
 	}
 
 	// Check that file can be opened
@@ -370,12 +386,21 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 
 	// Ready to start parsing
 	// ugly slightly more efficient version, 3-4x faster
+	unsigned int lineNumber = 0;
 	static std::string line;
 	static const std::string ws = " \n\r\t";
 	static const std::string includeString = "#include";
 	static const std::string notrackString = ":notrack";
 	static const std::string versionString = "#version __CONTEXT__";
+
+
+	auto addLineDef = [&lineNumber, &fileHash](std::string* content) 
+	{
+		*content += "#line " + std::to_string(lineNumber) + " " + std::to_string(fileHash) + "\n";
+	};
+	addLineDef(&content);
 	while (std::getline(f, line)) {
+		++lineNumber;
 		size_t start_pos = line.find_first_not_of(ws);
 		if (start_pos == std::string::npos)
 			start_pos = 0;
@@ -405,10 +430,12 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 							if (line.find_first_of(notrackString, p2) != std::string::npos)
 								keepTrack = false;
 						}
-						content += "// Begin including '" + includeFilename + "'\n";
+
+						content += ";// Begin including '" + includeFilename + "'\n";
 						if (!readFile(includeFilename, content, track && keepTrack))
 							content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
-						content += "// End including '" + includeFilename + "'\n";
+						content += ";// End including '" + includeFilename + "'\n";
+						addLineDef(&content);
 						success = true;
 					}
 				}
@@ -423,10 +450,13 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 							if (line.find_first_of(notrackString, p2) != std::string::npos)
 								keepTrack = false;
 						}
-						content += "// Begin including '" + includeFilename + "'\n";
+
+						content += ";// Begin including '" + includeFilename + "'\n";
 						if (!readFile(includeFilename, content, track && keepTrack))
 							content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
-						content += "// End including '" + includeFilename + "'\n";
+						content += ";// End including '" + includeFilename + "'\n";
+						lineNumber += 1;
+						addLineDef(&content);
 						success = true;
 					}
 				}

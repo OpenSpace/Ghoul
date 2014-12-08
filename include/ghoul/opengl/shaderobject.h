@@ -30,7 +30,7 @@
 //#include <ghoul/filesystem/file.h>
 
 #include <string>
-#include <map>
+#include <vector>
 #include <functional>
 
 namespace ghoul {
@@ -253,7 +253,7 @@ private:
 	ShaderObjectCallback _onChangeCallback;
 
 	/// Recursively #included files
-	std::map<std::string, ghoul::filesystem::File*> _trackedFiles;
+	std::vector<ghoul::filesystem::File*> _trackedFiles;
 
 	/**
 	 * Recursive file loading
