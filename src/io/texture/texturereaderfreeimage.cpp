@@ -59,8 +59,6 @@ opengl::Texture* TextureReaderFreeImage::loadTexture(const std::string& filename
 	BYTE* bits(0);
 	//image width and height
 	unsigned int width(0), height(0);
-	//OpenGL's image ID to map to
-	GLuint gl_texID;
 
 	//check the file signature and deduce its format
 	fif = FreeImage_GetFileType(filename.c_str(), 0);
@@ -92,7 +90,7 @@ opengl::Texture* TextureReaderFreeImage::loadTexture(const std::string& filename
 
 	FREE_IMAGE_TYPE			imageType = FreeImage_GetImageType(dib);
 	FREE_IMAGE_COLOR_TYPE	colorType = FreeImage_GetColorType(dib);
-	BITMAPINFOHEADER*		infoheader = FreeImage_GetInfoHeader(dib);
+	//BITMAPINFOHEADER*		infoheader = FreeImage_GetInfoHeader(dib);
 	/*
 	FIT_UNKNOWN = 0,	// unknown type
 		FIT_BITMAP = 1,	// standard image			: 1-, 4-, 8-, 16-, 24-, 32-bit

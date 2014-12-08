@@ -245,7 +245,7 @@ void CPUCapabilitiesComponent::detectMemory() {
 }
 
 void CPUCapabilitiesComponent::detectCPU() {
-#if defined(WIN32)
+#ifdef WIN32
     // names from Linux extension flags
     /*
     fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts 
@@ -341,10 +341,6 @@ void CPUCapabilitiesComponent::detectCPU() {
 	int nCLFLUSHcachelinesize = 0;
 	int nAPICPhysicalID = 0;
 	int nFeatureInfo = 0;
-	int nCacheLineSize = 0;
-	int nL2Associativity = 0;
-	int nCacheSizeK = 0;
-	int nRet = 0;
 	unsigned    nIds, nExIds, i;
 	bool    bSSE3NewInstructions = false;
 	bool    bMONITOR_MWAIT = false;

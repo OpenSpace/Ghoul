@@ -48,7 +48,7 @@ opengl::Texture* TextureReaderCMAP::loadTexture(const std::string& filename) con
 	}
 
 	int width = -1; // Width of the texture
-	uint8_t* values;
+	uint8_t* values = nullptr;
 
 	std::string line;
 	int i = 0;
@@ -67,6 +67,12 @@ opengl::Texture* TextureReaderCMAP::loadTexture(const std::string& filename) con
 			s >> width;
 			values = new uint8_t[width * 4];
 			continue;
+		}
+
+		if (!values) {
+			LERROR("The first non-comment, non-empty line must contain the width of "
+				"the image");
+			return nullptr;
 		}
 
 		float r,g,b,a;
