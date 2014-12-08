@@ -52,3 +52,11 @@ Copyright © 1994–2014 Lua.org, PUC-Rio.
 
 Webpage: http://www.lua.org
 License: MIT license (http://opensource.org/licenses/mit-license.html)
+
+
+Observer Pattern
+===
+Copyright (c) 2013 Juan Palacios juan.palacios.puyana@gmail.com
+
+Webpage: https://github.com/juanchopanza/cppblog/tree/master/Patterns/Observer
+License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
