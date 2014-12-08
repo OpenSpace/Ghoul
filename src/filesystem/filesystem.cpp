@@ -420,7 +420,6 @@ bool FileSystem::deleteDirectory(const Directory& path, bool recursive) const {
 	
 	WIN32_FIND_DATA FindFileData;
 	HANDLE hFind;
-	DWORD Attributes; 
 
 	const std::string dirWildcard = dirPath + PathSeparator + "*";
 
@@ -499,7 +498,7 @@ bool FileSystem::deleteDirectory(const Directory& path, bool recursive) const {
 bool FileSystem::emptyDirectory(const Directory& path) const {
     const string& dirPath = path;
 #ifdef WIN32
-	return PathIsDirectoryEmpty(dirPath.c_str());
+	return PathIsDirectoryEmpty(dirPath.c_str()) == TRUE;
 #else
 	int n = 0;
 	struct dirent *d;
