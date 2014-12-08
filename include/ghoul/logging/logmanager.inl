@@ -23,6 +23,12 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+/**
+ * @defgroup LOGGING_MACRO_GROUP Logging Macros
+ *
+ * @{
+ */
+
 /// Logs the 'message' with the 'category' at a level of 'logLevel'
 #define LOGC(__loglevel__, __category__, __message__) \
     do { \
@@ -98,3 +104,5 @@
  * _loggerCat needs to be defined and should contain the category.
  */
 #define LFATAL(__message__) LFATALC(_loggerCat, __message__)
+
+/** @} */
