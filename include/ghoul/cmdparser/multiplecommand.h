@@ -53,83 +53,26 @@ class MultipleCommand : public CommandlineCommand {
 public:
     MultipleCommand(std::vector<T>* ptr1, std::string name,
                     std::string shortName = "", std::string infoText = "",
-                    std::string parameterList = "")
-        : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), std::move(parameterList), 1, true)
-        , _ptr1(ptr1)
-        , _ptr2(nullptr)
-        , _ptr3(nullptr)
-        , _ptr4(nullptr)
-    {}
+                    std::string parameterList = "");
 
     MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2,
                     std::string name, std::string shortName = "",
                     std::string infoText = "",
-                    std::string parameterList = "")
-        : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), std::move(parameterList), 2, true)
-        , _ptr1(ptr1)
-        , _ptr2(ptr2)
-        , _ptr3(nullptr)
-        , _ptr4(nullptr)
-    {}
+                    std::string parameterList = "");
 
     MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2, std::vector<V>* ptr3,
         std::string name, std::string shortName = "",
                     std::string infoText = "",
-                    std::string parameterList = "")
-        : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), std::move(parameterList), 3, true)
-        , _ptr1(ptr1)
-        , _ptr2(ptr2)
-        , _ptr3(ptr3)
-        , _ptr4(nullptr)
-    {}
+                    std::string parameterList = "");
 
     MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2, std::vector<V>* ptr3,
                     std::vector<W>* ptr4, std::string name,
                     std::string shortName = "", std::string infoText = "",
-                    std::string parameterList = "")
-        : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), std::move(parameterList), 4, true)
-        , _ptr1(ptr1)
-        , _ptr2(ptr2)
-        , _ptr3(ptr3)
-        , _ptr4(ptr4)
-    {}
+                    std::string parameterList = "");
 
-    bool execute(const std::vector<std::string>& parameters) {
-        T v1;
-        cast(parameters[0], v1);
-        _ptr1->push_back(v1);
-        if (_ptr2 != nullptr) {
-            U v2;
-            cast<U>(parameters[1], v2);
-            _ptr2->push_back(v2);
-        }
-        if (_ptr3 != nullptr) {
-            V v3;
-            cast<V>(parameters[2], v3);
-            _ptr3->push_back(v3);
-        }
-        if (_ptr4 != nullptr) {
-            W v4;
-            cast<W>(parameters[3], v4);
-            _ptr4->push_back(v4);
-        }
+    bool execute(const std::vector<std::string>& parameters);
 
-        return true;
-    }
-
-    bool checkParameters(const std::vector<std::string>& parameters) {
-        bool result = parameters.size() == static_cast<size_t>(_argumentNum);
-
-        result &= is<T>(parameters[0]);
-        if (_ptr2 != nullptr)
-            result &= is<U>(parameters[1]);
-        if (_ptr3 != nullptr)
-            result &= is<V>(parameters[2]);
-        if (_ptr4 != nullptr)
-            result &= is<W>(parameters[3]);
-
-        return result;
-    }
+    bool checkParameters(const std::vector<std::string>& parameters);
 
 protected:
     std::vector<T>* _ptr1;
@@ -147,17 +90,9 @@ protected:
 class MultipleCommandZeroArguments : public CommandlineCommand {
 public:
     MultipleCommandZeroArguments(int* ptr, std::string name, std::string shortName = "",
-        std::string infoText = "")
-        : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), "", 0, true)
-        , _ptr(ptr)
-    {
-        *_ptr = 0;
-    }
-
-    bool execute(const std::vector<std::string>& /*parameters*/) {
-        ++(*_ptr);
-        return true;
-    }
+        std::string infoText = "");
+    
+	bool execute(const std::vector<std::string>& /*parameters*/);
 
 protected:
     int* _ptr;
@@ -165,5 +100,7 @@ protected:
 
 } // namespace cmdparser
 } // namespace ghoul
+
+#include "multiplecommand.inl"
 
 #endif // __MULTIPLECOMMAND_H__

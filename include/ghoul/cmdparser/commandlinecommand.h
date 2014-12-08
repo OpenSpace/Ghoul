@@ -109,6 +109,7 @@ public:
     /**
      * Returns a message describing the error reported by #checkParameters, or an empty
      * string, if no error has occurred.
+	 * \return The message describing the error reported by #checkParameters
      */
     const std::string& errorMessage() const;
 
