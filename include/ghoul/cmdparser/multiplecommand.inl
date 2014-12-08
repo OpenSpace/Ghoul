@@ -26,7 +26,7 @@
 namespace ghoul {
 namespace cmdparser {
 
-template<class T, class U = T, class V = U, class W = V>
+template<class T, class U, class V, class W>
 MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::string name,
                 std::string shortName, std::string infoText, std::string parameterList)
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
@@ -37,7 +37,7 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::string name
     , _ptr4(nullptr)
 {}
 
-template<class T, class U = T, class V = U, class W = V>
+template<class T, class U, class V, class W>
 MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2,
                 std::string name, std::string shortName, std::string infoText,
                 std::string parameterList)
@@ -49,7 +49,7 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* 
     , _ptr4(nullptr)
 {}
 
-template<class T, class U = T, class V = U, class W = V>
+template<class T, class U, class V, class W>
 MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2,
 				std::vector<V>* ptr3, std::string name, std::string shortName,
                 std::string infoText, std::string parameterList)
@@ -60,7 +60,7 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* 
     , _ptr4(nullptr)
 {}
 
-template<class T, class U = T, class V = U, class W = V>
+template<class T, class U, class V, class W>
 MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2, std::vector<V>* ptr3,
                 std::vector<W>* ptr4, std::string name, std::string shortName,
 				std::string infoText, std::string parameterList)
@@ -72,7 +72,7 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* 
     , _ptr4(ptr4)
 {}
 
-template<class T, class U = T, class V = U, class W = V>
+template<class T, class U, class V, class W>
 bool MultipleCommand<T,U,V,W>::execute(const std::vector<std::string>& parameters) {
     T v1;
     cast(parameters[0], v1);
@@ -96,7 +96,7 @@ bool MultipleCommand<T,U,V,W>::execute(const std::vector<std::string>& parameter
     return true;
 }
 
-template<class T, class U = T, class V = U, class W = V>
+template<class T, class U, class V, class W>
 bool MultipleCommand<T,U,V,W>::checkParameters(const std::vector<std::string>& parameters) {
     bool result = parameters.size() == static_cast<size_t>(_argumentNum);
 
