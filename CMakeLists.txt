@@ -22,44 +22,19 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         #
 #########################################################################################
 
+# @TODO Enable whole program optimization ---abock
+# @TODO Enable inline function expansion ---abock
+# @TODO Check/enable function level linking ---abock
+# @TODO Enable precompiled header ---abock
+
 cmake_minimum_required(VERSION 2.8.0)
 project(Ghoul)
-
-
-#SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix, usually d on windows")
-#SET(CMAKE_RELEASE_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
-#SET(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "add a postfix, usually empty on windows")
-#SET(CMAKE_MINSIZEREL_POSTFIX "s" CACHE STRING "add a postfix, usually empty on windows")
-#${CMAKE_CONFIGURATION_TYPES}
-#        SET(OSG_AGGRESSIVE_WARNING_FLAGS /W4 /wd4706 /wd4127 /wd4100)
-#    IF(OSG_USE_AGGRESSIVE_WARNINGS)
-#        # Add flags defined by OSG_AGGRESSIVE_WARNING_FLAGS if they aren't already there
-#        FOREACH(flag ${OSG_AGGRESSIVE_WARNING_FLAGS})
-#            IF(NOT CMAKE_CXX_FLAGS MATCHES "${flag}")
-#                SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")
-#            ENDIF()
-#        ENDFOREACH()
-#    ELSE()
-#        # Remove all flags considered aggresive
-#        FOREACH(flag ${OSG_AGGRESSIVE_WARNING_FLAGS})
-#            STRING(REGEX REPLACE "${flag}" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-#        ENDFOREACH()
-#    ENDIF()
-
-# Whole Program Optimization
-# Inline function expansion
-# omit frame pointer?
-# function level linking
-# enhanced instructed set
-# hotpatchable image?
-# precompiled header
-# linker: show progress
 
 mark_as_advanced(CMAKE_BACKWARDS_COMPATIBILITY)
 
 if (POLICY CMP0011)
    cmake_policy(SET CMP0011 OLD) # or even better, NEW
-endif (POLICY CMP0011)
+endif ()
 
 if (NOT GHOUL_ROOT_DIR)
     set(GHOUL_ROOT_DIR ${PROJECT_SOURCE_DIR})
@@ -109,7 +84,7 @@ if (NOT GHOUL_USE_DYNAMIC_GLEW)
 endif ()
 
 find_package(DevIL)
-if(IL_FOUND)
+if (IL_FOUND)
     option(GHOUL_USE_DEVIL "Use the DevIL library" ON)
     if (GHOUL_USE_DEVIL)
         add_definitions(-DGHOUL_USE_DEVIL)
@@ -117,7 +92,7 @@ if(IL_FOUND)
         include_directories(${IL_INCLUDE_DIR})
         set(DEVIL_LIBRARIES ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
     endif ()
-endif()
+endif ()
 
 find_package(FreeImage)
 if (FREEIMAGE_FOUND)
@@ -129,8 +104,8 @@ if (FREEIMAGE_FOUND)
     endif()
 endif ()
 
-if(NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE) 
-    message( FATAL_ERROR "Need to build with DevIL or FreeImage" )
+if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE) 
+    message(FATAL_ERROR "Need to build with DevIL or FreeImage")
 endif()
 
 include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
@@ -154,7 +129,7 @@ if (APPLE)
         ${APP_SERVICES_LIBRARY})
 endif()
 
-if(WIN32)
+if (WIN32)
     set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} shlwapi)
 endif()
 
@@ -184,5 +159,4 @@ if (APPLE)
 endif ()
 
 add_subdirectory(src)
-
 add_subdirectory(${GHOUL_ROOT_DIR}/ext/lua)
