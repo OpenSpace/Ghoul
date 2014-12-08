@@ -45,9 +45,7 @@ public:
 };
 
 #else
-
 	namespace { char silenceLNK4221; };
-
 #endif // GHOUL_USE_DEVIL
 
 } // namespace impl
