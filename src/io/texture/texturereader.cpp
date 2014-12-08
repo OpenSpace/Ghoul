@@ -23,12 +23,52 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
- #ifndef __GHOUL_CMDPARSER__
- #define __GHOUL_CMDPARSER__
+#include <ghoul/io/texture/texturereader.h>
 
-#include "commandlinecommand.h"
-#include "commandlineparser.h"
-#include "multiplecommand.h"
-#include "singlecommand.h"
+#include <ghoul/filesystem/file.h>
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/io/texture/texturereaderbase.h>
+#include <set>
 
-#endif // __GHOUL_CMDPARSER__
+namespace {
+	const std::string _loggerCat = "TextureReader";
+}
+
+namespace ghoul {
+namespace io {
+
+std::vector<TextureReaderBase*> TextureReader::_readers;
+
+opengl::Texture* TextureReader::loadTexture(const std::string& filename) {
+	if (_readers.size() == 0) {
+		LERROR("No readers were registered with the TextureReader");
+		return nullptr;
+	}
+
+	std::string extension = ghoul::filesystem::File(filename).fileExtension();
+
+	TextureReaderBase* reader = readerForExtension(extension);
+	if (reader)
+		return reader->loadTexture(filename);
+	else {
+		LERROR("No reader was found for extension '" << extension << "'");
+		return nullptr;
+	}
+}
+
+void TextureReader::addReader(TextureReaderBase* reader) {
+	_readers.push_back(reader);
+}
+
+TextureReaderBase* TextureReader::readerForExtension(const std::string& extension) {
+	for (TextureReaderBase* reader : _readers) {
+		std::set<std::string> extensions = reader->supportedExtensions();
+		auto it = extensions.find(extension);
+		if (it != extensions.end())
+			return reader;
+	}
+	return nullptr;
+}
+
+} // namespace io
+} // namespace ghoul

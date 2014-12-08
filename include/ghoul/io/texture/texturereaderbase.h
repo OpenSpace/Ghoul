@@ -23,12 +23,25 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
- #ifndef __GHOUL_CMDPARSER__
- #define __GHOUL_CMDPARSER__
+#ifndef __TEXTUREREADERBASE_H__
+#define __TEXTUREREADERBASE_H__
 
-#include "commandlinecommand.h"
-#include "commandlineparser.h"
-#include "multiplecommand.h"
-#include "singlecommand.h"
+#include <set>
+#include <string>
 
-#endif // __GHOUL_CMDPARSER__
+namespace ghoul {
+namespace opengl {
+class Texture;
+}
+namespace io {
+
+class TextureReaderBase {
+public:
+	virtual opengl::Texture* loadTexture(const std::string& filename) const = 0;
+	virtual std::set<std::string> supportedExtensions() const = 0;
+};
+
+} // namespace io
+} // namespace ghoul
+
+#endif // __TEXTUREREADERBASE_H__

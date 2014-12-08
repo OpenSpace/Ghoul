@@ -23,12 +23,33 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
- #ifndef __GHOUL_CMDPARSER__
- #define __GHOUL_CMDPARSER__
+#ifndef __TEXTUREREADERFREEIMAGE_H__
+#define __TEXTUREREADERFREEIMAGE_H__
 
-#include "commandlinecommand.h"
-#include "commandlineparser.h"
-#include "multiplecommand.h"
-#include "singlecommand.h"
+#include <ghoul/io/texture/texturereaderbase.h>
 
-#endif // __GHOUL_CMDPARSER__
+#include <string>
+
+namespace ghoul {
+namespace io {
+namespace impl {
+
+#ifdef GHOUL_USE_FREEIMAGE
+
+/**
+ * Loads the texture using the FreeImage library and creates a Texture object from it.
+ */
+class TextureReaderFreeImage : public TextureReaderBase {
+public:
+	opengl::Texture* loadTexture(const std::string& filename) const override;
+	std::set<std::string> supportedExtensions() const override;
+};
+#else
+	namespace { char silenceLNK4221; };
+#endif // GHOUL_USE_FREEIMAGE
+
+} // namespace impl
+} // namespace io
+} // namespace ghoul
+
+#endif // __TEXTUREREADERFREEIMAGE_H__

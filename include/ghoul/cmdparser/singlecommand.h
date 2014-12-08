@@ -65,13 +65,7 @@ public:
      */
     SingleCommand(T* ptr1,
                   const std::string& name, const std::string& shortName = "",
-                  const std::string& infoText = "", const std::string parameterList = "")
-        : CommandlineCommand(name, shortName, infoText, parameterList, 1, false)
-        , _ptr1(ptr1)
-        , _ptr2(nullptr)
-        , _ptr3(nullptr)
-        , _ptr4(nullptr)
-    {}
+                  const std::string& infoText = "", const std::string parameterList = "");
 
     /**
      * This constructor uses two parameters. These can be of the same or different types.
@@ -91,13 +85,7 @@ public:
      */
     SingleCommand(T* ptr1, U* ptr2,
                   const std::string& name, const std::string& shortName = "",
-                  const std::string& infoText = "", const std::string parameterList = "")
-        : CommandlineCommand(name, shortName, infoText, parameterList, 2, false)
-        , _ptr1(ptr1)
-        , _ptr2(ptr2)
-        , _ptr3(nullptr)
-        , _ptr4(nullptr)
-    {}
+                  const std::string& infoText = "", const std::string parameterList = "");
 
     /**
      * This constructor uses three parameters. These can be of the same or different
@@ -119,13 +107,7 @@ public:
      */
     SingleCommand(T* ptr1, U* ptr2, V* ptr3,
                   const std::string& name, const std::string& shortName = "",
-                  const std::string& infoText = "", const std::string parameterList = "")
-        : CommandlineCommand(name, shortName, infoText, parameterList, 3, false)
-        , _ptr1(ptr1)
-        , _ptr2(ptr2)
-        , _ptr3(ptr3)
-        , _ptr4(nullptr)
-    {}
+                  const std::string& infoText = "", const std::string parameterList = "");
 
     /**
      * This constructor uses all four parameters. These can be of the same or different
@@ -149,65 +131,12 @@ public:
      */
     SingleCommand(T* ptr1, U* ptr2, V* ptr3, W* ptr4,
                   const std::string& name, const std::string& shortName = "",
-                  const std::string& infoText = "", const std::string parameterList = "")
-        : CommandlineCommand(name, shortName, infoText, parameterList, 4, false)
-        , _ptr1(ptr1)
-        , _ptr2(ptr2)
-        , _ptr3(ptr3)
-        , _ptr4(ptr4)
-    {}
+                  const std::string& infoText = "", const std::string parameterList = "");
 
     
-    bool execute(const std::vector<std::string>& parameters) {
-        cast(parameters[0], *_ptr1);
-        if (_ptr2 != nullptr)
-            cast(parameters[1], *_ptr2);
-        if (_ptr3 != nullptr)
-            cast(parameters[2], *_ptr3);
-        if (_ptr4 != nullptr)
-            cast(parameters[3], *_ptr4);
+    bool execute(const std::vector<std::string>& parameters);
 
-        return true;
-    }
-
-    bool checkParameters(const std::vector<std::string>& parameters) {
-        std::ostringstream errorStr;
-
-        bool result = parameters.size() == static_cast<size_t>(_argumentNum);
-        if (!result) {
-            errorStr << "Invalid number of parameters: " << parameters.size();
-            errorStr << ", expected: " << _argumentNum;
-            _errorMsg = errorStr.str();
-            return false;
-        }
-
-        result &= is<T>(parameters[0]);
-        if (!result)
-            errorStr << "First parameter invalid";
-
-        if (result && (_ptr2 != nullptr)) {
-            result &= is<U>(parameters[1]);
-            if (!result)
-                errorStr << "Second parameter invalid";
-        }
-
-        if (result && (_ptr3 != nullptr)) {
-            result &= is<V>(parameters[2]);
-            if (!result)
-                errorStr << "Third parameter invalid";
-        }
-
-        if (result && (_ptr4 != nullptr)) {
-            result &= is<W>(parameters[3]);
-            if (!result)
-                errorStr << "Fourth parameter invalid";
-        }
-
-        if (!result)
-            _errorMsg = errorStr.str();
-
-        return result;
-    }
+    bool checkParameters(const std::vector<std::string>& parameters);
 
 protected:
     T* _ptr1;
@@ -226,15 +155,9 @@ class SingleCommandZeroArguments : public CommandlineCommand {
 public:
     SingleCommandZeroArguments(bool* ptr, std::string name,
                                std::string shortName = "",
-                               std::string infoText = "")
-        : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), "", 0, false)
-        , _ptr(ptr)
-    {}
+                               std::string infoText = "");
 
-    bool execute(const std::vector<std::string>& /*parameters*/) {
-        *_ptr = true;
-        return true;
-    }
+    bool execute(const std::vector<std::string>& /*parameters*/);
 
 protected:
     bool* _ptr;
@@ -242,5 +165,7 @@ protected:
 
 } // namespace cmdparser
 } // namespace ghoul
+
+#include "singlecommand.inl"
 
 #endif // VRN_SINGLECOMMAND_H

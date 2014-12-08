@@ -23,12 +23,24 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
- #ifndef __GHOUL_CMDPARSER__
- #define __GHOUL_CMDPARSER__
+#include "ghoul/cmdparser/multiplecommand.h"
 
-#include "commandlinecommand.h"
-#include "commandlineparser.h"
-#include "multiplecommand.h"
-#include "singlecommand.h"
+namespace ghoul {
+namespace cmdparser {
 
-#endif // __GHOUL_CMDPARSER__
+MultipleCommandZeroArguments::MultipleCommandZeroArguments(int* ptr, std::string name,
+	std::string shortName, std::string infoText)
+    : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), "",
+		0, true)
+    , _ptr(ptr)
+{
+    *_ptr = 0;
+}
+
+bool MultipleCommandZeroArguments::execute(const std::vector<std::string>& /*parameters*/) {
+    ++(*_ptr);
+    return true;
+}
+
+} // namespace cmdparser
+} // namespace ghoul

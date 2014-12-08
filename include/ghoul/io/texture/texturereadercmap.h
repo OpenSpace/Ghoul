@@ -23,12 +23,26 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
- #ifndef __GHOUL_CMDPARSER__
- #define __GHOUL_CMDPARSER__
+#ifndef __TEXTUREREADERCMAP_H__
+#define __TEXTUREREADERCMAP_H__
 
-#include "commandlinecommand.h"
-#include "commandlineparser.h"
-#include "multiplecommand.h"
-#include "singlecommand.h"
+#include <ghoul/io/texture/texturereaderbase.h>
 
-#endif // __GHOUL_CMDPARSER__
+namespace ghoul {
+namespace io {
+namespace impl {
+
+/**
+ * Reads the cmap file that is used in AMNH's Digital Universe data package.
+ */
+class TextureReaderCMAP : public TextureReaderBase {
+public:
+	opengl::Texture* loadTexture(const std::string& filename) const override;
+	std::set<std::string> supportedExtensions() const override;
+};
+
+} // namespace impl
+} // namespace io
+} // namespace ghoul
+
+#endif // __TEXTUREREADERCMAP_H__

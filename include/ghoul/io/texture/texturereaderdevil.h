@@ -23,12 +23,35 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
- #ifndef __GHOUL_CMDPARSER__
- #define __GHOUL_CMDPARSER__
+#ifndef __TEXTUREREADERDEVIL_H__
+#define __TEXTUREREADERDEVIL_H__
 
-#include "commandlinecommand.h"
-#include "commandlineparser.h"
-#include "multiplecommand.h"
-#include "singlecommand.h"
+#include <ghoul/io/texture/texturereaderbase.h>
 
-#endif // __GHOUL_CMDPARSER__
+namespace ghoul {
+namespace io {
+namespace impl {
+
+#ifdef GHOUL_USE_DEVIL
+
+/**
+ * Loads the texture using the DevIL library. For a list of supported image formats, see 
+ * http://openil.sourceforge.net/features.php.
+ */
+class TextureReaderDevIL : public TextureReaderBase {
+public:
+	opengl::Texture* loadTexture(const std::string& filename) const override;
+	std::set<std::string> supportedExtensions() const override;
+};
+
+#else
+
+	namespace { char silenceLNK4221; };
+
+#endif // GHOUL_USE_DEVIL
+
+} // namespace impl
+} // namespace io
+} // namespace ghoul
+
+#endif // __TEXTUREREADERDEVIL_H__
