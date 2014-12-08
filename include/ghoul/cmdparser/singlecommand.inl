@@ -26,7 +26,7 @@
 namespace ghoul {
 namespace cmdparser {
 
-template<typename T, typename U = T, typename V = U, typename W = V>
+template<typename T, typename U, typename V, typename W>
 SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, const std::string& name,
                              const std::string& shortName,
                              const std::string& infoText,
@@ -38,7 +38,7 @@ SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, const std::string& name,
 	, _ptr4(nullptr)
 {}
 
-template<typename T, typename U = T, typename V = U, typename W = V>
+template<typename T, typename U, typename V, typename W>
 SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, const std::string& name,
                              const std::string&  shortName,
                              const std::string& infoText,
@@ -50,7 +50,7 @@ SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, const std::string& na
 	, _ptr4(nullptr)
 {}
 
-template<typename T, typename U = T, typename V = U, typename W = V>
+template<typename T, typename U, typename V, typename W>
 SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, V* ptr3,
 							const std::string& name,
                              const std::string& shortName,
@@ -63,7 +63,7 @@ SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, V* ptr3,
 	, _ptr4(nullptr)
 {}
 
-template<typename T, typename U = T, typename V = U, typename W = V>
+template<typename T, typename U, typename V, typename W>
 SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, V* ptr3, W* ptr4,
 							 const std::string& name,
 							 const std::string& shortName,
@@ -76,7 +76,7 @@ SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, V* ptr3, W* ptr4,
 	, _ptr4(ptr4)
 {}
 
-template<typename T, typename U = T, typename V = U, typename W = V>
+template<typename T, typename U, typename V, typename W>
 bool SingleCommand<T, U, V, W>::execute(const std::vector<std::string>& parameters) {
     cast(parameters[0], *_ptr1);
     if (_ptr2 != nullptr)
@@ -89,7 +89,7 @@ bool SingleCommand<T, U, V, W>::execute(const std::vector<std::string>& paramete
     return true;
 }
 
-template<typename T, typename U = T, typename V = U, typename W = V>
+template<typename T, typename U, typename V, typename W>
 bool SingleCommand<T, U, V, W>::checkParameters(
 										const std::vector<std::string>& parameters)
 {
