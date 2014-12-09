@@ -75,7 +75,7 @@ void FileSystem::addFileListener(File* file) {
 	int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
     auto eqRange = _trackedFiles.equal_range(wd);
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        if (it.second == file) {
+        if (it->second == file) {
             LERROR("Already tracking fileobject");
             return;
         }
@@ -91,9 +91,9 @@ void FileSystem::removeFileListener(File* file) {
     int count = _trackedFiles.count(wd);
     auto eqRange = _trackedFiles.equal_range(wd);
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        if (it.second == file) {
+        if (it->second == file) {
             if(count == 1)
-                ( void ) inotify_rm_watch( _inotifyHandle, it.first );
+                ( void ) inotify_rm_watch( _inotifyHandle, it->first );
             _trackedFiles.erase(it);
             return;
         }
