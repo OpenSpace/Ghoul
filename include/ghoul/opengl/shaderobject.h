@@ -233,6 +233,19 @@ public:
      */
     static std::string stringForShaderType(ShaderType type);
 
+	/**
+	 * Adds the passed folder to the list of include paths that are checked when a shader
+	 * includes a file. The list of include paths is traversed in the order in which they
+	 * where added to this class. If the folder does not exist, an error is logged, the
+	 * list of include paths is unchanged and <code>false</code> is returned. The folder
+	 * in which the shader is located will always be treated as if being on the top of the
+	 * list.
+	 * \param folderPath The folder that should be added to the list of include paths
+	 * \return <code>true</code> if the <code>folderPath</code> was added successfully,
+	 * <code>false</code> otherwise
+	 */
+	static bool addIncludePath(std::string folderPath);
+
 private:
     /// The OpenGL name of this ShaderObject
     GLuint _id;
@@ -259,6 +272,12 @@ private:
 	 * Recursive file loading
 	 */
 	bool readFile(const std::string& filename, std::string& content, bool track = true);
+
+	/**
+	 * The list of include paths that will be checked if a shader <code>include</code>s
+	 * another shader
+	 */
+	static std::vector<std::string> _includePaths;
 };
 
 } // namespace opengl

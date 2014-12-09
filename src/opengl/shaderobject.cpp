@@ -64,6 +64,8 @@ std::string glslVersionString() {
 namespace ghoul {
 namespace opengl {
 
+std::vector<std::string> ShaderObject::_includePaths = std::vector<std::string>();
+
 ShaderObject::ShaderObject(ShaderType shaderType)
     : _id(0)
     , _type(shaderType)
@@ -431,10 +433,36 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 								keepTrack = false;
 						}
 
-						content += ";// Begin including '" + includeFilename + "'\n";
-						if (!readFile(includeFilename, content, track && keepTrack))
-							content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
-						content += ";// End including '" + includeFilename + "'\n";
+						bool includeFileWasFound = FileSys.fileExists(includeFilename);
+
+						// Resolve the include paths if this default includeFilename does
+						// not exist
+						if (!includeFileWasFound) {
+							for (const std::string& includePath : _includePaths) {
+								includeFilename = includePath + FileSystem::PathSeparator + line.substr(p1 + 1, p2 - p1 - 1);
+
+								if (FileSys.fileExists(includeFilename)) {
+									includeFileWasFound = true;
+									break;
+								}
+							}
+						}
+
+						if (includeFileWasFound) {
+							// The ; are in the code for forcing compiler errors to occur
+							// in the correct file. Otherwise, they would leak from the
+							// included file into the source file (and vice versa)
+							content += ";// Begin including '" + includeFilename + "'\n";
+							if (!readFile(includeFilename, content, track && keepTrack))
+								content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
+							content += ";// End including '" + includeFilename + "'\n";
+						}
+						else {
+							LERROR("Could not resolve file path for include file '" <<
+								line.substr(p1 + 1, p2 - p1 - 1) << "'");
+
+							content += ";// Error including file '" + line.substr(p1 + 1, p2 - p1 - 1) + "'\n";
+						}
 						addLineDef(&content);
 						success = true;
 					}
@@ -479,6 +507,30 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 	}
 
 	f.close();
+	return true;
+}
+
+bool ShaderObject::addIncludePath(std::string folderPath) {
+	folderPath = absPath(folderPath);
+
+	// We only want unique values in this list
+	if (std::find(_includePaths.begin(), _includePaths.end(), folderPath)
+			!= _includePaths.end())
+	{
+		LERRORC("ShaderObject", 
+			"Include path '" << folderPath << "' was already registered");
+		return false;
+	}
+
+	// We only want valid folders in this folder
+	if (!FileSys.directoryExists(folderPath)) {
+		LERRORC("ShaderObject",
+			"Include path '" << folderPath << "' is not a valid folder");
+		return false;
+	}
+
+	// If we managed to get to this place, we have a valid directory
+	_includePaths.push_back(std::move(folderPath));
 	return true;
 }
 
