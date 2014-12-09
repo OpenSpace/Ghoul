@@ -127,25 +127,26 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
                       _programName.c_str());
     }
 
-	for (auto it = cpy._shaderObjects.cbegin(); it != cpy._shaderObjects.cend(); ++it) {
-        if (it->second) {
+	for (const ManagedShaderObject& obj : cpy._shaderObjects) {
+	//for (auto it = cpy._shaderObjects.cbegin(); it != cpy._shaderObjects.cend(); ++it) {
+        if (obj.second) {
             // ProgramObject owns ShaderObjects
-			ShaderObject* shaderCopy = new ShaderObject(*(it->first));
+			ShaderObject* shaderCopy = new ShaderObject(*(obj.first));
 			glAttachShader(_id, *shaderCopy);
 			_shaderObjects.emplace_back(shaderCopy, true);
         }
 		else {
-			glAttachShader(_id, *(it->first));
-			_shaderObjects.push_back(*it);
+			glAttachShader(_id, *(obj.first));
+			_shaderObjects.push_back(obj);
 		}
     }
 }
 
 ProgramObject::~ProgramObject() {
-	for (auto it: _shaderObjects) {
+	for (const ManagedShaderObject& obj : _shaderObjects) {
         // Only delete ShaderObjects that belong to this ProgramObject
-        if (it.second)
-            delete it.first;
+        if (obj.second)
+            delete obj.first;
     }
     _shaderObjects.clear();
     glDeleteProgram(_id);
@@ -171,10 +172,10 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
         _ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
         _ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
 
-        for (auto it = _shaderObjects.begin(); it != _shaderObjects.end(); ++it) {
+		for (const ManagedShaderObject& obj : _shaderObjects) {
             // Only delete ShaderObjects that belong to this ProgramObject
-            if (it->second)
-                delete it->first;
+            if (obj.second)
+                delete obj.first;
         } 
         _shaderObjects.clear();
         glDeleteProgram(_id);
@@ -190,18 +191,16 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
                           _programName.c_str());
         }
 
-        for (auto it = rhs._shaderObjects.cbegin();
-             it != rhs._shaderObjects.end(); ++it)
-		{
-            if (it->second) {
+		for (const ManagedShaderObject& obj : rhs._shaderObjects) {
+            if (obj.second) {
                 // ProgramObject owns ShaderObjects
-				ShaderObject* shaderCopy = new ShaderObject(*(it->first));
+				ShaderObject* shaderCopy = new ShaderObject(*(obj.first));
 				glAttachShader(_id, *shaderCopy);
 				_shaderObjects.emplace_back(shaderCopy, true);
             }
 			else {
-				glAttachShader(_id, *(it->first));
-				_shaderObjects.push_back(*it);
+				glAttachShader(_id, *(obj.first));
+				_shaderObjects.push_back(obj);
 			}
         }
     }
@@ -228,10 +227,10 @@ ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) {
 		_ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
 		_ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
 
-		for (auto it = _shaderObjects.begin(); it != _shaderObjects.end(); ++it) {
+		for (const ManagedShaderObject& obj : _shaderObjects) {
 			// Only delete ShaderObjects that belong to this ProgramObject
-			if (it->second) {
-				delete it->first;
+			if (obj.second) {
+				delete obj.first;
 			}
 		}
 		_shaderObjects.clear();
@@ -261,9 +260,8 @@ void ProgramObject::setProgramObjectCallback(ProgramObjectCallback changeCallbac
 	filesystem::File::FileChangedCallback c = [this, changeCallback](const filesystem::File&){
 		changeCallback(this);
 	};
-	for (auto shaderObject : _shaderObjects) {
+	for (const ManagedShaderObject& shaderObject : _shaderObjects)
 		shaderObject.first->setShaderObjectCallback(c);
-	}
 }
 
 bool ProgramObject::hasName() const {
@@ -278,10 +276,10 @@ void ProgramObject::attachObject(ShaderObject* shaderObject, bool transferOwners
     }
 #ifdef GHL_DEBUG
     // Check if ShaderObject is already attached
-    for (auto it = _shaderObjects.begin(); it != _shaderObjects.end(); ++it) {
-        if (it->first == shaderObject) {
-            if (it->first->hasName()) {
-                const std::string& name = it->first->name();
+	for (const ManagedShaderObject& obj : _shaderObjects) {
+        if (obj.first == shaderObject) {
+            if (obj.first->hasName()) {
+                const std::string& name = obj.first->name();
                 LWARNING("Shader object [" + name + "] already attached");
             }
             else
@@ -333,8 +331,8 @@ bool ProgramObject::compileShaderObjects() {
     }
 #endif
     bool success = true;
-    for (auto it = _shaderObjects.cbegin(); it != _shaderObjects.cend(); ++it)
-        success &= it->first->compile();
+	for (const ManagedShaderObject& obj : _shaderObjects)
+        success &= obj.first->compile();
 
     return success;
 }

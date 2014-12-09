@@ -625,7 +625,7 @@ bool FileSystem::expandPathTokens(std::string& path) const {
 
 std::vector<std::string> FileSystem::tokens() const {
 	std::vector<std::string> tokens;
-	for (auto token : _tokenMap) {
+	for (const auto& token : _tokenMap) {
 		tokens.push_back(token.first);
 	}
 	return tokens;

@@ -153,7 +153,7 @@ ShaderObject::ShaderObject(ShaderObject&& rhs) {
 ShaderObject::~ShaderObject() {
     glDeleteShader(_id);
 	_id = 0;
-	for (auto f : _trackedFiles)
+	for (ghoul::filesystem::File* f : _trackedFiles)
 		delete f;
 }
 
@@ -216,7 +216,7 @@ const std::string& ShaderObject::name() const {
 void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) {
 	_onChangeCallback = changeCallback;
 
-	for (auto fileObject : _trackedFiles) {
+	for (ghoul::filesystem::File* fileObject : _trackedFiles) {
 		fileObject->setCallback(_onChangeCallback);
 	}
 }
@@ -237,11 +237,11 @@ bool ShaderObject::setShaderFilename(std::string filename) {
     }
 
 	// Clear tracked files, this might have changed since last time
-	for (auto f : _trackedFiles)
+	for (ghoul::filesystem::File* f : _trackedFiles)
 		delete f;
 	_trackedFiles.erase(_trackedFiles.begin(), _trackedFiles.end());
 
-	// No need to alocate a new contents string for every shader
+	// No need to allocate a new contents string for every shader
 	// This makes ShaderObjects not thread safe
 	static std::string contents;
 	contents = "";
@@ -307,7 +307,7 @@ bool ShaderObject::compile() {
 
 		std::string filedefs = "";
 		size_t filehash = 0;
-		for (auto file : _trackedFiles) {
+		for (ghoul::filesystem::File* file : _trackedFiles) {
 			const std::string& path = file->path();
 			filedefs += std::to_string(filehash) + ": " + path + "\n";
 			++filehash;

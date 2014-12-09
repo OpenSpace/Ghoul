@@ -86,8 +86,8 @@ void TextureUnit::setZeroUnit() {
 }
 
 void TextureUnit::deinitialize() {
-    for (auto it = _busyUnits.begin(); it != _busyUnits.end(); ++it)
-        (*it) = false;
+	for (int i = 0; i < _busyUnits.size(); ++i)
+		_busyUnits[i] = false;
     _totalActive = 0;
     setZeroUnit();
 }

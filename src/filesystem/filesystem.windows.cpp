@@ -63,7 +63,7 @@ namespace filesystem {
 	};
 
 void FileSystem::deinitializeInternalWindows() {
-	for (auto d : _fileSystem->_directories) {
+	for (const auto& d : _fileSystem->_directories) {
 		DirectoryHandle* dh = d.second;
 		if (dh != nullptr && dh->_handle != nullptr) {
 			CancelIo(dh->_handle);
@@ -128,7 +128,7 @@ void FileSystem::removeFileListener(File* file) {
 
 void FileSystem::callbackHandler(DirectoryHandle* directoryHandle, const std::string& file) {
 	std::string fullPath;
-	for (auto d : FileSys._directories) {
+	for (const auto& d : FileSys._directories) {
 		if (d.second == directoryHandle)
 			fullPath = d.first + PathSeparator + file;
 	}

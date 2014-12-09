@@ -238,11 +238,12 @@ bool CommandlineParser::execute() {
     }
 
     // Second step: Check if every command is happy with the parameters assigned to it
-    for (auto it = parameterMap.begin(); it != parameterMap.end(); ++it) {
-        bool correct = it->first->checkParameters(it->second);
+	for (const auto& it : parameterMap) {
+		//for (const auto& it = parameterMap.begin(); it != parameterMap.end(); ++it) {
+        bool correct = it.first->checkParameters(it.second);
         if (!correct) {
-            LFATAL("Wrong arguments for " << it->first->name() << ": " <<
-                   it->first->errorMessage());
+            LFATAL("Wrong arguments for " << it.first->name() << ": " <<
+                   it.first->errorMessage());
             displayUsage();
             return false;
         }
@@ -254,11 +255,11 @@ bool CommandlineParser::execute() {
         s << " " << arg;
     LDEBUG("(Nameless argument:" << s.str() << ")");
     
-    for (auto it = parameterMap.cbegin(); it != parameterMap.cend(); ++it) {
+	for (const auto& it : parameterMap) {
         s.clear();
-        for (const std::string& arg : it->second)
+        for (const std::string& arg : it.second)
             s << " " << arg;
-        LDEBUG("(" << it->first->name() << ":" << s.str() << ")");
+        LDEBUG("(" << it.first->name() << ":" << s.str() << ")");
     }
 
     // Third step: Execute the nameless command if there are any arguments available
@@ -276,10 +277,10 @@ bool CommandlineParser::execute() {
 
     // Fourth step: Execute the commands (this step is only done if everyone is happy up
     // until now)
-    for (auto it = parameterMap.begin(); it != parameterMap.end(); ++it) {
-        bool correct = it->first->execute(it->second);
+	for (const auto& it : parameterMap) {
+        bool correct = it.first->execute(it.second);
         if (!correct) {
-            LFATAL("The execution for " + (*it).first->name() + " failed");
+            LFATAL("The execution for " + it.first->name() + " failed");
             displayUsage();
             return false;
         }

@@ -89,7 +89,7 @@ CacheManager::CacheManager(std::string directory)
     if (!cacheState.empty()) {
         LINFO("There was a crash in the previous run and it left the cache unclean. "
               "Cleaning it now");
-        for (auto cache : cacheState) {
+        for (const auto& cache : cacheState) {
             LINFO("Deleting file '" << cache.second << "'");
             FileSys.deleteFile(cache.second);
         }
@@ -101,7 +101,7 @@ CacheManager::~CacheManager() {
 	std::string&& path = FileSys.pathByAppendingComponent(_directory, _cacheFile);
 	std::ofstream file(path, std::ofstream::out);
 	if (file.good()) {
-		for (auto p : _files) {
+		for (const auto& p : _files) {
 			if (!p.second.isPersistent) {
                 // Delete all the non-persistent files
 				if (FileSys.fileExists(p.second.file))
@@ -248,7 +248,7 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
     LDEBUG("Cleaning directory '" << dir << "'");
     // First search for all subdirectories and call this function recursively on them
 	std::vector<std::string> contents = dir.readDirectories();
-	for (auto content : contents) {
+	for (const auto& content : contents) {
         if (FileSys.directoryExists(content)) {
 			cleanDirectory(content);
         }
@@ -275,7 +275,7 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
 {
     std::vector<LoadedCacheInfo> result;
     std::vector<std::string> directories = dir.readDirectories(false);
-    for (auto directory : directories) {
+    for (const auto& directory : directories) {
         Directory d(directory);
 
         // Extract the name of the directory
@@ -283,7 +283,7 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
         std::string directoryName = directory.substr(dir.path().size() + 1);
         
         std::vector<std::string> hashes = d.readDirectories();
-        for (auto hash : hashes) {
+        for (const auto& hash : hashes) {
             // Extract the hash from the directory name
             // +1 as the last path delimiter is missing from the path
             std::string hashName = hash.substr(d.path().size() + 1);
