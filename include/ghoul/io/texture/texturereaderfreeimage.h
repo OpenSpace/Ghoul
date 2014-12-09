@@ -44,8 +44,7 @@ public:
 	opengl::Texture* loadTexture(const std::string& filename) const override;
 	std::set<std::string> supportedExtensions() const override;
 };
-#else
-	namespace { char silenceLNK4221; };
+
 #endif // GHOUL_USE_FREEIMAGE
 
 } // namespace impl

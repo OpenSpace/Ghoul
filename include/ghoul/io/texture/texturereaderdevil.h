@@ -44,8 +44,6 @@ public:
 	std::set<std::string> supportedExtensions() const override;
 };
 
-#else
-	namespace { char silenceLNK4221; };
 #endif // GHOUL_USE_DEVIL
 
 } // namespace impl
