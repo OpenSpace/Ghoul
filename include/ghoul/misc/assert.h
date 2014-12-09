@@ -42,12 +42,18 @@
 #include <exception>
 #include <stdexcept>
 
+#ifndef WIN32
+#define GHL_NOEXCEPT noexcept
+#else
+#define GHL_NOEXCEPT
+#endif // WIN32
+
 namespace ghoul {
 
 class AssertException : public Exception, public std::runtime_error {
 public:
 	AssertException();
-	virtual const char* what() const;
+	virtual const char* what() const GHL_NOEXCEPT;
 };
 
 	/**
