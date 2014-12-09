@@ -52,6 +52,7 @@ void TemplateObservable<Event>::unregisterObserver(int observerId) {
 
 template <typename Event>
 void TemplateObservable<Event>::notify(const Event& event) const {
+	assert(_observers.find(event) != _observers.end());
 	for (auto obs : _observers.at(event))
 		obs.first();
 }

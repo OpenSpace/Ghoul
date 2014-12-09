@@ -42,7 +42,7 @@ namespace ghoul {
  * inter-process communication. The workflow for this is as follows: One process has to
  * #create a SharedMemory block with a specific name and will keep the ownership of that
  * name. It does not have to create a SharedMemory object itself, but it is the creating
- * process` responsibility to #remove the shared memory at the end of its lifetime; then,
+ * process' responsibility to #remove the shared memory at the end of its lifetime; then,
  * many other processes can use the constructor with the same name to get access to the
  * shared memory. The overloaded operator void* makes the SharedMemory usable just like a
  * void pointer in the code. The size of the memory is accessible using the #size method.
@@ -135,6 +135,8 @@ public:
      * is a valid pointer into a memory block of the predefined size (#size).
      */
     operator void*();
+
+	void* pointer() const { return _memory; }
 
     /**
      * Returns the usable size of the memory block. The value here is the same which was
