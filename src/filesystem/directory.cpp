@@ -89,7 +89,7 @@ Directory Directory::parentDirectory(bool absolutePath) const {
         return Directory(_directoryPath + pathSeparator + "..",
                          !absolutePath);
 #else
-#pragma unused (absolutePath)
+	(void)absolutePath; // remove unused argument warning ---abock
     size_t length = _directoryPath.length();
     size_t position = _directoryPath.find_last_of(pathSeparator);
     if(position == length && length > 1)
