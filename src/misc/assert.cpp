@@ -39,7 +39,8 @@ namespace {
 namespace ghoul {
 
 AssertException::AssertException() : std::runtime_error("") {}
-const char* AssertException::what() const {
+
+const char* AssertException::what() const GHL_NOEXCEPT {
 	return "GhoulAssertException";
 }
 
