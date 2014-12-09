@@ -160,3 +160,44 @@ endif ()
 
 add_subdirectory(src)
 add_subdirectory(${GHOUL_ROOT_DIR}/ext/lua)
+
+#####
+# User macros
+#####
+macro(GhoulCopySharedLibraries TARGET_EXECUTABLE)
+
+    # Windows DLL
+    if (WIN32)
+
+        # DevIL
+        if(GHOUL_USE_DEVIL)
+            if (CMAKE_CL_64)
+                set(DEVIL_DLL_DIR ${GHOUL_ROOT_DIR}/ext/il/lib/win64)
+            else (CMAKE_CL_64)
+                set(DEVIL_DLL_DIR ${GHOUL_ROOT_DIR}/ext/il/lib/win32)
+            endif (CMAKE_CL_64)
+            set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/DevIL.dll)
+            set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/ILU.dll)
+            set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/ILUT.dll)
+        endif(GHOUL_USE_DEVIL)
+
+        # FreeImage
+        if(GHOUL_USE_FREEIMAGE)
+            if (CMAKE_CL_64)
+                set(FREEIMAGE_DLL_DIR ${GHOUL_ROOT_DIR}/ext/freeimage/lib/win64)
+            else (CMAKE_CL_64)
+                set(FREEIMAGE_DLL_DIR ${GHOUL_ROOT_DIR}/ext/freeimage/lib/win32)
+            endif (CMAKE_CL_64)
+            set(SHARED_LIBS ${SHARED_LIBS} ${FREEIMAGE_DLL_DIR}/FreeImage.dll)
+        endif(GHOUL_USE_FREEIMAGE)
+
+        # Add the copy command
+        foreach( file_i ${SHARED_LIBS})
+            add_custom_command(TARGET ${TARGET_EXECUTABLE} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${file_i}"
+            $<TARGET_FILE_DIR:${TARGET_EXECUTABLE}>)
+        endforeach( file_i )
+    endif(WIN32)
+
+endmacro(GhoulCopySharedLibraries)
