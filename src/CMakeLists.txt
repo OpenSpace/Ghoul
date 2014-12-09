@@ -23,6 +23,28 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
+
+######
+# Macros
+######
+
+# source group macro
+macro(add_source_group GROUP_NAME GROUP_DIRECTORY)
+    file(GLOB SOURCE    ${SOURCE_ROOT_DIR}/${GROUP_DIRECTORY}/*.cpp 
+                        ${SOURCE_ROOT_DIR}/${GROUP_DIRECTORY}/*.c)
+    file(GLOB HEADER    ${HEADER_ROOT_DIR}/${GROUP_DIRECTORY}/*.h
+                        ${HEADER_ROOT_DIR}/${GROUP_DIRECTORY}/*.hpp
+                        ${HEADER_ROOT_DIR}/${GROUP_DIRECTORY}/*.inl
+                        ${HEADER_ROOT_DIR}/${GROUP_DIRECTORY}/${GROUP_DIRECTORY})
+
+    set(GHOUL_SOURCE ${GHOUL_SOURCE} ${SOURCE})
+    set(GHOUL_HEADER ${GHOUL_HEADER} ${HEADER} ${GLOB_HEADER})
+    source_group(${GROUP_NAME} FILES
+                    ${SOURCE}
+                    ${HEADER}
+                    ${GLOB_HEADER})
+endmacro(add_source_group)
+
 ######
 # Source
 ######
@@ -30,112 +52,21 @@
 set(SOURCE_ROOT_DIR ${GHOUL_ROOT_DIR}/src)
 set(HEADER_ROOT_DIR ${GHOUL_ROOT_DIR}/include/ghoul)
 
-file(GLOB CMDPARSER_SOURCE ${SOURCE_ROOT_DIR}/cmdparser/*.cpp)
-file(GLOB CMDPARSER_SOURCE_C ${SOURCE_ROOT_DIR}/cmdparser/*.c)
-set(GHOUL_SOURCE ${GHOUL_SOURCE} ${CMDPARSER_SOURCE} ${CMDPARSER_SOURCE_C})
-file(GLOB CMDPARSER_HEADER ${HEADER_ROOT_DIR}/cmdparser/*.h)
-file(GLOB CMDPARSER_HEADER_INL ${HEADER_ROOT_DIR}/cmdparser.inl)
-set(CMDPARSER_GLOB_HEADER ${HEADER_ROOT_DIR}/cmdparser/cmdparser)
-set(GHOUL_HEADER ${GHOUL_HEADER} ${CMDPARSER_HEADER} ${CMDPARSER_HEADER_INL})
-source_group(CmdParser FILES
-                ${CMDPARSER_SOURCE}
-                ${CMDPARSER_SOURCE_C}
-                ${CMDPARSER_GLOB_HEADER}
-                ${CMDPARSER_HEADER}
-                ${CMDPARSER_HEADER_INL})
-
-file(GLOB FILESYSTEM_SOURCE ${SOURCE_ROOT_DIR}/filesystem/*.cpp)
-file(GLOB FILESYSTEM_SOURCE_C ${SOURCE_ROOT_DIR}/filesystem/*.c)
-set(GHOUL_SOURCE ${GHOUL_SOURCE} ${FILESYSTEM_SOURCE} ${FILESYSTEM_SOURCE_C})
-file(GLOB FILESYSTEM_HEADER ${HEADER_ROOT_DIR}/filesystem/*.h)
-file(GLOB FILESYSTEM_HEADER_INL ${HEADER_ROOT_DIR}/filesystem/*.inl)
-set(FILESYSTEM_GLOB_HEADER ${HEADER_ROOT_DIR}/filesystem/filesystem)
-set(GHOUL_HEADER ${GHOUL_HEADER} ${FILESYSTEM_HEADER} ${FILESYSTEM_HEADER_INL})
-source_group(FileSystem FILES
-                ${FILESYSTEM_SOURCE}
-                ${FILESYSTEM_SOURCE_C}
-                ${FILESYSTEM_GLOB_HEADER}
-                ${FILESYSTEM_HEADER}
-                ${FILESYSTEM_HEADER_INL})
-
-file(GLOB IO_SOURCE ${SOURCE_ROOT_DIR}/io/*.cpp)
-file(GLOB IO_SOURCE_C ${SOURCE_ROOT_DIR}/io/*.c)
-set(GHOUL_SOURCE ${GHOUL_SOURCE} ${IO_SOURCE} ${IO_SOURCE_C})
-file(GLOB IO_HEADER ${HEADER_ROOT_DIR}/io/*.h)
-file(GLOB IO_HEADER_INL ${HEADER_ROOT_DIR}/io/*.inl)
-set(IO_GLOB_HEADER ${HEADER_ROOT_DIR}/io/io)
-set(GHOUL_HEADER ${GHOUL_HEADER} ${IO_HEADER} ${IO_HEADER_INL})
-source_group(IO FILES
-                ${IO_SOURCE}
-                ${IO_SOURCE_C}
-                ${IO_GLOB_HEADER}
-                ${IO_HEADER}
-                ${IO_HEADER_INL})
+add_source_group("CmdParser" "cmdparser")
+add_source_group("FileSystem" "filesystem")
+add_source_group("IO" "io")
 
 file(GLOB IO_TEXTURE_SOURCE ${SOURCE_ROOT_DIR}/io/texture/*.cpp)
 set(GHOUL_SOURCE ${GHOUL_SOURCE} ${IO_TEXTURE_SOURCE})
 file(GLOB IO_TEXTURE_HEADER ${HEADER_ROOT_DIR}/io/texture/*.h)
 set(GHOUL_HEADER ${GHOUL_HEADER} ${IO_TEXTURE_HEADER})
 source_group(IO\\Texture FILES ${IO_TEXTURE_SOURCE} ${IO_TEXTURE_HEADER})
-                
-file(GLOB LOG_SOURCE ${SOURCE_ROOT_DIR}/logging/*.cpp)
-file(GLOB LOG_SOURCE_C ${SOURCE_ROOT_DIR}/logging/*.c)
-set(GHOUL_SOURCE ${GHOUL_SOURCE} ${LOG_SOURCE} ${LOG_SOURCE_C})
-file(GLOB LOG_HEADER ${HEADER_ROOT_DIR}/logging/*.h)
-file(GLOB LOG_HEADER_INL ${HEADER_ROOT_DIR}/logging/*.inl)
-set(LOG_GLOB_HEADER ${HEADER_ROOT_DIR}/logging/logging)
-set(GHOUL_HEADER ${GHOUL_HEADER} ${LOG_HEADER} ${LOG_HEADER_INL})
-source_group(LogManager FILES
-                ${LOG_SOURCE}
-                ${LOG_SOURCE_C}
-                ${LOG_GLOB_HEADER}
-                ${LOG_HEADER}
-                ${LOG_HEADER_INL})
-
-file(GLOB LUA_SOURCE ${SOURCE_ROOT_DIR}/lua/*.cpp)
-file(GLOB LUA_SOURCE_C ${SOURCE_ROOT_DIR}/lua/*.c)
-set(GHOUL_SOURCE ${GHOUL_SOURCE} ${LUA_SOURCE} ${LUA_SOURCE_C})
-file(GLOB LUA_HEADER ${HEADER_ROOT_DIR}/lua/*.h)
-file(GLOB LUA_HEADER_INL ${HEADER_ROOT_DIR}/lua/*.inl)
-set(GHOUL_HEADER ${GHOUL_HEADER} ${LUA_HEADER} ${LUA_HEADER_INL})
-source_group(Lua FILES ${LUA_SOURCE} ${LUA_SOURCE_C} ${LUA_HEADER} ${LUA_HEADER_INL})
-
-file(GLOB MISC_SOURCE ${SOURCE_ROOT_DIR}/misc/*.cpp)
-file(GLOB MISC_SOURCE_C ${SOURCE_ROOT_DIR}/misc/*.c)
-set(GHOUL_SOURCE ${GHOUL_SOURCE} ${MISC_SOURCE} ${MISC_SOURCE_C})
-file(GLOB MISC_HEADER ${HEADER_ROOT_DIR}/misc/*.h)
-file(GLOB MISC_HEADER_INL ${HEADER_ROOT_DIR}/misc/*.inl)
-set(MISC_HEADER ${MISC_HEADER}
-    ${GHOUL_ROOT_DIR}/include/ghoul/glm.h)
-set(GHOUL_HEADER ${GHOUL_HEADER} ${MISC_HEADER} ${MISC_HEADER_INL})
-source_group(Misc FILES ${MISC_SOURCE} ${MISC_SOURCE_C} ${MISC_HEADER} ${MISC_HEADER_INL})
-
-file(GLOB OPENGL_SOURCE ${SOURCE_ROOT_DIR}/opengl/*.cpp)
-file(GLOB OPENGL_SOURCE_C ${SOURCE_ROOT_DIR}/opengl/*.c)
-set(GHOUL_SOURCE ${GHOUL_SOURCE} ${OPENGL_SOURCE} ${OPENGL_SOURCE_C})
-file(GLOB OPENGL_HEADER ${HEADER_ROOT_DIR}/opengl/*.h)
-file(GLOB OPENGL_HEADER_INL ${HEADER_ROOT_DIR}/opengl/*.inl)
-set(OPENGL_GLOB_HEADER ${HEADER_ROOT_DIR}/opengl/opengl)
-set(GHOUL_HEADER ${GHOUL_HEADER} ${OPENGL_HEADER} ${OPENGL_HEADER_INL})
-source_group(OpenGL FILES
-                ${OPENGL_SOURCE}
-                ${OPENGL_SOURCE_C}
-                ${OPENGL_GLOB_HEADER}
-                ${OPENGL_HEADER}
-                ${OPENGL_HEADER_INL})
-
-file(GLOB SYSTEMCAPABILITIES_SOURCE ${SOURCE_ROOT_DIR}/systemcapabilities/*.cpp)
-file(GLOB SYSTEMCAPABILITIES_SOURCE_C ${SOURCE_ROOT_DIR}/systemcapabilities/*.c)
-set(GHOUL_SOURCE ${GHOUL_SOURCE} ${SYSTEMCAPABILITIES_SOURCE} ${SYSTEMCAPABILITIES_SOURCE_C})
-file(GLOB SYSTEMCAPABILITIES_HEADER ${HEADER_ROOT_DIR}/systemcapabilities/*.h)
-file(GLOB SYSTEMCAPABILITIES_HEADER_INL ${HEADER_ROOT_DIR}/systemcapabilities/*.inl)
-set(GHOUL_HEADER ${GHOUL_HEADER} ${SYSTEMCAPABILITIES_HEADER} ${SYSTEMCAPABILITIES_HEADER_INL})
-source_group(SystemCapabilities FILES
-                ${SYSTEMCAPABILITIES_SOURCE}
-                ${SYSTEMCAPABILITIES_SOURCE_C}
-                ${SYSTEMCAPABILITIES_HEADER}
-                ${SYSTEMCAPABILITIES_HEADER_INL})
-
+             
+add_source_group("LogManager" "logging") 
+add_source_group("Lua" "lua") 
+add_source_group("Misc" "misc") 
+add_source_group("OpenGL" "opengl") 
+add_source_group("SystemCapabilities" "systemcapabilities") 
 
 set(GHOUL_HEADER ${GHOUL_HEADER} ${HEADER_ROOT_DIR}/glm.h)
 
