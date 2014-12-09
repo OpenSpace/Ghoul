@@ -88,7 +88,8 @@ Directory Directory::parentDirectory(bool absolutePath) const {
     else
         return Directory(_directoryPath + pathSeparator + "..",
                          !absolutePath);
-#else 
+#else
+#pragma unused (absolutePath)
     size_t length = _directoryPath.length();
     size_t position = _directoryPath.find_last_of(pathSeparator);
     if(position == length && length > 1)
