@@ -308,7 +308,7 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
         }
     }
     
-    return std::move(result);
+    return result;
 }
 
 } // namespace filesystem
