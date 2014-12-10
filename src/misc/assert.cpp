@@ -30,7 +30,10 @@
 #include <algorithm>
 
 namespace {
+
+	const std::string _loggerCat = "Assertion failed!";
 	const std::string padding = "    ";
+
 	void printOptions() {
 		std::cout << "(I)gnore / (A)ssertException / (E)xit: ";
 	}
@@ -51,13 +54,16 @@ void internal_assert(
 	const std::string& function,
 	int line) 
 {
-	std::stringstream ss;
-	ss << "Assertion '" << expression<<"' failed!";
-	LFATALC(ss.str(),
-		std::endl
+	// Message (if provided)
+	std::stringstream msg;
+	if(!message.empty())
+		msg << std::endl << padding << message;
+
+	LFATAL(std::endl
 		<< padding << "File:       " << file << ", line " << line << std::endl
-		<< padding << "Function:   " << function << std::endl 
-		<< padding << message);
+		<< padding << "Function:   " << function << std::endl
+		<< padding << "Assertion:  " << expression
+		<< msg.str());
 
 #ifdef GHL_DEBUG
 	std::string inputLine;

@@ -73,17 +73,13 @@ public:
 
 #if !defined(NDEBUG)
 
-/**
-* @defgroup ASSERT_MACRO_GROUP Assertion Macros
-*
-* @{
-*/
-
-/**
- * Assertion that prints the message and gives the option of aborting
- * or ignoring the assertion. Not defined in release mode.
- */
-#define ghoul_assert(__condition__, __message__) \
+#define GHL_ASSERT_0(__condition__) \
+	do { \
+		if(!(__condition__)) { \
+			ghoul::internal_assert(#__condition__, "", GHL_ASSERT_FILE, GHL_ASSERT_FUNCTION, GHL_ASSERT_LINE);\
+		} \
+	} while (false)
+#define GHL_ASSERT_1(__condition__, __message__) \
 	do { \
 		if(!(__condition__)) { \
 			std::ostringstream oss; \
@@ -92,17 +88,31 @@ public:
 		} \
 	} while (false)
 
+#define GET_MACRO(_1,_2,NAME,...) NAME
+
+/**
+* @defgroup ASSERT_MACRO_GROUP Assertion Macros
+*
+* @{
+*/
+
+/**
+ * Assertion that prints the message (if provided) and gives the option of aborting,
+ * exiting or ignoring the assertion. Not defined in release mode.
+ */
+#define ghoul_assert(...) GET_MACRO(__VA_ARGS__, GHL_ASSERT_1, GHL_ASSERT_0)(__VA_ARGS__)
+
 /**
  * Assertion that prints the message and gives the option of aborting
  * or ignoring the assertion. Not defined in release mode. Formatting
  * is done using <a href="http://www.cplusplus.com/reference/cstdio/sprintf/">sprintf</a>.
  * Maximum length of message is 2048 characters.
  */
-#define ghoul_assertf(__condition__, ...) \
+#define ghoul_assertf(__condition__, __format__, ...) \
 	do { \
 		if(!(__condition__)) { \
 			char buffer[2048] = {}; \
-			std::sprintf(buffer, __VA_ARGS__); \
+			std::sprintf(buffer, __format__, ##__VA_ARGS__); \
 			ghoul::internal_assert(#__condition__, buffer, GHL_ASSERT_FILE, GHL_ASSERT_FUNCTION, GHL_ASSERT_LINE);\
 		} \
 	} while (false)
@@ -111,8 +121,8 @@ public:
 #else 
 
 // The assertion macros defined for release mode
-#define ghoul_assert(__condition__, __message__)
-#define ghoul_assertf(__condition__, ...)
+#define ghoul_assert(...)
+#define ghoul_assertf(__condition__, __format__, ...)
 
 #endif // !defined(NDEBUG)
 
