@@ -88,12 +88,9 @@ void FileSystem::removeFileListener(File* file) {
 
     const std::string filename = file->path();
     int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
-    int count = _trackedFiles.count(wd);
     auto eqRange = _trackedFiles.equal_range(wd);
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
         if (it->second == file) {
-            if(count == 1)
-                ( void ) inotify_rm_watch( _inotifyHandle, it->first );
             _trackedFiles.erase(it);
             return;
         }
