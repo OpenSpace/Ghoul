@@ -92,7 +92,7 @@ void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {
             _stream << "\033[22;31m";   // red
             break;
         case LogManager::LogLevel::Fatal:
-            _stream << "\033[22;34m";   // blue
+            _stream << "\033[22;35m";   // blue
             break;
 		default:
 			_stream << "\033[0m";       // white
