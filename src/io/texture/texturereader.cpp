@@ -37,7 +37,20 @@ namespace {
 namespace ghoul {
 namespace io {
 
-std::vector<TextureReaderBase*> TextureReader::_readers;
+TextureReader::TextureReader() {
+
+}
+
+TextureReader::~TextureReader() {
+	for (TextureReaderBase* reader : _readers) {
+		delete reader;
+	}
+}
+
+TextureReader& TextureReader::ref() {
+	static TextureReader textureReader;
+	return textureReader;
+}
 
 opengl::Texture* TextureReader::loadTexture(const std::string& filename) {
 	if (_readers.size() == 0) {

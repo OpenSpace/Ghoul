@@ -41,12 +41,22 @@ class TextureReaderBase;
 
 class TextureReader {
 public:
-	static opengl::Texture* loadTexture(const std::string& filename);
-	static void addReader(TextureReaderBase* reader);
+	opengl::Texture* loadTexture(const std::string& filename);
+	void addReader(TextureReaderBase* reader);
+
+	static TextureReader& ref();
 
 protected:
-	static TextureReaderBase* readerForExtension(const std::string& extension);
-	static std::vector<TextureReaderBase*> _readers;
+	TextureReaderBase* readerForExtension(const std::string& extension);
+	std::vector<TextureReaderBase*> _readers;
+
+private:
+	TextureReader();
+	~TextureReader();
+	TextureReader(const TextureReader&) = delete;
+	TextureReader(const TextureReader&&) = delete;
+	TextureReader& operator= (const TextureReader& rhs) = delete;
+
 };
 
 } // namespace io
