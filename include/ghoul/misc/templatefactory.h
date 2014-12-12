@@ -181,7 +181,20 @@ public:
      * before; <code>false</code> otherwise
      */
     bool hasClass(const std::string& className) const;
+	
+	/**
+	 * Returns the list of all registered classes. All values in this vector can be used
+	 * to instantiate a new class sing the #create method
+	 * \return The list of all registered classes
+	 */
+	std::vector<std::string> registeredClasses() const;
 
+	/**
+	 * Returns the <code>type_info</code> of the baseclass for this factory, i.e., the
+	 * base class which is the super class for all actual instances that can be created
+	 * using the #create method
+	 * \return The <code>type_info</code> of the baseclass for this factory
+	 */
     const std::type_info& baseClassType() const override;
 
 private:

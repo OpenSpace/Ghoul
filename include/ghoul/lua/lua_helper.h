@@ -100,7 +100,7 @@ bool loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
 /**
 * Loads a Lua configuration into the given #ghoul::Dictionary%, extending the passed in
 * dictionary. This method will overwrite value with the same keys, but will not remove
-* any other keys from the dictionary. The script contained in the file must return a
+* any other keys from the dictionary. The script contained in the string must return a
 * single table, which is then parsed and included into the #ghoul::Dictionary. The single
 * restriction on the script is that it can only contain a pure array-style table (= only
 * indexed by numbers) or a pure dictionary-style table (= no numbering indices).
