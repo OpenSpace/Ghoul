@@ -246,14 +246,6 @@ void CPUCapabilitiesComponent::detectMemory() {
 
 void CPUCapabilitiesComponent::detectCPU() {
 #ifdef WIN32
-    // names from Linux extension flags
-    /*
-    fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts 
-    acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts 
-    rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx est 
-    tm2 ssse3 cx16 xtpr pdcm pcid sse4_1 sse4_2 popcnt tsc_deadline_timer aes xsave avx f16c rdrand 
-    lahf_lm ida arat epb xsaveopt pln pts dtherm tpr_shadow vnmi flexpriority ept vpid fsgsbase smep erms
-    */
 	const char* szFeatures[] =
 	{
 		"fpu",
@@ -261,26 +253,26 @@ void CPUCapabilitiesComponent::detectCPU() {
 		"de",
 		"pse",
 		"tsc",
-		"RDMSR and WRMSR Support",
+		"msr",
 		"pae",
 		"mce",
 		"cx8",
 		"apic",
 		"Unknown1",
-		"SYSENTER and SYSEXIT",
+		"sep",
 		"mtrr",
-		"PTE Global Bit",
+		"pge",
 		"mca",
-		"Conditional Move/Compare Instruction",
+		"cmov",
 		"pat",
 		"pse36",
-		"Processor Serial Number",
-		"CFLUSH Extension",
+		"psn",
+		"clflush",
 		"Unknown2",
 		"ds",
-		"Thermal Monitor and Clock Ctrl",
+		"acpi", //  @TODO: "Thermal Monitor and Clock Ctrl", is this correct? ---jonasstrandstedt
 		"mmx",
-		"FXSAVE/FXRSTOR",
+		"fxsr",
 		"sse",
 		"sse2",
 		"ss",
@@ -289,44 +281,6 @@ void CPUCapabilitiesComponent::detectCPU() {
 		"Unknown4",
 		"pbe"
 	};
-    /*
-    // Names from Windows example web page
-    const char* szFeatures[] =
-    {
-        "x87 FPU On Chip",
-        "Virtual-8086 Mode Enhancement",
-        "Debugging Extensions",
-        "Page Size Extensions",
-        "Time Stamp Counter",
-        "RDMSR and WRMSR Support",
-        "Physical Address Extensions",
-        "Machine Check Exception",
-        "CMPXCHG8B Instruction",
-        "APIC On Chip",
-        "Unknown1",
-        "SYSENTER and SYSEXIT",
-        "Memory Type Range Registers",
-        "PTE Global Bit",
-        "Machine Check Architecture",
-        "Conditional Move/Compare Instruction",
-        "Page Attribute Table",
-        "Page Size Extension",
-        "Processor Serial Number",
-        "CFLUSH Extension",
-        "Unknown2",
-        "Debug Store",
-        "Thermal Monitor and Clock Ctrl",
-        "MMX Technology",
-        "FXSAVE/FXRSTOR",
-        "SSE Extensions",
-        "SSE2 Extensions",
-        "Self Snoop",
-        "Hyper-threading Technology",
-        "Thermal Monitor",
-        "Unknown4",
-        "Pend. Brk. EN."
-    };
-    */
 
 	char CPUString[0x20];
 	char CPUBrandString[0x40];
@@ -419,31 +373,20 @@ void CPUCapabilitiesComponent::detectCPU() {
 	{
 
         if (bSSE3NewInstructions)
-            extensions << "sse3, ";
+            extensions << "sse3 ";
         if (bMONITOR_MWAIT)
-            extensions << "MONITOR/MWAIT, ";
+            extensions << "mwait "; // @TODO:  "MONITOR/MWAIT" is this correct? ---jonasstrandstedt
         if (bCPLQualifiedDebugStore)
-            extensions << "Qualified Debug Store, ";
+            extensions << "ds_cpl ";
         if (bThermalMonitor2)
-            extensions << "tm2, ";
-        /*
-		if (bSSE3NewInstructions)
-			extensions << "SSE3 New Instructions, ";
-		if (bMONITOR_MWAIT)
-			extensions << "MONITOR/MWAIT, ";
-		if (bCPLQualifiedDebugStore)
-			extensions << "Qualified Debug Store, ";
-		if (bThermalMonitor2)
-			extensions << "Thermal Monitor 2, ";
-            */
-
+            extensions << "tm2 ";
 		i = 0;
 		nIds = 1;
 		while (i < (sizeof(szFeatures) / sizeof(const char*)))
 		{
 			if (nFeatureInfo & nIds)
 			{
-				extensions << szFeatures[i] << ", ";
+				extensions << szFeatures[i] << " ";
 			}
 
 			nIds <<= 1;
@@ -456,8 +399,8 @@ void CPUCapabilitiesComponent::detectCPU() {
 
 	// Set extensions and remove trailing ", "
 	_extensions = extensions.str();
-	if (_extensions.length() > 2)
-		_extensions = _extensions.substr(0, _extensions.length()-2);
+	if (_extensions.length() > 1)
+		_extensions = _extensions.substr(0, _extensions.length()-1);
 
 	// Get the cores
 	SYSTEM_INFO systemInfo;
