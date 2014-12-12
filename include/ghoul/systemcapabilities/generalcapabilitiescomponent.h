@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __CPUCAPABILITIESCOMPONENT_H__
-#define __CPUCAPABILITIESCOMPONENT_H__
+#ifndef __GENERALCAPABILITIESCOMPONENT_H__
+#define __GENERALCAPABILITIESCOMPONENT_H__
 
 #include "systemcapabilitiescomponent.h"
 
@@ -38,10 +38,10 @@ namespace systemcapabilities {
  * \todo Implement CPU detection, feature detection
  * \todo More features
  */
-class CPUCapabilitiesComponent : public SystemCapabilitiesComponent {
+class GeneralCapabilitiesComponent : public SystemCapabilitiesComponent {
 public:
-    CPUCapabilitiesComponent();
-    ~CPUCapabilitiesComponent();
+    GeneralCapabilitiesComponent();
+    ~GeneralCapabilitiesComponent();
 
     std::vector<CapabilityInformation> capabilities(
         const SystemCapabilitiesComponent::Verbosity& verbosity) const override;
@@ -151,4 +151,4 @@ protected:
 } // namespace systemcapabilities
 } // namespace ghoul
 
-#endif // __CPUCAPABILITIESCOMPONENT_H__
+#endif // __GeneralCapabilitiesComponent_H__

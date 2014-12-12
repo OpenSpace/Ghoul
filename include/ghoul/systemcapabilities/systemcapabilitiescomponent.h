@@ -40,7 +40,7 @@ namespace systemcapabilities {
 /**
  * This class is the base class of all components that can detect a specific set of
  * features. Each subclass should focus on a specific module of features (like 
- * CPUCapabilitiesComponent or OpenGLCapabilitiesComponent). The action flow for a
+ * GeneralCapabilitiesComponent or OpenGLCapabilitiesComponent). The action flow for a
  * SystemCapabilitiesComponent subclass is as follows: It gets created with the
  * constructor and should provide a descriptive name to this SystemCapabilitiesComponent`s
  * constructor, then, the #initialize function will be called, #detectCapabilities follows

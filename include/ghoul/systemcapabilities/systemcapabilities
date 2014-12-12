@@ -26,7 +26,7 @@
  #ifndef __GHOUL_SYSTEMCAPABILITIES__
  #define __GHOUL_SYSTEMCAPABILITIES__
 
-#include "cpucapabilitiescomponent.h"
+#include "generalcapabilitiescomponent.h"
 #include "openglcapabilitiescomponent.h"
 #include "systemcapabilities.h"
 

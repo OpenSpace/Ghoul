@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "systemcapabilities/cpucapabilitiescomponent.h"
+#include "systemcapabilities/GeneralCapabilitiesComponent.h"
 
 #include <ghoul/opengl/ghoul_gl.h>
 #include <algorithm>
@@ -58,30 +58,30 @@
 #endif
 
 namespace {
-    const std::string _loggerCat = "CPUCapabilitiesComponents";
+    const std::string _loggerCat = "GeneralCapabilitiesComponents";
 }
 
 namespace ghoul {
 namespace systemcapabilities {
 
-CPUCapabilitiesComponent::CPUCapabilitiesComponent()
+GeneralCapabilitiesComponent::GeneralCapabilitiesComponent()
     : SystemCapabilitiesComponent()
 {
     clearCapabilities();
 }
 
-CPUCapabilitiesComponent::~CPUCapabilitiesComponent() {
+GeneralCapabilitiesComponent::~GeneralCapabilitiesComponent() {
     deinitialize();
 }
 
-void CPUCapabilitiesComponent::detectCapabilities() {
+void GeneralCapabilitiesComponent::detectCapabilities() {
     clearCapabilities();
     detectOS();
     detectMemory();
 	detectCPU();
 }
 
-void CPUCapabilitiesComponent::clearCapabilities() {
+void GeneralCapabilitiesComponent::clearCapabilities() {
     _operatingSystem = "";
     _installedMainMemory = 0;
 	_cpu = "";
@@ -92,7 +92,7 @@ void CPUCapabilitiesComponent::clearCapabilities() {
 	_extensions = "";
 }
 
-void CPUCapabilitiesComponent::detectOS() {
+void GeneralCapabilitiesComponent::detectOS() {
 #ifdef WIN32
     // This code is taken from
     // http://msdn.microsoft.com/en-us/library/windows/desktop/ms724429%28v=vs.85%29.aspx
@@ -209,7 +209,7 @@ void CPUCapabilitiesComponent::detectOS() {
 #endif
 }
 
-void CPUCapabilitiesComponent::detectMemory() {
+void GeneralCapabilitiesComponent::detectMemory() {
 #if defined(WIN32)
     std::string memory;
     bool success = queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
@@ -244,7 +244,7 @@ void CPUCapabilitiesComponent::detectMemory() {
 #endif
 }
 
-void CPUCapabilitiesComponent::detectCPU() {
+void GeneralCapabilitiesComponent::detectCPU() {
 #ifdef WIN32
 	const char* szFeatures[] =
 	{
@@ -526,80 +526,86 @@ void CPUCapabilitiesComponent::detectCPU() {
 }
 
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
-    CPUCapabilitiesComponent::capabilities(
-                        const SystemCapabilitiesComponent::Verbosity& /*verbosity*/) const
+    GeneralCapabilitiesComponent::capabilities(
+                        const SystemCapabilitiesComponent::Verbosity& verbosity) const
 {
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
 	result.emplace_back("Operating System", _operatingSystem);
-	result.emplace_back("CPU", _cpu);
-	result.emplace_back("Cores", coresAsString());
-	result.emplace_back("Cache line size", cacheLineSizeAsString());
-	result.emplace_back("L2 Associativity", L2AssiciativityAsString());
-	result.emplace_back("Cache size", cacheSizeAsString());
-	result.emplace_back("Extensions", _extensions);
-	result.emplace_back("Main Memory", installedMainMemoryAsString());
+	if (verbosity >= Verbosity::Default) {
+		result.emplace_back("CPU", _cpu);
+		result.emplace_back("Cores", coresAsString());
+	}
+	if (verbosity >= Verbosity::Full) {
+		result.emplace_back("Cache line size", cacheLineSizeAsString());
+		result.emplace_back("L2 Associativity", L2AssiciativityAsString());
+		result.emplace_back("Cache size", cacheSizeAsString());
+		result.emplace_back("Extensions", _extensions);
+	}
+	if (verbosity >= Verbosity::Default) {
+		result.emplace_back("Main Memory", installedMainMemoryAsString());
+	}
     return result;
 }
 
-const std::string& CPUCapabilitiesComponent::operatingSystem() const {
+const std::string& GeneralCapabilitiesComponent::operatingSystem() const {
     return _operatingSystem;
 }
 
-unsigned int CPUCapabilitiesComponent::installedMainMemory() const {
+unsigned int GeneralCapabilitiesComponent::installedMainMemory() const {
     return _installedMainMemory;
 }
 
-std::string CPUCapabilitiesComponent::installedMainMemoryAsString() const {
+std::string GeneralCapabilitiesComponent::installedMainMemoryAsString() const {
     std::stringstream s;
     s << _installedMainMemory << " MB";
     return s.str();
 }
 
-unsigned int CPUCapabilitiesComponent::cores() const {
+unsigned int GeneralCapabilitiesComponent::cores() const {
 	return _cores;
 }
 
-unsigned int CPUCapabilitiesComponent::cacheLineSize() const {
+unsigned int GeneralCapabilitiesComponent::cacheLineSize() const {
 	return _cacheLineSize;
 }
 
-unsigned int CPUCapabilitiesComponent::L2Assiciativity() const {
+unsigned int GeneralCapabilitiesComponent::L2Assiciativity() const {
 	return _L2Associativity;
 }
 
-unsigned int CPUCapabilitiesComponent::cacheSize() const {
+unsigned int GeneralCapabilitiesComponent::cacheSize() const {
 	return _cacheSize;
 }
 
-std::string CPUCapabilitiesComponent::coresAsString() const {
+std::string GeneralCapabilitiesComponent::coresAsString() const {
 	std::stringstream s;
 	s << _cores;
 	return s.str();
 }
 
-std::string CPUCapabilitiesComponent::cacheLineSizeAsString() const {
+std::string GeneralCapabilitiesComponent::cacheLineSizeAsString() const {
 	std::stringstream s;
 	s << _cacheLineSize;
 	return s.str();
 }
 
-std::string CPUCapabilitiesComponent::L2AssiciativityAsString() const {
+std::string GeneralCapabilitiesComponent::L2AssiciativityAsString() const {
 	std::stringstream s;
 	s << _L2Associativity;
 	return s.str();
 }
 
-std::string CPUCapabilitiesComponent::cacheSizeAsString() const {
+std::string GeneralCapabilitiesComponent::cacheSizeAsString() const {
 	std::stringstream s;
 	s << _cacheSize << " K";
 	return s.str();
 }
 
-std::string CPUCapabilitiesComponent::extensions() const {
+std::string GeneralCapabilitiesComponent::extensions() const {
 	return _extensions;
 }
 
-std::string CPUCapabilitiesComponent::name() const {
+std::string GeneralCapabilitiesComponent::name() const {
     return "CPU";
 }
 

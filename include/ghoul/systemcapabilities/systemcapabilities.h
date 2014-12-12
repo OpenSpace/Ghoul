@@ -27,7 +27,7 @@
 #define __SYSTEMCAPABILITIES_H__
 
 #include "systemcapabilitiescomponent.h"
-#include "cpucapabilitiescomponent.h"
+#include "generalcapabilitiescomponent.h"
 #include "openglcapabilitiescomponent.h"
 
 #include <string>
@@ -40,7 +40,7 @@ namespace systemcapabilities {
  * The SystemCapabilities class allows access to the functionality the system provides.
  * The class is composed of SystemCapabilitiesComponent%s with each component checking for
  * a specific kind of capabilities (for example OpenGLCapabilitiesComponent or
- * CPUCapabilitiesComponent) and provides access to the components with the templated
+ * GeneralCapabilitiesComponent) and provides access to the components with the templated
  * #component method. The values are not guaranteed to be constant over the lifetime of
  * the application, but most values can be considered to be static and cache-able. New
  * components can be added using the #addComponent and retrieved using the #component
@@ -149,7 +149,7 @@ private:
 } // namespace ghoul
 
 #define SysCap (ghoul::systemcapabilities::SystemCapabilities::ref())
-#define CpuCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::CPUCapabilitiesComponent>()))
+#define CpuCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::GeneralCapabilitiesComponent>()))
 #define OpenGLCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::OpenGLCapabilitiesComponent>()))
 #define OpenCLCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::OpenCLCapabilitiesComponent>()))
 

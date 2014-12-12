@@ -27,7 +27,7 @@
 
 #include "logging/logmanager.h"
 #include "systemcapabilities/systemcapabilitiescomponent.h"
-#include "systemcapabilities/cpucapabilitiescomponent.h"
+#include "systemcapabilities/generalcapabilitiescomponent.h"
 #include "systemcapabilities/openglcapabilitiescomponent.h"
 
 #include <assert.h>
