@@ -189,6 +189,15 @@ bool TemplateFactory<BaseClass>::hasClass(const std::string& className) const {
 }
 
 template <typename BaseClass>
+std::vector<std::string> ghoul::TemplateFactory<BaseClass>::registeredClasses() const {
+	std::vector<std::string> result;
+	result.reserve(_map.size());
+	for (const auto& it : _map)
+		result.push_back(it.first);
+	return result;
+}
+
+template <typename BaseClass>
 const std::type_info& ghoul::TemplateFactory<BaseClass>::baseClassType() const
 {
     return typeid(BaseClass);
