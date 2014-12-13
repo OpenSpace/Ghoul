@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "systemcapabilities/GeneralCapabilitiesComponent.h"
+#include "systemcapabilities/generalcapabilitiescomponent.h"
 
 #include <ghoul/opengl/ghoul_gl.h>
 #include <algorithm>
