@@ -53,6 +53,7 @@ set(SOURCE_ROOT_DIR ${GHOUL_ROOT_DIR}/src)
 set(HEADER_ROOT_DIR ${GHOUL_ROOT_DIR}/include/ghoul)
 
 add_source_group("CmdParser" "cmdparser")
+add_source_group("DesignPattern" "designpattern")
 add_source_group("Exception" "exception")
 add_source_group("FileSystem" "filesystem")
 add_source_group("IO" "io")

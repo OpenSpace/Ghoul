@@ -83,6 +83,10 @@ if (NOT GHOUL_USE_DYNAMIC_GLEW)
     add_definitions(-DGLEW_STATIC)
 endif ()
 
+find_package(LZ4 REQUIRED)
+include_directories(${LZ4_INCLUDE_DIR})
+set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${LZ4_LIBRARIES})
+
 find_package(DevIL)
 if (IL_FOUND)
     option(GHOUL_USE_DEVIL "Use the DevIL library" ON)

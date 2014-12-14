@@ -23,47 +23,54 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "gtest/gtest.h"
+#ifndef __SINGLETON_H__
+#define __SINGLETON_H__
 
-#include <ghoul/cmdparser/cmdparser>
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
+#include <iostream>
+#include <cassert>
 
-#include "tests/test_common.inl"
-#include "tests/test_buffer.inl"
-#include "tests/test_luatodictionary.inl"
-#include "tests/test_commandlineparser.inl"
-#include "tests/test_dictionary.inl"
-#include "tests/test_filesystem.inl"
+namespace ghoul {
 
-using namespace ghoul::cmdparser;
-using namespace ghoul::filesystem;
-using namespace ghoul::logging;
-
-#ifndef GHOUL_ROOT_DIR
-#define GHOUL_ROOT_DIR "../../../ext/ghoul"
-#endif
-
-int main(int argc, char** argv) {
-    LogManager::initialize(LogManager::LogLevel::None);
-    LogMgr.addLog(new ConsoleLog);
-
-    FileSystem::initialize();
+template <class T>
+class Singleton {
+public:
+    template <typename... Args>
+    static void initialize(Args... args) {
+        assert( ! isInitialized());
+        _instance = new T(std::forward<Args>(args)...);
+    }
     
-    const std::string root = GHOUL_ROOT_DIR;
-    const std::string testdir = root + "/tests";
-    const std::string scriptdir = root + "/scripts";
-
-    const bool extDir = FileSys.directoryExists(testdir);
-    if (extDir) {
-        FileSys.registerPathToken("${SCRIPTS_DIR}", scriptdir);
-        FileSys.registerPathToken("${TEST_DIR}", testdir);
+    static void deinitialize() {
+        assert(isInitialized());
+        delete _instance;
+        _instance = nullptr;
     }
-    else {
-        LFATALC("main", "Fix me");
-        return 0;
+    
+    static bool isInitialized() {
+        return _instance != nullptr;
     }
+    
+    static T& ref() {
+        assert(isInitialized());
+        return *_instance;
+    }
+protected:
+    Singleton() {};
+    ~Singleton() {};
+    
+private:
 
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+    // protecting against evil
+    Singleton(const Singleton&) = delete;
+    Singleton(const Singleton&&) = delete;
+    Singleton& operator= (const Singleton& rhs) = delete;
+    
+    // instance member
+    static T* _instance;
+    
+}; // Singleton
+
+template <class T> T* Singleton<T>::_instance = nullptr;
+
+} // namespace ghoul
+#endif
