@@ -190,7 +190,7 @@ TEST(Buffer, StoreCompress) {
     b.serialize(u1);
     
     b.write("binaryCompressed.bin", true);
-    b2.read("binaryCompressed.bin", true);
+    b2.read("binaryCompressed.bin");
     
     b2.deserialize(s2);
     b2.deserialize(i2);

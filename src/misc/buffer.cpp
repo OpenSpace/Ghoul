@@ -48,11 +48,11 @@ Buffer::Buffer(size_t capacity)
     , _offsetRead(0)
 {}
 
-Buffer::Buffer(const std::string& filename, bool compressed)
+Buffer::Buffer(const std::string& filename)
     : _offsetWrite(0)
     , _offsetRead(0)
 {
-    read(filename, compressed);
+    read(filename);
 }
 
 Buffer::Buffer(const Buffer& other) {
@@ -121,7 +121,8 @@ bool Buffer::write(const std::string& filename, bool compress) {
     std::ofstream file(filename, std::ios::binary | std::ios::out);
     if (!file)
         return false;
-
+    
+    file.write(reinterpret_cast<const char*>(&compress), sizeof(bool));
     if(compress) {
         value_type* data = new value_type[size()];
         int compressed_size = LZ4_compress(reinterpret_cast<const char*>(_data.data()),
@@ -146,7 +147,7 @@ bool Buffer::write(const std::string& filename, bool compress) {
     return true;
 }
 
-bool Buffer::read(const std::string& filename, bool compressed) {
+bool Buffer::read(const std::string& filename) {
     std::ifstream file(filename, std::ios::binary | std::ios::in);
     //BinaryFile file(filename, BinaryFile::OpenMode::In);
     if (!file)
@@ -154,6 +155,8 @@ bool Buffer::read(const std::string& filename, bool compressed) {
     
     _offsetRead = 0;
     size_t size;
+    bool compressed;
+    file.read(reinterpret_cast<char*>(&compressed), sizeof(bool));
     if(compressed) {
     
         // read original size
@@ -182,17 +185,17 @@ bool Buffer::read(const std::string& filename, bool compressed) {
     return true;
 }
 
-void Buffer::serialize(const char* data) {
-    serialize(std::string(data));
+void Buffer::serialize(const char* s) {
+    serialize(std::string(s));
 }
 
-void Buffer::serialize(const char* data, size_t size) {
+void Buffer::serialize(const value_type* data, size_t size) {
     _data.resize(_data.capacity() + size);
     std::memcpy(_data.data() + _offsetWrite, &data, size);
     _offsetWrite += size;
 }
 
-void Buffer::deserialize(char* data, size_t size) {
+void Buffer::deserialize(value_type* data, size_t size) {
     std::memcpy(data, &_data + _offsetRead, size);
     _offsetRead += size;
 }

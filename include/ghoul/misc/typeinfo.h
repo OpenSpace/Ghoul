@@ -46,16 +46,33 @@ namespace opengl {
     class Texture;
 }
 
+/**
+ * This class is a wrapper class for returning human readable names
+ * for the most commonly used types in Ghoul.
+ */
 class TypeInfo {
 public:
     
-    // unknown type
+    /**
+     * Returns the name of the provided type. If the class
+     * is not registered the typeid(T).name will be used. This
+     * will make the names look much worse and const types will
+     * be treated as the same as non-const types.
+     * \return The name of the provided type
+     */
     template<class T>
     static std::string name();
     
-    // unknown type
+    /**
+     * Returns the name of the type of the provided object. If the class
+     * is not registered the typeid(T).name will be used. This
+     * will make the names look much worse and const types will
+     * be treated as the same as non-const types.
+     * \param obj The object of the type name requested
+     * \return The name of the type of the provided object
+     */
     template<class T>
-    static std::string name(const T&);
+    static std::string name(const T& obj);
     
 }; // TypeInfo
 
