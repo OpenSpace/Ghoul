@@ -25,7 +25,7 @@
 #ifndef __BUFFER_H__
 #define __BUFFER_H__
 
-#include <cstdio> // std::memcpy
+#include <cstring> // std::memcpy
 #include <cassert>
 #include <string>
 #include <vector>
