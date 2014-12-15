@@ -164,7 +164,8 @@ public:
     /**
      * Serializes a vector of objects
      */
-    template<class T, template <typename, typename = std::allocator<T>> class C> void serialize(const C<T>& v);
+	template<typename T>
+	void serialize(const std::vector<T>& v);
     
     /**
      * Deserialize raw data
@@ -181,7 +182,8 @@ public:
     /**
      * Deserializes a vector of objects
      */
-    template<class T, template <typename, typename = std::allocator<T>> class C>  void deserialize(C<T>& v);
+	template<typename T>
+	void deserialize(std::vector<T>& v);
     
 private:
 

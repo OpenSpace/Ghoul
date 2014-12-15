@@ -244,16 +244,28 @@ TEST(Buffer, Vector) {
     fv.push_back(3.5);
     fv.push_back(4.5);
     fv.push_back(5.5);
+
+	std::vector<std::string> sv, sv2;
+	sv.push_back("first");
+	sv.push_back("second");
+	sv.push_back("third");
     
     ghoul::Buffer b;
     
     b.serialize(fv);
+	b.serialize(sv);
     b.deserialize(fv2);
+	b.deserialize(sv2);
     
     EXPECT_EQ(fv.size(), fv2.size());
     for(size_t i = 0; i < fv.size(); ++i) {
         EXPECT_EQ(fv.at(i), fv2.at(i));
     }
+
+	EXPECT_EQ(sv.size(), sv2.size());
+	for (size_t i = 0; i < sv.size(); ++i) {
+		EXPECT_EQ(sv.at(i), sv2.at(i));
+	}
     
 }
 

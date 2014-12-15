@@ -42,8 +42,8 @@ void ghoul::Buffer::deserialize(T& value) {
     _offsetRead += size;
 }
 
-template<class T, template <typename, typename = std::allocator<T>> class C>
-void ghoul::Buffer::serialize(const C<T>& v) {
+template<typename T>
+void ghoul::Buffer::serialize(const std::vector<T>& v) {
     static_assert(std::is_pod<T>::value, "T has to be a POD for general serialize");
     
     const size_t length = v.size();
@@ -57,8 +57,8 @@ void ghoul::Buffer::serialize(const C<T>& v) {
 }
 
 
-template<class T, template <typename, typename = std::allocator<T>> class C>
-void ghoul::Buffer::deserialize(C<T>& v) {
+template<typename T>
+void ghoul::Buffer::deserialize(std::vector<T>& v) {
     static_assert(std::is_pod<T>::value, "T has to be a POD for general deserialize");
     
     assert(_offsetRead + sizeof(size_t) <= _data.size());
