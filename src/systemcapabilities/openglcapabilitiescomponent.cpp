@@ -63,8 +63,21 @@ namespace systemcapabilities {
 
 OpenGLCapabilitiesComponent::OpenGLCapabilitiesComponent() 
     : SystemCapabilitiesComponent()
+	, _glslVersion()
+	, _vendor(Vendor::Other)
+	, _glewVersion()
+	, _maxTextureSize(-1)
+	, _maxTextureSize3D(-1)
+	, _numTextureUnits(-1)
+	, _supportTexturing3D(false)
+	, _maxFramebufferColorAttachments(-1)
+#ifdef GHOUL_USE_WMI
+	, _driverVersion("")
+	, _driverDate("")
+	, _adapterRAM(0)
+	, _adapterName("")
+#endif
 {
-    clearCapabilities();
 }
 
 OpenGLCapabilitiesComponent::~OpenGLCapabilitiesComponent() {
@@ -245,7 +258,7 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
 
     if (verbosity >= Verbosity::Full) {
         std::stringstream s;
-        if (_extensions.size() > 0) {
+        if (!_extensions.empty()) {
             for (size_t i = 0; i < _extensions.size() - 1; ++i)
                 s << _extensions[i] << ", ";
             s << _extensions[_extensions.size() - 1] << "\n";
