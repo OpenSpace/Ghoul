@@ -115,6 +115,7 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
     , _ignoreAttributeLocationError(cpy._ignoreAttributeLocationError)
     , _ignoreSubroutineLocationError(cpy._ignoreSubroutineLocationError)
     , _ignoreSubroutineUniformLocationError(cpy._ignoreSubroutineUniformLocationError)
+	, _onChangeCallback(nullptr)
 {
     _id = glCreateProgram();
     if (_id == 0)
@@ -171,6 +172,7 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
         _ignoreAttributeLocationError = rhs._ignoreAttributeLocationError;
         _ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
         _ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
+		_onChangeCallback = rhs._onChangeCallback;
 
 		for (const ManagedShaderObject& obj : _shaderObjects) {
             // Only delete ShaderObjects that belong to this ProgramObject
@@ -226,6 +228,7 @@ ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) {
 		_ignoreAttributeLocationError = rhs._ignoreAttributeLocationError;
 		_ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
 		_ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
+		_onChangeCallback = std::move(rhs._onChangeCallback);
 
 		for (const ManagedShaderObject& obj : _shaderObjects) {
 			// Only delete ShaderObjects that belong to this ProgramObject
@@ -325,7 +328,7 @@ void ProgramObject::detachObject(ShaderObject* shaderObject) {
 
 bool ProgramObject::compileShaderObjects() {
 #ifdef GHL_DEBUG
-    if (_shaderObjects.size() == 0) {
+    if (_shaderObjects.empty()) {
         LWARNING("No ShaderObjects present for compiling");
         return false;
     }
@@ -339,7 +342,7 @@ bool ProgramObject::compileShaderObjects() {
 
 bool ProgramObject::linkProgramObject() {
 #ifdef GHL_DEBUG
-    if (_shaderObjects.size() == 0) {
+    if (_shaderObjects.empty()) {
         LWARNING("No ShaderObjects present while linking");
         return false;
     }
@@ -370,7 +373,7 @@ bool ProgramObject::linkProgramObject() {
 
 bool ProgramObject::rebuildFromFile() {
 #ifdef GHL_DEBUG
-    if (_shaderObjects.size() == 0) {
+    if (_shaderObjects.empty()) {
         LWARNING("No ShaderObjects present while rebuilding");
         return false;
     }
@@ -393,7 +396,7 @@ bool ProgramObject::rebuildFromFile() {
 
 void ProgramObject::activate() {
 #ifdef GHL_DEBUG
-    if (_shaderObjects.size() == 0) {
+    if (_shaderObjects.empty()) {
         LWARNING("No ShaderObjects present while activating");
         return;
     }
@@ -2874,7 +2877,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
                                           const std::vector<GLuint>& values)
 {
 #ifdef GHL_DEBUG
-    if (values.size() == 0) {
+    if (values.empty()) {
         LWARNING("No values passed");
         return false;
     }
@@ -2898,7 +2901,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
                                         const std::map<std::string, std::string>& values)
 {
 #ifdef GHL_DEBUG
-    if (values.size() == 0) {
+    if (values.empty()) {
         LWARNING("No values passed");
         return false;
     }
