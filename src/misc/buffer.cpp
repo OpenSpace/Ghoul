@@ -127,7 +127,7 @@ bool Buffer::write(const std::string& filename, bool compress) {
         value_type* data = new value_type[size()];
         int compressed_size = LZ4_compress(reinterpret_cast<const char*>(_data.data()),
                                            reinterpret_cast<char*>(data),
-                                           _offsetWrite);
+                                           static_cast<int>(_offsetWrite));
         if (compressed_size <= 0) {
             delete[] data;
             return false;
@@ -174,7 +174,7 @@ bool Buffer::read(const std::string& filename) {
         _offsetWrite = LZ4_decompress_safe(reinterpret_cast<const char*>(data),
                                            reinterpret_cast<char*>(_data.data()),
                                            size,
-                                           _data.size());
+										   static_cast<int>(_data.size()));
         delete[] data;
     } else {
         file.read(reinterpret_cast<char*>(&size), sizeof(size_t));
