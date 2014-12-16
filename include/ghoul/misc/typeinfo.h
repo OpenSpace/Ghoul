@@ -132,16 +132,16 @@ TYPEINFO_NAME_DECLARATION(opengl::Texture)
 
 // unknown type
 template<class T>
-static std::string name() {
+std::string TypeInfo::name() {
     return std::string(typeid(T).name());
 }
 
 // unknown type
 template<class T>
-static std::string name(const T&) {
+std::string TypeInfo::name(const T&) {
     return name<T>();
 }
 
-}  // owl
+}  // ghoul
 
 #endif
