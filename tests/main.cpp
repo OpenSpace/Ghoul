@@ -23,7 +23,16 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#ifdef __unix__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
+#endif // __unix__
+
 #include "gtest/gtest.h"
+
+#ifdef __unix__
+#pragma GCC diagnostic pop
+#endif // __unix__
 
 #include <ghoul/cmdparser/cmdparser>
 #include <ghoul/filesystem/filesystem>
