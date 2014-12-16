@@ -25,7 +25,7 @@
 
 #ifdef __unix__
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wall"
+#pragma GCC diagnostic ignored "-Wconversion-null"
 #endif // __unix__
 
 #include "gtest/gtest.h"
