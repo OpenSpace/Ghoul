@@ -23,69 +23,29 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/opengl/vertexbufferobject.h>
-#include <ghoul/misc/assert.h>
-
-namespace ghoul {
-namespace opengl {
-
-VertexBufferObject::VertexBufferObject()
-	: _vaoID(0)
-	, _vBufferID(0)
-	, _iBufferID(0)
-	, _isize(0)
-{}
-
-VertexBufferObject::~VertexBufferObject() {
-	ghoul_assert(_vBufferID == 0,
-		"The VertexBufferObject must be deinitialized before destruction");
-}
-
-void VertexBufferObject::deinitialize() {
-	glDeleteBuffers(1, &_vBufferID);
-	glDeleteBuffers(1, &_iBufferID);
-	glDeleteVertexArrays(1, &_vaoID);
-
-	_vBufferID = 0;
-	_iBufferID = 0;
-	_vaoID = 0;
-}
-
-void VertexBufferObject::vertexAttribPointer(
-	GLuint index, 
-	GLint size,
-	GLenum type,
-	GLsizei stride, 
-	GLuint offset,  
-	GLboolean normalized)
+template<typename T>
+bool ghoul::opengl::VertexBufferObject::initialize(
+	const std::vector<T>& varray, 
+	const std::vector<GLint>& iarray) 
 {
-	glBindVertexArray(_vaoID);
-	glEnableVertexAttribArray(index);
-	glVertexAttribPointer(index, size, type, normalized, stride,
-		reinterpret_cast<const GLvoid*>(offset));
-	glBindVertexArray(0);
-}
+	static_assert(std::is_pod<T>::value, "T has to be a POD");
 
-void VertexBufferObject::bind() {
-	glBindVertexArray(_vaoID);
-}
+	generateGLObjects();
 
-void VertexBufferObject::unbind() {
-	glBindVertexArray(0);
-}
+	if (_vaoID == 0 || _vBufferID == 0 || _iBufferID == 0)
+		return false;
 
-void VertexBufferObject::render(GLenum mode) {
+	if (varray.size() == 0 || iarray.size() == 0)
+		return false;
+
+	_isize = iarray.size();
+
 	glBindVertexArray(_vaoID);
+
+	glBindBuffer(GL_ARRAY_BUFFER, _vBufferID);
+	glBufferData(GL_ARRAY_BUFFER, varray.size() * sizeof(T), varray.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
-	glDrawElements(mode, _isize, GL_UNSIGNED_INT, 0);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, iarray.size() * sizeof(GLint), iarray.data(), GL_STATIC_DRAW);
+
 	glBindVertexArray(0);
-}
-
-void VertexBufferObject::generateGLObjects() {
-	glGenVertexArrays(1, &_vaoID);
-	glGenBuffers(1, &_vBufferID);
-	glGenBuffers(1, &_iBufferID);
-}
-
-}
 }

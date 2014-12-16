@@ -25,17 +25,35 @@
 
 #ifndef __VERTEXBUFFEROBJECT_H__
 #define __VERTEXBUFFEROBJECT_H__
+
+// ghoul
 #include <ghoul/opengl/ghoul_gl.h>
 
+// std
 #include <vector>
 
 namespace ghoul {
 namespace opengl {
 
-
+/**
+ * This class is a wrapper for handling vertex buffer objects. It is only meant for 
+ * simplifying the creation and use of the most standard vertex buffer object with a 
+ * vertex list and an index list. 
+ */
 class VertexBufferObject {
 public:
+
+	/**
+	 * Default constructor. Initializes the internal GL objects to 0. 
+	 * VertexBufferObjects can be constructed withouta GL context but 
+	 * cannot be initialized without a GL context.
+	 */
 	VertexBufferObject();
+
+	/**
+	 * Default destructor. Calls an assertion in debug mode that the VertexBufferObject 
+	 * is not still initialized.
+	 */
 	~VertexBufferObject();
 
 	/**
@@ -45,6 +63,13 @@ public:
 	 */
 	template<typename T>
 	bool initialize(const std::vector<T>& varray, const std::vector<GLint>& iarray);
+
+	/**
+	 * Deinitializes the internal GL objects, if the VertexBufferObject is 
+	 * initialized then deinitialize must be done before destruction of 
+	 * the object.
+	 */
+	void deinitialize();
 
 	/**
 	 * A wrapper function for glEnableVertexAttribArray 
@@ -75,90 +100,29 @@ public:
 	void unbind();
 
 	/**
-	 * Renders the VBO using the provided mode. Default is GL_TRIANGLES.
-	 * \param mode The render mode
+	 * Renders the VBO using the provided mode.
+	 * \param mode The render mode, default is <code>GL_TRIANGLES</code>
 	 */
 	void render(GLenum mode = GL_TRIANGLES);
 
 private:
 
+	/**
+	 * Constructs the internal GL objects by calling 
+	 * glGenVertexArrays and glGenBuffers
+	 */
+	void generateGLObjects();
+
 	GLuint _vaoID;
 	GLuint _vBufferID;
 	GLuint _iBufferID;
 	unsigned int _isize;
+
 }; // class VertexBufferObject
 
-
-
-template<typename T>
-bool VertexBufferObject::initialize(const std::vector<T>& varray, const std::vector<GLint>& iarray) {
-	static_assert(std::is_pod<T>::value, "T has to be a POD");
-
-	glGenVertexArrays(1, &_vaoID);
-	glGenBuffers(1, &_vBufferID);
-	glGenBuffers(1, &_iBufferID);
-
-	if (_vaoID == 0 || _vBufferID == 0 || _iBufferID == 0)
-		return false;
-
-	if (varray.size() == 0 || iarray.size() == 0)
-		return false;
-
-	_isize = iarray.size();
-
-	glBindVertexArray(_vaoID);
-
-	glBindBuffer(GL_ARRAY_BUFFER, _vBufferID);
-	glBufferData(GL_ARRAY_BUFFER, varray.size() * sizeof(T), varray.data(), GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, iarray.size() * sizeof(GLint), iarray.data(), GL_STATIC_DRAW);
-
-	glBindVertexArray(0);
-}
-
-/*
-template<typename T>
-VertexBufferObject<T>::VertexBufferObject()
-	: _vaoID(0)
-	, _vBufferID(0)
-	, _iBufferID(0)
-	, _isize(0)
-{}
-
-template<typename T>
-VertexBufferObject<T>::~VertexBufferObject() {
-	glDeleteBuffers(1, &_vBufferID);
-	glDeleteBuffers(1, &_iBufferID);
-	glDeleteVertexArrays(1, &_vaoID);
-}
-template<typename T>
-void VertexBufferObject<T>::vertexAttribPointer(GLuint index, GLint size, GLuint offset, GLenum type, GLboolean normalized){
-	glBindVertexArray(_vaoID);
-	glEnableVertexAttribArray(index);
-	glVertexAttribPointer(index, size, type, normalized, sizeof(T),
-		reinterpret_cast<const GLvoid*>(offset));
-	glBindVertexArray(0);
-}
-
-template<typename T>
-void VertexBufferObject<T>::bind() {
-	glBindVertexArray(_vaoID);
-}
-
-template<typename T>
-void VertexBufferObject<T>::unbind() {
-	glBindVertexArray(0);
-}
-
-template<typename T>
-void VertexBufferObject<T>::render() {
-	glBindVertexArray(_vaoID);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
-	glDrawElements(GL_TRIANGLES, _isize, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-}
-*/
 } // namespace opengl
 } // namespace ghoul
+
+#include "vertexbufferobject.inl"
 
 #endif // __VERTEXBUFFEROBJECT_H__
