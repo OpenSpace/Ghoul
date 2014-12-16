@@ -55,7 +55,6 @@ namespace {
 namespace ghoul {
 namespace filesystem {
 
-FileSystem* FileSystem::_fileSystem = nullptr;
 const std::string FileSystem::TokenOpeningBraces = "${";
 const std::string FileSystem::TokenClosingBraces = "}";
 #ifdef WIN32
@@ -66,39 +65,24 @@ const char FileSystem::PathSeparator = '/';
 
 FileSystem::FileSystem()
     : _cacheManager(nullptr)
-{}
+{
+#if !defined(WIN32) && !defined(__APPLE__)
+	initializeInternalLinux();
+#endif
+}
 
 FileSystem::~FileSystem() {
     if(_cacheManager)
         delete _cacheManager;
-}
-
-void FileSystem::initialize() {
-    assert(_fileSystem == nullptr);
-    if (_fileSystem == nullptr)
-        _fileSystem = new FileSystem;
-
-#if !defined(WIN32) && !defined(__APPLE__)
-	_fileSystem->initializeInternalLinux();
-#endif
-}
-
-void FileSystem::deinitialize() {
-    assert(_fileSystem != nullptr);
 #ifdef WIN32
-	_fileSystem->deinitializeInternalWindows();
+	deinitializeInternalWindows();
 #elif __APPLE__
-	_fileSystem->deinitializeInternalApple();
+	deinitializeInternalApple();
 #else
-	_fileSystem->deinitializeInternalLinux();
+	deinitializeInternalLinux();
 #endif
-    delete _fileSystem;
 }
 
-FileSystem& FileSystem::ref() {
-    assert(_fileSystem != nullptr);
-    return *_fileSystem;
-}
 
 string FileSystem::absolutePath(string path) const {
     expandPathTokens(path);
@@ -534,18 +518,18 @@ void FileSystem::registerPathToken(string token, string path, bool override) {
     
     
 	if (!override) {
-		if (_fileSystem->_tokenMap.find(token) != _fileSystem->_tokenMap.end()) {
+		if (_tokenMap.find(token) != _tokenMap.end()) {
 			LERROR("Token already bound to path '" +
-						_fileSystem->_tokenMap[token] + "'");
+						_tokenMap[token] + "'");
 			return;
 		}
 	}
 #endif
 	if (override) {
-		auto it = _fileSystem->_tokenMap.find(token);
-		_fileSystem->_tokenMap.erase(it);
+		auto it = _tokenMap.find(token);
+		_tokenMap.erase(it);
 	}
-	_fileSystem->_tokenMap.emplace(token, path);
+	_tokenMap.emplace(token, path);
 }
     
 string FileSystem::cleanupPath(string path) const {
@@ -632,26 +616,26 @@ std::vector<std::string> FileSystem::tokens() const {
 }
     
 bool FileSystem::createCacheManager(const Directory& cacheDirectory) {
-    if (!_fileSystem->directoryExists(cacheDirectory)) {
+    if (!directoryExists(cacheDirectory)) {
         LERROR("Requested cache directory '" << cacheDirectory << "' did not exist");
         return false;
     }
     
-    if (_fileSystem->_cacheManager != nullptr) {
+    if (_cacheManager != nullptr) {
         LERROR("CacheManager was already created");
         return false;
     }
     
-    _fileSystem->_cacheManager = new CacheManager(cacheDirectory);
-    assert(_fileSystem->_cacheManager);
+    _cacheManager = new CacheManager(cacheDirectory);
+    assert(_cacheManager);
     return true;
 }
 
 void FileSystem::destroyCacheManager() {
-	assert(_fileSystem->_cacheManager);
+	assert(_cacheManager);
 
-	delete _fileSystem->_cacheManager;
-	_fileSystem->_cacheManager = nullptr;
+	delete _cacheManager;
+	_cacheManager = nullptr;
 }
 
 CacheManager* FileSystem::cacheManager() {

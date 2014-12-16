@@ -26,6 +26,10 @@
 #ifndef __FILESYSTEM_H__
 #define __FILESYSTEM_H__
 
+#include <ghoul/designpattern/singleton.h>
+#include <ghoul/filesystem/directory.h>
+#include <ghoul/filesystem/file.h>
+
 #include <map>
 #include <string>
 #include <vector>
@@ -34,9 +38,6 @@
 #if !defined(WIN32) && !defined(__APPLE__)
 #include <thread>
 #endif
-
-#include <ghoul/filesystem/directory.h>
-#include <ghoul/filesystem/file.h>
 
 namespace ghoul {
 namespace filesystem {
@@ -68,33 +69,11 @@ class CacheManager;
  * might lead to inconsistencies. For the same reason, it is not possible to unregister
  * tokens.
  */
-class FileSystem {
+class FileSystem: public Singleton<FileSystem> {
 public:
     static const char PathSeparator;
     static const std::string TokenOpeningBraces;
     static const std::string TokenClosingBraces;
-
-    /**
-     * Initializes the singleton object. This method triggers an assert if the FileSystem
-     * already has been initialized before without being deinitialized in between
-     * (#initialize()). 
-     */
-    static void initialize();
-    
-    /**
-     * Deinitializes the FileSystem and removes all registered path tokens. As some tokens
-     * might already have been resolved in some paths, deleting the tokens might lead to
-     * inconsistencies. This function will trigger an assert if the FileSystem has not
-     * been initialized (#initialize()) before.
-     */
-    static void deinitialize();
-    
-    /**
-     * Returns a reference to the static FileSystem. This method will trigger an assert if
-     * the FileSystem has not been initialized before.
-     * \return A reference to the static FileSystem.
-     */
-    static FileSystem& ref();
     
     /**
      * Returns the absolute path to the passed <code>path</code>, resolving any tokens (if
@@ -292,7 +271,22 @@ public:
      */
 	void triggerFilesystemEvents();
 
+	friend class Singleton < FileSystem > ;
+
 private:
+
+	/**
+	 * Constructs a FileSystem object
+	 */
+	FileSystem();
+
+	/**
+     * Deinitializes the FileSystem and removes all registered path tokens. As some tokens
+     * might already have been resolved in some paths, deleting the tokens might lead to
+     * inconsistencies.
+     */
+	~FileSystem();
+
     /**
      * This method cleans up a passed path by removing any double path separators and
      * replacing all separators into the ones used by the operating system. It also
@@ -335,17 +329,6 @@ private:
      */
     std::string resolveToken(const std::string& token) const;
 
-    /**
-     * Empty constructor. Private as there should not be any local FileSystems around,
-     * but the static one.
-     */
-    FileSystem();
-    
-    /**
-     * Private destructor, called by deinitialize
-     */
-    ~FileSystem();
-
     FileSystem(const FileSystem& rhs) = delete;
     FileSystem& operator=(const FileSystem& rhs) = delete;
     
@@ -354,10 +337,6 @@ private:
 
 	/// The cache manager object, only allocated if createCacheManager is called
 	CacheManager* _cacheManager;
-
-	/// This member variable stores the static FileSystem. Has to be initialized and
-	/// deinitialized using the #initialize and #deinitialize methods.
-	static FileSystem* _fileSystem;
 
 #ifdef WIN32
 

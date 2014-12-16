@@ -63,7 +63,7 @@ namespace filesystem {
 	};
 
 void FileSystem::deinitializeInternalWindows() {
-	for (const auto& d : _fileSystem->_directories) {
+	for (const auto& d : _directories) {
 		DirectoryHandle* dh = d.second;
 		if (dh != nullptr && dh->_handle != nullptr) {
 			CancelIo(dh->_handle);
