@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "logging/textlog.h"
+#include "ghoul/logging/textlog.h"
 
 #include <cstdio>
 

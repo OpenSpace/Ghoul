@@ -23,13 +23,13 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "systemcapabilities/generalcapabilitiescomponent.h"
+#include <ghoul/systemcapabilities/generalcapabilitiescomponent.h>
 
+#include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <algorithm>
 #include <cassert>
 #include <sstream>
-#include "logging/logmanager.h"
 
 #ifdef WIN32
     #include <Windows.h>

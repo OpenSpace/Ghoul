@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "misc/dictionary.h"
+#include "ghoul/misc/dictionary.h"
 
 #include <glm/gtc/type_ptr.hpp>
 

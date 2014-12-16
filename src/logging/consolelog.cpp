@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "logging/consolelog.h"
+#include "ghoul/logging/consolelog.h"
 #include <iostream>
 
 #ifdef WIN32

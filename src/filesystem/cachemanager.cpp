@@ -257,7 +257,7 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
     // deleted or there exists a file somewhere in the directory tree
 
 	contents = dir.read();
-    bool isEmpty = contents.size() == 0;
+    bool isEmpty = contents.empty();
 #ifdef __APPLE__
     // Apple stores the .DS_Store directory in the directory which can be removed
     std::string dsStore = FileSys.pathByAppendingComponent(dir, ".DS_Store");

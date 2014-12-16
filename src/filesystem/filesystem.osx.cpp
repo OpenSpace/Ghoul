@@ -90,10 +90,10 @@ namespace {
             //std::string ename = EventEnumToName(static_cast<Events>(eventFlags[i]));
             //printf("%s\n%s\n", path.c_str(), ename.c_str());
             
-            if(! eventFlags[i] & Events::kFSEventStreamEventFlagItemModified)
+            if(! (eventFlags[i] & Events::kFSEventStreamEventFlagItemModified))
                 continue;
             
-            if(! eventFlags[i] & Events::kFSEventStreamEventFlagItemIsFile)
+            if(! (eventFlags[i] & Events::kFSEventStreamEventFlagItemIsFile))
                 continue;
             
             ghoul::filesystem::callbackHandler(paths[i]);

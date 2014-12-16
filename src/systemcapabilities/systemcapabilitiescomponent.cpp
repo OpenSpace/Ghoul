@@ -23,9 +23,9 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "systemcapabilities/systemcapabilitiescomponent.h"
+#include "ghoul/systemcapabilities/systemcapabilitiescomponent.h"
 
-#include "logging/logmanager.h"
+#include "ghoul/logging/logmanager.h"
 
 namespace ghoul {
 namespace systemcapabilities {

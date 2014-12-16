@@ -29,7 +29,7 @@
  * http://www.intel.com/technology/comms/perfnet/download/CRC_generators.pdf             *
  ****************************************************************************************/
 
-#include "misc/crc32.h"
+#include "ghoul/misc/crc32.h"
 
 #include <algorithm>
 #include <cassert>
