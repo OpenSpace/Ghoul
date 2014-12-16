@@ -25,6 +25,7 @@
 
 #include <ghoul/io/rawvolumereader.h>
 #include <iostream>
+#include <fstream>
 
 namespace ghoul {
 
@@ -55,9 +56,10 @@ opengl::Texture* RawVolumeReader::read(std::string filename) {
 		int size = _hints._dimensions.x*_hints._dimensions.y*_hints._dimensions.z;
 		GLubyte *data = new GLubyte[size];
 
-		if( FILE *fin = fopen(filename.c_str(), "rb") ){
-			fread(data, sizeof(unsigned char), size, fin);
-			fclose(fin);
+		std::ifstream fin(filename, std::ios::in | std::ios::binary);
+		if( fin.good() ){
+			fin.read(reinterpret_cast<char*>(data), sizeof(unsigned char)*size);
+			fin.close();
 		} else {
 			fprintf( stderr, "Could not open file '%s'\n", filename.c_str() );
 		}
