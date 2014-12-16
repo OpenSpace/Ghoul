@@ -45,7 +45,7 @@ namespace cmdparser {
  * \tparam T The typename of the first argument type
  * \tparam U The typename of the second argument type, defaulting to <code>T</code>
  * \tparam V The typename of the third argument type, defaulting to <code>U</code>
- * \tparam W The typename of the fourth argument type, defaulting to <code>V>/code>
+ * \tparam W The typename of the fourth argument type, defaulting to <code>V</code>
  * \sa MultipleCommandZeroArguments
  */
 template<class T, class U = T, class V = U, class W = V>

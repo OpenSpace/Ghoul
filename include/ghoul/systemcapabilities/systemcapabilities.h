@@ -126,7 +126,7 @@ public:
 private:
     /**
      * Creates an empty SystemCapabilities object. The constructor will be called by the
-     * static #create method.
+     * static create method.
      */
     SystemCapabilities();
     /**

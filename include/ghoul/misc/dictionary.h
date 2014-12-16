@@ -45,7 +45,7 @@ namespace ghoul {
  * <code>StorageType</code> will be converted automatically. For example a value can be
  * stored as an <code>int</code> and can be retrieved as a <code>short</code>. The table
  * of all types is:
- * | <code>Type</code>               | <code>StorageType</code>  | <code>#Values</code> |
+ * | <code>Type</code>               | <code>StorageType</code>  | <code>\#Values</code>|
  * |:-------------------------------:|:-------------------------:|:--------------------:|
  * | <code>bool</code>               | <code>IntegralType</code>         |  1           |
  * | <code>char</code>               | <code>IntegralType</code>         |  1           |

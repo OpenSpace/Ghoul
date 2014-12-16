@@ -132,14 +132,14 @@ public:
      * \param filename The filename to be written to
      * \param compress Flag that specifies if the current Buffer should
      * be compressed when written to file
-     * \return <code>true</code> if successfull and <code>false</vode> if unsuccessfull
+     * \return <code>true</code> if successful and <code>false</code> if unsuccessful
      */
     bool write(const std::string& filename, bool compress = false);
     
     /**
      * Reads the Buffer from a Buffer file. 
      * \param filename The path to the file to read
-     * \return <code>true</code> if successfull and <code>false</vode> if unsuccessfull
+     * \return <code>true</code> if successful and <code>false</code> if unsuccessful
      */
     bool read(const std::string& filename);
     

@@ -38,10 +38,10 @@ namespace opengl {
  * This class is a wrapper for an OpenGL texture. It wraps the OpenGL method for
  * generating (<code>glGenTextures</code>), binding (<code>glBindTexture</code>, #bind),
  * enabling (<code>glEnable</code>, #enable) and others. A new texture can be created
- * either from an image file using the TextureManager or #loadTexture function or using a
+ * either from an image file using the TextureManager or loadTexture function or using a
  * pointer to the data. The data layout must be as specified by the
  * <code>glTexImageXD</code> functions (see OpenGL reference). After creation a Texture
- * must be uploaded (<code>uploadTexture</code>, #uploadTexture) before it can be used in
+ * must be uploaded (uploadTexture) before it can be used in
  * the graphics pipeline. See http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml
  * for detailed information on the different arguments
  */

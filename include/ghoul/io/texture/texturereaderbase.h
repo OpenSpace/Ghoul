@@ -37,6 +37,7 @@ namespace io {
 
 class TextureReaderBase {
 public:
+	virtual ~TextureReaderBase() {}
 	virtual opengl::Texture* loadTexture(const std::string& filename) const = 0;
 	virtual std::set<std::string> supportedExtensions() const = 0;
 };

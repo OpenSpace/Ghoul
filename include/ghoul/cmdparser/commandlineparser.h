@@ -54,12 +54,12 @@ public:
     ~CommandlineParser();
     
     /**
-     * Sets if this Commandline parser allows command-line arguments that do not belong to
+     * Sets if this CommandlineParser allows command-line arguments that do not belong to
      * any registered CommandlineCommand. If this is set to <code>true</code>, a receiving
-     * <code>std::vector</code> has to be provided in the #setCommandline method which
+     * <code>std::vector</code> has to be provided in the setCommandline method which
      * will contain all command-line arguments that were not consumed by this parser.
-     * Warning: This method is only valid to be called before #setCommmandLine. Calling it
-     * after the command-line has been set results in undefined behaviour.
+     * Warning: This method is only valid to be called before setCommmandLine. Calling it
+     * after the command-line has been set results in undefined behavior.
      * \param allowUnknownCommands If set to <code>true</code> this parser allows unknown
      * arguments without a corresponding CommandlineCommand. If <code>false</code> this
      * will lead to logging of errors and #execute will return <code>false</code> if any
@@ -70,7 +70,7 @@ public:
     /**
      * Returns if this CommandlineParser allows unknown commands, which do not have a
      * CommandlineCommand associated with them, in the command-line set by
-     * #setCommandline.
+     * setCommandline.
      * \return <code>true</code> if unknown command-line arguments are allowed by this
      * CommandlineParser; <code>false</code> otherwise
      */
@@ -83,19 +83,19 @@ public:
      * \param remainingArguments A pointer to the vector which will contain all the
      * command-line arguments which have not been consumed by this CommandlineParser. In
      * order for this parameter to be used, the <code>allowUnknownCommands</code>
-     * parameter in #CommandlineParser::CommandlineParser has to be set to
-     * <code>true<code> and <code>remainingArguments</code> must point to a valid instance
+     * parameter in CommandlineParser::CommandlineParser has to be set to
+     * <code>true</code> and <code>remainingArguments</code> must point to a valid instance
      * of <code>std::vector<std::string></code>
      */
     void setCommandLine(int argc, char** argv,
                         std::vector<std::string>* remainingArguments = nullptr);
 
     /**
-     * Parses the command-line (#setCommandLine), evaluates all the commands
-     * (#CommandlineCommand::checkParameters) and executes (#CommandlineCommand::execute)
-     * them. The nameless command (#addCommandForNamelessArguments) will be checked last,
+     * Parses the command-line (setCommandLine), evaluates all the commands
+     * (CommandlineCommand::checkParameters) and executes (CommandlineCommand::execute)
+     * them. The nameless command (addCommandForNamelessArguments) will be checked last,
      * but executed first. The execution order of other CommandlineCommands occurs in the
-     * order they appear in the command-line passed in #setCommandLine.
+     * order they appear in the command-line passed in setCommandLine.
      * \return <code>true</code> if the execution passed successfully; <code>false</code>
      * is returned if either the execution failed or the user requested the help. If the
      * execution fails, parts of the commands may have been already executed, thus leaving
@@ -108,7 +108,7 @@ public:
      * CommandlineCommand from the caller to the CommandlineParser, which will delete the
      * command upon destruction.
      * \param cmd The new command that is added to the CommandlineParser. The
-     * #CommandlineCommand::name and #CommandlineCommand::shortName have to unique to the
+     * CommandlineCommand::name and CommandlineCommand::shortName have to unique to the
      * CommandlineParser, must not be <code>Nameless</code> and have to start with at
      * least one <code>-</code> or the addition will fail.
      * Furthermore, if the <code>cmd</code> already has been added to the
@@ -117,8 +117,8 @@ public:
      * \param cmd The command that is to be added. The ownership of the CommandlineCommand
      * will be transferred to the CommandlineParser
      * \return <code>true</code> if the command was added successfully; <code>false</code>
-     * if it either already existed or the #CommandlineCommand::name or
-     * #CommandlineCommand::shortName were not unique.
+     * if it either already existed or the CommandlineCommand::name or
+     * CommandlineCommand::shortName were not unique.
      */
     bool addCommand(CommandlineCommand* cmd);
 
@@ -144,11 +144,11 @@ public:
      * Prints usage information to the provided <code>stream</code>. If the argument
      * <code>command</code> is empty, the usage information for all registered commands
      * is printed. Otherwise only the information for the CommandlineCommand with the
-     * #CommandlineCommand::name or #CommandlineCommand::shortName equal to 
+     * CommandlineCommand::name or CommandlineCommand::shortName equal to 
      * <code>command</code> will be printed. <code>Nameless</code> is a placeholder name
      * for the nameless command (#addCommandForNamelessArguments).
-     * \param command Show information for the command with the #CommandlineCommand::name
-     * or #CommandlineCommand::shortName only. If <code>command</code> is empty, the
+     * \param command Show information for the command with the CommandlineCommand::name
+     * or CommandlineCommand::shortName only. If <code>command</code> is empty, the
      * usage information for all commands is printed; if <code>command = "Nameless"</code>
      * the usage information for the nameless argument is logged
      * \param stream The stream to which the usage information should be printed
@@ -158,18 +158,18 @@ public:
     /**
      * Print the full help test to the provided <code>stream</code>. It consists of the
      * usage information (#displayUsage) followed by the help text for each
-     * CommandlineCommand (#CommandlineCommand::help).
+     * CommandlineCommand (CommandlineCommand::help).
      * \param stream The stream to which the help information should be printed
      */
     void displayHelp(std::ostream& stream = std::cout);
 
 
 protected:
-    /** Returns the CommandlineCommand with a specific #CommandlineCommand::shortName or
-     * #CommandlineCommand::name from the list of stored commands. If no such command
+    /** Returns the CommandlineCommand with a specific CommandlineCommand::shortName or
+     * CommandlineCommand::name from the list of stored commands. If no such command
      * exists <code>nullptr</code> will be returned.
-     * \param shortOrLongName Either the #CommandlineCommand::name or
-     * #CommandlineCommand::shortName of the command that should be fetched
+     * \param shortOrLongName Either the CommandlineCommand::name or
+     * CommandlineCommand::shortName of the command that should be fetched
      * \return The command that respond to the given name or short name, or
      * <code>nullptr</code> if no such CommandlineCommand exists
      */
@@ -177,11 +177,11 @@ protected:
     
     /**
      * This method returns <code>true</code> if unknown commands should be stored in the
-     * #CommandlineParser::_remainingArguments vector. This method checks if that vector
-     * is not <code>nullptr</code> and #CommandlineParser::_allowUnknownCommands has been
+     * CommandlineParser::_remainingArguments vector. This method checks if that vector
+     * is not <code>nullptr</code> and CommandlineParser::_allowUnknownCommands has been
      * set to <code>true</code>
      * \return <code>true</code> if the CommandlineParser should (and is capable of) store
-     * unknown commands in the #CommandlineParser::_remainingArguments vector
+     * unknown commands in the CommandlineParser::_remainingArguments vector
      */
     bool storeUnknownCommands() const;
 

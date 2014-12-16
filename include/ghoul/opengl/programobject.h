@@ -137,8 +137,8 @@ public:
     const std::string& name() const;
 
 	/**
-     * Sets the shader object callback
-     * \param callback object
+     * Sets the shader object callback.
+     * \param changeCallback object
      */
 	void setProgramObjectCallback(ProgramObjectCallback changeCallback);
 	

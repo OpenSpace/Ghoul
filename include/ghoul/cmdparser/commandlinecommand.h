@@ -39,7 +39,7 @@ namespace cmdparser {
  * A command is an operation that can be called via command line arguments on program
  * startup. As this class is virtual, it has to be derived from with the #execute method
  * implemented. The CommandlineCommand are used by adding them to the CommandlineParser,
- * using the method #CommandlineParser::addCommand. The common way of using the commands
+ * using the method CommandlineParser::addCommand. The common way of using the commands
  * is to pass a variable of appropriate type to the CommandlineCommand by reference, which
  * gets set to the correct value when the command is executed.
  * Within the parser, the command's <code>name</code> and <code>shortName</code> must be
@@ -61,10 +61,10 @@ public:
      * \param name The (long) name of the parameter. For example <code>--command1</code>
      * \param shortName The abbreviated name of the parameter. For example <code>-c</code>
      * \param infoText A short text (preferably one line) explaining what the command
-     * does. Used in the #CommandlineParser::displayHelp method
+     * does. Used in the CommandlineParser::displayHelp method
      * \param parameterList A user-readable description which parameters are used and
-     * supported. This is used in the #CommandlineParser::displayUsage and
-     * #CommandlineParser::displayHelp methods
+     * supported. This is used in the CommandlineParser::displayUsage and
+     * CommandlineParser::displayHelp methods
      * \param argumentNum The number of arguments this command accepts
      * \param allowMultipleCalls If this argument is <code>true</code> it signals the
      * CommandlineParser that it should allow multiple instances of this
@@ -94,8 +94,8 @@ public:
     const std::string& parameterList() const;
 
     /**
-     * Returns a short description used in the #CommandlineParser::displayHelp and
-     * #CommandlineParser::displayUsage methods
+     * Returns a short description used in the CommandlineParser::displayHelp and
+     * CommandlineParser::displayUsage methods
      * \return A short description of this command
      */
     const std::string& infoText() const;
@@ -136,13 +136,13 @@ public:
 
     /**
      * Returns the usage part for the help of this CommandlineCommand. Used in the
-     * #CommandlineParser::usage method.
+     * CommandlineParser::usage method.
      * \return The usage part for the help of this command
      */
     virtual std::string usage() const;
 
     /// Returns the help-part for a command. Used in the help()-method from the
-    /// commandlineparser
+    /// CommandlineParser
     virtual std::string help() const;
 
 protected:

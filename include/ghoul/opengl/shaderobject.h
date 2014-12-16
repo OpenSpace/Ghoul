@@ -167,8 +167,8 @@ public:
     const std::string& name() const;
 
 	/**
-     * Sets the shader object callback
-     * \param callback object
+     * Sets the shader object callback.
+     * \param changeCallback object
      */
 	void setShaderObjectCallback(ShaderObjectCallback changeCallback);
 
@@ -265,7 +265,7 @@ private:
 	/// The callback function if any of the tracked files are changed.
 	ShaderObjectCallback _onChangeCallback;
 
-	/// Recursively #included files
+	/// Recursively \#included files
 	std::vector<ghoul::filesystem::File*> _trackedFiles;
 
 	/**
