@@ -183,7 +183,7 @@ bool Dictionary::hasKeyAndValue(const std::string& key) const {
                                                     bool createIntermediate);            \
     template<> bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) \
           const;                                                                         \
-    template<> bool Dictionary::hasValue<TYPE>(const std::string& key) const;
+    template<> bool Dictionary::hasValue<TYPE>(const std::string& key) const
 
 DEF_EXT_TEMPLATES(bool);
 DEF_EXT_TEMPLATES(char);
