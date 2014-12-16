@@ -28,7 +28,7 @@ void ghoul::Buffer::serialize(const T& v) {
     static_assert(std::is_pod<T>::value, "T has to be a POD for general serialize");
     const size_t size = sizeof(T);
     _data.resize(_data.capacity() + size);
-    std::memcpy(_data.data() + _offsetWrite, &v, size);
+    memcpy(_data.data() + _offsetWrite, &v, size);
     _offsetWrite += size;
 }
 
@@ -38,7 +38,7 @@ void ghoul::Buffer::deserialize(T& value) {
     const size_t size = sizeof(T);
     assert(_offsetRead + size <= _data.size());
     
-    std::memcpy(&value, _data.data() + _offsetRead, size);
+    memcpy(&value, _data.data() + _offsetRead, size);
     _offsetRead += size;
 }
 
@@ -50,9 +50,9 @@ void ghoul::Buffer::serialize(const std::vector<T>& v) {
     const size_t size = sizeof(T)*length+sizeof(size_t);
     _data.resize(_data.capacity() + size);
     
-    std::memcpy(_data.data() + _offsetWrite, &length, sizeof(size_t));
+    memcpy(_data.data() + _offsetWrite, &length, sizeof(size_t));
     _offsetWrite += sizeof(size_t);
-    std::memcpy(_data.data() + _offsetWrite, v.data(), sizeof(T)*length);
+    memcpy(_data.data() + _offsetWrite, v.data(), sizeof(T)*length);
     _offsetWrite += sizeof(T)*length;
 }
 
@@ -63,10 +63,10 @@ void ghoul::Buffer::deserialize(std::vector<T>& v) {
     
     assert(_offsetRead + sizeof(size_t) <= _data.size());
     size_t n;
-    std::memcpy(&n, _data.data() + _offsetRead, sizeof(size_t));
+    memcpy(&n, _data.data() + _offsetRead, sizeof(size_t));
     _offsetRead += sizeof(size_t);
     assert(_offsetRead + sizeof(T)*n <= _data.size());
     v.resize(n);
-    std::memcpy(v.data(),_data.data() + _offsetRead, sizeof(T)*n);
+    memcpy(v.data(),_data.data() + _offsetRead, sizeof(T)*n);
     _offsetRead += sizeof(T)*n;
 }
