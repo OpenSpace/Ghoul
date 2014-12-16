@@ -30,10 +30,6 @@
 
 #include "gtest/gtest.h"
 
-#ifdef __unix__
-#pragma GCC diagnostic pop
-#endif // __unix__
-
 #include <ghoul/cmdparser/cmdparser>
 #include <ghoul/filesystem/filesystem>
 #include <ghoul/logging/logging>
@@ -76,3 +72,7 @@ int main(int argc, char** argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
+
+#ifdef __unix__
+#pragma GCC diagnostic pop
+#endif // __unix__
