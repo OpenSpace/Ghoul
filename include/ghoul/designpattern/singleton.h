@@ -26,34 +26,71 @@
 #ifndef __SINGLETON_H__
 #define __SINGLETON_H__
 
-#include <iostream>
-#include <cassert>
+#include <ghoul/misc/assert.h>
+#include <typeinfo>
 
 namespace ghoul {
 
+/**
+ * This class implements the singleton design pattern.
+ * @code
+ * class Example: public Singleton<Example> {
+ * public:
+ *     Example(int n) {...}
+ *     void exfunc() {};
+ * }
+ * int main() {
+ *     Example::initialize(2);
+ *     Example::ref().exfunc();
+ *     Example::deinitialize();
+ *     return 0;
+ * }
+ * @endcode
+ */
 template <class T>
 class Singleton {
 public:
+
+	/**
+     * Creates and initializes an empty singleton with the arguments passed to the 
+	 * template class T constructor.
+     * Calling #initialize when the singleton is already initialized will trigger an
+     * assertion.
+     */
     template <typename... Args>
     static void initialize(Args... args) {
-        assert( ! isInitialized());
+        ghoul_assert( ! isInitialized(), typeid(T).name() << " is already initialized!");
         _instance = new T(std::forward<Args>(args)...);
     }
     
-    static void deinitialize() {
-        assert(isInitialized());
+	/**
+     * Deinitializes and deletes the singleton. Calling this with an uninitialized
+     * singleton will trigger an assertion.
+     */
+	static void deinitialize() {
+		ghoul_assert(isInitialized(), typeid(T).name() << " is not initialized!");
         delete _instance;
         _instance = nullptr;
     }
     
+	/**
+     * Returns the initialization state of the singleton.
+     * \return The initialization state of the singleton
+     */
     static bool isInitialized() {
-        return _instance != nullptr;
+        return (_instance != nullptr);
     }
     
-    static T& ref() {
-        assert(isInitialized());
+	/**
+     * Returns the reference to the singleton. Triggers an assertion if the
+     * singleton has not been initialized yet.
+     * \return A reference to the singleton
+     */
+	static T& ref() {
+		ghoul_assert(isInitialized(), typeid(T).name() << " is not initialized!");
         return *_instance;
     }
+
 protected:
     Singleton() {};
     ~Singleton() {};

@@ -26,10 +26,13 @@
 #ifndef __LOGMANAGER_H__
 #define __LOGMANAGER_H__
 
+#include <ghoul/designpattern/singleton.h>
+
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <mutex>
 
 namespace ghoul {
 namespace logging {
@@ -59,9 +62,9 @@ class Log;
  * versions without the C require an <code>std::string</code> variable named
  * <code>_loggerCat</code> to be defined in the scope of the macro "call".
  */
-class LogManager {
+class LogManager: public Singleton<LogManager> {
 public:
-    virtual ~LogManager();
+	~LogManager();
     
     /**
      * Enumerates all available LogLevel for the LogManager. The LogLevels are guaranteed
@@ -97,41 +100,17 @@ public:
         None = 1 << 5
     };
 
-    /**
+	/**
      * Creates and initializes an empty LogManager with the passed LogManager::LogLevel.
      * \param level The lowest LogManager::LogLevel that will be passed to the containing
-     * Log%s. A LogManager::LogLevel of LogManager::LogLevel::Debug will never be passed
-     * along in a Release build.
+     * Log%s.
      * \param immediateFlush Determines if all Log%s will be flushed out immediately
      * after a message was received. In the case of file-backed logs, the files will be
      * written out to disk and in case of a console log, the console will be updated.
      * Passing <code>true</code> will slow down the execution but guarantees that a crash
      * immediately after a log message won't lead to data loss.
-     * Calling #initialize when the LogManager is already initialized will trigger an
-     * assertion.
      */
-    static void initialize(LogLevel level = LogLevel::Info, bool immediateFlush = false);
-
-    /**
-     * Deinitializes and deletes the LogManager. All the stored Logs in this LogManager
-     * will be deleted as well. After this method returns, the LogManager can be
-     * initialized again with different values. Calling this with an uninitialized
-     * LogManager will trigger an assertion.
-     */
-    static void deinitialize();
-
-    /**
-     * Returns the reference to the singleton LogManager. Triggers an assertion if the
-     * LogManager has not been initialized yet.
-     * \return A reference to an singleton LogManager
-     */
-    static LogManager& ref();
-
-    /**
-     * Returns the initialization state of the LogManager.
-     * \return The initialization state of the LogManager
-     */
-    static bool isInitialized();
+	LogManager(LogLevel level = LogLevel::Info, bool immediateFlush = false);
 
     /**
      * The main method to log messages. If the <code>level</code> is >= the level this
@@ -144,8 +123,8 @@ public:
      * \param message The message that will be passed to the Log%s. May contain
      * control sequences.
      */
-    virtual void logMessage(LogManager::LogLevel level, const std::string& category,
-                            const std::string& message) = 0;
+    void logMessage(LogManager::LogLevel level, const std::string& category,
+                            const std::string& message);
 
     /**
      * The main method to log messages. If the <code>level</code> is >= the level this
@@ -188,11 +167,13 @@ public:
      */
 	static LogLevel levelFromString(const std::string& level);
 
-protected:
+private:
+
+	std::mutex _mutex;
+	LogManager::LogLevel _level;
+	bool _immediateFlush;
     std::vector<Log*> _logs;  ///< Stores the Logs which are managed by this LogManager
 
-private:
-    static LogManager* _manager; ///< Singleton member
 };
 
 } // namespace logging
