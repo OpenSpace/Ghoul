@@ -23,6 +23,11 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#ifdef __unix__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion-null"
+#endif // __unix__
+
 #include "gtest/gtest.h"
 
 #include <ghoul/cmdparser/cmdparser>
@@ -67,3 +72,7 @@ int main(int argc, char** argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
+
+#ifdef __unix__
+#pragma GCC diagnostic pop
+#endif // __unix__

@@ -23,8 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "gtest/gtest.h"
-
 #include <ghoul/cmdparser/cmdparser>
 
 // GCC throws a lot of unnecessary
