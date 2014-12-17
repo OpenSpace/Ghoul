@@ -38,7 +38,7 @@ bool ghoul::opengl::VertexBufferObject::initialize(
 	if (varray.size() == 0 || iarray.size() == 0)
 		return false;
 
-	_isize = iarray.size();
+	_isize = static_cast<unsigned int>(iarray.size());
 
 	glBindVertexArray(_vaoID);
 
@@ -48,4 +48,5 @@ bool ghoul::opengl::VertexBufferObject::initialize(
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, iarray.size() * sizeof(GLint), iarray.data(), GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
+	return true;
 }
