@@ -42,6 +42,342 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <string>
+
+namespace std {
+
+inline std::string to_string(const glm::bvec2& _Val) {
+	return "{" + std::to_string(_Val.x) + "," + std::to_string(_Val.y) + "}";
+}
+
+inline std::string to_string(const glm::bvec3& _Val) {
+	return "{" +
+		std::to_string(_Val.x) + "," +
+		std::to_string(_Val.y) + "," +
+		std::to_string(_Val.z) + "}";
+}
+
+inline std::string to_string(const glm::bvec4& _Val) {
+	return "{" +
+		std::to_string(_Val.x) + "," +
+		std::to_string(_Val.y) + "," +
+		std::to_string(_Val.z) + "," +
+		std::to_string(_Val.w) + "}";
+}
+
+inline std::string to_string(const glm::vec2& _Val) {
+	return "{" + std::to_string(_Val.x) + "," + std::to_string(_Val.y) + "}";
+}
+
+inline std::string to_string(const glm::vec3& _Val) {
+	return "{" +
+		std::to_string(_Val.x) + "," +
+		std::to_string(_Val.y) + "," +
+		std::to_string(_Val.z) + "}";
+}
+
+inline std::string to_string(const glm::vec4& _Val) {
+	return "{" +
+		std::to_string(_Val.x) + "," +
+		std::to_string(_Val.y) + "," +
+		std::to_string(_Val.z) + "," +
+		std::to_string(_Val.w) + "}";
+}
+
+inline std::string to_string(const glm::dvec2& _Val) {
+	return "{" + std::to_string(_Val.x) + "," + std::to_string(_Val.y) + "}";
+}
+
+inline std::string to_string(const glm::dvec3& _Val) {
+	return "{" +
+		std::to_string(_Val.x) + "," +
+		std::to_string(_Val.y) + "," +
+		std::to_string(_Val.z) + "}";
+}
+
+inline std::string to_string(const glm::dvec4& _Val) {
+	return "{" +
+		std::to_string(_Val.x) + "," +
+		std::to_string(_Val.y) + "," +
+		std::to_string(_Val.z) + "," +
+		std::to_string(_Val.w) + "}";
+}
+
+inline std::string to_string(const glm::ivec2& _Val) {
+	return "{" + std::to_string(_Val.x) + "," + std::to_string(_Val.y) + "}";
+}
+
+inline std::string to_string(const glm::ivec3& _Val) {
+	return "{" +
+		std::to_string(_Val.x) + "," +
+		std::to_string(_Val.y) + "," +
+		std::to_string(_Val.z) + "}";
+}
+
+inline std::string to_string(const glm::ivec4& _Val) {
+	return "{" +
+		std::to_string(_Val.x) + "," +
+		std::to_string(_Val.y) + "," +
+		std::to_string(_Val.z) + "," +
+		std::to_string(_Val.w) + "}";
+}
+
+inline std::string to_string(const glm::uvec2& _Val) {
+	return "{" + std::to_string(_Val.x) + "," + std::to_string(_Val.y) + "}";
+}
+
+inline std::string to_string(const glm::uvec3& _Val) {
+	return "{" +
+		std::to_string(_Val.x) + "," +
+		std::to_string(_Val.y) + "," +
+		std::to_string(_Val.z) + "}";
+}
+
+inline std::string to_string(const glm::uvec4& _Val) {
+	return "{" +
+		std::to_string(_Val.x) + "," +
+		std::to_string(_Val.y) + "," +
+		std::to_string(_Val.z) + "," +
+		std::to_string(_Val.w) + "}";
+}
+
+inline std::string to_string(const glm::mat2& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "}";
+}
+
+inline std::string to_string(const glm::mat2x3& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[0].z) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[1].z) + "}";
+}
+
+inline std::string to_string(const glm::mat2x4& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[0].z) + "," +
+		std::to_string(_Val[0].w) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[1].z) + "," +
+		std::to_string(_Val[1].w) + "}";
+}
+
+inline std::string to_string(const glm::mat3x2& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[2].x) + "," +
+		std::to_string(_Val[2].y) + "}";
+}
+
+inline std::string to_string(const glm::mat3& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[0].z) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[1].z) + "," +
+		std::to_string(_Val[2].x) + "," +
+		std::to_string(_Val[2].y) + "," +
+		std::to_string(_Val[2].z) + "}";
+}
+
+inline std::string to_string(const glm::mat3x4& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[0].z) + "," +
+		std::to_string(_Val[0].w) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[1].z) + "," +
+		std::to_string(_Val[1].w) + "," +
+		std::to_string(_Val[2].x) + "," +
+		std::to_string(_Val[2].y) + "," +
+		std::to_string(_Val[2].z) + "," +
+		std::to_string(_Val[2].w) + "}";
+}
+
+inline std::string to_string(const glm::mat4x2& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[2].x) + "," +
+		std::to_string(_Val[2].y) + "," +
+		std::to_string(_Val[3].x) + "," +
+		std::to_string(_Val[3].y) + "}";
+}
+
+inline std::string to_string(const glm::mat4x3& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[0].z) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[1].z) + "," +
+		std::to_string(_Val[2].x) + "," +
+		std::to_string(_Val[2].y) + "," +
+		std::to_string(_Val[2].z) + "," +
+		std::to_string(_Val[3].x) + "," +
+		std::to_string(_Val[3].y) + "," +
+		std::to_string(_Val[3].z) + "}";
+}
+
+inline std::string to_string(const glm::mat4& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[0].z) + "," +
+		std::to_string(_Val[0].w) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[1].z) + "," +
+		std::to_string(_Val[1].w) + "," +
+		std::to_string(_Val[2].x) + "," +
+		std::to_string(_Val[2].y) + "," +
+		std::to_string(_Val[2].z) + "," +
+		std::to_string(_Val[2].w) + "," +
+		std::to_string(_Val[3].x) + "," +
+		std::to_string(_Val[3].y) + "," +
+		std::to_string(_Val[3].z) + "," +
+		std::to_string(_Val[3].w) + "}";
+}
+
+inline std::string to_string(const glm::dmat2& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "}";
+}
+
+inline std::string to_string(const glm::dmat2x3& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[0].z) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[1].z) + "}";
+}
+
+inline std::string to_string(const glm::dmat2x4& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[0].z) + "," +
+		std::to_string(_Val[0].w) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[1].z) + "," +
+		std::to_string(_Val[1].w) + "}";
+}
+
+inline std::string to_string(const glm::dmat3x2& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[2].x) + "," +
+		std::to_string(_Val[2].y) + "}";
+}
+
+inline std::string to_string(const glm::dmat3& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[0].z) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[1].z) + "," +
+		std::to_string(_Val[2].x) + "," +
+		std::to_string(_Val[2].y) + "," +
+		std::to_string(_Val[2].z) + "}";
+}
+
+inline std::string to_string(const glm::dmat3x4& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[0].z) + "," +
+		std::to_string(_Val[0].w) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[1].z) + "," +
+		std::to_string(_Val[1].w) + "," +
+		std::to_string(_Val[2].x) + "," +
+		std::to_string(_Val[2].y) + "," +
+		std::to_string(_Val[2].z) + "," +
+		std::to_string(_Val[2].w) + "}";
+}
+
+inline std::string to_string(const glm::dmat4x2& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[2].x) + "," +
+		std::to_string(_Val[2].y) + "," +
+		std::to_string(_Val[3].x) + "," +
+		std::to_string(_Val[3].y) + "}";
+}
+
+inline std::string to_string(const glm::dmat4x3& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[0].z) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[1].z) + "," +
+		std::to_string(_Val[2].x) + "," +
+		std::to_string(_Val[2].y) + "," +
+		std::to_string(_Val[2].z) + "," +
+		std::to_string(_Val[3].x) + "," +
+		std::to_string(_Val[3].y) + "," +
+		std::to_string(_Val[3].z) + "}";
+}
+
+inline std::string to_string(const glm::dmat4& _Val) {
+	return "{" +
+		std::to_string(_Val[0].x) + "," +
+		std::to_string(_Val[0].y) + "," +
+		std::to_string(_Val[0].z) + "," +
+		std::to_string(_Val[0].w) + "," +
+		std::to_string(_Val[1].x) + "," +
+		std::to_string(_Val[1].y) + "," +
+		std::to_string(_Val[1].z) + "," +
+		std::to_string(_Val[1].w) + "," +
+		std::to_string(_Val[2].x) + "," +
+		std::to_string(_Val[2].y) + "," +
+		std::to_string(_Val[2].z) + "," +
+		std::to_string(_Val[2].w) + "," +
+		std::to_string(_Val[3].x) + "," +
+		std::to_string(_Val[3].y) + "," +
+		std::to_string(_Val[3].z) + "," +
+		std::to_string(_Val[3].w) + "}";
+}
+
+} // namespace std
+
+
 #ifdef __APPLE__
 #pragma clang diagnostic pop
 #endif
