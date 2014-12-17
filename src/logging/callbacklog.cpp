@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "logging/callbacklog.h"
+#include "ghoul/logging/callbacklog.h"
 
 namespace ghoul {
 namespace logging {

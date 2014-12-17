@@ -23,12 +23,12 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "systemcapabilities/systemcapabilities.h"
+#include "ghoul/systemcapabilities/systemcapabilities.h"
 
-#include "logging/logmanager.h"
-#include "systemcapabilities/systemcapabilitiescomponent.h"
-#include "systemcapabilities/generalcapabilitiescomponent.h"
-#include "systemcapabilities/openglcapabilitiescomponent.h"
+#include "ghoul/logging/logmanager.h"
+#include "ghoul/systemcapabilities/systemcapabilitiescomponent.h"
+#include "ghoul/systemcapabilities/generalcapabilitiescomponent.h"
+#include "ghoul/systemcapabilities/openglcapabilitiescomponent.h"
 
 #include <assert.h>
 #include <sstream>

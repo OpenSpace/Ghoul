@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "logging/logmanager.h"
-#include "logging/log.h"
+#include "ghoul/logging/logmanager.h"
+#include "ghoul/logging/log.h"
 #include <cassert>
 #include <algorithm>
 #include <map>

@@ -82,13 +82,12 @@ void internal_assert(
 		}
 		else if (inputLine == "a") {
 			throw AssertException();
-			break; // Debuggers can continue from throw
 		}
 		else if (inputLine == "e") {
 			exit(EXIT_FAILURE);
 		}
 
-		// Fallthrough if no relevant option is selected
+		// Fall-through if no relevant option is selected
 		if(i == maxIterations-1)
 			throw AssertException();
 	}

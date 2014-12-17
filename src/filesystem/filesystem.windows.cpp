@@ -95,6 +95,7 @@ void FileSystem::addFileListener(File* file) {
 
 		if (handle->_handle == INVALID_HANDLE_VALUE) {
 			LERROR("Directory handle for '" << d << "' could not be obtained");
+			delete handle;
 			return;
 		}
 

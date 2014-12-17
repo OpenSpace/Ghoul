@@ -23,13 +23,13 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "systemcapabilities/generalcapabilitiescomponent.h"
+#include <ghoul/systemcapabilities/generalcapabilitiescomponent.h>
 
+#include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <algorithm>
 #include <cassert>
 #include <sstream>
-#include "logging/logmanager.h"
 
 #ifdef WIN32
     #include <Windows.h>
@@ -66,8 +66,15 @@ namespace systemcapabilities {
 
 GeneralCapabilitiesComponent::GeneralCapabilitiesComponent()
     : SystemCapabilitiesComponent()
+	, _operatingSystem("")
+	, _installedMainMemory(0)
+	, _cpu("")
+	, _cores(0)
+	, _cacheLineSize(0)
+	, _L2Associativity(0)
+	, _cacheSize(0)
+	, _extensions("")
 {
-    clearCapabilities();
 }
 
 GeneralCapabilitiesComponent::~GeneralCapabilitiesComponent() {

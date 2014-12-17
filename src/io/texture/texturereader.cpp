@@ -53,7 +53,7 @@ TextureReader& TextureReader::ref() {
 }
 
 opengl::Texture* TextureReader::loadTexture(const std::string& filename) {
-	if (_readers.size() == 0) {
+	if (_readers.empty()) {
 		LERROR("No readers were registered with the TextureReader");
 		return nullptr;
 	}

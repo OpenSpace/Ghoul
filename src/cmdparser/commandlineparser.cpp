@@ -133,7 +133,7 @@ void CommandlineParser::setCommandLine(int argc, char** argv,
 }
 
 bool CommandlineParser::execute() {
-    if (_arguments.size() == 0)
+    if (_arguments.empty())
         return true;
     // There is only one argument and this is either "-h" or "--help"
     // so display the help

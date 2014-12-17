@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "lua/lua_helper.h"
-#include "lua/ghoul_lua.h"
+#include "ghoul/lua/lua_helper.h"
+#include "ghoul/lua/ghoul_lua.h"
 
 #include <ghoul/filesystem/filesystem.h>
 
