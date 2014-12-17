@@ -218,6 +218,7 @@ void GeneralCapabilitiesComponent::detectOS() {
 
 void GeneralCapabilitiesComponent::detectMemory() {
 #if defined(WIN32)
+#ifdef GHOUL_USE_WMI
     std::string memory;
     bool success = queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
     if (!success)
@@ -229,6 +230,7 @@ void GeneralCapabilitiesComponent::detectMemory() {
         convert >> value;
         _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
     }
+#endif
 #elif defined(__APPLE__)
     
     int mib[2];
@@ -292,15 +294,6 @@ void GeneralCapabilitiesComponent::detectCPU() {
 	char CPUString[0x20];
 	char CPUBrandString[0x40];
 	int CPUInfo[4] = { -1 };
-	int nSteppingID = 0;
-	int nModel = 0;
-	int nFamily = 0;
-	int nProcessorType = 0;
-	int nExtendedmodel = 0;
-	int nExtendedfamily = 0;
-	int nBrandIndex = 0;
-	int nCLFLUSHcachelinesize = 0;
-	int nAPICPhysicalID = 0;
 	int nFeatureInfo = 0;
 	unsigned    nIds, nExIds, i;
 	bool    bSSE3NewInstructions = false;
@@ -329,15 +322,6 @@ void GeneralCapabilitiesComponent::detectCPU() {
 		// Interpret CPU feature information.
 		if (i == 1)
 		{
-			nSteppingID = CPUInfo[0] & 0xf;
-			nModel = (CPUInfo[0] >> 4) & 0xf;
-			nFamily = (CPUInfo[0] >> 8) & 0xf;
-			nProcessorType = (CPUInfo[0] >> 12) & 0x3;
-			nExtendedmodel = (CPUInfo[0] >> 16) & 0xf;
-			nExtendedfamily = (CPUInfo[0] >> 20) & 0xff;
-			nBrandIndex = CPUInfo[1] & 0xff;
-			nCLFLUSHcachelinesize = ((CPUInfo[1] >> 8) & 0xff) * 8;
-			nAPICPhysicalID = (CPUInfo[1] >> 24) & 0xff;
 			bSSE3NewInstructions = (CPUInfo[2] & 0x1) || false;
 			bMONITOR_MWAIT = (CPUInfo[2] & 0x8) || false;
 			bCPLQualifiedDebugStore = (CPUInfo[2] & 0x10) || false;
