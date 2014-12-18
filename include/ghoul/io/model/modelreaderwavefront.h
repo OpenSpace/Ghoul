@@ -36,7 +36,7 @@ namespace opengl {
 
 namespace io {
     
-class ModelReaderWavefront {
+class ModelReaderWavefront: public ModelReaderBase {
 public:
     ModelReaderWavefront();
     ~ModelReaderWavefront();
