@@ -127,7 +127,6 @@ public:
     };
 
     OpenGLCapabilitiesComponent();
-    ~OpenGLCapabilitiesComponent();
 
     std::vector<CapabilityInformation> capabilities(
         const SystemCapabilitiesComponent::Verbosity& verbosity) const override;
@@ -216,12 +215,12 @@ protected:
     
     bool _supportTexturing3D; // GL_EXT_texture3D
 
-#ifdef GHOUL_USE_WMI
+	// Only used in WMI, but declared nevertheless to prevent a mismatch in compiler flags
+	// between the cpp file and an application including this header
     std::string _driverVersion; ///< Stores the version of the installed driver
     std::string _driverDate; ///< Stores the date of the installed driver
     unsigned int _adapterRAM; ///< How many MB of memory is installed on the main GPU
     std::string _adapterName; ///< The name of the main GPU
-#endif
 };
 
 } // namespace systemcapabilities

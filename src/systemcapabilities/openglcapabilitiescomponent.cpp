@@ -71,17 +71,11 @@ OpenGLCapabilitiesComponent::OpenGLCapabilitiesComponent()
 	, _numTextureUnits(-1)
 	, _maxFramebufferColorAttachments(-1)
 	, _supportTexturing3D(false)
-#ifdef GHOUL_USE_WMI
 	, _driverVersion("")
 	, _driverDate("")
 	, _adapterRAM(0)
 	, _adapterName("")
-#endif
 {
-}
-
-OpenGLCapabilitiesComponent::~OpenGLCapabilitiesComponent() {
-    deinitialize();
 }
 
 void OpenGLCapabilitiesComponent::detectCapabilities() {
