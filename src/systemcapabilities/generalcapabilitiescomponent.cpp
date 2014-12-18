@@ -230,6 +230,13 @@ void GeneralCapabilitiesComponent::detectMemory() {
         convert >> value;
         _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
     }
+#else
+	ULONGLONG installedMainMemory;
+	// get installed memory in kB
+	BOOL success = GetPhysicallyInstalledSystemMemory(&installedMainMemory);
+	if (success == TRUE) {
+		_installedMainMemory = static_cast<unsigned int>(installedMainMemory / 1024);
+	}
 #endif
 #elif defined(__APPLE__)
     
