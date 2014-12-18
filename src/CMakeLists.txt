@@ -63,6 +63,12 @@ set(GHOUL_SOURCE ${GHOUL_SOURCE} ${IO_TEXTURE_SOURCE})
 file(GLOB IO_TEXTURE_HEADER ${HEADER_ROOT_DIR}/io/texture/*.h)
 set(GHOUL_HEADER ${GHOUL_HEADER} ${IO_TEXTURE_HEADER})
 source_group(IO\\Texture FILES ${IO_TEXTURE_SOURCE} ${IO_TEXTURE_HEADER})
+
+file(GLOB IO_MODEL_SOURCE ${SOURCE_ROOT_DIR}/io/model/*.cpp)
+set(GHOUL_SOURCE ${GHOUL_SOURCE} ${IO_MODEL_SOURCE})
+file(GLOB IO_MODEL_HEADER ${HEADER_ROOT_DIR}/io/model/*.h)
+set(GHOUL_HEADER ${GHOUL_HEADER} ${IO_MODEL_HEADER})
+source_group(IO\\Model FILES ${IO_MODEL_SOURCE} ${IO_MODEL_HEADER})
              
 add_source_group("LogManager" "logging") 
 add_source_group("Lua" "lua") 
