@@ -29,6 +29,9 @@ bool ghoul::opengl::VertexBufferObject::initialize(
 	const std::vector<GLint>& iarray) 
 {
 	static_assert(std::is_pod<T>::value, "T has to be a POD");
+    if(isInitialized()) {
+        return false;
+    }
 
 	generateGLObjects();
 
@@ -43,9 +46,16 @@ bool ghoul::opengl::VertexBufferObject::initialize(
 	glBindVertexArray(_vaoID);
 
 	glBindBuffer(GL_ARRAY_BUFFER, _vBufferID);
-	glBufferData(GL_ARRAY_BUFFER, varray.size() * sizeof(T), varray.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,
+                 varray.size() * sizeof(T),
+                 varray.data(),
+                 GL_STATIC_DRAW);
+                 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, iarray.size() * sizeof(GLint), iarray.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 iarray.size() * sizeof(GLint),
+                 iarray.data(),
+                 GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 	return true;

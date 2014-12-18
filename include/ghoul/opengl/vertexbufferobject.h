@@ -43,18 +43,45 @@ namespace opengl {
 class VertexBufferObject {
 public:
 
-	/**
-	 * Default constructor. Initializes the internal GL objects to 0. 
-	 * VertexBufferObjects can be constructed withouta GL context but 
-	 * cannot be initialized without a GL context.
-	 */
-	VertexBufferObject();
+    /**
+     * Default constructor. Initializes the internal GL objects to 0.
+     * VertexBufferObjects can be constructed withouta GL context but
+     * cannot be initialized without a GL context.
+     */
+    VertexBufferObject();
+    
+    /**
+     * Moves the other object in place of the created one. The other object
+     * will be in an uninitialized state afterwards.
+     */
+    VertexBufferObject(VertexBufferObject&& other);
+    
+    /**
+     * Moves the other object in place of the created one. The other object
+     * will be in an uninitialized state afterwards.
+     */
+    VertexBufferObject& operator=(VertexBufferObject&& other);
 
 	/**
 	 * Default destructor. Calls an assertion in debug mode that the VertexBufferObject 
 	 * is not still initialized.
 	 */
 	~VertexBufferObject();
+    
+    /**
+     * A runtime function that checks if initialize has been called.
+     * \returns <code>true</code> if any initialize function has been 
+     * called and <code>false</code> otherwise.
+     */
+    bool isInitialized() const;
+    
+    /**
+     * Initializes a VBO with a vertex and index list. The structure of the vertex data
+     * can be anything. Make sure to specify the correct offsets with vertexAttribPointer.
+     * \param varray The vertex array
+     * \param iarray The index list
+     */
+    bool initialize(const std::vector<GLfloat>& varray, const std::vector<GLint>& iarray);
 
 	/**
 	 * Initializes the VBO with the vertex and index list
@@ -70,6 +97,16 @@ public:
 	 * the object.
 	 */
 	void deinitialize();
+    
+    /**
+     * Sets the render mode for this VertexBufferObject. The render mode is how OpenGL is 
+     * treating the vertices and indices. The default is <code>GL_TRIANGLES</code> but
+     * other common render primitives are <code>GL_LINES</code> and
+     * <code>GL_POINTS</code>. See https://www.opengl.org/sdk/docs/man/html/glDrawElements.xhtml
+     * for supported render modes.
+     * \param mode The render mode. Default is <code>GL_TRIANGLES</code>
+     */
+    void setRenderMode(GLenum mode = GL_TRIANGLES);
 
 	/**
 	 * A wrapper function for glEnableVertexAttribArray 
@@ -79,7 +116,8 @@ public:
 	 * \param type The data type, for example GL_FLOAT
 	 * \param stride The size of the Vertex struct
 	 * \param offset The offset for the specific member
-	 * \param normalized Flag weather the parameter should be normalized. Defaults to GL_FALSE
+	 * \param normalized flag weather the attribute should be normalized.
+     * Defaults is <code>GL_FALSE</code>
 	 */
 	void vertexAttribPointer(
 		GLuint index, 
@@ -103,9 +141,13 @@ public:
 	 * Renders the VBO using the provided mode.
 	 * \param mode The render mode, default is <code>GL_TRIANGLES</code>
 	 */
-	void render(GLenum mode = GL_TRIANGLES);
+	void render();
 
 private:
+    
+    // no need and no point in copying VertexBufferObjects
+    VertexBufferObject(const VertexBufferObject&) = delete;
+    VertexBufferObject& operator=(const VertexBufferObject&) = delete;
 
 	/**
 	 * Constructs the internal GL objects by calling 
@@ -115,8 +157,9 @@ private:
 
 	GLuint _vaoID;
 	GLuint _vBufferID;
-	GLuint _iBufferID;
-	unsigned int _isize;
+    GLuint _iBufferID;
+    unsigned int _isize;
+    GLenum _mode;
 
 }; // class VertexBufferObject
 
