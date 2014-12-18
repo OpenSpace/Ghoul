@@ -315,11 +315,9 @@ std::string OpenGLCapabilitiesComponent::name() const {
 /// OpenGLVersion
 /////////////////////////////
 
-unsigned int packVersion(unsigned char major, unsigned char minor, unsigned char release);
-
-unsigned int packVersion(unsigned char major,
-                         unsigned char minor,
-                         unsigned char release)
+unsigned int packVersion(int major,
+                         int minor,
+                         int release)
 {
     // safe since: 2^8 * 1000 * 1000 < 2^32
     return
@@ -329,9 +327,9 @@ unsigned int packVersion(unsigned char major,
 }
 
 OpenGLCapabilitiesComponent::Version::Version(int major, int minor, int release) 
-    : _major(static_cast<unsigned char>(major))
-    , _minor(static_cast<unsigned char>(minor))
-    , _release(static_cast<unsigned char>(release))
+    : _major(major)
+    , _minor(minor)
+    , _release(release)
 {}
 
 bool OpenGLCapabilitiesComponent::Version::parseGLSLString(const string& version) {
@@ -391,9 +389,9 @@ bool OpenGLCapabilitiesComponent::Version::parseGLSLString(const string& version
             return false;
     }
 
-    _major = static_cast<unsigned char>(tmpMajor);
-    _minor = static_cast<unsigned char>(tmpMinor);
-    _release = static_cast<unsigned char>(tmpRelease);
+    _major = tmpMajor;
+    _minor = tmpMinor;
+    _release = tmpRelease;
 
     return true;
 }
@@ -436,9 +434,9 @@ bool OpenGLCapabilitiesComponent::Version::operator>=(const Version& rhs) const 
 
 std::string OpenGLCapabilitiesComponent::Version::toString() const {
     stringstream stream;
-    stream << static_cast<int>(_major) << "." << static_cast<int>(_minor);
+    stream << _major << "." << _minor;
     if (_release != 0)
-        stream << "." << static_cast<int>(_release);
+        stream << "." << _release;
     return stream.str();
 }
 

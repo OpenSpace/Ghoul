@@ -113,9 +113,9 @@ public:
          */
         bool operator>=(const Version& rhs) const;
 
-        unsigned char _major; ///< The <code>major</code> part of the version
-        unsigned char _minor; ///< The <code>minor</code> part of the version
-        unsigned char _release; ///< The <code>release</code> part of the version
+        int _major; ///< The <code>major</code> part of the version
+        int _minor; ///< The <code>minor</code> part of the version
+        int _release; ///< The <code>release</code> part of the version
     };
 
     /// This enum stores the possible vendors of graphics cards that can be detected

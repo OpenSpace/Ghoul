@@ -149,9 +149,8 @@ private:
 } // namespace ghoul
 
 #define SysCap (ghoul::systemcapabilities::SystemCapabilities::ref())
-#define CpuCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::GeneralCapabilitiesComponent>()))
-#define OpenGLCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::OpenGLCapabilitiesComponent>()))
-#define OpenCLCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::OpenCLCapabilitiesComponent>()))
+#define CpuCap (ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::GeneralCapabilitiesComponent>())
+#define OpenGLCap (ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::OpenGLCapabilitiesComponent>())
 
 #include "systemcapabilities.inl"
 
