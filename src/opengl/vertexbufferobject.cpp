@@ -34,11 +34,84 @@ VertexBufferObject::VertexBufferObject()
 	, _vBufferID(0)
 	, _iBufferID(0)
 	, _isize(0)
+    , _mode(GL_TRIANGLES)
 {}
 
+VertexBufferObject::VertexBufferObject(VertexBufferObject&& other) {
+    _vaoID = other._vaoID;
+    _vBufferID = other._vBufferID;
+    _iBufferID = other._iBufferID;
+    _isize = other._isize;
+    
+    other._vaoID = 0;
+    other._vBufferID = 0;
+    other._iBufferID = 0;
+    other._isize = 0;
+}
+
+VertexBufferObject& VertexBufferObject::operator=(VertexBufferObject&& other) {
+    if(this != &other) {
+        _vaoID = other._vaoID;
+        _vBufferID = other._vBufferID;
+        _iBufferID = other._iBufferID;
+        _isize = other._isize;
+        
+        other._vaoID = 0;
+        other._vBufferID = 0;
+        other._iBufferID = 0;
+        other._isize = 0;
+    }
+    return *this;
+}
+
 VertexBufferObject::~VertexBufferObject() {
-	ghoul_assert(_vBufferID == 0,
+	ghoul_assert(!isInitialized(),
 		"The VertexBufferObject must be deinitialized before destruction");
+}
+
+bool VertexBufferObject::isInitialized() const {
+    bool initialized = true;
+    initialized &= (_vaoID != 0);
+    initialized &= (_vBufferID != 0);
+    initialized &= (_iBufferID != 0);
+    initialized &= (_isize > 0);
+    return initialized;
+}
+
+bool VertexBufferObject::initialize(
+    const std::vector<GLfloat>& varray,
+    const std::vector<GLint>& iarray)
+{
+    if(isInitialized()) {
+        return false;
+    }
+    
+    generateGLObjects();
+    
+    if (_vaoID == 0 || _vBufferID == 0 || _iBufferID == 0)
+        return false;
+    
+    if (varray.size() == 0 || iarray.size() == 0)
+        return false;
+    
+    _isize = static_cast<unsigned int>(iarray.size());
+    
+    glBindVertexArray(_vaoID);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, _vBufferID);
+    glBufferData(GL_ARRAY_BUFFER,
+                 varray.size() * sizeof(GLfloat),
+                 varray.data(),
+                 GL_STATIC_DRAW);
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 iarray.size() * sizeof(GLint),
+                 iarray.data(),
+                 GL_STATIC_DRAW);
+    
+    glBindVertexArray(0);
+    return true;
 }
 
 void VertexBufferObject::deinitialize() {
@@ -49,6 +122,11 @@ void VertexBufferObject::deinitialize() {
 	_vBufferID = 0;
 	_iBufferID = 0;
 	_vaoID = 0;
+    _isize = 0;
+}
+
+void VertexBufferObject::setRenderMode(GLenum mode) {
+    _mode = mode;
 }
 
 void VertexBufferObject::vertexAttribPointer(
@@ -74,10 +152,10 @@ void VertexBufferObject::unbind() {
 	glBindVertexArray(0);
 }
 
-void VertexBufferObject::render(GLenum mode) {
+void VertexBufferObject::render() {
 	glBindVertexArray(_vaoID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
-	glDrawElements(mode, _isize, GL_UNSIGNED_INT, 0);
+	glDrawElements(_mode, _isize, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 

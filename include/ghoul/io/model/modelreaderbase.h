@@ -23,40 +23,27 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-template<typename T>
-bool ghoul::opengl::VertexBufferObject::initialize(
-	const std::vector<T>& varray, 
-	const std::vector<GLint>& iarray) 
-{
-	static_assert(std::is_pod<T>::value, "T has to be a POD");
-    if(isInitialized()) {
-        return false;
-    }
+#ifndef __MODELREADERBASE_H__
+#define __MODELREADERBASE_H__
 
-	generateGLObjects();
+#include <string>
 
-	if (_vaoID == 0 || _vBufferID == 0 || _iBufferID == 0)
-		return false;
+namespace ghoul {
 
-	if (varray.size() == 0 || iarray.size() == 0)
-		return false;
-
-	_isize = static_cast<unsigned int>(iarray.size());
-
-	glBindVertexArray(_vaoID);
-
-	glBindBuffer(GL_ARRAY_BUFFER, _vBufferID);
-	glBufferData(GL_ARRAY_BUFFER,
-                 varray.size() * sizeof(T),
-                 varray.data(),
-                 GL_STATIC_DRAW);
-                 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 iarray.size() * sizeof(GLint),
-                 iarray.data(),
-                 GL_STATIC_DRAW);
-
-	glBindVertexArray(0);
-	return true;
+// Forward declaration
+namespace opengl {
+    class VertexBufferObject;
 }
+
+namespace io {
+    
+class ModelReaderBase {
+public:
+    virtual ~ModelReaderBase() {}
+    virtual opengl::VertexBufferObject* loadModel(const std::string& filename) const = 0;
+};
+    
+} // namespace io
+} // namespace ghoul
+
+#endif // __MODELREADERBASE_H__
