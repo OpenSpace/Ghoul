@@ -134,6 +134,13 @@ bool Dictionary::getValue(const std::string& key, T& value) const {
 }
 
 template <typename T>
+T ghoul::Dictionary::value(const std::string& key) const {
+	T value;
+	getValueHelper(key, value);
+	return value;
+}
+
+template <typename T>
 bool ghoul::Dictionary::hasValueHelper(const std::string& key) const {
     const std::map<std::string, boost::any>::const_iterator it = find(key);
     if (it != cend()) {

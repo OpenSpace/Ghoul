@@ -198,6 +198,24 @@ public:
     bool getValue(const std::string& key, T& value) const;
 
     /**
+     * Returns the value stored at location with a given <code>key</code>. This key can be
+     * nested and will automatically be decomposed by the method to traverse to deeper
+     * levels of the Dictionary. If the Dictionary has a value at the provided key and the
+     * type agrees with the template parameter, the value will be returned. If either
+     * the key does not exist or the type does not agree, the return value is undefined.
+	 * Only if the type of the key and the requested type <code>T</code> disagree, an
+	 * error is logged. If the key does not exist in the dictionary, the error is silently
+	 * ignored if the code was compiled with GHL_DEBUG.
+     * \tparam The type of the value that should be tested. The <code>typeid</code> of
+     * this type has to be equal to the typeid of the value that is to be retrieved
+     * \param key The, potentially nested, key for which the stored value should be
+     * returned
+     * \return value The value stored at the <code>key</code>
+     */
+	template <typename T>
+	T value(const std::string& key) const;
+
+    /**
      * Returns <code>true</code> if the Dictionary stores a value at the provided
      * <code>key</code> and the stored type agrees with the provided template parameter.
      * The key can be nested and refer to deeper levels of the Dictionary. If any of the
