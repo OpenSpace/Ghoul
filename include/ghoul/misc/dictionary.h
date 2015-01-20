@@ -258,6 +258,14 @@ public:
     void clear();
 
 	/**
+	 * Returns <code>true</code> if this Dictionary is empty; <code>false</code>
+	 * otherwise.
+	 * \return <code>true</code> if this Dictionary is empty; <code>false</code>
+	 * otherwise
+	 */
+	bool empty() const;
+
+	/**
 	 * Removes key and value pair stored under the, potentially nested, <code>key</code>.
 	 * If the <code>key</code> was found and successfully removed, <code>true</code> is
 	 * returned, otherwise the method returns <code>false</code>. Under no circumstances

@@ -402,6 +402,10 @@ void Dictionary::clear() {
     return std::map<std::string, boost::any>::clear();
 }
 
+bool Dictionary::empty() const {
+	return std::map<std::string, boost::any>::empty();
+}
+
 bool Dictionary::removeKey(const std::string& key) {
 	std::map<std::string, boost::any>::size_type res = erase(key);
 	return (res == 1);
