@@ -396,11 +396,9 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 	static const std::string versionString = "#version __CONTEXT__";
 
 
-	auto addLineDef = [&lineNumber, &fileHash](std::string* content) 
-	{
+	auto addLineDef = [&lineNumber, &fileHash](std::string* content) {
 		*content += "#line " + std::to_string(lineNumber) + " " + std::to_string(fileHash) + "\n";
 	};
-	addLineDef(&content);
 	while (std::getline(f, line)) {
 		++lineNumber;
 		size_t start_pos = line.find_first_not_of(ws);

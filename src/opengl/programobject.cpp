@@ -2970,8 +2970,8 @@ ProgramObject* ProgramObject::Build(const std::string& name,
 	const ShaderObject::ShaderType fsType = ShaderObject::ShaderType::ShaderTypeFragment;
 
 	ProgramObject* program = new ProgramObject(name);
-	ShaderObject*  vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex");
-	ShaderObject*  fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment");
+	ShaderObject* vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex");
+	ShaderObject* fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment");
 	program->attachObject(vs);
 	program->attachObject(fs);
 
