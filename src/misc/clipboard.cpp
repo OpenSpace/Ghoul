@@ -32,7 +32,7 @@
 #include <ghoul/misc/clipboard.h>
 
 #include <algorithm>
-#include <stringstream>
+#include <sstream>
 
 #ifdef WIN32
 #include <Windows.h>
