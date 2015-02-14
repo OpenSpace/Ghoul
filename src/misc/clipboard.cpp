@@ -37,8 +37,33 @@
 #include <Windows.h>
 #endif
 
-namespace ghoul {
+namespace {
+#ifndef WIN32
+    // Dangerous as fuck (if malicious input)
+    bool exec(const std::string& cmd, std::string& value)
+    {
+        FILE* pipe = popen(cmd.c_str(), "r");
+        if (!pipe)
+            return false;
 
+        const int buffer_size = 1024;
+        char buffer[buffer_size];
+        value = "";
+        while (!feof(pipe))
+        {
+            if (fgets(buffer, buffer_size, pipe) != NULL)
+            {
+                value += buffer;
+            }
+        }
+        pclose(pipe);
+        return true;
+    }
+#endif
+}
+
+namespace ghoul {
+    
 std::string clipboardText() {
 #ifdef WIN32
     // Try opening the clipboard
