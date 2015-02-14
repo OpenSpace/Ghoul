@@ -36,7 +36,21 @@
 
 namespace ghoul {
 
+/**
+ * This function retrieves the contents of the system-wide clipboard and returns the
+ * textual representation. If the clipboard does not contain anything, an empty string is
+ * returned
+ * \return The contents of the system-wide clipboard
+ */
 std::string clipboardText();
+
+/**
+ * Writes a passed text into the system-wide clipboard, overwriting its previous content.
+ * If the writing was successful, the function returns <code>true</code> and
+ * <code>false</code> otherwise.
+ * \param text The text that is to be written into the clipboard
+ * \return <code>true</code> if the write was successful, <code>false</code> otherwise
+ */
 bool setClipboardText(std::string text);
 
 } // namespace ghoul
