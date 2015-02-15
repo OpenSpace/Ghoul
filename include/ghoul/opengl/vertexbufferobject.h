@@ -45,7 +45,7 @@ public:
 
     /**
      * Default constructor. Initializes the internal GL objects to 0.
-     * VertexBufferObjects can be constructed withouta GL context but
+     * VertexBufferObjects can be constructed without a GL context but
      * cannot be initialized without a GL context.
      */
     VertexBufferObject();
@@ -138,8 +138,7 @@ public:
 	void unbind();
 
 	/**
-	 * Renders the VBO using the provided mode.
-	 * \param mode The render mode, default is <code>GL_TRIANGLES</code>
+	 * Render the VBO using the provided mode through VertexBufferObject::setRenderMode.
 	 */
 	void render();
 
