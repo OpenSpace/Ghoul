@@ -442,12 +442,9 @@ bool FileSystem::deleteDirectory(const Directory& path, bool recursive) const {
     bool success = false;
     
     if (directory) {
-        struct dirent* p;
-        
         success = true;
-        
         while (success) {
-            p = readdir(directory);
+            struct dirent* p = readdir(directory);
             if (p == nullptr)
                 break;
             
@@ -485,11 +482,10 @@ bool FileSystem::emptyDirectory(const Directory& path) const {
 	return PathIsDirectoryEmpty(dirPath.c_str()) == TRUE;
 #else
 	int n = 0;
-	struct dirent *d;
-	DIR *dir = opendir(dirPath.c_str());
-	if (dir == NULL) //Not a directory or doesn't exist
+	DIR* dir = opendir(dirPath.c_str());
+	if (dir == nullptr) //Not a directory or doesn't exist
 		return false;
-	while ((d = readdir(dir)) != NULL) {
+	while (readdir(dir) != nullptr) {
 		if (++n > 2)
 			break;
 	}

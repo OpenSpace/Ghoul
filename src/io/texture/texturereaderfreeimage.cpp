@@ -51,8 +51,6 @@ namespace impl {
 opengl::Texture* TextureReaderFreeImage::loadTexture(const std::string& filename) const {
 	using opengl::Texture;
 
-	//image format
-	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 	//pointer to the image, once loaded
 	FIBITMAP *dib(0);
 	//pointer to the image data
@@ -60,8 +58,9 @@ opengl::Texture* TextureReaderFreeImage::loadTexture(const std::string& filename
 	//image width and height
 	unsigned int width(0), height(0);
 
-	//check the file signature and deduce its format
-	fif = FreeImage_GetFileType(filename.c_str(), 0);
+    //image format
+    //check the file signature and deduce its format
+	FREE_IMAGE_FORMAT fif = FreeImage_GetFileType(filename.c_str(), 0);
 	//if still unknown, try to guess the file format from the file extension
 	if (fif == FIF_UNKNOWN)
 		fif = FreeImage_GetFIFFromFilename(filename.c_str());

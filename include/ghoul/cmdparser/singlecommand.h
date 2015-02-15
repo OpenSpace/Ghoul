@@ -64,8 +64,8 @@ public:
      * Is presented to the user upon request by the CommandlineParser
      */
     SingleCommand(T* ptr1,
-                  const std::string& name, const std::string& shortName = "",
-                  const std::string& infoText = "", const std::string parameterList = "");
+                  std::string name, std::string shortName = "",
+                  std::string infoText = "", std::string parameterList = "");
 
     /**
      * This constructor uses two parameters. These can be of the same or different types.
@@ -84,8 +84,8 @@ public:
      * Is presented to the user upon request by the CommandlineParser
      */
     SingleCommand(T* ptr1, U* ptr2,
-                  const std::string& name, const std::string& shortName = "",
-                  const std::string& infoText = "", const std::string parameterList = "");
+                  std::string name, std::string shortName = "",
+                  std::string infoText = "", std::string parameterList = "");
 
     /**
      * This constructor uses three parameters. These can be of the same or different
@@ -106,8 +106,8 @@ public:
      * Is presented to the user upon request by the CommandlineParser
      */
     SingleCommand(T* ptr1, U* ptr2, V* ptr3,
-                  const std::string& name, const std::string& shortName = "",
-                  const std::string& infoText = "", const std::string parameterList = "");
+                  std::string name, std::string shortName = "",
+                  std::string infoText = "", std::string parameterList = "");
 
     /**
      * This constructor uses all four parameters. These can be of the same or different
@@ -130,8 +130,8 @@ public:
      * Is presented to the user upon request by the CommandlineParser
      */
     SingleCommand(T* ptr1, U* ptr2, V* ptr3, W* ptr4,
-                  const std::string& name, const std::string& shortName = "",
-                  const std::string& infoText = "", const std::string parameterList = "");
+                  std::string name, std::string shortName = "",
+                  std::string infoText = "", std::string parameterList = "");
 
     
     bool execute(const std::vector<std::string>& parameters);

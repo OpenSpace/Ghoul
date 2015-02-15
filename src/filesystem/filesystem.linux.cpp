@@ -116,7 +116,7 @@ void FileSystem::inotifyWatcher() {
         
         int offset = 0;
         while (offset < length) {
-            struct inotify_event *event = (inotify_event*)(buffer + offset);
+            struct inotify_event *event = reinterpret_cast<inotify_event*>(buffer + offset);
             switch (event->mask )
             {
 

@@ -229,7 +229,6 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
     const SystemCapabilitiesComponent::Verbosity& verbosity) const
 {
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
-    std::stringstream conversion;
     result.emplace_back("OpenGL Version", _glslVersion.toString());
     result.emplace_back("OpenGL Compiler", _glslCompiler);
     result.emplace_back("OpenGL Renderer", _glRenderer);

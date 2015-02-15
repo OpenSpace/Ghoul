@@ -170,7 +170,6 @@ std::set<std::string> TextureReaderDevIL::supportedExtensions() const {
 		"wdp", "hdp",				// HD Photo
 		"xpm"						// X Pixel Map
 	};
-
 }
 
 } // namespace impl

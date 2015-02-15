@@ -567,7 +567,7 @@ unsigned int GeneralCapabilitiesComponent::cacheLineSize() const {
 	return _cacheLineSize;
 }
 
-unsigned int GeneralCapabilitiesComponent::L2Assiciativity() const {
+unsigned int GeneralCapabilitiesComponent::L2Associativity() const {
 	return _L2Associativity;
 }
 

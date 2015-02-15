@@ -55,14 +55,15 @@ Buffer::Buffer(const std::string& filename)
     read(filename);
 }
 
-Buffer::Buffer(const Buffer& other) {
-    // copy memory
-    _data = other._data;
-    _offsetWrite = other._offsetWrite;
-    _offsetRead = other._offsetRead;
+Buffer::Buffer(const Buffer& other) 
+    : _data(other._data)
+    , _offsetWrite(other._offsetWrite)
+    , _offsetRead(other._offsetRead)
+{
 }
+
 Buffer::Buffer(Buffer&& other) {
-    if(this != &other) {
+    if (this != &other) {
         // move memory
         _data = std::move(other._data);
         _offsetWrite = other._offsetWrite;
@@ -73,6 +74,7 @@ Buffer::Buffer(Buffer&& other) {
         other._offsetRead = 0;
     }
 }
+
 Buffer& Buffer::operator=(const Buffer& rhs) {
     if(this != &rhs) {
         // copy memory
@@ -82,6 +84,7 @@ Buffer& Buffer::operator=(const Buffer& rhs) {
     }
     return *this;
 }
+
 Buffer& Buffer::operator=(Buffer&& rhs) {
     if(this != &rhs) {
         // move memory

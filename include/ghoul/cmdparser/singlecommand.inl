@@ -27,11 +27,12 @@ namespace ghoul {
 namespace cmdparser {
 
 template<typename T, typename U, typename V, typename W>
-SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, const std::string& name,
-                             const std::string& shortName,
-                             const std::string& infoText,
-                             const std::string parameterList)
-    : CommandlineCommand(name, shortName, infoText, parameterList, 1, false)
+SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, std::string name,
+                             std::string shortName,
+                             std::string infoText,
+                             std::string parameterList)
+    : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), 
+        std::move(parameterList), 1, false)
 	, _ptr1(ptr1)
 	, _ptr2(nullptr)
 	, _ptr3(nullptr)
@@ -39,11 +40,12 @@ SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, const std::string& name,
 {}
 
 template<typename T, typename U, typename V, typename W>
-SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, const std::string& name,
-                             const std::string&  shortName,
-                             const std::string& infoText,
-                             const std::string parameterList)
-    : CommandlineCommand(name, shortName, infoText, parameterList, 2, false)
+SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, std::string name,
+                             std::string shortName,
+                             std::string infoText,
+                             std::string parameterList)
+    : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
+        std::move(parameterList), 2, false)
 	, _ptr1(ptr1)
 	, _ptr2(ptr2)
 	, _ptr3(nullptr)
@@ -52,11 +54,12 @@ SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, const std::string& na
 
 template<typename T, typename U, typename V, typename W>
 SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, V* ptr3,
-							const std::string& name,
-                             const std::string& shortName,
-                             const std::string& infoText,
-                             const std::string parameterList)
-    : CommandlineCommand(name, shortName, infoText, parameterList, 3, false)
+							 std::string name,
+                             std::string shortName,
+                             std::string infoText,
+                             std::string parameterList)
+    : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
+        std::move(parameterList), 3, false)
 	, _ptr1(ptr1)
 	, _ptr2(ptr2)
 	, _ptr3(ptr3)
@@ -65,11 +68,12 @@ SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, V* ptr3,
 
 template<typename T, typename U, typename V, typename W>
 SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, V* ptr3, W* ptr4,
-							 const std::string& name,
-							 const std::string& shortName,
-							 const std::string& infoText,
-							 const std::string parameterList)
-    : CommandlineCommand(name, shortName, infoText, parameterList, 4, false)
+							 std::string name,
+							 std::string shortName,
+							 std::string infoText,
+							 std::string parameterList)
+    : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
+        std::move(parameterList), 4, false)
 	, _ptr1(ptr1)
 	, _ptr2(ptr2)
 	, _ptr3(ptr3)

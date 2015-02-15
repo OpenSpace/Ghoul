@@ -78,7 +78,7 @@ public:
 	 * Returns the L2 associativity
 	 * \return The L2 associativity
 	 */
-	unsigned int L2Assiciativity() const;
+	unsigned int L2Associativity() const;
 
 	/**
 	 * Returns the cache size

@@ -32,13 +32,13 @@ namespace ghoul {
 RawVolumeReader::ReadHints::ReadHints(glm::ivec3 dimensions) : _dimensions(dimensions) {
 }
 
-RawVolumeReader::RawVolumeReader() {
-	_hints = ReadHints();
-}
+RawVolumeReader::RawVolumeReader() 
+    : _hints(ReadHints())
+{}
 
-RawVolumeReader::RawVolumeReader(const ReadHints& hints) {
-	_hints = hints;
-}
+RawVolumeReader::RawVolumeReader(const ReadHints& hints) 
+: _hints(hints)
+{}
 
 RawVolumeReader::~RawVolumeReader() {
 }
