@@ -45,7 +45,7 @@ std::string LogManager::stringFromLevel(LogLevel level) {
             return "Error";
         case LogLevel::Fatal:
             return "Fatal";
-        case LogLevel::None:
+        case LogLevel::NoLogging:
             return "None";
     }
     assert(false);
@@ -59,7 +59,7 @@ LogManager::LogLevel LogManager::levelFromString(const std::string& level) {
 		{ "Warning", LogLevel::Warning },
 		{ "Error"  , LogLevel::Error },
 		{ "Fatal"  , LogLevel::Fatal },
-		{ "None"   , LogLevel::None }
+		{ "None"   , LogLevel::NoLogging }
 	};
 
 	auto it = levels.find(level);
