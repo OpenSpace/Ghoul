@@ -50,7 +50,7 @@ using namespace ghoul::logging;
 #endif
 
 int main(int argc, char** argv) {
-    LogManager::initialize(LogManager::LogLevel::None);
+    LogManager::initialize(LogManager::LogLevel::NoLogging);
     LogMgr.addLog(new ConsoleLog);
 
     FileSystem::initialize();
