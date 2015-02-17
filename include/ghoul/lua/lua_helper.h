@@ -43,21 +43,6 @@ public:
 };
 
 /**
- * Logs the Lua table that is located on the top of the stack in the passed
- * <code>state</code> with the passed ghoul::logging::LogManager::LogLevel and returns the
- * logged string. The key-value pair for each entry in the table is printed, which might
- * cause the function to be called recursively. The output will be written the format:
- * <code>{ key = value key = value ... }</code>. If the top of the stack does not
- * represent a Lua table, an empty string is returned
- * \param state The Lua state that contains the table to be logged
- * \param level The logging::LogManager::LogLevel at which the table will be logged
- * \return The same string that was logged, or <code>""</code> if the <code>state</code>
- * was not valid
- */
-std::string logTable(lua_State* state,logging::LogManager::LogLevel level = 
-                         logging::LogManager::LogLevel::Info);
-
-/**
  * Logs the stack of the Lua state that is passed into the function at the provided <code>
  * level</code> and returns the logged string. The values of each entry in the stack is
  * printed, which includes tables (printed recursively), but excludes

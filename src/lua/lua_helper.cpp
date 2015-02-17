@@ -83,7 +83,7 @@ std::string luaTableToString(lua_State* state, bool& success, int tableLocation 
             result << luaTableToString(state, success, -1);
 		else 
 			result << luaTypeToString(lua_type(state, VAL));
-		result << "  ";
+		result << ",  ";
         lua_pop(state, 1);
     }
     result << "}";
