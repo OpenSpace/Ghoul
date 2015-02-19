@@ -42,6 +42,17 @@ public:
     FormattingException(const std::string&);
 };
 
+
+/**
+ * Returns the location of the calling function using <code>luaL_where</code> and returns
+ * that location as a string. This method is just a wrapper around this function and its
+ * use is for non-fatal error handling.
+ * \param L The Lua state that is to be exermined
+ * \return The location of the function whose stack is being tested
+ */
+std::string errorLocation(lua_State* L);
+
+
 /**
  * Logs the stack of the Lua state that is passed into the function at the provided <code>
  * level</code> and returns the logged string. The values of each entry in the stack is

@@ -92,6 +92,11 @@ std::string luaTableToString(lua_State* state, bool& success, int tableLocation 
 
 }
 
+std::string errorLocation(lua_State* L) {
+    luaL_where(L, 1);
+    return lua_tostring(L, -1);
+}
+
 std::string logStack(lua_State* state, LogManager::LogLevel level) {
     std::stringstream result;
     const int top = lua_gettop(state);
