@@ -4,3 +4,6 @@
 [submodule "ext/gtest"]
 	path = ext/gtest
 	url = https://github.com/OpenSpace/GTest.git
+[submodule "ext/tinyobjloader"]
+	path = ext/tinyobjloader
+	url = https://github.com/syoyo/tinyobjloader.git

@@ -119,6 +119,7 @@ endif()
 include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
 set(BOOST_ROOT "${GHOUL_ROOT_DIR}/ext/boost")
 set(Boost_USE_STATIC_LIBS ON)
+
 find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${Boost_LIBRARIES})
@@ -140,6 +141,14 @@ endif()
 if (WIN32)
     set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} shlwapi)
 endif()
+
+# tinyobjloader
+set(GHOUL_EXT_TINYOBJ_SOURCE
+    ${GHOUL_ROOT_DIR}/ext/tinyobjloader/tiny_obj_loader.h
+    ${GHOUL_ROOT_DIR}/ext/tinyobjloader/tiny_obj_loader.cc
+    )
+add_library(tinyobjloader ${GHOUL_EXT_TINYOBJ_SOURCE})
+set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} tinyobjloader)
 
 option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
 if (GHOUL_HAVE_TESTS)
