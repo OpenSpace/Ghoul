@@ -140,18 +140,26 @@ std::string logStack(lua_State* state, LogManager::LogLevel level) {
     return resultStr;
 }
 
-bool loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dictionary) {
+bool loadDictionaryFromFile(
+    const std::string& filename,
+    ghoul::Dictionary& dictionary,
+    lua_State* state
+    )
+{
     const static std::string _loggerCat = "lua_loadDictionaryFromFile";
 
-    if (_state == nullptr) {
-        LDEBUG("Creating Lua state");
-        _state = luaL_newstate();
+    if (state == nullptr) {
         if (_state == nullptr) {
-            LFATAL("Error creating new Lua state: Memory allocation error");
-            return false;
+            LDEBUG("Creating Lua state");
+            _state = luaL_newstate();
+            if (_state == nullptr) {
+                LFATAL("Error creating new Lua state: Memory allocation error");
+                return false;
+            }
+            LDEBUG("Open libraries");
+            luaL_openlibs(_state);
         }
-        LDEBUG("Open libraries");
-        luaL_openlibs(_state);
+        state = _state;
     }
 
     if (filename.empty()) {
@@ -165,79 +173,87 @@ bool loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
     }
 
     LDEBUG("Loading dictionary script '" << filename << "'");
-    int status = luaL_loadfile(_state, absPath(filename).c_str());
+    int status = luaL_loadfile(state, absPath(filename).c_str());
     if (status != LUA_OK) {
-        LERROR("Error loading script: '" << lua_tostring(_state, -1) << "'");
+        LERROR("Error loading script: '" << lua_tostring(state, -1) << "'");
         return false;
     }
 
     LDEBUG("Executing script");
-    if (lua_pcall(_state, 0, LUA_MULTRET, 0)) {
-        LERROR("Error executing script: " << lua_tostring(_state, -1));
+    if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
+        LERROR("Error executing script: " << lua_tostring(state, -1));
         return false;
     }
 
-    if (lua_isnil(_state, -1)) {
+    if (lua_isnil(state, -1)) {
         LERROR("Error in script: '" << filename << "'. Script did not return anything.");
         return false;
     }
 
-    if (!lua_istable(_state, -1)) {
+    if (!lua_istable(state, -1)) {
         LERROR("Error in script: '" << filename << "'. Script did not return a table.");
         return false;
     }
 
-    luaDictionaryFromState(_state, dictionary);
+    luaDictionaryFromState(state, dictionary);
 
     // Clean up after ourselves by cleaning the stack
-    lua_settop(_state, 0);
+    lua_settop(state, 0);
 
     return true;
 }
 
-bool loadDictionaryFromString(const std::string& script, ghoul::Dictionary& dictionary) {
+bool loadDictionaryFromString(
+    const std::string& script,
+    ghoul::Dictionary& dictionary,
+    lua_State* state
+    )
+{
     const static std::string _loggerCat = "lua_loadDictionaryFromString";
 
-    if (_state == nullptr) {
-        LDEBUG("Creating Lua state");
-        _state = luaL_newstate();
+    if (state == nullptr) {
         if (_state == nullptr) {
-            LFATAL("Error creating new Lua state: Memory allocation error");
-            return false;
+            LDEBUG("Creating Lua state");
+            _state = luaL_newstate();
+            if (_state == nullptr) {
+                LFATAL("Error creating new Lua state: Memory allocation error");
+                return false;
+            }
+            LDEBUG("Open libraries");
+            luaL_openlibs(_state);
         }
-        LDEBUG("Open libraries");
-        luaL_openlibs(_state);
+        state = _state;
     }
 
     LDEBUG("Loading dictionary script '" << script.substr(0, 12) << "[...]'");
-    int status = luaL_loadstring(_state, script.c_str());
+    int status = luaL_loadstring(state, script.c_str());
     if (status != LUA_OK) {
-        LERROR("Error loading script: '" << lua_tostring(_state, -1) << "'");
+        LERROR("Error loading script: '" << lua_tostring(state, -1) << "'");
         return false;
     }
 
     LDEBUG("Executing script");
-    if (lua_pcall(_state, 0, LUA_MULTRET, 0)) {
-        LERROR("Error executing script: " << lua_tostring(_state, -1));
+    if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
+        LERROR("Error executing script: " << lua_tostring(state, -1));
         return false;
     }
 
-    if (lua_isnil(_state, -1)) {
+    if (lua_isnil(state, -1)) {
         LERROR("Error in script: '" << script.substr(0, 12)
                                     << "[...]'. Script did not return anything.");
         return false;
     }
 
-    if (!lua_istable(_state, -1)) {
+    if (!lua_istable(state, -1)) {
         LERROR("Error in script: '" << script.substr(0, 12)
                                     << "[...]'. Script did not return a table.");
         return false;
     }
 
-    luaDictionaryFromState(_state, dictionary);
+    luaDictionaryFromState(state, dictionary);
 
     // Clean up after ourselves by cleaning the stack
-    lua_settop(_state, 0);
+    lua_settop(state, 0);
 
     return true;
 }
@@ -337,6 +353,20 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict)
         // get back up one level
         lua_pop(state, 1);
     }
+}
+
+lua_State* createNewLuaState() {
+    const std::string _loggerCat = "createNewLuaState";
+    lua_State* s;
+    LDEBUG("Creating Lua state");
+    s = luaL_newstate();
+    if (s == nullptr) {
+        LFATAL("Error creating new Lua state: Memory allocation error");
+        return nullptr;
+    }
+    LDEBUG("Open libraries");
+    luaL_openlibs(s);
+    return s;
 }
 
 }  // namespace lua
