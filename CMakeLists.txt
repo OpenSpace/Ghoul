@@ -164,7 +164,6 @@ if (GHOUL_HAVE_TESTS)
     
     add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})
     target_link_libraries(GhoulTest gtest Ghoul Lua ${MAC_LIBS})
-    # set_target_properties(
 endif ()
 
 #####
