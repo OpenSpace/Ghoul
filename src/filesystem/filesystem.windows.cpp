@@ -23,7 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#if defined(WIN32)
+#ifdef WIN32
+
 #include <ghoul/filesystem/filesystem.h>
 
 #include <ghoul/filesystem/cachemanager.h>
@@ -55,12 +56,13 @@ namespace {
 
 namespace ghoul {
 namespace filesystem {
-	struct DirectoryHandle {
-		HANDLE _handle;
-		unsigned char _activeBuffer;
-		std::vector<BYTE> _changeBuffer[2];
-		OVERLAPPED _overlappedBuffer;
-	};
+
+struct DirectoryHandle {
+    HANDLE _handle;
+    unsigned char _activeBuffer;
+    std::vector<BYTE> _changeBuffer[2];
+    OVERLAPPED _overlappedBuffer;
+};
 
 void FileSystem::deinitializeInternalWindows() {
 	for (const auto& d : _directories) {
