@@ -44,6 +44,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include <string.h>
+#include <errno.h>
 #endif
 
 using std::string;
@@ -100,7 +102,8 @@ string FileSystem::absolutePath(string path) const {
     char errorBuffer[PATH_BUFFER_SIZE];
     buffer = realpath(path.c_str(), errorBuffer);
     if (buffer == NULL) {
-        LERROR("Error resolving the real path. Problem part: '" << errorBuffer << "'");
+        int errsv = errno;
+        LWARNING("Error resolving the real path. Problem part: '" << errorBuffer << "' " << strerror(errsv));
         return path;
     }
 #endif
