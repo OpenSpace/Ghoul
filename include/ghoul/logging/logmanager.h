@@ -29,10 +29,10 @@
 #include <ghoul/designpattern/singleton.h>
 
 #include <iostream>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <mutex>
 
 namespace ghoul {
 namespace logging {

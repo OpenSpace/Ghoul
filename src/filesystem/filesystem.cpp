@@ -52,6 +52,7 @@ using std::string;
 
 namespace {
     const string _loggerCat = "FileSystem";
+    const string TemporaryPathToken = "TEMPORARY";
 }
 
 namespace ghoul {
@@ -71,6 +72,29 @@ FileSystem::FileSystem()
 #if !defined(WIN32) && !defined(__APPLE__)
 	initializeInternalLinux();
 #endif
+
+    std::string temporaryPath = "";
+#ifdef WIN32
+    DWORD result = GetTempPath(0, "");
+    if (result != 0) {
+        std::vector<TCHAR> tempPath(result);
+        result = GetTempPath(result, tempPath.data());
+        if ((result != 0) || (result <= tempPath.size()))
+            temporaryPath = tempPath.data();
+    }
+#else // WIN32
+    temporaryPath = P_tmpdir;
+#endif // WIN32
+
+    if (!temporaryPath.empty()) {
+        LINFO("Set temporary path ${TEMPORARY} to " << temporaryPath);
+        registerPathToken(
+            TokenOpeningBraces + TemporaryPathToken + TokenClosingBraces,
+            temporaryPath
+        );
+    }
+    else
+        LFATAL("Could not find the path of the system's temporary files");
 }
 
 FileSystem::~FileSystem() {

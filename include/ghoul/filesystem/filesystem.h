@@ -67,9 +67,10 @@ class CacheManager;
  * asset paths with only one point of specification. These tokens can only be bound once,
  * as some of the tokens might already have been resolved and changing the tokens later
  * might lead to inconsistencies. For the same reason, it is not possible to unregister
- * tokens.
+ * tokens. Every FileSystem contains one token <code>${TEMPORARY}</code> that points to
+ * the location of the system's temporary files.
  */
-class FileSystem: public Singleton<FileSystem> {
+class FileSystem : public Singleton<FileSystem> {
 public:
     static const char PathSeparator;
     static const std::string TokenOpeningBraces;
@@ -271,7 +272,7 @@ public:
      */
 	void triggerFilesystemEvents();
 
-	friend class Singleton < FileSystem > ;
+    friend class Singleton<FileSystem>;
 
 private:
 
