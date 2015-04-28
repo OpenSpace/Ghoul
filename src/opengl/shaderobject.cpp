@@ -394,6 +394,13 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 	static const std::string includeString = "#include";
 	static const std::string notrackString = ":notrack";
 	static const std::string versionString = "#version __CONTEXT__";
+    
+#ifdef __APPLE__
+    static const std::string includeSeparator = "";
+#else
+    static const std::string includeSeparator = ";";
+#endif
+    
 
 
 	auto addLineDef = [&lineNumber, &fileHash](std::string* content) {
@@ -450,16 +457,16 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 							// The ; are in the code for forcing compiler errors to occur
 							// in the correct file. Otherwise, they would leak from the
 							// included file into the source file (and vice versa)
-							content += ";// Begin including '" + includeFilename + "'\n";
+							content += includeSeparator + "// Begin including '" + includeFilename + "'\n";
 							if (!readFile(includeFilename, content, track && keepTrack))
 								content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
-							content += ";// End including '" + includeFilename + "'\n";
+							content += includeSeparator + "// End including '" + includeFilename + "'\n";
 						}
 						else {
 							LERROR("Could not resolve file path for include file '" <<
 								line.substr(p1 + 1, p2 - p1 - 1) << "'");
 
-							content += ";// Error including file '" + line.substr(p1 + 1, p2 - p1 - 1) + "'\n";
+							content += includeSeparator + "// Error including file '" + line.substr(p1 + 1, p2 - p1 - 1) + "'\n";
 						}
 						addLineDef(&content);
 						success = true;
@@ -477,10 +484,10 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 								keepTrack = false;
 						}
 
-						content += ";// Begin including '" + includeFilename + "'\n";
+						content += includeSeparator + "// Begin including '" + includeFilename + "'\n";
 						if (!readFile(includeFilename, content, track && keepTrack))
 							content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
-						content += ";// End including '" + includeFilename + "'\n";
+						content += includeSeparator + "// End including '" + includeFilename + "'\n";
 						lineNumber += 1;
 						addLineDef(&content);
 						success = true;
@@ -488,7 +495,7 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 				}
 			}
 			if (!success) {
-				content += "// Error in #include pattern!\n";
+				content += includeSeparator + "// Error in #include pattern!\n";
 			}
 		}
 		else if (line == versionString) {
