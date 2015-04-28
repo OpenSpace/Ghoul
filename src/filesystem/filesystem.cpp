@@ -127,7 +127,6 @@ string FileSystem::absolutePath(string path) const {
     buffer = realpath(path.c_str(), errorBuffer);
     if (buffer == NULL) {
         int errsv = errno;
-        LWARNING("Error resolving the real path. Problem part: '" << errorBuffer << "' " << strerror(errsv));
         return path;
     }
 #endif
