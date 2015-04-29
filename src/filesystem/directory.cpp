@@ -150,8 +150,8 @@ void Directory::readFiles(std::vector<std::string>& result,
                     directories.push(path + "/" + ent->d_name);
             }
         }
+        closedir(dir);
     }
-    closedir(dir);
 #endif
     while (!directories.empty()) {
         const string& directory = directories.top();
@@ -205,8 +205,8 @@ void Directory::readDirectories(
                     directories.push(path + "/" + ent->d_name);
             }
         }
+        closedir(dir);
     }
-    closedir(dir);
 #endif
     while (!directories.empty()) {
         const string& directory = directories.top();
