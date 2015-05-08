@@ -55,7 +55,7 @@ opengl::Texture* TextureReaderCMAP::loadTexture(const std::string& filename) con
 	while (file.good()) {
 		std::getline(file, line);
 		// Skip empty lines
-		if (line.empty())
+		if (line.empty() || line == "\r")
 			continue;
 		// # defines a comment
 		if (line[0] == '#')
