@@ -176,7 +176,7 @@ bool Buffer::read(const std::string& filename) {
         // decompress
         _offsetWrite = LZ4_decompress_safe(reinterpret_cast<const char*>(data),
                                            reinterpret_cast<char*>(_data.data()),
-                                           size,
+                                           static_cast<int>(size),
 										   static_cast<int>(_data.size()));
         delete[] data;
     } else {
