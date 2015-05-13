@@ -126,7 +126,6 @@ string FileSystem::absolutePath(string path) const {
     char errorBuffer[PATH_BUFFER_SIZE];
     buffer = realpath(path.c_str(), errorBuffer);
     if (buffer == NULL) {
-        int errsv = errno;
         return path;
     }
 #endif
