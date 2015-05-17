@@ -418,7 +418,9 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 			end_pos += 1;
 
 		const size_t length = end_pos - start_pos;
-
+        
+        std::string trimmedLine = line.substr(start_pos, length);
+        
 		// If begins with #include
 		if (length > 11 && line.substr(start_pos, includeString.length()) == includeString) {
 			bool success = false;
@@ -498,7 +500,7 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 				content += includeSeparator + "// Error in #include pattern!\n";
 			}
 		}
-		else if (line == versionString) {
+		else if (trimmedLine == versionString) {
 			static std::string versionString = glslVersionString();
 			content += versionString + "\n";
 		}
