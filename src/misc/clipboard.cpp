@@ -109,8 +109,14 @@ bool setClipboardText(std::string text) {
 #ifdef WIN32
     char *ptrData = nullptr;
     HANDLE hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, text.length() + 1);
+    if (hData == nullptr)
+        return false;
 
     ptrData = (char*)GlobalLock(hData);
+    if (ptrData == nullptr) {
+        GlobalFree(hData);
+        return false;
+    }
     memcpy(ptrData, text.c_str(), text.length() + 1);
 
     GlobalUnlock(hData);
