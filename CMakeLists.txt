@@ -131,7 +131,7 @@ if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE)
     endif()
 endif()
 
-include_directories(${GHOUL_ROOT_DIR}/ext/lua/include)
+include_directories(${GHOUL_ROOT_DIR}/ext/lua/src)
 set(BOOST_ROOT "${GHOUL_ROOT_DIR}/ext/boost")
 set(Boost_USE_STATIC_LIBS ON)
 
