@@ -233,12 +233,14 @@ public:
      * a valid and existing Directory.
      * \param cacheDirectory The directory in which all cached files will be stored. Has
      * to be an existing directory with proper read/write access.
+     * \param version The version of the this cache. If the passed version is different
+     * from the cache on disk, the cache is completely discarded
      * \return <code>true</code> if the CacheManager was created successfully;
      * <code>false</code> otherwise. Causes for failure are, among others, a non-existing
      * directory, missing read/write rights, or if the CacheManager was created previously
      * without destroying it in between (destroyCacheManager)
      */
-    bool createCacheManager(const Directory& cacheDirectory);
+    bool createCacheManager(const Directory& cacheDirectory, int version = -1);
     
     /**
      * Destroys the previously created CacheManager. The destruction of the CacheManager

@@ -636,7 +636,7 @@ std::vector<std::string> FileSystem::tokens() const {
 	return tokens;
 }
     
-bool FileSystem::createCacheManager(const Directory& cacheDirectory) {
+bool FileSystem::createCacheManager(const Directory& cacheDirectory, int version) {
     if (!directoryExists(cacheDirectory)) {
         LERROR("Requested cache directory '" << cacheDirectory << "' did not exist");
         return false;
@@ -647,8 +647,8 @@ bool FileSystem::createCacheManager(const Directory& cacheDirectory) {
         return false;
     }
     
-    _cacheManager = new CacheManager(cacheDirectory);
-    assert(_cacheManager);
+    _cacheManager = new CacheManager(cacheDirectory, version);
+    ghoul_assert(_cacheManager, "CacheManager creation failed");
     return true;
 }
 

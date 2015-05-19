@@ -43,8 +43,9 @@ namespace {
 namespace ghoul {
 namespace filesystem {
 
-CacheManager::CacheManager(std::string directory)
+CacheManager::CacheManager(std::string directory, int version)
     : _directory(std::move(directory))
+    , _version(version)
 {
     // In the cache state, we check our cache directory for all values, in a later step
     // we remove all persistent values, so that only the non-persistent values remain
@@ -57,6 +58,21 @@ CacheManager::CacheManager(std::string directory)
 	std::ifstream file(path);
 	if (file.good()) {
 		std::string line;
+        // The first line of the file contains the version number
+        std::getline(file, line);
+        if (line != std::to_string(_version)) {
+            LINFO("Cache version has changed. Current version " << line <<
+                " new version " << _version);
+            for (const auto& cache : cacheState) {
+                LINFO("Deleting file '" << cache.second << "'");
+                FileSys.deleteFile(cache.second);
+            }
+            cleanDirectory(_directory);
+            file.close();
+            FileSys.deleteFile(path);
+            return;
+        }
+
         // loading the cache file that might exist from a previous run of the application
         // and reading all the persistent files from that file
 		while (std::getline(file, line)) {
@@ -94,6 +110,8 @@ CacheManager::CacheManager(std::string directory)
             FileSys.deleteFile(cache.second);
         }
         cleanDirectory(_directory);
+        file.close();
+        FileSys.deleteFile(path);
     }
 }
 
@@ -101,6 +119,7 @@ CacheManager::~CacheManager() {
 	std::string&& path = FileSys.pathByAppendingComponent(_directory, _cacheFile);
 	std::ofstream file(path, std::ofstream::out);
 	if (file.good()) {
+        file << _version << std::endl;
 		for (const auto& p : _files) {
 			if (!p.second.isPersistent) {
                 // Delete all the non-persistent files

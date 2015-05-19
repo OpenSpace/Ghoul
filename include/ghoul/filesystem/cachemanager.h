@@ -61,8 +61,11 @@ public:
      * might have been left intact if the previous run crashed. After the constructor
      * returns, the CacheManager will leave a cleaned cache directory and the persistent
      * files are correctly registered and available.
+     * \param directory The directory that is used for the CacheManager
+     * \param version The version of the cache. If a mayor change happens that shouldn't
+     * be dealt on an individual level, this invalidates previous caches
      */
-	CacheManager(std::string directory);
+	CacheManager(std::string directory, int version = -1);
     
     /**
      * The destructor will save all information on persistent files in a
@@ -265,6 +268,9 @@ protected:
 
 	/// The cache directory
 	Directory _directory;
+
+    /// The cache version
+    int _version;
 
 	/// A map containing file hashes and file information
 	std::map<unsigned int, CacheInformation> _files;
