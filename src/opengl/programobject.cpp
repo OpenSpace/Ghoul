@@ -80,6 +80,7 @@ ProgramObject::ProgramObject()
     , _ignoreAttributeLocationError(false)
     , _ignoreSubroutineLocationError(false)
     , _ignoreSubroutineUniformLocationError(false)
+    , _programIsDirty(true)
 {
     _id = glCreateProgram();
     if (_id == 0)
@@ -94,6 +95,7 @@ ProgramObject::ProgramObject(std::string name)
     , _ignoreAttributeLocationError(false)
     , _ignoreSubroutineLocationError(false)
     , _ignoreSubroutineUniformLocationError(false)
+    , _programIsDirty(true)
 {
     _id = glCreateProgram();
     if (_id == 0)
@@ -116,6 +118,7 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
     , _ignoreSubroutineLocationError(cpy._ignoreSubroutineLocationError)
     , _ignoreSubroutineUniformLocationError(cpy._ignoreSubroutineUniformLocationError)
 	, _onChangeCallback(nullptr)
+    , _programIsDirty(true)
 {
     _id = glCreateProgram();
     if (_id == 0)
@@ -173,6 +176,7 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
         _ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
         _ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
 		_onChangeCallback = rhs._onChangeCallback;
+        _programIsDirty = rhs._programIsDirty;
 
 		for (const ManagedShaderObject& obj : _shaderObjects) {
             // Only delete ShaderObjects that belong to this ProgramObject
@@ -229,6 +233,7 @@ ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) {
 		_ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
 		_ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
 		_onChangeCallback = std::move(rhs._onChangeCallback);
+        _programIsDirty = std::move(rhs._programIsDirty);
 
 		for (const ManagedShaderObject& obj : _shaderObjects) {
 			// Only delete ShaderObjects that belong to this ProgramObject
@@ -261,6 +266,7 @@ const string& ProgramObject::name() const{
 
 void ProgramObject::setProgramObjectCallback(ProgramObjectCallback changeCallback) {
 	filesystem::File::FileChangedCallback c = [this, changeCallback](const filesystem::File&){
+        _programIsDirty = true;
 		changeCallback(this);
 	};
 	for (const ManagedShaderObject& shaderObject : _shaderObjects)
@@ -272,11 +278,7 @@ bool ProgramObject::hasName() const {
 }
 
 void ProgramObject::attachObject(ShaderObject* shaderObject, bool transferOwnership) {
-    // Check for null pointer
-    if (shaderObject == nullptr) {
-        LWARNING("Passed ShaderObject is nullptr");
-        return;
-    }
+    ghoul_assert(shaderObject != nullptr, "Passed ShaderObject is nullptr");
 #ifdef GHL_DEBUG
     // Check if ShaderObject is already attached
 	for (const ManagedShaderObject& obj : _shaderObjects) {
@@ -291,6 +293,12 @@ void ProgramObject::attachObject(ShaderObject* shaderObject, bool transferOwners
         }
     }
 #endif
+    filesystem::File::FileChangedCallback c = [this](const filesystem::File&) {
+        _programIsDirty = true;
+    };
+    shaderObject->setShaderObjectCallback(c);
+
+
     glAttachShader(_id, *shaderObject);
 	_shaderObjects.emplace_back(shaderObject, transferOwnership);
 }
@@ -368,6 +376,7 @@ bool ProgramObject::linkProgramObject() {
 
         return false;
     }
+    _programIsDirty = false;
     return linkStatus == GL_TRUE;
 }
 
@@ -392,6 +401,10 @@ bool ProgramObject::rebuildFromFile() {
 
 	*this = std::move(p);
 	return true;
+}
+
+bool ProgramObject::isDirty() const {
+    return _programIsDirty;
 }
 
 void ProgramObject::activate() {

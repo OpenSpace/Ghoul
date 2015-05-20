@@ -196,6 +196,14 @@ public:
     bool rebuildFromFile();
 
     /**
+     * Returns whether this ProgramObject is dirty and needs to be recompiled and rebuilt
+     * due to a change in the underlying file. A ProgramObject is automatically set to be
+     * not dirty once it is linked correctly.
+     * \return <code>true</code> if this ProgramObject has to be recompiled and rebuilt
+     */
+    bool isDirty() const;
+
+    /**
      * Activates this ProgramObject for use in the OpenGL. Will call the OpenGL function
      * <code>glUseProgram</code>.
      */
@@ -3331,6 +3339,10 @@ private:
 
 	/// The user provided callback if any of the ShadeObjects tracked files is changed
 	ProgramObjectCallback _onChangeCallback;
+
+    /// A flag that gets set to <code>true</code> if the underlying shader file has been
+    /// changed and a recompile is necessary.
+    bool _programIsDirty;
 };
 
 } // namespace opengl
