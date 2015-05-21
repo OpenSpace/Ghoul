@@ -96,6 +96,7 @@ target_include_directories(Ghoul PUBLIC ${LZ4_INCLUDE_DIR})
 target_link_libraries(Ghoul ${LZ4_LIBRARIES})
 
 # Boost
+set(BOOST_ROOT "${GHOUL_ROOT_DIR}/ext/boost")
 find_package(Boost REQUIRED)
 target_include_directories(Ghoul PUBLIC ${Boost_INCLUDE_DIRS})
 # set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${Boost_LIBRARIES})
