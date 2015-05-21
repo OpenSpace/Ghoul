@@ -24,6 +24,10 @@
 
 cmake_minimum_required(VERSION 3.0)
 
+list(REMOVE_ITEM CMAKE_CONFIGURATION_TYPES "MinSizeRel")
+mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
+mark_as_advanced(CMAKE_INSTALL_PREFIX)
+
 project(Ghoul)
 message(STATUS "Generating Ghoul project")
 
