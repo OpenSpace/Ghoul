@@ -39,6 +39,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_ROOT_DIR}/ext)
 include(src/CMakeLists.txt)
 
 # Options
+option(GHOUL_HAVE_TESTS "Activate the unit tests" OFF)
 if (WIN32)
     option(GHOUL_USE_WMI "Use Windows Management Instrumentation" ON)
 endif()
@@ -153,24 +154,27 @@ if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE AND NOT GHOUL_USE_SOIL)
     message(FATAL_ERROR "Ghoul needs to be built with DevIL, FreeImage, or SoIL")
 endif()
 
+if (GHOUL_HAVE_TESTS)
+    file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
+    add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})
+    target_compile_definitions(GhoulTest PUBLIC
+        "DGHOUL_HAVE_TESTS"
+        "DGTEST_HAS_TR1_TUPLE=0"
+        "DGTEST_HAS_GLOBAL_STRING=0"
+    )
+    target_include_directories(GhoulTest PUBLIC "${GHOUL_ROOT_DIR}/ext/gtest/include" "${GHOUL_ROOT_DIR}")
+    add_subdirectory(${GHOUL_ROOT_DIR}/ext/gtest)
+    target_link_libraries(GhoulTest gtest Ghoul Lua)
 
-
-
-# option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
-# if (GHOUL_HAVE_TESTS)
-#     add_definitions(-DGHOUL_HAVE_TESTS)
-#     add_definitions(-DGTEST_HAS_TR1_TUPLE=0)
-#     add_definitions(-DGTEST_HAS_GLOBAL_STRING=0)
-#     add_subdirectory(${GHOUL_ROOT_DIR}/ext/gtest)
-    
-#     include_directories("${GHOUL_ROOT_DIR}/ext/gtest/include")
-#     include_directories("${GHOUL_ROOT_DIR}")
-#     include_directories("${GHOUL_ROOT_DIR}/include")
-#     file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
-    
-#     add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})
-#     target_link_libraries(GhoulTest gtest Ghoul Lua ${MAC_LIBS})
-# endif ()
+    if (APPLE)
+        target_link_libraries(GhoulTest
+            ${CARBON_LIBRARY}
+            ${COREFOUNDATION_LIBRARY}
+            ${COCOA_LIBRARY}
+            ${APP_SERVICES_LIBRARY}
+        )
+    endif()
+endif ()
 
 # #####
 # # Platform-dependent Settings
