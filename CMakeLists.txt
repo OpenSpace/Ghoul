@@ -22,11 +22,6 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         #
 #########################################################################################
 
-# @TODO Enable whole program optimization ---abock
-# @TODO Enable inline function expansion ---abock
-# @TODO Check/enable function level linking ---abock
-# @TODO Enable precompiled header ---abock
-
 cmake_minimum_required(VERSION 3.0)
 
 project(Ghoul)
@@ -46,7 +41,7 @@ include(src/CMakeLists.txt)
 option(GHOUL_HAVE_TESTS "Activate the unit tests" OFF)
 if (WIN32)
     option(GHOUL_USE_WMI "Use Windows Management Instrumentation" ON)
-endif()
+endif ()
 
 #############################
 # Declare the library
@@ -64,7 +59,7 @@ if (MSVC)
         target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_WMI" "_WIN32_DCOM") # Is _WIN32_DCOM necessary? ---abock
         target_link_libraries(Ghoul "WbemUuid.lib" "shlwapi")
 #         set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} "WbemUuid.lib")
-    endif()
+    endif ()
 elseif (APPLE)
     target_compile_options(Ghoul PUBLIC "-std=c++11" "-stdlib=libc++" "-Wno-write-strings" "-Wall")
     target_compile_definitions(Ghoul PUBLIC "__APPLE__" "__gl_h_") # Is it set automatically? --- abock
@@ -83,7 +78,7 @@ elseif (APPLE)
     )
 elseif (UNIX) # The order is important as UNIX is also true on MacOS
     target_compile_options(Ghoul PUBLIC "-std=c++0x" "ggdb" "-Wall" "-Wno-long-long" "-pedantic" "-Wextra") # Do we want to make GDB dependent on debug build? ---abock
-endif()
+endif ()
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     if (MSVC OR XCODE)
@@ -149,7 +144,7 @@ if (FREEIMAGE_FOUND)
         target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_FREEIMAGE")
         target_include_directories(Ghoul PUBLIC ${FREEIMAGE_INCLUDE_PATH})
         target_link_libraries(Ghoul ${FREEIMAGE_LIBRARIES})
-    endif()
+    endif ()
 endif ()
 
 # SOIL
@@ -160,12 +155,12 @@ if (SOIL_FOUND)
         target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_SOIL")
         target_include_directories(Ghoul PUBLIC ${SOIL_INCLUDE_DIRS})
         target_link_libraries(Ghoul ${SOIL_LIBRARIES})
-    endif()
-endif()
+    endif ()
+endif ()
 
 if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE AND NOT GHOUL_USE_SOIL)
     message(FATAL_ERROR "Ghoul needs to be built with DevIL, FreeImage, or SoIL")
-endif()
+endif ()
 
 
 #############################
@@ -190,7 +185,7 @@ if (GHOUL_HAVE_TESTS)
             ${COCOA_LIBRARY}
             ${APP_SERVICES_LIBRARY}
         )
-    endif()
+    endif ()
 endif ()
 
 #############################
@@ -200,16 +195,16 @@ macro(GhoulCopySharedLibraries TARGET_EXECUTABLE)
     # Windows DLL
     if (WIN32)
         # DevIL
-        if(GHOUL_USE_DEVIL)
+        if (GHOUL_USE_DEVIL)
             if (CMAKE_CL_64)
                 set(DEVIL_DLL_DIR ${GHOUL_ROOT_DIR}/ext/il/lib/win64)
             else (CMAKE_CL_64)
                 set(DEVIL_DLL_DIR ${GHOUL_ROOT_DIR}/ext/il/lib/win32)
-            endif (CMAKE_CL_64)
+            endif ()
             set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/DevIL.dll)
             set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/ILU.dll)
             set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/ILUT.dll)
-        endif(GHOUL_USE_DEVIL)
+        endif ()
 
         # FreeImage
         if(GHOUL_USE_FREEIMAGE)
@@ -217,16 +212,16 @@ macro(GhoulCopySharedLibraries TARGET_EXECUTABLE)
                 set(FREEIMAGE_DLL_DIR ${GHOUL_ROOT_DIR}/ext/freeimage/lib/win64)
             else (CMAKE_CL_64)
                 set(FREEIMAGE_DLL_DIR ${GHOUL_ROOT_DIR}/ext/freeimage/lib/win32)
-            endif (CMAKE_CL_64)
+            endif ()
             set(SHARED_LIBS ${SHARED_LIBS} ${FREEIMAGE_DLL_DIR}/FreeImage.dll)
-        endif(GHOUL_USE_FREEIMAGE)
+        endif ()
 
         # Add the copy command
-        foreach( ile_i ${SHARED_LIBS})
+        foreach(ile_i ${SHARED_LIBS})
             add_custom_command(TARGET ${TARGET_EXECUTABLE} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${file_i}"
             $<TARGET_FILE_DIR:${TARGET_EXECUTABLE}>)
-        endforeach( file_i )
-    endif(WIN32)
-endmacro(GhoulCopySharedLibraries)
+        endforeach ()
+    endif (WIN32)
+endmacro ()
