@@ -35,20 +35,30 @@ message(STATUS "Generating Ghoul project")
 set(GHOUL_ROOT_DIR ${PROJECT_SOURCE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_ROOT_DIR}/ext)
 
+#############################
 # Including the source files (with source groups already defined)
+#############################
 include(src/CMakeLists.txt)
 
+#############################
 # Options
+#############################
 option(GHOUL_HAVE_TESTS "Activate the unit tests" OFF)
 if (WIN32)
     option(GHOUL_USE_WMI "Use Windows Management Instrumentation" ON)
 endif()
 
+#############################
+# Declare the library
+#############################
 add_library(Ghoul STATIC ${GHOUL_SOURCE} ${GHOUL_HEADER})
 target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
+#############################
+# Compile settings
+#############################
 if (MSVC)
-    target_compile_options(Ghoul PRIVATE "/MP")
+    target_compile_options(Ghoul PRIVATE "/MP" "/W4" "/wd4201" "/wd4127")
 
     if (GHOUL_USE_WMI)
         target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_WMI" "_WIN32_DCOM") # Is _WIN32_DCOM necessary? ---abock
@@ -56,8 +66,8 @@ if (MSVC)
 #         set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} "WbemUuid.lib")
     endif()
 elseif (APPLE)
-    target_compile_options(Ghoul PUBLIC "-std=c++11 -stdlib=libc++")
-    target_compile_definitions(Ghoul PUBLIC "__APPLE__") # Is it set automatically? --- abock
+    target_compile_options(Ghoul PUBLIC "-std=c++11" "-stdlib=libc++" "-Wno-write-strings" "-Wall")
+    target_compile_definitions(Ghoul PUBLIC "__APPLE__" "__gl_h_") # Is it set automatically? --- abock
 
     include_directories(/Developer/Headers/FlatCarbon)
     find_library(COREFOUNDATION_LIBRARY CoreFoundation)
@@ -72,9 +82,20 @@ elseif (APPLE)
         ${APP_SERVICES_LIBRARY}
     )
 elseif (UNIX) # The order is important as UNIX is also true on MacOS
-    target_compile_options(Ghoul PUBLIC "-std=c++0x -ggdb") # Do we want to make GDB dependent on debug build? ---abock
+    target_compile_options(Ghoul PUBLIC "-std=c++0x" "ggdb" "-Wall" "-Wno-long-long" "-pedantic" "-Wextra") # Do we want to make GDB dependent on debug build? ---abock
 endif()
 
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    if (MSVC OR XCODE)
+        target_compile_definitions(Ghoul PRIVATE $<$<CONFIG:Debug>:GHL_DEBUG>)
+    else () 
+        target_compile_definitions(Ghoul PRIVATE "GHL_DEBUG" "_DEBUG")
+    endif (MSVC OR XCODE)
+endif()
+
+#############################
+# Dependencies
+#############################
 
 # GLM
 set(GLM_ROOT_DIR "${GHOUL_ROOT_DIR}/ext/glm")
@@ -107,14 +128,6 @@ add_subdirectory(ext/lua)
 
 # tinyobjloader
 add_subdirectory(ext/tinyobjloader)
-# # tinyobjloader
-# set(GHOUL_EXT_TINYOBJ_SOURCE
-#     ${GHOUL_ROOT_DIR}/ext/tinyobjloader/tiny_obj_loader.h
-#     ${GHOUL_ROOT_DIR}/ext/tinyobjloader/tiny_obj_loader.cc
-#     )
-# add_library(tinyobjloader ${GHOUL_EXT_TINYOBJ_SOURCE})
-# set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} tinyobjloader)
-
 
 # DevIL
 find_package(DevIL)
@@ -154,6 +167,10 @@ if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE AND NOT GHOUL_USE_SOIL)
     message(FATAL_ERROR "Ghoul needs to be built with DevIL, FreeImage, or SoIL")
 endif()
 
+
+#############################
+# Unit Test Suite
+#############################
 if (GHOUL_HAVE_TESTS)
     file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
     add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})
@@ -176,131 +193,40 @@ if (GHOUL_HAVE_TESTS)
     endif()
 endif ()
 
-# #####
-# # Platform-dependent Settings
-# #####
-# if (APPLE)
-#     add_definitions(-D__gl_h_)
-#     add_definitions(-Wno-write-strings)
-# endif ()
+#############################
+# User macros
+#############################
+macro(GhoulCopySharedLibraries TARGET_EXECUTABLE)
+    # Windows DLL
+    if (WIN32)
+        # DevIL
+        if(GHOUL_USE_DEVIL)
+            if (CMAKE_CL_64)
+                set(DEVIL_DLL_DIR ${GHOUL_ROOT_DIR}/ext/il/lib/win64)
+            else (CMAKE_CL_64)
+                set(DEVIL_DLL_DIR ${GHOUL_ROOT_DIR}/ext/il/lib/win32)
+            endif (CMAKE_CL_64)
+            set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/DevIL.dll)
+            set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/ILU.dll)
+            set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/ILUT.dll)
+        endif(GHOUL_USE_DEVIL)
 
-# add_subdirectory(src)
-# add_subdirectory(${GHOUL_ROOT_DIR}/ext/lua)
+        # FreeImage
+        if(GHOUL_USE_FREEIMAGE)
+            if (CMAKE_CL_64)
+                set(FREEIMAGE_DLL_DIR ${GHOUL_ROOT_DIR}/ext/freeimage/lib/win64)
+            else (CMAKE_CL_64)
+                set(FREEIMAGE_DLL_DIR ${GHOUL_ROOT_DIR}/ext/freeimage/lib/win32)
+            endif (CMAKE_CL_64)
+            set(SHARED_LIBS ${SHARED_LIBS} ${FREEIMAGE_DLL_DIR}/FreeImage.dll)
+        endif(GHOUL_USE_FREEIMAGE)
 
-# #####
-# # User macros
-# #####
-# macro(GhoulCopySharedLibraries TARGET_EXECUTABLE)
-
-#     # Windows DLL
-#     if (WIN32)
-
-#         # DevIL
-#         if(GHOUL_USE_DEVIL)
-#             if (CMAKE_CL_64)
-#                 set(DEVIL_DLL_DIR ${GHOUL_ROOT_DIR}/ext/il/lib/win64)
-#             else (CMAKE_CL_64)
-#                 set(DEVIL_DLL_DIR ${GHOUL_ROOT_DIR}/ext/il/lib/win32)
-#             endif (CMAKE_CL_64)
-#             set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/DevIL.dll)
-#             set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/ILU.dll)
-#             set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/ILUT.dll)
-#         endif(GHOUL_USE_DEVIL)
-
-#         # FreeImage
-#         if(GHOUL_USE_FREEIMAGE)
-#             if (CMAKE_CL_64)
-#                 set(FREEIMAGE_DLL_DIR ${GHOUL_ROOT_DIR}/ext/freeimage/lib/win64)
-#             else (CMAKE_CL_64)
-#                 set(FREEIMAGE_DLL_DIR ${GHOUL_ROOT_DIR}/ext/freeimage/lib/win32)
-#             endif (CMAKE_CL_64)
-#             set(SHARED_LIBS ${SHARED_LIBS} ${FREEIMAGE_DLL_DIR}/FreeImage.dll)
-#         endif(GHOUL_USE_FREEIMAGE)
-
-#         # Add the copy command
-#         foreach( file_i ${SHARED_LIBS})
-#             add_custom_command(TARGET ${TARGET_EXECUTABLE} POST_BUILD
-#             COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#             "${file_i}"
-#             $<TARGET_FILE_DIR:${TARGET_EXECUTABLE}>)
-#         endforeach( file_i )
-#     endif(WIN32)
-
-# endmacro(GhoulCopySharedLibraries)
-
-# ######
-# # Source
-# ######
-
-# set(SOURCE_ROOT_DIR ${GHOUL_ROOT_DIR}/src)
-# set(HEADER_ROOT_DIR ${GHOUL_ROOT_DIR}/include/ghoul)
-
-# add_source_group("CmdParser" "cmdparser")
-# add_source_group("DesignPattern" "designpattern")
-# add_source_group("Exception" "exception")
-# add_source_group("FileSystem" "filesystem")
-# add_source_group("IO" "io")
-
-# file(GLOB IO_TEXTURE_SOURCE ${SOURCE_ROOT_DIR}/io/texture/*.cpp)
-# set(GHOUL_SOURCE ${GHOUL_SOURCE} ${IO_TEXTURE_SOURCE})
-# file(GLOB IO_TEXTURE_HEADER ${HEADER_ROOT_DIR}/io/texture/*.h)
-# set(GHOUL_HEADER ${GHOUL_HEADER} ${IO_TEXTURE_HEADER})
-# source_group(IO\\Texture FILES ${IO_TEXTURE_SOURCE} ${IO_TEXTURE_HEADER})
-
-# file(GLOB IO_MODEL_SOURCE ${SOURCE_ROOT_DIR}/io/model/*.cpp)
-# set(GHOUL_SOURCE ${GHOUL_SOURCE} ${IO_MODEL_SOURCE})
-# file(GLOB IO_MODEL_HEADER ${HEADER_ROOT_DIR}/io/model/*.h)
-# set(GHOUL_HEADER ${GHOUL_HEADER} ${IO_MODEL_HEADER})
-# source_group(IO\\Model FILES ${IO_MODEL_SOURCE} ${IO_MODEL_HEADER})
-             
-# add_source_group("LogManager" "logging") 
-# add_source_group("Lua" "lua") 
-# add_source_group("Misc" "misc") 
-# add_source_group("OpenGL" "opengl") 
-# add_source_group("SystemCapabilities" "systemcapabilities") 
-
-# set(GHOUL_HEADER ${GHOUL_HEADER} ${HEADER_ROOT_DIR}/glm.h)
-
-# ######
-# # Dependencies
-# ######
-# set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${DEVIL_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${MAC_LIBS})
-
-# include_directories(
-#     ${GHOUL_ROOT_DIR}/include
-#     ${GHOUL_ROOT_DIR}/include/ghoul)
-    
-# if (CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake|MSBuild)")
-#     if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-#         string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-#     else ()
-#         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
-#     endif ()
-#     # C4201: nonstandard extension used : nameless struct/union    # Extension is ubiquitous
-#     # C4127: 'if' or 'while' loop evaluates to a constant          # Used for 'swallowing the semicolon" idiom
-#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4201 /wd4127")
-# else()
-#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-#     if(UNIX)
-#         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-long-long -pedantic -Wextra")
-#     endif(UNIX)
-# endif ()
-
-# # Create the Ghoul library
-# add_library(Ghoul STATIC ${GHOUL_SOURCE} ${GHOUL_HEADER})
-
-# # Adding debug flags for the debug build
-# if(CMAKE_BUILD_TYPE MATCHES Debug)
-#     if(MSVC OR XCODE)
-#         if(${CMAKE_VERSION} VERSION_GREATER 3.0 OR ${CMAKE_VERSION} VERSION_EQUAL 3.0)
-#             target_compile_definitions(Ghoul PRIVATE $<$<CONFIG:Debug>:GHL_DEBUG>)
-#         else()
-#             set_target_properties(Ghoul PROPERTIES COMPILE_DEFINITIONS_DEBUG "GHL_DEBUG")
-#         endif()
-#     else() 
-#         add_definitions(-DGHL_DEBUG)
-#         add_definitions(-D_DEBUG)
-#     endif(MSVC OR XCODE)
-# endif(CMAKE_BUILD_TYPE MATCHES Debug)
-
-# target_link_libraries(Ghoul Lua ${GHOUL_DEPENDENCIES})
+        # Add the copy command
+        foreach( ile_i ${SHARED_LIBS})
+            add_custom_command(TARGET ${TARGET_EXECUTABLE} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${file_i}"
+            $<TARGET_FILE_DIR:${TARGET_EXECUTABLE}>)
+        endforeach( file_i )
+    endif(WIN32)
+endmacro(GhoulCopySharedLibraries)
