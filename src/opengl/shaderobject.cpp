@@ -238,6 +238,12 @@ bool ShaderObject::setShaderFilename(std::string filename) {
         return true;
     }
 
+    if (!FileSys.fileExists(_fileName)) {
+        LERROR("Filename '" << absPath(_fileName) << "' did not exist");
+        deleteShader();
+        return false;
+    }
+
 	// Clear tracked files, this might have changed since last time
 	for (ghoul::filesystem::File* f : _trackedFiles)
 		delete f;

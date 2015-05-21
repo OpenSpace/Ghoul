@@ -2979,6 +2979,20 @@ ProgramObject* ProgramObject::Build(const std::string& name,
 	const std::string& vpath,
 	const std::string& fpath)
 {
+    bool filesExist = true;
+    if (!FileSys.fileExists(vpath)) {
+        LERRORC(name, "Could not find vertex shader '" << vpath << "'");
+        filesExist = false;
+    }
+
+    if (!FileSys.fileExists(fpath)) {
+        LERRORC(name, "Could not find fragment shader '" << fpath << "'");
+        filesExist = false;
+    }
+
+    if (!filesExist)
+        return nullptr;
+
 	const ShaderObject::ShaderType vsType = ShaderObject::ShaderType::ShaderTypeVertex;
 	const ShaderObject::ShaderType fsType = ShaderObject::ShaderType::ShaderTypeFragment;
 
@@ -3001,7 +3015,27 @@ ProgramObject* ProgramObject::Build(const std::string& name,
 	const std::string& fpath,
 	const std::string& gpath)
 {
-	const ShaderObject::ShaderType vsType = ShaderObject::ShaderType::ShaderTypeVertex;
+    bool filesExist = true;
+
+    if (!FileSys.fileExists(vpath)) {
+        LERRORC(name, "Could not find vertex shader '" << vpath << "'");
+        filesExist = false;
+    }
+
+    if (!FileSys.fileExists(fpath)) {
+        LERRORC(name, "Could not find fragment shader '" << fpath << "'");
+        filesExist = false;
+    }
+
+    if (!FileSys.fileExists(gpath)) {
+        LERRORC(name, "Could not find geometry shader '" << gpath << "'");
+        filesExist = false;
+    }
+
+    if (!filesExist)
+        return nullptr;
+
+    const ShaderObject::ShaderType vsType = ShaderObject::ShaderType::ShaderTypeVertex;
 	const ShaderObject::ShaderType fsType = ShaderObject::ShaderType::ShaderTypeFragment;
 	const ShaderObject::ShaderType gsType = ShaderObject::ShaderType::ShaderTypeGeometry;
 
@@ -3028,6 +3062,36 @@ ProgramObject* ProgramObject::Build(const std::string& name,
 	const std::string& tepath,
 	const std::string& tcpath)
 {
+    bool filesExist = true;
+
+    if (!FileSys.fileExists(vpath)) {
+        LERRORC(name, "Could not find vertex shader '" << vpath << "'");
+        filesExist = false;
+    }
+
+    if (!FileSys.fileExists(fpath)) {
+        LERRORC(name, "Could not find fragment shader '" << fpath << "'");
+        filesExist = false;
+    }
+
+    if (!FileSys.fileExists(gpath)) {
+        LERRORC(name, "Could not find geometry shader '" << gpath << "'");
+        filesExist = false;
+    }
+
+    if (!FileSys.fileExists(tepath)) {
+        LERRORC(name, "Could not find tessellation evaluation shader '" << tepath << "'");
+        filesExist = false;
+    }
+
+    if (!FileSys.fileExists(tcpath)) {
+        LERRORC(name, "Could not find tessellation control shader '" << tcpath << "'");
+        filesExist = false;
+    }
+
+    if (!filesExist)
+        return nullptr;
+
 	const ShaderObject::ShaderType vsType = ShaderObject::ShaderType::ShaderTypeVertex;
 	const ShaderObject::ShaderType fsType = ShaderObject::ShaderType::ShaderTypeFragment;
 	const ShaderObject::ShaderType gsType = ShaderObject::ShaderType::ShaderTypeGeometry;
