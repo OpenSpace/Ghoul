@@ -43,35 +43,33 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
 include(src/CMakeLists.txt)
 
 #############################
-# Options
-#############################
-option(GHOUL_HAVE_TESTS "Activate the unit tests" OFF)
-if (WIN32)
-    option(GHOUL_USE_WMI "Use Windows Management Instrumentation" ON)
-endif ()
-
-#############################
 # Declare the library
 #############################
 add_library(Ghoul STATIC ${GHOUL_SOURCE} ${GHOUL_HEADER})
 target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 #############################
-# Compile settings
+# Options
 #############################
-if (MSVC)
-    target_compile_options(Ghoul PRIVATE "/MP" "/W4" "/wd4201" "/wd4127")
-
+if (WIN32)
+    option(GHOUL_USE_WMI "Use Windows Management Instrumentation" ON)
     if (GHOUL_USE_WMI)
         target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_WMI" "_WIN32_DCOM") # Is _WIN32_DCOM necessary? ---abock
         target_link_libraries(Ghoul "WbemUuid.lib" "shlwapi")
 #         set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} "WbemUuid.lib")
     endif ()
+endif ()
+
+#############################
+# Compile settings
+#############################
+if (MSVC)
+    target_compile_options(Ghoul PRIVATE "/MP" "/W4" "/wd4201" "/wd4127")
 elseif (APPLE)
     target_compile_options(Ghoul PUBLIC "-std=c++11" "-stdlib=libc++" "-Wno-write-strings" "-Wall")
     target_compile_definitions(Ghoul PUBLIC "__APPLE__" "__gl_h_") # Is it set automatically? --- abock
 
-    include_directories(/Developer/Headers/FlatCarbon)
+    target_include_directories(Ghoul "/Developer/Headers/FlatCarbon")
     find_library(COREFOUNDATION_LIBRARY CoreFoundation)
     find_library(CARBON_LIBRARY Carbon)
     find_library(COCOA_LIBRARY Carbon)
@@ -98,38 +96,42 @@ endif()
 #############################
 # Dependencies
 #############################
-
 # GLM
 set(GLM_ROOT_DIR "${GHOUL_ROOT_DIR}/ext/glm")
 find_package(GLM REQUIRED)
-target_include_directories(Ghoul PUBLIC ${GLM_INCLUDE_DIRS})
+target_include_directories(Ghoul SYSTEM PUBLIC ${GLM_INCLUDE_DIRS})
 target_compile_definitions(Ghoul PUBLIC "GLM_SWIZZLE")
 
 # OpenGL
 find_package(OpenGL REQUIRED)
-target_include_directories(Ghoul PUBLIC ${OPENGL_INCLUDE_DIR})
+target_include_directories(Ghoul SYSTEM PUBLIC ${OPENGL_INCLUDE_DIR})
+target_link_libraries(Ghoul ${OPENGL_LIBRARIES})
 
 # GLEW
 find_package(GLEW REQUIRED)
-target_include_directories(Ghoul PUBLIC ${GLEW_INCLUDE_DIRS})
+target_include_directories(Ghoul SYSTEM PUBLIC ${GLEW_INCLUDE_DIRS})
+target_compile_definitions(Ghoul PUBLIC "GLEW_STATIC")
 target_link_libraries(Ghoul ${GLEW_LIBRARIES})
 
 # LZ4
 find_package(LZ4 REQUIRED)
-target_include_directories(Ghoul PUBLIC ${LZ4_INCLUDE_DIR})
+target_include_directories(Ghoul SYSTEM PUBLIC ${LZ4_INCLUDE_DIR})
 target_link_libraries(Ghoul ${LZ4_LIBRARIES})
 
 # Boost
 set(BOOST_ROOT "${GHOUL_ROOT_DIR}/ext/boost")
 find_package(Boost REQUIRED)
-target_include_directories(Ghoul PUBLIC ${Boost_INCLUDE_DIRS})
+target_include_directories(Ghoul SYSTEM PUBLIC ${Boost_INCLUDE_DIRS})
 # set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${Boost_LIBRARIES})
 
 # Lua
 add_subdirectory(ext/lua)
+target_link_libraries(Ghoul Lua)
 
 # tinyobjloader
 add_subdirectory(ext/tinyobjloader)
+target_link_libraries(Ghoul tinyobjloader)
+target_include_directories(Ghoul SYSTEM PUBLIC "${GHOUL_ROOT_DIR}/ext/tinyobjloader")
 
 # DevIL
 find_package(DevIL)
@@ -171,8 +173,9 @@ endif ()
 
 
 #############################
-# Unit Test Suite
+# Other applications
 #############################
+option(GHOUL_HAVE_TESTS "Activate the unit tests" OFF)
 if (GHOUL_HAVE_TESTS)
     file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
     add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})

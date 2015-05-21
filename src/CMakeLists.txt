@@ -150,9 +150,9 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilitiescomponent.h
 )
 
-# Place files into a source_group
-foreach(file ${GHOUL_SOURCE} ${GHOUL_HEADER})
-    # Remove the prefixes from the files 
+# Place files into source_group
+foreach (file ${GHOUL_SOURCE} ${GHOUL_HEADER})
+    # Remove prefixes from the files 
     set(original_file ${file})
     string(REPLACE "${PROJECT_SOURCE_DIR}/src/" "" file ${file})
     string(REPLACE "${PROJECT_SOURCE_DIR}/include/ghoul/" "" file ${file})
@@ -162,7 +162,7 @@ foreach(file ${GHOUL_SOURCE} ${GHOUL_HEADER})
     string(TOUPPER ${FIRST_LETTER} FIRST_LETTER)
     string(REGEX REPLACE "^.(.*)" "${FIRST_LETTER}\\1" directory "${directory}")
     source_group("${directory}" FILES ${original_file})
-endforeach()
+endforeach ()
 
 # Hide the variables from the GUI
 mark_as_advanced(GHOUL_SOURCE GHOUL_HEADER)
