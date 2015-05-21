@@ -24,7 +24,8 @@
 
 cmake_minimum_required(VERSION 3.0)
 
-list(REMOVE_ITEM CMAKE_CONFIGURATION_TYPES "MinSizeRel")
+#set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo")
+set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo CACHE TYPE INTERNAL FORCE)
 mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
 mark_as_advanced(CMAKE_INSTALL_PREFIX)
 
@@ -33,6 +34,8 @@ message(STATUS "Generating Ghoul project")
 
 set(GHOUL_ROOT_DIR ${PROJECT_SOURCE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_ROOT_DIR}/ext)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
 
 #############################
 # Including the source files (with source groups already defined)
