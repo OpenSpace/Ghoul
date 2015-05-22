@@ -126,6 +126,7 @@ target_include_directories(Ghoul SYSTEM PUBLIC ${Boost_INCLUDE_DIRS})
 
 # Lua
 add_subdirectory(ext/lua)
+target_include_directories(Ghoul PUBLIC "ext/lua/src")
 target_link_libraries(Ghoul Lua)
 
 # tinyobjloader
