@@ -69,7 +69,7 @@ elseif (APPLE)
     target_compile_options(Ghoul PUBLIC "-std=c++11" "-stdlib=libc++" "-Wno-write-strings" "-Wall")
     target_compile_definitions(Ghoul PUBLIC "__APPLE__" "__gl_h_") # Is it set automatically? --- abock
 
-    target_include_directories(Ghoul "/Developer/Headers/FlatCarbon")
+    target_include_directories(Ghoul PUBLIC "/Developer/Headers/FlatCarbon")
     find_library(COREFOUNDATION_LIBRARY CoreFoundation)
     find_library(CARBON_LIBRARY Carbon)
     find_library(COCOA_LIBRARY Carbon)
