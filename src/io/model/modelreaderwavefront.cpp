@@ -82,27 +82,47 @@ ModelReaderWavefront::loadModel(const std::string& filename) const{
     std::string line;
     
     while(std::getline(file, line)) {
+#ifdef _MSC_VER
+        if (sscanf_s(line.c_str(), "v %f%f%f", &f1, &f2, &f3)) {
+#else
         if (sscanf(line.c_str(), "v %f%f%f", &f1, &f2, &f3)) {
+
+#endif
             positions.push_back(f1);
             positions.push_back(f2);
             positions.push_back(f3);
             continue;
         }
+
+#ifdef _MSC_VER
+        if (sscanf_s(line.c_str(), "vn %f%f%f", &f1, &f2, &f3)) {
+#else
         if (sscanf(line.c_str(), "vn %f%f%f", &f1, &f2, &f3)) {
+#endif
             normals.push_back(f1);
             normals.push_back(f2);
             normals.push_back(f3);
             continue;
         }
+
+#ifdef _MSC_VER
+        if (sscanf_s(line.c_str(), "vt %f%f%f", &f1, &f2, &f3)) {
+#else
         if (sscanf(line.c_str(), "vt %f%f%f", &f1, &f2, &f3)) {
+#endif
             texcoords.push_back(f1);
             texcoords.push_back(f2);
             texcoords.push_back(f3);
             continue;
         }
         if (texcoords.size() > 0){
+#ifdef _MSC_VER
+            if (sscanf_s(line.c_str(), "f %i/%i/%i %i/%i/%i %i/%i/%i",
+                       &i1, &i2, &i3, &i4, &i5, &i6, &i7, &i8, &i9))
+#else
             if (sscanf(line.c_str(), "f %i/%i/%i %i/%i/%i %i/%i/%i",
                        &i1, &i2, &i3, &i4, &i5, &i6, &i7, &i8, &i9))
+#endif
             {
                 // v1
                 positionsIndices.push_back(i1-1);
@@ -121,9 +141,14 @@ ModelReaderWavefront::loadModel(const std::string& filename) const{
                 continue;
             }
         }
-        else{
+        else {
+#ifdef _MSC_VER
+            if (sscanf_s(line.c_str(), "f %i//%i %i//%i %i//%i",
+                       &i1, &i2, &i3, &i4, &i5, &i6))
+#else
             if (sscanf(line.c_str(), "f %i//%i %i//%i %i//%i",
                        &i1, &i2, &i3, &i4, &i5, &i6))
+#endif
             {
                 // v1
                 positionsIndices.push_back(i1-1);
@@ -166,7 +191,7 @@ ModelReaderWavefront::loadModel(const std::string& filename) const{
         }
         
         vertices.push_back(v);
-        indices.push_back(i);
+        indices.push_back(static_cast<GLint>(i));
     }
     
     opengl::VertexBufferObject* vbo = new opengl::VertexBufferObject();
