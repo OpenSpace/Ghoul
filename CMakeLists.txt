@@ -82,7 +82,7 @@ elseif (APPLE)
         ${APP_SERVICES_LIBRARY}
     )
 elseif (UNIX) # The order is important as UNIX is also true on MacOS
-    target_compile_options(Ghoul PUBLIC "-std=c++0x" "ggdb" "-Wall" "-Wno-long-long" "-pedantic" "-Wextra") # Do we want to make GDB dependent on debug build? ---abock
+    target_compile_options(Ghoul PUBLIC "-std=c++0x" "-ggdb" "-Wall" "-Wno-long-long" "-pedantic" "-Wextra") # Do we want to make GDB dependent on debug build? ---abock
 endif ()
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
