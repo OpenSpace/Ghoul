@@ -107,16 +107,19 @@ find_package(OpenGL REQUIRED)
 target_include_directories(Ghoul SYSTEM PUBLIC ${OPENGL_INCLUDE_DIR})
 target_link_libraries(Ghoul ${OPENGL_LIBRARIES})
 
+
 # GLEW
 find_package(GLEW REQUIRED)
 target_include_directories(Ghoul SYSTEM PUBLIC ${GLEW_INCLUDE_DIRS})
 target_compile_definitions(Ghoul PUBLIC "GLEW_STATIC")
 target_link_libraries(Ghoul ${GLEW_LIBRARIES})
 
+
 # LZ4
 find_package(LZ4 REQUIRED)
 target_include_directories(Ghoul SYSTEM PUBLIC ${LZ4_INCLUDE_DIR})
 target_link_libraries(Ghoul ${LZ4_LIBRARIES})
+
 
 # Boost
 set(BOOST_ROOT "${GHOUL_ROOT_DIR}/ext/boost")
@@ -124,15 +127,11 @@ find_package(Boost REQUIRED)
 target_include_directories(Ghoul SYSTEM PUBLIC ${Boost_INCLUDE_DIRS})
 # set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} ${Boost_LIBRARIES})
 
+
 # Lua
 add_subdirectory(ext/lua)
-target_include_directories(Ghoul PUBLIC "ext/lua/src")
+target_include_directories(Ghoul SYSTEM PUBLIC "ext/lua/src")
 target_link_libraries(Ghoul Lua)
-if (MSVC)
-    target_compile_options(Lua PUBLIC "/W0" "/MP")
-else ()
-    target_compile_options(Lua PUBLIC "-w" "-Wno-deprecated-declarations")
-endif ()
 
 
 # tinyobjloader
