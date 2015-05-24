@@ -48,7 +48,9 @@ const string _loggerCat = "File";
 const char pathSeparator = '\\';
 const unsigned int changeBufferSize = 16384u;
 
+#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 #elif __APPLE__
 const char pathSeparator = '/';
 #else

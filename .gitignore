@@ -7,3 +7,5 @@ Makefile
 src/cmake_install.cmake
 src/Makefile
 doc/
+ext/boost
+bin/
