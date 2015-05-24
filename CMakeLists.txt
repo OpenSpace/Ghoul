@@ -131,7 +131,7 @@ target_link_libraries(Ghoul Lua)
 if (MSVC)
     target_compile_options(Lua PUBLIC "/W0" "/MP")
 else ()
-    target_compile_options(Lua PUBLIC "-w")
+    target_compile_options(Lua PUBLIC "-w -Wno-deprecated-declarations")
 endif ()
 
 
