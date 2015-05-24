@@ -81,10 +81,10 @@ TEST(FileSystemTest, OnChangeCallback) {
 	bool b1 = false;
 	bool b2 = false;
 
-	auto c1 = [&b1](const File& f) {
+	auto c1 = [&b1](const File&) {
 		b1 = true;
 	};
-	auto c2 = [&b2](const File& f) {
+	auto c2 = [&b2](const File&) {
 		b2 = true;
 	};
 

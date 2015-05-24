@@ -39,9 +39,9 @@ namespace ghoul {
  * <code>e</code>. Enough space in the vector will automatically be allocated. If an
  * error occurred, <code>false</code> will be returned and the <code>tokens</code>
  * vector will be empty.
- * \param input The input URI that is to be tokenized using the
- * PropertyOwner::URISeparator.
- * \param tokens The results of the tokenization operation
+ * \param input The input URI that is to be tokenized using the <code>separator</code>
+ * \param separator The separator that is used for tokenize the string
+ * \return The results of the tokenization operation
  */
 std::vector<std::string> tokenizeString(
     const std::string& input,
