@@ -59,15 +59,23 @@ if (WIN32)
 #         set(GHOUL_DEPENDENCIES ${GHOUL_DEPENDENCIES} "WbemUuid.lib")
     endif ()
 endif ()
+option(GHOUL_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 
 #############################
 # Compile settings
 #############################
 if (MSVC)
-    target_compile_options(Ghoul PRIVATE "/MP" "/W4" "/wd4201" "/wd4127")
+    target_compile_options(Ghoul PUBLIC "/MP" "/W4" "/wd4201" "/wd4127")
+    if (GHOUL_WARNINGS_AS_ERRORS)
+        target_compile_options(Ghoul PUBLIC "/WX")
+    endif ()
 elseif (APPLE)
     target_compile_options(Ghoul PUBLIC "-std=c++11" "-stdlib=libc++" "-Wno-write-strings" "-Wall")
     target_compile_definitions(Ghoul PUBLIC "__APPLE__" "__gl_h_") # Is it set automatically? --- abock
+
+    if (GHOUL_WARNINGS_AS_ERRORS)
+        target_compile_options(Ghoul PUBLIC "-Werror")
+    endif ()
 
     target_include_directories(Ghoul PUBLIC "/Developer/Headers/FlatCarbon")
     find_library(COREFOUNDATION_LIBRARY CoreFoundation)
@@ -83,6 +91,10 @@ elseif (APPLE)
     )
 elseif (UNIX) # The order is important as UNIX is also true on MacOS
     target_compile_options(Ghoul PUBLIC "-std=c++0x" "-ggdb" "-Wall" "-Wno-long-long" "-pedantic" "-Wextra") # Do we want to make GDB dependent on debug build? ---abock
+
+    if (GHOUL_WARNINGS_AS_ERRORS)
+        target_compile_options(Ghoul PUBLIC "-Werror")
+    endif ()
 endif ()
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
