@@ -42,7 +42,6 @@ public:
     FormattingException(const std::string&);
 };
 
-
 /**
  * Returns the location of the calling function using <code>luaL_where</code> and returns
  * that location as a string. This method is just a wrapper around this function and its
@@ -151,8 +150,18 @@ std::string luaTypeToString(int type);
  */
 lua_State* createNewLuaState();
 
+/**
+ * Destroys the passed lua state and frees all memory that is associated with it.
+ * \param state The Lua state that is to be deleted
+ */
+void destroyLuaState(lua_State* state);
 
 void luaDictionaryFromState(lua_State* L, ghoul::Dictionary& d);
+
+namespace internal {
+    void deinitializeGlobalState();
+} // namespace internal
+
 
 } // namespace lua
 } // namespace ghoul

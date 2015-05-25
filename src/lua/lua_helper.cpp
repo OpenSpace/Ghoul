@@ -39,7 +39,6 @@ namespace lua {
 
 static lua_State* _state = nullptr;
 
-
 FormattingException::FormattingException(const std::string& msg)
     : std::runtime_error(msg) {
 }
@@ -368,6 +367,19 @@ lua_State* createNewLuaState() {
     luaL_openlibs(s);
     return s;
 }
+
+void destroyLuaState(lua_State* state) {
+    lua_close(state);
+}
+
+namespace internal {
+
+void deinitializeGlobalState() {
+    lua_close(_state);
+    _state = nullptr;
+}
+
+} // namespace internal
 
 }  // namespace lua
 }  // namespace ghoul

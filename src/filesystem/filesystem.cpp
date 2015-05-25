@@ -131,7 +131,7 @@ string FileSystem::absolutePath(string path) const {
 #endif
 
     if (buffer) {
-        path = string(buffer);
+        path.assign(buffer);
 #ifdef WIN32
         delete[] buffer;
 #endif
