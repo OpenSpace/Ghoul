@@ -24,7 +24,7 @@
 
 cmake_minimum_required(VERSION 3.0)
 
-#set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo")
+# Remove RelMinSize configuration option
 set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo CACHE TYPE INTERNAL FORCE)
 mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
 mark_as_advanced(CMAKE_INSTALL_PREFIX)
@@ -32,6 +32,7 @@ mark_as_advanced(CMAKE_INSTALL_PREFIX)
 project(Ghoul)
 message(STATUS "Generating Ghoul project")
 
+# Setting default paths
 set(GHOUL_ROOT_DIR ${PROJECT_SOURCE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_ROOT_DIR}/ext)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
@@ -60,6 +61,7 @@ if (WIN32)
     endif ()
 endif ()
 option(GHOUL_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
+option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
 
 #############################
 # Compile settings
@@ -70,8 +72,20 @@ if (MSVC)
         target_compile_options(Ghoul PUBLIC "/WX")
     endif ()
 elseif (APPLE)
-    target_compile_options(Ghoul PUBLIC "-std=c++11" "-stdlib=libc++" "-Wno-write-strings" "-Wall")
-    target_compile_definitions(Ghoul PUBLIC "__APPLE__" "__gl_h_") # Is it set automatically? --- abock
+    include (CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+    CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+    mark_as_advanced(COMPILER_SUPPORTS_CXX11, COMPILER_SUPPORTS_CXX0X)
+    if (COMPILER_SUPPORTS_CXX11)
+        target_compile_options(Ghoul PUBLIC "-std=c++11")
+    elseif (COMPILER_SUPPORTS_CXX0X)
+        target_compile_options(Ghoul PUBLIC "-std=c++0x")
+    else ()
+      message(FATAL_ERROR "Compiler does not have C++11 support")
+    endif ()
+
+    target_compile_options(Ghoul PUBLIC "-stdlib=libc++" "-Wno-write-strings" "-Wall")
+    target_compile_definitions(Ghoul PUBLIC "__gl_h_")
 
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(Ghoul PUBLIC "-Werror")
@@ -90,19 +104,27 @@ elseif (APPLE)
         ${APP_SERVICES_LIBRARY}
     )
 elseif (UNIX) # The order is important as UNIX is also true on MacOS
-    target_compile_options(Ghoul PUBLIC "-std=c++0x" "-ggdb" "-Wall" "-Wno-long-long" "-pedantic" "-Wextra") # Do we want to make GDB dependent on debug build? ---abock
+    include (CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+    CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+    mark_as_advanced(COMPILER_SUPPORTS_CXX11, COMPILER_SUPPORTS_CXX0X)
+    if (COMPILER_SUPPORTS_CXX11)
+        target_compile_options(Ghoul PUBLIC "-std=c++11")
+    elseif (COMPILER_SUPPORTS_CXX0X)
+        target_compile_options(Ghoul PUBLIC "-std=c++0x")
+    else ()
+      message(FATAL_ERROR "Compiler does not have C++11 support")
+    endif ()
+
+    target_compile_options(Ghoul PUBLIC "-ggdb" "-Wall" "-Wno-long-long" "-pedantic" "-Wextra")
 
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(Ghoul PUBLIC "-Werror")
     endif ()
 endif ()
 
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-    if (MSVC OR XCODE)
-        target_compile_definitions(Ghoul PRIVATE $<$<CONFIG:Debug>:GHL_DEBUG>)
-    else () 
-        target_compile_definitions(Ghoul PRIVATE "GHL_DEBUG" "_DEBUG")
-    endif (MSVC OR XCODE)
+if (GHOUL_HIGH_DEBUG_MODE)
+    target_compile_definitions(Ghoul PRIVATE "GHL_DEBUG")
 endif()
 
 #############################
