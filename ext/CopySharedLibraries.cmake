@@ -22,7 +22,17 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         #
 #########################################################################################
 
-macro(ghl_copy_shared_libraries target ghoul_dir)
+function (copy_files target)
+    # Add the copy command
+    foreach(file_i ${ARGN})
+        add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${file_i}"
+        $<TARGET_FILE_DIR:${target}>)
+    endforeach ()
+endfunction ()
+
+macro (ghl_copy_shared_libraries target ghoul_dir)
     # Windows DLL
     if (WIN32)
         # DevIL
@@ -47,12 +57,6 @@ macro(ghl_copy_shared_libraries target ghoul_dir)
             set(SHARED_LIBS ${SHARED_LIBS} ${FREEIMAGE_DLL_DIR}/FreeImage.dll)
         endif ()
 
-        # Add the copy command
-        foreach(file_i ${SHARED_LIBS})
-            add_custom_command(TARGET ${target} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${file_i}"
-            $<TARGET_FILE_DIR:${target}>)
-        endforeach ()
+        copy_files(${target} ${SHARED_LIBS})
     endif (WIN32)
 endmacro ()
