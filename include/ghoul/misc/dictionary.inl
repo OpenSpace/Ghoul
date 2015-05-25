@@ -47,7 +47,7 @@ bool ghoul::Dictionary::setValueHelper(std::string key, T value,
     const bool hasRestPath = splitKey(key, first, rest);
     if (!hasRestPath) {
         // if no rest exists, key == first and we can just insert the value
-        (*this)[key] = value;
+        (*this)[key] = std::move(value);
         return true;
     }
 
@@ -76,7 +76,7 @@ bool ghoul::Dictionary::setValueHelper(std::string key, T value,
         return false;
     }
     // Proper tail-recursion
-    return dict->setValue(rest, value, createIntermediate);
+    return dict->setValue(rest, std::move(value), createIntermediate);
 }
 
 template <typename T>
