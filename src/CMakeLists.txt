@@ -131,6 +131,8 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/typeinfo.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/framebufferobject.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/ghoul_gl.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/opengl
