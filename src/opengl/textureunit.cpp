@@ -117,12 +117,9 @@ void TextureUnit::assignUnit() {
 
 void TextureUnit::initialize() {
     if (systemcapabilities::SystemCapabilities::isInitialized())
-		if (OpenGLCap)
-	        _maxTexUnits = OpenGLCap->maximumNumberOfTextureUnits();
-		else 
-			_maxTexUnits = 8; // Reasonable default setting for OpenGL
+        _maxTexUnits = OpenGLCap.maximumNumberOfTextureUnits();
     else
-        _maxTexUnits = 0;
+        _maxTexUnits = 8; // Reasonable default setting for OpenGL
     _busyUnits = std::vector<bool>(_maxTexUnits, false);
     _initialized = true;
 }
