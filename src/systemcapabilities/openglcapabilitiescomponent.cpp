@@ -352,8 +352,10 @@ bool OpenGLCapabilitiesComponent::Version::parseGLSLString(const string& version
     else {
         // second format
         size_t spaceSeparator = version.find_first_of(' ', separatorMajorMinor + 1);
-        if (spaceSeparator == string::npos)
-            minor = version.substr(separatorMajorMinor + 1);
+        if (spaceSeparator == string::npos) {
+            const int minorVersionLength = 1;
+            minor = version.substr(separatorMajorMinor + 1, minorVersionLength);
+        }
         else {
             size_t len = spaceSeparator - (separatorMajorMinor + 1);
             minor = version.substr(separatorMajorMinor + 1, len);
