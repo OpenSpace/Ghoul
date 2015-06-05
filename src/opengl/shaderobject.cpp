@@ -30,6 +30,7 @@
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/filesystem/file.h>
 #include <ghoul/misc/crc32.h>
+#include <ghoul/systemcapabilities/systemcapabilities.h>
 
 #include <algorithm>
 #include <cassert>
@@ -401,13 +402,16 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 	static const std::string notrackString = ":notrack";
 	static const std::string versionString = "#version __CONTEXT__";
     
-#ifdef __APPLE__
-    static const std::string includeSeparator = "";
-#else
-    static const std::string includeSeparator = ";";
-#endif
+    std::string includeSeparator = ";";
     
-
+    // Nvidia supports empty statements in the middle of the shader code
+    // Sofar, ATI and Apple drivers throw an error
+    using Vendor = ghoul::systemcapabilities::OpenGLCapabilitiesComponent::Vendor;
+    if (OpenGLCap.gpuVendor() == Vendor::ATI)
+        includeSeparator = "";
+#ifdef __APPLE__
+    includeSeparator = "";
+#endif
 
 	auto addLineDef = [&lineNumber, &fileHash](std::string* content) {
 		*content += "#line " + std::to_string(lineNumber) + " " + std::to_string(fileHash) + "\n";
