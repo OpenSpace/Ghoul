@@ -375,7 +375,8 @@ void destroyLuaState(lua_State* state) {
 namespace internal {
 
 void deinitializeGlobalState() {
-    lua_close(_state);
+    if (_state)
+        lua_close(_state);
     _state = nullptr;
 }
 
