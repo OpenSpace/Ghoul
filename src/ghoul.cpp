@@ -25,12 +25,13 @@
 
 #include <ghoul/ghoul.h>
 
+#include <ghoul/filesystem/filesystem.h>
 #include <ghoul/lua/lua_helper.h>
 
 namespace ghoul {
 
 void initialize() {
-
+    ghoul::filesystem::FileSystem::initialize();
 }
 
 void deinitialize() {
