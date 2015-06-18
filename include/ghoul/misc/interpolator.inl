@@ -24,6 +24,7 @@
  ****************************************************************************************/
 
 #include <array>
+#include <glm/gtx/quaternion.hpp>
 
 namespace ghoul{
 
@@ -34,18 +35,44 @@ U ghoul::Interpolator<ghoul::Interpolators::Linear>::interpolate(double fact, U 
         //the two required are there.
         //static_assert(sizeof...(arguments) == 0, "Interpolation requires at least two values");
         #else
-        #warning "Linear only wants 2, duh"
+        //#warning "Linear only wants 2, duh"
         #endif
         std::array<U, sizeof...(arguments)> list = {arguments...};
         return fact * p1 + (1.0 - fact) * p0;
     }
+
+template<>
+glm::quat ghoul::Interpolator<ghoul::Interpolators::Linear>::interpolate(double fact, glm::quat p0, glm::quat p1){
+	#ifdef GHL_DEBUG
+		//no error to report here, any number of extra arguments may be given but we know that at least
+		//the two required are there.
+		//static_assert(sizeof...(arguments) == 0, "Interpolation requires at least two values");
+	#else
+		//#warning "Linear only wants 2, duh"
+	#endif
+		
+	return glm::slerp(p0, p1, static_cast<float>(fact));
+}
+
+template<>
+glm::dquat ghoul::Interpolator<ghoul::Interpolators::Linear>::interpolate(double fact, glm::dquat p0, glm::dquat p1){
+#ifdef GHL_DEBUG
+	//no error to report here, any number of extra arguments may be given but we know that at least
+	//the two required are there.
+	//static_assert(sizeof...(arguments) == 0, "Interpolation requires at least two values");
+#else
+	//#warning "Linear only wants 2, duh"
+#endif
+
+	return glm::slerp(p0, p1, fact);
+}
 
 template<typename U, typename... UArgs>
 U ghoul::Interpolator<ghoul::Interpolators::CatmullRom>::interpolate(double fact, U p0, U p1, UArgs && ... arguments){
     #ifdef GHL_DEBUG
     static_assert(sizeof...(arguments) < 2, "Catmull-Rom interpolation requires at least four control points");
     #else
-    #warning "Catmull-Rom interpolation requires at least four control points"
+    //#warning "Catmull-Rom interpolation requires at least four control points"
     #endif
     std::array<U, sizeof...(arguments)> list = {arguments...};
     
