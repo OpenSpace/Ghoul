@@ -58,7 +58,7 @@ public:
          * <code>false</code> otherwise. If the parsing failed, the version parts will not
          * be changed.
          */
-        bool parseGLSLString(const std::string& version);
+        bool parseGLSLString(std::string version);
 
         /**
          * Returns the stored GLSL version in the format <code>major.minor.release</code>.

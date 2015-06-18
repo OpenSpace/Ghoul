@@ -325,12 +325,18 @@ OpenGLCapabilitiesComponent::Version::Version(int major, int minor, int release)
     , _release(release)
 {}
 
-bool OpenGLCapabilitiesComponent::Version::parseGLSLString(const string& version) {
+bool OpenGLCapabilitiesComponent::Version::parseGLSLString(string version) {
     // version string has one of the formats:
     // <major version>.<minor version>.<release version> <vendor specific information>
     // <major version>.<minor version> [<vendor specific information>]
+    // where the vendor specific information can contain arbitrary symbols
 
     stringstream stream;
+
+    size_t separatorSpace = version.find_first_of(" ");
+    if (separatorSpace == string::npos)
+        return false;
+    version = version.substr(0, separatorSpace);
 
     size_t separatorMajorMinor = version.find_first_of('.');
     if (separatorMajorMinor == string::npos)
@@ -343,24 +349,15 @@ bool OpenGLCapabilitiesComponent::Version::parseGLSLString(const string& version
         // first format
         size_t len = separatorMinorRelease - (separatorMajorMinor + 1);
         minor = version.substr(separatorMajorMinor + 1, len);
-        size_t spaceSeparator = version.find_first_of(' ', separatorMinorRelease + 1);
-        if (spaceSeparator == string::npos)
-            return false;
-        len = spaceSeparator - (separatorMinorRelease + 1);
-        release = version.substr(separatorMinorRelease + 1, len);
+
+        release = version.substr(separatorMinorRelease + 1);
     }
     else {
         // second format
-        size_t spaceSeparator = version.find_first_of(' ', separatorMajorMinor + 1);
-        if (spaceSeparator == string::npos) {
-            const int minorVersionLength = 1;
-            minor = version.substr(separatorMajorMinor + 1, minorVersionLength);
-        }
-        else {
-            size_t len = spaceSeparator - (separatorMajorMinor + 1);
-            minor = version.substr(separatorMajorMinor + 1, len);
-        }
+        minor = version.substr(separatorMajorMinor + 1);
     }
+
+    
 
     stream << major;
     int tmpMajor;
