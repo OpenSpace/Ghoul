@@ -1962,6 +1962,31 @@ public:
 
 
     //////////////////////////////////////////////////////////////////////////////////////
+    ////// SSBO Bindings
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Locates and sets the SSBO <code>name</code> with the passed <code>binding</code>.
+     * Returns <code>true</code> if the block could be found; <code>false</code>
+     * otherwise. Will call the OpenGL function <code>glGetUniformBlockIndex</code>.
+     * \param name The name of the SSBO in the ShaderObject%s
+     * \param binding The binding the block should be bound to
+     * \return <code>true</code> if the block was successfully located, <code>false
+     * </code> otherwise
+     */
+    bool setSsboBinding(const std::string& name, GLuint binding);
+
+    /**
+     * Sets the block with index <code>index</code> with the passed binding
+     * <code>binding</code>. Will call the OpenGL function
+     * <code>glShaderStorageBlockBinding</code>.
+     * \param index The index of the block retrieved from #glGetUniformBlockIndex
+     * \param binding The binding the block should be bound to
+     */
+    void setSsboBinding(GLint index, GLuint binding);
+
+
+    //////////////////////////////////////////////////////////////////////////////////////
     ////// Attributes
     //////////////////////////////////////////////////////////////////////////////////////
 

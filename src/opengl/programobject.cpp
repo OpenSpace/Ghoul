@@ -2023,6 +2023,18 @@ void ProgramObject::setUniform(GLint location,
     }
 }
 
+bool ProgramObject::setSsboBinding(const std::string& name, GLuint binding) {
+    GLint index = glGetUniformBlockIndex(_id, name.c_str());
+    if (index == -1)
+        return false;
+    setSsboBinding(index, binding);
+    return true;
+}
+
+void ProgramObject::setSsboBinding(GLint index, GLuint binding) {
+    glShaderStorageBlockBinding(_id, index, binding);
+}
+
 GLint ProgramObject::attributeLocation(const std::string& name) const {
     const GLint location = glGetAttribLocation(_id, name.c_str());
     if (!_ignoreAttributeLocationError && location == -1)
