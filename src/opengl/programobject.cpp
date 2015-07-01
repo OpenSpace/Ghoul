@@ -2024,7 +2024,7 @@ void ProgramObject::setUniform(GLint location,
 }
 
 bool ProgramObject::setSsboBinding(const std::string& name, GLuint binding) {
-    GLint index = glGetUniformBlockIndex(_id, name.c_str());
+    GLint index = glGetProgramResourceIndex(_id, GL_SHADER_STORAGE_BLOCK, name.c_str());
     if (index == -1)
         return false;
     setSsboBinding(index, binding);
