@@ -109,7 +109,10 @@ CacheManager::CacheManager(std::string directory, int version)
             LINFO("Deleting file '" << cache.second << "'");
             FileSys.deleteFile(cache.second);
         }
+        // First clean the cache directory with all contents
         cleanDirectory(_directory);
+        // Then recreate the directory for further use
+        FileSys.createDirectory(_directory);
         file.close();
         FileSys.deleteFile(path);
     }
