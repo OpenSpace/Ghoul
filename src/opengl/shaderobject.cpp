@@ -258,7 +258,7 @@ bool ShaderObject::setShaderFilename(std::string filename) {
 	bool success = readFile(_fileName, contents);
 	
 	// If in debug mode, output the source to file
-#ifndef NDEBUG
+//#ifndef NDEBUG
 	std::string generatedFilename;
 	ghoul::filesystem::File ghlFile(_fileName);
 	if (!FileSys.cacheManager() || 
@@ -279,7 +279,7 @@ bool ShaderObject::setShaderFilename(std::string filename) {
 	std::ofstream os(generatedFilename);
 	os << contents;
 	os.close();
-#endif
+//#endif
 	
 	if (!success)
 		return false;
