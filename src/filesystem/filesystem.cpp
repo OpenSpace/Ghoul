@@ -114,27 +114,20 @@ string FileSystem::absolutePath(string path) const {
     expandPathTokens(path);
 
     static const int PATH_BUFFER_SIZE = 4096;
-    char* buffer = nullptr;
+    char* buffer = new char[PATH_BUFFER_SIZE];
 #ifdef WIN32
-    buffer = new char[PATH_BUFFER_SIZE];
     const DWORD success = GetFullPathName(path.c_str(), PATH_BUFFER_SIZE, buffer, 0);
     if (success == 0) {
         delete[] buffer;
         buffer = nullptr;
     }
 #else
-    char errorBuffer[PATH_BUFFER_SIZE];
-    buffer = realpath(path.c_str(), errorBuffer);
-    if (buffer == NULL) {
-        return path;
-    }
+    realpath(path.c_str(), buffer);
 #endif
 
     if (buffer) {
         path.assign(buffer);
-#ifdef WIN32
         delete[] buffer;
-#endif
         return path;
     }
 
