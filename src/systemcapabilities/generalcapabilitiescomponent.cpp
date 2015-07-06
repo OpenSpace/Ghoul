@@ -406,33 +406,36 @@ void GeneralCapabilitiesComponent::detectCPU() {
 	_cores = systemInfo.dwNumberOfProcessors;
 #elif defined(__APPLE__)
     int mib[2];
-    size_t len;
-    char *p;
+    size_t len = 512;
     int intValue;
     
-    mib[0] = CTL_HW;
-    mib[1] = USER_CS_PATH;
-    mib[1] = HW_MODEL;
-    mib[1] = HW_MACHINE_ARCH;
-    sysctl(mib, 2, NULL, &len, NULL, 0);
-    p = new char[len];
-    sysctl(mib, 2, p, &len, NULL, 0);
-    _cpu = p;
-    delete[] p;
+//    mib[0] = CTL_HW;
+//    mib[1] = USER_CS_PATH;
+//    mib[1] = HW_MODEL;
+//    mib[1] = HW_MACHINE_ARCH;
+    
+//    sysctl(mib, 2, NULL, &len, NULL, 0);
+    char p[512];
+//    p = new char[len];
+//    sysctl(mib, 2, p, &len, NULL, 0);
+//    _cpu = p;
+//    delete[] p;
     
     // CPU name
-    sysctlbyname( "machdep.cpu.brand_string", NULL, &len, NULL, 0 );
-    p = new char[len];
-    sysctlbyname( "machdep.cpu.brand_string", p, &len, NULL, 0 );
+//    sysctlbyname( "machdep.cpu.brand_string", NULL, &len, NULL, 0 );
+//    p = new char[len];
+    std::memset(p, 0, 512);
+    sysctlbyname("machdep.cpu.brand_string", p, &len, NULL, 0 );
     _cpu = p;
-    delete[] p;
+//    delete[] p;
     
     // CPU features/extensions
-    sysctlbyname( "machdep.cpu.features", NULL, &len, NULL, 0 );
-    p = new char[len];
+//    sysctlbyname( "machdep.cpu.features", NULL, &len, NULL, 0 );
+//    p = new char[len];
+    std::memset(p, 0, 512);
     sysctlbyname( "machdep.cpu.features", p, &len, NULL, 0 );
     _extensions = p;
-    delete[] p;
+//    delete[] p;
     
     // It works using reinterpret_cast<char*>(&intValue) directly
     // since the expected size is an integer. But to avoid risks
@@ -442,40 +445,44 @@ void GeneralCapabilitiesComponent::detectCPU() {
     // Number of cores
     mib[0] = CTL_HW;
     mib[1] = HW_AVAILCPU;
-    sysctl(mib, 2, NULL, &len, NULL, 0);
-    p = new char[len];
+//    sysctl(mib, 2, NULL, &len, NULL, 0);
+//    p = new char[len];
+    std::memset(p, 0, 512);
     sysctl(mib, 2, p, &len, NULL, 0);
     std::memcpy(&intValue, p, sizeof(int));
     _cores = static_cast<unsigned int>(intValue);
-    delete[] p;
+//    delete[] p;
     
     // Cacheline size
     mib[0] = CTL_HW;
     mib[1] = HW_CACHELINE;
-    sysctl(mib, 2, NULL, &len, NULL, 0);
-    p = new char[len];
+//    sysctl(mib, 2, NULL, &len, NULL, 0);
+//    p = new char[len];
+    std::memset(p, 0, 512);
     sysctl(mib, 2, p, &len, NULL, 0);
     std::memcpy(&intValue, p, sizeof(int));
     _cacheLineSize = static_cast<unsigned int>(intValue);
-    delete[] p;
+//    delete[] p;
     
     // Cache size
     mib[0] = CTL_HW;
     mib[1] = HW_L2CACHESIZE;
-    sysctl(mib, 2, NULL, &len, NULL, 0);
-    p = new char[len];
+//    sysctl(mib, 2, NULL, &len, NULL, 0);
+//    p = new char[len];
+    std::memset(p, 0, 512);
     sysctl(mib, 2, p, &len, NULL, 0);
     std::memcpy(&intValue, p, sizeof(int));
     _cacheSize = static_cast<unsigned int>(intValue);
-    delete[] p;
+//    delete[] p;
     
     // L2 associativity
-    sysctlbyname( "machdep.cpu.cache.L2_associativity", NULL, &len, NULL, 0 );
-    p = new char[len];
+//    sysctlbyname( "machdep.cpu.cache.L2_associativity", NULL, &len, NULL, 0 );
+//    p = new char[len];
+    std::memset(p, 0, 512);
     sysctlbyname( "machdep.cpu.cache.L2_associativity", p, &len, NULL, 0 );
     std::memcpy(&intValue, p, sizeof(int));
     _L2Associativity = static_cast<unsigned int>(intValue);
-    delete[] p;
+//    delete[] p;
 #else
     FILE* file;
     const unsigned int maxSize = 2048;
