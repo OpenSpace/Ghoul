@@ -109,7 +109,7 @@ void OpenGLCapabilitiesComponent::detectGLSLVersion() {
     if (glslVersion) {
         bool success = _glslVersion.parseGLSLString(string(glslVersion));
         if (!success)
-            LERROR("Detection of the GLSL version failed. Detected version: '" 
+            LERROR("Detection of the GLSL version failed. Retrieved version: '" 
             << string(glslVersion) << "'");
     }
     else
@@ -334,9 +334,8 @@ bool OpenGLCapabilitiesComponent::Version::parseGLSLString(string version) {
     stringstream stream;
 
     size_t separatorSpace = version.find_first_of(" ");
-    if (separatorSpace == string::npos)
-        return false;
-    version = version.substr(0, separatorSpace);
+    if (separatorSpace != string::npos)
+        version = version.substr(0, separatorSpace);
 
     size_t separatorMajorMinor = version.find_first_of('.');
     if (separatorMajorMinor == string::npos)
