@@ -69,10 +69,6 @@ const char FileSystem::PathSeparator = '/';
 FileSystem::FileSystem()
     : _cacheManager(nullptr)
 {
-#if !defined(WIN32) && !defined(__APPLE__)
-	initializeInternalLinux();
-#endif
-
     std::string temporaryPath = "";
 #ifdef WIN32
     DWORD result = GetTempPath(0, "");
@@ -95,6 +91,13 @@ FileSystem::FileSystem()
     }
     else
         LFATAL("Could not find the path of the system's temporary files");
+}
+
+void FileSystem::initialize() {
+    Singleton<FileSystem>::initialize();
+#if !defined(WIN32) && !defined(__APPLE__)
+    FileSys.initializeInternalLinux();
+#endif
 }
 
 FileSystem::~FileSystem() {

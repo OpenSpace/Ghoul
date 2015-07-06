@@ -75,6 +75,8 @@ public:
     static const char PathSeparator;
     static const std::string TokenOpeningBraces;
     static const std::string TokenClosingBraces;
+
+    static void initialize();
     
     /**
      * Returns the absolute path to the passed <code>path</code>, resolving any tokens (if
