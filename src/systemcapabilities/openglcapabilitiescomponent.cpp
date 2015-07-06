@@ -353,7 +353,8 @@ bool OpenGLCapabilitiesComponent::Version::parseGLSLString(string version) {
     }
     else {
         // second format
-        minor = version.substr(separatorMajorMinor + 1);
+        // The Minor version is only one number, so we only extract one
+        minor = version.substr(separatorMajorMinor + 1, 1);
     }
 
     
