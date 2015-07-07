@@ -259,30 +259,37 @@ bool FileSystem::fileExists(std::string path, bool isRawPath) const {
 	if (!isRawPath)
 		path = absPath(path);
 #ifdef WIN32
-	const DWORD attributes = GetFileAttributes(path.c_str());
-	if (attributes == INVALID_FILE_ATTRIBUTES) {
-		const DWORD error = GetLastError();
-		if ((error != ERROR_FILE_NOT_FOUND) && (error != ERROR_PATH_NOT_FOUND)) {
-			LPTSTR errorBuffer = nullptr;
-			DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-				FORMAT_MESSAGE_ALLOCATE_BUFFER |
-				FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL,
-				error,
-				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-				(LPTSTR)&errorBuffer,
-				0,
-				NULL);
-			if ((nValues > 0) && (errorBuffer != nullptr)) {
-				string error(errorBuffer);
-				LocalFree(errorBuffer);
-				LERROR("Error retrieving file attributes: " << error);
-			}
-		}
-		return false;
-	}
-	else
-		return (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
+    BOOL exists = PathFileExists(path.c_str());
+    if (exists == FALSE) {
+        // The path did not exist, so the file cannot exist
+        return false;
+    }
+    else {
+	    const DWORD attributes = GetFileAttributes(path.c_str());
+	    if (attributes == INVALID_FILE_ATTRIBUTES) {
+		    const DWORD error = GetLastError();
+		    if ((error != ERROR_FILE_NOT_FOUND) && (error != ERROR_PATH_NOT_FOUND)) {
+			    LPTSTR errorBuffer = nullptr;
+			    DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+				    FORMAT_MESSAGE_ALLOCATE_BUFFER |
+				    FORMAT_MESSAGE_IGNORE_INSERTS,
+				    NULL,
+				    error,
+				    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+				    (LPTSTR)&errorBuffer,
+				    0,
+				    NULL);
+			    if ((nValues > 0) && (errorBuffer != nullptr)) {
+				    string error(errorBuffer);
+				    LocalFree(errorBuffer);
+				    LERROR("Error retrieving file attributes: " << error);
+			    }
+		    }
+		    return false;
+	    }
+	    else
+		    return (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
+    }
 #else
 	struct stat buffer;
 	const int statResult = stat(path.c_str(), &buffer);
