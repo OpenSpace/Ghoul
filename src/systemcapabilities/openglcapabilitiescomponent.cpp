@@ -63,7 +63,7 @@ namespace systemcapabilities {
 
 OpenGLCapabilitiesComponent::OpenGLCapabilitiesComponent() 
     : SystemCapabilitiesComponent()
-	, _glslVersion()
+	, _glVersion()
 	, _vendor(Vendor::Other)
 	, _glewVersion()
 	, _maxTextureSize(-1)
@@ -104,16 +104,9 @@ void OpenGLCapabilitiesComponent::detectCapabilities() {
 }
 
 void OpenGLCapabilitiesComponent::detectGLSLVersion() {
-    const char* glslVersion =
-        reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION));
-    if (glslVersion) {
-        bool success = _glslVersion.parseGLSLString(string(glslVersion));
-        if (!success)
-            LERROR("Detection of the GLSL version failed. Retrieved version: '" 
-            << string(glslVersion) << "'");
-    }
-    else
-        LERROR("Detection the GLSL version failed. 'glGetString' returned 0.");
+    int major, minor;
+    glGetIntegerv(GL_MAJOR_VERSION, &(_glVersion._major));
+    glGetIntegerv(GL_MINOR_VERSION, &(_glVersion._minor));
 }
 
 void OpenGLCapabilitiesComponent::detectGPUVendor() {
@@ -199,9 +192,9 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
 }
 
 void OpenGLCapabilitiesComponent::clearCapabilities() {
-    _glslVersion._major = 0;
-    _glslVersion._minor = 0;
-    _glslVersion._release = 0;
+    _glVersion._major = 0;
+    _glVersion._minor = 0;
+    _glVersion._release = 0;
     _glslCompiler.clear();
     _vendor = Vendor::Other;
     _glRenderer = "";
@@ -229,7 +222,7 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
     const SystemCapabilitiesComponent::Verbosity& verbosity) const
 {
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
-    result.emplace_back("OpenGL Version", _glslVersion.toString());
+    result.emplace_back("OpenGL Version", _glVersion.toString());
     result.emplace_back("OpenGL Compiler", _glslCompiler);
     result.emplace_back("OpenGL Renderer", _glRenderer);
     result.emplace_back("GPU Vendor", gpuVendorString());
@@ -262,7 +255,7 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
 }
 
 const OpenGLCapabilitiesComponent::Version& OpenGLCapabilitiesComponent::openGLVersion() const {
-    return _glslVersion;
+    return _glVersion;
 }
 
 const string& OpenGLCapabilitiesComponent::glslCompiler() const {
@@ -324,69 +317,6 @@ OpenGLCapabilitiesComponent::Version::Version(int major, int minor, int release)
     , _minor(minor)
     , _release(release)
 {}
-
-bool OpenGLCapabilitiesComponent::Version::parseGLSLString(string version) {
-    // version string has one of the formats:
-    // <major version>.<minor version>.<release version> <vendor specific information>
-    // <major version>.<minor version> [<vendor specific information>]
-    // where the vendor specific information can contain arbitrary symbols
-
-    stringstream stream;
-
-    size_t separatorSpace = version.find_first_of(" ");
-    if (separatorSpace != string::npos)
-        version = version.substr(0, separatorSpace);
-
-    size_t separatorMajorMinor = version.find_first_of('.');
-    if (separatorMajorMinor == string::npos)
-        return false;
-    string major = version.substr(0, separatorMajorMinor);
-    size_t separatorMinorRelease = version.find_first_of('.', separatorMajorMinor + 1);
-    string minor = "";
-    string release = "";
-    if (separatorMinorRelease != string::npos) {
-        // first format
-        size_t len = separatorMinorRelease - (separatorMajorMinor + 1);
-        minor = version.substr(separatorMajorMinor + 1, len);
-
-        release = version.substr(separatorMinorRelease + 1);
-    }
-    else {
-        // second format
-        // The Minor version is only one number, so we only extract one
-        minor = version.substr(separatorMajorMinor + 1, 1);
-    }
-
-    
-
-    stream << major;
-    int tmpMajor;
-    stream >> tmpMajor;
-    if (stream.fail())
-        return false;
-
-    stream.clear();
-    stream << minor;
-    int tmpMinor;
-    stream >> tmpMinor;
-    if (stream.fail())
-        return false;
-
-    int tmpRelease = 0;
-    if (release != "") {
-        stream.clear();
-        stream << release;
-        stream >> tmpRelease;
-        if (stream.fail())
-            return false;
-    }
-
-    _major = tmpMajor;
-    _minor = tmpMinor;
-    _release = tmpRelease;
-
-    return true;
-}
 
 bool OpenGLCapabilitiesComponent::Version::operator==(const Version& rhs) const {
     return (_major == rhs._major) && (_minor == rhs._minor) && (_release == rhs._release);

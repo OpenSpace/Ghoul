@@ -48,19 +48,6 @@ public:
         Version(int major = 0, int minor = 0, int release = 0);
 
         /**
-         * Parses the version string, which should be either of the format
-         * <code>major.minor.release vendor-specific information</code> or
-         * <code>major.minor vendor-specific information</code> and should normally be
-         * retrieved using the <code>glGetString(GL_SHADING_LANGUAGE_VERSION)</code>
-         * method.
-         * \param version The version as a formatted string 
-         * \return <code>True</code> if the string could be successfully parsed;
-         * <code>false</code> otherwise. If the parsing failed, the version parts will not
-         * be changed.
-         */
-        bool parseGLSLString(std::string version);
-
-        /**
          * Returns the stored GLSL version in the format <code>major.minor.release</code>.
          * \return The GLSL version as a string
          */
@@ -201,7 +188,7 @@ protected:
     /// Use WMI (on Windows) to retrieve information about the installed driver
     void detectDriverInformation();
 
-    Version _glslVersion; ///< GLSL Version
+    Version _glVersion; ///< OpenGL Version
     std::string _glslCompiler; ///< GPU vendor
     Vendor _vendor; ///< GPU vendor
     std::string _glRenderer; ///< GL_RENDERER
