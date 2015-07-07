@@ -402,13 +402,12 @@ bool ShaderObject::readFile(const std::string& filename, std::string& content, b
 	static const std::string notrackString = ":notrack";
 	static const std::string versionString = "#version __CONTEXT__";
     
-    std::string includeSeparator = ";";
+    std::string includeSeparator = "";
     
-    // Nvidia supports empty statements in the middle of the shader code
-    // Sofar, ATI and Apple drivers throw an error
+    // Sofar, only Nvidia on Windows supports empty statements in the middle of the shader
     using Vendor = ghoul::systemcapabilities::OpenGLCapabilitiesComponent::Vendor;
-    if (OpenGLCap.gpuVendor() == Vendor::ATI)
-        includeSeparator = "";
+    if (OpenGLCap.gpuVendor() == Vendor::Nvidia)
+        includeSeparator = ";";
 #ifdef __APPLE__
     includeSeparator = "";
 #endif
