@@ -2814,7 +2814,7 @@ bool Dictionary::getValue<Dictionary>(const std::string& key, Dictionary& value)
 #endif
 
 Dictionary::Dictionary(std::initializer_list<std::pair<std::string, boost::any>> l) {
-    for (const auto& p : l)
+    for (auto p : l)
         setValueAnyHelper(std::move(p.first), std::move(p.second));
 }
 
