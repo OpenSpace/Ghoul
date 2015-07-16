@@ -72,8 +72,8 @@ option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
 #############################
 # Compile settings
 #############################
-set_property(TARGET ${project} PROPERTY CXX_STANDARD 11)
-set_property(TARGET ${project} PROPERTY CXX_STANDARD_REQUIRED On)
+set_property(TARGET Ghoul PROPERTY CXX_STANDARD 11)
+set_property(TARGET Ghoul PROPERTY CXX_STANDARD_REQUIRED On)
 
 if (MSVC)
     target_compile_options(Ghoul PUBLIC "/MP" "/W4" "/wd4201" "/wd4127")
