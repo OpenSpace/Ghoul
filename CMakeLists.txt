@@ -30,6 +30,13 @@ mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
 mark_as_advanced(CMAKE_INSTALL_PREFIX)
 
 project(Ghoul)
+
+if (MSVC)
+    if (MSVC_VERSION LESS 1800)
+        message(FATAL_ERROR "OpenSpace requires at least Visual Studio 2013")
+    endif ()
+endif ()
+
 message(STATUS "Generating Ghoul project")
 
 # Setting default paths
@@ -65,24 +72,15 @@ option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
 #############################
 # Compile settings
 #############################
+set_property(TARGET ${project} PROPERTY CXX_STANDARD 11)
+set_property(TARGET ${project} PROPERTY CXX_STANDARD_REQUIRED On)
+
 if (MSVC)
     target_compile_options(Ghoul PUBLIC "/MP" "/W4" "/wd4201" "/wd4127")
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(Ghoul PUBLIC "/WX")
     endif ()
 elseif (APPLE)
-    include (CheckCXXCompilerFlag)
-    CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-    CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-    mark_as_advanced(COMPILER_SUPPORTS_CXX11, COMPILER_SUPPORTS_CXX0X)
-    if (COMPILER_SUPPORTS_CXX11)
-        target_compile_options(Ghoul PUBLIC "-std=c++11")
-    elseif (COMPILER_SUPPORTS_CXX0X)
-        target_compile_options(Ghoul PUBLIC "-std=c++0x")
-    else ()
-      message(FATAL_ERROR "Compiler does not have C++11 support")
-    endif ()
-
     target_compile_options(Ghoul PUBLIC "-stdlib=libc++" "-Wno-write-strings" "-Wall")
     target_compile_definitions(Ghoul PUBLIC "__gl_h_")
 
@@ -103,18 +101,6 @@ elseif (APPLE)
         ${APP_SERVICES_LIBRARY}
     )
 elseif (UNIX) # The order is important as UNIX is also true on MacOS
-    include (CheckCXXCompilerFlag)
-    CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-    CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-    mark_as_advanced(COMPILER_SUPPORTS_CXX11, COMPILER_SUPPORTS_CXX0X)
-    if (COMPILER_SUPPORTS_CXX11)
-        target_compile_options(Ghoul PUBLIC "-std=c++11")
-    elseif (COMPILER_SUPPORTS_CXX0X)
-        target_compile_options(Ghoul PUBLIC "-std=c++0x")
-    else ()
-      message(FATAL_ERROR "Compiler does not have C++11 support")
-    endif ()
-
     target_compile_options(Ghoul PUBLIC "-ggdb" "-Wall" "-Wno-long-long" "-pedantic" "-Wextra")
 
     if (GHOUL_WARNINGS_AS_ERRORS)
