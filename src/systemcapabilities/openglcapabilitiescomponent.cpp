@@ -104,7 +104,6 @@ void OpenGLCapabilitiesComponent::detectCapabilities() {
 }
 
 void OpenGLCapabilitiesComponent::detectGLSLVersion() {
-    int major, minor;
     glGetIntegerv(GL_MAJOR_VERSION, &(_glVersion._major));
     glGetIntegerv(GL_MINOR_VERSION, &(_glVersion._minor));
 }
