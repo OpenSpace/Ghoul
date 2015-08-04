@@ -44,6 +44,8 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderdevil.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderfreeimage.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadersoil.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriter.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/texture/texturewritersoil.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/bufferlog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/callbacklog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/consolelog.cpp
@@ -106,6 +108,9 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderdevil.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderfreeimage.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadersoil.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriter.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterbase.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewritersoil.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/bufferlog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/callbacklog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/consolelog.h
