@@ -69,6 +69,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/opengl/programobject.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/shadermanager.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/shaderobject.cpp
+    ${PROJECT_SOURCE_DIR}/src/opengl/shaderpreprocessor.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/texture.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/texturemanager.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/textureunit.cpp
@@ -144,6 +145,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobject.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shadermanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderobject.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderpreprocessor.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texturemanager.h
