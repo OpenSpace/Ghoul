@@ -32,6 +32,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <ghoul/opengl/shaderpreprocessor.h>
 
 namespace ghoul {
 	namespace filesystem {
@@ -81,7 +82,7 @@ public:
      * to be compiled.
      * \param shaderType The type of shader that this ShaderObject will represent
      */
-	ShaderObject(ShaderType shaderType);
+    ShaderObject(ShaderType shaderType, Dictionary dictionary = Dictionary());
 
     /**
      * This constructor creates a shader of the passed type and loads the shader source 
@@ -92,7 +93,7 @@ public:
      * \param filename The name of the file that will be used to load the source of this 
      * shader
      */
-    ShaderObject(ShaderType shaderType, std::string filename);
+    ShaderObject(ShaderType shaderType, std::string filename, Dictionary dictionary = Dictionary());
 
     /**
      * This constructor creates a shader of the passed type and loads the shader source 
@@ -105,7 +106,7 @@ public:
      * shader
      * \param name The human readable name of this ShaderObject
      */
-    ShaderObject(ShaderType shaderType, std::string filename, std::string name);
+    ShaderObject(ShaderType shaderType, std::string filename, std::string name, Dictionary dictionary = Dictionary());
 
     /**
      * A copy constructor that will copy all of the internal state, and the shader source,
@@ -166,7 +167,14 @@ public:
      */
     const std::string& name() const;
 
-	/**
+    /**
+     * Sets the dictionary of the shader object.
+     * Will trigger a rebuild from file.
+     * \param dictionary object
+     */
+    void setDictionary(Dictionary dictionary);
+
+    /**
      * Sets the shader object callback.
      * \param changeCallback object
      */
@@ -233,18 +241,20 @@ public:
      */
     static std::string stringForShaderType(ShaderType type);
 
-	/**
-	 * Adds the passed folder to the list of include paths that are checked when a shader
-	 * includes a file. The list of include paths is traversed in the order in which they
-	 * where added to this class. If the folder does not exist, an error is logged, the
-	 * list of include paths is unchanged and <code>false</code> is returned. The folder
-	 * in which the shader is located will always be treated as if being on the top of the
-	 * list.
-	 * \param folderPath The folder that should be added to the list of include paths
-	 * \return <code>true</code> if the <code>folderPath</code> was added successfully,
-	 * <code>false</code> otherwise
-	 */
-	static bool addIncludePath(std::string folderPath);
+    /**
+     * Deprecated! Use ShaderPreprocessor::addIncludePath instead.
+     *
+     * Adds the passed folder to the list of include paths that are checked when a shader
+     * includes a file. The list of include paths is traversed in the order in which they
+     * where added to this class. If the folder does not exist, an error is logged, the
+     * list of include paths is unchanged and <code>false</code> is returned. The folder
+     * in which the shader is located will always be treated as if being on the top of the
+     * list.
+     * \param folderPath The folder that should be added to the list of include paths
+     * \return <code>true</code> if the <code>folderPath</code> was added successfully,
+     * <code>false</code> otherwise
+     */
+    static bool addIncludePath(std::string folderPath);
 
 private:
     /// The OpenGL name of this ShaderObject
@@ -259,25 +269,17 @@ private:
     /// The internal name of this ShaderObject; initialized to empty
     std::string _shaderName;
 
+    // The dictionary to be used for substitution by the preprocessor
+    Dictionary _dictionary;
+
     /// The logger category that will be used for logging of ShaderObject methods
     std::string _loggerCat;
 
-	/// The callback function if any of the tracked files are changed.
-	ShaderObjectCallback _onChangeCallback;
+    /// The callback function if any of the tracked files are changed.
+    ShaderObjectCallback _onChangeCallback;
 
-	/// Recursively \#included files
-	std::vector<ghoul::filesystem::File*> _trackedFiles;
-
-	/**
-	 * Recursive file loading
-	 */
-	bool readFile(const std::string& filename, std::string& content, bool track = true);
-
-	/**
-	 * The list of include paths that will be checked if a shader <code>include</code>s
-	 * another shader
-	 */
-	static std::vector<std::string> _includePaths;
+    /// The preprocessor to process the shader file and track changes.
+    ShaderPreprocessor _preprocessor;
 };
 
 } // namespace opengl

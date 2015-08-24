@@ -46,47 +46,34 @@
 
 namespace {
 const std::string _loggerCat = "ShaderObject";
-
-std::string glslVersionString() {
-	int versionMajor;
-	int versionMinor;
-	int profileMask;
-	glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
-	glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
-	glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profileMask);
-	std::stringstream ss;
-	ss << "#version " << versionMajor << versionMinor << "0" << // version is set
-		(profileMask & GL_CONTEXT_CORE_PROFILE_BIT ? " core" :
-		(profileMask & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT ? " compatibility" : ""));
-	return ss.str();
-}
 }
 
 namespace ghoul {
 namespace opengl {
 
-std::vector<std::string> ShaderObject::_includePaths = std::vector<std::string>();
-
-ShaderObject::ShaderObject(ShaderType shaderType)
+ShaderObject::ShaderObject(ShaderType shaderType, Dictionary dictionary)
     : _id(0)
     , _type(shaderType)
     , _fileName("")
     , _shaderName("")
-	, _loggerCat("ShaderObject")
-	, _onChangeCallback(nullptr)
+    , _dictionary(dictionary)
+    , _loggerCat("ShaderObject")
+    , _onChangeCallback(nullptr)
 {
     _id = glCreateShader(_type);
+    _preprocessor.setDictionary(dictionary);
     if (_id == 0)
         LERROR("glCreateShader returned 0");
 }
 
-ShaderObject::ShaderObject(ShaderType shaderType, std::string filename)
+ShaderObject::ShaderObject(ShaderType shaderType, std::string filename, Dictionary dictionary)
     : _id(0)
     , _type(shaderType)
     , _fileName(std::move(filename))
     , _shaderName("")
-	, _loggerCat("ShaderObject")
-	, _onChangeCallback(nullptr)
+    , _dictionary(dictionary)
+    , _loggerCat("ShaderObject")
+    , _onChangeCallback(nullptr)
 {
 #ifdef DEBUG
     if (filename == "")
@@ -94,19 +81,21 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename)
 #endif
 
     _id = glCreateShader(_type);
+    _preprocessor.setDictionary(dictionary);
     if (_id == 0)
         LERROR("glCreateShader returned 0");
     setShaderFilename(_fileName);
 }
 
 ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
-						   std::string name)
+                           std::string name, Dictionary dictionary)
     : _id(0)
     , _type(shaderType)
     , _fileName(std::move(filename))
     , _shaderName(std::move(name))
-	, _loggerCat("ShaderObject('" + _shaderName + "')")
-	, _onChangeCallback(nullptr)
+    , _dictionary(dictionary)
+    , _loggerCat("ShaderObject('" + _shaderName + "')")
+    , _onChangeCallback(nullptr)
 {
     _id = glCreateShader(_type);
     if (_id == 0)
@@ -116,6 +105,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
         glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1),
                       _shaderName.c_str());
 #endif
+    _preprocessor.setDictionary(dictionary);
     setShaderFilename(_fileName);
 }
 
@@ -123,9 +113,11 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
     : _id(0)
     , _type(cpy._type)
     , _fileName(cpy._fileName)
-	, _shaderName(cpy._shaderName)
-	, _loggerCat(cpy._loggerCat)
-	, _onChangeCallback(cpy._onChangeCallback)
+    , _shaderName(cpy._shaderName)
+    , _dictionary(cpy._dictionary)
+    , _loggerCat(cpy._loggerCat)
+    , _onChangeCallback(cpy._onChangeCallback)
+    , _preprocessor(cpy._preprocessor)
 {
     _id = glCreateShader(_type);
     if (_id == 0)
@@ -136,6 +128,7 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
                       _shaderName.c_str());
 #endif
     setShaderFilename(_fileName);
+    setShaderObjectCallback(_onChangeCallback);
 }
 
 ShaderObject::ShaderObject(ShaderObject&& rhs) {
@@ -147,17 +140,17 @@ ShaderObject::ShaderObject(ShaderObject&& rhs) {
 		_type = rhs._type;
 		_fileName = std::move(rhs._fileName);
 		_shaderName = std::move(rhs._shaderName);
+		_dictionary = std::move(rhs._dictionary);
 		_loggerCat = std::move(rhs._loggerCat);
 		_onChangeCallback = rhs._onChangeCallback;
-		_trackedFiles = std::move(rhs._trackedFiles);
+		_preprocessor = std::move(rhs._preprocessor);
+		setShaderObjectCallback(rhs._onChangeCallback);
 	}
 }
 
 ShaderObject::~ShaderObject() {
     glDeleteShader(_id);
 	_id = 0;
-	for (ghoul::filesystem::File* f : _trackedFiles)
-		delete f;
 }
 
 ShaderObject::operator GLuint() const {
@@ -169,8 +162,11 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
         _type = rhs._type;
         _fileName = rhs._fileName;
         _shaderName = rhs._shaderName;
-		_loggerCat = rhs._loggerCat;
-		_onChangeCallback = rhs._onChangeCallback;
+        _dictionary = rhs._dictionary;
+        _loggerCat = rhs._loggerCat;
+        _onChangeCallback = rhs._onChangeCallback;
+        _preprocessor = rhs._preprocessor;
+        setShaderObjectCallback(rhs._onChangeCallback);
 
         glDeleteShader(_id);
         _id = glCreateShader(_type);
@@ -195,9 +191,13 @@ ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) {
 		_type = rhs._type;
 		_fileName = std::move(rhs._fileName);
 		_shaderName = std::move(rhs._shaderName);
+		_dictionary = std::move(rhs._dictionary);
 		_loggerCat = std::move(rhs._loggerCat);
-		_onChangeCallback = rhs._onChangeCallback;
-		_trackedFiles = std::move(rhs._trackedFiles);
+		_onChangeCallback = std::move(rhs._onChangeCallback);
+		_preprocessor = std::move(rhs._preprocessor);
+		// Take ownership of the moved preprocessor
+		setShaderObjectCallback(_onChangeCallback);
+
 	}
 	return *this;
 }
@@ -216,12 +216,19 @@ const std::string& ShaderObject::name() const {
     return _shaderName;
 }
 
-void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) {
-	_onChangeCallback = changeCallback;
+void ShaderObject::setDictionary(Dictionary dictionary) {
+    _dictionary = dictionary;
+    _preprocessor.setDictionary(dictionary);
+    rebuildFromFile();
+}
 
-	for (ghoul::filesystem::File* fileObject : _trackedFiles) {
-		fileObject->setCallback(_onChangeCallback);
+void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) {
+    _onChangeCallback = changeCallback;
+    _preprocessor.setCallback([this](const filesystem::File& file) {
+	if (_onChangeCallback) {
+	    _onChangeCallback(file);
 	}
+    });
 }
 
 bool ShaderObject::hasName() const {
@@ -245,18 +252,17 @@ bool ShaderObject::setShaderFilename(std::string filename) {
         return false;
     }
 
-	// Clear tracked files, this might have changed since last time
-	for (ghoul::filesystem::File* f : _trackedFiles)
-		delete f;
-	_trackedFiles.erase(_trackedFiles.begin(), _trackedFiles.end());
+    // No need to allocate a new contents string for every shader
+    // This makes ShaderObjects not thread safe
+    static std::string contents;
+    contents = "";
 
-	// No need to allocate a new contents string for every shader
-	// This makes ShaderObjects not thread safe
-	static std::string contents;
-	contents = "";
+    bool success;
+    _preprocessor.setShaderPath(filename);
+    success = _preprocessor.process(contents);
 
-	bool success = readFile(_fileName, contents);
-	
+
+
 	// If in debug mode, output the source to file
 //#ifndef NDEBUG
 	std::string generatedFilename;
@@ -314,17 +320,9 @@ bool ShaderObject::compile() {
             return false;
         }
 
-		std::string filedefs = "";
-		size_t filehash = 0;
-		for (ghoul::filesystem::File* file : _trackedFiles) {
-			const std::string& path = file->path();
-			filedefs += std::to_string(filehash) + ": " + path + "\n";
-			++filehash;
-		}
-
         GLchar* log = new GLchar[logLength];
         glGetShaderInfoLog(_id, logLength, NULL, log);
-		LERROR(typeAsString() << " compile error:\n" << log << std::endl << filedefs);
+        LERROR(typeAsString() << " compile error:\n" << log << std::endl << _preprocessor.getFileIdentifiersString());
 
         delete[] log;
 
@@ -359,196 +357,15 @@ std::string ShaderObject::stringForShaderType(ShaderType type) {
     }
 }
 
-bool ShaderObject::readFile(const std::string& filename, std::string& content, bool track) {
-	// check that the file exists
-	if (!FileSys.fileExists(filename)) {
-		LWARNING("Could not find '" << filename << "'");
-		return false;
-	}
-
-	// Check that the file is currently not in _trackedFiles
-	for (const auto f : _trackedFiles) {
-		if (f->path() == filename) {
-			LWARNING("Already including '" << filename << "'");
-			return false;
-		}
-	}
-
-	// Construct a file object, track the current file 
-	// even if we cannot open the file
-	using namespace ghoul::filesystem;
-	File* fileObject = new File(filename, false);
-	int fileHash = -1;
-	if (track) {
-		fileObject->setCallback(_onChangeCallback);
-		fileHash = static_cast<int>(_trackedFiles.size());
-		_trackedFiles.push_back( fileObject);
-	}
-
-	// Check that file can be opened
-	std::ifstream f(filename, std::ifstream::in);
-	if (!f.good()) {
-		LWARNING("Could not open '" << filename << "': " << strerror(errno));
-		f.close();
-		return false;
-	}
-
-	// Ready to start parsing
-	// ugly slightly more efficient version, 3-4x faster
-	unsigned int lineNumber = 0;
-	static std::string line;
-	static const std::string ws = " \n\r\t";
-	static const std::string includeString = "#include";
-	static const std::string notrackString = ":notrack";
-	static const std::string versionString = "#version __CONTEXT__";
-    
-    std::string includeSeparator = "";
-    
-    // Sofar, only Nvidia on Windows supports empty statements in the middle of the shader
-    using Vendor = ghoul::systemcapabilities::OpenGLCapabilitiesComponent::Vendor;
-    if (OpenGLCap.gpuVendor() == Vendor::Nvidia)
-        includeSeparator = ";";
-#ifdef __APPLE__
-    includeSeparator = "";
-#endif
-
-	auto addLineDef = [&lineNumber, &fileHash](std::string* content) {
-		*content += "#line " + std::to_string(lineNumber) + " " + std::to_string(fileHash) + "\n";
-	};
-	while (std::getline(f, line)) {
-		++lineNumber;
-		size_t start_pos = line.find_first_not_of(ws);
-		if (start_pos == std::string::npos)
-			start_pos = 0;
-		size_t end_pos = line.find_last_not_of(ws);
-		if (end_pos == std::string::npos)
-			end_pos = line.length();
-		else
-			end_pos += 1;
-
-		const size_t length = end_pos - start_pos;
-        
-        std::string trimmedLine = line.substr(start_pos, length);
-        
-		// If begins with #include
-		if (length > 11 && line.substr(start_pos, includeString.length()) == includeString) {
-			bool success = false;
-
-			size_t p1 = line.find_first_not_of(ws, start_pos + includeString.length());
-			size_t p2 = std::string::npos;
-			if (p1 != std::string::npos) {
-				if (line.at(p1) == '\"') {
-					p2 = line.find_first_of("\"", p1 + 1);
-					if (p2 != std::string::npos) {
-						std::string includeFilename = fileObject->directoryName() + FileSystem::PathSeparator + line.substr(p1 + 1, p2 - p1 - 1);
-
-						size_t remaining = end_pos - p2;
-						bool keepTrack = true;
-						if (remaining > notrackString.length()) {
-							if (line.find_first_of(notrackString, p2) != std::string::npos)
-								keepTrack = false;
-						}
-
-						bool includeFileWasFound = FileSys.fileExists(includeFilename);
-
-						// Resolve the include paths if this default includeFilename does
-						// not exist
-						if (!includeFileWasFound) {
-							for (const std::string& includePath : _includePaths) {
-								includeFilename = includePath + FileSystem::PathSeparator + line.substr(p1 + 1, p2 - p1 - 1);
-
-								if (FileSys.fileExists(includeFilename)) {
-									includeFileWasFound = true;
-									break;
-								}
-							}
-						}
-
-						if (includeFileWasFound) {
-							// The ; are in the code for forcing compiler errors to occur
-							// in the correct file. Otherwise, they would leak from the
-							// included file into the source file (and vice versa)
-							content += includeSeparator + "// Begin including '" + includeFilename + "'\n";
-							if (!readFile(includeFilename, content, track && keepTrack))
-								content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
-							content += includeSeparator + "// End including '" + includeFilename + "'\n";
-						}
-						else {
-							LERROR("Could not resolve file path for include file '" <<
-								line.substr(p1 + 1, p2 - p1 - 1) << "'");
-
-							content += includeSeparator + "// Error including file '" + line.substr(p1 + 1, p2 - p1 - 1) + "'\n";
-						}
-						addLineDef(&content);
-						success = true;
-					}
-				}
-				else if (line.at(p1) == '<') {
-					p2 = line.find_first_of(">", p1 + 1);
-					if (p2 != std::string::npos) {
-						std::string includeFilename = absPath(line.substr(p1 + 1, p2 - p1 - 1));
-
-						size_t remaining = end_pos - p2;
-						bool keepTrack = true;
-						if (remaining > notrackString.length()) {
-							if (line.find_first_of(notrackString, p2) != std::string::npos)
-								keepTrack = false;
-						}
-
-						content += includeSeparator + "// Begin including '" + includeFilename + "'\n";
-						if (!readFile(includeFilename, content, track && keepTrack))
-							content += "// Warning, unsuccessful loading of '" + includeFilename + "'\n";
-						content += includeSeparator + "// End including '" + includeFilename + "'\n";
-						lineNumber += 1;
-						addLineDef(&content);
-						success = true;
-					}
-				}
-			}
-			if (!success) {
-				content += includeSeparator + "// Error in #include pattern!\n";
-			}
-		}
-		else if (trimmedLine == versionString) {
-			static std::string versionString = glslVersionString();
-			content += versionString + "\n";
-		}
-		else{
-			content += line + "\n";
-		}
-	}
-
-	if (!track) {
-		delete fileObject;
-	}
-
-	f.close();
-	return true;
-}
-
+/**
+ * Add include path. Deprecated.
+ * Use ShaderPreprocessor::addIncludePath(std::string folderPath) instead.
+ */
 bool ShaderObject::addIncludePath(std::string folderPath) {
-	folderPath = absPath(folderPath);
-
-	// We only want unique values in this list
-	if (std::find(_includePaths.begin(), _includePaths.end(), folderPath)
-			!= _includePaths.end())
-	{
-		LERRORC("ShaderObject", 
-			"Include path '" << folderPath << "' was already registered");
-		return false;
-	}
-
-	// We only want valid folders in this folder
-	if (!FileSys.directoryExists(folderPath)) {
-		LERRORC("ShaderObject",
-			"Include path '" << folderPath << "' is not a valid folder");
-		return false;
-	}
-
-	// If we managed to get to this place, we have a valid directory
-	_includePaths.push_back(std::move(folderPath));
-	return true;
+    return ShaderPreprocessor::addIncludePath(folderPath);
 }
+
+
 
 } // namespace opengl
 } // namespace ghoul

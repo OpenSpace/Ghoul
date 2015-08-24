@@ -70,6 +70,11 @@ public:
          FileChangedCallback fileChangedCallback = FileChangedCallback());
 
     /**
+     * Copy constructor.
+     */
+    File(const File& file);
+
+    /**
      * The destructor will automatically stop the notification of future changes in the 
      * file system.
      */

@@ -136,12 +136,14 @@ public:
      */
     const std::string& name() const;
 
-	/**
+
+    bool rebuildWithDictionary(Dictionary dictionary);
+
+    /**
      * Sets the shader object callback.
      * \param changeCallback object
      */
-	void setProgramObjectCallback(ProgramObjectCallback changeCallback);
-	
+    void setProgramObjectCallback(ProgramObjectCallback changeCallback);
 
     /**
      * Returns <code>true</code> if this ProgramObject has a human readable name assigned
@@ -3289,8 +3291,9 @@ public:
 	 */
 	
 	static ProgramObject* Build(const std::string& name,
-								const std::string& vpath,
-								const std::string& fpath);
+				    const std::string& vpath,
+				    const std::string& fpath,
+				    Dictionary dictionary = Dictionary());
 
 	/**
 	 * Constructs and links a ProgramObject
@@ -3304,10 +3307,11 @@ public:
 	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
 	 * unsuccessfull
 	*/
-	static ProgramObject* Build(const std::string& name, 
-								const std::string& vpath, 
-								const std::string& fpath, 
-								const std::string& gpath);
+	static ProgramObject* Build(const std::string& name,
+				    const std::string& vpath,
+				    const std::string& fpath,
+				    const std::string& gpath,
+				    Dictionary dictionary = Dictionary());
 	/**
 	 * Constructs and links a ProgramObject
 	 * \param name The human readable name of this ProgramObject
@@ -3325,11 +3329,12 @@ public:
 	 * unsuccessfull
 	 */
 	static ProgramObject* Build(const std::string& name,
-								const std::string& vpath,
-								const std::string& fpath,
-								const std::string& gpath,
-								const std::string& tepath,
-								const std::string& tcpath);
+				    const std::string& vpath,
+				    const std::string& fpath,
+				    const std::string& gpath,
+				    const std::string& tepath,
+				    const std::string& tcpath,
+				    Dictionary dictionary = Dictionary());
 
 private:
     /// The OpenGL name of this program object.

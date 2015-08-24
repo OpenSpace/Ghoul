@@ -70,7 +70,15 @@ File::File(std::string filename, bool isRawPath,
     if (_fileChangedCallback)
         installFileChangeListener();
 }
-    
+
+File::File(const File& cpy)
+    : _filename(cpy._filename)
+    , _fileChangedCallback(cpy._fileChangedCallback)
+{
+    if (_fileChangedCallback)
+        installFileChangeListener();
+}
+
 File::~File() {
 	if (_fileChangedCallback)
 		removeFileChangeListener();
