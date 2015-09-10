@@ -258,7 +258,7 @@ bool ShaderObject::setShaderFilename(std::string filename) {
     contents = "";
 
     bool success;
-    _preprocessor.setShaderPath(filename);
+    _preprocessor.setShaderPath(_fileName);
     success = _preprocessor.process(contents);
 
 

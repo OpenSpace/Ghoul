@@ -140,7 +140,9 @@ bool ShaderPreprocessor::includeFile(const std::string& path, ShaderPreprocessor
     }
 
     env.inputs.push_back(ShaderPreprocessor::Input(stream, file, prevIndentation + env.indentation));
-    addLineNumber(env);
+    if (env.inputs.size() > 1) {
+        addLineNumber(env);
+    }
 
     while (parseLine(env)) {
         if (!env.success) {
