@@ -25,7 +25,9 @@
 
 #include <ghoul/io/texture/texturewriter.h>
 
+#include <ghoul/filesystem/filesystem.h>
 #include <ghoul/filesystem/file.h>
+#include <ghoul/filesystem/directory.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/io/texture/texturewriterbase.h>
 #include <set>
@@ -58,12 +60,17 @@ namespace io {
             return;
         }
         
-        std::string extension = ghoul::filesystem::File(filename).fileExtension();
+        ghoul::filesystem::File file(filename);
+        std::string extension = file.fileExtension();
         
         TextureWriterBase* writer = writerForExtension(extension);
-        if (writer)
+        if (writer) {
+            // Make sure directory exists
+            ghoul::filesystem::Directory directory(file.directoryName());
+            FileSys.createDirectory(directory, true);
+            // Write to file
             writer->saveTexture(texture, filename);
-        else {
+        } else {
             LERROR("No writer was found for extension '" << extension << "'");
         }
     }

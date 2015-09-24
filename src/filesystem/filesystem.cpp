@@ -125,7 +125,30 @@ string FileSystem::absolutePath(string path) const {
         buffer = nullptr;
     }
 #else
-    realpath(path.c_str(), buffer);
+    if (!realpath(path.c_str(), buffer)) {
+        // Find the longest path that exists
+        std::string fullPath(path);
+        string::size_type match;
+        string::size_type lastMatch = std::string::npos;
+        while ((match = fullPath.rfind(PathSeparator, lastMatch - 1)) != std::string::npos) {
+            std::string before = fullPath.substr(0, match);
+            std::string after = fullPath.substr(match, std::string::npos);
+            if (realpath(before.c_str(), buffer)) {
+                std::string resolvedPath = std::string(buffer) + after;
+                delete[] buffer;
+                return resolvedPath;
+            }
+            lastMatch = match;
+        }
+        // Nothing in the relative path was found, use current directory
+        std::string before = ".";
+        std::string after = fullPath;
+        if (realpath(before.c_str(), buffer)) {
+            std::string resolvedPath = std::string(buffer) + PathSeparator + after;
+            delete[] buffer;
+            return resolvedPath;
+        }
+    }
 #endif
 
     if (buffer) {
