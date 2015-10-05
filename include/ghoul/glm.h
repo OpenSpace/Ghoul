@@ -39,6 +39,11 @@
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif // __unix__
 
+
+#ifndef GLM_META_PROG_HELPERS
+#define GLM_META_PROG_HELPERS
+#endif // GLM_META_PROG_HELPERS
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
