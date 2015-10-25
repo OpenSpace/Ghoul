@@ -27,6 +27,7 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/logging/log.h>
+#include <ghoul/systemcapabilities/systemcapabilities.h>
 #include <string>
 #include <fstream>
 
@@ -81,20 +82,20 @@ std::vector<std::string> ShaderPreprocessor::_includePaths = std::vector<std::st
 
 ShaderPreprocessor::ShaderPreprocessor(const std::string& shaderPath, Dictionary dictionary)
     : _shaderPath(shaderPath)
-    , _dictionary(dictionary) {}
+    , _dictionary(dictionary)
+{}
 
 ShaderPreprocessor::~ShaderPreprocessor() {
-  clearTrackedPaths();
+    clearTrackedPaths();
 }
 
-void ShaderPreprocessor::setShaderPath(const std::string& shaderPath) {
-    _shaderPath = shaderPath;
+void ShaderPreprocessor::setShaderPath(std::string shaderPath) {
+    _shaderPath = std::move(shaderPath);
 }
 
 void ShaderPreprocessor::setDictionary(Dictionary dictionary) {
     _dictionary = std::move(dictionary);
 }
-
 
 bool ShaderPreprocessor::process(std::string& output) {
     std::stringstream stream;
@@ -182,7 +183,21 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
     if (fileIdentifier == -1) {
         LERROR("could not find in tracked files: " << filename);
     }
-    env.output << "; // semicolon separator added by preprocessor to isolate error messages. " << std::endl << "#line " << env.inputs.back().lineNumber << " " << fileIdentifier << std::endl;
+    
+    std::string includeSeparator = "";
+    // Sofar, only Nvidia on Windows supports empty statements in the middle of the shader
+    using Vendor = ghoul::systemcapabilities::OpenGLCapabilitiesComponent::Vendor;
+    if (OpenGLCap.gpuVendor() == Vendor::Nvidia)
+        includeSeparator = ";";
+#ifdef __APPLE__
+    includeSeparator = "";
+#endif
+
+    if (!includeSeparator.empty())
+        includeSeparator += "// semicolon separator added by preprocessor to isolate error messages";
+    
+    
+    env.output << includeSeparator << std::endl << "#line " << env.inputs.back().lineNumber << " " << fileIdentifier << std::endl;
 }
 
 bool ShaderPreprocessor::isInsideEmptyForStatement(ShaderPreprocessor::Env& env) {

@@ -47,7 +47,7 @@ namespace ghoul {
       ShaderPreprocessor(const std::string& shaderPath = "", Dictionary dict = Dictionary());
       ~ShaderPreprocessor();
       void setDictionary(Dictionary dict);
-      void setShaderPath(const std::string& shaderPath);
+      void setShaderPath(std::string shaderPath);
       void setCallback(ShaderChangedCallback cb);
       bool process(std::string& output);
       std::string getFileIdentifiersString();
