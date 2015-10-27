@@ -81,6 +81,13 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/ghoul.cpp
 )
 
+if (GHOUL_MODULE_FONTRENDERING)
+    set(GHOUL_SOURCE
+        ${GHOUL_SOURCE}
+        ${PROJECT_SOURCE_DIR}/src/font/font.cpp
+    )
+endif ()
+
 set(GHOUL_HEADER 
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/cmdparser
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.h
@@ -160,6 +167,14 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilitiescomponent.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/ghoul.h
 )
+
+if (GHOUL_MODULE_FONTRENDERING)
+    set(GHOUL_HEADER
+        ${GHOUL_HEADER}
+        ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
+    )
+endif ()
+
 
 include (${PROJECT_SOURCE_DIR}/ext/GroupFilesIntoFolders.cmake)
 group_files_into_folders(${GHOUL_SOURCE} ${GHOUL_HEADER})
