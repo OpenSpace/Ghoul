@@ -69,6 +69,8 @@ endif ()
 option(GHOUL_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
 
+option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
+
 #############################
 # Compile settings
 #############################
@@ -194,6 +196,12 @@ if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE AND NOT GHOUL_USE_SOIL)
     message(FATAL_ERROR "Ghoul needs to be built with DevIL, FreeImage, or SoIL")
 endif ()
 
+if (GHOUL_MODULE_FONTRENDERING)
+    add_subdirectory(${GHOUL_ROOT_DIR}/ext/freetype2)
+
+    target_include_directories(Ghoul PUBLIC ${GHOUL_ROOT_DIR}/ext/freetype2/include)
+    target_link_libraries(Ghoul freetype)
+endif ()
 
 #############################
 # Other applications
