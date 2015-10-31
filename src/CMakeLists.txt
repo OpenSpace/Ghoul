@@ -35,6 +35,8 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.linux.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.osx.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.windows.cpp
+    ${PROJECT_SOURCE_DIR}/src/font/font.cpp
+    ${PROJECT_SOURCE_DIR}/src/font/fontmanager.cpp
     ${PROJECT_SOURCE_DIR}/src/io/rawvolumereader.cpp
     ${PROJECT_SOURCE_DIR}/src/io/volumereader.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderlua.cpp
@@ -71,6 +73,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/opengl/shaderobject.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/shaderpreprocessor.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/texture.cpp
+    ${PROJECT_SOURCE_DIR}/src/opengl/textureatlas.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/texturemanager.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/textureunit.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/vertexbufferobject.cpp
@@ -105,6 +108,8 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/file.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontmanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/rawvolumereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/volumereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
@@ -154,6 +159,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderobject.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderpreprocessor.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureatlas.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texturemanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureunit.h
