@@ -204,8 +204,10 @@ Font::Glyph* Font::glyph(wchar_t character) {
     size_t nGlyphNotLoaded = loadGlyphs({character});
     if (nGlyphNotLoaded == 0)
         return _glyphs.back();
-    else
+    else {
+        LERROR(nGlyphNotLoaded << " glyphs could not be loaded");
         return nullptr;
+    }
 }
     
 std::string Font::name() const {

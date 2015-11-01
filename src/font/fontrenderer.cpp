@@ -52,36 +52,37 @@ namespace {
     const std::string DefaultFragmentShaderPath = "${TEMPORARY}/defaultfontrenderer_fs.glsl";
 
     const std::string DefaultVertexShaderSource = "\
-    #version __CONTEXT__ \
-    \
-    layout (location = 0) in vec2 position; \
-    layout (location = 1) in vec2 texCoords; \
-    \
-    layout (location = 0) out vec2 out_TexCoords; \
-    \
-    uniform mat4 model; \
-    uniform mat4 view; \
-    uniform mat4 projection; \
-    \
-    main() { \
-        out_TexCoords = texCoords; \
-        gl_Position = projection * view * model * vec4(position, 0.0, 1.0); \
-    } \
+    #version __CONTEXT__ \n\
+    \n\
+    layout (location = 0) in vec2 in_position; \n\
+    layout (location = 1) in vec2 in_texCoords; \n\
+    \n\
+    layout (location = 0) out vec2 texCoords; \n\
+    \n\
+    uniform mat4 model; \n\
+    uniform mat4 view; \n\
+    uniform mat4 projection; \n\
+    \n\
+    void main() { \n\
+        texCoords = in_texCoords; \n\
+        gl_Position = projection * view * model * vec4(in_position, 0.0, 1.0); \n\
+    } \n\
     ";
     
     const std::string DefaultFragmentShaderSource = "\
-    #version __CONTEXT__ \
-    \
-    layout (location = 0) in vec2 texCoords; \
-    \
-    uniform vec4 color; \
-    uniform sampler2D texture; \
-    \
-    \
-    main() { \
-        float a = texture2D(texture, texCoords).r; \
-//        gl_FragColor = color * pow(a, 1.0/vgamma); \
-        gl_FragColor = color * a; \
+    #version __CONTEXT__ \n\
+    \n\
+    layout (location = 0) in vec2 texCoords; \n\
+    \n\
+    out vec4 FragColor; \n\
+    \n\
+    uniform vec4 color; \n\
+    uniform sampler2D tex; \n\
+    \n\
+    void main() { \n\
+        float a = texture(tex, texCoords).r; \n\
+//        FragColor = color * pow(a, 1.0/vgamma); \n\
+        FragColor = color * a; \n\
     } \
     ";
 }
@@ -110,7 +111,13 @@ FontRenderer::FontRenderer(opengl::ProgramObject* program)
 bool FontRenderer::initialize() {
     ghoul_assert(_defaultRenderer == nullptr, "FontRenderer was already initialized");
 
-//    std::ofstream fil
+    std::ofstream file(absPath(DefaultVertexShaderPath));
+    file << DefaultVertexShaderSource;
+    file.close();
+    
+    file.open(absPath(DefaultFragmentShaderPath));
+    file << DefaultFragmentShaderSource;
+    file.close();
     
     using namespace opengl;
     ProgramObject* program = new ProgramObject("Font");
@@ -128,6 +135,7 @@ bool FontRenderer::initialize() {
         return false;
     
     _defaultRenderer = new FontRenderer;
+    _defaultRenderer->_program = program;
     
     return true;
 }
@@ -138,6 +146,11 @@ bool FontRenderer::deinitialize() {
     _defaultRenderer = nullptr;
     
     return true;
+}
+    
+FontRenderer* FontRenderer::defaultRenderer() {
+    ghoul_assert(_defaultRenderer != nullptr, "FontRenderer was not initialized");
+    return _defaultRenderer;
 }
     
 void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const glm::vec4& color, const char* format, ...)
