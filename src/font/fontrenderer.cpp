@@ -258,7 +258,7 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
     }
     
     _program->setUniform("color", color);
-    _program->setUniform("texture", font.atlas().id());
+    _program->setUniform("tex", font.atlas().id());
     _program->setUniform("model", glm::mat4(1.f));
     _program->setUniform("view", glm::mat4(1.f));
     _program->setUniform("projection", glm::mat4(1.f));

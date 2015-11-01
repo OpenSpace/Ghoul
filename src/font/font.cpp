@@ -57,6 +57,8 @@ static int vscprintf (const char * format, va_list pargs)
 namespace {
     const std::string _loggerCat = "Font";
     const float HighResolution = 64.f;
+    const int DPI = 72;
+
     
     const float HighFaceResolutionFactor = 100.f;
 }
@@ -478,6 +480,50 @@ void Font::generateKerning() {
 //}
 //    
 bool Font::loadFace(float size, FT_Library& library, FT_Face& face) {
+    FT_Matrix matrix = {
+        (int)((1.0/HighResolution) * 0x10000L),
+        (int)((0.0)      * 0x10000L),
+        (int)((0.0)      * 0x10000L),
+        (int)((1.0)      * 0x10000L)};
+    
+    FT_Error error = FT_Init_FreeType(&library);
+    if (error) {
+        LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
+        return 0;
+    }
+    
+    /* Load face */
+    error = FT_New_Face(library, _name.c_str(), 0, &face);
+    
+    if (error) {
+        LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
+        FT_Done_FreeType(library);
+        return 0;
+    }
+    
+    /* Select charmap */
+    error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
+    if (error) {
+        LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
+        FT_Done_Face(face);
+        FT_Done_FreeType(library);
+        return 0;
+    }
+    
+    /* Set char size */
+    error = FT_Set_Char_Size(face, (int)(size * HighResolution), 0, DPI * HighResolution, DPI);
+    
+    if (error) {
+        LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
+        FT_Done_Face(face);
+        FT_Done_FreeType(library);
+        return 0;
+    }
+    
+    /* Set transform matrix */
+    FT_Set_Transform(face, &matrix, NULL);
+    
+    return 1;
 }
 
     

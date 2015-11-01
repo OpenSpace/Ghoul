@@ -38,7 +38,19 @@ namespace fontrendering {
 FontManager::FontManager(glm::ivec3 atlasDimensions)
     : _textureAtlas(atlasDimensions.x, atlasDimensions.y, atlasDimensions.z)
 {
-    _defaultCharacterSet = { L' ' };
+    
+    _defaultCharacterSet = {
+        L' ', L'!', L'\\', L'"', L'#', L'$', L'%', L'&', L'\'', L'(',
+        L')', L'*', L'+', L',', L'-', L'.', L'/', L'0', L'1', L'2',
+        L'3', L'4', L'5', L'6', L'7', L'8', L'9', L':', L';', L'<',
+        L'=', L'>', L'?', L'@', L'A', L'B', L'C', L'D', L'E', L'F',
+        L'G', L'H', L'I', L'J', L'K', L'L', L'M', L'N', L'O', L'P',
+        L'Q', L'R', L'S', L'T', L'U', L'V', L'W', L'X', L'Y', L'Z',
+        L'[', L']', L'^', L'_', L'~', L'a', L'b', L'c', L'd', L'e',
+        L'f', L'g', L'h', L'i', L'j', L'k', L'l', L'm', L'n', L'o',
+        L'p', L'q', L'r', L's', L't', L'u', L'v', L'w', L'x', L'y',
+        L'z', L'{', L'|', L'}'
+    };
 }
     
 FontManager::FontManager(const FontManager& rhs)
@@ -102,11 +114,10 @@ Font* FontManager::font(const std::string& name, float fontSize) {
     if (itFont != _fonts.end())
         return itFont->second;
     
-    Font* f = new Font(name, fontSize, _textureAtlas);
-    if (f == nullptr) {
-        LERROR("Error loading font with file '" << name << "' and size '" << fontSize << "'");
-        return nullptr;
-    }
+    std::string fontPath = _fontPaths[name];
+    Font* f = new Font(fontPath, fontSize, _textureAtlas);
+    
+    // check if font file exists ---abock
     
     f->loadGlyphs(_defaultCharacterSet);
     
