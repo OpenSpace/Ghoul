@@ -38,6 +38,21 @@ const struct {
 } FT_Errors[] =
 #include FT_ERRORS_H
 
+//Replacement for Visual Studio's _vscprintf function
+#if (_MSC_VER < 1400) //if older than visual studio 2005
+static int vscprintf (const char * format, va_list pargs)
+{
+    int retval;
+    va_list argcopy;
+    va_copy(argcopy, pargs);
+    retval = vsnprintf(NULL, 0, format, argcopy);
+    va_end(argcopy);
+    return retval;
+}
+#else
+#define vscprintf(f,a) _vscprintf(f,a)
+#endif
+
 
 namespace {
     const std::string _loggerCat = "Font";
@@ -199,6 +214,14 @@ std::string Font::name() const {
     
 float Font::fontSize() const {
     return _pointSize;
+}
+    
+float Font::height() const {
+    return _height;
+}
+    
+opengl::TextureAtlas& Font::atlas() {
+    return _atlas;
 }
     
 size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {

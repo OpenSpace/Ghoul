@@ -67,6 +67,8 @@ public:
     int width() const;
     int height() const;
     int depth() const;
+    
+    unsigned int id() const;
 
 private:
     int atlasFit(size_t index, int width, int height);

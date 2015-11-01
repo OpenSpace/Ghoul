@@ -54,8 +54,8 @@ FontManager::FontManager(FontManager&& rhs)
 }
     
 FontManager::~FontManager() {
-    for (Font* f : _fonts)
-        delete f;
+    for (std::pair<std::string, Font*> f : _fonts)
+        delete f.second;
 }
     
 FontManager& FontManager::operator=(const FontManager &rhs) {
@@ -69,23 +69,49 @@ FontManager& FontManager::operator=(FontManager&& rhs) {
     return *this;
 }
     
-Font* FontManager::fontFromFilename(const std::string& filename, float fontSize) {
-    auto it = std::find_if(_fonts.begin(),
-                 _fonts.end(),
-                 [filename, fontSize](Font* f) { return f->name() == filename && f->fontSize() == fontSize; }
-                 );
+bool FontManager::registerFont(std::string name, const std::string& filename) {
+    auto it = _fontPaths.find(name);
+    if (it != _fontPaths.end()) {
+        const std::string& registeredPath = it->first;
+        
+        if (registeredPath == filename)
+            return true;
+        else {
+            LERROR("Font '" << name << "' was registered with path '" <<
+                   registeredPath << "' before. Trying to register with path '" <<
+                   filename << "' now");
+            return false;
+        }
+    }
     
-    if (it != _fonts.end())
-        return *it;
+    _fontPaths[name] = filename;
+    return true;
+}
     
-    Font* f = new Font(filename, fontSize, _textureAtlas);
+Font* FontManager::font(const std::string& name, float fontSize) {
+    auto itPath = _fontPaths.find(name);
+    if (itPath == _fontPaths.end()) {
+        LERROR("Font '" << name << "' is not a registered font");
+        return nullptr;
+    }
+
+    auto itFont = std::find_if(_fonts.begin(),
+                           _fonts.end(),
+                               [name, fontSize](std::pair<std::string, Font*> f) { return f.second->name() == name && f.second->fontSize() == fontSize; }
+                           );
+    if (itFont != _fonts.end())
+        return itFont->second;
+    
+    Font* f = new Font(name, fontSize, _textureAtlas);
     if (f == nullptr) {
-        LERROR("Error loading font with file '" << filename << "' and size '" << fontSize << "'");
+        LERROR("Error loading font with file '" << name << "' and size '" << fontSize << "'");
         return nullptr;
     }
     
     f->loadGlyphs(_defaultCharacterSet);
-    _fonts.push_back(f);
+    
+    _fonts[name] = f;
+    return f;
 }
     
     

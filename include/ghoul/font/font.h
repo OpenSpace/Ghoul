@@ -42,8 +42,8 @@
 #include FT_LCD_FILTER_H
 
 
-
 namespace ghoul {
+    
 namespace fontrendering {
     
 class Font {
@@ -117,16 +117,20 @@ public:
     
     bool initialize();
     
-    Glyph* glyph(wchar_t character);
-    
     std::string name() const;
     float fontSize() const;
+    float height() const;
     
+    Glyph* glyph(wchar_t character);
+
     size_t loadGlyphs(const std::vector<wchar_t>& glyphs);
+    
+    opengl::TextureAtlas& atlas();
 
 private:
     void generateKerning();
     bool loadFace(float size, FT_Library& library, FT_Face& face);
+
 //    bool getFace(FT_Library* library, FT_Face* face);
 //    bool getFace(float size, FT_Library* library, FT_Face* face);
 //    bool getHiResFace(FT_Library* library, FT_Face* face);
@@ -136,6 +140,7 @@ private:
     std::vector<Glyph*> _glyphs;
     
     opengl::TextureAtlas& _atlas;
+    
     std::string _name;
     float _pointSize;
     bool _autoHinting;
@@ -150,8 +155,6 @@ private:
     float _decender;
     float _underlinePosition;
     float _underlineThickness;
-    
-    
 };
     
 } // namespace fontrendering

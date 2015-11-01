@@ -37,6 +37,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.windows.cpp
     ${PROJECT_SOURCE_DIR}/src/font/font.cpp
     ${PROJECT_SOURCE_DIR}/src/font/fontmanager.cpp
+    ${PROJECT_SOURCE_DIR}/src/font/fontrenderer.cpp
     ${PROJECT_SOURCE_DIR}/src/io/rawvolumereader.cpp
     ${PROJECT_SOURCE_DIR}/src/io/volumereader.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderlua.cpp
@@ -110,6 +111,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontmanager.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontrenderer.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/rawvolumereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/volumereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h

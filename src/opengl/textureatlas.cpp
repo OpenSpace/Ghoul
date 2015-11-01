@@ -71,6 +71,10 @@ int TextureAtlas::height() const {
 int TextureAtlas::depth() const {
     return _depth;
 }
+    
+unsigned int TextureAtlas::id() const {
+    return _id;
+}
 
 void TextureAtlas::upload() {
     // TODO: Change to use ghoul::opengl::Texture class instead ---abock

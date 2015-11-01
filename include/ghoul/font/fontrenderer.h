@@ -23,41 +23,44 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __FONTMANAGER_H__
-#define __FONTMANAGER_H__
+#ifndef __FONTRENDERER_H__
+#define __FONTRENDERER_H__
 
-#include <ghoul/font/font.h>
 #include <ghoul/glm.h>
-#include <ghoul/opengl/textureatlas.h>
-
-#include <map>
-#include <string>
-#include <vector>
+#include <ghoul/font/font.h>
 
 namespace ghoul {
+    
+namespace opengl {
+    class ProgramObject;
+}
+    
 namespace fontrendering {
     
-class FontManager {
+class FontRenderer {
 public:
-    FontManager(glm::ivec3 atlasDimensions = glm::ivec3(512, 512, 1));
-    FontManager(const FontManager& rhs);
-    FontManager(FontManager&& rhs);
-    FontManager& operator=(const FontManager& rhs);
-    FontManager& operator=(FontManager&& rhs);
-    ~FontManager();
+    FontRenderer(opengl::ProgramObject* program);
+    static bool initialize();
+    static bool deinitialize();
+    static FontRenderer* defaultRenderer();
     
-    bool registerFont(std::string name, const std::string& filename);
+    void render(Font& font, glm::vec2 pos, const glm::vec4& color, const char* format, ...);
+    void render(Font& font, const glm::vec2& pos, const char* format, ...);
     
-    Font* font(const std::string& name, float fontSize);
     
 private:
-    ghoul::opengl::TextureAtlas _textureAtlas;
-    std::map<std::string, Font*> _fonts;
-    std::map<std::string, std::string> _fontPaths;
-    std::vector<wchar_t> _defaultCharacterSet;
+    FontRenderer();
+    
+    static FontRenderer* _defaultRenderer;
+    
+    opengl::ProgramObject* _program;
+    unsigned int _vao;
+    unsigned int _vbo;
+    unsigned int _ibo;
 };
     
 } // namespace fontrendering
 } // namespace ghoul
 
-#endif // __FONTMANAGER_H__
+#endif // __FONTRENDERER_H__
+
