@@ -39,7 +39,7 @@ namespace fontrendering {
     
 class FontRenderer {
 public:
-    FontRenderer(opengl::ProgramObject* program);
+    FontRenderer(opengl::ProgramObject* program, glm::vec2 windowSize);
     static bool initialize();
     static bool deinitialize();
     static FontRenderer* defaultRenderer();
@@ -47,15 +47,19 @@ public:
     void render(Font& font, glm::vec2 pos, const glm::vec4& color, const char* format, ...);
     void render(Font& font, const glm::vec2& pos, const char* format, ...);
     
+    void setWindowSize(glm::vec2 windowSize);
     
 private:
     FontRenderer();
     
     static FontRenderer* _defaultRenderer;
     
+    glm::vec2 _windowSize;
+    
     opengl::ProgramObject* _program;
     unsigned int _vao;
     unsigned int _vbo;
+    unsigned int _vbo2;
     unsigned int _ibo;
 };
     

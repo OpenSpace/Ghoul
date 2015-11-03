@@ -30,6 +30,10 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/programobject.h>
 
+#include <ghoul/opengl/textureunit.h>
+
+#include <glm/gtc/matrix_transform.hpp>
+
 //Replacement for Visual Studio's _vscprintf function
 #if (_MSC_VER < 1400) //if older than visual studio 2005
 static int vscprintf (const char * format, va_list pargs) {
@@ -82,7 +86,9 @@ namespace {
     void main() { \n\
         float a = texture(tex, texCoords).r; \n\
 //        FragColor = color * pow(a, 1.0/vgamma); \n\
-        FragColor = color * a; \n\
+//        FragColor = color * a; \n\
+//        FragColor = vec4(1.0, 0.0, 0.0, 1.0); \n\
+          FragColor = vec4(vec3(a), 1.0); \n\
     } \
     ";
 }
@@ -96,16 +102,19 @@ FontRenderer::FontRenderer()
     : _program(nullptr)
     , _vao(0)
     , _vbo(0)
+    , _vbo2(0)
     , _ibo(0)
 {}
     
-FontRenderer::FontRenderer(opengl::ProgramObject* program)
+FontRenderer::FontRenderer(opengl::ProgramObject* program, glm::vec2 windowSize)
     : _program(program)
     , _vao(0)
     , _vbo(0)
+    , _vbo2(0)
     , _ibo(0)
 {
     ghoul_assert(program != nullptr, "No program provided");
+    setWindowSize(std::move(windowSize));
 }
 
 bool FontRenderer::initialize() {
@@ -211,13 +220,14 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
-    glActiveTexture(GL_TEXTURE0);
+//    glActiveTexture(GL_TEXTURE0);
 
     _program->activate();
     
     unsigned int vertexIndex = 0;
     std::vector<GLuint> indices;
     std::vector<GLfloat> vertices;
+    std::vector<GLfloat> texCoords;
     for (size_t i = 0; i < lines.size(); ++i) {
         const std::string& line = lines[i];
         pos.y -= h * static_cast<float>(i);
@@ -245,11 +255,18 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
                     vertexIndex, vertexIndex + 1, vertexIndex + 2,
                     vertexIndex, vertexIndex + 2, vertexIndex + 3
                 });
+                vertexIndex += 4;
                 vertices.insert(vertices.end(), {
-                    x0, y0, s0, t0,
-                    x0, y1, s0, t1,
-                    x1, y1, s1, t1,
-                    x1, y0, s1, t0
+                    x0, y0,
+                    x0, y1,
+                    x1, y1,
+                    x1, y0
+                });
+                texCoords.insert(texCoords.end(), {
+                    s0, t0,
+                    s0, t1,
+                    s1, t1,
+                    s1, t0
                 });
                 pos.x += glyph->_advance_x;
             }
@@ -257,43 +274,93 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
         }
     }
     
+    glm::mat4 projection = glm::ortho(
+        0.f,
+        _windowSize.x,
+        0.f,
+        _windowSize.y
+    );
+    
+//    indices.clear();
+//    vertices.clear();
+//    texCoords.clear();
+//    
+//    const float f = 0.5f;
+//    vertices.insert(vertices.end(), {
+//        250.f, 250.f,
+//        750.f, 250.f,
+//        750.f, 750.f,
+//        250.f, 750.f
+//    });
+//    texCoords.insert(texCoords.end(), {
+//        0.f, 0.f,
+//        1.f, 0.f,
+//        1.f, 1.f,
+//        0.f, 1.f
+//    });
+//    
+//    indices.insert(indices.end(), {
+//        0, 1, 2, 0, 2, 3
+//    });
+//    
+//    glViewport( 0, 0, _windowSize.x, _windowSize.y );
+    
+    ghoul::opengl::TextureUnit atlasUnit;
+    atlasUnit.activate();
+    glBindTexture(GL_TEXTURE_2D, font.atlas().id());
+    
+    _program->setIgnoreUniformLocationError(true);
     _program->setUniform("color", color);
-    _program->setUniform("tex", font.atlas().id());
+    _program->setUniform("tex", atlasUnit);
     _program->setUniform("model", glm::mat4(1.f));
     _program->setUniform("view", glm::mat4(1.f));
-    _program->setUniform("projection", glm::mat4(1.f));
+//    _program->setUniform("projection", glm::mat4(1.f));
+    _program->setUniform("projection", projection);
+    _program->setIgnoreUniformLocationError(false);
     
     if (_vao == 0) {
         glGenVertexArrays(1, &_vao);
         glGenBuffers(1, &_vbo);
+        glGenBuffers(1, &_vbo2);
         glGenBuffers(1, &_ibo);
     }
     glBindVertexArray(_vao);
     
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBufferData(GL_ARRAY_BUFFER,
-                 vertices.size(), vertices.data(), GL_DYNAMIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size(), indices.data(), GL_DYNAMIC_DRAW);
+                 vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
     
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_DYNAMIC_DRAW);
+//
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(
-        0, 2 * sizeof(float), GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0
+//        0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0
+          0, 2, GL_FLOAT, GL_FALSE, 0, 0
     );
+
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo2);
+    glBufferData(GL_ARRAY_BUFFER,
+                 texCoords.size() * sizeof(float), texCoords.data(), GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(
-        0, 2 * sizeof(float), GL_FLOAT, GL_FALSE, 2 * sizeof(float), reinterpret_cast<const GLvoid*>(2 * sizeof(float))
+        1, 2, GL_FLOAT, GL_FALSE, 0, 0
     );
+    
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+//    glDrawArrays(GL_TRIANGLES, 0, 6);
     
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    
+
     delete[] buffer;
+}
+    
+void FontRenderer::setWindowSize(glm::vec2 windowSize) {
+    _windowSize = std::move(windowSize);
+//    _windowSize = glm::vec2(1.f, 1.f);
 }
     
     

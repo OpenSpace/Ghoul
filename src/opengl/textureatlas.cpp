@@ -51,6 +51,7 @@ TextureAtlas::TextureAtlas(int width, int height, int depth)
     _nodes.emplace_back(1, 1, width - 2);
 
     _data = new unsigned char[width * height * depth];
+    memset(_data, 0, _width * _height * _depth);
 }
     
 TextureAtlas::~TextureAtlas() {
@@ -115,7 +116,6 @@ void TextureAtlas::clear() {
 }
     
 glm::ivec4 TextureAtlas:: allocateRegion(int width, int height) {
-    glm::ivec3* prev;
     glm::ivec4 region(0, 0, width, height);
 
     int bestHeight = std::numeric_limits<int>::max();
@@ -141,7 +141,8 @@ glm::ivec4 TextureAtlas:: allocateRegion(int width, int height) {
     if (bestIndex == -1)
         return glm::ivec4(-1, -1, 0, 0);
     
-    _nodes.emplace_back(region.x, region.y + height, width);
+    _nodes.insert(_nodes.begin() + bestIndex, {region.x, region.y + height, width});
+//    _nodes.emplace_back(region.x, region.y + height, width);
     
     for (size_t i = bestIndex + 1; i < _nodes.size(); ++i) {
         glm::ivec3& node = _nodes[i];
