@@ -40,6 +40,7 @@ namespace fontrendering {
 class FontRenderer {
 public:
     FontRenderer(opengl::ProgramObject* program, glm::vec2 windowSize);
+    ~FontRenderer();
     static bool initialize();
     static bool deinitialize();
     static FontRenderer* defaultRenderer();

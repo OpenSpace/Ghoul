@@ -85,10 +85,7 @@ namespace {
     \n\
     void main() { \n\
         float a = texture(tex, texCoords).r; \n\
-//        FragColor = color * pow(a, 1.0/vgamma); \n\
-//        FragColor = color * a; \n\
-//        FragColor = vec4(1.0, 0.0, 0.0, 1.0); \n\
-          FragColor = vec4(vec3(a), a); \n\
+        FragColor = color * a; \n\
     } \
     ";
 }
@@ -114,32 +111,49 @@ FontRenderer::FontRenderer(opengl::ProgramObject* program, glm::vec2 windowSize)
     ghoul_assert(program != nullptr, "No program provided");
     setWindowSize(std::move(windowSize));
 }
+    
+FontRenderer::~FontRenderer() {
+    glDeleteVertexArrays(1, &_vao);
+    glDeleteBuffers(1, &_vbo);
+    glDeleteBuffers(1, &_ibo);
+}
 
 bool FontRenderer::initialize() {
-    ghoul_assert(_defaultRenderer == nullptr, "FontRenderer was already initialized");
+    LDEBUG("Creating default FontRenderer");
+    ghoul_assert(_defaultRenderer == nullptr, "Default FontRenderer was already initialized");
 
-    std::ofstream file(absPath(DefaultVertexShaderPath));
+    std::string vsPath = absPath(DefaultVertexShaderPath);
+    LDEBUG("Writing default vertex shader to '" << vsPath << "'");
+    std::ofstream file(vsPath);
     file << DefaultVertexShaderSource;
     file.close();
     
-    file.open(absPath(DefaultFragmentShaderPath));
+    std::string fsPath = absPath(DefaultFragmentShaderPath);
+    LDEBUG("Writing default fragment shader to '" << fsPath << "'");
+    file.open(fsPath);
     file << DefaultFragmentShaderSource;
     file.close();
     
     using namespace opengl;
     ProgramObject* program = new ProgramObject("Font");
-    ShaderObject* vertex = new ShaderObject(ShaderObject::ShaderTypeVertex, absPath(DefaultVertexShaderPath));
+    ShaderObject* vertex = new ShaderObject(ShaderObject::ShaderTypeVertex, vsPath);
     program->attachObject(vertex);
-    ShaderObject* fragment = new ShaderObject(ShaderObject::ShaderTypeFragment, absPath(DefaultFragmentShaderPath));
+    ShaderObject* fragment = new ShaderObject(ShaderObject::ShaderTypeFragment, fsPath);
     program->attachObject(fragment);
 
+    LDEBUG("Compile default font shader");
     bool compileSuccess = program->compileShaderObjects();
-    if (!compileSuccess)
+    if (!compileSuccess) {
+        delete program;
         return false;
+    }
     
+    LDEBUG("Link default font shader");
     bool linkSuccess = program->linkProgramObject();
-    if (!linkSuccess)
+    if (!linkSuccess) {
+        delete program;
         return false;
+    }
     
     _defaultRenderer = new FontRenderer;
     _defaultRenderer->_program = program;
@@ -222,7 +236,6 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
     unsigned int vertexIndex = 0;
     std::vector<GLuint> indices;
     std::vector<GLfloat> vertices;
-    std::vector<GLfloat> texCoords;
     for (size_t i = 0; i < lines.size(); ++i) {
         const std::string& line = lines[i];
         pos.y -= h * static_cast<float>(i);
@@ -256,16 +269,6 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
                     x0, y1, s0, t1,
                     x1, y1, s1, t1,
                     x1, y0, s1, t0
-//                    x0, y0,
-//                    x0, y1,
-//                    x1, y1,
-//                    x1, y0
-                });
-                texCoords.insert(texCoords.end(), {
-                    s0, t0,
-                    s0, t1,
-                    s1, t1,
-                    s1, t0
                 });
                 pos.x += glyph->_advance_x;
             }
