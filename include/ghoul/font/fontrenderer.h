@@ -59,7 +59,6 @@ private:
     opengl::ProgramObject* _program;
     unsigned int _vao;
     unsigned int _vbo;
-    unsigned int _vbo2;
     unsigned int _ibo;
 };
     
