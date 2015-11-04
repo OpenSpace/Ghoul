@@ -250,14 +250,14 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
                     kerning = glyph->kerning(line[j-1]);
                 
                 pos.x += kerning;
-                float x0 = pos.x + glyph->_offset_x;
-                float y0 = pos.y + glyph->_offset_y;
-                float x1 = x0 + glyph->_width;
-                float y1 = y0 - glyph->_height;
-                float s0 = glyph->_topLeft.x;
-                float t0 = glyph->_topLeft.y;
-                float s1 = glyph->_bottomRight.x;
-                float t1 = glyph->_bottomRight.y;
+                float x0 = pos.x + glyph->offsetX();
+                float y0 = pos.y + glyph->offsetY();
+                float x1 = x0 + glyph->width();
+                float y1 = y0 - glyph->height();
+                float s0 = glyph->texCoordTopLeft().x;
+                float t0 = glyph->texCoordTopLeft().y;
+                float s1 = glyph->texCoordBottomRight().x;
+                float t1 = glyph->texCoordBottomRight().y;
                 
                 indices.insert(indices.end(), {
                     vertexIndex, vertexIndex + 1, vertexIndex + 2,
@@ -270,7 +270,7 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
                     x1, y1, s1, t1,
                     x1, y0, s1, t0
                 });
-                pos.x += glyph->_advance_x;
+                pos.x += glyph->advanceX();
             }
             
         }

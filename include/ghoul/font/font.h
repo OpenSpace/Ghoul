@@ -57,20 +57,45 @@ public:
     
     class Glyph {
     public:
-        Glyph(wchar_t character);
-        float kerning(wchar_t character);
+        friend class Font;
+
+        Glyph(wchar_t character,
+              size_t width = 0,
+              size_t height = 0,
+              int offsetX = 0,
+              int offsetY = 0,
+              float advanceX = 0.f,
+              float advanceY = 0.f,
+              glm::vec2 texCoordTopLeft = glm::vec2(0.f),
+              glm::vec2 texCoordBottomRight = glm::vec2(0.f),
+              Outline outline = Outline::None,
+              float outlineThickness = 0.f
+        );
+
+        float kerning(wchar_t character) const;
         
-//    private:
+        int offsetX() const;
+        int offsetY() const;
+        size_t width() const;
+        size_t height() const;
+        
+        float advanceX() const { return _advanceX; }
+        float advanceY() const { return _advanceY; }
+        
+        glm::vec2 texCoordTopLeft() const { return _topLeft; }
+        glm::vec2 texCoordBottomRight() const { return _bottomRight; }
+        
+        float outlineThickness() const { return _outlineThickness; }
+        
+    private:
 
         wchar_t _charcode; ///< Wide character this glyph represents
-        
-        unsigned int _id; ///< Glyph id (used for display lists)
         
         size_t _width; ///< Glyph's width in pixels
         
         size_t _height; ///< Glyph's height in pixels
         
-        int _offset_x; ///< Glyph's left bearing expressed in integer pixels
+        int _offsetX; ///< Glyph's left bearing expressed in integer pixels
         
         /**
          * Glyphs's top bearing expressed in integer pixels.
@@ -78,21 +103,21 @@ public:
          * Remember that this is the distance from the baseline to the top-most
          * glyph scanline, upwards y coordinates being positive.
          */
-        int _offset_y;
+        int _offsetY;
         
         /**
          * For horizontal text layouts, this is the horizontal distance (in
          * fractional pixels) used to increment the pen position when the glyph is
          * drawn as part of a string of text.
          */
-        float _advance_x;
+        float _advanceX;
         
         /**
          * For vertical text layouts, this is the vertical distance (in fractional
          * pixels) used to increment the pen position when the glyph is drawn as
          * part of a string of text.
          */
-        float _advance_y;
+        float _advanceY;
         
         glm::vec2 _topLeft; ///< Normalized texture coordinate of top-left corner
         glm::vec2 _bottomRight; ///< Normalized texture coordinate of bottom-right corner
@@ -108,7 +133,7 @@ public:
                                           // Struct kerning...
         
         Outline _outline; ///< Glyph outline type
-        float _outline_thickness; ///< Glyph outline thickness
+        float _outlineThickness; ///< Glyph outline thickness
     };
     
     

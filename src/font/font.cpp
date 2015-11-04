@@ -66,18 +66,54 @@ namespace {
 namespace ghoul {
 namespace fontrendering {
     
-Font::Glyph::Glyph(wchar_t character)
+Font::Glyph::Glyph(wchar_t character,
+                   size_t width,
+                   size_t height,
+                   int offsetX,
+                   int offsetY,
+                   float advanceX,
+                   float advanceY,
+                   glm::vec2 texCoordTopLeft,
+                   glm::vec2 texCoordBottomRight,
+                   Outline outline,
+                   float outlineThickness
+                   )
     : _charcode(std::move(character))
+    , _width(width)
+    , _height(height)
+    , _offsetX(offsetX)
+    , _offsetY(offsetY)
+    , _advanceX(advanceX)
+    , _advanceY(advanceY)
+    , _topLeft(std::move(texCoordTopLeft))
+    , _bottomRight(std::move(texCoordBottomRight))
+    , _outline(outline)
+    , _outlineThickness(outlineThickness)
 {
-    
 }
     
-float Font::Glyph::kerning(wchar_t character) {
+float Font::Glyph::kerning(wchar_t character) const {
     auto it = _kerning.find(character);
     if (it != _kerning.end())
         return it->second;
     else
         return 0.f;
+}
+    
+int Font::Glyph::offsetX() const {
+    return _offsetX;
+}
+
+int Font::Glyph::offsetY() const {
+    return _offsetY;
+}
+    
+size_t Font::Glyph::width() const {
+    return _width;
+}
+    
+size_t Font::Glyph::height() const {
+    return _height;
 }
     
 Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas)
@@ -154,7 +190,7 @@ Font::Glyph* Font::glyph(wchar_t character) {
         bool correctCharacter = (glyph->_charcode == character);
         bool isSpecialCharacter = (character == static_cast<wchar_t>(-1));
         bool correctOutlineType = glyph->_outline == _outlineType;
-        bool correctOutlineThickness = glyph->_outline_thickness == _outlineThickness;
+        bool correctOutlineThickness = glyph->outlineThickness() == _outlineThickness;
         
 
         if (correctCharacter && (isSpecialCharacter || (correctOutlineType &&
@@ -260,7 +296,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             if ((glyph->_charcode == glyphs[i]) &&
                ((glyphs[i] == (wchar_t)(-1) ) ||
                 ((glyph->_outline == _outlineType) &&
-                 (glyph->_outline_thickness == _outlineThickness))))
+                 (glyph->outlineThickness() == _outlineThickness))))
             {
                 found = true;
                 break;
@@ -401,28 +437,47 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         y = region.y;
         _atlas.setRegion(x, y, w, h, ft_bitmap.buffer, ft_bitmap.pitch);
         
-        Glyph* glyph = new Glyph(glyphs[i]);
-        glyph->_width = w;
-        glyph->_height = h;
-        glyph->_outline = _outlineType;
-        glyph->_outline_thickness = _outlineThickness;
-        glyph->_offset_x = ft_glyph_left;
-        glyph->_offset_y = ft_glyph_top;
-        glyph->_topLeft = glm::vec2(
-            x/static_cast<float>(width),
-            y/static_cast<float>(height)
-        );
-        glyph->_bottomRight = glm::vec2(
-            (x + glyph->_width)/static_cast<float>(width),
-            (y + glyph->_height)/static_cast<float>(height)
-                                        
-        );
+//        glyph->_width = w;
+////        glyph->_height = h;
+//        glyph->_outline = _outlineType;
+//        glyph->_outline_thickness = _outlineThickness;
+////        glyph->_offset_x = ft_glyph_left;
+////        glyph->_offset_y = ft_glyph_top;
+//        glyph->_topLeft = glm::vec2(
+//            x/static_cast<float>(width),
+//            y/static_cast<float>(height)
+//        );
+//        glyph->_bottomRight = glm::vec2(
+//            (x + glyph->_width)/static_cast<float>(width),
+//            (y + glyph->_height)/static_cast<float>(height)
+//                                        
+//        );
         
         // Discard hinting to get advance
         FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
-        slot = face->glyph;
-        glyph->_advance_x = slot->advance.x / HighResolution;
-        glyph->_advance_y = slot->advance.y / HighResolution;
+//        slot = face->glyph;
+//        glyph->_advance_x = slot->advance.x / HighResolution;
+//        glyph->_advance_y = slot->advance.y / HighResolution;
+        
+        Glyph* glyph = new Glyph(
+            glyphs[i],
+            w,
+            h,
+            ft_glyph_left,
+            ft_glyph_top,
+            face->glyph->advance.x / HighResolution,
+            face->glyph->advance.y / HighResolution,
+            glm::vec2(
+                x/static_cast<float>(width),
+                y/static_cast<float>(height)
+            ),
+            glm::vec2(
+                (x + w)/static_cast<float>(width),
+                (y + h)/static_cast<float>(height)
+            ),
+            _outlineType,
+            _outlineThickness
+        );
         
         _glyphs.push_back(glyph);
         
