@@ -286,23 +286,6 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         return glyphs.size();
 
     // Search through the loaded glyphs to avoid duplicates
-//    for (const wchar_t glyph : glyphs) {
-//        bool foundGlyph = false;
-//        for (const Glyph* const loadedGlyph : _glyphs) {
-//            bool correctCharcode = loadedGlyph->_charcode == glyph;
-//            bool specialGlyph = glyph == static_cast<wchar_t>(-1);
-//            bool correctOutline = loadedGlyph->_outline == _outlineType;
-//            bool correctOutlineThickness = loadedGlyph->outlineThickness() == _outlineThickness;
-//            
-//            if (correctCharcode && (specialGlyph || (correctOutline && correctOutlineThickness))) {
-//                foundGlyph = true;
-//                break;
-//            }
-//                
-//        }
-    
-//        
-//    }
     for (size_t i = 0; i < glyphs.size(); ++i) {
         bool foundGlyph = false;
         /* Check if charcode has been already loaded */
@@ -378,7 +361,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             }
             
             FT_Stroker_Set(stroker,
-                           static_cast<int>(_outlineThickness) * static_cast<int>(HighResolution),
+                           static_cast<int>(_outlineThickness * HighResolution),
                            FT_STROKER_LINECAP_ROUND,
                            FT_STROKER_LINEJOIN_ROUND,
                            0);
