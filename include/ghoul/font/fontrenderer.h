@@ -30,11 +30,11 @@
 #include <ghoul/font/font.h>
 
 namespace ghoul {
-    
+
 namespace opengl {
     class ProgramObject;
 }
-    
+
 namespace fontrendering {
     
 class FontRenderer {

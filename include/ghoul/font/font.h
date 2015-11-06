@@ -121,16 +121,9 @@ public:
         
         glm::vec2 _topLeft; ///< Normalized texture coordinate of top-left corner
         glm::vec2 _bottomRight; ///< Normalized texture coordinate of bottom-right corner
-                     //        float s0; ///< First normalized texture coordinate (x) of top-left corner
-                     //
-                     //        float t0; ///< Second normalized texture coordinate (y) of top-left corner
-                     //
-                     //        float s1; ///< First normalized texture coordinate (x) of bottom-right corner
-                     //
-                     //        float t1; ///< Second normalized texture coordinate (y) of bottom-right corner
         
-        std::map<wchar_t, float> _kerning; ///< A vector of kerning pairs relative to this glyph
-                                          // Struct kerning...
+        /// A vector of kerning pairs relative to this glyph
+        std::map<wchar_t, float> _kerning;
         
         Outline _outline; ///< Glyph outline type
         float _outlineThickness; ///< Glyph outline thickness

@@ -284,26 +284,45 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
     bool success = loadFace(_pointSize, library, face);
     if (!success)
         return glyphs.size();
+
+    // Search through the loaded glyphs to avoid duplicates
+//    for (const wchar_t glyph : glyphs) {
+//        bool foundGlyph = false;
+//        for (const Glyph* const loadedGlyph : _glyphs) {
+//            bool correctCharcode = loadedGlyph->_charcode == glyph;
+//            bool specialGlyph = glyph == static_cast<wchar_t>(-1);
+//            bool correctOutline = loadedGlyph->_outline == _outlineType;
+//            bool correctOutlineThickness = loadedGlyph->outlineThickness() == _outlineThickness;
+//            
+//            if (correctCharcode && (specialGlyph || (correctOutline && correctOutlineThickness))) {
+//                foundGlyph = true;
+//                break;
+//            }
+//                
+//        }
     
-    /* Load each glyph */
+//        
+//    }
     for (size_t i = 0; i < glyphs.size(); ++i) {
-        bool found = false;
+        bool foundGlyph = false;
         /* Check if charcode has been already loaded */
         for (size_t j = 0; j < _glyphs.size(); ++j ) {
-            Glyph* glyph = _glyphs[j];
+            const Glyph * const glyph = _glyphs[j];
             // If charcode is -1, we don't care about outline type or thickness
             // if( (glyph->charcode == charcodes[i])) {
-            if ((glyph->_charcode == glyphs[i]) &&
-               ((glyphs[i] == (wchar_t)(-1) ) ||
-                ((glyph->_outline == _outlineType) &&
-                 (glyph->outlineThickness() == _outlineThickness))))
-            {
-                found = true;
+            bool correctCharcode = glyph->_charcode == glyphs[i];
+            bool specialGlyph = glyphs[i] == static_cast<wchar_t>(-1);
+            bool correctOutline =
+                (glyph->_outline == _outlineType) &&
+                (glyph->outlineThickness() == _outlineThickness);
+            
+            if (correctCharcode && (specialGlyph || correctOutline)) {
+                foundGlyph = true;
                 break;
             }
         }
         
-        if (found)
+        if (foundGlyph)
             continue;
         
         FT_Int32 flags = 0;
@@ -437,27 +456,9 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         y = region.y;
         _atlas.setRegion(x, y, w, h, ft_bitmap.buffer, ft_bitmap.pitch);
         
-//        glyph->_width = w;
-////        glyph->_height = h;
-//        glyph->_outline = _outlineType;
-//        glyph->_outline_thickness = _outlineThickness;
-////        glyph->_offset_x = ft_glyph_left;
-////        glyph->_offset_y = ft_glyph_top;
-//        glyph->_topLeft = glm::vec2(
-//            x/static_cast<float>(width),
-//            y/static_cast<float>(height)
-//        );
-//        glyph->_bottomRight = glm::vec2(
-//            (x + glyph->_width)/static_cast<float>(width),
-//            (y + glyph->_height)/static_cast<float>(height)
-//                                        
-//        );
         
         // Discard hinting to get advance
         FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
-//        slot = face->glyph;
-//        glyph->_advance_x = slot->advance.x / HighResolution;
-//        glyph->_advance_y = slot->advance.y / HighResolution;
         
         Glyph* glyph = new Glyph(
             glyphs[i],

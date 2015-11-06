@@ -84,8 +84,13 @@ namespace {
     uniform sampler2D tex; \n\
     \n\
     void main() { \n\
-        float a = texture(tex, texCoords).r; \n\
-        FragColor = color * a; \n\
+        //float a = texture(tex, texCoords).r; \n\
+        //    FragColor = color * a; \n\
+        vec4 c = texture(tex, texCoords); \n\
+        float t = max(max(c.r,c.g),c.b); \n\
+        vec4 cc = vec4(color.rgb, (c.r+c.g+c.b)/3.0); \n\
+        cc = t*cc + (1.0-t)*vec4(c.r,c.g,c.b, min(min(c.r,c.g),c.b)); \n\
+        FragColor = vec4( cc.rgb, color.a*cc); \n\
     } \
     ";
 }
