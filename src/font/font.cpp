@@ -38,20 +38,20 @@ const struct {
 } FT_Errors[] =
 #include FT_ERRORS_H
 
-//Replacement for Visual Studio's _vscprintf function
-#if (_MSC_VER < 1400) //if older than visual studio 2005
-static int vscprintf (const char * format, va_list pargs)
-{
-    int retval;
-    va_list argcopy;
-    va_copy(argcopy, pargs);
-    retval = vsnprintf(NULL, 0, format, argcopy);
-    va_end(argcopy);
-    return retval;
-}
-#else
-#define vscprintf(f,a) _vscprintf(f,a)
-#endif
+////Replacement for Visual Studio's _vscprintf function
+//#if (_MSC_VER < 1400) //if older than visual studio 2005
+//static int vscprintf (const char * format, va_list pargs)
+//{
+//    int retval;
+//    va_list argcopy;
+//    va_copy(argcopy, pargs);
+//    retval = vsnprintf(NULL, 0, format, argcopy);
+//    va_end(argcopy);
+//    return retval;
+//}
+//#else
+//#define vscprintf(f,a) _vscprintf(f,a)
+//#endif
 
 
 namespace {
@@ -66,6 +66,22 @@ namespace {
 namespace ghoul {
 namespace fontrendering {
     
+const std::string Font::AttributeAutoHinting = "AutoHinting";
+const std::string Font::AttributeOutline = "Outline";
+const std::string Font::AttributeOutlineThickness = "OutlineThickness";
+const std::string Font::AttributeLCDFiltering = "LCDFiltering";
+const std::string Font::AttributeLCDWeights = "LCDWeights";
+const std::string Font::AttributeKerning = "Kerning";
+const std::string Font::AttributeHeight = "Height";
+const std::string Font::AttributeLinegap = "Linegap";
+const std::string Font::AttributeAscender = "Ascender";
+const std::string Font::AttributeDecender = "Decender";
+
+
+
+    
+    
+    
 Font::Glyph::Glyph(wchar_t character,
                    size_t width,
                    size_t height,
@@ -75,7 +91,7 @@ Font::Glyph::Glyph(wchar_t character,
                    float advanceY,
                    glm::vec2 texCoordTopLeft,
                    glm::vec2 texCoordBottomRight,
-                   Outline outline,
+                   bool outline,
                    float outlineThickness
                    )
     : _charcode(std::move(character))
@@ -115,14 +131,26 @@ size_t Font::Glyph::width() const {
 size_t Font::Glyph::height() const {
     return _height;
 }
+
+template <typename T>
+void setValueFromDictionary(const Dictionary& attributes, const std::string& attribute, T& value) {
+    if (attributes.hasKey(attribute)) {
+        if (attributes.hasValue<T>(attribute))
+            value = attributes.value<T>(attribute);
+        else {
+            LERROR("Attribute '" << attribute << "' for font was not of type " << std::string(typeid(T).name()));
+        }
+    }
+}
+
     
-Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas)
+Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, const Dictionary& attributes)
     : _atlas(atlas)
     , _name(std::move(filename))
     , _pointSize(pointSize)
     , _autoHinting(true)
-    , _outlineType(Outline::None)
-    , _outlineThickness(0.f)
+    , _outline(false)
+    , _outlineThickness(0.15f)
     , _lcdFiltering(true)
     , _kerning(true)
     // FT_LCD_FILTER_LIGHT   is (0x00, 0x55, 0x56, 0x55, 0x00)
@@ -132,15 +160,66 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas)
     , _linegap(0.f)
     , _ascender(0.f)
     , _decender(0.f)
-    , _underlinePosition(0.f)
-    , _underlineThickness(0.f)
+//    , _underlinePosition(0.f)
+//    , _underlineThickness(0.f)
 {
     ghoul_assert(_pointSize > 0.f, "Need positive point size");
     ghoul_assert(!_name.empty(), "Empty file name not allowed");
+    
+    if (attributes.size() > 0) {
+        setValueFromDictionary(attributes, AttributeAutoHinting, _autoHinting);
+        setValueFromDictionary(attributes, AttributeOutline, _outline);
+        setValueFromDictionary(attributes, AttributeOutlineThickness, _outlineThickness);
+        setValueFromDictionary(attributes, AttributeLCDFiltering, _lcdFiltering);
+        setValueFromDictionary(attributes, AttributeLCDWeights, _lcdWeights);
+        setValueFromDictionary(attributes, AttributeKerning, _kerning);
+        setValueFromDictionary(attributes, AttributeHeight, _height);
+        setValueFromDictionary(attributes, AttributeLinegap, _linegap);
+        setValueFromDictionary(attributes, AttributeAscender, _ascender);
+        setValueFromDictionary(attributes, AttributeDecender, _decender);
+        
+        static const std::array<std::string, 10> AllAttributes = {{
+            AttributeAutoHinting,
+            AttributeOutline,
+            AttributeOutlineThickness,
+            AttributeLCDFiltering,
+            AttributeLCDWeights,
+            AttributeKerning,
+            AttributeHeight,
+            AttributeLinegap,
+            AttributeAscender,
+            AttributeDecender
+        }};
+        
+        for (const std::string& key : attributes.keys()) {
+            auto it = std::find(AllAttributes.begin(), AllAttributes.end(), key);
+            if (it == AllAttributes.end())
+                LWARNING("Unknown key '" << key << "' for fonts");
+        }
+    }
 }
     
 Font::~Font() {
         
+}
+    
+bool Font::operator==(const Font& rhs) {
+    return (
+        (_name == rhs._name) &&
+        (_pointSize == rhs._pointSize) &&
+        (_glyphs == rhs._glyphs) &&
+        (&_atlas == &rhs._atlas) &&
+        (_autoHinting == rhs._autoHinting) &&
+        (_outline == rhs._outline) &&
+        (_outlineThickness == rhs._outlineThickness) &&
+        (_lcdFiltering == rhs._lcdFiltering) &&
+        (_kerning == rhs._kerning) &&
+        (_lcdWeights == rhs._lcdWeights) &&
+        (_height = rhs._height) &&
+        (_linegap == rhs._linegap) &&
+        (_ascender == rhs._ascender) &&
+        (_decender == rhs._decender)
+    );
 }
     
 bool Font::initialize() {
@@ -152,18 +231,6 @@ bool Font::initialize() {
     if (!success)
         return false;
     
-    _underlinePosition = face->underline_position / (HighResolution * HighResolution) * _pointSize;
-    _underlinePosition = std::round(_underlinePosition);
-    if (_underlinePosition > -2.f)
-        _underlinePosition = -2.f;
-//    _underlinePosition = std::max(-2.f, _underlinePosition);
-
-    _underlineThickness = face->underline_thickness / (HighResolution * HighResolution) * _pointSize;
-    _underlineThickness = std::round(_underlineThickness);
-    if (_underlineThickness < 1.f)
-        _underlineThickness = 1.f;
-//    _underlineThickness = std::min(1.f, _underlineThickness);
-
     
     FT_Size_Metrics metrics = face->size->metrics;
     _ascender = (metrics.ascender >> 6) / 100.f;
@@ -175,21 +242,19 @@ bool Font::initialize() {
     FT_Done_FreeType(library);
     
     /* -1 is a special glyph */
-    
     glyph(-1);
-//    texture_font_get_glyph(self, -1 );
     
     return true;
 }
     
 Font::Glyph* Font::glyph(wchar_t character) {
-    /* Check if charcode has been already loaded */
+    // Check if charcode has been already loaded
     for (size_t i = 0; i < _glyphs.size(); ++i) {
         Glyph* glyph = _glyphs[i];
         
         bool correctCharacter = (glyph->_charcode == character);
         bool isSpecialCharacter = (character == static_cast<wchar_t>(-1));
-        bool correctOutlineType = glyph->_outline == _outlineType;
+        bool correctOutlineType = glyph->_outline == _outline;
         bool correctOutlineThickness = glyph->outlineThickness() == _outlineThickness;
         
 
@@ -201,25 +266,19 @@ Font::Glyph* Font::glyph(wchar_t character) {
         
     }
     
-    /* charcode -1 is special : it is used for line drawing (overline,
-     * underline, strikethrough) and background.
-     */
+    // charcode -1 is special: it is used for line drawing (overline, underline,
+    // strikethrough) and background.
     if (character == static_cast<wchar_t>(-1)) {
         size_t width = _atlas.width();
         size_t height = _atlas.height();
         glm::ivec4 region = _atlas.allocateRegion(5, 5);
-        std::array<unsigned char, 4*4*3> data;
-        data.fill(std::numeric_limits<unsigned char>::max());
-//        static unsigned char data[4*4*3] = {
-//            
-//            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-//            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-//            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-//            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
-        if ( region.x < 0 )
-        {
+        if (region.x < 0)
             return nullptr;
-        }
+
+        // The last *4 for the depth is not a danger here as _atlas.setRegion only
+        // extracts as much data as is needed for the used texture atlas
+        std::array<unsigned char, 4*4*4> data;
+        data.fill(std::numeric_limits<unsigned char>::max());
         
         _atlas.setRegion(region.x, region.y, 4, 4, data.data(), 0);
         
@@ -235,10 +294,10 @@ Font::Glyph* Font::glyph(wchar_t character) {
 
         _glyphs.push_back(glyph);
 
-        return glyph; //*(texture_glyph_t **) vector_back( self->glyphs );
+        return glyph;
     }
     
-    /* Glyph has not been already loaded */
+    // Glyph has not been already loaded
     size_t nGlyphNotLoaded = loadGlyphs({character});
     if (nGlyphNotLoaded == 0)
         return _glyphs.back();
@@ -252,13 +311,50 @@ std::string Font::name() const {
     return _name;
 }
     
-float Font::fontSize() const {
+float Font::pointSize() const {
     return _pointSize;
 }
-    
+
+bool Font::autoHinting() const {
+    return _autoHinting;
+}
+
+bool Font::outline() const {
+    return _outline;
+}
+
+float Font::outlineThickness() const {
+    return _outlineThickness;
+}
+
+bool Font::lcdFiltering() const {
+    return lcdFiltering();
+}
+
+bool Font::kerning() const {
+    return _kerning;
+}
+
+std::array<unsigned char, 5> Font::lcdWeights() const {
+    return _lcdWeights;
+}
+
 float Font::height() const {
     return _height;
 }
+
+float Font::linegap() const {
+    return _linegap;
+}
+
+float Font::ascender() const {
+    return _ascender;
+}
+
+float Font::decender() const {
+    return _decender;
+}
+    
     
 opengl::TextureAtlas& Font::atlas() {
     return _atlas;
@@ -296,7 +392,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             bool correctCharcode = glyph->_charcode == glyphs[i];
             bool specialGlyph = glyphs[i] == static_cast<wchar_t>(-1);
             bool correctOutline =
-                (glyph->_outline == _outlineType) &&
+                (glyph->_outline == _outline) &&
                 (glyph->outlineThickness() == _outlineThickness);
             
             if (correctCharcode && (specialGlyph || correctOutline)) {
@@ -315,7 +411,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         // WARNING: We use texture-atlas depth to guess if user wants
         //          LCD subpixel rendering
         
-        if (_outlineType != Outline::None)
+        if (_outline)
             flags |= FT_LOAD_NO_BITMAP;
         else
             flags |= FT_LOAD_RENDER;
@@ -341,7 +437,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         }
         
         
-        if (_outlineType == Outline::None) {
+        if (!_outline) {
             slot            = face->glyph;
             ft_bitmap       = slot->bitmap;
             ft_glyph_top    = slot->bitmap_top;
@@ -374,19 +470,19 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 return 0;
             }
             
-            switch (_outlineType) {
-                case Outline::None:
-                    break;
-                case Outline::Line:
+//            switch (_outlineType) {
+//                case Outline::None:
+//                    break;
+//                case Outline::Line:
                     error = FT_Glyph_Stroke(&ft_glyph, stroker, 1);
-                    break;
-                case Outline::Inner:
-                    error = FT_Glyph_StrokeBorder(&ft_glyph, stroker, 0, 1);
-                    break;
-                case Outline::Outer:
-                    error = FT_Glyph_StrokeBorder(&ft_glyph, stroker, 1, 1);
-                    break;
-            }
+//                    break;
+//                case Outline::Inner:
+//                    error = FT_Glyph_StrokeBorder(&ft_glyph, stroker, 0, 1);
+//                    break;
+//                case Outline::Outer:
+//                    error = FT_Glyph_StrokeBorder(&ft_glyph, stroker, 1, 1);
+//                    break;
+//            }
             if (error) {
                 LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
                 FT_Done_Face(face);
@@ -459,13 +555,13 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 (x + w)/static_cast<float>(width),
                 (y + h)/static_cast<float>(height)
             ),
-            _outlineType,
+            _outline,
             _outlineThickness
         );
         
         _glyphs.push_back(glyph);
         
-        if (_outlineType != Outline::None)
+        if (_outline)
             FT_Done_Glyph(ft_glyph);
     }
     
@@ -506,18 +602,6 @@ void Font::generateKerning() {
     FT_Done_FreeType( library );
 }
     
-//bool Font::getFace(float size, FT_Library* library, FT_Face* face) {
-//    return loadFace(size, library, face);
-//}
-//    
-//bool Font::getFace(FT_Library* library, FT_Face* face) {
-//    return getFace(_pointSize, library, face);
-//}
-//    
-//bool Font::getHiResFace(FT_Library* library, FT_Face* face) {
-//    return getFace(_pointSize * 100.f, library, face);
-//}
-//    
 bool Font::loadFace(float size, FT_Library& library, FT_Face& face) {
     FT_Matrix matrix = {
         (int)((1.0/HighResolution) * 0x10000L),

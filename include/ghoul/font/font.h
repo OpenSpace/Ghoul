@@ -28,6 +28,7 @@
 
 #include <ghoul/glm.h>
 
+#include <ghoul/misc/dictionary.h>
 #include <ghoul/opengl/textureatlas.h>
 
 #include <array>
@@ -48,12 +49,23 @@ namespace fontrendering {
     
 class Font {
 public:
-    enum class Outline {
-        None,
-        Line,
-        Inner,
-        Outer
-    };
+    static const std::string AttributeAutoHinting;
+    static const std::string AttributeOutline;
+    static const std::string AttributeOutlineThickness;
+    static const std::string AttributeLCDFiltering;
+    static const std::string AttributeLCDWeights;
+    static const std::string AttributeKerning;
+    static const std::string AttributeHeight;
+    static const std::string AttributeLinegap;
+    static const std::string AttributeAscender;
+    static const std::string AttributeDecender;
+
+//    enum class Outline {
+//        None,
+//        Line,
+//        Inner,
+//        Outer
+//    };
     
     class Glyph {
     public:
@@ -68,7 +80,7 @@ public:
               float advanceY = 0.f,
               glm::vec2 texCoordTopLeft = glm::vec2(0.f),
               glm::vec2 texCoordBottomRight = glm::vec2(0.f),
-              Outline outline = Outline::None,
+              bool outline = false,
               float outlineThickness = 0.f
         );
 
@@ -82,10 +94,14 @@ public:
         float advanceX() const { return _advanceX; }
         float advanceY() const { return _advanceY; }
         
-        glm::vec2 texCoordTopLeft() const { return _topLeft; }
-        glm::vec2 texCoordBottomRight() const { return _bottomRight; }
+        const glm::vec2& texCoordTopLeft() const { return _topLeft; }
+        const glm::vec2& texCoordBottomRight() const { return _bottomRight; }
         
+        bool outline() const { return _outline; }
         float outlineThickness() const { return _outlineThickness; }
+        
+        const glm::vec2& outlineTexCoordTopLeft() const { return _outlineTopLeft; }
+        const glm::vec2& outlineTexCoordBottomRight() const { return _outlineBottomRight; }
         
     private:
 
@@ -125,19 +141,35 @@ public:
         /// A vector of kerning pairs relative to this glyph
         std::map<wchar_t, float> _kerning;
         
-        Outline _outline; ///< Glyph outline type
+        bool _outline; ///< Glyph outline type
         float _outlineThickness; ///< Glyph outline thickness
+        
+        glm::vec2 _outlineTopLeft;
+        glm::vec2 _outlineBottomRight;
     };
     
     
-    Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas);
+    
+    Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, const Dictionary& attributes = Dictionary());
     ~Font();
+    
+    // Needs testing
+    bool operator==(const Font& rhs);
     
     bool initialize();
     
     std::string name() const;
-    float fontSize() const;
+    float pointSize() const;
+    bool autoHinting() const;
+    bool outline() const;
+    float outlineThickness() const;
+    bool lcdFiltering() const;
+    bool kerning() const;
+    std::array<unsigned char, 5> lcdWeights() const;
     float height() const;
+    float linegap() const;
+    float ascender() const;
+    float decender() const;
     
     Glyph* glyph(wchar_t character);
 
@@ -149,20 +181,17 @@ private:
     void generateKerning();
     bool loadFace(float size, FT_Library& library, FT_Face& face);
 
-//    bool getFace(FT_Library* library, FT_Face* face);
-//    bool getFace(float size, FT_Library* library, FT_Face* face);
-//    bool getHiResFace(FT_Library* library, FT_Face* face);
-
-
 
     std::vector<Glyph*> _glyphs;
+    std::vector<Glyph*> _outlineGlyphs;
     
     opengl::TextureAtlas& _atlas;
     
     std::string _name;
     float _pointSize;
     bool _autoHinting;
-    Outline _outlineType;
+    bool _outline;
+//    Outline _outlineType;
     float _outlineThickness;
     bool _lcdFiltering;
     bool _kerning;
@@ -171,8 +200,6 @@ private:
     float _linegap;
     float _ascender;
     float _decender;
-    float _underlinePosition;
-    float _underlineThickness;
 };
     
 } // namespace fontrendering

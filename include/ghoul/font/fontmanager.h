@@ -30,6 +30,8 @@
 #include <ghoul/glm.h>
 #include <ghoul/opengl/textureatlas.h>
 
+#include <ghoul/misc/dictionary.h>
+
 #include <map>
 #include <string>
 #include <vector>
@@ -39,6 +41,7 @@ namespace fontrendering {
     
 class FontManager {
 public:
+    
     FontManager(glm::ivec3 atlasDimensions = glm::ivec3(512, 512, 3));
     FontManager(const FontManager& rhs);
     FontManager(FontManager&& rhs);
@@ -46,9 +49,11 @@ public:
     FontManager& operator=(FontManager&& rhs);
     ~FontManager();
     
-    bool registerFont(std::string name, const std::string& filename);
+    // Does not check whether the file exists
+    // Stores the full path internally
+    bool registerFontPath(const std::string& fontName, const std::string& filePath);
     
-    Font* font(const std::string& name, float fontSize);
+    Font* font(const std::string& name, float fontSize, const Dictionary& attributes = Dictionary());
     
 private:
     ghoul::opengl::TextureAtlas _textureAtlas;

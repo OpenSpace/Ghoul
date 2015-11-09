@@ -34,7 +34,7 @@ namespace {
 
 namespace ghoul {
 namespace fontrendering {
-
+    
 FontManager::FontManager(glm::ivec3 atlasDimensions)
     : _textureAtlas(atlasDimensions.x, atlasDimensions.y, atlasDimensions.z)
 {
@@ -81,26 +81,27 @@ FontManager& FontManager::operator=(FontManager&& rhs) {
     return *this;
 }
     
-bool FontManager::registerFont(std::string name, const std::string& filename) {
-    auto it = _fontPaths.find(name);
+bool FontManager::registerFontPath(const std::string& fontName, const std::string& filePath) {
+    auto it = _fontPaths.find(fontName);
     if (it != _fontPaths.end()) {
         const std::string& registeredPath = it->first;
         
-        if (registeredPath == filename)
+        if (registeredPath == filePath)
             return true;
         else {
-            LERROR("Font '" << name << "' was registered with path '" <<
+            LERROR("Font '" << fontName << "' was registered with path '" <<
                    registeredPath << "' before. Trying to register with path '" <<
-                   filename << "' now");
+                   filePath << "' now");
             return false;
         }
     }
     
-    _fontPaths[name] = filename;
+    _fontPaths[fontName] = filePath;
     return true;
 }
     
-Font* FontManager::font(const std::string& name, float fontSize) {
+    
+Font* FontManager::font(const std::string& name, float fontSize, const Dictionary& attributes) {
     auto itPath = _fontPaths.find(name);
     if (itPath == _fontPaths.end()) {
         LERROR("Font '" << name << "' is not a registered font");
@@ -109,22 +110,35 @@ Font* FontManager::font(const std::string& name, float fontSize) {
 
     auto itFont = std::find_if(_fonts.begin(),
                            _fonts.end(),
-                               [name, fontSize](std::pair<std::string, Font*> f) { return f.second->name() == name && f.second->fontSize() == fontSize; }
+                               [name, fontSize](std::pair<std::string, Font*> f) { return f.second->name() == name && f.second->pointSize() == fontSize; }
                            );
     if (itFont != _fonts.end())
         return itFont->second;
     
     std::string fontPath = _fontPaths[name];
-    Font* f = new Font(fontPath, fontSize, _textureAtlas);
+    
+    Font* f = new Font(fontPath, fontSize, _textureAtlas, attributes);
+    
+    
+    bool initSuccess = f->initialize();
+    if (!initSuccess ) {
+        delete f;
+        return nullptr;
+    }
     
     // check if font file exists ---abock
     
-    f->loadGlyphs(_defaultCharacterSet);
+    size_t nFailedGlyphs = f->loadGlyphs(_defaultCharacterSet);
+    if (nFailedGlyphs != 0) {
+        delete f;
+        return nullptr;
+    }
+        
     
     _fonts[name] = f;
     return f;
 }
     
-    
+   
 } // namespace fontrendering
 } // namespace ghoul
