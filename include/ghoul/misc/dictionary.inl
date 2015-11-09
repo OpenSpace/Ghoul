@@ -136,7 +136,7 @@ bool Dictionary::getValue(const std::string& key, T& value) const {
 template <typename T>
 T ghoul::Dictionary::value(const std::string& key) const {
 	T value;
-	getValueHelper(key, value);
+	getValue(key, value);
 	return value;
 }
 
