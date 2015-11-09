@@ -361,14 +361,6 @@ opengl::TextureAtlas& Font::atlas() {
 }
     
 size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
-    size_t x, y, w, h;
-    
-    FT_Glyph ft_glyph;
-    FT_GlyphSlot slot;
-    FT_Bitmap ft_bitmap;
-    
-    FT_UInt glyph_index;
-    
     size_t missed = 0;
     
     size_t width  = _atlas.width();
@@ -407,7 +399,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         FT_Int32 flags = 0;
         int ft_glyph_top = 0;
         int ft_glyph_left = 0;
-        glyph_index = FT_Get_Char_Index(face, glyphs[i]);
+        FT_UInt glyph_index = FT_Get_Char_Index(face, glyphs[i]);
         // WARNING: We use texture-atlas depth to guess if user wants
         //          LCD subpixel rendering
         
@@ -437,6 +429,9 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         }
         
         
+        FT_GlyphSlot slot;
+        FT_Bitmap ft_bitmap;
+        FT_Glyph ft_glyph;
         if (!_outline) {
             slot            = face->glyph;
             ft_bitmap       = slot->bitmap;
@@ -470,19 +465,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 return 0;
             }
             
-//            switch (_outlineType) {
-//                case Outline::None:
-//                    break;
-//                case Outline::Line:
-                    error = FT_Glyph_Stroke(&ft_glyph, stroker, 1);
-//                    break;
-//                case Outline::Inner:
-//                    error = FT_Glyph_StrokeBorder(&ft_glyph, stroker, 0, 1);
-//                    break;
-//                case Outline::Outer:
-//                    error = FT_Glyph_StrokeBorder(&ft_glyph, stroker, 1, 1);
-//                    break;
-//            }
+            error = FT_Glyph_Stroke(&ft_glyph, stroker, 1);
             if (error) {
                 LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
                 FT_Done_Face(face);
@@ -521,8 +504,8 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         
         // We want each glyph to be separated by at least one black pixel
         // (for example for shader used in demo-subpixel.c)
-        w = ft_bitmap.width/depth + 1;
-        h = ft_bitmap.rows + 1;
+        size_t w = ft_bitmap.width/depth + 1;
+        size_t h = ft_bitmap.rows + 1;
         glm::ivec4 region = _atlas.allocateRegion(w, h);
         if (region.x < 0) {
             missed++;
@@ -531,8 +514,8 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         }
         w = w - 1;
         h = h - 1;
-        x = region.x;
-        y = region.y;
+        size_t x = region.x;
+        size_t y = region.y;
         _atlas.setRegion(x, y, w, h, ft_bitmap.buffer, ft_bitmap.pitch);
         
         
