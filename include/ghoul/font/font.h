@@ -50,8 +50,6 @@ namespace fontrendering {
 class Font {
 public:
     static const std::string AttributeAutoHinting;
-    static const std::string AttributeOutline;
-    static const std::string AttributeOutlineThickness;
     static const std::string AttributeKerning;
     static const std::string AttributeHeight;
     static const std::string AttributeLinegap;
@@ -70,11 +68,7 @@ public:
               float advanceX = 0.f,
               float advanceY = 0.f,
               glm::vec2 texCoordTopLeft = glm::vec2(0.f),
-              glm::vec2 texCoordBottomRight = glm::vec2(0.f),
-              bool outline = false,
-              float outlineThickness = 0.f,
-              glm::vec2 outlineTexCoordTopLeft = glm::vec2(0.f),
-              glm::vec2 outlineTexCoordBottomRight = glm::vec2(0.f)
+              glm::vec2 texCoordBottomRight = glm::vec2(0.f)
         );
 
         float kerning(wchar_t character) const;
@@ -89,12 +83,6 @@ public:
         
         const glm::vec2& texCoordTopLeft() const { return _topLeft; }
         const glm::vec2& texCoordBottomRight() const { return _bottomRight; }
-        
-        bool outline() const { return _outline; }
-        float outlineThickness() const { return _outlineThickness; }
-        
-        const glm::vec2& outlineTexCoordTopLeft() const { return _outlineTopLeft; }
-        const glm::vec2& outlineTexCoordBottomRight() const { return _outlineBottomRight; }
         
     private:
 
@@ -133,12 +121,6 @@ public:
         
         /// A vector of kerning pairs relative to this glyph
         std::map<wchar_t, float> _kerning;
-        
-        bool _outline; ///< Glyph outline type
-        float _outlineThickness; ///< Glyph outline thickness
-        
-        glm::vec2 _outlineTopLeft;
-        glm::vec2 _outlineBottomRight;
     };
     
     
@@ -154,9 +136,6 @@ public:
     std::string name() const;
     float pointSize() const;
     bool autoHinting() const;
-    bool outline() const;
-    float outlineThickness() const;
-    bool lcdFiltering() const;
     bool kerning() const;
     float height() const;
     float linegap() const;
@@ -181,9 +160,6 @@ private:
     std::string _name;
     float _pointSize;
     bool _autoHinting;
-    bool _outline;
-//    Outline _outlineType;
-    float _outlineThickness;
     bool _kerning;
     float _height;
     float _linegap;

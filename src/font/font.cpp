@@ -64,8 +64,6 @@ namespace ghoul {
 namespace fontrendering {
     
 const std::string Font::AttributeAutoHinting = "AutoHinting";
-const std::string Font::AttributeOutline = "Outline";
-const std::string Font::AttributeOutlineThickness = "OutlineThickness";
 const std::string Font::AttributeKerning = "Kerning";
 const std::string Font::AttributeHeight = "Height";
 const std::string Font::AttributeLinegap = "Linegap";
@@ -85,11 +83,7 @@ Font::Glyph::Glyph(wchar_t character,
                    float advanceX,
                    float advanceY,
                    glm::vec2 texCoordTopLeft,
-                   glm::vec2 texCoordBottomRight,
-                   bool outline,
-                   float outlineThickness,
-                   glm::vec2 outlineTexCoordTopLeft,
-                   glm::vec2 outlineTexCoordBottomRight
+                   glm::vec2 texCoordBottomRight
                    )
     : _charcode(std::move(character))
     , _width(width)
@@ -100,10 +94,6 @@ Font::Glyph::Glyph(wchar_t character,
     , _advanceY(advanceY)
     , _topLeft(std::move(texCoordTopLeft))
     , _bottomRight(std::move(texCoordBottomRight))
-    , _outline(outline)
-    , _outlineThickness(outlineThickness)
-    , _outlineTopLeft(std::move(outlineTexCoordTopLeft))
-    , _outlineBottomRight(std::move(outlineTexCoordBottomRight))
 {
 }
     
@@ -148,8 +138,6 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, c
     , _name(std::move(filename))
     , _pointSize(pointSize)
     , _autoHinting(true)
-    , _outline(false)
-    , _outlineThickness(0.25f)
     , _kerning(true)
     , _height(0.f)
     , _linegap(0.f)
@@ -163,8 +151,6 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, c
     
     if (attributes.size() > 0) {
         setValueFromDictionary(attributes, AttributeAutoHinting, _autoHinting);
-        setValueFromDictionary(attributes, AttributeOutline, _outline);
-        setValueFromDictionary(attributes, AttributeOutlineThickness, _outlineThickness);
         setValueFromDictionary(attributes, AttributeKerning, _kerning);
         setValueFromDictionary(attributes, AttributeHeight, _height);
         setValueFromDictionary(attributes, AttributeLinegap, _linegap);
@@ -173,8 +159,6 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, c
         
         static const std::array<std::string, 10> AllAttributes = {{
             AttributeAutoHinting,
-            AttributeOutline,
-            AttributeOutlineThickness,
             AttributeKerning,
             AttributeHeight,
             AttributeLinegap,
@@ -201,8 +185,6 @@ bool Font::operator==(const Font& rhs) {
         (_glyphs == rhs._glyphs) &&
         (&_atlas == &rhs._atlas) &&
         (_autoHinting == rhs._autoHinting) &&
-        (_outline == rhs._outline) &&
-        (_outlineThickness == rhs._outlineThickness) &&
         (_kerning == rhs._kerning) &&
         (_height = rhs._height) &&
         (_linegap == rhs._linegap) &&
@@ -242,17 +224,18 @@ Font::Glyph* Font::glyph(wchar_t character) {
     for (size_t i = 0; i < _glyphs.size(); ++i) {
         Glyph* glyph = _glyphs[i];
         
-        bool correctCharacter = (glyph->_charcode == character);
-        bool isSpecialCharacter = (character == static_cast<wchar_t>(-1));
-        bool correctOutlineType = glyph->_outline == _outline;
-        bool correctOutlineThickness = glyph->outlineThickness() == _outlineThickness;
-        
-
-        if (correctCharacter && (isSpecialCharacter || (correctOutlineType &&
-             correctOutlineThickness)))
-        {
+        if (glyph->_charcode == character)
             return glyph;
-        }
+        
+//        bool correctCharacter = (glyph->_charcode == character);
+//        bool isSpecialCharacter = (character == static_cast<wchar_t>(-1));
+//        
+//
+//        if (correctCharacter && (isSpecialCharacter || (correctOutlineType &&
+//             correctOutlineThickness)))
+//        {
+//            return glyph;
+//        }
         
     }
     
@@ -309,14 +292,6 @@ bool Font::autoHinting() const {
     return _autoHinting;
 }
 
-bool Font::outline() const {
-    return _outline;
-}
-
-float Font::outlineThickness() const {
-    return _outlineThickness;
-}
-
 bool Font::kerning() const {
     return _kerning;
 }
@@ -361,18 +336,24 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         /* Check if charcode has been already loaded */
         for (size_t j = 0; j < _glyphs.size(); ++j ) {
             const Glyph * const glyph = _glyphs[j];
-            // If charcode is -1, we don't care about outline type or thickness
-            // if( (glyph->charcode == charcodes[i])) {
-            bool correctCharcode = glyph->_charcode == glyphs[i];
-            bool specialGlyph = glyphs[i] == static_cast<wchar_t>(-1);
-            bool correctOutline =
-                (glyph->_outline == _outline) &&
-                (glyph->outlineThickness() == _outlineThickness);
-            
-            if (correctCharcode && (specialGlyph || correctOutline)) {
+            if (glyph->_charcode == glyphs[i]) {
                 foundGlyph = true;
                 break;
             }
+                
+            
+            // If charcode is -1, we don't care about outline type or thickness
+            // if( (glyph->charcode == charcodes[i])) {
+//            bool correctCharcode = glyph->_charcode == glyphs[i];
+//            bool specialGlyph = glyphs[i] == static_cast<wchar_t>(-1);
+//            bool correctOutline =
+//                (glyph->_outline == _outline) &&
+//                (glyph->outlineThickness() == _outlineThickness);
+//            
+//            if (correctCharcode && (specialGlyph || correctOutline)) {
+//                foundGlyph = true;
+//                break;
+//            }
         }
         
         if (foundGlyph)
@@ -434,7 +415,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             );
         }
         
-        
+        /*
         if (_outline) {
             FT_Int32 outlineFlags = flags;
             flags |= FT_LOAD_NO_BITMAP;
@@ -538,7 +519,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
 
             FT_Done_Glyph(ft_glyph);
         }
-        
+        */
         
         
         
@@ -680,7 +661,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             face->glyph->advance.x / HighResolution,
             face->glyph->advance.y / HighResolution,
             topLeft,
-            bottomRight,
+            bottomRight
 //            glm::vec2(
 //                x/static_cast<float>(width),
 //                y/static_cast<float>(height)
@@ -689,10 +670,6 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
 //                (x + w)/static_cast<float>(width),
 //                (y + h)/static_cast<float>(height)
 //            ),
-            _outline,
-            _outlineThickness,
-            outlineTopLeft,
-            outlineBottomRight
         );
         
         _glyphs.push_back(glyph);

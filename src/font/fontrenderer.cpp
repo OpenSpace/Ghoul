@@ -279,10 +279,6 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
                 float t0 = glyph->texCoordTopLeft().y;
                 float s1 = glyph->texCoordBottomRight().x;
                 float t1 = glyph->texCoordBottomRight().y;
-                float outlineS0 = glyph->outlineTexCoordTopLeft().x;
-                float outlineT0 = glyph->outlineTexCoordTopLeft().y;
-                float outlineS1 = glyph->outlineTexCoordBottomRight().x;
-                float outlineT1 = glyph->outlineTexCoordBottomRight().y;
 
                 indices.insert(indices.end(), {
                     vertexIndex, vertexIndex + 1, vertexIndex + 2,
@@ -290,10 +286,10 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
                 });
                 vertexIndex += 4;
                 vertices.insert(vertices.end(), {
-                    x0, y0, s0, t0, outlineS0, outlineT0,
-                    x0, y1, s0, t1, outlineS0, outlineT1,
-                    x1, y1, s1, t1, outlineS1, outlineT1,
-                    x1, y0, s1, t0, outlineS1, outlineT0
+                    x0, y0, s0, t0,
+                    x0, y1, s0, t1,
+                    x1, y1, s1, t1,
+                    x1, y0, s1, t0,
                 });
                 pos.x += glyph->advanceX();
             }
@@ -315,12 +311,12 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
     _program->setIgnoreUniformLocationError(true);
     _program->setUniform("color", glm::vec4(1.0, 1.0, 1.0, 1.0));
 //    _program->setUniform("color", color);
-    _program->setUniform("outlineColor", glm::vec4(0.0, 0.0, 0.0, 1.0));
+    _program->setUniform("outlineColor", glm::vec4(0.0, 1.0, 0.0, 1.0));
     _program->setUniform("tex", atlasUnit);
     _program->setUniform("model", glm::mat4(1.f));
     _program->setUniform("view", glm::mat4(1.f));
     _program->setUniform("projection", projection);
-    _program->setUniform("hasOutline", font.outline());
+    _program->setUniform("hasOutline", false);
     _program->setIgnoreUniformLocationError(false);
     
     if (_vao == 0) {
@@ -339,17 +335,12 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(
-          0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0
+          0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0
     );
 
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(
-        1, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<const void*>(2 * sizeof(float))
-    );
-
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(
-        2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<const void*>(4 * sizeof(float))
+        1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<const void*>(2 * sizeof(float))
     );
 
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
