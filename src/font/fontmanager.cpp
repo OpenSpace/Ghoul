@@ -101,7 +101,7 @@ bool FontManager::registerFontPath(const std::string& fontName, const std::strin
 }
     
     
-Font* FontManager::font(const std::string& name, float fontSize, const Dictionary& attributes) {
+Font* FontManager::font(const std::string& name, float fontSize) {
     auto itPath = _fontPaths.find(name);
     if (itPath == _fontPaths.end()) {
         LERROR("Font '" << name << "' is not a registered font");
@@ -117,7 +117,7 @@ Font* FontManager::font(const std::string& name, float fontSize, const Dictionar
     
     std::string fontPath = _fontPaths[name];
     
-    Font* f = new Font(fontPath, fontSize, _textureAtlas, attributes);
+    Font* f = new Font(fontPath, fontSize, _textureAtlas);
     
     
     bool initSuccess = f->initialize();

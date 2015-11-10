@@ -63,17 +63,6 @@ namespace {
 namespace ghoul {
 namespace fontrendering {
     
-const std::string Font::AttributeAutoHinting = "AutoHinting";
-const std::string Font::AttributeKerning = "Kerning";
-const std::string Font::AttributeHeight = "Height";
-const std::string Font::AttributeLinegap = "Linegap";
-const std::string Font::AttributeAscender = "Ascender";
-const std::string Font::AttributeDecender = "Decender";
-
-
-
-    
-    
     
 Font::Glyph::Glyph(wchar_t character,
                    size_t width,
@@ -120,58 +109,14 @@ size_t Font::Glyph::width() const {
 size_t Font::Glyph::height() const {
     return _height;
 }
-
-template <typename T>
-void setValueFromDictionary(const Dictionary& attributes, const std::string& attribute, T& value) {
-    if (attributes.hasKey(attribute)) {
-        if (attributes.hasValue<T>(attribute))
-            value = attributes.value<T>(attribute);
-        else {
-            LERROR("Attribute '" << attribute << "' for font was not of type " << std::string(typeid(T).name()));
-        }
-    }
-}
-
-    
-Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, const Dictionary& attributes)
+   
+Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas)
     : _atlas(atlas)
     , _name(std::move(filename))
     , _pointSize(pointSize)
-    , _autoHinting(true)
-    , _kerning(true)
-    , _height(0.f)
-    , _linegap(0.f)
-    , _ascender(0.f)
-    , _decender(0.f)
-//    , _underlinePosition(0.f)
-//    , _underlineThickness(0.f)
 {
     ghoul_assert(_pointSize > 0.f, "Need positive point size");
     ghoul_assert(!_name.empty(), "Empty file name not allowed");
-    
-    if (attributes.size() > 0) {
-        setValueFromDictionary(attributes, AttributeAutoHinting, _autoHinting);
-        setValueFromDictionary(attributes, AttributeKerning, _kerning);
-        setValueFromDictionary(attributes, AttributeHeight, _height);
-        setValueFromDictionary(attributes, AttributeLinegap, _linegap);
-        setValueFromDictionary(attributes, AttributeAscender, _ascender);
-        setValueFromDictionary(attributes, AttributeDecender, _decender);
-        
-        static const std::array<std::string, 10> AllAttributes = {{
-            AttributeAutoHinting,
-            AttributeKerning,
-            AttributeHeight,
-            AttributeLinegap,
-            AttributeAscender,
-            AttributeDecender
-        }};
-        
-        for (const std::string& key : attributes.keys()) {
-            auto it = std::find(AllAttributes.begin(), AllAttributes.end(), key);
-            if (it == AllAttributes.end())
-                LWARNING("Unknown key '" << key << "' for fonts");
-        }
-    }
 }
     
 Font::~Font() {
@@ -183,13 +128,7 @@ bool Font::operator==(const Font& rhs) {
         (_name == rhs._name) &&
         (_pointSize == rhs._pointSize) &&
         (_glyphs == rhs._glyphs) &&
-        (&_atlas == &rhs._atlas) &&
-        (_autoHinting == rhs._autoHinting) &&
-        (_kerning == rhs._kerning) &&
-        (_height = rhs._height) &&
-        (_linegap == rhs._linegap) &&
-        (_ascender == rhs._ascender) &&
-        (_decender == rhs._decender)
+        (&_atlas == &rhs._atlas)
     );
 }
     
@@ -205,10 +144,7 @@ bool Font::initialize() {
     
     
     FT_Size_Metrics metrics = face->size->metrics;
-    _ascender = (metrics.ascender >> 6) / HighFaceResolutionFactor;
-    _decender = (metrics.descender >> 6) / HighFaceResolutionFactor;
     _height = (metrics.height >> 6) / HighFaceResolutionFactor;
-    _linegap = _height - _ascender + _decender;
     
     FT_Done_Face(face);
     FT_Done_FreeType(library);
@@ -288,30 +224,9 @@ float Font::pointSize() const {
     return _pointSize;
 }
 
-bool Font::autoHinting() const {
-    return _autoHinting;
-}
-
-bool Font::kerning() const {
-    return _kerning;
-}
-
 float Font::height() const {
     return _height;
 }
-
-float Font::linegap() const {
-    return _linegap;
-}
-
-float Font::ascender() const {
-    return _ascender;
-}
-
-float Font::decender() const {
-    return _decender;
-}
-    
     
 opengl::TextureAtlas& Font::atlas() {
     return _atlas;
@@ -367,12 +282,8 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         glm::vec2 outlineTopLeft, outlineBottomRight;
         
         FT_Int32 flags = 0;
-        if (!_autoHinting)
-            flags |= FT_LOAD_NO_HINTING | FT_LOAD_NO_AUTOHINT;
-        else
-            flags |= FT_LOAD_FORCE_AUTOHINT;
+        flags |= FT_LOAD_FORCE_AUTOHINT;
         
-
         FT_UInt glyph_index = FT_Get_Char_Index(face, glyphs[i]);
         {
             FT_Int32 solidFlag = flags;

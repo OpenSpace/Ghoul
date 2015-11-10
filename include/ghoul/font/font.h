@@ -49,13 +49,6 @@ namespace fontrendering {
     
 class Font {
 public:
-    static const std::string AttributeAutoHinting;
-    static const std::string AttributeKerning;
-    static const std::string AttributeHeight;
-    static const std::string AttributeLinegap;
-    static const std::string AttributeAscender;
-    static const std::string AttributeDecender;
-
     class Glyph {
     public:
         friend class Font;
@@ -125,7 +118,7 @@ public:
     
     
     
-    Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, const Dictionary& attributes = Dictionary());
+    Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas);
     ~Font();
     
     // Needs testing
@@ -135,12 +128,7 @@ public:
     
     std::string name() const;
     float pointSize() const;
-    bool autoHinting() const;
-    bool kerning() const;
     float height() const;
-    float linegap() const;
-    float ascender() const;
-    float decender() const;
     
     Glyph* glyph(wchar_t character);
 
@@ -159,12 +147,7 @@ private:
     
     std::string _name;
     float _pointSize;
-    bool _autoHinting;
-    bool _kerning;
     float _height;
-    float _linegap;
-    float _ascender;
-    float _decender;
 };
     
 } // namespace fontrendering

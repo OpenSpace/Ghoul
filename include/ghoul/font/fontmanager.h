@@ -53,7 +53,7 @@ public:
     // Stores the full path internally
     bool registerFontPath(const std::string& fontName, const std::string& filePath);
     
-    Font* font(const std::string& name, float fontSize, const Dictionary& attributes = Dictionary());
+    Font* font(const std::string& name, float fontSize);
     
 private:
     ghoul::opengl::TextureAtlas _textureAtlas;
