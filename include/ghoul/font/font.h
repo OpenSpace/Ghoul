@@ -42,7 +42,7 @@
 // #include FT_ADVANCES_H
 #include FT_LCD_FILTER_H
 
-
+ 
 namespace ghoul {
     
 namespace fontrendering {
@@ -61,7 +61,9 @@ public:
               float advanceX = 0.f,
               float advanceY = 0.f,
               glm::vec2 texCoordTopLeft = glm::vec2(0.f),
-              glm::vec2 texCoordBottomRight = glm::vec2(0.f)
+              glm::vec2 texCoordBottomRight = glm::vec2(0.f),
+              glm::vec2 outlineTexCoordTopLeft = glm::vec2(0.f),
+              glm::vec2 outlineTexCoordBottomRight = glm::vec2(0.f)
         );
 
         float kerning(wchar_t character) const;
@@ -76,6 +78,8 @@ public:
         
         const glm::vec2& texCoordTopLeft() const { return _topLeft; }
         const glm::vec2& texCoordBottomRight() const { return _bottomRight; }
+        const glm::vec2& outlineTexCoordTopLeft() const { return _outlineTopLeft; }
+        const glm::vec2& outlineTexCoordBottomRight() const { return _outlineBottomRight; }
         
     private:
 
@@ -114,6 +118,9 @@ public:
         
         /// A vector of kerning pairs relative to this glyph
         std::map<wchar_t, float> _kerning;
+        
+        glm::vec2 _outlineTopLeft;
+        glm::vec2 _outlineBottomRight;
     };
     
     

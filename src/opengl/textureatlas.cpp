@@ -176,11 +176,11 @@ glm::ivec4 TextureAtlas:: allocateRegion(int width, int height) {
 
 }
 
-void TextureAtlas::setRegion(const glm::ivec4 region, void* data, int stride) {
-    setRegion(region.x, region.y, region.z, region.w, data, stride);
+void TextureAtlas::setRegion(const glm::ivec4 region, void* data) {
+    setRegion(region.x, region.y, region.z, region.w, data);
 }
 
-void TextureAtlas::setRegion(int x, int y, int width, int height, void* data, int stride) {
+void TextureAtlas::setRegion(int x, int y, int width, int height, void* data) {
     ghoul_assert(x > 0, "x argument out of bounds");
     ghoul_assert(x < (_width - 1), "x argument out of bounds");
     ghoul_assert((x + width) <= (_width - 1), "x arguments out of bounds");
@@ -191,7 +191,7 @@ void TextureAtlas::setRegion(int x, int y, int width, int height, void* data, in
     
     for (int i = 0; i < height; ++i) {
         void* dst = _data + ((y + i) * _width + x) * sizeof(char) * _depth;
-        void* src = reinterpret_cast<unsigned char*>(data) + (i * stride) * sizeof(char);
+        void* src = reinterpret_cast<unsigned char*>(data) + (i * width) * sizeof(char);
         size_t nBytes = width * sizeof(char) * _depth;
         
         memcpy(dst, src, nBytes);

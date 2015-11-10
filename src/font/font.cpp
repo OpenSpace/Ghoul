@@ -72,7 +72,10 @@ Font::Glyph::Glyph(wchar_t character,
                    float advanceX,
                    float advanceY,
                    glm::vec2 texCoordTopLeft,
-                   glm::vec2 texCoordBottomRight
+                   glm::vec2 texCoordBottomRight,
+                   glm::vec2 outlineTexCoordTopLeft,
+                   glm::vec2 outlineTexCoordBottomRight
+                   
                    )
     : _charcode(std::move(character))
     , _width(width)
@@ -83,6 +86,8 @@ Font::Glyph::Glyph(wchar_t character,
     , _advanceY(advanceY)
     , _topLeft(std::move(texCoordTopLeft))
     , _bottomRight(std::move(texCoordBottomRight))
+    , _outlineTopLeft(std::move(outlineTexCoordTopLeft))
+    , _outlineBottomRight(std::move(outlineTexCoordBottomRight))
 {
 }
     
@@ -189,7 +194,7 @@ Font::Glyph* Font::glyph(wchar_t character) {
         std::array<unsigned char, 4*4*4> data;
         data.fill(std::numeric_limits<unsigned char>::max());
         
-        _atlas.setRegion(region.x, region.y, 4, 4, data.data(), 0);
+        _atlas.setRegion(region.x, region.y, 4, 4, data.data());
         
         Glyph* glyph = new Glyph(static_cast<wchar_t>(-1));
         glyph->_topLeft = glm::vec2(
@@ -302,19 +307,17 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             ft_glyph_top = slot->bitmap_top;
             ft_glyph_left = slot->bitmap_left;
 
-            w = ft_bitmap.width/depth + 1;
-            h = ft_bitmap.rows + 1;
-            glm::ivec4 region = _atlas.allocateRegion(w, h);
+            w = ft_bitmap.width/depth;
+            h = ft_bitmap.rows;
+            glm::ivec4 region = _atlas.allocateRegion(w + 1, h + 1);
             if (region.x < 0) {
                 missed++;
                 LERROR("Texture atlas is full");
                 continue;
             }
-            --w;
-            --h;
             x = region.x;
             y = region.y;
-            _atlas.setRegion(x, y, w, h, ft_bitmap.buffer, ft_bitmap.pitch);
+            _atlas.setRegion(x, y, w, h, ft_bitmap.buffer);
 
             topLeft = glm::vec2(
                       x/static_cast<float>(width),
@@ -326,8 +329,6 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             );
         }
         
-        /*
-        if (_outline) {
             FT_Int32 outlineFlags = flags;
             flags |= FT_LOAD_NO_BITMAP;
 
@@ -353,9 +354,11 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 FT_Done_FreeType(library);
                 return 0;
             }
-            
+        
+        static const float OutlineThickness = 0.25f;
             FT_Stroker_Set(stroker,
-                           static_cast<int>(_outlineThickness * HighResolution),
+//                           static_cast<int>(_outlineThickness * HighResolution),
+                           static_cast<int>(OutlineThickness * HighResolution),
                            FT_STROKER_LINECAP_ROUND,
                            FT_STROKER_LINEJOIN_ROUND,
                            0);
@@ -377,26 +380,14 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 return 0;
             }
             
-//            if (depth == 1) {
-                error = FT_Glyph_To_Bitmap(&ft_glyph, FT_RENDER_MODE_NORMAL, 0, 1);
-                if (error) {
-                    LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                    FT_Done_Face(face);
-                    FT_Stroker_Done(stroker);
-                    FT_Done_FreeType(library);
-                    return 0;
-                }
-//            }
-//            else {
-//                error = FT_Glyph_To_Bitmap(&ft_glyph, FT_RENDER_MODE_LCD, 0, 1);
-//                if (error) {
-//                    LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-//                    FT_Done_Face(face);
-//                    FT_Stroker_Done(stroker);
-//                    FT_Done_FreeType(library);
-//                    return 0;
-//                }
-//            }
+            error = FT_Glyph_To_Bitmap(&ft_glyph, FT_RENDER_MODE_NORMAL, 0, 1);
+            if (error) {
+                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
+                FT_Done_Face(face);
+                FT_Stroker_Done(stroker);
+                FT_Done_FreeType(library);
+                return 0;
+            }
             ft_bitmap_glyph = (FT_BitmapGlyph) ft_glyph;
             ft_bitmap       = ft_bitmap_glyph->bitmap;
             ft_glyph_top    = ft_bitmap_glyph->top;
@@ -405,19 +396,17 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             
             // We want each glyph to be separated by at least one black pixel
             // (for example for shader used in demo-subpixel.c)
-            size_t w = ft_bitmap.width/depth + 1;
-            size_t h = ft_bitmap.rows + 1;
-            glm::ivec4 region = _atlas.allocateRegion(w, h);
+            w = ft_bitmap.width/depth;
+            h = ft_bitmap.rows;
+            glm::ivec4 region = _atlas.allocateRegion(w + 1, h + 1);
             if (region.x < 0) {
                 missed++;
                 LERROR("Texture atlas is full");
                 continue;
             }
-            w = w - 1;
-            h = h - 1;
-            size_t x = region.x;
-            size_t y = region.y;
-            _atlas.setRegion(x, y, w, h, ft_bitmap.buffer, ft_bitmap.pitch);
+            x = region.x;
+            y = region.y;
+            _atlas.setRegion(x, y, w, h, ft_bitmap.buffer);
             
             outlineTopLeft = glm::vec2(
                                 x/static_cast<float>(width),
@@ -429,9 +418,8 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                                     );
 
             FT_Done_Glyph(ft_glyph);
-        }
-        */
-        
+//        }
+    
         
         
         
@@ -572,7 +560,9 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             face->glyph->advance.x / HighResolution,
             face->glyph->advance.y / HighResolution,
             topLeft,
-            bottomRight
+            bottomRight,
+            outlineTopLeft,
+            outlineBottomRight
 //            glm::vec2(
 //                x/static_cast<float>(width),
 //                y/static_cast<float>(height)
