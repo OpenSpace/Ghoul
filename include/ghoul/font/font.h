@@ -119,13 +119,15 @@ public:
         /// A vector of kerning pairs relative to this glyph
         std::map<wchar_t, float> _kerning;
         
+        /// Normalized texture coordinates for the top left of the outline
         glm::vec2 _outlineTopLeft;
+        /// Normalized texture coordinates for the bottom right of the outline
         glm::vec2 _outlineBottomRight;
     };
     
     
     
-    Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas);
+    Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, bool outline = true, float outlineThickness = 1.f);
     ~Font();
     
     // Needs testing
@@ -136,6 +138,9 @@ public:
     std::string name() const;
     float pointSize() const;
     float height() const;
+    
+    bool outline() const;
+    float outlineThickness() const;
     
     Glyph* glyph(wchar_t character);
 
@@ -155,6 +160,8 @@ private:
     std::string _name;
     float _pointSize;
     float _height;
+    bool _outline;
+    float _outlineThickness;
 };
     
 } // namespace fontrendering

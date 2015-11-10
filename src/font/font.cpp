@@ -115,10 +115,12 @@ size_t Font::Glyph::height() const {
     return _height;
 }
    
-Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas)
+Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, bool outline, float outlineThickness)
     : _atlas(atlas)
     , _name(std::move(filename))
     , _pointSize(pointSize)
+    , _outline(outline)
+    , _outlineThickness(outlineThickness)
 {
     ghoul_assert(_pointSize > 0.f, "Need positive point size");
     ghoul_assert(!_name.empty(), "Empty file name not allowed");
@@ -133,7 +135,9 @@ bool Font::operator==(const Font& rhs) {
         (_name == rhs._name) &&
         (_pointSize == rhs._pointSize) &&
         (_glyphs == rhs._glyphs) &&
-        (&_atlas == &rhs._atlas)
+        (&_atlas == &rhs._atlas) &&
+        (_outline = rhs._outline) &&
+        (_outlineThickness == rhs._outlineThickness)
     );
 }
     
@@ -367,6 +371,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             );
         }
         
+        if (_outline)
         {
             FT_Int32 outlineFlags = flags;
 //            flags |= FT_LOAD_NO_BITMAP;
@@ -394,10 +399,9 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 return glyphs.size() - i;
             }
         
-        static const float OutlineThickness = 0.5f;
             FT_Stroker_Set(stroker,
-//                           static_cast<int>(_outlineThickness * HighResolution),
-                           static_cast<int>(OutlineThickness * HighResolution),
+                           static_cast<int>(_outlineThickness * HighResolution),
+//                           static_cast<int>(OutlineThickness * HighResolution),
                            FT_STROKER_LINECAP_ROUND,
                            FT_STROKER_LINEJOIN_ROUND,
                            0);
