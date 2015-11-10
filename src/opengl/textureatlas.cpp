@@ -44,10 +44,13 @@ TextureAtlas::TextureAtlas(int width, int height, int depth)
     , _id(0)
     , _data(nullptr)
 {
-    ghoul_assert(width > 0, "Width has to be bigger than 0");
-    ghoul_assert(height > 0, "Height has to be bigger than 0");    
-    ghoul_assert((depth == 1) || (depth == 3) || (depth == 4), "Depth has to be 1, 3, or 4");
-
+    ghoul_assert(width > 4, "Width has to be bigger than 4");
+    ghoul_assert(height > 4, "Height has to be bigger than 4");
+    ghoul_assert(depth >= 1, "Depth has to be positive");
+    ghoul_assert(depth <= 4, "Depth has to be smaller or equal to 4");
+    // Limitations to the depth are due to the fact that the atlas is represented by
+    // a single texture on the GPU (which only allows up to four channels)
+    
     _nodes.emplace_back(1, 1, width - 2);
 
     _data = new unsigned char[width * height * depth];
@@ -87,22 +90,28 @@ void TextureAtlas::upload() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    if (_depth == 4) {
+    switch (_depth) {
+        case 1:
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, _width, _height,
+                         0, GL_RED, GL_UNSIGNED_BYTE, _data);
+            break;
+        case 2:
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, _width, _height,
+                         0, GL_RG, GL_UNSIGNED_BYTE, _data);
+            break;
+        case 3:
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height,
+                         0, GL_RGB, GL_UNSIGNED_BYTE, _data);
+            break;
+        case 4:
 #ifdef GL_UNSIGNED_INT_8_8_8_8_REV
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height,
-                     0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, _data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height,
+                         0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, _data);
 #else
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height,
-                     0, GL_RGBA, GL_UNSIGNED_BYTE, _data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height,
+                         0, GL_RGBA, GL_UNSIGNED_BYTE, _data);
 #endif
-    }
-    else if (_depth == 3) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height,
-                     0, GL_RGB, GL_UNSIGNED_BYTE, _data);
-    }
-    else {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, _width, _height,
-                     0, GL_RED, GL_UNSIGNED_BYTE, _data);
+            break;
     }
 }
 
@@ -142,7 +151,6 @@ glm::ivec4 TextureAtlas:: allocateRegion(int width, int height) {
         return glm::ivec4(-1, -1, 0, 0);
     
     _nodes.insert(_nodes.begin() + bestIndex, {region.x, region.y + height, width});
-//    _nodes.emplace_back(region.x, region.y + height, width);
     
     for (size_t i = bestIndex + 1; i < _nodes.size(); ++i) {
         glm::ivec3& node = _nodes[i];
@@ -177,7 +185,7 @@ void TextureAtlas::setRegion(int x, int y, int width, int height, void* data, in
     ghoul_assert(y < (_height - 1), "y argument out of bounds");
     ghoul_assert((y + height) <= (_height - 1), "y argument out of bounds");
     
-    for(int i = 0; i < height; ++i) {
+    for (int i = 0; i < height; ++i) {
         void* dst = _data + ((y + i) * _width + x) * sizeof(char) * _depth;
         void* src = reinterpret_cast<unsigned char*>(data) + (i * stride) * sizeof(char);
         size_t nBytes = width * sizeof(char) * _depth;

@@ -42,7 +42,7 @@ namespace fontrendering {
 class FontManager {
 public:
     
-    FontManager(glm::ivec3 atlasDimensions = glm::ivec3(512, 512, 3));
+    FontManager(glm::ivec3 atlasDimensions = glm::ivec3(512, 512, 1));
     FontManager(const FontManager& rhs);
     FontManager(FontManager&& rhs);
     FontManager& operator=(const FontManager& rhs);

@@ -52,21 +52,12 @@ public:
     static const std::string AttributeAutoHinting;
     static const std::string AttributeOutline;
     static const std::string AttributeOutlineThickness;
-    static const std::string AttributeLCDFiltering;
-    static const std::string AttributeLCDWeights;
     static const std::string AttributeKerning;
     static const std::string AttributeHeight;
     static const std::string AttributeLinegap;
     static const std::string AttributeAscender;
     static const std::string AttributeDecender;
 
-//    enum class Outline {
-//        None,
-//        Line,
-//        Inner,
-//        Outer
-//    };
-    
     class Glyph {
     public:
         friend class Font;
@@ -81,7 +72,9 @@ public:
               glm::vec2 texCoordTopLeft = glm::vec2(0.f),
               glm::vec2 texCoordBottomRight = glm::vec2(0.f),
               bool outline = false,
-              float outlineThickness = 0.f
+              float outlineThickness = 0.f,
+              glm::vec2 outlineTexCoordTopLeft = glm::vec2(0.f),
+              glm::vec2 outlineTexCoordBottomRight = glm::vec2(0.f)
         );
 
         float kerning(wchar_t character) const;
@@ -165,7 +158,6 @@ public:
     float outlineThickness() const;
     bool lcdFiltering() const;
     bool kerning() const;
-    std::array<unsigned char, 5> lcdWeights() const;
     float height() const;
     float linegap() const;
     float ascender() const;
@@ -183,7 +175,6 @@ private:
 
 
     std::vector<Glyph*> _glyphs;
-    std::vector<Glyph*> _outlineGlyphs;
     
     opengl::TextureAtlas& _atlas;
     
@@ -193,9 +184,7 @@ private:
     bool _outline;
 //    Outline _outlineType;
     float _outlineThickness;
-    bool _lcdFiltering;
     bool _kerning;
-    std::array<unsigned char, 5> _lcdWeights;
     float _height;
     float _linegap;
     float _ascender;
