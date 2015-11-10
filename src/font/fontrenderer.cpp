@@ -89,24 +89,31 @@ namespace {
     uniform sampler2D tex; \n\
     uniform bool hasOutline; \n\
     \n\
-    vec4 lcdColor(vec2 coords, vec4 color) { \n\
-        vec4 c = texture(tex, coords); \n\
-        float t = max(max(c.r, c.g), c.b); \n\
-        vec4 cc = vec4(color.rgb, (c.r+c.g+c.b)/3.0);\n\
-        cc = t*cc + (1-t)*vec4(c.rgb, min(min(c.r,c.g),c.b));\n\
-        return vec4(cc.rgb, color.a*cc.a);\n\
-    } \n\
+//    vec4 lcdColor(vec2 coords, vec4 color) { \n\
+//        vec4 c = texture(tex, coords); \n\
+//        float t = max(max(c.r, c.g), c.b); \n\
+//        vec4 cc = vec4(color.rgb, (c.r+c.g+c.b)/3.0);\n\
+//        cc = t*cc + (1-t)*vec4(c.rgb, min(min(c.r,c.g),c.b));\n\
+//        return vec4(cc.rgb, color.a*cc.a);\n\
+//    } \n\
     \n\
     void main() { \n\
-//        vec4 fullColor = lcdColor(texCoords, color); \n\
-          vec4 fullColor = vec4(color.rgb, color.a * texture(tex, texCoords).r); \n\
+        if (hasOutline) \n\
+            FragColor = vec4(outlineColor.rgb, outlineColor.a * texture(tex, outlineTexCoords).r); \n\
         \n\
+        else \n\
+            FragColor = vec4(color.rgb, color.a * texture(tex, texCoords).r);\n\
+//        vec4 fullColor = lcdColor(texCoords, color); \n\
+//          vec4 fullColor = vec4(color.rgb, color.a * texture(tex, texCoords).r); \n\
+//        float a = texture(tex, texCoords).r; \n\
+//        vec4 fullColor = vec4(color.rgb, color.a * a); \n\
+//        \n\
 //        if (hasOutline) { \n\
 //            vec4 c = lcdColor(outlineTexCoords, outlineColor); \n\
 //    c.a *= 2; \n\
 //            fullColor = mix(fullColor, c, c.a); \n\
 //        } \n\
-        FragColor = fullColor; \n\
+//        FragColor = fullColor; \n\
     } \
     ";
 }
@@ -280,16 +287,21 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
                 float s1 = glyph->texCoordBottomRight().x;
                 float t1 = glyph->texCoordBottomRight().y;
 
+                float outlineS0 = glyph->outlineTexCoordTopLeft().x;
+                float outlineT0 = glyph->outlineTexCoordTopLeft().y;
+                float outlineS1 = glyph->outlineTexCoordBottomRight().x;
+                float outlineT1 = glyph->outlineTexCoordBottomRight().y;
+
                 indices.insert(indices.end(), {
                     vertexIndex, vertexIndex + 1, vertexIndex + 2,
                     vertexIndex, vertexIndex + 2, vertexIndex + 3
                 });
                 vertexIndex += 4;
                 vertices.insert(vertices.end(), {
-                    x0, y0, s0, t0,
-                    x0, y1, s0, t1,
-                    x1, y1, s1, t1,
-                    x1, y0, s1, t0,
+                    x0, y0, s0, t0, outlineS0, outlineT0,
+                    x0, y1, s0, t1, outlineS0, outlineT1,
+                    x1, y1, s1, t1, outlineS1, outlineT1,
+                    x1, y0, s1, t0, outlineS1, outlineT0
                 });
                 pos.x += glyph->advanceX();
             }
@@ -311,12 +323,12 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
     _program->setIgnoreUniformLocationError(true);
     _program->setUniform("color", glm::vec4(1.0, 1.0, 1.0, 1.0));
 //    _program->setUniform("color", color);
-    _program->setUniform("outlineColor", glm::vec4(0.0, 1.0, 0.0, 1.0));
+    _program->setUniform("outlineColor", glm::vec4(0.0, 0.0, 0.0, 1.0));
     _program->setUniform("tex", atlasUnit);
     _program->setUniform("model", glm::mat4(1.f));
     _program->setUniform("view", glm::mat4(1.f));
     _program->setUniform("projection", projection);
-    _program->setUniform("hasOutline", false);
+//    _program->setUniform("hasOutline", false);
     _program->setIgnoreUniformLocationError(false);
     
     if (_vao == 0) {
@@ -335,15 +347,26 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(
-          0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0
+          0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0
     );
 
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(
-        1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<const void*>(2 * sizeof(float))
+        1, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<const void*>(2 * sizeof(float))
     );
 
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(
+        2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<const void*>(4 * sizeof(float))
+    );
+
+    _program->setUniform("hasOutline", true);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+    _program->setUniform("hasOutline", false);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+    //    if (hasOutline)
     
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

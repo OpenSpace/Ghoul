@@ -289,12 +289,36 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         FT_Int32 flags = 0;
         flags |= FT_LOAD_FORCE_AUTOHINT;
         
-        FT_UInt glyph_index = FT_Get_Char_Index(face, glyphs[i]);
+        FT_UInt glyphIndex = FT_Get_Char_Index(face, glyphs[i]);
+        
+        if (glyphIndex == 0) {
+            LERROR("Glyph was not present in the FreeType face");
+            FT_Done_Face(face);
+            FT_Done_FreeType(library);
+            return glyphs.size() - i;
+        }
+        
+        
+//        FT_Glyph mStrokeGlyph;
+//        FT_Stroker mStroker;
+//        FT_BitmapGlyph mBitmapGlyph;
+//        FT_BitmapGlyph mBitmapStrokeGlyph;
+//        FT_Bitmap * mBitmapPtr;
+//        FT_Bitmap * mStrokeBitmapPtr;
         {
-            FT_Int32 solidFlag = flags;
-            solidFlag |= FT_LOAD_RENDER;
+//            FT_Int32 solidFlag = flags;
+//            solidFlag |= FT_LOAD_RENDER;
             
-            FT_Error error = FT_Load_Glyph(face, glyph_index, solidFlag);
+            FT_Error error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
+            if (error) {
+                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
+                FT_Done_Face(face);
+                FT_Done_FreeType(library);
+                return glyphs.size() - i;
+            }
+            
+            FT_Glyph glyph;
+            error = FT_Get_Glyph(face->glyph, &glyph);
             if (error) {
                 LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
                 FT_Done_Face(face);
@@ -302,10 +326,24 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 return glyphs.size() - i;
             }
 
-            FT_GlyphSlot slot = face->glyph;
-            FT_Bitmap ft_bitmap = slot->bitmap;
-            ft_glyph_top = slot->bitmap_top;
-            ft_glyph_left = slot->bitmap_left;
+            error = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, true);
+            if (error) {
+                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
+                FT_Done_Face(face);
+                FT_Done_FreeType(library);
+                return glyphs.size() - i;
+            }
+
+            
+            
+            
+            
+
+            FT_BitmapGlyph g = (FT_BitmapGlyph)glyph;
+            FT_Bitmap ft_bitmap = g->bitmap;
+
+            ft_glyph_top = g->top;
+            ft_glyph_left = g->left;
 
             w = ft_bitmap.width/depth;
             h = ft_bitmap.rows;
@@ -329,10 +367,11 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             );
         }
         
+        {
             FT_Int32 outlineFlags = flags;
-            flags |= FT_LOAD_NO_BITMAP;
+//            flags |= FT_LOAD_NO_BITMAP;
 
-            FT_Error error = FT_Load_Glyph(face, glyph_index, outlineFlags);
+            FT_Error error = FT_Load_Glyph(face, glyphIndex, outlineFlags);
             if (error) {
                 LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
                 FT_Done_Face(face);
@@ -352,10 +391,10 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 FT_Done_Face(face);
                 FT_Stroker_Done(stroker);
                 FT_Done_FreeType(library);
-                return 0;
+                return glyphs.size() - i;
             }
         
-        static const float OutlineThickness = 0.25f;
+        static const float OutlineThickness = 0.5f;
             FT_Stroker_Set(stroker,
 //                           static_cast<int>(_outlineThickness * HighResolution),
                            static_cast<int>(OutlineThickness * HighResolution),
@@ -368,7 +407,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 FT_Done_Face(face);
                 FT_Stroker_Done(stroker);
                 FT_Done_FreeType(library);
-                return 0;
+                return glyphs.size() - i;
             }
             
             error = FT_Glyph_Stroke(&ft_glyph, stroker, 1);
@@ -377,7 +416,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 FT_Done_Face(face);
                 FT_Stroker_Done(stroker);
                 FT_Done_FreeType(library);
-                return 0;
+                return glyphs.size() - i;
             }
             
             error = FT_Glyph_To_Bitmap(&ft_glyph, FT_RENDER_MODE_NORMAL, 0, 1);
@@ -418,7 +457,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                                     );
 
             FT_Done_Glyph(ft_glyph);
-//        }
+        }
     
         
         
@@ -549,7 +588,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
 //        
         
         // Discard hinting to get advance
-        FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
+        FT_Load_Glyph(face, glyphIndex, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
         
         Glyph* glyph = new Glyph(
             glyphs[i],
