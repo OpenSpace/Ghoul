@@ -98,12 +98,19 @@ namespace {
 //    } \n\
     \n\
     void main() { \n\
-        if (hasOutline) \n\
-            FragColor = vec4(outlineColor.rgb, outlineColor.a * texture(tex, outlineTexCoords).r); \n\
-        \n\
-        else \n\
-            FragColor = vec4(color.rgb, color.a * texture(tex, texCoords).r);\n\
-//        vec4 fullColor = lcdColor(texCoords, color); \n\
+    float inside = texture(tex, texCoords).r;\n\
+    float outline = texture(tex, outlineTexCoords).r;\n\
+    vec4 blend = mix(outlineColor, color, inside);\n\
+    FragColor = blend * vec4(1.0, 1.0, 1.0, outline);\n\
+//        if (hasOutline) \n\
+//            FragColor = vec4(outlineColor.rgb, outlineColor.a * texture(tex, outlineTexCoords).r); \n\
+//        \n\
+//        else \n\
+//            FragColor = vec4(color.rgb, color.a * texture(tex, texCoords).r);\n\
+\
+ \
+  \
+    //        vec4 fullColor = lcdColor(texCoords, color); \n\
 //          vec4 fullColor = vec4(color.rgb, color.a * texture(tex, texCoords).r); \n\
 //        float a = texture(tex, texCoords).r; \n\
 //        vec4 fullColor = vec4(color.rgb, color.a * a); \n\
@@ -360,12 +367,14 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
         2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<const void*>(4 * sizeof(float))
     );
 
-    _program->setUniform("hasOutline", true);
+//    _program->setUniform("hasOutline", false);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
-    _program->setUniform("hasOutline", false);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+//    _program->setUniform("hasOutline", true);
+//    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
+
+    
     //    if (hasOutline)
     
     glBindVertexArray(0);
