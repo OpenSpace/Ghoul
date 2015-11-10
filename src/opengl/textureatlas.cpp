@@ -176,6 +176,10 @@ glm::ivec4 TextureAtlas:: allocateRegion(int width, int height) {
 
 }
 
+void TextureAtlas::setRegion(const glm::ivec4 region, void* data, int stride) {
+    setRegion(region.x, region.y, region.z, region.w, data, stride);
+}
+
 void TextureAtlas::setRegion(int x, int y, int width, int height, void* data, int stride) {
     ghoul_assert(x > 0, "x argument out of bounds");
     ghoul_assert(x < (_width - 1), "x argument out of bounds");

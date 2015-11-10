@@ -62,6 +62,7 @@ public:
     glm::ivec4 allocateRegion(int width, int height);
     
     /// fill specific region with data
+    void setRegion(const glm::ivec4 region, void* data, int stride);
     void setRegion(int x, int y, int width, int height, void* data, int stride);
     
     int width() const;
