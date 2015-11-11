@@ -37,6 +37,8 @@ namespace {
 
 namespace ghoul {
 namespace opengl {
+    
+const glm::ivec4 TextureAtlas::InvalidRegion = glm::vec4(-1, -1, 0, 0);
 
 TextureAtlas::TextureAtlas(glm::ivec3 size)
     : _size(std::move(size))
@@ -136,23 +138,19 @@ TextureAtlas& TextureAtlas::operator=(TextureAtlas&& rhs) {
     }
     return *this;
 }
-
-int TextureAtlas::width() const {
-    return _size.x;
-}
-
-int TextureAtlas::height() const {
-    return _size.y;
-}
-
-int TextureAtlas::depth() const {
-    return _size.z;
+    
+glm::ivec3 TextureAtlas::size() const {
+    return _size;
 }
 
 const Texture& TextureAtlas::texture() const {
     return *_texture;
 }
 
+int TextureAtlas::spaceUsed() const {
+    return _nUsed;
+}
+    
 void TextureAtlas::upload() {
     _texture->setPixelData(_data, false);
     _texture->bind();
@@ -192,7 +190,7 @@ glm::ivec4 TextureAtlas::newRegion(int width, int height) {
     }
     
     if (bestIndex == -1)
-        return glm::ivec4(-1, -1, 0, 0);
+        return InvalidRegion;
     
     _nodes.insert(_nodes.begin() + bestIndex, {region.x, region.y + height, width});
     

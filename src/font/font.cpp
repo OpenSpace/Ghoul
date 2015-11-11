@@ -179,8 +179,8 @@ Font::Glyph* Font::glyph(wchar_t character) {
     // charcode -1 is special: it is used for line drawing (overline, underline,
     // strikethrough) and background.
     if (character == static_cast<wchar_t>(-1)) {
-        size_t width = _atlas.width();
-        size_t height = _atlas.height();
+        size_t width = _atlas.size().x;
+        size_t height = _atlas.size().y;
         glm::ivec4 region = _atlas.newRegion(5, 5);
         if (region.x < 0)
             return nullptr;
@@ -240,9 +240,9 @@ bool Font::outline() const {
 size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
     size_t missed = 0;
     
-    unsigned int atlasWidth  = _atlas.width();
-    unsigned int atlasHeight = _atlas.height();
-    unsigned int atlasDepth  = _atlas.depth();
+    unsigned int atlasWidth  = _atlas.size().x;
+    unsigned int atlasHeight = _atlas.size().y;
+    unsigned int atlasDepth  = _atlas.size().z;
     
     FT_Library library;
     FT_Face face;

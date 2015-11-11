@@ -45,37 +45,130 @@ namespace ghoul {
 namespace opengl {
     
 /**
- * This class represents a texture atlas which can hold and automatically ...
+ * This class represents a texture atlas which automatically organizes smaller textures
+ * in a compact representation. The TextureAtlas is useful if many small textures are
+ * needed, but the overhead of creating a separate Texture for each is not desireable.
+ * The TextureAtlas is created with a <code>size</code>, and in order to fill the atlas,
+ * new regions have to first be requested (#newRegion) and then filled with data
+ * (#setRegionData). Due to the fact that the TextureAtlas is represented by a single
+ * Texture on the GPU, the <code>depth</code> can only be <code>1</code>, <code>2</code>,
+ * <code>3</code>, or <code>4</code>. Before the atlas can be used, it has to be uploaded
+ * to the GPU first (#upload).
  */
 class TextureAtlas {
 public:
-    /// width, height, depth of the underlying texture
+    static const glm::ivec4 InvalidRegion;
+    /**
+     * The constructor completely initializes the Texture Atlas. No additional 
+     * initialization step is necessary. Due to the fact that the underlying Texture is
+     * initialized here, it requires a valid OpenGL context.
+     * \param size The size (<code>width</code>, <code>height</code>, <code>depth</code>)
+     * of the TextureAtlas. The <code>width</code> and <code>height</code> have to be
+     * bigger than <code>4</code> and smaller than the GPU limit for 2D tetxures. The
+     * <code>depth</code> has to be <code>1</code>, <code>2</code>, <code>3</code>, or
+     * <code>4</code>.
+     */
     TextureAtlas(glm::ivec3 size);
+    
+    /**
+     * The constructor completely initializes the Texture Atlas. No additional
+     * initialization step is necessary. Due to the fact that the underlying Texture is
+     * initialized here, it requires a valid OpenGL context.
+     * \param width The width of the TextureAtlas; has to be bigger than <code>4</code>
+     * and smaller than the GPU limit for 2D tetxures.
+     * \param height The height of the TextureAtlas; has to be bigger than <code>4</code>
+     * and smaller than the GPU limit for 2D tetxures.
+     * \param depth The depth of the TetureAtlas; has to be <code>1</code>,
+     * <code>2</code>, <code>3</code>, or <code>4</code>.
+     */
     TextureAtlas(int width, int height, int depth);
+    
+    /**
+     * Copy constructor that performs a deep copy of all the element in the
+     * TextureAtlas such that the resulting atlas can be used independently.
+     * \param rhs The original TextureAtlas
+     */
     TextureAtlas(const TextureAtlas& rhs);
+    
+    /**
+     * Move constructor that leaves the incoming atlas invalid.
+     * \rhs The origin TextureAtlas
+     */
     TextureAtlas(TextureAtlas&& rhs);
+
+    /// The destructor taking care of the allocated memory and texture identifiers.
     ~TextureAtlas();
     
+    /**
+     * Assignment operator that performs a deep copy of all the elements in the
+     * TextureAtlas such that the resulting atlas can be used independently.
+     * \param rhs The original TextureAtlas
+     * \return A copy of the original TextureAtlas
+     */
     TextureAtlas& operator=(const TextureAtlas& rhs);
+    
+    /**
+     * Move operator that moves the data into the new atlas without performing any copy
+     * operations. This leaves the original atlas invalid.
+     * \param rhs The original TextureAtlas
+     * \return The atlas into which the original values were moved into
+     */
     TextureAtlas& operator=(TextureAtlas&& rhs);
     
-    /// Upload to graphics card
+    /**
+     * Uploads the TextureAtlas to the graphics card. This function requires a valid
+     * OpenGL context.
+     */
     void upload();
     
-    /// clear all data
+    /**
+     * Clears the TextureAtlas of all data, but leaves the underlying Texture unchanged.
+     * A separate call to #upload is required to change the representation on the GPU as
+     * well
+     */
     void clear();
-    
-    /// allocate a new region of size 'width' * 'height'
+
+    /**
+     * Allocate a new region in the TextureAtlas with the desired <code>width</code> and
+     * <code>height</code>. If a region cannot be created, the returned vector is equal to
+     * #InvalidRegion. The only reason for this function to fail is if there is not enough
+     * free space in the atlas.
+     * \param width The width of the requested region
+     * \param height The height of the requested region
+     * \return A vector describing the location of the region in the TextureAtlas. The
+     * first two elements are the <code>x</code> and <code>y</code> coordinates of the
+     * top left corner. The last two elements are the <code>width</code> and
+     * <code>height</code> of the region.
+     */
     glm::ivec4 newRegion(int width, int height);
-    
-    /// fill specific region with data
+
     void setRegionData(const glm::ivec4& region, void* data);
     void setRegionData(int x, int y, int width, int height, void* data);
     
-    int width() const;
-    int height() const;
-    int depth() const;
+    /**
+     * Returns the size of the TextureAtlas in <code>width</code>,
+     * <code>height</code>, and <code>depth</code>.
+     * \return The size of the TextureAtlas in <code>width</code>,
+     * <code>height</code>, and <code>depth</code>.
+     */
+    glm::ivec3 size() const;
     
+    /**
+     * Returns the amount of pixels out of the maximum size
+     * (<code>width</code> * <code>height</code>) that are currently in use.
+     * Please note that this is <b>not</b> equal to the amount of pixels that
+     * can possiblity be used due to fragmentation in the atlas.
+     * \return The amount of pixels that are currently in use in the atlas.
+     */
+    int spaceUsed() const;
+    
+    /**
+     * Returns the Texture that is the underlying storage for the
+     * TextureAtlas. This Texture can bound to a ProgramObject and 
+     * subsequently sampled to retrieve the stored textures.
+     * \return The Texture that is the underlying storage for this 
+     * TextureAtlas.
+     */
     const Texture& texture() const;
 
 private:
