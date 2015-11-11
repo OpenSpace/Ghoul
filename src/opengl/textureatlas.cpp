@@ -50,7 +50,7 @@ TextureAtlas::TextureAtlas(glm::ivec3 size)
     
     _nodes.emplace_back(1, 1, _size.x - 2);
     _data = new unsigned char[_size.x * _size.y * _size.z];
-    memset(_data, 0, _size.x * _size.y * _size.z);
+    std::memset(_data, 0, _size.x * _size.y * _size.z);
     
     Texture::Format format;
     switch (_size.z) {
@@ -122,7 +122,7 @@ void TextureAtlas::clear() {
 
     _nUsed = 0;
     
-    memset(_data, 0, _size.x * _size.y * _size.z);
+    std::memset(_data, 0, _size.x * _size.y * _size.z);
 }
 
 glm::ivec4 TextureAtlas::newRegion(int width, int height) {
