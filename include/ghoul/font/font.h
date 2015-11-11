@@ -140,7 +140,6 @@ public:
     float height() const;
     
     bool outline() const;
-    float outlineThickness() const;
     
     Glyph* glyph(wchar_t character);
 

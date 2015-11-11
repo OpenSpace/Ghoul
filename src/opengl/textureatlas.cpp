@@ -35,96 +35,97 @@ namespace {
 
 namespace ghoul {
 namespace opengl {
-    
-TextureAtlas::TextureAtlas(int width, int height, int depth)
-    : _width(width)
-    , _height(height)
-    , _depth(depth)
+
+TextureAtlas::TextureAtlas(glm::ivec3 size)
+    : _size(std::move(size))
     , _nUsed(0)
-    , _id(0)
     , _data(nullptr)
 {
-    ghoul_assert(width > 4, "Width has to be bigger than 4");
-    ghoul_assert(height > 4, "Height has to be bigger than 4");
-    ghoul_assert(depth >= 1, "Depth has to be positive");
-    ghoul_assert(depth <= 4, "Depth has to be smaller or equal to 4");
     // Limitations to the depth are due to the fact that the atlas is represented by
     // a single texture on the GPU (which only allows up to four channels)
+    ghoul_assert(_size.x > 4, "Width has to be bigger than 4");
+    ghoul_assert(_size.y > 4, "Height has to be bigger than 4");
+    ghoul_assert(_size.z >= 1, "Depth has to be positive");
+    ghoul_assert(_size.z <= 4, "Depth has to be smaller or equal to 4");
     
-    _nodes.emplace_back(1, 1, width - 2);
+    _nodes.emplace_back(1, 1, _size.x - 2);
+    _data = new unsigned char[_size.x * _size.y * _size.z];
+    memset(_data, 0, _size.x * _size.y * _size.z);
+    
+    Texture::Format format;
+    switch (_size.z) {
+        case 1:
+            format = Texture::Format::Red;
+            break;
+        case 2:
+            format = Texture::Format::RG;
+            break;
+        case 3:
+            format = Texture::Format::RGB;
+            break;
+        case 4:
+            format = Texture::Format::RGBA;
+            break;
+    }
+    GLuint internalFormat = format;
+    GLenum dataType = GL_UNSIGNED_BYTE;
+    
+#ifdef GL_UNSIGNED_INT_8_8_8_8_REV
+    if (_size.z == 4) {
+        internalFormat = GL_BGRA;
+        dataType = GL_UNSIGNED_INT_8_8_8_8_REV;
+    }
+#endif
 
-    _data = new unsigned char[width * height * depth];
-    memset(_data, 0, _width * _height * _depth);
+    _texture = new Texture(
+        _size,
+        format,
+        internalFormat,
+        dataType
+    );
 }
-    
+
+TextureAtlas::TextureAtlas(int width, int height, int depth)
+    : TextureAtlas(glm::ivec3(width, height, depth))
+{}
+
 TextureAtlas::~TextureAtlas() {
+    delete _texture;
     delete[] _data;
-    if (_id)
-        glDeleteTextures(1, &_id);
 }
-    
-    
+
 int TextureAtlas::width() const {
-    return _width;
+    return _size.x;
 }
 
 int TextureAtlas::height() const {
-    return _height;
+    return _size.y;
 }
-    
+
 int TextureAtlas::depth() const {
-    return _depth;
+    return _size.z;
 }
-    
-unsigned int TextureAtlas::id() const {
-    return _id;
+
+const Texture& TextureAtlas::texture() const {
+    return *_texture;
 }
 
 void TextureAtlas::upload() {
-    // TODO: Change to use ghoul::opengl::Texture class instead ---abock
-    if (!_id)
-        glGenTextures(1, &_id);
-    
-    glBindTexture(GL_TEXTURE_2D, _id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    switch (_depth) {
-        case 1:
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, _width, _height,
-                         0, GL_RED, GL_UNSIGNED_BYTE, _data);
-            break;
-        case 2:
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, _width, _height,
-                         0, GL_RG, GL_UNSIGNED_BYTE, _data);
-            break;
-        case 3:
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height,
-                         0, GL_RGB, GL_UNSIGNED_BYTE, _data);
-            break;
-        case 4:
-#ifdef GL_UNSIGNED_INT_8_8_8_8_REV
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height,
-                         0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, _data);
-#else
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height,
-                         0, GL_RGBA, GL_UNSIGNED_BYTE, _data);
-#endif
-            break;
-    }
+    _texture->setPixelData(_data, false);
+    _texture->bind();
+    _texture->uploadTexture();
 }
 
 void TextureAtlas::clear() {
     _nodes.clear();
-    _nodes.emplace_back(1, 1 , _width - 2);
+    _nodes.emplace_back(1, 1 , _size.x - 2);
 
     _nUsed = 0;
     
-    memset(_data, 0, _width * _height * _depth);
+    memset(_data, 0, _size.x * _size.y * _size.z);
 }
-    
-glm::ivec4 TextureAtlas:: allocateRegion(int width, int height) {
+
+glm::ivec4 TextureAtlas::allocateRegion(int width, int height) {
     glm::ivec4 region(0, 0, width, height);
 
     int bestHeight = std::numeric_limits<int>::max();
@@ -176,45 +177,48 @@ glm::ivec4 TextureAtlas:: allocateRegion(int width, int height) {
 
 }
 
-void TextureAtlas::setRegion(const glm::ivec4 region, void* data) {
-    setRegion(region.x, region.y, region.z, region.w, data);
-}
-
-void TextureAtlas::setRegion(int x, int y, int width, int height, void* data) {
+void TextureAtlas::setRegion(const glm::ivec4& region, void* data) {
+    int x = region.x;
+    int y = region.y;
+    int width = region.z;
+    int height = region.w;
+    
     ghoul_assert(x > 0, "x argument out of bounds");
-    ghoul_assert(x < (_width - 1), "x argument out of bounds");
-    ghoul_assert((x + width) <= (_width - 1), "x arguments out of bounds");
-
+    ghoul_assert(x < (_size.x - 1), "x argument out of bounds");
+    ghoul_assert((x + width) <= (_size.x - 1), "x arguments out of bounds");
+    
     ghoul_assert(y > 0, "y argument out of bounds");
-    ghoul_assert(y < (_height - 1), "y argument out of bounds");
-    ghoul_assert((y + height) <= (_height - 1), "y argument out of bounds");
+    ghoul_assert(y < (_size.y - 1), "y argument out of bounds");
+    ghoul_assert((y + height) <= (_size.y - 1), "y argument out of bounds");
     
     for (int i = 0; i < height; ++i) {
-        void* dst = _data + ((y + i) * _width + x) * sizeof(char) * _depth;
+        void* dst = _data + ((y + i) * _size.x + x) * sizeof(char) * _size.z;
         void* src = reinterpret_cast<unsigned char*>(data) + (i * width) * sizeof(char);
-        size_t nBytes = width * sizeof(char) * _depth;
+        size_t nBytes = width * sizeof(char) * _size.z;
         
         memcpy(dst, src, nBytes);
     }
 }
 
+void TextureAtlas::setRegion(int x, int y, int width, int height, void* data) {
+    setRegion(glm::ivec4(x, y, width, height), data);
+}
+
 int TextureAtlas::atlasFit(size_t index, int width, int height) {
     int x = _nodes[index].x;
     int y = _nodes[index].y;
-    int width_left = width;
-    size_t i = index;
     
-    if ((x + width) > (_width - 1))
+    if ((x + width) > (_size.x - 1))
         return -1;
-    while (width_left > 0) {
-        const glm::ivec3& node = _nodes[i];
+    while (width > 0) {
+        const glm::ivec3& node = _nodes[index];
         
         if (node.y > y)
             y = node.y;
-        if ((y + height) > (_height - 1))
+        if ((y + height) > (_size.y - 1))
             return -1;
-        width_left -= node.z;
-        ++i;
+        width -= node.z;
+        ++index;
     }
     return y;
 }
@@ -230,7 +234,6 @@ void TextureAtlas::atlasMerge() {
         }
     }
 }
-
 
 
 } // namespace opengl

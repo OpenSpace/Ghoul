@@ -35,8 +35,9 @@
 #ifndef __TEXTUREATLAS_H__
 #define __TEXTUREATLAS_H__
 
-#include "ghoul/opengl/ghoul_gl.h"
 #include "ghoul/glm.h"
+#include "ghoul/opengl/ghoul_gl.h"
+#include "ghoul/opengl/texture.h"
 
 #include <vector>
 
@@ -49,6 +50,7 @@ namespace opengl {
 class TextureAtlas {
 public:
     /// width, height, depth of the underlying texture
+    TextureAtlas(glm::ivec3 size);
     TextureAtlas(int width, int height, int depth);
     ~TextureAtlas();
     
@@ -62,28 +64,25 @@ public:
     glm::ivec4 allocateRegion(int width, int height);
     
     /// fill specific region with data
-    void setRegion(const glm::ivec4 region, void* data);
+    void setRegion(const glm::ivec4& region, void* data);
     void setRegion(int x, int y, int width, int height, void* data);
     
     int width() const;
     int height() const;
     int depth() const;
     
-    unsigned int id() const;
+    const Texture& texture() const;
 
 private:
     int atlasFit(size_t index, int width, int height);
     void atlasMerge();
     
     std::vector<glm::ivec3> _nodes;
+    Texture* _texture;
     
-    int _width;
-    int _height;
-    int _depth;
+    glm::ivec3 _size;
     
     int _nUsed; ///< Allocated surface size
-    
-    unsigned int _id;
     
     unsigned char* _data;
 };

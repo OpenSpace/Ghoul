@@ -36,7 +36,7 @@ namespace ghoul {
 namespace fontrendering {
     
 FontManager::FontManager(glm::ivec3 atlasDimensions)
-    : _textureAtlas(atlasDimensions.x, atlasDimensions.y, atlasDimensions.z)
+    : _textureAtlas(std::move(atlasDimensions))
 {
     
     _defaultCharacterSet = {

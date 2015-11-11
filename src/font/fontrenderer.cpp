@@ -84,45 +84,22 @@ namespace {
     \n\
     out vec4 FragColor; \n\
     \n\
+    uniform sampler2D tex; \n\
     uniform vec4 color; \n\
     uniform vec4 outlineColor; \n\
-    uniform sampler2D tex; \n\
     uniform bool hasOutline; \n\
     \n\
-//    vec4 lcdColor(vec2 coords, vec4 color) { \n\
-//        vec4 c = texture(tex, coords); \n\
-//        float t = max(max(c.r, c.g), c.b); \n\
-//        vec4 cc = vec4(color.rgb, (c.r+c.g+c.b)/3.0);\n\
-//        cc = t*cc + (1-t)*vec4(c.rgb, min(min(c.r,c.g),c.b));\n\
-//        return vec4(cc.rgb, color.a*cc.a);\n\
-//    } \n\
-    \n\
     void main() { \n\
-    float inside = texture(tex, texCoords).r;\n\
-    float outline = texture(tex, outlineTexCoords).r;\n\
-    vec4 blend = mix(outlineColor, color, inside);\n\
-    FragColor = blend * vec4(1.0, 1.0, 1.0, outline);\n\
-//        if (hasOutline) \n\
-//            FragColor = vec4(outlineColor.rgb, outlineColor.a * texture(tex, outlineTexCoords).r); \n\
-//        \n\
-//        else \n\
-//            FragColor = vec4(color.rgb, color.a * texture(tex, texCoords).r);\n\
-\
- \
-  \
-    //        vec4 fullColor = lcdColor(texCoords, color); \n\
-//          vec4 fullColor = vec4(color.rgb, color.a * texture(tex, texCoords).r); \n\
-//        float a = texture(tex, texCoords).r; \n\
-//        vec4 fullColor = vec4(color.rgb, color.a * a); \n\
-//        \n\
-//        if (hasOutline) { \n\
-//            vec4 c = lcdColor(outlineTexCoords, outlineColor); \n\
-//    c.a *= 2; \n\
-//            fullColor = mix(fullColor, c, c.a); \n\
-//        } \n\
-//        FragColor = fullColor; \n\
-    } \
-    ";
+        if (hasOutline) { \n\
+            float inside = texture(tex, texCoords).r;\n\
+            float outline = texture(tex, outlineTexCoords).r;\n\
+            vec4 blend = mix(outlineColor, color, inside);\n\
+            FragColor = blend * vec4(1.0, 1.0, 1.0, outline);\n\
+        } \n\
+        else { \n\
+            FragColor = vec4(color.rgb, color.a * texture(tex, texCoords).r); \n\
+        } \n\
+    }";
 }
 
 namespace ghoul {
@@ -135,7 +112,11 @@ FontRenderer::FontRenderer()
     , _vao(0)
     , _vbo(0)
     , _ibo(0)
-{}
+{
+    glGenVertexArrays(1, &_vao);
+    glGenBuffers(1, &_vbo);
+    glGenBuffers(1, &_ibo);
+}
     
 FontRenderer::FontRenderer(opengl::ProgramObject* program, glm::vec2 windowSize)
     : _program(program)
@@ -145,12 +126,19 @@ FontRenderer::FontRenderer(opengl::ProgramObject* program, glm::vec2 windowSize)
 {
     ghoul_assert(program != nullptr, "No program provided");
     setWindowSize(std::move(windowSize));
+    
+    glGenVertexArrays(1, &_vao);
+    glGenBuffers(1, &_vbo);
+    glGenBuffers(1, &_ibo);
 }
     
 FontRenderer::~FontRenderer() {
     glDeleteVertexArrays(1, &_vao);
     glDeleteBuffers(1, &_vbo);
     glDeleteBuffers(1, &_ibo);
+    
+    delete _program;
+    _program = nullptr;
 }
 
 bool FontRenderer::initialize() {
@@ -204,18 +192,17 @@ bool FontRenderer::deinitialize() {
     return true;
 }
     
-FontRenderer* FontRenderer::defaultRenderer() {
+FontRenderer& FontRenderer::defaultRenderer() {
     ghoul_assert(_defaultRenderer != nullptr, "FontRenderer was not initialized");
-    return _defaultRenderer;
+    return *_defaultRenderer;
 }
     
-void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const glm::vec4& color, const char* format, ...)
+void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const glm::vec4& color, const char* format, ...) const
 {
     if (format == nullptr)
         return;
     
     float h = font.height();
-    //    float h = ft_font->getHeight() * 1.59f;
     
     va_list args;	 // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables
@@ -273,7 +260,10 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
     std::vector<GLfloat> vertices;
     for (size_t i = 0; i < lines.size(); ++i) {
         const std::string& line = lines[i];
-        pos.y -= h * static_cast<float>(i);
+        
+        glm::vec2 movingPos = pos;
+        
+        movingPos.y -= i * h;
         for (size_t j = 0 ; j < line.size(); ++j) {
             Font::Glyph* glyph = font.glyph(line[j]);
             if (glyph == nullptr) {
@@ -284,9 +274,9 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
                 if (j > 0)
                     kerning = glyph->kerning(line[j-1]);
                 
-                pos.x += kerning;
-                float x0 = pos.x + glyph->offsetX();
-                float y0 = pos.y + glyph->offsetY();
+                movingPos.x += kerning;
+                float x0 = movingPos.x + glyph->offsetX();
+                float y0 = movingPos.y + glyph->offsetY();
                 float x1 = x0 + glyph->width();
                 float y1 = y0 - glyph->height();
                 float s0 = glyph->texCoordTopLeft().x;
@@ -310,7 +300,7 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
                     x1, y1, s1, t1, outlineS1, outlineT1,
                     x1, y0, s1, t0, outlineS1, outlineT0
                 });
-                pos.x += glyph->advanceX();
+                movingPos.x += glyph->advanceX();
             }
             
         }
@@ -325,24 +315,19 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
     
     ghoul::opengl::TextureUnit atlasUnit;
     atlasUnit.activate();
-    glBindTexture(GL_TEXTURE_2D, font.atlas().id());
+    font.atlas().texture().bind();
+//    glBindTexture(GL_TEXTURE_2D, font.atlas().id());
     
     _program->setIgnoreUniformLocationError(true);
-    _program->setUniform("color", glm::vec4(1.0, 1.0, 1.0, 1.0));
-//    _program->setUniform("color", color);
+    _program->setUniform("color", color);
     _program->setUniform("outlineColor", glm::vec4(0.0, 0.0, 0.0, 1.0));
     _program->setUniform("tex", atlasUnit);
     _program->setUniform("model", glm::mat4(1.f));
     _program->setUniform("view", glm::mat4(1.f));
     _program->setUniform("projection", projection);
-//    _program->setUniform("hasOutline", false);
+    _program->setUniform("hasOutline", font.outline());
     _program->setIgnoreUniformLocationError(false);
     
-    if (_vao == 0) {
-        glGenVertexArrays(1, &_vao);
-        glGenBuffers(1, &_vbo);
-        glGenBuffers(1, &_ibo);
-    }
     glBindVertexArray(_vao);
     
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
@@ -367,16 +352,8 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
         2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<const void*>(4 * sizeof(float))
     );
 
-//    _program->setUniform("hasOutline", false);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
-//    _program->setUniform("hasOutline", true);
-//    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-
-
-    
-    //    if (hasOutline)
-    
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -387,15 +364,6 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
 void FontRenderer::setWindowSize(glm::vec2 windowSize) {
     _windowSize = std::move(windowSize);
 }
-    
-    
-//void FontRenderer::render(ghoul::fontrendering::Font& font, const glm::vec2& pos, const char* format, ...)
-//{
-//    // Deal with variable arguments
-////    render(font, pos, glm::vec4(1.f), format, ...);
-//}
-    
-    
     
 } // namespace fontrendering
 } // namespace ghoul
