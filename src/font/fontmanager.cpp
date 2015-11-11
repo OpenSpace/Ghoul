@@ -54,30 +54,42 @@ FontManager::FontManager(glm::ivec3 atlasDimensions)
 }
     
 FontManager::FontManager(const FontManager& rhs)
-    : _textureAtlas(rhs._textureAtlas.width(), rhs._textureAtlas.height(), rhs._textureAtlas.depth())
-{
-    ghoul_assert(false, "unimplemented");
-}
+    : _textureAtlas(rhs._textureAtlas)
+    , _fonts(rhs._fonts)
+    , _fontPaths(rhs._fontPaths)
+    , _defaultCharacterSet(rhs._defaultCharacterSet)
+{}
     
 FontManager::FontManager(FontManager&& rhs)
-    : _textureAtlas(rhs._textureAtlas)
-{
-    ghoul_assert(false, "unimplemented");
-}
+    : _textureAtlas(std::move(rhs._textureAtlas))
+    , _fonts(std::move(rhs._fonts))
+    , _fontPaths(std::move(rhs._fontPaths))
+    , _defaultCharacterSet(std::move(rhs._defaultCharacterSet))
+{}
     
 FontManager::~FontManager() {
     for (std::pair<std::string, Font*> f : _fonts)
         delete f.second;
 }
     
-FontManager& FontManager::operator=(const FontManager &rhs) {
-    ghoul_assert(false, "unimplemented");
-    
+FontManager& FontManager::operator=(const FontManager& rhs) {
+    if (this != &rhs) {
+        _textureAtlas = rhs._textureAtlas;
+        _fonts = rhs._fonts;
+        _fontPaths = rhs._fontPaths;
+        _defaultCharacterSet = rhs._defaultCharacterSet;
+    }
     return *this;
 }
     
 FontManager& FontManager::operator=(FontManager&& rhs) {
-    ghoul_assert(false, "unimplemented");
+    if (this != &rhs) {
+        _textureAtlas = std::move(rhs._textureAtlas);
+        _fonts = std::move(rhs._fonts);
+        _fontPaths = std::move(rhs._fontPaths);
+        _defaultCharacterSet = std::move(rhs._defaultCharacterSet);
+        
+    }
     return *this;
 }
     

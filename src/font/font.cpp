@@ -420,12 +420,12 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             int heightOffset = h - insideBitmap->bitmap.rows;
             
             int k, l;
-            for (int j = 0; j < h; ++j) {
-                for (int i = 0; i < w; ++i) {
+            for (unsigned int j = 0; j < h; ++j) {
+                for (unsigned int i = 0; i < w; ++i) {
                     k = i - widthOffset;
                     l = j - heightOffset;
                     buffer[(i + j*w)] =
-                    (k >= insideBitmap->bitmap.width || l >= insideBitmap->bitmap.rows || k < 0 || l < 0) ?
+                    (k >= static_cast<int>(insideBitmap->bitmap.width) || l >= static_cast<int>(insideBitmap->bitmap.rows) || k < 0 || l < 0) ?
                     0 : insideBitmap->bitmap.buffer[k + insideBitmap->bitmap.width*l];
                     
                 }

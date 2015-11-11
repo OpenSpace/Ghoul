@@ -1982,7 +1982,7 @@ public:
      * Sets the block with index <code>index</code> with the passed binding
      * <code>binding</code>. Will call the OpenGL function
      * <code>glShaderStorageBlockBinding</code>.
-     * \param index The index of the block retrieved from #glGetUniformBlockIndex
+     * \param index The index of the block retrieved from glGetUniformBlockIndex
      * \param binding The binding the block should be bound to
      */
     void setSsboBinding(GLint index, GLuint binding);
@@ -3286,6 +3286,8 @@ public:
 	 * source of this shader
 	 * \param fpath The name of the vertex shader file that will be used to load the 
 	 * source of this shader
+     * \param dictionary The dictionary that is used for the created !ShaderObject s and
+     * ultimately for the !ShaderPreprocessor
 	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
 	 * unsuccessfull
 	 */
@@ -3304,6 +3306,8 @@ public:
 	 * source of this shader
 	 * \param gpath The name of the geometry shader file that will be used to load the
 	 * source of this shader
+     * \param dictionary The dictionary that is used for the created !ShaderObject s and
+     * ultimately for the !ShaderPreprocessor
 	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
 	 * unsuccessfull
 	*/
@@ -3325,6 +3329,8 @@ public:
 	 * source of this shader
 	 * \param tcpath The name of the tessellation control shader file that will be used to load the
 	 * source of this shader
+     * \param dictionary The dictionary that is used for the created !ShaderObject s and
+     * ultimately for the !ShaderPreprocessor
 	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
 	 * unsuccessfull
 	 */

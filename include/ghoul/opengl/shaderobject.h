@@ -81,6 +81,7 @@ public:
      * Before this can be used, a shader must be loaded with #setShaderFilename and it has
      * to be compiled.
      * \param shaderType The type of shader that this ShaderObject will represent
+     * \param dictionary The dictionary that is used for the !ShaderPreprocessor
      */
     ShaderObject(ShaderType shaderType, Dictionary dictionary = Dictionary());
 
@@ -92,6 +93,7 @@ public:
      * \param shaderType The type of shader that this ShaderObject will represent
      * \param filename The name of the file that will be used to load the source of this 
      * shader
+     * \param dictionary The dictionary that is used for the !ShaderPreprocessor
      */
     ShaderObject(ShaderType shaderType, std::string filename, Dictionary dictionary = Dictionary());
 
@@ -105,6 +107,7 @@ public:
      * \param filename The name of the file that will be used to load the source of this 
      * shader
      * \param name The human readable name of this ShaderObject
+     * \param dictionary The dictionary that is used for the !ShaderPreprocessor
      */
     ShaderObject(ShaderType shaderType, std::string filename, std::string name, Dictionary dictionary = Dictionary());
 
