@@ -110,15 +110,15 @@ void Texture::generateId() {
     glGenTextures(1, &_id);
 }
 
-void Texture::enable() {
+void Texture::enable() const {
     glEnable(_type);
 }
 
-void Texture::disable() {
+void Texture::disable()  const {
     glDisable(_type);
 }
 
-void Texture::bind() {
+void Texture::bind() const {
     glBindTexture(_type, _id);
 }
 

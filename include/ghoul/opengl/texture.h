@@ -156,16 +156,16 @@ public:
     ~Texture();
 
     /// Enables this texture type by calling <code>glEnable</code>
-    void enable();
+    void enable() const;
     /// Disables this texture type by calling <code>glDisable</code>
-    void disable();
+    void disable() const;
 
     /// Binds this texture to the texture type by calling <code>glBindTexture</code>
-    void bind();
+    void bind() const;
 
     /// Returns the OpenGL name of this texture.
     operator GLuint() const;
-
+    
     /**
      * Returns an (optional) name for this Texture. The name is not used internally and is
      * solely for external purposes. One possible use is the filename from which the 
