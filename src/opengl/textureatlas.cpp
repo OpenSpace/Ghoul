@@ -29,6 +29,8 @@
 #include "ghoul/misc/assert.h"
 #include "ghoul/opengl/ghoul_gl.h"
 
+#include <cstring>
+
 namespace {
     const std::string _loggerCat = "TextureAtlas";
 }
