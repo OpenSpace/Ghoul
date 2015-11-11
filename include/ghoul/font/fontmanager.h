@@ -45,10 +45,11 @@ public:
     FontManager(glm::ivec3 atlasDimensions = glm::ivec3(512, 512, 1));
     FontManager(const FontManager& rhs);
     FontManager(FontManager&& rhs);
-    FontManager& operator=(const FontManager& rhs);
-    FontManager& operator=(FontManager&& rhs);
     ~FontManager();
     
+    FontManager& operator=(const FontManager& rhs);
+    FontManager& operator=(FontManager&& rhs);
+
     // Does not check whether the file exists
     // Stores the full path internally
     bool registerFontPath(const std::string& fontName, const std::string& filePath);

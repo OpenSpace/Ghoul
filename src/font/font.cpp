@@ -121,6 +121,7 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, b
     : _atlas(atlas)
     , _name(std::move(filename))
     , _pointSize(pointSize)
+    , _height(0.f)
     , _outline(outline)
     , _outlineThickness(outlineThickness)
 {

@@ -69,7 +69,7 @@ const char FileSystem::PathSeparator = '/';
 FileSystem::FileSystem()
     : _cacheManager(nullptr)
 {
-    std::string temporaryPath = "";
+    std::string temporaryPath;
 #ifdef WIN32
     DWORD result = GetTempPath(0, "");
     if (result != 0) {

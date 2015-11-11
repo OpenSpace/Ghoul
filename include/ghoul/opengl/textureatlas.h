@@ -52,7 +52,12 @@ public:
     /// width, height, depth of the underlying texture
     TextureAtlas(glm::ivec3 size);
     TextureAtlas(int width, int height, int depth);
+    TextureAtlas(const TextureAtlas& rhs);
+    TextureAtlas(TextureAtlas&& rhs);
     ~TextureAtlas();
+    
+    TextureAtlas& operator=(const TextureAtlas& rhs);
+    TextureAtlas& operator=(TextureAtlas&& rhs);
     
     /// Upload to graphics card
     void upload();

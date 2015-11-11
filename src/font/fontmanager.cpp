@@ -37,9 +37,7 @@ namespace fontrendering {
     
 FontManager::FontManager(glm::ivec3 atlasDimensions)
     : _textureAtlas(std::move(atlasDimensions))
-{
-    
-    _defaultCharacterSet = {
+    , _defaultCharacterSet({
         L' ', L'!', L'\\', L'"', L'#', L'$', L'%', L'&', L'\'', L'(',
         L')', L'*', L'+', L',', L'-', L'.', L'/', L'0', L'1', L'2',
         L'3', L'4', L'5', L'6', L'7', L'8', L'9', L':', L';', L'<',
@@ -50,8 +48,8 @@ FontManager::FontManager(glm::ivec3 atlasDimensions)
         L'f', L'g', L'h', L'i', L'j', L'k', L'l', L'm', L'n', L'o',
         L'p', L'q', L'r', L's', L't', L'u', L'v', L'w', L'x', L'y',
         L'z', L'{', L'|', L'}'
-    };
-}
+    })
+{}
     
 FontManager::FontManager(const FontManager& rhs)
     : _textureAtlas(rhs._textureAtlas)

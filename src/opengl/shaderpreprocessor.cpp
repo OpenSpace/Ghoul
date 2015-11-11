@@ -254,9 +254,9 @@ std::string ShaderPreprocessor::debugString(ShaderPreprocessor::Env& env) {
 bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
     std::string& line = env.line;
     std::stringstream processed;
-    int beginOffset, endOffset;
+    int beginOffset;
     while ((beginOffset = line.find("#{")) != -1) {
-        endOffset = line.substr(beginOffset).find("}");
+        int endOffset = line.substr(beginOffset).find("}");
         if (endOffset == -1) {
             LERROR("Parse error. Could not parse line. " << debugString(env));
             return false;

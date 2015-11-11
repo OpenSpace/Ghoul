@@ -90,10 +90,51 @@ TextureAtlas::TextureAtlas(glm::ivec3 size)
 TextureAtlas::TextureAtlas(int width, int height, int depth)
     : TextureAtlas(glm::ivec3(width, height, depth))
 {}
+    
+TextureAtlas::TextureAtlas(const TextureAtlas& rhs)
+    : _nodes(rhs._nodes)
+    , _texture(new Texture(*rhs._texture))
+    , _size(rhs._size)
+    , _nUsed(rhs._nUsed)
+{
+    _data = new unsigned char[_size.x * _size.y * _size.z];
+    std::memcpy(_data, rhs._data, _size.x * _size.y * _size.z);
+}
+    
+TextureAtlas::TextureAtlas(TextureAtlas&& rhs)
+    : _nodes(std::move(rhs._nodes))
+    , _texture(std::move(rhs._texture))
+    , _size(std::move(rhs._size))
+    , _nUsed(std::move(rhs._nUsed))
+    , _data(std::move(rhs._data))
+{}
 
 TextureAtlas::~TextureAtlas() {
     delete _texture;
     delete[] _data;
+}
+    
+TextureAtlas& TextureAtlas::operator=(const TextureAtlas& rhs) {
+    if (this != &rhs) {
+        _nodes = rhs._nodes;
+        _texture = new Texture(*rhs._texture);
+        _size = rhs._size;
+        _nUsed = rhs._nUsed;
+        _data = new unsigned char[_size.x * _size.y * _size.z];
+        std::memcpy(_data, rhs._data, _size.x * _size.y * _size.z);
+    }
+    return *this;
+}
+
+TextureAtlas& TextureAtlas::operator=(TextureAtlas&& rhs) {
+    if (this != &rhs) {
+        _nodes = std::move(rhs._nodes);
+        _texture = std::move(rhs._texture);
+        _size = std::move(rhs._size);
+        _nUsed = std::move(rhs._nUsed);
+        _data = std::move(rhs._data);
+    }
+    return *this;
 }
 
 int TextureAtlas::width() const {
