@@ -65,14 +65,12 @@ namespace {
     layout (location = 0) out vec2 texCoords; \n\
     layout (location = 1) out vec2 outlineTexCoords; \n\
     \n\
-    uniform mat4 model; \n\
-    uniform mat4 view; \n\
     uniform mat4 projection; \n\
     \n\
     void main() { \n\
         texCoords = in_texCoords; \n\
         outlineTexCoords = in_outlineTexCoords; \n\
-        gl_Position = projection * view * model * vec4(in_position, 0.0, 1.0); \n\
+        gl_Position = projection * vec4(in_position, 0.0, 1.0); \n\
     } \n\
     ";
     
@@ -197,7 +195,7 @@ FontRenderer& FontRenderer::defaultRenderer() {
     return *_defaultRenderer;
 }
     
-void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const glm::vec4& color, const char* format, ...) const
+void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const glm::vec4& color, const glm::vec4& outlineColor, const char* format, ...) const
 {
     if (format == nullptr)
         return;
@@ -316,14 +314,11 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
     ghoul::opengl::TextureUnit atlasUnit;
     atlasUnit.activate();
     font.atlas().texture().bind();
-//    glBindTexture(GL_TEXTURE_2D, font.atlas().id());
     
     _program->setIgnoreUniformLocationError(true);
     _program->setUniform("color", color);
-    _program->setUniform("outlineColor", glm::vec4(0.0, 0.0, 0.0, 1.0));
+    _program->setUniform("outlineColor", outlineColor);
     _program->setUniform("tex", atlasUnit);
-    _program->setUniform("model", glm::mat4(1.f));
-    _program->setUniform("view", glm::mat4(1.f));
     _program->setUniform("projection", projection);
     _program->setUniform("hasOutline", font.outline());
     _program->setIgnoreUniformLocationError(false);

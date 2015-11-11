@@ -45,7 +45,7 @@ public:
     static bool deinitialize();
     static FontRenderer& defaultRenderer();
     
-    void render(Font& font, glm::vec2 pos, const glm::vec4& color, const char* format, ...) const;
+    void render(Font& font, glm::vec2 pos, const glm::vec4& color, const glm::vec4& outlineColor, const char* format, ...) const;
     void render(Font& font, const glm::vec2& pos, const char* format, ...) const;
     
     void setWindowSize(glm::vec2 windowSize);
