@@ -125,7 +125,7 @@ void TextureAtlas::clear() {
     memset(_data, 0, _size.x * _size.y * _size.z);
 }
 
-glm::ivec4 TextureAtlas::allocateRegion(int width, int height) {
+glm::ivec4 TextureAtlas::newRegion(int width, int height) {
     glm::ivec4 region(0, 0, width, height);
 
     int bestHeight = std::numeric_limits<int>::max();
@@ -177,7 +177,7 @@ glm::ivec4 TextureAtlas::allocateRegion(int width, int height) {
 
 }
 
-void TextureAtlas::setRegion(const glm::ivec4& region, void* data) {
+void TextureAtlas::setRegionData(const glm::ivec4& region, void* data) {
     int x = region.x;
     int y = region.y;
     int width = region.z;
@@ -200,8 +200,8 @@ void TextureAtlas::setRegion(const glm::ivec4& region, void* data) {
     }
 }
 
-void TextureAtlas::setRegion(int x, int y, int width, int height, void* data) {
-    setRegion(glm::ivec4(x, y, width, height), data);
+void TextureAtlas::setRegionData(int x, int y, int width, int height, void* data) {
+    setRegionData(glm::ivec4(x, y, width, height), data);
 }
 
 int TextureAtlas::atlasFit(size_t index, int width, int height) {

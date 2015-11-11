@@ -61,11 +61,11 @@ public:
     void clear();
     
     /// allocate a new region of size 'width' * 'height'
-    glm::ivec4 allocateRegion(int width, int height);
+    glm::ivec4 newRegion(int width, int height);
     
     /// fill specific region with data
-    void setRegion(const glm::ivec4& region, void* data);
-    void setRegion(int x, int y, int width, int height, void* data);
+    void setRegionData(const glm::ivec4& region, void* data);
+    void setRegionData(int x, int y, int width, int height, void* data);
     
     int width() const;
     int height() const;

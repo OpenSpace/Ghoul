@@ -180,7 +180,7 @@ Font::Glyph* Font::glyph(wchar_t character) {
     if (character == static_cast<wchar_t>(-1)) {
         size_t width = _atlas.width();
         size_t height = _atlas.height();
-        glm::ivec4 region = _atlas.allocateRegion(5, 5);
+        glm::ivec4 region = _atlas.newRegion(5, 5);
         if (region.x < 0)
             return nullptr;
 
@@ -189,7 +189,7 @@ Font::Glyph* Font::glyph(wchar_t character) {
         std::array<unsigned char, 4*4*4> data;
         data.fill(std::numeric_limits<unsigned char>::max());
         
-        _atlas.setRegion(region.x, region.y, 4, 4, data.data());
+        _atlas.setRegionData(region.x, region.y, 4, 4, data.data());
         
         Glyph* glyph = new Glyph(static_cast<wchar_t>(-1));
         glyph->_topLeft = glm::vec2(
@@ -350,7 +350,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             w = outlineBitmap->bitmap.width/atlasDepth;
             h = outlineBitmap->bitmap.rows;
             
-            glm::ivec4 region = _atlas.allocateRegion(w + 1, h + 1);
+            glm::ivec4 region = _atlas.newRegion(w + 1, h + 1);
             if (region.x < 0) {
                 missed++;
                 LERROR("Texture atlas is full");
@@ -358,7 +358,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             }
             int x = region.x;
             int y = region.y;
-            _atlas.setRegion(x, y, w, h, outlineBitmap->bitmap.buffer);
+            _atlas.setRegionData(x, y, w, h, outlineBitmap->bitmap.buffer);
             
             outlineTopLeft = glm::vec2(
                                        x/static_cast<float>(atlasWidth),
@@ -405,7 +405,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         h = std::max(h, insideBitmap->bitmap.rows);
         
         
-        glm::ivec4 region = _atlas.allocateRegion(w + 1, h + 1);
+        glm::ivec4 region = _atlas.newRegion(w + 1, h + 1);
         if (region.x < 0) {
             missed++;
             LERROR("Texture atlas is full");
@@ -431,13 +431,13 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 }
             }
             
-            _atlas.setRegion(x, y, w, h, buffer.data());
+            _atlas.setRegionData(x, y, w, h, buffer.data());
             
             x += widthOffset / 2.f;
             y += heightOffset / 2.f;
         }
         else {
-            _atlas.setRegion(x, y, w, h, insideBitmap->bitmap.buffer);
+            _atlas.setRegionData(x, y, w, h, insideBitmap->bitmap.buffer);
             
         }
         
@@ -453,239 +453,6 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
 
         
         
-        /*
-        
-        
-        if (!_outline) {
-            FT_Error error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Done_FreeType(library);
-                return glyphs.size() - i;
-            }
-            
-            FT_Glyph glyph;
-            error = FT_Get_Glyph(face->glyph, &glyph);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Done_FreeType(library);
-                return glyphs.size() - i;
-            }
-            
-            error = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, true);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Done_FreeType(library);
-                return glyphs.size() - i;
-            }
-            
-            
-            FT_BitmapGlyph g = (FT_BitmapGlyph)glyph;
-            FT_Bitmap ft_bitmap = g->bitmap;
-            
-            ft_glyph_top = g->top;
-            ft_glyph_left = g->left;
-            
-            w = ft_bitmap.width/atlasDepth;
-            h = ft_bitmap.rows;
-            glm::ivec4 region = _atlas.allocateRegion(w + 1, h + 1);
-            if (region.x < 0) {
-                missed++;
-                LERROR("Texture atlas is full");
-                continue;
-            }
-            int x = region.x;
-            int y = region.y;
-            _atlas.setRegion(x, y, w, h, ft_bitmap.buffer);
-            
-            topLeft = glm::vec2(
-                                x/static_cast<float>(atlasWidth),
-                                y/static_cast<float>(atlasHeight)
-                                );
-            bottomRight = glm::vec2(
-                                    (x + w)/static_cast<float>(atlasWidth),
-                                    (y + h)/static_cast<float>(atlasHeight)
-                                    );
-        }
-        else {
-            FT_Error error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Done_FreeType(library);
-                return glyphs.size() - i;
-            }
-            
-            FT_Glyph insideGlyph;
-            error = FT_Get_Glyph(face->glyph, &insideGlyph);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Done_FreeType(library);
-                return glyphs.size() - i;
-            }
-            
-            error = FT_Glyph_To_Bitmap(&insideGlyph, FT_RENDER_MODE_NORMAL, nullptr, true);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Done_FreeType(library);
-                return glyphs.size() - i;
-            }
-            
-            
-            FT_BitmapGlyph insideBitmap = (FT_BitmapGlyph)insideGlyph;
-            
-            ft_glyph_top = insideBitmap->top;
-            ft_glyph_left = insideBitmap->left;
-            
-            w = insideBitmap->bitmap.width/atlasDepth;
-            h = insideBitmap->bitmap.rows;
-
-            
-            
-            
-        
-            FT_Int32 outlineFlags = flags;
-            //            flags |= FT_LOAD_NO_BITMAP;
-            
-            error = FT_Load_Glyph(face, glyphIndex, outlineFlags);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Done_FreeType(library);
-                return glyphs.size() - i;
-            }
-            
-            
-            FT_Stroker stroker;
-            error = FT_Stroker_New(library, &stroker);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                
-                FT_Done_Face(face);
-                FT_Stroker_Done(stroker);
-                FT_Done_FreeType(library);
-                return glyphs.size() - i;
-            }
-            
-            FT_Stroker_Set(stroker,
-                           static_cast<int>(_outlineThickness * PointConversionFactor),
-                           //                           static_cast<int>(OutlineThickness * HighResolution),
-                           FT_STROKER_LINECAP_ROUND,
-                           FT_STROKER_LINEJOIN_ROUND,
-                           0);
-
-            FT_Glyph outlineGlyph;
-            error = FT_Get_Glyph(face->glyph, &outlineGlyph);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Stroker_Done(stroker);
-                FT_Done_FreeType(library);
-                return glyphs.size() - i;
-            }
-            
-                        error = FT_Glyph_Stroke(&outlineGlyph, stroker, 1);
-//            error = FT_Glyph_StrokeBorder(&outlineGlyph, stroker, false, true);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Stroker_Done(stroker);
-                FT_Done_FreeType(library);
-                return glyphs.size() - i;
-            }
-            
-            error = FT_Glyph_To_Bitmap(&outlineGlyph, FT_RENDER_MODE_NORMAL, 0, 1);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Stroker_Done(stroker);
-                FT_Done_FreeType(library);
-                return 0;
-            }
-            FT_BitmapGlyph outlineBitmap;
-            outlineBitmap = (FT_BitmapGlyph)outlineGlyph;
-
-            ft_glyph_top    = outlineBitmap->top;
-            ft_glyph_left   = outlineBitmap->left;
-            FT_Stroker_Done(stroker);
-            
-            // We want each glyph to be separated by at least one black pixel
-            // (for example for shader used in demo-subpixel.c)
-            w = std::max(w, outlineBitmap->bitmap.width/atlasDepth);
-            h = std::max(h, outlineBitmap->bitmap.rows);
-        
-        
-            // Now w and h contain the bigger of the two values:
-            
-            glm::ivec4 region = _atlas.allocateRegion(w + 1, h + 1);
-            if (region.x < 0) {
-                missed++;
-                LERROR("Texture atlas is full");
-                continue;
-            }
-            int x = region.x;
-            int y = region.y;
-            
-            std::vector<unsigned char> buffer(w * h * sizeof(char), 0);
-            int widthOffset = w - insideBitmap->bitmap.width;
-            int heightOffset = h - insideBitmap->bitmap.rows;
-            
-            int k, l;
-            for (int j = 0; j < h; ++j) {
-                for (int i = 0; i < w; ++i) {
-                    k = i - widthOffset;
-                    l = j - heightOffset;
-                    buffer[(i + j*w)] =
-                    (k >= insideBitmap->bitmap.width || l >= insideBitmap->bitmap.rows || k < 0 || l < 0) ?
-                    0 : insideBitmap->bitmap.buffer[k + insideBitmap->bitmap.width*l];
-                   
-                }
-            }
-            
-            _atlas.setRegion(x, y, w, h, buffer.data());
-            
-            topLeft = glm::vec2(
-                                (x + widthOffset / 2.f)/static_cast<float>(atlasWidth),
-                                (y + heightOffset / 2.f)/static_cast<float>(atlasHeight)
-                                );
-            bottomRight = glm::vec2(
-                                    (x + w + widthOffset / 2.f)/static_cast<float>(atlasWidth),
-                                    (y + h + heightOffset / 2.f)/static_cast<float>(atlasHeight)
-                                    );
-
-            
-            
-            region = _atlas.allocateRegion(w + 1, h + 1);
-            if (region.x < 0) {
-                missed++;
-                LERROR("Texture atlas is full");
-                continue;
-            }
-            x = region.x;
-            y = region.y;
-            _atlas.setRegion(x, y, w, h, outlineBitmap->bitmap.buffer);
-            
-            outlineTopLeft = glm::vec2(
-                                       x/static_cast<float>(atlasWidth),
-                                       y/static_cast<float>(atlasHeight)
-                                       );
-            outlineBottomRight = glm::vec2(
-                                           (x + w)/static_cast<float>(atlasWidth),
-                                           (y + h)/static_cast<float>(atlasHeight)
-                                           );
-
-            
-        
-            
-            
-        
-        }
-        */
         // Discard hinting to get advance
         FT_Load_Glyph(face, glyphIndex, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
         
@@ -744,50 +511,39 @@ void Font::generateKerning() {
 }
     
 bool Font::loadFace(float size, FT_Library& library, FT_Face& face) {
-    FT_Matrix matrix = {
-        (int)((1.0/PointConversionFactor) * 0x10000L),
-        (int)((0.0)      * 0x10000L),
-        (int)((0.0)      * 0x10000L),
-        (int)((1.0/PointConversionFactor)      * 0x10000L)};
-    
     FT_Error error = FT_Init_FreeType(&library);
     if (error) {
         LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-        return 0;
+        return false;
     }
-    
-    /* Load face */
+
+    // Load face
     error = FT_New_Face(library, _name.c_str(), 0, &face);
-    
     if (error) {
         LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
         FT_Done_FreeType(library);
-        return 0;
+        return false;
     }
     
-    /* Select charmap */
+    // Select charmap
     error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
     if (error) {
         LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
         FT_Done_Face(face);
         FT_Done_FreeType(library);
-        return 0;
+        return false;
     }
-    
-    /* Set char size */
+
+    // Set char size
     error = FT_Set_Char_Size(face, (int)(size * PointConversionFactor), 0, DPI , DPI);
-    
     if (error) {
         LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
         FT_Done_Face(face);
         FT_Done_FreeType(library);
-        return 0;
+        return false;
     }
     
-    /* Set transform matrix */
-//    FT_Set_Transform(face, &matrix, NULL);
-    
-    return 1;
+    return true;
 }
 
     
