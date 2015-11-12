@@ -132,15 +132,15 @@ bool FontManager::registerFontPath(const std::string& fontName,
     return true;
 }
     
-Font* FontManager::font(const std::string& name, float fontSize, bool loadGlyphs) {
+Font* FontManager::font(const std::string& name, float fontSize, bool withOutline, bool loadGlyphs) {
     unsigned int hash = hashCRC32(name);
-    Font* res = font(hash, fontSize, loadGlyphs);
+    Font* res = font(hash, fontSize, withOutline, loadGlyphs);
     if (res == nullptr)
         LERROR("Loading of font '" << name << "' failed");
     return res;
 }
     
-Font* FontManager::font(unsigned int hashName, float fontSize, bool loadGlyphs) {
+Font* FontManager::font(unsigned int hashName, float fontSize, bool withOutline, bool loadGlyphs) {
     auto itPath = _fontPaths.find(hashName);
     if (itPath == _fontPaths.end()) {
         LERROR("Font with hash '" << hashName << "' is not a registered font");
@@ -149,12 +149,12 @@ Font* FontManager::font(unsigned int hashName, float fontSize, bool loadGlyphs) 
     
     auto fonts = _fonts.equal_range(hashName);
     for (auto it = fonts.first; it != fonts.second; ++it) {
-        if (it->second->pointSize() == fontSize)
+        if (it->second->pointSize() == fontSize && it->second->outline() == withOutline)
             return it->second;
     }
     
     
-    Font* f = new Font(_fontPaths[hashName], fontSize, _textureAtlas);
+    Font* f = new Font(_fontPaths[hashName], fontSize, _textureAtlas, withOutline);
     
     bool initSuccess = f->initialize();
     if (!initSuccess ) {

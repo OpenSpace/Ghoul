@@ -42,7 +42,8 @@ namespace fontrendering {
  * access to these fonts based a user-defined, unique name. The paths to fonts must be
  * registered (#registerFontPath) with a name before the fonts can be accessed (#font).
  * Each registered font can give rise to one Font class for each requested fontSize. When
- * each Font is created, it is, on default, initialized with a default set of glyphs.
+ * each Font is created, it is, on default, initialized with a default set of glyphs and
+ * has an outline with a default outline thickness.
  */
 class FontManager {
 public:
@@ -132,12 +133,15 @@ public:
      * exist, a <code>nullptr</code> is returned.
      * \param name User-defined name for the Font that is to be retrieved
      * \param fontSize The font size (in pt) for the Font
+     * \param withOutline If this parameter is <code>true</code> the created Font will
+     * contain outlines as well as the base Font
      * \param loadGlyphs If <code>true</code>, the first initialization of the Font will
      * also preload a set of commonly used glyphs
      * \return Returns a usable and initialized Font object, or <code>nullptr</code> if an
      * error occurred
      */
-    Font* font(const std::string& name, float fontSize, bool loadGlyphs = true);
+    Font* font(const std::string& name, float fontSize, bool withOutline = true,
+               bool loadGlyphs = true);
 
     /**
      * Retrieves the Font with the hashed name <code>hashName</code>, which must have been
@@ -151,12 +155,15 @@ public:
      * <code>nullptr</code> is returned.
      * \param hashName A hashed name of the font that is to be retrieved
      * \param fontSize The font size (in pt) for the Font
+     * \param withOutline If this parameter is <code>true</code> the created Font will
+     * contain outlines as well as the base Font
      * \param loadGlyphs If <code>true</code>, the first initialization of the Font will
      * also preload a set of commonly used glyphs
      * \return Returns a usable and initialized Font object, or <code>nullptr</code> if an
      * error occurred
      */
-    Font* font(unsigned int hashName, float fontSize, bool loadGlyphs = true);
+    Font* font(unsigned int hashName, float fontSize, bool withOutline = true,
+               bool loadGlyphs = true);
     
 private:
     /// The TextureAtlas that is used to store all glyphs for all registered Font objects
