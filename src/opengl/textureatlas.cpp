@@ -23,11 +23,11 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/opengl/textureatlas.h"
+#include <ghoul/opengl/textureatlas.h>
 
-#include "ghoul/logging/logmanager.h"
-#include "ghoul/misc/assert.h"
-#include "ghoul/opengl/ghoul_gl.h"
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
+#include <ghoul/opengl/ghoul_gl.h>
 
 #include <cstring>
 

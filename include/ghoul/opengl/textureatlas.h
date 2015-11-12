@@ -35,9 +35,9 @@
 #ifndef __TEXTUREATLAS_H__
 #define __TEXTUREATLAS_H__
 
-#include "ghoul/glm.h"
-#include "ghoul/opengl/ghoul_gl.h"
-#include "ghoul/opengl/texture.h"
+#include <ghoul/glm.h>
+#include <ghoul/opengl/ghoul_gl.h>
+#include <ghoul/opengl/texture.h>
 
 #include <vector>
 
