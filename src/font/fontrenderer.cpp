@@ -183,11 +183,14 @@ bool FontRenderer::initialize() {
 }
     
 bool FontRenderer::deinitialize() {
-    ghoul_assert(_defaultRenderer != nullptr, "FontRenderer was not initialized");
     delete _defaultRenderer;
     _defaultRenderer = nullptr;
     
     return true;
+}
+    
+bool FontRenderer::isInitialized() {
+    return _defaultRenderer != nullptr;
 }
     
 FontRenderer& FontRenderer::defaultRenderer() {
@@ -195,12 +198,16 @@ FontRenderer& FontRenderer::defaultRenderer() {
     return *_defaultRenderer;
 }
     
-void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const glm::vec4& color, const glm::vec4& outlineColor, const char* format, ...) const
+// I wish I didn't have to copy-n-paste the render function, but *sigh* ---abock
+    
+void FontRenderer::render(ghoul::fontrendering::Font& font,
+                          glm::vec2 pos,
+                          glm::vec4 color,
+                          glm::vec4 outlineColor,
+                          const char* format, ...) const
 {
     if (format == nullptr)
         return;
-    
-    float h = font.height();
     
     va_list args;	 // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables
@@ -221,6 +228,94 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
 #endif
     va_end(args);
     
+    internalRender(
+        font,
+        std::move(pos),
+        std::move(color),
+        std::move(outlineColor),
+        buffer
+    );
+    delete[] buffer;
+
+}
+    
+void FontRenderer::render(ghoul::fontrendering::Font& font,
+                          glm::vec2 pos,
+                          glm::vec4 color,
+                          const char* format, ...) const
+{
+    if (format == nullptr)
+        return;
+    
+    va_list args;	 // Pointer To List Of Arguments
+    va_start(args, format); // Parses The String For Variables
+    
+    int size = 1 + vscprintf(format, args);
+    char* buffer = new (std::nothrow) char[size];
+    if (buffer == nullptr) {
+        LERROR("Error allocating buffer");
+        return;
+    }
+    
+    memset(buffer, 0, size);
+    
+#if (_MSC_VER >= 1400) //visual studio 2005 or later
+    vsprintf_s(buffer, size, format, args);
+#else
+    vsprintf(buffer, format, args);
+#endif
+    va_end(args);
+    
+    internalRender(
+        font,
+        std::move(pos),
+        color,
+        glm::vec4(0.f, 0.f, 0.f, color.a),
+        buffer
+    );
+    delete[] buffer;
+    
+}
+
+void FontRenderer::render(ghoul::fontrendering::Font& font,
+                          glm::vec2 pos,
+                          const char* format, ...) const
+{
+    if (format == nullptr)
+        return;
+    
+    va_list args;	 // Pointer To List Of Arguments
+    va_start(args, format); // Parses The String For Variables
+    
+    int size = 1 + vscprintf(format, args);
+    char* buffer = new (std::nothrow) char[size];
+    if (buffer == nullptr) {
+        LERROR("Error allocating buffer");
+        return;
+    }
+    
+    memset(buffer, 0, size);
+    
+#if (_MSC_VER >= 1400) //visual studio 2005 or later
+    vsprintf_s(buffer, size, format, args);
+#else
+    vsprintf(buffer, format, args);
+#endif
+    va_end(args);
+    
+    internalRender(
+        font,
+        std::move(pos),
+        glm::vec4(1.f),
+        glm::vec4(0.f, 0.f, 0.f, 1.f),
+        buffer
+    );
+    delete[] buffer;
+    
+}
+    
+void FontRenderer::internalRender(Font& font, glm::vec2 pos, glm::vec4 color, glm::vec4 outlineColor, const char* buffer) const {
+    float h = font.height();
     
     //Here is some code to split the text that we have been
     //given into a set of lines.
@@ -230,7 +325,7 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
     //this tutorial with unnecessary library dependencies).
     const char* start_line = buffer;
     std::vector<std::string> lines;
-    char* c;
+    const char* c;
     for (c = buffer; *c; c++) {
         if (*c == '\n') {
             std::string line;
@@ -281,12 +376,12 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
                 float t0 = glyph->texCoordTopLeft().y;
                 float s1 = glyph->texCoordBottomRight().x;
                 float t1 = glyph->texCoordBottomRight().y;
-
+                
                 float outlineS0 = glyph->outlineTexCoordTopLeft().x;
                 float outlineT0 = glyph->outlineTexCoordTopLeft().y;
                 float outlineS1 = glyph->outlineTexCoordBottomRight().x;
                 float outlineT1 = glyph->outlineTexCoordBottomRight().y;
-
+                
                 indices.insert(indices.end(), {
                     vertexIndex, vertexIndex + 1, vertexIndex + 2,
                     vertexIndex, vertexIndex + 2, vertexIndex + 3
@@ -305,11 +400,11 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
     }
     
     glm::mat4 projection = glm::ortho(
-        0.f,
-        _windowSize.x,
-        0.f,
-        _windowSize.y
-    );
+                                      0.f,
+                                      _windowSize.x,
+                                      0.f,
+                                      _windowSize.y
+                                      );
     
     ghoul::opengl::TextureUnit atlasUnit;
     atlasUnit.activate();
@@ -331,29 +426,28 @@ void FontRenderer::render(ghoul::fontrendering::Font& font, glm::vec2 pos, const
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_DYNAMIC_DRAW);
-
+    
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(
-          0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0
-    );
-
+                          0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0
+                          );
+    
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(
-        1, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<const void*>(2 * sizeof(float))
-    );
-
+                          1, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<const void*>(2 * sizeof(float))
+                          );
+    
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(
-        2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<const void*>(4 * sizeof(float))
-    );
-
+                          2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<const void*>(4 * sizeof(float))
+                          );
+    
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-
+    
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    delete[] buffer;
+    
 }
     
 void FontRenderer::setWindowSize(glm::vec2 windowSize) {
