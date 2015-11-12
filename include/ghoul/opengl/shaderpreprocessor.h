@@ -124,7 +124,7 @@ namespace ghoul {
       };
 
     private:
-      bool includeFile(const std::string& path, ShaderPreprocessor::Env& env);
+      bool includeFile(const std::string& path, bool track, ShaderPreprocessor::Env& env);
       bool parseLine(ShaderPreprocessor::Env& env);
       bool parseFor(ShaderPreprocessor::Env& env);
       bool parseEndFor(ShaderPreprocessor::Env& env);
@@ -142,12 +142,12 @@ namespace ghoul {
       void addLineNumber(ShaderPreprocessor::Env& env);
       bool isInsideEmptyForStatement(ShaderPreprocessor::Env& env);
 
-      bool trackPath(const std::string& path);
-      void clearTrackedPaths();
+      bool addIncludePath(const std::string& path, bool track);
+      void clearIncludedPaths();
 
       std::string debugString(ShaderPreprocessor::Env& env);
 
-      std::map<std::string, ghoul::filesystem::File> _trackedFiles;
+      std::map<std::string, ghoul::filesystem::File> _includedFiles;
       std::map<std::string, int> _fileIdentifiers;
       static std::vector<std::string> _includePaths;
       std::string _shaderPath;
