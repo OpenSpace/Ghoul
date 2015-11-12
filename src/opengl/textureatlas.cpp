@@ -33,12 +33,14 @@
 
 namespace {
     const std::string _loggerCat = "TextureAtlas";
+    
+    const glm::ivec4 InvalidRegionLocation = glm::vec4(-1, -1, 0, 0);
 }
 
 namespace ghoul {
 namespace opengl {
     
-const glm::ivec4 TextureAtlas::InvalidRegion = glm::vec4(-1, -1, 0, 0);
+const TextureAtlas::RegionHandle TextureAtlas::InvalidRegion = TextureAtlas::RegionHandle(-1);
 
 TextureAtlas::TextureAtlas(glm::ivec3 size)
     : _size(std::move(size))
@@ -96,6 +98,7 @@ TextureAtlas::TextureAtlas(int width, int height, int depth)
 TextureAtlas::TextureAtlas(const TextureAtlas& rhs)
     : _nodes(rhs._nodes)
     , _texture(new Texture(*rhs._texture))
+    , _handleInformation(rhs._handleInformation)
     , _size(rhs._size)
     , _nUsed(rhs._nUsed)
 {
@@ -106,6 +109,7 @@ TextureAtlas::TextureAtlas(const TextureAtlas& rhs)
 TextureAtlas::TextureAtlas(TextureAtlas&& rhs)
     : _nodes(std::move(rhs._nodes))
     , _texture(std::move(rhs._texture))
+    , _handleInformation(std::move(rhs._handleInformation))
     , _size(std::move(rhs._size))
     , _nUsed(std::move(rhs._nUsed))
     , _data(std::move(rhs._data))
@@ -120,6 +124,7 @@ TextureAtlas& TextureAtlas::operator=(const TextureAtlas& rhs) {
     if (this != &rhs) {
         _nodes = rhs._nodes;
         _texture = new Texture(*rhs._texture);
+        _handleInformation = rhs._handleInformation;
         _size = rhs._size;
         _nUsed = rhs._nUsed;
         _data = new unsigned char[_size.x * _size.y * _size.z];
@@ -132,6 +137,7 @@ TextureAtlas& TextureAtlas::operator=(TextureAtlas&& rhs) {
     if (this != &rhs) {
         _nodes = std::move(rhs._nodes);
         _texture = std::move(rhs._texture);
+        _handleInformation = std::move(rhs._handleInformation);
         _size = std::move(rhs._size);
         _nUsed = std::move(rhs._nUsed);
         _data = std::move(rhs._data);
@@ -165,10 +171,14 @@ void TextureAtlas::clear() {
     
     std::memset(_data, 0, _size.x * _size.y * _size.z);
 }
-
-glm::ivec4 TextureAtlas::newRegion(int width, int height) {
+    
+TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
+    // We assign an area that is one pixel bigger to allow for a margin around each region
+    width += 1;
+    height += 1;
+    
     glm::ivec4 region(0, 0, width, height);
-
+    
     int bestHeight = std::numeric_limits<int>::max();
     int bestWidth = std::numeric_limits<int>::max();
     int bestIndex = -1;
@@ -178,7 +188,7 @@ glm::ivec4 TextureAtlas::newRegion(int width, int height) {
         if (y >= 0) {
             const glm::ivec3& node = _nodes[i];
             if (((y + height) < bestHeight ) ||
-               (((y + height) == bestHeight) && (node.z < bestWidth)))
+                (((y + height) == bestHeight) && (node.z < bestWidth)))
             {
                 bestHeight = y + height;
                 bestIndex = i;
@@ -214,11 +224,24 @@ glm::ivec4 TextureAtlas::newRegion(int width, int height) {
     }
     atlasMerge();
     _nUsed += width * height;
-    return region;
-
+    
+    // The region width and height values are used elsewhere in the TextureAtlas and they
+    // should not know about the margin
+    region.z -= 1;
+    region.w -= 1;
+    
+    if (region == InvalidRegionLocation)
+        return InvalidRegion;
+    else {
+        _handleInformation.push_back(region);
+        return static_cast<RegionHandle>(_handleInformation.size() - 1);
+    }
 }
+    
+void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
+    ghoul_assert(handle < _handleInformation.size(), "Invalid handle");
+    glm::ivec4 region = _handleInformation[handle];
 
-void TextureAtlas::setRegionData(const glm::ivec4& region, void* data) {
     int x = region.x;
     int y = region.y;
     int width = region.z;
@@ -240,9 +263,22 @@ void TextureAtlas::setRegionData(const glm::ivec4& region, void* data) {
         memcpy(dst, src, nBytes);
     }
 }
+    
+void TextureAtlas::getTextureCoordinates(RegionHandle handle, glm::vec2& topLeft, glm::vec2& bottomRight, const glm::ivec2& offset) const {
+    ghoul_assert(handle < _handleInformation.size(), "Invalid handle");
 
-void TextureAtlas::setRegionData(int x, int y, int width, int height, void* data) {
-    setRegionData(glm::ivec4(x, y, width, height), data);
+    glm::ivec4 region = _handleInformation[handle];
+    
+    topLeft.x = static_cast<float>(region.x + offset.x) / static_cast<float>(_size.x);
+    topLeft.y = static_cast<float>(region.y + offset.y) / static_cast<float>(_size.y);
+    
+    bottomRight.x = static_cast<float>(region.x + offset.x + region.z ) / static_cast<float>(_size.x);
+    bottomRight.y = static_cast<float>(region.y + offset.y + region.w ) / static_cast<float>(_size.y);
+}
+    
+void TextureAtlas::getTexelCoordinates(RegionHandle handle, glm::ivec4& coordinates) const {
+    ghoul_assert(handle < _handleInformation.size(), "Invalid handle");
+    coordinates = _handleInformation[handle];
 }
 
 int TextureAtlas::atlasFit(size_t index, int width, int height) {

@@ -57,7 +57,9 @@ namespace opengl {
  */
 class TextureAtlas {
 public:
-    static const glm::ivec4 InvalidRegion;
+    typedef int RegionHandle;
+    static const RegionHandle InvalidRegion;
+    
     /**
      * The constructor completely initializes the Texture Atlas. No additional 
      * initialization step is necessary. Due to the fact that the underlying Texture is
@@ -140,10 +142,12 @@ public:
      * top left corner. The last two elements are the <code>width</code> and
      * <code>height</code> of the region.
      */
-    glm::ivec4 newRegion(int width, int height);
+    RegionHandle newRegion(int width, int height);
 
-    void setRegionData(const glm::ivec4& region, void* data);
-    void setRegionData(int x, int y, int width, int height, void* data);
+    void setRegionData(RegionHandle handle, void* data);
+    void getTextureCoordinates(RegionHandle handle, glm::vec2& topLeft, glm::vec2& bottomRight, const glm::ivec2& offset = glm::ivec2(0)) const;
+    void getTexelCoordinates(RegionHandle handle, glm::ivec4& coordinates) const;
+
     
     /**
      * Returns the size of the TextureAtlas in <code>width</code>,
@@ -177,6 +181,8 @@ private:
     
     std::vector<glm::ivec3> _nodes;
     Texture* _texture;
+    
+    std::vector<glm::ivec4> _handleInformation;
     
     glm::ivec3 _size;
     

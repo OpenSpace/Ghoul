@@ -168,6 +168,8 @@ bool Font::initialize() {
 }
     
 Font::Glyph* Font::glyph(wchar_t character) {
+    using TextureAtlas = opengl::TextureAtlas;
+
     // Check if charcode has been already loaded
     for (size_t i = 0; i < _glyphs.size(); ++i) {
         Glyph* glyph = _glyphs[i];
@@ -179,29 +181,23 @@ Font::Glyph* Font::glyph(wchar_t character) {
     // charcode -1 is special: it is used for line drawing (overline, underline,
     // strikethrough) and background.
     if (character == static_cast<wchar_t>(-1)) {
-        size_t width = _atlas.size().x;
-        size_t height = _atlas.size().y;
-        glm::ivec4 region = _atlas.newRegion(5, 5);
-        if (region.x < 0)
+        TextureAtlas::RegionHandle handle = _atlas.newRegion(4, 4);
+        if (handle == TextureAtlas::InvalidRegion)
             return nullptr;
 
         // The last *4 for the depth is not a danger here as _atlas.setRegion only
         // extracts as much data as is needed for the used texture atlas
         std::array<unsigned char, 4*4*4> data;
         data.fill(std::numeric_limits<unsigned char>::max());
+
+        _atlas.setRegionData(handle, data.data());
         
-        _atlas.setRegionData(region.x, region.y, 4, 4, data.data());
+        glm::ivec4 region;
+        _atlas.getTexelCoordinates(handle, region);
+        
         
         Glyph* glyph = new Glyph(static_cast<wchar_t>(-1));
-        glyph->_topLeft = glm::vec2(
-            (region.x+2)/static_cast<float>(width),
-            (region.y+2)/static_cast<float>(height)
-        );
-        glyph->_bottomRight = glm::vec2(
-            (region.x+3)/static_cast<float>(width),
-            (region.y+3)/static_cast<float>(height)
-        );
-
+        _atlas.getTextureCoordinates(handle, glyph->_topLeft, glyph->_bottomRight);
         _glyphs.push_back(glyph);
 
         return glyph;
@@ -238,10 +234,10 @@ bool Font::outline() const {
 }
     
 size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
+    using TextureAtlas = opengl::TextureAtlas;
+    
     size_t missed = 0;
     
-    unsigned int atlasWidth  = _atlas.size().x;
-    unsigned int atlasHeight = _atlas.size().y;
     unsigned int atlasDepth  = _atlas.size().z;
     
     FT_Library library;
@@ -351,24 +347,14 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             w = outlineBitmap->bitmap.width/atlasDepth;
             h = outlineBitmap->bitmap.rows;
             
-            glm::ivec4 region = _atlas.newRegion(w + 1, h + 1);
-            if (region.x < 0) {
+            TextureAtlas::RegionHandle handle = _atlas.newRegion(w, h);
+            if (handle == TextureAtlas::InvalidRegion) {
                 missed++;
                 LERROR("Texture atlas is full");
                 continue;
             }
-            int x = region.x;
-            int y = region.y;
-            _atlas.setRegionData(x, y, w, h, outlineBitmap->bitmap.buffer);
-            
-            outlineTopLeft = glm::vec2(
-                                       x/static_cast<float>(atlasWidth),
-                                       y/static_cast<float>(atlasHeight)
-                                       );
-            outlineBottomRight = glm::vec2(
-                                           (x + w)/static_cast<float>(atlasWidth),
-                                           (y + h)/static_cast<float>(atlasHeight)
-                                           );
+            _atlas.setRegionData(handle, outlineBitmap->bitmap.buffer);
+            _atlas.getTextureCoordinates(handle, outlineTopLeft, outlineBottomRight);
         }
         
         FT_Error error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
@@ -406,14 +392,14 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         h = std::max(h, insideBitmap->bitmap.rows);
         
         
-        glm::ivec4 region = _atlas.newRegion(w + 1, h + 1);
-        if (region.x < 0) {
+        TextureAtlas::RegionHandle handle = _atlas.newRegion(w, h);
+        if (handle == TextureAtlas::InvalidRegion) {
             missed++;
             LERROR("Texture atlas is full");
             continue;
         }
-        int x = region.x;
-        int y = region.y;
+        int x = 0;
+        int y = 0;
         
         if (_outline) {
             std::vector<unsigned char> buffer(w * h * sizeof(char), 0);
@@ -432,28 +418,20 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 }
             }
             
-            _atlas.setRegionData(x, y, w, h, buffer.data());
+            _atlas.setRegionData(handle, buffer.data());
             
-            x += widthOffset / 2.f;
-            y += heightOffset / 2.f;
+            _atlas.getTextureCoordinates(
+                handle,
+                topLeft,
+                bottomRight,
+                glm::ivec2(widthOffset / 2.f, heightOffset / 2.f)
+            );
         }
         else {
-            _atlas.setRegionData(x, y, w, h, insideBitmap->bitmap.buffer);
-            
+            _atlas.setRegionData(handle, insideBitmap->bitmap.buffer);
+            _atlas.getTextureCoordinates(handle, topLeft, bottomRight);
         }
-        
-        topLeft = glm::vec2(
-                            x/static_cast<float>(atlasWidth),
-                            y/static_cast<float>(atlasHeight)
-                            );
-        bottomRight = glm::vec2(
-                                (x + w)/static_cast<float>(atlasWidth),
-                                (y + h)/static_cast<float>(atlasHeight)
-                                );
-        
 
-        
-        
         // Discard hinting to get advance
         FT_Load_Glyph(face, glyphIndex, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
         
