@@ -192,10 +192,6 @@ Font::Glyph* Font::glyph(wchar_t character) {
 
         _atlas.setRegionData(handle, data.data());
         
-        glm::ivec4 region;
-        _atlas.getTexelCoordinates(handle, region);
-        
-        
         Glyph* glyph = new Glyph(static_cast<wchar_t>(-1));
         _atlas.getTextureCoordinates(handle, glyph->_topLeft, glyph->_bottomRight);
         _glyphs.push_back(glyph);
@@ -398,9 +394,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             LERROR("Texture atlas is full");
             continue;
         }
-        int x = 0;
-        int y = 0;
-        
+       
         if (_outline) {
             std::vector<unsigned char> buffer(w * h * sizeof(char), 0);
             int widthOffset = w - insideBitmap->bitmap.width;
@@ -424,7 +418,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 handle,
                 topLeft,
                 bottomRight,
-                glm::ivec2(widthOffset / 2.f, heightOffset / 2.f)
+                glm::ivec4(widthOffset / 2.f, heightOffset / 2.f, 0, 0)
             );
         }
         else {

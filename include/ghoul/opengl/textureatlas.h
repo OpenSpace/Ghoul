@@ -134,21 +134,70 @@ public:
      * Allocate a new region in the TextureAtlas with the desired <code>width</code> and
      * <code>height</code>. If a region cannot be created, the returned vector is equal to
      * #InvalidRegion. The only reason for this function to fail is if there is not enough
-     * free space in the atlas.
+     * free space in the atlas. Please note that the internal width and height of the
+     * region will be increased by 1 pixel to account for a margin and prevent
+     * interpolation issues. The only implication for the usage is the increase storage
+     * requirement.
      * \param width The width of the requested region
      * \param height The height of the requested region
-     * \return A vector describing the location of the region in the TextureAtlas. The
-     * first two elements are the <code>x</code> and <code>y</code> coordinates of the
-     * top left corner. The last two elements are the <code>width</code> and
-     * <code>height</code> of the region.
+     * \param A handle to the new region that can be passed to the #setRegionData,
+     * #getTextureCoordinates, and #getTexelCoordinates functions
      */
     RegionHandle newRegion(int width, int height);
 
+    /**
+     * Sets the data in the region designated by the <code>handle</code> to the passed
+     * <code>data</code>. <b>Warning</b>: Please note that this function does not check
+     * for buffer overflows or underflows. In all cases,
+     * <code>width(region) * height(region) * depth(atlas)</code> number of bytes are read
+     * from the <code>data</code> block.
+     * \param handle The handle of the region for which the data is provided
+     * \param data The data that should be set for the specified region
+     */
     void setRegionData(RegionHandle handle, void* data);
-    void getTextureCoordinates(RegionHandle handle, glm::vec2& topLeft, glm::vec2& bottomRight, const glm::ivec2& offset = glm::ivec2(0)) const;
-    void getTexelCoordinates(RegionHandle handle, glm::ivec4& coordinates) const;
-
     
+    /**
+     * Returns the texture coordinates that define the provided region. If the returned
+     * <code>topLeft</code> and <code>bottomRight</code> coordinates are used as texture
+     * coordinates, the result will be the same as if the data would have been bound to a
+     * separate texture. The <code>windowing</code> parameter provides possiblity to
+     * offset the starting points (with the first two arguments and restrict the width
+     * (with the third and fourth arguments).
+     *\verbatim
+ -------------------
+|         b         |
+|    -----------    |
+| a |           | c |
+|   |           |   |
+|    -----------    |
+|         d         |
+ -------------------
+     *\endverbatim
+     * <code>windowing.x = a</code></br>
+     * <code>windowing.y = b</code></br>
+     * <code>windowing.z = c</code></br>
+     * <code>windowing.w = d</code></br>
+     *
+     *
+     * \param handle The handle of the region for which the texture coordinates shall be
+     * retrieved
+     * \param topLeft The top left corner of the region in texture coordinates
+     * \param bottomRight The bottom right corner of the region in texture coordinates
+     * \param windowing Determines whether a subset of the region should be retrieved. If
+     * this parameter is equal to <code>glm::ivec4(0)</code>, the full region is returned.
+     * The first two parameters <code>x</code> and <code>y</code> determine an offset for
+     * the top left corner, while the third and fourth parameters are subtracted from the
+     * bottom right corner. That means thati f <code>windowing</code> is equal to
+     * <code>glm::ivec4(width / 4, height / 4, width / 4, height / 4</code>, a subset in
+     * the center of the region is returned.
+     */
+    void getTextureCoordinates(
+        RegionHandle handle,
+        glm::vec2& topLeft,
+        glm::vec2& bottomRight,
+        const glm::ivec4& windowing = glm::ivec4(0)
+    ) const;
+
     /**
      * Returns the size of the TextureAtlas in <code>width</code>,
      * <code>height</code>, and <code>depth</code>.
@@ -176,8 +225,10 @@ public:
     const Texture& texture() const;
 
 private:
+    void createTexture(const glm::ivec3& size);
     int atlasFit(size_t index, int width, int height);
     void atlasMerge();
+    bool validHandle(RegionHandle handle) const;
     
     std::vector<glm::ivec3> _nodes;
     Texture* _texture;

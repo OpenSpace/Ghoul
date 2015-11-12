@@ -41,7 +41,6 @@ namespace fontrendering {
     
 class FontManager {
 public:
-    
     FontManager(glm::ivec3 atlasDimensions = glm::ivec3(512, 512, 1));
     FontManager(const FontManager& rhs);
     FontManager(FontManager&& rhs);
@@ -55,6 +54,8 @@ public:
     bool registerFontPath(const std::string& fontName, const std::string& filePath);
     
     Font* font(const std::string& name, float fontSize);
+    
+    ghoul::opengl::TextureAtlas& atlas() { return _textureAtlas; }
     
 private:
     ghoul::opengl::TextureAtlas _textureAtlas;

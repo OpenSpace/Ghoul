@@ -58,37 +58,7 @@ TextureAtlas::TextureAtlas(glm::ivec3 size)
     _data = new unsigned char[_size.x * _size.y * _size.z];
     std::memset(_data, 0, _size.x * _size.y * _size.z);
     
-    Texture::Format format;
-    switch (_size.z) {
-        case 1:
-            format = Texture::Format::Red;
-            break;
-        case 2:
-            format = Texture::Format::RG;
-            break;
-        case 3:
-            format = Texture::Format::RGB;
-            break;
-        case 4:
-            format = Texture::Format::RGBA;
-            break;
-    }
-    GLuint internalFormat = format;
-    GLenum dataType = GL_UNSIGNED_BYTE;
-    
-#ifdef GL_UNSIGNED_INT_8_8_8_8_REV
-    if (_size.z == 4) {
-        internalFormat = GL_BGRA;
-        dataType = GL_UNSIGNED_INT_8_8_8_8_REV;
-    }
-#endif
-
-    _texture = new Texture(
-        _size,
-        format,
-        internalFormat,
-        dataType
-    );
+    createTexture(_size);
 }
 
 TextureAtlas::TextureAtlas(int width, int height, int depth)
@@ -150,6 +120,7 @@ glm::ivec3 TextureAtlas::size() const {
 }
 
 const Texture& TextureAtlas::texture() const {
+    ghoul_assert(_texture != nullptr, "No texture is present");
     return *_texture;
 }
 
@@ -226,20 +197,20 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
     _nUsed += width * height;
     
     // The region width and height values are used elsewhere in the TextureAtlas and they
-    // should not know about the margin
+    // should not know about the added margins
     region.z -= 1;
     region.w -= 1;
     
-    if (region == InvalidRegionLocation)
-        return InvalidRegion;
-    else {
-        _handleInformation.push_back(region);
-        return static_cast<RegionHandle>(_handleInformation.size() - 1);
-    }
+    // Make the location information retrievable
+    _handleInformation.push_back(region);
+    
+    // Since we push_back the region, the current handle is the last valid array index
+    RegionHandle handle = static_cast<RegionHandle>(_handleInformation.size() - 1);
+    return handle;
 }
     
 void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
-    ghoul_assert(handle < _handleInformation.size(), "Invalid handle");
+    ghoul_assert(validHandle(handle), "Invalid handle");
     glm::ivec4 region = _handleInformation[handle];
 
     int x = region.x;
@@ -255,6 +226,9 @@ void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
     ghoul_assert(y < (_size.y - 1), "y argument out of bounds");
     ghoul_assert((y + height) <= (_size.y - 1), "y argument out of bounds");
     
+    // As the incoming data is a single stream of bytes, we need to chop it up into chunks
+    // of length 'width'. We have 'height' of these chunks that need to be copied into our
+    // atlas
     for (int i = 0; i < height; ++i) {
         void* dst = _data + ((y + i) * _size.x + x) * sizeof(char) * _size.z;
         void* src = reinterpret_cast<unsigned char*>(data) + (i * width) * sizeof(char);
@@ -264,37 +238,77 @@ void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
     }
 }
     
-void TextureAtlas::getTextureCoordinates(RegionHandle handle, glm::vec2& topLeft, glm::vec2& bottomRight, const glm::ivec2& offset) const {
-    ghoul_assert(handle < _handleInformation.size(), "Invalid handle");
-
+void TextureAtlas::getTextureCoordinates(RegionHandle handle, glm::vec2& topLeft, glm::vec2& bottomRight, const glm::ivec4& windowing) const {
+    ghoul_assert(validHandle(handle), "Invalid handle");
     glm::ivec4 region = _handleInformation[handle];
     
-    topLeft.x = static_cast<float>(region.x + offset.x) / static_cast<float>(_size.x);
-    topLeft.y = static_cast<float>(region.y + offset.y) / static_cast<float>(_size.y);
+    int topLeftX = region.x + windowing.x;
+    int topLeftY = region.y + windowing.y;
     
-    bottomRight.x = static_cast<float>(region.x + offset.x + region.z ) / static_cast<float>(_size.x);
-    bottomRight.y = static_cast<float>(region.y + offset.y + region.w ) / static_cast<float>(_size.y);
+    int bottomRightX = topLeftX + (region.z - windowing.z);
+    int bottomRightY = topLeftY + (region.w - windowing.w);
+    
+    topLeft.x = static_cast<float>(topLeftX) / static_cast<float>(_size.x);
+    topLeft.y = static_cast<float>(topLeftY) / static_cast<float>(_size.y);
+    
+    bottomRight.x = static_cast<float>(bottomRightX) / static_cast<float>(_size.x);
+    bottomRight.y = static_cast<float>(bottomRightY) / static_cast<float>(_size.y);
 }
     
-void TextureAtlas::getTexelCoordinates(RegionHandle handle, glm::ivec4& coordinates) const {
-    ghoul_assert(handle < _handleInformation.size(), "Invalid handle");
-    coordinates = _handleInformation[handle];
+void TextureAtlas::createTexture(const glm::ivec3& size) {
+    Texture::Format format;
+    // Choose the correct texture format based on the textureatlas depth
+    switch (size.z) {
+        case 1:
+            format = Texture::Format::Red;
+            break;
+        case 2:
+            format = Texture::Format::RG;
+            break;
+        case 3:
+            format = Texture::Format::RGB;
+            break;
+        case 4:
+            format = Texture::Format::RGBA;
+            break;
+    }
+    GLuint internalFormat = format;
+    
+    // Normally, we want to store data as single bytes, but if the reversed format is
+    // supported, we can use that for depth==4 atlasses
+    GLenum dataType = GL_UNSIGNED_BYTE;
+    
+#ifdef GL_UNSIGNED_INT_8_8_8_8_REV
+    if (size.z == 4) {
+        internalFormat = GL_BGRA;
+        dataType = GL_UNSIGNED_INT_8_8_8_8_REV;
+    }
+#endif
+    
+    _texture = new Texture(
+        size,
+        format,
+        internalFormat,
+        dataType
+    );
 }
-
+    
 int TextureAtlas::atlasFit(size_t index, int width, int height) {
     int x = _nodes[index].x;
     int y = _nodes[index].y;
     
+    // We first fill up the width
     if ((x + width) > (_size.x - 1))
         return -1;
-    while (width > 0) {
+    int remainingWidth = width;
+    while (remainingWidth > 0) {
         const glm::ivec3& node = _nodes[index];
         
         if (node.y > y)
             y = node.y;
         if ((y + height) > (_size.y - 1))
             return -1;
-        width -= node.z;
+        remainingWidth -= node.z;
         ++index;
     }
     return y;
@@ -312,6 +326,11 @@ void TextureAtlas::atlasMerge() {
     }
 }
 
+bool TextureAtlas::validHandle(TextureAtlas::RegionHandle handle) const {
+    return
+        (handle < _handleInformation.size()) &&
+        (handle >= 0);
+}
 
 } // namespace opengl
 } // namespace ghoul
