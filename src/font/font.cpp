@@ -289,12 +289,36 @@ const Font::Glyph* Font::glyph(wchar_t character) {
     if (nGlyphNotLoaded == 0)
         return &(_glyphs.back());
     else {
-        LERROR("Glyphs '" << character << "' could not be loaded");
+        LERROR("Glyph '" << character << "' could not be loaded");
         return nullptr;
     }
 }
     
 size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
+#define HandleError(error) \
+    if (error) { \
+        LERROR("FT_Error: " << \
+               FT_Errors[error].code << \
+               " (" << FT_Errors[error].message << ")" \
+        ); \
+        FT_Done_Face(face); \
+        FT_Done_FreeType(library); \
+        return characters.size() - i; \
+    }
+
+#define HandleErrorWithStroker(error) \
+    if (error) { \
+        LERROR("FT_Error: " << \
+            FT_Errors[error].code << \
+            " (" << FT_Errors[error].message << ")" \
+        ); \
+        FT_Done_Face(face); \
+        FT_Done_FreeType(library); \
+        return characters.size() - i; \
+    }
+
+
+    
     using TextureAtlas = opengl::TextureAtlas;
     
     size_t missed = 0;
@@ -308,7 +332,6 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         return characters.size();
 
     for (size_t i = 0; i < characters.size(); ++i) {
-        
         // Search through the loaded glyphs to avoid duplicates
         wchar_t charcode = characters[i];
         auto it = std::find_if(
@@ -321,95 +344,60 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         
         // First generate the font without outline and store it in the font atlas
         // only if an outline is request, repeat the process for the outline
-        int ft_glyph_top, ft_glyph_left;
+
+        int leftBearing, topBearing;
         glm::vec2 topLeft, bottomRight;
         glm::vec2 outlineTopLeft, outlineBottomRight;
-        unsigned int w = 0, h = 0;
+        unsigned int width = 0;
+        unsigned int height = 0;
         
-        FT_Int32 flags = 0;
-        flags |= FT_LOAD_FORCE_AUTOHINT;
-        
-        FT_UInt glyphIndex = FT_Get_Char_Index(face, characters[i]);
+        FT_UInt glyphIndex = FT_Get_Char_Index(face, charcode);
         if (glyphIndex == 0) {
             LERROR("Glyph was not present in the FreeType face");
             FT_Done_Face(face);
             FT_Done_FreeType(library);
             return characters.size() - i;
         }
-        
+
+        FT_Error error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
+        HandleError(error);
+        // In case the font has an outline, we load it first as we need the size of the
+        // outline for loading the base layer
+        // The reason for this is that the outline is slightly bigger than the base layer
+        // for most Glyphs. Therefore, if the Font has an outline, we need to increase the
+        // size of the base to match the outline so that they can be rendered on top of
+        // each other
         if (_hasOutline) {
-            FT_Int32 outlineFlags = flags;
-            //            flags |= FT_LOAD_NO_BITMAP;
-            
-            FT_Error error = FT_Load_Glyph(face, glyphIndex, outlineFlags);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Done_FreeType(library);
-                return characters.size() - i;
-            }
-            
-            
             FT_Stroker stroker;
             error = FT_Stroker_New(library, &stroker);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                
-                FT_Done_Face(face);
-                FT_Stroker_Done(stroker);
-                FT_Done_FreeType(library);
-                return characters.size() - i;
-            }
+            HandleErrorWithStroker(error);
             
             FT_Stroker_Set(stroker,
-                           static_cast<int>(_outlineThickness * PointConversionFactor),
-                           //                           static_cast<int>(OutlineThickness * HighResolution),
-                           FT_STROKER_LINECAP_ROUND,
-                           FT_STROKER_LINEJOIN_ROUND,
-                           0);
+                static_cast<int>(_outlineThickness * PointConversionFactor),
+                FT_STROKER_LINECAP_ROUND,
+                FT_STROKER_LINEJOIN_ROUND,
+                0
+            );
             
             FT_Glyph outlineGlyph;
             error = FT_Get_Glyph(face->glyph, &outlineGlyph);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Stroker_Done(stroker);
-                FT_Done_FreeType(library);
-                return characters.size() - i;
-            }
-//            error = FT_Glyph_StrokeBorder( &outlineGlyph., stroker, 0, 1 );
+            HandleErrorWithStroker(error);
           
             error = FT_Glyph_Stroke(&outlineGlyph, stroker, 1);
-            //            error = FT_Glyph_StrokeBorder(&outlineGlyph, stroker, false, true);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Stroker_Done(stroker);
-                FT_Done_FreeType(library);
-                return characters.size() - i;
-            }
-            
-            error = FT_Glyph_To_Bitmap(&outlineGlyph, FT_RENDER_MODE_NORMAL, 0, 1);
-            if (error) {
-                LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-                FT_Done_Face(face);
-                FT_Stroker_Done(stroker);
-                FT_Done_FreeType(library);
-                return characters.size() - i;
-            }
-            FT_BitmapGlyph outlineBitmap;
-            outlineBitmap = (FT_BitmapGlyph)outlineGlyph;
-            
-            ft_glyph_top    = outlineBitmap->top;
-            ft_glyph_left   = outlineBitmap->left;
+            HandleErrorWithStroker(error);
             FT_Stroker_Done(stroker);
+           
+            error = FT_Glyph_To_Bitmap(&outlineGlyph, FT_RENDER_MODE_NORMAL, nullptr, 1);
+            HandleError(error);
             
-            // We want each glyph to be separated by at least one black pixel
-            // (for example for shader used in demo-subpixel.c)
-            w = outlineBitmap->bitmap.width/atlasDepth;
-            h = outlineBitmap->bitmap.rows;
+            FT_BitmapGlyph outlineBitmap = reinterpret_cast<FT_BitmapGlyph>(outlineGlyph);
+            topBearing    = outlineBitmap->top;
+            leftBearing   = outlineBitmap->left;
             
-            TextureAtlas::RegionHandle handle = _atlas.newRegion(w, h);
+            width = outlineBitmap->bitmap.width / atlasDepth;
+            height = outlineBitmap->bitmap.rows;
+            
+            TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
             if (handle == TextureAtlas::InvalidRegion) {
                 missed++;
                 LERROR("Texture atlas is full");
@@ -419,67 +407,66 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             _atlas.getTextureCoordinates(handle, outlineTopLeft, outlineBottomRight);
         }
         
-        FT_Error error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
-        if (error) {
-            LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-            FT_Done_Face(face);
-            FT_Done_FreeType(library);
-            return characters.size() - i;
-        }
-        
         FT_Glyph insideGlyph;
         error = FT_Get_Glyph(face->glyph, &insideGlyph);
-        if (error) {
-            LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-            FT_Done_Face(face);
-            FT_Done_FreeType(library);
-            return characters.size() - i;
-        }
+        HandleError(error);
         
-        error = FT_Glyph_To_Bitmap(&insideGlyph, FT_RENDER_MODE_NORMAL, nullptr, true);
-        if (error) {
-            LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-            FT_Done_Face(face);
-            FT_Done_FreeType(library);
-            return characters.size() - i;
-        }
+        error = FT_Glyph_To_Bitmap(&insideGlyph, FT_RENDER_MODE_NORMAL, nullptr, 1);
+        HandleError(error);
         
+        FT_BitmapGlyph insideBitmap = reinterpret_cast<FT_BitmapGlyph>(insideGlyph);
         
-        FT_BitmapGlyph insideBitmap = (FT_BitmapGlyph)insideGlyph;
+        topBearing = insideBitmap->top;
+        leftBearing = insideBitmap->left;
+
+        // We take the maximum of the width (either 0 if there is no outline, or the
+        // outline width if there is one) and the height
+        width = std::max(width, insideBitmap->bitmap.width / atlasDepth);
+        height = std::max(height, insideBitmap->bitmap.rows);
         
-        ft_glyph_top = insideBitmap->top;
-        ft_glyph_left = insideBitmap->left;
-        
-        w = std::max(w, insideBitmap->bitmap.width/atlasDepth);
-        h = std::max(h, insideBitmap->bitmap.rows);
-        
-        
-        TextureAtlas::RegionHandle handle = _atlas.newRegion(w, h);
+        TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
         if (handle == TextureAtlas::InvalidRegion) {
             missed++;
             LERROR("Texture atlas is full");
             continue;
         }
-       
-        if (_hasOutline) {
-            std::vector<unsigned char> buffer(w * h * sizeof(char), 0);
-            int widthOffset = w - insideBitmap->bitmap.width;
-            int heightOffset = h - insideBitmap->bitmap.rows;
+        
+        // If we don't have an outline for this font, our current 'width' and 'height'
+        // corresponds to the buffer, so we can just use it straight away.
+        // If we have an outline, the buffer has a different size from the region in the
+        // atlas, so we need to copy the values from the buffer into the atlas region
+        // first
+        if (!_hasOutline) {
+            _atlas.setRegionData(handle, insideBitmap->bitmap.buffer);
+            _atlas.getTextureCoordinates(handle, topLeft, bottomRight);
+        }
+        else {
+            std::vector<unsigned char> buffer(width * height * sizeof(char), 0);
+            int widthOffset = width - insideBitmap->bitmap.width;
+            int heightOffset = height - insideBitmap->bitmap.rows;
             
-            int k, l;
-            for (unsigned int j = 0; j < h; ++j) {
-                for (unsigned int i = 0; i < w; ++i) {
-                    k = i - widthOffset;
-                    l = j - heightOffset;
-                    buffer[(i + j*w)] =
-                    (k >= static_cast<int>(insideBitmap->bitmap.width) || l >= static_cast<int>(insideBitmap->bitmap.rows) || k < 0 || l < 0) ?
-                    0 : insideBitmap->bitmap.buffer[k + insideBitmap->bitmap.width*l];
+            for (unsigned int j = 0; j < height; ++j) {
+                for (unsigned int i = 0; i < width; ++i) {
+                    int k = i - widthOffset;
+                    int l = j - heightOffset;
                     
+                    bool inBorder =
+                        (k < 0) ||
+                        (k >= static_cast<int>(insideBitmap->bitmap.width)) ||
+                        (l < 0) ||
+                        (l >= static_cast<int>(insideBitmap->bitmap.rows));
+                    
+                    if (!inBorder) {
+                        buffer[(i + j*width)] =
+                            insideBitmap->bitmap.buffer[k + insideBitmap->bitmap.width*l];
+                    }
                 }
             }
             
             _atlas.setRegionData(handle, buffer.data());
             
+            // We need to offset the texture coordinates by half of the width and height
+            // differences
             _atlas.getTextureCoordinates(
                 handle,
                 topLeft,
@@ -487,20 +474,15 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
                 glm::ivec4(widthOffset / 2.f, heightOffset / 2.f, 0, 0)
             );
         }
-        else {
-            _atlas.setRegionData(handle, insideBitmap->bitmap.buffer);
-            _atlas.getTextureCoordinates(handle, topLeft, bottomRight);
-        }
 
         // Discard hinting to get advance
         FT_Load_Glyph(face, glyphIndex, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
-        
         _glyphs.emplace_back(
-            characters[i],
-            w,
-            h,
-            ft_glyph_left,
-            ft_glyph_top,
+            charcode,
+            width,
+            height,
+            leftBearing,
+            topBearing,
             face->glyph->advance.x / PointConversionFactor,
             face->glyph->advance.y / PointConversionFactor,
             topLeft,
@@ -525,8 +507,12 @@ void Font::generateKerning() {
     if (!success)
         return;
     
-    /* For each glyph couple combination, check if kerning is necessary */
-    /* Starts at index 1 since 0 is for the special backgroudn glyph */
+    bool hasKerning = FT_HAS_KERNING(face);
+    if (!hasKerning)
+        return;
+    
+    // For each combination of Glyphs, determine the kerning factors. The index starts at
+    // 1 as 0 is reserved for the special background glyph
     for (size_t i = 1; i < _glyphs.size(); ++i) {
         Glyph& glyph = _glyphs[i];
         FT_UInt glyphIndex = FT_Get_Char_Index(face, glyph._charcode);
@@ -536,10 +522,9 @@ void Font::generateKerning() {
             const Glyph& prevGlyph = _glyphs[j];
             FT_UInt prevIndex = FT_Get_Char_Index(face, prevGlyph._charcode);
             FT_Vector kerning;
-            FT_Get_Kerning(face, prevIndex, glyphIndex, FT_KERNING_UNFITTED, &kerning);
-            if (kerning.x != 0) {
-                glyph._kerning[prevGlyph._charcode] = kerning.x / (PointConversionFactor*PointConversionFactor);
-            }
+            FT_Get_Kerning(face, prevIndex, glyphIndex, FT_KERNING_DEFAULT, &kerning);
+            if (kerning.x != 0)
+                glyph._kerning[prevGlyph._charcode] = kerning.x / (PointConversionFactor);
         }
     }
     
