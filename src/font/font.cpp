@@ -31,6 +31,8 @@
 #include <algorithm>
 #include <array>
 
+#include <cstdarg>
+
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_STROKER_H
@@ -48,6 +50,8 @@ const struct {
 #include FT_ERRORS_H
 
 #ifdef WIN32
+#define vscprintf(f,a) _vscprintf(f,a)
+#else
 static int vscprintf(const char* format, va_list pargs) {
     va_list argcopy;
     va_copy(argcopy, pargs);
@@ -55,9 +59,7 @@ static int vscprintf(const char* format, va_list pargs) {
     va_end(argcopy);
     return retval;
 }
-#else
-#define vscprintf(f,a) _vscprintf(f,a)
-#endif // WIN32
+#endif
 
 namespace {
     const std::string _loggerCat = "Font";
