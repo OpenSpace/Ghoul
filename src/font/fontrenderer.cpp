@@ -402,7 +402,7 @@ void FontRenderer::internalRender(Font& font,
     _program->setUniform("outlineColor", outlineColor);
     _program->setUniform("tex", atlasUnit);
     _program->setUniform("projection", projection);
-    _program->setUniform("hasOutline", font.outline());
+    _program->setUniform("hasOutline", font.hasOutline());
     _program->setIgnoreUniformLocationError(false);
     
     glBindVertexArray(_vao);

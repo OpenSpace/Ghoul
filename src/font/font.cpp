@@ -194,30 +194,22 @@ const glm::vec2& Font::Glyph::outlineBottomRight() const {
     return _outlineBottomRight;
 }
    
-Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, bool outline, float outlineThickness)
+Font::Font(std::string filename,
+           float pointSize,
+           opengl::TextureAtlas& atlas,
+           bool hasOutline,
+           float outlineThickness)
     : _atlas(atlas)
     , _name(std::move(filename))
     , _pointSize(pointSize)
     , _height(0.f)
-    , _outline(outline)
+    , _hasOutline(hasOutline)
     , _outlineThickness(outlineThickness)
 {
     ghoul_assert(_pointSize > 0.f, "Need positive point size");
     ghoul_assert(!_name.empty(), "Empty file name not allowed");
 }
-    
-bool Font::operator==(const Font& rhs) {
-    // TODO: This is untested ---abock
-    return (
-        (_name == rhs._name) &&
-        (_pointSize == rhs._pointSize) &&
-        (_glyphs == rhs._glyphs) &&
-        (&_atlas == &rhs._atlas) &&
-        (_outline = rhs._outline) &&
-        (_outlineThickness == rhs._outlineThickness)
-    );
-}
-    
+
 bool Font::initialize() {
     // Get font metrics at higher resolution for increased accuracy
     static const float HighFaceResolutionFactor = 100.f;
@@ -239,47 +231,7 @@ bool Font::initialize() {
     
     return true;
 }
-    
-const Font::Glyph* Font::glyph(wchar_t character) {
-    using TextureAtlas = opengl::TextureAtlas;
 
-    // Check if charcode has been already loaded
-    for (const Glyph& g : _glyphs) {
-        if (g._charcode == character)
-            return &g;
-    }
-    
-    // charcode -1 is special: it is used for line drawing (overline, underline,
-    // strikethrough) and background.
-    if (character == static_cast<wchar_t>(-1)) {
-        TextureAtlas::RegionHandle handle = _atlas.newRegion(4, 4);
-        if (handle == TextureAtlas::InvalidRegion)
-            return nullptr;
-
-        // The last *4 for the depth is not a danger here as _atlas.setRegion only
-        // extracts as much data as is needed for the used texture atlas
-        std::array<unsigned char, 4*4*4> data;
-        data.fill(std::numeric_limits<unsigned char>::max());
-
-        _atlas.setRegionData(handle, data.data());
-        
-        Glyph glyph(static_cast<wchar_t>(-1));
-        _atlas.getTextureCoordinates(handle, glyph._topLeft, glyph._bottomRight);
-        _glyphs.push_back(std::move(glyph));
-
-        return &(_glyphs.back());
-    }
-    
-    // Glyph has not been already loaded
-    size_t nGlyphNotLoaded = loadGlyphs({character});
-    if (nGlyphNotLoaded == 0)
-        return &(_glyphs.back());
-    else {
-        LERROR("Glyphs '" << character << "' could not be loaded");
-        return nullptr;
-    }
-}
-    
 std::string Font::name() const {
     return _name;
 }
@@ -296,11 +248,51 @@ opengl::TextureAtlas& Font::atlas() {
     return _atlas;
 }
     
-bool Font::outline() const {
-    return _outline;
+bool Font::hasOutline() const {
+    return _hasOutline;
+}
+
+const Font::Glyph* Font::glyph(wchar_t character) {
+    using TextureAtlas = opengl::TextureAtlas;
+    
+    // Check if charcode has been already loaded
+    for (const Glyph& g : _glyphs) {
+        if (g._charcode == character)
+            return &g;
+    }
+    
+    // charcode -1 is special: it is used for line drawing (overline, underline,
+    // strikethrough) and background.
+    if (character == static_cast<wchar_t>(-1)) {
+        TextureAtlas::RegionHandle handle = _atlas.newRegion(4, 4);
+        if (handle == TextureAtlas::InvalidRegion)
+            return nullptr;
+        
+        // The last *4 for the depth is not a danger here as _atlas.setRegion only
+        // extracts as much data as is needed for the used texture atlas
+        std::array<unsigned char, 4*4*4> data;
+        data.fill(std::numeric_limits<unsigned char>::max());
+        
+        _atlas.setRegionData(handle, data.data());
+        
+        Glyph glyph(static_cast<wchar_t>(-1));
+        _atlas.getTextureCoordinates(handle, glyph._topLeft, glyph._bottomRight);
+        _glyphs.push_back(std::move(glyph));
+        
+        return &(_glyphs.back());
+    }
+    
+    // Glyph has not been already loaded
+    size_t nGlyphNotLoaded = loadGlyphs({character});
+    if (nGlyphNotLoaded == 0)
+        return &(_glyphs.back());
+    else {
+        LERROR("Glyphs '" << character << "' could not be loaded");
+        return nullptr;
+    }
 }
     
-size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
+size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
     using TextureAtlas = opengl::TextureAtlas;
     
     size_t missed = 0;
@@ -311,12 +303,12 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
     FT_Face face;
     bool success = loadFace(_name, _pointSize, library, face);
     if (!success)
-        return glyphs.size();
+        return characters.size();
 
-    for (size_t i = 0; i < glyphs.size(); ++i) {
+    for (size_t i = 0; i < characters.size(); ++i) {
         
         // Search through the loaded glyphs to avoid duplicates
-        wchar_t charcode = glyphs[i];
+        wchar_t charcode = characters[i];
         auto it = std::find_if(
             _glyphs.begin(),
             _glyphs.end(),
@@ -335,15 +327,15 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         FT_Int32 flags = 0;
         flags |= FT_LOAD_FORCE_AUTOHINT;
         
-        FT_UInt glyphIndex = FT_Get_Char_Index(face, glyphs[i]);
+        FT_UInt glyphIndex = FT_Get_Char_Index(face, characters[i]);
         if (glyphIndex == 0) {
             LERROR("Glyph was not present in the FreeType face");
             FT_Done_Face(face);
             FT_Done_FreeType(library);
-            return glyphs.size() - i;
+            return characters.size() - i;
         }
         
-        if (_outline) {
+        if (_hasOutline) {
             FT_Int32 outlineFlags = flags;
             //            flags |= FT_LOAD_NO_BITMAP;
             
@@ -352,7 +344,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
                 FT_Done_Face(face);
                 FT_Done_FreeType(library);
-                return glyphs.size() - i;
+                return characters.size() - i;
             }
             
             
@@ -364,7 +356,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 FT_Done_Face(face);
                 FT_Stroker_Done(stroker);
                 FT_Done_FreeType(library);
-                return glyphs.size() - i;
+                return characters.size() - i;
             }
             
             FT_Stroker_Set(stroker,
@@ -381,9 +373,10 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 FT_Done_Face(face);
                 FT_Stroker_Done(stroker);
                 FT_Done_FreeType(library);
-                return glyphs.size() - i;
+                return characters.size() - i;
             }
-            
+//            error = FT_Glyph_StrokeBorder( &outlineGlyph., stroker, 0, 1 );
+          
             error = FT_Glyph_Stroke(&outlineGlyph, stroker, 1);
             //            error = FT_Glyph_StrokeBorder(&outlineGlyph, stroker, false, true);
             if (error) {
@@ -391,7 +384,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 FT_Done_Face(face);
                 FT_Stroker_Done(stroker);
                 FT_Done_FreeType(library);
-                return glyphs.size() - i;
+                return characters.size() - i;
             }
             
             error = FT_Glyph_To_Bitmap(&outlineGlyph, FT_RENDER_MODE_NORMAL, 0, 1);
@@ -400,7 +393,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
                 FT_Done_Face(face);
                 FT_Stroker_Done(stroker);
                 FT_Done_FreeType(library);
-                return 0;
+                return characters.size() - i;
             }
             FT_BitmapGlyph outlineBitmap;
             outlineBitmap = (FT_BitmapGlyph)outlineGlyph;
@@ -429,7 +422,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
             FT_Done_Face(face);
             FT_Done_FreeType(library);
-            return glyphs.size() - i;
+            return characters.size() - i;
         }
         
         FT_Glyph insideGlyph;
@@ -438,7 +431,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
             FT_Done_Face(face);
             FT_Done_FreeType(library);
-            return glyphs.size() - i;
+            return characters.size() - i;
         }
         
         error = FT_Glyph_To_Bitmap(&insideGlyph, FT_RENDER_MODE_NORMAL, nullptr, true);
@@ -446,7 +439,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
             FT_Done_Face(face);
             FT_Done_FreeType(library);
-            return glyphs.size() - i;
+            return characters.size() - i;
         }
         
         
@@ -466,7 +459,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             continue;
         }
        
-        if (_outline) {
+        if (_hasOutline) {
             std::vector<unsigned char> buffer(w * h * sizeof(char), 0);
             int widthOffset = w - insideBitmap->bitmap.width;
             int heightOffset = h - insideBitmap->bitmap.rows;
@@ -501,7 +494,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         FT_Load_Glyph(face, glyphIndex, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
         
         _glyphs.emplace_back(
-            glyphs[i],
+            characters[i],
             w,
             h,
             ft_glyph_left,
@@ -552,43 +545,5 @@ void Font::generateKerning() {
     FT_Done_FreeType( library );
 }
 
-    /*
-bool loadFace(const std::string& name, float size, FT_Library& library, FT_Face& face) {
-    FT_Error error = FT_Init_FreeType(&library);
-    if (error) {
-        LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-        return false;
-    }
-
-    // Load face
-    error = FT_New_Face(library, name.c_str(), 0, &face);
-    if (error) {
-        LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-        FT_Done_FreeType(library);
-        return false;
-    }
-    
-    // Select charmap
-    error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
-    if (error) {
-        LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-        FT_Done_Face(face);
-        FT_Done_FreeType(library);
-        return false;
-    }
-
-    // Set char size
-    error = FT_Set_Char_Size(face, (int)(size * PointConversionFactor), 0, DPI , DPI);
-    if (error) {
-        LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
-        FT_Done_Face(face);
-        FT_Done_FreeType(library);
-        return false;
-    }
-    
-    return true;
-}
-*/
-    
 } // namespace fontrendering
 } // namespace ghoul

@@ -194,35 +194,112 @@ public:
         std::map<wchar_t, float> _kerning;
     };
 
-    Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, bool outline = true, float outlineThickness = 1.f);
-    
-    bool operator==(const Font& rhs);
-    
+    /**
+     * Constructor creating a new Font with the specified <code>filename</code> at the
+     * provided <code>pointSize</code>. The Glyphs of this Font will be stored in the
+     * <code>atlas</code> TextureAtlas if there is enough free space. If
+     * <code>outline</code> is <code>true</code> two sets of Glyphs are created which are
+     * combined to provide an outline of thickness <code>outlineThickness</code> to the
+     * glyphs.
+     * \param filename The full path to the font file
+     * \param pointSize The font size in pt
+     * \param atlas The TextureAtlas which holds the created Glyphs
+     * \param hasOutline A flag whether Glyphs of this Font should have an outline or not
+     * \param outlineThickness The thickness of the outline. This setting is ignored if
+     * the Font does not have an outline.
+     */
+    Font(std::string filename,
+         float pointSize,
+         opengl::TextureAtlas& atlas,
+         bool hasOutline = true,
+         float outlineThickness = 1.f
+    );
+
+    /**
+     * Initializes the Font by loading the <code>filename</code> provided in the
+     * constructor and setting some Font metrics. Calling this function after the
+     * contruction is the first step to test whether the Font works. The return value
+     * reports whether an error has occured.
+     * \return <code>true</code> if the Font has been initialized successfully,
+     * <code>false</code> otherwise
+     */
     bool initialize();
-    
+
+    /**
+     * Returns the name of the Font
+     * \return The name of the Font
+     */
     std::string name() const;
+    
+    /**
+     * Returns the font size of this Font
+     * \return The font size of this Font
+     */
     float pointSize() const;
+    
+    /**
+     * Returns the line seperator for this Font. This is the vertical length that
+     * separates two consecutive lines.
+     * \return The vertical line separation
+     */
     float height() const;
     
-    bool outline() const;
+    /**
+     * Returns whether this Font has an outline or not
+     * \return <code>true</code> if this Font has an outline, <code>false</code> otherwise
+     */
+    bool hasOutline() const;
     
+    /**
+     * Returns the Glyph that representes the passed <code>character</code>. The first
+     * call to this function for each character creates and caches the Glyph before
+     * returning it.
+     * \param character The character for which the Glyph should be returned
+     * \return A pointer to the Glyph or <code>nullptr</code> if the Glyph could not be
+     * loaded
+     */
     const Glyph* glyph(wchar_t character);
 
-    size_t loadGlyphs(const std::vector<wchar_t>& glyphs);
+    /**
+     * Preloads a list of Glyphs. Glyphs that are passed as part of 
+     * <code>characters</code> that have been loaded previously are ignored and not loaded 
+     * multiple times.
+     * \param characters A list of characters for which Glyphs should be created and
+     * cached
+     * \return The number of characters that have not been loaded. If this value is 0, all
+     * passed characters were successfully loaded
+     */
+    size_t loadGlyphs(const std::vector<wchar_t>& characters);
     
+    /**
+     * Returns the TextureAtlas that stores all of the Glyphs for this Font
+     * \return The TextureAtlas that stores all of the Glyphs for this Font
+     */
     opengl::TextureAtlas& atlas();
 
 private:
+    /// Generates the Kerning values for all Glyph pairs that have sofar been loaded
     void generateKerning();
 
+    /// A list of all loaded Glyphs
     std::vector<Glyph> _glyphs;
     
+    /// The TextureAtlas backend storage for the loaded Glyphs
     opengl::TextureAtlas& _atlas;
     
+    /// The file name of this Font
     std::string _name;
+    
+    /// The font size in pt
     float _pointSize;
+    
+    /// The vertical distance between two consecutive lines
     float _height;
-    bool _outline;
+    
+    /// Whether this Font has an outline or not
+    bool _hasOutline;
+    
+    /// The thickness of the outline
     float _outlineThickness;
 };
     

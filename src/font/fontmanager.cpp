@@ -149,7 +149,7 @@ Font* FontManager::font(unsigned int hashName, float fontSize, bool withOutline,
     
     auto fonts = _fonts.equal_range(hashName);
     for (auto it = fonts.first; it != fonts.second; ++it) {
-        if (it->second->pointSize() == fontSize && it->second->outline() == withOutline)
+        if (it->second->pointSize() == fontSize && it->second->hasOutline() == withOutline)
             return it->second;
     }
     
