@@ -25,27 +25,24 @@
 
 #include <ghoul/font/fontrenderer.h>
 
-#include <ghoul/misc/assert.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
 #include <ghoul/opengl/programobject.h>
-
 #include <ghoul/opengl/textureunit.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
-//Replacement for Visual Studio's _vscprintf function
-#if (_MSC_VER < 1400) //if older than visual studio 2005
-static int vscprintf (const char * format, va_list pargs) {
-    int retval;
+#ifdef WIN32
+#define vscprintf(f,a) _vscprintf(f,a)
+#else
+static int vscprintf(const char* format, va_list pargs) {
     va_list argcopy;
     va_copy(argcopy, pargs);
-    retval = vsnprintf(NULL, 0, format, argcopy);
+    int retval = vsnprintf(nullptr, 0, format, argcopy);
     va_end(argcopy);
     return retval;
 }
-#else
-#define vscprintf(f,a) _vscprintf(f,a)
 #endif
 
 
@@ -83,7 +80,7 @@ namespace {
     out vec4 FragColor; \n\
     \n\
     uniform sampler2D tex; \n\
-    uniform vec4 color; \n\
+    uniform vec4 baseColor; \n\
     uniform vec4 outlineColor; \n\
     uniform bool hasOutline; \n\
     \n\
@@ -91,11 +88,11 @@ namespace {
         if (hasOutline) { \n\
             float inside = texture(tex, texCoords).r;\n\
             float outline = texture(tex, outlineTexCoords).r;\n\
-            vec4 blend = mix(outlineColor, color, inside);\n\
+            vec4 blend = mix(outlineColor, baseColor, inside);\n\
             FragColor = blend * vec4(1.0, 1.0, 1.0, outline);\n\
         } \n\
         else { \n\
-            FragColor = vec4(color.rgb, color.a * texture(tex, texCoords).r); \n\
+            FragColor = vec4(baseColor.rgb, baseColor * texture(tex, texCoords).r); \n\
         } \n\
     }";
 }
@@ -117,19 +114,13 @@ FontRenderer::FontRenderer()
 }
     
 FontRenderer::FontRenderer(opengl::ProgramObject* program, glm::vec2 windowSize)
-    : _program(program)
-    , _vao(0)
-    , _vbo(0)
-    , _ibo(0)
+    : FontRenderer()
 {
     ghoul_assert(program != nullptr, "No program provided");
+    _program = program;
     setWindowSize(std::move(windowSize));
     
-    glGenVertexArrays(1, &_vao);
-    glGenBuffers(1, &_vbo);
-    glGenBuffers(1, &_ibo);
 }
-    
 FontRenderer::~FontRenderer() {
     glDeleteVertexArrays(1, &_vao);
     glDeleteBuffers(1, &_vbo);
@@ -199,7 +190,6 @@ FontRenderer& FontRenderer::defaultRenderer() {
 }
     
 // I wish I didn't have to copy-n-paste the render function, but *sigh* ---abock
-    
 void FontRenderer::render(ghoul::fontrendering::Font& font,
                           glm::vec2 pos,
                           glm::vec4 color,
@@ -314,15 +304,15 @@ void FontRenderer::render(ghoul::fontrendering::Font& font,
     
 }
     
-void FontRenderer::internalRender(Font& font, glm::vec2 pos, glm::vec4 color, glm::vec4 outlineColor, const char* buffer) const {
+void FontRenderer::internalRender(Font& font,
+                                  glm::vec2 pos,
+                                  glm::vec4 color,
+                                  glm::vec4 outlineColor,
+                                  const char* buffer) const
+{
     float h = font.height();
     
-    //Here is some code to split the text that we have been
-    //given into a set of lines.
-    //This could be made much neater by using
-    //a regular expression library such as the one avliable from
-    //boost.org (I've only done it out by hand to avoid complicating
-    //this tutorial with unnecessary library dependencies).
+    // Splitting the text into separate lines
     const char* start_line = buffer;
     std::vector<std::string> lines;
     const char* c;
@@ -351,36 +341,32 @@ void FontRenderer::internalRender(Font& font, glm::vec2 pos, glm::vec4 color, gl
     unsigned int vertexIndex = 0;
     std::vector<GLuint> indices;
     std::vector<GLfloat> vertices;
-    for (size_t i = 0; i < lines.size(); ++i) {
-        const std::string& line = lines[i];
-        
-        glm::vec2 movingPos = pos;
-        
-        movingPos.y -= i * h;
+    glm::vec2 movingPos = pos;
+    for (const std::string& line : lines) {
+//    for (size_t i = 0; i < lines.size(); ++i) {
+//        const std::string& line = lines[i];
         for (size_t j = 0 ; j < line.size(); ++j) {
             Font::Glyph* glyph = font.glyph(line[j]);
             if (glyph == nullptr) {
                 LERROR("No glyph for '" << line[j] << " in font '" << font.name() << "'");
             }
             else {
-                float kerning = 0.f;
                 if (j > 0)
-                    kerning = glyph->kerning(line[j-1]);
+                    movingPos.x += glyph->kerning(line[j-1]);
                 
-                movingPos.x += kerning;
                 float x0 = movingPos.x + glyph->offsetX();
                 float y0 = movingPos.y + glyph->offsetY();
+                float s0 = glyph->topLeft().x;
+                float t0 = glyph->topLeft().y;
+                float outlineS0 = glyph->outlineTopLeft().x;
+                float outlineT0 = glyph->outlineTopLeft().y;
+
                 float x1 = x0 + glyph->width();
                 float y1 = y0 - glyph->height();
-                float s0 = glyph->texCoordTopLeft().x;
-                float t0 = glyph->texCoordTopLeft().y;
-                float s1 = glyph->texCoordBottomRight().x;
-                float t1 = glyph->texCoordBottomRight().y;
-                
-                float outlineS0 = glyph->outlineTexCoordTopLeft().x;
-                float outlineT0 = glyph->outlineTexCoordTopLeft().y;
-                float outlineS1 = glyph->outlineTexCoordBottomRight().x;
-                float outlineT1 = glyph->outlineTexCoordBottomRight().y;
+                float s1 = glyph->bottomRight().x;
+                float t1 = glyph->bottomRight().y;
+                float outlineS1 = glyph->outlineBottomRight().x;
+                float outlineT1 = glyph->outlineBottomRight().y;
                 
                 indices.insert(indices.end(), {
                     vertexIndex, vertexIndex + 1, vertexIndex + 2,
@@ -393,25 +379,26 @@ void FontRenderer::internalRender(Font& font, glm::vec2 pos, glm::vec4 color, gl
                     x1, y1, s1, t1, outlineS1, outlineT1,
                     x1, y0, s1, t0, outlineS1, outlineT0
                 });
-                movingPos.x += glyph->advanceX();
+                movingPos.x += glyph->horizontalAdvance();
             }
             
         }
+        movingPos.y -= h;
     }
     
     glm::mat4 projection = glm::ortho(
-                                      0.f,
-                                      _windowSize.x,
-                                      0.f,
-                                      _windowSize.y
-                                      );
+        0.f,
+        _windowSize.x,
+        0.f,
+        _windowSize.y
+    );
     
     ghoul::opengl::TextureUnit atlasUnit;
     atlasUnit.activate();
     font.atlas().texture().bind();
     
     _program->setIgnoreUniformLocationError(true);
-    _program->setUniform("color", color);
+    _program->setUniform("baseColor", color);
     _program->setUniform("outlineColor", outlineColor);
     _program->setUniform("tex", atlasUnit);
     _program->setUniform("projection", projection);
@@ -421,33 +408,42 @@ void FontRenderer::internalRender(Font& font, glm::vec2 pos, glm::vec4 color, gl
     glBindVertexArray(_vao);
     
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-    glBufferData(GL_ARRAY_BUFFER,
-                 vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        vertices.size() * sizeof(float),
+        vertices.data(),
+        GL_DYNAMIC_DRAW
+    );
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_DYNAMIC_DRAW);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        indices.size() * sizeof(GLuint),
+        indices.data(),
+        GL_DYNAMIC_DRAW
+    );
     
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(
-                          0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0
-                          );
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
     
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(
-                          1, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<const void*>(2 * sizeof(float))
-                          );
+        1, 2, GL_FLOAT, GL_FALSE,
+        6 * sizeof(float), reinterpret_cast<const void*>(2 * sizeof(float))
+    );
     
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(
-                          2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<const void*>(4 * sizeof(float))
-                          );
+        2, 2, GL_FLOAT, GL_FALSE,
+        6 * sizeof(float), reinterpret_cast<const void*>(4 * sizeof(float))
+    );
     
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    
+    glEnable(GL_DEPTH_TEST);
 }
     
 void FontRenderer::setWindowSize(glm::vec2 windowSize) {

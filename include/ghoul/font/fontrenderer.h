@@ -63,11 +63,11 @@ public:
      * maps the pixel coordinates to normalized device coordinates, the <code>tex</code>
      * (<code>sampler2D</code>) is the TextureAtlas that contains all glyphs and into
      * which the <i>Base Texture Coordinates</i> and <i>Outline Texture Coordinates</i>
-     * index into. The <code>color</code> (<code>vec4</code>) contains the user-specified
-     * color for the base layer, whereas the <code>outlineColor</code> (<code>vec4</code>)
-     * is the color for the outline layer. Finally, the <code>hasOutline</code>
-     * (<code>bool</code>) is <code>true</code> whether the passed font has an outline or
-     * not.
+     * index into. The <code>baseColor</code> (<code>vec4</code>) contains the
+     * user-specified color for the base layer, whereas the <code>outlineColor</code>
+     * (<code>vec4</code>) is the color for the outline layer. Finally, the
+     * <code>hasOutline</code> (<code>bool</code>) is <code>true</code> whether the passed
+     * font has an outline or not.
      * \param program The custom ProgramObject that is used to render any passed text.
      * This method takes the ownership of the ProgramObject.
      * \param windowSize The size of the rendering window into which this FontRenderer
