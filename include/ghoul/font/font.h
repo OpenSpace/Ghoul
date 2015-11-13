@@ -251,6 +251,19 @@ public:
     bool hasOutline() const;
     
     /**
+     * Computes and retures the bounding box for the passed string with the settings of
+     * this Font. The value returned is in pixel values and provides the width and the
+     * height of the text if it were to be rendered.
+     * \param text The format text that is rendered to the screen. This text can contain
+     * symbolic constants (the same as in printf) to refer to later variable arguments,
+     * which are substituted. The <code>text</code> can also contain '\\n' to have a
+     * linebreak, which is of the correct length with regard to the selected font. This
+     * parameter cannot be a <code>nullptr</code>.
+     * \return The pixel coordinates of the bounding box of the passed text
+     */
+    glm::vec2 boundingBox(const char* text, ...);
+    
+    /**
      * Returns the Glyph that representes the passed <code>character</code>. The first
      * call to this function for each character creates and caches the Glyph before
      * returning it.

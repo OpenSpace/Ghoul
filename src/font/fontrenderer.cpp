@@ -198,8 +198,7 @@ void FontRenderer::render(ghoul::fontrendering::Font& font,
                           glm::vec4 outlineColor,
                           const char* format, ...) const
 {
-    if (format == nullptr)
-        return;
+    ghoul_assert(format != nullptr, "No format is provided");
     
     va_list args;	 // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables
@@ -236,8 +235,7 @@ void FontRenderer::render(ghoul::fontrendering::Font& font,
                           glm::vec4 color,
                           const char* format, ...) const
 {
-    if (format == nullptr)
-        return;
+    ghoul_assert(format != nullptr, "No format is provided");
     
     va_list args;	 // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables
@@ -251,7 +249,7 @@ void FontRenderer::render(ghoul::fontrendering::Font& font,
     
     memset(buffer, 0, size);
     
-#if (_MSC_VER >= 1400) //visual studio 2005 or later
+#if WIN32 //visual studio 2005 or later
     vsprintf_s(buffer, size, format, args);
 #else
     vsprintf(buffer, format, args);
@@ -273,8 +271,7 @@ void FontRenderer::render(ghoul::fontrendering::Font& font,
                           glm::vec2 pos,
                           const char* format, ...) const
 {
-    if (format == nullptr)
-        return;
+    ghoul_assert(format != nullptr, "No format is provided");
     
     va_list args;	 // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables

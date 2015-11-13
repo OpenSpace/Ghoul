@@ -135,7 +135,8 @@ public:
      * \param text The format text that is rendered to the screen. This text can contain
      * symbolic constants (the same as in printf) to refer to later variable arguments,
      * which are substituted. The <code>text</code> can also contain '\\n' to have a
-     * linebreak, which is of the correct length with regard to the selected font.
+     * linebreak, which is of the correct length with regard to the selected font. This
+     * parameter cannot be a <code>nullptr</code>.
      */
     void render(Font& font, glm::vec2 pos, glm::vec4 color,
                 glm::vec4 outlineColor, const char* text, ...) const;
@@ -152,7 +153,8 @@ public:
      * \param text The format text that is rendered to the screen. This text can contain
      * symbolic constants (the same as in printf) to refer to later variable arguments,
      * which are substituted. The <code>text</code> can also contain '\\n' to have a
-     * linebreak, which is of the correct length with regard to the selected font.
+     * linebreak, which is of the correct length with regard to the selected font. This
+     * parameter cannot be a <code>nullptr</code>.
      */
     void render(Font& font, glm::vec2 pos, glm::vec4 color,
                 const char* format, ...) const;
@@ -167,7 +169,8 @@ public:
      * \param text The format text that is rendered to the screen. This text can contain
      * symbolic constants (the same as in printf) to refer to later variable arguments,
      * which are substituted. The <code>text</code> can also contain '\\n' to have a
-     * linebreak, which is of the correct length with regard to the selected font.
+     * linebreak, which is of the correct length with regard to the selected font. This
+     * parameter cannot be a <code>nullptr</code>.
      */
     void render(Font& font, glm::vec2 pos, const char* format, ...) const;
     
