@@ -29,6 +29,13 @@
 #include <ghoul/logging/logmanager.h>
 
 #include <algorithm>
+#include <array>
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_STROKER_H
+
+
 
 #undef __FTERRORS_H__
 #define FT_ERRORDEF( e, v, s )  { e, s },
@@ -40,35 +47,80 @@ const struct {
 } FT_Errors[] =
 #include FT_ERRORS_H
 
-////Replacement for Visual Studio's _vscprintf function
-//#if (_MSC_VER < 1400) //if older than visual studio 2005
-//static int vscprintf (const char * format, va_list pargs)
-//{
-//    int retval;
-//    va_list argcopy;
-//    va_copy(argcopy, pargs);
-//    retval = vsnprintf(NULL, 0, format, argcopy);
-//    va_end(argcopy);
-//    return retval;
-//}
-//#else
-//#define vscprintf(f,a) _vscprintf(f,a)
-//#endif
-
+#ifdef WIN32
+static int vscprintf(const char* format, va_list pargs) {
+    va_list argcopy;
+    va_copy(argcopy, pargs);
+    int retval = vsnprintf(nullptr, 0, format, argcopy);
+    va_end(argcopy);
+    return retval;
+}
+#else
+#define vscprintf(f,a) _vscprintf(f,a)
+#endif // WIN32
 
 namespace {
     const std::string _loggerCat = "Font";
     const float PointConversionFactor = 64.f;  // Sizes in FT are given in 1/64th of pt
     const int DPI = 72;
+
+    // Initializes the passed 'library' and loads the font face specified by the 'name'
+    // and 'size' into the provided 'face'
+    bool loadFace(const std::string& name,
+                  float size,
+                  FT_Library& library,
+                  FT_Face& face)
+    {
+        FT_Error error = FT_Init_FreeType(&library);
+        if (error) {
+            LERROR("FT_Error: " <<
+                   FT_Errors[error].code <<
+                   " (" << FT_Errors[error].message << ")");
+            return false;
+        }
+        
+        // Load face
+        error = FT_New_Face(library, name.c_str(), 0, &face);
+        if (error) {
+            LERROR("FT_Error: " <<
+                   FT_Errors[error].code <<
+                   " (" << FT_Errors[error].message << ")");
+            FT_Done_FreeType(library);
+            return false;
+        }
+        
+        // Select charmap
+        error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
+        if (error) {
+            LERROR("FT_Error: " <<
+                   FT_Errors[error].code <<
+                   " (" << FT_Errors[error].message << ")");
+            FT_Done_Face(face);
+            FT_Done_FreeType(library);
+            return false;
+        }
+        
+        // Set char size
+        error = FT_Set_Char_Size(face, (int)(size * PointConversionFactor), 0, DPI , DPI);
+        if (error) {
+            LERROR("FT_Error: " <<
+                   FT_Errors[error].code <<
+                   " (" << FT_Errors[error].message << ")");
+            FT_Done_Face(face);
+            FT_Done_FreeType(library);
+            return false;
+        }
+        return true;
+    }
 }
+
 
 namespace ghoul {
 namespace fontrendering {
     
-    
 Font::Glyph::Glyph(wchar_t character,
-                   size_t width,
-                   size_t height,
+                   int width,
+                   int height,
                    int offsetX,
                    int offsetY,
                    float advanceX,
@@ -76,21 +128,38 @@ Font::Glyph::Glyph(wchar_t character,
                    glm::vec2 texCoordTopLeft,
                    glm::vec2 texCoordBottomRight,
                    glm::vec2 outlineTexCoordTopLeft,
-                   glm::vec2 outlineTexCoordBottomRight
-                   
-                   )
+                   glm::vec2 outlineTexCoordBottomRight)
     : _charcode(std::move(character))
     , _width(width)
     , _height(height)
     , _offsetX(offsetX)
     , _offsetY(offsetY)
-    , _advanceX(advanceX)
-    , _advanceY(advanceY)
+    , _horizontalAdvance(advanceX)
+    , _verticalAdvance(advanceY)
     , _topLeft(std::move(texCoordTopLeft))
     , _bottomRight(std::move(texCoordBottomRight))
     , _outlineTopLeft(std::move(outlineTexCoordTopLeft))
     , _outlineBottomRight(std::move(outlineTexCoordBottomRight))
-{
+{}
+    
+bool Font::Glyph::operator==(const Font::Glyph& rhs) const {
+    return _charcode == rhs._charcode;
+}
+    
+int Font::Glyph::width() const {
+    return _width;
+}
+
+int Font::Glyph::height() const {
+    return _height;
+}
+
+int Font::Glyph::offsetX() const {
+    return _offsetX;
+}
+
+int Font::Glyph::offsetY() const {
+    return _offsetY;
 }
     
 float Font::Glyph::kerning(wchar_t character) const {
@@ -101,20 +170,28 @@ float Font::Glyph::kerning(wchar_t character) const {
         return 0.f;
 }
     
-int Font::Glyph::offsetX() const {
-    return _offsetX;
+float Font::Glyph::horizontalAdvance() const {
+    return _horizontalAdvance;
 }
 
-int Font::Glyph::offsetY() const {
-    return _offsetY;
+float Font::Glyph::verticalAdvance() const {
+    return _verticalAdvance;
 }
     
-size_t Font::Glyph::width() const {
-    return _width;
+const glm::vec2& Font::Glyph::topLeft() const {
+    return _topLeft;
 }
     
-size_t Font::Glyph::height() const {
-    return _height;
+const glm::vec2& Font::Glyph::bottomRight() const {
+    return _bottomRight;
+}
+
+const glm::vec2& Font::Glyph::outlineTopLeft() const {
+    return _outlineTopLeft;
+}
+
+const glm::vec2& Font::Glyph::outlineBottomRight() const {
+    return _outlineBottomRight;
 }
    
 Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, bool outline, float outlineThickness)
@@ -129,11 +206,8 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, b
     ghoul_assert(!_name.empty(), "Empty file name not allowed");
 }
     
-Font::~Font() {
-        
-}
-    
 bool Font::operator==(const Font& rhs) {
+    // TODO: This is untested ---abock
     return (
         (_name == rhs._name) &&
         (_pointSize == rhs._pointSize) &&
@@ -145,37 +219,34 @@ bool Font::operator==(const Font& rhs) {
 }
     
 bool Font::initialize() {
-    // Get font metrics at high resolution for increased accuracy
+    // Get font metrics at higher resolution for increased accuracy
     static const float HighFaceResolutionFactor = 100.f;
+
     FT_Library library;
     FT_Face face;
 
-    bool success = loadFace(_pointSize * HighFaceResolutionFactor, library, face);
+    bool success = loadFace(_name, _pointSize * HighFaceResolutionFactor, library, face);
     if (!success)
         return false;
     
-    
-    FT_Size_Metrics metrics = face->size->metrics;
-    _height = (metrics.height >> 6) / HighFaceResolutionFactor;
+    _height = (face->size->metrics.height >> 6) / HighFaceResolutionFactor;
     
     FT_Done_Face(face);
     FT_Done_FreeType(library);
     
-    /* -1 is a special glyph */
+    // -1 is a special glyph
     glyph(-1);
     
     return true;
 }
     
-Font::Glyph* Font::glyph(wchar_t character) {
+const Font::Glyph* Font::glyph(wchar_t character) {
     using TextureAtlas = opengl::TextureAtlas;
 
     // Check if charcode has been already loaded
-    for (size_t i = 0; i < _glyphs.size(); ++i) {
-        Glyph* glyph = _glyphs[i];
-        
-        if (glyph->_charcode == character)
-            return glyph;
+    for (const Glyph& g : _glyphs) {
+        if (g._charcode == character)
+            return &g;
     }
     
     // charcode -1 is special: it is used for line drawing (overline, underline,
@@ -192,19 +263,19 @@ Font::Glyph* Font::glyph(wchar_t character) {
 
         _atlas.setRegionData(handle, data.data());
         
-        Glyph* glyph = new Glyph(static_cast<wchar_t>(-1));
-        _atlas.getTextureCoordinates(handle, glyph->_topLeft, glyph->_bottomRight);
-        _glyphs.push_back(glyph);
+        Glyph glyph(static_cast<wchar_t>(-1));
+        _atlas.getTextureCoordinates(handle, glyph._topLeft, glyph._bottomRight);
+        _glyphs.push_back(std::move(glyph));
 
-        return glyph;
+        return &(_glyphs.back());
     }
     
     // Glyph has not been already loaded
     size_t nGlyphNotLoaded = loadGlyphs({character});
     if (nGlyphNotLoaded == 0)
-        return _glyphs.back();
+        return &(_glyphs.back());
     else {
-        LERROR(nGlyphNotLoaded << " glyphs could not be loaded");
+        LERROR("Glyphs '" << character << "' could not be loaded");
         return nullptr;
     }
 }
@@ -238,7 +309,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
     
     FT_Library library;
     FT_Face face;
-    bool success = loadFace(_pointSize, library, face);
+    bool success = loadFace(_name, _pointSize, library, face);
     if (!success)
         return glyphs.size();
 
@@ -249,7 +320,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         auto it = std::find_if(
             _glyphs.begin(),
             _glyphs.end(),
-            [charcode](Glyph* glyph) { return glyph->_charcode == charcode; }
+            [charcode](const Glyph& glyph) { return glyph._charcode == charcode; }
         );
         if (it != _glyphs.end())
             continue;
@@ -429,7 +500,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
         // Discard hinting to get advance
         FT_Load_Glyph(face, glyphIndex, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
         
-        Glyph* glyph = new Glyph(
+        _glyphs.emplace_back(
             glyphs[i],
             w,
             h,
@@ -442,8 +513,6 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& glyphs) {
             outlineTopLeft,
             outlineBottomRight
         );
-        
-        _glyphs.push_back(glyph);
     }
     
     FT_Done_Face(face);
@@ -457,24 +526,24 @@ void Font::generateKerning() {
     FT_Library library;
     FT_Face face;
     
-    bool success = loadFace(_pointSize, library, face);
+    bool success = loadFace(_name, _pointSize, library, face);
     if (!success)
         return;
     
     /* For each glyph couple combination, check if kerning is necessary */
     /* Starts at index 1 since 0 is for the special backgroudn glyph */
     for (size_t i = 1; i < _glyphs.size(); ++i) {
-        Glyph* glyph = _glyphs[i];
-        FT_UInt glyphIndex = FT_Get_Char_Index(face, glyph->_charcode);
-        glyph->_kerning.clear();
+        Glyph& glyph = _glyphs[i];
+        FT_UInt glyphIndex = FT_Get_Char_Index(face, glyph._charcode);
+        glyph._kerning.clear();
         
         for (size_t j = 1; j < _glyphs.size(); ++j) {
-            Glyph* prevGlyph = _glyphs[j];
-            FT_UInt prevIndex = FT_Get_Char_Index(face, prevGlyph->_charcode);
+            const Glyph& prevGlyph = _glyphs[j];
+            FT_UInt prevIndex = FT_Get_Char_Index(face, prevGlyph._charcode);
             FT_Vector kerning;
             FT_Get_Kerning(face, prevIndex, glyphIndex, FT_KERNING_UNFITTED, &kerning);
             if (kerning.x != 0) {
-                glyph->_kerning[prevGlyph->_charcode] = kerning.x / (PointConversionFactor*PointConversionFactor);
+                glyph._kerning[prevGlyph._charcode] = kerning.x / (PointConversionFactor*PointConversionFactor);
             }
         }
     }
@@ -482,8 +551,9 @@ void Font::generateKerning() {
     FT_Done_Face( face );
     FT_Done_FreeType( library );
 }
-    
-bool Font::loadFace(float size, FT_Library& library, FT_Face& face) {
+
+    /*
+bool loadFace(const std::string& name, float size, FT_Library& library, FT_Face& face) {
     FT_Error error = FT_Init_FreeType(&library);
     if (error) {
         LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
@@ -491,7 +561,7 @@ bool Font::loadFace(float size, FT_Library& library, FT_Face& face) {
     }
 
     // Load face
-    error = FT_New_Face(library, _name.c_str(), 0, &face);
+    error = FT_New_Face(library, name.c_str(), 0, &face);
     if (error) {
         LERROR("FT_Error: " << FT_Errors[error].code << " (" << FT_Errors[error].message << ")");
         FT_Done_FreeType(library);
@@ -518,7 +588,7 @@ bool Font::loadFace(float size, FT_Library& library, FT_Face& face) {
     
     return true;
 }
-
+*/
     
 } // namespace fontrendering
 } // namespace ghoul

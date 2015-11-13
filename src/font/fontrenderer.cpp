@@ -346,7 +346,7 @@ void FontRenderer::internalRender(Font& font,
 //    for (size_t i = 0; i < lines.size(); ++i) {
 //        const std::string& line = lines[i];
         for (size_t j = 0 ; j < line.size(); ++j) {
-            Font::Glyph* glyph = font.glyph(line[j]);
+            const Font::Glyph* glyph = font.glyph(line[j]);
             if (glyph == nullptr) {
                 LERROR("No glyph for '" << line[j] << " in font '" << font.name() << "'");
             }
@@ -356,7 +356,6 @@ void FontRenderer::internalRender(Font& font,
                 
                 float x0 = movingPos.x + glyph->offsetX();
                 float y0 = movingPos.y + glyph->offsetY();
-<<<<<<< .merge_file_YaTQdj
                 float s0 = glyph->topLeft().x;
                 float t0 = glyph->topLeft().y;
                 float outlineS0 = glyph->outlineTopLeft().x;
@@ -368,19 +367,6 @@ void FontRenderer::internalRender(Font& font,
                 float t1 = glyph->bottomRight().y;
                 float outlineS1 = glyph->outlineBottomRight().x;
                 float outlineT1 = glyph->outlineBottomRight().y;
-=======
-                float s0 = glyph->texCoordTopLeft().x;
-                float t0 = glyph->texCoordTopLeft().y;
-                float outlineS0 = glyph->outlineTexCoordTopLeft().x;
-                float outlineT0 = glyph->outlineTexCoordTopLeft().y;
-
-                float x1 = x0 + glyph->width();
-                float y1 = y0 - glyph->height();
-                float s1 = glyph->texCoordBottomRight().x;
-                float t1 = glyph->texCoordBottomRight().y;
-                float outlineS1 = glyph->outlineTexCoordBottomRight().x;
-                float outlineT1 = glyph->outlineTexCoordBottomRight().y;
->>>>>>> .merge_file_0uLC9e
                 
                 indices.insert(indices.end(), {
                     vertexIndex, vertexIndex + 1, vertexIndex + 2,

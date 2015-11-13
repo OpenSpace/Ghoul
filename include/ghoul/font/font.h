@@ -27,35 +27,48 @@
 #define __FONT_H__
 
 #include <ghoul/glm.h>
-
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/opengl/textureatlas.h>
 
-#include <array>
-#include <map>
 #include <string>
 #include <vector>
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_STROKER_H
-// #include FT_ADVANCES_H
-#include FT_LCD_FILTER_H
-
- 
 namespace ghoul {
-    
 namespace fontrendering {
-    
+
+/**
+ * The Font class encapsulates a single fontface for a specific font size. It contains all
+ * the information that is necessary to compute display sizes and, using the FontRendering
+ * render the font to the screen. Each Font consists of Glyphs, the individual characters.
+ * A Font can have an outline, which is a border of varying thickness around each
+ * character. Individual Glyphs can be requested using the #glyph function, which
+ * automatically loads and caches missing Glyphs on the first load. The storage backend
+ * for Fonts is TextureAtlas into which all Glyphs (regular and outline) are saved. Access
+ * into this TextureAtlas is performed on a per-glyph basis and each Glyph stores its
+ * texture coordinates in the atlas. Each Font is uniquely identified by the combination
+ * of name, font size, whether it has an outline, the thickness of the outline, and the
+ * TextureAtlas it uses.
+ */
 class Font {
 public:
+    /**
+     * This class contains the metrics and the texture locations in the TextureAtlas for a
+     * single glyph for a specific font. Each glyph supplies two pairs of coordinates:
+     * </br>
+     * 1. The top left and bottom right corners of the base glyph (i.e., the regular
+     * glyph if it is rendered without an outline.</br>
+     * 2. The top left and bottom right corners of the outline glyph (i.e., a filled glyph
+     * that can be rendered behind the base glyph in a different color to provide an
+     * outline to the base.
+     */
     class Glyph {
     public:
         friend class Font;
 
+        /// The default constructor for a Glyph
         Glyph(wchar_t character,
-              size_t width = 0,
-              size_t height = 0,
+              int width = 0,
+              int height = 0,
               int offsetX = 0,
               int offsetY = 0,
               float advanceX = 0.f,
@@ -65,72 +78,124 @@ public:
               glm::vec2 outlineTexCoordTopLeft = glm::vec2(0.f),
               glm::vec2 outlineTexCoordBottomRight = glm::vec2(0.f)
         );
+        
+        bool operator==(const Glyph& rhs) const;
+        
+        /**
+         * Returns the horizontal extent of the glyph
+         * \return The horizontal extent of the glyph
+         */
+        int width() const;
+        
+        /**
+         * Returns the vertical extent of the glyph
+         * \return The vertical extent of the glyph
+         */
+        int height() const;
 
+        /**
+         * Returns the left-side bearing of the glyph
+         * \return the left-side bearing of the glyph
+         */
+        int offsetX() const;
+        
+        /**
+         * Returns the top-side bearing of the glyph
+         * \return The top-side bearing of the glyph
+         */
+        int offsetY() const;
+
+        /**
+         * Returns the horizontal advance for this glyph
+         * \return The horizontal advance for this glyph
+         */
+        float horizontalAdvance() const;
+        
+        /**
+         * Returns the vertical advance for this glyph
+         * \return The vertical advance for this glyph
+         */
+        float verticalAdvance() const;
+        
+        /**
+         * Returns the kerning value between this glyph and <code>character</code>.
+         * \param character The following character for which the kerning value should be
+         * returned.
+         * \return The kerning value between this glyph and <code>character</code>.
+         */
         float kerning(wchar_t character) const;
         
-        int offsetX() const;
-        int offsetY() const;
-        size_t width() const;
-        size_t height() const;
+        /**
+         * Returns the texture coordinate that points to the top left corner of the base
+         * representation for this Glyph in the TextureAtlas
+         * \return The top left base texture coordinate
+         */
+        const glm::vec2& topLeft() const;
         
-        float advanceX() const { return _advanceX; }
-        float advanceY() const { return _advanceY; }
+        /**
+         * Returns the texture coordinate that points to the bottom right corner of the
+         * base representation for this Glyph in the TextureAtlas
+         * \return The bottom right base texture coordinates
+         */
+        const glm::vec2& bottomRight() const;
         
-        const glm::vec2& texCoordTopLeft() const { return _topLeft; }
-        const glm::vec2& texCoordBottomRight() const { return _bottomRight; }
-        const glm::vec2& outlineTexCoordTopLeft() const { return _outlineTopLeft; }
-        const glm::vec2& outlineTexCoordBottomRight() const { return _outlineBottomRight; }
+        /**
+         * Returns the texture coordinate that points to the top left corner of the
+         * outline representation for this Glyph in the TextureAtlas
+         * \return The top left outline texture coordinate
+         */
+        const glm::vec2& outlineTopLeft() const;
+        
+        /**
+         * Returns the texture coordinate that points to the bottom right corner of the
+         * outline representation for this Glyph in the TextureAtlas
+         * \return The bottom right outline texture coordinate
+         */
+        const glm::vec2& outlineBottomRight() const;
         
     private:
+        /// The wide character that this glyph represents
+        wchar_t _charcode;
 
-        wchar_t _charcode; ///< Wide character this glyph represents
-        
-        size_t _width; ///< Glyph's width in pixels
-        
-        size_t _height; ///< Glyph's height in pixels
-        
-        int _offsetX; ///< Glyph's left bearing expressed in integer pixels
-        
-        /**
-         * Glyphs's top bearing expressed in integer pixels.
-         *
-         * Remember that this is the distance from the baseline to the top-most
-         * glyph scanline, upwards y coordinates being positive.
-         */
+        /// Glyph's width in pixels
+        int _width;
+
+        /// Glyph's height in pixels
+        int _height;
+
+        ///< Glyph's left bearing expressed in pixels
+        int _offsetX;
+
+        /// Glyphs's top bearing expressed in pixels
         int _offsetY;
+
+        /// This is the distance used when the glyph is drawn as part
+        /// of horizontal text
+        float _horizontalAdvance;
         
-        /**
-         * For horizontal text layouts, this is the horizontal distance (in
-         * fractional pixels) used to increment the pen position when the glyph is
-         * drawn as part of a string of text.
-         */
-        float _advanceX;
+        /// This is the distance used when the glyph is drawn as part
+        /// of vertical text
+        float _verticalAdvance;
         
-        /**
-         * For vertical text layouts, this is the vertical distance (in fractional
-         * pixels) used to increment the pen position when the glyph is drawn as
-         * part of a string of text.
-         */
-        float _advanceY;
-        
-        glm::vec2 _topLeft; ///< Normalized texture coordinate of top-left corner
-        glm::vec2 _bottomRight; ///< Normalized texture coordinate of bottom-right corner
-        
+        /// Normalized texture coordinate of top-left corner
+        glm::vec2 _topLeft;
+        /// Normalized texture coordinate of bottom-right corner
+        glm::vec2 _bottomRight;
+
+        /// Normalized texture coordinates for the top left of the
+        /// outline
+        glm::vec2 _outlineTopLeft;
+
+        /// Normalized texture coordinates for the bottom right of the
+        /// outline
+        glm::vec2 _outlineBottomRight;
+
         /// A vector of kerning pairs relative to this glyph
         std::map<wchar_t, float> _kerning;
-        
-        /// Normalized texture coordinates for the top left of the outline
-        glm::vec2 _outlineTopLeft;
-        /// Normalized texture coordinates for the bottom right of the outline
-        glm::vec2 _outlineBottomRight;
     };
-    
-    
-    
+
     Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas, bool outline = true, float outlineThickness = 1.f);
-    ~Font();
     
-    // Needs testing
     bool operator==(const Font& rhs);
     
     bool initialize();
@@ -141,7 +206,7 @@ public:
     
     bool outline() const;
     
-    Glyph* glyph(wchar_t character);
+    const Glyph* glyph(wchar_t character);
 
     size_t loadGlyphs(const std::vector<wchar_t>& glyphs);
     
@@ -149,10 +214,8 @@ public:
 
 private:
     void generateKerning();
-    bool loadFace(float size, FT_Library& library, FT_Face& face);
 
-
-    std::vector<Glyph*> _glyphs;
+    std::vector<Glyph> _glyphs;
     
     opengl::TextureAtlas& _atlas;
     
