@@ -328,7 +328,7 @@ void TextureAtlas::atlasMerge() {
 
 bool TextureAtlas::validHandle(TextureAtlas::RegionHandle handle) const {
     return
-        (handle < _handleInformation.size()) &&
+        (static_cast<size_t>(handle) < _handleInformation.size()) &&
         (handle >= 0);
 }
 
