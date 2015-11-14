@@ -458,7 +458,7 @@ bool ShaderPreprocessor::parseVersion(ShaderPreprocessor::Env& env) {
     static const std::string versionString = "#version __CONTEXT__";
     std::string& line = env.line;
     if  (line.length() >= versionString.length() && line.substr(0, versionString.length()) == versionString) {
-        env.output << glslVersionString();
+        env.output << glslVersionString() << std::endl;
         return true;
     }
     return false;

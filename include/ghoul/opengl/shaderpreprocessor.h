@@ -39,79 +39,81 @@
 #include <fstream>
 
 namespace ghoul {
+namespace opengl {
 
-  namespace opengl {
-    class ShaderPreprocessor {
-    public:
-      typedef std::function<void (const filesystem::File&)> ShaderChangedCallback;
-      ShaderPreprocessor(const std::string& shaderPath = "", Dictionary dict = Dictionary());
-      ~ShaderPreprocessor();
-      void setDictionary(Dictionary dict);
-      void setShaderPath(std::string shaderPath);
-      void setCallback(ShaderChangedCallback cb);
-      bool process(std::string& output);
-      std::string getFileIdentifiersString();
+class ShaderPreprocessor {
+public:
+  typedef std::function<void (const filesystem::File&)> ShaderChangedCallback;
 
-      /**
-       * Adds the passed folder to the list of include paths that are checked when a shader
-       * includes a file. The list of include paths is traversed in the order in which they
-       * where added to this class. If the folder does not exist, an error is logged, the
-       * list of include paths is unchanged and <code>false</code> is returned. The folder
-       * in which the shader is located will always be treated as if being on the top of the
-       * list.
-       * \param folderPath The folder that should be added to the list of include paths
-       * \return <code>true</code> if the <code>folderPath</code> was added successfully,
-       * <code>false</code> otherwise
-       */
-      static bool addIncludePath(std::string folderPath);
+    ShaderPreprocessor(const std::string& shaderPath = "", Dictionary dict = Dictionary());
+    ~ShaderPreprocessor();
+    void setDictionary(Dictionary dict);
+    void setShaderPath(std::string shaderPath);
+    void setCallback(ShaderChangedCallback cb);
+    bool process(std::string& output);
+    std::string getFileIdentifiersString();
 
-      struct Input {
-        Input(std::ifstream& s, ghoul::filesystem::File& f, std::string indent = "")
-          : stream(s)
-          , file(f)
-          , lineNumber(1)
-          , indentation(indent) {}
-        std::ifstream& stream;
-        ghoul::filesystem::File& file;
-        unsigned int lineNumber;
-        std::string indentation;
-      };
+    /**
+    * Adds the passed folder to the list of include paths that are checked when a shader
+    * includes a file. The list of include paths is traversed in the order in which they
+    * where added to this class. If the folder does not exist, an error is logged, the
+    * list of include paths is unchanged and <code>false</code> is returned. The folder
+    * in which the shader is located will always be treated as if being on the top of the
+    * list.
+    * \param folderPath The folder that should be added to the list of include paths
+    * \return <code>true</code> if the <code>folderPath</code> was added successfully,
+    * <code>false</code> otherwise
+    */
+    static bool addIncludePath(std::string folderPath);
 
-      struct ForStatement {
-        ForStatement(unsigned int input,
-                     unsigned int lineNum,
-                     unsigned int pos,
-                     const std::string& kName,
-                     const std::string& vName,
-                     const std::string& dRef,
-                     int keyI)
-          : inputIndex(input)
-          , lineNumber(lineNum)
-          , streamPos(pos)
-          , keyName(kName)
-          , valueName(vName)
-          , dictionaryRef(dRef)
-          , keyIndex(keyI) {}
+    struct Input {
+    Input(std::ifstream& s, ghoul::filesystem::File& f, std::string indent = "")
+      : stream(s)
+      , file(f)
+      , lineNumber(1)
+      , indentation(indent) {}
+    std::ifstream& stream;
+    ghoul::filesystem::File& file;
+    unsigned int lineNumber;
+    std::string indentation;
+    };
 
-        unsigned int inputIndex;
-        unsigned int lineNumber;
-        unsigned int streamPos;
+    struct ForStatement {
+    ForStatement(unsigned int input,
+                 unsigned int lineNum,
+                 unsigned int pos,
+                 const std::string& kName,
+                 const std::string& vName,
+                 const std::string& dRef,
+                 int keyI)
+      : inputIndex(input)
+      , lineNumber(lineNum)
+      , streamPos(pos)
+      , keyName(kName)
+      , valueName(vName)
+      , dictionaryRef(dRef)
+      , keyIndex(keyI) {}
 
-        std::string keyName;
-        std::string valueName;
-        std::string dictionaryRef;
+    unsigned int inputIndex;
+    unsigned int lineNumber;
+    unsigned int streamPos;
 
-        int keyIndex;
-      };
+    std::string keyName;
+    std::string valueName;
+    std::string dictionaryRef;
 
-      typedef std::set<std::string> Scope;
+    int keyIndex;
+    };
 
-      struct Env {
+    typedef std::set<std::string> Scope;
+
+    struct Env {
         Env(std::stringstream& o)
-          : line("")
-          , output(o)
-          , indentation("")
-          , success(true) {}
+            : line("")
+            , output(o)
+            , indentation("")
+            , success(true)
+        {}
 
         std::string line;
         std::vector<Input> inputs;
@@ -121,41 +123,41 @@ namespace ghoul {
         std::stringstream& output;
         std::string indentation;
         bool success;
-      };
-
-    private:
-      bool includeFile(const std::string& path, bool track, ShaderPreprocessor::Env& env);
-      bool parseLine(ShaderPreprocessor::Env& env);
-      bool parseFor(ShaderPreprocessor::Env& env);
-      bool parseEndFor(ShaderPreprocessor::Env& env);
-      bool parseInclude(ShaderPreprocessor::Env& env);
-      bool parseVersion(ShaderPreprocessor::Env& env);
-
-      bool substituteLine(ShaderPreprocessor::Env& env);
-      bool substitute(const std::string& in, std::string& out, ShaderPreprocessor::Env& env);
-      bool resolveAlias(const std::string& in, std::string& out, ShaderPreprocessor::Env& env);
-
-      bool pushScope(std::map<std::string, std::string> map, ShaderPreprocessor::Env& env);
-      bool popScope(ShaderPreprocessor::Env& env);
-
-      bool tokenizeFor(const std::string& line, std::string& keyName, std::string& valueName, std::string& dictionaryName, ShaderPreprocessor::Env& env);
-      void addLineNumber(ShaderPreprocessor::Env& env);
-      bool isInsideEmptyForStatement(ShaderPreprocessor::Env& env);
-
-      bool addIncludePath(const std::string& path, bool track);
-      void clearIncludedPaths();
-
-      std::string debugString(ShaderPreprocessor::Env& env);
-
-      std::map<std::string, ghoul::filesystem::File> _includedFiles;
-      std::map<std::string, int> _fileIdentifiers;
-      static std::vector<std::string> _includePaths;
-      std::string _shaderPath;
-      Dictionary _dictionary;
-      ShaderChangedCallback _onChangeCallback;
-
     };
-  } // namespace opengl
+
+private:
+    bool includeFile(const std::string& path, bool track, ShaderPreprocessor::Env& env);
+    bool parseLine(ShaderPreprocessor::Env& env);
+    bool parseFor(ShaderPreprocessor::Env& env);
+    bool parseEndFor(ShaderPreprocessor::Env& env);
+    bool parseInclude(ShaderPreprocessor::Env& env);
+    bool parseVersion(ShaderPreprocessor::Env& env);
+
+    bool substituteLine(ShaderPreprocessor::Env& env);
+    bool substitute(const std::string& in, std::string& out, ShaderPreprocessor::Env& env);
+    bool resolveAlias(const std::string& in, std::string& out, ShaderPreprocessor::Env& env);
+
+    bool pushScope(std::map<std::string, std::string> map, ShaderPreprocessor::Env& env);
+    bool popScope(ShaderPreprocessor::Env& env);
+
+    bool tokenizeFor(const std::string& line, std::string& keyName, std::string& valueName, std::string& dictionaryName, ShaderPreprocessor::Env& env);
+    void addLineNumber(ShaderPreprocessor::Env& env);
+    bool isInsideEmptyForStatement(ShaderPreprocessor::Env& env);
+
+    bool addIncludePath(const std::string& path, bool track);
+    void clearIncludedPaths();
+
+    std::string debugString(ShaderPreprocessor::Env& env);
+
+    std::map<std::string, ghoul::filesystem::File> _includedFiles;
+    std::map<std::string, int> _fileIdentifiers;
+    static std::vector<std::string> _includePaths;
+    std::string _shaderPath;
+    Dictionary _dictionary;
+    ShaderChangedCallback _onChangeCallback;
+};
+    
+} // namespace opengl
 } // namespace ghoul
 
-#endif
+#endif // __SHADERPREPROCESSOR_H__
