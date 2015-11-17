@@ -63,8 +63,8 @@ static int vscprintf(const char* format, va_list pargs) {
 namespace {
     const std::string _loggerCat = "Font";
     const float PointConversionFactor = 64.f;  // Sizes in FT are given in 1/64th of pt
-    const int DPI = 72;
-
+    const int DPI = 96;
+    
     // Initializes the passed 'library' and loads the font face specified by the 'name'
     // and 'size' into the provided 'face'
     bool loadFace(const std::string& name,
@@ -584,7 +584,7 @@ void Font::generateKerning() {
             FT_Vector kerning;
             FT_Get_Kerning(face, prevIndex, glyphIndex, FT_KERNING_DEFAULT, &kerning);
             if (kerning.x != 0)
-                glyph._kerning[prevGlyph._charcode] = kerning.x / (PointConversionFactor);
+                glyph._kerning[prevGlyph._charcode] = kerning.x / (PointConversionFactor * PointConversionFactor);
         }
     }
     

@@ -192,12 +192,13 @@ FontRenderer& FontRenderer::defaultRenderer() {
 }
     
 // I wish I didn't have to copy-n-paste the render function, but *sigh* ---abock
-void FontRenderer::render(ghoul::fontrendering::Font& font,
+void FontRenderer::render(ghoul::fontrendering::Font* font,
                           glm::vec2 pos,
                           glm::vec4 color,
                           glm::vec4 outlineColor,
                           const char* format, ...) const
 {
+    ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
     
     va_list args;	 // Pointer To List Of Arguments
@@ -220,7 +221,7 @@ void FontRenderer::render(ghoul::fontrendering::Font& font,
     va_end(args);
     
     internalRender(
-        font,
+        *font,
         std::move(pos),
         std::move(color),
         std::move(outlineColor),
@@ -230,11 +231,12 @@ void FontRenderer::render(ghoul::fontrendering::Font& font,
 
 }
     
-void FontRenderer::render(ghoul::fontrendering::Font& font,
+void FontRenderer::render(ghoul::fontrendering::Font* font,
                           glm::vec2 pos,
                           glm::vec4 color,
                           const char* format, ...) const
 {
+    ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
     
     va_list args;	 // Pointer To List Of Arguments
@@ -257,7 +259,7 @@ void FontRenderer::render(ghoul::fontrendering::Font& font,
     va_end(args);
     
     internalRender(
-        font,
+        *font,
         std::move(pos),
         color,
         glm::vec4(0.f, 0.f, 0.f, color.a),
@@ -267,10 +269,11 @@ void FontRenderer::render(ghoul::fontrendering::Font& font,
     
 }
 
-void FontRenderer::render(ghoul::fontrendering::Font& font,
+void FontRenderer::render(ghoul::fontrendering::Font* font,
                           glm::vec2 pos,
                           const char* format, ...) const
 {
+    ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
     
     va_list args;	 // Pointer To List Of Arguments
@@ -293,7 +296,7 @@ void FontRenderer::render(ghoul::fontrendering::Font& font,
     va_end(args);
     
     internalRender(
-        font,
+        *font,
         std::move(pos),
         glm::vec4(1.f),
         glm::vec4(0.f, 0.f, 0.f, 1.f),
@@ -342,8 +345,6 @@ void FontRenderer::internalRender(Font& font,
     std::vector<GLfloat> vertices;
     glm::vec2 movingPos = pos;
     for (const std::string& line : lines) {
-//    for (size_t i = 0; i < lines.size(); ++i) {
-//        const std::string& line = lines[i];
         for (size_t j = 0 ; j < line.size(); ++j) {
             const Font::Glyph* glyph = font.glyph(line[j]);
             if (glyph == nullptr) {

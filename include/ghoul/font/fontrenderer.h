@@ -126,7 +126,8 @@ public:
      * coordinates <code>pos</code> using the Font <code>font</code> in the base color
      * <code>color</code> and the outline color <code>outlineColor</code>. If the Font
      * does not have an outline, the <code>outlineColor</code> is ignored.
-     * \param font The Font that is used to render the provided text
+     * \param font The Font that is used to render the provided text. If this argument is
+     * <code>nullptr</code>, an assertion is thrown
      * \param pos The screen-space position (in pixel coordinates) that is used to render
      * the text
      * \param color The base color that is used to render the text
@@ -138,7 +139,7 @@ public:
      * linebreak, which is of the correct length with regard to the selected font. This
      * parameter cannot be a <code>nullptr</code>.
      */
-    void render(Font& font, glm::vec2 pos, glm::vec4 color,
+    void render(Font* font, glm::vec2 pos, glm::vec4 color,
                 glm::vec4 outlineColor, const char* text, ...) const;
 
     /**
@@ -146,7 +147,8 @@ public:
      * coordinates <code>pos</code> using the Font <code>font</code> in the base color
      * <code>color</code>. In case the Font has an outline, the outline is rendered in
      * black with the same transparency as the provided <code>color</code>.
-     * \param font The Font that is used to render the provided text
+     * \param font The Font that is used to render the provided text. If this argument is
+     * <code>nullptr</code>, an assertion is thrown
      * \param pos The screen-space position (in pixel coordinates) that is used to render
      * the text
      * \param color The base color that is used to render the text
@@ -156,14 +158,15 @@ public:
      * linebreak, which is of the correct length with regard to the selected font. This
      * parameter cannot be a <code>nullptr</code>.
      */
-    void render(Font& font, glm::vec2 pos, glm::vec4 color,
+    void render(Font* font, glm::vec2 pos, glm::vec4 color,
                 const char* format, ...) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
      * coordinates <code>pos</code> using the Font <code>font</code> in white color. In
      * case the Font has an outline, the outline is rendered in black.
-     * \param font The Font that is used to render the provided text
+     * \param font The Font that is used to render the provided text. If this argument is
+     * <code>nullptr</code>, an assertion is thrown
      * \param pos The screen-space position (in pixel coordinates) that is used to render
      * the text
      * \param text The format text that is rendered to the screen. This text can contain
@@ -172,7 +175,7 @@ public:
      * linebreak, which is of the correct length with regard to the selected font. This
      * parameter cannot be a <code>nullptr</code>.
      */
-    void render(Font& font, glm::vec2 pos, const char* format, ...) const;
+    void render(Font* font, glm::vec2 pos, const char* format, ...) const;
     
     
 private:
@@ -201,9 +204,13 @@ private:
     /// The index buffer object that allows reusing vertices to form one quad per glyph
     unsigned int _ibo;
 };
-    
+
+template <typename... Args>
+void RenderFont(Args... args) {
+    ghoul::fontrendering::FontRenderer::defaultRenderer().render(args...);
+}
+
 } // namespace fontrendering
 } // namespace ghoul
 
 #endif // __FONTRENDERER_H__
-
