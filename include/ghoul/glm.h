@@ -382,6 +382,66 @@ inline std::string to_string(const glm::dmat4& _Val) {
 
 } // namespace std
 
+template <typename T, glm::precision P>
+std::ostream& operator<<(std::ostream& out, const glm::tvec2<T,P>& val) {
+    return out << std::to_string(val);
+}
+
+template <typename T, glm::precision P>
+std::ostream& operator<<(std::ostream& out, const glm::tvec3<T,P>& val) {
+    return out << std::to_string(val);
+}
+
+template <typename T, glm::precision P>
+std::ostream& operator<<(std::ostream& out, const glm::tvec4<T,P>& val) {
+    return out << std::to_string(val);
+}
+
+template <typename T, glm::precision P>
+std::ostream& operator<<(std::ostream& out, const glm::tmat2x2<T,P>& val) {
+    return out << std::to_string(val);
+}
+
+template <typename T, glm::precision P>
+std::ostream& operator<<(std::ostream& out, const glm::tmat2x3<T,P>& val) {
+    return out << std::to_string(val);
+}
+
+template <typename T, glm::precision P>
+std::ostream& operator<<(std::ostream& out, const glm::tmat2x4<T,P>& val) {
+    return out << std::to_string(val);
+}
+
+template <typename T, glm::precision P>
+std::ostream& operator<<(std::ostream& out, const glm::tmat3x2<T,P>& val) {
+    return out << std::to_string(val);
+}
+
+template <typename T, glm::precision P>
+std::ostream& operator<<(std::ostream& out, const glm::tmat3x3<T,P>& val) {
+    return out << std::to_string(val);
+}
+
+template <typename T, glm::precision P>
+std::ostream& operator<<(std::ostream& out, const glm::tmat3x4<T,P>& val) {
+    return out << std::to_string(val);
+}
+
+template <typename T, glm::precision P>
+std::ostream& operator<<(std::ostream& out, const glm::tmat4x2<T,P>& val) {
+    return out << std::to_string(val);
+}
+
+template <typename T, glm::precision P>
+std::ostream& operator<<(std::ostream& out, const glm::tmat4x3<T,P>& val) {
+    return out << std::to_string(val);
+}
+
+template <typename T, glm::precision P>
+std::ostream& operator<<(std::ostream& out, const glm::tmat4x4<T,P>& val) {
+    return out << std::to_string(val);
+}
+
 
 #ifdef __APPLE__
 #pragma clang diagnostic pop
