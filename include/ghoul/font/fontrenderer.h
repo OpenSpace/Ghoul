@@ -29,6 +29,8 @@
 #include <ghoul/glm.h>
 #include <ghoul/font/font.h>
 
+#include <tuple>
+
 namespace ghoul {
 
 namespace opengl {
@@ -138,9 +140,11 @@ public:
      * which are substituted. The <code>text</code> can also contain '\\n' to have a
      * linebreak, which is of the correct length with regard to the selected font. This
      * parameter cannot be a <code>nullptr</code>.
+     * \return A tuple containing the bounding box of the text that was printed and the
+     * number of lines that were printed
      */
-    void render(Font* font, glm::vec2 pos, glm::vec4 color,
-                glm::vec4 outlineColor, const char* text, ...) const;
+    std::tuple<glm::vec2, int> render(Font* font, glm::vec2 pos, glm::vec4 color,
+                                      glm::vec4 outlineColor, const char* text, ...) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -157,9 +161,11 @@ public:
      * which are substituted. The <code>text</code> can also contain '\\n' to have a
      * linebreak, which is of the correct length with regard to the selected font. This
      * parameter cannot be a <code>nullptr</code>.
+     * \return A tuple containing the bounding box of the text that was printed and the
+     * number of lines that were printed
      */
-    void render(Font* font, glm::vec2 pos, glm::vec4 color,
-                const char* format, ...) const;
+    std::tuple<glm::vec2, int> render(Font* font, glm::vec2 pos, glm::vec4 color,
+                                      const char* format, ...) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -174,15 +180,20 @@ public:
      * which are substituted. The <code>text</code> can also contain '\\n' to have a
      * linebreak, which is of the correct length with regard to the selected font. This
      * parameter cannot be a <code>nullptr</code>.
+     * \return A tuple containing the bounding box of the text that was printed and the
+     * number of lines that were printed
      */
-    void render(Font* font, glm::vec2 pos, const char* format, ...) const;
+    std::tuple<glm::vec2, int> render(Font* font, glm::vec2 pos,
+                                      const char* format, ...) const;
     
     
 private:
     /// Private constructor that is used in the #initialize static method
     FontRenderer();
     
-    void internalRender(Font& font, glm::vec2 pos, glm::vec4 color, glm::vec4 outlineColor, const char* buffer) const;
+    std::tuple<glm::vec2, int> internalRender(Font& font, glm::vec2 pos, glm::vec4 color,
+                                              glm::vec4 outlineColor,
+                                              const char* buffer) const;
     
     
     /// The singleton instance of the default FontRenderer
@@ -205,9 +216,65 @@ private:
     unsigned int _ibo;
 };
 
+/**
+ * This helper method prints the passed arguments using the #Font::render function of the
+ * default font. It is equivalent to calling defaultRenderer::render with the same
+ * arguments and discarding the second return value
+ * \param font The Font that is used to render the provided text. If this argument is
+ * <code>nullptr</code>, an assertion is thrown
+ * \param pos The screen-space position (in pixel coordinates) that is used to render
+ * the text
+ * \param args The variable arguments that are the format string (the same as in printf)
+ * and optional arguments afterwards.
+ * \return The bounding box of the text that was printed
+ */
 template <typename... Args>
-void RenderFont(Args... args) {
-    ghoul::fontrendering::FontRenderer::defaultRenderer().render(args...);
+glm::vec2 RenderFont(ghoul::fontrendering::Font* font, glm::vec2 pos, Args... args) {
+    return std::get<0>(ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...));
+}
+
+/**
+ * This helper method prints the passed arguments using the #Font::render function of the
+ * default font and moves the pen position downwards after the call. It is equivalent to
+ * calling defaultRenderer::render with the same arguments and then subtracting the
+ * returned height from the pen position and discarding the second return value
+ * \param font The Font that is used to render the provided text. If this argument is
+ * <code>nullptr</code>, an assertion is thrown
+ * \param pos The screen-space position (in pixel coordinates) that is used to render
+ * the text
+ * \param args The variable arguments that are the format string (the same as in printf)
+ * and optional arguments afterwards.
+ * \return The bounding box of the text that was printed
+ */
+template <typename... Args>
+glm::vec2 RenderFontCr(ghoul::fontrendering::Font* font, glm::vec2& pos, Args... args) {
+    std::tuple<glm::vec2, int> res =
+        ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...);
+
+    pos.y -= std::get<1>(res) * font->height();
+    return std::get<0>(res);
+}
+
+/**
+ * This helper method prints the passed arguments using the #Font::render function of the
+ * default font and moves the pen position upwards after the call. It is equivalent to
+ * calling defaultRenderer::render with the same arguments and then adding the
+ * returned height to the pen position and discarding the second return value
+ * \param font The Font that is used to render the provided text. If this argument is
+ * <code>nullptr</code>, an assertion is thrown
+ * \param pos The screen-space position (in pixel coordinates) that is used to render
+ * the text
+ * \param args The variable arguments that are the format string (the same as in printf)
+ * and optional arguments afterwards.
+ * \return The bounding box of the text that was printed
+ */
+template <typename... Args>
+glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font* font, glm::vec2& pos, Args... args) {
+    std::tuple<glm::vec2, int> res =
+        ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...);
+
+    pos.y += std::get<1>(res) * font->height();
+    return std::get<0>(res);
 }
 
 } // namespace fontrendering

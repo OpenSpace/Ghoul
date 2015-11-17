@@ -192,11 +192,11 @@ FontRenderer& FontRenderer::defaultRenderer() {
 }
     
 // I wish I didn't have to copy-n-paste the render function, but *sigh* ---abock
-void FontRenderer::render(ghoul::fontrendering::Font* font,
-                          glm::vec2 pos,
-                          glm::vec4 color,
-                          glm::vec4 outlineColor,
-                          const char* format, ...) const
+std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font,
+                                                glm::vec2 pos,
+                                                glm::vec4 color,
+                                                glm::vec4 outlineColor,
+                                                const char* format, ...) const
 {
     ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
@@ -208,7 +208,7 @@ void FontRenderer::render(ghoul::fontrendering::Font* font,
     char* buffer = new (std::nothrow) char[size];
     if (buffer == nullptr) {
         LERROR("Error allocating buffer");
-        return;
+        return glm::vec2(0.f);
     }
     
     memset(buffer, 0, size);
@@ -220,7 +220,7 @@ void FontRenderer::render(ghoul::fontrendering::Font* font,
 #endif
     va_end(args);
     
-    internalRender(
+    auto res = internalRender(
         *font,
         std::move(pos),
         std::move(color),
@@ -229,12 +229,13 @@ void FontRenderer::render(ghoul::fontrendering::Font* font,
     );
     delete[] buffer;
 
+    return res;
 }
     
-void FontRenderer::render(ghoul::fontrendering::Font* font,
-                          glm::vec2 pos,
-                          glm::vec4 color,
-                          const char* format, ...) const
+std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font,
+                                                glm::vec2 pos,
+                                                glm::vec4 color,
+                                                const char* format, ...) const
 {
     ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
@@ -246,7 +247,7 @@ void FontRenderer::render(ghoul::fontrendering::Font* font,
     char* buffer = new (std::nothrow) char[size];
     if (buffer == nullptr) {
         LERROR("Error allocating buffer");
-        return;
+        return glm::vec2(0.f);
     }
     
     memset(buffer, 0, size);
@@ -258,7 +259,7 @@ void FontRenderer::render(ghoul::fontrendering::Font* font,
 #endif
     va_end(args);
     
-    internalRender(
+    auto res = internalRender(
         *font,
         std::move(pos),
         color,
@@ -267,11 +268,12 @@ void FontRenderer::render(ghoul::fontrendering::Font* font,
     );
     delete[] buffer;
     
+    return res;
 }
 
-void FontRenderer::render(ghoul::fontrendering::Font* font,
-                          glm::vec2 pos,
-                          const char* format, ...) const
+std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font,
+                                                glm::vec2 pos,
+                                                const char* format, ...) const
 {
     ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
@@ -283,7 +285,7 @@ void FontRenderer::render(ghoul::fontrendering::Font* font,
     char* buffer = new (std::nothrow) char[size];
     if (buffer == nullptr) {
         LERROR("Error allocating buffer");
-        return;
+        return glm::vec2(0.f);
     }
     
     memset(buffer, 0, size);
@@ -295,7 +297,7 @@ void FontRenderer::render(ghoul::fontrendering::Font* font,
 #endif
     va_end(args);
     
-    internalRender(
+    auto res = internalRender(
         *font,
         std::move(pos),
         glm::vec4(1.f),
@@ -304,13 +306,14 @@ void FontRenderer::render(ghoul::fontrendering::Font* font,
     );
     delete[] buffer;
     
+    return res;
 }
     
-void FontRenderer::internalRender(Font& font,
-                                  glm::vec2 pos,
-                                  glm::vec4 color,
-                                  glm::vec4 outlineColor,
-                                  const char* buffer) const
+std::tuple<glm::vec2, int> FontRenderer::internalRender(Font& font,
+                                                        glm::vec2 pos,
+                                                        glm::vec4 color,
+                                                        glm::vec4 outlineColor,
+                                                        const char* buffer) const
 {
     float h = font.height();
     
@@ -344,7 +347,12 @@ void FontRenderer::internalRender(Font& font,
     std::vector<GLuint> indices;
     std::vector<GLfloat> vertices;
     glm::vec2 movingPos = pos;
+
+    glm::vec2 size = glm::vec2(0.f);
     for (const std::string& line : lines) {
+        movingPos.x = pos.x;
+        float width = 0.f;
+        float height = 0.f;
         for (size_t j = 0 ; j < line.size(); ++j) {
             const Font::Glyph* glyph = font.glyph(line[j]);
             if (glyph == nullptr) {
@@ -354,8 +362,8 @@ void FontRenderer::internalRender(Font& font,
                 if (j > 0)
                     movingPos.x += glyph->kerning(line[j-1]);
                 
-                float x0 = movingPos.x + glyph->offsetX();
-                float y0 = movingPos.y + glyph->offsetY();
+                float x0 = movingPos.x + glyph->leftBearing();
+                float y0 = movingPos.y + glyph->topBearing();
                 float s0 = glyph->topLeft().x;
                 float t0 = glyph->topLeft().y;
                 float outlineS0 = glyph->outlineTopLeft().x;
@@ -380,11 +388,17 @@ void FontRenderer::internalRender(Font& font,
                     x1, y0, s1, t0, outlineS1, outlineT0
                 });
                 movingPos.x += glyph->horizontalAdvance();
+                
+                width += glyph->horizontalAdvance();
+                height = std::max(height, static_cast<float>(glyph->height()));
             }
             
         }
+        size.x = std::max(size.x, width);
+        size.y += height;
         movingPos.y -= h;
     }
+    size.y = (lines.size() -  1) * font.height();
     
     glm::mat4 projection = glm::ortho(
         0.f,
@@ -444,6 +458,8 @@ void FontRenderer::internalRender(Font& font,
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glEnable(GL_DEPTH_TEST);
+    
+    return std::make_tuple(size, lines.size());
 }
     
 void FontRenderer::setWindowSize(glm::vec2 windowSize) {

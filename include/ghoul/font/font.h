@@ -69,8 +69,8 @@ public:
         Glyph(wchar_t character,
               int width = 0,
               int height = 0,
-              int offsetX = 0,
-              int offsetY = 0,
+              float leftBearing = 0.f,
+              float topBearing = 0.f,
               float advanceX = 0.f,
               float advanceY = 0.f,
               glm::vec2 texCoordTopLeft = glm::vec2(0.f),
@@ -97,13 +97,13 @@ public:
          * Returns the left-side bearing of the glyph
          * \return the left-side bearing of the glyph
          */
-        int offsetX() const;
+        float leftBearing() const;
         
         /**
          * Returns the top-side bearing of the glyph
          * \return The top-side bearing of the glyph
          */
-        int offsetY() const;
+        float topBearing() const;
 
         /**
          * Returns the horizontal advance for this glyph
@@ -164,10 +164,10 @@ public:
         int _height;
 
         ///< Glyph's left bearing expressed in pixels
-        int _offsetX;
+        float _leftBearing;
 
         /// Glyphs's top bearing expressed in pixels
-        int _offsetY;
+        float _topBearing;
 
         /// This is the distance used when the glyph is drawn as part
         /// of horizontal text
@@ -293,7 +293,10 @@ public:
 private:
     /// Generates the Kerning values for all Glyph pairs that have sofar been loaded
     void generateKerning();
-
+    
+    /// Computes the left bearing for a glyph with a higher accuracy
+    float computeLeftBearing(wchar_t charcode) const;
+    
     /// A list of all loaded Glyphs
     std::vector<Glyph> _glyphs;
     

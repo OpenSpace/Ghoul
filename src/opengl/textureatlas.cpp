@@ -241,6 +241,8 @@ void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
 void TextureAtlas::getTextureCoordinates(RegionHandle handle, glm::vec2& topLeft, glm::vec2& bottomRight, const glm::ivec4& windowing) const {
     ghoul_assert(validHandle(handle), "Invalid handle");
     glm::ivec4 region = _handleInformation[handle];
+
+    // Offset the location to the pixel center
     
     int topLeftX = region.x + windowing.x;
     int topLeftY = region.y + windowing.y;
@@ -289,8 +291,10 @@ void TextureAtlas::createTexture(const glm::ivec3& size) {
         size,
         format,
         internalFormat,
-        dataType
+        dataType,
+        Texture::FilterMode::Nearest
     );
+
 }
     
 int TextureAtlas::atlasFit(size_t index, int width, int height) {

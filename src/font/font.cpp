@@ -122,8 +122,8 @@ namespace fontrendering {
 Font::Glyph::Glyph(wchar_t character,
                    int width,
                    int height,
-                   int offsetX,
-                   int offsetY,
+                   float leftBearing,
+                   float topBearing,
                    float advanceX,
                    float advanceY,
                    glm::vec2 texCoordTopLeft,
@@ -133,8 +133,8 @@ Font::Glyph::Glyph(wchar_t character,
     : _charcode(std::move(character))
     , _width(width)
     , _height(height)
-    , _offsetX(offsetX)
-    , _offsetY(offsetY)
+    , _leftBearing(leftBearing)
+    , _topBearing(topBearing)
     , _horizontalAdvance(advanceX)
     , _verticalAdvance(advanceY)
     , _topLeft(std::move(texCoordTopLeft))
@@ -155,12 +155,12 @@ int Font::Glyph::height() const {
     return _height;
 }
 
-int Font::Glyph::offsetX() const {
-    return _offsetX;
+float Font::Glyph::leftBearing() const {
+    return _leftBearing;
 }
 
-int Font::Glyph::offsetY() const {
-    return _offsetY;
+float Font::Glyph::topBearing() const {
+    return _topBearing;
 }
     
 float Font::Glyph::kerning(wchar_t character) const {
@@ -302,8 +302,8 @@ glm::vec2 Font::boundingBox(const char* format, ...) {
                 if (j > 0)
                     width += g->kerning(line[j-1]);
                 
-                width += g->offsetX() + g->width() + g->horizontalAdvance();
-                height = std::max(height, static_cast<float>(g->offsetY() + g->height()));
+                width += g->horizontalAdvance();
+                height = std::max(height, static_cast<float>(g->height()));
             }
         }
         result.x = std::max(result.x, width);
@@ -356,6 +356,38 @@ const Font::Glyph* Font::glyph(wchar_t character) {
     }
 }
     
+float Font::computeLeftBearing(wchar_t charcode) const {
+    const float HighResolutionFactor = 10.f;
+    FT_Library library;
+    FT_Face face;
+    loadFace(_name, _pointSize * HighResolutionFactor, library, face);
+    
+    FT_UInt glyphIndex = FT_Get_Char_Index(face, charcode);
+    FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
+    
+    FT_Glyph outlineGlyph;
+    FT_Get_Glyph(face->glyph, &outlineGlyph);
+    if (_hasOutline) {
+        FT_Stroker stroker;
+        FT_Stroker_New(library, &stroker);
+        
+        float t = _outlineThickness * HighResolutionFactor * PointConversionFactor;
+        FT_Stroker_Set(stroker,
+                       static_cast<int>(t),
+                       FT_STROKER_LINECAP_ROUND,
+                       FT_STROKER_LINEJOIN_ROUND,
+                       0
+                       );
+        
+        FT_Glyph_Stroke(&outlineGlyph, stroker, 1);
+        FT_Stroker_Done(stroker);
+    }
+    FT_Glyph_To_Bitmap(&outlineGlyph, FT_RENDER_MODE_NORMAL, nullptr, 1);
+    
+    FT_BitmapGlyph outlineBitmap = reinterpret_cast<FT_BitmapGlyph>(outlineGlyph);
+    return outlineBitmap->left / HighResolutionFactor;
+}
+    
 size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
 #define HandleError(error) \
     if (error) { \
@@ -382,7 +414,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
     using TextureAtlas = opengl::TextureAtlas;
     
     size_t missed = 0;
-    
+    LINFO(_name);
     unsigned int atlasDepth  = _atlas.size().z;
     
     FT_Library library;
@@ -405,7 +437,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         // First generate the font without outline and store it in the font atlas
         // only if an outline is request, repeat the process for the outline
 
-        int leftBearing, topBearing;
+        float leftBearing, topBearing;
         glm::vec2 topLeft, bottomRight;
         glm::vec2 outlineTopLeft, outlineBottomRight;
         unsigned int width = 0;
@@ -421,6 +453,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
 
         FT_Error error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
         HandleError(error);
+        
         // In case the font has an outline, we load it first as we need the size of the
         // outline for loading the base layer
         // The reason for this is that the outline is slightly bigger than the base layer
@@ -452,7 +485,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             
             FT_BitmapGlyph outlineBitmap = reinterpret_cast<FT_BitmapGlyph>(outlineGlyph);
             topBearing    = outlineBitmap->top;
-            leftBearing   = outlineBitmap->left;
+            leftBearing = computeLeftBearing(charcode);
             
             width = outlineBitmap->bitmap.width / atlasDepth;
             height = outlineBitmap->bitmap.rows;
@@ -475,9 +508,8 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         HandleError(error);
         
         FT_BitmapGlyph insideBitmap = reinterpret_cast<FT_BitmapGlyph>(insideGlyph);
-        
         topBearing = insideBitmap->top;
-        leftBearing = insideBitmap->left;
+        leftBearing = std::max(leftBearing, computeLeftBearing(charcode));
 
         // We take the maximum of the width (either 0 if there is no outline, or the
         // outline width if there is one) and the height
@@ -502,8 +534,8 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         }
         else {
             std::vector<unsigned char> buffer(width * height * sizeof(char), 0);
-            int widthOffset = width - insideBitmap->bitmap.width;
-            int heightOffset = height - insideBitmap->bitmap.rows;
+            int widthOffset = (width - insideBitmap->bitmap.width) / 2;
+            int heightOffset = (height - insideBitmap->bitmap.rows) / 2;
             
             for (unsigned int j = 0; j < height; ++j) {
                 for (unsigned int i = 0; i < width; ++i) {
@@ -531,7 +563,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
                 handle,
                 topLeft,
                 bottomRight,
-                glm::ivec4(widthOffset / 2.f, heightOffset / 2.f, 0, 0)
+                glm::ivec4(widthOffset / 4.f, heightOffset / 4.f, widthOffset / 4.f, heightOffset / 4.f)
             );
         }
 
@@ -549,6 +581,10 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             bottomRight,
             outlineTopLeft,
             outlineBottomRight
+        );
+        
+        LINFO(
+              char(charcode) << ": (" << width << "," << height << ") [" << leftBearing << "," << topBearing << "] {" << face->glyph->advance.x / PointConversionFactor << "," << face->glyph->advance.y / PointConversionFactor << "} [[[" << "]]]"
         );
     }
     
