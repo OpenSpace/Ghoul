@@ -208,7 +208,7 @@ std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font
     char* buffer = new (std::nothrow) char[size];
     if (buffer == nullptr) {
         LERROR("Error allocating buffer");
-        return glm::vec2(0.f);
+        return std::make_tuple(glm::vec2(0.f), 0);
     }
     
     memset(buffer, 0, size);
@@ -247,7 +247,7 @@ std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font
     char* buffer = new (std::nothrow) char[size];
     if (buffer == nullptr) {
         LERROR("Error allocating buffer");
-        return glm::vec2(0.f);
+        return std::make_tuple(glm::vec2(0.f), 0);
     }
     
     memset(buffer, 0, size);
@@ -285,7 +285,7 @@ std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font
     char* buffer = new (std::nothrow) char[size];
     if (buffer == nullptr) {
         LERROR("Error allocating buffer");
-        return glm::vec2(0.f);
+        return std::make_tuple(glm::vec2(0.f), 0);;
     }
     
     memset(buffer, 0, size);
