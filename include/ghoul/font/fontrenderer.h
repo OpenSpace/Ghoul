@@ -29,8 +29,6 @@
 #include <ghoul/glm.h>
 #include <ghoul/font/font.h>
 
-#include <tuple>
-
 namespace ghoul {
 
 namespace opengl {
@@ -51,6 +49,11 @@ namespace fontrendering {
  */
 class FontRenderer {
 public:
+    struct BoundingBoxInformation {
+        glm::vec2 boundingBox;
+        int numberOfLines;
+    };
+    
     /**
      * This constructor requires a custom ProgramObject that handles the rendering of any
      * passed text. In addition the initial size of the rendering window has to be passed.
@@ -143,8 +146,8 @@ public:
      * \return A tuple containing the bounding box of the text that was printed and the
      * number of lines that were printed
      */
-    std::tuple<glm::vec2, int> render(Font* font, glm::vec2 pos, glm::vec4 color,
-                                      glm::vec4 outlineColor, const char* text, ...) const;
+    BoundingBoxInformation render(Font* font, glm::vec2 pos, glm::vec4 color,
+                                  glm::vec4 outlineColor, const char* text, ...) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -164,8 +167,8 @@ public:
      * \return A tuple containing the bounding box of the text that was printed and the
      * number of lines that were printed
      */
-    std::tuple<glm::vec2, int> render(Font* font, glm::vec2 pos, glm::vec4 color,
-                                      const char* format, ...) const;
+    BoundingBoxInformation render(Font* font, glm::vec2 pos, glm::vec4 color,
+                                  const char* format, ...) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -183,17 +186,17 @@ public:
      * \return A tuple containing the bounding box of the text that was printed and the
      * number of lines that were printed
      */
-    std::tuple<glm::vec2, int> render(Font* font, glm::vec2 pos,
-                                      const char* format, ...) const;
+    BoundingBoxInformation render(Font* font, glm::vec2 pos,
+                                  const char* format, ...) const;
     
     
 private:
     /// Private constructor that is used in the #initialize static method
     FontRenderer();
     
-    std::tuple<glm::vec2, int> internalRender(Font& font, glm::vec2 pos, glm::vec4 color,
-                                              glm::vec4 outlineColor,
-                                              const char* buffer) const;
+    BoundingBoxInformation internalRender(Font& font, glm::vec2 pos, glm::vec4 color,
+                                          glm::vec4 outlineColor,
+                                          const char* buffer) const;
     
     
     /// The singleton instance of the default FontRenderer
@@ -230,7 +233,10 @@ private:
  */
 template <typename... Args>
 glm::vec2 RenderFont(ghoul::fontrendering::Font* font, glm::vec2 pos, Args... args) {
-    return std::get<0>(ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...));
+    return (ghoul::fontrendering::FontRenderer::defaultRenderer().render(font,
+                                                                         pos,
+                                                                         args...)
+            ).boundingBox;
 }
 
 /**
@@ -248,11 +254,11 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font* font, glm::vec2 pos, Args... ar
  */
 template <typename... Args>
 glm::vec2 RenderFontCr(ghoul::fontrendering::Font* font, glm::vec2& pos, Args... args) {
-    std::tuple<glm::vec2, int> res =
+    auto res =
         ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...);
 
-    pos.y -= std::get<1>(res) * font->height();
-    return std::get<0>(res);
+    pos.y -= res.numberOfLines * font->height();
+    return res.boundingBox;
 }
 
 /**
@@ -270,11 +276,11 @@ glm::vec2 RenderFontCr(ghoul::fontrendering::Font* font, glm::vec2& pos, Args...
  */
 template <typename... Args>
 glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font* font, glm::vec2& pos, Args... args) {
-    std::tuple<glm::vec2, int> res =
+    auto res =
         ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...);
 
-    pos.y += std::get<1>(res) * font->height();
-    return std::get<0>(res);
+    pos.y += res.numberOfLines * font->height();
+    return res.boundingBox;
 }
 
 } // namespace fontrendering

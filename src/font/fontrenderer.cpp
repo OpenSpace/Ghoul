@@ -192,11 +192,11 @@ FontRenderer& FontRenderer::defaultRenderer() {
 }
     
 // I wish I didn't have to copy-n-paste the render function, but *sigh* ---abock
-std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font,
-                                                glm::vec2 pos,
-                                                glm::vec4 color,
-                                                glm::vec4 outlineColor,
-                                                const char* format, ...) const
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
+                                                          glm::vec2 pos,
+                                                          glm::vec4 color,
+                                                          glm::vec4 outlineColor,
+                                                          const char* format, ...) const
 {
     ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
@@ -205,11 +205,7 @@ std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font
     va_start(args, format); // Parses The String For Variables
     
     int size = 1 + vscprintf(format, args);
-    char* buffer = new (std::nothrow) char[size];
-    if (buffer == nullptr) {
-        LERROR("Error allocating buffer");
-        return std::make_tuple(glm::vec2(0.f), 0);
-    }
+    char* buffer = new char[size];
     
     memset(buffer, 0, size);
     
@@ -232,10 +228,10 @@ std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font
     return res;
 }
     
-std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font,
-                                                glm::vec2 pos,
-                                                glm::vec4 color,
-                                                const char* format, ...) const
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
+                                                          glm::vec2 pos,
+                                                          glm::vec4 color,
+                                                          const char* format, ...) const
 {
     ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
@@ -244,12 +240,7 @@ std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font
     va_start(args, format); // Parses The String For Variables
     
     int size = 1 + vscprintf(format, args);
-    char* buffer = new (std::nothrow) char[size];
-    if (buffer == nullptr) {
-        LERROR("Error allocating buffer");
-        return std::make_tuple(glm::vec2(0.f), 0);
-    }
-    
+    char* buffer = new char[size];
     memset(buffer, 0, size);
     
 #if WIN32 //visual studio 2005 or later
@@ -271,9 +262,9 @@ std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font
     return res;
 }
 
-std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font,
-                                                glm::vec2 pos,
-                                                const char* format, ...) const
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
+                                                          glm::vec2 pos,
+                                                          const char* format, ...) const
 {
     ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
@@ -282,11 +273,7 @@ std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font
     va_start(args, format); // Parses The String For Variables
     
     int size = 1 + vscprintf(format, args);
-    char* buffer = new (std::nothrow) char[size];
-    if (buffer == nullptr) {
-        LERROR("Error allocating buffer");
-        return std::make_tuple(glm::vec2(0.f), 0);;
-    }
+    char* buffer = new char[size];
     
     memset(buffer, 0, size);
     
@@ -309,11 +296,12 @@ std::tuple<glm::vec2, int> FontRenderer::render(ghoul::fontrendering::Font* font
     return res;
 }
     
-std::tuple<glm::vec2, int> FontRenderer::internalRender(Font& font,
-                                                        glm::vec2 pos,
-                                                        glm::vec4 color,
-                                                        glm::vec4 outlineColor,
-                                                        const char* buffer) const
+FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
+                                                                  glm::vec2 pos,
+                                                                  glm::vec4 color,
+                                                                  glm::vec4 outlineColor,
+                                                                  const char* buffer)
+                                                                  const
 {
     float h = font.height();
     
@@ -459,7 +447,7 @@ std::tuple<glm::vec2, int> FontRenderer::internalRender(Font& font,
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glEnable(GL_DEPTH_TEST);
     
-    return std::make_tuple(size, lines.size());
+    return { size, static_cast<int>(lines.size()) };
 }
     
 void FontRenderer::setWindowSize(glm::vec2 windowSize) {
