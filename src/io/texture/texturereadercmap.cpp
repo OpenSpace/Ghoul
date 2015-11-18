@@ -91,6 +91,7 @@ opengl::Texture* TextureReaderCMAP::loadTexture(const std::string& filename) con
 	if ((width * 4) != i) {
 		LERROR("Header assured " << width << " values, but " << i / 4.f <<
 			"were found");
+        delete[] values;
 		return nullptr;
 	}
 

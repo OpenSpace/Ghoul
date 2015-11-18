@@ -358,9 +358,11 @@ const Font::Glyph* Font::glyph(wchar_t character) {
     
 float Font::computeLeftBearing(wchar_t charcode) const {
     const float HighResolutionFactor = 10.f;
-    FT_Library library;
-    FT_Face face;
-    loadFace(_name, _pointSize * HighResolutionFactor, library, face);
+    FT_Library library = nullptr;
+    FT_Face face = nullptr;
+    bool success = loadFace(_name, _pointSize * HighResolutionFactor, library, face);
+    if (!success)
+        return 0.f;
     
     FT_UInt glyphIndex = FT_Get_Char_Index(face, charcode);
     FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
@@ -417,8 +419,8 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
     LINFO(_name);
     unsigned int atlasDepth  = _atlas.size().z;
     
-    FT_Library library;
-    FT_Face face;
+    FT_Library library = nullptr;
+    FT_Face face = nullptr;
     bool success = loadFace(_name, _pointSize, library, face);
     if (!success)
         return characters.size();
@@ -508,7 +510,7 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         HandleError(error);
         
         FT_BitmapGlyph insideBitmap = reinterpret_cast<FT_BitmapGlyph>(insideGlyph);
-        topBearing = insideBitmap->top;
+        topBearing = std::max(topBearing, static_cast<float>(insideBitmap->top));
         leftBearing = std::max(leftBearing, computeLeftBearing(charcode));
 
         // We take the maximum of the width (either 0 if there is no outline, or the

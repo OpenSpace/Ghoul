@@ -237,6 +237,7 @@ Directory FileSystem::currentDirectory() const {
     char* result = getcwd(buffer, MAXPATHLEN);
     if (result == nullptr) {
         LERROR("Error retrieving current directory: " << errno);
+        delete[] buffer;
         return Directory();
     }
     string currentDir = string(buffer);

@@ -100,54 +100,54 @@ namespace {
         }
     }
     
-    std::string EventEnumToName(Events e) {
-        std::string name;
-        if(e & Events::kFSEventStreamEventFlagMustScanSubDirs)
-            name += "| kFSEventStreamEventFlagMustScanSubDirs";
-        if(e & Events::kFSEventStreamEventFlagUserDropped)
-            name += "| kFSEventStreamEventFlagUserDropped";
-        if(e & Events::kFSEventStreamEventFlagKernelDropped)
-            name += "| kFSEventStreamEventFlagKernelDropped";
-        if(e & Events::kFSEventStreamEventFlagEventIdsWrapped)
-            name += "| kFSEventStreamEventFlagEventIdsWrapped";
-        if(e & Events::kFSEventStreamEventFlagHistoryDone)
-            name += "| kFSEventStreamEventFlagHistoryDone";
-        if(e & Events::kFSEventStreamEventFlagRootChanged)
-            name += "| kFSEventStreamEventFlagRootChanged";
-        if(e & Events::kFSEventStreamEventFlagMount)
-            name += "| kFSEventStreamEventFlagMount";
-        if(e & Events::kFSEventStreamEventFlagUnmount)
-            name += "| kFSEventStreamEventFlagUnmount";
-        
-        
-        if(e & Events::kFSEventStreamEventFlagItemCreated)
-            name += "| kFSEventStreamEventFlagItemCreated";
-        if(e & Events::kFSEventStreamEventFlagItemRemoved)
-            name += "| kFSEventStreamEventFlagItemRemoved";
-        if(e & Events::kFSEventStreamEventFlagItemInodeMetaMod)
-            name += "| kFSEventStreamEventFlagItemInodeMetaMod";
-        if(e & Events::kFSEventStreamEventFlagItemRenamed)
-            name += "| kFSEventStreamEventFlagItemRenamed";
-        if(e & Events::kFSEventStreamEventFlagItemModified)
-            name += "| kFSEventStreamEventFlagItemModified";
-        if(e & Events::kFSEventStreamEventFlagItemFinderInfoMod)
-            name += "| kFSEventStreamEventFlagItemFinderInfoMod";
-        if(e & Events::kFSEventStreamEventFlagItemChangeOwner)
-            name += "| kFSEventStreamEventFlagItemChangeOwner";
-        if(e & Events::kFSEventStreamEventFlagItemXattrMod)
-            name += "| kFSEventStreamEventFlagItemXattrMod";
-        if(e & Events::kFSEventStreamEventFlagItemIsFile)
-            name += "| kFSEventStreamEventFlagItemIsFile";
-        if(e & Events::kFSEventStreamEventFlagItemIsDir)
-            name += "| kFSEventStreamEventFlagItemIsDir";
-        if(e & Events::kFSEventStreamEventFlagItemIsSymlink)
-            name += "| kFSEventStreamEventFlagItemIsSymlink";
-        
-        if (name.length() > 2) {
-            name = name.substr(2);
-        }
-        return name;
-    }
+//    std::string EventEnumToName(Events e) {
+//        std::string name;
+//        if(e & Events::kFSEventStreamEventFlagMustScanSubDirs)
+//            name += "| kFSEventStreamEventFlagMustScanSubDirs";
+//        if(e & Events::kFSEventStreamEventFlagUserDropped)
+//            name += "| kFSEventStreamEventFlagUserDropped";
+//        if(e & Events::kFSEventStreamEventFlagKernelDropped)
+//            name += "| kFSEventStreamEventFlagKernelDropped";
+//        if(e & Events::kFSEventStreamEventFlagEventIdsWrapped)
+//            name += "| kFSEventStreamEventFlagEventIdsWrapped";
+//        if(e & Events::kFSEventStreamEventFlagHistoryDone)
+//            name += "| kFSEventStreamEventFlagHistoryDone";
+//        if(e & Events::kFSEventStreamEventFlagRootChanged)
+//            name += "| kFSEventStreamEventFlagRootChanged";
+//        if(e & Events::kFSEventStreamEventFlagMount)
+//            name += "| kFSEventStreamEventFlagMount";
+//        if(e & Events::kFSEventStreamEventFlagUnmount)
+//            name += "| kFSEventStreamEventFlagUnmount";
+//        
+//        
+//        if(e & Events::kFSEventStreamEventFlagItemCreated)
+//            name += "| kFSEventStreamEventFlagItemCreated";
+//        if(e & Events::kFSEventStreamEventFlagItemRemoved)
+//            name += "| kFSEventStreamEventFlagItemRemoved";
+//        if(e & Events::kFSEventStreamEventFlagItemInodeMetaMod)
+//            name += "| kFSEventStreamEventFlagItemInodeMetaMod";
+//        if(e & Events::kFSEventStreamEventFlagItemRenamed)
+//            name += "| kFSEventStreamEventFlagItemRenamed";
+//        if(e & Events::kFSEventStreamEventFlagItemModified)
+//            name += "| kFSEventStreamEventFlagItemModified";
+//        if(e & Events::kFSEventStreamEventFlagItemFinderInfoMod)
+//            name += "| kFSEventStreamEventFlagItemFinderInfoMod";
+//        if(e & Events::kFSEventStreamEventFlagItemChangeOwner)
+//            name += "| kFSEventStreamEventFlagItemChangeOwner";
+//        if(e & Events::kFSEventStreamEventFlagItemXattrMod)
+//            name += "| kFSEventStreamEventFlagItemXattrMod";
+//        if(e & Events::kFSEventStreamEventFlagItemIsFile)
+//            name += "| kFSEventStreamEventFlagItemIsFile";
+//        if(e & Events::kFSEventStreamEventFlagItemIsDir)
+//            name += "| kFSEventStreamEventFlagItemIsDir";
+//        if(e & Events::kFSEventStreamEventFlagItemIsSymlink)
+//            name += "| kFSEventStreamEventFlagItemIsSymlink";
+//        
+//        if (name.length() > 2) {
+//            name = name.substr(2);
+//        }
+//        return name;
+//    }
     
     
 }

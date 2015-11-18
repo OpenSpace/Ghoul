@@ -45,8 +45,10 @@
 
 #ifndef WIN32
 #define GHL_NOEXCEPT noexcept
+#define GHL_NORETURN __attribute__((analyzer_noreturn))
 #else
 #define GHL_NOEXCEPT
+#define GHL_NORETURN
 #endif // WIN32
 
 namespace ghoul {
@@ -66,7 +68,7 @@ public:
 		const std::string& message, 
 		const std::string& file, 
 		const std::string& function, 
-		int line);
+		int line) GHL_NORETURN;
 
 
 } // namespace ghoul

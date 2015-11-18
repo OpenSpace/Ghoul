@@ -73,7 +73,7 @@ public:
                      const std::string& message) override;
 
     /// Flushes the stream and, thereby, all messages that are in the associated buffer
-    void flush();
+    void flush() override;
 
 protected:
     StreamLog(const StreamLog& rhs) = delete;
