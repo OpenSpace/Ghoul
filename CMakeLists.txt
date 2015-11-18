@@ -158,6 +158,16 @@ add_subdirectory(ext/tinyobjloader)
 target_link_libraries(Ghoul tinyobjloader)
 target_include_directories(Ghoul SYSTEM PUBLIC "${GHOUL_ROOT_DIR}/ext/tinyobjloader")
 
+
+# Cppformat
+set(FMT_DOC CACHE OFF CACHE BOOL "Generate the doc target.")
+set(FMT_INSTALL CACHE OFF CACHE BOOL "Generate the install target.")
+set(FMT_TEST CACHE OFF CACHE BOOL "Generate the test target.")
+add_subdirectory(ext/cppformat)
+target_link_libraries(Ghoul cppformat)
+target_include_directories(Ghoul SYSTEM PUBLIC "${GHOUL_ROOT_DIR}/ext/cppformat")
+
+
 # DevIL
 find_package(DevIL)
 if (IL_FOUND)
