@@ -160,9 +160,9 @@ target_include_directories(Ghoul SYSTEM PUBLIC "${GHOUL_ROOT_DIR}/ext/tinyobjloa
 
 
 # Cppformat
-set(FMT_DOC CACHE OFF CACHE BOOL "Generate the doc target.")
-set(FMT_INSTALL CACHE OFF CACHE BOOL "Generate the install target.")
-set(FMT_TEST CACHE OFF CACHE BOOL "Generate the test target.")
+set(FMT_DOC OFF CACHE BOOL "Generate the doc target.")
+set(FMT_INSTALL OFF CACHE BOOL "Generate the install target.")
+set(FMT_TEST OFF CACHE BOOL "Generate the test target.")
 add_subdirectory(ext/cppformat)
 target_link_libraries(Ghoul cppformat)
 target_include_directories(Ghoul SYSTEM PUBLIC "${GHOUL_ROOT_DIR}/ext/cppformat")
@@ -207,6 +207,7 @@ if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE AND NOT GHOUL_USE_SOIL)
 endif ()
 
 if (GHOUL_MODULE_FONTRENDERING)
+    set(FREETYPE_DIST OFF CACHE BOOL "Generate the dist target.")
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/freetype2)
 
     target_include_directories(Ghoul PUBLIC ${GHOUL_ROOT_DIR}/ext/freetype2/include)
