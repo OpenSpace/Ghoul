@@ -35,7 +35,7 @@
 #  define GHL_ASSERT_FUNCTION __FUNCTION__
 #endif
 
-#include <ghoul/exception/exception.h>
+#include <ghoul/misc/exception.h>
 
 #include <string>
 #include <sstream>
@@ -51,10 +51,9 @@
 
 namespace ghoul {
 
-class AssertException : public Exception, public std::runtime_error {
+class AssertException : public RuntimeError {
 public:
-	AssertException();
-	virtual const char* what() const GHL_NOEXCEPT;
+    AssertException();
 };
 
 	/**

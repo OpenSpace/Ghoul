@@ -27,7 +27,6 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/cmdparser/commandlineparser.cpp
     ${PROJECT_SOURCE_DIR}/src/cmdparser/multiplecommand.cpp
     ${PROJECT_SOURCE_DIR}/src/cmdparser/singlecommand.cpp
-    ${PROJECT_SOURCE_DIR}/src/exception/exception.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/cachemanager.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/directory.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/file.cpp
@@ -63,6 +62,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/misc/clipboard.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/crc32.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/dictionary.cpp
+    ${PROJECT_SOURCE_DIR}/src/misc/exception.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/highresclock.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/misc.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/sharedmemory.cpp
@@ -103,7 +103,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/observer.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/observer.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/singleton.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/exception/exception.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/cachemanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/directory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/file.h
@@ -145,6 +144,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/crc32.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.inl
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/exception.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/highresclock.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/sharedmemory.h

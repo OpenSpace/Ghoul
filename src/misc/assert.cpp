@@ -42,11 +42,7 @@ namespace {
 
 namespace ghoul {
 
-AssertException::AssertException() : std::runtime_error("") {}
-
-const char* AssertException::what() const GHL_NOEXCEPT {
-	return "GhoulAssertException";
-}
+AssertException::AssertException() : RuntimeError("GhoulAssertException", "Assert") {}
 
 void internal_assert(
 	const std::string& expression,

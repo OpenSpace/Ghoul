@@ -23,14 +23,19 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/exception/exception.h>
+#include <ghoul/misc/exception.h>
+
+#include <format.h>
 
 namespace ghoul {
-
-Exception::Exception() {}
-
-const char* Exception::what() const {
-	return "GhoulException";
+    
+RuntimeError::RuntimeError(const std::string& msg, const std::string& component)
+    : std::runtime_error(msg)
+    , _component(component)
+{}
+    
+const char* RuntimeError::what() const noexcept {
+    return fmt::format("({}) {}", _component, std::runtime_error::what()).c_str();
 }
 
 } // namespace ghoul

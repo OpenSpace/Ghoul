@@ -26,14 +26,21 @@
 #ifndef __EXCEPTION_H__
 #define __EXCEPTION_H__
 
+#include <exception>
+#include <string>
+
 namespace ghoul {
 
-class Exception {
+class RuntimeError : public std::runtime_error {
 public:
-	Exception();
-	virtual const char* what() const;
-}; // class Exception
-
+    explicit RuntimeError(const std::string& msg, const std::string& component);
+    
+    const char* what() const noexcept;
+    
+private:
+    std::string _component;
+};
+    
 } // namespace ghoul
 
 #endif // __EXCEPTION_H__
