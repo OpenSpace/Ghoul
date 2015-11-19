@@ -43,13 +43,21 @@
 #include <exception>
 #include <stdexcept>
 
-#ifndef WIN32
+#ifdef WIN32
+// Check if this is still true with Visual Studio 2015 ---abock
+#define GHL_NOEXCEPT
+#else
 #define GHL_NOEXCEPT noexcept
+#endif // WIN32
+
+#ifdef WIN32
+#define GHL_NORETURN
+#elif __APPLE__
+// This tells the clang static analyzer that internal_assert is just like assert itself
 #define GHL_NORETURN __attribute__((analyzer_noreturn))
 #else
-#define GHL_NOEXCEPT
 #define GHL_NORETURN
-#endif // WIN32
+#endif
 
 namespace ghoul {
 

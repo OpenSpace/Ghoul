@@ -30,12 +30,7 @@
 namespace ghoul {
     
 RuntimeError::RuntimeError(const std::string& msg, const std::string& component)
-    : std::runtime_error(msg)
-    , _component(component)
+    : std::runtime_error(fmt::format("({}) {}", component, msg))
 {}
     
-const char* RuntimeError::what() const noexcept {
-    return fmt::format("({}) {}", _component, std::runtime_error::what()).c_str();
-}
-
 } // namespace ghoul

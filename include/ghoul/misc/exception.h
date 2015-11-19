@@ -35,11 +35,6 @@ namespace ghoul {
 class RuntimeError : public std::runtime_error {
 public:
     explicit RuntimeError(const std::string& msg, const std::string& component);
-    
-    const char* what() const noexcept;
-    
-private:
-    std::string _component;
 };
     
 } // namespace ghoul
