@@ -374,11 +374,11 @@ bool FileSystem::deleteFile(const File& path) const {
 bool FileSystem::createDirectory(const Directory& path, bool recursive) const {
 	if (recursive) {
 		std::vector<Directory> directories;
-		Directory d = path;
-        while (!FileSys.directoryExists(d)) {
+		Directory dir = path;
+        while (!FileSys.directoryExists(dir)) {
             //LERROR("Adding path to v: " << d.path());
-			directories.push_back(d);
-			d = d.parentDirectory();
+			directories.push_back(dir);
+			dir = dir.parentDirectory();
 		}
 
 		bool success = true;

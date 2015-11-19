@@ -263,7 +263,7 @@ glm::vec2 Font::boundingBox(const char* format, ...) {
     
     int size = 1 + vscprintf(format, args);
     char* buffer = new char[size];
-    memset(buffer, 0, size);
+    memset(buffer, 0, static_cast<size_t>(size));
     
 #if WIN32
     vsprintf_s(buffer, size, format, args);

@@ -107,13 +107,6 @@ public:
      * Add a new command to the parser. This method transfers ownership of the
      * CommandlineCommand from the caller to the CommandlineParser, which will delete the
      * command upon destruction.
-     * \param cmd The new command that is added to the CommandlineParser. The
-     * CommandlineCommand::name and CommandlineCommand::shortName have to unique to the
-     * CommandlineParser, must not be <code>Nameless</code> and have to start with at
-     * least one <code>-</code> or the addition will fail.
-     * Furthermore, if the <code>cmd</code> already has been added to the
-     * CommandlineParser, this method will fail. In both cases, <code>false</code> is
-     * returned.
      * \param cmd The command that is to be added. The ownership of the CommandlineCommand
      * will be transferred to the CommandlineParser
      * \return <code>true</code> if the command was added successfully; <code>false</code>

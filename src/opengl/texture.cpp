@@ -236,18 +236,14 @@ size_t Texture::numberOfChannels() const {
         case Format::Red:
         case Format::DepthComponent:
             return 1;
-            break;
         case Format::RG:
             return 2;
-            break;
         case Format::RGB:
         case Format::BGR:
             return 3;
-            break;
         case Format::RGBA:
         case Format::BGRA:
             return 4;
-            break;
     }
     return 0;
 }

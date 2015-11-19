@@ -185,7 +185,7 @@ public:
 	 * requested type <code>T</code> disagree, an error is logged. If the key does not
 	 * exist in the dictionary, the error is silently ignored if the code was compiled
 	 * with GHL_DEBUG.
-     * \tparam The type of the value that should be tested. The <code>typeid</code> of
+     * \tparam T The type of the value that should be tested. The <code>typeid</code> of
      * this type has to be equal to the typeid of the value that is to be retrieved
      * \param key The, potentially nested, key for which the stored value should be
      * returned
@@ -206,7 +206,7 @@ public:
 	 * Only if the type of the key and the requested type <code>T</code> disagree, an
 	 * error is logged. If the key does not exist in the dictionary, the error is silently
 	 * ignored if the code was compiled with GHL_DEBUG.
-     * \tparam The type of the value that should be tested. The <code>typeid</code> of
+     * \tparam T The type of the value that should be tested. The <code>typeid</code> of
      * this type has to be equal to the typeid of the value that is to be retrieved
      * \param key The, potentially nested, key for which the stored value should be
      * returned
@@ -220,7 +220,7 @@ public:
      * <code>key</code> and the stored type agrees with the provided template parameter.
      * The key can be nested and refer to deeper levels of the Dictionary. If any of the
      * intermediate levels does not exists, <code>false</code> is returned.
-     * \tparam The type of the value that should be tested. The <code>typeid</code> of
+     * \tparam T The type of the value that should be tested. The <code>typeid</code> of
      * this type has to be equal to the typeid of the value that is to be checked
      * \param key The, potentially nested, key which should be checked for existence
      * \return <code>true</code> if the Dictionary contains a value at the specified

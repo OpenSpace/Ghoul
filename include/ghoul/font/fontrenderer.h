@@ -57,7 +57,7 @@ public:
     /**
      * This constructor requires a custom ProgramObject that handles the rendering of any
      * passed text. In addition the initial size of the rendering window has to be passed.
-     * The inputs for the ProgramObject are as follows: </br>
+     * The inputs for the ProgramObject are as follows: <br>
      * The <b>vertex shader</b> recieves three <code>vec2</code> for each vertex: The
      * <i>Position</i> (location 0) in pixel screen space coordinates, the
      * <i>Base Texture Coordinates</i> (location 1) which provides the texture coordinates
@@ -159,7 +159,7 @@ public:
      * \param pos The screen-space position (in pixel coordinates) that is used to render
      * the text
      * \param color The base color that is used to render the text
-     * \param text The format text that is rendered to the screen. This text can contain
+     * \param format The format text that is rendered to the screen. This text can contain
      * symbolic constants (the same as in printf) to refer to later variable arguments,
      * which are substituted. The <code>text</code> can also contain '\\n' to have a
      * linebreak, which is of the correct length with regard to the selected font. This
@@ -178,7 +178,7 @@ public:
      * <code>nullptr</code>, an assertion is thrown
      * \param pos The screen-space position (in pixel coordinates) that is used to render
      * the text
-     * \param text The format text that is rendered to the screen. This text can contain
+     * \param format The format text that is rendered to the screen. This text can contain
      * symbolic constants (the same as in printf) to refer to later variable arguments,
      * which are substituted. The <code>text</code> can also contain '\\n' to have a
      * linebreak, which is of the correct length with regard to the selected font. This

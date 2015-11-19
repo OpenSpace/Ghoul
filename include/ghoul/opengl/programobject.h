@@ -1985,7 +1985,7 @@ public:
      * \param index The index of the block retrieved from glGetUniformBlockIndex
      * \param binding The binding the block should be bound to
      */
-    void setSsboBinding(GLint index, GLuint binding);
+    void setSsboBinding(GLuint index, GLuint binding);
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -2014,7 +2014,7 @@ public:
      * \param name The name of the attribute for which the location should be fetched
      * \return The location of the attribute, or <code>-1</code> if it could not be found
      */
-    GLint attributeLocation(const std::string& name) const;
+    GLuint attributeLocation(const std::string& name) const;
 
     /**
      * Binds the generic vertex attribute <code>index</code> to the attribute variable
@@ -2022,7 +2022,7 @@ public:
      * \param name The name of the attribute variable
      * \param index The location of the generic vertex attribute that should be bound
      */
-    void bindAttributeLocation(const std::string& name, GLint index);
+    void bindAttributeLocation(const std::string& name, GLuint index);
 
     /**
      * Locates and sets the vertex attribute <code>name</code> to the passed
@@ -2663,7 +2663,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, bool value);
+    void setAttribute(GLuint location, bool value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed values
@@ -2673,7 +2673,7 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, bool v1, bool v2);
+    void setAttribute(GLuint location, bool v1, bool v2);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed values
@@ -2684,7 +2684,7 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, bool v1, bool v2, bool v3);
+    void setAttribute(GLuint location, bool v1, bool v2, bool v3);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed values
@@ -2696,7 +2696,7 @@ public:
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, bool v1, bool v2, bool v3, bool v4);
+    void setAttribute(GLuint location, bool v1, bool v2, bool v3, bool v4);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2704,7 +2704,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, const glm::bvec2& value);
+    void setAttribute(GLuint location, const glm::bvec2& value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2712,7 +2712,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, const glm::bvec3& value);
+    void setAttribute(GLuint location, const glm::bvec3& value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2720,7 +2720,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, const glm::bvec4& value);
+    void setAttribute(GLuint location, const glm::bvec4& value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2728,7 +2728,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, GLint value);
+    void setAttribute(GLuint location, GLint value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed values
@@ -2738,7 +2738,7 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, GLint v1, GLint v2);
+    void setAttribute(GLuint location, GLint v1, GLint v2);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed values
@@ -2749,7 +2749,7 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, GLint v1, GLint v2, GLint v3);
+    void setAttribute(GLuint location, GLint v1, GLint v2, GLint v3);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed values
@@ -2761,7 +2761,7 @@ public:
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, GLint v1, GLint v2, GLint v3, GLint v4);
+    void setAttribute(GLuint location, GLint v1, GLint v2, GLint v3, GLint v4);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2769,7 +2769,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, const glm::ivec2& value);
+    void setAttribute(GLuint location, const glm::ivec2& value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2777,7 +2777,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, const glm::ivec3& value);
+    void setAttribute(GLuint location, const glm::ivec3& value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2785,7 +2785,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, const glm::ivec4& value);
+    void setAttribute(GLuint location, const glm::ivec4& value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2793,7 +2793,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, GLfloat value);
+    void setAttribute(GLuint location, GLfloat value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed values
@@ -2803,7 +2803,7 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, GLfloat v1, GLfloat v2);
+    void setAttribute(GLuint location, GLfloat v1, GLfloat v2);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed values
@@ -2814,7 +2814,7 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, GLfloat v1, GLfloat v2, GLfloat v3);
+    void setAttribute(GLuint location, GLfloat v1, GLfloat v2, GLfloat v3);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed values
@@ -2826,7 +2826,7 @@ public:
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4);
+    void setAttribute(GLuint location, GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2834,7 +2834,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, const glm::vec2& value);
+    void setAttribute(GLuint location, const glm::vec2& value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2842,7 +2842,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, const glm::vec3& value);
+    void setAttribute(GLuint location, const glm::vec3& value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2851,7 +2851,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * otherwise
      */
-    void setAttribute(GLint location, const glm::vec4& value);
+    void setAttribute(GLuint location, const glm::vec4& value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2859,7 +2859,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, GLdouble value);
+    void setAttribute(GLuint location, GLdouble value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed values
@@ -2869,7 +2869,7 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, GLdouble v1, GLdouble v2);
+    void setAttribute(GLuint location, GLdouble v1, GLdouble v2);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed values
@@ -2880,7 +2880,7 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, GLdouble v1, GLdouble v2, GLdouble v3);
+    void setAttribute(GLuint location, GLdouble v1, GLdouble v2, GLdouble v3);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed values
@@ -2892,7 +2892,7 @@ public:
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4);
+    void setAttribute(GLuint location, GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2900,7 +2900,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, const glm::dvec2& value);
+    void setAttribute(GLuint location, const glm::dvec2& value);
 
     /**
      * Sets the vertex attribute <code>name</code> to the passed <code>value</code>.
@@ -2910,7 +2910,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, const glm::dvec3& value);
+    void setAttribute(GLuint location, const glm::dvec3& value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2918,7 +2918,7 @@ public:
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
      */
-    void setAttribute(GLint location, const glm::dvec4& value);
+    void setAttribute(GLuint location, const glm::dvec4& value);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2929,7 +2929,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::mat2x2& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat2x2& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2940,7 +2940,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::mat2x3& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat2x3& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2951,7 +2951,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::mat2x4& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat2x4& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2962,7 +2962,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::mat3x2& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat3x2& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2973,7 +2973,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::mat3x3& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat3x3& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2984,7 +2984,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::mat3x4& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat3x4& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -2995,7 +2995,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::mat4x2& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat4x2& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -3006,7 +3006,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::mat4x3& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat4x3& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -3017,7 +3017,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::mat4x4& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat4x4& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute <code>name</code> to the passed <code>value</code>. Will 
@@ -3027,7 +3027,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::dmat2x2& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat2x2& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -3038,7 +3038,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::dmat2x3& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat2x3& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -3049,7 +3049,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::dmat2x4& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat2x4& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -3060,7 +3060,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::dmat3x2& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat3x2& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -3071,7 +3071,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::dmat3x3& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat3x3& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -3082,7 +3082,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::dmat3x4& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat3x4& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -3093,7 +3093,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::dmat4x2& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat4x2& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -3104,7 +3104,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order, 
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::dmat4x3& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat4x3& value, bool transpose = false);
 
     /**
      * Sets the vertex attribute at the <code>location</code> to the passed
@@ -3115,7 +3115,7 @@ public:
      * \param transpose <code>true</code> if the matrix should be set in row major order,
      * <code>false</code> if the matrix is in column major order
      */
-    void setAttribute(GLint location, const glm::dmat4x4& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat4x4& value, bool transpose = false);
 
 
 

@@ -140,7 +140,7 @@ public:
      * requirement.
      * \param width The width of the requested region
      * \param height The height of the requested region
-     * \param A handle to the new region that can be passed to the #setRegionData,
+     * \return A handle to the new region that can be passed to the #setRegionData,
      * #getTextureCoordinates, and #getTexelCoordinates functions
      */
     RegionHandle newRegion(int width, int height);
@@ -173,10 +173,10 @@ public:
 |         d         |
  -------------------
      *\endverbatim
-     * <code>windowing.x = a</code></br>
-     * <code>windowing.y = b</code></br>
-     * <code>windowing.z = c</code></br>
-     * <code>windowing.w = d</code></br>
+     * <code>windowing.x = a</code><br>
+     * <code>windowing.y = b</code><br>
+     * <code>windowing.z = c</code><br>
+     * <code>windowing.w = d</code><br>
      *
      *
      * \param handle The handle of the region for which the texture coordinates shall be
