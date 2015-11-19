@@ -584,10 +584,6 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             outlineTopLeft,
             outlineBottomRight
         );
-        
-        LINFO(
-              char(charcode) << ": (" << width << "," << height << ") [" << leftBearing << "," << topBearing << "] {" << face->glyph->advance.x / PointConversionFactor << "," << face->glyph->advance.y / PointConversionFactor << "} [[[" << "]]]"
-        );
     }
     
     FT_Done_Face(face);
