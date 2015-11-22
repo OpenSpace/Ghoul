@@ -26,11 +26,12 @@
 #ifndef __COMMANDLINECOMMAND_H__
 #define __COMMANDLINECOMMAND_H__
 
-#include <exception>
+#include <ghoul/misc/assert.h>
+#include <ghoul/misc/exception.h>
+
 #include <sstream>
 #include <string>
 #include <vector>
-#include <set>
 
 namespace ghoul {
 namespace cmdparser {
@@ -57,6 +58,15 @@ namespace cmdparser {
 class CommandlineCommand {
 public:
     /**
+     * Exception that gets thrown if an error occurs in the CommandlineCommand::execute
+     * that could not be checked in the CommandlineCommand::checkParameters method
+     */
+    class CommandException : public ghoul::RuntimeError {
+    public:
+        explicit CommandException(const std::string& msg);
+    };
+    
+    /**
      * The constructor which saves the arguments to own member variables.
      * \param name The (long) name of the parameter. For example <code>--command1</code>
      * \param shortName The abbreviated name of the parameter. For example <code>-c</code>
@@ -69,6 +79,9 @@ public:
      * \param allowMultipleCalls If this argument is <code>true</code> it signals the
      * CommandlineParser that it should allow multiple instances of this
      * CommandlineCommand in a single command line
+     * \pre \p name must not be empty
+     * \pre \p name must start with a '-'
+     * \pre If the \p shortName is not empty, it must start with a '-'
      */
     CommandlineCommand(std::string name, std::string shortName = "",
                        std::string infoText = "", std::string parameterList = "",
@@ -100,10 +113,16 @@ public:
      */
     const std::string& infoText() const;
 
-    /// Returns the number of accepted arguments for this command
+    /**
+     * Returns the number of accepted arguments for this command
+     * \return The number of accepted arguments for this command
+     */
     int argumentNumber() const;
 
-    /// Returns if the command can be called more than once in a single command line
+    /**
+     * Returns if the command can be called more than once in a single command line
+     * \return If the command can be called more than once in a single command line
+     */
     bool allowsMultipleCalls() const;
 
     /**
@@ -111,7 +130,7 @@ public:
      * string, if no error has occurred.
 	 * \return The message describing the error reported by #checkParameters
      */
-    const std::string& errorMessage() const;
+    std::string errorMessage() const;
 
     /**
      * Executes this command with the given parameters. Each subclass must implement this
@@ -121,6 +140,7 @@ public:
      * #checkParameters method
      * \return This method should return <code>true</code>, if the execution was
      * successful, <code>false</code> otherwise and log possible errors
+     * \throws
      */
     virtual bool execute(const std::vector<std::string>& parameters) = 0;
 
@@ -141,32 +161,36 @@ public:
      */
     virtual std::string usage() const;
 
-    /// Returns the help-part for a command. Used in the help()-method from the
-    /// CommandlineParser
+    /**
+     * Returns the help-part for a command. Used in the CommandlineParser::help method
+     * \return The help-part for a command
+     */
     virtual std::string help() const;
 
 protected:
     /**
-     * Tries to cast the string value <code>s</code> to the templated parameter T. If this
-     * succeeds, <code>true</code> is returned; otherwise <code>false</code>. The
-     * conversion is done via an <code>std::stringstream</code> so it can only cast those
-     * types supported by the stream.
+     * Casts the string value \p s into the type \p T. If the conversion fails, an
+     * CommandException is thrown. The conversion is done via an
+     * <code>std::stringstream</code> so it can only cast those types supported by the 
+     * stream.
      * \tparam T The type of the value which should be converted
      * \param s The <code>std::string</code> representation of the value
      * \param t The reference which will store the converted value
-     * \return <code>true</code> if the conversion was successful, <code>false</code>
-     * otherwise
+     * \throws CommandException If the conversion failed
+     * \pre \p s must not be empty
      */
     template <class T>
-    bool cast(const std::string& s, T& t) {
+    void cast(const std::string& s, T& t) {
+        ghoul_assert(!s.empty(), "s must not be empty");
         std::istringstream iss(s);
         iss >> std::dec >> t;
-        return !(iss.fail());
+        if (iss.fail())
+            throw CommandException("Illegal conversion");
     }
 
     /**
-     * Checks if the string value <code>s</code> can be cast into the type <code>T</code>.
-     * It only returns <code>true</code> for those values that can be converted using an
+     * Checks if the string value \p s can be cast into the type \p T. It only returns
+     * <code>true</code> for those values that can be converted using an
      * <code>std::stringstream</code>
      * \tparam T The type of the value which should be converted
      * \param s The <code>std::string</code> representation of the value

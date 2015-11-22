@@ -25,13 +25,12 @@
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 
-#include <ghoul/cmdparser/singlecommand.h>
-#include <ghoul/cmdparser/multiplecommand.h>
-
-#include <sstream>
-
 namespace ghoul {
 namespace cmdparser {
+    
+CommandlineCommand::CommandException::CommandException(const std::string& msg)
+    : ghoul::RuntimeError(msg, "Command")
+{}
 
 CommandlineCommand::CommandlineCommand(std::string name,
                                        std::string shortName,
@@ -47,10 +46,10 @@ CommandlineCommand::CommandlineCommand(std::string name,
     , _allowsMultipleCalls(allowMultipleCalls)
     , _errorMsg("")
 {
-#ifdef GHL_DEBUG
-    if (_name.empty())
-        LERRORC("CommandlineCommand", "Every CommandlineCommand needs a name");
-#endif
+    ghoul_assert(!_name.empty(), "Name must not be empty");
+    ghoul_assert(_name[0] == '-', "Name must start with a '-'");
+    if (!_shortName.empty())
+        ghoul_assert(_shortName[0] == '-', "Short name must start with a '-'");
 }
 
 CommandlineCommand::~CommandlineCommand() {}
@@ -104,7 +103,7 @@ std::string CommandlineCommand::help() const {
     return result;
 }
 
-const std::string& CommandlineCommand::errorMessage() const {
+std::string CommandlineCommand::errorMessage() const {
     return _errorMsg;
 }
 
