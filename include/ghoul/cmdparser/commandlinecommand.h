@@ -61,9 +61,18 @@ public:
      * Exception that gets thrown if an error occurs in the CommandlineCommand::execute
      * that could not be checked in the CommandlineCommand::checkParameters method
      */
-    class CommandException : public ghoul::RuntimeError {
+    class CommandExecutionException : public ghoul::RuntimeError {
     public:
-        explicit CommandException(const std::string& msg);
+        explicit CommandExecutionException(const std::string& msg);
+    };
+    
+    /**
+     * Exception that gets thrown if an error occurs in the 
+     * ComandlineCommand::checkParameters
+     */
+    class CommandParameterException : public ghoul::RuntimeError {
+    public:
+        explicit CommandParameterException(const std::string& msg);
     };
     
     /**
@@ -126,13 +135,6 @@ public:
     bool allowsMultipleCalls() const;
 
     /**
-     * Returns a message describing the error reported by #checkParameters, or an empty
-     * string, if no error has occurred.
-	 * \return The message describing the error reported by #checkParameters
-     */
-    std::string errorMessage() const;
-
-    /**
      * Executes this command with the given parameters. Each subclass must implement this
      * abstract method and perform all actions within it.
      * \param parameters The parameters needed for the execution of this command. By the
@@ -142,7 +144,7 @@ public:
      * successful, <code>false</code> otherwise and log possible errors
      * \throws
      */
-    virtual bool execute(const std::vector<std::string>& parameters) = 0;
+    virtual void execute(const std::vector<std::string>& parameters) = 0;
 
     /**
      * Checks the parameters for consistency and correct amount. The basic implementation
@@ -152,7 +154,7 @@ public:
      * \return <code>true</code>, if the parameters are correct, <code>false</code>
      * otherwise
      */
-    virtual bool checkParameters(const std::vector<std::string>& parameters);
+    virtual void checkParameters(const std::vector<std::string>& parameters) const;
 
     /**
      * Returns the usage part for the help of this CommandlineCommand. Used in the
@@ -180,12 +182,14 @@ protected:
      * \pre \p s must not be empty
      */
     template <class T>
-    void cast(const std::string& s, T& t) {
+    T cast(const std::string& s) const {
         ghoul_assert(!s.empty(), "s must not be empty");
         std::istringstream iss(s);
+        T t;
         iss >> std::dec >> t;
         if (iss.fail())
-            throw CommandException("Illegal conversion");
+            throw CommandExecutionException("Illegal conversion");
+        return t;
     }
 
     /**
@@ -198,11 +202,12 @@ protected:
      * otherwise
      */
     template <class T>
-    bool is(const std::string& s) {
+    void is(const std::string& s) const {
         std::istringstream iss(s);
         T t;
         iss >> std::dec >> t;
-        return !(iss.fail());
+        if (iss.fail())
+            throw CommandParameterException("Conversion failed");
     }
 
     /// Name of the command used on command-line level
@@ -219,8 +224,6 @@ protected:
     int _argumentNum;
     /// Stores, if the command can be called multiple times in a single command line
     bool _allowsMultipleCalls;
-    /// Error message set by checkParameters().
-    std::string _errorMsg;
 };
 
 }  // namespace cmdparser

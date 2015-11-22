@@ -35,12 +35,11 @@ namespace cmdparser {
 
 /**
  * This class represents a command that can called multiple times in a given commandline
- * and can have up to 4 arguments of respective types <code>T</code>, <code>U</code>,
- * <code>V</code>, and <code>U</code>. Each time the command is called, the converted
- * value is appended to a vector that has been passed in the constructor. The concrete
- * amount of variables is determined by the constructor used. The command tries to convert
- * the parameters to the appropriate types and stores them. The template classes
- * <code>T</code>, <code>U</code>, <code>V</code>, and <code>U</code> must be convertable
+ * and can have up to 4 arguments of respective types \p T, \p U, \p V, and \p U. Each
+ * time the command is called, the converted value is appended to a vector that has been
+ * passed in the constructor. The concrete amount of variables is determined by the
+ * constructor used. The command tries to convert the parameters to the appropriate types
+ * and stores them. The template classes \p T, \p U, \p V, and \p U must be convertable
  * using an <code>std::stringstream</code>.
  * \tparam T The typename of the first argument type
  * \tparam U The typename of the second argument type, defaulting to <code>T</code>
@@ -51,28 +50,118 @@ namespace cmdparser {
 template<class T, class U = T, class V = U, class W = V>
 class MultipleCommand : public CommandlineCommand {
 public:
+    /**
+     * This constructor uses the one parameter. The command does not take ownership of the
+     * passed vector.
+     * \param ptr1 The pointer to the parameters that will be set when this command is
+     * executed
+     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * order to be valid
+     * \param shortName The (optional) short name for this command. If it is provided, it
+     * has to start with a <code>-</code> in order to be valid
+     * \param infoText The info text that will be presented to the user if it is requested
+     * by the CommandlineParser
+     * \param parameterList The explanation of the parameters that this command expects.
+     * Is presented to the user upon request by the CommandlineParser
+     * \pre \p ptr1 must not be a nullptr
+     */
     MultipleCommand(std::vector<T>* ptr1, std::string name,
                     std::string shortName = "", std::string infoText = "",
                     std::string parameterList = "");
 
+    /**
+     * This constructor uses two parameters. These can be of the same or different types.
+     * The command does not take ownership of the vectors.
+     * \param ptr1 The pointer to the parameters that will be set when this command is
+     * executed
+     * \param ptr2 The pointer to the second parameters that will be set when this command
+     * is executed
+     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * order to be valid
+     * \param shortName The (optional) short name for this command. If it is provided, it
+     * has to start with a <code>-</code> in order to be valid
+     * \param infoText The info text that will be presented to the user if it is requested
+     * by the CommandlineParser
+     * \param parameterList The explanation of the parameters that this command expects.
+     * Is presented to the user upon request by the CommandlineParser
+     * \pre \p ptr1 must not be a nullptr
+     * \pre \p ptr2 must not be a nullptr
+     */
     MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2,
                     std::string name, std::string shortName = "",
                     std::string infoText = "",
                     std::string parameterList = "");
 
+    /**
+     * This constructor uses three parameters. These can be of the same or different
+     * types. The command does not take ownership of the vectors.
+     * \param ptr1 The pointer to the parameters that will be set when this command is
+     * executed
+     * \param ptr2 The pointer to the second parameters that will be set when this command
+     * is executed
+     * \param ptr3 The pointer to the third parameters that will be set when this command
+     * is executed
+     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * order to be valid
+     * \param shortName The (optional) short name for this command. If it is provided, it
+     * has to start with a <code>-</code> in order to be valid
+     * \param infoText The info text that will be presented to the user if it is requested
+     * by the CommandlineParser
+     * \param parameterList The explanation of the parameters that this command expects.
+     * Is presented to the user upon request by the CommandlineParser
+     * \pre \p ptr1 must not be a nullptr
+     * \pre \p ptr2 must not be a nullptr
+     * \pre \p ptr3 must not be a nullptr
+     */
     MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2, std::vector<V>* ptr3,
         std::string name, std::string shortName = "",
                     std::string infoText = "",
                     std::string parameterList = "");
 
+    /**
+     * This constructor uses all four parameters. These can be of the same or different
+     * types. The command does not take ownership of the vectors.
+     * \param ptr1 The pointer to the parameters that will be set when this command is
+     * executed
+     * \param ptr2 The pointer to the second parameters that will be set when this command
+     * is executed
+     * \param ptr3 The pointer to the third parameters that will be set when this command
+     * is executed
+     * \param ptr4 The pointer to the fourth parameters that will be set when this command
+     * is executed
+     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * order to be valid
+     * \param shortName The (optional) short name for this command. If it is provided, it
+     * has to start with a <code>-</code> in order to be valid
+     * \param infoText The info text that will be presented to the user if it is requested
+     * by the CommandlineParser
+     * \param parameterList The explanation of the parameters that this command expects.
+     * Is presented to the user upon request by the CommandlineParser
+     * \pre \p ptr1 must not be a nullptr
+     * \pre \p ptr2 must not be a nullptr
+     * \pre \p ptr3 must not be a nullptr
+     * \pre \p ptr4 must not be a nullptr
+     */
     MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2, std::vector<V>* ptr3,
                     std::vector<W>* ptr4, std::string name,
                     std::string shortName = "", std::string infoText = "",
                     std::string parameterList = "");
 
-    bool execute(const std::vector<std::string>& parameters);
+    /**
+     * Executes this MultipleCommand and stores the values passed as \p parameters into
+     * the pointers passed through the constructor.
+     * \param parameters The parameters for this MultipleCommand
+     * \throws CommandExecutionException If one parameter has the wrong type that was not
+     * detected in the checkParameters method
+     */
+    void execute(const std::vector<std::string>& parameters) override;
 
-    bool checkParameters(const std::vector<std::string>& parameters);
+    /**
+     * Checks whether all of the \p parameters have the correct types.
+     * \param parameters The list of parameters that are to be checked
+     * \throw CommandParameterException If any of the parameters have the wrong type
+     */
+    void checkParameters(const std::vector<std::string>& parameters) const override;
 
 protected:
     std::vector<T>* _ptr1;
@@ -89,10 +178,25 @@ protected:
  */
 class MultipleCommandZeroArguments : public CommandlineCommand {
 public:
+    /**
+     * This constructor uses one <code>int</code> parameter. The command does not take
+     * ownership of the passed value.
+     * \param ptr The pointer to the int that will be set to the number of executions
+     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * order to be valid
+     * \param shortName The (optional) short name for this command. If it is provided, it
+     * has to start with a <code>-</code> in order to be valid
+     * \param infoText The info text that will be presented to the user if it is requested
+     * by the CommandlineParser
+     */
     MultipleCommandZeroArguments(int* ptr, std::string name, std::string shortName = "",
         std::string infoText = "");
     
-	bool execute(const std::vector<std::string>& /*parameters*/);
+    /**
+     * Increases the <code>int</code> value passed in the constructor by one per
+     * execution.
+     */
+    void execute(const std::vector<std::string>& /*parameters*/) override;
 
 protected:
     int* _ptr;

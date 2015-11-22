@@ -25,10 +25,18 @@
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 
+#include <format.h>
+
 namespace ghoul {
 namespace cmdparser {
     
-CommandlineCommand::CommandException::CommandException(const std::string& msg)
+CommandlineCommand::CommandExecutionException::CommandExecutionException(
+                                                                 const std::string& msg)
+    : ghoul::RuntimeError(msg, "Command")
+{}
+    
+CommandlineCommand::CommandParameterException::CommandParameterException(
+                                                                 const std::string& msg)
     : ghoul::RuntimeError(msg, "Command")
 {}
 
@@ -44,7 +52,6 @@ CommandlineCommand::CommandlineCommand(std::string name,
     , _parameterList(std::move(parameterList))
     , _argumentNum(argumentNum)
     , _allowsMultipleCalls(allowMultipleCalls)
-    , _errorMsg("")
 {
     ghoul_assert(!_name.empty(), "Name must not be empty");
     ghoul_assert(_name[0] == '-', "Name must start with a '-'");
@@ -103,12 +110,16 @@ std::string CommandlineCommand::help() const {
     return result;
 }
 
-std::string CommandlineCommand::errorMessage() const {
-    return _errorMsg;
-}
-
-bool CommandlineCommand::checkParameters(const std::vector<std::string>& parameters) {
-    return (parameters.size() == static_cast<size_t>(argumentNumber()));
+void CommandlineCommand::checkParameters(
+                                     const std::vector<std::string>& parameters) const
+{
+    if (parameters.size() != static_cast<size_t>(argumentNumber())) {
+        throw CommandParameterException(fmt::format(
+            "Wrong number of arguments. Expected {} got {}",
+            argumentNumber(),
+            parameters.size()
+        ));
+    }
 }
 
 } // namespace cmdparser

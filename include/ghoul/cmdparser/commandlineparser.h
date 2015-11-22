@@ -112,16 +112,16 @@ public:
      * them. The nameless command (addCommandForNamelessArguments) will be checked last,
      * but executed first. The execution order of other CommandlineCommands occurs in the
      * order they appear in the command-line passed in setCommandLine. If the method
-     * throws a CommandException, only some of the commands may have been executed, thus
-     * leaving the CommandlineCommands in an undefined state. In the case of any other
-     * exception, none of the CommandlineCommands have been executed.
+     * throws a CommandExecutionException, only some of the commands may have been
+     * executed, thus leaving the CommandlineCommands in an undefined state. In the case
+     * of any other exception, none of the CommandlineCommands have been executed.
      * \return <code>true</code> if the help message should be displayed by the caller
      * using the displayHelp method. The method will return <code>false</code> if the 
      * \throws CommandlineException If there are malformed commandline parameters that
      * were passed in the setCommandLine method. Malformed parameters may be due to
      * invalid commands, multiple commands for commands that do not allow for multiple
      * executions, wrong parameter types, error with unnamed arguments
-     * \throws CommandException If the execution of a CommandlineCommand failed
+     * \throws CommandExecutionException If the execution of a CommandlineCommand failed
      */
     bool execute();
 

@@ -230,16 +230,8 @@ bool CommandlineParser::execute() {
     }
 
     // Second step: Check if every command is happy with the parameters assigned to it
-	for (const auto& it : parameterMap) {
-        bool correct = it.first->checkParameters(it.second);
-        if (!correct) {
-            throw CommandlineException(format(
-                "Wrong arguments for {}: {}",
-                it.first->name(),
-                it.first->errorMessage()
-            ));
-        }
-    }
+	for (const auto& it : parameterMap)
+        it.first->checkParameters(it.second);
 
     // Second-and-a-half step: Display pairs for (command,argument) in debug level
     std::stringstream s;
@@ -256,15 +248,8 @@ bool CommandlineParser::execute() {
 
     // Third step: Execute the nameless command if there are any arguments available
     if (!argumentsForNameless.empty()) {
-        bool c = _commandForNamelessArguments->checkParameters(argumentsForNameless);
-
-        if (c)
-            _commandForNamelessArguments->execute(argumentsForNameless);
-        else {
-            throw CommandlineException(
-                "One of the parameters for the nameless command was not correct"
-            );
-        }
+        _commandForNamelessArguments->checkParameters(argumentsForNameless);
+        _commandForNamelessArguments->execute(argumentsForNameless);
     }
 
     // Fourth step: Execute the commands (this step is only done if everyone is happy up

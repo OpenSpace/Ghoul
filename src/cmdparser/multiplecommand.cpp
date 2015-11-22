@@ -37,7 +37,7 @@ MultipleCommandZeroArguments::MultipleCommandZeroArguments(int* ptr, std::string
     *_ptr = 0;
 }
 
-bool MultipleCommandZeroArguments::execute(const std::vector<std::string>& /*parameters*/) {
+void MultipleCommandZeroArguments::execute(const std::vector<std::string>& /*parameters*/) {
     ++(*_ptr);
     return true;
 }
