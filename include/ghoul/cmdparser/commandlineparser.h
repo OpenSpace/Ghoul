@@ -185,6 +185,7 @@ public:
      * or CommandlineCommand::shortName only. If <code>command</code> is empty, the
      * usage information for all commands is printed; if <code>command = "Nameless"</code>
      * the usage information for the nameless argument is logged
+     * \param stream The stream to which the usage information is printed
      */
     void displayUsage(const std::string& command = "",
         std::ostream& stream = std::cout) const;
@@ -193,6 +194,7 @@ public:
      * Print the full help test to the provided \p stream. It consists of the usage
      * information (#displayUsage) followed by the help text for each CommandlineCommand
      * (CommandlineCommand::help).
+     * \param stream The stream to which the help information is printed
      */
     void displayHelp(std::ostream& stream = std::cout) const;
 
@@ -208,9 +210,9 @@ protected:
     CommandlineCommand* getCommand(const std::string& shortOrLongName);
     
     /**
-     * Returns <code>true</code> if the \m _arguments contains only a single help
+     * Returns <code>true</code> if the \a _arguments contains only a single help
      * argument.
-     * \return Whether the \m _arguments only contain a single help argument
+     * \return Whether the \a _arguments only contain a single help argument
      */
     bool hasOnlyHelpCommand() const;
 

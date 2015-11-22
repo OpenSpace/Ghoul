@@ -220,7 +220,7 @@ private:
 };
 
 /**
- * This helper method prints the passed arguments using the #Font::render function of the
+ * This helper method prints the passed arguments using the Font::render function of the
  * default font. It is equivalent to calling defaultRenderer::render with the same
  * arguments and discarding the second return value
  * \param font The Font that is used to render the provided text. If this argument is
@@ -240,7 +240,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font* font, glm::vec2 pos, Args... ar
 }
 
 /**
- * This helper method prints the passed arguments using the #Font::render function of the
+ * This helper method prints the passed arguments using the Font::render function of the
  * default font and moves the pen position downwards after the call. It is equivalent to
  * calling defaultRenderer::render with the same arguments and then subtracting the
  * returned height from the pen position and discarding the second return value
@@ -262,7 +262,7 @@ glm::vec2 RenderFontCr(ghoul::fontrendering::Font* font, glm::vec2& pos, Args...
 }
 
 /**
- * This helper method prints the passed arguments using the #Font::render function of the
+ * This helper method prints the passed arguments using the Font::render function of the
  * default font and moves the pen position upwards after the call. It is equivalent to
  * calling defaultRenderer::render with the same arguments and then adding the
  * returned height to the pen position and discarding the second return value

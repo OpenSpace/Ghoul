@@ -142,7 +142,8 @@ public:
      * #checkParameters method
      * \return This method should return <code>true</code>, if the execution was
      * successful, <code>false</code> otherwise and log possible errors
-     * \throws
+     * \throws CommandExecutionException If one parameter has the wrong type that was not
+     * detected in the checkParameters method
      */
     virtual void execute(const std::vector<std::string>& parameters) = 0;
 
@@ -153,6 +154,7 @@ public:
      * \param parameters The parameters which should be tested
      * \return <code>true</code>, if the parameters are correct, <code>false</code>
      * otherwise
+     * \throw CommandParameterException If any of the parameters have the wrong type
      */
     virtual void checkParameters(const std::vector<std::string>& parameters) const;
 
@@ -171,13 +173,12 @@ public:
 
 protected:
     /**
-     * Casts the string value \p s into the type \p T. If the conversion fails, an
-     * CommandException is thrown. The conversion is done via an
+     * Casts the string value \p s into the type <code>T</code>. If the conversion fails,
+     * an CommandException is thrown. The conversion is done via an
      * <code>std::stringstream</code> so it can only cast those types supported by the 
      * stream.
      * \tparam T The type of the value which should be converted
      * \param s The <code>std::string</code> representation of the value
-     * \param t The reference which will store the converted value
      * \throws CommandException If the conversion failed
      * \pre \p s must not be empty
      */
@@ -193,8 +194,8 @@ protected:
     }
 
     /**
-     * Checks if the string value \p s can be cast into the type \p T. It only returns
-     * <code>true</code> for those values that can be converted using an
+     * Checks if the string value \p s can be cast into the type <code>T</code>. It only
+     * returns <code>true</code> for those values that can be converted using an
      * <code>std::stringstream</code>
      * \tparam T The type of the value which should be converted
      * \param s The <code>std::string</code> representation of the value

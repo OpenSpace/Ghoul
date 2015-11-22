@@ -58,8 +58,7 @@ const char pathSeparator = '/';
 #endif
 }
 
-File::File(std::string filename, bool isRawPath,
-           FileChangedCallback fileChangedCallback)
+File::File(std::string filename, bool isRawPath, FileChangedCallback fileChangedCallback)
     : _fileChangedCallback(std::move(fileChangedCallback))
 {
     if (isRawPath)
