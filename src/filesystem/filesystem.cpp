@@ -28,6 +28,8 @@
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/logging/logmanager.h>
 
+#include <format.h>
+
 #include <algorithm>
 #include <cassert>
 #include <regex>
@@ -58,14 +60,19 @@ namespace {
 namespace ghoul {
 namespace filesystem {
 
-const std::string FileSystem::TokenOpeningBraces = "${";
-const std::string FileSystem::TokenClosingBraces = "}";
+const string FileSystem::TokenOpeningBraces = "${";
+const string FileSystem::TokenClosingBraces = "}";
+    
 #ifdef WIN32
 const char FileSystem::PathSeparator = '\\';
 #else
 const char FileSystem::PathSeparator = '/';
 #endif
 
+FileSystem::FileSystemException::FileSystemException(const string& msg)
+    : RuntimeError(msg, "FileSystem")
+{}
+    
 FileSystem::FileSystem()
     : _cacheManager(nullptr)
 {
@@ -89,8 +96,10 @@ FileSystem::FileSystem()
             temporaryPath
         );
     }
-    else
-        LFATAL("Could not find the path of the system's temporary files");
+    else {
+        throw FileSystemException(
+            "Could not find the path of the system's temporary files");
+    }
 }
 
 void FileSystem::initialize() {
@@ -101,8 +110,6 @@ void FileSystem::initialize() {
 }
 
 FileSystem::~FileSystem() {
-    if(_cacheManager)
-        delete _cacheManager;
 #ifdef WIN32
 	deinitializeInternalWindows();
 #elif __APPLE__
@@ -112,63 +119,55 @@ FileSystem::~FileSystem() {
 #endif
 }
 
-
 string FileSystem::absolutePath(string path) const {
+    ghoul_assert(!path.empty(), "Path must not be empty");
     expandPathTokens(path);
+    
+    const int PathBufferSize = 4096;
+    std::vector<char> buffer(PathBufferSize);
 
-    static const int PATH_BUFFER_SIZE = 4096;
-    char* buffer = new char[PATH_BUFFER_SIZE];
 #ifdef WIN32
-    const DWORD success = GetFullPathName(path.c_str(), PATH_BUFFER_SIZE, buffer, 0);
+    const DWORD success = GetFullPathName(path.c_str(), PATH_BUFFER_SIZE, buffer.data(), 0);
     if (success == 0) {
-        delete[] buffer;
-        buffer = nullptr;
+        throw FileSystemException(fmt::format(
+            "Error retrieving absolute path '{}'",
+            path
+        ));
     }
 #else
-    if (!realpath(path.c_str(), buffer)) {
+    if (!realpath(path.c_str(), buffer.data())) {
         // Find the longest path that exists
-        std::string fullPath(path);
+        string fullPath(path);
         string::size_type match;
         string::size_type lastMatch = std::string::npos;
-        while ((match = fullPath.rfind(PathSeparator, lastMatch - 1)) != std::string::npos) {
-            std::string before = fullPath.substr(0, match);
-            std::string after = fullPath.substr(match, std::string::npos);
-            if (realpath(before.c_str(), buffer)) {
-                std::string resolvedPath = std::string(buffer) + after;
-                delete[] buffer;
+        while ((match = fullPath.rfind(PathSeparator, lastMatch - 1)) != string::npos) {
+            string before = fullPath.substr(0, match);
+            string after = fullPath.substr(match, string::npos);
+            if (realpath(before.c_str(), buffer.data())) {
+                string resolvedPath = string(buffer.data()) + after;
                 return resolvedPath;
             }
             lastMatch = match;
         }
         // Nothing in the relative path was found, use current directory
-        std::string before = ".";
-        std::string after = fullPath;
-        if (realpath(before.c_str(), buffer)) {
-            std::string resolvedPath = std::string(buffer) + PathSeparator + after;
-            delete[] buffer;
+        string before = ".";
+        string after = fullPath;
+        if (realpath(before.c_str(), buffer.data())) {
+            string resolvedPath = string(buffer.data()) + PathSeparator + after;
             return resolvedPath;
         }
     }
 #endif
-
-    if (buffer) {
-        path.assign(buffer);
-        delete[] buffer;
-        return path;
-    }
-
+    
+    path.assign(buffer.data());
     return path;
 }
+    
+string FileSystem::relativePath(string path, const Directory& baseDirectory) const {
+    ghoul_assert(!path.empty(), "Path must not be empty");
 
-string FileSystem::relativePath(string path,
-                                const Directory& baseDirectory) const
-{
-    if (path.empty()) {
-        LERROR("'path' must contain a path");
-        return path;
-    }
-    string&& pathAbsolute = cleanupPath(absolutePath(path));
-    string&& directoryAbsolute = cleanupPath(absolutePath(baseDirectory));
+    string pathAbsolute = cleanupPath(absolutePath(path));
+    string directoryAbsolute = cleanupPath(absolutePath(baseDirectory));
 
     // Return identity path if absolutes are equal
     if (pathAbsolute == directoryAbsolute)
@@ -180,7 +179,7 @@ string FileSystem::relativePath(string path,
 
     // Find the common part in the 'path' and 'baseDirectory'
     size_t commonBasePosition = commonBasePathPosition(pathAbsolute, directoryAbsolute);
-    string&& directoryRemainder = directoryAbsolute.substr(commonBasePosition);
+    string directoryRemainder = directoryAbsolute.substr(commonBasePosition);
     string relativePath = pathAbsolute.substr(commonBasePosition);
     if (relativePath[0] == PathSeparator)
         relativePath = relativePath.substr(1);
@@ -198,50 +197,50 @@ string FileSystem::relativePath(string path,
     return relativePath;
 }
     
-std::string FileSystem::pathByAppendingComponent(std::string path,
-												 std::string component) const
-{
-	return std::move(path) + PathSeparator + std::move(component);
+string FileSystem::pathByAppendingComponent(string path, string component) const {
+    return std::move(path) + PathSeparator + std::move(component);
 }
 
 Directory FileSystem::currentDirectory() const {
 #ifdef WIN32
     // Get the size of the directory
     DWORD size = GetCurrentDirectory(0, NULL);
-    char* buffer = new char[size];
-    DWORD success = GetCurrentDirectory(size, buffer);
+    std::vector<char> buffer(size);
+    DWORD success = GetCurrentDirectory(size, buffer.data());
     if (success == 0) {
         // Log error
         DWORD error = GetLastError();
         LPTSTR errorBuffer = nullptr;
-        DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-                      FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                      FORMAT_MESSAGE_IGNORE_INSERTS,
-                      NULL,
-                      error,
-                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                      (LPTSTR)&errorBuffer,
-                      0,
-                      NULL);
+        DWORD nValues = FormatMessage(
+            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            error,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR)&errorBuffer,
+            0,
+            NULL
+        );
         if ((nValues > 0) && (errorBuffer != nullptr)) {
             string error(errorBuffer);
             LocalFree(errorBuffer);
-            LERROR("Error retrieving current directory: " << error);
+            throw FileSystemException(fmt::format(
+                "Error retrieving current directory: {}",
+                error
+            ));
         }
-        return Directory();
+        throw FileSystemException("Error retrieving current directory");
     }
-    string&& currentDir = std::move(string(buffer));
-    delete[] buffer;
+    string currentDir(buffer.data());
 #else
-    char* buffer = new char[MAXPATHLEN];
-    char* result = getcwd(buffer, MAXPATHLEN);
+    std::vector<char> buffer(MAXPATHLEN);
+    char* result = getcwd(buffer.data(), MAXPATHLEN);
     if (result == nullptr) {
-        LERROR("Error retrieving current directory: " << errno);
-        delete[] buffer;
-        return Directory();
+        throw FileSystemException(fmt::format(
+            "Error retrieving current directory: {}", strerror(errno)
+        ));
     }
-    string currentDir = string(buffer);
-    delete[] buffer;
+    string currentDir(buffer.data());
 #endif
     return Directory(currentDir);
 }
@@ -253,35 +252,41 @@ void FileSystem::setCurrentDirectory(const Directory& directory) const {
         // Log error
         DWORD error = GetLastError();
         LPTSTR errorBuffer = nullptr;
-        DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-                      FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                      FORMAT_MESSAGE_IGNORE_INSERTS,
-                      NULL,
-                      error,
-                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                      (LPTSTR)&errorBuffer,
-                      0,
-                      NULL);
+        DWORD nValues = FormatMessage(
+            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            error,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR)&errorBuffer,
+            0,
+            NULL
+        );
 		if ((nValues > 0) && (errorBuffer != nullptr)) {
             string error(errorBuffer);
             LocalFree(errorBuffer);
-            LERROR("Error setting current directory: " << error);
+            throw FileSystemException(fmt::format(
+                "Error setting current directory: {}", error
+            ));
         }
     }
 #else
     const int success = chdir(directory.path().c_str());
-    if (success != 0)
-        LERROR("Error setting current directory: " << errno);
+    if (success != 0) {
+        throw FileSystemException(fmt::format(
+            "Error setting current directory: {}", strerror(errno)
+        ));
+    }
 #endif
 }
 
 bool FileSystem::fileExists(const File& path) const {
-	return fileExists(path.path(),true);
+	return fileExists(path.path(), true);
 }
 
-bool FileSystem::fileExists(std::string path, bool isRawPath) const {
+bool FileSystem::fileExists(string path, bool isRawPath) const {
 	if (!isRawPath)
-		path = absPath(path);
+        path = absolutePath(std::move(path));
 #ifdef WIN32
     BOOL exists = PathFileExists(path.c_str());
     if (exists == FALSE) {
@@ -294,22 +299,25 @@ bool FileSystem::fileExists(std::string path, bool isRawPath) const {
 		    const DWORD error = GetLastError();
 		    if ((error != ERROR_FILE_NOT_FOUND) && (error != ERROR_PATH_NOT_FOUND)) {
 			    LPTSTR errorBuffer = nullptr;
-			    DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-				    FORMAT_MESSAGE_ALLOCATE_BUFFER |
-				    FORMAT_MESSAGE_IGNORE_INSERTS,
+			    DWORD nValues = FormatMessage(
+                    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                        FORMAT_MESSAGE_IGNORE_INSERTS,
 				    NULL,
 				    error,
 				    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 				    (LPTSTR)&errorBuffer,
 				    0,
-				    NULL);
+				    NULL
+                );
 			    if ((nValues > 0) && (errorBuffer != nullptr)) {
 				    string error(errorBuffer);
 				    LocalFree(errorBuffer);
-				    LERROR("Error retrieving file attributes: " << error);
+                    throw FileSystemException(fmt::format(
+                        "Error retrieving file attributes: {}", error
+                    ));
 			    }
 		    }
-		    return false;
+            throw FileSystemException("Error retrieving file attributes");
 	    }
 	    else
 		    return (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
@@ -317,8 +325,17 @@ bool FileSystem::fileExists(std::string path, bool isRawPath) const {
 #else
 	struct stat buffer;
 	const int statResult = stat(path.c_str(), &buffer);
-	if (statResult != 0)
-		return false;
+    if (statResult != 0) {
+        if (errno == ENOENT) {
+            // The error is that the file didn't exist
+            return false;
+        }
+        else {
+            throw FileSystemException(fmt::format(
+                "Error retrieving file attributes: {}", strerror(errno)
+            ));
+        }
+    }
 	const int isFile = S_ISREG(buffer.st_mode);
 	return (isFile != 0);
 #endif
@@ -331,22 +348,25 @@ bool FileSystem::directoryExists(const Directory& path) const {
         const DWORD error = GetLastError();
         if ((error != ERROR_FILE_NOT_FOUND) && (error != ERROR_PATH_NOT_FOUND)) {
             LPTSTR errorBuffer = nullptr;
-            DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-                FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
+            DWORD nValues = FormatMessage(
+                FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                    FORMAT_MESSAGE_IGNORE_INSERTS,
                 NULL,
                 error,
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                 (LPTSTR)&errorBuffer,
                 0,
-                NULL);
+                NULL
+            );
 			if ((nValues > 0) && (errorBuffer != nullptr)) {
                 string error(errorBuffer);
                 LocalFree(errorBuffer);
-                LERROR("Error retrieving file attributes: " << error);
+                throw FileSystemException(fmt::format(
+                    "Error retrieving file attributes: {}", error
+                ));
             }
         }
-        return false;
+        throw FileSystemException("Error retrieving file attributes");
     }
     else
         return (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
@@ -354,24 +374,33 @@ bool FileSystem::directoryExists(const Directory& path) const {
     const string& dirPath = path.path();
     struct stat buffer;
     const int statResult = stat(dirPath.c_str(), &buffer);
-    if (statResult != 0)
-        return false;
+    if (statResult != 0) {
+        if (errno == ENOENT) {
+            // The error is that the file didn't exist
+            return false;
+        }
+        else {
+            throw FileSystemException(fmt::format(
+                "Error retrieving file attributes: {}", strerror(errno)
+            ));
+        }
+    }
     const int isDir = S_ISDIR(buffer.st_mode);
     return (isDir != 0);
 #endif
 }
     
 bool FileSystem::deleteFile(const File& path) const {
-    const bool isFile = fileExists(path);
+    bool isFile = fileExists(path);
     if (isFile) {
-        const int removeResult = remove(path.path().c_str());
-        return removeResult == 0;
+        int removeResult = remove(path.path().c_str());
+        return (removeResult == 0);
     }
     else
         return false;
 }
     
-bool FileSystem::createDirectory(const Directory& path, bool recursive) const {
+void FileSystem::createDirectory(const Directory& path, bool recursive) const {
 	if (recursive) {
 		std::vector<Directory> directories;
 		Directory dir = path;
@@ -381,19 +410,14 @@ bool FileSystem::createDirectory(const Directory& path, bool recursive) const {
 			dir = dir.parentDirectory();
 		}
 
-		bool success = true;
 		std::for_each(
 			directories.rbegin(),
 			directories.rend(),
-			[&success, this](const Directory& d)
-			   {
-				if (!success)
-					return;
-				else
-					success = createDirectory(d, false);
-				});
-
-		return success;
+			[this](const Directory& d) {
+				createDirectory(d, false);
+            });
+        
+        return;
 	}
 	else {
 #ifdef WIN32
@@ -406,125 +430,129 @@ bool FileSystem::createDirectory(const Directory& path, bool recursive) const {
 				return true;
 			else {
 				LPTSTR errorBuffer = nullptr;
-				DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-							  FORMAT_MESSAGE_ALLOCATE_BUFFER |
-							  FORMAT_MESSAGE_IGNORE_INSERTS,
-							  NULL,
-							  error,
-							  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-							  (LPTSTR)&errorBuffer,
-							  0,
-							  NULL);
+				DWORD nValues = FormatMessage(
+                    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                        FORMAT_MESSAGE_IGNORE_INSERTS,
+                    NULL,
+                    error,
+                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                    (LPTSTR)&errorBuffer,
+                    0,
+                    NULL
+                );
 				if ((nValues > 0) && (errorBuffer != nullptr)) {
 					string error(errorBuffer);
 					LocalFree(errorBuffer);
-					LERROR("Error creating directory '" << path << "': " << error);
+                    throw FileSystemException(fmt::format(
+                        "Error creating directory '{}': {}", path, error
+                    ));
 				}
-				else 
-					LERROR("Error creating directory '" << path << "'");
-
-				return false;
+                throw FileSystemException(fmt::format(
+                    "Error creating directory '{}'", path
+                ));
 			}
 		}
 #else
 		int success = mkdir(path.path().c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-		if (success == 0)
-			return true;
-		else {
-			if (errno == EEXIST)
-				return true;
-			else {
-				LERROR("Error creating directory '" << path << "': " << errno);
-				return false;
-			}
-		}
+        if (success != 0 && errno != EEXIST) {
+            throw FileSystemException(fmt::format(
+                "Error creating diretory '{}': {}", path, strerror(errno)
+            ));
+        }
 #endif
 	}
 }
 
-bool FileSystem::deleteDirectory(const Directory& path, bool recursive) const {
-    const bool isDir = directoryExists(path);
-    if (!isDir)
-        return false;
-
-	if (!recursive && !emptyDirectory(path))
-		return false;
+void FileSystem::deleteDirectory(const Directory& path, bool recursive) const {
+    ghoul_assert(directoryExists(path), "Path must be an existing directory");
+    if (!recursive)
+        ghoul_assert(emptyDirectory(path), "Path must be empty");
 
 #ifdef WIN32
 	const string& dirPath = path;
-	bool success = true;
 	
 	WIN32_FIND_DATA FindFileData;
-	HANDLE hFind;
 
 	const std::string dirWildcard = dirPath + PathSeparator + "*";
 
 	//List files
-	hFind = FindFirstFile(dirWildcard.c_str(), &FindFileData);
-	do{
+	HANDLE hFind = FindFirstFile(dirWildcard.c_str(), &FindFileData);
+	do {
 		const std::string p = FindFileData.cFileName;
 		if (p == "." || p == "..")
 			continue;
 
 		const std::string fullPath = dirPath + PathSeparator + p;
-		if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-		{
-			bool rmDirResult = deleteDirectory(fullPath, recursive);
-			if (!rmDirResult)
-				success = false;
-		}
-		else
-		{
+        if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            try {
+                deleteDirectory(fullPath, recursive);
+            }
+            catch (...) {
+                FindClose(hFind);
+                throw;
+            }
+        }
+        else {
 			const int rmFileResult = remove(fullPath.c_str());
-			if (rmFileResult != 0)
-				success = false;
+            if (rmFileResult != 0) {
+                FindClose(hFind);
+                throw FileSystemException(fmt::format(
+                    "Error removing directory '{}'", path
+                ));
+            }
 		}
-	}while(FindNextFile(hFind, &FindFileData));
+	} while (FindNextFile(hFind, &FindFileData));
 	FindClose(hFind);
 
-	if (!success)
-		return false;
 
 	const int rmDirResult = _rmdir(dirPath.c_str());
-	return rmDirResult != -1;
-    
+    if (rmDirResult == -1) {
+        throw FileSystemException(fmt::format(
+            "Error removing directory '{}'", path
+        ));
+    }
 #else
     const string& dirPath = path;
-    DIR* directory = opendir(dirPath.c_str());
-    bool success = false;
-    
-    if (directory) {
-        success = true;
-        while (success) {
-            struct dirent* p = readdir(directory);
-            if (p == nullptr)
-                break;
-            
-            const string name = string(p->d_name);
-            if (name == "." || name == "..")
-                continue;
 
-            struct stat statbuf;
-            const string fullName = dirPath + "/" + name;
-            const int statResult = stat(fullName.c_str(), &statbuf);
-            if (statResult == 0) {
-                if (S_ISDIR(statbuf.st_mode))
-                    success &= deleteDirectory(fullName);
-                else {
-                    const int removeSuccess = remove(fullName.c_str());
-                    success &= (removeSuccess == 0);
+    if (recursive) {
+        DIR* directory = opendir(dirPath.c_str());
+    
+        if (directory) {
+            while (true) {
+                struct dirent* p = readdir(directory);
+                if (p == nullptr)
+                    break;
+                
+                string name = string(p->d_name);
+                if (name == "." || name == "..")
+                    continue;
+
+                struct stat statbuf;
+                string fullName = dirPath + "/" + name;
+                int statResult = stat(fullName.c_str(), &statbuf);
+                if (statResult == 0) {
+                    if (S_ISDIR(statbuf.st_mode))
+                        deleteDirectory(fullName);
+                    else {
+                        int removeSuccess = remove(fullName.c_str());
+                        if (removeSuccess != -1) {
+                            throw FileSystemException(fmt::format(
+                                "Error deleting file '{}' in directory '{}': {}",
+                                fullName, path, strerror(errno)
+                            ));
+                        }
+                    }
                 }
             }
         }
         closedir(directory);
     }
-    
-    if (success) {
-        const int rmdirSuccess = rmdir(dirPath.c_str());
-        success = (rmdirSuccess == 0);
+    int rmdirSuccess = rmdir(dirPath.c_str());
+    if (rmdirSuccess == -1) {
+        throw FileSystemException(fmt::format(
+            "Error deleting directory '{}': {}", path, strerror(errno)
+        ));
     }
-    
-    return success;
 #endif
 }
 
@@ -535,7 +563,7 @@ bool FileSystem::emptyDirectory(const Directory& path) const {
 #else
 	int n = 0;
 	DIR* dir = opendir(dirPath.c_str());
-	if (dir == nullptr) //Not a directory or doesn't exist
+	if (dir == NULL) //Not a directory or doesn't exist
 		return false;
 	while (readdir(dir) != nullptr) {
 		if (++n > 2)
@@ -556,8 +584,8 @@ void FileSystem::registerPathToken(string token, string path, bool override) {
         return;
     }
     
-    std::string&& beginning = token.substr(0, TokenOpeningBraces.size());
-    std::string&& ending = token.substr(token.size() - TokenClosingBraces.size());
+    string&& beginning = token.substr(0, TokenOpeningBraces.size());
+    string&& ending = token.substr(token.size() - TokenClosingBraces.size());
     if ((beginning != TokenOpeningBraces) || (ending != TokenClosingBraces)) {
         LERROR("Token has to start with '" + TokenOpeningBraces +
                     "' and end with '" + TokenClosingBraces + "'");
@@ -638,57 +666,51 @@ bool FileSystem::hasTokens(const string& path) const {
     return hasOpeningBrace && hasClosingBrace;
 }
 
-bool FileSystem::expandPathTokens(std::string& path) const {
+bool FileSystem::expandPathTokens(string& path) const {
     while (hasTokens(path)) {
         string::size_type beginning = path.find(TokenOpeningBraces);
         string::size_type closing = path.find(TokenClosingBraces);
         string::size_type closingLocation = closing + TokenClosingBraces.size();
-        const std::string currentToken = path.substr(beginning, closingLocation);
+        std::string currentToken = path.substr(beginning, closingLocation);
         const std::string& replacement = resolveToken(currentToken);
         if (replacement == currentToken) {
             // replacement == currentToken will be true if the respective token could not
             // be found;  resolveToken will print an error in that case
             return false;
         }
-        path.replace(beginning, closing + TokenClosingBraces.size() - beginning, replacement);
+        path.replace(
+            beginning,
+            closing + TokenClosingBraces.size() - beginning,
+            replacement
+        );
     }
     return true;
 }
 
-std::vector<std::string> FileSystem::tokens() const {
-	std::vector<std::string> tokens;
+std::vector<string> FileSystem::tokens() const {
+	std::vector<string> tokens;
 	for (const auto& token : _tokenMap) {
 		tokens.push_back(token.first);
 	}
 	return tokens;
 }
     
-bool FileSystem::createCacheManager(const Directory& cacheDirectory, int version) {
-    if (!directoryExists(cacheDirectory)) {
-        LERROR("Requested cache directory '" << cacheDirectory << "' did not exist");
-        return false;
-    }
+void FileSystem::createCacheManager(const Directory& cacheDirectory, int version) {
+    ghoul_assert(directoryExists(cacheDirectory), "Cache directory did not exist");
+    ghoul_assert(!_cacheManager, "CacheManager was already created");
     
-    if (_cacheManager != nullptr) {
-        LERROR("CacheManager was already created");
-        return false;
-    }
-    
-    _cacheManager = new CacheManager(cacheDirectory, version);
+    _cacheManager = std::make_unique<CacheManager>(cacheDirectory, version);
     ghoul_assert(_cacheManager, "CacheManager creation failed");
-    return true;
 }
 
 void FileSystem::destroyCacheManager() {
 	assert(_cacheManager);
-
-	delete _cacheManager;
 	_cacheManager = nullptr;
 }
 
 CacheManager* FileSystem::cacheManager() {
 	assert(_cacheManager);
-	return _cacheManager;
+	return _cacheManager.get();
 }
 
 void FileSystem::triggerFilesystemEvents() {
@@ -701,7 +723,7 @@ void FileSystem::triggerFilesystemEvents() {
 #endif
 }
 
-bool FileSystem::hasToken(const std::string& path, const std::string& token) const {
+bool FileSystem::hasToken(const string& path, const string& token) const {
     if (!hasTokens(path))
         return false;
     else {
@@ -721,8 +743,8 @@ bool FileSystem::hasToken(const std::string& path, const std::string& token) con
     }
 }
     
-std::string FileSystem::resolveToken(const std::string& token) const {
-    const std::map<std::string, std::string>::const_iterator it = _tokenMap.find(token);
+string FileSystem::resolveToken(const string& token) const {
+    const std::map<string, string>::const_iterator it = _tokenMap.find(token);
     if (it == _tokenMap.end()) {
         LERROR("Token '" + token + "' could not be resolved");
         return token;

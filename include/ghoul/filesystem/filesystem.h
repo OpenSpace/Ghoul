@@ -29,8 +29,10 @@
 #include <ghoul/designpattern/singleton.h>
 #include <ghoul/filesystem/directory.h>
 #include <ghoul/filesystem/file.h>
+#include <ghoul/misc/exception.h>
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include <functional>
@@ -42,28 +44,27 @@
 namespace ghoul {
 namespace filesystem {
 
-// Forward declare to minimize dependencies
 #ifdef WIN32
-	struct DirectoryHandle;
-	void readStarter(DirectoryHandle* directoryHandle);
-	void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
+struct DirectoryHandle;
+void readStarter(DirectoryHandle* directoryHandle);
+void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
 #elif defined(__APPLE__)
-    struct DirectoryHandle;
-    void callbackHandler(const std::string& path);
+struct DirectoryHandle;
+void callbackHandler(const std::string& path);
 #endif
 class CacheManager;
 
 /**
  * The methods in this class are used to access platform-independent features of the
  * underlying filesystem. It is possible to convert relative paths into absolute paths
- * (#absolutePath()) and vice versa (#relativePath()). The current working directory
- * can be accessed and changed (#currentDirectory(), #setCurrentDirectory(), 
- * #setCurrentDirectory()). All methods that require a Directory or File parameter can use
- * an <code>std::string</code> or <code>char*</code> directly as this will be converted
- * into a lightweight Directory or File object. The main functionality of the FileSystem 
- * is to deal with path tokens. These are tokens of the form <code>${...}</code> which are
- * like variables, pointing to a specific location. These tokens are resolved in various
- * methods (for example #absolutePath()) and thus be used to dynamically set, for example,
+ * (#absolutePath) and vice versa (#relativePath). The current working directory can be
+ * accessed and changed (#currentDirectory), #setCurrentDirectory, #setCurrentDirectory).
+ * All methods that require a Directory or File parameter can use an
+ * <code>std::string</code> or <code>char*</code> directly as this will be converted into
+ * a lightweight Directory or File object. The main functionality of the FileSystem is to
+ * deal with path tokens. These are tokens of the form <code>${...}</code> which are like
+ * variables, pointing to a specific location. These tokens are resolved in various
+ * methods (for example #absolutePath) and thus be used to dynamically set, for example,
  * asset paths with only one point of specification. These tokens can only be bound once,
  * as some of the tokens might already have been resolved and changing the tokens later
  * might lead to inconsistencies. For the same reason, it is not possible to unregister
@@ -72,50 +73,64 @@ class CacheManager;
  */
 class FileSystem : public Singleton<FileSystem> {
 public:
+    /// Exception that gets thrown if the FileSystem encounters a nonrecoverable error
+    struct FileSystemException : RuntimeError {
+        explicit FileSystemException(const std::string& msg);
+    };
+    
+    /**
+     * The token used to separate individual path elements (<code>\</code> or
+     * <code>/</code>)
+     */
     static const char PathSeparator;
+    
+    /// Opening braces that are used for path tokens
     static const std::string TokenOpeningBraces;
+    
+    /// Closing braces that are used for path tokens
     static const std::string TokenClosingBraces;
 
+    /// Initializes the FileSystem
     static void initialize();
     
     /**
-     * Returns the absolute path to the passed <code>path</code>, resolving any tokens (if
-     * present) in the process. The current working directory (#currentDirectory()) is
-     * used as a base path for this.
+     * Returns the absolute path to the passed \p path, resolving any tokens (if present)
+     * in the process. The current working directory (#currentDirectory) is used as a base
+     * path for this.
      * \param path The path that should be converted into an absolute path
-     * \return The absolute path to the passed <code>path</code>
+     * \return The absolute path to the passed \p path
+     * \pre \p path must not be empty
      */
     std::string absolutePath(std::string path) const;
     
     /**
-     * Returns the relative path of the passed <code>path</code> relative to the passed
-     * <code>baseDirectory</code>. All path tokens present in the <code>path</code> are
-     * automatically resolved. The <code>baseDirectory</code> can be resolved if the
-     * Directory object has been created that way. If, on Windows, the <code>path</code>
-     * and the <code>baseDirectory</code> are on different drives, no relative path can be
-     * constructed and the unchanged path is returned.
+     * Returns the path of the passed \p path relative to the passed \p baseDirectory. All
+     * path tokens present in the \p path are automatically resolved. The \p baseDirectory
+     * can be resolved if the Directory object has been created that way. If, on Windows,
+     * the \p path and the \p baseDirectory are on different drives, no relative path can
+     * be constructed and the unchanged path is returned.
      * \param path The path that should be converted into a relative path
      * \param baseDirectory The base directory the path is relative to
-     * \return The relative path leading from the <code>baseDirectory</code> to the
-     * <code>path</code>
+     * \return The relative path leading from the \p baseDirectory to the \p path
+     * \pre \p path must not be empty
      */
     std::string relativePath(std::string path,
-                             const Directory& baseDirectory = Directory()) const;
+        const Directory& baseDirectory = Directory()) const;
 
 	/**
-	 * Appends the <code>component</code> to the <code>path</code> by using the
-	 * appropriate path separator and returns the complete path. This method does not
-	 * check if the full path refers to a valid file/directory in the system.
-	 * \param path The base path to which the <code>component</code> will be added
-	 * \param component The path component that should be added to the <code>path</code>
-	 * \return The full path composed of the <code>path</code> + the
-	 * <code>component</code>
+	 * Appends the \p component to the \p path by using the appropriate path separator and
+     * returns the complete path. This method does not check if the full path refers to a
+     * valid file/directory in the system.
+	 * \param path The base path to which the \p component will be added
+	 * \param component The path component that should be added to the \p path
+	 * \return The full path composed of the \p path and the \p component
 	 */
 	std::string pathByAppendingComponent(std::string path, std::string component) const;
 
     /**
      * Returns the current working directory of this process.
      * \return The current working directory of this process
+     * \throw FileSystemException If the current directory could not be determined
      */
     Directory currentDirectory() const;
     
@@ -123,42 +138,49 @@ public:
      * Changes the current working directory of this process. Please note that this will
      * have an effect on all relative paths which are used henceforth.
      * \param directory The path that will be used as the new working directory
+     * \throw FileSystemException If the current directory could not be set
      */
     void setCurrentDirectory(const Directory& directory) const;
 
     /**
-     * Checks if the file at the <code>path</code> exists or not. This method will also
-     * return <code>false</code> if <code>path</code> points to a directory. This method
-     * will not expand any tokens that are passed to it.
+     * Checks if the file at the \p path exists or not. This method will also return
+     * <code>false</code> if \p path points to a directory. This method will not expand
+     * any tokens that are passed to it.
      * \param path The path that should be tested for existence
-     * \return <code>true</code> if <code>path</code> points to an existing file,
-     * <code>false</code> otherwise
+     * \return <code>true</code> if \p path points to an existing file, <code>false</code>
+     * otherwise
+     * \throw FileSystemException If there is an error retrieving the file attribtues
+     * for the \p path
      */
 	bool fileExists(const File& path) const;
 
 	/**
-     * Checks if the file at the <code>path</code> exists or not. This method will also
-     * return <code>false</code> if <code>path</code> points to a directory. This method
-     * will not expand any tokens that are passed to it.
+     * Checks if the file at the \p path exists or not. This method will also return
+     * <code>false</code> if \p path points to a directory. This method will not expand
+     * any tokens that are passed to it.
      * \param path The path that should be tested for existence
-	 * \param isRawPath A flag definition if the path is raw or have path tokens
-     * \return <code>true</code> if <code>path</code> points to an existing file,
-     * <code>false</code> otherwise
+	 * \param isRawPath A flag if the path is raw or have path tokens
+     * \return <code>true</code> if \p path points to an existing file, <code>false</code>
+     * otherwise
+     * \throw FileSystemException If there is an error retrieving the file attributes
+     * for the \p path
      */
 	bool fileExists(std::string path, bool isRawPath = false) const;
     
     /**
-     * Checks if the directory at the <code>path</code> exists or not. This method will
-     * return <code>false</code> if <code>path</code> points to a file.
+     * Checks if the directory at the \p path exists or not. This method will return
+     * <code>false</code> if \p path points to a file.
      * \param path The path that should be tested for existence
-     * \return <code>true</code> if <code>path</code> points to an existing directory,
+     * \return <code>true</code> if \p path points to an existing directory,
      * <code>false</code> otherwise
+     * \throw FileSystemException If there is an error retrieving the directory attributes
+     * for the \p path
      */
     bool directoryExists(const Directory& path) const;
     
     /**
-     * Deletes the file pointed to by <code>path</code>. The method will return <code>true
-     * </code> if the file was deleted successfully, <code>false</code> otherwise.
+     * Deletes the file pointed to by \p path. The method will return <code>true</code> if
+     * the file was deleted successfully, <code>false</code> otherwise.
      * \param path The file that should be deleted
      * \return <code>true</code> if the file was deleted successfully, <code>false</code>
      * otherwise
@@ -166,29 +188,29 @@ public:
     bool deleteFile(const File& path) const;
 
 	/**
-	 * Creates the directory pointed to by <code>path</code>. The method will return
-	 * <code>true</code> if the directory was created successfully. If
-	 * <code>recursive</code> is <code>true</code> all directories leading to the
-	 * <code>path</code> will be created a well.
+	 * Creates the directory pointed to by \p path. The method will return
+     * <code>true</code> if the directory was created successfully. If \p recursive is
+     * <code>true</code> all directories leading to the \p path will be created a well.
 	 * \param path The directory that is to be created
 	 * \param recursive If <code>true</code> all directories leading to the
-	 * <code>path</code> will be created; if <code>false</code> and the leading
-	 * directories do not exist, the method will fail and return <code>false</code>
-	 * \return <code>true</code> if the directory was created successfully;
-	 * <code>false</code> otherwise
+	 * \p path will be created; if <code>false</code> and the leading directories do not
+     * exist, the method will fail and return <code>false</code>
+     * \throw FileSystemException If there was an error creating the directory
 	 */
-	bool createDirectory(const Directory& path, bool recursive = false) const;
+	void createDirectory(const Directory& path, bool recursive = false) const;
 
     /**
-     * Deletes the directory pointed to by <code>path</code>. The method will return
+     * Deletes the directory pointed to by \p path. The method will return
      * <code>true</code> if the directory was deleted successfully, <code>false</code>
-     * otherwise. If recursive is true the content will be deleted as well.
+     * otherwise. If \p recursive is <code>true</code> the content will be deleted as
+     * well.
      * \param path The directory that should be deleted
      * \param recursive  True if content should be removed as well, default is false
-     * \return <code>true</code> if the file was deleted successfully, <code>false</code>
-     * otherwise
+     * \throw FileSystemException If there was an error deleting the directory
+     * \pre \p path must be an existing directory
+     * \pre \p path must be an empty directory if \p recursive is <code>false</code>
      */
-    bool deleteDirectory(const Directory& path, bool recursive = false) const;
+    void deleteDirectory(const Directory& path, bool recursive = false) const;
 
 	/**
      * Checks if the directory with <code>path</code> is empty. The method will return
@@ -241,8 +263,11 @@ public:
      * <code>false</code> otherwise. Causes for failure are, among others, a non-existing
      * directory, missing read/write rights, or if the CacheManager was created previously
      * without destroying it in between (destroyCacheManager)
+     * \pre \p cacheDirectory must point to an existing directory
+     * \pre \p The CacheManager must not have been created before without destroying it
+     
      */
-    bool createCacheManager(const Directory& cacheDirectory, int version = -1);
+    void createCacheManager(const Directory& cacheDirectory, int version = -1);
     
     /**
      * Destroys the previously created CacheManager. The destruction of the CacheManager
@@ -281,7 +306,8 @@ public:
 private:
 
 	/**
-	 * Constructs a FileSystem object
+	 * Constructs a FileSystem object.
+     * \throw FileSystemException if the temporary folder cannot be found
 	 */
 	FileSystem();
 
@@ -341,10 +367,9 @@ private:
     std::map<std::string, std::string> _tokenMap;
 
 	/// The cache manager object, only allocated if createCacheManager is called
-	CacheManager* _cacheManager;
+    std::unique_ptr<CacheManager> _cacheManager;
 
 #ifdef WIN32
-
 	/**
 	 * Windows specific deinitialize function
 	 */

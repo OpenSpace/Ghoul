@@ -56,11 +56,11 @@ void internal_assert(
 	if(!message.empty())
 		msg << std::endl << padding << message;
 
-	LFATAL(std::endl
+    std::cerr << std::endl
 		<< padding << "File:       " << file << ", line " << line << std::endl
 		<< padding << "Function:   " << function << std::endl
 		<< padding << "Assertion:  " << expression
-		<< msg.str());
+		<< msg.str();
 
 #ifdef GHL_DEBUG
 	std::string inputLine;

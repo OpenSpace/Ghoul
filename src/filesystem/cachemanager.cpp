@@ -110,12 +110,6 @@ CacheManager::CacheManager(std::string directory, int version)
 				}), cacheState.end());
 		}
 	}
-    else {
-        throw CacheException(fmt::format(
-            "Error opening cache file {} for CacheManager",
-            path
-        ));
-    }
     
     // At this point all values that remain in the cache state vector are left from a
     // previous crash of the application

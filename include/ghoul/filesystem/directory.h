@@ -26,8 +26,6 @@
 #ifndef __DIRECTORY_H__
 #define __DIRECTORY_H__
 
-#include <functional>
-#include <ostream>
 #include <string>
 #include <vector>
 
@@ -52,30 +50,15 @@ public:
     Directory();
     
     /**
-     * This constructor creates a Directory object pointing to the <code>path</code>. If
-     * <code>isRawPath</code> is <code>true</code>, the <code>path</code> is used as-is
-     * and not modified. If it is <code>false</code>, the default setting, the provided
-     * <code>path</code> is automatically changed into the absolute path representation, 
-     * removing all tokens, if present, in the process.
-     * \param path The path this Directory should point to. Can contain tokens and be 
-     * specified relative to the current working directory
-     * \param isRawPath If <code>false</code> the <code>path</code> parameter is converted
-     * into an absolute path, removing all tokens in the process. If <code>true</code>,
-     * the path is used as-is without changes. This might make the Directory object
-     * outdated if the current working directory is subsequently changed.
-     */
-    Directory(const char* path, bool isRawPath = false);
-    
-    /**
-     * This constructor creates a Directory object pointing to the <code>path</code>. If
-     * <code>isRawPath</code> is <code>true</code>, the <code>path</code> is used as-is
-     * and not modified. If it is <code>false</code>, the default setting, the provided
-     * <code>path</code> is automatically changed into the absolute path representation,
-     * removing all tokens, if present, in the process.
+     * This constructor creates a Directory object pointing to the \p path. If
+     * \p isRawPath is <code>true</code>, the \p path is used as-is and not modified. If
+     * it is <code>false</code>, the default setting, the provided \p path is
+     * automatically changed into the absolute path representation, removing all tokens,
+     * if present, in the process.
      * \param path The path this Directory should point to. Can contain tokens and be
      * specified relative to the current working directory
-     * \param isRawPath If <code>false</code> the <code>path</code> parameter is converted
-     * into an absolute path, removing all tokens in the process. If <code>true</code>,
+     * \param isRawPath If <code>false</code> the \p path parameter is converted into an
+     * absolute path, removing all tokens in the process. If <code>true</code>,
      * the path is used as-is without changes. This might make the Directory object
      * outdated if the current working directory is subsequently changed.
      */
@@ -104,8 +87,8 @@ public:
     /**
      * Returns the Directory object that points to the parent directory of the current
      * object. The path to this new object is created by appending <code>..</code> to the
-     * path of the current object. The <code>absolutePath</code> parameter determines if
-     * the new object is created using the absolute or relative path.
+     * path of the current object. The \p absolutePath parameter determines if the new
+     * object is created using the absolute or relative path.
      * \param absolutePath Determines if the path to the new object should be converted
      * into an absolute path or remain relative
      * \return The Directory object pointing to the parent directory of the current
@@ -115,80 +98,72 @@ public:
     
     /**
      * This method creates a list of all files and subdirectories in the current directory
-     * and returns the paths to each. If <code>recursiveSearch</code> is
-     * <code>true</code>, each subdirectory will be searched as well and all results will
-     * be combined. The parameter <code>sort</code> determines if the end result will be
-     * sorted by name.
+     * and returns the paths to each. If \p recursiveSearch is <code>true</code>, each
+     * subdirectory will be searched as well and all results will be combined. The
+     * parameter \p sort determines if the end result will be sorted by name.
      * \param recursiveSearch Determines if the subdirectories will be searched as well as
      * the current directory.
      * \param sort If <code>true</code> the final result will be sorted by name
      * \return The paths to all files and directories in the current directory (and
-     * subdirectories if <code>recursiveSearch</code> is <code>true</code>)
+     * subdirectories if \p recursiveSearch is <code>true</code>)
      */
     std::vector<std::string> read(bool recursiveSearch = false, bool sort = false) const;
 
     /**
      * This method creates a list of all files in the current directory and returns the
-     * path to each. If <code>recursiveSearch</code> is <code>true</code>, each
-     * subdirectory will be searched as well and all results will be combined. The
-     * parameter <code>sort</code> determines if the end result will be sorted by name.
+     * path to each. If \p recursiveSearch is <code>true</code>, each subdirectory will be
+     * searched as well and all results will be combined. The parameter \p sort determines
+     * if the end result will be sorted by name.
      * \param recursiveSearch Determines if the subdirectories will be searched as well as
      * the current directory.
      * \param sort If <code>true</code> the final result will be sorted by name
      * \return The paths to all files in the current directory (and subdirectories if
-     * <code>recursiveSearch</code> is <code>true</code>)
+     * \p recursiveSearch is <code>true</code>)
      */
     std::vector<std::string> readFiles(bool recursiveSearch = false,
-                                       bool sort = false) const;
+        bool sort = false) const;
 
     /**
      * This method creates a list of all subdirectories in the current directory and
-     * returns the path to each. If <code>recursiveSearch</code> is <code>true</code>,
-     * each subdirectory will be searched as well and all results will be combined. The
-     * parameter <code>sort</code> determines if the end result will be sorted by name.
+     * returns the path to each. If \p recursiveSearch is <code>true</code>, each
+     * subdirectory will be searched as well and all results will be combined. The
+     * parameter \p sort determines if the end result will be sorted by name.
      * \param recursiveSearch Determines if the subdirectories will be searched as well as
      * the current directory.
      * \param sort If <code>true</code> the final result will be sorted by name
      * \return The paths to all directories in the current directory (and subdirectories
-     * if <code>recursiveSearch</code> is <code>true</code>)
+     * if \p recursiveSearch is <code>true</code>)
      */
-    std::vector<std::string> readDirectories(
-		bool recursiveSearch = false,
+    std::vector<std::string> readDirectories(bool recursiveSearch = false,
 		bool sort = false) const;
 
 private:
     /**
      * Internal function that does the directory marching of all files that are in the
-     * directory point to by <code>path</code>. It will combine all results in the <code>
-     * result</code> parameter and will, if <code>recursiveSearch</code> is
-     * <code>true</code> recursively call itself; thus reusing the <code>result</code>
-     * parameter.
+     * directory point to by \p path. It will combine all results in the \p result
+     * parameter and will, if \p recursiveSearch is <code>true</code> recursively call
+     * itself; thus reusing the \p result parameter.
      * \param result The result vector that will contain all files in the directory
      * \param path The path of the directory whose files should be listed
      * \param recursiveSearch If <code>true</code>, this method will be called recursively 
      * for each directory in the current directory, combining all results in the
-     * <code>result</code> vector.
+     * \p result> vector
      */
-    void readFiles(
-		std::vector<std::string>& result, 
-		const std::string& path,
+    void readFiles(std::vector<std::string>& result, const std::string& path,
         bool recursiveSearch = false) const;
 
     /**
      * Internal function that does the directory marching of all subdirectories that are
-     * in the directory point to by <code>path</code>. It will combine all results in the
-     * <code>result</code> parameter and will, if <code>recursiveSearch</code> is
-     * <code>true</code> recursively call itself; thus reusing the <code>result</code>
-     * parameter.
+     * in the directory point to by \p path. It will combine all results in the \p result
+     * parameter and will, if \p recursiveSearch is <code>true</code> recursively call
+     * itself; thus reusing the \p result parameter.
      * \param result The result vector that will contain all files in the directory
      * \param path The path of the directory whose files should be listed
      * \param recursiveSearch If <code>true</code>, this method will be called recursively 
      * for each directory in the current directory, combining all results in the
-     * <code>result</code> vector.
+     * \p result vector.
      */
-    void readDirectories(
-        std::vector<std::string>& result,
-        const std::string& path,
+    void readDirectories(std::vector<std::string>& result, const std::string& path,
         bool recursiveSearch = false) const;
 
     /// The path in the filesystem to this Directory object. May be absolute or relative

@@ -50,7 +50,8 @@ namespace filesystem {
  * <code>isPersistent</code> flag set to <code>false</code>. Non-persistent files will
  * automatically be deleted when the program ends.<br>
  * The persistent files are stored in a <code>cache</code> file so that they can be
- * retained between application runs.
+ * retained between application runs. If two CacheManagers are pointing at the same
+ * directory, the result is undefined.
  */
 class CacheManager {
 public:
@@ -269,8 +270,8 @@ protected:
         bool isPersistent; ///< if the cached entry should be automatically deleted
 	};
     
-    typedef std::pair<unsigned int, std::string> LoadedCacheInfo;
-
+    using LoadedCacheInfo = std::pair<unsigned int, std::string>;
+    
 	/**
 	 * Generates a hash number from the file path and information string
 	 * \return A hash number

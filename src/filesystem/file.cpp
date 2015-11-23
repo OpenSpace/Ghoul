@@ -44,16 +44,11 @@ using std::string;
 namespace {
     const string _loggerCat = "File";
 #ifdef WIN32
-    const char pathSeparator = '\\';
     const unsigned int changeBufferSize = 16384u;
     
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
-#elif __APPLE__
-    const char pathSeparator = '/';
-#else
-    const char pathSeparator = '/';
 #endif
 }
 
@@ -112,7 +107,7 @@ const std::string& File::path() const {
 }
 
 std::string File::filename() const {
-    string::size_type separator = _filename.rfind(pathSeparator);
+    string::size_type separator = _filename.rfind(FileSystem::PathSeparator);
     if (separator != string::npos)
         return _filename.substr(separator + 1);
     else
@@ -137,7 +132,7 @@ string File::fullBaseName() const {
 }
 
 string File::directoryName() const {
-    string::size_type separator = _filename.rfind(pathSeparator);
+    string::size_type separator = _filename.rfind(FileSystem::PathSeparator);
     if (separator != string::npos)
         return _filename.substr(0, separator);
     else
