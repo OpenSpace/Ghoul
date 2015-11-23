@@ -61,8 +61,7 @@ public:
      * Exception that gets thrown if an error occurs in the CommandlineCommand::execute
      * that could not be checked in the CommandlineCommand::checkParameters method
      */
-    class CommandExecutionException : public ghoul::RuntimeError {
-    public:
+    struct CommandExecutionException : public RuntimeError {
         explicit CommandExecutionException(const std::string& msg);
     };
     
@@ -70,8 +69,7 @@ public:
      * Exception that gets thrown if an error occurs in the 
      * ComandlineCommand::checkParameters
      */
-    class CommandParameterException : public ghoul::RuntimeError {
-    public:
+    struct CommandParameterException : public RuntimeError {
         explicit CommandParameterException(const std::string& msg);
     };
     

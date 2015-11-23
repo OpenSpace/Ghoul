@@ -29,10 +29,10 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/crc32.h>
 
+#include <format.h>
+
 #include <algorithm>
-#include <assert.h>
 #include <fstream>
-#include <string>
 
 namespace {
 	const std::string _loggerCat = "CacheManager";
@@ -43,17 +43,23 @@ namespace {
 namespace ghoul {
 namespace filesystem {
 
+CacheManager::CacheException::CacheException(const std::string& msg)
+    : RuntimeError(msg, "Cache")
+{}
+
 CacheManager::CacheManager(std::string directory, int version)
-    : _directory(std::move(directory))
-    , _version(version)
+    : _version(version)
 {
+    ghoul_assert(!directory.empty(), "Directory must not be empty");
+    _directory = std::move(directory);
+    
     // In the cache state, we check our cache directory for all values, in a later step
     // we remove all persistent values, so that only the non-persistent values remain
     // Under normal operation, the resulting vector should be of size == 0, but if the
     // last execution of the application crashed, the directory was not cleaned up
     // properly
     std::vector<LoadedCacheInfo> cacheState = cacheInformationFromDirectory(_directory);
-	std::string&& path = FileSys.pathByAppendingComponent(_directory, _cacheFile);
+	std::string path = FileSys.pathByAppendingComponent(_directory, _cacheFile);
 
 	std::ifstream file(path);
 	if (file.good()) {
@@ -81,13 +87,18 @@ CacheManager::CacheManager(std::string directory, int version)
             // for each file:
             //   hash number\n
             //   filepath\n
-			std::stringstream s(line);
-
-			unsigned int hash;
-			s >> hash;
+            unsigned int hash;
+            try {
+                hash = std::stoul(line);
+            } catch (const std::invalid_argument& e) {
+                throw CacheException("Malformed cache file");
+            }
 
 			CacheInformation info;
 			std::getline(file, info.file);
+            if (!file.good())
+                throw CacheException("Malformed cache file");
+            
 			info.isPersistent = true;
 			_files.emplace(hash, info);
 
@@ -99,6 +110,12 @@ CacheManager::CacheManager(std::string directory, int version)
 				}), cacheState.end());
 		}
 	}
+    else {
+        throw CacheException(fmt::format(
+            "Error opening cache file {} for CacheManager",
+            path
+        ));
+    }
     
     // At this point all values that remain in the cache state vector are left from a
     // previous crash of the application
@@ -119,15 +136,14 @@ CacheManager::CacheManager(std::string directory, int version)
 }
 
 CacheManager::~CacheManager() {
-	std::string&& path = FileSys.pathByAppendingComponent(_directory, _cacheFile);
+	std::string path = FileSys.pathByAppendingComponent(_directory, _cacheFile);
 	std::ofstream file(path, std::ofstream::out);
 	if (file.good()) {
         file << _version << std::endl;
 		for (const auto& p : _files) {
 			if (!p.second.isPersistent) {
                 // Delete all the non-persistent files
-				if (FileSys.fileExists(p.second.file))
-					FileSys.deleteFile(p.second.file);
+                FileSys.deleteFile(p.second.file);
 			}
 			else
                 // Save the persistent files in the cache file
@@ -141,28 +157,28 @@ CacheManager::~CacheManager() {
 	cleanDirectory(_directory);
 }
 
-bool CacheManager::getCachedFile(const File& file, std::string& cachedFileName,
-	bool isPersistent)
-{
+std::string CacheManager::cachedFilename(const File& file,	bool isPersistent) {
 	std::string lastModifiedTime = file.lastModifiedDate();
-	return getCachedFile(file, lastModifiedTime, cachedFileName, isPersistent);
+	return cachedFilename(file, lastModifiedTime, isPersistent);
 }
 
 
-bool CacheManager::getCachedFile(const File& file, const std::string& information,
-                                 std::string &cachedFileName, bool isPersistent)
+std::string CacheManager::cachedFilename(const File& file, const std::string& information,
+                                 bool isPersistent)
 {
-    return getCachedFile(file.filename(), information, cachedFileName, isPersistent);
+    return cachedFilename(file.filename(), information, isPersistent);
 }
     
-bool CacheManager::getCachedFile(const std::string& baseName,
+std::string CacheManager::cachedFilename(const std::string& baseName,
                                  const std::string& information,
-                                 std::string& cachedFileName, bool isPersistent)
+                                 bool isPersistent)
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
-        LERROR("Base name '" << baseName << "' consists of illegal character");
-        return false;
+        throw CacheException(fmt::format(
+            "Base name '{}' has an illegal character",
+            baseName
+        ));
     }
     
 	unsigned int hash = generateHash(baseName, information);
@@ -186,16 +202,15 @@ bool CacheManager::getCachedFile(const std::string& baseName,
 	if (!FileSys.directoryExists(destination))
 		FileSys.createDirectory(destination);
 
-	auto it = _files.find(hash);
+    auto it = _files.find(hash);
 	if (it != _files.end()) {
 		// If we find the hash, it has been created before and we can just return the
 		// file name to the caller
-		cachedFileName = it->second.file;
-		return true;
+		return it->second.file;
 	}
 
     // Generate and output the newly generated cache name
-	cachedFileName = FileSys.pathByAppendingComponent(destination, baseName);
+    std::string cachedFileName = FileSys.pathByAppendingComponent(destination, baseName);
 
     // Store the cache information in the map
 	CacheInformation info = {
@@ -203,7 +218,7 @@ bool CacheManager::getCachedFile(const std::string& baseName,
 		isPersistent
 	};
 	_files.emplace(hash, info);
-	return true;
+    return cachedFileName;
 }
 
 bool CacheManager::hasCachedFile(const File& file) const {
@@ -220,8 +235,10 @@ bool CacheManager::hasCachedFile(const std::string& baseName,
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
-        LERROR("Base name '" << baseName << "' consists of illegal character");
-        return false;
+        throw CacheException(fmt::format(
+            "Base name '{}' has an illegal character",
+            baseName
+        ));
     }
     
     unsigned int hash = generateHash(baseName, information);    
@@ -242,8 +259,10 @@ void CacheManager::removeCacheFile(const std::string& baseName,
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
-        LERROR("Base name '" << baseName << "' consists of illegal character");
-        return;
+        throw CacheException(fmt::format(
+            "Base name '{}' has an illegal character",
+            baseName
+        ));
     }
     
     unsigned int hash = generateHash(baseName, information);
@@ -258,11 +277,9 @@ void CacheManager::removeCacheFile(const std::string& baseName,
     }
 }
 
-unsigned int CacheManager::generateHash(std::string file, std::string information) const
-{
+unsigned int CacheManager::generateHash(std::string file, std::string information) const {
 	std::string hashString = file + _hashDelimiter + information;
 	unsigned int hash = hashCRC32(hashString);
-
 	return hash;
 }
 
@@ -313,17 +330,26 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
             std::vector<std::string> files = Directory(hash).readFiles();
             // Cache directories should only contain a single file with the
             // same name as the directory
-            if (files.size() > 1)
-                LERROR("Directory '" << hash << "' contained more than one file");
+            if (files.size() > 1) {
+                throw CacheException(fmt::format(
+                    "Directory '{}' contained more than one file",
+                    hash
+                ));
+            }
             if (files.size() == 1) {
                 // Extract the file name from the full path
                 // +1 as the last path delimiter is missing from the path
                 std::string filename = files[0].substr(Directory(hash).path().size() + 1);
-				if (filename != directoryName)
-					LERROR("File contained in cache directory '" <<
-					hash << "' contains a file with name '" << filename <<
-					"instead of the expected '" << directoryName << "'");
-				else
+                if (filename != directoryName) {
+                    throw CacheException(fmt::format(
+                        "File contained in cache directory '{}' contains a file with "
+                        "name '{}' instead of expected '{}'",
+                        hash,
+                        filename,
+                        directoryName
+                    ));
+                }
+                else
 					// Adding the absPath to normalize all / and \ for Windows 
 					result.emplace_back(std::stoul(hashName), absPath(files[0]));
             }

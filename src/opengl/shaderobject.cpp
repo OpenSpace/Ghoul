@@ -267,20 +267,18 @@ bool ShaderObject::setShaderFilename(std::string filename) {
 //#ifndef NDEBUG
 	std::string generatedFilename;
 	ghoul::filesystem::File ghlFile(_fileName);
-	if (!FileSys.cacheManager() || 
-		!FileSys.cacheManager()->getCachedFile(
-			// we use the .baseName() version because otherwise we get a new file 
-			// every time we reload the shader
-			ghlFile.baseName(), 
-			"",
-			generatedFilename,
-			true)
-		)
-	{
-		// Either the cachemanager wasn't initialized or the
-		// filename could not be fetched
-		generatedFilename += ".GhoulGenerated.glsl";
-	}
+    if (FileSys.cacheManager()) {
+        // we use the .baseName() version because otherwise we get a new file
+        // every time we reload the shader
+        generatedFilename = FileSys.cacheManager()->cachedFilename(
+            ghlFile.baseName(), "", true
+        );
+    }
+    else {
+        // Either the cachemanager wasn't initialized or the
+        // filename could not be fetched
+        generatedFilename += ".GhoulGenerated.glsl";
+    }
 	
 	std::ofstream os(generatedFilename);
 	os << contents;

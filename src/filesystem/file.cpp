@@ -28,6 +28,8 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 
+#include <format.h>
+
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -39,28 +41,34 @@
 using std::function;
 using std::string;
 
-namespace ghoul {
-namespace filesystem {
-
 namespace {
-const string _loggerCat = "File";
+    const string _loggerCat = "File";
 #ifdef WIN32
-const char pathSeparator = '\\';
-const unsigned int changeBufferSize = 16384u;
-
+    const char pathSeparator = '\\';
+    const unsigned int changeBufferSize = 16384u;
+    
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 #elif __APPLE__
-const char pathSeparator = '/';
+    const char pathSeparator = '/';
 #else
-const char pathSeparator = '/';
+    const char pathSeparator = '/';
 #endif
 }
+
+namespace ghoul {
+namespace filesystem {
+
+File::FileException::FileException(const std::string& msg)
+    : RuntimeError(msg, "File")
+{}
 
 File::File(std::string filename, bool isRawPath, FileChangedCallback fileChangedCallback)
     : _fileChangedCallback(std::move(fileChangedCallback))
 {
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+    
     if (isRawPath)
         _filename = std::move(filename);
     else
@@ -112,7 +120,7 @@ std::string File::filename() const {
 }
 
 string File::baseName() const {
-    string&& fileName = filename();
+    string fileName = filename();
     string::size_type dot = fileName.rfind(".");
     if (dot != string::npos)
         return fileName.substr(0, dot);
@@ -146,9 +154,10 @@ string File::fileExtension() const {
     
 std::string File::lastModifiedDate() const {
 	if (!FileSys.fileExists(_filename)) {
-		LERROR("Error retrieving last-modified date for file '" << _filename << "'." <<
-			"File did not exist");
-		return "";
+        throw FileException(fmt::format(
+            "Error retrieving last-modified date for file '{}'. File did not exist",
+            _filename
+        ));
 	}
 #ifdef WIN32
 	WIN32_FILE_ATTRIBUTE_DATA infoData;
@@ -171,11 +180,17 @@ std::string File::lastModifiedDate() const {
 			NULL);
 		if (errorBuffer != nullptr) {
 			std::string error(errorBuffer);
-			LERROR("Could not retrieve last-modified date for file '" << _filename <<
-				"':" << error);
-			LocalFree(errorBuffer);
+            LocalFree(errorBuffer);
+            throw FileException(fmt::format(
+                "Could not retrieve last-modified date for file '{}': {}",
+                _filename,
+                error
+            ));
 		}
-		return "";
+        throw FileException(fmt::format(
+            "Could not retrieve last-modified date for file '{}'",
+            _filename
+        ));
 	}
 	else {
 		FILETIME lastWriteTime = infoData.ftLastWriteTime;
@@ -196,11 +211,17 @@ std::string File::lastModifiedDate() const {
 				NULL);
 			if ((nValues > 0) && (errorBuffer != nullptr)) {
 				std::string error(errorBuffer);
-				LERROR("'FileTimeToSystemTime' failed for file '" << _filename <<
-					"':" << error);
-				LocalFree(errorBuffer);
+                LocalFree(errorBuffer);
+                throw FileException(fmt::format(
+                    "'FileTimeToSystemTime' failed for file '{}': {}",
+                    _filename,
+                    error
+                ));
 			}
-			return "";
+            throw FileException(fmt::format(
+                "'FileTimeToSystemTime' failed for file '{}'",
+                _filename
+            ));
 		}
 		else {
 			return std::to_string(time.wYear) + "-" + std::to_string(time.wMonth) + "-" +

@@ -256,7 +256,7 @@ void FileSystem::callbackHandler(const std::string& path) {
     auto eqRange = FileSys._trackedFiles.equal_range(path);
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
         File* f = (*it).second;
-        f->_fileChangedCallback(*f);
+        f->callback()(*f);
     }
 }
 

@@ -26,6 +26,8 @@
 #ifndef __FILE_H__
 #define __FILE_H__
 
+#include <ghoul/misc/exception.h>
+
 #include <functional>
 #include <string>
 
@@ -49,6 +51,13 @@ class FileSystem;
  */
 class File {
 public:
+    /**
+     * Exception that gets thrown if there is a file-related error in any of the methods
+     */
+    struct FileException : public RuntimeError {
+        explicit FileException(const std::string& msg);
+    };
+    
     /// The type of the std::function that is used as the prototype for the callback
     using FileChangedCallback = std::function<void (const File&)>;
 
@@ -63,6 +72,7 @@ public:
      * path and any tokens, if present, are resolved
      * \param fileChangedCallback The callback function that is called once per change of
      * the file on the filesystem
+     * \pre \p filename must not be empty
      * \see FileSystem The system to register and use tokens
      */
     File(std::string filename, bool isRawPath = false,
@@ -89,10 +99,9 @@ public:
     void setCallback(FileChangedCallback callback);
     
     /**
-     * Returns the currently active <code>std::function</code> object. This object might
-     * be uninitialized if no callback has been registered previously.
-     * \return The currently active <code>std::function</code> object used as a callback
-     * function
+     * Returns the currently active callback. This object might be uninitialized if no
+     * callback has been registered previously.
+     * \return The currently active callback function
      */
     const FileChangedCallback& callback() const;
 
@@ -152,8 +161,9 @@ public:
     std::string fileExtension() const;
 
 	/**
-	 * This method returns the last-modified date of the file as an ISO 8601 string.
+	 * This method returns the last-modified date of the file as an ISO 8601 string
 	 * \return The last-modified date of the file as an ISO 8601 string
+     * \throws FileException If there is an error accessing the file
 	 */
 	std::string lastModifiedDate() const;
 
@@ -170,14 +180,14 @@ private:
      */
     void removeFileChangeListener();
 
-    std::string _filename; ///< The filename of this File
+    /// The filename of this File
+    std::string _filename;
+
     /**
      * The callback that is called when the file changes on disk. Has no performance
      * impact when it is not used
      */
     FileChangedCallback _fileChangedCallback;
-
-	friend class FileSystem;
 };
 
 /**

@@ -32,12 +32,12 @@ namespace cmdparser {
     
 CommandlineCommand::CommandExecutionException::CommandExecutionException(
                                                                  const std::string& msg)
-    : ghoul::RuntimeError(msg, "Command")
+    : RuntimeError(msg, "Command")
 {}
     
 CommandlineCommand::CommandParameterException::CommandParameterException(
                                                                  const std::string& msg)
-    : ghoul::RuntimeError(msg, "Command")
+    : RuntimeError(msg, "Command")
 {}
 
 CommandlineCommand::CommandlineCommand(std::string name,

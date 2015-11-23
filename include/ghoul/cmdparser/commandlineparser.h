@@ -44,8 +44,7 @@ public:
      * The exception that is thrown in the CommandlineParser::execute method when an
      * error occurs.
      */
-    class CommandlineException : public ghoul::RuntimeError {
-    public:
+    struct CommandlineException : public RuntimeError {
         explicit CommandlineException(const std::string& msg);
     };
     

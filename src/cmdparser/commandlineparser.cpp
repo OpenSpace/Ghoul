@@ -76,7 +76,7 @@ namespace ghoul {
 namespace cmdparser {
     
 CommandlineParser::CommandlineException::CommandlineException(const std::string& msg)
-    : ghoul::RuntimeError(msg, "CommandlineParser")
+    : RuntimeError(msg, "CommandlineParser")
 {}
     
 CommandlineParser::CommandlineParser(std::string programName, bool allowUnknownCommands,
