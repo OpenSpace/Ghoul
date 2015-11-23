@@ -32,10 +32,8 @@
 #include <ghoul/misc/exception.h>
 
 #include <map>
-#include <memory>
 #include <string>
 #include <vector>
-#include <functional>
 
 #if !defined(WIN32) && !defined(__APPLE__)
 #include <thread>
