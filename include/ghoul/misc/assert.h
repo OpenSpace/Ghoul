@@ -102,27 +102,12 @@ public:
 		} \
 	} while (false)
 
-/**
- * Assertion that prints the message and gives the option of aborting
- * or ignoring the assertion. Not defined in release mode. Formatting
- * is done using <a href="http://www.cplusplus.com/reference/cstdio/sprintf/">sprintf</a>.
- * Maximum length of final message is 2048 characters.
- */
-#define ghoul_assertf(__condition__, __format__, ...) \
-	do { \
-		if(!(__condition__)) { \
-			char buffer[2048] = {}; \
-			std::sprintf(buffer, __format__, ##__VA_ARGS__); \
-			ghoul::internal_assert(#__condition__, buffer, GHL_ASSERT_FILE, GHL_ASSERT_FUNCTION, GHL_ASSERT_LINE);\
-		} \
-	} while (false)
 
 /** @} */
 #else 
 
 // The assertion macros defined for release mode
 #define ghoul_assert(__condition__, __message__)
-#define ghoul_assertf(__condition__, __format__, ...)
 
 #endif // !defined(NDEBUG)
 

@@ -73,6 +73,8 @@ class CacheManager;
  */
 class FileSystem : public Singleton<FileSystem> {
 public:
+    friend class Singleton<FileSystem>;
+
     /// Exception that gets thrown if the FileSystem encounters a nonrecoverable error
     struct FileSystemException : RuntimeError {
         explicit FileSystemException(const std::string& msg);
@@ -90,9 +92,6 @@ public:
     /// Closing braces that are used for path tokens
     static const std::string TokenClosingBraces;
 
-    /// Initializes the FileSystem
-    static void initialize();
-    
     /**
      * Returns the absolute path to the passed \p path, resolving any tokens (if present)
      * in the process. The current working directory (#currentDirectory) is used as a base
@@ -213,9 +212,8 @@ public:
     void deleteDirectory(const Directory& path, bool recursive = false) const;
 
 	/**
-     * Checks if the directory with <code>path</code> is empty. The method will return
-     * <code>true</code> if the directory is empty, <code>false</code>
-     * otherwise. 
+     * Checks if the directory with \p path is empty. The method will return
+     * <code>true</code> if the directory is empty, <code>false</code> otherwise.
      * \param path The directory that should be checked
      * \return <code>true</code> if the directory is empty, <code>false</code>
      * otherwise
@@ -223,22 +221,26 @@ public:
     bool emptyDirectory(const Directory& path) const;
     
     /**
-     * Registers the path token <code>token</code> with this FileSystem. Henceforth, every
-     * call to, for example, #absolutePath(), the constructors of File, or Directory,
-     * will replace the <code>token</code> with <code>path</code>. The tokens cannot be
-     * removed or replaced afterwards, as this might lead to inconsistencies since some
-     * files might have replaced the tokens while others have not.
+     * Registers the path token \p token with this FileSystem. Henceforth, every call to,
+     * for example, #absolutePath(), the constructors of File, or Directory, will replace
+     * the \p token with \p path. The tokens cannot be removed or replaced afterwards, as
+     * this might lead to inconsistencies since some files might have replaced the tokens
+     * while others have not.
      * \param token The token in the form <code>${...}</code>
      * \param path The path the token should point to
 	 * \param override If <code>true</code> an existing token will be silently overriden
+     * \pre \p token must not be empty
+     * \pre \p token must start with FileSystem::TokenOpeningBrace and end with
+     * FileSystem::TokenClosingBraces
+     * \pre \p token must not have been registered before if \p override is false
      */
     void registerPathToken(std::string token, std::string path, bool override = false);
 
     /**
-     * Replaces the path tokens present in the <code>path</code> if any exist. If all 
-     * tokens could be replaced, the method returns <code>true</code>; if
-     * <code>false</code> is returned, one or more tokens could not be replaced. In this
-     * case, only part of the path is modified.
+     * Replaces the path tokens present in the \p path if any exist. If all tokens could
+     * be replaced, the method returns <code>true</code>; if <code>false</code> is
+     * returned, one or more tokens could not be replaced. In this case, only part of the
+     * path is modified.
      * \param path The path whose tokens should be replaced
      * \return <code>true</code> if all tokens were replaced successfully,
      * <code>false</code> otherwise
@@ -252,9 +254,17 @@ public:
 	std::vector<std::string> tokens() const;
     
     /**
+     * Checks whether the \p token has been registered to a path before.
+     * \param token The token to be checked
+     * \return <code>true</code> if the \p token has been registered to a path before,
+     * <code>false</code> otherwise
+     */
+    bool hasRegisteredToken(const std::string& token) const;
+    
+    /**
      * Creates a CacheManager for this FileSystem. If a CacheManager already exists, this
-     * method will fail and log an error. The passed <code>cacheDirectory</code> has to be
-     * a valid and existing Directory.
+     * method will fail and log an error. The passed \p cacheDirectory has to be a valid
+     * and existing Directory.
      * \param cacheDirectory The directory in which all cached files will be stored. Has
      * to be an existing directory with proper read/write access.
      * \param version The version of the this cache. If the passed version is different
@@ -274,25 +284,31 @@ public:
      * will trigger a cleanup of the cache directory via the CacheManager destructor.
      * After this method returns, a new CacheManager can be reinitialized with a new
      * cache directory
+     * \pre CacheManager must have been created before
      */
     void destroyCacheManager();
     
     /**
-     * Returns the CacheManager or <code>nullptr</code> if it has not been initialized.
+     * Returns the CacheManager associated with this FileSystem
      * \return The CacheManager or <code>nullptr</code> if it has not been initialized
+     * \pre CacheManager must have been created before
      */
     CacheManager* cacheManager();
 
     /**
-     * Listen to file for changes. When file is changed the File callback will 
-     * be called.
-	 * \param file The file object to be tracked.
+     * Listen to \p file for changes. When \p file is changed the File callback will be
+     * called.
+	 * \param file The file object to be tracked
+     * \pre \p file must not be a <code>nullptr</code>
+     * \pre \p file must not have been added before
      */
 	void addFileListener(File* file);
     
     /**
      * Removes the file object from tracking lists. The file on the filesystem may
 	 * still be tracked and other File objects may still have callbacks registered.
+     * \pre \p file must not be a <code>nullptr</code>
+     * \pre \p file must have been added before (addFileListener)
      */
 	void removeFileListener(File* file);
     
@@ -301,10 +317,7 @@ public:
      */
 	void triggerFilesystemEvents();
 
-    friend class Singleton<FileSystem>;
-
 private:
-
 	/**
 	 * Constructs a FileSystem object.
      * \throw FileSystemException if the temporary folder cannot be found
@@ -319,44 +332,49 @@ private:
 	~FileSystem();
 
     /**
-     * This method cleans up a passed path by removing any double path separators and
+     * This method cleans up a passed \p path by removing any double path separators and
      * replacing all separators into the ones used by the operating system. It also
      * removes any trailing separators at the end of the path.
      * \param path The path that should be cleaned up
      * \return The cleaned path with correct separators
+     * \pre \p path must not be empty
      */
     std::string cleanupPath(std::string path) const;
     
     /**
-     * This method returns the position until both paths <code>p1</code> and
-     * <code>p2</code> are equal. After the returned position, the paths are diverging.
+     * This method returns the position until both paths \p p1 and \p p2 are equal. After
+     * the returned position, the paths are diverging.
      * \param p1 The one path that is used for the comparison
      * \param p2 The other path that is used for the comparison
-     * \return The position until which the paths <code>p1</code> and <code>p2</code> are
-     * equal
+     * \return The position until which the paths \p p1 and \p p2 are equal
      */
     size_t commonBasePathPosition(const std::string& p1, const std::string& p2) const;
 
     /**
-     * Returns <code>true</code> if the <code>path</code> contains any tokens.
+     * Returns <code>true</code> if the \p path contains any tokens.
      * \param path The path that is checked for tokens
-     * \return <code>true</code> if the <code>path</code> contains any tokens
+     * \return <code>true</code> if the \p path contains any tokens
+     * \pre \p path must not be empty
      */
-    bool hasTokens(const std::string& path) const;
+    bool containsToken(const std::string& path) const;
     
     /**
-     * Returns true, if the <code>path</code> contains the token <code>token</code>.
-     * \param path The path that is checked for the existence of the <code>token</code>
-     * \param token The token that is checked for existence in the <code>path</code>
-     * \return <code>true</code> if the <code>token</code> exists in the <code>path</code>
+     * Returns true, if the \p path contains the \p token.
+     * \param path The path that is checked for the existence of the \p token
+     * \param token The token that is checked for existence in the \p path
+     * \return <code>true</code> if the \p token exists in the \p path
+     * \pre \p path must not be empty
+     * \pre \p token must not be empty
      */
     bool hasToken(const std::string& path, const std::string& token) const;
     
     /**
-     * Returns the path that was registered for the <code>token</code>. If the token has
-     * not been registered with any replacement path, the token itself is returned.
+     * Returns the path that was registered for the \p token. If the token has not been
+     * registered with any replacement path, the token itself is returned.
      * \param token The token whose replacement is looked up
      * \return The replacement string for the token
+     * \throw FileSystemException If the token could not be resolved
+     * \pre \p token must not be empty
      */
     std::string resolveToken(const std::string& token) const;
 
@@ -370,82 +388,62 @@ private:
     std::unique_ptr<CacheManager> _cacheManager;
 
 #ifdef WIN32
-	/**
-	 * Windows specific deinitialize function
-	 */
+    /// Windows specific deinitialize function
 	void deinitializeInternalWindows();
 
-	/**
-	 * Starts watching a directory 
-	 */
+    /// Starts watching a directory
 	void beginRead(DirectoryHandle* directoryHandle);
 
-	/**
-	 * Handles the callback for a directory for the local file path
-	 */
+    /// Handles the callback for a directory for the local file path
 	static void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
 	
-	/**
-	 * External function that calls beginRead 
-	 */
+    /// External function that calls beginRead
 	friend void readStarter(DirectoryHandle* directoryHandle);
 
-	/**
-	 * External function that calls callbackHandler 
-	 */
+    /// External function that calls callbackHandler
 	friend void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
 
+    /// The list of all tracked files
 	std::multimap<std::string, File*> _trackedFiles;
+    
+    /// The list of tracked directories
 	std::map<std::string, DirectoryHandle*> _directories;
 
 #elif __APPLE__
-    
-    /**
-     * OS X specific deinitialize function
-     */
+    /// OS X specific deinitialize function
     void deinitializeInternalApple();
-    
-    /**
-     * OS X specific triggerfil
-     */
+
+    /// OS X specific triger filesystem
     void triggerFilesystemEventsInternalApple();
     
-    /**
-     * OS X callback handler
-     */
+    /// OS X callback handler
     static void callbackHandler(const std::string& path);
-    
-    /**
-     * Friend callback handler calling the static callback handler
-     */
+
+    /// Friend callback handler calling the static callback handler
     friend void callbackHandler(const std::string& path);
-    
+
+    /// The list of all tracked files
     std::multimap<std::string, File*> _trackedFiles;
+    
+    /// The list of tracked directories
     std::map<std::string, DirectoryHandle*> _directories;
     
-    
 #else // Linux
-
-	/**
-	 * Linux specific initialize function
-	 */
+    /// Linux specific initialize function
 	void initializeInternalLinux();
 
-	/**
-	 * Linux specific deinitialize function
-	 */
+    /// Linux specific deinitialize function
 	void deinitializeInternalLinux();
 
-	/**
-	 * Function that run by the watcher thread
-	 */
+    /// Function that run by the watcher thread
 	static void inotifyWatcher();
 
     int _inotifyHandle;
     bool _keepGoing;
     std::thread _t;
-    std::multimap<int, File*> _trackedFiles;
     
+    /// The list of tracked files
+    std::multimap<int, File*> _trackedFiles;
 #endif
 };
 

@@ -59,7 +59,7 @@ public:
      */
     template <typename... Args>
     static void initialize(Args... args) {
-        ghoul_assert( ! isInitialized(), typeid(T).name() << " is already initialized!");
+        ghoul_assert(!isInitialized(), typeid(T).name() << " is already initialized!");
         _instance = new T(std::forward<Args>(args)...);
     }
     

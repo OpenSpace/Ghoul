@@ -100,10 +100,7 @@ FileSystem::FileSystem()
         throw FileSystemException(
             "Could not find the path of the system's temporary files");
     }
-}
-
-void FileSystem::initialize() {
-    Singleton<FileSystem>::initialize();
+    
 #if !defined(WIN32) && !defined(__APPLE__)
     FileSys.initializeInternalLinux();
 #endif
@@ -516,33 +513,43 @@ void FileSystem::deleteDirectory(const Directory& path, bool recursive) const {
 
     if (recursive) {
         DIR* directory = opendir(dirPath.c_str());
+        
+        if (!directory) {
+            throw FileSystemException(fmt::format(
+                "Error removing directory '{}': {}", path, strerror(errno)
+            ));
+        }
     
-        if (directory) {
-            while (true) {
-                struct dirent* p = readdir(directory);
-                if (p == nullptr)
-                    break;
-                
-                string name = string(p->d_name);
-                if (name == "." || name == "..")
-                    continue;
+        while (true) {
+            struct dirent* p = readdir(directory);
+            if (p == nullptr)
+                break;
+            
+            string name = string(p->d_name);
+            if (name == "." || name == "..")
+                continue;
 
-                struct stat statbuf;
-                string fullName = dirPath + "/" + name;
-                int statResult = stat(fullName.c_str(), &statbuf);
-                if (statResult == 0) {
-                    if (S_ISDIR(statbuf.st_mode))
-                        deleteDirectory(fullName);
-                    else {
-                        int removeSuccess = remove(fullName.c_str());
-                        if (removeSuccess != -1) {
-                            throw FileSystemException(fmt::format(
-                                "Error deleting file '{}' in directory '{}': {}",
-                                fullName, path, strerror(errno)
-                            ));
-                        }
+            struct stat statbuf;
+            string fullName = dirPath + "/" + name;
+            int statResult = stat(fullName.c_str(), &statbuf);
+            if (statResult == 0) {
+                if (S_ISDIR(statbuf.st_mode))
+                    deleteDirectory(fullName);
+                else {
+                    int removeSuccess = remove(fullName.c_str());
+                    if (removeSuccess != -1) {
+                        throw FileSystemException(fmt::format(
+                            "Error deleting file '{}' in directory '{}': {}",
+                            fullName, path, strerror(errno)
+                        ));
                     }
                 }
+            }
+            else {
+                throw FileSystemException(fmt::format(
+                    "Error getting information about file '{}' in directory '{}': {}",
+                    fullName, path, strerror(errno)
+                ));
             }
         }
         closedir(directory);
@@ -566,6 +573,7 @@ bool FileSystem::emptyDirectory(const Directory& path) const {
 	if (dir == NULL) //Not a directory or doesn't exist
 		return false;
 	while (readdir(dir) != nullptr) {
+        // The '.' and '..' are always present
 		if (++n > 2)
 			break;
 	}
@@ -578,54 +586,111 @@ bool FileSystem::emptyDirectory(const Directory& path) const {
 }
 
 void FileSystem::registerPathToken(string token, string path, bool override) {
-#ifdef GHL_DEBUG
-    if (token.empty()) {
-        LERROR("Token cannot not be empty");
-        return;
+    ghoul_assert(!token.empty(), "Token must not be empty");
+    
+    ghoul_assert(
+        (token.substr(0, TokenOpeningBraces.size()) == TokenOpeningBraces) &&
+        (token.substr(token.size() - TokenClosingBraces.size()) == TokenClosingBraces),
+        "Token must be enclosed by TokenBraces"
+    );
+    
+    if (!override) {
+        ghoul_assert(_tokenMap.find(token) == _tokenMap.end(),
+                     "Token must not have been registered before"
+        );
     }
-    
-    string&& beginning = token.substr(0, TokenOpeningBraces.size());
-    string&& ending = token.substr(token.size() - TokenClosingBraces.size());
-    if ((beginning != TokenOpeningBraces) || (ending != TokenClosingBraces)) {
-        LERROR("Token has to start with '" + TokenOpeningBraces +
-                    "' and end with '" + TokenClosingBraces + "'");
-        return;
-    }
-    
-    
-	if (!override) {
-		if (_tokenMap.find(token) != _tokenMap.end()) {
-			LERROR("Token already bound to path '" +
-						_tokenMap[token] + "'");
-			return;
-		}
-	}
-#endif
+
 	if (override) {
 		auto it = _tokenMap.find(token);
 		_tokenMap.erase(it);
 	}
 	_tokenMap.emplace(token, path);
 }
+
+bool FileSystem::expandPathTokens(string& path) const {
+    while (containsToken(path)) {
+        string::size_type beginning = path.find(TokenOpeningBraces);
+        string::size_type closing = path.find(TokenClosingBraces);
+        string::size_type closingLocation = closing + TokenClosingBraces.size();
+        std::string currentToken = path.substr(beginning, closingLocation);
+        const std::string& replacement = resolveToken(currentToken);
+        if (replacement == currentToken) {
+            // replacement == currentToken will be true if the respective token could not
+            // be found;  resolveToken will print an error in that case
+            return false;
+        }
+        path.replace(
+                     beginning,
+                     closing + TokenClosingBraces.size() - beginning,
+                     replacement
+                     );
+    }
+    return true;
+}
+
+std::vector<string> FileSystem::tokens() const {
+    std::vector<string> tokens;
+    for (const auto& token : _tokenMap) {
+        tokens.push_back(token.first);
+    }
+    return tokens;
+}
+    
+bool FileSystem::hasRegisteredToken(const string& token) const {
+    return _tokenMap.find(token) != _tokenMap.end();
+}
+
+void FileSystem::createCacheManager(const Directory& cacheDirectory, int version) {
+    ghoul_assert(directoryExists(cacheDirectory), "Cache directory did not exist");
+    ghoul_assert(!_cacheManager, "CacheManager was already created");
+    
+    _cacheManager = std::make_unique<CacheManager>(cacheDirectory, version);
+    ghoul_assert(_cacheManager, "CacheManager creation failed");
+}
+ 
+void FileSystem::destroyCacheManager() {
+    ghoul_assert(_cacheManager, "CacheManager was not created");
+    _cacheManager = nullptr;
+}
+
+CacheManager* FileSystem::cacheManager() {
+    ghoul_assert(_cacheManager, "CacheManager was not created");
+    return _cacheManager.get();
+}
+
+void FileSystem::triggerFilesystemEvents() {
+#ifdef WIN32
+    // Sleeping for 0 milliseconds will trigger any pending asynchronous procedure calls
+    SleepEx(0, TRUE);
+#endif
+#if defined(__APPLE__)
+    triggerFilesystemEventsInternalApple();
+#endif
+}
     
 string FileSystem::cleanupPath(string path) const {
+    ghoul_assert(!path.empty(), "Path must not be empty");
+    
 #ifdef WIN32
     // In Windows, replace all '/' by '\\' for conformity
     std::replace(path.begin(), path.end(), '/', '\\');
-    std::string&& drivePart = path.substr(0, 3);
-    std::regex&& driveRegex = std::regex("([[:lower:]][\\:][\\\\])");
-    const bool hasCorrectSize = path.size() >= 3;
-    if (hasCorrectSize && std::regex_match(drivePart, driveRegex))
-        std::transform(path.begin(), path.begin() + 1,
-                        path.begin(), toupper);
+    std::string drivePart = path.substr(0, 3);
+    std::regex driveRegex = std::regex("([[:lower:]][\\:][\\\\])");
+    bool hasCorrectSize = path.size() >= 3;
+    if (hasCorrectSize && std::regex_match(drivePart, driveRegex)) {
+        std::transform(
+            path.begin(),
+            path.begin() + 1,
+            path.begin(),
+            toupper
+        );
+    }
 #else
     // Remove all double separators (will automatically be done on Windows)
 #endif
     size_t position = 0;
     while (position != string::npos) {
-        char dualSeparator[2];
-        dualSeparator[0] = PathSeparator;
-        dualSeparator[1] = PathSeparator;
+        char dualSeparator[] = { PathSeparator, PathSeparator };
         position = path.find(dualSeparator);
         if (position != string::npos)
             path = std::move(path.substr(0, position) + path.substr(position + 1));
@@ -646,7 +711,7 @@ size_t FileSystem::commonBasePathPosition(const string& p1, const string& p2) co
     size_t currentPosition = 0;
     size_t nextPosition = p1.find(PathSeparator);
     while (nextPosition != string::npos) {
-        const int result = p1.compare(0, nextPosition, p2, 0 , nextPosition);
+        int result = p1.compare(0, nextPosition, p2, 0 , nextPosition);
         if (result == 0) {
             currentPosition = nextPosition;
             nextPosition = p1.find(PathSeparator, nextPosition + 1);
@@ -654,84 +719,32 @@ size_t FileSystem::commonBasePathPosition(const string& p1, const string& p2) co
         else
             break;
     }
-    const int result = p1.compare(0, p1.length(), p2, 0 , p1.length());
+    int result = p1.compare(0, p1.length(), p2, 0 , p1.length());
     if (result == 0)
         currentPosition = p1.length();
     return currentPosition;
 }
     
-bool FileSystem::hasTokens(const string& path) const {
-    const bool hasOpeningBrace = path.find(TokenOpeningBraces) != string::npos;
-    const bool hasClosingBrace = path.find(TokenClosingBraces) != string::npos;
+bool FileSystem::containsToken(const string& path) const {
+    ghoul_assert(!path.empty(), "Path must not be empty");
+    
+    bool hasOpeningBrace = path.find(TokenOpeningBraces) != string::npos;
+    bool hasClosingBrace = path.find(TokenClosingBraces) != string::npos;
     return hasOpeningBrace && hasClosingBrace;
 }
 
-bool FileSystem::expandPathTokens(string& path) const {
-    while (hasTokens(path)) {
-        string::size_type beginning = path.find(TokenOpeningBraces);
-        string::size_type closing = path.find(TokenClosingBraces);
-        string::size_type closingLocation = closing + TokenClosingBraces.size();
-        std::string currentToken = path.substr(beginning, closingLocation);
-        const std::string& replacement = resolveToken(currentToken);
-        if (replacement == currentToken) {
-            // replacement == currentToken will be true if the respective token could not
-            // be found;  resolveToken will print an error in that case
-            return false;
-        }
-        path.replace(
-            beginning,
-            closing + TokenClosingBraces.size() - beginning,
-            replacement
-        );
-    }
-    return true;
-}
-
-std::vector<string> FileSystem::tokens() const {
-	std::vector<string> tokens;
-	for (const auto& token : _tokenMap) {
-		tokens.push_back(token.first);
-	}
-	return tokens;
-}
-    
-void FileSystem::createCacheManager(const Directory& cacheDirectory, int version) {
-    ghoul_assert(directoryExists(cacheDirectory), "Cache directory did not exist");
-    ghoul_assert(!_cacheManager, "CacheManager was already created");
-    
-    _cacheManager = std::make_unique<CacheManager>(cacheDirectory, version);
-    ghoul_assert(_cacheManager, "CacheManager creation failed");
-}
-
-void FileSystem::destroyCacheManager() {
-	assert(_cacheManager);
-	_cacheManager = nullptr;
-}
-
-CacheManager* FileSystem::cacheManager() {
-	assert(_cacheManager);
-	return _cacheManager.get();
-}
-
-void FileSystem::triggerFilesystemEvents() {
-#ifdef WIN32
-	// Sleeping for 0 milliseconds will trigger any pending asynchronous procedure calls 
-	SleepEx(0, TRUE);
-#endif
-#if defined(__APPLE__)
-    triggerFilesystemEventsInternalApple();
-#endif
-}
-
 bool FileSystem::hasToken(const string& path, const string& token) const {
-    if (!hasTokens(path))
+    ghoul_assert(!path.empty(), "Path must not be empty");
+    ghoul_assert(!token.empty(), "Token must not be empty");
+    
+    if (!containsToken(path))
         return false;
     else {
         string::size_type beginning = path.find(TokenOpeningBraces);
         string::size_type closing = path.find(TokenClosingBraces);
         while ((beginning != string::npos) && (closing != string::npos)) {
             string::size_type closingLocation = closing + TokenClosingBraces.size();
-            const std::string currentToken = path.substr(beginning, closingLocation);
+            std::string currentToken = path.substr(beginning, closingLocation);
             if (currentToken == token)
                 return true;
             else {
@@ -744,10 +757,13 @@ bool FileSystem::hasToken(const string& path, const string& token) const {
 }
     
 string FileSystem::resolveToken(const string& token) const {
-    const std::map<string, string>::const_iterator it = _tokenMap.find(token);
+    ghoul_assert(!token.empty(), "Token must not be empty");
+    
+    auto it = _tokenMap.find(token);
     if (it == _tokenMap.end()) {
-        LERROR("Token '" + token + "' could not be resolved");
-        return token;
+        throw FileSystemException(fmt::format(
+            "Token '{}' could not be resolved", token
+        ));
     }
     else
         return it->second;
