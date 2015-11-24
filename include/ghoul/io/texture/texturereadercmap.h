@@ -30,18 +30,32 @@
 
 namespace ghoul {
 namespace io {
-namespace impl {
 
 /**
- * Reads the cmap file that is used in AMNH's Digital Universe data package.
+ * Reads a one dimensional texture from a cmap (color map) file. The format of the cmap
+ * files have the width of the Texture in the first non-comment, non-empty line and is
+ * followed by <code>width</code> number of lines that contain four values for red, green,
+ * blue, and alpha each. If the file is malformed, an TextureLoadException is thrown
  */
 class TextureReaderCMAP : public TextureReaderBase {
 public:
-	opengl::Texture* loadTexture(const std::string& filename) const override;
-	std::set<std::string> supportedExtensions() const override;
+    /**
+     * Loads the passed CMAP file.
+     * \param filename The CMAP file that is loaded
+     * \return The loaded Texture
+     * \throws TextureLoadException If the file is malformed
+     * \throws std::ifstream::failure If the file could not be opened
+     * \pre \p filename must not be empty
+     */
+    std::unique_ptr<opengl::Texture> loadTexture(std::string filename) const override;
+    
+    /**
+     * Returns the supported extension (<code>cmap</code>)
+     * \return The supported extension
+     */
+	std::vector<std::string> supportedExtensions() const override;
 };
 
-} // namespace impl
 } // namespace io
 } // namespace ghoul
 

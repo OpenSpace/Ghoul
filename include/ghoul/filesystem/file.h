@@ -51,9 +51,7 @@ class FileSystem;
  */
 class File {
 public:
-    /**
-     * Exception that gets thrown if there is a file-related error in any of the methods
-     */
+     /// Exception that gets thrown if there is a file-related error in any of the methods
     struct FileException : public RuntimeError {
         explicit FileException(const std::string& msg);
     };

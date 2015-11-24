@@ -26,37 +26,75 @@
 #ifndef __TEXTUREREADER_H__
 #define __TEXTUREREADER_H__
 
+#include <memory>
 #include <string>
 #include <vector>
 
+#include <ghoul/misc/exception.h>
+#include <ghoul/opengl/texture.h>
+
 namespace ghoul {
-
-namespace opengl {
-class Texture;
-}
-
 namespace io {
 
 class TextureReaderBase;
 
+/**
+ * This class managers multiple TextureReaderBase and makes them available through one
+ * method loadTexture. TextureReaderBases are added through the method addReader. The
+ * class provides a static member, but also allows users to create local variants.
+ * TextureReaderBases can be reused between multiple TextureReaders
+ */
 class TextureReader {
 public:
-	opengl::Texture* loadTexture(const std::string& filename);
-	void addReader(TextureReaderBase* reader);
-
-	static TextureReader& ref();
-
-protected:
-	TextureReaderBase* readerForExtension(const std::string& extension);
-	std::vector<TextureReaderBase*> _readers;
+    /// Exception that gets thrown when there is no reader for the provided \p extension
+    struct NoReaderException : public RuntimeError {
+        explicit NoReaderException(std::string extension);
+        std::string fileExtension;
+    };
+    
+    /**
+     * Returns the static variant of the TextureReader
+     * \return The static variant of the TextureReader
+     */
+    static TextureReader& ref();
+    
+    /**
+     * Loads the provided \p filename into a Texture and returns it. The correct
+     * TextureReaderBase is determined by the extension of the \p filename.
+     * \param filename The name of the file which should be loaded into a textrure
+     * \throw TextureLoadException If there was no reader for the specified \p filename
+     * \pre \p filename must not be empty
+     * \pre \p filename must have an extension
+     * \pre At least one TextureReaderBase must have been added to the TextureReader
+     * before (addReader)
+     */
+    std::unique_ptr<opengl::Texture> loadTexture(const std::string& filename);
+    
+    /**
+     * Adds the \p reader to this TextureReader and makes it available through subsequent
+     * calls to loadTexture. If an extension is supported by multiple TextureReaderBases,
+     * the TextureReaderBase that was added first will be used.
+     * \param reader The reader that is to be added to this TextureReader
+     * \pre \p reader must not have been added to this TextureReader before
+     */
+    void addReader(std::shared_ptr<TextureReaderBase> reader);
+    
+    /**
+     * Returns a list of all the previously registered TextureReaderBases.
+     * \return A list of all the previously registered TextureReaderBases
+     */
+    std::vector<std::shared_ptr<TextureReaderBase>> readers() const;
 
 private:
-	TextureReader();
-	~TextureReader();
-	TextureReader(const TextureReader&) = delete;
-	TextureReader(const TextureReader&&) = delete;
-	TextureReader& operator= (const TextureReader& rhs) = delete;
-
+    /**
+     * Returns the TextureReaderBase that is responsible for the provided extension.
+     * \param extension The extension for which the TextureReaderBase should be returned
+     * \throw TextureLoadException If there was no reader for the specified \p extension
+     */
+    TextureReaderBase* readerForExtension(const std::string& extension);
+    
+    /// The list of all registered readers
+    std::vector<std::shared_ptr<TextureReaderBase>> _readers;
 };
 
 } // namespace io

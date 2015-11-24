@@ -25,35 +25,34 @@
 
 #include <ghoul/io/texture/texturereadercmap.h>
 
-#include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
 #include <ghoul/opengl/texture.h>
+#include <ghoul/glm.h>
+
+#include <format.h>
 
 #include <fstream>
 #include <sstream>
-#include <stdint.h>
-
-namespace {
-	const std::string _loggerCat = "TextureReaderCMAP";
-}
 
 namespace ghoul {
 namespace io {
-namespace impl {
 
-opengl::Texture* TextureReaderCMAP::loadTexture(const std::string& filename) const {
-	std::ifstream file(filename);
-	if (!file.good()) {
-		LERROR("Could not open file '" << filename << "' for loading");
-		return nullptr;
-	}
+std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
+                                                               std::string filename) const
+{
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+    
+    std::ifstream file;
+    file.exceptions(std::ifstream::failbit);
+    file.open(filename, std::ifstream::in);
 
-	int width = -1; // Width of the texture
-	uint8_t* values = nullptr;
+    int width = 0;
+    uint8_t* values = nullptr;
+//    std::vector<uint8_t> values;
 
 	std::string line;
 	int i = 0;
-	while (file.good()) {
-		std::getline(file, line);
+	while (std::getline(file, line)) {
 		// Skip empty lines
 		if (line.empty() || line == "\r")
 			continue;
@@ -62,42 +61,51 @@ opengl::Texture* TextureReaderCMAP::loadTexture(const std::string& filename) con
 			continue;
 
 		std::stringstream s(line);
-		if (width == -1) {
-			// Width hasn't been set yet and we have a value, so it has to be the width
-			s >> width;
-			values = new uint8_t[width * 4];
-			continue;
-		}
+        if (!values) {
+            s >> width;
+            values = new uint8_t[width * 4];
+            continue;
+        }
+        
+        if (!values) {
+            throw TextureLoadException(
+                std::move(filename),
+                "The first non-comment, non-empty line must contain the image width",
+                this
+            );
+        }
 
-		if (!values) {
-			LERROR("The first non-comment, non-empty line must contain the width of "
-				"the image");
-			return nullptr;
-		}
+        glm::vec4 color;
+        s >> color.r;
+        s >> color.g;
+        s >> color.b;
+        s >> color.a;
+        
+        if (i > (width * 4)) {
+            throw TextureLoadException(
+                std::move(filename),
+                fmt::format("Header assured '{}' values but more were found", width),
+                this
+            );
+        }
 
-		float r,g,b,a;
-
-		s >> r;
-		s >> g;
-		s >> b;
-		s >> a;
-
-		values[i++] = static_cast<uint8_t>(r * 255);
-		values[i++] = static_cast<uint8_t>(g * 255);
-		values[i++] = static_cast<uint8_t>(b * 255);
-		values[i++] = static_cast<uint8_t>(a * 255);
+		values[i++] = static_cast<uint8_t>(color.r * 255);
+		values[i++] = static_cast<uint8_t>(color.g * 255);
+		values[i++] = static_cast<uint8_t>(color.b * 255);
+		values[i++] = static_cast<uint8_t>(color.a * 255);
 	}
 
 	if ((width * 4) != i) {
-		LERROR("Header assured " << width << " values, but " << i / 4.f <<
-			"were found");
-        delete[] values;
-		return nullptr;
+        throw TextureLoadException(
+            std::move(filename),
+            fmt::format("Header assured '{}' values but '{}' were found", width, i / 4.f),
+            this
+        );
 	}
 
 	using opengl::Texture;
-	Texture* texture = new Texture(
-		values,							// data
+    std::unique_ptr<Texture> texture = std::make_unique<Texture>(
+		values,                         // data
 		glm::size3_t(width, 1, 1),		// dimensions
 		Texture::Format::RGBA			// Format
 	);
@@ -105,10 +113,9 @@ opengl::Texture* TextureReaderCMAP::loadTexture(const std::string& filename) con
 	return texture;
 }
 
-std::set<std::string> TextureReaderCMAP::supportedExtensions() const {
+std::vector<std::string> TextureReaderCMAP::supportedExtensions() const {
 	return { "cmap" };
 }
 
-} // namespace impl
 } // namespace io
 } // namespace ghoul

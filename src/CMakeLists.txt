@@ -42,6 +42,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderlua.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderwavefront.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereader.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderbase.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadercmap.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderdevil.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderfreeimage.cpp

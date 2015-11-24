@@ -147,12 +147,16 @@ BaseClass* TemplateFactory<BaseClass>::create(const std::string& className,
 template <typename BaseClass>
 template <typename Class>
 void TemplateFactory<BaseClass>::registerClass(std::string className) {
-    static_assert(std::is_base_of<BaseClass, Class>::value,
-        "BaseClass must be the base class of Class");
+    static_assert(
+        std::is_base_of<BaseClass, Class>::value,
+        "BaseClass must be the base class of Class"
+    );
     static_assert(
         std::is_default_constructible<Class>::value |
-        std::is_convertible<Dictionary, Class>::value,
-        "Class needs a public default or Dictionary constructor");
+        //        std::is_convertible<Dictionary, Class>::value,
+        std::is_constructible<Class, const ghoul::Dictionary&>::value,
+        "Class needs a public default or Dictionary constructor"
+    );
 
     // Use the correct CreateHelper struct to create a function pointer that we can store
     // for later usage. std::is_convertible<>::value returns a boolean that checks at
@@ -160,7 +164,8 @@ void TemplateFactory<BaseClass>::registerClass(std::string className) {
     // checking if there is a proper constructor for it)
     FactoryFuncPtr&& function = CreateHelper<BaseClass, Class,
         (std::is_default_constructible<Class>::value * DEFAULT_CONSTRUCTOR) |
-        (std::is_convertible<Dictionary, Class>::value * DICTIONARY_CONSTRUCTOR)
+        //        (std::is_convertible<Dictionary, Class>::value * DICTIONARY_CONSTRUCTOR)
+        (std::is_constructible<Class, const ghoul::Dictionary&>::value * DICTIONARY_CONSTRUCTOR)
     >().createFunction();
 
     registerClass(std::move(className), function);

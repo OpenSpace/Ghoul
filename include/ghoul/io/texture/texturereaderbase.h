@@ -26,20 +26,57 @@
 #ifndef __TEXTUREREADERBASE_H__
 #define __TEXTUREREADERBASE_H__
 
-#include <set>
+#include <ghoul/misc/exception.h>
+
+#include <memory>
 #include <string>
+#include <vector>
 
 namespace ghoul {
 namespace opengl {
 class Texture;
 }
+    
 namespace io {
 
+/**
+ * The base class for reading textures from hard disk into a Texture object. Each reader
+ * must specify the extensions that is supports as well as provide a loadTexture overload
+ * to handle the files.
+ */
 class TextureReaderBase {
 public:
-	virtual ~TextureReaderBase() {}
-	virtual opengl::Texture* loadTexture(const std::string& filename) const = 0;
-	virtual std::set<std::string> supportedExtensions() const = 0;
+    /// The exception that gets thrown if there was an error loading the Texture
+    struct TextureLoadException : public RuntimeError {
+        explicit TextureLoadException(std::string name, std::string message,
+            const TextureReaderBase* reader);
+        
+        /// The filename that caused the exception to be thrown
+        std::string filename;
+        
+        /// The error message that occurred
+        std::string message;
+        
+        /// The TextureReaderBase that caused the exception
+        const TextureReaderBase* reader;
+    };
+    
+    /**
+     * Loads the texture \p filename from disk and returns the loaded Texture.
+     * \param filename The texture that should be loaded from the hard disk
+     * \return The loaded Texture object
+     * \pre \p filename must not be empty
+     * \pre The extension of \p filename must be among the supported extensions as
+     * reported by supportedExtensions
+     * \throw TextureReaderBase If there was an error loading the texture
+     */
+    virtual std::unique_ptr<opengl::Texture> loadTexture(std::string filename) const = 0;
+    
+    /**
+     * Returns a list of all extensions that this TextureReaderBase supports.
+     * \return A list of all extensions that this TextureReaderBase supports
+     */
+	virtual std::vector<std::string> supportedExtensions() const = 0;
 };
 
 } // namespace io
