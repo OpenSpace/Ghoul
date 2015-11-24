@@ -32,6 +32,7 @@
 #include <ghoul/misc/exception.h>
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
