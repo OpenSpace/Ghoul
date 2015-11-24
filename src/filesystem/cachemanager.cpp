@@ -46,7 +46,24 @@ namespace filesystem {
 CacheManager::CacheException::CacheException(const std::string& msg)
     : RuntimeError(msg, "Cache")
 {}
-
+    
+CacheManager::MalformedCacheException::MalformedCacheException(std::string file,
+                                                               std::string msg)
+    : CacheException(fmt::format("Malformed cache at '{}'", file))
+    , cacheFile(std::move(file))
+    , message(std::move(msg))
+{}
+  
+CacheManager::ErrorLoadingCacheException::ErrorLoadingCacheException(
+                                                             const std::string& message)
+    : CacheException(message)
+{}
+    
+CacheManager::IllegalArgumentException::IllegalArgumentException(std::string argument)
+    : CacheException(fmt::format("Argument '{}' contains an illegal character", argument))
+    , argumentName(std::move(argument))
+{}
+    
 CacheManager::CacheManager(std::string directory, int version)
     : _version(version)
 {
@@ -91,13 +108,13 @@ CacheManager::CacheManager(std::string directory, int version)
             try {
                 hash = std::stoul(line);
             } catch (const std::invalid_argument& e) {
-                throw CacheException("Malformed cache file");
+                throw MalformedCacheException(path);
             }
 
 			CacheInformation info;
 			std::getline(file, info.file);
             if (!file.good())
-                throw CacheException("Malformed cache file");
+                throw MalformedCacheException(path);
             
 			info.isPersistent = true;
 			_files.emplace(hash, info);
@@ -168,12 +185,8 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
                                  bool isPersistent)
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
-    if (pos != std::string::npos) {
-        throw CacheException(fmt::format(
-            "Base name '{}' has an illegal character",
-            baseName
-        ));
-    }
+    if (pos != std::string::npos)
+        throw IllegalArgumentException(baseName);
     
 	unsigned int hash = generateHash(baseName, information);
 
@@ -228,12 +241,8 @@ bool CacheManager::hasCachedFile(const std::string& baseName,
                                  const std::string& information) const
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
-    if (pos != std::string::npos) {
-        throw CacheException(fmt::format(
-            "Base name '{}' has an illegal character",
-            baseName
-        ));
-    }
+    if (pos != std::string::npos)
+        throw IllegalArgumentException(baseName);
     
     unsigned int hash = generateHash(baseName, information);    
     return _files.find(hash) != _files.end();
@@ -252,12 +261,8 @@ void CacheManager::removeCacheFile(const std::string& baseName,
                          const std::string& information)
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
-    if (pos != std::string::npos) {
-        throw CacheException(fmt::format(
-            "Base name '{}' has an illegal character",
-            baseName
-        ));
-    }
+    if (pos != std::string::npos)
+        throw IllegalArgumentException(baseName);
     
     unsigned int hash = generateHash(baseName, information);
 
@@ -282,9 +287,8 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
     // First search for all subdirectories and call this function recursively on them
 	std::vector<std::string> contents = dir.readDirectories();
 	for (const auto& content : contents) {
-        if (FileSys.directoryExists(content)) {
+        if (FileSys.directoryExists(content))
 			cleanDirectory(content);
-        }
 	}
     // We get to this point in the recursion if either all subdirectories have been
     // deleted or there exists a file somewhere in the directory tree
@@ -325,7 +329,7 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
             // Cache directories should only contain a single file with the
             // same name as the directory
             if (files.size() > 1) {
-                throw CacheException(fmt::format(
+                throw ErrorLoadingCacheException(fmt::format(
                     "Directory '{}' contained more than one file",
                     hash
                 ));
@@ -335,7 +339,7 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
                 // +1 as the last path delimiter is missing from the path
                 std::string filename = files[0].substr(Directory(hash).path().size() + 1);
                 if (filename != directoryName) {
-                    throw CacheException(fmt::format(
+                    throw ErrorLoadingCacheException(fmt::format(
                         "File contained in cache directory '{}' contains a file with "
                         "name '{}' instead of expected '{}'",
                         hash,

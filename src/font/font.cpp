@@ -74,24 +74,18 @@ namespace {
     {
         FT_Error error = FT_Init_FreeType(&library);
         if (error) {
-            throw ghoul::fontrendering::Font::FontException(fmt::format(
-                "Error loading font '{}' for size '{}': ({}) {}",
-                name, size,
-                FT_Errors[error].code,
-                FT_Errors[error].message
-            ));
+            throw ghoul::fontrendering::Font::FreeTypeException(
+                name, size, FT_Errors[error].code, FT_Errors[error].message
+            );
         }
         
         // Load face
         error = FT_New_Face(library, name.c_str(), 0, &face);
         if (error) {
             FT_Done_FreeType(library);
-            throw ghoul::fontrendering::Font::FontException(fmt::format(
-                "Error loading font '{}' for size '{}': ({}) {}",
-                name, size,
-                FT_Errors[error].code,
-                FT_Errors[error].message
-            ));
+            throw ghoul::fontrendering::Font::FreeTypeException(
+                name, size, FT_Errors[error].code, FT_Errors[error].message
+            );
         }
         
         // Select charmap
@@ -99,12 +93,9 @@ namespace {
         if (error) {
             FT_Done_Face(face);
             FT_Done_FreeType(library);
-            throw ghoul::fontrendering::Font::FontException(fmt::format(
-                "Error loading font '{}' for size '{}': ({}) {}",
-                name, size,
-                FT_Errors[error].code,
-                FT_Errors[error].message
-            ));
+            throw ghoul::fontrendering::Font::FreeTypeException(
+                name, size, FT_Errors[error].code, FT_Errors[error].message
+            );
         }
         
         // Set char size
@@ -112,12 +103,9 @@ namespace {
         if (error) {
             FT_Done_Face(face);
             FT_Done_FreeType(library);
-            throw ghoul::fontrendering::Font::FontException(fmt::format(
-                "Error loading font '{}' for size '{}': ({}) {}",
-                name, size,
-                FT_Errors[error].code,
-                FT_Errors[error].message
-            ));
+            throw ghoul::fontrendering::Font::FreeTypeException(
+                name, size, FT_Errors[error].code, FT_Errors[error].message
+            );
         }
     }
 }
@@ -128,6 +116,26 @@ namespace fontrendering {
     
 Font::FontException::FontException(const std::string& msg)
     : RuntimeError(msg, "Font")
+{}
+    
+Font::GlyphException::GlyphException(std::string name, float size, wchar_t character)
+    : FontException(fmt::format(
+        "Glyph '{}' was not present in the font '{}' at size '{}'",
+        name, size, char(character)))
+    , fontName(std::move(name))
+    , fontSize(size)
+    , glyph(character)
+{}
+    
+Font::FreeTypeException::FreeTypeException(std::string name, float size, int code,
+                                           std::string message)
+    : FontException(fmt::format(
+        "Error loading font '{}' for size '{}': ({}) {}",
+        name, size, code, message))
+    , fontName(std::move(name))
+    , fontSize(size)
+    , errorCode(code)
+    , errorMessage(std::move(message))
 {}
     
 Font::Glyph::Glyph(wchar_t character,
@@ -388,10 +396,12 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
     if (error) { \
         FT_Done_Face(face); \
         FT_Done_FreeType(library); \
-        throw FontException(fmt::format(\
-            "Error loading glyph {}. ({}) {}", \
-            char(charcode), FT_Errors[error].code, FT_Errors[error].message \
-        ));\
+        throw FreeTypeException( \
+            _name, \
+            _pointSize, \
+            FT_Errors[error].code, \
+            FT_Errors[error].message \
+        ); \
     }
 
 #define HandleErrorWithStroker(error) \
@@ -399,10 +409,12 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         FT_Done_Face(face); \
         FT_Done_FreeType(library); \
         FT_Stroker_Done(stroker); \
-        throw FontException(fmt::format(\
-            "Error loading glyph {}. ({}) {}", \
-            char(charcode), FT_Errors[error].code, FT_Errors[error].message \
-        ));\
+        throw FreeTypeException( \
+            _name, \
+            _pointSize, \
+            FT_Errors[error].code, \
+            FT_Errors[error].message \
+        ); \
     }
 
     using TextureAtlas = opengl::TextureAtlas;

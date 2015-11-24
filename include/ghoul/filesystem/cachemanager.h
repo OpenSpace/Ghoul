@@ -55,8 +55,27 @@ namespace filesystem {
  */
 class CacheManager {
 public:
+    /// Superclass for all cache-related exceptions
     struct CacheException : public RuntimeError {
         explicit CacheException(const std::string& msg);
+    };
+    
+    /// Exception that gets thrown if the cache has a malformed information file
+    struct MalformedCacheException : public CacheException {
+        explicit MalformedCacheException(std::string file, std::string msg = "");
+        std::string cacheFile;
+        std::string message;
+    };
+    
+    /// Exception that gets thrown if there was an error loading the previous cache files
+    struct ErrorLoadingCacheException : public CacheException {
+        explicit ErrorLoadingCacheException(const std::string& message);
+    };
+    
+    /// Exception that gets thrown if the argument for retrieving a cache file is invalid
+    struct IllegalArgumentException : public CacheException {
+        explicit IllegalArgumentException(std::string argument);
+        std::string argumentName;
     };
     
     /**
@@ -68,8 +87,8 @@ public:
      * \param directory The directory that is used for the CacheManager
      * \param version The version of the cache. If a major change happens that shouldn't
      * be dealt on an individual level, this invalidates previous caches
-     * \throw CacheException If the cache file could not be opened or if the cache file or
-     * directory is malformed
+     * \throw MalformedCacheException If the cache file could is malformed
+     * \throw ErrorLoadingCacheException If the previous cache could not be loaded
      * \pre \p directory must not be empty
      */
 	CacheManager(std::string directory, int version = -1);
@@ -99,7 +118,7 @@ public:
      * (<code>true</code>). If the cached file has been created before, this parameter is
      * silently ignored.
      * \return The cached file that can be used by the caller to store the results
-     * \throws CacheException If there is an illegal character (<code>/</code>,
+     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
      * <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>, <code>:</code>,
      * <code>|</code>, <code>"</code>, <code>\<</code>, <code>\></code>, or <code>.</code>
      * ) in the \p file
@@ -126,7 +145,7 @@ public:
      * (<code>true</code>). If the cached file has been created before, this parameter is
      * silently ignored.
      * \return The cached file that can be used by the caller to store the results
-     * \throws CacheException If there is an illegal character (<code>/</code>,
+     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
      * <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>, <code>:</code>,
      * <code>|</code>, <code>"</code>, <code>\<</code>, <code>\></code>, or <code>.</code>
      * ) in the \p file
@@ -163,7 +182,7 @@ public:
      * (<code>true</code>). If the cached file has been created before, this parameter is
      * silently ignored.
      * \return The cached file that can be used by the caller to store the results
-     * \throws CacheException If there is an illegal character (<code>/</code>,
+     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
      * <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>, <code>:</code>,
      * <code>|</code>, <code>"</code>, <code>\<</code>, <code>\></code>, or <code>.</code>
      * ) in the \p file
@@ -180,7 +199,7 @@ public:
      * \param file The file for which the cached file should be searched
      * \return <code>true</code> if a cached file was requested before; <code>false</code>
      * otherwise
-     * \throws CacheException If there is an illegal character (<code>/</code>,
+     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
      * <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>, <code>:</code>,
      * <code>|</code>, <code>"</code>, <code>\<</code>, <code>\></code>, or <code>.</code>
      * ) in the \p file
@@ -197,7 +216,7 @@ public:
      * \param information The identifying information for the file
      * \return <code>true</code> if a cached file was requested before; <code>false</code>
      * otherwise
-     * \throws CacheException If there is an illegal character (<code>/</code>,
+     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
      * <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>, <code>:</code>,
      * <code>|</code>, <code>"</code>, <code>\<</code>, <code>\></code>, or <code>.</code>
      * ) in the \p file
@@ -214,7 +233,7 @@ public:
      * \param information The identifying information for the file
      * \return <code>true</code> if a cached file was requested before; <code>false</code>
      * otherwise
-     * \throws CacheException If there is an illegal character (<code>/</code>,
+     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
      * <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>, <code>:</code>,
      * <code>|</code>, <code>"</code>, <code>\<</code>, <code>\></code>, or <code>.</code>
      * ) in the \p file
@@ -227,7 +246,7 @@ public:
      * will be signaled. The method will use the date of last modification as a unique
 	 * identifier for the file.
      * \param file The file for which the cache file should be deleted
-     * \throws CacheException If there is an illegal character (<code>/</code>,
+     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
      * <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>, <code>:</code>,
      * <code>|</code>, <code>"</code>, <code>\<</code>, <code>\></code>, or <code>.</code>
      * ) in the \p file
@@ -241,7 +260,7 @@ public:
      * \param file The file for which the cache file should be deleted
      * \param information The detailed information for the cached file which should be
      * deleted
-     * \throws CacheException If there is an illegal character (<code>/</code>,
+     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
      * <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>, <code>:</code>,
      * <code>|</code>, <code>"</code>, <code>\<</code>, <code>\></code>, or <code>.</code>
      * ) in the \p file
@@ -256,7 +275,7 @@ public:
      * \param baseName The base name for which the cache file should be deleted
      * \param information The detailed information identifying the cached file that
      * should be deleted
-     * \throws CacheException If there is an illegal character (<code>/</code>,
+     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
      * <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>, <code>:</code>,
      * <code>|</code>, <code>"</code>, <code>\<</code>, <code>\></code>, or <code>.</code>
      * ) in the \p file

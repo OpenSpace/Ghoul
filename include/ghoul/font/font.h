@@ -52,9 +52,41 @@ namespace fontrendering {
  */
 class Font {
 public:
-    /// The exception that gets thrown if an error occurs in the Font handling
-    struct FontException : RuntimeError {
+    /// Superclass for all font-related exceptions that this class throws
+    struct FontException : public RuntimeError {
         explicit FontException(const std::string& msg);
+    };
+    
+    /// The exception that gets thrown if an error occurs in the Font handling
+    struct GlyphException : public FontException {
+        explicit GlyphException(std::string name, float size, wchar_t character);
+        
+        /// The name of the font for which the glyph was missing
+        std::string fontName;
+        
+        /// The font size of the font for which the glyph was missing
+        float fontSize;
+        
+        /// The glyph that was missing from the font
+        wchar_t glyph;
+    };
+    
+    /// The exception that gets thrown when a FreeType-specific error occurs
+    struct FreeTypeException : public FontException {
+        explicit FreeTypeException(std::string name, float size, int code,
+            std::string message);
+        
+        /// The name of the font for which the FreeType error occurred
+        std::string fontName;
+        
+        /// The size of the font for which the FreeType error occurred
+        float fontSize;
+        
+        /// The FreeType error code that occurred
+        int errorCode;
+        
+        /// The FreeType error message that occurred
+        std::string errorMessage;
     };
     
     /**
@@ -212,7 +244,7 @@ public:
      * \param hasOutline A flag whether Glyphs of this Font should have an outline or not
      * \param outlineThickness The thickness of the outline. This setting is ignored if
      * the Font does not have an outline
-     * \throws FontException If there was an error loading the basic font information
+     * \throws FreeTypeException If there was an error loading the basic font information
      * \pre \p filename must not be empty
      * \pre \p pointSize must be positive and bigger than 0
      */
@@ -267,7 +299,8 @@ public:
      * function for each character creates and caches the Glyph before returning it.
      * \param character The character for which the Glyph should be returned
      * \return A pointer to the Glyph
-     * \throw FontException If the Glyph could not be loaded
+     * \throw FreeTypeException If a FreeType exception occurred while loading the glyph
+     * \throw GlyphException If there was an error loading the glyph
      */
     const Glyph* glyph(wchar_t character);
 
@@ -276,7 +309,8 @@ public:
      * have been loaded previously are ignored and not loaded multiple times.
      * \param characters A list of characters for which Glyphs should be created and
      * cached
-     * \throw FontException If any of the Glyphs could not be loaded
+     * \throw FreeTypeException If a FreeType exception occurred while loading the glyphs
+     * \throw GlyphException If there was an error loading the glyph
      */
     void loadGlyphs(const std::vector<wchar_t>& characters);
     

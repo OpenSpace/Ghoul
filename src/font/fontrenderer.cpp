@@ -119,7 +119,7 @@ FontRenderer::FontRenderer(opengl::ProgramObject* program, glm::vec2 windowSize)
     : FontRenderer()
 {
     ghoul_assert(program != nullptr, "No program provided");
-    _program = program;
+    _program = std::unique_ptr<opengl::ProgramObject>(program);
     setWindowSize(std::move(windowSize));
     
 }
@@ -127,14 +127,11 @@ FontRenderer::~FontRenderer() {
     glDeleteVertexArrays(1, &_vao);
     glDeleteBuffers(1, &_vbo);
     glDeleteBuffers(1, &_ibo);
-    
-    delete _program;
-    _program = nullptr;
 }
 
 bool FontRenderer::initialize() {
     LDEBUG("Creating default FontRenderer");
-    ghoul_assert(_defaultRenderer == nullptr, "Default FontRenderer was already initialized");
+    ghoul_assert(!_defaultRenderer, "Default FontRenderer was already initialized");
 
     std::string vsPath = absPath(DefaultVertexShaderPath);
     LDEBUG("Writing default vertex shader to '" << vsPath << "'");
@@ -170,7 +167,7 @@ bool FontRenderer::initialize() {
     }
     
     _defaultRenderer = new FontRenderer;
-    _defaultRenderer->_program = program;
+    _defaultRenderer->_program = std::unique_ptr<ProgramObject>(program);
     
     return true;
 }

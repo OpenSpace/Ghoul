@@ -204,7 +204,7 @@ private:
     glm::vec2 _windowSize;
     
     /// The ProgramObject that is used to render the text
-    opengl::ProgramObject* _program;
+    std::unique_ptr<opengl::ProgramObject> _program;
     
     /// The vertex array object holding the other OpenGL objects
     unsigned int _vao;

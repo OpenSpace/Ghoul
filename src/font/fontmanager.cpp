@@ -132,7 +132,7 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     if (loadGlyphs)
         f->loadGlyphs(_defaultCharacterSet);
     
-    _fonts.emplace(hashName, std::move(f));
+    _fonts.emplace(hashName, f);
     return f;
 }
     
