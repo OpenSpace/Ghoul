@@ -40,6 +40,7 @@
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/texture.h>
 
+#include <memory>
 #include <vector>
 
 namespace ghoul {

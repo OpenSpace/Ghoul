@@ -143,7 +143,7 @@ void FileSystem::callbackHandler(DirectoryHandle* directoryHandle, const std::st
 		auto eqRange = FileSys._trackedFiles.equal_range(fullPath);
 		for (auto it = eqRange.first; it != eqRange.second; ++it) {
 			File* f = (*it).second;
-			f->_fileChangedCallback(*f);
+			f->callback()(*f);
 		}
 	}
 }

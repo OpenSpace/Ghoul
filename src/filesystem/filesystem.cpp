@@ -122,7 +122,7 @@ string FileSystem::absolutePath(string path) const {
     std::vector<char> buffer(PathBufferSize);
 
 #ifdef WIN32
-    const DWORD success = GetFullPathName(path.c_str(), PATH_BUFFER_SIZE, buffer.data(), 0);
+    const DWORD success = GetFullPathName(path.c_str(), PathBufferSize, buffer.data(), 0);
     if (success == 0) {
         throw FileSystemException(fmt::format(
             "Error retrieving absolute path '{}'",
@@ -417,12 +417,10 @@ void FileSystem::createDirectory(const Directory& path, bool recursive) const {
 	else {
 #ifdef WIN32
 		BOOL success = CreateDirectory(path.path().c_str(), NULL);
-		if (success)
-			return true;
-		else {
+		if (!success) {
 			DWORD error = GetLastError();
 			if (ERROR == ERROR_ALREADY_EXISTS)
-				return true;
+				return;
 			else {
 				LPTSTR errorBuffer = nullptr;
 				DWORD nValues = FormatMessage(
