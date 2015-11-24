@@ -34,10 +34,6 @@ namespace {
 
 	const std::string _loggerCat = "Assertion failed!";
 	const std::string padding = "    ";
-
-	void printOptions() {
-		std::cout << "(I)gnore / (A)ssertException / (E)xit: ";
-	}
 }
 
 namespace ghoul {
@@ -60,14 +56,14 @@ void internal_assert(
 		<< padding << "File:       " << file << ", line " << line << std::endl
 		<< padding << "Function:   " << function << std::endl
 		<< padding << "Assertion:  " << expression
-		<< msg.str();
+        << msg.str() << std::endl;
 
 #ifdef GHL_DEBUG
 	std::string inputLine;
 	const size_t maxIterations = 3;
 	for (size_t i = 0; i < maxIterations; ++i) {
 
-		printOptions();
+        std::cerr << "(I)gnore / (A)ssertException / (E)xit: ";
 		std::getline(std::cin, inputLine);
 
 		// Transform to lower case

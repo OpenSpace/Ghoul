@@ -34,12 +34,12 @@ MultipleCommandZeroArguments::MultipleCommandZeroArguments(int* ptr, std::string
 		0, true)
     , _ptr(ptr)
 {
+    ghoul_assert(ptr, "Pointer must not be a nullptr");
     *_ptr = 0;
 }
 
 void MultipleCommandZeroArguments::execute(const std::vector<std::string>& /*parameters*/) {
     ++(*_ptr);
-    return true;
 }
 
 } // namespace cmdparser

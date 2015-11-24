@@ -29,6 +29,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
 
+#include <format.h>
 
 namespace {
     const std::string _loggerCat = "FontManager";
@@ -36,6 +37,14 @@ namespace {
 
 namespace ghoul {
 namespace fontrendering {
+    
+FontManager::FontRegistrationException::FontRegistrationException(const std::string& msg)
+    : RuntimeError(msg, "FontManager")
+{}
+    
+FontManager::FontAccessException::FontAccessException(const std::string& msg)
+    : RuntimeError(msg, "FontManager")
+{}
     
 FontManager::FontManager(glm::ivec3 atlasDimensions)
     : _textureAtlas(std::move(atlasDimensions))
@@ -53,98 +62,58 @@ FontManager::FontManager(glm::ivec3 atlasDimensions)
     })
 {}
     
-FontManager::FontManager(const FontManager& rhs)
-    : _textureAtlas(rhs._textureAtlas)
-    , _fontPaths(rhs._fontPaths)
-    , _defaultCharacterSet(rhs._defaultCharacterSet)
+unsigned int FontManager::registerFontPath(const std::string& fontName,
+                                           const std::string& filePath)
 {
-    // TODO: This has to be tested ---abock
-    for (const auto& font : rhs._fonts)
-        _fonts.emplace(font.first, new Font(*(font.second)));
-}
+    ghoul_assert(!fontName.empty(), "Fontname must not be empty");
+    ghoul_assert(!filePath.empty(), "Filepath must not be empty");
     
-FontManager::FontManager(FontManager&& rhs)
-    : _textureAtlas(std::move(rhs._textureAtlas))
-    , _fonts(std::move(rhs._fonts))
-    , _fontPaths(std::move(rhs._fontPaths))
-    , _defaultCharacterSet(std::move(rhs._defaultCharacterSet))
-{}
-    
-FontManager::~FontManager() {
-    for (auto f : _fonts)
-        delete f.second;
-}
-    
-FontManager& FontManager::operator=(const FontManager& rhs) {
-    if (this != &rhs) {
-        _textureAtlas = rhs._textureAtlas;
-        // TODO: This has to be tested ---abock
-        for (const auto& font : rhs._fonts)
-            _fonts.emplace(font.first, new Font(*(font.second)));
-        _fontPaths = rhs._fontPaths;
-        _defaultCharacterSet = rhs._defaultCharacterSet;
-
-
-    }
-    return *this;
-}
-    
-FontManager& FontManager::operator=(FontManager&& rhs) {
-    if (this != &rhs) {
-        _textureAtlas = std::move(rhs._textureAtlas);
-        _fonts = std::move(rhs._fonts);
-        _fontPaths = std::move(rhs._fontPaths);
-        _defaultCharacterSet = std::move(rhs._defaultCharacterSet);
-        
-    }
-    return *this;
-}
-    
-bool FontManager::registerFontPath(const std::string& fontName,
-                                   const std::string& filePath)
-{
-    unsigned int hash;
-    return registerFontPath(fontName, filePath, hash);
-}
-
-bool FontManager::registerFontPath(const std::string& fontName,
-                                   const std::string& filePath,
-                                   unsigned int& hashedName)
-{
     unsigned int hash = hashCRC32(fontName);
     auto it = _fontPaths.find(hash);
     if (it != _fontPaths.end()) {
         const std::string& registeredPath = it->second;
         
         if (registeredPath == filePath) {
-            hashedName = hash;
-            return true;
+            return hash;
         }
         else {
-            LERROR("Font '" << fontName << "' was registered with path '" <<
-                   registeredPath << "' before. Trying to register with path '" <<
-                   filePath << "' now");
-            return false;
+            throw FontRegistrationException(fmt::format(
+                "Font '{}' was registered with path '{}' before. "
+                    "Trying to register with path '{}' now",
+                fontName,
+                registeredPath,
+                filePath
+            ));
         }
     }
     _fontPaths[hash] = filePath;
-    hashedName = hash;
-    return true;
+    return hash;
 }
     
-Font* FontManager::font(const std::string& name, float fontSize, bool withOutline, bool loadGlyphs) {
+std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
+                                                        bool withOutline, bool loadGlyphs)
+{
+    ghoul_assert(!name.empty(), "Name must not be empty");
+    
     unsigned int hash = hashCRC32(name);
-    Font* res = font(hash, fontSize, withOutline, loadGlyphs);
-    if (res == nullptr)
-        LERROR("Loading of font '" << name << "' failed");
-    return res;
+    try {
+        return font(hash, fontSize, withOutline, loadGlyphs);
+    }
+    catch (const FontAccessException& e) {
+        throw FontAccessException(fmt::format(
+            "Error retrieving Font '{}' for size '{}'", name, fontSize
+        ));
+    }
 }
     
-Font* FontManager::font(unsigned int hashName, float fontSize, bool withOutline, bool loadGlyphs) {
+std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
+                                                        bool withOutline, bool loadGlyphs)
+{
     auto itPath = _fontPaths.find(hashName);
     if (itPath == _fontPaths.end()) {
-        LERROR("Font with hash '" << hashName << "' is not a registered font");
-        return nullptr;
+        throw FontAccessException(fmt::format(
+            "Error retrieving font with hash '{}' for size '{}'", hashName, fontSize
+        ));
     }
     
     auto fonts = _fonts.equal_range(hashName);
@@ -153,24 +122,17 @@ Font* FontManager::font(unsigned int hashName, float fontSize, bool withOutline,
             return it->second;
     }
     
+    auto f = std::make_shared<Font>(
+        _fontPaths[hashName],
+        fontSize,
+        _textureAtlas,
+        withOutline
+    );
     
-    Font* f = new Font(_fontPaths[hashName], fontSize, _textureAtlas, withOutline);
+    if (loadGlyphs)
+        f->loadGlyphs(_defaultCharacterSet);
     
-    bool initSuccess = f->initialize();
-    if (!initSuccess ) {
-        delete f;
-        return nullptr;
-    }
-    
-    if (loadGlyphs) {
-        size_t nFailedGlyphs = f->loadGlyphs(_defaultCharacterSet);
-        if (nFailedGlyphs != 0) {
-            delete f;
-            return nullptr;
-        }
-    }
-    
-    _fonts.emplace(hashName, f);
+    _fonts.emplace(hashName, std::move(f));
     return f;
 }
     

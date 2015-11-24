@@ -131,8 +131,7 @@ public:
      * coordinates <code>pos</code> using the Font <code>font</code> in the base color
      * <code>color</code> and the outline color <code>outlineColor</code>. If the Font
      * does not have an outline, the <code>outlineColor</code> is ignored.
-     * \param font The Font that is used to render the provided text. If this argument is
-     * <code>nullptr</code>, an assertion is thrown
+     * \param font The Font that is used to render the provided text
      * \param pos The screen-space position (in pixel coordinates) that is used to render
      * the text
      * \param color The base color that is used to render the text
@@ -146,7 +145,7 @@ public:
      * \return A tuple containing the bounding box of the text that was printed and the
      * number of lines that were printed
      */
-    BoundingBoxInformation render(Font* font, glm::vec2 pos, glm::vec4 color,
+    BoundingBoxInformation render(Font& font, glm::vec2 pos, glm::vec4 color,
                                   glm::vec4 outlineColor, const char* text, ...) const;
 
     /**
@@ -154,8 +153,7 @@ public:
      * coordinates <code>pos</code> using the Font <code>font</code> in the base color
      * <code>color</code>. In case the Font has an outline, the outline is rendered in
      * black with the same transparency as the provided <code>color</code>.
-     * \param font The Font that is used to render the provided text. If this argument is
-     * <code>nullptr</code>, an assertion is thrown
+     * \param font The Font that is used to render the provided text
      * \param pos The screen-space position (in pixel coordinates) that is used to render
      * the text
      * \param color The base color that is used to render the text
@@ -167,15 +165,14 @@ public:
      * \return A tuple containing the bounding box of the text that was printed and the
      * number of lines that were printed
      */
-    BoundingBoxInformation render(Font* font, glm::vec2 pos, glm::vec4 color,
+    BoundingBoxInformation render(Font& font, glm::vec2 pos, glm::vec4 color,
                                   const char* format, ...) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
      * coordinates <code>pos</code> using the Font <code>font</code> in white color. In
      * case the Font has an outline, the outline is rendered in black.
-     * \param font The Font that is used to render the provided text. If this argument is
-     * <code>nullptr</code>, an assertion is thrown
+     * \param font The Font that is used to render the provided text
      * \param pos The screen-space position (in pixel coordinates) that is used to render
      * the text
      * \param format The format text that is rendered to the screen. This text can contain
@@ -186,7 +183,7 @@ public:
      * \return A tuple containing the bounding box of the text that was printed and the
      * number of lines that were printed
      */
-    BoundingBoxInformation render(Font* font, glm::vec2 pos,
+    BoundingBoxInformation render(Font& font, glm::vec2 pos,
                                   const char* format, ...) const;
     
     
@@ -232,7 +229,7 @@ private:
  * \return The bounding box of the text that was printed
  */
 template <typename... Args>
-glm::vec2 RenderFont(ghoul::fontrendering::Font* font, glm::vec2 pos, Args... args) {
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos, Args... args) {
     return (ghoul::fontrendering::FontRenderer::defaultRenderer().render(font,
                                                                          pos,
                                                                          args...)
@@ -253,11 +250,11 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font* font, glm::vec2 pos, Args... ar
  * \return The bounding box of the text that was printed
  */
 template <typename... Args>
-glm::vec2 RenderFontCr(ghoul::fontrendering::Font* font, glm::vec2& pos, Args... args) {
+glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args) {
     auto res =
         ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...);
 
-    pos.y -= res.numberOfLines * font->height();
+    pos.y -= res.numberOfLines * font.height();
     return res.boundingBox;
 }
 
@@ -275,11 +272,11 @@ glm::vec2 RenderFontCr(ghoul::fontrendering::Font* font, glm::vec2& pos, Args...
  * \return The bounding box of the text that was printed
  */
 template <typename... Args>
-glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font* font, glm::vec2& pos, Args... args) {
+glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args) {
     auto res =
         ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...);
 
-    pos.y += res.numberOfLines * font->height();
+    pos.y += res.numberOfLines * font.height();
     return res.boundingBox;
 }
 

@@ -27,9 +27,10 @@
 #define __FONT_H__
 
 #include <ghoul/glm.h>
-#include <ghoul/misc/dictionary.h>
+#include <ghoul/misc/exception.h>
 #include <ghoul/opengl/textureatlas.h>
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -51,6 +52,11 @@ namespace fontrendering {
  */
 class Font {
 public:
+    /// The exception that gets thrown if an error occurs in the Font handling
+    struct FontException : RuntimeError {
+        explicit FontException(const std::string& msg);
+    };
+    
     /**
      * This class contains the metrics and the texture locations in the TextureAtlas for a
      * single glyph for a specific font. Each glyph supplies two pairs of coordinates:
@@ -118,10 +124,10 @@ public:
         float verticalAdvance() const;
         
         /**
-         * Returns the kerning value between this glyph and <code>character</code>.
+         * Returns the kerning value between this glyph and \p character.
          * \param character The following character for which the kerning value should be
          * returned.
-         * \return The kerning value between this glyph and <code>character</code>.
+         * \return The kerning value between this glyph and \p character
          */
         float kerning(wchar_t character) const;
         
@@ -195,18 +201,20 @@ public:
     };
 
     /**
-     * Constructor creating a new Font with the specified <code>filename</code> at the
-     * provided <code>pointSize</code>. The Glyphs of this Font will be stored in the
-     * <code>atlas</code> TextureAtlas if there is enough free space. If
-     * <code>outline</code> is <code>true</code> two sets of Glyphs are created which are
-     * combined to provide an outline of thickness <code>outlineThickness</code> to the
-     * glyphs.
+     * Constructor creating a new Font with the specified \p filename at the provided
+     * \p pointSize. The Glyphs of this Font will be stored in the \p atlas TextureAtlas
+     * if there is enough free space. If \p outline is <code>true</code> two sets of
+     * Glyphs are created which are combined to provide an outline of thickness
+     * \p outlineThickness to the glyphs.
      * \param filename The full path to the font file
      * \param pointSize The font size in pt
      * \param atlas The TextureAtlas which holds the created Glyphs
      * \param hasOutline A flag whether Glyphs of this Font should have an outline or not
      * \param outlineThickness The thickness of the outline. This setting is ignored if
-     * the Font does not have an outline.
+     * the Font does not have an outline
+     * \throws FontException If there was an error loading the basic font information
+     * \pre \p filename must not be empty
+     * \pre \p pointSize must be positive and bigger than 0
      */
     Font(std::string filename,
          float pointSize,
@@ -214,16 +222,6 @@ public:
          bool hasOutline = true,
          float outlineThickness = 1.f
     );
-
-    /**
-     * Initializes the Font by loading the <code>filename</code> provided in the
-     * constructor and setting some Font metrics. Calling this function after the
-     * contruction is the first step to test whether the Font works. The return value
-     * reports whether an error has occured.
-     * \return <code>true</code> if the Font has been initialized successfully,
-     * <code>false</code> otherwise
-     */
-    bool initialize();
 
     /**
      * Returns the name of the Font
@@ -260,29 +258,27 @@ public:
      * linebreak, which is of the correct length with regard to the selected font. This
      * parameter cannot be a <code>nullptr</code>.
      * \return The pixel coordinates of the bounding box of the passed text
+     * \pre \p text must not be empty
      */
     glm::vec2 boundingBox(const char* text, ...);
     
     /**
-     * Returns the Glyph that representes the passed <code>character</code>. The first
-     * call to this function for each character creates and caches the Glyph before
-     * returning it.
+     * Returns the Glyph that representes the passed \p character. The first call to this
+     * function for each character creates and caches the Glyph before returning it.
      * \param character The character for which the Glyph should be returned
-     * \return A pointer to the Glyph or <code>nullptr</code> if the Glyph could not be
-     * loaded
+     * \return A pointer to the Glyph
+     * \throw FontException If the Glyph could not be loaded
      */
     const Glyph* glyph(wchar_t character);
 
     /**
-     * Preloads a list of Glyphs. Glyphs that are passed as part of 
-     * <code>characters</code> that have been loaded previously are ignored and not loaded 
-     * multiple times.
+     * Preloads a list of Glyphs. Glyphs that are passed as part of  \p characters that
+     * have been loaded previously are ignored and not loaded multiple times.
      * \param characters A list of characters for which Glyphs should be created and
      * cached
-     * \return The number of characters that have not been loaded. If this value is 0, all
-     * passed characters were successfully loaded
+     * \throw FontException If any of the Glyphs could not be loaded
      */
-    size_t loadGlyphs(const std::vector<wchar_t>& characters);
+    void loadGlyphs(const std::vector<wchar_t>& characters);
     
     /**
      * Returns the TextureAtlas that stores all of the Glyphs for this Font

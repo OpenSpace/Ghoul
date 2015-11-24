@@ -29,6 +29,7 @@
 #include <ghoul/font/font.h>
 #include <ghoul/glm.h>
 #include <ghoul/opengl/textureatlas.h>
+#include <ghoul/misc/exception.h>
 
 #include <map>
 #include <string>
@@ -47,6 +48,15 @@ namespace fontrendering {
  */
 class FontManager {
 public:
+    /// This exception is thrown if registering a Font fails
+    struct FontRegistrationException : public RuntimeError {
+        explicit FontRegistrationException(const std::string& msg);
+    };
+    
+    struct FontAccessException : public RuntimeError {
+        explicit FontAccessException(const std::string& msg);
+    };
+    
     /**
      * The constructor that initializes the TextureAtlas. This means that this constructor
      * requires a valid OpenGL context.
@@ -57,70 +67,21 @@ public:
     FontManager(glm::ivec3 atlasDimensions = glm::ivec3(512, 512, 1));
     
     /**
-     * Copy-constructor for the FontManager that performs a deep-copy on all its settings.
-     * After the construction, both FontManagers can be used independently.
-     * \param rhs The source FontManager whose settings are copied
-     */
-    FontManager(const FontManager& rhs);
-    
-    /**
-     * Move constructor that moves all settings and leaves the incoming FontManager in an
-     * undefined state.
-     * \param rhs The incoming FontManager from which the settings are moved
-     */
-    FontManager(FontManager&& rhs);
-    
-    /**
-     * Default destructor that will delete all of the Fonts that have been created. All
-     * Fonts that have been created using this FontManager will be deleted.
-     */
-    ~FontManager();
-    
-    /**
-     * Assignment operator that performs a deep-copy of all of the incoming FontManager's
-     * settings, leaving two independent FontManagers
-     * \param rhs The incoming FontManager whose settings are deep-copied
-     */
-    FontManager& operator=(const FontManager& rhs);
-    
-    /**
-     * Movement operator that moves all settings from the incoming FontManager, leaving it
-     * in an undefined state.
-     * \param rhs The incoming FontManager from which the settings are moved
-     */
-    FontManager& operator=(FontManager&& rhs);
-
-    /**
-     * Registers a user-defined <code>fontName</code> to an absolute
-     * <code>filePath</code>. This function does not check whether the file exists, or is
-     * accessible. If either of these is the case, subsequent #font calls will report an
-     * error and failt to produce a Font. The <code>fontName</code> cannot have been
-     * assigned to a different <code>filePath</code> or an error is reported.
+     * Registers a user-defined \p fontName to an absolute \p filePath. This function does
+     * not check whether the file exists, or is accessible. If either of these is the
+     * case, subsequent #font calls fail. The \p fontName cannot have been assigned to a
+     * different \p filePath or an error is reported. This method returns a hashed version
+     * of the \p fontName that can be used in calls to the #font method for a more
+     * efficient lookup.
      * \param fontName The user-defined name under which this font is registered
      * \param filePath The filepath for this registered Font
-     * \return <code>true</code> if the Font was correctly registered, <code>false</code>
-     * otherwise
+     * \return The hashed representation of the \p fontName
+     * \throw FontManagerException If there was an error registering the Font
+     * \pre \p fontName must not be empty
+     * \pre \p filePath must not be empty
      */
-    bool registerFontPath(const std::string& fontName, const std::string& filePath);
-    
-    /**
-     * Registers a user-defined <code>fontName</code> to an absolute
-     * <code>filePath</code>. This function does not check whether the file exists, or is
-     * accessible. If either of these is the case, subsequent #font calls will report an
-     * error and failt to produce a Font. The <code>fontName</code> cannot have been
-     * assigned to a different <code>filePath</code> or an error is reported. This method
-     * will also create a hashed version of the <code>fontName</code> that can be used in
-     * calls to the #font method for a more efficient lookup.
-     * \param fontName The user-defined name under which this font is registered
-     * \param filePath The filepath for this registered Font
-     * \param hashedName Output variable into which the hashed representation of the
-     * <code>fontName</code> will be stored. Only if the method succeeds will this
-     * parameter be modified
-     * \return <code>true</code> if the Font was correctly registered, <code>false</code>
-     * otherwise
-     */
-    bool registerFontPath(const std::string& fontName,
-                          const std::string& filePath, unsigned int& hashedName);
+    unsigned int registerFontPath(const std::string& fontName,
+        const std::string& filePath);
 
     /**
      * Retrieves the Font with the name <code>name</code>, which must have been previously
@@ -139,9 +100,10 @@ public:
      * also preload a set of commonly used glyphs
      * \return Returns a usable and initialized Font object, or <code>nullptr</code> if an
      * error occurred
+     * \pre \p name must not be empty
      */
-    Font* font(const std::string& name, float fontSize, bool withOutline = true,
-               bool loadGlyphs = true);
+    std::shared_ptr<Font> font(const std::string& name, float fontSize,
+        bool withOutline = true, bool loadGlyphs = true);
 
     /**
      * Retrieves the Font with the hashed name <code>hashName</code>, which must have been
@@ -162,15 +124,20 @@ public:
      * \return Returns a usable and initialized Font object, or <code>nullptr</code> if an
      * error occurred
      */
-    Font* font(unsigned int hashName, float fontSize, bool withOutline = true,
-               bool loadGlyphs = true);
+    std::shared_ptr<Font> font(unsigned int hashName, float fontSize,
+        bool withOutline = true, bool loadGlyphs = true);
     
 private:
+    FontManager(const FontManager& rhs) = delete;
+    FontManager(FontManager&& rhs) = delete;
+    FontManager& operator=(const FontManager& rhs) = delete;
+    FontManager& operator=(FontManager&& rhs) = delete;
+    
     /// The TextureAtlas that is used to store all glyphs for all registered Font objects
     ghoul::opengl::TextureAtlas _textureAtlas;
     
     /// The map that is used to retrieve previously created Font objects.
-    std::multimap<unsigned int, Font*> _fonts;
+    std::multimap<unsigned int, std::shared_ptr<Font>> _fonts;
     
     /// The map that correlates the hashed names with the file paths for the fonts
     std::map<unsigned int, std::string> _fontPaths;

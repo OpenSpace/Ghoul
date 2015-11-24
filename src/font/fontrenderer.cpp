@@ -192,13 +192,12 @@ FontRenderer& FontRenderer::defaultRenderer() {
 }
     
 // I wish I didn't have to copy-n-paste the render function, but *sigh* ---abock
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec2 pos,
                                                           glm::vec4 color,
                                                           glm::vec4 outlineColor,
                                                           const char* format, ...) const
 {
-    ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
     
     va_list args;	 // Pointer To List Of Arguments
@@ -217,7 +216,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
     va_end(args);
     
     auto res = internalRender(
-        *font,
+        font,
         std::move(pos),
         std::move(color),
         std::move(outlineColor),
@@ -228,12 +227,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
     return res;
 }
     
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec2 pos,
                                                           glm::vec4 color,
                                                           const char* format, ...) const
 {
-    ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
     
     va_list args;	 // Pointer To List Of Arguments
@@ -251,7 +249,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
     va_end(args);
     
     auto res = internalRender(
-        *font,
+        font,
         std::move(pos),
         color,
         glm::vec4(0.f, 0.f, 0.f, color.a),
@@ -262,11 +260,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
     return res;
 }
 
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec2 pos,
                                                           const char* format, ...) const
 {
-    ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
     
     va_list args;	 // Pointer To List Of Arguments
@@ -285,7 +282,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
     va_end(args);
     
     auto res = internalRender(
-        *font,
+        font,
         std::move(pos),
         glm::vec4(1.f),
         glm::vec4(0.f, 0.f, 0.f, 1.f),
