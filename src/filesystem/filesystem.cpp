@@ -361,7 +361,7 @@ bool FileSystem::directoryExists(const Directory& path) const {
                 ));
             }
         }
-        throw FileSystemException("Error retrieving file attributes");
+		return false;
     }
     else
         return (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;

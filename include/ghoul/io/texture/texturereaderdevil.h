@@ -28,25 +28,38 @@
 
 #include <ghoul/io/texture/texturereaderbase.h>
 
+#include <memory>
+
 namespace ghoul {
 namespace io {
-namespace impl {
 
 #ifdef GHOUL_USE_DEVIL
 
 /**
  * Loads the texture using the DevIL library. For a list of supported image formats, see 
- * http://openil.sourceforge.net/features.php.
+ * http://openil.sourceforge.net/features.php
  */
 class TextureReaderDevIL : public TextureReaderBase {
 public:
-	opengl::Texture* loadTexture(const std::string& filename) const override;
-	std::set<std::string> supportedExtensions() const override;
+	/**
+	 * Loads the passed \p filename by using the DevIL library.
+	 * \param filename The file to load
+	 * \return The loaded Texture
+	 * \pre \p filename must not be empty
+	 * \throws TextureLoadException If there was an error loading the Texture file
+	 */
+	std::unique_ptr<opengl::Texture> loadTexture(std::string filename) const override;
+
+	/**
+	 * Returns the supported file extensions
+	 * \return The supported file extensions
+	 * \sa http://openil.sourceforge.net/features.php
+	 */
+	std::vector<std::string> supportedExtensions() const override;
 };
 
 #endif // GHOUL_USE_DEVIL
 
-} // namespace impl
 } // namespace io
 } // namespace ghoul
 
