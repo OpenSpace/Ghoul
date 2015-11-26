@@ -39,7 +39,7 @@ namespace io {
 class TextureReaderBase;
 
 /**
- * This class managers multiple TextureReaderBase and makes them available through one
+ * This class manages multiple TextureReaderBase and makes them available through one
  * method loadTexture. TextureReaderBases are added through the method addReader. The
  * class provides a static member, but also allows users to create local variants.
  * TextureReaderBases can be reused between multiple TextureReaders
@@ -47,8 +47,8 @@ class TextureReaderBase;
 class TextureReader {
 public:
     /// Exception that gets thrown when there is no reader for the provided \p extension
-    struct NoReaderException : public RuntimeError {
-        explicit NoReaderException(std::string extension);
+    struct MissingReaderException : public RuntimeError {
+        explicit MissingReaderException(std::string extension);
         std::string fileExtension;
     };
     
@@ -62,7 +62,8 @@ public:
      * Loads the provided \p filename into a Texture and returns it. The correct
      * TextureReaderBase is determined by the extension of the \p filename.
      * \param filename The name of the file which should be loaded into a textrure
-     * \throw TextureLoadException If there was no reader for the specified \p filename
+     * \throw TextureLoadException If there was an error reading the \p filename
+     * \throw MissingReaderException If there was no reader for the specified \p filename
      * \pre \p filename must not be empty
      * \pre \p filename must have an extension
      * \pre At least one TextureReaderBase must have been added to the TextureReader
@@ -89,7 +90,7 @@ private:
     /**
      * Returns the TextureReaderBase that is responsible for the provided extension.
      * \param extension The extension for which the TextureReaderBase should be returned
-     * \throw TextureLoadException If there was no reader for the specified \p extension
+     * \throw MissingReaderException If there was no reader for the specified \p extension
      */
     TextureReaderBase* readerForExtension(const std::string& extension);
     

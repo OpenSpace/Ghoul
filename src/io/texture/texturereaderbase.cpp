@@ -39,5 +39,7 @@ TextureReaderBase::TextureLoadException::TextureLoadException(std::string n,
     , reader(r)
 {}
     
+TextureReaderBase::~TextureReaderBase() {}
+    
 } // namespace io
 } // namespace ghoul

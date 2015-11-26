@@ -61,6 +61,9 @@ public:
         const TextureReaderBase* reader;
     };
     
+    /// Default virtual destructor
+    virtual ~TextureReaderBase();
+    
     /**
      * Loads the texture \p filename from disk and returns the loaded Texture.
      * \param filename The texture that should be loaded from the hard disk
@@ -68,7 +71,7 @@ public:
      * \pre \p filename must not be empty
      * \pre The extension of \p filename must be among the supported extensions as
      * reported by supportedExtensions
-     * \throw TextureReaderBase If there was an error loading the texture
+     * \throw TextureLoadException If there was an error loading the texture
      */
     virtual std::unique_ptr<opengl::Texture> loadTexture(std::string filename) const = 0;
     

@@ -48,6 +48,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderfreeimage.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadersoil.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriter.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriterbase.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturewritersoil.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/bufferlog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/callbacklog.cpp

@@ -23,72 +23,21 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/io/texture/texturereadersoil.h>
+#include <ghoul/io/texture/texturewriterbase.h>
 
-#ifdef GHOUL_USE_SOIL
-
-#include <ghoul/opengl/texture.h>
-#include <ghoul/glm.h>
-
-#include <SOIL.h>
+#include <format.h>
 
 namespace ghoul {
 namespace io {
-
-std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(
-                                                               std::string filename) const
-{
-    ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
-	using opengl::Texture;
  
-    int width, height;
-    unsigned char* image = SOIL_load_image(
-        filename.c_str(),
-        &width,
-        &height,
-        0,
-        SOIL_LOAD_RGBA
-    );
-
-    glm::size3_t size(width, height, 1);
-    Texture::Format format;
-    format = Texture::Format::RGBA;
-    GLenum type;
-    type = GL_UNSIGNED_BYTE;
-
-    return std::make_unique<Texture>(
-        image,
-        size,
-        format,
-        static_cast<int>(format),
-        type,
-        Texture::FilterMode::Linear
-    );
-}
-
-std::vector<std::string> TextureReaderSOIL::supportedExtensions() const {
-	// taken from http://www.lonesock.net/soil.html
-	return {
-		"bmp",	// load & save					
-        "png",  // load
-        "jpg",  // load
-        "tga",  // load & save
-        "dds",  // load & save
-        "psd",
-        "hdr",
-
-    // BMP - non-1bpp, non-RLE (from stb_image documentation)
-    // PNG - non-interlaced (from stb_image documentation)
-    // JPG - JPEG baseline (from stb_image documentation)
-    // TGA - greyscale or RGB or RGBA or indexed, uncompressed or RLE
-    // DDS - DXT1/2/3/4/5, uncompressed, cubemaps (can't read 3D DDS files yet)
-    // PSD - (from stb_image documentation)
-    // HDR - converted to LDR, unless loaded with *HDR* functions (RGBE or RGBdivA or RGBdivA2) 
-	};
-}
-
-} // namespace opengl
+TextureWriterBase::TextureWriteException::TextureWriteException(std::string n,
+                                                              std::string m,
+                                                              const TextureWriterBase* w)
+    : RuntimeError(fmt::format("Error writing texture '{}'", n), "TextureWriter")
+    , filename(std::move(n))
+    , message(std::move(m))
+    , writer(w)
+{}
+    
+} // namespace io
 } // namespace ghoul
-
-#endif // GHOUL_USE_SOIL

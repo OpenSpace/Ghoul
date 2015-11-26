@@ -28,25 +28,38 @@
 
 #include <ghoul/io/texture/texturereaderbase.h>
 
+#include <memory>
+
 namespace ghoul {
 namespace io {
-namespace impl {
 
 #ifdef GHOUL_USE_SOIL
 
 /**
- * Loads the texture using the Soil library. For a list of supported image formats, see 
+ * Loads the texture using the SOIL library. For a list of supported image formats, see
  * http://www.lonesock.net/soil.html 
  */
 class TextureReaderSOIL : public TextureReaderBase {
 public:
-	opengl::Texture* loadTexture(const std::string& filename) const override;
-	std::set<std::string> supportedExtensions() const override;
+    /**
+     * Loads the \p filename and creates a Texture from it.
+     * \param filename The texture file to be loaded
+     * \return The loaded Texture object
+     * \pre \p filename must not be empty
+     * \throw TextureLoadException If there was an error loading the Texture file
+     */
+    std::unique_ptr<opengl::Texture> loadTexture(std::string filename) const override;
+    
+    /**
+     * Returns the supported extensions.
+     * \return The supported extensions
+     * \sa http://lonesock.net/soil.html
+     */
+	std::vector<std::string> supportedExtensions() const override;
 };
 
 #endif // GHOUL_USE_SOIL
 
-} // namespace impl
 } // namespace io
 } // namespace ghoul
 

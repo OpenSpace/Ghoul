@@ -29,34 +29,74 @@
 #include <string>
 #include <vector>
 
+#include <ghoul/misc/exception.h>
+#include <ghoul/opengl/texture.h>
+
 namespace ghoul {
-
-namespace opengl {
-   class Texture;
-}
-
 namespace io {
 
 class TextureWriterBase;
- 
+
+/**
+ * This class manages multiple TextureWriterBase and makes them available through one
+ * method saveTexture. TextureWriterBases are added through the method addWriter. The
+ * class provides a static member, but also allows users to create local variants.
+ * TextureWriterBases can be reused between multiple TextureWriters
+ */
 class TextureWriter {
- public:
-    void saveTexture(const opengl::Texture* texture, const std::string& filename);
-    void addWriter(TextureWriterBase* writer);
-    
+public:
+    /// Exception that gets thrown when there is no writer for the provided \p extension
+    struct MissingWriterException : public RuntimeError {
+        explicit MissingWriterException(std::string extension);
+        std::string fileExtension;
+    };
+
+    /**
+     * Returns the static variant of the TextureWriter
+     * \return The static variant of the TextureWriter
+     */
     static TextureWriter& ref();
     
- protected:
+    /**
+     * Saves the provided \p texture into the \p filename on disk. The correct
+     * TextureWriterBase is determined by the extension of the \p filename.
+     * \param texture The Texture that is to be written to disk
+     * \param filename The target filename for \p filename. The extension of the
+     * \p filename determines the TextureWriterBase
+     * \throw TextureWriteException If there was an error writing the \p filename
+     * \throw MissingWriterException If there was no writer for the specified \p filename
+     * \pre \p filename must not be empty
+     * \pre \p filename must have an extension
+     * \pre At least one TextureWriterBase must have been added to the TextureWriter
+     * before (addWriter)
+     */
+    void saveTexture(const opengl::Texture& texture, const std::string& filename);
+    
+    /**
+     * Adds the \p writer to this TextureWriter and makes it available through subsequent
+     * calls to saveTexture. If an extension is supported by multiple TextureWriterBases,
+     * the TextureWriterBase that was added first will be used.
+     * \param writer The writer that is to be added to this TextureWriter
+     * \pre \p writer must not have been added to this TextureWriter before
+     */
+    void addWriter(std::shared_ptr<TextureWriterBase> writer);
+    
+    /**
+     * Returns a list of all the previously registered TextureWriterBases.
+     * \return A list of all the previously registered TextureWriterBases
+     */
+    std::vector<std::shared_ptr<TextureWriterBase>> writers() const;
+    
+private:
+    /**
+     * Returns the TextureWriterBase that is responsible for the provided extension.
+     * \param extension The extension for which the TextureWriterBase should be returned
+     * \throw MissingWriterException If there was no writer for the specified \p extension
+     */
     TextureWriterBase* writerForExtension(const std::string& extension);
-    std::vector<TextureWriterBase*> _writers;
     
- private:
-    TextureWriter();
-    ~TextureWriter();
-    TextureWriter(const TextureWriter&) = delete;
-    TextureWriter(const TextureWriter&&) = delete;
-    TextureWriter& operator= (const TextureWriter& rhs) = delete;
-    
+    /// The list of all registered writers
+    std::vector<std::shared_ptr<TextureWriterBase>> _writers;
 };
  
 } // namespace io

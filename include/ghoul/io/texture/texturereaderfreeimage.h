@@ -48,7 +48,7 @@ public:
      * \param filename The texture file to be loaded
      * \return The loaded Texture object
      * \pre \p filename must not be empty
-     * \throws TextureLoadException If there was an error loading the Texture file
+     * \throw TextureLoadException If there was an error loading the Texture file
      */
     std::unique_ptr<opengl::Texture> loadTexture(std::string filename) const override;
     

@@ -30,7 +30,6 @@
 
 namespace ghoul {
 namespace io {
-namespace impl {
 
 #ifdef GHOUL_USE_SOIL
 
@@ -39,14 +38,27 @@ namespace impl {
  * http://www.lonesock.net/soil.html 
  */
 class TextureWriterSOIL : public TextureWriterBase {
- public:
-    void saveTexture(const opengl::Texture* texture, const std::string& filename) const override;
-    std::set<std::string> supportedExtensions() const override;
+public:
+    /**
+     * Writes the \p texture into the \p filename.
+     * \param texture The Texture that is to be saved
+     * \param filename The target file on disk into which to save the Texture
+     * \pre \p filename must not be empty
+     * \pre The \p filename's file extension has to be supported
+     * \throw TextureWriteException If there was an error writing the Texture file
+     */
+    void saveTexture(const opengl::Texture& texture, const std::string& filename) const override;
+    
+    /**
+     * Returns the supported extensions.
+     * \return The supported extensions
+     * \sa http://lonesock.net/soil.html
+     */
+    std::vector<std::string> supportedExtensions() const override;
 };
 
 #endif // GHOUL_USE_SOIL
 
-} // namespace impl
 } // namespace io
 } // namespace ghoul
 
