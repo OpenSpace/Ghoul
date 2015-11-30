@@ -31,9 +31,6 @@
 namespace ghoul {
 namespace io {
     
-/**
- * This class is a very simplified reader for OBJ waveform models. Instead of a
- * full-fledged reader, such as tiny_ibj
 class ModelReaderWavefront: public ModelReaderBase {
 public:
     std::unique_ptr<opengl::VertexBufferObject> loadModel(
