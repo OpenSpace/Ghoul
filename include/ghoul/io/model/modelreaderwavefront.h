@@ -30,9 +30,25 @@
 
 namespace ghoul {
 namespace io {
-    
+
+/**
+ * This model reader loads the provided file using the TinyObjLoader library. This simple
+ * method loads multiple shapes, but does not work on the materials described in the OBJ
+ * file.
+ * \sa https://github.com/syoyo/tinyobjloader
+ */
 class ModelReaderWavefront: public ModelReaderBase {
 public:
+    /**
+     * Loads the OBJ file pointed to by \p filename and returns a constructed
+     * VertexBufferObject from it. Provided materials are ignored and all shapes are
+     * collapsed into one VertexBufferObject.
+     * \param filename The OBJ file to be loaded
+     * \return The initialized VertexBufferObject containing the model or models
+     * \throw ModelReaderException If there was an error reading the model from
+     * \p filename
+     * \pre \p filename must not be empty
+     */
     std::unique_ptr<opengl::VertexBufferObject> loadModel(
         const std::string& filename) const;
 };
