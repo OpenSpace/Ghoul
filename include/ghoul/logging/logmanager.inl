@@ -23,6 +23,9 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <iostream>
+#include <sstream>
+
 /**
  * @defgroup LOGGING_MACRO_GROUP Logging Macros
  *

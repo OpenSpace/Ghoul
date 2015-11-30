@@ -26,7 +26,7 @@
 #ifndef __HTMLLOG_H__
 #define __HTMLLOG_H__
 
-#include "textlog.h"
+#include <ghoul/logging/textlog.h>
 
 namespace ghoul {
 namespace logging {
@@ -48,25 +48,26 @@ namespace logging {
 class HTMLLog : public TextLog {
 public:
     /**
-    * Constructor that calls TextLog constructor and opens the file that will log the
-    * messages. If the file does not exist, it will be created.
-    * \param filename The path and filename of the file that will receive the log
-    * messages
-	* \param writeToAppend If this is <code>true</code>, the log messages will be appended
-	* to the file. If it is <code>false</code> the file will be overwritten without a
-	* warning.
-    * \param timeStamping Determines if the log should print the time when a message is
-    * logged in the log messages
-    * \param dateStamping Determines if the log should print the time when a message is
-    * logged in the log messages
-    * \param categoryStamping Determines if the log should print the categories in the
-    * log messages
-    * \param logLevelStamping Determines if the log should print the log level in the log
-    * messages
-    */
+     * Constructor that calls TextLog constructor and opens the file that will log the
+     * messages. If the file does not exist, it will be created.
+     * \param filename The path and filename of the file that will receive the log
+     * messages
+	 * \param writeToAppend If this is <code>true</code>, the log messages will be appended
+	 * to the file. If it is <code>false</code> the file will be overwritten without a
+	 * warning.
+     * \param timeStamping Determines if the log should print the time when a message is
+     * logged in the log messages
+     * \param dateStamping Determines if the log should print the time when a message is
+     * logged in the log messages
+     * \param categoryStamping Determines if the log should print the categories in the
+     * log messages
+     * \param logLevelStamping Determines if the log should print the log level in the log
+     * messages
+     * \pre \p filename must not be empty
+     */
     HTMLLog(std::string filename, bool writeToAppend = true, bool timeStamping = true,
-            bool dateStamping = true, bool categoryStamping = true,
-            bool logLevelStamping = true);
+        bool dateStamping = true, bool categoryStamping = true,
+        bool logLevelStamping = true);
 
     /// Destructor that closes and finalizes the HTML file
     ~HTMLLog();
@@ -79,8 +80,8 @@ public:
      * individually
      * \param message The message body of the log message
      */
-    virtual void log(LogManager::LogLevel level, const std::string& category,
-                     const std::string& message) override;
+    void log(LogManager::LogLevel level, const std::string& category,
+        const std::string& message) override;
 
 protected:
     /**

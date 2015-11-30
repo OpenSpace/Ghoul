@@ -39,9 +39,9 @@ namespace lua {
 
 static lua_State* _state = nullptr;
 
-FormattingException::FormattingException(const std::string& msg)
-    : std::runtime_error(msg) {
-}
+FormattingException::FormattingException(std::string message)
+    : RuntimeError(std::move(message), "Lua")
+{}
 
 namespace {
 

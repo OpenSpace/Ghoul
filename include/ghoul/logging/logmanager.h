@@ -28,9 +28,8 @@
 
 #include <ghoul/designpattern/singleton.h>
 
-#include <iostream>
+#include <memory>
 #include <mutex>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -64,7 +63,6 @@ class Log;
  */
 class LogManager: public Singleton<LogManager> {
 public:
-	~LogManager();
     
     /**
      * Enumerates all available LogLevel for the LogManager. The LogLevels are guaranteed
@@ -124,7 +122,7 @@ public:
      * control sequences.
      */
     void logMessage(LogManager::LogLevel level, const std::string& category,
-                            const std::string& message);
+        const std::string& message);
 
     /**
      * The main method to log messages. If the <code>level</code> is >= the level this
@@ -143,7 +141,7 @@ public:
      * #deinitialize%d. Adding the same Log twice has no effect and is permitted.
      * \param log The Log that should be added to this LogManager
      */
-    void addLog(Log* log);
+    void addLog(std::shared_ptr<Log> log);
 
     /**
      * Removes the passed log from the list of managed Log%s. This transfers the ownership
@@ -151,7 +149,7 @@ public:
      * remove a Log that is not part of this LogManager has no effect and is permitted.
      * \param log The Log that should be removed from this LogManager
      */
-    void removeLog(Log* log);
+    void removeLog(std::shared_ptr<Log> log);
 
     /**
      * Returns the string representation of the passed LogManager::LogLevel. The name of
@@ -168,12 +166,17 @@ public:
 	static LogLevel levelFromString(const std::string& level);
 
 private:
-
+    /// The mutex that is protecting the #logMessage calls
 	std::mutex _mutex;
+    
+    /// The LogLevel
 	LogManager::LogLevel _level;
+    
+    /// Whether all logs should be flushed immediately
 	bool _immediateFlush;
-    std::vector<Log*> _logs;  ///< Stores the Logs which are managed by this LogManager
-
+    
+    /// Stores the Logs which are managed by this LogManager
+    std::vector<std::shared_ptr<Log>> _logs;
 };
 
 } // namespace logging

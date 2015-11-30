@@ -28,18 +28,16 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/dictionary.h>
-
-#include <exception>
-#include <stdexcept>
+#include <ghoul/misc/exception.h>
 
 struct lua_State;
 
 namespace ghoul {
 namespace lua {
 
-class FormattingException : public std::runtime_error {
+class FormattingException : public RuntimeError {
 public:
-    FormattingException(const std::string&);
+    explicit FormattingException(std::string message);
 };
 
 /**

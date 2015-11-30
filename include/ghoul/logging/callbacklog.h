@@ -26,7 +26,7 @@
 #ifndef __CALLBACKLOG_H__
 #define __CALLBACKLOG_H__
 
-#include "log.h"
+#include <ghoul/logging/log.h>
 
 #include <functional>
 
@@ -35,38 +35,36 @@ namespace logging {
 
 /**
  * A concrete subclass of Log that passes logs to the provided callback function. The
- * callback is specified using the functional/bind mechanism found in the C++11 standard
- * (<code>std::function</code>). Trying to log messages when the callback object has been
- * deleted is undefined behavior. The formatting of the log messages depends on the
- * stamping settings. The different possibilities are:
+ * callback is specified using <code>std::function</code>. Trying to log messages when the
+ * callback object has been deleted results in undefined behavior. The formatting of the
+ * log messages depends on the stamping settings. The different possibilities are:
  * \verbatim
- [DATE | TIME] CATEGORY (LEVEL) MESSAGE
- [DATE] CATEGORY (LEVEL) MESSAGE
- [TIME] CATEGORY (LEVEL) MESSAGE
+[DATE | TIME] CATEGORY (LEVEL) MESSAGE
+[DATE] CATEGORY (LEVEL) MESSAGE
+[TIME] CATEGORY (LEVEL) MESSAGE
  \endverbatim
  * And the remaining possibilities with <code>CATEGORY</code> and <code>LEVEL</code>
  * missing.
  */
-
 class CallbackLog : public Log {
 public:
     /// The type of function that is used as a callback in this log
-    typedef std::function<void (const std::string&)> CallbackFunction;
+    typedef std::function<void (std::string)> CallbackFunction;
 
     /**
-    * Constructor that calls the Log constructor and initializes this CallbackLog.
-    * \param callbackFunction The callback function that is called for each log
-    * message.
-    * \param timeStamping Determines if the log should print the time when a message
-    * is logged
-    * \param dateStamping Determines if the log should print the time when a message
-    * is logged
-    * \param categoryStamping Determines if the log should print the categories
-    * \param logLevelStamping Determines if the log should print the log level
-    */
-    CallbackLog(CallbackFunction callbackFunction,
-                bool timeStamping = true, bool dateStamping = true,
-                bool categoryStamping = true, bool logLevelStamping = true);
+     * Constructor that calls the Log constructor and initializes this CallbackLog.
+     * \param callbackFunction The callback function that is called for each log
+     * message.
+     * \param timeStamping Determines if the log should print the time when a message
+     * is logged
+     * \param dateStamping Determines if the log should print the time when a message
+     * is logged
+     * \param categoryStamping Determines if the log should print the categories
+     * \param logLevelStamping Determines if the log should print the log level
+     */
+    CallbackLog(CallbackFunction callbackFunction, bool timeStamping = true,
+        bool dateStamping = true, bool categoryStamping = true,
+        bool logLevelStamping = true);
 
     /**
      * Method that logs a message with a given level and category to the console.
@@ -76,7 +74,7 @@ public:
      * \param message The message body of the log message
      */
     void log(LogManager::LogLevel level, const std::string& category,
-             const std::string& message) override;
+        const std::string& message) override;
 
     /**
      * Replaces the old callback with this <code>callbackFunction</code>. This function

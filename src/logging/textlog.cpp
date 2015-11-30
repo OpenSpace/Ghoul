@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/logging/textlog.h"
+#include <ghoul/logging/textlog.h>
 
 #include <cstdio>
 
@@ -35,65 +35,49 @@ TextLog::TextLog(const std::string& filename, bool writeToAppend, bool timeStamp
                  bool dateStamping, bool categoryStamping, bool logLevelStamping)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
     , _printFooter(writeToAppend)
-    , _file(nullptr)
+//    , _file(nullptr)
 {
-    const char* writeMode;
-    if (writeToAppend)
-        writeMode = "a";
-    else
-        writeMode = "w";
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)
-        errno_t error = fopen_s(&_file, filename.c_str(), writeMode);
-        if (error != 0)
-            _file = 0;
-#else
-        _file = fopen(filename.c_str(), writeMode);
-#endif
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+    
+    _file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
 
+    if (writeToAppend)
+        _file.open(filename, std::ofstream::out | std::ofstream::app);
+    else
+        _file.open(filename, std::ofstream::out | std::ostream::trunc);
 }
 
 TextLog::~TextLog() {
-    if (_file != nullptr) {
-        if (_printFooter)
-            fputs("--------\n", _file);
-        fclose(_file);
-    }
+    if (_printFooter)
+        _file << "--------" << std::endl;
 }
 
 void TextLog::log(LogManager::LogLevel level, const std::string& category,
-                  const std::string& message)
+                                                               const std::string& message)
 {
-    if (_file != nullptr) {
-        std::string output;
-        if (isDateStamping())
-            output += "[" + getDateString();
-        if (isTimeStamping())
-            output += " | " + getTimeString() + "] ";
-        else
-            output += "] ";
-        if (isCategoryStamping())
-            output += category + " ";
-        if (isLogLevelStamping())
-            output += "(" + LogManager::stringFromLevel(level) + ") ";
-        if (output != "")
-            output += ":\t";
-        output += message + '\n';
-        writeLine(output);
-    }
+    std::string output;
+    if (isDateStamping())
+        output += "[" + getDateString();
+    if (isTimeStamping())
+        output += " | " + getTimeString() + "] ";
+    else
+        output += "] ";
+    if (isCategoryStamping())
+        output += category + " ";
+    if (isLogLevelStamping())
+        output += "(" + LogManager::stringFromLevel(level) + ") ";
+    if (output != "")
+        output += ":\t";
+    output += message + '\n';
+    writeLine(std::move(output));
 }
 
 void TextLog::flush() {
-    if (_file != nullptr)
-        fflush(_file);
+    _file.flush();
 }
 
-void TextLog::writeLine(const std::string& line) {
-    if (_file != nullptr)
-        fputs(line.c_str(), _file);
-}
-
-bool TextLog::hasValidFile() const {
-    return (_file != nullptr);
+void TextLog::writeLine(std::string line) {
+    _file << std::move(line);
 }
 
 } // namespace logging

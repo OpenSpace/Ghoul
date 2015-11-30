@@ -25,14 +25,12 @@
 
 #include <ghoul/logging/bufferlog.h>
 
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/glm.h>
-#include <atomic>
-#include <cassert>
-#include <fstream>
-#include <string.h>
+#include <ghoul/misc/assert.h>
 
-//todo semaphore
+#include <atomic>
+#include <format.h>
+#include <fstream>
 
 namespace ghoul {
     
@@ -93,30 +91,41 @@ namespace {
     }
 }
     
-BufferLog::BufferLog(void* address, const size_t totalSize)
+BufferLog::MemoryExhaustionException::MemoryExhaustionException(int total, int requested)
+    : RuntimeError(
+        fmt::format("Exhausted BufferLog ({} of {} byte)", requested, total), "BufferLog")
+    , totalSize(total)
+    , requestedSize(requested)
+{}
+    
+BufferLog::BufferLog(void* address, size_t bufferSize)
     : _buffer(address)
-    , _totalSize(totalSize)
+    , _totalSize(bufferSize)
     , _inCallbackStack(false)
 {
+    ghoul_assert(address, "Address must not be nullptr");
+    ghoul_assert(bufferSize > 0, "Total size must be positive");
+
     initializeBuffer();
     Header* h = header(_buffer);
     h->mutex.clear();
 }
     
-BufferLog::BufferLog(void* address, const size_t totalSize,
-                     MemoryExhaustedCallback callback)
+BufferLog::BufferLog(void* address, size_t bufferSize, MemoryExhaustedCallback callback)
     : _buffer(address)
-    , _totalSize(totalSize)
+    , _totalSize(bufferSize)
     , _callback(std::move(callback))
     , _inCallbackStack(false)
 {
+    ghoul_assert(address, "Address must not be nullptr");
+    ghoul_assert(bufferSize > 0, "Total size must be positive");
+
     initializeBuffer();
     Header* h = header(_buffer);
     h->mutex.clear();
 }
     
 void BufferLog::initializeBuffer() {
-    assert(_buffer != nullptr);
     Header* h = header(_buffer);
     h->version = CURRENT_VERSION;
     h->attributes = 0;
@@ -143,17 +152,21 @@ void BufferLog::resetBuffer() {
         h->mutex.clear();
 }
     
-bool BufferLog::log(unsigned long long int timestamp, const char* message) {
+void BufferLog::log(unsigned long long timestamp, std::string message) {
+    ghoul_assert(!message.empty(), "Message must not be empty");
+    
     Header* h = header(_buffer);
     // This is the full size of the incoming message. +1 for the terminating \0 character
-    const size_t fullSize = sizeof(unsigned long long int) + strlen(message) + 1;
+    size_t fullSize = sizeof(unsigned long long) + message.length() + 1;
     
     // if test_and_set returns 'true', someone else is in the critical section
     while (h->mutex.test_and_set()) {}
     // the moment we return, we own the mutex
     
+    size_t requestedSize = h->firstEmptyByte + sizeof(Header) + fullSize;
+    
     // If this message would exceed the available memory...
-    if (h->firstEmptyByte + sizeof(Header) + fullSize > _totalSize) {
+    if (requestedSize > _totalSize) {
         // ... and we have a valid callback function
         if (_callback) {
             // delegate the cleaning up to the callback
@@ -162,34 +175,33 @@ bool BufferLog::log(unsigned long long int timestamp, const char* message) {
             _inCallbackStack = false;
             if (h->firstEmptyByte + fullSize > _totalSize) {
                 // The callback failed to clear the memory
-                LERROR("Memory log is full. Callback has to clear enough memory");
                 h->mutex.clear();
-                return false;
+                throw MemoryExhaustionException(_totalSize, requestedSize);
             }
         }
         else {
             // We have to fail if there is no callback
-            LERROR("Memory log is full");
             h->mutex.clear();
-            return false;
+            throw MemoryExhaustionException(_totalSize, requestedSize);
         }
     }
     // Copy the values of the timestamp
     memcpy(firstEmptyMemory(_buffer),
-           reinterpret_cast<void*>(&timestamp), sizeof(unsigned long long int));
+           reinterpret_cast<void*>(&timestamp), sizeof(unsigned long long));
     // Advance the empty pointer
-    h->firstEmptyByte += sizeof(unsigned long long int);
+    h->firstEmptyByte += sizeof(unsigned long long);
+    
     // Copy the message into the buffer, strcpy will copy the \0 terminator character, too
     char* destination = reinterpret_cast<char*>(firstEmptyMemory(_buffer));
 #ifdef WIN32
-    strcpy_s(destination, strlen(message) + 1, message);
+    strcpy_s(destination, message.length() + 1, message.c_str());
 #else
-    strcpy(destination, message);
+    strcpy(destination, message.c_str());
 #endif
     // Advance the empty pointer; +1 for the \0 terminator
-    h->firstEmptyByte += glm::detail::uint32(strlen(message) + 1);
+    h->firstEmptyByte += glm::detail::uint32(message.length() + 1);
+    
     h->mutex.clear();
-    return true;
 }
     
 void* BufferLog::buffer() {
@@ -205,7 +217,10 @@ size_t BufferLog::usedSize() const {
     return h->firstEmptyByte + sizeof(Header);
 }
 
-void BufferLog::setBuffer(void* buffer, size_t totalSize) {
+void BufferLog::setBuffer(void* buffer, size_t bufferSize) {
+    ghoul_assert(buffer, "Buffer must not be nullptr");
+    ghoul_assert(bufferSize > 0, "Total size must be positive");
+    
     Header* h = header(_buffer);
     // if test_and_set returns 'true', someone else is in the critical section
     // unless we are currently in a callstack containing the callback function. In which
@@ -214,7 +229,7 @@ void BufferLog::setBuffer(void* buffer, size_t totalSize) {
     // the moment we return, we own the mutex
 
     _buffer = buffer;
-    _totalSize = totalSize;
+    _totalSize = bufferSize;
     initializeBuffer();
     
     if (!_inCallbackStack)
@@ -223,22 +238,19 @@ void BufferLog::setBuffer(void* buffer, size_t totalSize) {
 }
     
 void BufferLog::writeToDisk(const std::string& filename) {
-    std::ofstream file(filename);
-    if (!file.good())
-        LERROR("Error opening file '" + filename + "'");
-    else {
-        Header* h = header(_buffer);
-        std::cout << h->firstEmptyByte << std::endl;
-        // if test_and_set returns 'true', someone else is in the critical section
-        // unless we are currently in a callstack containing the callback function. In
-        // which case we are already safe
-        while (h->mutex.test_and_set() && !_inCallbackStack) {}
-        // the moment we return, we own the mutex
-        file.write(reinterpret_cast<char*>(_buffer), usedSize());
-        if (!_inCallbackStack)
-            // only release the mutex if we are not in the callback stack
-            h->mutex.clear();
-    }
+    std::ofstream file;
+    file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+    file.open(filename);
+    Header* h = header(_buffer);
+    // if test_and_set returns 'true', someone else is in the critical section
+    // unless we are currently in a callstack containing the callback function. In
+    // which case we are already safe
+    while (h->mutex.test_and_set() && !_inCallbackStack) {}
+    // the moment we return, we own the mutex
+    file.write(reinterpret_cast<char*>(_buffer), usedSize());
+    if (!_inCallbackStack)
+        // only release the mutex if we are not in the callback stack
+        h->mutex.clear();
 }
 
 } // namespace ghoul

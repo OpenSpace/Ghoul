@@ -23,19 +23,20 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/logging/streamlog.h"
+#include <ghoul/logging/streamlog.h>
 
 namespace ghoul {
 namespace logging {
 
 StreamLog::StreamLog(std::ostream& stream, bool timeStamping, bool dateStamping,
-                     bool categoryStamping, bool logLevelStamping)
+                                             bool categoryStamping, bool logLevelStamping)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
     , _stream(stream)
 {}
 
 void StreamLog::log(LogManager::LogLevel level, const std::string& category,
-                    const std::string& message) {
+                                                               const std::string& message)
+{
     std::string output;
     if (isDateStamping())
         output += "[" + getDateString();
@@ -51,7 +52,7 @@ void StreamLog::log(LogManager::LogLevel level, const std::string& category,
     if (output != "")
         output += "\t";
     output += message;
-    _stream << output << std::endl;
+    _stream << std::move(output) << std::endl;
 }
 
 void StreamLog::flush() {
