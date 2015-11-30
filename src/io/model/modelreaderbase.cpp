@@ -23,14 +23,20 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/io/volumereader.h>
+#include <ghoul/io/model/modelreaderbase.h>
+
+#include <format.h>
+
+using std::string;
 
 namespace ghoul {
+namespace io {
 
-VolumeReader::VolumeReader() {
-}
-
-VolumeReader::~VolumeReader() {
-}
-
+ModelReaderBase::ModelReaderException::ModelReaderException(string file, string error)
+    : RuntimeError(fmt::format("Error reading model '{}': {}", file, error), "IO")
+    , fileName(std::move(file))
+    , errorMessage(std::move(error))
+{}
+    
+} // namespace io
 } // namespace ghoul

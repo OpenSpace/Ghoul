@@ -29,19 +29,15 @@
 #include <ghoul/io/model/modelreaderbase.h>
 
 namespace ghoul {
-
-// Forward declaration
-namespace opengl {
-    class VertexBufferObject;
-}
-
 namespace io {
     
+/**
+ * This class is a very simplified reader for OBJ waveform models. Instead of a
+ * full-fledged reader, such as tiny_ibj
 class ModelReaderWavefront: public ModelReaderBase {
 public:
-    ModelReaderWavefront();
-    ~ModelReaderWavefront();
-    opengl::VertexBufferObject* loadModel(const std::string& filename) const;
+    std::unique_ptr<opengl::VertexBufferObject> loadModel(
+        const std::string& filename) const;
 };
     
 } // namespace io

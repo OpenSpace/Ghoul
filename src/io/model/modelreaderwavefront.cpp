@@ -23,17 +23,15 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-// ghoul
 #include <ghoul/io/model/modelreaderwavefront.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/vertexbufferobject.h>
 #include <ghoul/glm.h>
 
-// std
-#include <vector>
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 namespace {
     const std::string _loggerCat = "WavefrontGeometry";
@@ -43,17 +41,9 @@ namespace {
 namespace ghoul {
 namespace io {
     
-ModelReaderWavefront::ModelReaderWavefront() {
-    
-}
-
-ModelReaderWavefront::~ModelReaderWavefront() {
-    
-}
-
-opengl::VertexBufferObject*
-ModelReaderWavefront::loadModel(const std::string& filename) const{
-    
+std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
+                                                        const std::string& filename) const
+{
     std::ifstream file(filename, std::ios::in);
     if(!file.good())
         return nullptr;
@@ -199,7 +189,7 @@ ModelReaderWavefront::loadModel(const std::string& filename) const{
     vbo->vertexAttribPointer(0, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, position));
     vbo->vertexAttribPointer(1, 2, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, tex));
     vbo->vertexAttribPointer(2, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, normal));
-    return vbo;
+    return std::unique_ptr<opengl::VertexBufferObject>(vbo);
 }
     
 } // namespace io

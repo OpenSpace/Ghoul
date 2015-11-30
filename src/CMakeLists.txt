@@ -37,8 +37,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/font/font.cpp
     ${PROJECT_SOURCE_DIR}/src/font/fontmanager.cpp
     ${PROJECT_SOURCE_DIR}/src/font/fontrenderer.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/rawvolumereader.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/volumereader.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderbase.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderlua.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderwavefront.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereader.cpp
@@ -50,6 +49,8 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriter.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriterbase.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturewritersoil.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/volume/rawvolumereader.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/volume/volumereader.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/bufferlog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/callbacklog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/consolelog.cpp
@@ -113,8 +114,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontmanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontrenderer.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/rawvolumereader.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/volumereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderlua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderwavefront.h
@@ -127,6 +126,8 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriter.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterbase.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewritersoil.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/volume/rawvolumereader.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/volume/volumereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/bufferlog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/callbacklog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/consolelog.h

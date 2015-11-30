@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/io/rawvolumereader.h>
+#include <ghoul/io/volume/rawvolumereader.h>
 #include <iostream>
 #include <fstream>
 
