@@ -39,7 +39,7 @@ class FormattingException : public RuntimeError {
 public:
     explicit FormattingException(std::string message);
 };
-
+    
 /**
  * Returns the location of the calling function using <code>luaL_where</code> and returns
  * that location as a string. This method is just a wrapper around this function and its

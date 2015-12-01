@@ -23,80 +23,82 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/lua/lua_helper.h"
-#include "ghoul/lua/ghoul_lua.h"
+#include <ghoul/lua/lua_helper.h>
 
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/lua/ghoul_lua.h>
 
 #include <sstream>
 #include <fstream>
-#include <iterator>
 
-using namespace ghoul::logging;
+using std::string;
+
+namespace {
+    
+static const int KeyTableIndex = -2;
+static const int ValueTableIndex = -1;
+
+string luaTableToString(lua_State* state, bool& success, int tableLocation = KeyTableIndex);
+    
+string luaValueToString(lua_State* state, int location) {
+    int type = lua_type(state, location);
+    switch (type) {
+        case LUA_TBOOLEAN:
+            return std::to_string(lua_toboolean(state, location));
+        case LUA_TNUMBER:
+            return std::to_string(lua_tonumber(state, location));
+        case LUA_TSTRING:
+            return lua_tostring(state, location);
+        case LUA_TTABLE:
+        {
+            bool success;
+            return luaTableToString(state, success, location);
+        }
+        default:
+            return ghoul::lua::luaTypeToString(type);
+    }
+}
+    
+string luaTableToString(lua_State* state, bool& success, int tableLocation) {
+    success = true;
+    if (!lua_istable(state, tableLocation)) {
+        success = false;
+        return "";
+    }
+    
+    std::stringstream result;
+    lua_pushvalue(state, tableLocation);
+    lua_pushnil(state);
+    
+    result << "{ ";
+    while (lua_next(state, -2) != 0) {
+        result << luaValueToString(state, KeyTableIndex);
+        result << " = ";
+        result << luaValueToString(state, ValueTableIndex);
+        result << ",  ";
+        lua_pop(state, 1);
+    }
+    lua_pop(state, 1);
+    result << "}";
+    return result.str();
+}
+}
 
 namespace ghoul {
 namespace lua {
 
 static lua_State* _state = nullptr;
 
-FormattingException::FormattingException(std::string message)
+FormattingException::FormattingException(string message)
     : RuntimeError(std::move(message), "Lua")
 {}
 
-namespace {
-
-std::string luaTableToString(lua_State* state, bool& success, int tableLocation = -2) {
-    static const int KEY = -2;
-    static const int VAL = -1;
-
-    success = true;
-    if (!lua_istable(state, tableLocation)) {
-        success = false;
-        return "";
-    }
-
-    std::stringstream result;
-    lua_pushnil(state);
-
-    result << "{ ";
-    while ((lua_next(state, tableLocation) != 0) && success) {
-        const int keyType = lua_type(state, KEY);
-        switch (keyType) {
-            case LUA_TNUMBER:
-                result << lua_tonumber(state, KEY);
-                break;
-            case LUA_TSTRING:
-                result << lua_tostring(state, KEY);
-                break;
-            default:
-                LERRORC("luaTableToString", "Missing type: " << keyType);
-                break;
-        }
-
-        result << " = ";
-        if (lua_isstring(state, VAL))
-            result << lua_tostring(state, VAL);
-        else if (lua_isnumber(state, VAL))
-            result << lua_tonumber(state, VAL);
-        else if (lua_istable(state, VAL))
-            result << luaTableToString(state, success, -1);
-		else 
-			result << luaTypeToString(lua_type(state, VAL));
-		result << ",  ";
-        lua_pop(state, 1);
-    }
-    result << "}";
-    return result.str();
-}
-
-}
-
-std::string errorLocation(lua_State* L) {
+string errorLocation(lua_State* L) {
     luaL_where(L, 1);
     return lua_tostring(L, -1);
 }
 
-std::string logStack(lua_State* state, LogManager::LogLevel level) {
+string logStack(lua_State* state, ghoul::logging::LogManager::LogLevel level) {
     std::stringstream result;
     const int top = lua_gettop(state);
     if (top == 0)
@@ -134,18 +136,18 @@ std::string logStack(lua_State* state, LogManager::LogLevel level) {
             result << "\n";
         }
     }
-    const std::string& resultStr = result.str();
+    const string& resultStr = result.str();
     LogMgr.logMessage(level, resultStr);
     return resultStr;
 }
 
 bool loadDictionaryFromFile(
-    const std::string& filename,
+    const string& filename,
     ghoul::Dictionary& dictionary,
     lua_State* state
     )
 {
-    const static std::string _loggerCat = "lua_loadDictionaryFromFile";
+    const static string _loggerCat = "lua_loadDictionaryFromFile";
 
     if (state == nullptr) {
         if (_state == nullptr) {
@@ -202,13 +204,8 @@ bool loadDictionaryFromFile(
     return true;
 }
 
-bool loadDictionaryFromString(
-    const std::string& script,
-    ghoul::Dictionary& dictionary,
-    lua_State* state
-    )
-{
-    const static std::string _loggerCat = "lua_loadDictionaryFromString";
+bool loadDictionaryFromString(const string& script, Dictionary& dictionary, lua_State* state) {
+    const static string _loggerCat = "lua_loadDictionaryFromString";
 
     if (state == nullptr) {
         if (_state == nullptr) {
@@ -257,7 +254,7 @@ bool loadDictionaryFromString(
     return true;
 }
     
-std::string luaTypeToString(int type) {
+string luaTypeToString(int type) {
     switch (type) {
         case LUA_TNONE:
             return "None";
@@ -284,11 +281,7 @@ std::string luaTypeToString(int type) {
     }
 }
 
-void luaDictionaryFromState(lua_State* state, Dictionary& dict)
-{
-    static const int KEY = -2;
-    static const int VAL = -1;
-
+void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
     enum class TableType {
         Undefined = 1,  // 001
         Map = 3,        // 010
@@ -298,10 +291,10 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict)
     TableType type = TableType::Undefined;
 
     lua_pushnil(state);
-    while (lua_next(state, KEY) != 0) {
+    while (lua_next(state, KeyTableIndex) != 0) {
         // get the key name
-        std::string key;
-        const int keyType = lua_type(state, KEY);
+        string key;
+        const int keyType = lua_type(state, KeyTableIndex);
         switch (keyType) {
             case LUA_TNUMBER:
                 if (type == TableType::Map)
@@ -310,7 +303,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict)
                           "array");
 
                 type = TableType::Array;
-                key = std::to_string(lua_tointeger(state, KEY));
+                key = std::to_string(lua_tointeger(state, KeyTableIndex));
                 break;
             case LUA_TSTRING:
                 if (type == TableType::Array)
@@ -318,7 +311,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict)
                           "Dictionary can only contain a pure map or a pure "
                           "array");
                 type = TableType::Map;
-                key = lua_tostring(state, KEY);
+                key = lua_tostring(state, KeyTableIndex);
                 break;
             default:
                 LERRORC("luaTableToString", "Missing type: " << keyType);
@@ -326,17 +319,17 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict)
         }
 
         // get the value
-        switch (lua_type(state, VAL)) {
+        switch (lua_type(state, ValueTableIndex)) {
             case LUA_TNUMBER: {
-                double value = lua_tonumber(state, VAL);
+                double value = lua_tonumber(state, ValueTableIndex);
                 dict.setValue(key, value);
             } break;
             case LUA_TBOOLEAN: {
-                bool value = (lua_toboolean(state, VAL) == 1);
+                bool value = (lua_toboolean(state, ValueTableIndex) == 1);
                 dict.setValue(key, value);
             } break;
             case LUA_TSTRING: {
-                std::string value = lua_tostring(state, VAL);
+                std::string value = lua_tostring(state, ValueTableIndex);
                 dict.setValue(key, value);
             } break;
             case LUA_TTABLE: {
@@ -346,7 +339,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict)
             } break;
             default:
                 throw FormattingException("Unknown type: "
-                                          + std::to_string(lua_type(state, VAL)));
+                                      + std::to_string(lua_type(state, ValueTableIndex)));
         }
 
         // get back up one level
@@ -355,7 +348,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict)
 }
 
 lua_State* createNewLuaState() {
-    const std::string _loggerCat = "createNewLuaState";
+    const string _loggerCat = "createNewLuaState";
     lua_State* s;
     LDEBUG("Creating Lua state");
     s = luaL_newstate();
