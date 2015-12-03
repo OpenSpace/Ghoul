@@ -336,11 +336,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
         float width = 0.f;
         float height = 0.f;
         for (size_t j = 0 ; j < line.size(); ++j) {
-            const Font::Glyph* glyph = font.glyph(line[j]);
-            if (glyph == nullptr) {
-                LERROR("No glyph for '" << line[j] << " in font '" << font.name() << "'");
-            }
-            else {
+            try {
+                const Font::Glyph* glyph = font.glyph(line[j]);
                 if (j > 0)
                     movingPos.x += glyph->kerning(line[j-1]);
                 
@@ -350,7 +347,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
                 float t0 = glyph->topLeft().y;
                 float outlineS0 = glyph->outlineTopLeft().x;
                 float outlineT0 = glyph->outlineTopLeft().y;
-
+                
                 float x1 = x0 + glyph->width();
                 float y1 = y0 - glyph->height();
                 float s1 = glyph->bottomRight().x;
@@ -374,7 +371,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
                 width += glyph->horizontalAdvance();
                 height = std::max(height, static_cast<float>(glyph->height()));
             }
-            
+            catch (const Font::FontException& e) {
+                LERROR("No glyph for '" << line[j] << " in font '" << font.name() << "'");
+            }
         }
         size.x = std::max(size.x, width);
         size.y += height;

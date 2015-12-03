@@ -120,7 +120,7 @@ string errorLocation(lua_State* state) {
     luaL_where(state, 1);
     string result = lua_tostring(state, -1);
     lua_pop(state, 1);
-    return lua_tostring(state, -1);
+    return result;
 }
 
 string stackInformation(lua_State* state) {
@@ -168,7 +168,7 @@ void loadDictionaryFromFile(const string& filename, ghoul::Dictionary& dictionar
                                                                          lua_State* state)
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    ghoul_assert(!FileSys.fileExists(absPath(filename)), "Filename must be a file");
+    ghoul_assert(FileSys.fileExists(absPath(filename)), "Filename must be a file");
     
     if (state == nullptr)
         state = staticLuaState();
