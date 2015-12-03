@@ -26,7 +26,8 @@
 template<class T>
 void ghoul::Buffer::serialize(const T& v) {
     static_assert(std::is_pod<T>::value, "T has to be a POD for general serialize");
-    const size_t size = sizeof(T);
+    
+    size_t size = sizeof(T);
     _data.resize(_data.capacity() + size);
     memcpy(_data.data() + _offsetWrite, &v, size);
     _offsetWrite += size;
@@ -35,8 +36,9 @@ void ghoul::Buffer::serialize(const T& v) {
 template<class T>
 void ghoul::Buffer::deserialize(T& value) {
     static_assert(std::is_pod<T>::value, "T has to be a POD for general deserialize");
-    const size_t size = sizeof(T);
-    assert(_offsetRead + size <= _data.size());
+    
+    size_t size = sizeof(T);
+    ghoul_assert(_offsetRead + size <= _data.size(), "Insufficient buffer size");
     
     memcpy(&value, _data.data() + _offsetRead, size);
     _offsetRead += size;
@@ -46,8 +48,8 @@ template<typename T>
 void ghoul::Buffer::serialize(const std::vector<T>& v) {
     static_assert(std::is_pod<T>::value, "T has to be a POD for general serialize");
     
-    const size_t length = v.size();
-    const size_t size = sizeof(T)*length+sizeof(size_t);
+    size_t length = v.size();
+    size_t size = sizeof(T)*length+sizeof(size_t);
     _data.resize(_data.capacity() + size);
     
     memcpy(_data.data() + _offsetWrite, &length, sizeof(size_t));
@@ -56,17 +58,61 @@ void ghoul::Buffer::serialize(const std::vector<T>& v) {
     _offsetWrite += sizeof(T)*length;
 }
 
+template <typename Iter>
+void ghoul::Buffer::serialize(Iter begin, Iter end) {
+    using T = typename std::iterator_traits<Iter>::value_type;
+    static_assert(
+        std::is_pod<T>::value,
+        "Iter must point to a POD for general serialize"
+    );
+    
+    size_t length = std::distance(begin, end);
+    size_t size = sizeof(T) * length + sizeof(size_t);
+    _data.resize(_data.capacity() + size);
+    
+    std::memcpy(_data.data() + _offsetWrite, &length, sizeof(size_t));
+    _offsetWrite += sizeof(size_t);
+    while (begin != end) {
+        serialize(*begin);
+        begin = std::next(begin);
+    }
+}
+
 
 template<typename T>
 void ghoul::Buffer::deserialize(std::vector<T>& v) {
     static_assert(std::is_pod<T>::value, "T has to be a POD for general deserialize");
     
-    assert(_offsetRead + sizeof(size_t) <= _data.size());
+    ghoul_assert(
+        _offsetRead + sizeof(size_t) <= _data.size(), "Insufficient buffer size"
+    );
     size_t n;
     memcpy(&n, _data.data() + _offsetRead, sizeof(size_t));
     _offsetRead += sizeof(size_t);
-    assert(_offsetRead + sizeof(T)*n <= _data.size());
+    ghoul_assert(_offsetRead + sizeof(T)*n <= _data.size(), "Insufficient buffer size");
     v.resize(n);
     memcpy(v.data(),_data.data() + _offsetRead, sizeof(T)*n);
     _offsetRead += sizeof(T)*n;
+}
+
+template <typename Iter>
+void ghoul::Buffer::deserialize(Iter begin, Iter end) {
+    using T = typename std::iterator_traits<Iter>::value_type;
+    static_assert(
+        std::is_pod<T>::value,
+        "Iter must point to a POD for general serialize"
+    );
+    
+    size_t n;
+    std::memcpy(&n, _data.data() + _offsetRead, sizeof(size_t));
+    _offsetRead += sizeof(size_t);
+    
+    ghoul_assert(
+        std::distance(begin, end) == n, "Requested size differs from stored size"
+    );
+    
+    while (begin != end) {
+        deserialize(*begin);
+        begin = std::next(begin);
+    }
 }
