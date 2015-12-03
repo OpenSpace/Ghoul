@@ -26,62 +26,43 @@
 #ifndef __ASSERT_H__
 #define __ASSERT_H__
 
-// Defines
-#define GHL_ASSERT_FILE __FILE__
-#define GHL_ASSERT_LINE __LINE__
-#if defined(__GNUC__) || defined(__clang__)
-#  define GHL_ASSERT_FUNCTION __PRETTY_FUNCTION__
-#else
-#  define GHL_ASSERT_FUNCTION __FUNCTION__
-#endif
-
 #include <ghoul/misc/exception.h>
 
 #include <string>
 #include <sstream>
-#include <cstdio>
-#include <exception>
-#include <stdexcept>
-
-#ifdef WIN32
-// Check if this is still true with Visual Studio 2015 ---abock
-#define GHL_NOEXCEPT
-#else
-#define GHL_NOEXCEPT noexcept
-#endif // WIN32
-
-#ifdef WIN32
-#define GHL_NORETURN
-#elif __APPLE__
-// This tells the clang static analyzer that internal_assert is just like assert itself
-#define GHL_NORETURN __attribute__((analyzer_noreturn))
-#else
-#define GHL_NORETURN
-#endif
 
 namespace ghoul {
 
-class AssertException : public RuntimeError {
-public:
-    AssertException();
+/**
+ * Exception that gets thrown if an assertion is triggered and the user selects the
+ * <code>AssertionException</code> option
+ */
+struct AssertionException : public RuntimeError {
+    explicit AssertionException(std::string expression, std::string message,
+                                std::string file, std::string function, int line);
 };
 
-	/**
-	 * Ghoul internal assert command. Is called  by
-	 * the ghoul_assert methods.
-	 * macro.
-	 */
-	void internal_assert(
-		const std::string& expression,
-		const std::string& message, 
-		const std::string& file, 
-		const std::string& function, 
-		int line) GHL_NORETURN;
+/**
+ * Ghoul internal assert command. Is called by the ghoul_assert macro.
+ * \param expression The expression that caused the assertion
+ * \param message The message that was provided for the assertion
+ * \param file The file in which the assertion triggered
+ * \param function The function in which the assertion triggered
+ * \param line The line in the \p file that triggered the assertion
+ */
+#ifdef __APPLE__
+// This tells the clang static analyzer that internal_assert is just like assert itself
+void internal_assert(std::string expression, std::string message, std::string file,
+    std::string function, int line) __attribute__((analyzer_noreturn));
+#else
+void internal_assert(std::string expression, std::string message, std::string file,
+    std::string function, int line);
+#endif // __APPLE__
 
 
 } // namespace ghoul
 
-#if !defined(NDEBUG)
+#if not defined(NDEBUG) || defined(DEBUG)
 
 /**
 * @defgroup ASSERT_MACRO_GROUP Assertion Macros
@@ -89,26 +70,34 @@ public:
 * @{
 */
 
+#if defined(__GNUC__) || defined(__clang__)
+#  define GHL_ASSERT_FUNCTION __PRETTY_FUNCTION__
+#else
+#  define GHL_ASSERT_FUNCTION __FUNCTION__
+#endif
+
 /**
  * Assertion that prints the message (if provided) and gives the option of aborting,
  * exiting or ignoring the assertion. Not defined in release mode.
  */
-#define ghoul_assert(__condition__, __message__) \
-	do { \
-		if(!(__condition__)) { \
-			std::ostringstream oss; \
-			oss << __message__; \
-			ghoul::internal_assert(#__condition__, oss.str(), GHL_ASSERT_FILE, GHL_ASSERT_FUNCTION, GHL_ASSERT_LINE);\
-		} \
+#define ghoul_assert(__condition__, __message__)                                         \
+    do {                                                                                 \
+		if (!(__condition__)) {                                                          \
+			std::ostringstream oss;                                                      \
+			oss << __message__;                                                          \
+			ghoul::internal_assert(                                                      \
+                #__condition__,                                                          \
+                oss.str(),                                                               \
+                __FILE__,                                                                \
+                GHL_ASSERT_FUNCTION,                                                     \
+                __LINE__                                                                 \
+            );                                                                           \
+		}                                                                                \
 	} while (false)
 
 
-/** @} */
 #else 
-
-// The assertion macros defined for release mode
 #define ghoul_assert(__condition__, __message__)
-
-#endif // !defined(NDEBUG)
+#endif // NDEBUG
 
 #endif // __ASSERT_H__
