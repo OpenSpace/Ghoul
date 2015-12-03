@@ -35,27 +35,45 @@ struct lua_State;
 namespace ghoul {
 namespace lua {
 
-class FormattingException : public RuntimeError {
-public:
-    explicit FormattingException(std::string message);
+struct LuaRuntimeException : public RuntimeError {
+    explicit LuaRuntimeException(std::string message);
 };
+    
+struct LuaFormatException : public LuaRuntimeException {
+    explicit LuaFormatException(std::string message, std::string file = "");
+    std::string filename;
+};
+    
+struct LuaLoadingException : public LuaRuntimeException {
+    explicit LuaLoadingException(std::string error, std::string file = "");
+    std::string errorMessage;
+    std::string filename;
+};
+    
+struct LuaExecutionException : public LuaRuntimeException {
+    explicit LuaExecutionException(std::string error, std::string file = "");
+    std::string errorMessage;
+    std::string filename;
+};
+
     
 /**
  * Returns the location of the calling function using <code>luaL_where</code> and returns
  * that location as a string. This method is just a wrapper around this function and its
  * use is for non-fatal error handling.
- * \param L The Lua state that is to be exermined
+ * \param state The Lua state that is to be exermined
  * \return The location of the function whose stack is being tested
+ * \pre \p state must not be nullptr
  */
-std::string errorLocation(lua_State* L);
+std::string errorLocation(lua_State* state);
 
 
 /**
- * Logs the stack of the Lua state that is passed into the function at the provided <code>
- * level</code> and returns the logged string. The values of each entry in the stack is
- * printed, which includes tables (printed recursively), but excludes
- * <code>function</code> objects. For functions, merely the word <code>function</code> is
- * logged. The messages is writing in the the format:
+ * Returns a string describing the \p state's current stack. The values of each entry in
+ * the stack is printed, which includes tables (printed recursively), but excludes
+ * <code>function</code>, <code>thread</code>, <code>userdata</code>, and
+ * <code>light userdata</code> objects, for which only the type is returned. The returned
+ * string is in the the format:
  * \verbatim
 <code>
 1: <entry>
@@ -65,41 +83,42 @@ std::string errorLocation(lua_State* L);
 \endverbatim
  * If the stack does not contain any values, an empty string is returned.
  * \param state The Lua state that will have its stack printed
- * \param level The logging::LogManager::LogLevel at which the stack will be logged
- * \return The same string that was logged, or <code>""</code> if the <code>state</code>
- * was not valid
+ * \return The description of the current \p state's stack
+ * \pre \p state must not be nullptr
  */
-std::string logStack(lua_State* state, logging::LogManager::LogLevel level = 
-                         logging::LogManager::LogLevel::Info);
+std::string stackInformation(lua_State* state);
 
 
 /**
  * Loads a Lua configuration into the given #ghoul::Dictionary%, extending the passed in
- * dictionary. This method will overwrite value with the same keys, but will not remove
+ * dictionary. This method will overwrite values with the same keys, but will not remove
  * any other keys from the dictionary. The script contained in the file must return a
  * single table, which is then parsed and included into the #ghoul::Dictionary. The single
  * restriction on the script is that it can only contain a pure array-style table (= only
  * indexed by numbers) or a pure dictionary-style table (= no numbering indices).
- * \param filename The filename pointing to the script that is executed
+ * \param filename The filename pointing to the script that is executed. Any #FileSystem
+ * path tokesn will be resolved by this function.
  * \param dictionary The #ghoul::Dictionary into which the values from the script are
  * added
  * \param state If this is set to a valid lua_State, this state is used instead of
  * creating a new state. It is the callers responsibility to ensure that the passed state
- * is valid. After calling this method, the stack of the passed state will be empty.
- * \return Returns <code>true</code> if the loading succeeded; <code>false</code>
- * otherwise.
- * \throws #ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
- * keys of both type <code>string</code> and type <code>number</code>
+ * is valid if this parameter is not <code>nullptr</code>. After calling this method, the
+ * stack of the passed state will be empty after this function returns.
+ * \throws FormattingException If the #ghoul::Dictionary contains mixed keys of both type
+ * <code>string</code> and type <code>number</code>
+ * \throws FormattingException If the script did not return anything else but a table
+ * \throws LuaRuntimeException If there was an error initializing a new Lua state if it 
+ * was necessary
+ * \pre \p filename must not be empty
+ * \pre \p filename must be a path to an existing file
+ * \post The \p state%'s stack is empty
  */
-bool loadDictionaryFromFile(
-    const std::string& filename,
-    ghoul::Dictionary& dictionary,
-    lua_State* state = nullptr
-    );
+void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dictionary,
+    lua_State* state = nullptr);
 
 /**
  * Loads a Lua configuration into the given #ghoul::Dictionary%, extending the passed in
- * dictionary. This method will overwrite value with the same keys, but will not remove
+ * dictionary. This method will overwrite values with the same keys, but will not remove
  * any other keys from the dictionary. The script contained in the string must return a
  * single table, which is then parsed and included into the #ghoul::Dictionary. The single
  * restriction on the script is that it can only contain a pure array-style table (= only
@@ -112,15 +131,31 @@ bool loadDictionaryFromFile(
  * is valid. After calling this method, the stack of the passed state will be empty.
  * \return Returns <code>true</code> if the loading succeeded; <code>false</code>
  * otherwise.
- * \throws #ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
+ * \throws ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
  * keys of both type <code>string</code> and type <code>number</code>
+ * \throws FormattingException If the script did not return anything else but a table
+ * \pre \p script must not be empty
+ * \post \p state%'s stack is empty
  */
-bool loadDictionaryFromString(
-    const std::string& script,
-    ghoul::Dictionary& dictionary,
-    lua_State* state = nullptr
-    );
+void loadDictionaryFromString(const std::string& script, ghoul::Dictionary& dictionary,
+    lua_State* state = nullptr);
 
+/**
+ * Uses the Lua \p state to populate the provided ghoul::Dictionary%, extending the passed
+ * \p dictionary. This method will overwrite values with the same keys, but will not
+ * remove any other keys from the dictionary. The \p state must have a single table object
+ * at the top of the stack. The table can only contain a pure array-style table (= only
+ * indexed by numbers) or a pure dictionary-style table (= no numbering indices).
+ * \param state The Lua state that is used to populate the \p dictionary
+ * \param dictionary The #ghoul::Dictionary into which the values from the stack are
+ * added
+ * \throws LuaFormatException If the \p dictionary contains mixed keys of both type
+ * <code>string</code> and type <code>number</code>
+ * \pre \p state must not be nullptr
+ * \post \p state%'s stack is unchanged
+ */
+void luaDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary);
+    
 /**
  * Converts the Lua type to a human-readable string. The supported types are:
  * \verbatim
@@ -136,8 +171,7 @@ bool loadDictionaryFromString(
  LUA_TTHREAD: Thread
  \endverbatim
  * \param type A Lua type that should be converted to a string
- * \return The converted string or <code>""</code> if <code>type</code> was an illegal
- * type
+ * \return The converted string
  */
 std::string luaTypeToString(int type);
 
@@ -153,8 +187,6 @@ lua_State* createNewLuaState();
  * \param state The Lua state that is to be deleted
  */
 void destroyLuaState(lua_State* state);
-
-void luaDictionaryFromState(lua_State* L, ghoul::Dictionary& d);
 
 namespace internal {
     void deinitializeGlobalState();

@@ -59,9 +59,12 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     
     Dictionary dictionary;
-    bool loadSuccess = lua::loadDictionaryFromFile(filename, dictionary);
-    if (!loadSuccess)
-        throw ModelReaderException(filename, "Could not load dictionary");
+    try {
+        lua::loadDictionaryFromFile(filename, dictionary);
+    }
+    catch (const ghoul::lua::LuaRuntimeException& e) {
+        throw ModelReaderException(filename, e.what());
+    }
     
     if (!dictionary.hasKeyAndValue<Dictionary>(keyVertices)) {
         throw ModelReaderException(
