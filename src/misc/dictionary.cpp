@@ -122,20 +122,20 @@ std::array<TARGET, SIZE> createArray(const SOURCE* const src) {
 
 template <typename TargetType>
 bool isConvertible(const Dictionary& dict) {
-    const bool correctSize = dict.size() == StorageTypeConverter<TargetType>::size;
+    bool correctSize = dict.size() == StorageTypeConverter<TargetType>::size;
     if (!correctSize)
         return false;
 
-    const std::vector<std::string>& keys = dict.keys();
+    const std::vector<string>& keys = dict.keys();
     for (size_t i = 0; i < StorageTypeConverter<TargetType>::size; ++i) {
-        const std::string& key = keys[i];
+        const string& key = keys[i];
 #ifdef WIN32
 #pragma warning(push)
     // Suppress the warning C2684 (Redundant test) that occurs if
     // StorageTypeConverter<TargetType>::type == TargetType
 #pragma warning(suppress: 6287)
 #endif // WIN32
-        const bool correctType = dict.hasValue<typename StorageTypeConverter<TargetType>::type>(
+        bool correctType = dict.hasValue<typename StorageTypeConverter<TargetType>::type>(
                                        key) || dict.hasValue<TargetType>(key);
 #ifdef WIN32
 #pragma warning(pop)
@@ -148,17 +148,17 @@ bool isConvertible(const Dictionary& dict) {
 
 template <typename TargetType>
 void convertGLM(const Dictionary& dict, TargetType& target) {
-    std::vector<std::string>&& keys = dict.keys();
+    std::vector<string>&& keys = dict.keys();
     // sort numerically rather than by ASCII value
-    std::sort(keys.begin(), keys.end(), [](const std::string& k1, const std::string& k2) {
+    std::sort(keys.begin(), keys.end(), [](const string& k1, const string& k2) {
         try {
             return std::stoi(k1) < std::stoi(k2);
-        } catch (std::invalid_argument&) {
+        } catch (const std::invalid_argument&) {
             return k1 < k2;
         }
     });
     for (size_t i = 0; i < StorageTypeConverter<TargetType>::size; ++i) {
-        const std::string& key = keys[i];
+        const string& key = keys[i];
         dict.getValue(key, glm::value_ptr(target)[i]);
     }
 }
@@ -167,9 +167,9 @@ template <typename TargetType>
 void convert(const Dictionary& dict, TargetType& target) {
     static_assert(StorageTypeConverter<TargetType>::size == 1,
                   "Wrong function call. StorageType::size > 1");
-    const std::vector<std::string>& keys = dict.keys();
+    const std::vector<string>& keys = dict.keys();
     for (size_t i = 0; i < StorageTypeConverter<TargetType>::size; ++i) {
-        const std::string& key = keys[i];
+        const string& key = keys[i];
         dict.getValue(key, target);
     }
 }
@@ -177,27 +177,25 @@ void convert(const Dictionary& dict, TargetType& target) {
 // Yes, all those functions could be replaced by a macro (and they were), but they are
 // easier to read (and debug!) this way ---abock
 template <>
-bool Dictionary::hasValue<double>(const std::string& key) const {
-    const bool val = hasValueHelper<StorageTypeConverter<double>::type>(key);
+bool Dictionary::hasValue<double>(const string& key) const {
+    bool val = hasValueHelper<StorageTypeConverter<double>::type>(key);
     if (val)
-    return true;
+        return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<double>(dict);
+            bool canConvert = isConvertible<double>(dict);
             if (canConvert)
-            return true;
+                return true;
         }
         return false;
     }
 }
 
 template <>
-bool Dictionary::setValue<double>(std::string key, double value, bool 
-                                  createIntermediate)
-{
+bool Dictionary::setValue<double>(string key, double value, bool createIntermediate) {
     return setValueHelper(
         std::move(key),
         StorageTypeConverter<double>::type(value),
@@ -206,20 +204,20 @@ bool Dictionary::setValue<double>(std::string key, double value, bool
 }
 
 template <>
-bool Dictionary::getValue<double>(const std::string& key, double& value) const {
+bool Dictionary::getValue<double>(const string& key, double& value) const {
     StorageTypeConverter<double>::type v;
-    const bool success = hasValueHelper<StorageTypeConverter<double>::type>(key);
+    bool success = hasValueHelper<StorageTypeConverter<double>::type>(key);
     if (success) {
         getValueHelper(key, v);
         value = static_cast<double>(v);
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<double>(dict);
+            bool canConvert = isConvertible<double>(dict);
             if (canConvert) {
                 convert(dict, value);
                 return true;
@@ -230,16 +228,16 @@ bool Dictionary::getValue<double>(const std::string& key, double& value) const {
 }
 
 template <>
-bool Dictionary::hasValue<long long>(const std::string& key) const {
-    const bool val = hasValueHelper<StorageTypeConverter<long long>::type>(key);
+bool Dictionary::hasValue<long long>(const string& key) const {
+    bool val = hasValueHelper<StorageTypeConverter<long long>::type>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<long long>(dict);
+            bool canConvert = isConvertible<long long>(dict);
             if (canConvert)
                 return true;
         }
@@ -248,8 +246,7 @@ bool Dictionary::hasValue<long long>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<long long>(std::string key, long long value,
-                                     bool createIntermediate)
+bool Dictionary::setValue<long long>(string key, long long value, bool createIntermediate)
 {
     return setValueHelper(
         std::move(key),
@@ -259,20 +256,20 @@ bool Dictionary::setValue<long long>(std::string key, long long value,
 }
 
 template <>
-bool Dictionary::getValue<long long>(const std::string& key, long long& value) const {
+bool Dictionary::getValue<long long>(const string& key, long long& value) const {
     StorageTypeConverter<long long>::type v;
-    const bool success = hasValueHelper<StorageTypeConverter<long long>::type>(key);
+    bool success = hasValueHelper<StorageTypeConverter<long long>::type>(key);
     if (success) {
         getValueHelper(key, v);
         value = static_cast<long long>(v);
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<long long>(dict);
+            bool canConvert = isConvertible<long long>(dict);
             if (canConvert) {
                 convert(dict, value);
                 return true;
@@ -283,16 +280,16 @@ bool Dictionary::getValue<long long>(const std::string& key, long long& value) c
 }
 
 template <>
-bool Dictionary::hasValue<unsigned long long>(const std::string& key) const {
-    const bool val = hasValueHelper<StorageTypeConverter<unsigned long long>::type>(key);
+bool Dictionary::hasValue<unsigned long long>(const string& key) const {
+    bool val = hasValueHelper<StorageTypeConverter<unsigned long long>::type>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<unsigned long long>(dict);
+            bool canConvert = isConvertible<unsigned long long>(dict);
             if (canConvert)
                 return true;
         }
@@ -301,7 +298,7 @@ bool Dictionary::hasValue<unsigned long long>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<unsigned long long>(std::string key, unsigned long long value,
+bool Dictionary::setValue<unsigned long long>(string key, unsigned long long value,
                                 bool createIntermediate)
 {
     return setValueHelper(
@@ -312,11 +309,11 @@ bool Dictionary::setValue<unsigned long long>(std::string key, unsigned long lon
 }
 
 template <>
-bool Dictionary::getValue<unsigned long long>(const std::string& key,
+bool Dictionary::getValue<unsigned long long>(const string& key,
                             unsigned long long& value) const
 {
     StorageTypeConverter<unsigned long long>::type v;
-    const bool success =
+    bool success =
         hasValueHelper<StorageTypeConverter<unsigned long long>::type>(key);
     if (success) {
         getValueHelper(key, v);
@@ -324,11 +321,11 @@ bool Dictionary::getValue<unsigned long long>(const std::string& key,
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<unsigned long long>(dict);
+            bool canConvert = isConvertible<unsigned long long>(dict);
             if (canConvert) {
                 convert(dict, value);
                 return true;
@@ -339,16 +336,16 @@ bool Dictionary::getValue<unsigned long long>(const std::string& key,
 }
 
 template <>
-bool Dictionary::hasValue<bool>(const std::string& key) const {
-    const bool val = hasValueHelper<StorageTypeConverter<bool>::type>(key);
+bool Dictionary::hasValue<bool>(const string& key) const {
+    bool val = hasValueHelper<StorageTypeConverter<bool>::type>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<bool>(dict);
+            bool canConvert = isConvertible<bool>(dict);
             if (canConvert)
                 return true;
         }
@@ -357,9 +354,7 @@ bool Dictionary::hasValue<bool>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<bool>(std::string key, bool value,
-                                bool createIntermediate)
-{
+bool Dictionary::setValue<bool>(string key, bool value, bool createIntermediate) {
     return setValueHelper(
         std::move(key),
         StorageTypeConverter<bool>::type(value),
@@ -368,20 +363,20 @@ bool Dictionary::setValue<bool>(std::string key, bool value,
 }
 
 template <>
-bool Dictionary::getValue<bool>(const std::string& key, bool& value) const {
+bool Dictionary::getValue<bool>(const string& key, bool& value) const {
     StorageTypeConverter<bool>::type v;
-    const bool success = hasValueHelper<StorageTypeConverter<bool>::type>(key);
+    bool success = hasValueHelper<StorageTypeConverter<bool>::type>(key);
     if (success) {
         getValueHelper(key, v);
         value = static_cast<bool>(v);
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<bool>(dict);
+            bool canConvert = isConvertible<bool>(dict);
             if (canConvert) {
                 convert(dict, value);
                 return true;
@@ -392,16 +387,16 @@ bool Dictionary::getValue<bool>(const std::string& key, bool& value) const {
 }
 
 template <>
-bool Dictionary::hasValue<char>(const std::string& key) const {
-    const bool val = hasValueHelper<StorageTypeConverter<char>::type>(key);
+bool Dictionary::hasValue<char>(const string& key) const {
+    bool val = hasValueHelper<StorageTypeConverter<char>::type>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<char>(dict);
+            bool canConvert = isConvertible<char>(dict);
             if (canConvert)
                 return true;
         }
@@ -410,9 +405,7 @@ bool Dictionary::hasValue<char>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<char>(std::string key, char value,
-                                bool createIntermediate)
-{
+bool Dictionary::setValue<char>(string key, char value, bool createIntermediate) {
     return setValueHelper(
         std::move(key),
         StorageTypeConverter<char>::type(value),
@@ -421,20 +414,20 @@ bool Dictionary::setValue<char>(std::string key, char value,
 }
 
 template <>
-bool Dictionary::getValue<char>(const std::string& key, char& value) const {
+bool Dictionary::getValue<char>(const string& key, char& value) const {
     StorageTypeConverter<char>::type v;
-    const bool success = hasValueHelper<StorageTypeConverter<char>::type>(key);
+    bool success = hasValueHelper<StorageTypeConverter<char>::type>(key);
     if (success) {
         getValueHelper(key, v);
         value = static_cast<char>(v);
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<char>(dict);
+            bool canConvert = isConvertible<char>(dict);
             if (canConvert) {
                 convert(dict, value);
                 return true;
@@ -445,16 +438,16 @@ bool Dictionary::getValue<char>(const std::string& key, char& value) const {
 }
 
 template <>
-bool Dictionary::hasValue<signed char>(const std::string& key) const {
-    const bool val = hasValueHelper<StorageTypeConverter<signed char>::type>(key);
+bool Dictionary::hasValue<signed char>(const string& key) const {
+    bool val = hasValueHelper<StorageTypeConverter<signed char>::type>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<signed char>(dict);
+            bool canConvert = isConvertible<signed char>(dict);
             if (canConvert)
                 return true;
         }
@@ -463,7 +456,7 @@ bool Dictionary::hasValue<signed char>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<signed char>(std::string key, signed char value,
+bool Dictionary::setValue<signed char>(string key, signed char value,
                                 bool createIntermediate)
 {
     return setValueHelper(
@@ -474,20 +467,20 @@ bool Dictionary::setValue<signed char>(std::string key, signed char value,
 }
 
 template <>
-bool Dictionary::getValue<signed char>(const std::string& key, signed char& value) const {
+bool Dictionary::getValue<signed char>(const string& key, signed char& value) const {
     StorageTypeConverter<signed char>::type v;
-    const bool success = hasValueHelper<StorageTypeConverter<signed char>::type>(key);
+    bool success = hasValueHelper<StorageTypeConverter<signed char>::type>(key);
     if (success) {
         getValueHelper(key, v);
         value = static_cast<signed char>(v);
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<signed char>(dict);
+            bool canConvert = isConvertible<signed char>(dict);
             if (canConvert) {
                 convert(dict, value);
                 return true;
@@ -498,16 +491,16 @@ bool Dictionary::getValue<signed char>(const std::string& key, signed char& valu
 }
 
 template <>
-bool Dictionary::hasValue<unsigned char>(const std::string& key) const {
-    const bool val = hasValueHelper<StorageTypeConverter<unsigned char>::type>(key);
+bool Dictionary::hasValue<unsigned char>(const string& key) const {
+    bool val = hasValueHelper<StorageTypeConverter<unsigned char>::type>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<unsigned char>(dict);
+            bool canConvert = isConvertible<unsigned char>(dict);
             if (canConvert)
                 return true;
         }
@@ -516,7 +509,7 @@ bool Dictionary::hasValue<unsigned char>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<unsigned char>(std::string key, unsigned char value,
+bool Dictionary::setValue<unsigned char>(string key, unsigned char value,
                                 bool createIntermediate)
 {
     return setValueHelper(
@@ -527,22 +520,22 @@ bool Dictionary::setValue<unsigned char>(std::string key, unsigned char value,
 }
 
 template <>
-bool Dictionary::getValue<unsigned char>(const std::string& key,
+bool Dictionary::getValue<unsigned char>(const string& key,
                                          unsigned char& value) const
 {
     StorageTypeConverter<unsigned char>::type v;
-    const bool success = hasValueHelper<StorageTypeConverter<unsigned char>::type>(key);
+    bool success = hasValueHelper<StorageTypeConverter<unsigned char>::type>(key);
     if (success) {
         getValueHelper(key, v);
         value = static_cast<unsigned char>(v);
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<unsigned char>(dict);
+            bool canConvert = isConvertible<unsigned char>(dict);
             if (canConvert) {
                 convert(dict, value);
                 return true;
@@ -553,16 +546,16 @@ bool Dictionary::getValue<unsigned char>(const std::string& key,
 }
 
 template <>
-bool Dictionary::hasValue<wchar_t>(const std::string& key) const {
-    const bool val = hasValueHelper<StorageTypeConverter<wchar_t>::type>(key);
+bool Dictionary::hasValue<wchar_t>(const string& key) const {
+    bool val = hasValueHelper<StorageTypeConverter<wchar_t>::type>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<wchar_t>(dict);
+            bool canConvert = isConvertible<wchar_t>(dict);
             if (canConvert)
                 return true;
         }
@@ -571,7 +564,7 @@ bool Dictionary::hasValue<wchar_t>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<wchar_t>(std::string key, wchar_t value,
+bool Dictionary::setValue<wchar_t>(string key, wchar_t value,
                                 bool createIntermediate)
 {
     return setValueHelper(
@@ -582,20 +575,20 @@ bool Dictionary::setValue<wchar_t>(std::string key, wchar_t value,
 }
 
 template <>
-bool Dictionary::getValue<wchar_t>(const std::string& key, wchar_t& value) const {
+bool Dictionary::getValue<wchar_t>(const string& key, wchar_t& value) const {
     StorageTypeConverter<wchar_t>::type v;
-    const bool success = hasValueHelper<StorageTypeConverter<wchar_t>::type>(key);
+    bool success = hasValueHelper<StorageTypeConverter<wchar_t>::type>(key);
     if (success) {
         getValueHelper(key, v);
         value = static_cast<wchar_t>(v);
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<wchar_t>(dict);
+            bool canConvert = isConvertible<wchar_t>(dict);
             if (canConvert) {
                 convert(dict, value);
                 return true;
@@ -606,16 +599,16 @@ bool Dictionary::getValue<wchar_t>(const std::string& key, wchar_t& value) const
 }
 
 template <>
-bool Dictionary::hasValue<short>(const std::string& key) const {
-    const bool val = hasValueHelper<StorageTypeConverter<short>::type>(key);
+bool Dictionary::hasValue<short>(const string& key) const {
+    bool val = hasValueHelper<StorageTypeConverter<short>::type>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<short>(dict);
+            bool canConvert = isConvertible<short>(dict);
             if (canConvert)
                 return true;
         }
@@ -624,7 +617,7 @@ bool Dictionary::hasValue<short>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<short>(std::string key, short value,
+bool Dictionary::setValue<short>(string key, short value,
                                 bool createIntermediate)
 {
     return setValueHelper(
@@ -635,20 +628,20 @@ bool Dictionary::setValue<short>(std::string key, short value,
 }
 
 template <>
-bool Dictionary::getValue<short>(const std::string& key, short& value) const {
+bool Dictionary::getValue<short>(const string& key, short& value) const {
     StorageTypeConverter<short>::type v;
-    const bool success = hasValueHelper<StorageTypeConverter<short>::type>(key);
+    bool success = hasValueHelper<StorageTypeConverter<short>::type>(key);
     if (success) {
         getValueHelper(key, v);
         value = static_cast<short>(v);
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<short>(dict);
+            bool canConvert = isConvertible<short>(dict);
             if (canConvert) {
                 convert(dict, value);
                 return true;
@@ -659,16 +652,16 @@ bool Dictionary::getValue<short>(const std::string& key, short& value) const {
 }
 
 template <>
-bool Dictionary::hasValue<unsigned short>(const std::string& key) const {
-    const bool val = hasValueHelper<StorageTypeConverter<unsigned short>::type>(key);
+bool Dictionary::hasValue<unsigned short>(const string& key) const {
+    bool val = hasValueHelper<StorageTypeConverter<unsigned short>::type>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<unsigned short>(dict);
+            bool canConvert = isConvertible<unsigned short>(dict);
             if (canConvert)
                 return true;
         }
@@ -677,7 +670,7 @@ bool Dictionary::hasValue<unsigned short>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<unsigned short>(std::string key, unsigned short value,
+bool Dictionary::setValue<unsigned short>(string key, unsigned short value,
                                 bool createIntermediate)
 {
     return setValueHelper(
@@ -688,22 +681,22 @@ bool Dictionary::setValue<unsigned short>(std::string key, unsigned short value,
 }
 
 template <>
-bool Dictionary::getValue<unsigned short>(const std::string& key, 
+bool Dictionary::getValue<unsigned short>(const string& key,
                                           unsigned short& value) const
 {
     StorageTypeConverter<unsigned short>::type v;
-    const bool success = hasValueHelper<StorageTypeConverter<unsigned short>::type>(key);
+    bool success = hasValueHelper<StorageTypeConverter<unsigned short>::type>(key);
     if (success) {
         getValueHelper(key, v);
         value = static_cast<unsigned short>(v);
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<unsigned short>(dict);
+            bool canConvert = isConvertible<unsigned short>(dict);
             if (canConvert) {
                 convert(dict, value);
                 return true;
@@ -714,16 +707,16 @@ bool Dictionary::getValue<unsigned short>(const std::string& key,
 }
 
 template <>
-bool Dictionary::hasValue<int>(const std::string& key) const {
-    const bool val = hasValueHelper<StorageTypeConverter<int>::type>(key);
+bool Dictionary::hasValue<int>(const string& key) const {
+    bool val = hasValueHelper<StorageTypeConverter<int>::type>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<int>(dict);
+            bool canConvert = isConvertible<int>(dict);
             if (canConvert)
                 return true;
         }
@@ -732,7 +725,7 @@ bool Dictionary::hasValue<int>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<int>(std::string key, int value, bool createIntermediate) {
+bool Dictionary::setValue<int>(string key, int value, bool createIntermediate) {
     return setValueHelper(
         std::move(key),
         StorageTypeConverter<int>::type(value),
@@ -741,20 +734,20 @@ bool Dictionary::setValue<int>(std::string key, int value, bool createIntermedia
 }
 
 template <>
-bool Dictionary::getValue<int>(const std::string& key, int& value) const {
+bool Dictionary::getValue<int>(const string& key, int& value) const {
     StorageTypeConverter<int>::type v;
-    const bool success = hasValueHelper<StorageTypeConverter<int>::type>(key);
+    bool success = hasValueHelper<StorageTypeConverter<int>::type>(key);
     if (success) {
         getValueHelper(key, v);
         value = static_cast<int>(v);
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<int>(dict);
+            bool canConvert = isConvertible<int>(dict);
             if (canConvert) {
                 convert(dict, value);
                 return true;
@@ -765,16 +758,16 @@ bool Dictionary::getValue<int>(const std::string& key, int& value) const {
 }
 
 template <>
-bool Dictionary::hasValue<unsigned int>(const std::string& key) const {
-    const bool val = hasValueHelper<StorageTypeConverter<unsigned int>::type>(key);
+bool Dictionary::hasValue<unsigned int>(const string& key) const {
+    bool val = hasValueHelper<StorageTypeConverter<unsigned int>::type>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<unsigned int>(dict);
+            bool canConvert = isConvertible<unsigned int>(dict);
             if (canConvert)
                 return true;
         }
@@ -783,7 +776,7 @@ bool Dictionary::hasValue<unsigned int>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<unsigned int>(std::string key, unsigned int value,
+bool Dictionary::setValue<unsigned int>(string key, unsigned int value,
                                 bool createIntermediate)
 {
     return setValueHelper(
@@ -794,22 +787,22 @@ bool Dictionary::setValue<unsigned int>(std::string key, unsigned int value,
 }
 
 template <>
-bool Dictionary::getValue<unsigned int>(const std::string& key,
+bool Dictionary::getValue<unsigned int>(const string& key,
                                         unsigned int& value) const
 {
     StorageTypeConverter<unsigned int>::type v;
-    const bool success = hasValueHelper<StorageTypeConverter<unsigned int>::type>(key);
+    bool success = hasValueHelper<StorageTypeConverter<unsigned int>::type>(key);
     if (success) {
         getValueHelper(key, v);
         value = static_cast<unsigned int>(v);
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<unsigned int>(dict);
+            bool canConvert = isConvertible<unsigned int>(dict);
             if (canConvert) {
                 convert(dict, value);
                 return true;
@@ -820,16 +813,16 @@ bool Dictionary::getValue<unsigned int>(const std::string& key,
 }
 
 template <>
-bool Dictionary::hasValue<float>(const std::string& key) const {
-    const bool val = hasValueHelper<StorageTypeConverter<float>::type>(key);
+bool Dictionary::hasValue<float>(const string& key) const {
+    bool val = hasValueHelper<StorageTypeConverter<float>::type>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<float>(dict);
+            bool canConvert = isConvertible<float>(dict);
             if (canConvert)
                 return true;
         }
@@ -838,7 +831,7 @@ bool Dictionary::hasValue<float>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<float>(std::string key, float value, bool createIntermediate) {
+bool Dictionary::setValue<float>(string key, float value, bool createIntermediate) {
     return setValueHelper(
         std::move(key),
         StorageTypeConverter<float>::type(value),
@@ -847,20 +840,20 @@ bool Dictionary::setValue<float>(std::string key, float value, bool createInterm
 }
 
 template <>
-bool Dictionary::getValue<float>(const std::string& key, float& value) const {
+bool Dictionary::getValue<float>(const string& key, float& value) const {
     StorageTypeConverter<float>::type v;
-    const bool success = hasValueHelper<StorageTypeConverter<float>::type>(key);
+    bool success = hasValueHelper<StorageTypeConverter<float>::type>(key);
     if (success) {
         getValueHelper(key, v);
         value = static_cast<float>(v);
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<float>(dict);
+            bool canConvert = isConvertible<float>(dict);
             if (canConvert) {
                 convert(dict, value);
                 return true;
@@ -871,18 +864,18 @@ bool Dictionary::getValue<float>(const std::string& key, float& value) const {
 }
 
 template <>
-bool Dictionary::hasValue<glm::vec2>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::vec2>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::vec2>::type,
                                         StorageTypeConverter<glm::vec2>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::vec2>(dict);
+            bool canConvert = isConvertible<glm::vec2>(dict);
             if (canConvert)
                 return true;
         }
@@ -891,7 +884,7 @@ bool Dictionary::hasValue<glm::vec2>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::vec2>(std::string key, glm::vec2 value,
+bool Dictionary::setValue<glm::vec2>(string key, glm::vec2 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -902,7 +895,7 @@ bool Dictionary::setValue<glm::vec2>(std::string key, glm::vec2 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::vec2>(const std::string& key, glm::vec2& value) const {
+bool Dictionary::getValue<glm::vec2>(const string& key, glm::vec2& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::vec2>::type,
                                         StorageTypeConverter<glm::vec2>::size>>(key);
@@ -914,11 +907,11 @@ bool Dictionary::getValue<glm::vec2>(const std::string& key, glm::vec2& value) c
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::vec2>(dict);
+            bool canConvert = isConvertible<glm::vec2>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -929,18 +922,18 @@ bool Dictionary::getValue<glm::vec2>(const std::string& key, glm::vec2& value) c
 }
 
 template <>
-bool Dictionary::hasValue<glm::dvec2>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::dvec2>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::dvec2>::type,
                                         StorageTypeConverter<glm::dvec2>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::dvec2>(dict);
+            bool canConvert = isConvertible<glm::dvec2>(dict);
             if (canConvert)
                 return true;
         }
@@ -949,7 +942,7 @@ bool Dictionary::hasValue<glm::dvec2>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::dvec2>(std::string key, glm::dvec2 value,
+bool Dictionary::setValue<glm::dvec2>(string key, glm::dvec2 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -972,11 +965,11 @@ bool Dictionary::getValue<glm::dvec2>(const std::string& key, glm::dvec2& value)
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::dvec2>(dict);
+            bool canConvert = isConvertible<glm::dvec2>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -987,18 +980,18 @@ bool Dictionary::getValue<glm::dvec2>(const std::string& key, glm::dvec2& value)
 }
 
 template <>
-bool Dictionary::hasValue<glm::ivec2>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::ivec2>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::ivec2>::type,
                                         StorageTypeConverter<glm::ivec2>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::ivec2>(dict);
+            bool canConvert = isConvertible<glm::ivec2>(dict);
             if (canConvert)
                 return true;
         }
@@ -1007,7 +1000,7 @@ bool Dictionary::hasValue<glm::ivec2>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::ivec2>(std::string key, glm::ivec2 value,
+bool Dictionary::setValue<glm::ivec2>(string key, glm::ivec2 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1018,7 +1011,7 @@ bool Dictionary::setValue<glm::ivec2>(std::string key, glm::ivec2 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::ivec2>(const std::string& key, glm::ivec2& value) const {
+bool Dictionary::getValue<glm::ivec2>(const string& key, glm::ivec2& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::ivec2>::type,
                                         StorageTypeConverter<glm::ivec2>::size>>(key);
@@ -1030,11 +1023,11 @@ bool Dictionary::getValue<glm::ivec2>(const std::string& key, glm::ivec2& value)
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::ivec2>(dict);
+            bool canConvert = isConvertible<glm::ivec2>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1045,18 +1038,18 @@ bool Dictionary::getValue<glm::ivec2>(const std::string& key, glm::ivec2& value)
 }
 
 template <>
-bool Dictionary::hasValue<glm::uvec2>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::uvec2>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::uvec2>::type,
                                         StorageTypeConverter<glm::uvec2>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::uvec2>(dict);
+            bool canConvert = isConvertible<glm::uvec2>(dict);
             if (canConvert)
                 return true;
         }
@@ -1065,7 +1058,7 @@ bool Dictionary::hasValue<glm::uvec2>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::uvec2>(std::string key, glm::uvec2 value,
+bool Dictionary::setValue<glm::uvec2>(string key, glm::uvec2 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1076,7 +1069,7 @@ bool Dictionary::setValue<glm::uvec2>(std::string key, glm::uvec2 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::uvec2>(const std::string& key, glm::uvec2& value) const {
+bool Dictionary::getValue<glm::uvec2>(const string& key, glm::uvec2& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::uvec2>::type,
                                         StorageTypeConverter<glm::uvec2>::size>>(key);
@@ -1088,11 +1081,11 @@ bool Dictionary::getValue<glm::uvec2>(const std::string& key, glm::uvec2& value)
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::uvec2>(dict);
+            bool canConvert = isConvertible<glm::uvec2>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1103,18 +1096,18 @@ bool Dictionary::getValue<glm::uvec2>(const std::string& key, glm::uvec2& value)
 }
 
 template <>
-bool Dictionary::hasValue<glm::bvec2>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::bvec2>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::bvec2>::type,
                                         StorageTypeConverter<glm::bvec2>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::bvec2>(dict);
+            bool canConvert = isConvertible<glm::bvec2>(dict);
             if (canConvert)
                 return true;
         }
@@ -1123,7 +1116,7 @@ bool Dictionary::hasValue<glm::bvec2>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::bvec2>(std::string key, glm::bvec2 value,
+bool Dictionary::setValue<glm::bvec2>(string key, glm::bvec2 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1134,7 +1127,7 @@ bool Dictionary::setValue<glm::bvec2>(std::string key, glm::bvec2 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::bvec2>(const std::string& key, glm::bvec2& value) const {
+bool Dictionary::getValue<glm::bvec2>(const string& key, glm::bvec2& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::bvec2>::type,
                                         StorageTypeConverter<glm::bvec2>::size>>(key);
@@ -1146,11 +1139,11 @@ bool Dictionary::getValue<glm::bvec2>(const std::string& key, glm::bvec2& value)
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::bvec2>(dict);
+            bool canConvert = isConvertible<glm::bvec2>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1161,18 +1154,18 @@ bool Dictionary::getValue<glm::bvec2>(const std::string& key, glm::bvec2& value)
 }
 
 template <>
-bool Dictionary::hasValue<glm::vec3>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::vec3>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::vec3>::type,
                                         StorageTypeConverter<glm::vec3>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::vec3>(dict);
+            bool canConvert = isConvertible<glm::vec3>(dict);
             if (canConvert)
                 return true;
         }
@@ -1181,7 +1174,7 @@ bool Dictionary::hasValue<glm::vec3>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::vec3>(std::string key, glm::vec3 value,
+bool Dictionary::setValue<glm::vec3>(string key, glm::vec3 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1192,7 +1185,7 @@ bool Dictionary::setValue<glm::vec3>(std::string key, glm::vec3 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::vec3>(const std::string& key, glm::vec3& value) const {
+bool Dictionary::getValue<glm::vec3>(const string& key, glm::vec3& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::vec3>::type,
                                         StorageTypeConverter<glm::vec3>::size>>(key);
@@ -1204,11 +1197,11 @@ bool Dictionary::getValue<glm::vec3>(const std::string& key, glm::vec3& value) c
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::vec3>(dict);
+            bool canConvert = isConvertible<glm::vec3>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1219,18 +1212,18 @@ bool Dictionary::getValue<glm::vec3>(const std::string& key, glm::vec3& value) c
 }
 
 template <>
-bool Dictionary::hasValue<glm::dvec3>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::dvec3>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::dvec3>::type,
                                         StorageTypeConverter<glm::dvec3>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::dvec3>(dict);
+            bool canConvert = isConvertible<glm::dvec3>(dict);
             if (canConvert)
                 return true;
         }
@@ -1239,7 +1232,7 @@ bool Dictionary::hasValue<glm::dvec3>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::dvec3>(std::string key, glm::dvec3 value,
+bool Dictionary::setValue<glm::dvec3>(string key, glm::dvec3 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1250,7 +1243,7 @@ bool Dictionary::setValue<glm::dvec3>(std::string key, glm::dvec3 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::dvec3>(const std::string& key, glm::dvec3& value) const {
+bool Dictionary::getValue<glm::dvec3>(const string& key, glm::dvec3& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::dvec3>::type,
                                         StorageTypeConverter<glm::dvec3>::size>>(key);
@@ -1262,11 +1255,11 @@ bool Dictionary::getValue<glm::dvec3>(const std::string& key, glm::dvec3& value)
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::dvec3>(dict);
+            bool canConvert = isConvertible<glm::dvec3>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1277,18 +1270,18 @@ bool Dictionary::getValue<glm::dvec3>(const std::string& key, glm::dvec3& value)
 }
 
 template <>
-bool Dictionary::hasValue<glm::ivec3>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::ivec3>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::ivec3>::type,
                                         StorageTypeConverter<glm::ivec3>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::ivec3>(dict);
+            bool canConvert = isConvertible<glm::ivec3>(dict);
             if (canConvert)
                 return true;
         }
@@ -1297,7 +1290,7 @@ bool Dictionary::hasValue<glm::ivec3>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::ivec3>(std::string key, glm::ivec3 value,
+bool Dictionary::setValue<glm::ivec3>(string key, glm::ivec3 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1308,7 +1301,7 @@ bool Dictionary::setValue<glm::ivec3>(std::string key, glm::ivec3 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::ivec3>(const std::string& key, glm::ivec3& value) const {
+bool Dictionary::getValue<glm::ivec3>(const string& key, glm::ivec3& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::ivec3>::type,
                                         StorageTypeConverter<glm::ivec3>::size>>(key);
@@ -1320,11 +1313,11 @@ bool Dictionary::getValue<glm::ivec3>(const std::string& key, glm::ivec3& value)
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::ivec3>(dict);
+            bool canConvert = isConvertible<glm::ivec3>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1335,18 +1328,18 @@ bool Dictionary::getValue<glm::ivec3>(const std::string& key, glm::ivec3& value)
 }
 
 template <>
-bool Dictionary::hasValue<glm::uvec3>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::uvec3>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::uvec3>::type,
                                         StorageTypeConverter<glm::uvec3>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::uvec3>(dict);
+            bool canConvert = isConvertible<glm::uvec3>(dict);
             if (canConvert)
                 return true;
         }
@@ -1355,7 +1348,7 @@ bool Dictionary::hasValue<glm::uvec3>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::uvec3>(std::string key, glm::uvec3 value,
+bool Dictionary::setValue<glm::uvec3>(string key, glm::uvec3 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1366,7 +1359,7 @@ bool Dictionary::setValue<glm::uvec3>(std::string key, glm::uvec3 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::uvec3>(const std::string& key, glm::uvec3& value) const {
+bool Dictionary::getValue<glm::uvec3>(const string& key, glm::uvec3& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::uvec3>::type,
                                         StorageTypeConverter<glm::uvec3>::size>>(key);
@@ -1378,11 +1371,11 @@ bool Dictionary::getValue<glm::uvec3>(const std::string& key, glm::uvec3& value)
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::uvec3>(dict);
+            bool canConvert = isConvertible<glm::uvec3>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1393,18 +1386,18 @@ bool Dictionary::getValue<glm::uvec3>(const std::string& key, glm::uvec3& value)
 }
 
 template <>
-bool Dictionary::hasValue<glm::bvec3>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::bvec3>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::bvec3>::type,
                                         StorageTypeConverter<glm::bvec3>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::bvec3>(dict);
+            bool canConvert = isConvertible<glm::bvec3>(dict);
             if (canConvert)
                 return true;
         }
@@ -1413,7 +1406,7 @@ bool Dictionary::hasValue<glm::bvec3>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::bvec3>(std::string key, glm::bvec3 value,
+bool Dictionary::setValue<glm::bvec3>(string key, glm::bvec3 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1424,7 +1417,7 @@ bool Dictionary::setValue<glm::bvec3>(std::string key, glm::bvec3 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::bvec3>(const std::string& key, glm::bvec3& value) const {
+bool Dictionary::getValue<glm::bvec3>(const string& key, glm::bvec3& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::bvec3>::type,
                                         StorageTypeConverter<glm::bvec3>::size>>(key);
@@ -1436,11 +1429,11 @@ bool Dictionary::getValue<glm::bvec3>(const std::string& key, glm::bvec3& value)
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::bvec3>(dict);
+            bool canConvert = isConvertible<glm::bvec3>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1451,18 +1444,18 @@ bool Dictionary::getValue<glm::bvec3>(const std::string& key, glm::bvec3& value)
 }
 
 template <>
-bool Dictionary::hasValue<glm::vec4>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::vec4>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::vec4>::type,
                                         StorageTypeConverter<glm::vec4>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::vec4>(dict);
+            bool canConvert = isConvertible<glm::vec4>(dict);
             if (canConvert)
                 return true;
         }
@@ -1471,7 +1464,7 @@ bool Dictionary::hasValue<glm::vec4>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::vec4>(std::string key, glm::vec4 value,
+bool Dictionary::setValue<glm::vec4>(string key, glm::vec4 value,
                                 bool createIntermediate) {
     auto v = createArray<
         glm::vec4::value_type,
@@ -1481,7 +1474,7 @@ bool Dictionary::setValue<glm::vec4>(std::string key, glm::vec4 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::vec4>(const std::string& key, glm::vec4& value) const {
+bool Dictionary::getValue<glm::vec4>(const string& key, glm::vec4& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::vec4>::type,
                                         StorageTypeConverter<glm::vec4>::size>>(key);
@@ -1492,11 +1485,11 @@ bool Dictionary::getValue<glm::vec4>(const std::string& key, glm::vec4& value) c
         value = glm::make_vec4(v.data());
         return success;
     } else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::vec4>(dict);
+            bool canConvert = isConvertible<glm::vec4>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1507,18 +1500,18 @@ bool Dictionary::getValue<glm::vec4>(const std::string& key, glm::vec4& value) c
 }
 
 template <>
-bool Dictionary::hasValue<glm::dvec4>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::dvec4>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::dvec4>::type,
                                         StorageTypeConverter<glm::dvec4>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::dvec4>(dict);
+            bool canConvert = isConvertible<glm::dvec4>(dict);
             if (canConvert)
                 return true;
         }
@@ -1527,7 +1520,7 @@ bool Dictionary::hasValue<glm::dvec4>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::dvec4>(std::string key, glm::dvec4 value,
+bool Dictionary::setValue<glm::dvec4>(string key, glm::dvec4 value,
                                 bool createIntermediate) {
     auto v = createArray<
         glm::dvec4::value_type,
@@ -1537,7 +1530,7 @@ bool Dictionary::setValue<glm::dvec4>(std::string key, glm::dvec4 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::dvec4>(const std::string& key, glm::dvec4& value) const {
+bool Dictionary::getValue<glm::dvec4>(const string& key, glm::dvec4& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::dvec4>::type,
                                         StorageTypeConverter<glm::dvec4>::size>>(key);
@@ -1549,11 +1542,11 @@ bool Dictionary::getValue<glm::dvec4>(const std::string& key, glm::dvec4& value)
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::dvec4>(dict);
+            bool canConvert = isConvertible<glm::dvec4>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1564,18 +1557,18 @@ bool Dictionary::getValue<glm::dvec4>(const std::string& key, glm::dvec4& value)
 }
 
 template <>
-bool Dictionary::hasValue<glm::ivec4>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::ivec4>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::ivec4>::type,
                                         StorageTypeConverter<glm::ivec4>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::ivec4>(dict);
+            bool canConvert = isConvertible<glm::ivec4>(dict);
             if (canConvert)
                 return true;
         }
@@ -1584,7 +1577,7 @@ bool Dictionary::hasValue<glm::ivec4>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::ivec4>(std::string key, glm::ivec4 value,
+bool Dictionary::setValue<glm::ivec4>(string key, glm::ivec4 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1595,7 +1588,7 @@ bool Dictionary::setValue<glm::ivec4>(std::string key, glm::ivec4 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::ivec4>(const std::string& key, glm::ivec4& value) const {
+bool Dictionary::getValue<glm::ivec4>(const string& key, glm::ivec4& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::ivec4>::type,
                                         StorageTypeConverter<glm::ivec4>::size>>(key);
@@ -1607,11 +1600,11 @@ bool Dictionary::getValue<glm::ivec4>(const std::string& key, glm::ivec4& value)
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::ivec4>(dict);
+            bool canConvert = isConvertible<glm::ivec4>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1622,18 +1615,18 @@ bool Dictionary::getValue<glm::ivec4>(const std::string& key, glm::ivec4& value)
 }
 
 template <>
-bool Dictionary::hasValue<glm::uvec4>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::uvec4>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::uvec4>::type,
                                         StorageTypeConverter<glm::uvec4>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::uvec4>(dict);
+            bool canConvert = isConvertible<glm::uvec4>(dict);
             if (canConvert)
                 return true;
         }
@@ -1642,7 +1635,7 @@ bool Dictionary::hasValue<glm::uvec4>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::uvec4>(std::string key, glm::uvec4 value,
+bool Dictionary::setValue<glm::uvec4>(string key, glm::uvec4 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1653,7 +1646,7 @@ bool Dictionary::setValue<glm::uvec4>(std::string key, glm::uvec4 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::uvec4>(const std::string& key, glm::uvec4& value) const {
+bool Dictionary::getValue<glm::uvec4>(const string& key, glm::uvec4& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::uvec4>::type,
                                         StorageTypeConverter<glm::uvec4>::size>>(key);
@@ -1665,11 +1658,11 @@ bool Dictionary::getValue<glm::uvec4>(const std::string& key, glm::uvec4& value)
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::uvec4>(dict);
+            bool canConvert = isConvertible<glm::uvec4>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1680,18 +1673,18 @@ bool Dictionary::getValue<glm::uvec4>(const std::string& key, glm::uvec4& value)
 }
 
 template <>
-bool Dictionary::hasValue<glm::bvec4>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::bvec4>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::bvec4>::type,
                                         StorageTypeConverter<glm::bvec4>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::bvec4>(dict);
+            bool canConvert = isConvertible<glm::bvec4>(dict);
             if (canConvert)
                 return true;
         }
@@ -1700,7 +1693,7 @@ bool Dictionary::hasValue<glm::bvec4>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::bvec4>(std::string key, glm::bvec4 value,
+bool Dictionary::setValue<glm::bvec4>(string key, glm::bvec4 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1711,7 +1704,7 @@ bool Dictionary::setValue<glm::bvec4>(std::string key, glm::bvec4 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::bvec4>(const std::string& key, glm::bvec4& value) const {
+bool Dictionary::getValue<glm::bvec4>(const string& key, glm::bvec4& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::bvec4>::type,
                                         StorageTypeConverter<glm::bvec4>::size>>(key);
@@ -1723,11 +1716,11 @@ bool Dictionary::getValue<glm::bvec4>(const std::string& key, glm::bvec4& value)
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::bvec4>(dict);
+            bool canConvert = isConvertible<glm::bvec4>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1738,18 +1731,18 @@ bool Dictionary::getValue<glm::bvec4>(const std::string& key, glm::bvec4& value)
 }
 
 template <>
-bool Dictionary::hasValue<glm::mat2x2>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::mat2x2>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat2x2>::type,
                                         StorageTypeConverter<glm::mat2x2>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::mat2x2>(dict);
+            bool canConvert = isConvertible<glm::mat2x2>(dict);
             if (canConvert)
                 return true;
         }
@@ -1758,7 +1751,7 @@ bool Dictionary::hasValue<glm::mat2x2>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::mat2x2>(std::string key, glm::mat2x2 value,
+bool Dictionary::setValue<glm::mat2x2>(string key, glm::mat2x2 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1769,7 +1762,7 @@ bool Dictionary::setValue<glm::mat2x2>(std::string key, glm::mat2x2 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::mat2x2>(const std::string& key, glm::mat2x2& value) const {
+bool Dictionary::getValue<glm::mat2x2>(const string& key, glm::mat2x2& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat2x2>::type,
                                         StorageTypeConverter<glm::mat2x2>::size>>(key);
@@ -1780,11 +1773,11 @@ bool Dictionary::getValue<glm::mat2x2>(const std::string& key, glm::mat2x2& valu
         value = glm::make_mat2x2(v.data());
         return success;
     } else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::mat2x2>(dict);
+            bool canConvert = isConvertible<glm::mat2x2>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1795,18 +1788,18 @@ bool Dictionary::getValue<glm::mat2x2>(const std::string& key, glm::mat2x2& valu
 }
 
 template <>
-bool Dictionary::hasValue<glm::mat2x3>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::mat2x3>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat2x3>::type,
                                         StorageTypeConverter<glm::mat2x3>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::mat2x3>(dict);
+            bool canConvert = isConvertible<glm::mat2x3>(dict);
             if (canConvert)
                 return true;
         }
@@ -1815,7 +1808,7 @@ bool Dictionary::hasValue<glm::mat2x3>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::mat2x3>(std::string key, glm::mat2x3 value,
+bool Dictionary::setValue<glm::mat2x3>(string key, glm::mat2x3 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1826,7 +1819,7 @@ bool Dictionary::setValue<glm::mat2x3>(std::string key, glm::mat2x3 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::mat2x3>(const std::string& key, glm::mat2x3& value) const {
+bool Dictionary::getValue<glm::mat2x3>(const string& key, glm::mat2x3& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat2x3>::type,
                                         StorageTypeConverter<glm::mat2x3>::size>>(key);
@@ -1838,11 +1831,11 @@ bool Dictionary::getValue<glm::mat2x3>(const std::string& key, glm::mat2x3& valu
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::mat2x3>(dict);
+            bool canConvert = isConvertible<glm::mat2x3>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1853,18 +1846,18 @@ bool Dictionary::getValue<glm::mat2x3>(const std::string& key, glm::mat2x3& valu
 }
 
 template <>
-bool Dictionary::hasValue<glm::mat2x4>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::mat2x4>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat2x4>::type,
                                         StorageTypeConverter<glm::mat2x4>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::mat2x4>(dict);
+            bool canConvert = isConvertible<glm::mat2x4>(dict);
             if (canConvert)
                 return true;
         }
@@ -1873,7 +1866,7 @@ bool Dictionary::hasValue<glm::mat2x4>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::mat2x4>(std::string key, glm::mat2x4 value,
+bool Dictionary::setValue<glm::mat2x4>(string key, glm::mat2x4 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1884,7 +1877,7 @@ bool Dictionary::setValue<glm::mat2x4>(std::string key, glm::mat2x4 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::mat2x4>(const std::string& key, glm::mat2x4& value) const {
+bool Dictionary::getValue<glm::mat2x4>(const string& key, glm::mat2x4& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat2x4>::type,
                                         StorageTypeConverter<glm::mat2x4>::size>>(key);
@@ -1896,11 +1889,11 @@ bool Dictionary::getValue<glm::mat2x4>(const std::string& key, glm::mat2x4& valu
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::mat2x4>(dict);
+            bool canConvert = isConvertible<glm::mat2x4>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1911,18 +1904,18 @@ bool Dictionary::getValue<glm::mat2x4>(const std::string& key, glm::mat2x4& valu
 }
 
 template <>
-bool Dictionary::hasValue<glm::mat3x2>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::mat3x2>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat3x2>::type,
                                         StorageTypeConverter<glm::mat3x2>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::mat3x2>(dict);
+            bool canConvert = isConvertible<glm::mat3x2>(dict);
             if (canConvert)
                 return true;
         }
@@ -1931,7 +1924,7 @@ bool Dictionary::hasValue<glm::mat3x2>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::mat3x2>(std::string key, glm::mat3x2 value,
+bool Dictionary::setValue<glm::mat3x2>(string key, glm::mat3x2 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -1942,7 +1935,7 @@ bool Dictionary::setValue<glm::mat3x2>(std::string key, glm::mat3x2 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::mat3x2>(const std::string& key, glm::mat3x2& value) const {
+bool Dictionary::getValue<glm::mat3x2>(const string& key, glm::mat3x2& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat3x2>::type,
                                         StorageTypeConverter<glm::mat3x2>::size>>(key);
@@ -1954,11 +1947,11 @@ bool Dictionary::getValue<glm::mat3x2>(const std::string& key, glm::mat3x2& valu
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::mat3x2>(dict);
+            bool canConvert = isConvertible<glm::mat3x2>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -1969,18 +1962,18 @@ bool Dictionary::getValue<glm::mat3x2>(const std::string& key, glm::mat3x2& valu
 }
 
 template <>
-bool Dictionary::hasValue<glm::mat3x3>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::mat3x3>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat3x3>::type,
                                         StorageTypeConverter<glm::mat3x3>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::mat3x3>(dict);
+            bool canConvert = isConvertible<glm::mat3x3>(dict);
             if (canConvert)
                 return true;
         }
@@ -1989,7 +1982,7 @@ bool Dictionary::hasValue<glm::mat3x3>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::mat3x3>(std::string key, glm::mat3x3 value,
+bool Dictionary::setValue<glm::mat3x3>(string key, glm::mat3x3 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -2000,7 +1993,7 @@ bool Dictionary::setValue<glm::mat3x3>(std::string key, glm::mat3x3 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::mat3x3>(const std::string& key, glm::mat3x3& value) const {
+bool Dictionary::getValue<glm::mat3x3>(const string& key, glm::mat3x3& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat3x3>::type,
                                         StorageTypeConverter<glm::mat3x3>::size>>(key);
@@ -2012,11 +2005,11 @@ bool Dictionary::getValue<glm::mat3x3>(const std::string& key, glm::mat3x3& valu
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::mat3x3>(dict);
+            bool canConvert = isConvertible<glm::mat3x3>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2027,18 +2020,18 @@ bool Dictionary::getValue<glm::mat3x3>(const std::string& key, glm::mat3x3& valu
 }
 
 template <>
-bool Dictionary::hasValue<glm::mat3x4>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::mat3x4>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat3x4>::type,
                                         StorageTypeConverter<glm::mat3x4>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::mat3x4>(dict);
+            bool canConvert = isConvertible<glm::mat3x4>(dict);
             if (canConvert)
                 return true;
         }
@@ -2047,7 +2040,7 @@ bool Dictionary::hasValue<glm::mat3x4>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::mat3x4>(std::string key, glm::mat3x4 value,
+bool Dictionary::setValue<glm::mat3x4>(string key, glm::mat3x4 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -2058,7 +2051,7 @@ bool Dictionary::setValue<glm::mat3x4>(std::string key, glm::mat3x4 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::mat3x4>(const std::string& key, glm::mat3x4& value) const {
+bool Dictionary::getValue<glm::mat3x4>(const string& key, glm::mat3x4& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat3x4>::type,
                                         StorageTypeConverter<glm::mat3x4>::size>>(key);
@@ -2070,11 +2063,11 @@ bool Dictionary::getValue<glm::mat3x4>(const std::string& key, glm::mat3x4& valu
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::mat3x4>(dict);
+            bool canConvert = isConvertible<glm::mat3x4>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2085,18 +2078,18 @@ bool Dictionary::getValue<glm::mat3x4>(const std::string& key, glm::mat3x4& valu
 }
 
 template <>
-bool Dictionary::hasValue<glm::mat4x2>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::mat4x2>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat4x2>::type,
                                         StorageTypeConverter<glm::mat4x2>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::mat4x2>(dict);
+            bool canConvert = isConvertible<glm::mat4x2>(dict);
             if (canConvert)
                 return true;
         }
@@ -2105,7 +2098,7 @@ bool Dictionary::hasValue<glm::mat4x2>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::mat4x2>(std::string key, glm::mat4x2 value,
+bool Dictionary::setValue<glm::mat4x2>(string key, glm::mat4x2 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -2116,7 +2109,7 @@ bool Dictionary::setValue<glm::mat4x2>(std::string key, glm::mat4x2 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::mat4x2>(const std::string& key, glm::mat4x2& value) const {
+bool Dictionary::getValue<glm::mat4x2>(const string& key, glm::mat4x2& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat4x2>::type,
                                         StorageTypeConverter<glm::mat4x2>::size>>(key);
@@ -2128,11 +2121,11 @@ bool Dictionary::getValue<glm::mat4x2>(const std::string& key, glm::mat4x2& valu
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::mat4x2>(dict);
+            bool canConvert = isConvertible<glm::mat4x2>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2143,18 +2136,18 @@ bool Dictionary::getValue<glm::mat4x2>(const std::string& key, glm::mat4x2& valu
 }
 
 template <>
-bool Dictionary::hasValue<glm::mat4x3>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::mat4x3>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat4x3>::type,
                                         StorageTypeConverter<glm::mat4x3>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::mat4x3>(dict);
+            bool canConvert = isConvertible<glm::mat4x3>(dict);
             if (canConvert)
                 return true;
         }
@@ -2163,7 +2156,7 @@ bool Dictionary::hasValue<glm::mat4x3>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::mat4x3>(std::string key, glm::mat4x3 value,
+bool Dictionary::setValue<glm::mat4x3>(string key, glm::mat4x3 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -2174,7 +2167,7 @@ bool Dictionary::setValue<glm::mat4x3>(std::string key, glm::mat4x3 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::mat4x3>(const std::string& key, glm::mat4x3& value) const {
+bool Dictionary::getValue<glm::mat4x3>(const string& key, glm::mat4x3& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat4x3>::type,
                                         StorageTypeConverter<glm::mat4x3>::size>>(key);
@@ -2186,11 +2179,11 @@ bool Dictionary::getValue<glm::mat4x3>(const std::string& key, glm::mat4x3& valu
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::mat4x3>(dict);
+            bool canConvert = isConvertible<glm::mat4x3>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2201,18 +2194,18 @@ bool Dictionary::getValue<glm::mat4x3>(const std::string& key, glm::mat4x3& valu
 }
 
 template <>
-bool Dictionary::hasValue<glm::mat4x4>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::mat4x4>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat4x4>::type,
                                         StorageTypeConverter<glm::mat4x4>::size>> (key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::mat4x4>(dict);
+            bool canConvert = isConvertible<glm::mat4x4>(dict);
             if (canConvert)
                 return true;
         }
@@ -2221,7 +2214,7 @@ bool Dictionary::hasValue<glm::mat4x4>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::mat4x4>(std::string key, glm::mat4x4 value,
+bool Dictionary::setValue<glm::mat4x4>(string key, glm::mat4x4 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -2232,7 +2225,7 @@ bool Dictionary::setValue<glm::mat4x4>(std::string key, glm::mat4x4 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::mat4x4>(const std::string& key, glm::mat4x4& value) const {
+bool Dictionary::getValue<glm::mat4x4>(const string& key, glm::mat4x4& value) const {
     bool success
             = hasValueHelper<std::array<StorageTypeConverter<glm::mat4x4>::type,
                                         StorageTypeConverter<glm::mat4x4>::size>>(key);
@@ -2244,11 +2237,11 @@ bool Dictionary::getValue<glm::mat4x4>(const std::string& key, glm::mat4x4& valu
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::mat4x4>(dict);
+            bool canConvert = isConvertible<glm::mat4x4>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2259,18 +2252,18 @@ bool Dictionary::getValue<glm::mat4x4>(const std::string& key, glm::mat4x4& valu
 }
 
 template <>
-bool Dictionary::hasValue<glm::dmat2x2>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::dmat2x2>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::dmat2x2>::type,
                                         StorageTypeConverter<glm::dmat2x2>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::dmat2x2>(dict);
+            bool canConvert = isConvertible<glm::dmat2x2>(dict);
             if (canConvert)
                 return true;
         }
@@ -2279,7 +2272,7 @@ bool Dictionary::hasValue<glm::dmat2x2>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::dmat2x2>(std::string key, glm::dmat2x2 value,
+bool Dictionary::setValue<glm::dmat2x2>(string key, glm::dmat2x2 value,
                                         bool createIntermediate)
 {
     auto v = createArray<
@@ -2290,7 +2283,7 @@ bool Dictionary::setValue<glm::dmat2x2>(std::string key, glm::dmat2x2 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::dmat2x2>(const std::string& key,
+bool Dictionary::getValue<glm::dmat2x2>(const string& key,
                                         glm::dmat2x2& value) const
 {
     bool success
@@ -2304,11 +2297,11 @@ bool Dictionary::getValue<glm::dmat2x2>(const std::string& key,
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::dmat2x2>(dict);
+            bool canConvert = isConvertible<glm::dmat2x2>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2319,18 +2312,18 @@ bool Dictionary::getValue<glm::dmat2x2>(const std::string& key,
 }
 
 template <>
-bool Dictionary::hasValue<glm::dmat2x3>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::dmat2x3>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::dmat2x3>::type,
                                         StorageTypeConverter<glm::dmat2x3>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::dmat2x3>(dict);
+            bool canConvert = isConvertible<glm::dmat2x3>(dict);
             if (canConvert)
                 return true;
         }
@@ -2339,7 +2332,7 @@ bool Dictionary::hasValue<glm::dmat2x3>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::dmat2x3>(std::string key, glm::dmat2x3 value,
+bool Dictionary::setValue<glm::dmat2x3>(string key, glm::dmat2x3 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -2350,7 +2343,7 @@ bool Dictionary::setValue<glm::dmat2x3>(std::string key, glm::dmat2x3 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::dmat2x3>(const std::string& key,
+bool Dictionary::getValue<glm::dmat2x3>(const string& key,
                                         glm::dmat2x3& value) const
 {
     bool success
@@ -2364,11 +2357,11 @@ bool Dictionary::getValue<glm::dmat2x3>(const std::string& key,
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::dmat2x3>(dict);
+            bool canConvert = isConvertible<glm::dmat2x3>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2379,18 +2372,18 @@ bool Dictionary::getValue<glm::dmat2x3>(const std::string& key,
 }
 
 template <>
-bool Dictionary::hasValue<glm::dmat2x4>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::dmat2x4>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::dmat2x4>::type,
                                         StorageTypeConverter<glm::dmat2x4>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::dmat2x4>(dict);
+            bool canConvert = isConvertible<glm::dmat2x4>(dict);
             if (canConvert)
                 return true;
         }
@@ -2399,7 +2392,7 @@ bool Dictionary::hasValue<glm::dmat2x4>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::dmat2x4>(std::string key, glm::dmat2x4 value,
+bool Dictionary::setValue<glm::dmat2x4>(string key, glm::dmat2x4 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -2410,7 +2403,7 @@ bool Dictionary::setValue<glm::dmat2x4>(std::string key, glm::dmat2x4 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::dmat2x4>(const std::string& key,
+bool Dictionary::getValue<glm::dmat2x4>(const string& key,
                                         glm::dmat2x4& value) const
 {
     bool success
@@ -2424,11 +2417,11 @@ bool Dictionary::getValue<glm::dmat2x4>(const std::string& key,
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::dmat2x4>(dict);
+            bool canConvert = isConvertible<glm::dmat2x4>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2439,18 +2432,18 @@ bool Dictionary::getValue<glm::dmat2x4>(const std::string& key,
 }
 
 template <>
-bool Dictionary::hasValue<glm::dmat3x2>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::dmat3x2>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::dmat3x2>::type,
                                         StorageTypeConverter<glm::dmat3x2>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::dmat3x2>(dict);
+            bool canConvert = isConvertible<glm::dmat3x2>(dict);
             if (canConvert)
                 return true;
         }
@@ -2459,7 +2452,7 @@ bool Dictionary::hasValue<glm::dmat3x2>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::dmat3x2>(std::string key, glm::dmat3x2 value,
+bool Dictionary::setValue<glm::dmat3x2>(string key, glm::dmat3x2 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -2470,7 +2463,7 @@ bool Dictionary::setValue<glm::dmat3x2>(std::string key, glm::dmat3x2 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::dmat3x2>(const std::string& key,
+bool Dictionary::getValue<glm::dmat3x2>(const string& key,
                                         glm::dmat3x2& value) const
 {
     bool success
@@ -2484,11 +2477,11 @@ bool Dictionary::getValue<glm::dmat3x2>(const std::string& key,
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::dmat3x2>(dict);
+            bool canConvert = isConvertible<glm::dmat3x2>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2499,18 +2492,18 @@ bool Dictionary::getValue<glm::dmat3x2>(const std::string& key,
 }
 
 template <>
-bool Dictionary::hasValue<glm::dmat3x3>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::dmat3x3>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::dmat3x3>::type,
                                         StorageTypeConverter<glm::dmat3x3>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::dmat3x3>(dict);
+            bool canConvert = isConvertible<glm::dmat3x3>(dict);
             if (canConvert)
                 return true;
         }
@@ -2519,7 +2512,7 @@ bool Dictionary::hasValue<glm::dmat3x3>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::dmat3x3>(std::string key, glm::dmat3x3 value,
+bool Dictionary::setValue<glm::dmat3x3>(string key, glm::dmat3x3 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -2530,7 +2523,7 @@ bool Dictionary::setValue<glm::dmat3x3>(std::string key, glm::dmat3x3 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::dmat3x3>(const std::string& key,
+bool Dictionary::getValue<glm::dmat3x3>(const string& key,
                                         glm::dmat3x3& value) const
 {
     bool success
@@ -2544,11 +2537,11 @@ bool Dictionary::getValue<glm::dmat3x3>(const std::string& key,
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::dmat3x3>(dict);
+            bool canConvert = isConvertible<glm::dmat3x3>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2559,18 +2552,18 @@ bool Dictionary::getValue<glm::dmat3x3>(const std::string& key,
 }
 
 template <>
-bool Dictionary::hasValue<glm::dmat3x4>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::dmat3x4>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::dmat3x4>::type,
                                         StorageTypeConverter<glm::dmat3x4>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::dmat3x4>(dict);
+            bool canConvert = isConvertible<glm::dmat3x4>(dict);
             if (canConvert)
                 return true;
         }
@@ -2579,7 +2572,7 @@ bool Dictionary::hasValue<glm::dmat3x4>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::dmat3x4>(std::string key, glm::dmat3x4 value,
+bool Dictionary::setValue<glm::dmat3x4>(string key, glm::dmat3x4 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -2590,7 +2583,7 @@ bool Dictionary::setValue<glm::dmat3x4>(std::string key, glm::dmat3x4 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::dmat3x4>(const std::string& key,
+bool Dictionary::getValue<glm::dmat3x4>(const string& key,
                                         glm::dmat3x4& value) const
 {
     bool success
@@ -2604,11 +2597,11 @@ bool Dictionary::getValue<glm::dmat3x4>(const std::string& key,
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::dmat3x4>(dict);
+            bool canConvert = isConvertible<glm::dmat3x4>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2619,18 +2612,18 @@ bool Dictionary::getValue<glm::dmat3x4>(const std::string& key,
 }
 
 template <>
-bool Dictionary::hasValue<glm::dmat4x2>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::dmat4x2>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::dmat4x2>::type,
                                         StorageTypeConverter<glm::dmat4x2>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::dmat4x2>(dict);
+            bool canConvert = isConvertible<glm::dmat4x2>(dict);
             if (canConvert)
                 return true;
         }
@@ -2639,7 +2632,7 @@ bool Dictionary::hasValue<glm::dmat4x2>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::dmat4x2>(std::string key, glm::dmat4x2 value,
+bool Dictionary::setValue<glm::dmat4x2>(string key, glm::dmat4x2 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -2650,7 +2643,7 @@ bool Dictionary::setValue<glm::dmat4x2>(std::string key, glm::dmat4x2 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::dmat4x2>(const std::string& key,
+bool Dictionary::getValue<glm::dmat4x2>(const string& key,
                                         glm::dmat4x2& value) const
 {
     bool success
@@ -2664,11 +2657,11 @@ bool Dictionary::getValue<glm::dmat4x2>(const std::string& key,
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::dmat4x2>(dict);
+            bool canConvert = isConvertible<glm::dmat4x2>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2679,18 +2672,18 @@ bool Dictionary::getValue<glm::dmat4x2>(const std::string& key,
 }
 
 template <>
-bool Dictionary::hasValue<glm::dmat4x3>(const std::string& key) const {
-    const bool val
+bool Dictionary::hasValue<glm::dmat4x3>(const string& key) const {
+    bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::dmat4x3>::type,
                                         StorageTypeConverter<glm::dmat4x3>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::dmat4x3>(dict);
+            bool canConvert = isConvertible<glm::dmat4x3>(dict);
             if (canConvert)
                 return true;
         }
@@ -2699,7 +2692,7 @@ bool Dictionary::hasValue<glm::dmat4x3>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::dmat4x3>(std::string key, glm::dmat4x3 value,
+bool Dictionary::setValue<glm::dmat4x3>(string key, glm::dmat4x3 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -2710,7 +2703,7 @@ bool Dictionary::setValue<glm::dmat4x3>(std::string key, glm::dmat4x3 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::dmat4x3>(const std::string& key,
+bool Dictionary::getValue<glm::dmat4x3>(const string& key,
                                         glm::dmat4x3& value) const
 {
     bool success
@@ -2724,11 +2717,11 @@ bool Dictionary::getValue<glm::dmat4x3>(const std::string& key,
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::dmat4x3>(dict);
+            bool canConvert = isConvertible<glm::dmat4x3>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2739,18 +2732,18 @@ bool Dictionary::getValue<glm::dmat4x3>(const std::string& key,
 }
 
 template <>
-bool Dictionary::hasValue<glm::dmat4x4>(const std::string& key) const {
+bool Dictionary::hasValue<glm::dmat4x4>(const string& key) const {
     const bool val
             = hasValueHelper<std::array<StorageTypeConverter<glm::dmat4x4>::type,
                                         StorageTypeConverter<glm::dmat4x4>::size>>(key);
     if (val)
         return true;
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            const bool canConvert = isConvertible<glm::dmat4x4>(dict);
+            bool canConvert = isConvertible<glm::dmat4x4>(dict);
             if (canConvert)
                 return true;
         }
@@ -2759,7 +2752,7 @@ bool Dictionary::hasValue<glm::dmat4x4>(const std::string& key) const {
 }
 
 template <>
-bool Dictionary::setValue<glm::dmat4x4>(std::string key, glm::dmat4x4 value,
+bool Dictionary::setValue<glm::dmat4x4>(string key, glm::dmat4x4 value,
                                 bool createIntermediate)
 {
     auto v = createArray<
@@ -2770,7 +2763,7 @@ bool Dictionary::setValue<glm::dmat4x4>(std::string key, glm::dmat4x4 value,
 }
 
 template <>
-bool Dictionary::getValue<glm::dmat4x4>(const std::string& key,
+bool Dictionary::getValue<glm::dmat4x4>(const string& key,
                                         glm::dmat4x4& value) const
 {
     bool success
@@ -2784,11 +2777,11 @@ bool Dictionary::getValue<glm::dmat4x4>(const std::string& key,
         return success;
     }
     else {
-        const bool hasDictionary = hasValueHelper<Dictionary>(key);
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            const bool canConvert = isConvertible<glm::dmat4x4>(dict);
+            bool canConvert = isConvertible<glm::dmat4x4>(dict);
             if (canConvert) {
                 convertGLM(dict, value);
                 return true;
@@ -2799,7 +2792,7 @@ bool Dictionary::getValue<glm::dmat4x4>(const std::string& key,
 }
 
 template <>
-bool Dictionary::getValue<Dictionary>(const std::string& key, Dictionary& value) const {
+bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& value) const {
     if (&value == this) {
         LERROR(
               "The argument in the 'getValue' methods cannot be the same Dictionary as "
@@ -2813,7 +2806,7 @@ bool Dictionary::getValue<Dictionary>(const std::string& key, Dictionary& value)
 #pragma warning ( default : 4800 )
 #endif
 
-Dictionary::Dictionary(std::initializer_list<std::pair<std::string, boost::any>> l) {
+Dictionary::Dictionary(std::initializer_list<std::pair<string, boost::any>> l) {
     for (auto p : l)
         setValueAnyHelper(std::move(p.first), std::move(p.second));
 }

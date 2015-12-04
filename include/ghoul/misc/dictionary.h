@@ -123,16 +123,15 @@ public:
      * Creates a Dictionary out of the provided <code>std::initializer_list</code>. This
      * initializer list can be, for example, of the format
      * <code>{ { "a", 1 }, { "b", 2 } }</code> and it will add all of the
-     * <code>std::pair</code>%s provided to the Dictionary.
+     * <code>std::pair</code>s provided to the Dictionary.
 	 * \param l The <code>std::initializer_list</code> that contains all of the values
 	 * that should be added to the Dictionary
      */
     Dictionary(std::initializer_list<std::pair<std::string, boost::any>> l);
 
     /**
-     * Returns all of the keys that are stored in the dictionary at a given
-     * <code>location</code>. This location specifier can be recursive to inspect the keys
-     * at deeper levels.
+     * Returns all of the keys that are stored in the dictionary at a given \p location.
+     * This location specifier can be recursive to inspect the keys at deeper levels.
      * \param location The location for which all keys should be returned
      * \return A list of all keys that are stored in the Dictionary for the provided
      * location
@@ -141,8 +140,7 @@ public:
 
     /**
      * Returns <code>true</code> if there is a specific key in the Dictionary, regardless
-     * of its type. <code>key</code> can be a nested location to search for keys at deeper
-     * levels.
+     * of its type. \p key can be a nested location to search for keys at deeper levels.
      * \param key The key that should be checked for existence
      * \return <code>true</code> if the provided key exists in the Dictionary,
      * <code>false</code> otherwise
@@ -150,24 +148,24 @@ public:
     bool hasKey(const std::string& key) const;
 
     /**
-     * Adds the <code>value</code> for a given location at <code>key</code>. If a value
-     * already exists at that key, the old value is overwritten, regardless of its
-     * previous type and without any feedback. The <code>key</code> parameter can be
-     * specified as a nested location to add values to deeper levels of the Dictionary.
-     * If <code>createIntermediate</code> is <code>true</code> all intermediate
-     * levels in the Dictionary are created automatically; if it is <code>false</code>,
-     * this function will fail and return <code>false</code> if a non-existing level is
-     * encountered.
-     * \param key The key at which the <code>value</code> will be entered. This can be a
-     * nested location to insert value are deeper levels. Depending on the value of the
-     * <code>createIntermediate</code> parameter, all intermediate levels already have to
-     * exist in the Dictionary or will be created on-the-fly.
+     * Adds the \p value for a given location at \p key. If a value already exists at that
+     * key, the old value is overwritten, regardless of its previous type and without any
+     * feedback. The \p key parameter can be specified as a nested location to add values
+     * to deeper levels of the Dictionary. If \p createIntermediate is <code>true</code>
+     * all intermediate levels in the Dictionary are created automatically; if it is
+     * <code>false</code>, this function will fail and return <code>false</code> if a
+     * non-existing level is encountered.
+     * \tparam T The type of the \p value to set
+     * \param key The key at which the \p value will be entered. This can be a nested
+     * location to insert value are deeper levels. Depending on the value of the
+     * \p createIntermediate parameter, all intermediate levels already have to exist in
+     * the Dictionary or will be created on-the-fly.
      * \param value The value that will be added into the Dictionary. If the type supports
      * it, the value will only be moved rather than copied.
      * \param createIntermediate If <code>true</code> all intermediate levels in the
-     * Dictionary will be automatically created along the way, if the provided
-     * <code>key</code> contains a nested location. If <code>false</code> the method will
-     * fail and return <code>false</code> if a missing intermediate level is encountered.
+     * Dictionary will be automatically created along the way, if the provided \p key
+     * contains a nested location. If <code>false</code> the method will fail and return
+     * <code>false</code> if a missing intermediate level is encountered.
      * \return <code>true</code> if the value was stored successfully, <code>false</code>
      * otherwise
      */
@@ -175,18 +173,17 @@ public:
     bool setValue(std::string key, T value, bool createIntermediate = false);
 
     /**
-     * Returns the value stored at location with a given <code>key</code>. This key can be
-     * nested and will automatically be decomposed by the method to traverse to deeper
-     * levels of the Dictionary. If the Dictionary has a value at the provided key and the
-     * type agrees with the template parameter, the value will be copied into the provided
-     * reference <code>value</code> and the method returns <code>true</code>. If either
-     * the key does not exist or the type does not agree, <code>false</code> is returned
-     * and the <code>value</code> is unchanged. Only if the type of the key and the
-	 * requested type <code>T</code> disagree, an error is logged. If the key does not
-	 * exist in the dictionary, the error is silently ignored if the code was compiled
-	 * with GHL_DEBUG.
-     * \tparam T The type of the value that should be tested. The <code>typeid</code> of
-     * this type has to be equal to the typeid of the value that is to be retrieved
+     * Returns the value stored at location with a given \p key. This key can be nested
+     * and will automatically be decomposed by the method to traverse to deeper levels of
+     * the Dictionary. If the Dictionary has a value at the provided key and the type
+     * agrees with the template parameter, the value will be copied into the provided
+     * reference \p value and the method returns <code>true</code>. If either the key does
+     * not exist or the type does not agree, <code>false</code> is returned and the
+     * <code>value</code> is unchanged. Only if the type of the key and the requested type
+     * <code>T</code> disagree, an error is logged. If the key does not exist in the
+     * dictionary, the error is silently ignored if the code was compiled with GHL_DEBUG.
+     * \tparam T The type of the value that should be retrieved. The <code>typeid</code>
+     * of this type has to be equal to the typeid of the value that is to be retrieved
      * \param key The, potentially nested, key for which the stored value should be
      * returned
      * \param value A reference to the value where the value will be copied to, if it
@@ -198,14 +195,14 @@ public:
     bool getValue(const std::string& key, T& value) const;
 
     /**
-     * Returns the value stored at location with a given <code>key</code>. This key can be
-     * nested and will automatically be decomposed by the method to traverse to deeper
-     * levels of the Dictionary. If the Dictionary has a value at the provided key and the
-     * type agrees with the template parameter, the value will be returned. If either
-     * the key does not exist or the type does not agree, the return value is undefined.
-	 * Only if the type of the key and the requested type <code>T</code> disagree, an
-	 * error is logged. If the key does not exist in the dictionary, the error is silently
-	 * ignored if the code was compiled with GHL_DEBUG.
+     * Returns the value stored at location with a given \p key. This key can be nested
+     * and will automatically be decomposed by the method to traverse to deeper levels of
+     * the Dictionary. If the Dictionary has a value at the provided key and the type
+     * agrees with the template parameter, the value will be returned. If either the key
+     * does not exist or the type does not agree, the return value is undefined. Only if
+     * the type of the key and the requested type <code>T</code> disagree, an error is
+     * logged. If the key does not exist in the dictionary, the error is silently ignored
+     * if the code was compiled with GHL_DEBUG.
      * \tparam T The type of the value that should be tested. The <code>typeid</code> of
      * this type has to be equal to the typeid of the value that is to be retrieved
      * \param key The, potentially nested, key for which the stored value should be
@@ -217,27 +214,27 @@ public:
 
     /**
      * Returns <code>true</code> if the Dictionary stores a value at the provided
-     * <code>key</code> and the stored type agrees with the provided template parameter.
-     * The key can be nested and refer to deeper levels of the Dictionary. If any of the
-     * intermediate levels does not exists, <code>false</code> is returned.
+     * \p key and the stored type agrees with the provided template parameter. The key can
+     * be nested and refer to deeper levels of the Dictionary. If any of the intermediate
+     * levels does not exists, <code>false</code> is returned.
      * \tparam T The type of the value that should be tested. The <code>typeid</code> of
      * this type has to be equal to the typeid of the value that is to be checked
      * \param key The, potentially nested, key which should be checked for existence
      * \return <code>true</code> if the Dictionary contains a value at the specified
-     * <code>key</code> with the correct type <code>T</code>. Will return
-     * <code>false</code> otherwise
+     * \p key with the correct type <code>T</code>. Will return <code>false</code>
+     * otherwise
      */
     template <typename T>
     bool hasValue(const std::string& key) const;
     
     /**
      * Returns <code>true</code> if the Dictionary contains a value for the specified
-     * <code>key</code> and the value that is stored is of the type <code>T</code>. This
-     * method calls the Dictionary::hasKey and Dictionary::hasValue methods.
+     * \p key and the value that is stored is of the type <code>T</code>. This method
+     * calls the Dictionary::hasKey and Dictionary::hasValue methods.
      * \tparam T The type of the value that should be tested
      * \param key The key that should be tested
-     * \return <code>true</code> if the Dictionary contains a value for the
-     * <code>key</code> and the value is of type <code>T</code>
+     * \return <code>true</code> if the Dictionary contains a value for the \p key and the
+     * value is of type <code>T</code>
      */
     template <typename T>
     bool hasKeyAndValue(const std::string& key) const;
@@ -258,18 +255,15 @@ public:
     void clear();
 
 	/**
-	 * Returns <code>true</code> if this Dictionary is empty; <code>false</code>
-	 * otherwise.
-	 * \return <code>true</code> if this Dictionary is empty; <code>false</code>
-	 * otherwise
+	 * Returns <code>true</code> if this Dictionary is empty; <code>false</code> otherwise
+	 * \return <code>true</code> if this Dictionary is empty; <code>false</code> otherwise
 	 */
 	bool empty() const;
 
 	/**
-	 * Removes key and value pair stored under the, potentially nested, <code>key</code>.
-	 * If the <code>key</code> was found and successfully removed, <code>true</code> is
-	 * returned, otherwise the method returns <code>false</code>. Under no circumstances
-	 * an error is logged.
+	 * Removes key and value pair stored under the, potentially nested, \p key. If the
+     * \p key was found and successfully removed, <code>true</code> is returned, otherwise
+     * the method returns <code>false</code>. Under no circumstances an error is logged.
 	 * \param key The, potentially nested, key pointing to the object that should be
 	 * deleted
 	 * \return Returns <code>true</code> if the key was successfully found and removed,
@@ -279,10 +273,9 @@ public:
 
 protected:
     /**
-     * Splits the provided <code>key</code> into a <code>first</code> part and the
-     * <code>rest</code>. Provided a key <code>a.b.c</code>, <code>first</code> will be
-     * assigned <code>a</code> and <code>rest</code> will be assigned <code>b.c</code>
-     * after calling this method.
+     * Splits the provided \p key into a \p first part and the \p rest. Provided a key
+     * <code>a.b.c</code>, \p first will be assigned <code>a</code> and \p rest will be
+     * assigned <code>b.c</code> after calling this method.
      * \param key The key that should be split
      * \param first The first part of the key
      * \param rest The rest of the key
@@ -297,7 +290,7 @@ protected:
      * correct version of #setValue%, which will do the conversion to the unified storage
      * format. Any type that is not explicitly handled here, is just passed on to the
      * #setValue function unchanged.
-     * \param key The key under which the <code>value</code> is stored
+     * \param key The key under which the \p value is stored
      * \param value The value that should be stored under the provided key
      */
     void setValueAnyHelper(std::string key, boost::any value);

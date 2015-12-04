@@ -38,6 +38,11 @@
 #include <ghoul/logging/logmanager.h>
 
 namespace ghoul {
+    
+//extern template bool Dictionary::setValue<double>(std::string key, double value, bool createIntermediate);
+//extern template bool Dictionary::getValue<double>(const std::string& key, double& value) const;
+//extern template bool Dictionary::hasValue<double>(const std::string& key) const;
+    
 
 template <typename T>
 bool ghoul::Dictionary::setValueHelper(std::string key, T value,
@@ -191,6 +196,8 @@ bool Dictionary::hasKeyAndValue(const std::string& key) const {
     template<> bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) \
           const;                                                                         \
     template<> bool Dictionary::hasValue<TYPE>(const std::string& key) const
+
+    
 
 DEF_EXT_TEMPLATES(bool);
 DEF_EXT_TEMPLATES(char);
