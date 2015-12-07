@@ -176,6 +176,9 @@ template <typename T>
 void Dictionary::getValueInternal(const std::string& key, T& value,
                                                            IsStandardScalarType<T>*) const
 {
+    bool keyExists = hasKey(key);
+    if (!keyExists)
+        throw KeyError("Key '" + key + "' did not exist in Dictionary");
     bool success = hasValueHelper<typename internal::StorageTypeConverter<T>::type>(key);
     if (success) {
         typename internal::StorageTypeConverter<T>::type v;
@@ -261,8 +264,13 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
 template <typename T>
 bool Dictionary::getValue(const std::string& key, T& value) const {
     try {
-        getValueInternal(key, value);
-        return true;
+        bool keyExists = hasKey(key);
+        if (!keyExists)
+            return false;
+        else {
+            getValueInternal(key, value);
+            return true;
+        }
     }
     catch (const DictionaryError& e) {
         return false;
