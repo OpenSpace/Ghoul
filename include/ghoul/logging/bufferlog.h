@@ -82,8 +82,8 @@ public:
      * log entry would exhaust the available memory in the buffer. It is the callback's
      * responsibility to either clear the buffer (#resetBuffer) or provide a new buffer
      * that is used instead (#setBuffer)
-     * \param \p address must not be <code>nullptr</code>
-     * \param \p bufferSize must be positive
+     * \pre \p address must not be <code>nullptr</code>
+     * \pre \p bufferSize must be positive
      */
     BufferLog(void* address, size_t bufferSize, MemoryExhaustedCallback callback);
 
@@ -96,8 +96,8 @@ public:
      * ownership of the memory is <b>not</b> passed to the BufferLog by this
      * \param bufferSize The total size of the buffer. It is the callers responsibility to
      * assure that the provided buffer is at least as big as \p bufferSize
-     * \param \p address must not be <code>nullptr</code>
-     * \param \p bufferSize must be positive
+     * \pre \p address must not be <code>nullptr</code>
+     * \pre \p bufferSize must be positive
      */
     BufferLog(void* address, size_t bufferSize);
     
@@ -122,7 +122,7 @@ public:
      * \throw MemoryExhaustionException If there was not enough memory left in the buffer
      * and there either was no MemoryExhaustCallback or the callback failed to provide new
      * memory
-     * \param \p message must not be empty
+     * \pre \p message must not be empty
      */
     void log(unsigned long long timestamp, std::string message);
  

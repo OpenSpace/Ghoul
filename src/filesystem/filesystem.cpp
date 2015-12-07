@@ -279,7 +279,7 @@ bool FileSystem::fileExists(const File& path) const {
 	return fileExists(path.path(), true);
 }
 
-bool FileSystem::fileExists(string path, bool isRawPath) const {
+bool FileSystem::fileExists(std::string path, bool isRawPath) const {
 	if (!isRawPath)
         path = absolutePath(std::move(path));
 #ifdef WIN32

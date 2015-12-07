@@ -96,8 +96,8 @@ std::string stackInformation(lua_State* state);
  * single table, which is then parsed and included into the #ghoul::Dictionary. The single
  * restriction on the script is that it can only contain a pure array-style table (= only
  * indexed by numbers) or a pure dictionary-style table (= no numbering indices).
- * \param filename The filename pointing to the script that is executed. Any #FileSystem
- * path tokesn will be resolved by this function.
+ * \param filename The filename pointing to the script that is executed. Any
+ * #ghoul::filesystem::FileSystem path tokesn will be resolved by this function.
  * \param dictionary The #ghoul::Dictionary into which the values from the script are
  * added
  * \param state If this is set to a valid lua_State, this state is used instead of

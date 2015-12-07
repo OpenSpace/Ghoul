@@ -144,7 +144,7 @@ public:
      * \param width The width of the requested region
      * \param height The height of the requested region
      * \return A handle to the new region that can be passed to the #setRegionData and
-     * #getTextureCoordinates functions
+     * #textureCoordinates functions
      * \throws InvalidRegionException If the new requested region does not fit in the 
      * TextureAtlas
      */

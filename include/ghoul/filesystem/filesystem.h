@@ -80,7 +80,7 @@ public:
     };
     
     /**
-     * The token used to separate individual path elements (<code>\</code> or
+     * The token used to separate individual path elements (<code>\\</code> or
      * <code>/</code>)
      */
     static const char PathSeparator;
