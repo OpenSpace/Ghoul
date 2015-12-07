@@ -23,7 +23,9 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/misc/dictionary.h"
+#include <ghoul/misc/dictionary.h>
+
+#include <ghoul/misc/assert.h>
 
 #include <algorithm>
 #include <array>
@@ -36,223 +38,115 @@ using namespace ghoul::internal;
  * The reason for the unified storage space is the easy conversion between similar types.
  * The Dictionary should not be used for high-performance code anyway, so the additional
  * storage requirement is a valid trade-off.
+ *
+ * The calling hierachy for the #ghoul::Dictionary::setValue,
+ * #ghoul::Dictionary::getValue, and #ghoul::Dictionary::hasValue methods are as follows:
+ 
+ * #ghoul::Dictionary::value <code>-></code> #ghoul::Dictionary::getValue <code>-></code>
+ * #ghoul::Dictionary::getValueInternal <code>-></code> #ghoul::Dictionary::getValueHelper
+ *
+ * #ghoul::Dictionary::hasValue <code>-></code> #ghoul::Dictionary::hasValueInternal
+ * <code>-></code> #ghoul::Dictionary::hasValueHelper
+ *
+ * #ghoul::Dictionary::setValue <code>-></code> #ghoul::Dictionary::setValueInternal
+ * <code>-></code> #ghoul::Dictionary::setValueHelper
  */
 
-namespace {
-const std::string _loggerCat = "Dictionary";
-
-}
-
 namespace ghoul {
+    
+Dictionary::DictionaryError::DictionaryError(std::string message)
+    : RuntimeError(std::move(message), "Dictionary")
+{}
+    
+Dictionary::KeyError::KeyError(std::string message)
+    : DictionaryError(std::move(message))
+{}
+    
+Dictionary::ConversionError::ConversionError(std::string message)
+    : DictionaryError(std::move(message))
+{}
 
 #ifdef WIN32
 #pragma warning(disable : 4800)
 #endif
 
+#define EXTERN_TEMPLATE_DEFINITION(__TYPE__) \
+template void Dictionary::setValue<__TYPE__>(std::string, __TYPE__, bool);               \
+template bool Dictionary::getValue<__TYPE__>(const std::string&, __TYPE__&) const;       \
+template __TYPE__ Dictionary::value<__TYPE__>(const std::string&) const;                 \
+template bool Dictionary::hasValue<__TYPE__>(const std::string&) const;                  \
+template bool isConvertible<__TYPE__>(const Dictionary&);                                \
+template void Dictionary::setValueHelper<__TYPE__>(std::string, __TYPE__, bool);         \
+template void Dictionary::getValueHelper<__TYPE__>(const std::string&, __TYPE__&) const; \
+template bool Dictionary::hasValueHelper<__TYPE__>(const std::string&) const;
 
-// Yes, all those functions could be replaced by a macro (and they were), but they are
-// easier to read (and debug!) this way ---abock
+EXTERN_TEMPLATE_DEFINITION(bool);
+EXTERN_TEMPLATE_DEFINITION(char);
+EXTERN_TEMPLATE_DEFINITION(signed char);
+EXTERN_TEMPLATE_DEFINITION(unsigned char);
+EXTERN_TEMPLATE_DEFINITION(wchar_t);
+EXTERN_TEMPLATE_DEFINITION(short);
+EXTERN_TEMPLATE_DEFINITION(unsigned short);
+EXTERN_TEMPLATE_DEFINITION(int);
+EXTERN_TEMPLATE_DEFINITION(unsigned int);
+EXTERN_TEMPLATE_DEFINITION(long long);
+EXTERN_TEMPLATE_DEFINITION(unsigned long long);
+EXTERN_TEMPLATE_DEFINITION(float);
+EXTERN_TEMPLATE_DEFINITION(double);
+EXTERN_TEMPLATE_DEFINITION(glm::vec2);
+EXTERN_TEMPLATE_DEFINITION(glm::dvec2);
+EXTERN_TEMPLATE_DEFINITION(glm::ivec2);
+EXTERN_TEMPLATE_DEFINITION(glm::uvec2);
+EXTERN_TEMPLATE_DEFINITION(glm::bvec2);
+EXTERN_TEMPLATE_DEFINITION(glm::vec3);
+EXTERN_TEMPLATE_DEFINITION(glm::dvec3);
+EXTERN_TEMPLATE_DEFINITION(glm::ivec3);
+EXTERN_TEMPLATE_DEFINITION(glm::uvec3);
+EXTERN_TEMPLATE_DEFINITION(glm::bvec3);
+EXTERN_TEMPLATE_DEFINITION(glm::vec4);
+EXTERN_TEMPLATE_DEFINITION(glm::dvec4);
+EXTERN_TEMPLATE_DEFINITION(glm::ivec4);
+EXTERN_TEMPLATE_DEFINITION(glm::uvec4);
+EXTERN_TEMPLATE_DEFINITION(glm::bvec4);
+EXTERN_TEMPLATE_DEFINITION(glm::mat2x2);
+EXTERN_TEMPLATE_DEFINITION(glm::mat2x3);
+EXTERN_TEMPLATE_DEFINITION(glm::mat2x4);
+EXTERN_TEMPLATE_DEFINITION(glm::mat3x2);
+EXTERN_TEMPLATE_DEFINITION(glm::mat3x3);
+EXTERN_TEMPLATE_DEFINITION(glm::mat3x4);
+EXTERN_TEMPLATE_DEFINITION(glm::mat4x2);
+EXTERN_TEMPLATE_DEFINITION(glm::mat4x3);
+EXTERN_TEMPLATE_DEFINITION(glm::mat4x4);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat2x2);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat2x3);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat2x4);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat3x2);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat3x3);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat3x4);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat4x2);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat4x3);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat4x4);
     
-template bool Dictionary::setValue<bool>(std::string key, bool value, bool createIntermediate);
-template bool Dictionary::getValue<bool>(const std::string& key, bool& value) const;
-template bool Dictionary::hasValue<bool>(const std::string& key) const;
-
-template bool Dictionary::setValue<char>(std::string key, char value, bool createIntermediate);
-template bool Dictionary::getValue<char>(const std::string& key, char& value) const;
-template bool Dictionary::hasValue<char>(const std::string& key) const;
-
-template bool Dictionary::setValue<signed char>(std::string key, signed char value, bool createIntermediate);
-template bool Dictionary::getValue<signed char>(const std::string& key, signed char& value) const;
-template bool Dictionary::hasValue<signed char>(const std::string& key) const;
-
-template bool Dictionary::setValue<unsigned char>(std::string key, unsigned char value, bool createIntermediate);
-template bool Dictionary::getValue<unsigned char>(const std::string& key, unsigned char& value) const;
-template bool Dictionary::hasValue<unsigned char>(const std::string& key) const;
-
-template bool Dictionary::setValue<wchar_t>(std::string key, wchar_t value, bool createIntermediate);
-template bool Dictionary::getValue<wchar_t>(const std::string& key, wchar_t& value) const;
-template bool Dictionary::hasValue<wchar_t>(const std::string& key) const;
-
-template bool Dictionary::setValue<short>(std::string key, short value, bool createIntermediate);
-template bool Dictionary::getValue<short>(const std::string& key, short& value) const;
-template bool Dictionary::hasValue<short>(const std::string& key) const;
-
-template bool Dictionary::setValue<unsigned short>(std::string key, unsigned short value, bool createIntermediate);
-template bool Dictionary::getValue<unsigned short>(const std::string& key, unsigned short& value) const;
-template bool Dictionary::hasValue<unsigned short>(const std::string& key) const;
-
-template bool Dictionary::setValue<int>(std::string key, int value, bool createIntermediate);
-template bool Dictionary::getValue<int>(const std::string& key, int& value) const;
-template bool Dictionary::hasValue<int>(const std::string& key) const;
-
-template bool Dictionary::setValue<unsigned int>(std::string key, unsigned int value, bool createIntermediate);
-template bool Dictionary::getValue<unsigned int>(const std::string& key, unsigned int& value) const;
-template bool Dictionary::hasValue<unsigned int>(const std::string& key) const;
-
-template bool Dictionary::setValue<long long>(std::string key, long long value, bool createIntermediate);
-template bool Dictionary::getValue<long long>(const std::string& key, long long& value) const;
-template bool Dictionary::hasValue<long long>(const std::string& key) const;
-
-template bool Dictionary::setValue<unsigned long long>(std::string key, unsigned long long value, bool createIntermediate);
-template bool Dictionary::getValue<unsigned long long>(const std::string& key, unsigned long long& value) const;
-template bool Dictionary::hasValue<unsigned long long>(const std::string& key) const;
-
-template bool Dictionary::setValue<float>(std::string key, float value, bool createIntermediate);
-template bool Dictionary::getValue<float>(const std::string& key, float& value) const;
-template bool Dictionary::hasValue<float>(const std::string& key) const;
-
-template bool Dictionary::setValue<double>(std::string key, double value, bool createIntermediate);
-template bool Dictionary::getValue<double>(const std::string& key, double& value) const;
-template bool Dictionary::hasValue<double>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::vec2>(std::string key, glm::vec2 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::vec2>(const std::string& key, glm::vec2& value) const;
-template bool Dictionary::hasValue<glm::vec2>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::dvec2>(std::string key, glm::dvec2 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::dvec2>(const std::string& key, glm::dvec2& value) const;
-template bool Dictionary::hasValue<glm::dvec2>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::ivec2>(std::string key, glm::ivec2 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::ivec2>(const std::string& key, glm::ivec2& value) const;
-template bool Dictionary::hasValue<glm::ivec2>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::uvec2>(std::string key, glm::uvec2 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::uvec2>(const std::string& key, glm::uvec2& value) const;
-template bool Dictionary::hasValue<glm::uvec2>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::bvec2>(std::string key, glm::bvec2 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::bvec2>(const std::string& key, glm::bvec2& value) const;
-template bool Dictionary::hasValue<glm::bvec2>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::vec3>(std::string key, glm::vec3 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::vec3>(const std::string& key, glm::vec3& value) const;
-template bool Dictionary::hasValue<glm::vec3>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::dvec3>(std::string key, glm::dvec3 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::dvec3>(const std::string& key, glm::dvec3& value) const;
-template bool Dictionary::hasValue<glm::dvec3>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::ivec3>(std::string key, glm::ivec3 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::ivec3>(const std::string& key, glm::ivec3& value) const;
-template bool Dictionary::hasValue<glm::ivec3>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::uvec3>(std::string key, glm::uvec3 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::uvec3>(const std::string& key, glm::uvec3& value) const;
-template bool Dictionary::hasValue<glm::uvec3>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::bvec3>(std::string key, glm::bvec3 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::bvec3>(const std::string& key, glm::bvec3& value) const;
-template bool Dictionary::hasValue<glm::bvec3>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::vec4>(std::string key, glm::vec4 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::vec4>(const std::string& key, glm::vec4& value) const;
-template bool Dictionary::hasValue<glm::vec4>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::dvec4>(std::string key, glm::dvec4 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::dvec4>(const std::string& key, glm::dvec4& value) const;
-template bool Dictionary::hasValue<glm::dvec4>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::ivec4>(std::string key, glm::ivec4 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::ivec4>(const std::string& key, glm::ivec4& value) const;
-template bool Dictionary::hasValue<glm::ivec4>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::uvec4>(std::string key, glm::uvec4 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::uvec4>(const std::string& key, glm::uvec4& value) const;
-template bool Dictionary::hasValue<glm::uvec4>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::bvec4>(std::string key, glm::bvec4 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::bvec4>(const std::string& key, glm::bvec4& value) const;
-template bool Dictionary::hasValue<glm::bvec4>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::mat2x2>(std::string key, glm::mat2x2 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::mat2x2>(const std::string& key, glm::mat2x2& value) const;
-template bool Dictionary::hasValue<glm::mat2x2>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::mat2x3>(std::string key, glm::mat2x3 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::mat2x3>(const std::string& key, glm::mat2x3& value) const;
-template bool Dictionary::hasValue<glm::mat2x3>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::mat2x4>(std::string key, glm::mat2x4 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::mat2x4>(const std::string& key, glm::mat2x4& value) const;
-template bool Dictionary::hasValue<glm::mat2x4>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::mat3x2>(std::string key, glm::mat3x2 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::mat3x2>(const std::string& key, glm::mat3x2& value) const;
-template bool Dictionary::hasValue<glm::mat3x2>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::mat3x3>(std::string key, glm::mat3x3 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::mat3x3>(const std::string& key, glm::mat3x3& value) const;
-template bool Dictionary::hasValue<glm::mat3x3>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::mat3x4>(std::string key, glm::mat3x4 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::mat3x4>(const std::string& key, glm::mat3x4& value) const;
-template bool Dictionary::hasValue<glm::mat3x4>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::mat4x2>(std::string key, glm::mat4x2 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::mat4x2>(const std::string& key, glm::mat4x2& value) const;
-template bool Dictionary::hasValue<glm::mat4x2>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::mat4x3>(std::string key, glm::mat4x3 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::mat4x3>(const std::string& key, glm::mat4x3& value) const;
-template bool Dictionary::hasValue<glm::mat4x3>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::mat4x4>(std::string key, glm::mat4x4 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::mat4x4>(const std::string& key, glm::mat4x4& value) const;
-template bool Dictionary::hasValue<glm::mat4x4>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::dmat2x2>(std::string key, glm::dmat2x2 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::dmat2x2>(const std::string& key, glm::dmat2x2& value) const;
-template bool Dictionary::hasValue<glm::dmat2x2>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::dmat2x3>(std::string key, glm::dmat2x3 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::dmat2x3>(const std::string& key, glm::dmat2x3& value) const;
-template bool Dictionary::hasValue<glm::dmat2x3>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::dmat2x4>(std::string key, glm::dmat2x4 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::dmat2x4>(const std::string& key, glm::dmat2x4& value) const;
-template bool Dictionary::hasValue<glm::dmat2x4>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::dmat3x2>(std::string key, glm::dmat3x2 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::dmat3x2>(const std::string& key, glm::dmat3x2& value) const;
-template bool Dictionary::hasValue<glm::dmat3x2>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::dmat3x3>(std::string key, glm::dmat3x3 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::dmat3x3>(const std::string& key, glm::dmat3x3& value) const;
-template bool Dictionary::hasValue<glm::dmat3x3>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::dmat3x4>(std::string key, glm::dmat3x4 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::dmat3x4>(const std::string& key, glm::dmat3x4& value) const;
-template bool Dictionary::hasValue<glm::dmat3x4>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::dmat4x2>(std::string key, glm::dmat4x2 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::dmat4x2>(const std::string& key, glm::dmat4x2& value) const;
-template bool Dictionary::hasValue<glm::dmat4x2>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::dmat4x3>(std::string key, glm::dmat4x3 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::dmat4x3>(const std::string& key, glm::dmat4x3& value) const;
-template bool Dictionary::hasValue<glm::dmat4x3>(const std::string& key) const;
-
-template bool Dictionary::setValue<glm::dmat4x4>(std::string key, glm::dmat4x4 value, bool createIntermediate);
-template bool Dictionary::getValue<glm::dmat4x4>(const std::string& key, glm::dmat4x4& value) const;
-template bool Dictionary::hasValue<glm::dmat4x4>(const std::string& key) const;
-
-template <>
-bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& value) const {
-    if (&value == this) {
-        LERROR(
-              "The argument in the 'getValue' methods cannot be the same Dictionary as "
-              "the method is called on");
-        return false;
-    }
-    return getValueHelper(key, value);
-}
+#undef EXTERN_TEMPLATE_DEFINITION
+#undef EXTERN_TEMPLATE_DEFINITION_SCALAR
 
 #ifdef WIN32
 #pragma warning ( default : 4800 )
 #endif
+    
+template <>
+bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& value) const {
+    ghoul_assert(&value != this, "Value argument must not be the this object");
+    try {
+        getValueHelper(key, value);
+        return true;
+    }
+    catch (const DictionaryError& e) {
+        return false;
+    }
+}
 
-Dictionary::Dictionary(std::initializer_list<std::pair<string, boost::any>> l) {
+Dictionary::Dictionary(std::initializer_list<std::pair<std::string, boost::any>> l) {
     for (auto p : l)
         setValueAnyHelper(std::move(p.first), std::move(p.second));
 }
@@ -271,16 +165,14 @@ std::vector<string> Dictionary::keys(const string& location) const {
     splitKey(location, first, rest);
 
     auto keyIt = find(first);
-    if (keyIt == cend()) {
-        LERROR("Key '" << first << "' was not found in dictionary");
-        return std::vector<string>();
-    }
+    if (keyIt == cend())
+        throw KeyError("Key '" + first + "' was not found");
 
     const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
     if (!dict) {
-        LERROR("Error converting key '" << first << "' to type 'Dictionary', was '"
-                                        << keyIt->second.type().name() << "'");
-        return std::vector<string>();
+        throw ConversionError("Error converting key '" + first + "' from type '" +
+            keyIt->second.type().name() + "' to type 'Dictionary"
+        );
     }
     // proper tail-recursion
     return dict->keys(rest);
@@ -310,7 +202,7 @@ size_t Dictionary::size() const {
 }
 
 void Dictionary::clear() {
-    return std::map<std::string, boost::any>::clear();
+    std::map<std::string, boost::any>::clear();
 }
 
 bool Dictionary::empty() const {
@@ -323,7 +215,7 @@ bool Dictionary::removeKey(const std::string& key) {
 }
 
 bool Dictionary::splitKey(const string& key, string& first, string& rest) const {
-    const string::size_type l = key.find('.');
+    string::size_type l = key.find('.');
 
     if (l == string::npos) {
         first = key;
