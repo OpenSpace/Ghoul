@@ -56,15 +56,21 @@ namespace ghoul {
     
 Dictionary::DictionaryError::DictionaryError(std::string message)
     : RuntimeError(std::move(message), "Dictionary")
-{}
+{
+    ghoul_assert(!message.empty(), "Message must not be empty");
+}
     
 Dictionary::KeyError::KeyError(std::string message)
     : DictionaryError(std::move(message))
-{}
+{
+    ghoul_assert(!message.empty(), "Message must not be empty");
+}
     
 Dictionary::ConversionError::ConversionError(std::string message)
     : DictionaryError(std::move(message))
-{}
+{
+    ghoul_assert(!message.empty(), "Message must not be empty");
+}
 
 #ifdef WIN32
 #pragma warning(disable : 4800)
@@ -179,6 +185,8 @@ std::vector<string> Dictionary::keys(const string& location) const {
 }
 
 bool Dictionary::hasKey(const string& key) const {
+    ghoul_assert(!key.empty(), "Key must not be empty");
+    
     auto it = find(key);
     if (it != cend())
         return true;
@@ -210,6 +218,8 @@ bool Dictionary::empty() const {
 }
 
 bool Dictionary::removeKey(const std::string& key) {
+    ghoul_assert(!key.empty(), "Key must not be empty");
+    
     std::map<std::string, boost::any>::size_type res = erase(key);
     return (res == 1);
 }

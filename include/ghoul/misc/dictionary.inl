@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <ghoul/misc/assert.h>
+
 namespace ghoul {
 
 template <typename T>
@@ -126,6 +128,7 @@ void Dictionary::setValueInternal(std::string key, T value, bool createIntermedi
 
 template <typename T>
 void Dictionary::setValue(std::string key, T value, bool createIntermediate) {
+    ghoul_assert(!key.empty(), "Key must not be empty");
     setValueInternal(std::move(key), std::move(value), createIntermediate);
 }
     
@@ -263,6 +266,8 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
 
 template <typename T>
 bool Dictionary::getValue(const std::string& key, T& value) const {
+    ghoul_assert(!key.empty(), "Key must not be empty");
+    
     try {
         bool keyExists = hasKey(key);
         if (!keyExists)
@@ -279,6 +284,8 @@ bool Dictionary::getValue(const std::string& key, T& value) const {
 
 template <typename T>
 T ghoul::Dictionary::value(const std::string& key) const {
+    ghoul_assert(!key.empty(), "Key must not be empty");
+    
     T value;
     getValueInternal(key, value);
     return value;
@@ -363,11 +370,15 @@ bool Dictionary::hasValueInternal(const std::string& key, IsNonStandardType<T>*)
 
 template <typename T>
 bool Dictionary::hasValue(const std::string& key) const {
+    ghoul_assert(!key.empty(), "Key must not be empty");
+    
     return hasValueInternal<T>(key);
 }
     
 template <typename T>
 bool Dictionary::hasKeyAndValue(const std::string& key) const {
+    ghoul_assert(!key.empty(), "Key must not be empty");
+
     // Short-circuit evaluation is used to guard the 'hasValue' function from non-existing
     // keys
     return (hasKey(key) && hasValue<T>(key));

@@ -66,7 +66,6 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/misc/crc32.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/dictionary.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/exception.cpp
-    ${PROJECT_SOURCE_DIR}/src/misc/highresclock.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/misc.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/sharedmemory.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/templatefactory.cpp
@@ -148,7 +147,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/exception.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/highresclock.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/sharedmemory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.h

@@ -25,12 +25,16 @@
 
 #include <ghoul/misc/exception.h>
 
-#include <format.h>
+#include <ghoul/misc/assert.h>
 
 namespace ghoul {
     
-RuntimeError::RuntimeError(const std::string& msg, const std::string& component)
-    : std::runtime_error(fmt::format("({}) {}", component, msg))
-{}
+RuntimeError::RuntimeError(const std::string& msg, const std::string& comp)
+    : std::runtime_error(comp.empty() ? msg : "(" + comp + ") " + msg)
+    , message(std::move(msg))
+    , component(std::move(comp))
+{
+    ghoul_assert(!msg.empty(), "Message must not be empty");
+}
     
 } // namespace ghoul
