@@ -25,13 +25,13 @@
 
 #include <ghoul/misc/sharedmemory.h>
 
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/crc32.h>
 #include <atomic>
 
 #ifndef WIN32
-#include <sys/shm.h>
+#include <errno.h>
 #include <string.h>
+#include <sys/shm.h>
 /* Common access type bits, used with ipcperm(). */
 #define IPC_R       000400  /* read permission */
 #define IPC_W       000200  /* write/alter permission */
@@ -52,11 +52,6 @@ namespace {
 #endif
     };
 
-    const unsigned char STATUS_SUCCESS  = 0;
-    const unsigned char STATUS_NOT_FOUND = 1;
-    const unsigned char STATUS_NO_MAPPING = 2;
-    const unsigned char STATUS_ALL_ERRORS = 255;
-    
     Header* header(void* memory) {
         return reinterpret_cast<Header*>(memory);
     }
@@ -91,33 +86,44 @@ namespace {
 #endif
 }
     
-bool SharedMemory::create(const std::string& name, size_t size) {
-    const std::string _loggerCat = "SharedMemory(" + name + ")";
+SharedMemory::SharedMemoryError::SharedMemoryError(std::string message)
+    : RuntimeError(std::move(message), "SharedMemory")
+{}
+    
+SharedMemory::SharedMemoryNotFoundError::SharedMemoryNotFoundError()
+    : SharedMemoryError("Shared memory did not exist")
+{}
+    
+void SharedMemory::create(const std::string& name, size_t size) {
+//    const std::string _loggerCat = "SharedMemory(" + name + ")";
     // adjust for the header size
     size += sizeof(Header);
 #ifdef WIN32
-    HANDLE handle = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
-                                      0, static_cast<DWORD>(size), name.c_str());
+    HANDLE handle = CreateFileMapping(
+        INVALID_HANDLE_VALUE,
+        NULL,
+        PAGE_READWRITE,
+        0,
+        static_cast<DWORD>(size),
+        name.c_str()
+    );
     const DWORD error = GetLastError();
     if (handle == NULL) {
-        const std::string&& errorMsg = lastErrorToString(error);
-        LERROR("Error occurred while creating shared memory: " << errorMsg);
-        return false;
+        std::string errorMsg = lastErrorToString(error);
+        throw SharedMemoryError("Error creating shared memory: " + errorMsg);
     }
     else { 
-        if (error == ERROR_ALREADY_EXISTS) {
-            LERROR("Error occurred while creating shared memory: " <<
-                "Section already exists");
-            return false;
-        }
+        if (error == ERROR_ALREADY_EXISTS)
+            throw SharedMemoryError("Error creating shared memory: Section exists");
         else {
             void* memory = MapViewOfFileEx(handle, FILE_MAP_ALL_ACCESS, 0, 0, 0, NULL);
 
             if (memory == nullptr) {
-                const std::string&& errorMsg = lastErrorToString(error);
-                LERROR("Error occurred while creating a view on shared memory: " <<
-                    errorMsg);
-                return false;
+                std::string errorMsg = lastErrorToString(error);
+                
+                throw SharedMemoryError(
+                    "Error creating a view on shared memory: " + errorMsg
+                );
             }
             else {
                 Header* h = header(memory);
@@ -125,69 +131,55 @@ bool SharedMemory::create(const std::string& name, size_t size) {
                 h->size = size  - sizeof(Header);
                 UnmapViewOfFile(memory);
                 _createdSections[name] = handle;
-                return true;
             }
         }
     }
 #else
-    const unsigned int h = hash(name);
-    const int result = shmget(h, size, IPC_CREAT | IPC_EXCL | IPC_R | IPC_W | IPC_M);
+    unsigned int h = hash(name);
+    int result = shmget(h, size, IPC_CREAT | IPC_EXCL | IPC_R | IPC_W | IPC_M);
     if (result == -1) {
-        LERROR("Error occurred while creating shared memory: " << strerror(errno));
-        return false;
+        std::string errorMsg = strerror(errno);
+        throw SharedMemoryError("Error creating shared memory: " + errorMsg);
     }
     void* memory = shmat(result, NULL, SHM_R | SHM_W);
     Header* memoryHeader = header(memory);
     memoryHeader->mutex.clear();
     shmdt(memory);
-    return true;
 #endif
 }
  
-bool SharedMemory::remove(const std::string& name) {
-    const std::string&& _loggerCat = "SharedMemory(" + name + ")";
+void SharedMemory::remove(const std::string& name) {
 #ifdef WIN32
-#ifdef GHL_DEBUG
-    if (_createdSections.find(name) == _createdSections.end()) {
-        LERROR("Shared memory section was not found");
-        return false;
-    }
-#endif
+    if (_createdSections.find(name) == _createdSections.end())
+        throw SharedMemoryNotFoundError();
+    
     HANDLE h = _createdSections[name];
     _createdSections.erase(name);
-    const BOOL result = CloseHandle(h);
+    BOOL result = CloseHandle(h);
     if (result == 0) {
-        const DWORD error = GetLastError();
-        const std::string&& errorMsg = lastErrorToString(error);
-        LERROR("Error closing handle: " << errorMsg);
-        return false;
+        DWORD error = GetLastError();
+        std::string errorMsg = lastErrorToString(error);
+        throw SharedMemoryError("Error closing handle: " + errorMsg);
     }
-    else
-        return true;
 #else
-    const unsigned int h = hash(name);
+    unsigned int h = hash(name);
     int result = shmget(h, 0, IPC_R | IPC_W | IPC_M);
     if (result == -1) {
-        LERROR("Error occurred while retrieving shared memory: " <<
-                    strerror(errno));
-        return false;
+        std::string errorMsg = strerror(errno);
+        throw SharedMemoryError("Error while retrieving shared memory: " + errorMsg);
     }
     else {
         result = shmctl(result, IPC_RMID, nullptr);
         if (result == -1) {
-            LERROR("Error occurred while removing shared memory: " <<
-                        strerror(errno));
-            return false;
+            std::string errorMsg = strerror(errno);
+            throw SharedMemoryError("Error while removing shared memory: " + errorMsg);
         }
-        else
-            return true;
     }
 #endif
 }
     
 bool SharedMemory::exists(const std::string& name) {
 #ifdef WIN32
-    const std::string&& _loggerCat = "SharedMemory(" + name + ")";
     HANDLE handle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, name.c_str());
     if (handle != NULL) {
         // the file exists, so we have to close it immediately to not leak the handle
@@ -201,57 +193,54 @@ bool SharedMemory::exists(const std::string& name) {
         if (error == ERROR_FILE_NOT_FOUND)
             return false;
         else {
-            const std::string&& errorMsg = lastErrorToString(error);
-            LERROR("Error checking if shared memory existed: " << errorMsg);
-            return true;
+            std::string errorMsg = lastErrorToString(error);
+            throw SharedMemoryError(
+                "Error checking if shared memory exists: " + errorMsg
+            );
         }
     }
 #else
-    const unsigned int h = hash(name);
-    const int result = shmget(h, 0, IPC_EXCL);
+    unsigned int h = hash(name);
+    int result = shmget(h, 0, IPC_EXCL);
     return result != -1;
 #endif
 }
     
-SharedMemory::SharedMemory(const std::string& name)
+SharedMemory::SharedMemory(std::string name)
     : _memory(nullptr)
-    , _loggerCat("SharedMemory(" + name + ")")
-    , _status(STATUS_SUCCESS)
+    , _name(std::move(name))
 #ifndef WIN32
     , _size(0)
 #endif
 {
 #ifdef WIN32
-    _sharedMemoryHandle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, name.c_str());
-    if (_sharedMemoryHandle == NULL) {
-        const DWORD error = GetLastError();
-        const std::string&& errorMsg = lastErrorToString(error);
-        LERROR("Error occurred while accessing shared memory: " << errorMsg);
-        _status |= STATUS_NOT_FOUND;
-        return;
+    _sharedMemoryHandle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, _name.c_str());
+    if (_sharedMemoryHandle == nullptr) {
+        std::string errorMsg = lastErrorToString(GetLastError());
+        throw SharedMemoryError("Error accessing shared memory: " + errorMsg);
     }
 
     _memory = MapViewOfFileEx(_sharedMemoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, 0, NULL);
     if (_memory == nullptr) {
-        const DWORD error = GetLastError();
-        const std::string&& errorMsg = lastErrorToString(error);
-        LERROR("Error occurred while creating view for shared memory: " <<
-                    errorMsg);
-        _status |= STATUS_NO_MAPPING;
-        return;
+        CloseHandle(_sharedMemoryHandle);
+        
+        std::string errorMsg = lastErrorToString(GetLastError());
+        throw SharedMemoryError("Error creating view for shared memory: " + errorMsg);
     }
 #else
-    const unsigned int h = hash(name);
+    unsigned int h = hash(_name);
     _sharedMemoryHandle = shmget(h, 0, IPC_R | IPC_W | IPC_M);
     if (_sharedMemoryHandle == -1) {
-        LERROR("Error occurred while accessing shared memory: " << strerror(errno));
-        _status |= STATUS_NOT_FOUND;
+        std::string errorMsg = strerror(errno);
+        throw SharedMemoryError("Error accessing shared memory: " + errorMsg);
     }
     else {
         _memory = shmat(_sharedMemoryHandle, NULL, SHM_R | SHM_W);
+        if (_memory == reinterpret_cast<void*>(-1)) {
+            std::string errorMsg = strerror(errno);
+            throw SharedMemoryError("Error mapping shared memory :" + errorMsg);
+        }
 
-        // TODO: Error handling (STATUS_NO_MAPPING)
-        
         struct shmid_ds sharedMemoryInfo;
         shmctl(_sharedMemoryHandle, IPC_STAT, &sharedMemoryInfo);
         _size = sharedMemoryInfo.shm_segsz  - sizeof(Header);
@@ -261,31 +250,10 @@ SharedMemory::SharedMemory(const std::string& name)
     
 SharedMemory::~SharedMemory() {
 #ifdef WIN32
-    BOOL result;
-    if ((_status & STATUS_NOT_FOUND) != 0) {
-        result = CloseHandle(_sharedMemoryHandle);
-        if (result == 0) {
-            const DWORD error = GetLastError();
-            const std::string&& errorMsg = lastErrorToString(error);
-            LERROR("Error closing handle: " << errorMsg);
-        }
-    }
-    if ((_status & STATUS_NO_MAPPING) != 0) {
-        result = UnmapViewOfFile(_memory);
-        if (result == 0) {
-            const DWORD error = GetLastError();
-            const std::string&& errorMsg = lastErrorToString(error);
-            LERROR("Error unmapping view: " << errorMsg);
-        }
-    }
-    _memory = nullptr;
+    CloseHandle(_sharedMemoryHandle);
+    UnmapViewOfFile(_memory);
 #else
-    if (_sharedMemoryHandle != -1) {
-        const int result = shmdt(_memory);
-        if (result == -1)
-            LERROR("Error detaching shared memory: " << strerror(errno));
-        _memory = nullptr;
-    }
+    shmdt(_memory);
 #endif
 }
     
@@ -295,29 +263,20 @@ SharedMemory::operator void*() {
     
 size_t SharedMemory::size() const {
 #ifdef WIN32
-    if (_memory != nullptr) {
-        const Header* const h = header(_memory);
-        return h->size;
-    }
-    else
-        return 0;
+    return header(_memory)->size;
 #else
     return _size;
 #endif
 }
     
 void SharedMemory::acquireLock() {
-    if (_memory != nullptr) {
-        Header* h = header(_memory);
-        while (h->mutex.test_and_set()) {}
-    }
+    Header* h = header(_memory);
+    while (h->mutex.test_and_set()) {}
 }
     
 void SharedMemory::releaseLock() {
-    if (_memory != nullptr) {
-        Header* h = header(_memory);
-        h->mutex.clear();
-    }
+    Header* h = header(_memory);
+    h->mutex.clear();
 }
     
 } // namespace ghoul

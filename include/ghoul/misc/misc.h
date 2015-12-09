@@ -32,20 +32,18 @@
 namespace ghoul {
 
 /**
- * Separates the provided <code>input</code> URI into the separate parts that are
- * added into the passed <code>tokens</code> vector. If <code>input</code> is
- * <code>a.b.c.d 1.e</code>, <code>tokens</code> will contain one entry for
- * <code>a</code>, <code>b</code>, <code>c</code>, <code>d 1</code>, and
- * <code>e</code>. Enough space in the vector will automatically be allocated. If an
- * error occurred, <code>false</code> will be returned and the <code>tokens</code>
- * vector will be empty.
- * \param input The input URI that is to be tokenized using the <code>separator</code>
+ * Separates the provided \p input URI into separate parts. If \p input is
+ * <code>a.b.c.d 1.e</code>, the returned vector will contain one entry for
+ * <code>a</code>, <code>b</code>, <code>c</code>, <code>d 1</code>, and <code>e</code>.
+ * If an error occurred, an exception will be thrown
+ * \param input The input URI that is to be tokenized using the \p separator
  * \param separator The separator that is used for tokenize the string
  * \return The results of the tokenization operation
+ * \throws RuntimeError If there was an error tokenizing the string
  */
 std::vector<std::string> tokenizeString(
     const std::string& input,
-    const char separator);
+    char separator = '.');
 
 } // namespace ghoul
 

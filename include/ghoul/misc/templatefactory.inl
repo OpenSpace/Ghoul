@@ -24,7 +24,8 @@
  ****************************************************************************************/
 
 #include <type_traits>
-#include <ghoul/logging/logmanager.h>
+
+#include <ghoul/misc/assert.h>
 
 namespace ghoul {
 
@@ -56,10 +57,13 @@ BaseClass* createDefault(bool useDictionary, const Dictionary& dict) {
 #ifdef GHL_DEBUG
     // We don't have a dictionary constructor, but the user tried to create it with a
     // Dictionary
-    if (useDictionary || dict.size() != 0)
-        LERRORC("TemplateFactory", "Class '" << typeid(Class).name() << "' does not " <<
-        "provide a constructor receiving a Dictionary; the provided dictionary is " <<
-        "silently ignored");
+    if (useDictionary || dict.size() != 0) {
+        std::string className = typeid(Class).name();
+        throw TemplateFactoryBase::TemplateConstructionError(
+            "Class '" + className +
+            "' does not provide a constructor receiving a Dictionary"
+        );
+    }
 #endif
     return new Class;
 }
@@ -76,11 +80,13 @@ BaseClass* createDefaultAndDictionary(bool useDictionary, const Dictionary& dict
 // Create Class using only the Dictionary constructor
 template <typename BaseClass, typename Class>
 BaseClass* createDictionary(bool useDictionary, const Dictionary& dict) {
-    if (!useDictionary)
-        // We don't have a default constructor, but the user tried to use it
-        LERRORC("TemplateFactory", "Class '" << typeid(Class).name() << "' does only " <<
-        "provide a Dictionary constructor but was called requesting the default " <<
-        "constructor");
+    if (!useDictionary) {
+        std::string className = typeid(Class).name();
+        throw TemplateFactoryBase::TemplateConstructionError(
+            "Class '" + className + "' does only provide a Dictionary constructor " +
+            " but was called using the default constructor"
+        );
+    }
     return new Class(dict);
 }
 
@@ -114,15 +120,15 @@ struct CreateHelper<BaseClass, Class, DICTIONARY_CONSTRUCTOR> {
     }
 };
 
-}
+} // namespace
 
 template <typename BaseClass>
 BaseClass* TemplateFactory<BaseClass>::create(const std::string& className) const {
+    ghoul_assert(!className.empty(), "Classname must not be empty");
+    
     auto it = _map.find(className);
-    if (it == _map.end()) {
-        LERRORC("TemplateFactory", "Factory did not have a class '" << className << "'");
-        return nullptr;
-    }
+    if (it == _map.end())
+        throw TemplateClassNotFoundError(className);
     else
         // If 'className' is a valid name, we can use the stored function pointer to
 		// create the class using the 'createType' method
@@ -133,11 +139,11 @@ template <typename BaseClass>
 BaseClass* TemplateFactory<BaseClass>::create(const std::string& className,
                                               const Dictionary& dictionary) const
 {
+    ghoul_assert(!className.empty(), "Classname must not be empty");
+
     auto it = _map.find(className);
-    if (it == _map.end()) {
-        LERRORC("TemplateFactory", "Factory did not have a class '" << className << "'");
-        return nullptr;
-    }
+    if (it == _map.end())
+        throw TemplateClassNotFoundError(className);
     else
         // If 'className' is a valid name, we can use the stored function pointer to
 		// create the class using the 'createType' method
@@ -153,29 +159,30 @@ void TemplateFactory<BaseClass>::registerClass(std::string className) {
     );
     static_assert(
         std::is_default_constructible<Class>::value |
-        //        std::is_convertible<Dictionary, Class>::value,
         std::is_constructible<Class, const ghoul::Dictionary&>::value,
         "Class needs a public default or Dictionary constructor"
     );
-
+    
+    ghoul_assert(!className.empty(), "Classname must not be empty");
+    
     // Use the correct CreateHelper struct to create a function pointer that we can store
-    // for later usage. std::is_convertible<>::value returns a boolean that checks at
-    // run-time if it is possible to convert a Dictionary into a Class (thereby implicitly
-    // checking if there is a proper constructor for it)
+    // for later usage. std::is_constructible<>::value returns a boolean that checks at
+    // run-time if there is a proper constructor for it)
     FactoryFuncPtr&& function = CreateHelper<BaseClass, Class,
         (std::is_default_constructible<Class>::value * DEFAULT_CONSTRUCTOR) |
-        //        (std::is_convertible<Dictionary, Class>::value * DICTIONARY_CONSTRUCTOR)
         (std::is_constructible<Class, const ghoul::Dictionary&>::value * DICTIONARY_CONSTRUCTOR)
     >().createFunction();
 
     registerClass(std::move(className), function);
 }
 
-
 template <typename BaseClass>
 void TemplateFactory<BaseClass>::registerClass(std::string className,
                                                FactoryFuncPtr factoryFunction)
 {
+    ghoul_assert(!className.empty(), "Classname must not be empty");
+    ghoul_assert(factoryFunction != nullptr, "Factory function must not be nullptr");
+    
     registerClass(std::move(className), FactoryFunction(std::move(factoryFunction)));
 }
 
@@ -183,18 +190,24 @@ template <typename BaseClass>
 void TemplateFactory<BaseClass>::registerClass(std::string className,
             std::function<BaseClass*(bool, const ghoul::Dictionary&)> factoryFunction)
 {
-	_map.emplace(std::move(className), std::move(factoryFunction));
+    ghoul_assert(!className.empty(), "Classname must not be empty");
+    ghoul_assert(factoryFunction != nullptr, "Factory function must not be nullptr");
+
+    if (_map.find(className) != _map.end())
+        throw TemplateFactoryError("Class '" + className + "' was registered before");
+    else
+        _map.emplace(std::move(className), std::move(factoryFunction));
 }
 
 template <typename BaseClass>
 bool TemplateFactory<BaseClass>::hasClass(const std::string& className) const {
+    ghoul_assert(!className.empty(), "Classname must not be empty");
+    
     return (_map.find(className) != _map.end());
 }
 
-}
-
 template <typename BaseClass>
-std::vector<std::string> ghoul::TemplateFactory<BaseClass>::registeredClasses() const {
+std::vector<std::string> TemplateFactory<BaseClass>::registeredClasses() const {
 	std::vector<std::string> result;
 	result.reserve(_map.size());
 	for (const auto& it : _map)
@@ -203,8 +216,9 @@ std::vector<std::string> ghoul::TemplateFactory<BaseClass>::registeredClasses() 
 }
 
 template <typename BaseClass>
-const std::type_info& ghoul::TemplateFactory<BaseClass>::baseClassType() const
+const std::type_info& TemplateFactory<BaseClass>::baseClassType() const
 {
     return typeid(BaseClass);
 }
 
+} // namespace ghoul
