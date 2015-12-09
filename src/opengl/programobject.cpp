@@ -72,40 +72,46 @@ using glm::value_ptr;
 namespace ghoul {
 namespace opengl {
 
+ProgramObject::ProgramObjectError::ProgramObjectError(std::string message)
+    : RuntimeError(std::move(message), "ProgramObject")
+{}
+    
+ProgramObject::ProgramObjectLinkingError::ProgramObjectLinkingError(std::string msg,
+                                                                         std::string name)
+    : ProgramObjectError(
+        name.empty() ?
+        "Error linking program object: " + msg :
+        "Error linking program object [" + name + "]: " + msg
+      )
+    , linkerError(std::move(msg))
+    , programName(std::move(name))
+{}
+    
 ProgramObject::ProgramObject()
     : _id(0)
     , _programName("")
     , _loggerCat("ProgramObject")
-    , _ignoreUniformLocationError(false)
-    , _ignoreAttributeLocationError(false)
-    , _ignoreSubroutineLocationError(false)
-    , _ignoreSubroutineUniformLocationError(false)
-    , _programIsDirty(true)
 {
     _id = glCreateProgram();
     if (_id == 0)
-        LERROR("glCreateProgram returned 0");
+        throw ProgramObjectError("glCreateProgram returned 0");
 }
 
 ProgramObject::ProgramObject(std::string name)
     : _id(0)
     , _programName(std::move(name))
     , _loggerCat("ProgramObject('" + _programName + "')")
-    , _ignoreUniformLocationError(false)
-    , _ignoreAttributeLocationError(false)
-    , _ignoreSubroutineLocationError(false)
-    , _ignoreSubroutineUniformLocationError(false)
-    , _programIsDirty(true)
 {
     _id = glCreateProgram();
     if (_id == 0)
-        LERROR("glCreateProgram returned 0");
+        throw ProgramObjectError("glCreateProgram returned 0");
     if (glObjectLabel) {
         glObjectLabel(
-                      GL_PROGRAM,
-                      _id,
-                      static_cast<GLsizei>(_programName.length() + 1),
-                      _programName.c_str());
+            GL_PROGRAM,
+            _id,
+            static_cast<GLsizei>(_programName.length() + 1),
+            _programName.c_str()
+        );
     }
 }
 
@@ -122,37 +128,24 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
 {
     _id = glCreateProgram();
     if (_id == 0)
-        LERROR("glCreateProgram returned 0");
+        throw ProgramObjectError("glCreateProgram returned 0");
     if (glObjectLabel) {
         glObjectLabel(
-                      GL_PROGRAM,
-                      _id,
-                      static_cast<GLsizei>(_programName.length() + 1),
-                      _programName.c_str());
+            GL_PROGRAM,
+            _id,
+            static_cast<GLsizei>(_programName.length() + 1),
+            _programName.c_str()
+        );
     }
 
-	for (const ManagedShaderObject& obj : cpy._shaderObjects) {
-	//for (auto it = cpy._shaderObjects.cbegin(); it != cpy._shaderObjects.cend(); ++it) {
-        if (obj.second) {
-            // ProgramObject owns ShaderObjects
-			ShaderObject* shaderCopy = new ShaderObject(*(obj.first));
-			glAttachShader(_id, *shaderCopy);
-			_shaderObjects.emplace_back(shaderCopy, true);
-        }
-		else {
-			glAttachShader(_id, *(obj.first));
-			_shaderObjects.push_back(obj);
-		}
+	for (const auto& obj : cpy._shaderObjects) {
+        auto shaderCopy = std::make_shared<ShaderObject>(*obj);
+        glAttachShader(_id, *shaderCopy);
+        _shaderObjects.push_back(shaderCopy);
     }
 }
 
 ProgramObject::~ProgramObject() {
-	for (const ManagedShaderObject& obj : _shaderObjects) {
-        // Only delete ShaderObjects that belong to this ProgramObject
-        if (obj.second)
-            delete obj.first;
-    }
-    _shaderObjects.clear();
     glDeleteProgram(_id);
 }
 
@@ -178,36 +171,24 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
 		_onChangeCallback = rhs._onChangeCallback;
         _programIsDirty = rhs._programIsDirty;
 
-		for (const ManagedShaderObject& obj : _shaderObjects) {
-            // Only delete ShaderObjects that belong to this ProgramObject
-            if (obj.second)
-                delete obj.first;
-        } 
-        _shaderObjects.clear();
         glDeleteProgram(_id);
 
         _id = glCreateProgram();
         if (_id == 0)
-            LERROR("glCreateProgram returned 0");
+            throw ProgramObjectError("glCreateProgram returned 0");
         if (glObjectLabel) {
             glObjectLabel(
-                          GL_PROGRAM,
-                          _id,
-                          static_cast<GLsizei>(_programName.length() + 1),
-                          _programName.c_str());
+                GL_PROGRAM,
+                _id,
+                static_cast<GLsizei>(_programName.length() + 1),
+                _programName.c_str()
+            );
         }
 
-		for (const ManagedShaderObject& obj : rhs._shaderObjects) {
-            if (obj.second) {
-                // ProgramObject owns ShaderObjects
-				ShaderObject* shaderCopy = new ShaderObject(*(obj.first));
-				glAttachShader(_id, *shaderCopy);
-				_shaderObjects.emplace_back(shaderCopy, true);
-            }
-			else {
-				glAttachShader(_id, *(obj.first));
-				_shaderObjects.push_back(obj);
-			}
+		for (const auto& obj : rhs._shaderObjects) {
+            auto shaderCopy = std::make_shared<ShaderObject>(*obj);
+            glAttachShader(_id, *shaderCopy);
+            _shaderObjects.push_back(shaderCopy);
         }
     }
     return *this;
@@ -235,12 +216,6 @@ ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) {
 		_onChangeCallback = std::move(rhs._onChangeCallback);
         _programIsDirty = std::move(rhs._programIsDirty);
 
-		for (const ManagedShaderObject& obj : _shaderObjects) {
-			// Only delete ShaderObjects that belong to this ProgramObject
-			if (obj.second) {
-				delete obj.first;
-			}
-		}
 		_shaderObjects.clear();
 		_shaderObjects = std::move(rhs._shaderObjects);
 		_onChangeCallback = rhs._onChangeCallback;
@@ -265,10 +240,10 @@ const string& ProgramObject::name() const{
     return _programName;
 }
 
-bool ProgramObject::rebuildWithDictionary(Dictionary dictionary) {
-    for (const ManagedShaderObject& shaderObject : _shaderObjects)
-        shaderObject.first->setDictionary(dictionary);
-    return rebuildFromFile();
+void ProgramObject::rebuildWithDictionary(Dictionary dictionary) {
+    for (const auto& shaderObject : _shaderObjects)
+        shaderObject->setDictionary(dictionary);
+    rebuildFromFile();
 }
 
 void ProgramObject::setProgramObjectCallback(ProgramObjectCallback changeCallback) {
@@ -276,92 +251,39 @@ void ProgramObject::setProgramObjectCallback(ProgramObjectCallback changeCallbac
         _programIsDirty = true;
 		changeCallback(this);
 	};
-	for (const ManagedShaderObject& shaderObject : _shaderObjects)
-		shaderObject.first->setShaderObjectCallback(c);
+	for (const auto& shaderObject : _shaderObjects)
+		shaderObject->setShaderObjectCallback(c);
 }
 
-bool ProgramObject::hasName() const {
-    return !_programName.empty();
-}
+void ProgramObject::attachObject(std::shared_ptr<ShaderObject> shaderObject) {
+    ghoul_assert(shaderObject, "ShaderObject must not be nullptr");
+    auto it = std::find(_shaderObjects.begin(), _shaderObjects.end(), shaderObject);
+    ghoul_assert(it == _shaderObjects.end(), "ShaderObject was already registered");
 
-void ProgramObject::attachObject(ShaderObject* shaderObject, bool transferOwnership) {
-    ghoul_assert(shaderObject != nullptr, "Passed ShaderObject is nullptr");
-#ifdef GHL_DEBUG
-    // Check if ShaderObject is already attached
-	for (const ManagedShaderObject& obj : _shaderObjects) {
-        if (obj.first == shaderObject) {
-            if (obj.first->hasName()) {
-                const std::string& name = obj.first->name();
-                LWARNING("Shader object [" + name + "] already attached");
-            }
-            else
-                LWARNING("ShaderObject already attached");
-            return;
-        }
-    }
-#endif
     filesystem::File::FileChangedCallback c = [this](const filesystem::File&) {
         _programIsDirty = true;
     };
     shaderObject->setShaderObjectCallback(c);
 
-
     glAttachShader(_id, *shaderObject);
-	_shaderObjects.emplace_back(shaderObject, transferOwnership);
+	_shaderObjects.push_back(shaderObject);
 }
 
-void ProgramObject::detachObject(ShaderObject* shaderObject) {
-    // Check for null pointer
-    if (shaderObject == nullptr) {
-        LWARNING("Passed ShaderObject is nullptr");
-        return;
-    }
+void ProgramObject::detachObject(std::shared_ptr<ShaderObject> shaderObject) {
+    ghoul_assert(shaderObject, "ShaderObject must not be nullptr");
+    auto it = std::find(_shaderObjects.begin(), _shaderObjects.end(), shaderObject);
+    ghoul_assert(it != _shaderObjects.end(), "ShaderObject must have been registered");
 
-    // Check if ShaderObject is attached
-    auto it = _shaderObjects.begin();
-    for (; it != _shaderObjects.end(); ++it) {
-        if (it->first == shaderObject)
-            break;
-    }
-    if (it == _shaderObjects.end()) {
-        if (shaderObject->hasName())
-            LWARNING("ShaderObject [" + shaderObject->name() + 
-            "] not attached to ProgramObject");
-        else
-            LWARNING("ShaderObject not attached to ProgramObject");
-        return;
-    }
-    else {
-        glDetachShader(_id, *shaderObject);
-
-        if (it->second)
-            // ShaderObject belongs to this ProgramObject
-            delete shaderObject;
-        _shaderObjects.erase(it);
-    }
+    glDetachShader(_id, *shaderObject);
+    _shaderObjects.erase(it);
 }
 
-bool ProgramObject::compileShaderObjects() {
-#ifdef GHL_DEBUG
-    if (_shaderObjects.empty()) {
-        LWARNING("No ShaderObjects present for compiling");
-        return false;
-    }
-#endif
-    bool success = true;
-	for (const ManagedShaderObject& obj : _shaderObjects)
-        success &= obj.first->compile();
-
-    return success;
+void ProgramObject::compileShaderObjects() {
+	for (const auto& obj : _shaderObjects)
+        obj->compile();
 }
 
-bool ProgramObject::linkProgramObject() {
-#ifdef GHL_DEBUG
-    if (_shaderObjects.empty()) {
-        LWARNING("No ShaderObjects present while linking");
-        return false;
-    }
-#endif
+void ProgramObject::linkProgramObject() {
     glLinkProgram(_id);
 
     GLint linkStatus;
@@ -370,44 +292,23 @@ bool ProgramObject::linkProgramObject() {
         GLint logLength;
         glGetProgramiv(_id, GL_INFO_LOG_LENGTH, &logLength);
 
-        if (logLength == 0) {
-            LERROR("ProgramObject linking error: Unknown error");
-            return false;
-        }
+        if (logLength == 0)
+            throw ProgramObjectLinkingError("Unknown error", name());
 
-        GLchar* rawLog = new GLchar[logLength];
-        glGetProgramInfoLog(_id, logLength, NULL, rawLog);
-        string log(rawLog);
-        delete[] rawLog;
-        LERROR("ProgramObject linking error:\n" + log);
-
-        return false;
+        std::vector<GLchar> rawLog(logLength);
+        glGetProgramInfoLog(_id, logLength, NULL, rawLog.data());
+        string log(rawLog.data());
+        throw ProgramObjectLinkingError(log, name());
     }
     _programIsDirty = false;
-    return linkStatus == GL_TRUE;
 }
 
-bool ProgramObject::rebuildFromFile() {
-#ifdef GHL_DEBUG
-    if (_shaderObjects.empty()) {
-        LWARNING("No ShaderObjects present while rebuilding");
-        return false;
-    }
-#endif
-
+void ProgramObject::rebuildFromFile() {
 	ProgramObject p(*this);
-	if (!p.compileShaderObjects()) {
-		LWARNING("Could not recompile ShaderObjects");
-		return false;
-	}
+    p.compileShaderObjects();
+    p.linkProgramObject();
 
-	if (!p.linkProgramObject()) {
-		LWARNING("Could not link ProgramObject");
-		return false;
-	}
-
-	*this = std::move(p);
-	return true;
+    *this = std::move(p);
 }
 
 bool ProgramObject::isDirty() const {
@@ -415,12 +316,6 @@ bool ProgramObject::isDirty() const {
 }
 
 void ProgramObject::activate() {
-#ifdef GHL_DEBUG
-    if (_shaderObjects.empty()) {
-        LWARNING("No ShaderObjects present while activating");
-        return;
-    }
-#endif
     glUseProgram(_id);
 }
 
@@ -2996,7 +2891,7 @@ void ProgramObject::bindFragDataLocation(const std::string& name, GLuint colorNu
     glBindFragDataLocation(_id, colorNumber, name.c_str());
 }
 
-ProgramObject* ProgramObject::Build(const std::string& name,
+std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                     const std::string& vpath,
                                     const std::string& fpath,
                                     Dictionary dictionary) {
@@ -3014,24 +2909,23 @@ ProgramObject* ProgramObject::Build(const std::string& name,
     if (!filesExist)
         return nullptr;
 
-	const ShaderObject::ShaderType vsType = ShaderObject::ShaderType::ShaderTypeVertex;
-	const ShaderObject::ShaderType fsType = ShaderObject::ShaderType::ShaderTypeFragment;
+    using ShaderObject::ShaderType::ShaderTypeVertex;
+    using ShaderObject::ShaderType::ShaderTypeFragment;
 
-	ProgramObject* program = new ProgramObject(name);
-	ShaderObject* vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex", dictionary);
-	ShaderObject* fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment", dictionary);
-	program->attachObject(vs);
-	program->attachObject(fs);
+    std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
+    program->attachObject(std::make_unique<ShaderObject>(
+        ShaderTypeVertex, absPath(vpath), name + " Vertex", dictionary
+    ));
+    program->attachObject(std::make_unique<ShaderObject>(
+        ShaderTypeFragment, absPath(fpath), name + " Fragment", dictionary
+    ));
 
-	if (program->compileShaderObjects() && program->linkProgramObject())
-		return program;
-
-	// unsuccessful compilation, cleanup and return nullptr
-	delete program;
-	return nullptr;
+    program->compileShaderObjects();
+    program->linkProgramObject();
+    return program;
 }
 
-ProgramObject* ProgramObject::Build(const std::string& name,
+std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                     const std::string& vpath,
                                     const std::string& fpath,
                                     const std::string& gpath,
@@ -3056,27 +2950,27 @@ ProgramObject* ProgramObject::Build(const std::string& name,
     if (!filesExist)
         return nullptr;
 
-    const ShaderObject::ShaderType vsType = ShaderObject::ShaderType::ShaderTypeVertex;
-	const ShaderObject::ShaderType fsType = ShaderObject::ShaderType::ShaderTypeFragment;
-	const ShaderObject::ShaderType gsType = ShaderObject::ShaderType::ShaderTypeGeometry;
+    using ShaderObject::ShaderType::ShaderTypeVertex;
+    using ShaderObject::ShaderType::ShaderTypeGeometry;
+    using ShaderObject::ShaderType::ShaderTypeFragment;
+    
+    std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
+	program->attachObject(std::make_unique<ShaderObject>(
+        ShaderTypeVertex, absPath(vpath), name + " Vertex", dictionary
+    ));
+    program->attachObject(std::make_unique<ShaderObject>(
+        ShaderTypeGeometry, absPath(gpath), name + " Geometry", dictionary
+    ));
+    program->attachObject(std::make_unique<ShaderObject>(
+        ShaderTypeFragment, absPath(fpath), name + " Fragment", dictionary
+    ));
 
-	ProgramObject* program = new ProgramObject(name);
-	ShaderObject*  vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex", dictionary);
-	ShaderObject*  fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment", dictionary);
-	ShaderObject*  gs = new ShaderObject(gsType, absPath(gpath), name + " Geometry", dictionary);
-	program->attachObject(vs);
-	program->attachObject(fs);
-	program->attachObject(gs);
-
-	if (program->compileShaderObjects() && program->linkProgramObject())
-		return program;
-
-	// unsuccessful compilation, cleanup and return nullptr
-	delete program;
-	return nullptr;
+    program->compileShaderObjects();
+    program->linkProgramObject();
+    return program;
 }
 
-ProgramObject* ProgramObject::Build(const std::string& name,
+std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                     const std::string& vpath,
                                     const std::string& fpath,
                                     const std::string& gpath,
@@ -3113,30 +3007,34 @@ ProgramObject* ProgramObject::Build(const std::string& name,
     if (!filesExist)
         return nullptr;
 
-	const ShaderObject::ShaderType vsType = ShaderObject::ShaderType::ShaderTypeVertex;
-	const ShaderObject::ShaderType fsType = ShaderObject::ShaderType::ShaderTypeFragment;
-	const ShaderObject::ShaderType gsType = ShaderObject::ShaderType::ShaderTypeGeometry;
-	const ShaderObject::ShaderType teType = ShaderObject::ShaderType::ShaderTypeTesselationEvaluation;
-	const ShaderObject::ShaderType tcType = ShaderObject::ShaderType::ShaderTypeTesselationControl;
+    using ShaderObject::ShaderType::ShaderTypeVertex;
+    using ShaderObject::ShaderType::ShaderTypeGeometry;
+    using ShaderObject::ShaderType::ShaderTypeTesselationEvaluation;
+    using ShaderObject::ShaderType::ShaderTypeTesselationControl;
+    using ShaderObject::ShaderType::ShaderTypeFragment;
+    
+    std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
+    program->attachObject(std::make_unique<ShaderObject>(
+        ShaderTypeVertex, absPath(vpath), name + " Vertex", dictionary
+    ));
+    program->attachObject(std::make_unique<ShaderObject>(
+        ShaderTypeGeometry, absPath(gpath), name + " Geometry", dictionary
+    ));
+    program->attachObject(std::make_unique<ShaderObject>(
+        ShaderTypeTesselationEvaluation, absPath(tepath),
+        name + " Tessellation Evaluation", dictionary
+    ));
+    program->attachObject(std::make_unique<ShaderObject>(
+        ShaderTypeTesselationControl, absPath(tcpath),
+        name + " Tessellation Control", dictionary
+    ));
+    program->attachObject(std::make_unique<ShaderObject>(
+        ShaderTypeFragment, absPath(fpath), name + " Fragment", dictionary
+    ));
 
-	ProgramObject* program = new ProgramObject(name);
-	ShaderObject*  vs = new ShaderObject(vsType, absPath(vpath), name + " Vertex", dictionary);
-	ShaderObject*  fs = new ShaderObject(fsType, absPath(fpath), name + " Fragment", dictionary);
-	ShaderObject*  gs = new ShaderObject(gsType, absPath(gpath), name + " Geometry", dictionary);
-	ShaderObject*  te = new ShaderObject(teType, absPath(tepath), name + " Tessellation Evaluation", dictionary);
-	ShaderObject*  tc = new ShaderObject(tcType, absPath(tcpath), name + " Tessellation Control", dictionary);
-	program->attachObject(vs);
-	program->attachObject(fs);
-	program->attachObject(gs);
-	program->attachObject(te);
-	program->attachObject(tc);
-
-	if (program->compileShaderObjects() && program->linkProgramObject())
-		return program;
-
-	// unsuccessful compilation, cleanup and return nullptr
-	delete program;
-	return nullptr;
+    program->compileShaderObjects();
+    program->linkProgramObject();
+    return program;
 }
 
 } // namespace opengl

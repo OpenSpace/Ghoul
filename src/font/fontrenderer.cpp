@@ -146,28 +146,18 @@ bool FontRenderer::initialize() {
     file.close();
     
     using namespace opengl;
-    ProgramObject* program = new ProgramObject("Font");
-    ShaderObject* vertex = new ShaderObject(ShaderObject::ShaderTypeVertex, vsPath);
-    program->attachObject(vertex);
-    ShaderObject* fragment = new ShaderObject(ShaderObject::ShaderTypeFragment, fsPath);
-    program->attachObject(fragment);
+    std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>("Font");
+    program->attachObject(std::make_unique<ShaderObject>(ShaderObject::ShaderTypeVertex, vsPath));
+    program->attachObject(std::make_unique<ShaderObject>(ShaderObject::ShaderTypeFragment, fsPath));
 
     LDEBUG("Compile default font shader");
-    bool compileSuccess = program->compileShaderObjects();
-    if (!compileSuccess) {
-        delete program;
-        return false;
-    }
+    program->compileShaderObjects();
     
     LDEBUG("Link default font shader");
-    bool linkSuccess = program->linkProgramObject();
-    if (!linkSuccess) {
-        delete program;
-        return false;
-    }
+    program->linkProgramObject();
     
     _defaultRenderer = new FontRenderer;
-    _defaultRenderer->_program = std::unique_ptr<ProgramObject>(program);
+    _defaultRenderer->_program = std::move(program);
     
     return true;
 }

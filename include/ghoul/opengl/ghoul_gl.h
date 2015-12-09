@@ -38,4 +38,4 @@
     #include <GL/glu.h>
 #endif
 
-#endif // __TEXTUREUNIT_H__
+#endif // __GHOULGL_H__

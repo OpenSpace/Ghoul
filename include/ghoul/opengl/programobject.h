@@ -26,10 +26,12 @@
 #ifndef __PROGRAMOBJECT_H__
 #define __PROGRAMOBJECT_H__
 
+#include <ghoul/misc/exception.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/shaderobject.h>
 #include <ghoul/glm.h>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -47,36 +49,50 @@ namespace opengl {
  * #activate and #deactivate). If the OpenGL name of the ProgramObject is required, it is
  * available as an overloaded operator to an <code>GLuint</code> type. The copy
  * constructor and the assignment operation will perform deep copies of the attached
- * ShaderObject%s. The ownership of the copies of the ShaderObject%s will belong to the
- * new copy, while the ownership of original ShaderObject%s will not change. When setting
- * uniforms, attributes, subroutines, and subroutine uniforms, a flag is available
- * (#setIgnoreUniformLocationError, #setIgnoreAttributeLocationError,
- * #setIgnoreSubroutineLocationError, and #setIgnoreSubroutineUniformLocationError) that
- * enables/disables the logging in case one of the resources was not found during the
- * function call. All other sanity checks will only be performed if the library is
- * compiled with the <code>GHL_DEBUG</code> macro being defined.
+ * ShaderObject%s. When setting uniforms, attributes, subroutines, and subroutine
+ * uniforms, a flag is available (#setIgnoreUniformLocationError,
+ * #setIgnoreAttributeLocationError, #setIgnoreSubroutineLocationError, and
+ * #setIgnoreSubroutineUniformLocationError) that enables/disables the logging in case one
+ * of the resources was not found during the function call. All other sanity checks will
+ * only be performed if the library is compiled with the <code>GHL_DEBUG</code> macro
+ * being defined.
  */
 class ProgramObject {
 public:
-
 	/**
-	* A type definition for a callback function that is called if any of
-	* the tracked files is changed.
+	* A type definition for a callback function that is called if any of the tracked files
+    * is changed.
 	*/
-	typedef std::function<void(ProgramObject*)> ProgramObjectCallback;
+    using ProgramObjectCallback = std::function<void(ProgramObject*)>;
+    
+    /// Main exception that is thrown by methods of the ProgramObject class
+    struct ProgramObjectError : public RuntimeError {
+        explicit ProgramObjectError(std::string message);
+    };
+    
+    /// Exception that is thrown if the linking of a ProgramObject fails
+    struct ProgramObjectLinkingError : public ProgramObjectError {
+        ProgramObjectLinkingError(std::string linkerError, std::string programName);
+        std::string linkerError;
+        std::string programName;
+    };
 
     /**
      * Constructor that will automatically create a new OpenGL name for the new
      * ProgramObject. The internal name will be initialized as empty and the default state
      * for all location errors is that they will be logged.
+     * \throw ProgramObjectError If there was an error creating the OpenGL program object
+     * name
      */
     ProgramObject();
 
     /**
      * Constructor that will automatically create a new OpenGL name for the new
      * ProgramObject. The internal name (and debug name, if available) will be set to the
-     * passed <code>name</code>. The default state for all location errors is that they
-     * will be logged.
+     * passed \p name. The default state for all location errors is that they will be
+     * logged.
+     * \throw ProgramObjectError If there was an error creating the OpenGL program object
+     * name
      */
     ProgramObject(std::string name);
 
@@ -85,59 +101,57 @@ public:
      * and copies the state of the location errors and internal (and debug) name. The
      * copied ShaderObject%s' ownership will belong to the newly created ProgramObject
      * while the original`s ownership will be unchanged.
+     * \throw ProgramObjectError If there was an error creating the OpenGL program object
+     * name
      */
     ProgramObject(const ProgramObject& cpy);
 
     /**
-     * Destructor that will delete all the ShaderObject%s whose ownership belong to this
-     * ProgramObject. It will also delete the OpenGL name that is attached to the
-     * ProgramObject. Please note, while the lifetime of the ProgramObject ends after the
-     * destructor finishes, the OpenGL name might still be in use and is only deleted if
-     * the last (OpenGL internal) reference to the program object is removed. This means
-     * that the OpenGL name will leak and will be unreachable if the destructor is called
-     * while the ProgramObject is still #activate%d.
+     * Destructor that will delete the OpenGL name that is attached to the ProgramObject.
+     * Please note, while the lifetime of the ProgramObject ends after the destructor
+     * finishes, the OpenGL name might still be in use and is only deleted if the last
+     * (OpenGL internal) reference to the program object is removed. This means that the
+     * OpenGL name will leak and will be unreachable if the destructor is called while the
+     * ProgramObject is still #activate%d.
      */
     ~ProgramObject();
 
     /**
      * This operator will reveal the OpenGL name of this ProgramObject so that it can be
-     * directly used in native OpenGL functions. If the constructor failed, the returned
-     * value will be <code>0</code>; otherwise, a valid OpenGL name is returned.
+     * directly used in native OpenGL functions.
      * \returns The OpenGL name of this ProgramObject
      */
     operator GLuint() const;
 
     /**
-     * Assignment operator that will copy all the internal state of the right hand side`s
-     * ProgramObject and will perform a deep copy of all the attached ShaderObject%s. Each
-     * copy's ownership will belong to the left hand side, while the old ShaderObject%s
-     * will be deleted (depending on their respective ownerships).
+     * Assignment operator that will copy all the internal state of the right hand side's
+     * ProgramObject and will perform a deep copy of all the attached ShaderObject%s.
      * \param rhs The assignment source
      */
     ProgramObject& operator=(const ProgramObject& rhs);
 
     /**
-     * Assignment operator that will move all the internal state of the right hand side`s
-     * ProgramObject and will invalidate the right hand side`s object.
+     * Assignment operator that will move all the internal state of the right hand side's
+     * ProgramObject and will invalidate the right hand side's object.
      * \param rhs The assignment source
      */
     ProgramObject& operator=(ProgramObject&& rhs);
 
     /**
-     * Sets the (human readable) name (used for logging) and (if available) the object
-     * label for this ProgramObject. Besides this, the name is not used internally.
+     * Sets the human readable name used for logging and (if available) the object label
+     * for this ProgramObject. Besides this, the name is not used internally.
      * \param name The human readable name of this ProgramObject
      */
     void setName(std::string name);
 
     /**
-     * Returns the (human readable) name for this ProgramObject.
+     * Returns the human readable name for this ProgramObject.
      * \return The name for this ProgramObject
      */
     const std::string& name() const;
 
 
-    bool rebuildWithDictionary(Dictionary dictionary);
+    void rebuildWithDictionary(Dictionary dictionary);
 
     /**
      * Sets the shader object callback.
@@ -146,56 +160,45 @@ public:
     void setProgramObjectCallback(ProgramObjectCallback changeCallback);
 
     /**
-     * Returns <code>true</code> if this ProgramObject has a human readable name assigned
-     * to it.
-     * \return <code>true</code> if this ProgramObject has a human readable name assigned
-     * to it
-     */
-    bool hasName() const;
-
-    /**
      * Attaches the specified ShaderObject to this ProgramObject.
      * \param shaderObject The ShaderObject that will be attached to this ProgramObject.
-     * May not be a null pointer.
-     * \param transferOwnership If this is <code>true</code> this ProgramObject will take
-     * ownership of the passed ShaderObject and will dispose of it when the ProgramObject
-     * is deleted
+     * \pre \p shaderObject must not be nullptr
+     * \pre \p shaderObject must not have been registered before
      */
-    void attachObject(ShaderObject* shaderObject, bool transferOwnership = true);
+    void attachObject(std::shared_ptr<ShaderObject> shaderObject);
 
     /**
-     * Detaches the specified ShaderObject from this ProgramObject. If
-     * <code>shaderObject</code> belongs to this ProgramObject, it will be deleted after
-     * detaching.
-     * \param shaderObject The ShaderObject that should be detached. May not be a null
-     * pointer
+     * Detaches the specified ShaderObject from this ProgramObject.
+     * \param shaderObject The ShaderObject that should be detached.
+     * \pre \p shaderObject must not be nullptr
+     * \pre \p shaderObject must have been registered before
      */
-    void detachObject(ShaderObject* shaderObject);
+    void detachObject(std::shared_ptr<ShaderObject> shaderObject);
 
     /**
-     * Compiles all the ShaderObject%s that are attached to this ProgramObject. Will
-     * return the combined success of each individual compilation.
-     * \return <code>true</code> if each attached ShaderObject was compiled successfully.
-     * <code>false</code> otherwise
+     * Compiles all the ShaderObject%s that are attached to this ProgramObject.
+     * \throw ShaderCompileError If there was an error compiling at least one of the
+     * attached ShaderObject%s
      */
-    bool compileShaderObjects();
+    void compileShaderObjects();
 
     /**
-     * Links all attached ShaderObject%s into a program object. If an error occurs during
-     * the linking process, the linker log will be logged and <code>false</code> is
-     * returned.
-     * \return <code>true</code> if the linking succeeds, <code>false</code> otherwise
+     * Links all attached ShaderObject%s into a program object.
+     * \throw ProgramObjectLinkingError If there was an error linking the ProgramObject
      */
-    bool linkProgramObject();
+    void linkProgramObject();
 
     /**
      * Reloads and rebuilds all the attached ShaderObject%s from their respective files.
-     * Will call ShaderObject::rebuildFromFile on each attached ShaderObject
-     * regardless of ownership.
-     * \return <code>true</code> if the rebuilding of all ShaderObject%s succeeds,
-     * <code>false</code> otherwise
+     * Will call ShaderObject::rebuildFromFile on each attached ShaderObject. If an error
+     * occurs while rebuilding, an exception is thrown, but the object that this method is
+     * called on is unchanged. Only if the compiling and linking succeeds, this object is
+     * modified.
+     * \throw ShaderCompileError If there was an error compiling at least one of the
+     * attached ShaderObject%s
+     * \throw ProgramObjectLinkingError If there was an error linking the ProgramObject
      */
-    bool rebuildFromFile();
+    void rebuildFromFile();
 
     /**
      * Returns whether this ProgramObject is dirty and needs to be recompiled and rebuilt
@@ -217,6 +220,69 @@ public:
      */
     void deactivate();
 
+    /**
+     * Constructs and links a ProgramObject
+     * \param name The human readable name of this ProgramObject
+     * \param vpath The name of the vertex shader file that will be used to load the
+     * source of this shader
+     * \param fpath The name of the vertex shader file that will be used to load the
+     * source of this shader
+     * \param dictionary The dictionary that is used for the created !ShaderObject s and
+     * ultimately for the !ShaderPreprocessor
+     * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
+     * unsuccessfull
+     */
+    
+    static std::unique_ptr<ProgramObject> Build(const std::string& name,
+                                const std::string& vpath,
+                                const std::string& fpath,
+                                Dictionary dictionary = Dictionary());
+    
+    /**
+     * Constructs and links a ProgramObject
+     * \param name The human readable name of this ProgramObject
+     * \param vpath The name of the vertex shader file that will be used to load the
+     * source of this shader
+     * \param fpath The name of the vertex shader file that will be used to load the
+     * source of this shader
+     * \param gpath The name of the geometry shader file that will be used to load the
+     * source of this shader
+     * \param dictionary The dictionary that is used for the created !ShaderObject s and
+     * ultimately for the !ShaderPreprocessor
+     * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
+     * unsuccessfull
+     */
+    static std::unique_ptr<ProgramObject> Build(const std::string& name,
+                                const std::string& vpath,
+                                const std::string& fpath,
+                                const std::string& gpath,
+                                Dictionary dictionary = Dictionary());
+    /**
+     * Constructs and links a ProgramObject
+     * \param name The human readable name of this ProgramObject
+     * \param vpath The name of the vertex shader file that will be used to load the
+     * source of this shader
+     * \param fpath The name of the fragment shader file that will be used to load the
+     * source of this shader
+     * \param gpath The name of the geometry shader file that will be used to load the
+     * source of this shader
+     * \param tepath The name of the tessellation evaluation shader file that will be used to load the
+     * source of this shader
+     * \param tcpath The name of the tessellation control shader file that will be used to load the
+     * source of this shader
+     * \param dictionary The dictionary that is used for the created !ShaderObject s and
+     * ultimately for the !ShaderPreprocessor
+     * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
+     * unsuccessfull
+     */
+    static std::unique_ptr<ProgramObject> Build(const std::string& name,
+                                const std::string& vpath,
+                                const std::string& fpath,
+                                const std::string& gpath,
+                                const std::string& tepath,
+                                const std::string& tcpath,
+                                Dictionary dictionary = Dictionary());
+    
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -233,14 +299,14 @@ public:
     /**
      * Returns the state of this ProgramObject if the logging of location errors should be
      * enabled or not.
-      * \return <code>true</code> if location errors will be ignored
-      */
+     * \return <code>true</code> if location errors will be ignored
+     */
     bool ignoreUniformLocationError() const;
 
     /**
-     * Returns the location of the uniform specified by <code>name</code>. If the uniform
-     * can not be found in any of the attached ShaderObject%s, <code>-1</code> is returned
-     * and (provided it is not disabled) a warning will be logged. Will call the OpenGL
+     * Returns the location of the uniform specified by \p name. If the uniform can not be
+     * found in any of the attached ShaderObject%s, <code>-1</code> is returned and
+     * (provided it is not disabled) a warning will be logged. Will call the OpenGL
      * function <code>glGetUniformLocation</code>.
      * \param name The name of the uniform for which the location should be fetched
      * \return The location of the uniform, or <code>-1</code> if the uniform could not be
@@ -249,21 +315,20 @@ public:
     GLint uniformLocation(const std::string& name) const;
 
     /**
-     * Locates and sets the uniform <code>name</code> with the passed <code>value</code>.
-     * Returns<code>true</code> if the uniform could be found; <code>false</code>
-     * otherwise. Will call the OpenGL function <code>glProgramUniform1i</code>.
+     * Locates and sets the uniform \p name with the passed \p value. Returns
+     * <code>true</code> if the uniform could be found; <code>false</code> otherwise. Will
+     * call the OpenGL function <code>glProgramUniform1i</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \return <code>true</code> if the uniform was successfully located, <code>false
-     * </code> otherwise
+     * \return <code>true</code> if the uniform was successfully located,
+     * <code>false</code> otherwise
      */
     bool setUniform(const std::string& name, bool value);
 
     /**
-     * Locates and sets the uniform <code>name</code> with the passed values
-     * <code>v1</code> and <code>v2</code>. Returns <code>true</code> if the uniform could
-     * be found; <code>false</code> otherwise. Will call the OpenGL function
-     * <code>glProgramUniform2i</code>.
+     * Locates and sets the uniform \p name with the passed values \p v1 and \p v2.
+     * Returns <code>true</code> if the uniform could be found; <code>false</code>
+     * otherwise. Will call the OpenGL function <code>glProgramUniform2i</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
@@ -3279,69 +3344,6 @@ public:
      */
     void bindFragDataLocation(const std::string& name, GLuint colorNumber);
 
-	/**
-	 * Constructs and links a ProgramObject
-	 * \param name The human readable name of this ProgramObject
-	 * \param vpath The name of the vertex shader file that will be used to load the 
-	 * source of this shader
-	 * \param fpath The name of the vertex shader file that will be used to load the 
-	 * source of this shader
-     * \param dictionary The dictionary that is used for the created !ShaderObject s and
-     * ultimately for the !ShaderPreprocessor
-	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
-	 * unsuccessfull
-	 */
-	
-	static ProgramObject* Build(const std::string& name,
-				    const std::string& vpath,
-				    const std::string& fpath,
-				    Dictionary dictionary = Dictionary());
-
-	/**
-	 * Constructs and links a ProgramObject
-	 * \param name The human readable name of this ProgramObject
-	 * \param vpath The name of the vertex shader file that will be used to load the
-	 * source of this shader
-	 * \param fpath The name of the vertex shader file that will be used to load the
-	 * source of this shader
-	 * \param gpath The name of the geometry shader file that will be used to load the
-	 * source of this shader
-     * \param dictionary The dictionary that is used for the created !ShaderObject s and
-     * ultimately for the !ShaderPreprocessor
-	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
-	 * unsuccessfull
-	*/
-	static ProgramObject* Build(const std::string& name,
-				    const std::string& vpath,
-				    const std::string& fpath,
-				    const std::string& gpath,
-				    Dictionary dictionary = Dictionary());
-	/**
-	 * Constructs and links a ProgramObject
-	 * \param name The human readable name of this ProgramObject
-	 * \param vpath The name of the vertex shader file that will be used to load the
-	 * source of this shader
-	 * \param fpath The name of the fragment shader file that will be used to load the
-	 * source of this shader
-	 * \param gpath The name of the geometry shader file that will be used to load the
-	 * source of this shader
-	 * \param tepath The name of the tessellation evaluation shader file that will be used to load the
-	 * source of this shader
-	 * \param tcpath The name of the tessellation control shader file that will be used to load the
-	 * source of this shader
-     * \param dictionary The dictionary that is used for the created !ShaderObject s and
-     * ultimately for the !ShaderPreprocessor
-	 * \return The contructed ProgramObject if successfull. <code>nullptr</code> if
-	 * unsuccessfull
-	 */
-	static ProgramObject* Build(const std::string& name,
-				    const std::string& vpath,
-				    const std::string& fpath,
-				    const std::string& gpath,
-				    const std::string& tepath,
-				    const std::string& tcpath,
-				    Dictionary dictionary = Dictionary());
-
 private:
     /// The OpenGL name of this program object.
     GLuint _id;
@@ -3353,32 +3355,26 @@ private:
     std::string _loggerCat;
 
     /// <code>true</code> if uniform location errors should be ignored.
-    bool _ignoreUniformLocationError;
+    bool _ignoreUniformLocationError = false;
 
     /// <code>true</code> if attribute location errors should be ignored.
-    bool _ignoreAttributeLocationError;
+    bool _ignoreAttributeLocationError = false;
 
     /// <code>true</code> if subroutine location errors should be ignored.
-    bool _ignoreSubroutineLocationError;
+    bool _ignoreSubroutineLocationError = false;
 
     /// <code>true</code> if subroutine uniform location errors should be ignored.
-    bool _ignoreSubroutineUniformLocationError;
-
-    /// A typedef for a managed shader object. Stores (Shader, ProgramOwnsShader).
-    typedef std::pair<ShaderObject*, bool> ManagedShaderObject;
-
-    /// A typedef for an <code>std::vector</code> of ManagedShaderObject%s.
-    typedef std::vector<ManagedShaderObject> ManagedShaderObjects;
+    bool _ignoreSubroutineUniformLocationError = false;
 
     /// All the ShaderObjects that are managed and attached to this ProgramObject.
-    ManagedShaderObjects _shaderObjects;
+    std::vector<std::shared_ptr<ShaderObject>> _shaderObjects;
 
 	/// The user provided callback if any of the ShadeObjects tracked files is changed
 	ProgramObjectCallback _onChangeCallback;
 
     /// A flag that gets set to <code>true</code> if the underlying shader file has been
     /// changed and a recompile is necessary.
-    bool _programIsDirty;
+    bool _programIsDirty = true;
 };
 
 } // namespace opengl
