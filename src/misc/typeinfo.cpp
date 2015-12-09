@@ -24,101 +24,125 @@
 
 #include <ghoul/misc/typeinfo.h>
 
-#include <sstream>
+#include <ghoul/filesystem/cachemanager.h>
+#include <ghoul/misc/buffer.h>
+#include <ghoul/misc/dictionary.h>
+#include <ghoul/opengl/opengl>
 
-#define TYPEINFO_NAME_IMPLEMENTATION(class_name) \
-    template<>std::string TypeInfo::name<class_name>() { \
-        return #class_name; \
-    } \
-    template<>std::string TypeInfo::name<class_name*>() { \
-        return #class_name"*"; \
-    } \
-    template<>std::string TypeInfo::name<const class_name>() { \
-        return "const "#class_name; \
-    } \
-    template<>std::string TypeInfo::name<const class_name*>() { \
-        return "const "#class_name"*"; \
-    } \
-    template<>std::string TypeInfo::name<std::vector<class_name> >() { \
-        return "std::vector<"#class_name">";\
-    } \
-    template<>std::string TypeInfo::name<std::vector<class_name*> >() { \
-        return "std::vector<"#class_name"*>";\
-    } \
-    template<>std::string TypeInfo::name<std::vector<class_name>*>() { \
-        return "std::vector<"#class_name">*";\
-    } \
-    template<>std::string TypeInfo::name<std::vector<class_name*>*>() { \
-        return "std::vector<"#class_name"*>*";\
-    } \
-    template<>std::string TypeInfo::name<std::vector<const class_name> >() { \
-        return "std::vector<const "#class_name">";\
-    } \
-    template<>std::string TypeInfo::name<std::vector<const class_name*> >() { \
-        return "std::vector<const "#class_name"*>";\
-    } \
-    template<>std::string TypeInfo::name<std::vector<const class_name>*>() { \
-        return "std::vector<const "#class_name">*";\
-    } \
-    template<>std::string TypeInfo::name<std::vector<const class_name*>*>() { \
-        return "std::vector<const "#class_name"*>*";\
-    } \
-    template<>std::string TypeInfo::name<const std::vector<class_name> >() { \
-        return "const std::vector<"#class_name">";\
-    } \
-    template<>std::string TypeInfo::name<const std::vector<class_name*> >() { \
-        return "const std::vector<"#class_name"*>";\
-    } \
-    template<>std::string TypeInfo::name<const std::vector<class_name>*>() { \
-        return "const std::vector<"#class_name">*";\
-    } \
-    template<>std::string TypeInfo::name<const std::vector<class_name*>*>() { \
-        return "const std::vector<"#class_name"*>*";\
-    } \
-    template<>std::string TypeInfo::name<const std::vector<const class_name> >() { \
-        return "const std::vector<const "#class_name">";\
-    } \
-    template<>std::string TypeInfo::name<const std::vector<const class_name*> >() { \
-        return "const std::vector<const "#class_name"*>";\
-    } \
-    template<>std::string TypeInfo::name<const std::vector<const class_name>*>() { \
-        return "const std::vector<const "#class_name">*";\
-    } \
-    template<>std::string TypeInfo::name<const std::vector<const class_name*>*>() { \
-        return "const std::vector<const "#class_name"*>*";\
-    } \
+#define TYPEINFO_NAME_DEFINITION(__CLASS__)                                              \
+                                                                                         \
+template <>                                                                              \
+std::string TypeInfo::name<__CLASS__>() {                                                \
+    return #__CLASS__;                                                                   \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<__CLASS__*>() {                                               \
+    return #__CLASS__"*";                                                                \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<const __CLASS__>() {                                          \
+    return "const "#__CLASS__;                                                           \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<const __CLASS__*>() {                                         \
+    return "const "#__CLASS__"*";                                                        \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<std::vector<__CLASS__> >() {                                  \
+    return "std::vector<"#__CLASS__">";                                                  \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<std::vector<__CLASS__*> >() {                                 \
+    return "std::vector<"#__CLASS__"*>";                                                 \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<std::vector<__CLASS__>*>() {                                  \
+    return "std::vector<"#__CLASS__">*";                                                 \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<std::vector<__CLASS__*>*>() {                                 \
+    return "std::vector<"#__CLASS__"*>*";                                                \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<std::vector<const __CLASS__> >() {                            \
+    return "std::vector<const "#__CLASS__">";                                            \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<std::vector<const __CLASS__*> >() {                           \
+    return "std::vector<const "#__CLASS__"*>";                                           \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<std::vector<const __CLASS__>*>() {                            \
+    return "std::vector<const "#__CLASS__">*";                                           \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<std::vector<const __CLASS__*>*>() {                           \
+    return "std::vector<const "#__CLASS__"*>*";                                          \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<const std::vector<__CLASS__> >() {                            \
+    return "const std::vector<"#__CLASS__">";                                            \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<const std::vector<__CLASS__*> >() {                           \
+    return "const std::vector<"#__CLASS__"*>";                                           \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<const std::vector<__CLASS__>*>() {                            \
+    return "const std::vector<"#__CLASS__">*";                                           \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<const std::vector<__CLASS__*>*>() {                           \
+    return "const std::vector<"#__CLASS__"*>*";                                          \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<const std::vector<const __CLASS__> >() {                      \
+    return "const std::vector<const "#__CLASS__">";                                      \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<const std::vector<const __CLASS__*> >() {                     \
+    return "const std::vector<const "#__CLASS__"*>";                                     \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<const std::vector<const __CLASS__>*>() {                      \
+    return "const std::vector<const "#__CLASS__">*";                                     \
+}                                                                                        \
+template <>                                                                              \
+std::string TypeInfo::name<const std::vector<const __CLASS__*>*>() {                     \
+    return "const std::vector<const "#__CLASS__"*>*";                                    \
+}                                                                                        \
 
 
 namespace ghoul {
 
 // Fundamental types
-TYPEINFO_NAME_IMPLEMENTATION(std::nullptr_t)
-TYPEINFO_NAME_IMPLEMENTATION(char)
-TYPEINFO_NAME_IMPLEMENTATION(bool)
-TYPEINFO_NAME_IMPLEMENTATION(short)
-TYPEINFO_NAME_IMPLEMENTATION(int)
-TYPEINFO_NAME_IMPLEMENTATION(long)
-TYPEINFO_NAME_IMPLEMENTATION(long long)
-TYPEINFO_NAME_IMPLEMENTATION(float)
-TYPEINFO_NAME_IMPLEMENTATION(double)
-TYPEINFO_NAME_IMPLEMENTATION(long double)
-TYPEINFO_NAME_IMPLEMENTATION(unsigned char)
-TYPEINFO_NAME_IMPLEMENTATION(unsigned short)
-TYPEINFO_NAME_IMPLEMENTATION(unsigned int)
-TYPEINFO_NAME_IMPLEMENTATION(unsigned long)
-TYPEINFO_NAME_IMPLEMENTATION(unsigned long long)
-TYPEINFO_NAME_IMPLEMENTATION(signed char)
-TYPEINFO_NAME_IMPLEMENTATION(std::string)
+TYPEINFO_NAME_DEFINITION(std::nullptr_t)
+TYPEINFO_NAME_DEFINITION(char)
+TYPEINFO_NAME_DEFINITION(bool)
+TYPEINFO_NAME_DEFINITION(short)
+TYPEINFO_NAME_DEFINITION(int)
+TYPEINFO_NAME_DEFINITION(long)
+TYPEINFO_NAME_DEFINITION(long long)
+TYPEINFO_NAME_DEFINITION(float)
+TYPEINFO_NAME_DEFINITION(double)
+TYPEINFO_NAME_DEFINITION(long double)
+TYPEINFO_NAME_DEFINITION(unsigned char)
+TYPEINFO_NAME_DEFINITION(unsigned short)
+TYPEINFO_NAME_DEFINITION(unsigned int)
+TYPEINFO_NAME_DEFINITION(unsigned long)
+TYPEINFO_NAME_DEFINITION(unsigned long long)
+TYPEINFO_NAME_DEFINITION(signed char)
+TYPEINFO_NAME_DEFINITION(std::string)
 
 // ghoul classes
-TYPEINFO_NAME_IMPLEMENTATION(ghoul::filesystem::CacheManager)
-TYPEINFO_NAME_IMPLEMENTATION(ghoul::filesystem::Directory)
-TYPEINFO_NAME_IMPLEMENTATION(ghoul::filesystem::File)
-TYPEINFO_NAME_IMPLEMENTATION(ghoul::Buffer)
-TYPEINFO_NAME_IMPLEMENTATION(ghoul::Dictionary)
-TYPEINFO_NAME_IMPLEMENTATION(ghoul::opengl::FramebufferObject)
-TYPEINFO_NAME_IMPLEMENTATION(ghoul::opengl::ProgramObject)
-TYPEINFO_NAME_IMPLEMENTATION(ghoul::opengl::ShaderObject)
-TYPEINFO_NAME_IMPLEMENTATION(ghoul::opengl::Texture)
+TYPEINFO_NAME_DEFINITION(ghoul::filesystem::CacheManager)
+TYPEINFO_NAME_DEFINITION(ghoul::filesystem::Directory)
+TYPEINFO_NAME_DEFINITION(ghoul::filesystem::File)
+TYPEINFO_NAME_DEFINITION(ghoul::Buffer)
+TYPEINFO_NAME_DEFINITION(ghoul::Dictionary)
+TYPEINFO_NAME_DEFINITION(ghoul::opengl::FramebufferObject)
+TYPEINFO_NAME_DEFINITION(ghoul::opengl::ProgramObject)
+TYPEINFO_NAME_DEFINITION(ghoul::opengl::ShaderObject)
+TYPEINFO_NAME_DEFINITION(ghoul::opengl::Texture)
 
 }

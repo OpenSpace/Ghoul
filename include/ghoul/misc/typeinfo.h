@@ -34,116 +34,32 @@
 
 namespace ghoul {
 
-// Forward declare the ghoul classes. Declaratio nnot necessary
-class Buffer;
-class Dictionary;
-namespace filesystem {
-    class CacheManager;
-    class Directory;
-    class File;
-}
-namespace opengl {
-    class FramebufferObject;
-    class ProgramObject;
-    class ShaderObject;
-    class Texture;
-}
-
 /**
  * This class is a wrapper class for returning human readable names
  * for the most commonly used types in Ghoul.
  */
 class TypeInfo {
 public:
-    
     /**
-     * Returns the name of the provided type. If the class
-     * is not registered the typeid(T).name will be used. This
-     * will make the names look much worse and const types will
-     * be treated as the same as non-const types.
+     * Returns the name of the provided type. If the class is not registered, the
+     * <code>typeid(T).name</code> will be used. This will make the names look much worse
+     * and const types will be treated as the same as non-const types.
      * \return The name of the provided type
      */
     template<class T>
     static std::string name();
     
     /**
-     * Returns the name of the type of the provided object. If the class
-     * is not registered the typeid(T).name will be used. This
-     * will make the names look much worse and const types will
-     * be treated as the same as non-const types.
+     * Returns the name of the type of the provided object. If the class is not
+     * registered, the <code>typeid(T).name</code> will be used. This will make the names
+     * look much worse and const types will be treated as the same as non-const types.
      * \param obj The object of the type name requested
      * \return The name of the type of the provided object
      */
     template<class T>
     static std::string name(const T& obj);
     
-}; // TypeInfo
-
-#define TYPEINFO_NAME_DECLARATION(class_name) \
-    template<>std::string TypeInfo::name<class_name>(); \
-    template<>std::string TypeInfo::name<class_name*>(); \
-    template<>std::string TypeInfo::name<const class_name>(); \
-    template<>std::string TypeInfo::name<const class_name*>(); \
-    template<>std::string TypeInfo::name<std::vector<class_name> >(); \
-    template<>std::string TypeInfo::name<std::vector<class_name*> >(); \
-    template<>std::string TypeInfo::name<std::vector<class_name>*>(); \
-    template<>std::string TypeInfo::name<std::vector<class_name*>*>(); \
-    template<>std::string TypeInfo::name<std::vector<const class_name> >(); \
-    template<>std::string TypeInfo::name<std::vector<const class_name*> >(); \
-    template<>std::string TypeInfo::name<std::vector<const class_name>*>(); \
-    template<>std::string TypeInfo::name<std::vector<const class_name*>*>(); \
-    template<>std::string TypeInfo::name<const std::vector<class_name> >(); \
-    template<>std::string TypeInfo::name<const std::vector<class_name*> >(); \
-    template<>std::string TypeInfo::name<const std::vector<class_name>*>(); \
-    template<>std::string TypeInfo::name<const std::vector<class_name*>*>(); \
-    template<>std::string TypeInfo::name<const std::vector<const class_name> >(); \
-    template<>std::string TypeInfo::name<const std::vector<const class_name*> >(); \
-    template<>std::string TypeInfo::name<const std::vector<const class_name>*>(); \
-    template<>std::string TypeInfo::name<const std::vector<const class_name*>*>();
-    
-
-
-// Fundamental types
-TYPEINFO_NAME_DECLARATION(std::nullptr_t)
-TYPEINFO_NAME_DECLARATION(char)
-TYPEINFO_NAME_DECLARATION(bool)
-TYPEINFO_NAME_DECLARATION(short)
-TYPEINFO_NAME_DECLARATION(int)
-TYPEINFO_NAME_DECLARATION(long)
-TYPEINFO_NAME_DECLARATION(long long)
-TYPEINFO_NAME_DECLARATION(float)
-TYPEINFO_NAME_DECLARATION(double)
-TYPEINFO_NAME_DECLARATION(long double)
-TYPEINFO_NAME_DECLARATION(unsigned char)
-TYPEINFO_NAME_DECLARATION(unsigned short)
-TYPEINFO_NAME_DECLARATION(unsigned int)
-TYPEINFO_NAME_DECLARATION(unsigned long)
-TYPEINFO_NAME_DECLARATION(unsigned long long)
-TYPEINFO_NAME_DECLARATION(signed char)
-TYPEINFO_NAME_DECLARATION(std::string)
-
-// ghoul classes
-TYPEINFO_NAME_DECLARATION(Buffer)
-TYPEINFO_NAME_DECLARATION(Dictionary)
-TYPEINFO_NAME_DECLARATION(filesystem::CacheManager)
-TYPEINFO_NAME_DECLARATION(filesystem::Directory)
-TYPEINFO_NAME_DECLARATION(filesystem::File)
-TYPEINFO_NAME_DECLARATION(opengl::FramebufferObject)
-TYPEINFO_NAME_DECLARATION(opengl::ProgramObject)
-TYPEINFO_NAME_DECLARATION(opengl::ShaderObject)
-TYPEINFO_NAME_DECLARATION(opengl::Texture)
-
-// unknown type
-template<class T>
-std::string TypeInfo::name() {
-    return std::string(typeid(T).name());
-}
-
-// unknown type
-template<class T>
-std::string TypeInfo::name(const T&) {
-    return name<T>();
-}
+};
 
 }  // ghoul
 

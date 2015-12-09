@@ -23,15 +23,15 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
- #ifndef __GHOUL_OPENGL__
- #define __GHOUL_OPENGL__
+#ifndef __GHOUL_OPENGL__
+#define __GHOUL_OPENGL__
 
+#include "framebufferobject.h"
 #include "programobject.h"
 #include "shadermanager.h"
 #include "shaderobject.h"
 #include "texture.h"
 #include "texturemanager.h"
-#include "texturereader.h"
 #include "textureunit.h"
 
 #endif // __GHOUL_OPENGL__
