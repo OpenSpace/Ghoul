@@ -37,19 +37,37 @@ namespace ghoul {
  * that threw the exception if it was set.
  */
 struct RuntimeError : public std::runtime_error {
-    /** Main constructor constructing the exception with the provided \p message and
+    /** 
+     * Main constructor constructing the exception with the provided \p message and
      * \p component.
      * \param message The main message of the exception
      * \param component The optional component
      * \pre \p message must not be empty
      */
-    explicit RuntimeError(const std::string& message, const std::string& component = "");
+    explicit RuntimeError(std::string message, std::string component = "");
     
     /// The main message describing the exception
     std::string message;
     
     /// The name of the component that threw the exception
     std::string component;
+};
+    
+/**
+ * Exception that is thrown if an IO access failed because a file could was not found
+ */
+struct FileNotFoundError : public RuntimeError {
+    /**
+     * Main constructor constructing the exception with the provided missing \p file and
+     * the \p component that threw the exception
+     * \param file The file that was missing which caused this exception to be thrown
+     * \param component The optional compoment that caused this exception to be thrown
+     * \pre \p file must not be empty
+     */
+    explicit FileNotFoundError(std::string file, std::string component = "");
+    
+    /// The file that was missing
+    std::string file;
 };
     
 } // namespace ghoul

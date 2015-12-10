@@ -29,12 +29,17 @@
 
 namespace ghoul {
     
-RuntimeError::RuntimeError(const std::string& msg, const std::string& comp)
+RuntimeError::RuntimeError(std::string msg, std::string comp)
     : std::runtime_error(comp.empty() ? msg : "(" + comp + ") " + msg)
     , message(std::move(msg))
     , component(std::move(comp))
 {
-    ghoul_assert(!msg.empty(), "Message must not be empty");
+    ghoul_assert(!message.empty(), "Message must not be empty");
 }
+    
+FileNotFoundError::FileNotFoundError(std::string f, std::string comp)
+    : RuntimeError("Could not find file '" + f + "'", std::move(comp))
+    , file(std::move(f))
+{}
     
 } // namespace ghoul

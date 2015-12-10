@@ -28,6 +28,7 @@
 
 #include <ghoul/opengl/ghoul_gl.h>
 //#include <ghoul/filesystem/file.h>
+#include <ghoul/misc/exception.h>
 
 #include <string>
 #include <vector>
@@ -53,6 +54,31 @@ namespace opengl {
  */
 class ShaderObject {
 public:
+    /// Main exception that is thrown by methods of the ShaderObject class
+    struct ShaderObjectError : public RuntimeError {
+        explicit ShaderObjectError(std::string message);
+    };
+
+    
+    /// The exception that is thrown if the compilation of a ShaderObject failed
+    struct ShaderCompileError : public ShaderObjectError {
+        /**
+         * The constructor constructing a ShaderCompileError containing the cause for the
+         * error (\p compileError) as well as the, optional, \p shaderName
+         */
+        explicit ShaderCompileError(std::string compileError, std::string fileIdentifiers,
+            std::string shaderName);
+
+        /// The compile error as reported by the GLSL compiler
+        std::string compileError;
+        
+        /// File identifiers of included files as reported by ShaderPreprocessor
+        std::string fileIdentifiers;
+        
+        /// The name of the ShaderObject that caused the compile error
+        std::string shaderName;
+    };
+    
     /**
      * An enum of the different types of shaders that can be used in OpenGL. They can be 
      * used interchangeably in native OpenGL calls, too. Compute shaders are only 
@@ -74,7 +100,7 @@ public:
 	* A type definition for a callback function that is called if any of
 	* the tracked files is changed.
 	*/
-	typedef std::function<void(const filesystem::File&)> ShaderObjectCallback;
+    using ShaderObjectCallback = std::function<void(const filesystem::File&)>;
 
     /**
      * This constructor creates a shader of the passed type with an empty source string. 
@@ -82,6 +108,8 @@ public:
      * to be compiled.
      * \param shaderType The type of shader that this ShaderObject will represent
      * \param dictionary The dictionary that is used for the !ShaderPreprocessor
+     * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
+     * generated
      */
     ShaderObject(ShaderType shaderType, Dictionary dictionary = Dictionary());
 
@@ -94,8 +122,12 @@ public:
      * \param filename The name of the file that will be used to load the source of this 
      * shader
      * \param dictionary The dictionary that is used for the !ShaderPreprocessor
+     * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
+     * generated
+     * \pre \p filename must not be empty
      */
-    ShaderObject(ShaderType shaderType, std::string filename, Dictionary dictionary = Dictionary());
+    ShaderObject(ShaderType shaderType, std::string filename,
+        Dictionary dictionary = Dictionary());
 
     /**
      * This constructor creates a shader of the passed type and loads the shader source 
@@ -108,8 +140,12 @@ public:
      * shader
      * \param name The human readable name of this ShaderObject
      * \param dictionary The dictionary that is used for the !ShaderPreprocessor
+     * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
+     * generated
+     * \pre \p filename must not be empty
      */
-    ShaderObject(ShaderType shaderType, std::string filename, std::string name, Dictionary dictionary = Dictionary());
+    ShaderObject(ShaderType shaderType, std::string filename, std::string name,
+        Dictionary dictionary = Dictionary());
 
     /**
      * A copy constructor that will copy all of the internal state, and the shader source,
@@ -118,6 +154,8 @@ public:
      * the copied Shader will use the changed file. That means a ShaderObject will not
      * cache the contents of the file inside.
      * \param cpy The original object that will be copied
+     * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
+     * generated
      */
 	ShaderObject(const ShaderObject& cpy);
 
@@ -148,6 +186,8 @@ public:
      * ShaderObject will not cache the contents of the file inside.
      * \param rhs The original right hand side that will be used to set this object
      * \return A reference to <code>this</code>
+     * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
+     * generated
      */
 	ShaderObject& operator=(const ShaderObject& rhs);
 
@@ -184,29 +224,22 @@ public:
 	void setShaderObjectCallback(ShaderObjectCallback changeCallback);
 
     /**
-     * Returns <code>true</code> if this ShaderObject has an internal name assigned to it,
-     * <code>false</code> otherwise.
-     * \return <code>true</code> if this ShaderObject has an internal name assigned to it,
-     * <code>false</code> otherwise.
-     */
-    bool hasName() const;
-
-    /**
      * Returns the filepath for the shader object file
      * \return The filename
      */
 	std::string filename();
 
     /**
-     * (Re)sets the filename this ShaderObject is based on. It will load the contents of
-     * the file and uses it as the source text for this ShaderObject. If the file can not
-     * be opened or is empty an error message is logged and the old shader will be deleted
-     * in the process. The loaded shader will not automatically compiled after loading.
-     * The method returns if the loading was successful.
+     * (Re)sets the \p filename this ShaderObject is based on. It will load the contents
+     * of the file and uses it as the source text for this ShaderObject. If the file can
+     * not be opened or is empty an exception is thrown. The loaded shader will not
+     * automatically compiled after loading.
      * \param filename The name of the file that will be used to load this shader
-     * \return <code>true</code>, if the load was successful, <code>false</code> otherwise
+     * \throw FileNotFoundError If the \p filename did not point to a valid file
+     * \throw ShaderObjectError If the file pointed to by \p filename was empty
+     * \pre \p filename must not be empty
      */
-    bool setShaderFilename(std::string filename);
+    void setShaderFilename(std::string filename);
 
     /**
      * This method will mark the OpenGL name as unused. Because of the way the OpenGL
@@ -218,19 +251,16 @@ public:
     /**
      * This method will reload the shader source from the file specified earlier. The 
      * OpenGL name will not change by this operation. After loading, the ShaderObject is 
-     * not compiled. If the file is no longer available, the previous shader source will 
-     * be removed.
+     * not compiled.
      */
-    bool rebuildFromFile();
+    void reloadFromFile();
 
     /**
      * This method will compile the shader source in this ShaderObject and returns the 
-     * success of this operation. If the compiling fails, the compiler log will be logged 
-     * as an error and this will return <code>false</code>.
-     * \return <code>true</code> if the shader source was compiled successfully, <code>
-     * false</code> otherwise
+     * success of this operation.
+     * \throw ShaderCompileError If there was an error while compiling the ShaderObject
      */
-    bool compile();
+    void compile();
 
     /**
      * Returns the type of this ShaderObject as a human readable string.
@@ -243,21 +273,6 @@ public:
      * \return The ShaderObject <code>type</code> as a human readable string.
      */
     static std::string stringForShaderType(ShaderType type);
-
-    /**
-     * Deprecated! Use ShaderPreprocessor::addIncludePath instead.
-     *
-     * Adds the passed folder to the list of include paths that are checked when a shader
-     * includes a file. The list of include paths is traversed in the order in which they
-     * where added to this class. If the folder does not exist, an error is logged, the
-     * list of include paths is unchanged and <code>false</code> is returned. The folder
-     * in which the shader is located will always be treated as if being on the top of the
-     * list.
-     * \param folderPath The folder that should be added to the list of include paths
-     * \return <code>true</code> if the <code>folderPath</code> was added successfully,
-     * <code>false</code> otherwise
-     */
-    static bool addIncludePath(std::string folderPath);
 
 private:
     /// The OpenGL name of this ShaderObject
@@ -278,10 +293,10 @@ private:
     /// The logger category that will be used for logging of ShaderObject methods
     std::string _loggerCat;
 
-    /// The callback function if any of the tracked files are changed.
+    /// The callback function if any of the tracked files are changed
     ShaderObjectCallback _onChangeCallback;
 
-    /// The preprocessor to process the shader file and track changes.
+    /// The preprocessor to process the shader file and track changes
     ShaderPreprocessor _preprocessor;
 };
 
