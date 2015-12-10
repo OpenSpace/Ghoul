@@ -25,18 +25,11 @@
 
 #include <ghoul/opengl/shaderobject.h>
 
-#include <ghoul/logging/log.h>
-#include <ghoul/filesystem/filesystem>
+#include <ghoul/filesystem/filesystem.h>
 #include <ghoul/filesystem/cachemanager.h>
-#include <ghoul/filesystem/file.h>
 #include <ghoul/misc/crc32.h>
-#include <ghoul/systemcapabilities/systemcapabilities.h>
 
 #include <algorithm>
-#include <cassert>
-#include <cctype>
-#include <cstring>
-#include <fstream>
 #include <functional>
 
 #ifdef _MSC_VER
@@ -240,12 +233,10 @@ void ShaderObject::setDictionary(Dictionary dictionary) {
 }
 
 void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) {
-    _onChangeCallback = changeCallback;
-    _preprocessor.setCallback([this](const filesystem::File& file) {
-        if (_onChangeCallback) {
-            _onChangeCallback(file);
-        }
-    });
+    _onChangeCallback = std::move(changeCallback);
+    // The ShaderPreprocessor will take care to call the callback whenever the underlying
+    // file or an included file changes
+    _preprocessor.setCallback(_onChangeCallback);
 }
 
 std::string ShaderObject::filename() {
@@ -289,8 +280,6 @@ void ShaderObject::setShaderFilename(std::string filename) {
 	
     const char* contentPtr =  contents.c_str();
     glShaderSource(_id, 1, &contentPtr, nullptr);
-
-    LINFO("Loaded " + typeAsString() + ": '" + _fileName + "'");
 }
 
 void ShaderObject::deleteShader() {

@@ -3526,9 +3526,6 @@ private:
     /// All the ShaderObjects that are managed and attached to this ProgramObject.
     std::vector<std::shared_ptr<ShaderObject>> _shaderObjects;
 
-	/// The user provided callback if any of the ShadeObjects tracked files is changed
-	ProgramObjectCallback _onChangeCallback;
-
     /// A flag that gets set to <code>true</code> if the underlying shader file has been
     /// changed and a recompile is necessary.
     bool _programIsDirty = true;

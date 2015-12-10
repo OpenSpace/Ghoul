@@ -27,31 +27,12 @@
 
 #include <ghoul/filesystem/filesystem.h>
 
-#include <ghoul/filesystem/cachemanager.h>
-#include <ghoul/logging/logmanager.h>
-
-#include <algorithm>
-#include <cassert>
-#include <regex>
-#include <cstdio>
-
-#include <dirent.h>
-#include <unistd.h>
-#include <sys/param.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <pwd.h>
-
 #include <CoreServices/CoreServices.h>
-#include <sys/stat.h>
-
-using std::string;
 
 namespace {
-
-    const string _loggerCat = "FileSystem";
+    const std::string _loggerCat = "FileSystem";
 	// the maximum latency allowed before a changed is registered
-	const CFAbsoluteTime latency = 1.0;
+	const CFAbsoluteTime Latency = 1.0;
     
     enum Events {
         kFSEventStreamEventFlagNone = 0x00000000,
@@ -84,13 +65,16 @@ namespace {
     {
         char** paths = reinterpret_cast<char**>(eventPaths);
         for (size_t i = 0; i < numEvents; ++i) {
-            if (!(eventFlags[i] & Events::kFSEventStreamEventFlagItemModified))
-                continue;
+            using Events::kFSEventStreamEventFlagItemModified;
+            using Events::kFSEventStreamEventFlagItemInodeMetaMod;
+            using Events::kFSEventStreamEventFlagItemIsFile;
             
-            if (!(eventFlags[i] & Events::kFSEventStreamEventFlagItemIsFile))
-                continue;
-            
-            ghoul::filesystem::callbackHandler(paths[i]);
+            const bool mod = eventFlags[i] & kFSEventStreamEventFlagItemModified;
+            const bool iNode = eventFlags[i] & kFSEventStreamEventFlagItemInodeMetaMod;
+            const bool file = eventFlags[i] & kFSEventStreamEventFlagItemIsFile;
+
+            if ((mod || iNode) && file)
+                ghoul::filesystem::callbackHandler(paths[i]);
         }
     }
 }
@@ -126,7 +110,7 @@ void FileSystem::addFileListener(File* file) {
 	if (f == _directories.end()) {
 		bool alreadyTrackingParent = false;
 		for (auto dir : _directories) {
-			if (d.length() > dir.first.length() && d.find_first_of(dir.first) == 0) {
+            if (d.length() > dir.first.length() && d.find(dir.first) != std::string::npos) {
 				alreadyTrackingParent = true;
 				break;
 			}
@@ -152,7 +136,7 @@ void FileSystem::addFileListener(File* file) {
 				&callbackInfo,
 				pathsToWatch,
 				kFSEventStreamEventIdSinceNow,
-				latency,
+				Latency,
 				kFSEventStreamCreateFlagFileEvents
             );
 
@@ -196,11 +180,12 @@ void callbackHandler(const std::string& path) {
 }
 
 void FileSystem::callbackHandler(const std::string& path) {
-    size_t n = FileSys._trackedFiles.count(path);
+    auto files = FileSys._trackedFiles;
+    size_t n = files.count(path);
     if (n == 0)
         return;
     
-    auto eqRange = FileSys._trackedFiles.equal_range(path);
+    auto eqRange = files.equal_range(path);
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
         File* f = (*it).second;
         f->callback()(*f);

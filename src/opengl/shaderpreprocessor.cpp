@@ -635,7 +635,8 @@ bool ShaderPreprocessor::addIncludePath(const std::string& path, bool track) {
         // Todo, what happens if file does not exist?
         _includedFiles.emplace(std::pair<std::string, ghoul::filesystem::File>(path, ghoul::filesystem::File(path)));
         if (track) {
-          const auto& filePtr = _includedFiles.find(path);
+            const auto& filePtr = _includedFiles.find(path);
+//            filePtr->second.setCallback(_onChangeCallback);
           filePtr->second.setCallback([this](const filesystem::File& file) {
               if (_onChangeCallback) {
                 _onChangeCallback(file);

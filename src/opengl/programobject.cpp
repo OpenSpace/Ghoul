@@ -122,7 +122,6 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
     , _ignoreAttributeLocationError(cpy._ignoreAttributeLocationError)
     , _ignoreSubroutineLocationError(cpy._ignoreSubroutineLocationError)
     , _ignoreSubroutineUniformLocationError(cpy._ignoreSubroutineUniformLocationError)
-	, _onChangeCallback(nullptr)
     , _programIsDirty(true)
 {
     _id = glCreateProgram();
@@ -168,7 +167,6 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
         _ignoreAttributeLocationError = rhs._ignoreAttributeLocationError;
         _ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
         _ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
-		_onChangeCallback = rhs._onChangeCallback;
         _programIsDirty = rhs._programIsDirty;
 
         glDeleteProgram(_id);
@@ -214,12 +212,10 @@ ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) {
 		_ignoreAttributeLocationError = rhs._ignoreAttributeLocationError;
 		_ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
 		_ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
-		_onChangeCallback = std::move(rhs._onChangeCallback);
         _programIsDirty = std::move(rhs._programIsDirty);
 
 		_shaderObjects.clear();
 		_shaderObjects = std::move(rhs._shaderObjects);
-		_onChangeCallback = rhs._onChangeCallback;
 	}
 	return *this;
 }
