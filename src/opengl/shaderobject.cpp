@@ -31,6 +31,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <fstream>
 
 #ifdef _MSC_VER
 #pragma warning(push)

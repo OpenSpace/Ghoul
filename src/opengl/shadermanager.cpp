@@ -56,19 +56,27 @@ ShaderManager& ShaderManager::ref() {
 
 ShaderObject* ShaderManager::shaderObject(unsigned int hashedName) {
     auto it = _objects.find(hashedName);
-    if (it == _objects.end())
-        return nullptr;
+    if (it == _objects.end()) {
+        throw ShaderManagerError(
+            "Could not find ShaderObject for hash '" + std::to_string(hashedName) + "'"
+        );
+    }
     else
         return it->second.get();
 }
 
 ShaderObject* ShaderManager::shaderObject(const std::string& name) {
     unsigned int hash = hashCRC32(name);
-    return shaderObject(hash);
+    try {
+        return shaderObject(hash);
+    }
+    catch (const ShaderManagerError&) {
+        throw ShaderManagerError("Could not find ShaderObject for '" + name + "'");
+    }
 }
 
 unsigned int ShaderManager::registerShaderObject(const std::string& name,
-                                                     std::unique_ptr<ShaderObject> shader)
+                                                 std::unique_ptr<ShaderObject> shader)
 {
     unsigned int hashedName = hashCRC32(name);
     auto it = _objects.find(hashedName);
@@ -94,7 +102,9 @@ std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(
     if (it == _objects.end())
         return nullptr;
     
-    return std::move(it->second);
+    auto tmp = std::move(it->second);
+    _objects.erase(hashedName);
+    return std::move(tmp);
 }
 
 unsigned int ShaderManager::hashedNameForName(const std::string& name) const {

@@ -34,6 +34,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <cstdarg>
+#include <fstream>
 
 #ifdef WIN32
 #define vscprintf(f,a) _vscprintf(f,a)

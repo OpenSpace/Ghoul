@@ -25,104 +25,81 @@
 
 #include <ghoul/opengl/texturemanager.h>
 
-#include <ghoul/opengl/texture.h>
-#include <ghoul/logging/logmanager.h>
-
 #include <ghoul/misc/crc32.h>
-#include <cassert>
-
-namespace {
-    const std::string _loggerCat = "TextureManager";
-}
+#include <ghoul/opengl/texture.h>
 
 namespace ghoul {
 namespace opengl {
 
+TextureManager::TextureManagerError::TextureManagerError(std::string message)
+    : RuntimeError(std::move(message), "TextureManager")
+{}
+    
 TextureManager* TextureManager::_manager = nullptr;
-
-TextureManager::TextureManager() {}
-
-TextureManager::~TextureManager() {
-    std::map<unsigned int, Texture*>::iterator it = _textures.begin();
-    for (; it != _textures.end(); ++it)
-        delete it->second;
-    _textures.clear();
-}
-
+    
 void TextureManager::initialize() {
-    if (_manager == nullptr)
-        _manager = new TextureManager;
-    assert(_manager != nullptr);
+    ghoul_assert(_manager == nullptr, "Static manager must not have been initialized");
+    _manager = new TextureManager;
 }
 
 void TextureManager::deinitialize() {
+    ghoul_assert(_manager, "Static manager must have been intialized");
     delete _manager;
     _manager = nullptr;
 }
 
 TextureManager& TextureManager::ref() {
-    assert(_manager != nullptr);
+    ghoul_assert(_manager, "Static manager must have been initialized");
     return *_manager;
 }
 
 Texture* TextureManager::texture(unsigned int hashedName) {
-    std::map<unsigned int, Texture*>::iterator it = _textures.find(hashedName);
-    if (it == _textures.end())
-        return nullptr;
+    auto it = _textures.find(hashedName);
+    if (it == _textures.end()) {
+        throw TextureManagerError(
+            "Could not find Texture for hash '" + std::to_string(hashedName) + "'"
+        );
+    }
     else
-        return it->second;
+        return it->second.get();
 }
 
 Texture* TextureManager::texture(const std::string& name) {
     unsigned int hash = hashCRC32(name);
-    return texture(hash);
+    try {
+        return texture(hash);
+    }
+    catch (const TextureManagerError&) {
+        throw TextureManagerError("Could not find Texture for '" + name + "'");
+    }
 }
 
-bool TextureManager::registerTexture(const std::string& name, Texture* texture) {
-    unsigned int hashedName = 0;
-    return registerTexture(name, texture, hashedName);
-}
-
-bool TextureManager::registerTexture(const std::string& name,
-                                     Texture* texture, unsigned int& hashedName)
+unsigned int TextureManager::registerTexture(const std::string& name,
+                                             std::unique_ptr<Texture> texture)
 {
-    hashedName = hashCRC32(name);
-    std::map<unsigned int, Texture*>::iterator it = _textures.find(hashedName);
+    unsigned int hashedName = hashCRC32(name);
+    auto it = _textures.find(hashedName);
     if (it == _textures.end()) {
-        _textures[hashedName] = texture;
-        return true;
+        _textures[hashedName] = std::move(texture);
+        return hashedName;
     }
-    else {
-        if (_textures[hashedName] == texture)
-            LWARNING("Name '" + name + "' is already registered in TextureManager.");
-        else
-            LWARNING("Name '" + name +
-            "' is already registered for a different Texture in TextureManager");
-        return false;
-    }
+    else
+        throw TextureManagerError("Name '" + name + "' was already registered");
 }
 
-void TextureManager::unregisterTexture(const std::string& name) {
+std::unique_ptr<Texture> TextureManager::unregisterTexture(const std::string& name) {
     unsigned int hashedName = hashCRC32(name);
-    unregisterTexture(hashedName);
+    return unregisterTexture(hashedName);
 }
 
-void TextureManager::unregisterTexture(unsigned int hashedName) {
-    std::map<unsigned int, Texture*>::iterator it = _textures.find(hashedName);
-    if (it != _textures.end())
-        delete (it->second);
-    _textures.erase(it);
-}
-
-void TextureManager::forgetTexture(const std::string& name) {
-    unsigned int hashedName = hashCRC32(name);
-    forgetTexture(hashedName);
-}
-
-void TextureManager::forgetTexture(unsigned int hashedName) {
-    std::map<unsigned int, Texture*>::iterator it = _textures.find(hashedName);
-    if (it != _textures.end())
-        _textures.erase(it);
+std::unique_ptr<Texture> TextureManager::unregisterTexture(unsigned int hashedName) {
+    auto it = _textures.find(hashedName);
+    if (it == _textures.end())
+        return nullptr;
+        
+    auto tmp = std::move(it->second);
+    _textures.erase(hashedName);
+    return std::move(tmp);
 }
 
 unsigned int TextureManager::hashedNameForName(const std::string& name) const {

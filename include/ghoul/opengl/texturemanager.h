@@ -26,7 +26,10 @@
 #ifndef __TEXTUREMANAGER_H__
 #define __TEXTUREMANAGER_H__
 
+#include <ghoul/misc/exception.h>
+
 #include <map>
+#include <memory>
 #include <string>
 
 namespace ghoul {
@@ -37,122 +40,93 @@ class Texture;
 /**
  * This singleton class provides a central and efficient storage for Texture objects. The
  * Texture%s stored in this class belong to the TextureManager and should be deleted using
- * #unregisterTexture or their ownership taken be away from the TextureManager by using
- * #forgetTexture. Texture%s can be registered (#registerTexture), unregistered
- * (#unregisterTexture), forgotten (#forgetTexture), or retrieved (#texture) using either
- * an <code>std::string</code> name, or a generated hash value which is more efficient to
+ * #unregisterTexture which returns the stored Texture. If the calling function does not
+ * pick up the returned value, it is then destroyed. Texture%s can be registered
+ * (#registerTexture), unregistered (#unregisterTexture), or retrieved (#texture) using
+ * either an string name or a generated hash value which is more efficient to
  * retrieve than a string.
  */
 class TextureManager {
 public:
+    /// Main exception that is thrown in the methods of the TextureManager
+    struct TextureManagerError : public RuntimeError {
+        explicit TextureManagerError(std::string message);
+    };
+    
     /**
      * Static initializer that initializes the static member. This needs to be done before
-     * the TextureManager can be used. If the manager has been already initialized, this
-     * results in a no op.
+     * the TextureManager can be used.
+     * \pre The static TextureManager must not have been initialized before
      */
     static void initialize();
 
     /**
-     * Static deinitializer that will remove all of the registered textures, that haven't 
-     * been either forgotten (#forgetTexture) or unregistered (#unregisterTexture, which
-     * will instead delete the texture). The manager will be deleted and will be 
-     * unavailable until it is re-initialized (#initialize).
+     * Static deinitializer that will remove all of the registered textures. The manager
+     * will be deleted and will be unavailable until it is re-initialized (#initialize).
+     * \pre The static TextureManager must have been initialized before
      */
     static void deinitialize();
 
     /**
-     * This method returns a reference to the initialized TextureManager. The manager has
-     * to be initialized before it can be used, or an assertion will be triggered.
+     * This method returns a reference to the initialized TextureManager.
      * \return An initialized reference to the singleton manager
+     * \pre The static TextureManager must have been initialized before
      */
     static TextureManager& ref();
 
     /**
-     * This method will return the Texture that was registered with the passed
-     * <code>hashedName</code>.
+     * This method will return the Texture that was registered with a string whose hash
+     * value is equal to \p hashedName. The hashed name that can be used will be returned
+     * from the #registerTexture method.
      * \param hashedName The hash of the Texture that is to be fetched
      * \return The Texture that has been registered with the passed name
+     * \throw TextureManagerError If the ShaderObject for \p name did not exist
      */
-
     Texture* texture(unsigned int hashedName);
 
     /**
-     * This method will return the Texture that was registered with the passed
-     * <code>name</code>. This method will create the hash value from the passed string
-     * and will call the #texture method.
+     * This method will return the Texture that was registered with the passed \p name.
+     * This method will create the hash value from the passed string and will call the
+     * #texture method.
      * \param name The name of the Texture that is to be fetched
      * \return The Texture that has been registered with the passed name
+     * \throw TextureManagerError If the ShaderObject for \p name did not exist
      */
     Texture* texture(const std::string& name);
 
     /**
      * Register the passed Texture under the passed name so that it can be retrieved
-     * either by the given <code>name</code> or by the hashed value that is equal to the
-     * hash value of the passed name. The hashed value can later be retrieved by the
-     * function #hashedNameForName. This method will transfer the ownership of the Texture
-     * to the TextureManager. If the manager already contains a hashed value equal to the 
-     * hash value of the name, a warning is logged and <code>false</code> is returned.
+     * either by the given \p name or by the returned hashed value. If the manager already
+     * contains a hashed value equal to the hash value of hte name, an exception is
+     * thrown.
      * \param name The name under which the Texture should be registered
      * \param texture The Texture that should be registered
-     * \return <code>true</code> if the Texture was registered successfully in the 
-     * TextureManager, <code>false</code> if a texture with the specified name was already 
-     * present in the manager
+     * \return The hashed value that is generated from the \p name
+     * \pre \p texture must not be nullptr
      */
-    bool registerTexture(const std::string& name, Texture* texture);
-
-    /**
-     * Register the passed Texture under the passed name so that it can be retrieved
-     * either by the given <code>name</code> or by the hashed value is returned in the
-     * third parameter of this function. The hashed value can later be retrieved by the
-     * function #hashedNameForName as well. This method will transfer the ownership of the
-     * Texture to the TextureManager. If the manager already contains a hashed value equal
-     * to the hash value of the name, a warning is logged and <code>false</code> is
-     * returned.
-     * \param name The name under which the Texture should be registered
-     * \param texture The Texture that should be registered
-     * \param hashedName The hashed value that is generated from the <code>name</code>
-     * \return <code>true</code> if the Texture was registered successfully in the 
-     * TextureManager, <code>false</code> if a texture with the specified name was already
-     * present in the manager
-     */
-    bool registerTexture(const std::string& name,
-                         Texture* texture, unsigned int& hashedName);
+    unsigned int registerTexture(const std::string& name,
+        std::unique_ptr<Texture> texture);
 
     /**
      * This method will unregister the Texture that was registered under the passed
-     * <code>name</code>. The Texture will be removed from the manager and deleted.
+     * \p name. The Texture will be returned to the caller. If the caller ignores the
+     * return value, the Texture will be deleted.
      * \param name The name under which the Texture was registered previously
+     * \return The previously registered Texture or <code>nullptr</code> if the \p name
+     * was not a valid Texture
      */
-    void unregisterTexture(const std::string& name);
+    std::unique_ptr<Texture> unregisterTexture(const std::string& name);
 
     /**
      * This method will unregister the Texture that was registered under a name whose hash 
-     * value is equal to the passed <code>hashName</code>. The Texture will be removed
-     * from the manager and deleted.
-     * \param hashedName The hash value which is used to refer to a previously stored 
+     * value is equal to the passed \p hashName. The Texture will be returned to the
+     * caller. If the caller ignores the return value, the Texture will be deleted.
+     * \param hashedName The hash value which is used to refer to a previously stored
      * Texture
+     * \return The previously registered Texture or <code>nullptr</code> if the \p name
+     * was not a valid Texture
      */
-    void unregisterTexture(unsigned int hashedName);
-
-    /**
-     * This method will unregister the Texture that was registered under the passed
-     * <code>name</code>.
-     * The Texture will be removed from the manager, but it will not be automatically 
-     * deleted. This means that the ownership of the Texture is transferred to the caller 
-     * of this function.
-     * \param name The name under which the Texture was registered previously
-     */
-    void forgetTexture(const std::string& name);
-
-    /**
-     * This method will unregister the Texture that was registered under a name whose hash 
-     * value is equal to the passed <code>hashName</code>. The Texture will be removed
-     * from the manager, but it will not be automatically deleted. This means that the
-     * ownership of the Texture is transferred to the caller of this function.
-     * \param hashedName The hash value which is used to refer to a previously stored 
-     * Texture
-     */
-    void forgetTexture(unsigned int hashedName);
+    std::unique_ptr<Texture> unregisterTexture(unsigned int hashedName);
 
     /**
      * This method returns the hash value for a given string. The hash function is 
@@ -164,13 +138,11 @@ public:
     unsigned int hashedNameForName(const std::string& name) const;
 
 private:
-    TextureManager();
-    ~TextureManager();
-
-    TextureManager(const TextureManager& c) = delete;
-
-    static TextureManager* _manager; ///< singleton member
-    std::map<unsigned int, Texture*> _textures;
+    /// The singleton member
+    static TextureManager* _manager;
+    
+    /// Map containing all the registered Texture%s
+    std::map<unsigned int, std::unique_ptr<Texture>> _textures;
 };
 
 #define TexMgr (ghoul::opengl::TextureManager::ref())

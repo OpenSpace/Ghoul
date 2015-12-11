@@ -259,6 +259,14 @@ public:
      * <code>false</code> otherwise
      */
     bool hasRegisteredToken(const std::string& token) const;
+
+    /**
+     * Returns <code>true</code> if the \p path contains any tokens.
+     * \param path The path that is checked for tokens
+     * \return <code>true</code> if the \p path contains any tokens
+     * \pre \p path must not be empty
+     */
+    bool containsToken(const std::string& path) const;
     
     /**
      * Creates a CacheManager for this FileSystem. If a CacheManager already exists, this
@@ -349,14 +357,6 @@ private:
      */
     size_t commonBasePathPosition(const std::string& p1, const std::string& p2) const;
 
-    /**
-     * Returns <code>true</code> if the \p path contains any tokens.
-     * \param path The path that is checked for tokens
-     * \return <code>true</code> if the \p path contains any tokens
-     * \pre \p path must not be empty
-     */
-    bool containsToken(const std::string& path) const;
-    
     /**
      * Returns true, if the \p path contains the \p token.
      * \param path The path that is checked for the existence of the \p token

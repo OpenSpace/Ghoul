@@ -25,19 +25,15 @@
 
 #include <ghoul/opengl/textureunit.h>
 
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/systemcapabilities/systemcapabilities>
-
-#include <exception>
-#include <stdexcept>
-
-namespace {
-    const std::string _loggerCat = "TextureUnit";
-}
 
 namespace ghoul {
 namespace opengl {
 
+TextureUnit::TextureUnitError::TextureUnitError(std::string message)
+    : RuntimeError(std::move(message), "TextureUnit")
+{}
+    
 bool TextureUnit::_initialized = false;
 unsigned int TextureUnit::_totalActive = 0;
 unsigned int TextureUnit::_maxTexUnits = 0;
@@ -85,22 +81,13 @@ void TextureUnit::setZeroUnit() {
     glActiveTexture(GL_TEXTURE0);
 }
 
-void TextureUnit::deinitialize() {
-	for (size_t i = 0; i < _busyUnits.size(); ++i)
-		_busyUnits[i] = false;
-    _totalActive = 0;
-    setZeroUnit();
-}
-
 int TextureUnit::numberActiveUnits() {
     return _totalActive;
 }
 
 void TextureUnit::assignUnit() {
-    if (_totalActive >= _maxTexUnits) {
-        LERROR("No more texture units available");
-        return;
-    }
+    if (_totalActive >= _maxTexUnits)
+        throw TextureUnitError("No more texture units available");
 
     _assigned = true;
 

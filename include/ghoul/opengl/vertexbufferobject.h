@@ -26,10 +26,8 @@
 #ifndef __VERTEXBUFFEROBJECT_H__
 #define __VERTEXBUFFEROBJECT_H__
 
-// ghoul
 #include <ghoul/opengl/ghoul_gl.h>
 
-// std
 #include <vector>
 
 namespace ghoul {
@@ -38,66 +36,69 @@ namespace opengl {
 /**
  * This class is a wrapper for handling vertex buffer objects. It is only meant for 
  * simplifying the creation and use of the most standard vertex buffer object with a 
- * vertex list and an index list. 
+ * vertex list and an index list. It will create an internal vertex array object to store
+ * the created VertexBufferObject.
  */
 class VertexBufferObject {
 public:
 
     /**
-     * Default constructor. Initializes the internal GL objects to 0.
-     * VertexBufferObjects can be constructed without a GL context but
-     * cannot be initialized without a GL context.
+     * Default constructor. Initializes the internal GL objects to 0. VertexBufferObject%s
+     * cannot be constructed without an OpenGL context.
      */
     VertexBufferObject();
     
     /**
-     * Moves the other object in place of the created one. The other object
-     * will be in an uninitialized state afterwards.
+     * Moves the other object in place of the created one. The other object will be in an
+     * uninitialized state afterwards.
      */
     VertexBufferObject(VertexBufferObject&& other);
     
     /**
-     * Moves the other object in place of the created one. The other object
-     * will be in an uninitialized state afterwards.
+     * Moves the other object in place of the created one. The other object will be in an
+     * uninitialized state afterwards.
      */
     VertexBufferObject& operator=(VertexBufferObject&& other);
 
 	/**
-	 * Default destructor. Calls an assertion in debug mode that the VertexBufferObject 
-	 * is not still initialized.
+	 * Default destructor.
 	 */
 	~VertexBufferObject();
     
     /**
      * A runtime function that checks if initialize has been called.
-     * \returns <code>true</code> if any initialize function has been 
-     * called and <code>false</code> otherwise.
+     * \returns <code>true</code> if any initialize function has been called and
+     * <code>false</code> otherwise.
      */
     bool isInitialized() const;
     
     /**
-     * Initializes a VBO with a vertex and index list. The structure of the vertex data
-     * can be anything. Make sure to specify the correct offsets with vertexAttribPointer.
-     * \param varray The vertex array
-     * \param iarray The index list
+     * Initializes the VertexBufferObject with the provided \p vertexArray and
+     * \p indexArray list. The structure of the vertex data can be arbitrary but correct
+     * offsets must be specified using #vertexAttribPointer.
+     * \param vertexArray The vertex array used for this VertexBufferObject
+     * \param indexArray The index list used for this VertexBufferObject
+     * \pre VertexBufferObject must not have been initialized
+     * \pre \p vertexArray must not be empty
+     * \pre \p indexArray must not be empty
      */
-    bool initialize(const std::vector<GLfloat>& varray, const std::vector<GLint>& iarray);
+    void initialize(const std::vector<GLfloat>& vertexArray,
+        const std::vector<GLint>& indexArray);
 
 	/**
-	 * Initializes the VBO with the vertex and index list
-	 * \param varray The vertex array
-	 * \param iarray The index list
+     * Initializes the VertexBufferObject with the provided \p vertexArray and
+     * \p indexArray list. The structure of the vertex data can be arbitrary but correct
+     * offsets must be specified using #vertexAttribPointer.
+     * \tparam T The structore holding information for each vertex; must be a
+     * <code>POD</code>
+     * \param vertexArray The vertex array used for this VertexBufferObject
+     * \param indexArray The index list used for this VertexBufferObject
+     * \pre VertexBufferObject must not have been initialized before
 	 */
 	template<typename T>
-	bool initialize(const std::vector<T>& varray, const std::vector<GLint>& iarray);
+	void initialize(const std::vector<T>& vertexArray,
+        const std::vector<GLint>& indexArray);
 
-	/**
-	 * Deinitializes the internal GL objects, if the VertexBufferObject is 
-	 * initialized then deinitialize must be done before destruction of 
-	 * the object.
-	 */
-	void deinitialize();
-    
     /**
      * Sets the render mode for this VertexBufferObject. The render mode is how OpenGL is 
      * treating the vertices and indices. The default is <code>GL_TRIANGLES</code> but
@@ -109,58 +110,50 @@ public:
     void setRenderMode(GLenum mode = GL_TRIANGLES);
 
 	/**
-	 * A wrapper function for glEnableVertexAttribArray 
-	 * and glVertexAttribPointer
-	 * \param index The index of the attribute
-	 * \param size The number of elements 
-	 * \param type The data type, for example GL_FLOAT
-	 * \param stride The size of the Vertex struct
+	 * A wrapper function for <code>glEnableVertexAttribArray</code> and
+     * <code>glVertexAttribPointer</code> that defines how the values passed in the
+     * #initialize method are interpreted.
+	 * \param index The index of the attribute to be modified
+	 * \param size The number of elements in this attribute
+	 * \param type The data type, for example <code>GL_FLOAT</code>
+	 * \param stride The size for all values of a vertex
 	 * \param offset The offset for the specific member
-	 * \param normalized flag weather the attribute should be normalized.
-     * Defaults is <code>GL_FALSE</code>
+	 * \param normalized flag weather the attribute should be normalized
 	 */
-	void vertexAttribPointer(
-		GLuint index, 
-		GLint size,
-		GLenum type,
-		GLsizei stride, 
-		GLuint offset, 
-		GLboolean normalized = GL_FALSE);
+	void vertexAttribPointer(GLuint index, GLint size, GLenum type, GLsizei stride,
+		GLuint offset, GLboolean normalized = GL_FALSE);
 
-	/**
-	 * Binds the VBO
-	 */
+    /// Binds the VBO
 	void bind();
 
-	/**
-	 * Unbinds the VBO
-	 */
+    /// Unbinds the VBO
 	void unbind();
 
-	/**
-	 * Render the VBO using the provided mode through VertexBufferObject::setRenderMode.
-	 */
+    /// Render the VBO using the provided mode through VertexBufferObject::setRenderMode.
 	void render();
 
 private:
-    
-    // no need and no point in copying VertexBufferObjects
-    VertexBufferObject(const VertexBufferObject&) = delete;
-    VertexBufferObject& operator=(const VertexBufferObject&) = delete;
-
 	/**
-	 * Constructs the internal GL objects by calling 
-	 * glGenVertexArrays and glGenBuffers
+	 * Constructs the internal GL objects by calling <code>glGenVertexArrays</code> and
+     * <code>glGenBuffers</code>
 	 */
 	void generateGLObjects();
 
+    /// The vertex array object that stores the created VertexBufferObject
 	GLuint _vaoID;
+    
+    /// The vertex buffer object
 	GLuint _vBufferID;
+    
+    /// The index buffer obejct
     GLuint _iBufferID;
+    
+    /// The size of the index buffer, determining how many vertices are drawn
     unsigned int _isize;
+    
+    /// The rendering mode of this VertexBufferObject
     GLenum _mode;
-
-}; // class VertexBufferObject
+};
 
 } // namespace opengl
 } // namespace ghoul
