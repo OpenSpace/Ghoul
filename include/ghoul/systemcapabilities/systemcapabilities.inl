@@ -26,10 +26,19 @@
 namespace ghoul {
 namespace systemcapabilities {
 
-template <class T>
+template <typename T>
 T* SystemCapabilities::component() {
-    for (SystemCapabilitiesComponent* c : _components) {
-        T* r = dynamic_cast<T*>(c);
+    static_assert(
+        !std::is_pointer<T>::value,
+        "Template parameter must not be a pointer"
+    );
+    static_assert(
+        std::is_base_of<SystemCapabilitiesComponent, T>::value,
+        "Template parameter must be a subclass of SystemCapabilitiesComponent"
+    );
+
+    for (auto& c : _components) {
+        T* r = dynamic_cast<T*>(c.get());
         if (r)
             return r;
     }

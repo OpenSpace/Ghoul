@@ -27,7 +27,7 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/logging/log.h>
-#include <ghoul/systemcapabilities/systemcapabilities.h>
+#include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
 #include <string>
 #include <sstream>
 #include <fstream>

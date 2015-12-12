@@ -25,10 +25,7 @@
 
 #include <ghoul/systemcapabilities/generalcapabilitiescomponent.h>
 
-#include <ghoul/logging/logmanager.h>
-#include <ghoul/opengl/ghoul_gl.h>
 #include <algorithm>
-#include <cassert>
 #include <sstream>
 
 #ifdef WIN32
@@ -63,23 +60,22 @@ namespace {
 
 namespace ghoul {
 namespace systemcapabilities {
-
-GeneralCapabilitiesComponent::GeneralCapabilitiesComponent()
-    : SystemCapabilitiesComponent()
-	, _operatingSystem("")
-	, _installedMainMemory(0)
-	, _cpu("")
-	, _cores(0)
-	, _cacheLineSize(0)
-	, _L2Associativity(0)
-	, _cacheSize(0)
-	, _extensions("")
-{
-}
-
-GeneralCapabilitiesComponent::~GeneralCapabilitiesComponent() {
-    deinitialize();
-}
+    
+GeneralCapabilitiesComponent::GeneralCapabilitiesComponentError::
+    GeneralCapabilitiesComponentError(std::string message)
+    : RuntimeError(std::move(message), "GeneralCapabilitiesComponent")
+{}
+    
+GeneralCapabilitiesComponent::OperatingSystemError::OperatingSystemError(std::string d,
+                                                                         std::string e)
+    : GeneralCapabilitiesComponentError(d + ". Error: " + e)
+    , description(std::move(d))
+    , errorMessage(std::move(e))
+{}
+    
+GeneralCapabilitiesComponent::MainMemoryError::MainMemoryError(std::string message)
+    : GeneralCapabilitiesComponentError(std::move(message))
+{}
 
 void GeneralCapabilitiesComponent::detectCapabilities() {
     clearCapabilities();
@@ -113,27 +109,33 @@ void GeneralCapabilitiesComponent::detectOS() {
     BOOL osVersionInfoEx = GetVersionEx((OSVERSIONINFO*) &osVersionInfo);
 
     if (osVersionInfoEx == 0) {
-        LERROR("Retrieving OS version failed. 'GetVersionEx' returned 0.");
-        LERROR("Last Error: " << GetLastError());
-        return;
+        throw OperatingSystemError(
+            "Retrieving OS version failed. 'GetVersionEx' returned 0.",
+            GetLastError()
+        );
     }
     HMODULE module = GetModuleHandle(TEXT("kernel32.dll"));
     if (module == 0) {
-        LERROR("Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0.");
-        LERROR("Last Error: " << GetLastError());
-        return;
+        throw OperatingSystemError(
+            "Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0.",
+            GetLastError()
+        );
     }
     PGNSI procedureGetNativeSystemInfo = (PGNSI) GetProcAddress(
         module,
-        "GetNativeSystemInfo");
+        "GetNativeSystemInfo"
+    );
     if (procedureGetNativeSystemInfo != 0)
         procedureGetNativeSystemInfo(&systemInfo);
     else
         GetSystemInfo(&systemInfo);
 
     std::stringstream resultStream;
-    if (osVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT && osVersionInfo.dwMajorVersion > 4) {
+    if ((osVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) &&
+        (osVersionInfo.dwMajorVersion > 4))
+    {
         resultStream << "Microsoft ";
+        // @TODO Add Windows 10 support ---abock
         if (osVersionInfo.dwMajorVersion == 6) {
             if (osVersionInfo.dwMinorVersion == 0) {
                 if (osVersionInfo.wProductType == VER_NT_WORKSTATION)
@@ -204,9 +206,12 @@ void GeneralCapabilitiesComponent::detectOS() {
     _operatingSystem = resultStream.str();
 #else
     utsname name;
-    if (uname(&name) != 0) {
-        LERROR("OS detection failed. 'uname' returned non-null value");
-        return;
+    auto res = uname(&name);
+    if (res != 0) {
+        throw OperatingSystemError(
+            "OS detection failed. 'uname' returned non-null value",
+            std::to_string(res)
+        );
     }
     std::stringstream resultStream;
     resultStream << name.sysname << " " << name.release << " "
@@ -222,7 +227,7 @@ void GeneralCapabilitiesComponent::detectMemory() {
     std::string memory;
     bool success = queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
     if (!success)
-        LERROR("Reading of main RAM failed.");
+        throw MainMemoryError("Error reading about of physical memory from WMI");
     else {
         std::stringstream convert;
         convert << memory;
@@ -234,33 +239,32 @@ void GeneralCapabilitiesComponent::detectMemory() {
 	ULONGLONG installedMainMemory;
 	// get installed memory in kB
 	BOOL success = GetPhysicallyInstalledSystemMemory(&installedMainMemory);
-	if (success == TRUE) {
+	if (success == TRUE)
 		_installedMainMemory = static_cast<unsigned int>(installedMainMemory / 1024);
-	}
+    else
+        throw MainMemoryError("Error reading about of physical memory");
 #endif
 #elif defined(__APPLE__)
-    
     int mib[2];
     size_t len;
-    char *p;
     mib[0] = CTL_HW;
     mib[1] = HW_MEMSIZE;
     sysctl(mib, 2, NULL, &len, NULL, 0);
-    p = new char[len];
-    sysctl(mib, 2, p, &len, NULL, 0);
+    std::vector<char> p(len);
+    sysctl(mib, 2, p.data(), &len, NULL, 0);
     
     int64_t value;
-    std::memcpy(&value, p, sizeof(int64_t));
+    std::memcpy(&value, p.data(), sizeof(int64_t));
     _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
-    delete[] p;
 #else
     struct sysinfo memInfo;
-    sysinfo (&memInfo);
+    sysinfo(&memInfo);
     _installedMainMemory = static_cast<unsigned int>((memInfo.totalram / 1024) / 1024);
 #endif
 }
 
 void GeneralCapabilitiesComponent::detectCPU() {
+    /// @TODO This function needs cleanup ---abock
 #ifdef WIN32
 	const char* szFeatures[] =
 	{
@@ -531,24 +535,20 @@ void GeneralCapabilitiesComponent::detectCPU() {
 }
 
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
-    GeneralCapabilitiesComponent::capabilities(
-                        const SystemCapabilitiesComponent::Verbosity& verbosity) const
+    GeneralCapabilitiesComponent::capabilities() const
 {
+    using Verbosity::Minimal;
+    using Verbosity::Full;
+    
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
-	result.emplace_back("Operating System", _operatingSystem);
-	if (verbosity >= Verbosity::Default) {
-		result.emplace_back("CPU", _cpu);
-		result.emplace_back("Cores", coresAsString());
-	}
-	if (verbosity >= Verbosity::Full) {
-		result.emplace_back("Cache line size", cacheLineSizeAsString());
-		result.emplace_back("L2 Associativity", L2AssiciativityAsString());
-		result.emplace_back("Cache size", cacheSizeAsString());
-		result.emplace_back("Extensions", _extensions);
-	}
-	if (verbosity >= Verbosity::Default) {
-		result.emplace_back("Main Memory", installedMainMemoryAsString());
-	}
+    result.push_back({ "Operating System", _operatingSystem, Minimal });
+    result.push_back({ "CPU", _cpu });
+    result.push_back({ "Cores", coresAsString() });
+    result.push_back({ "Cache line size", cacheLineSizeAsString(), Full });
+    result.push_back({ "L2 Associativity", L2AssiciativityAsString(), Full });
+    result.push_back({ "Cache size", cacheSizeAsString(), Full });
+    result.push_back({ "Extensions", _extensions, Full });
+    result.push_back({ "Main Memory", installedMainMemoryAsString() });
     return result;
 }
 
@@ -561,9 +561,7 @@ unsigned int GeneralCapabilitiesComponent::installedMainMemory() const {
 }
 
 std::string GeneralCapabilitiesComponent::installedMainMemoryAsString() const {
-    std::stringstream s;
-    s << _installedMainMemory << " MB";
-    return s.str();
+    return std::to_string(_installedMainMemory) + " MB";
 }
 
 unsigned int GeneralCapabilitiesComponent::cores() const {
@@ -583,27 +581,19 @@ unsigned int GeneralCapabilitiesComponent::cacheSize() const {
 }
 
 std::string GeneralCapabilitiesComponent::coresAsString() const {
-	std::stringstream s;
-	s << _cores;
-	return s.str();
+    return std::to_string(_cores);
 }
 
 std::string GeneralCapabilitiesComponent::cacheLineSizeAsString() const {
-	std::stringstream s;
-	s << _cacheLineSize;
-	return s.str();
+    return std::to_string(_cacheLineSize);
 }
 
 std::string GeneralCapabilitiesComponent::L2AssiciativityAsString() const {
-	std::stringstream s;
-	s << _L2Associativity;
-	return s.str();
+    return std::to_string(_L2Associativity);
 }
 
 std::string GeneralCapabilitiesComponent::cacheSizeAsString() const {
-	std::stringstream s;
-	s << _cacheSize << " K";
-	return s.str();
+    return std::to_string(_cacheSize) + " KB";
 }
 
 std::string GeneralCapabilitiesComponent::extensions() const {

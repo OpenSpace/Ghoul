@@ -26,10 +26,9 @@
 #ifndef __SYSTEMCAPABILITIES_H__
 #define __SYSTEMCAPABILITIES_H__
 
-#include "systemcapabilitiescomponent.h"
-#include "generalcapabilitiescomponent.h"
-#include "openglcapabilitiescomponent.h"
+#include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -51,24 +50,23 @@ class SystemCapabilities {
 public:
     /**
      * Initializes the static member variable and makes the global SystemCapabilities
-     * available via the #ref method. Calling this method twice will trigger an assertion.
+     * available via the #ref method.
+     * \pre The static SystemCapabilities must not have been initialized
      */
     static void initialize();
 
     /**
      * Destroys the static member variable and cleans up all the
      * SystemCapabilitiesComponent%s that have been added to this SystemCapabilities
-     * (#addComponent). The
-     * #ghoul::systemcapabilities::SystemCapabilitiesComponent::deinitialize methods will
-     * be called in the process. If this method is called and the SystemCapabilities is 
-     * already destroyed, an assertion will be triggered.
+     * (#addComponent).
+     * \pre The static SystemCapabilities must have been initialized
      */
     static void deinitialize();
 
     /**
-     * Returns a reference to the global SystemCapabilities object. The system must have
-     * been initialized previously, or an assertion will be triggered.
+     * Returns a reference to the global SystemCapabilities object.
      * \return A reference to the global SystemCapabilities object
+     * \pre The static SystemCapabilities must have been initialized
      */
     static SystemCapabilities& ref();
 
@@ -91,7 +89,7 @@ public:
     /**
      * Logs all of the detected capabilities of the log, group by the individual
      * SystemCapabilitiesComponent%s. The verbosity of the log is controlled by the
-     * <code>verbosity</code>. This method will, in turn, call the
+     * \p verbosity. This method will, in turn, call the
      * #ghoul::systemcapabilities::SystemCapabilitiesComponent::capabilities of all the
      * registered SystemCapabilitiesComponent%s.
      * \param verbosity The verbosity of the resulting log entries
@@ -106,51 +104,39 @@ public:
      * #ghoul::systemcapabilities::SystemCapabilitiesComponent::initialize and
      * #ghoul::systemcapabilities::SystemCapabilitiesComponent::detectCapabilities
      * methods. A specific subclass of SystemCapabilitiesComponent can only be added once
-     * to the SystemCapabilities. This requirement will only be tested if
-     * <code>GHL_DEBUG</code> is defined.
+     * to the SystemCapabilities
      * \param component The component that will be added to this SystemCapabilities
-     * object. This method call will transfer ownership of the component to this object
-     * permanently.
+     * object.
+     * \pre \p component must not be nullptr
+     * \pre \p A component of the same type must not have been added before
      */
-    void addComponent(SystemCapabilitiesComponent* component);
+    void addComponent(std::unique_ptr<SystemCapabilitiesComponent> component);
 
     /**
-     * Returns the component of type T or <code>nullptr</code> if no such component
-     * exists.
+     * Returns the component of type <code>T</code> or <code>nullptr</code> if no such 
+     * component exists.
      * \tparam T The subclass of SystemCapabilitiesComponent that should be retrieved
-     * \return The SystemCapabilitiesComponent that should be retrieved
+     * \return The SystemCapabilitiesComponent that should be retrieved or
+     * <code>nullptr</code> if no such type exists
      */
-    template <class T>
+    template <typename T>
     T* component();
 
 private:
-    /**
-     * Creates an empty SystemCapabilities object. The constructor will be called by the
-     * static create method.
-     */
-    SystemCapabilities();
-    /**
-     * Destructor that will deinitialize and dispose of all the
-     * SystemCapabilitiesComponent%s that have been added to this SystemCapabilities
-     * object.
-     */
-    ~SystemCapabilities();
-
-    SystemCapabilities(const SystemCapabilities& rhs) = delete;
-
+    /// Clears the capabilities of all components
     void clearCapabilities();
 
-    std::vector<SystemCapabilitiesComponent*> _components;
+    /// The list of all components of this SystemCapabilities
+    std::vector<std::unique_ptr<SystemCapabilitiesComponent>> _components;
 
-    static SystemCapabilities* _systemCapabilities;  ///< singleton member
+    /// The static singleton member
+    static SystemCapabilities* _systemCapabilities;
 };
 
 } // namespace systemcapabilities
 } // namespace ghoul
 
 #define SysCap (ghoul::systemcapabilities::SystemCapabilities::ref())
-#define CpuCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::GeneralCapabilitiesComponent>()))
-#define OpenGLCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::OpenGLCapabilitiesComponent>()))
 
 #include "systemcapabilities.inl"
 

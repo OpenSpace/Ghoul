@@ -25,11 +25,10 @@
 
 #include "ghoul/systemcapabilities/openglcapabilitiescomponent.h"
 
+#include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/ghoul_gl.h>
+
 #include <algorithm>
-#include <cassert>
-#include <sstream>
-#include "ghoul/logging/logmanager.h"
 
 #ifdef WIN32
     #include <Windows.h>
@@ -42,41 +41,21 @@
     #include <sys/utsname.h>
 #endif
 
-using std::string;
-using std::stringstream;
-using std::vector;
-using std::wstring;
-
 namespace {
     const std::string _loggerCat = "OpenGLCapabilities";
-
-    template <class T>
-    std::string toString(T i) {
-        std::stringstream s;
-        s << i;
-        return s.str();
-    }
 }
 
 namespace ghoul {
 namespace systemcapabilities {
+    
+OpenGLCapabilitiesComponent::OpenGLCapabilitiesComponentError::
+    OpenGLCapabilitiesComponentError(std::string message)
+    : RuntimeError(std::move(message), "OpenGLCapabilitiesComponent")
+{}
 
-OpenGLCapabilitiesComponent::OpenGLCapabilitiesComponent() 
-    : SystemCapabilitiesComponent()
-	, _glVersion()
-	, _vendor(Vendor::Other)
-	, _glewVersion()
-	, _maxTextureSize(-1)
-	, _maxTextureSize3D(-1)
-	, _numTextureUnits(-1)
-	, _maxFramebufferColorAttachments(-1)
-	, _supportTexturing3D(false)
-	, _driverVersion("")
-	, _driverDate("")
-	, _adapterRAM(0)
-	, _adapterName("")
-{
-}
+OpenGLCapabilitiesComponent::GPUVendorError::GPUVendorError(std::string message)
+    : OpenGLCapabilitiesComponentError(std::move(message))
+{}
 
 void OpenGLCapabilitiesComponent::detectCapabilities() {
     clearCapabilities();
@@ -89,15 +68,7 @@ void OpenGLCapabilitiesComponent::detectCapabilities() {
     detectDriverInformation();
 
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_maxTextureSize);
-    if (_glewVersion >= Version(1,2,0) || glewIsSupported("GL_EXT_texture3D"))
-        _supportTexturing3D = true;
-
-    if (_supportTexturing3D) {
-        if (_glewVersion >= Version(2,0,0))
-            glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &_maxTextureSize3D);
-        else
-            glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE_EXT, &_maxTextureSize3D);
-    }
+    glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &_maxTextureSize3D);
 
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &_numTextureUnits);
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &_maxFramebufferColorAttachments);
@@ -112,16 +83,16 @@ void OpenGLCapabilitiesComponent::detectGPUVendor() {
     const char* vendor =
         reinterpret_cast<const char*>(glGetString(GL_VENDOR));
     if (vendor)
-        _glslCompiler = string(vendor);
+        _glslCompiler = std::string(vendor);
     else
-        LERROR("Detection the GPU Vendor failed. 'glGetString' returned 0.");
+        throw GPUVendorError("Detection the GPU Vendor failed");
 
-    if (_glslCompiler.find("NVIDIA") != string::npos)
+    if (_glslCompiler.find("NVIDIA") != std::string::npos)
         _vendor = Vendor::Nvidia;
-    else if (_glslCompiler.find("ATI") != string::npos)
+    else if (_glslCompiler.find("ATI") != std::string::npos)
         _vendor = Vendor::ATI;
-    else if ((_glslCompiler.find("INTEL") != string::npos) 
-        || (_glslCompiler.find("Intel") != string::npos))
+    else if ((_glslCompiler.find("INTEL") != std::string::npos)
+        || (_glslCompiler.find("Intel") != std::string::npos))
     {
         _vendor = Vendor::Intel;
     }
@@ -133,7 +104,7 @@ void OpenGLCapabilitiesComponent::detectGPUVendor() {
 }
 
 void OpenGLCapabilitiesComponent::detectGLRenderer() {
-    _glRenderer = string(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
+    _glRenderer = std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
 }
 
 void OpenGLCapabilitiesComponent::detectExtensions() {
@@ -141,7 +112,7 @@ void OpenGLCapabilitiesComponent::detectExtensions() {
     glGetIntegerv(GL_NUM_EXTENSIONS, &nExtensions);
     for (GLint i = 0; i < nExtensions; ++i) {
         const GLubyte* ext = glGetStringi(GL_EXTENSIONS, i);
-        const string extension = string(reinterpret_cast<const char*>(ext));
+        const std::string extension = std::string(reinterpret_cast<const char*>(ext));
         _extensions.push_back(extension);
     }
 }
@@ -156,14 +127,19 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
 #ifdef GHOUL_USE_WMI
     bool versionSuccess = queryWMI("Win32_VideoController", "DriverVersion", _driverVersion);
     if (!versionSuccess) {
-        LERROR("Reading of video controller driver version failed.");
         _driverVersion = "";
+        throw WMIError(
+            "Reading of video controller driver version failed", GetLastError()
+        );
     }
 
     string driverDateFull;
     bool dateSuccess = queryWMI("Win32_VideoController", "DriverDate", driverDateFull);
-    if (!dateSuccess)
-        LERROR("Reading of video controller driver date failed.");
+    if (!dateSuccess) {
+        throw WMIError(
+            "Reading of video controller driver date failed", GetLastError()
+        );
+    }
     else {
         stringstream dateStream;
         dateStream << driverDateFull.substr(0,4) << "-"
@@ -174,8 +150,10 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
 
     bool adapterRAMSuccess = queryWMI("Win32_VideoController", "AdapterRAM", _adapterRAM);
     if (!adapterRAMSuccess) {
-        LERROR("Reading of video controller RAM failed.");
         _adapterRAM = 0;
+        throw WMIError(
+            "Reading of video controller RAM failed", GetLastError()
+        );
     }
     else {
         // adapterRAM is in bytes
@@ -184,8 +162,10 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
 
     bool nameSucess = queryWMI("Win32_VideoController", "Name", _adapterName);
     if (!nameSucess) {
-        LERROR("Reading of video controller's name failed.");
         _adapterName = "";
+        throw WMIError(
+            "Reading of video controller's name failed", GetLastError()
+        );
     }
 #endif
 }
@@ -206,8 +186,6 @@ void OpenGLCapabilitiesComponent::clearCapabilities() {
     _maxTextureSize3D = -1;
     _numTextureUnits = -1;
 
-    _supportTexturing3D = false;
-
 #ifdef GHOUL_USE_WMI
     _driverVersion = "";
     _driverDate = "";
@@ -217,60 +195,59 @@ void OpenGLCapabilitiesComponent::clearCapabilities() {
 }
 
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
-    OpenGLCapabilitiesComponent::capabilities(
-    const SystemCapabilitiesComponent::Verbosity& verbosity) const
+    OpenGLCapabilitiesComponent::capabilities() const
 {
+    using Verbosity::Minimal;
+    using Verbosity::Full;
+    
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
-    result.emplace_back("OpenGL Version", _glVersion.toString());
-    result.emplace_back("OpenGL Compiler", _glslCompiler);
-    result.emplace_back("OpenGL Renderer", _glRenderer);
-    result.emplace_back("GPU Vendor", gpuVendorString());
-    result.emplace_back("GLEW Version", _glewVersion.toString());
+    result.push_back({ "OpenGL Version", _glVersion.toString(), Minimal });
+    result.push_back({ "OpenGL Compiler", _glslCompiler, Minimal });
+    result.push_back({ "OpenGL Renderer", _glRenderer, Minimal });
+    result.push_back({"GPU Vendor", gpuVendorString(), Minimal });
+    result.push_back({"GLEW Version", _glewVersion.toString(), Minimal });
 #ifdef GHOUL_USE_WMI
-    result.emplace_back("GPU Name", _adapterName);
-    result.emplace_back("GPU Driver Version", _driverVersion);
-    result.emplace_back("GPU Driver Date", _driverDate);
-    result.emplace_back("GPU RAM", toString(_adapterRAM) + " MB");
+    result.push_back({ "GPU Name", _adapterName, Minimal });
+    result.push_back({ "GPU Driver Version", _driverVersion, Minimal });
+    result.push_back({ "GPU Driver Date", _driverDate, Minimal });
+    result.push_back({ "GPU RAM", toString(_adapterRAM) + " MB", Minimal });
 #endif
 
-    if (verbosity >= Verbosity::Default) {
-        result.emplace_back("Max Texture Size", toString(_maxTextureSize));
-        result.emplace_back("Max 3D Texture Size", toString(_maxTextureSize3D));
-        result.emplace_back("Num of Texture Units", toString(_numTextureUnits));
-        result.emplace_back(
-			"FBO Color Attachments", toString(_maxFramebufferColorAttachments));
-    }
+    result.push_back({ "Max Texture Size", std::to_string(_maxTextureSize) });
+    result.push_back({ "Max 3D Texture Size", std::to_string(_maxTextureSize3D) });
+    result.push_back({ "Num of Texture Units", std::to_string(_numTextureUnits) });
+    result.push_back({
+        "FBO Color Attachments", std::to_string(_maxFramebufferColorAttachments)
+    });
 
-    if (verbosity >= Verbosity::Full) {
-        std::stringstream s;
-        if (!_extensions.empty()) {
-            for (size_t i = 0; i < _extensions.size() - 1; ++i)
-                s << _extensions[i] << ", ";
-            s << _extensions[_extensions.size() - 1] << "\n";
-        }
-        result.emplace_back("Extensions", s.str());
+    std::stringstream s;
+    if (!_extensions.empty()) {
+        for (size_t i = 0; i < _extensions.size() - 1; ++i)
+            s << _extensions[i] << ", ";
+        s << _extensions[_extensions.size() - 1] << "\n";
     }
+    result.push_back({ "Extensions", s.str(), Full });
     return result;
 }
 
-const OpenGLCapabilitiesComponent::Version& OpenGLCapabilitiesComponent::openGLVersion() const {
+OpenGLCapabilitiesComponent::Version OpenGLCapabilitiesComponent::openGLVersion() const {
     return _glVersion;
 }
 
-const string& OpenGLCapabilitiesComponent::glslCompiler() const {
+const std::string& OpenGLCapabilitiesComponent::glslCompiler() const {
     return _glslCompiler;
 }
 
-const OpenGLCapabilitiesComponent::Vendor& OpenGLCapabilitiesComponent::gpuVendor() const {
+OpenGLCapabilitiesComponent::Vendor OpenGLCapabilitiesComponent::gpuVendor() const {
     return _vendor;
 }
 
-const vector<string>& OpenGLCapabilitiesComponent::extensions() const {
+const std::vector<std::string>& OpenGLCapabilitiesComponent::extensions() const {
     return _extensions;
 }
 
-bool OpenGLCapabilitiesComponent::isExtensionSupported(const string& extension) const {
-    vector<string>::const_iterator result =
+bool OpenGLCapabilitiesComponent::isExtensionSupported(const std::string& extension) const {
+    auto result =
         std::find(_extensions.begin(), _extensions.end(), extension);
     return (result != _extensions.end());
 }
@@ -300,22 +277,13 @@ std::string OpenGLCapabilitiesComponent::name() const {
 /// OpenGLVersion
 /////////////////////////////
 
-unsigned int packVersion(int major,
-                         int minor,
-                         int release)
-{
+unsigned int packVersion(int major, int minor, int release) {
     // safe since: 2^8 * 1000 * 1000 < 2^32
     return
         major * 1000 * 1000 +
         minor * 1000        +
         release;
 }
-
-OpenGLCapabilitiesComponent::Version::Version(int major, int minor, int release) 
-    : _major(major)
-    , _minor(minor)
-    , _release(release)
-{}
 
 bool OpenGLCapabilitiesComponent::Version::operator==(const Version& rhs) const {
     return (_major == rhs._major) && (_minor == rhs._minor) && (_release == rhs._release);
@@ -354,11 +322,11 @@ bool OpenGLCapabilitiesComponent::Version::operator>=(const Version& rhs) const 
 }
 
 std::string OpenGLCapabilitiesComponent::Version::toString() const {
-    stringstream stream;
-    stream << _major << "." << _minor;
+    using std::to_string;
     if (_release != 0)
-        stream << "." << _release;
-    return stream.str();
+        return to_string(_major) + "." + to_string(_minor) + "." + to_string(_release);
+    else
+        return to_string(_major) + "." + to_string(_minor);
 }
 
 } // namespace ghoul
