@@ -102,8 +102,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/multiplecommand.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.inl
-    ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/observer.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/observer.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/singleton.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/cachemanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/directory.h

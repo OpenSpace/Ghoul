@@ -50,12 +50,10 @@ namespace ghoul {
 template <class T>
 class Singleton {
 public:
-
 	/**
      * Creates and initializes an empty singleton with the arguments passed to the 
 	 * template class T constructor.
-     * Calling #initialize when the singleton is already initialized will trigger an
-     * assertion.
+     * \pre The singleton must not have been initialized before
      */
     template <typename... Args>
     static void initialize(Args... args) {
@@ -64,8 +62,8 @@ public:
     }
     
 	/**
-     * Deinitializes and deletes the singleton. Calling this with an uninitialized
-     * singleton will trigger an assertion.
+     * Deinitializes and deletes the singleton.
+     * \pre The singleton must have been initialized before
      */
 	static void deinitialize() {
 		ghoul_assert(isInitialized(), typeid(T).name() << " is not initialized!");
@@ -82,9 +80,9 @@ public:
     }
     
 	/**
-     * Returns the reference to the singleton. Triggers an assertion if the
-     * singleton has not been initialized yet.
+     * Returns the reference to the singleton.
      * \return A reference to the singleton
+     * \pre The singleton must have been initialized before
      */
 	static T& ref() {
 		ghoul_assert(isInitialized(), typeid(T).name() << " is not initialized!");
@@ -92,15 +90,15 @@ public:
     }
 
 protected:
-    Singleton() {};
-    ~Singleton() {};
+    Singleton() = default;
+    ~Singleton() = default;
     
 private:
-
     // protecting against evil
     Singleton(const Singleton&) = delete;
     Singleton(const Singleton&&) = delete;
-    Singleton& operator= (const Singleton& rhs) = delete;
+    Singleton& operator=(const Singleton& rhs) = delete;
+    Singleton& operator=(Singleton&& rhs) = delete;
     
     // instance member
     static T* _instance;
