@@ -56,21 +56,15 @@ namespace ghoul {
     
 Dictionary::DictionaryError::DictionaryError(std::string message)
     : RuntimeError(std::move(message), "Dictionary")
-{
-    ghoul_assert(!message.empty(), "Message must not be empty");
-}
+{}
     
 Dictionary::KeyError::KeyError(std::string message)
     : DictionaryError(std::move(message))
-{
-    ghoul_assert(!message.empty(), "Message must not be empty");
-}
+{}
     
 Dictionary::ConversionError::ConversionError(std::string message)
     : DictionaryError(std::move(message))
-{
-    ghoul_assert(!message.empty(), "Message must not be empty");
-}
+{}
 
 #ifdef WIN32
 #pragma warning(disable : 4800)
