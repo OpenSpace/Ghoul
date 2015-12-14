@@ -106,7 +106,9 @@ void SystemCapabilities::addComponent(
         _components.begin(),
         _components.end(),
         [&component](const std::unique_ptr<SystemCapabilitiesComponent>& rhs) {
-            return typeid(component) == typeid(rhs);
+            auto& c = *component;
+            auto& r = *rhs;
+            return typeid(c) == typeid(r);
         }
     );
     
