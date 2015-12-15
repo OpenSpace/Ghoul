@@ -57,7 +57,8 @@ class SystemCapabilitiesComponent {
 public:
     /// The verbosity that is used in the #capabilities method
     enum class Verbosity {
-        Minimal = 0, ///< The minimal verbosity presenting the absolute minimum information
+        None = 0, ///< No verbosity at all, discarding all information strings
+        Minimal, ///< The minimal verbosity presenting the absolute minimum information
         Default, ///< The default verbosity
         Full ///< Show all the available information
     };
