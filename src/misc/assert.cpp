@@ -55,9 +55,9 @@ namespace ghoul {
 
 AssertionException::AssertionException(std::string exp, std::string msg,
                                          std::string file, std::string func, int line)
-    : RuntimeError(fmt::format("{}, \"{}\" ({}:{} ({})",
+    : std::runtime_error(fmt::format("{}, \"{}\" ({}:{} ({})",
         std::move(exp), std::move(msg), std::move(file), line, std::move(func)
-    ), "Assertion")
+    ))
 {}
     
 void internal_assert(std::string expression, std::string message, std::string file,

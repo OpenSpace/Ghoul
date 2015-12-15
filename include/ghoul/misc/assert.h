@@ -37,7 +37,7 @@ namespace ghoul {
  * Exception that gets thrown if an assertion is triggered and the user selects the
  * <code>AssertionException</code> option
  */
-struct AssertionException : public RuntimeError {
+struct AssertionException : public std::runtime_error {
     explicit AssertionException(std::string expression, std::string message,
                                 std::string file, std::string function, int line);
 };
