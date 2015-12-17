@@ -176,9 +176,9 @@ void luaDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary);
 std::string luaTypeToString(int type);
 
 /**
- * Creates a new Lua state and initializes it with the default Lua libraries. If the
- * allocation of memory fails, an error is logged and <code>nullptr</code> is returned.
- * \return A valid Lua state or <code>nullptr</code> if the state creation failed
+ * Creates a new Lua state and initializes it with the default Lua libraries.
+ * \return A valid new Lua state initialized with the default Lua libraries
+ * \throw LuaRuntimeException If there wa an error creating the new Lua state
  */
 lua_State* createNewLuaState();
 
