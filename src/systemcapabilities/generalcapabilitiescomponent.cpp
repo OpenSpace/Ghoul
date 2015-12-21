@@ -109,16 +109,54 @@ void GeneralCapabilitiesComponent::detectOS() {
     BOOL osVersionInfoEx = GetVersionEx((OSVERSIONINFO*) &osVersionInfo);
 
     if (osVersionInfoEx == 0) {
+        DWORD error = GetLastError();
+        LPTSTR errorBuffer = nullptr;
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            error,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR)&errorBuffer,
+            0,
+            NULL);
+        if (errorBuffer != nullptr) {
+            std::string errorMsg(errorBuffer);
+            LocalFree(errorBuffer);
+            throw OperatingSystemError(
+                "Retrieving OS version failed. 'GetVersionEx' returned 0.",
+                errorMsg
+                );
+        }
         throw OperatingSystemError(
             "Retrieving OS version failed. 'GetVersionEx' returned 0.",
-            GetLastError()
+            ""
         );
     }
     HMODULE module = GetModuleHandle(TEXT("kernel32.dll"));
     if (module == 0) {
+        DWORD error = GetLastError();
+        LPTSTR errorBuffer = nullptr;
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            error,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR)&errorBuffer,
+            0,
+            NULL);
+        if (errorBuffer != nullptr) {
+            std::string errorMsg(errorBuffer);
+            LocalFree(errorBuffer);
+            throw OperatingSystemError(
+                "Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0.",
+                errorMsg
+                );
+        }
         throw OperatingSystemError(
             "Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0.",
-            GetLastError()
+            ""
         );
     }
     PGNSI procedureGetNativeSystemInfo = (PGNSI) GetProcAddress(
@@ -225,16 +263,20 @@ void GeneralCapabilitiesComponent::detectMemory() {
 #if defined(WIN32)
 #ifdef GHOUL_USE_WMI
     std::string memory;
-    bool success = queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
-    if (!success)
-        throw MainMemoryError("Error reading about of physical memory from WMI");
-    else {
-        std::stringstream convert;
-        convert << memory;
-        unsigned long long value;
-        convert >> value;
-        _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
+    try {
+        queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
     }
+    catch (const WMIError& e) {
+        throw MainMemoryError(
+            "Error reading physical memory from WMI. " +
+            e.message + " (" + std::to_string(e.errorCode)
+        );
+    }
+    std::stringstream convert;
+    convert << memory;
+    unsigned long long value;
+    convert >> value;
+    _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
 #else
 	ULONGLONG installedMainMemory;
 	// get installed memory in kB
@@ -534,20 +576,28 @@ void GeneralCapabilitiesComponent::detectCPU() {
 #endif
 }
 
+struct Foo {
+    std::string a;
+    std::string b;
+    SystemCapabilitiesComponent::Verbosity c;
+};
+
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
     GeneralCapabilitiesComponent::capabilities() const
-{
-    using Verbosity::Minimal;
-    using Verbosity::Full;
-    
+{   
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
-    result.push_back({ "Operating System", _operatingSystem, Minimal });
+
+    Foo f = {"1", "2", SystemCapabilitiesComponent::Verbosity::Minimal };
+
+    SystemCapabilitiesComponent::CapabilityInformation i = { std::string("foo"), std::string("bar"), SystemCapabilitiesComponent::Verbosity::Minimal };
+
+    result.push_back({ "Operating System", _operatingSystem, Verbosity::Minimal });
     result.push_back({ "CPU", _cpu });
     result.push_back({ "Cores", coresAsString() });
-    result.push_back({ "Cache line size", cacheLineSizeAsString(), Full });
-    result.push_back({ "L2 Associativity", L2AssiciativityAsString(), Full });
-    result.push_back({ "Cache size", cacheSizeAsString(), Full });
-    result.push_back({ "Extensions", _extensions, Full });
+    result.push_back({ "Cache line size", cacheLineSizeAsString(), Verbosity::Full });
+    result.push_back({ "L2 Associativity", L2AssiciativityAsString(), Verbosity::Full });
+    result.push_back({ "Cache size", cacheSizeAsString(), Verbosity::Full });
+    result.push_back({ "Extensions", _extensions,Verbosity::Full });
     result.push_back({ "Main Memory", installedMainMemoryAsString() });
     return result;
 }

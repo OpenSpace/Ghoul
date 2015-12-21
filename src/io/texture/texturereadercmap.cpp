@@ -45,6 +45,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
     std::ifstream file;
     file.exceptions(std::ifstream::failbit);
     file.open(filename, std::ifstream::in);
+    file.exceptions(std::ifstream::goodbit);
 
     int width = 0;
     uint8_t* values = nullptr;

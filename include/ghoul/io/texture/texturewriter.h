@@ -26,6 +26,7 @@
 #ifndef __TEXTUREWRITER_H__
 #define __TEXTUREWRITER_H__
 
+#include <memory>
 #include <string>
 #include <vector>
 

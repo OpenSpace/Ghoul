@@ -125,48 +125,23 @@ void OpenGLCapabilitiesComponent::detectGLEWVersion() {
 
 void OpenGLCapabilitiesComponent::detectDriverInformation() {
 #ifdef GHOUL_USE_WMI
-    bool versionSuccess = queryWMI("Win32_VideoController", "DriverVersion", _driverVersion);
-    if (!versionSuccess) {
-        _driverVersion = "";
-        throw WMIError(
-            "Reading of video controller driver version failed", GetLastError()
-        );
-    }
+    queryWMI("Win32_VideoController", "DriverVersion", _driverVersion);
+    
+    std::string driverDateFull;
+    queryWMI("Win32_VideoController", "DriverDate", driverDateFull);
 
-    string driverDateFull;
-    bool dateSuccess = queryWMI("Win32_VideoController", "DriverDate", driverDateFull);
-    if (!dateSuccess) {
-        throw WMIError(
-            "Reading of video controller driver date failed", GetLastError()
-        );
-    }
-    else {
-        stringstream dateStream;
-        dateStream << driverDateFull.substr(0,4) << "-"
-            << driverDateFull.substr(4,2) << "-"
-            << driverDateFull.substr(6,2);
-        _driverDate = dateStream.str();
-    }
+    std::stringstream dateStream;
+    dateStream << driverDateFull.substr(0,4) << "-"
+        << driverDateFull.substr(4,2) << "-"
+        << driverDateFull.substr(6,2);
+    _driverDate = dateStream.str();
 
-    bool adapterRAMSuccess = queryWMI("Win32_VideoController", "AdapterRAM", _adapterRAM);
-    if (!adapterRAMSuccess) {
-        _adapterRAM = 0;
-        throw WMIError(
-            "Reading of video controller RAM failed", GetLastError()
-        );
-    }
-    else {
-        // adapterRAM is in bytes
-        _adapterRAM = (_adapterRAM / 1024) / 1024;
-    }
 
-    bool nameSucess = queryWMI("Win32_VideoController", "Name", _adapterName);
-    if (!nameSucess) {
-        _adapterName = "";
-        throw WMIError(
-            "Reading of video controller's name failed", GetLastError()
-        );
-    }
+    queryWMI("Win32_VideoController", "AdapterRAM", _adapterRAM);
+    // adapterRAM is in bytes
+    _adapterRAM = (_adapterRAM / 1024) / 1024;
+
+    queryWMI("Win32_VideoController", "Name", _adapterName);
 #endif
 }
 
@@ -197,20 +172,17 @@ void OpenGLCapabilitiesComponent::clearCapabilities() {
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
     OpenGLCapabilitiesComponent::capabilities() const
 {
-    using Verbosity::Minimal;
-    using Verbosity::Full;
-    
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
-    result.push_back({ "OpenGL Version", _glVersion.toString(), Minimal });
-    result.push_back({ "OpenGL Compiler", _glslCompiler, Minimal });
-    result.push_back({ "OpenGL Renderer", _glRenderer, Minimal });
-    result.push_back({"GPU Vendor", gpuVendorString(), Minimal });
-    result.push_back({"GLEW Version", _glewVersion.toString(), Minimal });
+    result.push_back({ "OpenGL Version", _glVersion.toString(), Verbosity::Minimal });
+    result.push_back({ "OpenGL Compiler", _glslCompiler, Verbosity::Minimal });
+    result.push_back({ "OpenGL Renderer", _glRenderer, Verbosity::Minimal });
+    result.push_back({"GPU Vendor", gpuVendorString(), Verbosity::Minimal });
+    result.push_back({"GLEW Version", _glewVersion.toString(),Verbosity::Minimal });
 #ifdef GHOUL_USE_WMI
-    result.push_back({ "GPU Name", _adapterName, Minimal });
-    result.push_back({ "GPU Driver Version", _driverVersion, Minimal });
-    result.push_back({ "GPU Driver Date", _driverDate, Minimal });
-    result.push_back({ "GPU RAM", toString(_adapterRAM) + " MB", Minimal });
+    result.push_back({ "GPU Name", _adapterName, Verbosity::Minimal });
+    result.push_back({ "GPU Driver Version", _driverVersion, Verbosity::Minimal });
+    result.push_back({ "GPU Driver Date", _driverDate, Verbosity::Minimal });
+    result.push_back({ "GPU RAM", std::to_string(_adapterRAM) + " MB",Verbosity::Minimal });
 #endif
 
     result.push_back({ "Max Texture Size", std::to_string(_maxTextureSize) });
@@ -226,7 +198,7 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
             s << _extensions[i] << ", ";
         s << _extensions[_extensions.size() - 1] << "\n";
     }
-    result.push_back({ "Extensions", s.str(), Full });
+    result.push_back({ "Extensions", s.str(), Verbosity::Full });
     return result;
 }
 

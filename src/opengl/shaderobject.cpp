@@ -274,9 +274,17 @@ void ShaderObject::setShaderFilename(std::string filename) {
         generatedFilename += ".GhoulGenerated.glsl";
     }
 	
-	std::ofstream os(generatedFilename);
-	os << contents;
-	os.close();
+    std::ofstream os;
+    os.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+    try {
+        os.open(generatedFilename);
+        os << contents;
+        os.close();
+    }
+    catch (const std::ios_base::failure& e) {
+        std::string f = e.what();
+        f = f;
+    }
 #endif // GHL_DEBUG
 	
     const char* contentPtr =  contents.c_str();

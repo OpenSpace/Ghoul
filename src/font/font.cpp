@@ -388,6 +388,9 @@ float Font::computeLeftBearing(wchar_t charcode) const {
     FT_Glyph_To_Bitmap(&outlineGlyph, FT_RENDER_MODE_NORMAL, nullptr, 1);
     
     FT_BitmapGlyph outlineBitmap = reinterpret_cast<FT_BitmapGlyph>(outlineGlyph);
+
+    FT_Done_Face(face);
+    FT_Done_FreeType(library);
     return outlineBitmap->left / HighResolutionFactor;
 }
     

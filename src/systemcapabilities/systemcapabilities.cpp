@@ -36,10 +36,6 @@
 #include <algorithm>
 #include <ghoul/misc/assert.h>
 
-namespace {
-    const std::string _loggerCat = "SystemCapabilities";
-}
-
 namespace ghoul {
 namespace systemcapabilities {
 
@@ -88,7 +84,7 @@ void SystemCapabilities::logCapabilities(
                                   SystemCapabilitiesComponent::Verbosity verbosity) const
 {
     for (auto& c : _components) {
-        const std::string _loggerCat = ::_loggerCat + "." + c->name();
+        const std::string _loggerCat = "SystemCapabilitiesComponent." + c->name();
         auto capabilities = c->capabilities();
         for (SystemCapabilitiesComponent::CapabilityInformation cap : capabilities) {
             if (verbosity >= cap.verbosity)

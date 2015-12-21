@@ -338,6 +338,12 @@ bool FileSystem::fileExists(std::string path, bool isRawPath) const {
 
 bool FileSystem::directoryExists(const Directory& path) const {
 #ifdef WIN32
+    const BOOL isDirectory = PathIsDirectory(path.path().c_str());
+    return isDirectory == (BOOL)FILE_ATTRIBUTE_DIRECTORY;
+
+    //if (isDirectory)
+
+    /*
     const DWORD attributes = GetFileAttributes(path.path().c_str());
     if (attributes == INVALID_FILE_ATTRIBUTES) {
         const DWORD error = GetLastError();
@@ -365,6 +371,7 @@ bool FileSystem::directoryExists(const Directory& path) const {
     }
     else
         return (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+        */
 #else
     const string& dirPath = path.path();
     struct stat buffer;
@@ -434,10 +441,10 @@ void FileSystem::createDirectory(const Directory& path, bool recursive) const {
                     NULL
                 );
 				if ((nValues > 0) && (errorBuffer != nullptr)) {
-					string error(errorBuffer);
+					string errorMsg(errorBuffer);
 					LocalFree(errorBuffer);
                     throw FileSystemException(fmt::format(
-                        "Error creating directory '{}': {}", path, error
+                        "Error creating directory '{}': {}", path, errorMsg
                     ));
 				}
                 throw FileSystemException(fmt::format(

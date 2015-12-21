@@ -133,7 +133,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         NULL,                        // client identity
         EOAC_NONE                    // proxy capabilities 
         );
-    if (FAILED(hRes)) {std::unique_ptr
+    if (FAILED(hRes)) {
         _iwbemServices->Release();
         _iwbemServices = nullptr;
         _iwbemLocator->Release();

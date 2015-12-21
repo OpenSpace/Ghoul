@@ -82,6 +82,8 @@ public:
 
 private:
     struct Input {
+        Input(std::ifstream& stream, ghoul::filesystem::File& file, std::string indentation);
+
         std::ifstream& stream;
         ghoul::filesystem::File& file;
         std::string indentation;
@@ -102,14 +104,16 @@ private:
     
     struct Env {
         using Scope = std::set<std::string>;
+
+        Env(std::stringstream& output, std::string line = "", std::string indentation = "");
         
         std::stringstream& output;
-        std::string line = "";
+        std::string line;
         std::vector<Input> inputs;
         std::vector<Scope> scopes;
         std::vector<ForStatement> forStatements;
         std::map<std::string, std::vector<std::string> > aliases;
-        std::string indentation = "";
+        std::string indentation;
         bool success = true;
     };
     

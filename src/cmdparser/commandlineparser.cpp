@@ -30,8 +30,9 @@
 #include <ghoul/misc/assert.h>
 #include <format.h>
 
-#include <map>
+#include <algorithm>
 #include <iostream>
+#include <map>
 
 using fmt::format;
 

@@ -72,7 +72,7 @@ public:
         std::string value;
         
         /// The SystemCapabilitiesComponent%'s recommendation for Verbosity
-        Verbosity verbosity = Verbosity::Default;
+        Verbosity verbosity;
     };
 
     /**
@@ -233,7 +233,7 @@ protected:
      * \pre \p attribute must not be empty
      * \pre The Windows Management Instrumentation must have been initialized
      */
-    static bool queryWMI(const std::string& wmiClass, const std::string& attribute,
+    static void queryWMI(const std::string& wmiClass, const std::string& attribute,
         unsigned long long& value);
 
     /**

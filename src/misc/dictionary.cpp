@@ -141,7 +141,7 @@ bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& value) cons
         getValueHelper(key, value);
         return true;
     }
-    catch (const DictionaryError& e) {
+    catch (const DictionaryError&) {
         return false;
     }
 }

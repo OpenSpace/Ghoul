@@ -337,15 +337,13 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
     if (!FileSys.fileExists(fpath))
         throw FileNotFoundError(fpath, "ProgramObject");
     
-    using ShaderObject::ShaderType::ShaderTypeVertex;
-    using ShaderObject::ShaderType::ShaderTypeFragment;
     
     std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
     program->attachObject(std::make_unique<ShaderObject>(
-        ShaderTypeVertex, absPath(vpath), name + " Vertex", dictionary
+        ShaderObject::ShaderType::ShaderTypeVertex, absPath(vpath), name + " Vertex", dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
-        ShaderTypeFragment, absPath(fpath), name + " Fragment", dictionary
+        ShaderObject::ShaderType::ShaderTypeFragment, absPath(fpath), name + " Fragment", dictionary
     ));
     
     program->compileShaderObjects();
@@ -371,20 +369,16 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
     
     if (!FileSys.fileExists(gpath))
         throw FileNotFoundError(gpath, "ProgramObject");
-
-    using ShaderObject::ShaderType::ShaderTypeVertex;
-    using ShaderObject::ShaderType::ShaderTypeGeometry;
-    using ShaderObject::ShaderType::ShaderTypeFragment;
     
     std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
     program->attachObject(std::make_unique<ShaderObject>(
-        ShaderTypeVertex, absPath(vpath), name + " Vertex", dictionary
+        ShaderObject::ShaderType::ShaderTypeVertex, absPath(vpath), name + " Vertex", dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
-        ShaderTypeGeometry, absPath(gpath), name + " Geometry", dictionary
+        ShaderObject::ShaderType::ShaderTypeGeometry, absPath(gpath), name + " Geometry", dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
-        ShaderTypeFragment, absPath(fpath), name + " Fragment", dictionary
+        ShaderObject::ShaderType::ShaderTypeFragment, absPath(fpath), name + " Fragment", dictionary
     ));
     
     program->compileShaderObjects();
@@ -420,30 +414,24 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
 
     if (!FileSys.fileExists(tcpath))
         throw FileNotFoundError(tcpath, "ProgramObject");
-
-    using ShaderObject::ShaderType::ShaderTypeVertex;
-    using ShaderObject::ShaderType::ShaderTypeGeometry;
-    using ShaderObject::ShaderType::ShaderTypeTesselationEvaluation;
-    using ShaderObject::ShaderType::ShaderTypeTesselationControl;
-    using ShaderObject::ShaderType::ShaderTypeFragment;
     
     std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
     program->attachObject(std::make_unique<ShaderObject>(
-        ShaderTypeVertex, absPath(vpath), name + " Vertex", dictionary
+        ShaderObject::ShaderType::ShaderTypeVertex, absPath(vpath), name + " Vertex", dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
-        ShaderTypeGeometry, absPath(gpath), name + " Geometry", dictionary
+        ShaderObject::ShaderType::ShaderTypeGeometry, absPath(gpath), name + " Geometry", dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
-        ShaderTypeTesselationEvaluation, absPath(tepath),
+        ShaderObject::ShaderType::ShaderTypeTesselationEvaluation, absPath(tepath),
         name + " Tessellation Evaluation", dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
-        ShaderTypeTesselationControl, absPath(tcpath),
+        ShaderObject::ShaderType::ShaderTypeTesselationControl, absPath(tcpath),
         name + " Tessellation Control", dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
-        ShaderTypeFragment, absPath(fpath), name + " Fragment", dictionary
+        ShaderObject::ShaderType::ShaderTypeFragment, absPath(fpath), name + " Fragment", dictionary
     ));
     
     program->compileShaderObjects();

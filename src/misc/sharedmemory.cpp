@@ -73,14 +73,15 @@ namespace {
             0,
             NULL);
         if ((nValues > 0) && (errorBuffer != nullptr)) {
-            std::string error(errorBuffer);
+            std::string errorMsg(errorBuffer);
             LocalFree(errorBuffer);
-            return error;
+            return errorMsg;
         }
         else {
-            LERRORC("SharedMemory",
-                "Error constructing format message for error: " << error);
-            return "";
+            return std::string(
+                "Error constructing format message for error: ") +
+                std::to_string(error)
+            ;
         }
     }
 #endif

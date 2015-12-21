@@ -111,11 +111,11 @@ public:
         bool operator>=(const Version& rhs) const;
 
         /// The <code>major</code> part of the version
-        int _major = 0;
+        int _major;
         /// The <code>minor</code> part of the version
-        int _minor = 0;
+        int _minor;
         /// The <code>release</code> part of the version
-        int _release = 0;
+        int _release;
     };
 
     /// This enum stores the possible vendors of graphics cards that can be detected

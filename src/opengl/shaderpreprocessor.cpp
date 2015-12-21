@@ -104,6 +104,18 @@ ShaderPreprocessor::IncludeError::IncludeError(std::string f)
     , file(std::move(f))
 {}
 
+ShaderPreprocessor::Input::Input(std::ifstream& s, ghoul::filesystem::File& f, std::string i)
+    : stream(s)
+    , file(f)
+    , indentation(std::move(i))
+{}
+
+ShaderPreprocessor::Env::Env(std::stringstream& o, std::string l, std::string i)
+    : output(o)
+    , line(std::move(l))
+    , indentation(std::move(i))
+{}
+
 void ShaderPreprocessor::setDictionary(Dictionary dictionary) {
     _dictionary = std::move(dictionary);
 }
@@ -181,15 +193,18 @@ void ShaderPreprocessor::includeFile(const std::string& path, bool trackChanges,
     }
 
     std::ifstream stream(path);
+    if (!stream.good())
+        perror(path.c_str());
+    ghoul_assert(stream.good() , "Input stream '" + path + "' is not good");
 
     ghoul::filesystem::File file(path);
 
     std::string prevIndentation =
         environment.inputs.size() > 0 ? environment.inputs.back().indentation : "";
 
-    environment.inputs.push_back({
+    environment.inputs.emplace_back(
         stream, file, prevIndentation + environment.indentation
-    });
+    );
     if (environment.inputs.size() > 1)
         addLineNumber(environment);
 
@@ -207,11 +222,11 @@ void ShaderPreprocessor::includeFile(const std::string& path, bool trackChanges,
         if (forStatement.inputIndex + 1 >= environment.inputs.size()) {
             int inputIndex = forStatement.inputIndex;
             ShaderPreprocessor::Input& forInput = environment.inputs[inputIndex];
-            std::string path = forInput.file.path();
+            std::string p = forInput.file.path();
             int lineNumber = forStatement.lineNumber;
 
             throw ParserError(
-                "Unexpected end of file. Still processing #for loop from " + path + ":" +
+                "Unexpected end of file. Still processing #for loop from " + p + ":" +
                 std::to_string(lineNumber) + ". " + debugString(environment)
             );
         }
@@ -229,7 +244,7 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
         _includedFiles.find(filename) != _includedFiles.end(),
         "File not in included files"
     );
-    int fileIdentifier = _includedFiles.at(filename).fileIdentifier;
+    size_t fileIdentifier = _includedFiles.at(filename).fileIdentifier;
     
     std::string includeSeparator = "";
     // Sofar, only Nvidia on Windows supports empty statements in the middle of the shader
@@ -295,8 +310,8 @@ bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
     std::string& line = env.line;
     std::stringstream processed;
     int beginOffset;
-    while ((beginOffset = line.find("#{")) != -1) {
-        int endOffset = line.substr(beginOffset).find("}");
+    while ((beginOffset = static_cast<int>(line.find("#{"))) != -1) {
+        int endOffset = static_cast<int>(line.substr(beginOffset).find("}"));
         if (endOffset == -1)
             throw ParserError("Could not parse line. " + debugString(env));
 
@@ -448,6 +463,15 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
                         includeFileWasFound = true;
                         break;
                     }
+                }
+            }
+
+            if (!includeFileWasFound) {
+                // Our last chance is that the include file is an absolute path
+                bool found = FileSys.fileExists(includeFilename);
+                if (found) {
+                    includeFilepath = absPath(includeFilename);
+                    includeFileWasFound = true;
                 }
             }
 

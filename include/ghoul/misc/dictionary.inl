@@ -277,7 +277,7 @@ bool Dictionary::getValue(const std::string& key, T& value) const {
             return true;
         }
     }
-    catch (const DictionaryError& e) {
+    catch (const DictionaryError&) {
         return false;
     }
 }

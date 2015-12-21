@@ -33,6 +33,8 @@
 
 #include <ghoul/misc/assert.h>
 
+#include <algorithm>
+
 namespace {
 	const int CRCPOLY = 0x82f63b78;
 	const int CRCINIT = 0xFFFFFFFF;

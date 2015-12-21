@@ -139,10 +139,13 @@ CacheManager::CacheManager(std::string directory, int version)
         }
         // First clean the cache directory with all contents
         cleanDirectory(_directory);
-        // Then recreate the directory for further use
-        FileSys.createDirectory(_directory);
+        //FileSys.deleteDirectory(_directory, true);
         file.close();
         FileSys.deleteFile(path);
+        if (!FileSys.directoryExists(_directory)) {
+            // Then recreate the directory for further use
+            FileSys.createDirectory(_directory);
+        }
     }
 }
 
