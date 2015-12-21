@@ -135,8 +135,10 @@ void ShaderPreprocessor::process(std::string& output) {
 
 void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
     _onChangeCallback = changeCallback;
-    for (auto& files : _includedFiles)
-        files.second.file.setCallback(changeCallback);
+    for (auto& files : _includedFiles) {
+        if (files.second.isTracked)
+            files.second.file.setCallback(changeCallback);
+    }
 }
 
 std::string ShaderPreprocessor::getFileIdentifiersString() {
@@ -174,7 +176,7 @@ void ShaderPreprocessor::includeFile(const std::string& path, bool trackChanges,
     if (_includedFiles.find(path) == _includedFiles.end()) {
         auto it = _includedFiles.emplace(
             path,
-            FileStruct{ filesystem::File(path), _includedFiles.size() }
+            FileStruct{ filesystem::File(path), _includedFiles.size(), trackChanges }
         ).first;
         if (trackChanges)
             it->second.file.setCallback(_onChangeCallback);
