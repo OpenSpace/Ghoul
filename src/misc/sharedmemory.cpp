@@ -257,8 +257,12 @@ SharedMemory::~SharedMemory() {
 #endif
 }
     
-SharedMemory::operator void*() {
+SharedMemory::operator void*() const {
     return reinterpret_cast<void*>(reinterpret_cast<char*>(_memory) + sizeof(Header));
+}
+    
+void* SharedMemory::memory() const {
+    return operator void*();
 }
     
 size_t SharedMemory::size() const {

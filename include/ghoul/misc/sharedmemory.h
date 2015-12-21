@@ -149,7 +149,15 @@ public:
      * user. 
      * \return A valid pointer into a memory block of the predefined size (#size).
      */
-    operator void*();
+    operator void*() const;
+
+    /**
+     * Returns the pointer to the first usable address of the allocated memory. The
+     * transparently handled header is automatically skipped and is invisible to the
+     * user.
+     * \return A valid pointer into a memory block of the predefined size (#size).
+     */
+    void* memory() const;
 
     /**
      * Returns the usable size of the memory block. The value here is the same which was
