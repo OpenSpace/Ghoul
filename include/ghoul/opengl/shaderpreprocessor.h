@@ -145,6 +145,7 @@ private:
     struct FileStruct {
         ghoul::filesystem::File file;
         size_t fileIdentifier;
+        bool isTracked;
     };
     
     std::map<std::string, FileStruct> _includedFiles;
