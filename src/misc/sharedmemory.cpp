@@ -144,6 +144,9 @@ void SharedMemory::create(const std::string& name, size_t size) {
     }
     void* memory = shmat(result, NULL, SHM_R | SHM_W);
     Header* memoryHeader = header(memory);
+    
+//    new (&memoryHeader->mutex) std::atomic_flag();
+    
     memoryHeader->mutex.clear();
     shmdt(memory);
 #endif
@@ -258,12 +261,8 @@ SharedMemory::~SharedMemory() {
 #endif
 }
     
-SharedMemory::operator void*() const {
-    return reinterpret_cast<void*>(reinterpret_cast<char*>(_memory) + sizeof(Header));
-}
-    
 void* SharedMemory::memory() const {
-    return operator void*();
+    return reinterpret_cast<void*>(reinterpret_cast<char*>(_memory) + sizeof(Header));
 }
     
 size_t SharedMemory::size() const {
