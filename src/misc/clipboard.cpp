@@ -95,13 +95,13 @@ std::string clipboardText() {
 #elif defined(__APPLE__)
     std::string text;
     if (exec("pbpaste", text))
-        return text.substr(0, text.length() - 1);
-    return ""; // remove a line ending
+        return text.substr(0, text.length()); // remove a line ending
+    return "";
 #else
     std::string text;
     if (exec("xclip -o -sel c -f", text))
-        return text.substr(0, text.length() - 1);
-    return ""; // remove a line ending
+        return text.substr(0, text.length());  // remove a line ending
+    return "";
 #endif
 }
 
