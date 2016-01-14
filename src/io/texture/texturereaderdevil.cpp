@@ -67,6 +67,11 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(std::string fil
     ILint height = ilGetInteger(IL_IMAGE_HEIGHT);
     ILint depth = ilGetInteger(IL_IMAGE_DEPTH);
 
+    if (imageFormat == IL_LUMINANCE) {
+        imageFormat = IL_RGB;
+        imageByte *= 3;
+    }
+
     // Copy data from common data store to own address space
     ILubyte* data = new ILubyte[width * height * imageByte];
     ilCopyPixels(0, 0, 0, width, height, 1, imageFormat, IL_UNSIGNED_BYTE, data);
