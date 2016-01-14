@@ -62,7 +62,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
     
     size_t totalSizeIndex = 0;
     size_t totalSizeVertex = 0;
-    for (int i = 0; i < shapes.size(); ++i) {
+    for (size_t i = 0; i < shapes.size(); ++i) {
         totalSizeIndex += shapes[i].mesh.indices.size();
         totalSizeVertex += shapes[i].mesh.positions.size();
         
@@ -90,8 +90,8 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
     // The _shapeCounts array stores for each shape, how many vertices that shape has
     size_t positionIndex = 0;
     size_t indicesIndex = 0;
-    for (int i = 0; i < shapes.size(); ++i) {
-        for (int j = 0; j < shapes[i].mesh.positions.size() / 3; ++j) {
+    for (size_t i = 0; i < shapes.size(); ++i) {
+        for (size_t j = 0; j < shapes[i].mesh.positions.size() / 3; ++j) {
             vertices[j + positionIndex].location[0] = shapes[i].mesh.positions[3 * j + 0];
             vertices[j + positionIndex].location[1] = shapes[i].mesh.positions[3 * j + 1];
             vertices[j + positionIndex].location[2] = shapes[i].mesh.positions[3 * j + 2];

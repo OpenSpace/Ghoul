@@ -73,52 +73,52 @@ namespace internal {
         static const size_t size = S;                                                    \
     };
     
-    DEF_STORAGE_CONVERTER(bool, IntegralType, 1);
-    DEF_STORAGE_CONVERTER(char, IntegralType, 1);
-    DEF_STORAGE_CONVERTER(signed char, IntegralType, 1);
-    DEF_STORAGE_CONVERTER(unsigned char, UnsignedIntegralType, 1);
-    DEF_STORAGE_CONVERTER(wchar_t, IntegralType, 1);
-    DEF_STORAGE_CONVERTER(short, IntegralType, 1);
-    DEF_STORAGE_CONVERTER(unsigned short, UnsignedIntegralType, 1);
-    DEF_STORAGE_CONVERTER(int, IntegralType, 1);
-    DEF_STORAGE_CONVERTER(unsigned int, UnsignedIntegralType, 1);
-    DEF_STORAGE_CONVERTER(long long, IntegralType, 1);
-    DEF_STORAGE_CONVERTER(unsigned long long, UnsignedIntegralType, 1);
-    DEF_STORAGE_CONVERTER(float, FloatingType, 1);
-    DEF_STORAGE_CONVERTER(double, FloatingType, 1);
-    DEF_STORAGE_CONVERTER(glm::vec2, FloatingType, 2);
-    DEF_STORAGE_CONVERTER(glm::dvec2, FloatingType, 2);
-    DEF_STORAGE_CONVERTER(glm::ivec2, IntegralType, 2);
-    DEF_STORAGE_CONVERTER(glm::uvec2, UnsignedIntegralType, 2);
-    DEF_STORAGE_CONVERTER(glm::bvec2, IntegralType, 2);
-    DEF_STORAGE_CONVERTER(glm::vec3, FloatingType, 3);
-    DEF_STORAGE_CONVERTER(glm::dvec3, FloatingType, 3);
-    DEF_STORAGE_CONVERTER(glm::ivec3, IntegralType, 3);
-    DEF_STORAGE_CONVERTER(glm::uvec3, UnsignedIntegralType, 3);
-    DEF_STORAGE_CONVERTER(glm::bvec3, IntegralType, 3);
-    DEF_STORAGE_CONVERTER(glm::vec4, FloatingType, 4);
-    DEF_STORAGE_CONVERTER(glm::dvec4, FloatingType, 4);
-    DEF_STORAGE_CONVERTER(glm::ivec4, IntegralType, 4);
-    DEF_STORAGE_CONVERTER(glm::uvec4, UnsignedIntegralType, 4);
-    DEF_STORAGE_CONVERTER(glm::bvec4, IntegralType, 4);
-    DEF_STORAGE_CONVERTER(glm::mat2x2, FloatingType, 4);
-    DEF_STORAGE_CONVERTER(glm::mat2x3, FloatingType, 6);
-    DEF_STORAGE_CONVERTER(glm::mat2x4, FloatingType, 8);
-    DEF_STORAGE_CONVERTER(glm::mat3x2, FloatingType, 6);
-    DEF_STORAGE_CONVERTER(glm::mat3x3, FloatingType, 9);
-    DEF_STORAGE_CONVERTER(glm::mat3x4, FloatingType, 12);
-    DEF_STORAGE_CONVERTER(glm::mat4x2, FloatingType, 8);
-    DEF_STORAGE_CONVERTER(glm::mat4x3, FloatingType, 12);
-    DEF_STORAGE_CONVERTER(glm::mat4x4, FloatingType, 16);
-    DEF_STORAGE_CONVERTER(glm::dmat2x2, FloatingType, 4);
-    DEF_STORAGE_CONVERTER(glm::dmat2x3, FloatingType, 6);
-    DEF_STORAGE_CONVERTER(glm::dmat2x4, FloatingType, 8);
-    DEF_STORAGE_CONVERTER(glm::dmat3x2, FloatingType, 6);
-    DEF_STORAGE_CONVERTER(glm::dmat3x3, FloatingType, 9);
-    DEF_STORAGE_CONVERTER(glm::dmat3x4, FloatingType, 12);
-    DEF_STORAGE_CONVERTER(glm::dmat4x2, FloatingType, 8);
-    DEF_STORAGE_CONVERTER(glm::dmat4x3, FloatingType, 12);
-    DEF_STORAGE_CONVERTER(glm::dmat4x4, FloatingType, 16);
+    DEF_STORAGE_CONVERTER(bool, IntegralType, 1)
+    DEF_STORAGE_CONVERTER(char, IntegralType, 1)
+    DEF_STORAGE_CONVERTER(signed char, IntegralType, 1)
+    DEF_STORAGE_CONVERTER(unsigned char, UnsignedIntegralType, 1)
+    DEF_STORAGE_CONVERTER(wchar_t, IntegralType, 1)
+    DEF_STORAGE_CONVERTER(short, IntegralType, 1)
+    DEF_STORAGE_CONVERTER(unsigned short, UnsignedIntegralType, 1)
+    DEF_STORAGE_CONVERTER(int, IntegralType, 1)
+    DEF_STORAGE_CONVERTER(unsigned int, UnsignedIntegralType, 1)
+    DEF_STORAGE_CONVERTER(long long, IntegralType, 1)
+    DEF_STORAGE_CONVERTER(unsigned long long, UnsignedIntegralType, 1)
+    DEF_STORAGE_CONVERTER(float, FloatingType, 1)
+    DEF_STORAGE_CONVERTER(double, FloatingType, 1)
+    DEF_STORAGE_CONVERTER(glm::vec2, FloatingType, 2)
+    DEF_STORAGE_CONVERTER(glm::dvec2, FloatingType, 2)
+    DEF_STORAGE_CONVERTER(glm::ivec2, IntegralType, 2)
+    DEF_STORAGE_CONVERTER(glm::uvec2, UnsignedIntegralType, 2)
+    DEF_STORAGE_CONVERTER(glm::bvec2, IntegralType, 2)
+    DEF_STORAGE_CONVERTER(glm::vec3, FloatingType, 3)
+    DEF_STORAGE_CONVERTER(glm::dvec3, FloatingType, 3)
+    DEF_STORAGE_CONVERTER(glm::ivec3, IntegralType, 3)
+    DEF_STORAGE_CONVERTER(glm::uvec3, UnsignedIntegralType, 3)
+    DEF_STORAGE_CONVERTER(glm::bvec3, IntegralType, 3)
+    DEF_STORAGE_CONVERTER(glm::vec4, FloatingType, 4)
+    DEF_STORAGE_CONVERTER(glm::dvec4, FloatingType, 4)
+    DEF_STORAGE_CONVERTER(glm::ivec4, IntegralType, 4)
+    DEF_STORAGE_CONVERTER(glm::uvec4, UnsignedIntegralType, 4)
+    DEF_STORAGE_CONVERTER(glm::bvec4, IntegralType, 4)
+    DEF_STORAGE_CONVERTER(glm::mat2x2, FloatingType, 4)
+    DEF_STORAGE_CONVERTER(glm::mat2x3, FloatingType, 6)
+    DEF_STORAGE_CONVERTER(glm::mat2x4, FloatingType, 8)
+    DEF_STORAGE_CONVERTER(glm::mat3x2, FloatingType, 6)
+    DEF_STORAGE_CONVERTER(glm::mat3x3, FloatingType, 9)
+    DEF_STORAGE_CONVERTER(glm::mat3x4, FloatingType, 12)
+    DEF_STORAGE_CONVERTER(glm::mat4x2, FloatingType, 8)
+    DEF_STORAGE_CONVERTER(glm::mat4x3, FloatingType, 12)
+    DEF_STORAGE_CONVERTER(glm::mat4x4, FloatingType, 16)
+    DEF_STORAGE_CONVERTER(glm::dmat2x2, FloatingType, 4)
+    DEF_STORAGE_CONVERTER(glm::dmat2x3, FloatingType, 6)
+    DEF_STORAGE_CONVERTER(glm::dmat2x4, FloatingType, 8)
+    DEF_STORAGE_CONVERTER(glm::dmat3x2, FloatingType, 6)
+    DEF_STORAGE_CONVERTER(glm::dmat3x3, FloatingType, 9)
+    DEF_STORAGE_CONVERTER(glm::dmat3x4, FloatingType, 12)
+    DEF_STORAGE_CONVERTER(glm::dmat4x2, FloatingType, 8)
+    DEF_STORAGE_CONVERTER(glm::dmat4x3, FloatingType, 12)
+    DEF_STORAGE_CONVERTER(glm::dmat4x4, FloatingType, 16)
     
 #undef DEF_STORAGE_CONVERTER
 
