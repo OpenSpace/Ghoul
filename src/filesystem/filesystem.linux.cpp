@@ -127,7 +127,7 @@ void FileSystem::inotifyWatcher() {
                     auto eqRange = FileSys._trackedFiles.equal_range(wd);
                     for (auto it = eqRange.first; it != eqRange.second; ++it) {
                         File* fileobject = it->second;
-                        fileobject->_fileChangedCallback(*fileobject);
+                        fileobject->callback()(*fileobject);
                     }
                     
                 }
