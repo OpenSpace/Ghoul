@@ -26,20 +26,52 @@
 #ifndef __TEXTUREWRITERBASE_H__
 #define __TEXTUREWRITERBASE_H__
 
-#include <set>
+#include <ghoul/misc/exception.h>
+#include <ghoul/opengl/texture.h>
+
 #include <string>
+#include <vector>
 
 namespace ghoul {
-namespace opengl {
-class Texture;
-}
 namespace io {
 
 class TextureWriterBase {
- public:
+public:
+    /// The exception that gets thrown if there was an error writing the Texture
+    struct TextureWriteException : public RuntimeError {
+        explicit TextureWriteException(std::string name, std::string message,
+                                      const TextureWriterBase* writer);
+        
+        /// The filename that caused the exception to be thrown
+        std::string filename;
+        
+        /// The error message that occurred
+        std::string message;
+        
+        /// The TextureWriterBase that caused the exception
+        const TextureWriterBase* writer;
+    };
+
+    /// Default virtual destructor
     virtual ~TextureWriterBase() {}
-    virtual void saveTexture(const opengl::Texture* texture, const std::string& filename) const = 0;
-    virtual std::set<std::string> supportedExtensions() const = 0;
+    
+    /**
+     * Saves the \p texture to disk.
+     * \param texture The Texture to write to disk
+     * \param filename The target file for the Texture
+     * \pre \p filename must not be empty
+     * \pre The extension of \p filename must be among the supported extensions as
+     * reported by supportedExtensions
+     * \throw TextureWriteException If there was an error writing the \p texture
+     */
+    virtual void saveTexture(const opengl::Texture& texture,
+        const std::string& filename) const = 0;
+    
+    /**
+     * Returns a list of all extensions that this TextureWriteException supports.
+     * \return A list of all extensions that this TextureWriteException supports
+     */
+    virtual std::vector<std::string> supportedExtensions() const = 0;
 };
 
 } // namespace io

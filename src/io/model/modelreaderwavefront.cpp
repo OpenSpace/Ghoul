@@ -23,180 +23,102 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-// ghoul
 #include <ghoul/io/model/modelreaderwavefront.h>
+
+#include <ghoul/misc/assert.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/vertexbufferobject.h>
-#include <ghoul/glm.h>
 
-// std
-#include <vector>
+#include <format.h>
+#include <tiny_obj_loader.h>
+
 #include <cstdio>
 #include <iostream>
+#include <memory>
 #include <fstream>
-
-namespace {
-    const std::string _loggerCat = "WavefrontGeometry";
-}
-
+#include <vector>
 
 namespace ghoul {
 namespace io {
     
-ModelReaderWavefront::ModelReaderWavefront() {
-    
-}
+std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
+                                                        const std::string& filename) const
+{
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-ModelReaderWavefront::~ModelReaderWavefront() {
-    
-}
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
+    std::string errorMessage;
+    bool success = tinyobj::LoadObj(
+        shapes,
+        materials,
+        errorMessage,
+        filename.c_str(),
+        filename.c_str()
+    );
 
-opengl::VertexBufferObject*
-ModelReaderWavefront::loadModel(const std::string& filename) const{
+    if (!success)
+        throw ModelReaderException(filename, errorMessage);
     
-    std::ifstream file(filename, std::ios::in);
-    if(!file.good())
-        return nullptr;
-
+    size_t totalSizeIndex = 0;
+    size_t totalSizeVertex = 0;
+    for (int i = 0; i < shapes.size(); ++i) {
+        totalSizeIndex += shapes[i].mesh.indices.size();
+        totalSizeVertex += shapes[i].mesh.positions.size();
+        
+        if (shapes[i].mesh.positions.size() != shapes[i].mesh.normals.size()) {
+            throw ModelReaderException(
+                filename,
+                fmt::format(
+                    "Malformed OBJ file: Number of positions {} != number of normals",
+                    shapes[i].mesh.positions.size(),
+                    shapes[i].mesh.normals.size()
+                )
+            );
+        }
+    }
+    
     struct Vertex {
-        GLfloat position[3];
+        GLfloat location[3];
         GLfloat tex[2];
         GLfloat normal[3];
     };
+    std::vector<Vertex> vertices(totalSizeVertex);
+    std::vector<int> indices(totalSizeIndex);
     
-    // Final vertex and index vectors
-    std::vector<Vertex> vertices;
-    std::vector<int> indices;
-    
-    // temporary vectors
-    std::vector<GLfloat> positions;
-    std::vector<GLfloat> texcoords;
-    std::vector<GLfloat> normals;
-    std::vector<int> positionsIndices;
-    std::vector<int> texcoordsIndices;
-    std::vector<int> normalsIndices;
-    
-    // temporary variables for fetching
-    float f1, f2, f3;
-    int i1, i2, i3, i4, i5, i6, i7, i8, i9;
-    std::string line;
-    
-    while(std::getline(file, line)) {
-#ifdef _MSC_VER
-        if (sscanf_s(line.c_str(), "v %f%f%f", &f1, &f2, &f3)) {
-#else
-        if (sscanf(line.c_str(), "v %f%f%f", &f1, &f2, &f3)) {
-
-#endif
-            positions.push_back(f1);
-            positions.push_back(f2);
-            positions.push_back(f3);
-            continue;
-        }
-
-#ifdef _MSC_VER
-        if (sscanf_s(line.c_str(), "vn %f%f%f", &f1, &f2, &f3)) {
-#else
-        if (sscanf(line.c_str(), "vn %f%f%f", &f1, &f2, &f3)) {
-#endif
-            normals.push_back(f1);
-            normals.push_back(f2);
-            normals.push_back(f3);
-            continue;
-        }
-
-#ifdef _MSC_VER
-        if (sscanf_s(line.c_str(), "vt %f%f%f", &f1, &f2, &f3)) {
-#else
-        if (sscanf(line.c_str(), "vt %f%f%f", &f1, &f2, &f3)) {
-#endif
-            texcoords.push_back(f1);
-            texcoords.push_back(f2);
-            texcoords.push_back(f3);
-            continue;
-        }
-        if (texcoords.size() > 0){
-#ifdef _MSC_VER
-            if (sscanf_s(line.c_str(), "f %i/%i/%i %i/%i/%i %i/%i/%i",
-                       &i1, &i2, &i3, &i4, &i5, &i6, &i7, &i8, &i9))
-#else
-            if (sscanf(line.c_str(), "f %i/%i/%i %i/%i/%i %i/%i/%i",
-                       &i1, &i2, &i3, &i4, &i5, &i6, &i7, &i8, &i9))
-#endif
-            {
-                // v1
-                positionsIndices.push_back(i1-1);
-                texcoordsIndices.push_back(i2-1);
-                normalsIndices.push_back(i3-1);
-                
-                // v2
-                positionsIndices.push_back(i4-1);
-                texcoordsIndices.push_back(i5-1);
-                normalsIndices.push_back(i6-1);
-                // v3
-                
-                positionsIndices.push_back(i7-1);
-                texcoordsIndices.push_back(i8-1);
-                normalsIndices.push_back(i9-1);
-                continue;
+    // We add all shapes of the model into the same vertex array, one after the other
+    // The _shapeCounts array stores for each shape, how many vertices that shape has
+    size_t positionIndex = 0;
+    size_t indicesIndex = 0;
+    for (int i = 0; i < shapes.size(); ++i) {
+        for (int j = 0; j < shapes[i].mesh.positions.size() / 3; ++j) {
+            vertices[j + positionIndex].location[0] = shapes[i].mesh.positions[3 * j + 0];
+            vertices[j + positionIndex].location[1] = shapes[i].mesh.positions[3 * j + 1];
+            vertices[j + positionIndex].location[2] = shapes[i].mesh.positions[3 * j + 2];
+            
+            vertices[j + positionIndex].normal[0] = shapes[i].mesh.normals[3 * j + 0];
+            vertices[j + positionIndex].normal[1] = shapes[i].mesh.normals[3 * j + 1];
+            vertices[j + positionIndex].normal[2] = shapes[i].mesh.normals[3 * j + 2];
+            
+            if (2 * j + 1 < shapes[i].mesh.texcoords.size()) {
+                vertices[j + positionIndex].tex[0] = shapes[i].mesh.texcoords[2 * j + 0];
+                vertices[j + positionIndex].tex[1] = shapes[i].mesh.texcoords[2 * j + 1];
             }
+            
         }
-        else {
-#ifdef _MSC_VER
-            if (sscanf_s(line.c_str(), "f %i//%i %i//%i %i//%i",
-                       &i1, &i2, &i3, &i4, &i5, &i6))
-#else
-            if (sscanf(line.c_str(), "f %i//%i %i//%i %i//%i",
-                       &i1, &i2, &i3, &i4, &i5, &i6))
-#endif
-            {
-                // v1
-                positionsIndices.push_back(i1-1);
-                normalsIndices.push_back(i2-1);
-                
-                // v2
-                positionsIndices.push_back(i3-1);
-                normalsIndices.push_back(i4-1);
-                
-                // v3
-                positionsIndices.push_back(i5-1);
-                normalsIndices.push_back(i6-1);
-                continue;
-            }
-        }
-    }
-    file.close();
-    
-    // the total number of needed
-    const size_t vertexSize = positionsIndices.size() / 3;
-    vertices.reserve(vertexSize);
-    indices.reserve(vertexSize);
-    for(size_t i = 0; i < vertexSize; ++i) {
-        Vertex v;
-        int normalIndex = normalsIndices.at(i) * 3;
-        int textureIndex = texcoordsIndices.at(i) * 3;
-        int vertexIndex = positionsIndices.at(i)*3;
+        positionIndex += shapes[i].mesh.positions.size() / 3;
         
-        for (size_t j = 0; j < 3; ++j) {
-            v.position[j] = positions.at(vertexIndex + j);
-            v.normal[j] = positions.at(normalIndex + j);
-        }
-        
-        // texture coordinates
-        v.tex[0] = 0.0f;
-        v.tex[1] = 0.0f;
-        if(!texcoordsIndices.empty()) {
-            v.tex[0] = texcoords.at(textureIndex);
-            v.tex[1] = texcoords.at(textureIndex+1);
-        }
-        
-        vertices.push_back(v);
-        indices.push_back(static_cast<GLint>(i));
+        std::copy(
+            shapes[i].mesh.indices.begin(),
+            shapes[i].mesh.indices.end(),
+            indices.begin() + indicesIndex
+        );
+        indicesIndex += shapes[i].mesh.indices.size();
     }
     
-    opengl::VertexBufferObject* vbo = new opengl::VertexBufferObject();
+    auto vbo = std::make_unique<opengl::VertexBufferObject>();
     vbo->initialize(vertices, indices);
-    vbo->vertexAttribPointer(0, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, position));
+    vbo->vertexAttribPointer(0, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, location));
     vbo->vertexAttribPointer(1, 2, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, tex));
     vbo->vertexAttribPointer(2, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, normal));
     return vbo;

@@ -28,5 +28,21 @@
 namespace ghoul {
 
 TemplateFactoryBase::~TemplateFactoryBase() {}
+    
+TemplateFactoryBase::TemplateFactoryError::TemplateFactoryError(std::string message)
+    : RuntimeError(std::move(message), "TemplateFactory")
+{}
 
+TemplateFactoryBase::TemplateClassNotFoundError::TemplateClassNotFoundError(
+                                                                         std::string name)
+    : TemplateFactoryError("Could not find class '" + name + "'")
+    , className(std::move(name))
+{}
+ 
+TemplateFactoryBase::TemplateConstructionError::TemplateConstructionError(
+                                                                      std::string message)
+    : TemplateFactoryError(std::move(message))
+{}
+    
 }
+

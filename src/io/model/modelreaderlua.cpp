@@ -23,19 +23,21 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-// ghoul
 #include <ghoul/io/model/modelreaderlua.h>
+
+#include <ghoul/lua/lua_helper.h>
+#include <ghoul/misc/assert.h>
+#include <ghoul/misc/dictionary.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/vertexbufferobject.h>
-#include <ghoul/lua/lua_helper.h>
-#include <ghoul/misc/dictionary.h>
 
-// std
+#include <format.h>
+#include <map>
 #include <vector>
 
+using fmt::format;
+
 namespace {
-    const std::string _loggerCat = "ModelReaderLua";
-    
     const std::string keyMode = "Mode";
     const std::string keyVertices = "Vertices";
     const std::string keyIndices = "Indices";
@@ -51,151 +53,123 @@ namespace {
 namespace ghoul {
 namespace io {
     
-ModelReaderLua::ModelReaderLua() {}
+std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
+                                                        const std::string& filename) const
+{
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+    
+    Dictionary dictionary;
+    try {
+        lua::loadDictionaryFromFile(filename, dictionary);
+    }
+    catch (const ghoul::lua::LuaRuntimeException& e) {
+        throw ModelReaderException(filename, e.what());
+    }
+    
+    if (!dictionary.hasKeyAndValue<Dictionary>(keyVertices)) {
+        throw ModelReaderException(
+            filename, format("Missing key or wrong format for '{}'", keyVertices)
+        );
+    }
+    if (!dictionary.hasKeyAndValue<Dictionary>(keyIndices)) {
+        throw ModelReaderException(
+            filename, format("Missing key or wrong format for '{}'", keyIndices)
+        );
+    }
+    if (!dictionary.hasKeyAndValue<Dictionary>(keyAttribPointers)) {
+        throw ModelReaderException(
+            filename, format("Missing key or wrong format for '{}'", keyAttribPointers)
+        );
+    }
+    if (!dictionary.hasKeyAndValue<std::string>(keyMode)) {
+        throw ModelReaderException(
+            filename, format("Missing key or wrong format for '{}'", keyMode)
+        );
+    }
 
-ModelReaderLua::~ModelReaderLua() {}
-
-opengl::VertexBufferObject*
-ModelReaderLua::loadModel(const std::string& filename) const{
-
-    ghoul::Dictionary dictionary;
-    bool loadSuccess = ghoul::lua::loadDictionaryFromFile(filename, dictionary);
-    if(!loadSuccess) {
-        LERROR("Could not load dictionary from file '" << filename << "'!");
-        return nullptr;
-    }
-    
-    bool hasKeys = true;
-    hasKeys &= dictionary.hasKey(keyVertices);
-    hasKeys &= dictionary.hasKey(keyIndices);
-    hasKeys &= dictionary.hasKey(keyAttribPointers);
-    if(!hasKeys) {
-        LERROR("Missing key. Need keys, '"
-               << keyVertices << "', '"
-               << keyIndices << "', '"
-               << keyAttribPointers << "'");
-        return nullptr;
-    }
-    
-    Dictionary vertices;
-    Dictionary indices;
-    Dictionary attribpointers;
-    if(!dictionary.getValue(keyVertices, vertices)) {
-        LERROR("Could not get vertices!");
-        return nullptr;
-    }
-    if(!dictionary.getValue(keyIndices, indices)) {
-        LERROR("Could not get indices!");
-        return nullptr;
-    }
-    if(!dictionary.getValue(keyAttribPointers, attribpointers)) {
-        LERROR("Could not get attribpointers!");
-        return nullptr;
-    }
-    
-    // Arrays
-    std::vector<GLfloat> varray;
-    std::vector<GLint> iarray;
-    
     // get vertices
+    Dictionary vertices = dictionary.value<Dictionary>(keyVertices);
+    std::vector<GLfloat> varray;
     auto vkeys = vertices.keys();
+    // Does this need a std::stoi function for the sorting? Otherwise 10 might be sorted
+    // before 2 ---abock
     std::sort(vkeys.begin(), vkeys.end());
-    for(const auto& key: vkeys) {
-        double d;
-        if(vertices.getValue(key, d)) {
-            varray.push_back(static_cast<GLfloat>(d));
-        }
+    for (const auto& key : vkeys) {
+        double d = vertices.value<double>(key);
+        varray.push_back(static_cast<GLfloat>(d));
     }
     
     // get indices
+    Dictionary indices = dictionary.value<Dictionary>(keyIndices);
+    std::vector<GLint> iarray;
     auto ikeys = vertices.keys();
+    // Does this need a std::stoi function for the sorting? Otherwise 10 might be sorted
+    // before 2 ---abock
     std::sort(ikeys.begin(), ikeys.end());
-    for(const auto& key: ikeys) {
-        double d;
-        if(indices.getValue(key, d)) {
-            iarray.push_back(static_cast<GLint>(d));
-        }
+    for (const auto& key : ikeys) {
+        double d = indices.value<double>(key);
+        iarray.push_back(static_cast<GLint>(d));
     }
     
-    // sanity check
-    if(varray.empty()) {
-        LERROR("No vertices specified!");
-        return nullptr;
-    }
-    if(iarray.empty()) {
-        LERROR("No indices specified!");
-        return nullptr;
-    }
+    if (varray.empty())
+        throw ModelReaderException(filename, "No vertices specified");
+    if (iarray.empty())
+        throw ModelReaderException(filename, "No indices specified");
 
-    // everything is ok so far, create the object
-    opengl::VertexBufferObject* vbo = new opengl::VertexBufferObject();
+    // Create the resulting VBO
+    auto vbo = std::make_unique<opengl::VertexBufferObject>();
     vbo->initialize(varray, iarray);
     
-    auto attribkeys = attribpointers.keys();
-    for (const auto& key: attribkeys) {
+    Dictionary attribPointers = dictionary.value<Dictionary>(keyAttribPointers);
+    auto attribKeys = attribPointers.keys();
+    for (const auto& key : attribKeys) {
         ghoul::Dictionary d;
-        if(attribpointers.getValue(key, d)) {
-            double tmp;
-        
-            int position = 0;
-            int size = 0;
-            GLenum type = GL_FLOAT;
-            int stride = 0;
-            int offset = 0;
+        if(attribPointers.getValue(key, d)) {
+            double position = 0.0;
+            attribPointers.getValue(keyPosition, position);
+            
+            double size = 0.0;
+            attribPointers.getValue(keySize, size);
+            
+            double stride = 0.0;
+            attribPointers.getValue(keyStride, stride);
+            
+            double offset = 0.0;
+            attribPointers.getValue(keyOffset, offset);
+
             bool normalized = false;
+            attribPointers.getValue(keyNormalized, normalized);
             
-            if(attribpointers.getValue(keyPosition, tmp))
-                position = static_cast<int>(tmp);
-            if(attribpointers.getValue(keySize, tmp))
-                size = static_cast<int>(tmp);
-            if(attribpointers.getValue(keyStride, tmp))
-                stride = static_cast<int>(tmp);
-            if(attribpointers.getValue(keyOffset, tmp))
-                offset = static_cast<int>(tmp);
-            attribpointers.getValue(keyNormalized, normalized);
-            
-            // @TODO: Fix some good way of supporting other types ---jonasstrandstedt
-            std::string stringtype;
-            if(attribpointers.getValue(keyType, stringtype)) {
-                if(stringtype == "GL_FLOAT")
-                    type = GL_FLOAT;
-                //else if(stringtype == "GL_INT")
-                //    type = GL_INT;
-            }
-            
+            GLenum type = GL_FLOAT;
             vbo->vertexAttribPointer(position, size, type, stride, offset, normalized);
         }
     }
     
-    // get and set render mode
-    std::string mode;
-    if(dictionary.getValue(keyMode, mode)) {
-        if(mode == "GL_POINTS")
-            vbo->setRenderMode(GL_POINTS);
-        else if(mode == "GL_LINE_STRIP")
-            vbo->setRenderMode(GL_LINE_STRIP);
-        else if(mode == "GL_LINE_LOOP")
-            vbo->setRenderMode(GL_LINE_LOOP);
-        else if(mode == "GL_LINES")
-            vbo->setRenderMode(GL_LINES);
-        else if(mode == "GL_LINE_STRIP_ADJACENCY")
-            vbo->setRenderMode(GL_LINE_STRIP_ADJACENCY);
-        else if(mode == "GL_LINES_ADJACENCY")
-            vbo->setRenderMode(GL_LINES_ADJACENCY);
-        else if(mode == "GL_TRIANGLE_STRIP")
-            vbo->setRenderMode(GL_TRIANGLE_STRIP);
-        else if(mode == "GL_TRIANGLE_FAN")
-            vbo->setRenderMode(GL_TRIANGLE_FAN);
-        else if(mode == "GL_TRIANGLES")
-            vbo->setRenderMode(GL_TRIANGLES);
-        else if(mode == "GL_TRIANGLE_STRIP_ADJACENCY")
-            vbo->setRenderMode(GL_TRIANGLE_STRIP_ADJACENCY);
-        else if(mode == "GL_TRIANGLES_ADJACENCY")
-            vbo->setRenderMode(GL_TRIANGLES_ADJACENCY);
-        else if(mode == "GL_PATCHES")
-            vbo->setRenderMode(GL_PATCHES);
-    }
+    static const std::map<std::string, GLenum> ModeMap = {
+        {"GL_POINTS", GL_POINTS},
+        {"GL_LINE_STRIP", GL_LINE_STRIP},
+        {"GL_LINE_LOOP", GL_LINE_LOOP},
+        {"GL_LINES", GL_LINES},
+        {"GL_LINE_STRIP_ADJACENCY", GL_LINE_STRIP_ADJACENCY},
+        {"GL_LINES_ADJACENCY", GL_LINES_ADJACENCY},
+        {"GL_TRIANGLE_STRIP", GL_TRIANGLE_STRIP},
+        {"GL_TRIANGLE_FAN", GL_TRIANGLE_FAN},
+        {"GL_TRIANGLES", GL_TRIANGLES},
+        {"GL_TRIANGLE_STRIP_ADJACENCY", GL_TRIANGLE_STRIP_ADJACENCY},
+        {"GL_TRIANGLES_ADJACENCY", GL_TRIANGLES_ADJACENCY},
+        {"GL_PATCHES", GL_PATCHES}
+    };
     
+    std::string modeString = dictionary.value<std::string>(keyMode);
+    auto it = ModeMap.find(modeString);
+    if (it == ModeMap.end()) {
+        throw ModelReaderException(
+            filename, format("Illegal rendering mode '{}'", modeString)
+        );
+    }
+
+    GLenum mode = ModeMap.at(modeString);
+    vbo->setRenderMode(mode);
     return vbo;
 }
     

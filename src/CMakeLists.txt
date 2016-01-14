@@ -37,17 +37,20 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/font/font.cpp
     ${PROJECT_SOURCE_DIR}/src/font/fontmanager.cpp
     ${PROJECT_SOURCE_DIR}/src/font/fontrenderer.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/rawvolumereader.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/volumereader.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderbase.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderlua.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderwavefront.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereader.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderbase.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadercmap.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderdevil.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderfreeimage.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadersoil.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriter.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriterbase.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturewritersoil.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/volume/rawvolumereader.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/volume/volumereader.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/bufferlog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/callbacklog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/consolelog.cpp
@@ -63,7 +66,6 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/misc/crc32.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/dictionary.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/exception.cpp
-    ${PROJECT_SOURCE_DIR}/src/misc/highresclock.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/misc.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/sharedmemory.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/templatefactory.cpp
@@ -100,8 +102,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/multiplecommand.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.inl
-    ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/observer.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/observer.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/singleton.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/cachemanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/directory.h
@@ -111,8 +111,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontmanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontrenderer.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/rawvolumereader.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/volumereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderlua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderwavefront.h
@@ -125,6 +123,8 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriter.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterbase.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewritersoil.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/volume/rawvolumereader.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/volume/volumereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/bufferlog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/callbacklog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/consolelog.h
@@ -145,14 +145,14 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/exception.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/highresclock.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/sharedmemory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/typeinfo.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/typeinfo.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/framebufferobject.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/ghoul_gl.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/opengl

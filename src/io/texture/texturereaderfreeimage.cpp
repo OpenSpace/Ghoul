@@ -28,31 +28,27 @@
 #ifdef GHOUL_USE_FREEIMAGE
 
 #include <ghoul/opengl/texture.h>
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/glm.h>
 
 #define FREEIMAGE_COLORORDER_BGR 0
 #define FREEIMAGE_COLORORDER_RGB 1
 #if defined(APPLE) || defined(FREEIMAGE_BIGENDIAN)
-#define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_RGB
+#define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_BGR
 #else
 #define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_RGB
 #endif
 #include <FreeImage.h>
 
-namespace {
-	const std::string _loggerCat = "TextureReaderFreeImage";
-}
-
 namespace ghoul {
 namespace io {
-namespace impl {
 
-opengl::Texture* TextureReaderFreeImage::loadTexture(const std::string& filename) const {
+std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
+                                                               std::string filename) const
+{
 	using opengl::Texture;
 
 	//pointer to the image, once loaded
-	FIBITMAP *dib(0);
+	FIBITMAP* dib(0);
 	//pointer to the image data
 	BYTE* bits(0);
 	//image width and height
@@ -116,12 +112,10 @@ opengl::Texture* TextureReaderFreeImage::loadTexture(const std::string& filename
 
 		*/
 
-	if (imageType != FIT_BITMAP) {
-		LERROR("Could not read image file '" << filename <<
-			"' of data type: '" << imageType << "'");
-		return nullptr;
-	}
-	GLenum type = GL_UNSIGNED_BYTE;
+	if (imageType != FIT_BITMAP)
+        throw TextureLoadException(std::move(filename), "Could not read image", this);
+
+    GLenum type = GL_UNSIGNED_BYTE;
 	Texture::Format format;
 	switch (colorType) {
 	case FIC_RGB:
@@ -131,18 +125,15 @@ opengl::Texture* TextureReaderFreeImage::loadTexture(const std::string& filename
 		format = Texture::Format::RGBA;
 		break;
 	default:
-		LERROR("Could not read image file '" << filename <<
-			"' of color type: '" << colorType << "'");
-		return nullptr;
-
+        throw TextureLoadException(std::move(filename), "Could not read image", this);
 	}
-	int imageByte = FreeImage_GetBPP(dib);
+
+    int imageByte = FreeImage_GetBPP(dib);
 	unsigned int pitch = FreeImage_GetPitch(dib);
 	BYTE* data = new BYTE[width * height * imageByte/8];
 
 	FreeImage_ConvertToRawBits(data, dib, pitch, imageByte, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE);
 	FreeImage_Unload(dib);
-
 
 	// Swap red and blue channels, cannot use GL_BGR in OpenGL core profile
 	for (size_t i = 0; i < width * height; ++i) {
@@ -150,12 +141,10 @@ opengl::Texture* TextureReaderFreeImage::loadTexture(const std::string& filename
 		std::swap(data[index], data[index + 2]);
 	}
 
-    Texture* result;
-    result = new Texture(data, size, format, static_cast<int>(format), type);
-	return result;
+    return std::make_unique<Texture>(data, size, format, static_cast<int>(format), type);
 }
 
-std::set<std::string> TextureReaderFreeImage::supportedExtensions() const {
+std::vector<std::string> TextureReaderFreeImage::supportedExtensions() const {
 	// @TODO detect the supporteded extensions loaded by modules ---abock
 	// Taken from http://freeimage.sourceforge.net/features.html
 	return {
@@ -191,7 +180,6 @@ std::set<std::string> TextureReaderFreeImage::supportedExtensions() const {
 	};
 }
 
-} // namespace impl
 } // namespace opengl
 } // namespace ghoul
 

@@ -23,82 +23,111 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/lua/lua_helper.h"
-#include "ghoul/lua/ghoul_lua.h"
+#include <ghoul/lua/lua_helper.h>
 
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/lua/ghoul_lua.h>
+
+#include <format.h>
 
 #include <sstream>
 #include <fstream>
-#include <iterator>
 
-using namespace ghoul::logging;
+using std::string;
+
+namespace {
+    
+static const int KeyTableIndex = -2;
+static const int ValueTableIndex = -1;
+
+string luaTableToString(lua_State* state, int tableLocation = KeyTableIndex);
+    
+string luaValueToString(lua_State* state, int location) {
+    ghoul_assert(state, "State must not be nullptr");
+    
+    int type = lua_type(state, location);
+    switch (type) {
+        case LUA_TBOOLEAN:
+            return std::to_string(lua_toboolean(state, location));
+        case LUA_TNUMBER:
+            return std::to_string(lua_tonumber(state, location));
+        case LUA_TSTRING:
+            return lua_tostring(state, location);
+        case LUA_TTABLE:
+            return luaTableToString(state, location);
+        default:
+            return ghoul::lua::luaTypeToString(type);
+    }
+}
+    
+string luaTableToString(lua_State* state, int tableLocation) {
+    ghoul_assert(state, "State must not be nullptr");
+    ghoul_assert(lua_istable(state, tableLocation), "Lua object is not a table");
+    
+    std::stringstream result;
+    lua_pushvalue(state, tableLocation);
+    lua_pushnil(state);
+    
+    result << "{ ";
+    while (lua_next(state, -2) != 0) {
+        result << luaValueToString(state, KeyTableIndex);
+        result << " = ";
+        result << luaValueToString(state, ValueTableIndex);
+        result << ",  ";
+        lua_pop(state, 1);
+    }
+    lua_pop(state, 1);
+    result << "}";
+    return result.str();
+}
+}
 
 namespace ghoul {
 namespace lua {
 
 static lua_State* _state = nullptr;
-
-FormattingException::FormattingException(const std::string& msg)
-    : std::runtime_error(msg) {
+    
+lua_State* staticLuaState() {
+    if (_state == nullptr)
+        _state = createNewLuaState();
+    return _state;
 }
 
-namespace {
+LuaRuntimeException::LuaRuntimeException(string message)
+    : RuntimeError(std::move(message), "Lua")
+{}
 
-std::string luaTableToString(lua_State* state, bool& success, int tableLocation = -2) {
-    static const int KEY = -2;
-    static const int VAL = -1;
+LuaFormatException::LuaFormatException(string message, string file)
+    : LuaRuntimeException(std::move(message))
+    , filename(std::move(file))
+{}
+    
+LuaLoadingException::LuaLoadingException(string error, string file)
+    : LuaRuntimeException(fmt::format("Error loading script '{}': {}", file, error))
+    , errorMessage(std::move(error))
+    , filename(std::move(file))
+{}
+    
+LuaExecutionException::LuaExecutionException(string error, string file)
+    : LuaRuntimeException(fmt::format("Error executing script '{}': {}", file, error))
+    , errorMessage(std::move(error))
+    , filename(std::move(file))
+{}
 
-    success = true;
-    if (!lua_istable(state, tableLocation)) {
-        success = false;
-        return "";
-    }
+string errorLocation(lua_State* state) {
+    ghoul_assert(state, "State must not be empty");
+    
+    luaL_where(state, 1);
+    string result = lua_tostring(state, -1);
+    lua_pop(state, 1);
+    return result;
+}
 
+string stackInformation(lua_State* state) {
+    ghoul_assert(state, "State must not be nullptr");
+    
     std::stringstream result;
-    lua_pushnil(state);
-
-    result << "{ ";
-    while ((lua_next(state, tableLocation) != 0) && success) {
-        const int keyType = lua_type(state, KEY);
-        switch (keyType) {
-            case LUA_TNUMBER:
-                result << lua_tonumber(state, KEY);
-                break;
-            case LUA_TSTRING:
-                result << lua_tostring(state, KEY);
-                break;
-            default:
-                LERRORC("luaTableToString", "Missing type: " << keyType);
-                break;
-        }
-
-        result << " = ";
-        if (lua_isstring(state, VAL))
-            result << lua_tostring(state, VAL);
-        else if (lua_isnumber(state, VAL))
-            result << lua_tonumber(state, VAL);
-        else if (lua_istable(state, VAL))
-            result << luaTableToString(state, success, -1);
-		else 
-			result << luaTypeToString(lua_type(state, VAL));
-		result << ",  ";
-        lua_pop(state, 1);
-    }
-    result << "}";
-    return result.str();
-}
-
-}
-
-std::string errorLocation(lua_State* L) {
-    luaL_where(L, 1);
-    return lua_tostring(L, -1);
-}
-
-std::string logStack(lua_State* state, LogManager::LogLevel level) {
-    std::stringstream result;
-    const int top = lua_gettop(state);
+    int top = lua_gettop(state);
     if (top == 0)
         result << "Lua Stack (empty)";
     else {
@@ -116,9 +145,8 @@ std::string logStack(lua_State* state, LogManager::LogLevel level) {
                 case LUA_TNUMBER:
                     result << lua_tonumber(state, i);
                     break;
-                case LUA_TTABLE: {
-                    bool success;
-                    result << luaTableToString(state, success, i);
+                case LUA_TTABLE:
+                    result << luaTableToString(state, i);
                     break;
 				case LUA_TTHREAD:
 				case LUA_TUSERDATA:
@@ -126,7 +154,6 @@ std::string logStack(lua_State* state, LogManager::LogLevel level) {
 				case LUA_TFUNCTION:
 					result << luaTypeToString(t);
 					break;
-                }
                 default:
                     result << lua_typename(state, t);
                     break;
@@ -134,130 +161,136 @@ std::string logStack(lua_State* state, LogManager::LogLevel level) {
             result << "\n";
         }
     }
-    const std::string& resultStr = result.str();
-    LogMgr.logMessage(level, resultStr);
-    return resultStr;
+    return result.str();
 }
 
-bool loadDictionaryFromFile(
-    const std::string& filename,
-    ghoul::Dictionary& dictionary,
-    lua_State* state
-    )
+void loadDictionaryFromFile(const string& filename, ghoul::Dictionary& dictionary,
+                                                                         lua_State* state)
 {
-    const static std::string _loggerCat = "lua_loadDictionaryFromFile";
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+    ghoul_assert(FileSys.fileExists(absPath(filename)), "Filename must be a file");
+    
+    if (state == nullptr)
+        state = staticLuaState();
 
-    if (state == nullptr) {
-        if (_state == nullptr) {
-            LDEBUG("Creating Lua state");
-            _state = luaL_newstate();
-            if (_state == nullptr) {
-                LFATAL("Error creating new Lua state: Memory allocation error");
-                return false;
-            }
-            LDEBUG("Open libraries");
-            luaL_openlibs(_state);
-        }
-        state = _state;
-    }
-
-    if (filename.empty()) {
-        LERROR("Filename was empty");
-        return false;
-    }
-
-    if (!FileSys.fileExists(absPath(filename))) {
-        LERROR("File '" << absPath(filename) << "' did not exist");
-        return false;
-    }
-
-    LDEBUG("Loading dictionary script '" << filename << "'");
     int status = luaL_loadfile(state, absPath(filename).c_str());
-    if (status != LUA_OK) {
-        LERROR("Error loading script: '" << lua_tostring(state, -1) << "'");
-        return false;
-    }
+    if (status != LUA_OK)
+        throw LuaLoadingException(lua_tostring(state, -1), absPath(filename));
 
-    LDEBUG("Executing script");
-    if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
-        LERROR("Error executing script: " << lua_tostring(state, -1));
-        return false;
-    }
+    status = lua_pcall(state, 0, LUA_MULTRET, 0);
+    if (status != LUA_OK)
+        throw LuaExecutionException(lua_tostring(state, -1), absPath(filename));
 
-    if (lua_isnil(state, -1)) {
-        LERROR("Error in script: '" << filename << "'. Script did not return anything.");
-        return false;
-    }
+    if (lua_isnil(state, -1))
+        throw LuaFormatException("Script did not return anything", absPath(filename));
 
-    if (!lua_istable(state, -1)) {
-        LERROR("Error in script: '" << filename << "'. Script did not return a table.");
-        return false;
-    }
+    if (!lua_istable(state, -1))
+        throw LuaFormatException("Script did not return a table", absPath(filename));
 
     luaDictionaryFromState(state, dictionary);
 
     // Clean up after ourselves by cleaning the stack
     lua_settop(state, 0);
-
-    return true;
 }
 
-bool loadDictionaryFromString(
-    const std::string& script,
-    ghoul::Dictionary& dictionary,
-    lua_State* state
-    )
+void loadDictionaryFromString(const string& script, Dictionary& dictionary,
+                                                                         lua_State* state)
 {
-    const static std::string _loggerCat = "lua_loadDictionaryFromString";
+    ghoul_assert(!script.empty(), "Script must not be empty");
+    
+    if (state == nullptr)
+        state = staticLuaState();
 
-    if (state == nullptr) {
-        if (_state == nullptr) {
-            LDEBUG("Creating Lua state");
-            _state = luaL_newstate();
-            if (_state == nullptr) {
-                LFATAL("Error creating new Lua state: Memory allocation error");
-                return false;
-            }
-            LDEBUG("Open libraries");
-            luaL_openlibs(_state);
-        }
-        state = _state;
-    }
-
-    LDEBUG("Loading dictionary script '" << script.substr(0, 12) << "[...]'");
     int status = luaL_loadstring(state, script.c_str());
-    if (status != LUA_OK) {
-        LERROR("Error loading script: '" << lua_tostring(state, -1) << "'");
-        return false;
-    }
+    if (status != LUA_OK)
+        throw LuaLoadingException(lua_tostring(state, -1));
 
-    LDEBUG("Executing script");
-    if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
-        LERROR("Error executing script: " << lua_tostring(state, -1));
-        return false;
-    }
+    if (lua_pcall(state, 0, LUA_MULTRET, 0))
+        throw LuaExecutionException(lua_tostring(state, -1));
 
-    if (lua_isnil(state, -1)) {
-        LERROR("Error in script: '" << script.substr(0, 12)
-                                    << "[...]'. Script did not return anything.");
-        return false;
-    }
+    if (lua_isnil(state, -1))
+        throw LuaFormatException("Script did not return anything");
 
-    if (!lua_istable(state, -1)) {
-        LERROR("Error in script: '" << script.substr(0, 12)
-                                    << "[...]'. Script did not return a table.");
-        return false;
-    }
+    if (!lua_istable(state, -1))
+        throw LuaFormatException("Script did not return a table");
 
     luaDictionaryFromState(state, dictionary);
 
     // Clean up after ourselves by cleaning the stack
     lua_settop(state, 0);
-
-    return true;
 }
     
-std::string luaTypeToString(int type) {
+void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
+    enum class TableType {
+        Undefined = 1,  // 001
+        Map = 3,        // 010
+        Array = 5       // 101
+    };
+    
+    ghoul_assert(state, "State must not be nullptr");
+
+    TableType type = TableType::Undefined;
+
+    lua_pushnil(state);
+    while (lua_next(state, KeyTableIndex) != 0) {
+        // get the key
+        string key;
+        int keyType = lua_type(state, KeyTableIndex);
+        switch (keyType) {
+            case LUA_TNUMBER:
+                if (type == TableType::Map) {
+                    throw LuaFormatException(
+                          "Dictionary can only contain a pure map or a pure array"
+                    );
+                }
+
+                type = TableType::Array;
+                key = std::to_string(lua_tointeger(state, KeyTableIndex));
+                break;
+            case LUA_TSTRING:
+                if (type == TableType::Array) {
+                    throw LuaFormatException(
+                          "Dictionary can only contain a pure map or a pure array"
+                    );
+                }
+                
+                type = TableType::Map;
+                key = lua_tostring(state, KeyTableIndex);
+                break;
+            default:
+                throw LuaFormatException("Table index type is not a number or a string");
+        }
+
+        // get the value
+        switch (lua_type(state, ValueTableIndex)) {
+            case LUA_TNUMBER: {
+                double value = lua_tonumber(state, ValueTableIndex);
+                dict.setValue(key, value);
+            } break;
+            case LUA_TBOOLEAN: {
+                bool value = (lua_toboolean(state, ValueTableIndex) == 1);
+                dict.setValue(key, value);
+            } break;
+            case LUA_TSTRING: {
+                std::string value = lua_tostring(state, ValueTableIndex);
+                dict.setValue(key, value);
+            } break;
+            case LUA_TTABLE: {
+                Dictionary d;
+                luaDictionaryFromState(state, d);
+                dict.setValue(key, d);
+            } break;
+            default:
+                throw LuaFormatException("Unknown type: "
+                                      + std::to_string(lua_type(state, ValueTableIndex)));
+        }
+
+        // get back up one level
+        lua_pop(state, 1);
+    }
+}
+
+string luaTypeToString(int type) {
     switch (type) {
         case LUA_TNONE:
             return "None";
@@ -280,90 +313,21 @@ std::string luaTypeToString(int type) {
         case LUA_TTHREAD:
             return "Thread";
         default:
+            ghoul_assert(false, "Missing type in switch-case");
             return "";
     }
 }
 
-void luaDictionaryFromState(lua_State* state, Dictionary& dict)
-{
-    static const int KEY = -2;
-    static const int VAL = -1;
-
-    enum class TableType {
-        Undefined = 1,  // 001
-        Map = 3,        // 010
-        Array = 5       // 101
-    };
-
-    TableType type = TableType::Undefined;
-
-    lua_pushnil(state);
-    while (lua_next(state, KEY) != 0) {
-        // get the key name
-        std::string key;
-        const int keyType = lua_type(state, KEY);
-        switch (keyType) {
-            case LUA_TNUMBER:
-                if (type == TableType::Map)
-                    throw FormattingException(
-                          "Dictionary can only contain a pure map or a pure "
-                          "array");
-
-                type = TableType::Array;
-                key = std::to_string(lua_tointeger(state, KEY));
-                break;
-            case LUA_TSTRING:
-                if (type == TableType::Array)
-                    throw FormattingException(
-                          "Dictionary can only contain a pure map or a pure "
-                          "array");
-                type = TableType::Map;
-                key = lua_tostring(state, KEY);
-                break;
-            default:
-                LERRORC("luaTableToString", "Missing type: " << keyType);
-                break;
-        }
-
-        // get the value
-        switch (lua_type(state, VAL)) {
-            case LUA_TNUMBER: {
-                double value = lua_tonumber(state, VAL);
-                dict.setValue(key, value);
-            } break;
-            case LUA_TBOOLEAN: {
-                bool value = (lua_toboolean(state, VAL) == 1);
-                dict.setValue(key, value);
-            } break;
-            case LUA_TSTRING: {
-                std::string value = lua_tostring(state, VAL);
-                dict.setValue(key, value);
-            } break;
-            case LUA_TTABLE: {
-                Dictionary d;
-                luaDictionaryFromState(state, d);
-                dict.setValue(key, d);
-            } break;
-            default:
-                throw FormattingException("Unknown type: "
-                                          + std::to_string(lua_type(state, VAL)));
-        }
-
-        // get back up one level
-        lua_pop(state, 1);
-    }
-}
-
 lua_State* createNewLuaState() {
-    const std::string _loggerCat = "createNewLuaState";
     lua_State* s;
-    LDEBUG("Creating Lua state");
+    LDEBUGC("Lua", "Creating Lua state");
     s = luaL_newstate();
     if (s == nullptr) {
-        LFATAL("Error creating new Lua state: Memory allocation error");
-        return nullptr;
+        throw LuaRuntimeException(
+            "Error creating new Lua state: Memory allocation error"
+        );
     }
-    LDEBUG("Open libraries");
+    LDEBUGC("Lua", "Open libraries");
     luaL_openlibs(s);
     return s;
 }

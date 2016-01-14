@@ -26,7 +26,9 @@
 #ifndef __TEXTLOG_H__
 #define __TEXTLOG_H__
 
-#include "log.h"
+#include <ghoul/logging/log.h>
+
+#include <fstream>
 
 namespace ghoul {
 namespace logging {
@@ -48,9 +50,10 @@ namespace logging {
  */
 class TextLog : public Log {
 public:
-    /**
+   /**
     * Constructor that calls Log constructor and opens the file that will log the
-    * messages. If the file does not exist, it will be created.
+    * messages. If the file does not exist, it will be created. If the path to the file is
+    * invalid, an <code>std::ios_base::failure</code> exception will be thrown.
     * \param filename The path and filename of the file that will receive the log
     * messages
     * \param writeToAppend If this is <code>true</code>, the log messages will be appended
@@ -64,6 +67,8 @@ public:
     * log messages
     * \param logLevelStamping Determines if the log should print the log level in the log
     * messages
+    * \throw std::ios_base::failure If the opening of the file failed
+    * \pre \p filename must not be empty
     */
     TextLog(const std::string& filename, bool writeToAppend = true,
             bool timeStamping = true, bool dateStamping = true,
@@ -84,27 +89,20 @@ public:
                      const std::string& message);
 
     /// Flushes the text file and, thereby, all messages that are in the associated buffer
-    void flush();
+    virtual void flush();
 
 protected:
-    /**
-     * Returns true if this TextLog has a valid file descriptor, i.e., it is possible to
-     * write logs to this Log.
-     * \return True if a valid file is opened
-     */
-    bool hasValidFile() const;
-
     /**
      * Writes the passed 'line' to the opened file. The line will be printed 'as-is' and
      * no endline or other control sequence will be added.
      * \param [in] line The line of text that should be printed to the file
      */
-    void writeLine(const std::string& line);
+    void writeLine(std::string line);
 
     bool _printFooter; ///< Should a line be printed at the end after the file is closed?
 
 private:
-    FILE* _file; ///< The file to which the log messages will be sent
+    std::fstream _file;
 };
 
 } // namespace logging

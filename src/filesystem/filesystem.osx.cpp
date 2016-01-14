@@ -23,33 +23,16 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#if defined(__APPLE__)
+#ifdef __APPLE__
+
 #include <ghoul/filesystem/filesystem.h>
 
-#include <ghoul/filesystem/cachemanager.h>
-#include <ghoul/logging/logmanager.h>
-
-#include <algorithm>
-#include <cassert>
-#include <regex>
-#include <cstdio>
-
-#include <dirent.h>
-#include <unistd.h>
-#include <sys/param.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <pwd.h>
-
 #include <CoreServices/CoreServices.h>
-#include <sys/stat.h>
-
-using std::string;
 
 namespace {
-    const string _loggerCat = "FileSystem";
+    const std::string _loggerCat = "FileSystem";
 	// the maximum latency allowed before a changed is registered
-	const CFAbsoluteTime latency = 1.0;
+	const CFAbsoluteTime Latency = 1.0;
     
     enum Events {
         kFSEventStreamEventFlagNone = 0x00000000,
@@ -76,80 +59,24 @@ namespace {
         kFSEventStreamEventFlagItemIsSymlink = 0x00040000
     };
     
-    void completionHandler(
-                           ConstFSEventStreamRef ,//streamRef,
-                           void * ,//clientCallBackInfo,
-                           size_t numEvents,
-                           void *eventPaths,
-                           const FSEventStreamEventFlags eventFlags[],
-                           const FSEventStreamEventId[] )//eventIds[])
+    void completionHandler(ConstFSEventStreamRef, void*, size_t numEvents,
+                           void* eventPaths, const FSEventStreamEventFlags eventFlags[],
+                           const FSEventStreamEventId[])
     {
-        char **paths = reinterpret_cast<char**>(eventPaths);
-        for (size_t i=0; i<numEvents; i++) {
+        char** paths = reinterpret_cast<char**>(eventPaths);
+        for (size_t i = 0; i < numEvents; ++i) {
+            using Events::kFSEventStreamEventFlagItemModified;
+            using Events::kFSEventStreamEventFlagItemInodeMetaMod;
+            using Events::kFSEventStreamEventFlagItemIsFile;
             
-            //std::string ename = EventEnumToName(static_cast<Events>(eventFlags[i]));
-            //printf("%s\n%s\n", path.c_str(), ename.c_str());
-            
-            if(! (eventFlags[i] & Events::kFSEventStreamEventFlagItemModified))
-                continue;
-            
-            if(! (eventFlags[i] & Events::kFSEventStreamEventFlagItemIsFile))
-                continue;
-            
-            ghoul::filesystem::callbackHandler(paths[i]);
+            const bool mod = eventFlags[i] & kFSEventStreamEventFlagItemModified;
+            const bool iNode = eventFlags[i] & kFSEventStreamEventFlagItemInodeMetaMod;
+            const bool file = eventFlags[i] & kFSEventStreamEventFlagItemIsFile;
+
+            if ((mod || iNode) && file)
+                ghoul::filesystem::callbackHandler(paths[i]);
         }
     }
-    
-//    std::string EventEnumToName(Events e) {
-//        std::string name;
-//        if(e & Events::kFSEventStreamEventFlagMustScanSubDirs)
-//            name += "| kFSEventStreamEventFlagMustScanSubDirs";
-//        if(e & Events::kFSEventStreamEventFlagUserDropped)
-//            name += "| kFSEventStreamEventFlagUserDropped";
-//        if(e & Events::kFSEventStreamEventFlagKernelDropped)
-//            name += "| kFSEventStreamEventFlagKernelDropped";
-//        if(e & Events::kFSEventStreamEventFlagEventIdsWrapped)
-//            name += "| kFSEventStreamEventFlagEventIdsWrapped";
-//        if(e & Events::kFSEventStreamEventFlagHistoryDone)
-//            name += "| kFSEventStreamEventFlagHistoryDone";
-//        if(e & Events::kFSEventStreamEventFlagRootChanged)
-//            name += "| kFSEventStreamEventFlagRootChanged";
-//        if(e & Events::kFSEventStreamEventFlagMount)
-//            name += "| kFSEventStreamEventFlagMount";
-//        if(e & Events::kFSEventStreamEventFlagUnmount)
-//            name += "| kFSEventStreamEventFlagUnmount";
-//        
-//        
-//        if(e & Events::kFSEventStreamEventFlagItemCreated)
-//            name += "| kFSEventStreamEventFlagItemCreated";
-//        if(e & Events::kFSEventStreamEventFlagItemRemoved)
-//            name += "| kFSEventStreamEventFlagItemRemoved";
-//        if(e & Events::kFSEventStreamEventFlagItemInodeMetaMod)
-//            name += "| kFSEventStreamEventFlagItemInodeMetaMod";
-//        if(e & Events::kFSEventStreamEventFlagItemRenamed)
-//            name += "| kFSEventStreamEventFlagItemRenamed";
-//        if(e & Events::kFSEventStreamEventFlagItemModified)
-//            name += "| kFSEventStreamEventFlagItemModified";
-//        if(e & Events::kFSEventStreamEventFlagItemFinderInfoMod)
-//            name += "| kFSEventStreamEventFlagItemFinderInfoMod";
-//        if(e & Events::kFSEventStreamEventFlagItemChangeOwner)
-//            name += "| kFSEventStreamEventFlagItemChangeOwner";
-//        if(e & Events::kFSEventStreamEventFlagItemXattrMod)
-//            name += "| kFSEventStreamEventFlagItemXattrMod";
-//        if(e & Events::kFSEventStreamEventFlagItemIsFile)
-//            name += "| kFSEventStreamEventFlagItemIsFile";
-//        if(e & Events::kFSEventStreamEventFlagItemIsDir)
-//            name += "| kFSEventStreamEventFlagItemIsDir";
-//        if(e & Events::kFSEventStreamEventFlagItemIsSymlink)
-//            name += "| kFSEventStreamEventFlagItemIsSymlink";
-//        
-//        if (name.length() > 2) {
-//            name = name.substr(2);
-//        }
-//        return name;
-//    }
-    
-    
 }
 
 namespace ghoul {
@@ -170,26 +97,31 @@ void FileSystem::deinitializeInternalApple() {
 }
 
 void FileSystem::addFileListener(File* file) {
-	assert(file != nullptr);
+    ghoul_assert(file, "File must not a nullptr");
+#ifdef GHL_DEBUG
+    auto eqRange = _trackedFiles.equal_range(file->path());
+    for (auto it = eqRange.first; it != eqRange.second; ++it) {
+        ghoul_assert(it->second != file, "File already registered");
+    }
+#endif
+    
 	std::string d = file->directoryName();
 	auto f = _directories.find(d);
 	if (f == _directories.end()) {
-
 		bool alreadyTrackingParent = false;
-		for(auto dir: _directories) {
-			if (d.length() > dir.first.length() && d.find_first_of(dir.first) == 0) {
+		for (auto dir : _directories) {
+            if (d.length() > dir.first.length() && d.find(dir.first) != std::string::npos) {
 				alreadyTrackingParent = true;
 				break;
 			}
 		}
-		if(!alreadyTrackingParent) {
+		if (!alreadyTrackingParent) {
 			DirectoryHandle* handle = new DirectoryHandle;
 
 			// Create the FSEventStream responsible for this directory (Apple's callback system
 			// only works on the granularity of the directory)
-			CFStringRef path = CFStringCreateWithCString(NULL,
-				d.c_str(),
-				kCFStringEncodingASCII);
+			CFStringRef path = CFStringCreateWithCString(NULL, d.c_str(),
+                                                         kCFStringEncodingASCII);
 			CFArrayRef pathsToWatch = CFArrayCreate(NULL, (const void **)&path, 1, NULL);
 			FSEventStreamContext callbackInfo;
 			callbackInfo.version = 0;
@@ -204,36 +136,35 @@ void FileSystem::addFileListener(File* file) {
 				&callbackInfo,
 				pathsToWatch,
 				kFSEventStreamEventIdSinceNow,
-				latency,
-				kFSEventStreamCreateFlagFileEvents);
+				Latency,
+				kFSEventStreamCreateFlagFileEvents
+            );
 
 			// Add checking the event stream to the current run loop
 			// If there is a performance bottleneck, this could be done on a separate thread?
 			FSEventStreamScheduleWithRunLoop(handle->_eventStream,
 				CFRunLoopGetCurrent(),
-				kCFRunLoopDefaultMode);
+				kCFRunLoopDefaultMode
+            );
 			// Start monitoring
 			FSEventStreamStart(handle->_eventStream);
 			_directories[d] = handle;
 		}
 	}
 
-#ifdef GHL_DEBUG
-	auto eqRange = _trackedFiles.equal_range(file->path());
-	// Erase (b,15) pair
-	for (auto it = eqRange.first; it != eqRange.second; ++it) {
-		if (it->second == file) {
-			LWARNING("Already tracking fileobject");
-			return;
-		}
-	}
-#endif
 	_trackedFiles.insert({ file->path(), file });
 }
 
 void FileSystem::removeFileListener(File* file) {
-	assert(file != nullptr);
-	auto eqRange = _trackedFiles.equal_range(file->path());
+	ghoul_assert(file, "File must not be nullptr");
+
+    auto eqRange = _trackedFiles.equal_range(file->path());
+
+    bool found = false;
+    for (auto it = eqRange.first; it != eqRange.second; ++it)
+        found |= (it->second == file);
+    ghoul_assert(found, "File not previously registered");
+    
 	for (auto it = eqRange.first; it != eqRange.second; ++it) {
 		//LDEBUG("comparing for removal, " << file << "==" << it->second);
 		if (it->second == file) {
@@ -249,19 +180,20 @@ void callbackHandler(const std::string& path) {
 }
 
 void FileSystem::callbackHandler(const std::string& path) {
-    size_t n = FileSys._trackedFiles.count(path);
+    auto files = FileSys._trackedFiles;
+    size_t n = files.count(path);
     if (n == 0)
         return;
     
-    auto eqRange = FileSys._trackedFiles.equal_range(path);
+    auto eqRange = files.equal_range(path);
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
         File* f = (*it).second;
-        f->_fileChangedCallback(*f);
+        f->callback()(*f);
     }
 }
 
 void FileSystem::triggerFilesystemEventsInternalApple() {
-    for(auto d: _directories) {
+    for (auto d: _directories) {
         FSEventStreamFlushSync(d.second->_eventStream);
     }
 }

@@ -26,66 +26,34 @@
 #include <array>
 #include <glm/gtx/quaternion.hpp>
 
-namespace ghoul{
-
-template<typename U, typename... UArgs>
-U ghoul::Interpolator<ghoul::Interpolators::Linear>::interpolate(double fact, U p0, U p1, UArgs && ... arguments){
-        #ifdef GHL_DEBUG
-        //no error to report here, any number of extra arguments may be given but we know that at least
-        //the two required are there.
-        //static_assert(sizeof...(arguments) == 0, "Interpolation requires at least two values");
-        #else
-        //#warning "Linear only wants 2, duh"
-        #endif
-        std::array<U, sizeof...(arguments)> list = {arguments...};
-        return fact * p1 + (1.0 - fact) * p0;
-    }
-
-template<>
-glm::quat ghoul::Interpolator<ghoul::Interpolators::Linear>::interpolate(double fact, glm::quat p0, glm::quat p1){
-	#ifdef GHL_DEBUG
-		//no error to report here, any number of extra arguments may be given but we know that at least
-		//the two required are there.
-		//static_assert(sizeof...(arguments) == 0, "Interpolation requires at least two values");
-	#else
-		//#warning "Linear only wants 2, duh"
-	#endif
-		
-	return glm::slerp(p0, p1, static_cast<float>(fact));
+namespace ghoul {
+    
+template <typename T>
+T interpolateLinear(double t, const T& p0, const T& p1) {
+    return t * p1 + (1.0 - t) * p0;
 }
 
-template<>
-glm::dquat ghoul::Interpolator<ghoul::Interpolators::Linear>::interpolate(double fact, glm::dquat p0, glm::dquat p1){
-#ifdef GHL_DEBUG
-	//no error to report here, any number of extra arguments may be given but we know that at least
-	//the two required are there.
-	//static_assert(sizeof...(arguments) == 0, "Interpolation requires at least two values");
-#else
-	//#warning "Linear only wants 2, duh"
-#endif
-
-	return glm::slerp(p0, p1, fact);
+template <>
+glm::quat interpolateLinear(double t, const glm::quat& p0, const glm::quat& p1) {
+    return glm::slerp(p0, p1, static_cast<float>(t));
 }
-
-template<typename U, typename... UArgs>
-U ghoul::Interpolator<ghoul::Interpolators::CatmullRom>::interpolate(double fact, U p0, U p1, UArgs && ... arguments){
-    #ifdef GHL_DEBUG
-    static_assert(sizeof...(arguments) < 2, "Catmull-Rom interpolation requires at least four control points");
-    #else
-    //#warning "Catmull-Rom interpolation requires at least four control points"
-    #endif
-    std::array<U, sizeof...(arguments)> list = {arguments...};
     
-    //the additional two control points contained in the arguments variable
-    //indexing by [] is safe up until index 1 since we have already checked that the size is at least two.
-    U p2, p3;
-    p2 = list[0];
-    p3 = list[1];
+template <>
+glm::dquat interpolateLinear(double t, const glm::dquat& p0, const glm::dquat& p1) {
+    return glm::slerp(p0, p1, t);
+}
     
-    double t = fact;
+template <typename T>
+T interpolateCatmullRom(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
     double t2 = t*t;
     double t3 = t2*t;
     
-    return  0.5 * ( 2.0 * p1 + t * (p2 - p0) + t2 * (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) + t3 * (3.0 * p1 - p0  - 3.0 * p2 + p3) );
-    }
+    return 0.5 * (
+        2.0*p1 +
+        t*(p2 - p0) +
+        t2*(2.0*p0 - 5.0*p1 + 4.0*p2 - p3) +
+        t3*(3.0*p1 - p0  - 3.0*p2 + p3)
+    );
 }
+
+} // namespace ghoul

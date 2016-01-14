@@ -47,24 +47,7 @@ using std::vector;
 namespace ghoul {
 namespace filesystem {
 
-namespace {
-#ifdef WIN32
-    const char pathSeparator = '\\';
-#else
-    const char pathSeparator = '/';
-#endif
-}
-
-Directory::Directory() 
-    : _directoryPath(FileSys.absolutePath("."))
-{}
-
-Directory::Directory(const char* path, bool isRawPath) {
-    if (isRawPath)
-        _directoryPath = string(path);
-    else
-        _directoryPath = FileSys.absolutePath(string(path));
-}
+Directory::Directory() : _directoryPath(FileSys.absolutePath(".")) {}
 
 Directory::Directory(std::string path, bool isRawPath) {
     if (isRawPath)
@@ -83,17 +66,17 @@ const std::string& Directory::path() const {
 
 Directory Directory::parentDirectory(bool absolutePath) const {
 #ifdef WIN32
-    if (_directoryPath.back() == pathSeparator)
+    if (_directoryPath.back() == FileSystem::PathSeparator)
         return Directory(_directoryPath + "..", !absolutePath);
     else
-        return Directory(_directoryPath + pathSeparator + "..",
+        return Directory(_directoryPath + FileSystem::PathSeparator + "..",
                          !absolutePath);
 #else
 	(void)absolutePath; // remove unused argument warning ---abock
     size_t length = _directoryPath.length();
-    size_t position = _directoryPath.find_last_of(pathSeparator);
+    size_t position = _directoryPath.find_last_of(FileSystem::PathSeparator);
     if(position == length && length > 1)
-        position = _directoryPath.find_last_of(pathSeparator, length-1);
+        position = _directoryPath.find_last_of(FileSystem::PathSeparator, length-1);
     
     return Directory(_directoryPath.substr(0, position));
 #endif
@@ -139,7 +122,7 @@ void Directory::readFiles(std::vector<std::string>& result,
 #else
     DIR* dir = opendir(path.c_str());
     struct dirent* ent;
-    if (dir != NULL) {
+    if (dir) {
         string name;
         while ((ent = readdir(dir))) {
             name = ent->d_name;
@@ -160,7 +143,9 @@ void Directory::readFiles(std::vector<std::string>& result,
     }
 }
 
-std::vector<std::string> Directory::readDirectories(bool recursiveSearch, bool sort) const {
+std::vector<std::string> Directory::readDirectories(bool recursiveSearch,
+                                                    bool sort) const
+{
     std::vector<std::string> result;
     readDirectories(result, _directoryPath, recursiveSearch);
     if (sort)
@@ -168,10 +153,8 @@ std::vector<std::string> Directory::readDirectories(bool recursiveSearch, bool s
     return result;
 }
 
-void Directory::readDirectories(
-    std::vector<std::string>& result,
-    const std::string& path,
-    bool recursiveSearch) const
+void Directory::readDirectories(std::vector<std::string>& result, const std::string& path,
+                                bool recursiveSearch) const
 {
     std::stack<string> directories;
 
@@ -195,7 +178,7 @@ void Directory::readDirectories(
 #else
     DIR* dir = opendir(path.c_str());
     struct dirent* ent;
-    if (dir != NULL) {
+    if (dir) {
         string name;
         while ((ent = readdir(dir))) {
             name = ent->d_name;

@@ -23,56 +23,21 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/io/rawvolumereader.h>
-#include <iostream>
-#include <fstream>
+#include <ghoul/io/texture/texturewriterbase.h>
+
+#include <format.h>
 
 namespace ghoul {
-
-RawVolumeReader::ReadHints::ReadHints(glm::ivec3 dimensions) : _dimensions(dimensions) {
-}
-
-RawVolumeReader::RawVolumeReader() 
-    : _hints(ReadHints())
+namespace io {
+ 
+TextureWriterBase::TextureWriteException::TextureWriteException(std::string n,
+                                                              std::string m,
+                                                              const TextureWriterBase* w)
+    : RuntimeError(fmt::format("Error writing texture '{}'", n), "TextureWriter")
+    , filename(std::move(n))
+    , message(std::move(m))
+    , writer(w)
 {}
-
-RawVolumeReader::RawVolumeReader(const ReadHints& hints) 
-: _hints(hints)
-{}
-
-RawVolumeReader::~RawVolumeReader() {
-}
-
-void RawVolumeReader::setReadHints(glm::ivec3 dimension) {
-	_hints._dimensions = dimension;
-}
-
-void RawVolumeReader::setReadHints(const ReadHints& hints) {
-	_hints = hints;
-}
-
-opengl::Texture* RawVolumeReader::read(std::string filename) {
-	if (_hints._dimensions != glm::ivec3(0)) {
-		int size = _hints._dimensions.x*_hints._dimensions.y*_hints._dimensions.z;
-		GLubyte *data = new GLubyte[size];
-
-		std::ifstream fin(filename, std::ios::in | std::ios::binary);
-		if( fin.good() ){
-			fin.read(reinterpret_cast<char*>(data), sizeof(unsigned char)*size);
-			fin.close();
-		} else {
-			fprintf( stderr, "Could not open file '%s'\n", filename.c_str() );
-		}
-
-		opengl::Texture* texture = new opengl::Texture(data, glm::size3_t(_hints._dimensions),
-				_hints._format, _hints._internalFormat, GL_UNSIGNED_BYTE,
-				opengl::Texture::FilterMode::Linear, opengl::Texture::WrappingMode::ClampToBorder);
-		//texture->uploadTexture();
-		return texture;
-	} else {
-		std::cout << "Error. Volume dimensions not set" << std::endl;
-		return nullptr;
-	}
-}
-
+    
+} // namespace io
 } // namespace ghoul

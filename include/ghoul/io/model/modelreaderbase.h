@@ -26,21 +26,54 @@
 #ifndef __MODELREADERBASE_H__
 #define __MODELREADERBASE_H__
 
+#include <ghoul/misc/exception.h>
+
+#include <memory>
 #include <string>
 
 namespace ghoul {
 
-// Forward declaration
 namespace opengl {
     class VertexBufferObject;
 }
 
 namespace io {
     
+/**
+ * Concrete instantiations of this abstract base class provide the ability to load
+ * geometric models from a file on disk into a VertexBufferObject. The resulting
+ * VertexBufferObject is fully initialized and usable. A valid OpenGL context has to be
+ * present for the loadModel function.
+ */
 class ModelReaderBase {
 public:
-    virtual ~ModelReaderBase() {}
-    virtual opengl::VertexBufferObject* loadModel(const std::string& filename) const = 0;
+    /**
+     * The exception that gets thrown if there is an error loading a model from the
+     * provided \p file. The \p error message is contained in the exception.
+     */
+    struct ModelReaderException : public RuntimeError {
+        explicit ModelReaderException(std::string file, std::string error);
+       
+        /// The file which caused the exception
+        std::string fileName;
+        
+        /// The error message
+        std::string errorMessage;
+    };
+    
+    
+    /// Default virtual destructor
+    virtual ~ModelReaderBase() = default;
+    
+    /**
+     * The method loading the specific model from disk. The result is a fully initialized
+     * and usable VertexBufferObject
+     * \param filename The file on disk that is to be loaded
+     * \return The intialized VertexBufferObject
+     * \throw ModelReaderException If there was an error loading the model from disk
+     */
+    virtual std::unique_ptr<opengl::VertexBufferObject> loadModel(
+        const std::string& filename) const = 0;
 };
     
 } // namespace io

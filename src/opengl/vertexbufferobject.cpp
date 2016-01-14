@@ -24,7 +24,6 @@
  ****************************************************************************************/
 
 #include <ghoul/opengl/vertexbufferobject.h>
-#include <ghoul/misc/assert.h>
 
 namespace ghoul {
 namespace opengl {
@@ -35,7 +34,9 @@ VertexBufferObject::VertexBufferObject()
 	, _iBufferID(0)
 	, _isize(0)
     , _mode(GL_TRIANGLES)
-{}
+{
+    
+}
 
 VertexBufferObject::VertexBufferObject(VertexBufferObject&& other) {
     _vaoID = other._vaoID;
@@ -65,8 +66,14 @@ VertexBufferObject& VertexBufferObject::operator=(VertexBufferObject&& other) {
 }
 
 VertexBufferObject::~VertexBufferObject() {
-	ghoul_assert(!isInitialized(),
-		"The VertexBufferObject must be deinitialized before destruction");
+    glDeleteBuffers(1, &_vBufferID);
+    glDeleteBuffers(1, &_iBufferID);
+    glDeleteVertexArrays(1, &_vaoID);
+    
+    _vBufferID = 0;
+    _iBufferID = 0;
+    _vaoID = 0;
+    _isize = 0;
 }
 
 bool VertexBufferObject::isInitialized() const {
@@ -78,69 +85,56 @@ bool VertexBufferObject::isInitialized() const {
     return initialized;
 }
 
-bool VertexBufferObject::initialize(
-    const std::vector<GLfloat>& varray,
-    const std::vector<GLint>& iarray)
+void VertexBufferObject::initialize(const std::vector<GLfloat>& vertexArray,
+                                    const std::vector<GLint>& indexArray)
 {
-    if(isInitialized()) {
-        return false;
-    }
+    ghoul_assert(!isInitialized(), "VertexBufferObject must not have been initialized");
+    ghoul_assert(!vertexArray.empty(), "Vertex array must not be empty");
+    ghoul_assert(!indexArray.empty(), "Index array must not be empty");
     
     generateGLObjects();
     
-    if (_vaoID == 0 || _vBufferID == 0 || _iBufferID == 0)
-        return false;
-    
-    if (varray.size() == 0 || iarray.size() == 0)
-        return false;
-    
-    _isize = static_cast<unsigned int>(iarray.size());
+    _isize = static_cast<unsigned int>(indexArray.size());
     
     glBindVertexArray(_vaoID);
     
     glBindBuffer(GL_ARRAY_BUFFER, _vBufferID);
-    glBufferData(GL_ARRAY_BUFFER,
-                 varray.size() * sizeof(GLfloat),
-                 varray.data(),
-                 GL_STATIC_DRAW);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        vertexArray.size() * sizeof(GLfloat),
+        vertexArray.data(),
+        GL_STATIC_DRAW
+    );
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 iarray.size() * sizeof(GLint),
-                 iarray.data(),
-                 GL_STATIC_DRAW);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        indexArray.size() * sizeof(GLint),
+        indexArray.data(),
+        GL_STATIC_DRAW
+    );
     
     glBindVertexArray(0);
-    return true;
-}
-
-void VertexBufferObject::deinitialize() {
-	glDeleteBuffers(1, &_vBufferID);
-	glDeleteBuffers(1, &_iBufferID);
-	glDeleteVertexArrays(1, &_vaoID);
-
-	_vBufferID = 0;
-	_iBufferID = 0;
-	_vaoID = 0;
-    _isize = 0;
 }
 
 void VertexBufferObject::setRenderMode(GLenum mode) {
     _mode = mode;
 }
 
-void VertexBufferObject::vertexAttribPointer(
-	GLuint index, 
-	GLint size,
-	GLenum type,
-	GLsizei stride, 
-	GLuint offset,  
-	GLboolean normalized)
+void VertexBufferObject::vertexAttribPointer(GLuint index, GLint size, GLenum type,
+                                             GLsizei stride, GLuint offset,
+                                             GLboolean normalized)
 {
 	glBindVertexArray(_vaoID);
 	glEnableVertexAttribArray(index);
-	glVertexAttribPointer(index, size, type, normalized, stride,
-		reinterpret_cast<const GLvoid*>(offset));
+	glVertexAttribPointer(
+        index,
+        size,
+        type,
+        normalized,
+        stride,
+        reinterpret_cast<const GLvoid*>(offset)
+    );
 	glBindVertexArray(0);
 }
 
@@ -165,5 +159,5 @@ void VertexBufferObject::generateGLObjects() {
 	glGenBuffers(1, &_iBufferID);
 }
 
-}
-}
+} // namespace opengl
+} // namespace ghoul

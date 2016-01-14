@@ -23,96 +23,134 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <ghoul/misc/assert.h>
 #include <glm/gtx/component_wise.hpp>
-#include <cassert>
 
 namespace ghoul {
 namespace opengl {
 
 template <class T>
-T& Texture::texel(size_t x) {
-    assert(sizeof(T) == _bpp);
-    assert(x < glm::compMul(_dimensions));
-    assert(_type == GL_TEXTURE_1D);
+T& Texture::texel(unsigned int x) {
+    ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
+    ghoul_assert(x < _dimensions.x, "x must be smaller than the width of the Texture");
+    ghoul_assert(_type == GL_TEXTURE_1D, "Function must be called on a 1D texture");
     return (reinterpret_cast<T*>(_pixels))[x];
 }
 
 template <class T>
-const T& Texture::texel(size_t x) const {
-    assert(sizeof(T) == _bpp);
-    assert(x < glm::compMul(_dimensions));
-    assert(_type == GL_TEXTURE_1D);
+const T& Texture::texel(unsigned int x) const {
+    ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
+    ghoul_assert(x < _dimensions.x, "x must be smaller than the width of the Texture");
+    ghoul_assert(_type == GL_TEXTURE_1D, "Function must be called on a 1D texture");
     return (reinterpret_cast<T*>(_pixels))[x];
 }
 
 template <class T>
-T& Texture::texel(size_t x, size_t y) {
-    assert(sizeof(T) == _bpp);
-    assert((y * _dimensions.x) + x < glm::compMul(_dimensions));
-    assert(_type == GL_TEXTURE_2D);
+T& Texture::texel(unsigned int x, unsigned int y) {
+    ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
+    ghoul_assert(x < _dimensions.x, "x must be smaller than the width of the Texture");
+    ghoul_assert(y < _dimensions.y, "y must be smaller than the height of the Texture");
+    ghoul_assert(_type == GL_TEXTURE_2D, "Function must be called on a 2D texture");
     return (reinterpret_cast<T*>(_pixels)[y * _dimensions.x + x]);
 }
 
 template<class T>
-const T& Texture::texel(size_t x, size_t y) const {
-    assert(sizeof(T) == _bpp);
-    assert((y * _dimensions.x) + x < glm::compMul(_dimensions));
-    assert(_type == GL_TEXTURE_2D);
+const T& Texture::texel(unsigned int x, unsigned int y) const {
+    ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
+    ghoul_assert(x < _dimensions.x, "x must be smaller than the width of the Texture");
+    ghoul_assert(y < _dimensions.y, "y must be smaller than the height of the Texture");
+    ghoul_assert(_type == GL_TEXTURE_2D, "Function must be called on a 2D texture");
     return (reinterpret_cast<T*>(_pixels)[y * _dimensions.x + x]);
 }
 
 template <class T>
-T& Texture::texel(const glm::size2_t& position) {
-    assert(sizeof(T) == _bpp);
-    assert((position.y * _dimensions.x) + position.x < glm::compMul(_dimensions));
-    assert(_type == GL_TEXTURE_2D);
+T& Texture::texel(const glm::uvec2& position) {
+    ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
+    ghoul_assert(
+        position.x < _dimensions.x,
+        "x must be smaller than the width of the Texture"
+    );
+    ghoul_assert(
+        position.y < _dimensions.y,
+        "y must be smaller than the height of the Texture"
+    );
+    ghoul_assert(_type == GL_TEXTURE_2D, "Function must be called on a 2D texture");
     return (reinterpret_cast<T*>(_pixels)[(position.y * _dimensions.x) + position.x]);
 }
 
 template<class T>
-const T& Texture::texel(const glm::size2_t& position) const {
-    assert(sizeof(T) == _bpp);
-    assert((position.y * _dimensions.x) + position.x < glm::compMul(_dimensions));
-    assert(_type == GL_TEXTURE_2D);
+const T& Texture::texel(const glm::uvec2& position) const {
+    ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
+    ghoul_assert(
+        position.x < _dimensions.x,
+        "x must be smaller than the width of the Texture"
+    );
+    ghoul_assert(
+        position.y < _dimensions.y,
+        "y must be smaller than the height of the Texture"
+    );
+    ghoul_assert(_type == GL_TEXTURE_2D, "Function must be called on a 2D texture");
     return (reinterpret_cast<T*>(_pixels)[(position.y * _dimensions.x) + position.x]);
 }
 
 template <class T>
-T& Texture::texel(size_t x, size_t y, size_t z) {
-    assert(sizeof(T) == _bpp);
-    assert((z * _dimensions.x * _dimensions.y) +
-            (y * _dimensions.x) + x < glm::compMul(_dimensions));
-    assert(_type == GL_TEXTURE_3D);
+T& Texture::texel(unsigned int x, unsigned int y, unsigned int z) {
+    ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
+    ghoul_assert(x < _dimensions.x, "x must be smaller than the width of the Texture");
+    ghoul_assert(y < _dimensions.y, "y must be smaller than the height of the Texture");
+    ghoul_assert(z < _dimensions.z, "z must be smaller than the depth of the Texture");
+    ghoul_assert(_type == GL_TEXTURE_3D, "Function must be called on a 3D texture");
     return (reinterpret_cast<T*>(_pixels)[(z * _dimensions.x * _dimensions.y) +
                                           (y * _dimensions.x) + x]);
 }
 
 template<class T>
-const T& Texture::texel(size_t x, size_t y, size_t z) const {
-    assert(sizeof(T) == _bpp);
-    assert((z * _dimensions.x * _dimensions.y) +
-        (y * _dimensions.x) + x < glm::compMul(_dimensions));
-    assert(_type == GL_TEXTURE_3D);
+const T& Texture::texel(unsigned int x, unsigned int y, unsigned int z) const {
+    ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
+    ghoul_assert(x < _dimensions.x, "x must be smaller than the width of the Texture");
+    ghoul_assert(y < _dimensions.y, "y must be smaller than the height of the Texture");
+    ghoul_assert(z < _dimensions.z, "z must be smaller than the depth of the Texture");
+    ghoul_assert(_type == GL_TEXTURE_3D, "Function must be called on a 3D texture");
     return (reinterpret_cast<T*>(_pixels)[(z * _dimensions.x * _dimensions.y) +
         (y * _dimensions.x) + x]);
 }
 
 template <class T>
-T& Texture::texel(const glm::size3_t& position) {
-    assert(sizeof(T) == _bpp);
-    assert((position.z * _dimensions.x * _dimensions.y) +
-        (position.y * _dimensions.x) + position.x < glm::compMul(_dimensions));
-    assert(_type == GL_TEXTURE_3D);
+T& Texture::texel(const glm::uvec3& position) {
+    ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
+    ghoul_assert(
+        position.x < _dimensions.x,
+        "x must be smaller than the width of the Texture"
+    );
+    ghoul_assert(
+        position.y < _dimensions.y,
+        "y must be smaller than the height of the Texture"
+    );
+    ghoul_assert(
+        position.z < _dimensions.z,
+        "z must be smaller than the depth of the Texture"
+    );
+    ghoul_assert(_type == GL_TEXTURE_3D, "Function must be called on a 3D texture");
     return (reinterpret_cast<T*>(_pixels)[(position.z * _dimensions.x * _dimensions.y) +
         (position.y * _dimensions.x) + position.x]);
 }
 
 template<class T>
-const T& Texture::texel(const glm::size3_t& position) const {
-    assert(sizeof(T) == _bpp);
-    assert((position.z * _dimensions.x * _dimensions.y) +
-        (position.y * _dimensions.x) + position.x < glm::compMul(_dimensions));
-    assert(_type == GL_TEXTURE_3D);
+const T& Texture::texel(const glm::uvec3& position) const {
+    ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
+    ghoul_assert(
+        position.x < _dimensions.x,
+        "x must be smaller than the width of the Texture"
+    );
+    ghoul_assert(
+        position.y < _dimensions.y,
+        "y must be smaller than the height of the Texture"
+    );
+    ghoul_assert(
+        position.z < _dimensions.z,
+        "z must be smaller than the depth of the Texture"
+    );
+    ghoul_assert(_type == GL_TEXTURE_3D, "Function must be called on a 3D texture");
     return (reinterpret_cast<T*>(_pixels)[(position.z * _dimensions.x * _dimensions.y) +
         (position.y * _dimensions.x) + position.x]);
 }

@@ -25,49 +25,60 @@
 
 #include <ghoul/misc/assert.h>
 
-#include <iostream>
-#include <exception>
-#include <ghoul/logging/logmanager.h>
+#include <format.h>
+
 #include <algorithm>
+#include <iostream>
+#include <vector>
 
 namespace {
-
-	const std::string _loggerCat = "Assertion failed!";
-	const std::string padding = "    ";
-
-	void printOptions() {
-		std::cout << "(I)gnore / (A)ssertException / (E)xit: ";
-	}
+    std::vector<std::string> PermanentlyIgnoredAsserts;
+    
+    std::string hashing(std::string file, int line) {
+        return file + "||" + std::to_string(line);
+    }
+    
+    void addPermanentlyIgnoredAssert(std::string file, int line) {
+        PermanentlyIgnoredAsserts.emplace_back(hashing(file, line));
+    }
+    
+    bool isPermanentlyIgnored(std::string file, int line) {
+        auto it = std::find(
+            PermanentlyIgnoredAsserts.begin(),
+            PermanentlyIgnoredAsserts.end(),
+            hashing(file, line)
+        );
+        return it != PermanentlyIgnoredAsserts.end();
+    }
 }
 
 namespace ghoul {
 
-AssertException::AssertException() : RuntimeError("GhoulAssertException", "Assert") {}
-
-void internal_assert(
-	const std::string& expression,
-	const std::string& message,
-	const std::string& file,
-	const std::string& function,
-	int line) 
+AssertionException::AssertionException(std::string exp, std::string msg,
+                                         std::string file, std::string func, int line)
+    : std::runtime_error(fmt::format("{}, \"{}\" ({}:{} ({})",
+        std::move(exp), std::move(msg), std::move(file), line, std::move(func)
+    ))
+{}
+    
+void internal_assert(std::string expression, std::string message, std::string file,
+                                                           std::string function, int line)
 {
-	// Message (if provided)
-	std::stringstream msg;
-	if(!message.empty())
-		msg << std::endl << padding << message;
+#ifdef GHL_DEBUG
+    if (isPermanentlyIgnored(file, line))
+        return;
+    
+    const std::string padding = "    ";
 
-	LFATAL(std::endl
+    std::cerr << std::endl
 		<< padding << "File:       " << file << ", line " << line << std::endl
 		<< padding << "Function:   " << function << std::endl
 		<< padding << "Assertion:  " << expression
-		<< msg.str());
+        << padding << message        << std::endl;
 
-#ifdef GHL_DEBUG
-	std::string inputLine;
-	const size_t maxIterations = 3;
-	for (size_t i = 0; i < maxIterations; ++i) {
-
-		printOptions();
+    while (true) {
+        std::cerr << "(I)gnore / Ignore (P)ermanently / (A)ssertionException / (E)xit: ";
+        std::string inputLine;
 		std::getline(std::cin, inputLine);
 
 		// Transform to lower case
@@ -76,21 +87,32 @@ void internal_assert(
 		if (inputLine == "i") {
 			break;
 		}
+        else if (inputLine == "p") {
+            addPermanentlyIgnoredAssert(file, line);
+            break;
+        }
 		else if (inputLine == "a") {
-			throw AssertException();
+            throw AssertionException(
+                std::move(expression),
+                std::move(message),
+                std::move(file),
+                std::move(function),
+                line
+            );
 		}
 		else if (inputLine == "e") {
 			exit(EXIT_FAILURE);
 		}
-
-		// Fall-through if no relevant option is selected
-		if(i == maxIterations-1)
-			throw AssertException();
 	}
 #else
-	throw AssertException();
+    throw AssertionException(
+        std::move(expression),
+        std::move(message),
+        std::move(file),
+        std::move(function),
+        line
+    );
 #endif
 }
 
 } // namespace ghoul
-

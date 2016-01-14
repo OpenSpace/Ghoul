@@ -26,107 +26,102 @@
 #ifndef __SHADERPREPROCESSOR_H__
 #define __SHADERPREPROCESSOR_H__
 
-#include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/filesystem/file.h>
-#include <ghoul/filesystem/filesystem.h>
-#include <string>
-#include <vector>
+#include <ghoul/misc/dictionary.h>
+#include <ghoul/misc/exception.h>
+
+#include <functional>
 #include <map>
 #include <set>
-#include <functional>
-#include <ghoul/misc/dictionary.h>
-#include <sstream>
-#include <fstream>
+#include <string>
+#include <vector>
 
 namespace ghoul {
 namespace opengl {
 
 class ShaderPreprocessor {
 public:
-  typedef std::function<void (const filesystem::File&)> ShaderChangedCallback;
-
-    ShaderPreprocessor(const std::string& shaderPath = "", Dictionary dict = Dictionary());
-    ~ShaderPreprocessor();
+    using ShaderChangedCallback = std::function<void (const filesystem::File&)>;
+    
+    struct ShaderPreprocessorError : public RuntimeError {
+        explicit ShaderPreprocessorError(std::string message);
+    };
+    
+    struct SubstitutionError : public ShaderPreprocessorError {
+        explicit SubstitutionError(std::string message);
+    };
+    
+    struct ParserError : public ShaderPreprocessorError {
+        explicit ParserError(std::string message);
+    };
+    
+    struct IncludeError : public ShaderPreprocessorError {
+        explicit IncludeError(std::string file);
+        std::string file;
+    };
+    
+    ShaderPreprocessor(std::string shaderPath = "", Dictionary dict = Dictionary());
     void setDictionary(Dictionary dict);
     void setShaderPath(std::string shaderPath);
     void setCallback(ShaderChangedCallback cb);
-    bool process(std::string& output);
+    void process(std::string& output);
     std::string getFileIdentifiersString();
 
     /**
-    * Adds the passed folder to the list of include paths that are checked when a shader
-    * includes a file. The list of include paths is traversed in the order in which they
-    * where added to this class. If the folder does not exist, an error is logged, the
-    * list of include paths is unchanged and <code>false</code> is returned. The folder
-    * in which the shader is located will always be treated as if being on the top of the
-    * list.
-    * \param folderPath The folder that should be added to the list of include paths
-    * \return <code>true</code> if the <code>folderPath</code> was added successfully,
-    * <code>false</code> otherwise
-    */
-    static bool addIncludePath(std::string folderPath);
+     * Adds the passed folder to the list of include paths that are checked when a shader
+     * includes a file. The list of include paths is traversed in the order in which they
+     * where added to this class. The folder in which the shader is located will always be
+     * treated as if being on the top of the list.
+     * \param folderPath The folder that should be added to the list of include paths
+     * \pre \p folderPath must not be empty
+     * \pre \p folderPath must be an existing directory
+     * \pre \p folderPath must be a path without FileSystem tokens
+     */
+    static void addIncludePath(std::string folderPath);
 
+
+private:
     struct Input {
-    Input(std::ifstream& s, ghoul::filesystem::File& f, std::string indent = "")
-      : stream(s)
-      , file(f)
-      , lineNumber(1)
-      , indentation(indent) {}
-    std::ifstream& stream;
-    ghoul::filesystem::File& file;
-    unsigned int lineNumber;
-    std::string indentation;
-    };
+        Input(std::ifstream& stream, ghoul::filesystem::File& file, std::string indentation);
 
+        std::ifstream& stream;
+        ghoul::filesystem::File& file;
+        std::string indentation;
+        unsigned int lineNumber = 1;
+    };
+    
     struct ForStatement {
-    ForStatement(unsigned int input,
-                 unsigned int lineNum,
-                 unsigned int pos,
-                 const std::string& kName,
-                 const std::string& vName,
-                 const std::string& dRef,
-                 int keyI)
-      : inputIndex(input)
-      , lineNumber(lineNum)
-      , streamPos(pos)
-      , keyName(kName)
-      , valueName(vName)
-      , dictionaryRef(dRef)
-      , keyIndex(keyI) {}
-
-    unsigned int inputIndex;
-    unsigned int lineNumber;
-    unsigned int streamPos;
-
-    std::string keyName;
-    std::string valueName;
-    std::string dictionaryRef;
-
-    int keyIndex;
+        unsigned int inputIndex;
+        unsigned int lineNumber;
+        unsigned int streamPos;
+        
+        std::string keyName;
+        std::string valueName;
+        std::string dictionaryReference;
+        
+        int keyIndex;
     };
-
-    typedef std::set<std::string> Scope;
-
+    
     struct Env {
-        Env(std::stringstream& o)
-            : line("")
-            , output(o)
-            , indentation("")
-            , success(true)
-        {}
+        using Scope = std::set<std::string>;
 
+        Env(std::stringstream& output, std::string line = "", std::string indentation = "");
+        
+        std::stringstream& output;
         std::string line;
         std::vector<Input> inputs;
         std::vector<Scope> scopes;
         std::vector<ForStatement> forStatements;
         std::map<std::string, std::vector<std::string> > aliases;
-        std::stringstream& output;
         std::string indentation;
-        bool success;
+        bool success = true;
     };
-
-private:
-    bool includeFile(const std::string& path, bool track, ShaderPreprocessor::Env& env);
+    
+    // pre path exists
+    // pre path not empty
+    // pre path must not contain path tokens
+    // throws std::ios_base::failure if error opening file
+    void includeFile(const std::string& path, bool trackChanges, ShaderPreprocessor::Env& environment);
     bool parseLine(ShaderPreprocessor::Env& env);
     bool parseFor(ShaderPreprocessor::Env& env);
     bool parseEndFor(ShaderPreprocessor::Env& env);
@@ -134,23 +129,26 @@ private:
     bool parseVersion(ShaderPreprocessor::Env& env);
 
     bool substituteLine(ShaderPreprocessor::Env& env);
-    bool substitute(const std::string& in, std::string& out, ShaderPreprocessor::Env& env);
+    std::string substitute(const std::string& in, ShaderPreprocessor::Env& env);
     bool resolveAlias(const std::string& in, std::string& out, ShaderPreprocessor::Env& env);
 
-    bool pushScope(std::map<std::string, std::string> map, ShaderPreprocessor::Env& env);
-    bool popScope(ShaderPreprocessor::Env& env);
+    void pushScope(std::map<std::string, std::string> map, ShaderPreprocessor::Env& env);
+    
+    void popScope(ShaderPreprocessor::Env& env);
 
     bool tokenizeFor(const std::string& line, std::string& keyName, std::string& valueName, std::string& dictionaryName, ShaderPreprocessor::Env& env);
     void addLineNumber(ShaderPreprocessor::Env& env);
     bool isInsideEmptyForStatement(ShaderPreprocessor::Env& env);
 
-    bool addIncludePath(const std::string& path, bool track);
-    void clearIncludedPaths();
-
     std::string debugString(ShaderPreprocessor::Env& env);
 
-    std::map<std::string, ghoul::filesystem::File> _includedFiles;
-    std::map<std::string, int> _fileIdentifiers;
+    struct FileStruct {
+        ghoul::filesystem::File file;
+        size_t fileIdentifier;
+        bool isTracked;
+    };
+    
+    std::map<std::string, FileStruct> _includedFiles;
     static std::vector<std::string> _includePaths;
     std::string _shaderPath;
     Dictionary _dictionary;

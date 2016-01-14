@@ -25,12 +25,21 @@
 
 #include <ghoul/misc/exception.h>
 
-#include <format.h>
+#include <ghoul/misc/assert.h>
 
 namespace ghoul {
     
-RuntimeError::RuntimeError(const std::string& msg, const std::string& component)
-    : std::runtime_error(fmt::format("({}) {}", component, msg))
+RuntimeError::RuntimeError(std::string msg, std::string comp)
+    : std::runtime_error(comp.empty() ? msg : "(" + comp + ") " + msg)
+    , message(std::move(msg))
+    , component(std::move(comp))
+{
+    ghoul_assert(!message.empty(), "Message must not be empty");
+}
+    
+FileNotFoundError::FileNotFoundError(std::string f, std::string comp)
+    : RuntimeError("Could not find file '" + f + "'", std::move(comp))
+    , file(std::move(f))
 {}
     
 } // namespace ghoul

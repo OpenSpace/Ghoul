@@ -26,7 +26,10 @@
 #ifndef __SHADERMANAGER_H__
 #define __SHADERMANAGER_H__
 
+#include <ghoul/misc/exception.h>
+
 #include <map>
+#include <memory>
 #include <string>
 
 namespace ghoul {
@@ -36,46 +39,50 @@ class ShaderObject;
 
 /**
  * This singleton class provides a central and efficient storage for ShaderObject%s. The
- * shaders stored in this class belong to the ShaderManager and should be deleted using 
- * #unregisterShaderObject or their ownership be taken away from the  ShaderManager by
- * using #forgetShaderObject.
- * Shader%s can be registered (#registerShaderObject), unregistered
- * (#unregisterShaderObject), forgotten (#forgetShaderObject), or retrieved
- * (#shaderObject) using either a string name, or a generated hash value which is more
+ * shaders stored in this class belong to the ShaderManager and should be deleted using
+ * #unregisterShaderObject which returns the stored ShaderObject. If the calling function
+ * does not pick up the returned value, it is then destroyed. Shader%s can be registered
+ * (#registerShaderObject), unregistered (#unregisterShaderObject), or retrieved
+ * (#shaderObject) using either a string name or a generated hash value which is more
  * efficient to retrieve than a string.
  */
 class ShaderManager {
 public:
+    /// Main exception that is thrown in the methods of the ShaderManager
+    struct ShaderManagerError : public RuntimeError {
+        explicit ShaderManagerError(std::string message);
+    };
+    
     /**
      * Static initializer that initializes the static member. This needs to be done before
-     * the ShaderManager can be used. If the manager has been already initialized, an
-     * assertion will be triggered.
+     * the ShaderManager can be used.
+     * \pre The static ShaderManager must not have been initialized before
      */
     static void initialize();
     
     /**
-     * Static deinitializer that will remove all of the registered ShaderObject%s, that 
-     * haven't been either forgotten (#forgetShaderObject) or unregistered ( 
-     * #unregisterShaderObject, which will instead delete the shader). The manager will be 
-     * deleted and will be unavailable until it is re-initialized (#initialize). If there
-     * was no #initialize%d ShaderManager, an assertion will be triggered.
+     * Static deinitializer that will remove all of the registered ShaderObject%s. The
+     * manager will be deleted and will be unavailable until it is re-initialized
+     * (#initialize).
+     * \pre The static ShaderManager must have been initialized before
      */
     static void deinitialize();
     
     /**
-     * This method returns a reference to the initialized ShaderManager. If the manager
-     * has not been initialized, an assertion will be triggered.
+     * This method returns a reference to the initialized ShaderManager.
      * \return An initialized reference to the singleton manager
+     * \pre The static ShaderManager must have been initialized before
      */
     static ShaderManager& ref();
     
     /**
      * This method will return the ShaderObject that was registered with a string whose
-     * hash value is equal to <code>hashedName</code>. The hashed name that can be used
-     * will be returned from the #registerShaderObject method.
+     * hash value is equal to \p hashedName. The hashed name that can be used will be
+     * returned from the #registerShaderObject method.
      * \param hashedName The hashed name of the ShaderObject that is to be fetched
      * \return The ShaderObject that has been registered with a string that evaluates 
-     * to the <code>hashedName</code>
+     * to the \p hashedName
+     * \throw ShaderManagerError if the ShaderObject for \p hashedName did not exist
      */
     ShaderObject* shaderObject(unsigned int hashedName);
     
@@ -84,98 +91,63 @@ public:
      * This method will create the hash value from the passed string and will call the
      * #shaderObject method.
      * \param name The name of the ShaderObject that is to be fetched
-     * \return The \see ShaderObject that has been registered with the passed name
+     * \return The ShaderObject that has been registered with the passed name
+     * \throw ShaderManagerError If the ShaderObject for \p name did not exist
      */
     ShaderObject* shaderObject(const std::string& name);
     
     /**
      * Register the passed ShaderObject under the passed name so that it can be retrieved
-     * either by the given name or by the hashed value that is equal to the hash 
-     * value of the passed name. The hashed value can later be retrieved by the function
-     * #hashedNameForName. This method will transfer the ownership of the ShaderObject to
-     * the ShaderManager. If the manager already contains a hashed value equal to the hash
-     * value of the name, a warning is logged and <code>false</code> is returned.
+     * either by the given \p name or by the returned hashed value. If the manager already
+     * contains a hashed value equal to the hash value of the name, an exception is
+     * thrown.
      * \param name The name under which the ShaderObject should be registered
      * \param shader The ShaderObject that should be registered
-     * \return <code>true</code> if the ShaderObject was registered successfully in the
-     * ShaderManager, <code>false</code> if a ShaderObject with the specified name was
-     * already present in the manager
+     * \return The hashed value that is generated from the \p name
+     * \throw ShaderManagerError If there already was a ShaderObject for the provided
+     * \p name
+     * \pre \p shader must not be nullptr
      */
-    bool registerShaderObject(const std::string& name, ShaderObject* shader);
-    
-    /**
-     * Register the passed ShaderObject under the passed name so that it can be retrieved
-     * either by the given name or by the hashed value is returned in the third parameter
-     * of this function. The hashed value can later be retrieved by the function
-     * #hashedNameForName as well. This method will transfer the ownership of the
-     * ShaderObject to the ShaderManager. If the manager already contains a hashed value 
-     * equal to the hash value of the name, a warning is logged and <code>false</code> is
-     * returned.
-     * \param name The name under which the ShaderObject should be registered
-     * \param shader The ShaderObject that should be registered
-     * \param hashedName The hashed value that is generated from the <code>name</code>
-     * \return <code>true</code> if the ShaderObject was registered successfully in the
-     * ShaderManager, <code>false</code> if a ShaderObject with the specified name was 
-     * already present in the manager
-     */
-    bool registerShaderObject(const std::string& name,
-                              ShaderObject* shader, unsigned int& hashedName);
+    unsigned int registerShaderObject(const std::string& name,
+        std::unique_ptr<ShaderObject> shader);
     
     /**
      * This method will unregister the ShaderObject that was registered under the passed 
-     * name. The ShaderObject will be removed from the manager and deleted.
+     * name. The ShaderObject will be returned to the caller. If the caller ignores the
+     * return value, the ShaderObject will be deleted.
      * \param name The name under which the ShaderObject was registered previously
+     * \return The previously registered ShaderObject or <code>nullptr</code> if the
+     * \p name was not a valid ShaderObject
      */
-    void unregisterShaderObject(const std::string& name);
+    std::unique_ptr<ShaderObject> unregisterShaderObject(const std::string& name);
     
     /**
      * This method will unregister the ShaderObject that was registered under a name whose
-     * hash value is equal to the passed <code>hashName</code>. The ShaderObject will be
-     * removed from the manager and deleted.
+     * hash value is equal to the passed \p hashName. The ShaderObject will be returned to
+     * the caller. If the caller ignores the return value, the ShaderObject will be
+     * deleted.
      * \param hashedName The hash value which is used to refer to a previously stored
      * ShaderObject
+     * \return The registered ShaderObject or <code>nullptr</code> if the \p name was not
+     * a valid ShaderObject
      */
-    void unregisterShaderObject(unsigned int hashedName);
+    std::unique_ptr<ShaderObject> unregisterShaderObject(unsigned int hashedName);
     
     /**
-     * This method will unregister the ShaderObject that was registered under the passed 
-     * name. The ShaderObject will be removed from the manager, but it will not be 
-     * automatically deleted. This means that the ownership of the ShaderObject is 
-     * transferred to the caller of this function.
-     * \param name The name under which the ShaderObject was registered previously
-     */
-    void forgetShaderObject(const std::string& name);
-
-    /**
-     * This method will unregister the ShaderObject that was registered under a name whose 
-     * hash value is equal to the passed <code>hashName</code>. The ShaderObject will be
-     * removed from the manager, but it will not be automatically deleted. This means that
-     * the ownership of the ShaderObject is transferred to the caller of this function.
-     * \param hashedName The hash value which is used to refer to a previously stored
-     * ShaderObject
-     */
-    void forgetShaderObject(unsigned int hashedName);
-    
-    /**
-     * This method returns the hash value for a given string. The hash function is
-     * implementation detail, but it is guaranteed to be static in an application run and
-     * it will always produce reliable, consistent results.
+     * This method returns the hash value for a given \p name. The hash function is
+     * implementation-dependent, but it is guaranteed to be static in an application run
+     * and it will produce reliable, consistent results.
      * \param name The name which should be converted into a hash value
      * \return The hash value for the passed name
      */
     unsigned int hashedNameForName(const std::string& name) const;
     
-    
 private:
-    ShaderManager() = default;
-    ~ShaderManager();
-
-    ShaderManager(const ShaderManager& c) = delete;
-    
-    static ShaderManager* _manager; ///< Singleton member
+    /// The singleton member
+    static ShaderManager* _manager;
     
     /// Map containing all the registered ShaderObject%s
-    std::map<unsigned int, ShaderObject*> _objects;
+    std::map<unsigned int, std::unique_ptr<ShaderObject>> _objects;
 };
     
 #define ShdrMgr (ghoul::opengl::ShaderManager::ref())

@@ -34,31 +34,26 @@
 #include <sstream>
 #include <typeinfo>
 #include <algorithm>
-
-namespace {
-    const std::string _loggerCat = "SystemCapabilities";
-}
+#include <ghoul/misc/assert.h>
 
 namespace ghoul {
 namespace systemcapabilities {
 
 SystemCapabilities* SystemCapabilities::_systemCapabilities = nullptr;
 
-SystemCapabilities::SystemCapabilities() {}
-
-SystemCapabilities::~SystemCapabilities() {
-    for (SystemCapabilitiesComponent* component : _components)
-        delete component;
-}
-
 void SystemCapabilities::initialize() {
-    assert(_systemCapabilities == nullptr);
+    ghoul_assert(
+        _systemCapabilities == nullptr,
+        "Static SystemCapabilities must not have been initialized"
+    );
     if (_systemCapabilities == nullptr)
         _systemCapabilities = new SystemCapabilities;
 }
 
 void SystemCapabilities::deinitialize() {
-    assert(_systemCapabilities != nullptr);
+    ghoul_assert(
+        _systemCapabilities, "Static SystemCapabilities must have been initialized"
+    );
     delete _systemCapabilities;
     _systemCapabilities = nullptr;
 }
@@ -68,49 +63,53 @@ bool SystemCapabilities::isInitialized() {
 }
 
 SystemCapabilities& SystemCapabilities::ref() {
-    assert(_systemCapabilities != nullptr);
+    ghoul_assert(
+        _systemCapabilities, "Static SystemCapabilities must have been initialized"
+    );
     return *_systemCapabilities;
 }
 
 void SystemCapabilities::detectCapabilities() {
-    for (SystemCapabilitiesComponent* c : _components) {
-        if (!c->isInitialized())
-            c->initialize();
-    }
     clearCapabilities();
-    for (SystemCapabilitiesComponent* component : _components)
+    for (auto& component : _components)
         component->detectCapabilities();
 }
 
 void SystemCapabilities::clearCapabilities() {
-    for (SystemCapabilitiesComponent* component : _components)
+    for (auto& component : _components)
         component->clearCapabilities();
 }
 
 void SystemCapabilities::logCapabilities(
                                   SystemCapabilitiesComponent::Verbosity verbosity) const
 {
-    for (SystemCapabilitiesComponent* c : _components) {
-        const std::string _loggerCat = ::_loggerCat + "." + c->name();
-        std::vector<SystemCapabilitiesComponent::CapabilityInformation> cap = c->capabilities(verbosity);
-        for (SystemCapabilitiesComponent::CapabilityInformation c : cap) {
-            LINFO(c.first << ": " << c.second);
+    for (auto& c : _components) {
+        const std::string _loggerCat = "SystemCapabilitiesComponent." + c->name();
+        auto capabilities = c->capabilities();
+        for (SystemCapabilitiesComponent::CapabilityInformation cap : capabilities) {
+            if (verbosity >= cap.verbosity)
+                LINFO(cap.description << ": " << cap.value);
         }
     }
 }
 
-void SystemCapabilities::addComponent(SystemCapabilitiesComponent* component) {
-#ifdef GHL_DEBUG
-    //std::type_info i = typeid(*component);
-    // TODO check typeid?
-    if (std::find(
-        _components.begin(), _components.end(), component) != _components.end())
-    {
-        LWARNING("Component with name '" << component->name() << "' was already added");
-        return;
-    }
-#endif
-    _components.push_back(component);
+void SystemCapabilities::addComponent(
+                                  std::unique_ptr<SystemCapabilitiesComponent> component)
+{
+    ghoul_assert(component != nullptr, "Component must not be nullptr");
+    
+    auto it = std::find_if(
+        _components.begin(),
+        _components.end(),
+        [&component](const std::unique_ptr<SystemCapabilitiesComponent>& rhs) {
+            auto& c = *component;
+            auto& r = *rhs;
+            return typeid(c) == typeid(r);
+        }
+    );
+    
+    ghoul_assert(it == _components.end(), "Component must not have been added before");
+    _components.push_back(std::move(component));
 }
 
 } // namespace systemcapabilities

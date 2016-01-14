@@ -26,61 +26,56 @@
 #include <ghoul/io/texture/texturereader.h>
 
 #include <ghoul/filesystem/file.h>
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/io/texture/texturereaderbase.h>
-#include <set>
+#include <ghoul/misc/assert.h>
 
-namespace {
-	const std::string _loggerCat = "TextureReader";
-}
+#include <format.h>
 
 namespace ghoul {
 namespace io {
-
-TextureReader::TextureReader() {
-
-}
-
-TextureReader::~TextureReader() {
-	for (TextureReaderBase* reader : _readers) {
-		delete reader;
-	}
-}
-
+    
+TextureReader::MissingReaderException::MissingReaderException(std::string extension)
+    : RuntimeError(fmt::format("No reader was found for extension '{}'", extension), "IO")
+    , fileExtension(std::move(extension))
+{}
+    
 TextureReader& TextureReader::ref() {
 	static TextureReader textureReader;
 	return textureReader;
 }
 
-opengl::Texture* TextureReader::loadTexture(const std::string& filename) {
-	if (_readers.empty()) {
-		LERROR("No readers were registered with the TextureReader");
-		return nullptr;
-	}
-
-	std::string extension = ghoul::filesystem::File(filename).fileExtension();
-
+std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& filename) {
+    ghoul_assert(!_readers.empty(), "No readers were registered before");
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+    
+	const std::string& extension = ghoul::filesystem::File(filename).fileExtension();
+    ghoul_assert(!extension.empty(), "Filename must have an extension");
+    
 	TextureReaderBase* reader = readerForExtension(extension);
-	if (reader)
-		return reader->loadTexture(filename);
-	else {
-		LERROR("No reader was found for extension '" << extension << "'");
-		return nullptr;
-	}
+    return reader->loadTexture(filename);
 }
 
-void TextureReader::addReader(TextureReaderBase* reader) {
+void TextureReader::addReader(std::shared_ptr<TextureReaderBase> reader) {
+    ghoul_assert(
+        std::find(_readers.begin(), _readers.end(), reader) == _readers.end(),
+        "Readers must not be added twice"
+    );
+    
 	_readers.push_back(reader);
 }
 
+std::vector<std::shared_ptr<TextureReaderBase>> TextureReader::readers() const {
+    return _readers;
+}
+    
 TextureReaderBase* TextureReader::readerForExtension(const std::string& extension) {
-	for (TextureReaderBase* reader : _readers) {
-		std::set<std::string> extensions = reader->supportedExtensions();
-		auto it = extensions.find(extension);
+	for (const auto& reader : _readers) {
+		auto extensions = reader->supportedExtensions();
+        auto it = std::find(extensions.begin(), extensions.end(), extension);
 		if (it != extensions.end())
-			return reader;
+			return reader.get();
 	}
-	return nullptr;
+    throw MissingReaderException(extension);
 }
 
 } // namespace io

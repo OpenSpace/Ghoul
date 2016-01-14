@@ -25,6 +25,8 @@
 
 #include <ghoul/opengl/texture.h>
 
+#include <ghoul/misc/assert.h>
+
 using glm::detail::int8;
 using glm::detail::int16;
 using glm::detail::int32;
@@ -37,14 +39,13 @@ using glm::tvec4;
 using glm::vec2;
 using glm::vec3;
 using glm::vec4;
-using glm::size3_t;
 using glm::compMul;
 using std::numeric_limits;
 
 namespace ghoul {
 namespace opengl {
 
-Texture::Texture(glm::size3_t dimensions, Format format, GLint internalFormat,
+Texture::Texture(glm::uvec3 dimensions, Format format, GLint internalFormat,
                  GLenum dataType, FilterMode filter, WrappingMode wrapping)
     : _dimensions(std::move(dimensions))
     , _format(format)
@@ -55,14 +56,17 @@ Texture::Texture(glm::size3_t dimensions, Format format, GLint internalFormat,
     , _mipMapLevel(8)
     , _anisotropyLevel(-1.f)
     , _hasOwnershipOfData(false)
-    , _pixels(0)
+    , _pixels(nullptr)
 {
+    ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
+    ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
+    ghoul_assert(_dimensions.z >= 1, "Element of dimensions must be bigger or equal 1");
+    
     initialize(true);
 }
 
-Texture::Texture(void* data, glm::size3_t dimensions, Format format,
-                 GLint internalFormat, GLenum dataType, FilterMode filter,
-                 WrappingMode wrapping)
+Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLint internalFormat,
+                 GLenum dataType, FilterMode filter, WrappingMode wrapping)
      : _dimensions(std::move(dimensions))
      , _format(format)
      , _internalFormat(internalFormat)
@@ -74,6 +78,10 @@ Texture::Texture(void* data, glm::size3_t dimensions, Format format,
      , _hasOwnershipOfData(true)
      , _pixels(data)
 {
+    ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
+    ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
+    ghoul_assert(_dimensions.z >= 1, "Element of dimensions must be bigger or equal 1");
+
     initialize(false);
 }
 
@@ -96,7 +104,7 @@ void Texture::initialize(bool allocateData) {
 }
 
 void Texture::allocateMemory() {
-    size_t arraySize = compMul(_dimensions) * _bpp;
+    unsigned int arraySize = compMul(_dimensions) * _bpp;
     _pixels = new GLubyte[arraySize];
 }
 
@@ -138,23 +146,23 @@ GLenum Texture::type() const {
     return _type;
 }
 
-const glm::size3_t& Texture::dimensions() const {
+const glm::uvec3& Texture::dimensions() const {
     return _dimensions;
 }
 
-void Texture::setDimensions(size3_t dimensions) {
+void Texture::setDimensions(glm::uvec3 dimensions) {
     _dimensions = std::move(dimensions);
 }
 
-size_t Texture::width() const {
+unsigned int Texture::width() const {
     return _dimensions.x;
 }
 
-size_t Texture::height() const {
+unsigned int Texture::height() const {
     return _dimensions.y;
 }
 
-size_t Texture::depth() const {
+unsigned int Texture::depth() const {
     return _dimensions.z;
 }
 
@@ -202,8 +210,10 @@ void Texture::applyFilter() {
                 glGenerateMipmap(_type);
                 if (_anisotropyLevel == -1.f) {
                     GLfloat maxTextureAnisotropy = 1.0;
-                    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT,
-                        &maxTextureAnisotropy);
+                    glGetFloatv(
+                        GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT,
+                        &maxTextureAnisotropy
+                    );
                     _anisotropyLevel = maxTextureAnisotropy;
                 }
                 glTexParameterf(_type, GL_TEXTURE_MAX_ANISOTROPY_EXT, _anisotropyLevel);
@@ -224,14 +234,14 @@ void Texture::setDataType(GLenum dataType) {
     calculateBytesPerPixel();
 }
 
-size_t Texture::expectedPixelDataSize() const {
+unsigned int Texture::expectedPixelDataSize() const {
     if (_pixels)
         return compMul(_dimensions) * _bpp;
     else
         return 0;
 }
 
-size_t Texture::numberOfChannels() const {
+unsigned int Texture::numberOfChannels() const {
     switch (_format) {
         case Format::Red:
         case Format::DepthComponent:
@@ -253,6 +263,10 @@ GLubyte Texture::bytesPerPixel() const {
 }
 
 void Texture::setType(GLenum type) {
+    ghoul_assert(
+        (type == GL_TEXTURE_1D) || (type == GL_TEXTURE_2D) || (type == GL_TEXTURE_3D),
+        "Type must be GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D"
+    );
     _type = type;
 }
 
@@ -270,7 +284,7 @@ const void* Texture::pixelData() const {
 
 void Texture::setPixelData(void* pixels, bool takeOwnership) {
     if (_hasOwnershipOfData)
-        delete (GLubyte*) _pixels;
+        delete reinterpret_cast<GLubyte*>(_pixels);
     _hasOwnershipOfData = takeOwnership;
     _pixels = pixels;
 }
@@ -301,8 +315,10 @@ void Texture::applyWrapping() {
     switch (_type) {
         case GL_TEXTURE_3D:
             glTexParameteri(_type, GL_TEXTURE_WRAP_R, wrapping);
+            // Intentional fallthrough
         case GL_TEXTURE_2D:
             glTexParameteri(_type, GL_TEXTURE_WRAP_T, wrapping);
+            // Intentional fallthrough
         case GL_TEXTURE_1D:
             glTexParameteri(_type, GL_TEXTURE_WRAP_S, wrapping);
             break;
@@ -315,18 +331,43 @@ void Texture::uploadTexture() {
     bind();
     switch (_type) {
         case GL_TEXTURE_1D:
-            glTexImage1D(_type, 0, _internalFormat,
-                         GLsizei(_dimensions.x), 0, GLint(_format), _dataType, _pixels);
+            glTexImage1D(
+                _type,
+                0,
+                _internalFormat,
+                GLsizei(_dimensions.x),
+                0,
+                GLint(_format),
+                _dataType,
+                _pixels
+            );
             break;
         case GL_TEXTURE_2D:
-            glTexImage2D(_type, 0, _internalFormat,
-                         GLsizei(_dimensions.x), GLsizei(_dimensions.y), 0, GLint(_format),
-                         _dataType, _pixels);
+            glTexImage2D(
+                _type,
+                0,
+                _internalFormat,
+                GLsizei(_dimensions.x),
+                GLsizei(_dimensions.y),
+                0,
+                GLint(_format),
+                _dataType,
+                _pixels
+            );
             break;
         case GL_TEXTURE_3D:
-            glTexImage3D(_type, 0, _internalFormat,
-                         GLsizei(_dimensions.x), GLsizei(_dimensions.y),
-                         GLsizei(_dimensions.z), 0, GLint(_format), _dataType, _pixels);
+            glTexImage3D(
+                _type,
+                0,
+                _internalFormat,
+                GLsizei(_dimensions.x),
+                GLsizei(_dimensions.y),
+                GLsizei(_dimensions.z),
+                0,
+                GLint(_format),
+                _dataType,
+                _pixels
+            );
             break;
         default:
             assert(false);
@@ -351,9 +392,9 @@ void Texture::determineTextureType() {
         _type = GL_TEXTURE_3D;
 }
 
-vec4 Texture::texelAsFloat(size_t x) const {
-    assert(x < compMul(_dimensions));
-    assert(_type == GL_TEXTURE_1D);
+vec4 Texture::texelAsFloat(unsigned int x) const {
+    ghoul_assert(x < compMul(_dimensions), "x must be inside the texture dimensions");
+    ghoul_assert(_type == GL_TEXTURE_1D, "Function must be called on a 1D texture");
 
     vec4 result(0.f);
     switch (_format) {
@@ -723,9 +764,12 @@ vec4 Texture::texelAsFloat(size_t x) const {
     return result;
 }
 
-vec4 Texture::texelAsFloat(size_t x, size_t y) const {
-    assert((y * _dimensions.x) + x < compMul(_dimensions));
-    assert(_type == GL_TEXTURE_2D);
+vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
+    ghoul_assert(
+        (y * _dimensions.x) + x < glm::compMul(_dimensions),
+        "x and y must be inside the texture dimensions"
+    );
+    ghoul_assert(_type == GL_TEXTURE_2D, "Function must be called on a 2D texture");
 
     vec4 result(0.f);
     switch (_format) {
@@ -1095,9 +1139,13 @@ vec4 Texture::texelAsFloat(size_t x, size_t y) const {
     return result;
 }
 
-vec4 Texture::texelAsFloat(size_t x, size_t y, size_t z) const {
-    assert((z * _dimensions.x * _dimensions.y) + (y * _dimensions.x) + x < compMul(_dimensions));
-    assert(_type == GL_TEXTURE_3D);
+vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const {
+    ghoul_assert(
+        (z * _dimensions.x * _dimensions.y) + (y * _dimensions.x) + x
+            < glm::compMul(_dimensions),
+        "x, y, and z must be inside the texture dimensions"
+    );
+    ghoul_assert(_type == GL_TEXTURE_3D, "Function must be called on a 3D texture");
 
     vec4 result(0.f);
     switch (_format) {
@@ -1467,11 +1515,11 @@ vec4 Texture::texelAsFloat(size_t x, size_t y, size_t z) const {
     return result;
 }
 
-vec4 Texture::texelAsFloat(const glm::size2_t& pos) const {
+vec4 Texture::texelAsFloat(const glm::uvec2& pos) const {
     return texelAsFloat(pos.x, pos.y);
 }
 
-vec4 Texture::texelAsFloat(const glm::size3_t& pos) const {
+vec4 Texture::texelAsFloat(const glm::uvec3& pos) const {
     return texelAsFloat(pos.x, pos.y, pos.z);
 }
 

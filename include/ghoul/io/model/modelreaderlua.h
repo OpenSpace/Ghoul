@@ -29,22 +29,45 @@
 #include <ghoul/io/model/modelreaderbase.h>
 
 namespace ghoul {
-
-// Forward declaration
-namespace opengl {
-    class VertexBufferObject;
-}
-
 namespace io {
     
+/**
+ * This model reader reads a model that is specified as a Lua table. The Lua file must
+ * return a single top-level table specifying <code>Vertices</code>, <code>Indices</code>,
+ * <code>VertexAttribPointers</code>, and the <code>Mode</code>. The <code>Vertices</code>
+ * and <code>Indices</code> must be flat table whereas the
+ * <code>VertexAttribPointers</code> dictionary must contain tables with the
+ * <code>Position</code>, <code>Size</code>, <code>Stride</code>, <code>Offset</code>, and
+ * <code>Normalized</code> arguments found in OpenGL's <code>VertexAttribPointer</code>
+ * method. The default values for the <code>VertexAttribPointer</code> are:
+ * <code>Position = 0</code>, <code>Size = 0</code>, <code>Stride = 0</code>,
+ * <code>Offset = 0</code>, and <code>Normalized = false</code>.
+ * The value for the <code>type</code> is always <code>GL_FLOAT</code>.<br>
+ * The allowed values for the <code>Mode</code> are the strings:
+ * <code>GL_LINES</code>, <code>GL_POINTS</code>, <code>GL_LINE_STRIP</code>,
+ * <code>GL_LINE_LOOP</code>, <code>GL_LINES</code>, <code>GL_LINE_STRIP_ADJACENCY</code>,
+ * <code>GL_LINES_ADJACENCY</code>, <code>GL_TRIANGLE_STRIP</code>,
+ * <code>GL_TRIANGLE_FAN</code>, <code>GL_TRIANGLES</code>,
+ * <code>GL_TRIANGLE_STRIP_ADJACENCY</code>, <code>GL_TRIANGLES_ADJACENCY</code>, or
+ * <code>GL_PATCHES</code>.
+ * \sa https://www.opengl.org/sdk/docs/man/html/glVertexAttribPointer.xhtml
+ */
 class ModelReaderLua: public ModelReaderBase {
 public:
-    ModelReaderLua();
-    ~ModelReaderLua();
-    opengl::VertexBufferObject* loadModel(const std::string& filename) const;
+    /**
+     * Loads the model described as a Lua table and returns the initialized
+     * VertexBufferObject.
+     * \param filename The Lua file that is to be read. The file must return a single Lua
+     * table
+     * \return The initialized VertexBufferObject of the specified model
+     * \throw ModelReaderException If there was an exception loading the model
+     * \pre \p filename must not be empty
+     */
+    std::unique_ptr<opengl::VertexBufferObject> loadModel(
+        const std::string& filename) const;
 };
     
 } // namespace io
 } // namespace ghoul
 
-#endif // __MODELREADERWAVEFRONT_H__
+#endif // __MODELREADERLUA_H__

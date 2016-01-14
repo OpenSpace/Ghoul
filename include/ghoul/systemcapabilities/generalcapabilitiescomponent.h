@@ -26,7 +26,10 @@
 #ifndef __GENERALCAPABILITIESCOMPONENT_H__
 #define __GENERALCAPABILITIESCOMPONENT_H__
 
-#include "systemcapabilitiescomponent.h"
+#include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
+
+#include <ghoul/misc/exception.h>
+#include <ghoul/systemcapabilities/systemcapabilities.h>
 
 namespace ghoul {
 namespace systemcapabilities {
@@ -40,16 +43,39 @@ namespace systemcapabilities {
  */
 class GeneralCapabilitiesComponent : public SystemCapabilitiesComponent {
 public:
-    GeneralCapabilitiesComponent();
-    ~GeneralCapabilitiesComponent();
+    /// Main exception that is thrown if an error occured in the detection of general
+    /// capabilities
+    struct GeneralCapabilitiesComponentError : public RuntimeError {
+        explicit GeneralCapabilitiesComponentError(std::string message);
+    };
 
-    std::vector<CapabilityInformation> capabilities(
-        const SystemCapabilitiesComponent::Verbosity& verbosity) const override;
+    /// Exception that is thrown if there was an error detecting the operating system
+    struct OperatingSystemError : public GeneralCapabilitiesComponentError {
+        explicit OperatingSystemError(std::string description, std::string errorMessage);
+        
+        /// The general description of the error
+        std::string description;
+        
+        /// Additional information about the error message
+        std::string errorMessage;
+    };
+    
+    /// Exception that is thrown if there was an error detecting the main memory
+    struct MainMemoryError : public GeneralCapabilitiesComponentError {
+        explicit MainMemoryError(std::string message);
+    };
+    
+    /**
+     * Returns the list of all capabilities that were detected by this
+     * SystemCapabilitiesComponent.
+     * \return The list of all detected capabilities
+     */
+    std::vector<CapabilityInformation> capabilities() const override;
 
     /**
      * Returns the operating system as a parsed string. The exact format of the returned
      * string is implementation and operating system-dependent but it should contain the
-     * manufacturer and the version. The default value is <code>""</code>.
+     * manufacturer and the version.
      * \return The operating system as a parsed string
      */
     const std::string& operatingSystem() const;
@@ -130,25 +156,61 @@ public:
     std::string name() const override;
 
 protected:
+    /**
+     * Method that detects all of the capabilities.
+     * \throw OperatingSystemError If the detection of the operating system failed
+     * \throw MainMemoryError If the detection of the main memory failed
+     */
     void detectCapabilities() override;
     void clearCapabilities() override;
 
+    /**
+     * Detects the operating system.
+     * \throw OperatingSystemError If the detection of the operating system failed
+     */
     void detectOS();
+    
+    /**
+     * Detects the amount of the computer's main memory.
+     * \throw MainMemoryError If the detection of the main memory failed
+     * \throw WMIError If there was an error accessing the Windows Management
+     */
     void detectMemory();
+    
+    /**
+     * Detects detailed information about the CPU on this computer.
+     */
 	void detectCPU();
 
-    std::string _operatingSystem; ///< Information about the operating system
-    unsigned int _installedMainMemory; ///< The amount of RAM that is installed
-	std::string _cpu; ///< Information about the CPU
-	unsigned int _cores;
-	unsigned int _cacheLineSize;
-	unsigned int _L2Associativity;
-	unsigned int _cacheSize;
-	std::string _extensions;
+    /// Information about the operating system
+    std::string _operatingSystem = "";
+    
+    /// The amount of RAM that is installed
+    unsigned int _installedMainMemory = 0;
+    
+    /// Information about the CPU
+	std::string _cpu = "";
+    
+    /// Number of CPU cores
+	unsigned int _cores = 0;
+    
+    /// The size of a cache line
+	unsigned int _cacheLineSize = 0;
+    
+    /// The associativity of the L2 cache
+	unsigned int _L2Associativity = 0;
+    
+    /// The size of the cache
+	unsigned int _cacheSize = 0;
+    
+    /// Available CPU extensions
+	std::string _extensions = "";
 
 };
 
 } // namespace systemcapabilities
 } // namespace ghoul
+
+#define CpuCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::GeneralCapabilitiesComponent>()))
 
 #endif // __GeneralCapabilitiesComponent_H__

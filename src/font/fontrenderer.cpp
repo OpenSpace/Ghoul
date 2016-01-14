@@ -34,6 +34,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <cstdarg>
+#include <fstream>
 
 #ifdef WIN32
 #define vscprintf(f,a) _vscprintf(f,a)
@@ -119,7 +120,7 @@ FontRenderer::FontRenderer(opengl::ProgramObject* program, glm::vec2 windowSize)
     : FontRenderer()
 {
     ghoul_assert(program != nullptr, "No program provided");
-    _program = program;
+    _program = std::unique_ptr<opengl::ProgramObject>(program);
     setWindowSize(std::move(windowSize));
     
 }
@@ -127,14 +128,11 @@ FontRenderer::~FontRenderer() {
     glDeleteVertexArrays(1, &_vao);
     glDeleteBuffers(1, &_vbo);
     glDeleteBuffers(1, &_ibo);
-    
-    delete _program;
-    _program = nullptr;
 }
 
 bool FontRenderer::initialize() {
     LDEBUG("Creating default FontRenderer");
-    ghoul_assert(_defaultRenderer == nullptr, "Default FontRenderer was already initialized");
+    ghoul_assert(!_defaultRenderer, "Default FontRenderer was already initialized");
 
     std::string vsPath = absPath(DefaultVertexShaderPath);
     LDEBUG("Writing default vertex shader to '" << vsPath << "'");
@@ -149,28 +147,18 @@ bool FontRenderer::initialize() {
     file.close();
     
     using namespace opengl;
-    ProgramObject* program = new ProgramObject("Font");
-    ShaderObject* vertex = new ShaderObject(ShaderObject::ShaderTypeVertex, vsPath);
-    program->attachObject(vertex);
-    ShaderObject* fragment = new ShaderObject(ShaderObject::ShaderTypeFragment, fsPath);
-    program->attachObject(fragment);
+    std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>("Font");
+    program->attachObject(std::make_unique<ShaderObject>(ShaderObject::ShaderTypeVertex, vsPath));
+    program->attachObject(std::make_unique<ShaderObject>(ShaderObject::ShaderTypeFragment, fsPath));
 
     LDEBUG("Compile default font shader");
-    bool compileSuccess = program->compileShaderObjects();
-    if (!compileSuccess) {
-        delete program;
-        return false;
-    }
+    program->compileShaderObjects();
     
     LDEBUG("Link default font shader");
-    bool linkSuccess = program->linkProgramObject();
-    if (!linkSuccess) {
-        delete program;
-        return false;
-    }
+    program->linkProgramObject();
     
     _defaultRenderer = new FontRenderer;
-    _defaultRenderer->_program = program;
+    _defaultRenderer->_program = std::move(program);
     
     return true;
 }
@@ -192,13 +180,12 @@ FontRenderer& FontRenderer::defaultRenderer() {
 }
     
 // I wish I didn't have to copy-n-paste the render function, but *sigh* ---abock
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec2 pos,
                                                           glm::vec4 color,
                                                           glm::vec4 outlineColor,
                                                           const char* format, ...) const
 {
-    ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
     
     va_list args;	 // Pointer To List Of Arguments
@@ -217,7 +204,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
     va_end(args);
     
     auto res = internalRender(
-        *font,
+        font,
         std::move(pos),
         std::move(color),
         std::move(outlineColor),
@@ -228,12 +215,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
     return res;
 }
     
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec2 pos,
                                                           glm::vec4 color,
                                                           const char* format, ...) const
 {
-    ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
     
     va_list args;	 // Pointer To List Of Arguments
@@ -251,7 +237,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
     va_end(args);
     
     auto res = internalRender(
-        *font,
+        font,
         std::move(pos),
         color,
         glm::vec4(0.f, 0.f, 0.f, color.a),
@@ -262,11 +248,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
     return res;
 }
 
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec2 pos,
                                                           const char* format, ...) const
 {
-    ghoul_assert(font != nullptr, "No Font is provided");
     ghoul_assert(format != nullptr, "No format is provided");
     
     va_list args;	 // Pointer To List Of Arguments
@@ -285,7 +270,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font* font,
     va_end(args);
     
     auto res = internalRender(
-        *font,
+        font,
         std::move(pos),
         glm::vec4(1.f),
         glm::vec4(0.f, 0.f, 0.f, 1.f),
@@ -342,11 +327,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
         float width = 0.f;
         float height = 0.f;
         for (size_t j = 0 ; j < line.size(); ++j) {
-            const Font::Glyph* glyph = font.glyph(line[j]);
-            if (glyph == nullptr) {
-                LERROR("No glyph for '" << line[j] << " in font '" << font.name() << "'");
-            }
-            else {
+            try {
+                const Font::Glyph* glyph = font.glyph(line[j]);
                 if (j > 0)
                     movingPos.x += glyph->kerning(line[j-1]);
                 
@@ -356,7 +338,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
                 float t0 = glyph->topLeft().y;
                 float outlineS0 = glyph->outlineTopLeft().x;
                 float outlineT0 = glyph->outlineTopLeft().y;
-
+                
                 float x1 = x0 + glyph->width();
                 float y1 = y0 - glyph->height();
                 float s1 = glyph->bottomRight().x;
@@ -380,7 +362,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
                 width += glyph->horizontalAdvance();
                 height = std::max(height, static_cast<float>(glyph->height()));
             }
-            
+            catch (const Font::FontException& e) {
+                LERROR("No glyph for '" << line[j] << " in font '" << font.name() << "'");
+            }
         }
         size.x = std::max(size.x, width);
         size.y += height;

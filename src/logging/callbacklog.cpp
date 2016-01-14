@@ -23,18 +23,16 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/logging/callbacklog.h"
+#include <ghoul/logging/callbacklog.h>
 
 namespace ghoul {
 namespace logging {
 
-CallbackLog::CallbackLog(CallbackFunction callbackFunction,
-                         bool timeStamping, bool dateStamping, bool categoryStamping,
-                         bool logLevelStamping)
+CallbackLog::CallbackLog(CallbackFunction callbackFunction, bool timeStamping,
+                         bool dateStamping, bool categoryStamping, bool logLevelStamping)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
     , _callbackFunction(std::move(callbackFunction))
 {}
-
 
 void CallbackLog::log(LogManager::LogLevel level, const std::string& category,
                       const std::string& message)
@@ -54,7 +52,7 @@ void CallbackLog::log(LogManager::LogLevel level, const std::string& category,
     if (output != "")
         output += "\t";
     output += message;
-    _callbackFunction(output);
+    _callbackFunction(std::move(output));
 }
 
 void CallbackLog::setCallback(CallbackFunction callbackFunction) {

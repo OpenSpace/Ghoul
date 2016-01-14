@@ -28,32 +28,29 @@
 #ifndef __BUFFER_H__
 #define __BUFFER_H__
 
-#include <cstring> // std::memcpy
-#include <cassert>
+#include <ghoul/misc/assert.h>
+#include <ghoul/misc/exception.h>
+
 #include <string>
 #include <vector>
-#include <type_traits>
-#include <initializer_list>
 
 namespace ghoul {
 
 /**
- * This class is a buffer container for serialized objects. The serialize
- * functions copies the memory of the provided object to the end of the 
- * internal array. The deserialize functions copies the memory from the 
- * end of the array into the provided object. Serialize and deserialize 
- * functions can be used interleaved since there are one read and one 
- * write pointer. The write and read functions write and read the internal
- * array to a binary file, LZ4 compression is supported.
+ * This class is a buffer container for serialized objects. The serialize functions copy
+ * the memory of the provided object to the end of the internal array. The deserialize
+ * functions copies the memory from the end of the array into the provided object.
+ * Serialize and deserialize functions can be used interleaved since there are one read
+ * and one write pointer. The write and read functions write and read the internal
+ * array to a binary file; LZ4 compression is supported.
  */
 class Buffer {
 public:
-    typedef unsigned char value_type;
-    typedef std::vector<value_type>::size_type size_type;
+    using value_type = unsigned char;
+    using size_type = std::vector<value_type>::size_type;
 
     /**
-     * Default Buffer object constructor. The size of the internal 
-     * array is 0.
+     * Default Buffer object constructor. The size of the internal array is 0.
      */
     Buffer();
     
@@ -66,30 +63,36 @@ public:
     /**
      * Constructs a Buffer object from file.
      * \param filename The filename of the binary Buffer file.
+     * \pre \p filename must not be empty
+     * \throw std::ios_base::failure If the buffer could not be read from \p filename
      */
     Buffer(const std::string& filename);
     
     /**
      * Constructs a Buffer by copying another Buffer object.
+     * \param other The Buffer to copy the data from
      */
     Buffer(const Buffer& other);
     
     /**
-     * Moves the original object into this one. The original 
-     * object must not be used after the move since it is in 
-     * an undefined state.
+     * Moves the original object into this one. The original object must not be used after
+     * the move since it is in an undefined state.
+     * \param other The Buffer from which the data is moved out of
      */
     Buffer(Buffer&& other);
     
     /**
      * Constructs a Buffer by copying another Buffer object.
+     * \param rhs The Buffer from which the data is copied
+     * \return The object this operator was called on
      */
     Buffer& operator=(const Buffer& rhs);
     
     /**
-     * Moves the original object into this one. The original
-     * object must not be used after the move since it is in
-     * an undefined state.
+     * Moves the original object into this one. The original object must not be used after
+     * the move since it is in an undefined state.
+     * \param rhs The Buffer out of which the data is moved
+     * \return The object this operator was called on
      */
     Buffer& operator=(Buffer&& rhs);
     
@@ -123,88 +126,135 @@ public:
     size_type capacity() const;
     
     /**
-     * Returns the size of the internal array. This is the same as
-     * the amount of bytes currently serialized.
+     * Returns the size of the internal array. This is the same as the amount of bytes
+     * currently serialized.
      * \return The current size of the internal array
      */
     size_type size() const;
     
     /**
-     * Writes the current Buffer to a file. This file will be bigger than 
-     * the current Buffer size because it also writes metadata to the file.
+     * Writes the current Buffer to a file. This file will be bigger than the current
+     * Buffer size because it also writes metadata to the file.
      * \param filename The filename to be written to
-     * \param compress Flag that specifies if the current Buffer should
-     * be compressed when written to file
-     * \return <code>true</code> if successful and <code>false</code> if unsuccessful
+     * \param compress Flag that specifies if the current Buffer should be compressed when
+     * written to file
+     * \pre \p filename must not be empty
+     * \throw std::ios_base::failure If there was an error writing the file
+     * \throw RuntimeError if there was an error compressing the data
      */
-    bool write(const std::string& filename, bool compress = false);
+    void write(const std::string& filename, bool compress = false);
     
     /**
      * Reads the Buffer from a Buffer file. 
      * \param filename The path to the file to read
-     * \return <code>true</code> if successful and <code>false</code> if unsuccessful
+     * \throw std::ios_base::failure If there was an error reading the file
+     * \pre \p filename must not be empty
      */
-    bool read(const std::string& filename);
+    void read(const std::string& filename);
     
     /**
      * Serializes a const char* string to a std::string
      * \param s The string to be serialized
+     * \pre \p s must not be <code>nullptr</code>
      */
     void serialize(const char* s);
     
     /**
-     * Serializes raw data
+     * Serializes raw data.
      * \param data Pointer to the raw data to serialize
      * \param size The size of the data to serialize in bytes
+     * \pre \p data must not be <code>nullptr</code>
      */
     void serialize(const value_type* data, size_t size);
     
     /**
-     * Seralizes an object
+     * Seralizes a general object.
+     * \param v The object to be serialized
+     * \tparam T The type of the object
+     * \pre \p T must be a POD type
      */
-    template<class T> void serialize(const T& v);
+    template <class T>
+    void serialize(const T& v);
     
     /**
-     * Serializes a vector of objects
+     * Serializes a vector of general objects.
+     * \param v The vector of objects to serialize
+     * \tparam T The type of each object
+     * \pre \p T must be a POD type
      */
-	template<typename T>
+	template <typename T>
 	void serialize(const std::vector<T>& v);
+    
+    /**
+     * Serializes the elements [begin, end) to the Buffer.
+     * \param begin Inclusive iterator to the front of the set of serialized elements
+     * \param end Exclusive iterator to the end of the set of serialized elements
+     * \tparam Iter Forward-iterator
+     * \pre The type pointed to by \p Iter must be a POD
+     */
+    template <typename Iter>
+    void serialize(Iter begin, Iter end);
     
     /**
      * Deserialize raw data
      * \param data Pointer to a datablock to copy data into
      * \param size The size number of bytes of data to copy
+     * \pre \p data must not be <code>nullptr</code>
      */
     void deserialize(value_type* data, size_t size);
     
     /**
-     * Deserializes an object
+     * Deserializes a general object.
+     * \param value The object to deserialize
+     * \tparam T The type of the object to deserialize
+     * \pre \p T must be a POD type
      */
-    template<class T> void deserialize(T& value);
+    template <class T>
+    void deserialize(T& value);
     
     /**
-     * Deserializes a vector of objects
+     * Deserializes a vector of general objects.
+     * \param v The vector of objects to deserialize
+     * \tparam T The type of each object
+     * \pre \p T must be a POD type
      */
-	template<typename T>
+	template <typename T>
 	void deserialize(std::vector<T>& v);
     
+    /**
+     * Deserializes the Buffer into the elements [begin, end).
+     * \param begin Inclusive iterator to the front of the set of deserialized elements
+     * \param end Exclusive iterator to the end of the set of deserialized elements
+     * \tparam Iter Forward-iterator
+     * \pre The type pointed to by \p Iter must be a POD
+     * \pre The number of elements deserialized must be equal to the distance between
+     * \p begin and \p end
+     */
+    template <typename Iter>
+    void deserialize(Iter begin, Iter end);
+    
 private:
-
+    /// The buffer storage
     std::vector<value_type> _data;
+    
+    /// Pointer to the current writing position
     size_t _offsetWrite;
+    
+    /// Pointer to the current reading position
     size_t _offsetRead;
-    
-    
-}; // class Buffer
+};
 
 // Specializations for std::string
-template<>
+template <>
 void Buffer::serialize(const std::string& v);
-template<>
+    
+template <>
 void Buffer::deserialize(std::string& v);
-template<>
+    
+template <>
 void Buffer::serialize(const std::vector<std::string>& v);
-template<>
+    
+template <>
 void Buffer::deserialize(std::vector<std::string>& v);
 
 } // namespace ghoul

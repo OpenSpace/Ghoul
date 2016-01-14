@@ -28,27 +28,28 @@
 #ifdef GHOUL_USE_SOIL
 
 #include <ghoul/opengl/texture.h>
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/glm.h>
 
 #include <SOIL.h>
 
-namespace {
-	const std::string _loggerCat = "TextureReaderSOIL";
-}
-
 namespace ghoul {
 namespace io {
-namespace impl {
 
-opengl::Texture* TextureReaderSOIL::loadTexture(const std::string& filename) const {
+std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(
+                                                               std::string filename) const
+{
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+    
 	using opengl::Texture;
-    LDEBUG("loading texture!");
  
     int width, height;
-    unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, 0, SOIL_LOAD_RGBA);
-    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-    // SOIL_free_image_data(image);
+    unsigned char* image = SOIL_load_image(
+        filename.c_str(),
+        &width,
+        &height,
+        0,
+        SOIL_LOAD_RGBA
+    );
 
     glm::size3_t size(width, height, 1);
     Texture::Format format;
@@ -56,11 +57,17 @@ opengl::Texture* TextureReaderSOIL::loadTexture(const std::string& filename) con
     GLenum type;
     type = GL_UNSIGNED_BYTE;
 
-    Texture* result = new Texture(image, size, format, static_cast<int>(format), type, Texture::FilterMode::Linear);
-	return result;
+    return std::make_unique<Texture>(
+        image,
+        size,
+        format,
+        static_cast<int>(format),
+        type,
+        Texture::FilterMode::Linear
+    );
 }
 
-std::set<std::string> TextureReaderSOIL::supportedExtensions() const {
+std::vector<std::string> TextureReaderSOIL::supportedExtensions() const {
 	// taken from http://www.lonesock.net/soil.html
 	return {
 		"bmp",	// load & save					
@@ -81,7 +88,6 @@ std::set<std::string> TextureReaderSOIL::supportedExtensions() const {
 	};
 }
 
-} // namespace impl
 } // namespace opengl
 } // namespace ghoul
 

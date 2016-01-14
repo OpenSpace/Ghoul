@@ -23,9 +23,10 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/systemcapabilities/systemcapabilitiescomponent.h"
+#include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
 
-#include "ghoul/logging/logmanager.h"
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
 
 namespace ghoul {
 namespace systemcapabilities {
@@ -33,59 +34,41 @@ namespace systemcapabilities {
 #ifdef GHOUL_USE_WMI
     IWbemLocator* SystemCapabilitiesComponent::_iwbemLocator = nullptr;
     IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
+    
+SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, HRESULT code)
+    : RuntimeError(msg + ". Error Code: " + std::to_string(code), "WMI")
+    , message(std::move(msg))
+    , errorCode(std::move(code))
+{}
 #endif
 
-SystemCapabilitiesComponent::SystemCapabilitiesComponent()
-    : _isInitialized(false)
-{}
-
-SystemCapabilitiesComponent::~SystemCapabilitiesComponent() {}
-
+SystemCapabilitiesComponent::SystemCapabilitiesComponent(bool initializeWMI) {
 #ifdef GHOUL_USE_WMI
-void SystemCapabilitiesComponent::initialize(bool initializeWMI) {
-    if (initializeWMI && !isWMIinitialized()) {
+    if (initializeWMI && !isWMIInitialized()) {
         SystemCapabilitiesComponent::initializeWMI();
     }
-#else
-void SystemCapabilitiesComponent::initialize(bool) {
 #endif
-    _isInitialized = true;
 }
 
-void SystemCapabilitiesComponent::deinitialize() {
+SystemCapabilitiesComponent::~SystemCapabilitiesComponent() {
 #ifdef GHOUL_USE_WMI
-    if (isWMIinitialized())
+    if (isWMIInitialized())
         deinitializeWMI();
 #endif
-    clearCapabilities();
-    _isInitialized = false;
-}
-
-bool SystemCapabilitiesComponent::isInitialized() const {
-    return _isInitialized;
 }
 
 #ifdef GHOUL_USE_WMI
 void SystemCapabilitiesComponent::initializeWMI() {
     const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
+    ghoul_assert(!isWMIInitialized(), "WMI must not have been initialized");
+    
     // This code is based on
     // http://msdn.microsoft.com/en-us/library/aa390423.aspx
     // All rights remain with their original copyright owners
 
-    if (isWMIinitialized()) {
-        LWARNING("The WMI initialization has already been initialized.");
-        return;
-    }
-
     HRESULT hRes = CoInitializeEx(0, COINIT_APARTMENTTHREADED);
-    if (FAILED(hRes)) {
-        LERROR("WMI initialization failed. 'CoInitializeEx' failed." 
-            << " Error Code: " << hRes);
-        return;
-    }
-    //if (hRes = S_FALSE)
-    //    // WMI was already initialized
-    //    return;
+    if (FAILED(hRes))
+        throw WMIError("WMI initialization failed. 'CoInitializeEx' failed", hRes);
     hRes = CoInitializeSecurity(
         NULL, 
         -1,                          // COM authentication
@@ -98,9 +81,8 @@ void SystemCapabilitiesComponent::initializeWMI() {
         NULL                         // Reserved
         );
     if (FAILED(hRes))
-        LDEBUG("CoInitializeSecurity failed with error code: 0x" << hRes);
-    else
-        LDEBUG("CoInitializeSecurity successful.");
+        throw WMIError("CoInitializeSecurity failed with error code", hRes);
+    LDEBUG("CoInitializeSecurity successful.");
 
     hRes = CoCreateInstance(
         CLSID_WbemLocator,
@@ -109,11 +91,12 @@ void SystemCapabilitiesComponent::initializeWMI() {
         IID_IWbemLocator,
         reinterpret_cast<LPVOID*>(&_iwbemLocator));
     if (FAILED(hRes)) {
-        LERROR("WMI initialization failed. Failed to create IWbemLocator object." 
-            << " Error Code: " << hRes);
-        _iwbemLocator = 0;
+        _iwbemLocator = nullptr;
         CoUninitialize();
-        return;
+
+        throw WMIError(
+            "WMI initialization failed. Failed to create IWbemLocator object", hRes
+        );
     }
 
     LDEBUG("IWbemLocator object successfully created.");
@@ -129,13 +112,13 @@ void SystemCapabilitiesComponent::initializeWMI() {
         &_iwbemServices          // pointer to IWbemServices proxy
         );
     if (FAILED(hRes)) {
-        LERROR("WMI initialization failed. Failed to connect to WMI server."
-            << " Error Code: " << hRes);
         _iwbemLocator->Release();
+        _iwbemLocator = nullptr;
         CoUninitialize();
-        _iwbemLocator = 0;
-        _iwbemServices = 0;
-        return;
+        _iwbemServices = nullptr;
+        throw WMIError(
+            "WMI initialization failed. Failed to connect to WMI server", hRes
+        );
     }
 
     LDEBUG("Connected to ROOT\\CIMV2 WMI namespace.");
@@ -151,32 +134,27 @@ void SystemCapabilitiesComponent::initializeWMI() {
         EOAC_NONE                    // proxy capabilities 
         );
     if (FAILED(hRes)) {
-        LERROR("WMI initialization failed. Could not set proxy blanket. Error Code: 0x"
-            << hRes);
         _iwbemServices->Release();
-        _iwbemServices = 0;
+        _iwbemServices = nullptr;
         _iwbemLocator->Release();
-        _iwbemLocator = 0;
+        _iwbemLocator = nullptr;
         CoUninitialize();
-        return;
+        throw WMIError("WMI initialization failed. Could not set proxy blanket", hRes);
     }
     LDEBUG("WMI successfully initialized.");
 }
 
 void SystemCapabilitiesComponent::deinitializeWMI() {
     const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
-    if (!isWMIinitialized()) {
-        LWARNING("WMI is not initialized.");
-        return;
-    }
+    ghoul_assert(isWMIInitialized(), "WMI must have been initialized");
 
     LDEBUG("Deinitializing WMI.");
     if (_iwbemLocator)
         _iwbemLocator->Release();
-    _iwbemLocator = 0;
+    _iwbemLocator = nullptr;
     if (_iwbemServices)
         _iwbemServices->Release();
-    _iwbemServices = 0;
+    _iwbemServices = nullptr;
 
     CoUninitialize();
 }
@@ -201,19 +179,18 @@ std::string wstr2str(const std::wstring& wstr) {
     return r;
 }
 
-bool SystemCapabilitiesComponent::isWMIinitialized() {
-    return ((_iwbemLocator != nullptr) && (_iwbemServices != nullptr));
+bool SystemCapabilitiesComponent::isWMIInitialized() {
+    return (_iwbemLocator && _iwbemServices);
 }
 
 VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
                                                const std::string& attribute)
 {
     const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
-    if (!isWMIinitialized()) {
-        LERROR("WMI is not initialized.");
-        return nullptr;
-    }
-
+    ghoul_assert(isWMIInitialized(), "WMI must have been initialized");
+    ghoul_assert(!wmiClass.empty(), "wmiClass must not be empty");
+    ghoul_assert(!attribute.empty(), "Attribute must not be empty");
+    
     VARIANT* result = nullptr;
     IEnumWbemClassObject* enumerator = nullptr;
     std::string query = "SELECT " + attribute + " FROM " + wmiClass;
@@ -222,11 +199,10 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
         bstr_t(query.c_str()),
         WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, 
         NULL,
-        &enumerator);
-    if (FAILED(hRes)) {
-        LERROR("WMI query failed. Error Code: 0x" << hRes);
-        return nullptr;
-    }
+        &enumerator
+    );
+    if (FAILED(hRes))
+        throw WMIError("WMI query failed", hRes);
 
     IWbemClassObject* pclsObject = nullptr;
     ULONG returnValue = 0;
@@ -236,7 +212,8 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
             WBEM_INFINITE,
             1,
             &pclsObject,
-            &returnValue);
+            &returnValue
+        );
         if (!FAILED(hRes) && returnValue) {
             result = new VARIANT;
             hr = pclsObject->Get(
@@ -244,14 +221,14 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
                 0,
                 result,
                 0,
-                0);
+                0
+            );
         }
     }
 
     if (FAILED(hr)) {
-        LINFO("No WMI query result.");
         VariantClear(result);
-		return nullptr;
+        throw WMIError("No WMI query result", hr);
 	}
 
     if (enumerator)
@@ -262,60 +239,39 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
     return result;
 }
 
-bool SystemCapabilitiesComponent::queryWMI(
-    const std::string& wmiClass,
-    const std::string& attribute,
-    std::string& value) 
+void SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
+                                           const std::string& attribute,
+                                           std::string& value)
 {
     VARIANT* variant = queryWMI(wmiClass, attribute);
-    if (!variant)
-        return false;
-    else {
-        value = wstr2str(std::wstring(variant->bstrVal));
-        VariantClear(variant);
-        return true;
-    }
+    value = wstr2str(std::wstring(variant->bstrVal));
+    VariantClear(variant);
 }
 
-bool SystemCapabilitiesComponent::queryWMI(
-    const std::string& wmiClass,
-    const std::string& attribute,
-    int& value)
+void SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
+                                           const std::string& attribute, int& value)
 {
     VARIANT* variant = queryWMI(wmiClass, attribute);
-    if (!variant)
-        return false;
-    else {
-        value = variant->intVal;
-        VariantClear(variant);
-        return true;
-    }
+    value = variant->intVal;
+    VariantClear(variant);
 }
 
-bool SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass, const std::string& attribute,
+void SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
+                                           const std::string& attribute,
                                            unsigned int& value)
 {
     VARIANT* variant = queryWMI(wmiClass, attribute);
-    if (!variant)
-        return false;
-    else {
-        value = variant->uintVal;
-        VariantClear(variant);
-        return true;
-    }
+    value = variant->uintVal;
+    VariantClear(variant);
 }
 
-bool SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass, const std::string& attribute,
+void SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
+                                           const std::string& attribute,
                                            unsigned long long& value)
 {
     VARIANT* variant = queryWMI(wmiClass, attribute);
-    if (!variant)
-        return false;
-    else {
-        value = variant->ullVal;
-        VariantClear(variant);
-        return true;
-    }
+    value = variant->ullVal;
+    VariantClear(variant);
 }
 
 #endif

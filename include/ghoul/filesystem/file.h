@@ -26,6 +26,8 @@
 #ifndef __FILE_H__
 #define __FILE_H__
 
+#include <ghoul/misc/exception.h>
+
 #include <functional>
 #include <string>
 
@@ -35,36 +37,41 @@ namespace filesystem {
 class FileSystem;
 
 /**
- * This class is an abstract handle for a generic file in the file system. The main
- * functionality is to be able to extract parts of the path like the #baseName, the
- * #directoryName, or the #fileExtension. The second functionality of this class
- * is a platform-independent way of being notified of changes of the file. The constructor
- * or the #setCallback methods expect an <code>std::function</code> object (possibly
- * initialized using a lambda-expression) that will be called whenever the file changes on
- * the hard disk. The callback function has this object passed as a parameter. If many
- * changes of the file happen in quick succession, each change will trigger a separate
- * call of the callback. The file system is not polled, but the changes are pushed to the
- * application, so the changes are registered efficiently and are solely impacted by the
- * overhead of <code>std::function</code>.
+ * This class is a handle for a generic file in the file system. The main functionality is
+ * to be able to extract parts of the path like the #baseName, the #directoryName, or the 
+ * #fileExtension. The second functionality of this class is a platform-independent way of 
+ * being notified of changes of the file. The constructor or the #setCallback methods
+ * expect an <code>std::function</code> object (possibly initialized using a lambda-
+ * expression) that will be called whenever the file changes on the hard disk. The
+ * callback function has this object passed as a parameter. If many changes of the file 
+ * happen in quick succession, each change will trigger a separate call of the callback.
+ * The file system is not polled, but the changes are pushed to the application, so the 
+ * changes are registered efficiently and are solely impacted by the overhead of 
+ * <code>std::function</code>.
  */
 class File {
 public:
+     /// Exception that gets thrown if there is a file-related error in any of the methods
+    struct FileException : public RuntimeError {
+        explicit FileException(const std::string& msg);
+    };
+    
     /// The type of the std::function that is used as the prototype for the callback
-    typedef std::function<void (const File&)> FileChangedCallback;
+    using FileChangedCallback = std::function<void (const File&)>;
 
     /**
-     * This method constructs a new File object using a given <code>filename</code> as an
-     * std string. <code>isRawPath</code> controls if the path is used without changes, or
-     * if tokens should be converted first. The token conversion is
-     * done using the #ghoul::filesystem::FileSystem. <code>fileChangedCallback</code>
+     * This method constructs a new File object using a given \p filename. \p isRawPath
+     * controls if the path is used without changes, or if tokens should be converted
+     * first. The token conversion is done using the FileSystem. \p fileChangedCallback
      * will be called whenever the pointed file changes on the hard disk.
      * \param filename The path to the file this File object should point to
-     * \param isRawPath If this value is <code>true</code>, the value of
-     * <code>filename</code> is used as-is. If it is <code>false</code>, the path is
-     * converted into an absolute path and any tokens, if present, are resolved
+     * \param isRawPath If this value is <code>true</code>, the value of \p filename is
+     * used as-is. If it is <code>false</code>, the path is converted into an absolute
+     * path and any tokens, if present, are resolved
      * \param fileChangedCallback The callback function that is called once per change of
      * the file on the filesystem
-     * \see ghoul::filesystem::FileSystem The system to register and use tokens
+     * \pre \p filename must not be empty
+     * \see FileSystem The system to register and use tokens
      */
     File(std::string filename, bool isRawPath = false,
          FileChangedCallback fileChangedCallback = FileChangedCallback());
@@ -90,10 +97,9 @@ public:
     void setCallback(FileChangedCallback callback);
     
     /**
-     * Returns the currently active <code>std::function</code> object. This object might
-     * be uninitialized if no callback has been registered previously.
-     * \return The currently active <code>std::function</code> object used as a callback
-     * function
+     * Returns the currently active callback. This object might be uninitialized if no
+     * callback has been registered previously.
+     * \return The currently active callback function
      */
     const FileChangedCallback& callback() const;
 
@@ -153,8 +159,9 @@ public:
     std::string fileExtension() const;
 
 	/**
-	 * This method returns the last-modified date of the file as an ISO 8601 string.
+	 * This method returns the last-modified date of the file as an ISO 8601 string
 	 * \return The last-modified date of the file as an ISO 8601 string
+     * \throws FileException If there is an error accessing the file
 	 */
 	std::string lastModifiedDate() const;
 
@@ -171,14 +178,14 @@ private:
      */
     void removeFileChangeListener();
 
-    std::string _filename; ///< The filename of this File
+    /// The filename of this File
+    std::string _filename;
+
     /**
      * The callback that is called when the file changes on disk. Has no performance
      * impact when it is not used
      */
     FileChangedCallback _fileChangedCallback;
-
-	friend class FileSystem;
 };
 
 /**

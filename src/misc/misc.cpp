@@ -27,10 +27,7 @@
 
 namespace ghoul {
 
-std::vector<std::string> tokenizeString(
-    const std::string& input,
-    const char separator)
-{
+std::vector<std::string> tokenizeString(const std::string& input, char separator) {
     size_t separatorPos = input.find(separator);
     if (separatorPos == std::string::npos) {
         return { input };

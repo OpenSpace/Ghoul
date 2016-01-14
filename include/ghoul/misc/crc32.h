@@ -37,16 +37,16 @@
 namespace ghoul {
 
 /**
- * Computes the CRC-32 hash of the string <code>s</code> with the length <code>len</code>.
- * If the string is longer than <code>len</code>, the behavior is undefined. 
+ * Computes the CRC-32 hash of the string \p s with the length \p len. If the string is
+ * longer than <code>len</code>, the behavior is undefined.
  * \param s The string for which to compute the CRC-32 hash
- * \param len The length of the string <code>s</code>
+ * \param len The length of the string \p s
  * \return The hash value for the passed string
  */
 unsigned int hashCRC32(const char* s, size_t len);
 
 /**
- * Computes the CRC-32 hash of the string <code>s</code>.
+ * Computes the CRC-32 hash of the string \p s.
  * \param s The string for which to compute the CRC-32 hash
  * \return The hash value for the passed string
  */

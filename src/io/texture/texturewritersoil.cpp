@@ -29,27 +29,26 @@
 
 #include <ghoul/filesystem/file.h>
 #include <ghoul/opengl/texture.h>
-#include <ghoul/logging/logmanager.h>
-#include <ghoul/glm.h>
-#include <vector>
 
 #include <SOIL.h>
 
-namespace {
-    const std::string _loggerCat = "TextureWriterSOIL";
-}
-
 namespace ghoul {
 namespace io {
-namespace impl {
 
-void TextureWriterSOIL::saveTexture(const opengl::Texture* texture, const std::string& filename) const {
-    using opengl::Texture;
-    
-    int width = texture->width(),
-        height = texture->height();
+void TextureWriterSOIL::saveTexture(const opengl::Texture& texture,
+                                                        const std::string& filename) const
+{
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
     
     std::string extension = ghoul::filesystem::File(filename).fileExtension();
+    ghoul_assert(
+        std::find(supportedExtensions().begin(), supportedExtensions.end(), extension),
+        "Extension of the filename must be supported"
+    );
+    
+    int width = texture.width();
+    int height = texture.height();
+    
     int type;
     
     if (extension == "bmp") {
@@ -58,25 +57,30 @@ void TextureWriterSOIL::saveTexture(const opengl::Texture* texture, const std::s
         type = SOIL_SAVE_TYPE_TGA;
     } else if (extension == "dds") {
         type = SOIL_SAVE_TYPE_DDS;
-    } else {
-        LERROR("Extension \"" << extension << "\" not supported.");
-        return;
     }
-
+    
     const unsigned char* data = static_cast<const unsigned char*>(texture->pixelData());
-    SOIL_save_image(filename.c_str(), type, width, height, texture->numberOfChannels(), data);
+    int result = SOIL_save_image(
+        filename.c_str(),
+        type,
+        width,
+        height,
+        texture->numberOfChannels(),
+        data
+    );
+    if (result == 0)
+        throw TextureWriteException(filename, "Error writing Texture", this);
 }
     
-    std::set<std::string> TextureWriterSOIL::supportedExtensions() const {
-        // taken from http://www.lonesock.net/soil.html
-        return {
-                "bmp",  // load & save
-		"tga",  // load & save
-                "dds",  // load & save
+std::vector<std::string> TextureWriterSOIL::supportedExtensions() const {
+    // taken from http://www.lonesock.net/soil.html
+    return {
+        "bmp",
+		"tga",
+        "dds"
 	};
-    }
+}
     
-} // namespace impl
 } // namespace opengl
 } // namespace ghoul
 

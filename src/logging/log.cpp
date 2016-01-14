@@ -23,23 +23,21 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/logging/log.h"
-#include "ghoul/logging/logmanager.h"
-#include <ctime>
-#include <stdio.h>
+#include <ghoul/logging/log.h>
+
+#include <chrono>
+#include <iomanip>
 
 namespace ghoul {
 namespace logging {
 
 Log::Log(bool timeStamping, bool dateStamping, bool categoryStamping,
-         bool logLevelStamping)
+                                                                    bool logLevelStamping)
     : _timeStamping(timeStamping)
     , _dateStamping(dateStamping)
     , _categoryStamping(categoryStamping)
     , _logLevelStamping(logLevelStamping)
 {}
-
-Log::~Log() {}
 
 bool Log::isTimeStamping() const {
     return _timeStamping;
@@ -74,39 +72,21 @@ void Log::setLogLevelStamping(bool logLevelStamping) {
 }
 
 std::string Log::getTimeString() const {
-    time_t timeSinceEpoch = 0;
-    time(&timeSinceEpoch);
-
-    char buffer[256];
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)
-    tm localTime;
-    localtime_s(&localTime, &timeSinceEpoch);
-    sprintf_s(buffer, "%.2i:%.2i:%.2i",
-              localTime.tm_hour, localTime.tm_min, localTime.tm_sec);
-#else
-    const tm* const localTime = localtime(&timeSinceEpoch);
-    sprintf(buffer, "%.2i:%.2i:%.2i",
-            localTime->tm_hour, localTime->tm_min, localTime->tm_sec);
-#endif
-    return std::string(buffer);
+    auto now = std::chrono::system_clock::now();
+    time_t time = std::chrono::system_clock::to_time_t(now);
+    
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&time), "%T");
+    return ss.str();
 }
 
 std::string Log::getDateString() const {
-    time_t timeSinceEpoch = 0;
-    time(&timeSinceEpoch);
-
-    char buffer[256];
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)
-    tm localTime;
-    localtime_s(&localTime, &timeSinceEpoch);
-    sprintf_s(buffer, "%.2i-%.2i-%.2i",
-              localTime.tm_year + 1900, localTime.tm_mon + 1, localTime.tm_mday);
-#else
-    const tm* const localTime = localtime(&timeSinceEpoch);
-    sprintf(buffer, "%.2i:%.2i:%.2i",
-            localTime->tm_mday, localTime->tm_mon + 1, localTime->tm_year + 1900);
-#endif
-    return std::string(buffer);
+    auto now = std::chrono::system_clock::now();
+    time_t time = std::chrono::system_clock::to_time_t(now);
+    
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&time), "%F");
+    return ss.str();
 }
 
 void Log::flush() {}

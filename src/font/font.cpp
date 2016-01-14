@@ -28,15 +28,15 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/logging/logmanager.h>
 
+#include <format.h>
+
 #include <algorithm>
 #include <array>
-
-#include <cstdarg>
+#include <tuple>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_STROKER_H
-
 
 #undef __FTERRORS_H__
 #define FT_ERRORDEF( e, v, s )  { e, s },
@@ -67,57 +67,76 @@ namespace {
     
     // Initializes the passed 'library' and loads the font face specified by the 'name'
     // and 'size' into the provided 'face'
-    bool loadFace(const std::string& name,
+    void loadFace(const std::string& name,
                   float size,
                   FT_Library& library,
                   FT_Face& face)
     {
         FT_Error error = FT_Init_FreeType(&library);
         if (error) {
-            LERROR("FT_Error: " <<
-                   FT_Errors[error].code <<
-                   " (" << FT_Errors[error].message << ")");
-            return false;
+            throw ghoul::fontrendering::Font::FreeTypeException(
+                name, size, FT_Errors[error].code, FT_Errors[error].message
+            );
         }
         
         // Load face
         error = FT_New_Face(library, name.c_str(), 0, &face);
         if (error) {
-            LERROR("FT_Error: " <<
-                   FT_Errors[error].code <<
-                   " (" << FT_Errors[error].message << ")");
             FT_Done_FreeType(library);
-            return false;
+            throw ghoul::fontrendering::Font::FreeTypeException(
+                name, size, FT_Errors[error].code, FT_Errors[error].message
+            );
         }
         
         // Select charmap
         error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
         if (error) {
-            LERROR("FT_Error: " <<
-                   FT_Errors[error].code <<
-                   " (" << FT_Errors[error].message << ")");
             FT_Done_Face(face);
             FT_Done_FreeType(library);
-            return false;
+            throw ghoul::fontrendering::Font::FreeTypeException(
+                name, size, FT_Errors[error].code, FT_Errors[error].message
+            );
         }
         
         // Set char size
         error = FT_Set_Char_Size(face, (int)(size * PointConversionFactor), 0, DPI , DPI);
         if (error) {
-            LERROR("FT_Error: " <<
-                   FT_Errors[error].code <<
-                   " (" << FT_Errors[error].message << ")");
             FT_Done_Face(face);
             FT_Done_FreeType(library);
-            return false;
+            throw ghoul::fontrendering::Font::FreeTypeException(
+                name, size, FT_Errors[error].code, FT_Errors[error].message
+            );
         }
-        return true;
     }
 }
 
 
 namespace ghoul {
 namespace fontrendering {
+    
+Font::FontException::FontException(const std::string& msg)
+    : RuntimeError(msg, "Font")
+{}
+    
+Font::GlyphException::GlyphException(std::string name, float size, wchar_t character)
+    : FontException(fmt::format(
+        "Glyph '{}' was not present in the font '{}' at size '{}'",
+        name, size, char(character)))
+    , fontName(std::move(name))
+    , fontSize(size)
+    , glyph(character)
+{}
+    
+Font::FreeTypeException::FreeTypeException(std::string name, float size, int code,
+                                           std::string message)
+    : FontException(fmt::format(
+        "Error loading font '{}' for size '{}': ({}) {}",
+        name, size, code, message))
+    , fontName(std::move(name))
+    , fontSize(size)
+    , errorCode(code)
+    , errorMessage(std::move(message))
+{}
     
 Font::Glyph::Glyph(wchar_t character,
                    int width,
@@ -207,20 +226,15 @@ Font::Font(std::string filename,
     , _hasOutline(hasOutline)
     , _outlineThickness(outlineThickness)
 {
+    ghoul_assert(!_name.empty(), "Filename must not be empty");
     ghoul_assert(_pointSize > 0.f, "Need positive point size");
-    ghoul_assert(!_name.empty(), "Empty file name not allowed");
-}
-
-bool Font::initialize() {
+    
     // Get font metrics at higher resolution for increased accuracy
     static const float HighFaceResolutionFactor = 100.f;
-
+    
     FT_Library library;
     FT_Face face;
-
-    bool success = loadFace(_name, _pointSize * HighFaceResolutionFactor, library, face);
-    if (!success)
-        return false;
+    loadFace(_name, _pointSize * HighFaceResolutionFactor, library, face);
     
     _height = (face->size->metrics.height >> 6) / HighFaceResolutionFactor;
     
@@ -229,8 +243,6 @@ bool Font::initialize() {
     
     // -1 is a special glyph
     glyph(-1);
-    
-    return true;
 }
 
 std::string Font::name() const {
@@ -256,28 +268,26 @@ bool Font::hasOutline() const {
 glm::vec2 Font::boundingBox(const char* format, ...) {
     ghoul_assert(format != nullptr, "No format is provided");
     glm::vec2 result(0.f);
-
     
     va_list args;	 // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables
     
     int size = 1 + vscprintf(format, args);
-    char* buffer = new char[size];
-    memset(buffer, 0, static_cast<size_t>(size));
+    std::vector<char> buffer(size, 0);
     
-#if WIN32
-    vsprintf_s(buffer, size, format, args);
+#ifdef WIN32
+    vsprintf_s(buffer.data(), size, format, args);
 #else
-    vsprintf(buffer, format, args);
+    vsprintf(buffer.data(), format, args);
 #endif
     va_end(args);
     
 
     // Splitting the text into separate lines
-    const char* start_line = buffer;
+    const char* start_line = buffer.data();
     std::vector<std::string> lines;
     const char* c;
-    for (c = buffer; *c; c++) {
+    for (c = buffer.data(); *c; c++) {
         if (*c == '\n') {
             std::string line;
             for (const char* n = start_line; n < c; ++n)
@@ -311,7 +321,6 @@ glm::vec2 Font::boundingBox(const char* format, ...) {
     }
     
     result.y += (lines.size() - 1) * _height;
-    delete[] buffer;
 
     return result;
 }
@@ -329,9 +338,6 @@ const Font::Glyph* Font::glyph(wchar_t character) {
     // strikethrough) and background.
     if (character == static_cast<wchar_t>(-1)) {
         TextureAtlas::RegionHandle handle = _atlas.newRegion(4, 4);
-        if (handle == TextureAtlas::InvalidRegion)
-            return nullptr;
-        
         // The last *4 for the depth is not a danger here as _atlas.setRegion only
         // extracts as much data as is needed for the used texture atlas
         std::array<unsigned char, 4*4*4> data;
@@ -340,29 +346,24 @@ const Font::Glyph* Font::glyph(wchar_t character) {
         _atlas.setRegionData(handle, data.data());
         
         Glyph glyph(static_cast<wchar_t>(-1));
-        _atlas.getTextureCoordinates(handle, glyph._topLeft, glyph._bottomRight);
+        auto coords = _atlas.textureCoordinates(handle);
+        glyph._topLeft = coords.topLeft;
+        glyph._bottomRight = coords.bottomRight;
         _glyphs.push_back(std::move(glyph));
         
         return &(_glyphs.back());
     }
     
     // Glyph has not been already loaded
-    size_t nGlyphNotLoaded = loadGlyphs({character});
-    if (nGlyphNotLoaded == 0)
-        return &(_glyphs.back());
-    else {
-        LERROR("Glyph '" << character << "' could not be loaded");
-        return nullptr;
-    }
+    loadGlyphs({character});
+    return &(_glyphs.back());
 }
     
 float Font::computeLeftBearing(wchar_t charcode) const {
     const float HighResolutionFactor = 10.f;
     FT_Library library = nullptr;
     FT_Face face = nullptr;
-    bool success = loadFace(_name, _pointSize * HighResolutionFactor, library, face);
-    if (!success)
-        return 0.f;
+    loadFace(_name, _pointSize * HighResolutionFactor, library, face);
     
     FT_UInt glyphIndex = FT_Get_Char_Index(face, charcode);
     FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
@@ -387,43 +388,45 @@ float Font::computeLeftBearing(wchar_t charcode) const {
     FT_Glyph_To_Bitmap(&outlineGlyph, FT_RENDER_MODE_NORMAL, nullptr, 1);
     
     FT_BitmapGlyph outlineBitmap = reinterpret_cast<FT_BitmapGlyph>(outlineGlyph);
+
+    FT_Done_Face(face);
+    FT_Done_FreeType(library);
     return outlineBitmap->left / HighResolutionFactor;
 }
     
-size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
+void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
 #define HandleError(error) \
     if (error) { \
-        LERROR("FT_Error: " << \
-               FT_Errors[error].code << \
-               " (" << FT_Errors[error].message << ")" \
-        ); \
         FT_Done_Face(face); \
         FT_Done_FreeType(library); \
-        return characters.size() - i; \
+        throw FreeTypeException( \
+            _name, \
+            _pointSize, \
+            FT_Errors[error].code, \
+            FT_Errors[error].message \
+        ); \
     }
 
 #define HandleErrorWithStroker(error) \
     if (error) { \
-        LERROR("FT_Error: " << \
-            FT_Errors[error].code << \
-            " (" << FT_Errors[error].message << ")" \
-        ); \
         FT_Done_Face(face); \
         FT_Done_FreeType(library); \
-        return characters.size() - i; \
+        FT_Stroker_Done(stroker); \
+        throw FreeTypeException( \
+            _name, \
+            _pointSize, \
+            FT_Errors[error].code, \
+            FT_Errors[error].message \
+        ); \
     }
 
     using TextureAtlas = opengl::TextureAtlas;
     
-    size_t missed = 0;
-    LINFO(_name);
     unsigned int atlasDepth  = _atlas.size().z;
     
     FT_Library library = nullptr;
     FT_Face face = nullptr;
-    bool success = loadFace(_name, _pointSize, library, face);
-    if (!success)
-        return characters.size();
+    loadFace(_name, _pointSize, library, face);
 
     for (size_t i = 0; i < characters.size(); ++i) {
         // Search through the loaded glyphs to avoid duplicates
@@ -447,10 +450,12 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         
         FT_UInt glyphIndex = FT_Get_Char_Index(face, charcode);
         if (glyphIndex == 0) {
-            LERROR("Glyph was not present in the FreeType face");
             FT_Done_Face(face);
             FT_Done_FreeType(library);
-            return characters.size() - i;
+            throw FontException(fmt::format(
+                "Glyph {} was not present in the FreeType face",
+                char(charcode)
+            ));
         }
 
         FT_Error error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
@@ -493,13 +498,11 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             height = outlineBitmap->bitmap.rows;
             
             TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
-            if (handle == TextureAtlas::InvalidRegion) {
-                missed++;
-                LERROR("Texture atlas is full");
-                continue;
-            }
-            _atlas.setRegionData(handle, outlineBitmap->bitmap.buffer);
-            _atlas.getTextureCoordinates(handle, outlineTopLeft, outlineBottomRight);
+            if (outlineBitmap->bitmap.buffer)
+                _atlas.setRegionData(handle, outlineBitmap->bitmap.buffer);
+            auto res = _atlas.textureCoordinates(handle);
+            outlineTopLeft = res.topLeft;
+            outlineBottomRight = res.bottomRight;
         }
         
         FT_Glyph insideGlyph;
@@ -519,11 +522,6 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         height = std::max(height, insideBitmap->bitmap.rows);
         
         TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
-        if (handle == TextureAtlas::InvalidRegion) {
-            missed++;
-            LERROR("Texture atlas is full");
-            continue;
-        }
         
         // If we don't have an outline for this font, our current 'width' and 'height'
         // corresponds to the buffer, so we can just use it straight away.
@@ -532,7 +530,9 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         // first
         if (!_hasOutline) {
             _atlas.setRegionData(handle, insideBitmap->bitmap.buffer);
-            _atlas.getTextureCoordinates(handle, topLeft, bottomRight);
+            auto res = _atlas.textureCoordinates(handle);
+            topLeft = res.topLeft;
+            bottomRight = res.bottomRight;
         }
         else {
             std::vector<unsigned char> buffer(width * height * sizeof(char), 0);
@@ -557,16 +557,17 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
                 }
             }
             
-            _atlas.setRegionData(handle, buffer.data());
+            if (!buffer.empty())
+                _atlas.setRegionData(handle, buffer.data());
             
             // We need to offset the texture coordinates by half of the width and height
             // differences
-            _atlas.getTextureCoordinates(
-                handle,
-                topLeft,
-                bottomRight,
-                glm::ivec4(widthOffset / 4.f, heightOffset / 4.f, widthOffset / 4.f, heightOffset / 4.f)
+            auto res = _atlas.textureCoordinates(handle,
+                glm::ivec4(widthOffset / 4.f, heightOffset / 4.f,
+                           widthOffset / 4.f, heightOffset / 4.f)
             );
+            topLeft = res.topLeft;
+            bottomRight = res.bottomRight;
         }
 
         // Discard hinting to get advance
@@ -590,16 +591,13 @@ size_t Font::loadGlyphs(const std::vector<wchar_t>& characters) {
     FT_Done_FreeType(library);
     _atlas.upload();
     generateKerning();
-    return missed;
 }
     
 void Font::generateKerning() {
     FT_Library library;
     FT_Face face;
     
-    bool success = loadFace(_name, _pointSize, library, face);
-    if (!success)
-        return;
+    loadFace(_name, _pointSize, library, face);
     
     bool hasKerning = FT_HAS_KERNING(face);
     if (!hasKerning)
@@ -622,8 +620,8 @@ void Font::generateKerning() {
         }
     }
     
-    FT_Done_Face( face );
-    FT_Done_FreeType( library );
+    FT_Done_Face(face);
+    FT_Done_FreeType(library);
 }
 
 } // namespace fontrendering

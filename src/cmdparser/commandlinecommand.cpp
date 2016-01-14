@@ -25,13 +25,20 @@
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 
-#include <ghoul/cmdparser/singlecommand.h>
-#include <ghoul/cmdparser/multiplecommand.h>
-
-#include <sstream>
+#include <format.h>
 
 namespace ghoul {
 namespace cmdparser {
+    
+CommandlineCommand::CommandExecutionException::CommandExecutionException(
+                                                                 const std::string& msg)
+    : RuntimeError(msg, "Command")
+{}
+    
+CommandlineCommand::CommandParameterException::CommandParameterException(
+                                                                 const std::string& msg)
+    : RuntimeError(msg, "Command")
+{}
 
 CommandlineCommand::CommandlineCommand(std::string name,
                                        std::string shortName,
@@ -45,12 +52,11 @@ CommandlineCommand::CommandlineCommand(std::string name,
     , _parameterList(std::move(parameterList))
     , _argumentNum(argumentNum)
     , _allowsMultipleCalls(allowMultipleCalls)
-    , _errorMsg("")
 {
-#ifdef GHL_DEBUG
-    if (_name.empty())
-        LERRORC("CommandlineCommand", "Every CommandlineCommand needs a name");
-#endif
+    ghoul_assert(!_name.empty(), "Name must not be empty");
+    ghoul_assert(_name[0] == '-', "Name must start with a '-'");
+    if (!_shortName.empty())
+        ghoul_assert(_shortName[0] == '-', "Short name must start with a '-'");
 }
 
 CommandlineCommand::~CommandlineCommand() {}
@@ -104,12 +110,16 @@ std::string CommandlineCommand::help() const {
     return result;
 }
 
-const std::string& CommandlineCommand::errorMessage() const {
-    return _errorMsg;
-}
-
-bool CommandlineCommand::checkParameters(const std::vector<std::string>& parameters) {
-    return (parameters.size() == static_cast<size_t>(argumentNumber()));
+void CommandlineCommand::checkParameters(
+                                     const std::vector<std::string>& parameters) const
+{
+    if (parameters.size() != static_cast<size_t>(argumentNumber())) {
+        throw CommandParameterException(fmt::format(
+            "Wrong number of arguments. Expected {} got {}",
+            argumentNumber(),
+            parameters.size()
+        ));
+    }
 }
 
 } // namespace cmdparser

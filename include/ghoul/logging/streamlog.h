@@ -26,7 +26,7 @@
 #ifndef __STREAMLOG_H__
 #define __STREAMLOG_H__
 
-#include "log.h"
+#include <ghoul/logging/log.h>
 #include <ostream>
 
 namespace ghoul {
@@ -59,7 +59,7 @@ public:
      * log messages
      */
     StreamLog(std::ostream& stream, bool timeStamping = false, bool dateStamping = false,
-              bool categoryStamping = true, bool logLevelStamping = true);
+        bool categoryStamping = true, bool logLevelStamping = true);
 
     /**
      * Method that logs a <code>message</code> with a given <code>level</code> and
@@ -70,15 +70,12 @@ public:
      * \param message The message body of the log message
      */
     virtual void log(LogManager::LogLevel level, const std::string& category,
-                     const std::string& message) override;
+        const std::string& message) override;
 
     /// Flushes the stream and, thereby, all messages that are in the associated buffer
-    void flush() override;
+    virtual void flush() override;
 
 protected:
-    StreamLog(const StreamLog& rhs) = delete;
-    StreamLog& operator=(const StreamLog& rhs) = delete;
-
     std::ostream& _stream; ///< The stream to which the log messages will be sent
 };
 

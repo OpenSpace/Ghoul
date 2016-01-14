@@ -31,6 +31,8 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/glm.h>
 
+#include <format.h>
+
 #include <IL/il.h>
 #include <IL/ilu.h>
 
@@ -40,9 +42,8 @@ namespace {
 
 namespace ghoul {
 namespace io {
-namespace impl {
 
-opengl::Texture* TextureReaderDevIL::loadTexture(const std::string& filename) const {
+std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(std::string filename) const {
 	using opengl::Texture;
     ilInit();
     iluInit();
@@ -53,9 +54,11 @@ opengl::Texture* TextureReaderDevIL::loadTexture(const std::string& filename) co
     ILboolean loadSuccess = ilLoadImage(filename.c_str());
     if (!loadSuccess) {
         ILenum error = ilGetError();
-        LERROR("Error while loading image '" << filename << "': " <<
-                    iluErrorString(error));
-        return nullptr;
+		throw TextureLoadException(
+			std::move(filename),
+			fmt::format("Error loading image: {}", iluErrorString(error)),
+			this
+		);
     }
     ILint imageFormat = ilGetInteger(IL_IMAGE_FORMAT);
     ILint imageType = ilGetInteger(IL_IMAGE_TYPE);
@@ -63,6 +66,11 @@ opengl::Texture* TextureReaderDevIL::loadTexture(const std::string& filename) co
     ILint width = ilGetInteger(IL_IMAGE_WIDTH);
     ILint height = ilGetInteger(IL_IMAGE_HEIGHT);
     ILint depth = ilGetInteger(IL_IMAGE_DEPTH);
+
+    if (imageFormat == IL_LUMINANCE) {
+        imageFormat = IL_RGB;
+        imageByte *= 3;
+    }
 
     // Copy data from common data store to own address space
     ILubyte* data = new ILubyte[width * height * imageByte];
@@ -85,9 +93,11 @@ opengl::Texture* TextureReaderDevIL::loadTexture(const std::string& filename) co
             format = Texture::Format::BGRA;
             break;
         default:
-            LERROR("Could not read image file '" << filename << "' of format: '" <<
-                        imageFormat << "'");
-            return nullptr;
+			throw TextureLoadException(
+				std::move(filename),
+				fmt::format("Error reading format: {}", imageFormat),
+				this
+			);
     }
 
     
@@ -115,16 +125,17 @@ opengl::Texture* TextureReaderDevIL::loadTexture(const std::string& filename) co
             type = GL_FLOAT;
             break;
         default:
-            LERROR("Could not read image file '" << filename <<
-                        "' of data type: '" << imageType << "'");
-            return nullptr;
+			throw TextureLoadException(
+				std::move(filename),
+				fmt::format("Error reading data type: {}", imageType),
+				this
+			);
     }
 
-    Texture* result = new Texture(data, size, format, static_cast<int>(format), type);
-	return result;
+	return std::make_unique<Texture>(data, size, format, static_cast<int>(format), type);
 }
 
-std::set<std::string> TextureReaderDevIL::supportedExtensions() const {
+std::vector<std::string> TextureReaderDevIL::supportedExtensions() const {
 	// Taken from http://openil.sourceforge.net/features.php
 	return {
 		"bmp",						// Windows Bitmap
@@ -172,7 +183,6 @@ std::set<std::string> TextureReaderDevIL::supportedExtensions() const {
 	};
 }
 
-} // namespace impl
 } // namespace opengl
 } // namespace ghoul
 

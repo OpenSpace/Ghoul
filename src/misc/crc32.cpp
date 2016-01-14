@@ -29,43 +29,44 @@
  * http://www.intel.com/technology/comms/perfnet/download/CRC_generators.pdf             *
  ****************************************************************************************/
 
-#include "ghoul/misc/crc32.h"
+#include <ghoul/misc/crc32.h>
+
+#include <ghoul/misc/assert.h>
 
 #include <algorithm>
-#include <cassert>
 
 namespace {
 	const int CRCPOLY = 0x82f63b78;
 	const int CRCINIT = 0xFFFFFFFF;
 
-    unsigned int _crcLookup[8][256];
-    bool _isInitialized = false;
+    unsigned int CrcLookup[8][256];
+    bool IsInitialized = false;
 
     void initializeLookupTable() {
-        assert(!_isInitialized);
+        ghoul_assert(!IsInitialized, "Lookup table already initialized");
         for (int i = 0; i <= 0xFF; ++i) {
             unsigned int x = i;
             for (int j = 0; j < 8; ++j)
                 x = (x>>1) ^ (CRCPOLY & (-(int)(x & 1)));
-            _crcLookup[0][i] = x;
+            CrcLookup[0][i] = x;
         }
         
         for (int i = 0; i <= 0xFF; ++i) {
-            unsigned int c = _crcLookup[0][i];
+            unsigned int c = CrcLookup[0][i];
             for (int j = 1; j < 8; ++j) {
-                c = _crcLookup[0][c & 0xFF] ^ (c >> 8);
-                _crcLookup[j][i] = c;
+                c = CrcLookup[0][c & 0xFF] ^ (c >> 8);
+                CrcLookup[j][i] = c;
             }
         }
         
-        _isInitialized = true;
+        IsInitialized = true;
     }
 }
 
 namespace ghoul {
 
 unsigned int hashCRC32(const char* s, size_t len) {
-    if (!_isInitialized)
+    if (!IsInitialized)
         initializeLookupTable();
 
     int crc = CRCINIT;
@@ -74,7 +75,7 @@ unsigned int hashCRC32(const char* s, size_t len) {
     align = std::min(align, len);
     len -= align;
     for (; align; align--)
-        crc = _crcLookup[0][(crc ^ *s++) & 0xFF] ^ (crc >> 8);
+        crc = CrcLookup[0][(crc ^ *s++) & 0xFF] ^ (crc >> 8);
 
 #if 0
     // TODO: reliable check for architecture needed here (ab)
@@ -97,19 +98,19 @@ unsigned int hashCRC32(const char* s, size_t len) {
         unsigned int next = *(unsigned int*)s;
         s += sizeof(unsigned int);
         crc =
-            _crcLookup[7][(crc      ) & 0xFF] ^
-            _crcLookup[6][(crc >>  8) & 0xFF] ^
-            _crcLookup[5][(crc >> 16) & 0xFF] ^
-            _crcLookup[4][(crc >> 24)] ^
-            _crcLookup[3][(next      ) & 0xFF] ^
-            _crcLookup[2][(next >>  8) & 0xFF] ^
-            _crcLookup[1][(next >> 16) & 0xFF] ^
-            _crcLookup[0][(next >> 24)];
+            CrcLookup[7][(crc      ) & 0xFF] ^
+            CrcLookup[6][(crc >>  8) & 0xFF] ^
+            CrcLookup[5][(crc >> 16) & 0xFF] ^
+            CrcLookup[4][(crc >> 24)] ^
+            CrcLookup[3][(next      ) & 0xFF] ^
+            CrcLookup[2][(next >>  8) & 0xFF] ^
+            CrcLookup[1][(next >> 16) & 0xFF] ^
+            CrcLookup[0][(next >> 24)];
     }
 
     len &= sizeof(unsigned int) * 2 - 1;
     for (; len; len--)
-        crc = _crcLookup[0][(crc ^ *s++) & 0xFF] ^ (crc >> 8);
+        crc = CrcLookup[0][(crc ^ *s++) & 0xFF] ^ (crc >> 8);
 
 #endif
     return ~crc;

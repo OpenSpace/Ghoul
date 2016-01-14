@@ -26,7 +26,10 @@
 #ifndef __OPENGLCAPABILITIESCOMPONENT_H__
 #define __OPENGLCAPABILITIESCOMPONENT_H__
 
-#include "systemcapabilitiescomponent.h"
+#include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
+
+#include <ghoul/misc/exception.h>
+#include <ghoul/systemcapabilities/systemcapabilities.h>
 
 #include <string>
 #include <vector>
@@ -40,13 +43,20 @@ namespace systemcapabilities {
  */
 class OpenGLCapabilitiesComponent : public SystemCapabilitiesComponent {
 public:
+    /// The main exception that is thrown if there is an error detecting an OpenGL
+    /// capability
+    struct OpenGLCapabilitiesComponentError : public RuntimeError {
+        explicit OpenGLCapabilitiesComponentError(std::string message);
+    };
+    
+    struct GPUVendorError : public OpenGLCapabilitiesComponentError {
+        explicit GPUVendorError(std::string message);
+    };
+    
     /**
      * This struct stores the detected version of the GLSL driver
      */
     struct Version {
-        /// Constructor initializing values
-        Version(int major = 0, int minor = 0, int release = 0);
-
         /**
          * Returns the stored GLSL version in the format <code>major.minor.release</code>.
          * \return The GLSL version as a string
@@ -100,9 +110,12 @@ public:
          */
         bool operator>=(const Version& rhs) const;
 
-        int _major; ///< The <code>major</code> part of the version
-        int _minor; ///< The <code>minor</code> part of the version
-        int _release; ///< The <code>release</code> part of the version
+        /// The <code>major</code> part of the version
+        int _major;
+        /// The <code>minor</code> part of the version
+        int _minor;
+        /// The <code>release</code> part of the version
+        int _release;
     };
 
     /// This enum stores the possible vendors of graphics cards that can be detected
@@ -113,17 +126,14 @@ public:
         Other ///< vendor could not be detected
     };
 
-    OpenGLCapabilitiesComponent();
-
-    std::vector<CapabilityInformation> capabilities(
-        const SystemCapabilitiesComponent::Verbosity& verbosity) const override;
+    std::vector<CapabilityInformation> capabilities() const override;
 
     /**
      * Returns the maximum OpenGL version that is supported on this platform. This means
      * that all the lower version will be supported as well,
      * \return The maximum OpenGL version
      */
-    const Version& openGLVersion() const;
+    Version openGLVersion() const;
 
     /**
      * Returns the value of a call to <code>glGetString(GL_VENDOR)</code>. This will give
@@ -137,7 +147,7 @@ public:
      * Returns the vendor of the main graphics card.
      * \return The vendor of the main graphics card
      */
-    const Vendor& gpuVendor() const;
+    Vendor gpuVendor() const;
 
     /**
      * Returns the vendor of the main graphics card converted into a string.
@@ -172,12 +182,19 @@ public:
     std::string name() const override;
 
 protected:
+    /**
+     * Method that detects all of the capabilities.
+     * \throw GPUVendorError If the detection of the GPU vendor failed
+     * \throw WMIError If the Windows Management Instrumentation was requested and access
+     * to it failed
+     */
     void detectCapabilities() override;
     void clearCapabilities() override;
 
     /// Detect the maximum supported GLSL Version
     void detectGLSLVersion();
     /// Detect the vendor of the main GPU
+    /// \throws GPUVendorError if there was an error detecting the GPU vendor
     void detectGPUVendor();
     /// Get the vendor string from OpenGL
     void detectGLRenderer();
@@ -185,32 +202,50 @@ protected:
     void detectExtensions();
     /// Detect the available GLEW version
     void detectGLEWVersion();
-    /// Use WMI (on Windows) to retrieve information about the installed driver
+    /**
+     * Use WMI (on Windows) to retrieve information about the installed driver
+     * \throws WMIError If there was an error accessing the Windows Management
+     * Instrumentation
+     */
     void detectDriverInformation();
 
-    Version _glVersion; ///< OpenGL Version
-    std::string _glslCompiler; ///< GPU vendor
-    Vendor _vendor; ///< GPU vendor
-    std::string _glRenderer; ///< GL_RENDERER
-    std::vector<std::string> _extensions; ///< supported GLSL extensions
-    Version _glewVersion; ///< GLEW Version
+    /// OpenGL Version
+    Version _glVersion;
+    /// GPU vendor
+    std::string _glslCompiler;
+    /// GPU vendor
+    Vendor _vendor;
+    /// GL_RENDERER
+    std::string _glRenderer;
+    /// supported GLSL extensions
+    std::vector<std::string> _extensions;
+    /// GLEW Version
+    Version _glewVersion;
     
-    int _maxTextureSize; ///< The maximum size a texture can have
-    int _maxTextureSize3D; ///< GL_MAX_3D_TEXTURE_SIZE
-    int _numTextureUnits; ///< The maximum number of texture units
-    int _maxFramebufferColorAttachments; ///< The maximum number of color attachments for an FBO
+    /// The maximum supported texture size can have
+    int _maxTextureSize = -1;
+    /// The maximum supported texture size for 3D textures
+    int _maxTextureSize3D = -1;
+    /// The maximum number of texture units
+    int _numTextureUnits = -1;
+    /// The maximum number of color attachments for an FBO
+    int _maxFramebufferColorAttachments = -1;
     
-    bool _supportTexturing3D; // GL_EXT_texture3D
-
 	// Only used in WMI, but declared nevertheless to prevent a mismatch in compiler flags
 	// between the cpp file and an application including this header
-    std::string _driverVersion; ///< Stores the version of the installed driver
-    std::string _driverDate; ///< Stores the date of the installed driver
-    unsigned int _adapterRAM; ///< How many MB of memory is installed on the main GPU
-    std::string _adapterName; ///< The name of the main GPU
+    /// Stores the version of the installed driver
+    std::string _driverVersion;
+    /// Stores the date of the installed driver
+    std::string _driverDate;
+    /// How many MB of memory is installed on the main GPU
+    unsigned int _adapterRAM = 0;
+    /// The name of the main GPU
+    std::string _adapterName;
 };
 
 } // namespace systemcapabilities
 } // namespace ghoul
+
+#define OpenGLCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::OpenGLCapabilitiesComponent>()))
 
 #endif // __OPENGLCAPABILITIESCOMPONENT_H__

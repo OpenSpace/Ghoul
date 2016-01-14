@@ -25,103 +25,86 @@
 
 #include <ghoul/opengl/shadermanager.h>
 
-#include <ghoul/opengl/shaderobject.h>
-#include <ghoul/logging/logmanager.h>
-
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
-#include <cassert>
-
-namespace {
-    const std::string _loggerCat = "ShaderManager";
-}
+#include <ghoul/opengl/shaderobject.h>
 
 namespace ghoul {
 namespace opengl {
-        
+    
+ShaderManager::ShaderManagerError::ShaderManagerError(std::string message)
+    : RuntimeError(std::move(message), "ShaderManager")
+{}
+    
 ShaderManager* ShaderManager::_manager = nullptr;
     
-ShaderManager::~ShaderManager() {
-    std::map<unsigned int, ShaderObject*>::iterator it = _objects.begin();
-    for (; it != _objects.end(); ++it)
-        delete it->second;
-    _objects.clear();
-}
-
 void ShaderManager::initialize() {
-    assert(_manager == nullptr);
+    ghoul_assert(_manager == nullptr, "Static manager must not have been initialized");
     _manager = new ShaderManager;
-    assert(_manager != nullptr);
 }
 
 void ShaderManager::deinitialize() {
-    assert(_manager != nullptr);
+    ghoul_assert(_manager, "Static manager must have been intialized");
     delete _manager;
     _manager = nullptr;
 }
 
 ShaderManager& ShaderManager::ref() {
-    assert(_manager != nullptr);
+    ghoul_assert(_manager, "Static manager must have been intialized");
     return *_manager;
 }
 
 ShaderObject* ShaderManager::shaderObject(unsigned int hashedName) {
-    std::map<unsigned int, ShaderObject*>::iterator it = _objects.find(hashedName);
-    if (it == _objects.end())
-        return nullptr;
+    auto it = _objects.find(hashedName);
+    if (it == _objects.end()) {
+        throw ShaderManagerError(
+            "Could not find ShaderObject for hash '" + std::to_string(hashedName) + "'"
+        );
+    }
     else
-        return it->second;
+        return it->second.get();
 }
 
 ShaderObject* ShaderManager::shaderObject(const std::string& name) {
-    const unsigned int hash = hashCRC32(name);
-    return shaderObject(hash);
+    unsigned int hash = hashCRC32(name);
+    try {
+        return shaderObject(hash);
+    }
+    catch (const ShaderManagerError&) {
+        throw ShaderManagerError("Could not find ShaderObject for '" + name + "'");
+    }
 }
 
-bool ShaderManager::registerShaderObject(const std::string& name, ShaderObject* shader) {
-    unsigned int hashedName = 0;
-    return registerShaderObject(name, shader, hashedName);
-}
-
-bool ShaderManager::registerShaderObject(const std::string& name,
-                                         ShaderObject* shader, unsigned int& hashedName)
+unsigned int ShaderManager::registerShaderObject(const std::string& name,
+                                                 std::unique_ptr<ShaderObject> shader)
 {
-    hashedName = hashCRC32(name);
-    std::map<unsigned int, ShaderObject*>::iterator it = _objects.find(hashedName);
+    unsigned int hashedName = hashCRC32(name);
+    auto it = _objects.find(hashedName);
     if (it == _objects.end()) {
-        _objects[hashedName] = shader;
-        return true;
+        _objects[hashedName] = std::move(shader);
+        return hashedName;
     }
-    else {
-        if (_objects[hashedName] == shader)
-            LWARNING("Name '" + name + "' is already registered.");
-        else
-            LWARNING("Name '" + name +
-                          "' is already registered for a different ShaderObject");
-        return false;
-    }
+    else
+        throw ShaderManagerError("Name '" + name + "' was already registered");
 }
 
-void ShaderManager::unregisterShaderObject(const std::string& name) {
-    const unsigned int hashedName = hashCRC32(name);
-    unregisterShaderObject(hashedName);
+std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(
+                                                                  const std::string& name)
+{
+    unsigned int hashedName = hashCRC32(name);
+    return unregisterShaderObject(hashedName);
 }
 
-void ShaderManager::unregisterShaderObject(unsigned int hashedName) {
-    std::map<unsigned int, ShaderObject*>::iterator it = _objects.find(hashedName);
-    if (it != _objects.end())
-        delete (it->second);
-    _objects.erase(it);
-}
-
-void ShaderManager::forgetShaderObject(const std::string& name) {
-    const unsigned int hashedName = hashCRC32(name);
-    forgetShaderObject(hashedName);
-}
-
-void ShaderManager::forgetShaderObject(unsigned int hashedName) {
-    std::map<unsigned int, ShaderObject*>::iterator it = _objects.find(hashedName);
-    if (it != _objects.end())
-        _objects.erase(it);
+std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(
+                                                                  unsigned int hashedName)
+{
+    auto it = _objects.find(hashedName);
+    if (it == _objects.end())
+        return nullptr;
+    
+    auto tmp = std::move(it->second);
+    _objects.erase(hashedName);
+    return std::move(tmp);
 }
 
 unsigned int ShaderManager::hashedNameForName(const std::string& name) const {

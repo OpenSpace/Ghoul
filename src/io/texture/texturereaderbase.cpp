@@ -23,39 +23,23 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __OBSERVERABLE_H__
-#define __OBSERVERABLE_H__
+#include <ghoul/io/texture/texturereaderbase.h>
 
-#include <functional>
-#include <map>
-#include <vector>
+#include <format.h>
 
 namespace ghoul {
-
-template <typename Event>
-class TemplateObservable {
-public:
-	template <typename Observer>
-	int registerObserver(const Event& event, Observer&& observer);
-
-	template <typename Observer>
-	int registerObserver(Event&& event, Observer&& observer);
-
-	void unregisterObserver(int observerId);
-
-	void notify(const Event& event) const;
-
-private:
-	typedef std::pair<std::function<void()>, int> Function;
-
-	int _currentIndex = 0;
-	std::map<Event, std::vector<Function>> _observers;
-};
-
-typedef TemplateObservable<std::string> Observable;
-
+namespace io {
+ 
+TextureReaderBase::TextureLoadException::TextureLoadException(std::string n,
+                                                              std::string m,
+                                                              const TextureReaderBase* r)
+    : RuntimeError(fmt::format("Error loading texture '{}'", n), "TextureLoader")
+    , filename(std::move(n))
+    , message(std::move(m))
+    , reader(r)
+{}
+    
+TextureReaderBase::~TextureReaderBase() {}
+    
+} // namespace io
 } // namespace ghoul
-
-#include "observer.inl"
-
-#endif // __OBSERVERABLE_H__

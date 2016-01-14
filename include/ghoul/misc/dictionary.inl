@@ -23,223 +23,430 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-// Removes a warning that occurs when trying to convert int directly to bool values in the
-// glm::bvecX template specializations
-#ifdef WIN32
-#pragma warning(disable : 4800)
-#endif
-
-#include <ghoul/glm.h>
-
-#ifdef WIN32
-#pragma warning(default : 4800)
-#endif
-
-#include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
 
 namespace ghoul {
 
 template <typename T>
-bool ghoul::Dictionary::setValueHelper(std::string key, T value,
-                                       bool createIntermediate) {
+bool isConvertible(const Dictionary& dict) {
+    using StorageType = internal::StorageTypeConverter<T>;
+    
+    bool correctSize = dict.size() == StorageType::size;
+    if (!correctSize)
+        return false;
+    
+    const std::vector<std::string>& keys = dict.keys();
+    for (size_t i = 0; i < StorageType::size; ++i) {
+        const std::string& key = keys[i];
+        #ifdef WIN32
+        #pragma warning(push)
+        // Suppress the warning C2684 (Redundant test) that occurs if
+        // StorageTypeConverter<TargetType>::type == TargetType
+        #pragma warning(suppress: 6287)
+        #endif // WIN32
+        bool correctType =
+            dict.hasValue<typename StorageType::type>(key) || dict.hasValue<T>(key);
+        #ifdef WIN32
+        #pragma warning(pop)
+        #endif // WIN32
+        if (!correctType)
+            return false;
+    }
+    return true;
+}
+
+///////////
+// setValue
+///////////
+    
+template <typename T>
+void Dictionary::setValueHelper(std::string key, T value, bool createIntermediate) {
     std::string first;
     std::string rest;
-    const bool hasRestPath = splitKey(key, first, rest);
+    bool hasRestPath = splitKey(key, first, rest);
     if (!hasRestPath) {
         // if no rest exists, key == first and we can just insert the value
-        (*this)[key] = std::move(value);
-        return true;
+        (*this)[std::move(key)] = std::move(value);
+        return;
     }
-
+    
     // if we get to this point, the 'key' did contain a nested key
     // so we have to find the correct Dictionary (or create it if it doesn't exist)
-    std::map<std::string, boost::any>::iterator keyIt = find(first);
+    auto keyIt = find(first);
     if (keyIt == cend()) {
         // didn't find the Dictionary
         if (createIntermediate) {
-            ghoul::Dictionary intermediate;
-            (*this)[first] = intermediate;
+            (*this)[first] = ghoul::Dictionary();
             keyIt = find(first);
         }
-        else {
-            LERRORC("Dictionary", "Key '" << first << "' was not found in dictionary");
-            return false;
-        }
+        else
+            throw KeyError("Intermediate key '{}' was not found in dictionary" + first);
     }
-
+    
     // See if it is actually a Dictionary at this location
-    Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
+    Dictionary* dict = boost::any_cast<Dictionary>(&(keyIt->second));
     if (dict == nullptr) {
-        LERRORC("Dictionary", "Error converting key '"
-            << first << "' to type 'Dictionary', was '"
-            << keyIt->second.type().name() << "'");
-        return false;
+        throw ConversionError(
+            "Error converting key '" + first + "' from type '" +
+            keyIt->second.type().name() + "' to type 'Dictionary'"
+        );
     }
     // Proper tail-recursion
-    return dict->setValue(rest, std::move(value), createIntermediate);
+    dict->setValue(std::move(rest), std::move(value), createIntermediate);
+}
+    
+template <typename T>
+void Dictionary::setValueInternal(std::string key, T value, bool createIntermediate,
+                                                                 IsStandardScalarType<T>*)
+{
+    setValueHelper(
+        std::move(key),
+        static_cast<typename internal::StorageTypeConverter<T>::type>(value),
+        createIntermediate
+    );
 }
 
 template <typename T>
-bool Dictionary::setValue(std::string key, T value, bool createIntermediate) {
-    return setValueHelper(std::move(key), std::move(value), createIntermediate);
+void Dictionary::setValueInternal(std::string key, T value, bool createIntermediate,
+                                                                 IsStandardVectorType<T>*)
+{
+    using StorageType = internal::StorageTypeConverter<T>;
+    
+    std::array<typename StorageType::type, StorageType::size> v;
+    auto ptr = glm::value_ptr(value);
+    for (size_t i = 0; i < StorageType::size; ++i)
+        v[i] = static_cast<typename StorageType::type>(ptr[i]);
+    setValueHelper(std::move(key), std::move(v), createIntermediate);
 }
 
+template <typename T>
+void Dictionary::setValueInternal(std::string key, T value, bool createIntermediate,
+                                                                    IsNonStandardType<T>*)
+{
+    setValueHelper(std::move(key), std::move(value), createIntermediate);
+}
 
 template <typename T>
-bool ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
+void Dictionary::setValue(std::string key, T value, bool createIntermediate) {
+    ghoul_assert(!key.empty(), "Key must not be empty");
+    setValueInternal(std::move(key), std::move(value), createIntermediate);
+}
+    
+///////////
+// getValue
+///////////
+    
+template <typename T>
+void ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
     // If we can find the key directly, we can return it immediately
-    const std::map<std::string, boost::any>::const_iterator it = find(key);
+    auto it = find(key);
     if (it != cend()) {
-        const T* const v = boost::any_cast<T>(&(it->second));
+        const T* v = boost::any_cast<T>(&(it->second));
         // See if it has the correct type
         if (v == nullptr) {
-            LERRORC("Dictionary", "Wrong type of key '"
-                << key << "': Expected '" << typeid(T).name()
-                << "', got '" << it->second.type().name() << "'");
-            return false;
+            throw ConversionError(
+                "Wrong type for key '" + key + "': Expected '" + typeid(T).name() +
+                "' got '" + it->second.type().name() + "'"
+            );
         }
         value = *v;
-        return true;
+        return;
     }
-
+    
     // if we get to this point, the 'key' did contain a nested key
     // so we have to find the correct Dictionary (or create it if it doesn't exist)
     std::string first;
     std::string rest;
     splitKey(key, first, rest);
+    
+    auto keyIt = find(first);
+    if (keyIt == cend())
+        throw KeyError("Could not find key '" + first + "' in Dictionary");
 
-    const std::map<std::string, boost::any>::const_iterator keyIt = find(first);
-    if (keyIt == cend()) {
-#ifdef GHL_DEBUG
-		LERRORC("Dictionary", "Could not find key '" << first << "' in Dictionary");
-#endif
-        return false;
-	}
-
-    const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
+    const Dictionary* dict = boost::any_cast<Dictionary>(&(keyIt->second));
     // See if it is actually a Dictionary at this location
     if (dict == nullptr) {
-        LERRORC("Dictionary", "Error converting key '"
-            << first << "' to type 'Dictionary', was '"
-            << keyIt->second.type().name() << "'");
-        return false;
+        throw ConversionError(
+            "Error converting key '" + first + "' from type '" +
+            keyIt->second.type().name() + "' to type 'Dictionary'"
+        );
     }
     // Proper tail-recursion
-    return dict->getValue<T>(rest, value);
+    dict->getValue<T>(rest, value);
+}
+
+template <typename T>
+void Dictionary::getValueInternal(const std::string& key, T& value,
+                                                           IsStandardScalarType<T>*) const
+{
+    bool keyExists = hasKey(key);
+    if (!keyExists)
+        throw KeyError("Key '" + key + "' did not exist in Dictionary");
+    bool success = hasValueHelper<typename internal::StorageTypeConverter<T>::type>(key);
+    if (success) {
+        typename internal::StorageTypeConverter<T>::type v;
+        getValueHelper(key, v);
+        value = static_cast<T>(v);
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper(key, dict);
+            bool canConvert = isConvertible<T>(dict);
+            if (canConvert) {
+                const std::vector<std::string>& keys = dict.keys();
+                for (size_t i = 0; i < internal::StorageTypeConverter<T>::size; ++i) {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, value);
+                    return;
+                }
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" + typeid(T).name() + "'"
+    );
+}
+
+template <typename T>
+void Dictionary::getValueInternal(const std::string& key, T& value,
+                                                           IsStandardVectorType<T>*) const
+{
+    using Array = std::array<
+        typename internal::StorageTypeConverter<T>::type,
+        internal::StorageTypeConverter<T>::size
+    >;
+    
+    bool success = hasValueHelper<Array>(key);
+    if (success) {
+        Array v;
+        getValueHelper(key, v);
+        memcpy(glm::value_ptr(value), v.data(), sizeof(T));
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper<Dictionary>(key, dict);
+            bool canConvert = isConvertible<T>(dict);
+            if (canConvert) {
+                std::vector<std::string> keys = dict.keys();
+                // sort numerically rather than by ASCII value
+                std::sort(keys.begin(), keys.end(), [](const auto& k1, const auto& k2) {
+                    try {
+                        return std::stoi(k1) < std::stoi(k2);
+                    } catch (const std::invalid_argument&) {
+                        return k1 < k2;
+                    }
+                });
+                for (size_t i = 0; i < internal::StorageTypeConverter<T>::size; ++i) {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, glm::value_ptr(value)[i]);
+                }
+                return;
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" + typeid(T).name() + "'"
+    );
+}
+
+template <typename T>
+void Dictionary::getValueInternal(const std::string& key, T& value,
+                                                              IsNonStandardType<T>*) const
+{
+    getValueHelper(key, value);
 }
 
 template <typename T>
 bool Dictionary::getValue(const std::string& key, T& value) const {
-    return getValueHelper(key, value);
+    ghoul_assert(!key.empty(), "Key must not be empty");
+    
+    try {
+        bool keyExists = hasKey(key);
+        if (!keyExists)
+            return false;
+        else {
+            getValueInternal(key, value);
+            return true;
+        }
+    }
+    catch (const DictionaryError&) {
+        return false;
+    }
 }
 
 template <typename T>
 T ghoul::Dictionary::value(const std::string& key) const {
-	T value;
-	getValue(key, value);
-	return value;
+    ghoul_assert(!key.empty(), "Key must not be empty");
+    
+    T value;
+    getValueInternal(key, value);
+    return value;
 }
+
+///////////
+// hasValue
+///////////
 
 template <typename T>
 bool ghoul::Dictionary::hasValueHelper(const std::string& key) const {
-    const std::map<std::string, boost::any>::const_iterator it = find(key);
+    auto it = find(key);
     if (it != cend()) {
         // If we can find the key directly, we can check the types and return
-        const bool typeCorrect = (it->second.type() == typeid(T));
+        bool typeCorrect = (it->second.type() == typeid(T));
         return typeCorrect;
     }
-
+    
     std::string first;
     std::string rest;
     splitKey(key, first, rest);
-
-    const std::map<std::string, boost::any>::const_iterator keyIt = find(first);
+    
+    auto keyIt = find(first);
     if (keyIt == cend())
         // If we can't find the first part of nested key, there is no need to continue
         return false;
-
-    const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
+    
+    const Dictionary* dict = boost::any_cast<Dictionary>(&(keyIt->second));
     if (dict == nullptr)
         // If it is not a Dictionary, the value can't be found and no recursion necessary
         return false;
-
+    
     // Proper tail-recursion
     return dict->hasValue<T>(rest);
+}
+    
+template <typename T>
+bool Dictionary::hasValueInternal(const std::string& key, IsStandardScalarType<T>*) const
+{
+    bool val = hasValueHelper<typename internal::StorageTypeConverter<T>::type>(key);
+    if (val)
+        return true;
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper(key, dict);
+            bool canConvert = isConvertible<T>(dict);
+            if (canConvert)
+                return true;
+        }
+        return false;
+    }
+}
+
+template <typename T>
+bool Dictionary::hasValueInternal(const std::string& key, IsStandardVectorType<T>*) const
+{
+    bool val = hasValueHelper<std::array<
+        typename internal::StorageTypeConverter<T>::type,
+        internal::StorageTypeConverter<T>::size
+    >>(key);
+    if (val)
+        return true;
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper(key, dict);
+            bool canConvert = isConvertible<T>(dict);
+            if (canConvert)
+                return true;
+        }
+        return false;
+    }
+}
+
+template <typename T>
+bool Dictionary::hasValueInternal(const std::string& key, IsNonStandardType<T>*) const {
+    return hasValueHelper<T>(key);
 }
 
 template <typename T>
 bool Dictionary::hasValue(const std::string& key) const {
-    return hasValueHelper<T>(key);
+    ghoul_assert(!key.empty(), "Key must not be empty");
+    
+    return hasValueInternal<T>(key);
 }
     
 template <typename T>
 bool Dictionary::hasKeyAndValue(const std::string& key) const {
+    ghoul_assert(!key.empty(), "Key must not be empty");
+
     // Short-circuit evaluation is used to guard the 'hasValue' function from non-existing
     // keys
     return (hasKey(key) && hasValue<T>(key));
 }
 
-// Make template definitions so that the compiler won't try to instantiate each
-// member function individually whenever it is encountered. This way, we promise the
-// compiler that they will be instantiated somewhere else. This is done in the
-// dictionary.cpp compilation unit; if a new template specialization is added, it must be
-// included here and in the dictionary.cpp file
+// Extern define template declaration such that the compiler won't try to instantiate each
+// member function individually whenever it is encountered. The definitions are located
+// in the dictionary.cpp compilation unit
+    
+#define EXTERN_TEMPLATE_DECLARATION(__TYPE__) \
+extern template void Dictionary::setValue<__TYPE__>(std::string, __TYPE__, bool);        \
+extern template bool Dictionary::getValue<__TYPE__>(const std::string&, __TYPE__&) const;\
+extern template __TYPE__ Dictionary::value<__TYPE__>(const std::string&) const;          \
+extern template bool Dictionary::hasValue<__TYPE__>(const std::string&) const;           \
+extern template bool isConvertible<__TYPE__>(const Dictionary&);                         \
+extern template void Dictionary::setValueHelper<__TYPE__>(std::string, __TYPE__, bool);  \
+extern template void Dictionary::getValueHelper<__TYPE__>(const std::string&,            \
+                                                                       __TYPE__&) const; \
+extern template bool Dictionary::hasValueHelper<__TYPE__>(const std::string&) const;
+    
+EXTERN_TEMPLATE_DECLARATION(bool);
+EXTERN_TEMPLATE_DECLARATION(char);
+EXTERN_TEMPLATE_DECLARATION(signed char);
+EXTERN_TEMPLATE_DECLARATION(unsigned char);
+EXTERN_TEMPLATE_DECLARATION(wchar_t);
+EXTERN_TEMPLATE_DECLARATION(short);
+EXTERN_TEMPLATE_DECLARATION(unsigned short);
+EXTERN_TEMPLATE_DECLARATION(int);
+EXTERN_TEMPLATE_DECLARATION(unsigned int);
+EXTERN_TEMPLATE_DECLARATION(long long);
+EXTERN_TEMPLATE_DECLARATION(unsigned long long);
+EXTERN_TEMPLATE_DECLARATION(float);
+EXTERN_TEMPLATE_DECLARATION(double);
+EXTERN_TEMPLATE_DECLARATION(glm::vec2);
+EXTERN_TEMPLATE_DECLARATION(glm::dvec2);
+EXTERN_TEMPLATE_DECLARATION(glm::ivec2);
+EXTERN_TEMPLATE_DECLARATION(glm::uvec2);
+EXTERN_TEMPLATE_DECLARATION(glm::bvec2);
+EXTERN_TEMPLATE_DECLARATION(glm::vec3);
+EXTERN_TEMPLATE_DECLARATION(glm::dvec3);
+EXTERN_TEMPLATE_DECLARATION(glm::ivec3);
+EXTERN_TEMPLATE_DECLARATION(glm::uvec3);
+EXTERN_TEMPLATE_DECLARATION(glm::bvec3);
+EXTERN_TEMPLATE_DECLARATION(glm::vec4);
+EXTERN_TEMPLATE_DECLARATION(glm::dvec4);
+EXTERN_TEMPLATE_DECLARATION(glm::ivec4);
+EXTERN_TEMPLATE_DECLARATION(glm::uvec4);
+EXTERN_TEMPLATE_DECLARATION(glm::bvec4);
+EXTERN_TEMPLATE_DECLARATION(glm::mat2x2);
+EXTERN_TEMPLATE_DECLARATION(glm::mat2x3);
+EXTERN_TEMPLATE_DECLARATION(glm::mat2x4);
+EXTERN_TEMPLATE_DECLARATION(glm::mat3x2);
+EXTERN_TEMPLATE_DECLARATION(glm::mat3x3);
+EXTERN_TEMPLATE_DECLARATION(glm::mat3x4);
+EXTERN_TEMPLATE_DECLARATION(glm::mat4x2);
+EXTERN_TEMPLATE_DECLARATION(glm::mat4x3);
+EXTERN_TEMPLATE_DECLARATION(glm::mat4x4);
+EXTERN_TEMPLATE_DECLARATION(glm::dmat2x2);
+EXTERN_TEMPLATE_DECLARATION(glm::dmat2x3);
+EXTERN_TEMPLATE_DECLARATION(glm::dmat2x4);
+EXTERN_TEMPLATE_DECLARATION(glm::dmat3x2);
+EXTERN_TEMPLATE_DECLARATION(glm::dmat3x3);
+EXTERN_TEMPLATE_DECLARATION(glm::dmat3x4);
+EXTERN_TEMPLATE_DECLARATION(glm::dmat4x2);
+EXTERN_TEMPLATE_DECLARATION(glm::dmat4x3);
+EXTERN_TEMPLATE_DECLARATION(glm::dmat4x4);
 
-#define DEF_EXT_TEMPLATES(TYPE)                                                          \
-    template<> bool Dictionary::setValue<TYPE>(std::string key, TYPE value,         \
-                                                    bool createIntermediate);            \
-    template<> bool Dictionary::getValue<TYPE>(const std::string& key, TYPE& value) \
-          const;                                                                         \
-    template<> bool Dictionary::hasValue<TYPE>(const std::string& key) const
-
-DEF_EXT_TEMPLATES(bool);
-DEF_EXT_TEMPLATES(char);
-DEF_EXT_TEMPLATES(signed char);
-DEF_EXT_TEMPLATES(unsigned char);
-DEF_EXT_TEMPLATES(wchar_t);
-DEF_EXT_TEMPLATES(short);
-DEF_EXT_TEMPLATES(unsigned short);
-DEF_EXT_TEMPLATES(int);
-DEF_EXT_TEMPLATES(unsigned int);
-DEF_EXT_TEMPLATES(long long);
-DEF_EXT_TEMPLATES(unsigned long long);
-DEF_EXT_TEMPLATES(float);
-DEF_EXT_TEMPLATES(double);
-DEF_EXT_TEMPLATES(glm::vec2);
-DEF_EXT_TEMPLATES(glm::dvec2);
-DEF_EXT_TEMPLATES(glm::ivec2);
-DEF_EXT_TEMPLATES(glm::uvec2);
-DEF_EXT_TEMPLATES(glm::bvec2);
-DEF_EXT_TEMPLATES(glm::vec3);
-DEF_EXT_TEMPLATES(glm::dvec3);
-DEF_EXT_TEMPLATES(glm::ivec3);
-DEF_EXT_TEMPLATES(glm::uvec3);
-DEF_EXT_TEMPLATES(glm::bvec3);
-DEF_EXT_TEMPLATES(glm::vec4);
-DEF_EXT_TEMPLATES(glm::dvec4);
-DEF_EXT_TEMPLATES(glm::ivec4);
-DEF_EXT_TEMPLATES(glm::uvec4);
-DEF_EXT_TEMPLATES(glm::bvec4);
-DEF_EXT_TEMPLATES(glm::mat2x2);
-DEF_EXT_TEMPLATES(glm::mat2x3);
-DEF_EXT_TEMPLATES(glm::mat2x4);
-DEF_EXT_TEMPLATES(glm::mat3x2);
-DEF_EXT_TEMPLATES(glm::mat3x3);
-DEF_EXT_TEMPLATES(glm::mat3x4);
-DEF_EXT_TEMPLATES(glm::mat4x2);
-DEF_EXT_TEMPLATES(glm::mat4x3);
-DEF_EXT_TEMPLATES(glm::mat4x4);
-DEF_EXT_TEMPLATES(glm::dmat2x2);
-DEF_EXT_TEMPLATES(glm::dmat2x3);
-DEF_EXT_TEMPLATES(glm::dmat2x4);
-DEF_EXT_TEMPLATES(glm::dmat3x2);
-DEF_EXT_TEMPLATES(glm::dmat3x3);
-DEF_EXT_TEMPLATES(glm::dmat3x4);
-DEF_EXT_TEMPLATES(glm::dmat4x2);
-DEF_EXT_TEMPLATES(glm::dmat4x3);
-DEF_EXT_TEMPLATES(glm::dmat4x4);
-
-#undef DEF_EXT_TEMPLATES
+#undef EXTERN_TEMPLATE_DECLARATION
 
 template<>
 bool Dictionary::getValue<Dictionary>(const std::string& key, Dictionary& value) const;

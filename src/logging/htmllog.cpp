@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/logging/htmllog.h"
+#include <ghoul/logging/htmllog.h>
 
 #include <cassert>
 
@@ -34,44 +34,39 @@ HTMLLog::HTMLLog(std::string filename, bool writeToAppend, bool timeStamping,
 				bool dateStamping, bool categoryStamping, bool logLevelStamping)
     : TextLog(std::move(filename), writeToAppend, timeStamping, dateStamping,
 				categoryStamping, logLevelStamping)
-{
-    if (hasValidFile()) {
-        std::string output = \
-            "<html>\n\
-            \t<head>\n\
-            \t\t<title>Log File</title>\n\
-            \t</head>\n\
-            \t<body>\n\
-            \n\
-            \t<table cellpadding=3 cellspacing=0 border=1>\n\
-            \t\t<CAPTION>Log File</CAPTION>\n\
-            \n\
-            \t\t<THEAD>\n\
-            \t\t\t<TR>\n";
-        if (isDateStamping())
-            output += "\t\t\t\t<th>Date</th>\n";
-        if (isTimeStamping())
-            output += "\t\t\t\t<th>Time</th>\n";
-        if (isCategoryStamping())
-            output += "\t\t\t\t<th>Category</th>\n";
-        if (isLogLevelStamping())
-            output += "\t\t\t\t<th>Level</th>\n";
-        output += "\t\t\t\t<th>Message</th>\n\
-                  \t\t\t</tr>\n\
-                  \t\t<tbody>\n";
-        writeLine(output);
-    }
+{    
+    std::string output = \
+        "<html>\n\
+        \t<head>\n\
+        \t\t<title>Log File</title>\n\
+        \t</head>\n\
+        \t<body>\n\
+        \n\
+        \t<table cellpadding=3 cellspacing=0 border=1>\n\
+        \t\t<CAPTION>Log File</CAPTION>\n\
+        \n\
+        \t\t<THEAD>\n\
+        \t\t\t<TR>\n";
+    if (isDateStamping())
+        output += "\t\t\t\t<th>Date</th>\n";
+    if (isTimeStamping())
+        output += "\t\t\t\t<th>Time</th>\n";
+    if (isCategoryStamping())
+        output += "\t\t\t\t<th>Category</th>\n";
+    if (isLogLevelStamping())
+        output += "\t\t\t\t<th>Level</th>\n";
+    output += "\t\t\t\t<th>Message</th>\n\
+              \t\t\t</tr>\n\
+              \t\t<tbody>\n";
+    writeLine(std::move(output));
 }
 
 HTMLLog::~HTMLLog() {
-    if (hasValidFile()) {
-        const std::string output = \
-            "\t\t</tbody>\n\
-            \t</table>\n\
-            \t</body>\n\
-            </html>";
-        writeLine(output);
-    }
+    writeLine("\t\t</tbody>\n\
+              \t</table>\n\
+              \t</body>\n\
+              </html>"
+    );
 }
 
 
@@ -89,7 +84,7 @@ void HTMLLog::log(LogManager::LogLevel level, const std::string& category,
         output += "\t\t\t\t<td>" + LogManager::stringFromLevel(level) + "</td>\n";
     output += "\t\t\t\t<td>" + message + "</td>\n\t\t\t</tr>\n";
 
-    writeLine(output);
+    writeLine(std::move(output));
 }
 
 std::string HTMLLog::colorForLevel(LogManager::LogLevel level) {
@@ -107,8 +102,6 @@ std::string HTMLLog::colorForLevel(LogManager::LogLevel level) {
         case LogManager::LogLevel::NoLogging:
             return "#FFFFFF";
     }
-    assert(false);
-    return "#FF00FF";
 }
 
 } // namespace logging

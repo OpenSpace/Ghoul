@@ -27,112 +27,92 @@ namespace ghoul {
 namespace cmdparser {
 
 template<typename T, typename U, typename V, typename W>
-SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, std::string name,
-                             std::string shortName,
-                             std::string infoText,
-                             std::string parameterList)
+SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, std::string name, std::string shortName,
+                                         std::string infoText, std::string parameterList)
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), 
-        std::move(parameterList), 1, false)
+                         std::move(parameterList), 1, false)
 	, _ptr1(ptr1)
 	, _ptr2(nullptr)
 	, _ptr3(nullptr)
 	, _ptr4(nullptr)
-{}
+{
+    ghoul_assert(_ptr1, "Ptr1 must not be empty");
+}
 
 template<typename T, typename U, typename V, typename W>
 SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, std::string name,
-                             std::string shortName,
-                             std::string infoText,
-                             std::string parameterList)
+                                         std::string shortName, std::string infoText,
+                                         std::string parameterList)
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
-        std::move(parameterList), 2, false)
+                         std::move(parameterList), 2, false)
 	, _ptr1(ptr1)
 	, _ptr2(ptr2)
 	, _ptr3(nullptr)
 	, _ptr4(nullptr)
-{}
+{
+    ghoul_assert(_ptr1, "Ptr1 must not be empty");
+    ghoul_assert(_ptr2, "Ptr2 must not be empty");
+}
 
 template<typename T, typename U, typename V, typename W>
-SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, V* ptr3,
-							 std::string name,
-                             std::string shortName,
-                             std::string infoText,
-                             std::string parameterList)
+SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, V* ptr3, std::string name,
+                                         std::string shortName, std::string infoText,
+                                         std::string parameterList)
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
-        std::move(parameterList), 3, false)
+                         std::move(parameterList), 3, false)
 	, _ptr1(ptr1)
 	, _ptr2(ptr2)
 	, _ptr3(ptr3)
 	, _ptr4(nullptr)
-{}
+{
+    ghoul_assert(_ptr1, "Ptr1 must not be empty");
+    ghoul_assert(_ptr2, "Ptr2 must not be empty");
+    ghoul_assert(_ptr3, "Ptr3 must not be empty");
+}
 
 template<typename T, typename U, typename V, typename W>
 SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, V* ptr3, W* ptr4,
-							 std::string name,
-							 std::string shortName,
-							 std::string infoText,
-							 std::string parameterList)
+                                         std::string name, std::string shortName,
+                                         std::string infoText, std::string parameterList)
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
-        std::move(parameterList), 4, false)
+                         std::move(parameterList), 4, false)
 	, _ptr1(ptr1)
 	, _ptr2(ptr2)
 	, _ptr3(ptr3)
 	, _ptr4(ptr4)
-{}
-
-template<typename T, typename U, typename V, typename W>
-bool SingleCommand<T, U, V, W>::execute(const std::vector<std::string>& parameters) {
-    cast(parameters[0], *_ptr1);
-    if (_ptr2 != nullptr)
-        cast(parameters[1], *_ptr2);
-    if (_ptr3 != nullptr)
-        cast(parameters[2], *_ptr3);
-    if (_ptr4 != nullptr)
-        cast(parameters[3], *_ptr4);
-
-    return true;
+{
+    ghoul_assert(_ptr1, "Ptr1 must not be empty");
+    ghoul_assert(_ptr2, "Ptr2 must not be empty");
+    ghoul_assert(_ptr3, "Ptr3 must not be empty");
+    ghoul_assert(_ptr4, "Ptr4 must not be empty");
 }
 
 template<typename T, typename U, typename V, typename W>
-bool SingleCommand<T, U, V, W>::checkParameters(
-										const std::vector<std::string>& parameters)
+void SingleCommand<T, U, V, W>::execute(const std::vector<std::string>& parameters) {
+    *_ptr1 = cast<T>(parameters[0]);
+    if (_ptr2 != nullptr)
+        *_ptr2 = cast<U>(parameters[1]);
+    if (_ptr3 != nullptr)
+        *_ptr3 = cast<V>(parameters[2]);
+    if (_ptr4 != nullptr)
+        *_ptr4 = cast<W>(parameters[3]);
+}
+
+template<typename T, typename U, typename V, typename W>
+void SingleCommand<T, U, V, W>::checkParameters(
+										const std::vector<std::string>& parameters) const
 {
-    std::ostringstream errorStr;
+    CommandlineCommand::checkParameters(parameters);
+    is<T>(parameters[0]);
+    
+    if (_ptr2)
+        is<U>(parameters[1]);
 
-    bool result = parameters.size() == static_cast<size_t>(_argumentNum);
-    if (!result) {
-        errorStr << "Invalid number of parameters: " << parameters.size();
-        errorStr << ", expected: " << _argumentNum;
-        _errorMsg = errorStr.str();
-        return false;
-    }
+    if (_ptr3)
+        is<V>(parameters[2]);
 
-    result &= is<T>(parameters[0]);
-    if (!result)
-        errorStr << "First parameter invalid";
-
-    if (result && (_ptr2 != nullptr)) {
-        result &= is<U>(parameters[1]);
-        if (!result)
-            errorStr << "Second parameter invalid";
-    }
-
-    if (result && (_ptr3 != nullptr)) {
-        result &= is<V>(parameters[2]);
-        if (!result)
-            errorStr << "Third parameter invalid";
-    }
-
-    if (result && (_ptr4 != nullptr)) {
-        result &= is<W>(parameters[3]);
-        if (!result)
-            errorStr << "Fourth parameter invalid";
-    }
-
-    if (!result)
-        _errorMsg = errorStr.str();
-
-    return result;
+    if (_ptr4)
+        is<W>(parameters[3]);
 }
 
 } // namespace cmdparser

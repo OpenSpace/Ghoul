@@ -26,7 +26,7 @@
 #ifndef __LOG_H__
 #define __LOG_H__
 
-#include "logmanager.h"
+#include <ghoul/logging/logmanager.h>
 #include <string>
 
 namespace ghoul {
@@ -48,8 +48,7 @@ namespace logging {
  */
 class Log {
 public:
-    /// Empty virtual destructor.
-    virtual ~Log();
+    virtual ~Log() = default;
 
     /**
      * Method that logs a message with a given <code>level</code> and
@@ -60,7 +59,7 @@ public:
      * \param message The message body of the log message
      */
     virtual void log(LogManager::LogLevel level, const std::string& category,
-                     const std::string& message) = 0;
+        const std::string& message) = 0;
 
     /**
      * Flushes the Log. This has different effects on different subclasses, but after this
@@ -120,10 +119,6 @@ protected:
      */
     std::string getDateString() const;
 
-protected:
-    Log& operator=(const Log&) = delete;
-    Log(const Log&) = delete;
-    
 private:
     bool _timeStamping; ///< Is the log printing the time?
     bool _dateStamping; ///< Is the log printing the date?

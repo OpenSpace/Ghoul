@@ -23,39 +23,20 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <utility>
+#include <ghoul/io/model/modelreaderbase.h>
+
+#include <format.h>
+
+using std::string;
 
 namespace ghoul {
+namespace io {
 
-template <typename Event>
-template <typename Observer>
-int TemplateObservable<Event>::registerObserver(const Event& event, Observer&& observer) {
-	_observers[event].push_back({std::forward<Observer>(observer), _currentIndex});
-	return _currentIndex++;
-}
-
-template <typename Event>
-template <typename Observer>
-int TemplateObservable<Event>::registerObserver(Event&& event, Observer&& observer) {
-	_observers[std::move(event)].push_back({std::forward<Observer>(observer), _currentIndex});
-	return _currentIndex++;
-}
-
-template <typename Event>
-void TemplateObservable<Event>::unregisterObserver(int observerId) {
-	auto it = std::find_if(_observers.begin(), _observers.end(), [observerId](const std::pair<Event, Function>& obs) {
-		return obs.second.second == observerId;
-	});
-		
-	if (it != _observers.end())
-		_observers.erase(it);
-}
-
-template <typename Event>
-void TemplateObservable<Event>::notify(const Event& event) const {
-	assert(_observers.find(event) != _observers.end());
-	for (const auto& obs : _observers.at(event))
-		obs.first();
-}
-
+ModelReaderBase::ModelReaderException::ModelReaderException(string file, string error)
+    : RuntimeError(fmt::format("Error reading model '{}': {}", file, error), "IO")
+    , fileName(std::move(file))
+    , errorMessage(std::move(error))
+{}
+    
+} // namespace io
 } // namespace ghoul

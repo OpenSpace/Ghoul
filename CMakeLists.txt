@@ -74,7 +74,7 @@ option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
 #############################
 # Compile settings
 #############################
-set_property(TARGET Ghoul PROPERTY CXX_STANDARD 11)
+set_property(TARGET Ghoul PROPERTY CXX_STANDARD 14)
 set_property(TARGET Ghoul PROPERTY CXX_STANDARD_REQUIRED On)
 
 if (MSVC)

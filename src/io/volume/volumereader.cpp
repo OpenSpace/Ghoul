@@ -23,35 +23,14 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef RAWVOLUMEREADER_H_
-#define RAWVOLUMEREADER_H_
-
-#include <ghoul/io/volumereader.h>
+#include <ghoul/io/volume/volumereader.h>
 
 namespace ghoul {
 
-class RawVolumeReader : public VolumeReader {
-public:
-	struct ReadHints {
-		ReadHints(glm::ivec3 dimensions = glm::ivec3(0));
-		glm::ivec3 _dimensions;
-		opengl::Texture::Format _format;
-		GLenum _internalFormat;
-	};
+VolumeReader::VolumeReader() {
+}
 
-	RawVolumeReader();
-	RawVolumeReader(const ReadHints& hints);
-	~RawVolumeReader();
-
-	void setReadHints(glm::ivec3 dimension);
-	void setReadHints(const ReadHints& hints);
-
-	opengl::Texture* read(std::string filename);
-protected:
-private:
-	ReadHints _hints;
-};
+VolumeReader::~VolumeReader() {
+}
 
 } // namespace ghoul
-
-#endif /* RAWVOLUMEREADER_H_ */

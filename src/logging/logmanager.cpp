@@ -53,7 +53,7 @@ std::string LogManager::stringFromLevel(LogLevel level) {
 }
 
 LogManager::LogLevel LogManager::levelFromString(const std::string& level) {
-	std::map<std::string, LogLevel> levels = {
+	static const std::map<std::string, LogLevel> levels = {
 		{ "Debug"  , LogLevel::Debug },
 		{ "Info"   , LogLevel::Info },
 		{ "Warning", LogLevel::Warning },
@@ -72,34 +72,26 @@ LogManager::LogManager(LogManager::LogLevel level, bool immediateFlush)
 	, _immediateFlush(immediateFlush)
 {}
 
-LogManager::~LogManager() {
-	for (Log* log : _logs)
-		delete log;
-    _logs.clear();
-}
-
-void LogManager::addLog(Log* log) {
-    std::vector<Log*>::const_iterator it = std::find(_logs.begin(), _logs.end(), log);
+void LogManager::addLog(std::shared_ptr<Log> log) {
+    auto it = std::find(_logs.begin(), _logs.end(), log);
     if (it == _logs.end())
-        _logs.push_back(log);
+        _logs.push_back(std::move(log));
 }
 
-void LogManager::removeLog(Log* log) {
-    std::vector<Log*>::iterator it = std::find(_logs.begin(), _logs.end(), log);
+void LogManager::removeLog(std::shared_ptr<Log> log) {
+    auto it = std::find(_logs.begin(), _logs.end(), log);
     if (it != _logs.end())
         _logs.erase(it);
 }
 
-void LogManager::logMessage(
-	LogManager::LogLevel level, 
-	const std::string& category,
-	const std::string& message) 
+void LogManager::logMessage(LogManager::LogLevel level, const std::string& category,
+                                                               const std::string& message)
 {
 	if (level >= _level) {
 		// Acquire lock, automatically released at end of scope
 		std::lock_guard<std::mutex> lock(_mutex);
 
-		std::vector<Log*>::const_iterator it = _logs.begin();
+		auto it = _logs.begin();
 		for (; it != _logs.end(); ++it) {
 			(*it)->log(level, category, message);
 			if (_immediateFlush)

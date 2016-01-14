@@ -28,65 +28,61 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/directory.h>
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/io/texture/texturewriterbase.h>
-#include <set>
 
-namespace {
-    const std::string _loggerCat = "TextureWriter";
-}
+#include <format.h>
+
+using std::string;
 
 namespace ghoul {
 namespace io {
+    
+TextureWriter::MissingWriterException::MissingWriterException(std::string extension)
+    : RuntimeError(fmt::format("No writer was found for extension '{}'", extension), "IO")
+    , fileExtension(std::move(extension))
+{}
 
-    TextureWriter::TextureWriter() {
-        
-    }
+TextureWriter& TextureWriter::ref() {
+    static TextureWriter textureWriter;
+    return textureWriter;
+}
+
+void TextureWriter::saveTexture(const opengl::Texture& texture, const string& filename) {
+    ghoul_assert(!_writers.empty(), "No writers were registered before");
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+
+    ghoul::filesystem::File file = ghoul::filesystem::File(filename);
+    const std::string& extension = file.fileExtension();
+    ghoul_assert(!extension.empty(), "Filename must have an extension");
     
-    TextureWriter::~TextureWriter() {
-        for (TextureWriterBase* writer : _writers) {
-            delete writer;
-        }
-    }
+    TextureWriterBase* writer = writerForExtension(extension);
+    // Make sure the directory for the file exists
+    FileSys.createDirectory(file.directoryName());
+    writer->saveTexture(texture, filename);
+}
+
+void TextureWriter::addWriter(std::shared_ptr<TextureWriterBase> writer) {
+    ghoul_assert(
+        std::find(_writers.begin(), _writers.end(), writer) == _writers.end(),
+        "Writers must not be added twice"
+    );
+
+    _writers.push_back(writer);
+}
     
-    TextureWriter& TextureWriter::ref() {
-        static TextureWriter textureWriter;
-        return textureWriter;
+std::vector<std::shared_ptr<TextureWriterBase>> TextureWriter::writers() const {
+    return _writers;
+}
+
+TextureWriterBase* TextureWriter::writerForExtension(const std::string& extension) {
+    for (const auto& writer : _writers) {
+        auto extensions = writer->supportedExtensions();
+        auto it = std::find(extensions.begin(), extensions.end(), extension);
+        if (it != extensions.end())
+            return writer.get();
     }
-    
-    void TextureWriter::saveTexture(const opengl::Texture* texture, const std::string& filename) {
-        if (_writers.empty()) {
-            LERROR("No writers were registered with the TextureWriter");
-            return;
-        }
-        
-        ghoul::filesystem::File file(filename);
-        std::string extension = file.fileExtension();
-        
-        TextureWriterBase* writer = writerForExtension(extension);
-        if (writer) {
-            // Make sure directory exists
-            ghoul::filesystem::Directory directory(file.directoryName());
-            FileSys.createDirectory(directory, true);
-            // Write to file
-            writer->saveTexture(texture, filename);
-        } else {
-            LERROR("No writer was found for extension '" << extension << "'");
-        }
-    }
-    
-    void TextureWriter::addWriter(TextureWriterBase* writer) {
-        _writers.push_back(writer);
-    }
-    
-    TextureWriterBase* TextureWriter::writerForExtension(const std::string& extension) {
-        for (TextureWriterBase* writer : _writers) {
-            std::set<std::string> extensions = writer->supportedExtensions();
-            auto it = extensions.find(extension);
-            if (it != extensions.end())
-                return writer;
-        }
-            return nullptr;
-    }
+    throw MissingWriterException(extension);
+}
+
 } // namespace io
 } // namespace ghoul

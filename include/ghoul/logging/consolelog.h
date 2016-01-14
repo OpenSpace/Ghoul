@@ -26,19 +26,19 @@
 #ifndef __CONSOLELOG_H__
 #define __CONSOLELOG_H__
 
-#include "streamlog.h"
+#include <ghoul/logging/streamlog.h>
 
 namespace ghoul {
 namespace logging {
 
 /**
- * A concrete subclass of Log that logs the messages to the console using the
+ * A concrete subclass of Log that logs the messages to the console to the
  * <code>std::cout</code> stream. The formatting of the log messages depends on the
  * stamping settings. The different possibilities are:
  * \verbatim
- "[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
- "[DATE] CATEGORY (LEVEL) MESSAGE"
- "[TIME] CATEGORY (LEVEL) MESSAGE"
+"[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
+"[DATE] CATEGORY (LEVEL) MESSAGE"
+"[TIME] CATEGORY (LEVEL) MESSAGE"
  \endverbatim
  * And the remaining possibilities with <code>CATEGORY</code> and <code>LEVEL</code>
  * missing. A parameter in the constructor determines if the output text will be colored
@@ -53,20 +53,20 @@ namespace logging {
 class ConsoleLog : public StreamLog {
 public:
     /**
-    * Constructor that calls Log constructor.
-    * \param colorOutput Determines if the log should printed in color
-    * \param timeStamping Determines if the log should print the time when a message
-    * is logged in the log messages
-    * \param dateStamping Determines if the log should print the time when a message
-    * is logged in the log messages
-    * \param categoryStamping Determines if the log should print the categories in
-    * the log messages
-    * \param logLevelStamping Determines if the log should print the log level in the
-    * log messages
-    */
+     * Constructor that calls Log constructor.
+     * \param colorOutput Determines if the log should printed in color
+     * \param timeStamping Determines if the log should print the time when a message
+     * is logged in the log messages
+     * \param dateStamping Determines if the log should print the time when a message
+     * is logged in the log messages
+     * \param categoryStamping Determines if the log should print the categories in
+     * the log messages
+     * \param logLevelStamping Determines if the log should print the log level in the
+     * log messages
+     */
     ConsoleLog(bool colorOutput = true, bool timeStamping = false,
-               bool dateStamping = false, bool categoryStamping = true,
-               bool logLevelStamping = true);
+        bool dateStamping = false, bool categoryStamping = true,
+        bool logLevelStamping = true);
 
     /**
      * Method that logs a message with a given level and category to the console.
@@ -76,12 +76,9 @@ public:
      * \param message The message body of the log message
      */
     void log(LogManager::LogLevel level, const std::string& category,
-             const std::string& message) override;
+        const std::string& message) override;
 
 protected:
-    // No defined on purpose. Using should throw linker error.
-    ConsoleLog& operator=(const ConsoleLog&);
-    ConsoleLog(const ConsoleLog&);
     /**
      * Prepares the console to print the next messages in the color according to the
      * LogManager::LogLevel:<br>
@@ -100,7 +97,8 @@ protected:
      */
     void resetColor();
 
-    const bool _colorOutput; ///< Is the log printed in color?
+    /// Is the log printed in color?
+    const bool _colorOutput;
 };
 
 } // namespace logging

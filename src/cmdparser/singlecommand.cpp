@@ -36,9 +36,8 @@ SingleCommandZeroArguments::SingleCommandZeroArguments(bool *ptr, std::string na
 	, _ptr(ptr)
 {}
 
-bool SingleCommandZeroArguments::execute(const std::vector<std::string>& /*parameters*/) {
+void SingleCommandZeroArguments::execute(const std::vector<std::string>& /*parameters*/) {
     *_ptr = true;
-    return true;
 }
 
 } // namespace cmdparser
