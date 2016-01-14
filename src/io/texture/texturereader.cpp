@@ -29,6 +29,7 @@
 #include <ghoul/io/texture/texturereaderbase.h>
 #include <ghoul/misc/assert.h>
 
+#include <algorithm>
 #include <format.h>
 
 namespace ghoul {
