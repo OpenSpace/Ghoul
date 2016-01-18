@@ -36,14 +36,14 @@ namespace ghoul {
  * \param t The interpolation factor to use in interpolation
  * \param p0 The first control point of the interpolation
  * \param p1 The second control point of the interpolation
- * \return The interpolated value for the given control points based on \t
+ * \return The interpolated value for the given control points based on \p t
  */
 template <typename T>
 T interpolateLinear(double t, const T& p0, const T& p1);
 
 /**
  * Returns an interpolated value using the Catmull-Rom spline interpolation scheme. Four
- * control points are used in the interpolation; \p p0, \p p1, \p p2, and \p3. The 
+ * control points are used in the interpolation; \p p0, \p p1, \p p2, and \p p3. The 
  * interpolation is calculated based on the interpolation factor \p t.
  * \param t The interpolation factor to use in interpolation
  * \param p0 The first control point of the interpolation

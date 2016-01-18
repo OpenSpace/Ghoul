@@ -2420,7 +2420,7 @@ public:
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
      * and \p v3. Returns <code>true</code> if the vertex attribute could be found;
      * <code>false</code> otherwise. Will call the OpenGL function
-     * code>glVertexAttrib3f</code>.
+     * <code>glVertexAttrib3f</code>.
      * \param name The name of the vertex attribute to be set
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to

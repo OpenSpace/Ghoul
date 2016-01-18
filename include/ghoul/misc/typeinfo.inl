@@ -107,5 +107,3 @@ std::string TypeInfo::name(const T&) {
 }
 
 }  // ghoul
-
-#endif

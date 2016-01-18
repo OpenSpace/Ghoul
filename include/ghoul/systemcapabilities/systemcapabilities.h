@@ -99,11 +99,10 @@ public:
 
     /**
      * Adds the passed <code>component</code> to this SystemCapabilities and assumes
-     * ownership of this object. This method will not automatically initialize and/or
-     * detect the capabilities in this component; this has to be done using the
-     * #ghoul::systemcapabilities::SystemCapabilitiesComponent::initialize and
+     * ownership of this object. This method will not automatically detect the
+     * capabilities in this component; this has to be done using the
      * #ghoul::systemcapabilities::SystemCapabilitiesComponent::detectCapabilities
-     * methods. A specific subclass of SystemCapabilitiesComponent can only be added once
+     * method. A specific subclass of SystemCapabilitiesComponent can only be added once
      * to the SystemCapabilities
      * \param component The component that will be added to this SystemCapabilities
      * object.

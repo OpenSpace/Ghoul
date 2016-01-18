@@ -100,4 +100,6 @@ void internal_assert(std::string expression, std::string message, std::string fi
 #define ghoul_assert(__condition__, __message__)
 #endif // NDEBUG
 
+/** @}  */
+
 #endif // __ASSERT_H__

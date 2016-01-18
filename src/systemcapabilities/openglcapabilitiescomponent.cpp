@@ -177,19 +177,29 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
     result.push_back({ "OpenGL Compiler", _glslCompiler, Verbosity::Minimal });
     result.push_back({ "OpenGL Renderer", _glRenderer, Verbosity::Minimal });
     result.push_back({"GPU Vendor", gpuVendorString(), Verbosity::Minimal });
-    result.push_back({"GLEW Version", _glewVersion.toString(),Verbosity::Minimal });
+    result.push_back({"GLEW Version", _glewVersion.toString(),Verbosity::Minimal });     
 #ifdef GHOUL_USE_WMI
     result.push_back({ "GPU Name", _adapterName, Verbosity::Minimal });
     result.push_back({ "GPU Driver Version", _driverVersion, Verbosity::Minimal });
     result.push_back({ "GPU Driver Date", _driverDate, Verbosity::Minimal });
-    result.push_back({ "GPU RAM", std::to_string(_adapterRAM) + " MB",Verbosity::Minimal });
+    result.push_back({
+        "GPU RAM", std::to_string(_adapterRAM) + " MB",Verbosity::Minimal }
+    );
 #endif
 
-    result.push_back({ "Max Texture Size", std::to_string(_maxTextureSize) });
-    result.push_back({ "Max 3D Texture Size", std::to_string(_maxTextureSize3D) });
-    result.push_back({ "Num of Texture Units", std::to_string(_numTextureUnits) });
     result.push_back({
-        "FBO Color Attachments", std::to_string(_maxFramebufferColorAttachments)
+        "Max Texture Size", std::to_string(_maxTextureSize), Verbosity::Default }
+    );
+    result.push_back({
+        "Max 3D Texture Size", std::to_string(_maxTextureSize3D), Verbosity::Default }
+    );
+    result.push_back({
+        "Num of Texture Units", std::to_string(_numTextureUnits), Verbosity::Default }
+    );
+    result.push_back({
+        "FBO Color Attachments",
+        std::to_string(_maxFramebufferColorAttachments),
+        Verbosity::Default
     });
 
     std::stringstream s;

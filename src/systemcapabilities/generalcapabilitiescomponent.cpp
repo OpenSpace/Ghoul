@@ -306,7 +306,7 @@ void GeneralCapabilitiesComponent::detectMemory() {
 }
 
 void GeneralCapabilitiesComponent::detectCPU() {
-    /// @TODO This function needs cleanup ---abock
+    // @TODO This function needs cleanup ---abock
 #ifdef WIN32
 	const char* szFeatures[] =
 	{
@@ -592,13 +592,13 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
     SystemCapabilitiesComponent::CapabilityInformation i = { std::string("foo"), std::string("bar"), SystemCapabilitiesComponent::Verbosity::Minimal };
 
     result.push_back({ "Operating System", _operatingSystem, Verbosity::Minimal });
-    result.push_back({ "CPU", _cpu });
-    result.push_back({ "Cores", coresAsString() });
+    result.push_back({ "CPU", _cpu, Verbosity::Default });
+    result.push_back({ "Cores", coresAsString(), Verbosity::Default });
     result.push_back({ "Cache line size", cacheLineSizeAsString(), Verbosity::Full });
     result.push_back({ "L2 Associativity", L2AssiciativityAsString(), Verbosity::Full });
     result.push_back({ "Cache size", cacheSizeAsString(), Verbosity::Full });
     result.push_back({ "Extensions", _extensions,Verbosity::Full });
-    result.push_back({ "Main Memory", installedMainMemoryAsString() });
+    result.push_back({ "Main Memory", installedMainMemoryAsString(), Verbosity::Default });
     return result;
 }
 

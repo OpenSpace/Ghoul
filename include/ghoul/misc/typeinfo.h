@@ -63,4 +63,4 @@ public:
 
 }  // ghoul
 
-#endif
+#endif // __TYPEINFO_H__

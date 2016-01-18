@@ -47,6 +47,9 @@ SystemCapabilitiesComponent::SystemCapabilitiesComponent(bool initializeWMI) {
     if (initializeWMI && !isWMIInitialized()) {
         SystemCapabilitiesComponent::initializeWMI();
     }
+#else
+    // Remove 'unused parameter' warning
+    (void)(initializeWMI);
 #endif
 }
 
