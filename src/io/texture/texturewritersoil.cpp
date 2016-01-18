@@ -42,7 +42,7 @@ void TextureWriterSOIL::saveTexture(const opengl::Texture& texture,
     
     std::string extension = ghoul::filesystem::File(filename).fileExtension();
     ghoul_assert(
-        std::find(supportedExtensions().begin(), supportedExtensions.end(), extension),
+        std::find(supportedExtensions().begin(), supportedExtensions().end(), extension),
         "Extension of the filename must be supported"
     );
     
