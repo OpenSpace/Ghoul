@@ -102,6 +102,7 @@ std::string HTMLLog::colorForLevel(LogManager::LogLevel level) {
         case LogManager::LogLevel::NoLogging:
             return "#FFFFFF";
     }
+    return "";
 }
 
 } // namespace logging

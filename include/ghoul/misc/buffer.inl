@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <cstring>
+
 template<class T>
 void ghoul::Buffer::serialize(const T& v) {
     static_assert(std::is_pod<T>::value, "T has to be a POD for general serialize");
@@ -52,9 +54,9 @@ void ghoul::Buffer::serialize(const std::vector<T>& v) {
     size_t size = sizeof(T)*length+sizeof(size_t);
     _data.resize(_data.capacity() + size);
     
-    memcpy(_data.data() + _offsetWrite, &length, sizeof(size_t));
+    std::memcpy(_data.data() + _offsetWrite, &length, sizeof(size_t));
     _offsetWrite += sizeof(size_t);
-    memcpy(_data.data() + _offsetWrite, v.data(), sizeof(T)*length);
+    std::memcpy(_data.data() + _offsetWrite, v.data(), sizeof(T)*length);
     _offsetWrite += sizeof(T)*length;
 }
 
