@@ -66,7 +66,7 @@ void TextureWriter::addWriter(std::shared_ptr<TextureWriterBase> writer) {
     ghoul_assert(
         std::any_of(
             _writers.begin(),
-            _writers.end(), [reader](std::shared_ptr<TextureWriterBase>& rhs) {
+            _writers.end(), [writer](std::shared_ptr<TextureWriterBase>& rhs) {
                 return rhs.get() == writer.get();
             }
         ),
