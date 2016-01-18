@@ -61,7 +61,7 @@ void TextureWriterSOIL::saveTexture(const opengl::Texture& texture,
         type = SOIL_SAVE_TYPE_DDS;
     }
     
-    const unsigned char* data = static_cast<const unsigned char*>(texture->pixelData());
+    const unsigned char* data = static_cast<const unsigned char*>(texture.pixelData());
     int result = SOIL_save_image(
         filename.c_str(),
         type,
