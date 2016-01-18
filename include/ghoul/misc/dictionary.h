@@ -46,6 +46,7 @@
 
 #include <map>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace ghoul {
