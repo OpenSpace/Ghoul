@@ -36,6 +36,9 @@
 #include <comdef.h>
 #endif
 
+// X11 #defines 'None' in its X.h header file. We don't want it here ---abock
+#undef None
+
 namespace ghoul {
 namespace systemcapabilities {
 
