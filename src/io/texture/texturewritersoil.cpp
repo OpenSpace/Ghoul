@@ -67,7 +67,7 @@ void TextureWriterSOIL::saveTexture(const opengl::Texture& texture,
         type,
         width,
         height,
-        texture->numberOfChannels(),
+        texture.numberOfChannels(),
         data
     );
     if (result == 0)
