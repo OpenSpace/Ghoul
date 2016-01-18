@@ -30,6 +30,7 @@
 #include <ghoul/filesystem/directory.h>
 #include <ghoul/io/texture/texturewriterbase.h>
 
+#include <algorithm>
 #include <format.h>
 
 using std::string;
@@ -63,7 +64,12 @@ void TextureWriter::saveTexture(const opengl::Texture& texture, const string& fi
 
 void TextureWriter::addWriter(std::shared_ptr<TextureWriterBase> writer) {
     ghoul_assert(
-        std::find(_writers.begin(), _writers.end(), writer) == _writers.end(),
+        std::any_of(
+            _writers.begin(),
+            _writers.end(), [reader](std::shared_ptr<TextureWriterBase>& rhs) {
+                return rhs.get() == writer.get();
+            }
+        ),
         "Writers must not be added twice"
     );
 
