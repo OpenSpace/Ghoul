@@ -58,9 +58,10 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& f
 
 void TextureReader::addReader(std::shared_ptr<TextureReaderBase> reader) {
     ghoul_assert(
-        std::any_of(
+        std::none_of(
             _readers.begin(),
-            _readers.end(), [reader](std::shared_ptr<TextureReaderBase>& rhs) {
+            _readers.end(),
+            [&reader](std::shared_ptr<TextureReaderBase>& rhs) {
                 return rhs.get() == reader.get();
             }
         ),

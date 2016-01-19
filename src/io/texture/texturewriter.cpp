@@ -64,7 +64,7 @@ void TextureWriter::saveTexture(const opengl::Texture& texture, const string& fi
 
 void TextureWriter::addWriter(std::shared_ptr<TextureWriterBase> writer) {
     ghoul_assert(
-        std::any_of(
+        std::none_of(
             _writers.begin(),
             _writers.end(), [writer](std::shared_ptr<TextureWriterBase>& rhs) {
                 return rhs.get() == writer.get();
