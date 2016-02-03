@@ -41,7 +41,7 @@ namespace opengl {
 
 class ShaderPreprocessor {
 public:
-    using ShaderChangedCallback = std::function<void (const filesystem::File&)>;
+    using ShaderChangedCallback = std::function<void ()>;
     
     struct ShaderPreprocessorError : public RuntimeError {
         explicit ShaderPreprocessorError(std::string message);
@@ -61,8 +61,10 @@ public:
     };
     
     ShaderPreprocessor(std::string shaderPath = "", Dictionary dict = Dictionary());
+    std::string filename();
+    Dictionary dictionary();
     void setDictionary(Dictionary dict);
-    void setShaderPath(std::string shaderPath);
+    void setFilename(const std::string& filename);
     void setCallback(ShaderChangedCallback cb);
     void process(std::string& output);
     std::string getFileIdentifiersString();
@@ -127,6 +129,7 @@ private:
     bool parseEndFor(ShaderPreprocessor::Env& env);
     bool parseInclude(ShaderPreprocessor::Env& env);
     bool parseVersion(ShaderPreprocessor::Env& env);
+    bool parseOs(ShaderPreprocessor::Env& env);
 
     bool substituteLine(ShaderPreprocessor::Env& env);
     std::string substitute(const std::string& in, ShaderPreprocessor::Env& env);

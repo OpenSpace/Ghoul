@@ -61,18 +61,18 @@ ShaderObject::ShaderCompileError::ShaderCompileError(std::string error,
     , fileIdentifiers(std::move(ident))
     , shaderName(std::move(name))
 {}
-    
+
 ShaderObject::ShaderObject(ShaderType shaderType, Dictionary dictionary)
     : _id(0)
     , _type(shaderType)
-    , _fileName("")
     , _shaderName("")
-    , _dictionary(dictionary)
     , _loggerCat("ShaderObject")
     , _onChangeCallback(nullptr)
 {
     _id = glCreateShader(_type);
-    _preprocessor.setDictionary(dictionary);
+    _preprocessor.setDictionary(std::move(dictionary));
+    _preprocessor.setFilename("");
+
     if (_id == 0)
         throw ShaderObjectError("glCreateShader returned 0");
 }
@@ -81,32 +81,30 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
                            Dictionary dictionary)
     : _id(0)
     , _type(shaderType)
-    , _fileName(std::move(filename))
     , _shaderName("")
-    , _dictionary(dictionary)
     , _loggerCat("ShaderObject")
     , _onChangeCallback(nullptr)
 {
-    ghoul_assert(!_fileName.empty(), "Filename must not be empty");
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
 
     _id = glCreateShader(_type);
     if (_id == 0)
         throw ShaderObjectError("glCreateShader returned 0");
-    _preprocessor.setDictionary(dictionary);
-    setShaderFilename(_fileName);
+    _preprocessor.setDictionary(std::move(dictionary));
+    _preprocessor.setFilename(std::move(filename));
+
+    rebuildFromFile();
 }
 
 ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
                            std::string name, Dictionary dictionary)
     : _id(0)
     , _type(shaderType)
-    , _fileName(std::move(filename))
     , _shaderName(std::move(name))
-    , _dictionary(dictionary)
     , _loggerCat("ShaderObject('" + _shaderName + "')")
     , _onChangeCallback(nullptr)
 {
-    ghoul_assert(!_fileName.empty(), "Filename must not be empty");
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
 
     _id = glCreateShader(_type);
     if (_id == 0)
@@ -116,16 +114,16 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
         glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1),
                       _shaderName.c_str());
 #endif
-    _preprocessor.setDictionary(dictionary);
-    setShaderFilename(_fileName);
+    _preprocessor.setFilename(std::move(filename));
+    _preprocessor.setDictionary(std::move(dictionary));
+
+    rebuildFromFile();
 }
 
 ShaderObject::ShaderObject(const ShaderObject& cpy)
     : _id(0)
     , _type(cpy._type)
-    , _fileName(cpy._fileName)
     , _shaderName(cpy._shaderName)
-    , _dictionary(cpy._dictionary)
     , _loggerCat(cpy._loggerCat)
     , _onChangeCallback(cpy._onChangeCallback)
     , _preprocessor(cpy._preprocessor)
@@ -138,8 +136,8 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
         glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1),
                       _shaderName.c_str());
 #endif
-    setShaderFilename(_fileName);
     setShaderObjectCallback(_onChangeCallback);
+    rebuildFromFile();
 }
 
 ShaderObject::ShaderObject(ShaderObject&& rhs) {
@@ -147,9 +145,7 @@ ShaderObject::ShaderObject(ShaderObject&& rhs) {
         _id = std::move(rhs._id);
 
 		_type = rhs._type;
-		_fileName = std::move(rhs._fileName);
 		_shaderName = std::move(rhs._shaderName);
-		_dictionary = std::move(rhs._dictionary);
 		_loggerCat = std::move(rhs._loggerCat);
         _onChangeCallback = std::move(rhs._onChangeCallback);
 		_preprocessor = std::move(rhs._preprocessor);
@@ -169,9 +165,7 @@ ShaderObject::operator GLuint() const {
 ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
     if (this != &rhs) {
         _type = rhs._type;
-        _fileName = rhs._fileName;
         _shaderName = rhs._shaderName;
-        _dictionary = rhs._dictionary;
         _loggerCat = rhs._loggerCat;
         _onChangeCallback = rhs._onChangeCallback;
         _preprocessor = rhs._preprocessor;
@@ -186,7 +180,7 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
             glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1)
                           , _shaderName.c_str());
 #endif
-        setShaderFilename(_fileName);
+        rebuildFromFile();
     }
     return *this;
 }
@@ -195,9 +189,7 @@ ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) {
 	if (this != &rhs) {
         _id = std::move(rhs._id);
 		_type = rhs._type;
-		_fileName = std::move(rhs._fileName);
 		_shaderName = std::move(rhs._shaderName);
-		_dictionary = std::move(rhs._dictionary);
 		_loggerCat = std::move(rhs._loggerCat);
 		_onChangeCallback = std::move(rhs._onChangeCallback);
 		_preprocessor = std::move(rhs._preprocessor);
@@ -227,45 +219,54 @@ const std::string& ShaderObject::name() const {
     return _shaderName;
 }
 
-void ShaderObject::setDictionary(Dictionary dictionary) {
-    _dictionary = dictionary;
-    _preprocessor.setDictionary(dictionary);
-    reloadFromFile();
-}
-
 void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) {
     _onChangeCallback = std::move(changeCallback);
     // The ShaderPreprocessor will take care to call the callback whenever the underlying
-    // file or an included file changes
+    // file changes, an included file changes, or the dictionary changes.
     _preprocessor.setCallback(_onChangeCallback);
 }
 
-std::string ShaderObject::filename() {
-	return _fileName;
+void ShaderObject::setFilename(const std::string& filename) {
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+    if (!FileSys.fileExists(filename))
+        throw FileNotFoundError(filename);
+
+    _preprocessor.setFilename(filename);
 }
 
-void ShaderObject::setShaderFilename(std::string filename) {
-    ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
-	_fileName = std::move(filename);
+std::string ShaderObject::filename() {
+	return _preprocessor.filename();
+}
 
-    if (!FileSys.fileExists(_fileName))
-        throw FileNotFoundError(_fileName);
+void ShaderObject::setDictionary(Dictionary dictionary) {
+    _preprocessor.setDictionary(dictionary);
+}
 
+Dictionary ShaderObject::dictionary() {
+    return _preprocessor.dictionary();
+}
+
+void ShaderObject::rebuildFromFile() {
     std::string contents;
-
-    _preprocessor.setShaderPath(_fileName);
     _preprocessor.process(contents);
 
 	// If in debug mode, output the source to file
 #ifdef GHL_DEBUG
 	std::string generatedFilename;
-	ghoul::filesystem::File ghlFile(_fileName);
+
+    std::string baseName;
+    if (_shaderName == "") {
+		ghoul::filesystem::File ghlFile(filename());
+		baseName = ghlFile.baseName();
+    } else {
+		baseName = _shaderName;
+    }
+
     if (FileSys.cacheManager()) {
         // we use the .baseName() version because otherwise we get a new file
         // every time we reload the shader
         generatedFilename = FileSys.cacheManager()->cachedFilename(
-            ghlFile.baseName(), "", true
+            baseName, "", true
         );
     }
     else {
@@ -296,9 +297,6 @@ void ShaderObject::deleteShader() {
     _id = 0;
 }
 
-void ShaderObject::reloadFromFile() {
-    setShaderFilename(_fileName);
-}
 
 void ShaderObject::compile() {
     glCompileShader(_id);

@@ -118,10 +118,26 @@ ShaderPreprocessor::Env::Env(std::stringstream& o, std::string l, std::string i)
 
 void ShaderPreprocessor::setDictionary(Dictionary dictionary) {
     _dictionary = std::move(dictionary);
+    if (_onChangeCallback) {
+        _onChangeCallback();
+    }
 }
 
-void ShaderPreprocessor::setShaderPath(std::string shaderPath) {
-    _shaderPath = std::move(shaderPath);
+Dictionary ShaderPreprocessor::dictionary() {
+    return _dictionary;
+}
+
+void ShaderPreprocessor::setFilename(const std::string& shaderPath) {
+    if (_shaderPath != shaderPath) {
+        _shaderPath = shaderPath;
+        if (_onChangeCallback) {
+            _onChangeCallback();
+        }
+    }
+}
+
+std::string ShaderPreprocessor::filename() {
+    return _shaderPath;
 }
     
 void ShaderPreprocessor::process(std::string& output) {
@@ -149,7 +165,9 @@ void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
     _onChangeCallback = changeCallback;
     for (auto& files : _includedFiles) {
         if (files.second.isTracked)
-            files.second.file.setCallback(changeCallback);
+			files.second.file.setCallback([this](const filesystem::File& file) {
+			_onChangeCallback();
+		});
     }
 }
 
@@ -191,7 +209,9 @@ void ShaderPreprocessor::includeFile(const std::string& path, bool trackChanges,
             FileStruct{ filesystem::File(path), _includedFiles.size(), trackChanges }
         ).first;
         if (trackChanges)
-            it->second.file.setCallback(_onChangeCallback);
+			it->second.file.setCallback([this](const filesystem::File& file) {
+			_onChangeCallback();
+		});
     }
 
     std::ifstream stream(path);
@@ -260,7 +280,8 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
 #endif
 
     env.output << includeSeparator << std::endl
-        << "#line " << env.inputs.back().lineNumber << " " << fileIdentifier << std::endl;
+               << "#line " << env.inputs.back().lineNumber << " " << fileIdentifier
+               << "// " << filename << std::endl;
 }
 
 bool ShaderPreprocessor::isInsideEmptyForStatement(ShaderPreprocessor::Env& env) {
@@ -288,6 +309,7 @@ bool ShaderPreprocessor::parseLine(ShaderPreprocessor::Env& env) {
     if (!specialLine) {
         specialLine |=
             parseVersion(env) ||    // #version __CONTEXT__
+            parseOs(env) ||         // #define __OS__
             parseInclude(env) ||    // #include
             parseFor(env);          // #for <key>, <value> in <dictionary>
     }
@@ -500,6 +522,32 @@ bool ShaderPreprocessor::parseVersion(ShaderPreprocessor::Env& env) {
     std::string& line = env.line;
     if (line.substr(0, versionString.length()) == versionString) {
         env.output << glslVersionString() << std::endl;
+        return true;
+    }
+    return false;
+}
+
+bool ShaderPreprocessor::parseOs(ShaderPreprocessor::Env& env) {
+    static const std::string osString = "#define __OS__";
+    std::string& line = env.line;
+    if  (line.length() >= osString.length() &&
+         line.substr(0, osString.length()) == osString) {
+        std::string os;
+
+#ifdef WIN32
+        os = "WIN32";
+#endif
+#ifdef __APPLE__
+        os = "APPLE";
+#endif
+#ifdef __linux__
+        os = "linux";
+#endif
+        env.output << "#ifndef __OS__" << std::endl;
+        env.output << "#define __OS__ " << os << std::endl;
+        env.output << "#define " << os << std::endl;
+        env.output << "#endif" << std::endl;
+        addLineNumber(env);
         return true;
     }
     return false;

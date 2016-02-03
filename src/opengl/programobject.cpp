@@ -237,14 +237,21 @@ const string& ProgramObject::name() const{
     return _programName;
 }
 
-void ProgramObject::rebuildWithDictionary(Dictionary dictionary) {
-    for (const auto& shaderObject : _shaderObjects)
-        shaderObject->setDictionary(dictionary);
-    rebuildFromFile();
+void ProgramObject::setDictionary(const Dictionary& dict) {
+    for (const auto& shaderObject : _shaderObjects) {
+        shaderObject->setDictionary(dict);
+    }
+}
+
+Dictionary ProgramObject::dictionary() {
+    if (_shaderObjects.empty()) {
+        throw ProgramObjectError("No shader object attached");
+    }
+    return _shaderObjects[0]->dictionary();
 }
 
 void ProgramObject::setProgramObjectCallback(ProgramObjectCallback changeCallback) {
-	filesystem::File::FileChangedCallback c = [this, changeCallback](const filesystem::File&){
+	ShaderObject::ShaderObjectCallback c = [this, changeCallback](){
         _programIsDirty = true;
 		changeCallback(this);
 	};
@@ -257,7 +264,7 @@ void ProgramObject::attachObject(std::shared_ptr<ShaderObject> shaderObject) {
     auto it = std::find(_shaderObjects.begin(), _shaderObjects.end(), shaderObject);
     ghoul_assert(it == _shaderObjects.end(), "ShaderObject was already registered");
 
-    filesystem::File::FileChangedCallback c = [this](const filesystem::File&) {
+    ShaderObject::ShaderObjectCallback c = [this]() {
         _programIsDirty = true;
     };
     shaderObject->setShaderObjectCallback(c);

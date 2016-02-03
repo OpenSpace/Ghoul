@@ -100,7 +100,7 @@ public:
 	* A type definition for a callback function that is called if any of
 	* the tracked files is changed.
 	*/
-    using ShaderObjectCallback = std::function<void(const filesystem::File&)>;
+    using ShaderObjectCallback = std::function<void()>;
 
     /**
      * This constructor creates a shader of the passed type with an empty source string. 
@@ -211,6 +211,12 @@ public:
     const std::string& name() const;
 
     /**
+    * Returns the dictionary that will be used to compile the shader object
+    * \return The dictionary
+    */
+    Dictionary dictionary();
+
+    /**
      * Sets the dictionary of the shader object.
      * Will trigger a rebuild from file.
      * \param dictionary object
@@ -239,7 +245,13 @@ public:
      * \throw ShaderObjectError If the file pointed to by \p filename was empty
      * \pre \p filename must not be empty
      */
-    void setShaderFilename(std::string filename);
+    void setFilename(const std::string& filename);
+
+    /**
+    * Rebuild the shader object from file using the file set by setFilename and the
+    * dictionary set by setDictionary.
+    */
+    void rebuildFromFile();
 
     /**
      * This method will mark the OpenGL name as unused. Because of the way the OpenGL
@@ -281,14 +293,8 @@ private:
     /// The type of this ShaderObject
     ShaderType _type;
 
-    /// The filename that is used to load the source for this ShaderObject;
-    std::string _fileName;
-
     /// The internal name of this ShaderObject; initialized to empty
     std::string _shaderName;
-
-    // The dictionary to be used for substitution by the preprocessor
-    Dictionary _dictionary;
 
     /// The logger category that will be used for logging of ShaderObject methods
     std::string _loggerCat;

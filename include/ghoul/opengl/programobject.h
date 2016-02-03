@@ -156,16 +156,16 @@ public:
     const std::string& name() const;
 
     /**
-     * Rebuild all of the attached ShaderObject%s with a new \p dictionary used for the
-     * ShaderPreprocessor.
-     * \param dictionary The Dictionary that is passed to the ShaderObject%s before
-     * recompiling
-     * \throw ShaderCompileError If there was an error compiling at least one of the
-     * attached ShaderObject%s
-     * \throw ProgramObjectLinkingError If there was an error linking the ProgramObject
-     * \sa ShaderPreprocessor
+     * Sets the dictionary, without rebuilding the shader.
+     * The program object will be dirty after this operation.
+     * (_builtLatest will be false)
      */
-    void rebuildWithDictionary(Dictionary dictionary);
+    void setDictionary(const Dictionary& dictionary);
+
+    /**
+     * Returns the current dictionary.
+     */
+    Dictionary dictionary();
 
     /**
      * Sets the shader object callback.
@@ -3526,9 +3526,10 @@ private:
     /// All the ShaderObjects that are managed and attached to this ProgramObject.
     std::vector<std::shared_ptr<ShaderObject>> _shaderObjects;
 
-    /// A flag that gets set to <code>true</code> if the underlying shader file has been
-    /// changed and a recompile is necessary.
-    bool _programIsDirty = true;
+    /// A flag indicating whether the program needs to be recompiled
+    /// due to a change in the shader source or in the dictionary.
+    bool _programIsDirty;
+
 };
 
 } // namespace opengl
