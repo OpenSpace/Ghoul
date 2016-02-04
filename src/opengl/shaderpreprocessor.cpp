@@ -283,7 +283,7 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
 
     env.output << includeSeparator << std::endl
                << "#line " << env.inputs.back().lineNumber << " " << fileIdentifier
-               << "// " << filename << std::endl;
+               << " // " << filename << std::endl;
 }
 
 bool ShaderPreprocessor::isInsideEmptyForStatement(ShaderPreprocessor::Env& env) {
