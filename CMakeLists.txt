@@ -32,8 +32,8 @@ mark_as_advanced(CMAKE_INSTALL_PREFIX)
 project(Ghoul)
 
 if (MSVC)
-    if (MSVC_VERSION LESS 1800)
-        message(FATAL_ERROR "OpenSpace requires at least Visual Studio 2013")
+    if (MSVC_VERSION LESS 1900)
+        message(FATAL_ERROR "OpenSpace requires at least Visual Studio 2015")
     endif ()
 endif ()
 
@@ -44,6 +44,8 @@ set(GHOUL_ROOT_DIR ${PROJECT_SOURCE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_ROOT_DIR}/ext)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
+
+include (${GHOUL_ROOT_DIR}/ext/handle_external_library.cmake)
 
 #############################
 # Including the source files (with source groups already defined)
@@ -68,6 +70,7 @@ if (WIN32)
 endif ()
 option(GHOUL_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
+option(GHOUL_DISABLE_EXTERNAL_WARNINGS "Disable warnings in external libraries" ON)
 
 option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
 
@@ -146,27 +149,17 @@ target_link_libraries(Ghoul ${LZ4_LIBRARIES})
 find_package(Boost REQUIRED)
 target_include_directories(Ghoul SYSTEM PUBLIC ${Boost_INCLUDE_DIRS})
 
-
 # Lua
-add_subdirectory(ext/lua)
-target_include_directories(Ghoul SYSTEM PUBLIC "ext/lua/src")
-target_link_libraries(Ghoul Lua)
-
+include_external_library(Ghoul Lua ${GHOUL_ROOT_DIR}/ext/lua)
 
 # tinyobjloader
-add_subdirectory(ext/tinyobjloader)
-target_link_libraries(Ghoul tinyobjloader)
-target_include_directories(Ghoul SYSTEM PUBLIC "${GHOUL_ROOT_DIR}/ext/tinyobjloader")
-
+include_external_library(Ghoul tinyobjloader ${GHOUL_ROOT_DIR}/ext/tinyobjloader ${GHOUL_ROOT_DIR}/ext/tinyobjloader)
 
 # Cppformat
 set(FMT_DOC OFF CACHE BOOL "Generate the doc target.")
 set(FMT_INSTALL OFF CACHE BOOL "Generate the install target.")
 set(FMT_TEST OFF CACHE BOOL "Generate the test target.")
-add_subdirectory(ext/cppformat)
-target_link_libraries(Ghoul cppformat)
-target_include_directories(Ghoul SYSTEM PUBLIC "${GHOUL_ROOT_DIR}/ext/cppformat")
-
+include_external_library(Ghoul cppformat ${GHOUL_ROOT_DIR}/ext/cppformat ${GHOUL_ROOT_DIR}/ext/cppformat)
 
 # DevIL
 find_package(DevIL)
@@ -208,10 +201,7 @@ endif ()
 
 if (GHOUL_MODULE_FONTRENDERING)
     set(FREETYPE_DIST OFF CACHE BOOL "Generate the dist target.")
-    add_subdirectory(${GHOUL_ROOT_DIR}/ext/freetype2)
-
-    target_include_directories(Ghoul PUBLIC ${GHOUL_ROOT_DIR}/ext/freetype2/include)
-    target_link_libraries(Ghoul freetype)
+    include_external_library(Ghoul freetype ${GHOUL_ROOT_DIR}/ext/freetype2 ${GHOUL_ROOT_DIR}/ext/freetype2/include)
 endif ()
 
 #############################
