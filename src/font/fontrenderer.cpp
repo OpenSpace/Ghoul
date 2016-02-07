@@ -328,7 +328,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
         float height = 0.f;
         for (size_t j = 0 ; j < line.size(); ++j) {
             try {
-                const Font::Glyph* glyph = font.glyph(line[j]);
+                wchar_t character = line[j];
+                if (character == wchar_t('\t'))
+                    character = wchar_t(' ');
+
+                const Font::Glyph* glyph = font.glyph(character);
                 if (j > 0)
                     movingPos.x += glyph->kerning(line[j-1]);
                 
