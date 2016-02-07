@@ -97,7 +97,9 @@ void internal_assert(std::string expression, std::string message, std::string fi
 
 
 #else 
-#define ghoul_assert(__condition__, __message__)
+
+#define ghoul_assert(__condition__, __message__) {}
+
 #endif // NDEBUG
 
 /** @}  */
