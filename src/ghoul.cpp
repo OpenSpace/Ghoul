@@ -36,6 +36,7 @@ void initialize() {
 
 void deinitialize() {
     ghoul::lua::internal::deinitializeGlobalState();
+    ghoul::filesystem::FileSystem::deinitialize();
 }
 
 } // namespace ghoul

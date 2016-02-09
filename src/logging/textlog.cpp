@@ -35,7 +35,6 @@ TextLog::TextLog(const std::string& filename, bool writeToAppend, bool timeStamp
                  bool dateStamping, bool categoryStamping, bool logLevelStamping)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
     , _printFooter(writeToAppend)
-//    , _file(nullptr)
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     
@@ -55,21 +54,26 @@ TextLog::~TextLog() {
 void TextLog::log(LogManager::LogLevel level, const std::string& category,
                                                                const std::string& message)
 {
-    std::string output;
-    if (isDateStamping())
-        output += "[" + getDateString();
-    if (isTimeStamping())
-        output += " | " + getTimeString() + "] ";
-    else
-        output += "] ";
-    if (isCategoryStamping())
-        output += category + " ";
-    if (isLogLevelStamping())
-        output += "(" + LogManager::stringFromLevel(level) + ") ";
-    if (output != "")
-        output += ":\t";
-    output += message + '\n';
-    writeLine(std::move(output));
+    if (category.empty() && message.empty())
+        writeLine("\n");
+    else {
+        std::string output;
+        if (isDateStamping())
+            output += "[" + getDateString();
+        if (isTimeStamping())
+            output += " | " + getTimeString();
+
+        if (isDateStamping() || isTimeStamping())
+            output += "] ";
+        if (isCategoryStamping() && !category.empty())
+            output += category + " ";
+        if (isLogLevelStamping())
+            output += "(" + LogManager::stringFromLevel(level) + ") ";
+        if (output != "")
+            output += ":\t";
+        output += message + '\n';
+        writeLine(std::move(output));
+    }
 }
 
 void TextLog::flush() {
