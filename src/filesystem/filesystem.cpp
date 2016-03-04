@@ -48,6 +48,10 @@
 #include <errno.h>
 #endif
 
+#if !defined(WIN32) && !defined(__APPLE__)
+#include <sys/inotify.h>
+#endif
+
 using std::string;
 
 namespace {
@@ -100,7 +104,9 @@ FileSystem::FileSystem()
     }
     
 #if !defined(WIN32) && !defined(__APPLE__)
-    FileSys.initializeInternalLinux();
+    _inotifyHandle = inotify_init();
+    _keepGoing = true;
+    _t = std::thread(inotifyWatcher);
 #endif
 }
 
