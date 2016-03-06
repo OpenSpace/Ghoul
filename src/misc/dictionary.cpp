@@ -71,12 +71,13 @@ Dictionary::ConversionError::ConversionError(std::string message)
 #endif
 
 #define EXTERN_TEMPLATE_DEFINITION(__TYPE__) \
-template void Dictionary::setValue<__TYPE__>(std::string, __TYPE__, bool);               \
+template void Dictionary::setValue<__TYPE__>(std::string, __TYPE__, CreateIntermediate); \
 template bool Dictionary::getValue<__TYPE__>(const std::string&, __TYPE__&) const;       \
 template __TYPE__ Dictionary::value<__TYPE__>(const std::string&) const;                 \
 template bool Dictionary::hasValue<__TYPE__>(const std::string&) const;                  \
 template bool isConvertible<__TYPE__>(const Dictionary&);                                \
-template void Dictionary::setValueHelper<__TYPE__>(std::string, __TYPE__, bool);         \
+template void Dictionary::setValueHelper<__TYPE__>(std::string, __TYPE__,                \
+    CreateIntermediate);                                                                 \
 template void Dictionary::getValueHelper<__TYPE__>(const std::string&, __TYPE__&) const; \
 template bool Dictionary::hasValueHelper<__TYPE__>(const std::string&) const;
 
@@ -326,7 +327,7 @@ void Dictionary::setValueAnyHelper(std::string key, boost::any value) {
     else if (type == typeid(glm::dmat4x4))
         setValue(std::move(key), std::move(boost::any_cast<glm::dmat4x4>(value)));
     else
-        setValue(key, value, false);
+        setValue(key, value, CreateIntermediate::No);
 }
 
 }  // namespace ghoul

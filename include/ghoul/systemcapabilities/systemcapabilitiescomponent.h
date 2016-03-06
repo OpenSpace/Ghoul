@@ -58,6 +58,8 @@ namespace systemcapabilities {
  */
 class SystemCapabilitiesComponent {
 public:
+    enum class InitializeWMI { Yes, No };
+
     /// The verbosity that is used in the #capabilities method
     enum class Verbosity {
         None = 0, ///< No verbosity at all, discarding all information strings
@@ -88,7 +90,7 @@ public:
      * \param initializeWMI If this parameter is <code>true</code>, the Windows Management
      * Instrumentation will be initialized.
      */
-    SystemCapabilitiesComponent(bool initializeWMI = true);
+    SystemCapabilitiesComponent(InitializeWMI initializeWMI = InitializeWMI::Yes);
 
     /// The virtual destructor that will deinitialize all necessary values
     virtual ~SystemCapabilitiesComponent();

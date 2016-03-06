@@ -32,7 +32,7 @@ SingleCommandZeroArguments::SingleCommandZeroArguments(bool *ptr, std::string na
 													   std::string shortName,
 													   std::string infoText)
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), "",
-						 0, false)
+						 0, CommandlineCommand::MultipleCalls::No)
 	, _ptr(ptr)
 {}
 

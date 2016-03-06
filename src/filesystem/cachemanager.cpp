@@ -171,21 +171,21 @@ CacheManager::~CacheManager() {
 	cleanDirectory(_directory);
 }
 
-std::string CacheManager::cachedFilename(const File& file,	bool isPersistent) {
+std::string CacheManager::cachedFilename(const File& file, Persistent isPersistent) {
 	std::string lastModifiedTime = file.lastModifiedDate();
 	return cachedFilename(file, lastModifiedTime, isPersistent);
 }
 
 
 std::string CacheManager::cachedFilename(const File& file, const std::string& information,
-                                 bool isPersistent)
+                                         Persistent isPersistent)
 {
     return cachedFilename(file.filename(), information, isPersistent);
 }
     
 std::string CacheManager::cachedFilename(const std::string& baseName,
-                                 const std::string& information,
-                                 bool isPersistent)
+                                         const std::string& information,
+                                         Persistent isPersistent)
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos)
@@ -225,7 +225,7 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
     // Store the cache information in the map
 	CacheInformation info = {
 		cachedFileName,
-		isPersistent
+		isPersistent == Persistent::Yes ? true : false
 	};
 	_files.emplace(hash, info);
     return cachedFileName;
@@ -314,7 +314,7 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
     const Directory& dir) const
 {
     std::vector<LoadedCacheInfo> result;
-    std::vector<std::string> directories = dir.readDirectories(false);
+    std::vector<std::string> directories = dir.readDirectories();
     for (const auto& directory : directories) {
         Directory d(directory);
 

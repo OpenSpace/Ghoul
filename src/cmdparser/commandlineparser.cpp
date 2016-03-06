@@ -80,12 +80,14 @@ CommandlineParser::CommandlineException::CommandlineException(const std::string&
     : RuntimeError(msg, "CommandlineParser")
 {}
     
-CommandlineParser::CommandlineParser(std::string programName, bool allowUnknownCommands,
-                                std::string shortHelpCommand, std::string longHelpCommand)
+CommandlineParser::CommandlineParser(std::string programName,
+                                     AllowUnknownCommands unknownCommands,
+                                     std::string shortHelpCommand,
+                                     std::string longHelpCommand)
     : _commandForNamelessArguments(nullptr)
     , _remainingArguments(std::make_shared<std::vector<std::string>>())
     , _programName(std::move(programName))
-    , _allowUnknownCommands(allowUnknownCommands)
+    , _allowUnknownCommands(unknownCommands == AllowUnknownCommands::Yes ? true : false)
     , _shortHelpCommand(std::move(shortHelpCommand))
     , _longHelpCommand(std::move(longHelpCommand))
 {}
@@ -94,8 +96,8 @@ CommandlineParser::~CommandlineParser() {
     _commands.clear();
 }
     
-void CommandlineParser::setAllowUnknownCommands(bool allowUnknownCommands) {
-    _allowUnknownCommands = allowUnknownCommands;
+void CommandlineParser::setAllowUnknownCommands(AllowUnknownCommands unknownCommands) {
+    _allowUnknownCommands = unknownCommands == AllowUnknownCommands::Yes ? true : false;
 }
 
 bool CommandlineParser::allowsUnknownCommands() const {

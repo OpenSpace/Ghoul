@@ -52,6 +52,8 @@ namespace fontrendering {
  */
 class Font {
 public:
+    enum class Outline { Yes, No };
+
     /// Superclass for all font-related exceptions that this class throws
     struct FontException : public RuntimeError {
         explicit FontException(const std::string& msg);
@@ -251,7 +253,7 @@ public:
     Font(std::string filename,
          float pointSize,
          opengl::TextureAtlas& atlas,
-         bool hasOutline = true,
+         Outline hasOutline = Outline::Yes,
          float outlineThickness = 1.f
     );
 

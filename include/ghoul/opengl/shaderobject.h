@@ -27,7 +27,6 @@
 #define __SHADEROBJECT_H__
 
 #include <ghoul/opengl/ghoul_gl.h>
-//#include <ghoul/filesystem/file.h>
 #include <ghoul/misc/exception.h>
 
 #include <string>
@@ -265,7 +264,7 @@ public:
      * OpenGL name will not change by this operation. After loading, the ShaderObject is 
      * not compiled.
      */
-    void reloadFromFile();
+    //void reloadFromFile();
 
     /**
      * This method will compile the shader source in this ShaderObject and returns the 

@@ -49,8 +49,8 @@ namespace filesystem {
 
 Directory::Directory() : _directoryPath(FileSys.absolutePath(".")) {}
 
-Directory::Directory(std::string path, bool isRawPath) {
-    if (isRawPath)
+Directory::Directory(std::string path, RawPath isRawPath) {
+    if (isRawPath == RawPath::Yes)
         _directoryPath = path.empty() ? "." : std::move(path);
     else
         _directoryPath = std::move(FileSys.absolutePath(path.empty() ? "." : path));
@@ -64,13 +64,20 @@ const std::string& Directory::path() const {
     return _directoryPath;
 }
 
-Directory Directory::parentDirectory(bool absolutePath) const {
+Directory Directory::parentDirectory(AbsolutePath absolutePath) const {
 #ifdef WIN32
-    if (_directoryPath.back() == FileSystem::PathSeparator)
-        return Directory(_directoryPath + "..", !absolutePath);
-    else
-        return Directory(_directoryPath + FileSystem::PathSeparator + "..",
-                         !absolutePath);
+    if (_directoryPath.back() == FileSystem::PathSeparator) {
+        return Directory(
+            _directoryPath + "..",
+            absolutePath == AbsolutePath::Yes ? RawPath::No : RawPath::Yes
+        );
+    } 
+    else {
+        return Directory(
+            _directoryPath + FileSystem::PathSeparator + "..",
+            absolutePath == AbsolutePath::Yes ? RawPath::No : RawPath::Yes
+        );
+    }
 #else
 	(void)absolutePath; // remove unused argument warning ---abock
     size_t length = _directoryPath.length();
@@ -82,25 +89,27 @@ Directory Directory::parentDirectory(bool absolutePath) const {
 #endif
 }
 
-std::vector<std::string> Directory::read(bool recursiveSearch, bool sort) const {
+std::vector<std::string> Directory::read(Recursive recursiveSearch,
+                                         Sort sort) const
+{
     vector<string> result;
     readDirectories(result, _directoryPath, recursiveSearch);
     readFiles(result, _directoryPath, recursiveSearch);
-    if (sort)
+    if (sort == Sort::Yes)
         std::sort(result.begin(), result.end());
     return result;
 }
 
-std::vector<std::string> Directory::readFiles(bool recursiveSearch, bool sort) const {
+std::vector<std::string> Directory::readFiles(Recursive recursiveSearch, Sort sort) const{
     vector<string> result;
     readFiles(result, _directoryPath, recursiveSearch);
-    if (sort)
+    if (sort == Sort::Yes)
         std::sort(result.begin(), result.end());
     return result;
 }
 
 void Directory::readFiles(std::vector<std::string>& result,
-                          const std::string& path, bool recursiveSearch) const
+                          const std::string& path, Recursive recursiveSearch) const
 {
     std::stack<string> directories;
 #ifdef WIN32
@@ -114,7 +123,7 @@ void Directory::readFiles(std::vector<std::string>& result,
             const DWORD isDir = findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
             if (!isDir)
                 result.push_back(path + "/" + file);
-            if (recursiveSearch && isDir && file != "." && file != "..")
+            if (recursiveSearch == Recursive::Yes && isDir && file != "." && file != "..")
                 directories.push(path + "/" + file);
         } while (FindNextFile(findHandle, &findFileData) != 0);
     }
@@ -129,7 +138,7 @@ void Directory::readFiles(std::vector<std::string>& result,
             if ((name != ".") && (name != "..")) {
                 if (ent->d_type != DT_DIR) 
                     result.push_back(path + "/" + ent->d_name);
-                if (recursiveSearch && (ent->d_type == DT_DIR))
+                if (recursiveSearch == Recursive::Yes && (ent->d_type == DT_DIR))
                     directories.push(path + "/" + ent->d_name);
             }
         }
@@ -143,18 +152,18 @@ void Directory::readFiles(std::vector<std::string>& result,
     }
 }
 
-std::vector<std::string> Directory::readDirectories(bool recursiveSearch,
-                                                    bool sort) const
+std::vector<std::string> Directory::readDirectories(Recursive recursiveSearch,
+                                                    Sort sort) const
 {
     std::vector<std::string> result;
     readDirectories(result, _directoryPath, recursiveSearch);
-    if (sort)
+    if (sort == Sort::Yes)
         std::sort(result.begin(), result.end());
     return result;
 }
 
 void Directory::readDirectories(std::vector<std::string>& result, const std::string& path,
-                                bool recursiveSearch) const
+                                Recursive recursiveSearch) const
 {
     std::stack<string> directories;
 
@@ -169,7 +178,7 @@ void Directory::readDirectories(std::vector<std::string>& result, const std::str
             const DWORD isDir = findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
             if (isDir && (file != ".") && (file != "..")) {
                 result.push_back(path + "\\" + file);
-                if (recursiveSearch)
+                if (recursiveSearch == Recursive::Yes)
                     directories.push(path + "\\" + file);
             }
         } while (FindNextFile(findHandle, &findFileData) != 0);
@@ -184,7 +193,7 @@ void Directory::readDirectories(std::vector<std::string>& result, const std::str
             name = ent->d_name;
             if ((ent->d_type == DT_DIR) && (name != ".") && (name != "..")) {
                 result.push_back(path + "/" + ent->d_name);
-                if (recursiveSearch)
+                if (recursiveSearch == Recursive::Yes)
                     directories.push(path + "/" + ent->d_name);
             }
         }

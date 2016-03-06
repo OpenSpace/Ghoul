@@ -52,6 +52,8 @@ namespace logging {
 
 class ConsoleLog : public StreamLog {
 public:
+    enum class ColorOutput { Yes, No };
+
     /**
      * Constructor that calls Log constructor.
      * \param colorOutput Determines if the log should printed in color
@@ -64,9 +66,11 @@ public:
      * \param logLevelStamping Determines if the log should print the log level in the
      * log messages
      */
-    ConsoleLog(bool colorOutput = true, bool timeStamping = false,
-        bool dateStamping = false, bool categoryStamping = true,
-        bool logLevelStamping = true);
+    ConsoleLog(ColorOutput colorOutput = ColorOutput::Yes,
+        TimeStamping timeStamping = TimeStamping::No,
+        DateStamping dateStamping = DateStamping::No,
+        CategoryStamping categoryStamping = CategoryStamping::Yes,
+        LogLevelStamping logLevelStamping = LogLevelStamping::Yes);
 
     /**
      * Method that logs a message with a given level and category to the console.

@@ -383,17 +383,17 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
         _windowSize.y
     );
     
-    ghoul::opengl::TextureUnit atlasUnit;
+    opengl::TextureUnit atlasUnit;
     atlasUnit.activate();
     font.atlas().texture().bind();
     
-    _program->setIgnoreUniformLocationError(true);
+    _program->setIgnoreUniformLocationError(opengl::ProgramObject::IgnoreError::Yes);
     _program->setUniform("baseColor", color);
     _program->setUniform("outlineColor", outlineColor);
     _program->setUniform("tex", atlasUnit);
     _program->setUniform("projection", projection);
     _program->setUniform("hasOutline", font.hasOutline());
-    _program->setIgnoreUniformLocationError(false);
+    _program->setIgnoreUniformLocationError(opengl::ProgramObject::IgnoreError::No);
     
     glBindVertexArray(_vao);
     

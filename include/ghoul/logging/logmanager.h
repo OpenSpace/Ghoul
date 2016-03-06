@@ -63,7 +63,8 @@ class Log;
  */
 class LogManager: public Singleton<LogManager> {
 public:
-    
+    enum class ImmediateFlush { Yes, No };
+
     /**
      * Enumerates all available LogLevel for the LogManager. The LogLevels are guaranteed
      * to be strictly ordered from least important to important.
@@ -108,7 +109,8 @@ public:
      * Passing <code>true</code> will slow down the execution but guarantees that a crash
      * immediately after a log message won't lead to data loss.
      */
-	LogManager(LogLevel level = LogLevel::Info, bool immediateFlush = false);
+	LogManager(LogLevel level = LogLevel::Info,
+        ImmediateFlush immediateFlush = ImmediateFlush::No);
 
     /**
      * The main method to log messages. If the <code>level</code> is >= the level this

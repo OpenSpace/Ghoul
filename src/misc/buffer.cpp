@@ -120,13 +120,13 @@ Buffer::size_type Buffer::size() const {
     return _offsetWrite;
 }
 
-void Buffer::write(const std::string& filename, bool compress) {
+void Buffer::write(const std::string& filename, Compress compress) {
     std::ofstream file;
     file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     file.open(filename, std::ios::binary | std::ios::out);
 
     file.write(reinterpret_cast<const char*>(&compress), sizeof(bool));
-    if (compress) {
+    if (compress == Compress::Yes) {
         std::vector<value_type> buffer(size());
         int compressed_size = LZ4_compress(
             reinterpret_cast<const char*>(_data.data()),

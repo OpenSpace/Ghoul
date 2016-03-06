@@ -47,6 +47,8 @@ namespace opengl {
  */
 class Texture {
 public:
+    enum class TakeOwnership { Yes, No };
+
     /**
      * This enum specifies the allowed formats for the Texture%s. These are directly
      * mapped to the appropriate OpenGL constants.
@@ -327,7 +329,7 @@ public:
      * \param takeOwnership Should this Texture take ownership of the data and delete
      * it?
      */
-    void setPixelData(void* pixels, bool takeOwnership = true);
+    void setPixelData(void* pixels, TakeOwnership takeOwnership = TakeOwnership::Yes);
 
     /**
      * Returns <code>true</code> if the OpenGL texture is resident in the GPU memory.
@@ -382,7 +384,7 @@ public:
      * \param hasOwnership <code>true</code> if this Texture should own the data in
      * <code>_pixels</code>
      */
-    void setDataOwnership(bool hasOwnership);
+    void setDataOwnership(TakeOwnership hasOwnership);
 
     /**
      * Returns if this Texture owns its contained data.

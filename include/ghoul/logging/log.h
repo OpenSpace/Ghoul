@@ -48,6 +48,11 @@ namespace logging {
  */
 class Log {
 public:
+    enum class TimeStamping { Yes, No };
+    enum class DateStamping { Yes, No };
+    enum class CategoryStamping { Yes, No };
+    enum class LogLevelStamping { Yes, No };
+
     virtual ~Log() = default;
 
     /**
@@ -79,32 +84,34 @@ protected:
      * \param logLevelStamping Determines if the log should print the log level in
      * the log messages
      */
-    Log(bool timeStamping = true, bool dateStamping = true, bool categoryStamping = true,
-        bool logLevelStamping = true);
+    Log(TimeStamping timeStamping = TimeStamping::Yes,
+        DateStamping dateStamping = DateStamping::Yes,
+        CategoryStamping categoryStamping = CategoryStamping::Yes,
+        LogLevelStamping logLevelStamping = LogLevelStamping::Yes);
 
     /// Is the log printing the logging time?
     bool isTimeStamping() const;
 
     /// Set the log printing of the time
-    void setTimeStamping(bool timeStamping);
+    void setTimeStamping(TimeStamping timeStamping);
 
     /// Is the log printing the logging date?
     bool isDateStamping() const;
 
     /// Set the log printing of the date
-    void setDateStamping(bool dateStamping);
+    void setDateStamping(DateStamping dateStamping);
 
     /// Is the log printing the category?
     bool isCategoryStamping() const;
 
     /// Set the log printing of the category
-    void setCategoryStamping(bool categoryStamping);
+    void setCategoryStamping(CategoryStamping categoryStamping);
 
     /// Is the log printing the log level?
     bool isLogLevelStamping() const;
 
     /// Set the log printing of the log level
-    void setLogLevelStamping(bool logLevelStamping);
+    void setLogLevelStamping(LogLevelStamping logLevelStamping);
 
     /**
      * Returns the current time as a string. The format for the time is "HH:MM:SS" and the

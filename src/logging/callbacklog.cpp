@@ -28,8 +28,9 @@
 namespace ghoul {
 namespace logging {
 
-CallbackLog::CallbackLog(CallbackFunction callbackFunction, bool timeStamping,
-                         bool dateStamping, bool categoryStamping, bool logLevelStamping)
+CallbackLog::CallbackLog(CallbackFunction callbackFunction, TimeStamping timeStamping,
+            DateStamping dateStamping, CategoryStamping categoryStamping,
+            LogLevelStamping logLevelStamping)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
     , _callbackFunction(std::move(callbackFunction))
 {}

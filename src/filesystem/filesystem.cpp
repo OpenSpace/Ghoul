@@ -282,11 +282,11 @@ void FileSystem::setCurrentDirectory(const Directory& directory) const {
 }
 
 bool FileSystem::fileExists(const File& path) const {
-	return fileExists(path.path(), true);
+	return fileExists(path.path(), RawPath::Yes);
 }
 
-bool FileSystem::fileExists(std::string path, bool isRawPath) const {
-	if (!isRawPath)
+bool FileSystem::fileExists(std::string path, RawPath isRawPath) const {
+	if (isRawPath == RawPath::No)
         path = absolutePath(std::move(path));
 #ifdef WIN32
     BOOL exists = PathFileExists(path.c_str());
@@ -408,8 +408,8 @@ bool FileSystem::deleteFile(const File& path) const {
         return false;
 }
     
-void FileSystem::createDirectory(const Directory& path, bool recursive) const {
-	if (recursive) {
+void FileSystem::createDirectory(const Directory& path, Recursive recursive) const {
+	if (recursive == Recursive::Yes) {
 		std::vector<Directory> directories;
 		Directory dir = path;
         while (!FileSys.directoryExists(dir)) {
@@ -422,7 +422,7 @@ void FileSystem::createDirectory(const Directory& path, bool recursive) const {
 			directories.rbegin(),
 			directories.rend(),
 			[this](const Directory& d) {
-				createDirectory(d, false);
+				createDirectory(d, Recursive::No);
             });
         
         return;
@@ -469,9 +469,9 @@ void FileSystem::createDirectory(const Directory& path, bool recursive) const {
 	}
 }
 
-void FileSystem::deleteDirectory(const Directory& path, bool recursive) const {
+void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) const {
     ghoul_assert(directoryExists(path), "Path must be an existing directory");
-    if (!recursive)
+    if (recursive == Recursive::No)
         ghoul_assert(emptyDirectory(path), "Path must be empty");
 
 #ifdef WIN32
@@ -520,7 +520,7 @@ void FileSystem::deleteDirectory(const Directory& path, bool recursive) const {
 #else
     const string& dirPath = path;
 
-    if (recursive) {
+    if (recursive == Recursive::Yes) {
         DIR* directory = opendir(dirPath.c_str());
         
         if (!directory) {
@@ -594,7 +594,7 @@ bool FileSystem::emptyDirectory(const Directory& path) const {
 #endif
 }
 
-void FileSystem::registerPathToken(string token, string path, bool override) {
+void FileSystem::registerPathToken(string token, string path, Override override) {
     ghoul_assert(!token.empty(), "Token must not be empty");
     
     ghoul_assert(
@@ -603,13 +603,13 @@ void FileSystem::registerPathToken(string token, string path, bool override) {
         "Token must be enclosed by TokenBraces"
     );
     
-    if (!override) {
+    if (override == Override::No) {
         ghoul_assert(_tokenMap.find(token) == _tokenMap.end(),
                      "Token must not have been registered before"
         );
     }
 
-	if (override) {
+	if (override == Override::Yes) {
 		auto it = _tokenMap.find(token);
 		_tokenMap.erase(it);
 	}

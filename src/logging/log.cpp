@@ -31,44 +31,44 @@
 namespace ghoul {
 namespace logging {
 
-Log::Log(bool timeStamping, bool dateStamping, bool categoryStamping,
-                                                                    bool logLevelStamping)
-    : _timeStamping(timeStamping)
-    , _dateStamping(dateStamping)
-    , _categoryStamping(categoryStamping)
-    , _logLevelStamping(logLevelStamping)
+Log::Log(TimeStamping timeStamping, DateStamping dateStamping, 
+         CategoryStamping categoryStamping, LogLevelStamping logLevelStamping)
+    : _timeStamping(timeStamping == TimeStamping::Yes ? true : false)
+    , _dateStamping(dateStamping == DateStamping::Yes ? true : false)
+    , _categoryStamping(categoryStamping == CategoryStamping::Yes ? true : false)
+    , _logLevelStamping(logLevelStamping == LogLevelStamping::Yes ? true : false)
 {}
 
 bool Log::isTimeStamping() const {
     return _timeStamping;
 }
 
-void Log::setTimeStamping(bool timeStamping) {
-    _timeStamping = timeStamping;
+void Log::setTimeStamping(TimeStamping timeStamping) {
+    _timeStamping = timeStamping == TimeStamping::Yes ? true : false;
 }
 
 bool Log::isDateStamping() const {
     return _dateStamping;
 }
 
-void Log::setDateStamping(bool dateStamping) {
-    _dateStamping = dateStamping;
+void Log::setDateStamping(DateStamping dateStamping) {
+    _dateStamping = dateStamping == DateStamping::Yes ? true : false;
 }
 
 bool Log::isCategoryStamping() const {
     return _categoryStamping;
 }
 
-void Log::setCategoryStamping(bool categoryStamping) {
-    _categoryStamping = categoryStamping;
+void Log::setCategoryStamping(CategoryStamping categoryStamping) {
+    _categoryStamping = categoryStamping == CategoryStamping::Yes ? true : false;
 }
 
 bool Log::isLogLevelStamping() const {
     return _logLevelStamping;
 }
 
-void Log::setLogLevelStamping(bool logLevelStamping) {
-    _logLevelStamping = logLevelStamping;
+void Log::setLogLevelStamping(LogLevelStamping logLevelStamping) {
+    _logLevelStamping = logLevelStamping == LogLevelStamping::Yes ? true : false;
 }
 
 std::string Log::getTimeString() const {

@@ -72,6 +72,10 @@ class CacheManager;
  */
 class FileSystem : public Singleton<FileSystem> {
 public:
+    enum class RawPath { Yes, No };
+    enum class Recursive { Yes, No };
+    enum class Override { Yes, No };
+
     friend class Singleton<FileSystem>;
 
     /// Exception that gets thrown if the FileSystem encounters a nonrecoverable error
@@ -163,7 +167,7 @@ public:
      * \throw FileSystemException If there is an error retrieving the file attributes
      * for the \p path
      */
-	bool fileExists(std::string path, bool isRawPath = false) const;
+	bool fileExists(std::string path, RawPath isRawPath = RawPath::No) const;
     
     /**
      * Checks if the directory at the \p path exists or not. This method will return
@@ -195,7 +199,8 @@ public:
      * exist, the method will fail and return <code>false</code>
      * \throw FileSystemException If there was an error creating the directory
 	 */
-	void createDirectory(const Directory& path, bool recursive = false) const;
+	void createDirectory(const Directory& path,
+        Recursive recursive = Recursive::No) const;
 
     /**
      * Deletes the directory pointed to by \p path. The method will return
@@ -208,7 +213,8 @@ public:
      * \pre \p path must be an existing directory
      * \pre \p path must be an empty directory if \p recursive is <code>false</code>
      */
-    void deleteDirectory(const Directory& path, bool recursive = false) const;
+    void deleteDirectory(const Directory& path,
+        Recursive recursive = Recursive::No) const;
 
 	/**
      * Checks if the directory with \p path is empty. The method will return
@@ -233,7 +239,8 @@ public:
      * FileSystem::TokenClosingBraces
      * \pre \p token must not have been registered before if \p override is false
      */
-    void registerPathToken(std::string token, std::string path, bool override = false);
+    void registerPathToken(std::string token, std::string path,
+        Override override = Override::No);
 
     /**
      * Replaces the path tokens present in the \p path if any exist. If all tokens could
@@ -394,13 +401,15 @@ private:
 	void beginRead(DirectoryHandle* directoryHandle);
 
     /// Handles the callback for a directory for the local file path
-	static void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
+	static void callbackHandler(DirectoryHandle* directoryHandle,
+        const std::string& filepath);
 	
     /// External function that calls beginRead
 	friend void readStarter(DirectoryHandle* directoryHandle);
 
     /// External function that calls callbackHandler
-	friend void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
+	friend void callbackHandler(DirectoryHandle* directoryHandle,
+        const std::string& filepath);
 
     /// The list of all tracked files
 	std::multimap<std::string, File*> _trackedFiles;

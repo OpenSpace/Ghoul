@@ -214,16 +214,13 @@ const glm::vec2& Font::Glyph::outlineBottomRight() const {
     return _outlineBottomRight;
 }
    
-Font::Font(std::string filename,
-           float pointSize,
-           opengl::TextureAtlas& atlas,
-           bool hasOutline,
-           float outlineThickness)
+Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
+           Outline hasOutline, float outlineThickness)
     : _atlas(atlas)
     , _name(std::move(filename))
     , _pointSize(pointSize)
     , _height(0.f)
-    , _hasOutline(hasOutline)
+    , _hasOutline(hasOutline == Outline::Yes ? true : false)
     , _outlineThickness(outlineThickness)
 {
     ghoul_assert(!_name.empty(), "Filename must not be empty");

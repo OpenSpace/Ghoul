@@ -45,13 +45,13 @@ CommandlineCommand::CommandlineCommand(std::string name,
                                        std::string infoText,
                                        std::string parameterList,
                                        int argumentNum,
-                                       bool allowMultipleCalls)
+                                       MultipleCalls allowMultipleCalls)
     : _name(std::move(name))
     , _shortName(std::move(shortName))
     , _infoText(std::move(infoText))
     , _parameterList(std::move(parameterList))
     , _argumentNum(argumentNum)
-    , _allowsMultipleCalls(allowMultipleCalls)
+    , _allowsMultipleCalls(allowMultipleCalls == MultipleCalls::Yes ? true : false)
 {
     ghoul_assert(!_name.empty(), "Name must not be empty");
     ghoul_assert(_name[0] == '-', "Name must start with a '-'");

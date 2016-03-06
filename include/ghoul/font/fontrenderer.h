@@ -146,7 +146,7 @@ public:
      * number of lines that were printed
      */
     BoundingBoxInformation render(Font& font, glm::vec2 pos, glm::vec4 color,
-                                  glm::vec4 outlineColor, const char* text, ...) const;
+        glm::vec4 outlineColor, const char* text, ...) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -166,7 +166,7 @@ public:
      * number of lines that were printed
      */
     BoundingBoxInformation render(Font& font, glm::vec2 pos, glm::vec4 color,
-                                  const char* format, ...) const;
+        const char* format, ...) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -184,7 +184,7 @@ public:
      * number of lines that were printed
      */
     BoundingBoxInformation render(Font& font, glm::vec2 pos,
-                                  const char* format, ...) const;
+        const char* format, ...) const;
     
     
 private:
@@ -192,9 +192,7 @@ private:
     FontRenderer();
     
     BoundingBoxInformation internalRender(Font& font, glm::vec2 pos, glm::vec4 color,
-                                          glm::vec4 outlineColor,
-                                          const char* buffer) const;
-    
+        glm::vec4 outlineColor, const char* buffer) const;
     
     /// The singleton instance of the default FontRenderer
     static FontRenderer* _defaultRenderer;
@@ -230,10 +228,8 @@ private:
  */
 template <typename... Args>
 glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos, Args... args) {
-    return (ghoul::fontrendering::FontRenderer::defaultRenderer().render(font,
-                                                                         pos,
-                                                                         args...)
-            ).boundingBox;
+    return (ghoul::fontrendering::FontRenderer::defaultRenderer().render(
+        font, pos, args...)).boundingBox;
 }
 
 /**

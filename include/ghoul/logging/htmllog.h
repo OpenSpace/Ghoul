@@ -65,9 +65,11 @@ public:
      * messages
      * \pre \p filename must not be empty
      */
-    HTMLLog(std::string filename, bool writeToAppend = true, bool timeStamping = true,
-        bool dateStamping = true, bool categoryStamping = true,
-        bool logLevelStamping = true);
+    HTMLLog(std::string filename, Append writeToAppend = Append::Yes,
+        TimeStamping timeStamping = TimeStamping::Yes,
+        DateStamping dateStamping = DateStamping::Yes,
+        CategoryStamping categoryStamping = CategoryStamping::Yes,
+        LogLevelStamping logLevelStamping = LogLevelStamping::Yes);
 
     /// Destructor that closes and finalizes the HTML file
     ~HTMLLog();

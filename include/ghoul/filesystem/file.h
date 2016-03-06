@@ -51,6 +51,8 @@ class FileSystem;
  */
 class File {
 public:
+    enum class RawPath { Yes, No };
+
      /// Exception that gets thrown if there is a file-related error in any of the methods
     struct FileException : public RuntimeError {
         explicit FileException(const std::string& msg);
@@ -73,7 +75,7 @@ public:
      * \pre \p filename must not be empty
      * \see FileSystem The system to register and use tokens
      */
-    File(std::string filename, bool isRawPath = false,
+    File(std::string filename, RawPath isRawPath = RawPath::No,
          FileChangedCallback fileChangedCallback = FileChangedCallback());
 
     /**

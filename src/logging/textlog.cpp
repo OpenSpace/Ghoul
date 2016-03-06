@@ -31,16 +31,17 @@ namespace ghoul {
 namespace logging {
 
 
-TextLog::TextLog(const std::string& filename, bool writeToAppend, bool timeStamping,
-                 bool dateStamping, bool categoryStamping, bool logLevelStamping)
+TextLog::TextLog(const std::string& filename, Append writeToAppend,
+        TimeStamping timeStamping, DateStamping dateStamping,
+        CategoryStamping categoryStamping, LogLevelStamping logLevelStamping)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
-    , _printFooter(writeToAppend)
+    , _printFooter(writeToAppend == Append::Yes)
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     
     _file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
 
-    if (writeToAppend)
+    if (writeToAppend == Append::Yes)
         _file.open(filename, std::ofstream::out | std::ofstream::app);
     else
         _file.open(filename, std::ofstream::out | std::ostream::trunc);

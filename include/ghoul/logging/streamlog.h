@@ -58,8 +58,10 @@ public:
      * \param logLevelStamping Determines if the log should print the log level in the
      * log messages
      */
-    StreamLog(std::ostream& stream, bool timeStamping = false, bool dateStamping = false,
-        bool categoryStamping = true, bool logLevelStamping = true);
+    StreamLog(std::ostream& stream, TimeStamping timeStamping = TimeStamping::No,
+        DateStamping dateStamping = DateStamping::No,
+        CategoryStamping categoryStamping = CategoryStamping::Yes,
+        LogLevelStamping logLevelStamping = LogLevelStamping::Yes);
 
     /**
      * Method that logs a <code>message</code> with a given <code>level</code> and

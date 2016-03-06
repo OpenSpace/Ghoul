@@ -59,12 +59,13 @@ File::FileException::FileException(const std::string& msg)
     : RuntimeError(msg, "File")
 {}
 
-File::File(std::string filename, bool isRawPath, FileChangedCallback fileChangedCallback)
+File::File(std::string filename, RawPath isRawPath,
+          FileChangedCallback fileChangedCallback)
     : _fileChangedCallback(std::move(fileChangedCallback))
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     
-    if (isRawPath)
+    if (isRawPath == RawPath::Yes)
         _filename = std::move(filename);
     else
         _filename = std::move(FileSys.absolutePath(std::move(filename)));

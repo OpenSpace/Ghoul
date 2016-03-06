@@ -50,7 +50,9 @@ namespace logging {
  */
 class TextLog : public Log {
 public:
-   /**
+    enum class Append { Yes, No };
+
+    /**
     * Constructor that calls Log constructor and opens the file that will log the
     * messages. If the file does not exist, it will be created. If the path to the file is
     * invalid, an <code>std::ios_base::failure</code> exception will be thrown.
@@ -70,9 +72,11 @@ public:
     * \throw std::ios_base::failure If the opening of the file failed
     * \pre \p filename must not be empty
     */
-    TextLog(const std::string& filename, bool writeToAppend = true,
-            bool timeStamping = true, bool dateStamping = true,
-            bool categoryStamping = true, bool logLevelStamping = true);
+    TextLog(const std::string& filename, Append writeToAppend = Append::Yes,
+        TimeStamping timeStamping = TimeStamping::Yes,
+        DateStamping dateStamping = DateStamping::Yes,
+        CategoryStamping categoryStamping = CategoryStamping::Yes,
+        LogLevelStamping logLevelStamping = LogLevelStamping::Yes);
     
     /// Destructor closing and releasing the file handle
     ~TextLog();

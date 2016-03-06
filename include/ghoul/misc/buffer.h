@@ -46,6 +46,8 @@ namespace ghoul {
  */
 class Buffer {
 public:
+    enum class Compress { Yes, No };
+
     using value_type = unsigned char;
     using size_type = std::vector<value_type>::size_type;
 
@@ -142,7 +144,7 @@ public:
      * \throw std::ios_base::failure If there was an error writing the file
      * \throw RuntimeError if there was an error compressing the data
      */
-    void write(const std::string& filename, bool compress = false);
+    void write(const std::string& filename, Compress compress = Compress::No);
     
     /**
      * Reads the Buffer from a Buffer file. 

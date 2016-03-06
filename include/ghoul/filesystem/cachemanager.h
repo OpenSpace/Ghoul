@@ -55,6 +55,8 @@ namespace filesystem {
  */
 class CacheManager {
 public:
+    enum class Persistent { Yes, No };
+
     /// Superclass for all cache-related exceptions
     struct CacheException : public RuntimeError {
         explicit CacheException(const std::string& msg);
@@ -123,7 +125,8 @@ public:
      * <code>|</code>, <code>"</code>, <code>\<</code>, <code>\></code>, or <code>.</code>
      * ) in the \p file
      */
-    std::string cachedFilename(const File& file, bool isPersistent = false);
+    std::string cachedFilename(const File& file,
+        Persistent isPersistent = Persistent::No);
 
     /**
      * Returns the path to a storage location for the cached file. Depending on the
@@ -151,7 +154,7 @@ public:
      * ) in the \p file
      */
     std::string cachedFilename(const File& file, const std::string& information,
-        bool isPersistent = false);
+        Persistent isPersistent = Persistent::No);
 
     /**
      * Returns the path to a storage location for the cached file. Depending on the
@@ -188,7 +191,7 @@ public:
      * ) in the \p file
      */
     std::string cachedFilename(const std::string& baseName,
-        const std::string& information, bool isPersistent = false);
+        const std::string& information, Persistent isPersistent = Persistent::No);
 
 	/**
      * This method checks if a cached \p file has been registered before in this 
@@ -308,7 +311,7 @@ protected:
 	 * and used as a foundation for cleaning directories.
 	 */
     std::vector<LoadedCacheInfo> cacheInformationFromDirectory(
-                                                            const Directory& dir) const;
+        const Directory& dir) const;
 
 	CacheManager(const CacheManager& c) = delete;
 	CacheManager(CacheManager&& m) = delete;

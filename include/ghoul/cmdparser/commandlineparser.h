@@ -40,6 +40,8 @@ class CommandlineCommand;
 
 class CommandlineParser {
 public:
+    enum class AllowUnknownCommands { Yes, No };
+
     /**
      * The exception that is thrown in the CommandlineParser::execute method when an
      * error occurs.
@@ -61,9 +63,10 @@ public:
      * \param longHelpCommand The long version of the command used to request help
      * information
      */
-    CommandlineParser(std::string programName = "", bool allowUnknownCommands = false,
-                      std::string shortHelpCommand = "-h",
-                      std::string longHelpCommand = "--help");
+    CommandlineParser(std::string programName = "",
+        AllowUnknownCommands allowUnknownCommands = AllowUnknownCommands::No,
+        std::string shortHelpCommand = "-h",
+        std::string longHelpCommand = "--help");
 
     /**
      * The destructor will also delete all the contained commands within.
@@ -82,7 +85,7 @@ public:
      * will lead to logging of errors and #execute will return <code>false</code> if any
      * unknown commands are encountered during execution
      */
-    void setAllowUnknownCommands(bool allowUnknownCommands);
+    void setAllowUnknownCommands(AllowUnknownCommands allowUnknownCommands);
     
     /**
      * Returns if this CommandlineParser allows unknown commands, which do not have a

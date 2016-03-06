@@ -60,7 +60,9 @@ bool isConvertible(const Dictionary& dict) {
 ///////////
     
 template <typename T>
-void Dictionary::setValueHelper(std::string key, T value, bool createIntermediate) {
+void Dictionary::setValueHelper(std::string key, T value,
+                                CreateIntermediate createIntermediate)
+{
     std::string first;
     std::string rest;
     bool hasRestPath = splitKey(key, first, rest);
@@ -75,7 +77,7 @@ void Dictionary::setValueHelper(std::string key, T value, bool createIntermediat
     auto keyIt = find(first);
     if (keyIt == cend()) {
         // didn't find the Dictionary
-        if (createIntermediate) {
+        if (createIntermediate == CreateIntermediate::Yes) {
             (*this)[first] = ghoul::Dictionary();
             keyIt = find(first);
         }
@@ -96,8 +98,9 @@ void Dictionary::setValueHelper(std::string key, T value, bool createIntermediat
 }
     
 template <typename T>
-void Dictionary::setValueInternal(std::string key, T value, bool createIntermediate,
-                                                                 IsStandardScalarType<T>*)
+void Dictionary::setValueInternal(std::string key, T value,
+                                  CreateIntermediate createIntermediate,
+                                  IsStandardScalarType<T>*)
 {
     setValueHelper(
         std::move(key),
@@ -107,8 +110,9 @@ void Dictionary::setValueInternal(std::string key, T value, bool createIntermedi
 }
 
 template <typename T>
-void Dictionary::setValueInternal(std::string key, T value, bool createIntermediate,
-                                                                 IsStandardVectorType<T>*)
+void Dictionary::setValueInternal(std::string key, T value,
+                                  CreateIntermediate createIntermediate,
+                                  IsStandardVectorType<T>*)
 {
     using StorageType = internal::StorageTypeConverter<T>;
     
@@ -120,14 +124,17 @@ void Dictionary::setValueInternal(std::string key, T value, bool createIntermedi
 }
 
 template <typename T>
-void Dictionary::setValueInternal(std::string key, T value, bool createIntermediate,
-                                                                    IsNonStandardType<T>*)
+void Dictionary::setValueInternal(std::string key, T value,
+                                  CreateIntermediate createIntermediate,
+                                  IsNonStandardType<T>*)
 {
     setValueHelper(std::move(key), std::move(value), createIntermediate);
 }
 
 template <typename T>
-void Dictionary::setValue(std::string key, T value, bool createIntermediate) {
+void Dictionary::setValue(std::string key, T value,
+    CreateIntermediate createIntermediate)
+{
     ghoul_assert(!key.empty(), "Key must not be empty");
     setValueInternal(std::move(key), std::move(value), createIntermediate);
 }
@@ -389,12 +396,14 @@ bool Dictionary::hasKeyAndValue(const std::string& key) const {
 // in the dictionary.cpp compilation unit
     
 #define EXTERN_TEMPLATE_DECLARATION(__TYPE__) \
-extern template void Dictionary::setValue<__TYPE__>(std::string, __TYPE__, bool);        \
+extern template void Dictionary::setValue<__TYPE__>(std::string, __TYPE__,               \
+    CreateIntermediate);                                                                 \
 extern template bool Dictionary::getValue<__TYPE__>(const std::string&, __TYPE__&) const;\
 extern template __TYPE__ Dictionary::value<__TYPE__>(const std::string&) const;          \
 extern template bool Dictionary::hasValue<__TYPE__>(const std::string&) const;           \
 extern template bool isConvertible<__TYPE__>(const Dictionary&);                         \
-extern template void Dictionary::setValueHelper<__TYPE__>(std::string, __TYPE__, bool);  \
+extern template void Dictionary::setValueHelper<__TYPE__>(std::string, __TYPE__,         \
+    CreateIntermediate);                                                                 \
 extern template void Dictionary::getValueHelper<__TYPE__>(const std::string&,            \
                                                                        __TYPE__&) const; \
 extern template bool Dictionary::hasValueHelper<__TYPE__>(const std::string&) const;

@@ -91,7 +91,7 @@ unsigned int FontManager::registerFontPath(const std::string& fontName,
 }
     
 std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
-                                                        bool withOutline, bool loadGlyphs)
+                                        Outline withOutline, Glyph loadGlyphs)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -107,7 +107,7 @@ std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
 }
     
 std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
-                                                        bool withOutline, bool loadGlyphs)
+                                        Outline withOutline, Glyph loadGlyphs)
 {
     auto itPath = _fontPaths.find(hashName);
     if (itPath == _fontPaths.end()) {
@@ -118,18 +118,23 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     
     auto fonts = _fonts.equal_range(hashName);
     for (auto it = fonts.first; it != fonts.second; ++it) {
-        if (it->second->pointSize() == fontSize && it->second->hasOutline() == withOutline)
+        if (it->second->pointSize() == fontSize &&
+            it->second->hasOutline() == (withOutline == Outline::Yes))
+        {
             return it->second;
+        }
     }
     
+    Font::Outline outline =
+        withOutline == Outline::Yes ? Font::Outline::Yes : Font::Outline::No;
     auto f = std::make_shared<Font>(
         _fontPaths[hashName],
         fontSize,
         _textureAtlas,
-        withOutline
+        outline
     );
     
-    if (loadGlyphs)
+    if (loadGlyphs == Glyph::Yes)
         f->loadGlyphs(_defaultCharacterSet);
     
     _fonts.emplace(hashName, f);

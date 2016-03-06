@@ -30,8 +30,9 @@
 namespace ghoul {
 namespace logging {
 
-HTMLLog::HTMLLog(std::string filename, bool writeToAppend, bool timeStamping,
-				bool dateStamping, bool categoryStamping, bool logLevelStamping)
+HTMLLog::HTMLLog(std::string filename, Append writeToAppend, TimeStamping timeStamping,
+        DateStamping dateStamping, CategoryStamping categoryStamping,
+        LogLevelStamping logLevelStamping)
     : TextLog(std::move(filename), writeToAppend, timeStamping, dateStamping,
 				categoryStamping, logLevelStamping)
 {    

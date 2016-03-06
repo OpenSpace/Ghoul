@@ -62,9 +62,11 @@ public:
      * \param categoryStamping Determines if the log should print the categories
      * \param logLevelStamping Determines if the log should print the log level
      */
-    CallbackLog(CallbackFunction callbackFunction, bool timeStamping = true,
-        bool dateStamping = true, bool categoryStamping = true,
-        bool logLevelStamping = true);
+    CallbackLog(CallbackFunction callbackFunction,
+        TimeStamping timeStamping = TimeStamping::Yes,
+        DateStamping dateStamping = DateStamping::Yes,
+        CategoryStamping categoryStamping = CategoryStamping::Yes,
+        LogLevelStamping logLevelStamping = LogLevelStamping::Yes);
 
     /**
      * Method that logs a message with a given level and category to the console.

@@ -256,7 +256,7 @@ void ShaderObject::rebuildFromFile() {
 
     std::string baseName;
     if (_shaderName == "") {
-		ghoul::filesystem::File ghlFile(filename());
+		filesystem::File ghlFile(filename());
 		baseName = ghlFile.baseName();
     } else {
 		baseName = _shaderName;
@@ -266,7 +266,7 @@ void ShaderObject::rebuildFromFile() {
         // we use the .baseName() version because otherwise we get a new file
         // every time we reload the shader
         generatedFilename = FileSys.cacheManager()->cachedFilename(
-            baseName, "", true
+            baseName, "", filesystem::CacheManager::Persistent::Yes
         );
     }
     else {

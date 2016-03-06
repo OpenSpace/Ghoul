@@ -60,7 +60,10 @@ namespace opengl {
  */
 class ProgramObject {
 public:
-	/**
+    enum class IgnoreError { Yes, No };
+    enum class Transpose { Yes, No };
+
+    /**
 	* A type definition for a callback function that is called if any of the tracked files
     * is changed.
 	*/
@@ -330,7 +333,7 @@ public:
      * be found in any of the attached ShaderObjects.
      * \param ignoreError Should the location error be ignored?
      */
-    void setIgnoreUniformLocationError(bool ignoreError);
+    void setIgnoreUniformLocationError(IgnoreError ignoreError);
     
     /**
      * Returns the state of this ProgramObject if the logging of location errors should be
@@ -1094,14 +1097,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix2fv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat2x2& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1109,14 +1112,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix2x3fv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat2x3& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1124,14 +1127,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix2x4fv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat2x4& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1139,14 +1142,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix3x2fv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat3x2& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1154,14 +1157,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix3fv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat3x3& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1169,14 +1172,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix3x4fv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat3x4& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1184,14 +1187,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix4x2fv</code>
      * \param name The name of the uniform in the ShaderObjects
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat4x2& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1199,14 +1202,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix4x3fv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat4x3& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1214,14 +1217,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix4fv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat4x4& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1229,14 +1232,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix2dv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat2x2& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1244,14 +1247,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix2x3dv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat2x3& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1259,14 +1262,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix2x4dv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order, 
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat2x4& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1274,14 +1277,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix3x2dv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order, 
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat3x2& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1289,14 +1292,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix3dv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat3x3& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1304,14 +1307,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix3x4dv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat3x4& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1319,14 +1322,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix4x2dv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat4x2& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1334,14 +1337,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix4x3dv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat4x3& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1349,14 +1352,14 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix4dv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat4x4& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform located at \p location with the passed \p value. Will call the
@@ -1929,11 +1932,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix2fv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::mat2x2& value, bool transpose = false);
+    void setUniform(GLint location, const glm::mat2x2& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -1941,11 +1945,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix2x3fv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::mat2x3& value, bool transpose = false);
+    void setUniform(GLint location, const glm::mat2x3& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -1953,11 +1958,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix2x4fv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::mat2x4& value, bool transpose = false);
+    void setUniform(GLint location, const glm::mat2x4& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -1965,11 +1971,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix3x2fv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::mat3x2& value, bool transpose = false);
+    void setUniform(GLint location, const glm::mat3x2& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -1977,11 +1984,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix3fv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::mat3x3& value, bool transpose = false);
+    void setUniform(GLint location, const glm::mat3x3& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -1989,11 +1997,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix3x4fv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::mat3x4& value, bool transpose = false);
+    void setUniform(GLint location, const glm::mat3x4& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -2001,11 +2010,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix4x2fv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::mat4x2& value, bool transpose = false);
+    void setUniform(GLint location, const glm::mat4x2& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -2013,11 +2023,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix4x3fv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::mat4x3& value, bool transpose = false);
+    void setUniform(GLint location, const glm::mat4x3& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -2025,11 +2036,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix4fv</code>
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::mat4x4& value, bool transpose = false);
+    void setUniform(GLint location, const glm::mat4x4& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -2037,11 +2049,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix2dv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::dmat2x2& value, bool transpose = false);
+    void setUniform(GLint location, const glm::dmat2x2& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -2049,11 +2062,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix2x3dv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::dmat2x3& value, bool transpose = false);
+    void setUniform(GLint location, const glm::dmat2x3& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -2061,11 +2075,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix2x4dv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::dmat2x4& value, bool transpose = false);
+    void setUniform(GLint location, const glm::dmat2x4& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -2073,11 +2088,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix3x2dv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::dmat3x2& value, bool transpose = false);
+    void setUniform(GLint location, const glm::dmat3x2& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -2085,11 +2101,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix3dv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::dmat3x3& value, bool transpose = false);
+    void setUniform(GLint location, const glm::dmat3x3& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -2097,11 +2114,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix3x4dv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::dmat3x4& value, bool transpose = false);
+    void setUniform(GLint location, const glm::dmat3x4& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -2109,11 +2127,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix4x2dv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::dmat4x2& value, bool transpose = false);
+    void setUniform(GLint location, const glm::dmat4x2& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -2121,11 +2140,12 @@ public:
      * otherwise Will call the OpenGL function <code>glProgramUniformMatrix4x3dv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::dmat4x3& value, bool transpose = false);
+    void setUniform(GLint location, const glm::dmat4x3& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the uniform(s) located at \p location with the passed value \p value. Returns
@@ -2133,11 +2153,12 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix4dv</code>.
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>-1</code>
      */
-    void setUniform(GLint location, const glm::dmat4x4& value, bool transpose = false);
+    void setUniform(GLint location, const glm::dmat4x4& value,
+        Transpose transpose = Transpose::No);
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -2175,7 +2196,7 @@ public:
      * not be found in any of the attached ShaderObjects.
      * \param ignoreError Should the location error be ignored?
      */
-    void setIgnoreAttributeLocationError(bool ignoreError);
+    void setIgnoreAttributeLocationError(IgnoreError ignoreError);
 
     /**
      * Returns the state of this ProgramObject if the logging of location errors should be
@@ -2585,14 +2606,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat2x2& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2601,14 +2622,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat2x3& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2617,14 +2638,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat2x4& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2633,14 +2654,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat3x2& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2649,14 +2670,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat3x3& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2665,14 +2686,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat3x4& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2681,14 +2702,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat4x2& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2697,14 +2718,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat4x3& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2713,14 +2734,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat4x4& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2729,14 +2750,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat2x2& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2745,14 +2766,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat2x3& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2761,14 +2782,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat2x4& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2777,14 +2798,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat3x2& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2793,14 +2814,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat3x3& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2809,14 +2830,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat3x4& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2825,14 +2846,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat4x2& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2841,14 +2862,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat4x3& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2857,14 +2878,14 @@ public:
      * rows/columns.
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      * otherwise
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat4x4& value,
-        bool transpose = false);
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
@@ -3148,198 +3169,216 @@ public:
      * OpenGL function <code>glVertexAttrib2fv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transposeTranspose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::mat2x2& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat2x2& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttrib3fv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::mat2x3& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat2x3& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttrib4fv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::mat2x4& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat2x4& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttrib2fv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::mat3x2& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat3x2& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttrib3fv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::mat3x3& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat3x3& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttrib4fv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::mat3x4& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat3x4& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttrib2fv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::mat4x2& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat4x2& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttrib3fv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::mat4x3& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat4x3& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttrib4fv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::mat4x4& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::mat4x4& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute \p location to the passed \p value. Will call the OpenGL
      * function <code>glVertexAttribL2dv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::dmat2x2& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat2x2& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttribL3dv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::dmat2x3& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat2x3& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttribL4dv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::dmat2x4& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat2x4& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttribL2dv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::dmat3x2& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat3x2& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttribL3dv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::dmat3x3& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat3x3& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttribL4dv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::dmat3x4& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat3x4& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttribL2dv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::dmat4x2& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat4x2& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttribL3dv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order, 
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::dmat4x3& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat4x3& value,
+        Transpose transpose = Transpose::No);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
      * OpenGL function <code>glVertexAttribL4dv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transpose <code>true</code> if the matrix should be set in row major order,
-     * <code>false</code> if the matrix is in column major order
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
+     * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, const glm::dmat4x4& value, bool transpose = false);
+    void setAttribute(GLuint location, const glm::dmat4x4& value,
+        Transpose transpose = Transpose::No);
 
     //////////////////////////////////////////////////////////////////////////////////////
     ////// Attributes
@@ -3350,7 +3389,7 @@ public:
      * not be found in any of the attached ShaderObjects.
      * \param ignoreError Should the location error be ignored?
      */
-    void setIgnoreSubroutineLocationError(bool ignoreError);
+    void setIgnoreSubroutineLocationError(IgnoreError ignoreError);
 
     /**
      * Returns the state of this ProgramObject if the logging of location errors should be
@@ -3364,7 +3403,7 @@ public:
      * uniform can not be found in any of the attached ShaderObjects.
      * \param ignoreError Should the location error be ignored?
      */
-    void setIgnoreSubroutineUniformLocationError(bool ignoreError);
+    void setIgnoreSubroutineUniformLocationError(IgnoreError ignoreError);
 
     /**
      * Returns the state of this ProgramObject if the logging of location errors should be 
@@ -3529,7 +3568,6 @@ private:
     /// A flag indicating whether the program needs to be recompiled
     /// due to a change in the shader source or in the dictionary.
     bool _programIsDirty;
-
 };
 
 } // namespace opengl

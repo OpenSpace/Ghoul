@@ -214,6 +214,8 @@ using has_storage_converter = static_not<
  */
 class Dictionary : private std::map<std::string, boost::any> {
 public:
+    enum class CreateIntermediate { Yes, No };
+
     /// Base class for all Dictionary%-based exceptions
     struct DictionaryError : public RuntimeError {
         explicit DictionaryError(std::string message);
@@ -291,7 +293,8 @@ public:
      * \pre \p key must not be empty
      */
     template <typename T>
-    void setValue(std::string key, T value, bool createIntermediate = false);
+    void setValue(std::string key, T value,
+        CreateIntermediate createIntermediate = CreateIntermediate::No);
 
     /**
      * Returns the value stored at location with a given \p key. This key can be nested
@@ -476,7 +479,7 @@ private:
      * \sa setValue
      */
     template <typename T>
-    void setValueHelper(std::string key, T value, bool createIntermediate);
+    void setValueHelper(std::string key, T value, CreateIntermediate createIntermediate);
     
     /**
      * Internal setValue implementation for types that are standard, scalar types. The
@@ -490,7 +493,7 @@ private:
      * \sa setValue
      */
     template <typename T>
-    void setValueInternal(std::string key, T value, bool createIntermediate,
+    void setValueInternal(std::string key, T value, CreateIntermediate createIntermediate,
         IsStandardScalarType<T>* = nullptr);
     
     /**
@@ -505,7 +508,7 @@ private:
      * \sa setValue
      */
     template <typename T>
-    void setValueInternal(std::string key, T value, bool createIntermediate,
+    void setValueInternal(std::string key, T value, CreateIntermediate createIntermediate,
         IsStandardVectorType<T>* = nullptr);
     
     /**
@@ -520,7 +523,7 @@ private:
      * \sa setValue
      */
     template <typename T>
-    void setValueInternal(std::string key, T value, bool createIntermediate,
+    void setValueInternal(std::string key, T value, CreateIntermediate createIntermediate,
         IsNonStandardType<T>* = nullptr);
 
     /**

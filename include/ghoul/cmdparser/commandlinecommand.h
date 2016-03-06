@@ -57,6 +57,8 @@ namespace cmdparser {
  */
 class CommandlineCommand {
 public:
+    enum class MultipleCalls { Yes, No };
+
     /**
      * Exception that gets thrown if an error occurs in the CommandlineCommand::execute
      * that could not be checked in the CommandlineCommand::checkParameters method
@@ -92,7 +94,8 @@ public:
      */
     CommandlineCommand(std::string name, std::string shortName = "",
                        std::string infoText = "", std::string parameterList = "",
-                       int argumentNum = 1, bool allowMultipleCalls = false);
+                       int argumentNum = 1,
+                       MultipleCalls allowMultipleCalls = MultipleCalls::No);
     virtual ~CommandlineCommand();
 
     /**

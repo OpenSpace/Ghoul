@@ -29,9 +29,9 @@ namespace ghoul {
 namespace cmdparser {
 
 MultipleCommandZeroArguments::MultipleCommandZeroArguments(int* ptr, std::string name,
-	std::string shortName, std::string infoText)
+                                              std::string shortName, std::string infoText)
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), "",
-		0, true)
+		0, CommandlineCommand::MultipleCalls::Yes)
     , _ptr(ptr)
 {
     ghoul_assert(ptr, "Pointer must not be a nullptr");

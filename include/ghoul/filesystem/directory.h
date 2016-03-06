@@ -43,6 +43,11 @@ namespace filesystem {
  */
 class Directory {
 public:
+    enum class RawPath { Yes, No };
+    enum class AbsolutePath { Yes, No };
+    enum class Recursive { Yes, No };
+    enum class Sort { Yes, No };
+
     /**
      * This constructor creates a Directory object pointing to the absolute path of the
      * current working directory.
@@ -62,7 +67,7 @@ public:
      * the path is used as-is without changes. This might make the Directory object
      * outdated if the current working directory is subsequently changed.
      */
-    Directory(std::string path, bool isRawPath = false);
+    Directory(std::string path, RawPath isRawPath = RawPath::No);
 
     /**
      * Operator that returns the path this directory points to. This can, depending on the
@@ -94,7 +99,7 @@ public:
      * \return The Directory object pointing to the parent directory of the current
      * directory.
      */
-    Directory parentDirectory(bool absolutePath = false) const;
+    Directory parentDirectory(AbsolutePath absolutePath = AbsolutePath::No) const;
     
     /**
      * This method creates a list of all files and subdirectories in the current directory
@@ -107,7 +112,8 @@ public:
      * \return The paths to all files and directories in the current directory (and
      * subdirectories if \p recursiveSearch is <code>true</code>)
      */
-    std::vector<std::string> read(bool recursiveSearch = false, bool sort = false) const;
+    std::vector<std::string> read(Recursive recursiveSearch = Recursive::No,
+        Sort sort = Sort::No) const;
 
     /**
      * This method creates a list of all files in the current directory and returns the
@@ -120,8 +126,8 @@ public:
      * \return The paths to all files in the current directory (and subdirectories if
      * \p recursiveSearch is <code>true</code>)
      */
-    std::vector<std::string> readFiles(bool recursiveSearch = false,
-        bool sort = false) const;
+    std::vector<std::string> readFiles(Recursive recursiveSearch = Recursive::No,
+        Sort sort = Sort::No) const;
 
     /**
      * This method creates a list of all subdirectories in the current directory and
@@ -134,8 +140,8 @@ public:
      * \return The paths to all directories in the current directory (and subdirectories
      * if \p recursiveSearch is <code>true</code>)
      */
-    std::vector<std::string> readDirectories(bool recursiveSearch = false,
-		bool sort = false) const;
+    std::vector<std::string> readDirectories(Recursive recursiveSearch = Recursive::No,
+        Sort sort = Sort::No) const;
 
 private:
     /**
@@ -150,7 +156,7 @@ private:
      * \p result> vector
      */
     void readFiles(std::vector<std::string>& result, const std::string& path,
-        bool recursiveSearch = false) const;
+        Recursive recursiveSearch = Recursive::No) const;
 
     /**
      * Internal function that does the directory marching of all subdirectories that are
@@ -164,7 +170,7 @@ private:
      * \p result vector.
      */
     void readDirectories(std::vector<std::string>& result, const std::string& path,
-        bool recursiveSearch = false) const;
+        Recursive recursiveSearch = Recursive::No) const;
 
     /// The path in the filesystem to this Directory object. May be absolute or relative
     std::string _directoryPath;

@@ -47,7 +47,8 @@ public:
      * \pre The \p filename's file extension has to be supported
      * \throw TextureWriteException If there was an error writing the Texture file
      */
-    void saveTexture(const opengl::Texture& texture, const std::string& filename) const override;
+    void saveTexture(const opengl::Texture& texture,
+        const std::string& filename) const override;
     
     /**
      * Returns the supported extensions.

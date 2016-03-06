@@ -68,10 +68,11 @@ static bool runningInDebugger() {
 namespace ghoul {
 namespace logging {
 
-ConsoleLog::ConsoleLog(bool colorOutput, bool timeStamping, bool dateStamping,
-                       bool categoryStamping, bool logLevelStamping)
+ConsoleLog::ConsoleLog(ColorOutput colorOutput, TimeStamping timeStamping,
+            DateStamping dateStamping, CategoryStamping categoryStamping,
+            LogLevelStamping logLevelStamping)
     : StreamLog(std::cout, timeStamping, dateStamping, categoryStamping, logLevelStamping)
-    , _colorOutput(colorOutput)
+    , _colorOutput(colorOutput == ColorOutput::Yes)
 {
 }
 

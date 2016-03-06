@@ -49,6 +49,9 @@ namespace fontrendering {
  */
 class FontManager {
 public:
+    enum class Outline { Yes, No };
+    enum class Glyph { Yes, No };
+
     /// This exception is thrown if registering a Font fails
     struct FontRegistrationException : public RuntimeError {
         explicit FontRegistrationException(const std::string& msg);
@@ -104,7 +107,7 @@ public:
      * \pre \p name must not be empty
      */
     std::shared_ptr<Font> font(const std::string& name, float fontSize,
-        bool withOutline = true, bool loadGlyphs = true);
+        Outline withOutline = Outline::Yes, Glyph loadGlyphs = Glyph::Yes);
 
     /**
      * Retrieves the Font with the hashed name <code>hashName</code>, which must have been
@@ -126,7 +129,7 @@ public:
      * error occurred
      */
     std::shared_ptr<Font> font(unsigned int hashName, float fontSize,
-        bool withOutline = true, bool loadGlyphs = true);
+        Outline withOutline = Outline::Yes, Glyph loadGlyphs = Glyph::Yes);
     
 private:
     FontManager(const FontManager& rhs) = delete;

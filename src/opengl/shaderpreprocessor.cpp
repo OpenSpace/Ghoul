@@ -144,7 +144,7 @@ void ShaderPreprocessor::process(std::string& output) {
     std::stringstream stream;
     ShaderPreprocessor::Env env{stream};
 
-    includeFile(absPath(_shaderPath), true, env);
+    includeFile(absPath(_shaderPath), TrackChanges::Yes, env);
 
     if (env.forStatements.size() > 0) {
         throw ParserError(
@@ -197,7 +197,7 @@ void ShaderPreprocessor::addIncludePath(std::string folderPath) {
         _includePaths.push_back(std::move(folderPath));
 }
     
-void ShaderPreprocessor::includeFile(const std::string& path, bool trackChanges,
+void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges trackChanges,
                                      ShaderPreprocessor::Env& environment)
 {
     ghoul_assert(!path.empty(), "Path must not be empty");
@@ -207,9 +207,13 @@ void ShaderPreprocessor::includeFile(const std::string& path, bool trackChanges,
     if (_includedFiles.find(path) == _includedFiles.end()) {
         auto it = _includedFiles.emplace(
             path,
-            FileStruct{ filesystem::File(path), _includedFiles.size(), trackChanges }
+            FileStruct {
+                filesystem::File(path),
+                _includedFiles.size(),
+                trackChanges == TrackChanges::Yes
+            }
         ).first;
-        if (trackChanges)
+        if (trackChanges == TrackChanges::Yes)
 			it->second.file.setCallback([this](const filesystem::File& file) {
 			(void) file; // Suppress compiler warning about unused parameter
 			_onChangeCallback();
@@ -502,7 +506,11 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
             }
 
             if (includeFileWasFound)
-                includeFile(absPath(includeFilepath), mustTrackInclude, env);
+                includeFile(
+                    absPath(includeFilepath),
+                    mustTrackInclude ? TrackChanges::Yes : TrackChanges::No,
+                    env
+                );
             else
                 throw IncludeError(includeFilename);
         } else if (line.at(p1) == '<') {
@@ -512,7 +520,11 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
            
             size_t includeLength = p2 - p1 - 1;
             std::string includeFilename = absPath(line.substr(p1 + 1, includeLength));
-            includeFile(includeFilename, mustTrackInclude, env);
+            includeFile(
+                includeFilename,
+                mustTrackInclude ? TrackChanges::Yes : TrackChanges::No,
+                env
+            );
         }
         return true;
     }

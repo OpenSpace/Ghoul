@@ -446,8 +446,8 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
     return program;
 }
 
-void ProgramObject::setIgnoreUniformLocationError(bool ignoreError) {
-    _ignoreUniformLocationError = ignoreError;
+void ProgramObject::setIgnoreUniformLocationError(IgnoreError ignoreError) {
+    _ignoreUniformLocationError = ignoreError == IgnoreError::Yes;
 }
 
 bool ProgramObject::ignoreUniformLocationError() const {
@@ -1032,7 +1032,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::dvec4* values, int 
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::mat2x2& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1044,7 +1044,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat2x2& value
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::mat2x3& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1056,7 +1056,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat2x3& value
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::mat2x4& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1068,7 +1068,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat2x4& value
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::mat3x2& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1080,7 +1080,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat3x2& value
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::mat3x3& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1092,7 +1092,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat3x3& value
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::mat3x4& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1104,7 +1104,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat3x4& value
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::mat4x2& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1116,7 +1116,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat4x2& value
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::mat4x3& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1128,7 +1128,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat4x3& value
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::mat4x4& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1140,7 +1140,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat4x4& value
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::dmat2x2& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1152,7 +1152,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat2x2& valu
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::dmat2x3& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1164,7 +1164,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat2x3& valu
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::dmat2x4& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1176,7 +1176,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat2x4& valu
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::dmat3x2& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     const GLint location = uniformLocation(name);
     if (location == -1)
@@ -1186,7 +1186,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat3x2& valu
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::dmat3x3& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     const GLint location = uniformLocation(name);
     if (location == -1)
@@ -1196,7 +1196,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat3x3& valu
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::dmat3x4& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     const GLint location = uniformLocation(name);
     if (location == -1)
@@ -1206,7 +1206,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat3x4& valu
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::dmat4x2& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1218,7 +1218,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat4x2& valu
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::dmat4x3& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -1230,7 +1230,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat4x3& valu
 }
 
 bool ProgramObject::setUniform(const std::string& name, const glm::dmat4x4& value,
-                               bool transpose)
+                               Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2045,254 +2045,507 @@ void ProgramObject::setUniform(GLint location, glm::dvec4* values, int count) {
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::mat2x2& value, bool transpose) {
+void ProgramObject::setUniform(GLint location, const glm::mat2x2& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix2fv)
-        glProgramUniformMatrix2fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix2fv) {
+        glProgramUniformMatrix2fv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix2fv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix2fv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::mat2x3& value, bool transpose) {
+void ProgramObject::setUniform(GLint location, const glm::mat2x3& value,
+                               Transpose transpose)
+{
+
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix2x3fv)
-        glProgramUniformMatrix2x3fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix2x3fv) {
+        glProgramUniformMatrix2x3fv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix2x3fv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix2x3fv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::mat2x4& value, bool transpose) {
+void ProgramObject::setUniform(GLint location, const glm::mat2x4& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix2x4fv)
-        glProgramUniformMatrix2x4fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix2x4fv) {
+        glProgramUniformMatrix2x4fv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix2x4fv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix2x4fv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::mat3x2& value, bool transpose) {
+void ProgramObject::setUniform(GLint location, const glm::mat3x2& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix3x2fv)
-        glProgramUniformMatrix3x2fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix3x2fv) {
+        glProgramUniformMatrix3x2fv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix3x2fv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix3x2fv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::mat3x3& value, bool transpose) {
+void ProgramObject::setUniform(GLint location, const glm::mat3x3& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix3fv)
-        glProgramUniformMatrix3fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix3fv) {
+        glProgramUniformMatrix3fv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix3fv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix3fv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::mat3x4& value, bool transpose) {
+void ProgramObject::setUniform(GLint location, const glm::mat3x4& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix3x4fv)
-        glProgramUniformMatrix3x4fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix3x4fv) {
+        glProgramUniformMatrix3x4fv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix3x4fv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix3x4fv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::mat4x2& value, bool transpose) {
+void ProgramObject::setUniform(GLint location, const glm::mat4x2& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix4x2fv)
-        glProgramUniformMatrix4x2fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix4x2fv) {
+        glProgramUniformMatrix4x2fv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix4x2fv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix4x2fv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::mat4x3& value, bool transpose) {
+void ProgramObject::setUniform(GLint location, const glm::mat4x3& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix4x3fv)
-        glProgramUniformMatrix4x3fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix4x3fv) {
+        glProgramUniformMatrix4x3fv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix4x3fv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix4x3fv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::mat4x4& value, bool transpose) {
+void ProgramObject::setUniform(GLint location, const glm::mat4x4& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix4fv)
-        glProgramUniformMatrix4fv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix4fv) {
+        glProgramUniformMatrix4fv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix4fv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix4fv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::dmat2x2& value, bool transpose){
+void ProgramObject::setUniform(GLint location, const glm::dmat2x2& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix2dv)
-        glProgramUniformMatrix2dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix2dv) {
+        glProgramUniformMatrix2dv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix2dv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix2dv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::dmat2x3& value, bool transpose){
+void ProgramObject::setUniform(GLint location, const glm::dmat2x3& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix2x3dv)
-        glProgramUniformMatrix2x3dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix2x3dv) {
+        glProgramUniformMatrix2x3dv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix2x3dv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix2x3dv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::dmat2x4& value, bool transpose){
+void ProgramObject::setUniform(GLint location, const glm::dmat2x4& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix2x4dv)
-        glProgramUniformMatrix2x4dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix2x4dv) {
+        glProgramUniformMatrix2x4dv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix2x4dv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix2x4dv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::dmat3x2& value, bool transpose){
+void ProgramObject::setUniform(GLint location, const glm::dmat3x2& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix3x2dv)
-        glProgramUniformMatrix3x2dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix3x2dv) {
+        glProgramUniformMatrix3x2dv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix3x2dv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix3x2dv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::dmat3x3& value, bool transpose){
+void ProgramObject::setUniform(GLint location, const glm::dmat3x3& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix3dv)
-        glProgramUniformMatrix3dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix3dv) {
+        glProgramUniformMatrix3dv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix3dv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix3dv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::dmat3x4& value, bool transpose){
+void ProgramObject::setUniform(GLint location, const glm::dmat3x4& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix3x4dv)
-        glProgramUniformMatrix3x4dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix3x4dv) {
+        glProgramUniformMatrix3x4dv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix3x4dv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix3x4dv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::dmat4x2& value, bool transpose){
+void ProgramObject::setUniform(GLint location, const glm::dmat4x2& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix4x2dv)
-        glProgramUniformMatrix4x2dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix4x2dv) {
+        glProgramUniformMatrix4x2dv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix4x2dv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix4x2dv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::dmat4x3& value, bool transpose){
+void ProgramObject::setUniform(GLint location, const glm::dmat4x3& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix4x3dv)
-        glProgramUniformMatrix4x3dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix4x3dv) {
+        glProgramUniformMatrix4x3dv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix4x3dv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix4x3dv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
 
-void ProgramObject::setUniform(GLint location, const glm::dmat4x4& value, bool transpose){
+void ProgramObject::setUniform(GLint location, const glm::dmat4x4& value,
+                               Transpose transpose)
+{
     ghoul_assert(location != -1, "Location must not be -1");
     
-    if (glProgramUniformMatrix4dv)
-        glProgramUniformMatrix4dv(_id, location, 1, transpose, value_ptr(value));
+    if (glProgramUniformMatrix4dv) {
+        glProgramUniformMatrix4dv(
+            _id,
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
+    }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix4dv(location, 1, transpose, value_ptr(value));
+        glUniformMatrix4dv(
+            location,
+            1,
+            transpose == Transpose::Yes,
+            value_ptr(value)
+        );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -2326,8 +2579,8 @@ bool ProgramObject::ignoreAttributeLocationError() const {
     return _ignoreAttributeLocationError;
 }
 
-void ProgramObject::setIgnoreAttributeLocationError(bool ignoreError) {
-    _ignoreAttributeLocationError = ignoreError;
+void ProgramObject::setIgnoreAttributeLocationError(IgnoreError ignoreError) {
+    _ignoreAttributeLocationError = ignoreError == IgnoreError::Yes;
 }
 
 bool ProgramObject::setAttribute(const std::string& name, bool value) {
@@ -2623,7 +2876,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dvec4& valu
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::mat2x2& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2635,7 +2888,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat2x2& val
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::mat2x3& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2647,7 +2900,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat2x3& val
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::mat2x4& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2659,7 +2912,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat2x4& val
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::mat3x2& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2671,7 +2924,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat3x2& val
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::mat3x3& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2683,7 +2936,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat3x3& val
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::mat3x4& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2695,7 +2948,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat3x4& val
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::mat4x2& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2707,7 +2960,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat4x2& val
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::mat4x3& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2719,7 +2972,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat4x3& val
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::mat4x4& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2731,7 +2984,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat4x4& val
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::dmat2x2& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2743,7 +2996,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat2x2& va
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::dmat2x3& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2755,7 +3008,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat2x3& va
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::dmat2x4& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2767,7 +3020,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat2x4& va
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::dmat3x2& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2779,7 +3032,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat3x2& va
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::dmat3x3& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2791,7 +3044,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat3x3& va
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::dmat3x4& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2803,7 +3056,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat3x4& va
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::dmat4x2& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2815,7 +3068,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat4x2& va
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::dmat4x3& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -2827,7 +3080,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat4x3& va
 }
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::dmat4x4& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -3011,11 +3264,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::dvec4& value) {
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::mat2x2& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttrib2fv(location, value_ptr(value[0]));
@@ -3024,11 +3277,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat2x2& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::mat2x3& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttrib3fv(location, value_ptr(value[0]));
@@ -3037,11 +3290,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat2x3& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::mat2x4& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttrib4fv(location, value_ptr(value[0]));
@@ -3050,11 +3303,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat2x4& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::mat3x2& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttrib2fv(location, value_ptr(value[0]));
@@ -3064,11 +3317,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat3x2& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::mat3x3& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttrib3fv(location, value_ptr(value[0]));
@@ -3078,11 +3331,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat3x3& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::mat3x4& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttrib4fv(location, value_ptr(value[0]));
@@ -3092,11 +3345,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat3x4& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::mat4x2& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttrib2fv(location, value_ptr(value[0]));
@@ -3107,11 +3360,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat4x2& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::mat4x3& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttrib3fv(location, value_ptr(value[0]));
@@ -3122,11 +3375,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat4x3& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::mat4x4& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttrib4fv(location, value_ptr(value[0]));
@@ -3137,11 +3390,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat4x4& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dmat2x2& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttribL2dv(location, value_ptr(value[0]));
@@ -3150,11 +3403,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat2x2& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dmat2x3& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttribL3dv(location, value_ptr(value[0]));
@@ -3163,11 +3416,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat2x3& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dmat2x4& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttribL4dv(location, value_ptr(value[0]));
@@ -3176,11 +3429,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat2x4& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dmat3x2& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttribL2dv(location, value_ptr(value[0]));
@@ -3190,11 +3443,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat3x2& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dmat3x3& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttribL3dv(location, value_ptr(value[0]));
@@ -3204,11 +3457,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat3x3& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dmat3x4& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttribL4dv(location, value_ptr(value[0]));
@@ -3218,11 +3471,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat3x4& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dmat4x2& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttribL2dv(location, value_ptr(value[0]));
@@ -3233,11 +3486,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat4x2& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dmat4x3& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttribL3dv(location, value_ptr(value[0]));
@@ -3248,11 +3501,11 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat4x3& value,
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dmat4x4& value,
-                                 bool transpose)
+                                 Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
     
-    if (transpose)
+    if (transpose == Transpose::Yes)
         setAttribute(location, glm::transpose(value));
     else {
         glVertexAttribL4dv(location, value_ptr(value[0]));
@@ -3262,16 +3515,16 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat4x4& value,
     }
 }
 
-void ProgramObject::setIgnoreSubroutineLocationError(bool ignoreError) {
-    _ignoreSubroutineLocationError = ignoreError;
+void ProgramObject::setIgnoreSubroutineLocationError(IgnoreError ignoreError) {
+    _ignoreSubroutineLocationError = ignoreError == IgnoreError::Yes;
 }
 
 bool ProgramObject::ignoreSubroutineLocationError() const {
     return _ignoreSubroutineLocationError;
 }
 
-void ProgramObject::setIgnoreSubroutineUniformLocationError(bool ignoreError) {
-    _ignoreSubroutineUniformLocationError = ignoreError;
+void ProgramObject::setIgnoreSubroutineUniformLocationError(IgnoreError ignoreError) {
+    _ignoreSubroutineUniformLocationError = ignoreError == IgnoreError::Yes;
 }
 
 bool ProgramObject::ignoreSubroutineUniformLocationError() const {

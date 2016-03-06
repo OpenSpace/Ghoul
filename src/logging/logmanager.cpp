@@ -67,9 +67,9 @@ LogManager::LogLevel LogManager::levelFromString(const std::string& level) {
 	return it->second;
 }
 
-LogManager::LogManager(LogManager::LogLevel level, bool immediateFlush)
+LogManager::LogManager(LogManager::LogLevel level, ImmediateFlush immediateFlush)
 	: _level(level)
-	, _immediateFlush(immediateFlush)
+	, _immediateFlush(immediateFlush == ImmediateFlush::Yes)
 {}
 
 void LogManager::addLog(std::shared_ptr<Log> log) {

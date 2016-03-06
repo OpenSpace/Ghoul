@@ -41,6 +41,8 @@ namespace opengl {
 
 class ShaderPreprocessor {
 public:
+    enum class TrackChanges { Yes, No };
+
     using ShaderChangedCallback = std::function<void ()>;
     
     struct ShaderPreprocessorError : public RuntimeError {
@@ -123,7 +125,7 @@ private:
     // pre path not empty
     // pre path must not contain path tokens
     // throws std::ios_base::failure if error opening file
-    void includeFile(const std::string& path, bool trackChanges, ShaderPreprocessor::Env& environment);
+    void includeFile(const std::string& path, TrackChanges trackChanges, ShaderPreprocessor::Env& environment);
     bool parseLine(ShaderPreprocessor::Env& env);
     bool parseFor(ShaderPreprocessor::Env& env);
     bool parseEndFor(ShaderPreprocessor::Env& env);

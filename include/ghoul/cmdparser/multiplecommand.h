@@ -65,9 +65,8 @@ public:
      * Is presented to the user upon request by the CommandlineParser
      * \pre \p ptr1 must not be a nullptr
      */
-    MultipleCommand(std::vector<T>* ptr1, std::string name,
-                    std::string shortName = "", std::string infoText = "",
-                    std::string parameterList = "");
+    MultipleCommand(std::vector<T>* ptr1, std::string name, std::string shortName = "",
+        std::string infoText = "", std::string parameterList = "");
 
     /**
      * This constructor uses two parameters. These can be of the same or different types.
@@ -87,10 +86,9 @@ public:
      * \pre \p ptr1 must not be a nullptr
      * \pre \p ptr2 must not be a nullptr
      */
-    MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2,
-                    std::string name, std::string shortName = "",
-                    std::string infoText = "",
-                    std::string parameterList = "");
+    MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2, std::string name,
+        std::string shortName = "", std::string infoText = "",
+        std::string parameterList = "");
 
     /**
      * This constructor uses three parameters. These can be of the same or different
@@ -114,9 +112,8 @@ public:
      * \pre \p ptr3 must not be a nullptr
      */
     MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2, std::vector<V>* ptr3,
-        std::string name, std::string shortName = "",
-                    std::string infoText = "",
-                    std::string parameterList = "");
+        std::string name, std::string shortName = "", std::string infoText = "",
+        std::string parameterList = "");
 
     /**
      * This constructor uses all four parameters. These can be of the same or different
@@ -143,9 +140,8 @@ public:
      * \pre \p ptr4 must not be a nullptr
      */
     MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2, std::vector<V>* ptr3,
-                    std::vector<W>* ptr4, std::string name,
-                    std::string shortName = "", std::string infoText = "",
-                    std::string parameterList = "");
+        std::vector<W>* ptr4, std::string name, std::string shortName = "",
+        std::string infoText = "", std::string parameterList = "");
 
     /**
      * Executes this MultipleCommand and stores the values passed as \p parameters into

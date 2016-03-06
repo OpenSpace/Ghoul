@@ -63,8 +63,8 @@ public:
      * \pre \p ptr1 must not be a nullptr
      */
     SingleCommand(T* ptr1,
-                  std::string name, std::string shortName = "",
-                  std::string infoText = "", std::string parameterList = "");
+        std::string name, std::string shortName = "", std::string infoText = "",
+        std::string parameterList = "");
 
     /**
      * This constructor uses two parameters. These can be of the same or different types.
@@ -85,8 +85,8 @@ public:
      * \pre \p ptr2 must not be a nullptr
      */
     SingleCommand(T* ptr1, U* ptr2,
-                  std::string name, std::string shortName = "",
-                  std::string infoText = "", std::string parameterList = "");
+        std::string name, std::string shortName = "", std::string infoText = "",
+        std::string parameterList = "");
 
     /**
      * This constructor uses three parameters. These can be of the same or different
@@ -110,8 +110,8 @@ public:
      * \pre \p ptr3 must not be a nullptr
      */
     SingleCommand(T* ptr1, U* ptr2, V* ptr3,
-                  std::string name, std::string shortName = "",
-                  std::string infoText = "", std::string parameterList = "");
+        std::string name, std::string shortName = "", std::string infoText = "",
+        std::string parameterList = "");
 
     /**
      * This constructor uses all four parameters. These can be of the same or different
@@ -138,8 +138,8 @@ public:
      * \pre \p ptr4 must not be a nullptr
      */
     SingleCommand(T* ptr1, U* ptr2, V* ptr3, W* ptr4,
-                  std::string name, std::string shortName = "",
-                  std::string infoText = "", std::string parameterList = "");
+        std::string name, std::string shortName = "", std::string infoText = "",
+        std::string parameterList = "");
 
     /**
      * Executes this SingleCommand and stores the values passed as \p parameters into the
@@ -184,9 +184,8 @@ public:
      * \param infoText The info text that will be presented to the user if it is requested
      * by the CommandlineParser
      */
-    SingleCommandZeroArguments(bool* ptr, std::string name,
-                               std::string shortName = "",
-                               std::string infoText = "");
+    SingleCommandZeroArguments(bool* ptr, std::string name, std::string shortName = "",
+        std::string infoText = "");
 
     /**
      * Sets the <code>bool</code> value passed in the constructor to <code>true</code>
