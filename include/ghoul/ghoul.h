@@ -26,10 +26,18 @@
 #ifndef __GHOUL_H__
 #define __GHOUL_H__
 
+#include <string>
+
 namespace ghoul {
 
 void initialize();
 void deinitialize();
+
+std::string licenseText();
+
+const int GHOUL_MAJOR_VERSION = 0;
+const int GHOUL_MINOR_VERSION = 9;
+const int GHOUL_PATCH_VERSION = 0;
 
 } // namespace ghoul
 
