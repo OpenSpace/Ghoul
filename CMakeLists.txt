@@ -145,10 +145,6 @@ target_include_directories(Ghoul SYSTEM PUBLIC ${LZ4_INCLUDE_DIR})
 target_link_libraries(Ghoul ${LZ4_LIBRARIES})
 
 
-# Boost
-find_package(Boost REQUIRED)
-target_include_directories(Ghoul SYSTEM PUBLIC ${Boost_INCLUDE_DIRS})
-
 # Lua
 include_external_library(Ghoul Lua ${GHOUL_ROOT_DIR}/ext/lua)
 
