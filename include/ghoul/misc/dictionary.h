@@ -42,7 +42,7 @@
 
 #include <ghoul/misc/exception.h>
 
-#include <boost/any.hpp>
+#include <ghoul/misc/any.h>
 
 #include <map>
 #include <string>
@@ -140,13 +140,13 @@ using has_storage_converter = static_not<
  * The Dictionary is a class to generically store arbitrary items associated with and
  * accessible using <code>std::string</code>%s. It has the abilitiy to store and retrieve
  * these items by unique <code>std::string</code>-typed keys. The items that can be stored
- * have to be compatible with the <code>boost::any</code> type. For a select list of types
- * an automatic conversion is performed, so that simple type conversions are possible. The
- * following table is a complete listing of all types that are automatically converted.
- * Each type has a <code>StorageType</code> that is used to store the type internally.
- * Each type with the same number of values and the same <code>StorageType</code> will be
- * converted automatically. For example a value can be stored as an <code>int</code> and
- * can be retrieved as a <code>short</code>. The table of all types is:
+ * have to be compatible with the ghoul::any type. For a select list of types an automatic
+ * conversion is performed, so that simple type conversions are possible. The following
+ * table is a complete listing of all types that are automatically converted. Each type
+ * has a <code>StorageType</code> that is used to store the type internally. Each type
+ * with the same number of values and the same <code>StorageType</code> will be converted
+ * automatically. For example a value can be stored as an <code>int</code> and can be
+ * retrieved as a <code>short</code>. The table of all types is:
  * | <code>Type</code>               | <code>StorageType</code>  | <code>\#Values</code>|
  * |:-------------------------------:|:-------------------------:|:--------------------:|
  * | <code>bool</code>               | <code>IntegralType</code>         |  1           |
@@ -212,7 +212,7 @@ using has_storage_converter = static_not<
  * exception to this is the #setValue method, which has an additional parameter that
  * controls if each individual level of the Dictionary is created on-the-fly or not.
  */
-class Dictionary : private std::map<std::string, boost::any> {
+class Dictionary : private std::map<std::string, ghoul::any> {
 public:
     enum class CreateIntermediate { Yes, No };
 
@@ -244,7 +244,7 @@ public:
 	 * \param l The <code>std::initializer_list</code> that contains all of the values
 	 * that should be added to the Dictionary
      */
-    Dictionary(std::initializer_list<std::pair<std::string, boost::any>> l);
+    Dictionary(std::initializer_list<std::pair<std::string, ghoul::any>> l);
 
     /**
      * Returns all of the keys that are stored in the dictionary at a given \p location.
@@ -424,7 +424,7 @@ private:
      * \param key The key under which the \p value is stored
      * \param value The value that should be stored under the provided key
      */
-    void setValueAnyHelper(std::string key, boost::any value);
+    void setValueAnyHelper(std::string key, ghoul::any value);
 
     /**
      * This type is used in SFINAE evaluation of the internal methods (#setValueInternal,

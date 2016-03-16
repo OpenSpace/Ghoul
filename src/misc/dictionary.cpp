@@ -147,7 +147,7 @@ bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& value) cons
     }
 }
 
-Dictionary::Dictionary(std::initializer_list<std::pair<std::string, boost::any>> l) {
+Dictionary::Dictionary(std::initializer_list<std::pair<std::string, ghoul::any>> l) {
     for (auto p : l)
         setValueAnyHelper(std::move(p.first), std::move(p.second));
 }
@@ -169,7 +169,7 @@ std::vector<string> Dictionary::keys(const string& location) const {
     if (keyIt == cend())
         throw KeyError("Key '" + first + "' was not found");
 
-    const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
+    const Dictionary* const dict = ghoul::any_cast<Dictionary>(&(keyIt->second));
     if (!dict) {
         throw ConversionError("Error converting key '" + first + "' from type '" +
             keyIt->second.type().name() + "' to type 'Dictionary"
@@ -194,28 +194,28 @@ bool Dictionary::hasKey(const string& key) const {
     if (keyIt == cend())
         return false;
 
-    const Dictionary* const dict = boost::any_cast<Dictionary>(&(keyIt->second));
+    const Dictionary* const dict = ghoul::any_cast<Dictionary>(&(keyIt->second));
     if (!dict)
         return false;
     return dict->hasKey(rest);
 }
 
 size_t Dictionary::size() const {
-    return std::map<std::string, boost::any>::size();
+    return std::map<std::string, ghoul::any>::size();
 }
 
 void Dictionary::clear() {
-    std::map<std::string, boost::any>::clear();
+    std::map<std::string, ghoul::any>::clear();
 }
 
 bool Dictionary::empty() const {
-    return std::map<std::string, boost::any>::empty();
+    return std::map<std::string, ghoul::any>::empty();
 }
 
 bool Dictionary::removeKey(const std::string& key) {
     ghoul_assert(!key.empty(), "Key must not be empty");
     
-    std::map<std::string, boost::any>::size_type res = erase(key);
+    std::map<std::string, ghoul::any>::size_type res = erase(key);
     return (res == 1);
 }
 
@@ -232,100 +232,100 @@ bool Dictionary::splitKey(const string& key, string& first, string& rest) const 
     }
 }
 
-void Dictionary::setValueAnyHelper(std::string key, boost::any value) {
+void Dictionary::setValueAnyHelper(std::string key, ghoul::any value) {
     // Ugly if-else statement is necessary as 'type' cannot be not constexpr
     const std::type_info& type = value.type();
 
     if (type == typeid(bool))
-        setValue(std::move(key), std::move(boost::any_cast<bool>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<bool>(value)));
     else if (type == typeid(char))
-        setValue(std::move(key), std::move(boost::any_cast<char>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<char>(value)));
     else if (type == typeid(signed char))
-        setValue(std::move(key), std::move(boost::any_cast<signed char>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<signed char>(value)));
     else if (type == typeid(unsigned char))
-        setValue(std::move(key), std::move(boost::any_cast<unsigned char>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<unsigned char>(value)));
     else if (type == typeid(wchar_t))
-        setValue(std::move(key), std::move(boost::any_cast<wchar_t>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<wchar_t>(value)));
     else if (type == typeid(short))
-        setValue(std::move(key), std::move(boost::any_cast<short>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<short>(value)));
     else if (type == typeid(unsigned short))
-        setValue(std::move(key), std::move(boost::any_cast<unsigned short>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<unsigned short>(value)));
     else if (type == typeid(int))
-        setValue(std::move(key), std::move(boost::any_cast<int>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<int>(value)));
     else if (type == typeid(unsigned int))
-        setValue(std::move(key), std::move(boost::any_cast<unsigned int>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<unsigned int>(value)));
     else if (type == typeid(long long))
-        setValue(std::move(key), std::move(boost::any_cast<long long>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<long long>(value)));
     else if (type == typeid(unsigned long long))
-        setValue(std::move(key), std::move(boost::any_cast<unsigned long long>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<unsigned long long>(value)));
     else if (type == typeid(float))
-        setValue(std::move(key), std::move(boost::any_cast<float>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<float>(value)));
     else if (type == typeid(glm::vec2))
-        setValue(std::move(key), std::move(boost::any_cast<glm::vec2>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::vec2>(value)));
     else if (type == typeid(glm::dvec2))
-        setValue(std::move(key), std::move(boost::any_cast<glm::dvec2>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::dvec2>(value)));
     else if (type == typeid(glm::ivec2))
-        setValue(std::move(key), std::move(boost::any_cast<glm::ivec2>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::ivec2>(value)));
     else if (type == typeid(glm::uvec2))
-        setValue(std::move(key), std::move(boost::any_cast<glm::uvec2>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::uvec2>(value)));
     else if (type == typeid(glm::bvec2))
-        setValue(std::move(key), std::move(boost::any_cast<glm::bvec2>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::bvec2>(value)));
     else if (type == typeid(glm::vec3))
-        setValue(std::move(key), std::move(boost::any_cast<glm::vec3>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::vec3>(value)));
     else if (type == typeid(glm::dvec3))
-        setValue(std::move(key), std::move(boost::any_cast<glm::dvec3>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::dvec3>(value)));
     else if (type == typeid(glm::ivec3))
-        setValue(std::move(key), std::move(boost::any_cast<glm::ivec3>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::ivec3>(value)));
     else if (type == typeid(glm::uvec3))
-        setValue(std::move(key), std::move(boost::any_cast<glm::uvec3>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::uvec3>(value)));
     else if (type == typeid(glm::bvec3))
-        setValue(std::move(key), std::move(boost::any_cast<glm::bvec3>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::bvec3>(value)));
     else if (type == typeid(glm::vec4))
-        setValue(std::move(key), std::move(boost::any_cast<glm::vec4>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::vec4>(value)));
     else if (type == typeid(glm::dvec4))
-        setValue(std::move(key), std::move(boost::any_cast<glm::dvec4>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::dvec4>(value)));
     else if (type == typeid(glm::ivec4))
-        setValue(std::move(key), std::move(boost::any_cast<glm::ivec4>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::ivec4>(value)));
     else if (type == typeid(glm::uvec4))
-        setValue(std::move(key), std::move(boost::any_cast<glm::uvec4>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::uvec4>(value)));
     else if (type == typeid(glm::bvec4))
-        setValue(std::move(key), std::move(boost::any_cast<glm::bvec4>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::bvec4>(value)));
     else if (type == typeid(glm::mat2x2))
-        setValue(std::move(key), std::move(boost::any_cast<glm::mat2x2>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat2x2>(value)));
     else if (type == typeid(glm::mat2x3))
-        setValue(std::move(key), std::move(boost::any_cast<glm::mat2x3>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat2x3>(value)));
     else if (type == typeid(glm::mat2x4))
-        setValue(std::move(key), std::move(boost::any_cast<glm::mat2x4>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat2x4>(value)));
     else if (type == typeid(glm::mat3x2))
-        setValue(std::move(key), std::move(boost::any_cast<glm::mat3x2>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat3x2>(value)));
     else if (type == typeid(glm::mat3x3))
-        setValue(std::move(key), std::move(boost::any_cast<glm::mat3x3>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat3x3>(value)));
     else if (type == typeid(glm::mat3x4))
-        setValue(std::move(key), std::move(boost::any_cast<glm::mat3x4>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat3x4>(value)));
     else if (type == typeid(glm::mat4x2))
-        setValue(std::move(key), std::move(boost::any_cast<glm::mat4x2>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat4x2>(value)));
     else if (type == typeid(glm::mat4x3))
-        setValue(std::move(key), std::move(boost::any_cast<glm::mat4x3>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat4x3>(value)));
     else if (type == typeid(glm::mat4x4))
-        setValue(std::move(key), std::move(boost::any_cast<glm::mat4x4>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat4x4>(value)));
     else if (type == typeid(glm::dmat2x2))
-        setValue(std::move(key), std::move(boost::any_cast<glm::dmat2x2>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat2x2>(value)));
     else if (type == typeid(glm::dmat2x3))
-        setValue(std::move(key), std::move(boost::any_cast<glm::dmat2x3>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat2x3>(value)));
     else if (type == typeid(glm::dmat2x4))
-        setValue(std::move(key), std::move(boost::any_cast<glm::dmat2x4>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat2x4>(value)));
     else if (type == typeid(glm::dmat3x2))
-        setValue(std::move(key), std::move(boost::any_cast<glm::dmat3x2>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat3x2>(value)));
     else if (type == typeid(glm::dmat3x3))
-        setValue(std::move(key), std::move(boost::any_cast<glm::dmat3x3>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat3x3>(value)));
     else if (type == typeid(glm::dmat3x4))
-        setValue(std::move(key), std::move(boost::any_cast<glm::dmat3x4>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat3x4>(value)));
     else if (type == typeid(glm::dmat4x2))
-        setValue(std::move(key), std::move(boost::any_cast<glm::dmat4x2>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat4x2>(value)));
     else if (type == typeid(glm::dmat4x3))
-        setValue(std::move(key), std::move(boost::any_cast<glm::dmat4x3>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat4x3>(value)));
     else if (type == typeid(glm::dmat4x4))
-        setValue(std::move(key), std::move(boost::any_cast<glm::dmat4x4>(value)));
+        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat4x4>(value)));
     else
         setValue(key, value, CreateIntermediate::No);
 }

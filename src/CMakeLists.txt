@@ -60,6 +60,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/logging/streamlog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/textlog.cpp
     ${PROJECT_SOURCE_DIR}/src/lua/lua_helper.cpp
+    ${PROJECT_SOURCE_DIR}/src/misc/any.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/assert.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/buffer.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/clipboard.cpp
@@ -137,6 +138,8 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/textlog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/ghoul_lua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/any.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/any.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/assert.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/buffer.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/buffer.inl
