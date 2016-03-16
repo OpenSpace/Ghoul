@@ -155,6 +155,14 @@ include_external_library(Ghoul Lua ${GHOUL_ROOT_DIR}/ext/lua)
 # tinyobjloader
 include_external_library(Ghoul tinyobjloader ${GHOUL_ROOT_DIR}/ext/tinyobjloader ${GHOUL_ROOT_DIR}/ext/tinyobjloader)
 
+# Assimp
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "We don't build assimp tools because they need DirectX.")
+set(ASSIM_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
+set(ASSIMP_NO_EXPORTER ON CACHE BOOL "Decrease compiling time.")
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable GTest.")
+include_external_library(Ghoul assimp ${GHOUL_ROOT_DIR}/ext/assimp ${GHOUL_ROOT_DIR}/ext/assimp/include)
+
+
 # Cppformat
 set(FMT_DOC OFF CACHE BOOL "Generate the doc target.")
 set(FMT_INSTALL OFF CACHE BOOL "Generate the install target.")
@@ -203,6 +211,7 @@ if (GHOUL_MODULE_FONTRENDERING)
     set(FREETYPE_DIST OFF CACHE BOOL "Generate the dist target.")
     include_external_library(Ghoul freetype ${GHOUL_ROOT_DIR}/ext/freetype2 ${GHOUL_ROOT_DIR}/ext/freetype2/include)
 endif ()
+
 
 #############################
 # Other applications

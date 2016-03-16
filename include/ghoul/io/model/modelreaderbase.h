@@ -27,7 +27,7 @@
 #define __MODELREADERBASE_H__
 
 #include <ghoul/misc/exception.h>
-
+#include <ghoul/opengl/ghoul_gl.h>
 #include <memory>
 #include <string>
 
@@ -46,6 +46,16 @@ namespace io {
  * present for the loadModel function.
  */
 class ModelReaderBase {
+public:
+    /**
+     * Vertex base properties.
+     */
+    struct Vertex {
+        GLfloat location[3];
+        GLfloat tex[2];
+        GLfloat normal[3];
+    };
+
 public:
     /**
      * The exception that gets thrown if there is an error loading a model from the

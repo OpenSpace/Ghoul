@@ -78,11 +78,11 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
         }
     }
     
-    struct Vertex {
+    /*struct Vertex {
         GLfloat location[3];
         GLfloat tex[2];
         GLfloat normal[3];
-    };
+    };*/
     std::vector<Vertex> vertices(totalSizeVertex);
     std::vector<int> indices(totalSizeIndex);
     

@@ -39,7 +39,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/font/fontrenderer.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderbase.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderlua.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderwavefront.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/model/modelreadermultiformat.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereader.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderbase.cpp
     ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadercmap.cpp
@@ -113,7 +113,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontrenderer.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderlua.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderwavefront.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreadermultiformat.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderbase.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadercmap.h

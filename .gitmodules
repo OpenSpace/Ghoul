@@ -16,3 +16,6 @@ url=https://github.com/syoyo/tinyobjloader.git
 [submodule "ext/cppformat"]
 	path = ext/cppformat
 	url = https://github.com/cppformat/cppformat.git
+[submodule "ext/assimp"]
+	path = ext/assimp
+	url = https://github.com/assimp/assimp.git
