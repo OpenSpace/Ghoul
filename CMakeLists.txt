@@ -74,6 +74,7 @@ option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
 option(GHOUL_DISABLE_EXTERNAL_WARNINGS "Disable warnings in external libraries" ON)
 
 option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
+option(GHOUL_MODULE_OPENGL "Enable OpenGL" ON)
 
 option(BUILD_SHARED_LIBS "Build package with shared libraries." OFF)
 
@@ -129,18 +130,18 @@ find_package(GLM REQUIRED)
 target_include_directories(Ghoul SYSTEM PUBLIC ${GLM_INCLUDE_DIRS})
 target_compile_definitions(Ghoul PUBLIC "GLM_SWIZZLE")
 
-# OpenGL
-find_package(OpenGL REQUIRED)
-target_include_directories(Ghoul SYSTEM PUBLIC ${OPENGL_INCLUDE_DIR})
-target_link_libraries(Ghoul ${OPENGL_LIBRARIES})
+if (GHOUL_MODULE_OPENGL)
+    # OpenGL
+    find_package(OpenGL REQUIRED)
+    target_include_directories(Ghoul SYSTEM PUBLIC ${OPENGL_INCLUDE_DIR})
+    target_link_libraries(Ghoul ${OPENGL_LIBRARIES})
 
-
-# GLEW
-find_package(GLEW REQUIRED)
-target_include_directories(Ghoul SYSTEM PUBLIC ${GLEW_INCLUDE_DIRS})
-target_compile_definitions(Ghoul PUBLIC "GLEW_STATIC")
-target_link_libraries(Ghoul ${GLEW_LIBRARIES})
-
+    # GLEW
+    find_package(GLEW REQUIRED)
+    target_include_directories(Ghoul SYSTEM PUBLIC ${GLEW_INCLUDE_DIRS})
+    target_compile_definitions(Ghoul PUBLIC "GLEW_STATIC")
+    target_link_libraries(Ghoul ${GLEW_LIBRARIES})
+endif ()
 
 # LZ4
 find_package(LZ4 REQUIRED)

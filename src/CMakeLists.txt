@@ -71,16 +71,6 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/misc/sharedmemory.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/templatefactory.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/typeinfo.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/framebufferobject.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/programobject.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/shadermanager.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/shaderobject.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/shaderpreprocessor.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/texture.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/textureatlas.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/texturemanager.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/textureunit.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/vertexbufferobject.cpp
     ${PROJECT_SOURCE_DIR}/src/systemcapabilities/generalcapabilitiescomponent.cpp
     ${PROJECT_SOURCE_DIR}/src/systemcapabilities/openglcapabilitiescomponent.cpp
     ${PROJECT_SOURCE_DIR}/src/systemcapabilities/systemcapabilities.cpp
@@ -92,6 +82,22 @@ if (GHOUL_MODULE_FONTRENDERING)
     set(GHOUL_SOURCE
         ${GHOUL_SOURCE}
         ${PROJECT_SOURCE_DIR}/src/font/font.cpp
+    )
+endif ()
+
+if (GHOUL_MODULE_OPENGL)
+    set(GHOUL_SOURCE
+        ${GHOUL_SOURCE}
+        ${PROJECT_SOURCE_DIR}/src/opengl/framebufferobject.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/programobject.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/shadermanager.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/shaderobject.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/shaderpreprocessor.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/texture.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/textureatlas.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/texturemanager.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/textureunit.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/vertexbufferobject.cpp
     )
 endif ()
 
@@ -156,20 +162,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/typeinfo.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/typeinfo.inl
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/framebufferobject.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/ghoul_gl.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/opengl
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobject.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shadermanager.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderobject.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderpreprocessor.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureatlas.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.inl
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texturemanager.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureunit.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/generalcapabilitiescomponent.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/openglcapabilitiescomponent.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities
@@ -183,6 +175,26 @@ if (GHOUL_MODULE_FONTRENDERING)
     set(GHOUL_HEADER
         ${GHOUL_HEADER}
         ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
+    )
+endif ()
+
+if (GHOUL_MODULE_OPENGL)
+    set(GHOUL_HEADER
+        ${GHOUL_HEADER}
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/framebufferobject.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/ghoul_gl.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/opengl
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobject.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shadermanager.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderobject.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderpreprocessor.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureatlas.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.inl
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texturemanager.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureunit.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.inl
     )
 endif ()
 
