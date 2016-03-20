@@ -1,11 +1,5 @@
-build/
 .DS_Store
-*.swp
-CMakeFiles
-cmake_install.cmake
-Makefile
-src/cmake_install.cmake
-src/Makefile
-doc/
-ext/boost
 bin/
+build/
+doc/
+*.swp

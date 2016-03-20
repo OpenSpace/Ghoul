@@ -3169,7 +3169,7 @@ public:
      * OpenGL function <code>glVertexAttrib2fv</code> on the rows/columns.
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
-     * \param transposeTranspose::Yes if the matrix should be set in row major order,
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
      * Transpose::No if the matrix is in column major order
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */

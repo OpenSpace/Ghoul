@@ -44,9 +44,9 @@ namespace opengl {
  * This class is a wrapper for an OpenGL shader object. It represents a single shader
  * object of the types declared in ShaderObject::ShaderType. All ShaderObject%s must be
  * loaded from a file on disk. The shader will load the contents of the file in the 
- * constructor (if a constructor with a filename was chosen) or in the #setShaderFilename
+ * constructor (if a constructor with a filename was chosen) or in the #setFilename
  * method. If the file changes after it has been loaded, the ShaderObject will not change
- * unless #reloadFromFile is called, which pulls the changes. Each object can have a name
+ * unless #rebuildFromFile is called, which pulls the changes. Each object can have a name
  * that will be used for a debug label (if available) and for the logging. The type of the
  * ShaderObject is selected in the constructor and cannot be changed afterwards. To use
  * the ShaderObjects, they have to be attached to a ProgramObject first.
@@ -103,8 +103,8 @@ public:
 
     /**
      * This constructor creates a shader of the passed type with an empty source string. 
-     * Before this can be used, a shader must be loaded with #setShaderFilename and it has
-     * to be compiled.
+     * Before this can be used, a shader must be loaded with #setFilename and it has to be
+     * compiled.
      * \param shaderType The type of shader that this ShaderObject will represent
      * \param dictionary The dictionary that is used for the !ShaderPreprocessor
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
