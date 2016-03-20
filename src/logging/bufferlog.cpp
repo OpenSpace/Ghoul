@@ -29,7 +29,7 @@
 #include <ghoul/misc/assert.h>
 
 #include <atomic>
-#include <format.h>
+#include <cppformat/format.h>
 #include <fstream>
 
 namespace ghoul {

@@ -25,7 +25,7 @@
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 
-#include <format.h>
+#include <cppformat/format.h>
 
 namespace ghoul {
 namespace cmdparser {

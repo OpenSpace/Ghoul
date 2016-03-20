@@ -30,7 +30,7 @@
 #include <ghoul/misc/assert.h>
 
 #include <algorithm>
-#include <format.h>
+#include <cppformat/format.h>
 
 namespace ghoul {
 namespace io {

@@ -49,6 +49,84 @@
 
 #include <string>
 
+namespace ghoul {
+
+template <typename T>
+struct glm_components : public std::integral_constant<std::size_t, 0> {};
+
+template <typename T, glm::precision P>
+struct glm_components<glm::tvec2<T, P>> : public std::integral_constant<std::size_t, 2> {};
+
+template <typename T, glm::precision P>
+struct glm_components<glm::tvec3<T, P>> : public std::integral_constant<std::size_t, 3> {};
+
+template <typename T, glm::precision P>
+struct glm_components<glm::tvec4<T, P>> : public std::integral_constant<std::size_t, 4> {};
+
+
+template <typename T>
+struct glm_rows : public std::integral_constant<std::size_t, 0> {};
+
+template <typename T, glm::precision P>
+struct glm_rows<glm::tmat2x2<T, P>> : public std::integral_constant<std::size_t, 2> {};
+
+template <typename T, glm::precision P>
+struct glm_rows<glm::tmat2x3<T, P>> : public std::integral_constant<std::size_t, 3> {};
+
+template <typename T, glm::precision P>
+struct glm_rows<glm::tmat2x4<T, P>> : public std::integral_constant<std::size_t, 4> {};
+
+template <typename T, glm::precision P>
+struct glm_rows<glm::tmat3x2<T, P>> : public std::integral_constant<std::size_t, 2> {};
+
+template <typename T, glm::precision P>
+struct glm_rows<glm::tmat3x3<T, P>> : public std::integral_constant<std::size_t, 3> {};
+
+template <typename T, glm::precision P>
+struct glm_rows<glm::tmat3x4<T, P>> : public std::integral_constant<std::size_t, 4> {};
+
+template <typename T, glm::precision P>
+struct glm_rows<glm::tmat4x2<T, P>> : public std::integral_constant<std::size_t, 2> {};
+
+template <typename T, glm::precision P>
+struct glm_rows<glm::tmat4x3<T, P>> : public std::integral_constant<std::size_t, 3> {};
+
+template <typename T, glm::precision P>
+struct glm_rows<glm::tmat4x4<T, P>> : public std::integral_constant<std::size_t, 4> {};
+
+
+template <typename T>
+struct glm_cols : public std::integral_constant<std::size_t, 0> {};
+
+template <typename T, glm::precision P>
+struct glm_cols<glm::tmat2x2<T, P>> : public std::integral_constant<std::size_t, 2> {};
+
+template <typename T, glm::precision P>
+struct glm_cols<glm::tmat2x3<T, P>> : public std::integral_constant<std::size_t, 2> {};
+
+template <typename T, glm::precision P>
+struct glm_cols<glm::tmat2x4<T, P>> : public std::integral_constant<std::size_t, 2> {};
+
+template <typename T, glm::precision P>
+struct glm_cols<glm::tmat3x2<T, P>> : public std::integral_constant<std::size_t, 3> {};
+
+template <typename T, glm::precision P>
+struct glm_cols<glm::tmat3x3<T, P>> : public std::integral_constant<std::size_t, 3> {};
+
+template <typename T, glm::precision P>
+struct glm_cols<glm::tmat3x4<T, P>> : public std::integral_constant<std::size_t, 3> {};
+
+template <typename T, glm::precision P>
+struct glm_cols<glm::tmat4x2<T, P>> : public std::integral_constant<std::size_t, 4> {};
+
+template <typename T, glm::precision P>
+struct glm_cols<glm::tmat4x3<T, P>> : public std::integral_constant<std::size_t, 4> {};
+
+template <typename T, glm::precision P>
+struct glm_cols<glm::tmat4x4<T, P>> : public std::integral_constant<std::size_t, 4> {};
+
+} // ghoul
+
 namespace std {
 
 inline std::string to_string(const glm::bvec2& _Val) {

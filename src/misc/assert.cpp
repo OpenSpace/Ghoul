@@ -25,7 +25,7 @@
 
 #include <ghoul/misc/assert.h>
 
-#include <format.h>
+#include <cppformat/format.h>
 
 #include <algorithm>
 #include <iostream>

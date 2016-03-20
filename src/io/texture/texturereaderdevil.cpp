@@ -31,7 +31,7 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/glm.h>
 
-#include <format.h>
+#include <cppformat/format.h>
 
 #include <IL/il.h>
 #include <IL/ilu.h>
