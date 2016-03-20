@@ -33,7 +33,7 @@ project(Ghoul)
 
 if (MSVC)
     if (MSVC_VERSION LESS 1900)
-        message(FATAL_ERROR "OpenSpace requires at least Visual Studio 2015")
+        message(FATAL_ERROR "Ghoul requires at least Visual Studio 2015")
     endif ()
 endif ()
 
@@ -41,11 +41,13 @@ message(STATUS "Generating Ghoul project")
 
 # Setting default paths
 set(GHOUL_ROOT_DIR ${PROJECT_SOURCE_DIR})
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_ROOT_DIR}/ext)
+set(GHOUL_CMAKE_DIR ${GHOUL_ROOT_DIR}/support/cmake)
+set(GHOUL_CMAKE_DIR ${GHOUL_ROOT_DIR}/support/cmake PARENT_SCOPE)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_CMAKE_DIR} ${GHOUL_ROOT_DIR}/ext)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
 
-include (${GHOUL_ROOT_DIR}/ext/handle_external_library.cmake)
+include (${GHOUL_CMAKE_DIR}/handle_external_library.cmake)
 
 #############################
 # Including the source files (with source groups already defined)
@@ -73,6 +75,8 @@ option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
 option(GHOUL_DISABLE_EXTERNAL_WARNINGS "Disable warnings in external libraries" ON)
 
 option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
+
+option(BUILD_SHARED_LIBS "Build package with shared libraries." OFF)
 
 #############################
 # Compile settings

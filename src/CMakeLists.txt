@@ -2,7 +2,7 @@
 #                                                                                       #
 # GHOUL                                                                                 #
 #                                                                                       #
-# Copyright (c) 2012-2015                                                               #
+# Copyright (c) 2012-2016                                                               #
 #                                                                                       #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this  #
 # software and associated documentation files (the "Software"), to deal in the Software #
@@ -187,5 +187,5 @@ if (GHOUL_MODULE_FONTRENDERING)
 endif ()
 
 
-include (${PROJECT_SOURCE_DIR}/ext/GroupFilesIntoFolders.cmake)
+include (${GHOUL_CMAKE_DIR}/GroupFilesIntoFolders.cmake)
 group_files_into_folders(${GHOUL_SOURCE} ${GHOUL_HEADER})
