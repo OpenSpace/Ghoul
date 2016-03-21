@@ -158,9 +158,12 @@ set(ASSIM_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
 set(ASSIMP_NO_EXPORTER ON CACHE BOOL "Decrease compiling time.")
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable GTest.")
 include_external_library(Ghoul assimp ${GHOUL_ROOT_DIR}/ext/assimp ${GHOUL_ROOT_DIR}/ext/assimp/include)
-set_property(TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "External")
 set_property(TARGET uninstall PROPERTY FOLDER "External")
-set_property(TARGET zlibstatic PROPERTY FOLDER "External")
+
+if (WIN32)
+    set_property(TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "External")
+    set_property(TARGET zlibstatic PROPERTY FOLDER "External")
+endif ()
 
 # Cppformat
 set(FMT_DOC OFF CACHE BOOL "Generate the doc target.")
