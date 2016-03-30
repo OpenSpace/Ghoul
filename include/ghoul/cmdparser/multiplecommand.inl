@@ -23,6 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+
 namespace ghoul {
 namespace cmdparser {
 
@@ -30,7 +31,7 @@ template<class T, class U, class V, class W>
 MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::string name,
                 std::string shortName, std::string infoText, std::string parameterList)
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
-                         std::move(parameterList), 1, true)
+                         std::move(parameterList), 1, MultipleCalls::Yes)
     , _ptr1(ptr1)
     , _ptr2(nullptr)
     , _ptr3(nullptr)
@@ -44,7 +45,7 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* 
                 std::string name, std::string shortName, std::string infoText,
                 std::string parameterList)
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
-                         std::move(parameterList), 2, true)
+                         std::move(parameterList), 2, MultipleCalls::Yes)
     , _ptr1(ptr1)
     , _ptr2(ptr2)
     , _ptr3(nullptr)
@@ -59,7 +60,7 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* 
 				std::vector<V>* ptr3, std::string name, std::string shortName,
                 std::string infoText, std::string parameterList)
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
-                         std::move(parameterList), 3, true)
+                         std::move(parameterList), 3, MultipleCalls::Yes)
     , _ptr1(ptr1)
     , _ptr2(ptr2)
     , _ptr3(ptr3)
@@ -75,7 +76,7 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* 
                 std::vector<V>* ptr3, std::vector<W>* ptr4, std::string name,
                 std::string shortName, std::string infoText, std::string parameterList)
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
-                         std::move(parameterList), 4, true)
+                         std::move(parameterList), 4, MultipleCalls::Yes)
     , _ptr1(ptr1)
     , _ptr2(ptr2)
     , _ptr3(ptr3)
