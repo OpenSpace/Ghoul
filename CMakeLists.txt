@@ -162,7 +162,7 @@ set_property(TARGET uninstall PROPERTY FOLDER "External")
 
 if (WIN32)
     set_property(TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "External")
-    set_property(TARGET zlibstatic PROPERTY FOLDER "External")
+    #set_property(TARGET zlibstatic PROPERTY FOLDER "External")
 endif ()
 
 # Cppformat
