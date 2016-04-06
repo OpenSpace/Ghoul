@@ -63,7 +63,7 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTextureFromMemory(const std:
     // const std::string& extension = ghoul::filesystem::File(filename).fileExtension();
     // ghoul_assert(!extension.empty(), "Filename must have an extension");
     
-    //temporary to get SOIL for linux --piwell
+    //temporary to get SOIL or FreeImage for linux --piwell
     const std::string& extension = "jpg";
     TextureReaderBase* reader = readerForExtension(extension);
     return reader->loadTextureFromMemory(buffer);
