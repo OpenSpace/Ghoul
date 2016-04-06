@@ -178,6 +178,9 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(c
 	if (!dib)
 		return nullptr;
 
+	//close the memory stream
+	FreeImage_CloseMemory(stream);
+
 	//retrieve the image data
 	bits = FreeImage_GetBits(dib);
 	//get the image width and height
