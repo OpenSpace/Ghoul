@@ -51,6 +51,7 @@ public:
      * \throw TextureLoadException If there was an error loading the Texture file
      */
     std::unique_ptr<opengl::Texture> loadTexture(std::string filename) const override;
+    std::unique_ptr<opengl::Texture> loadTextureFromMemory(const std::string& buffer) const override;
     
     /**
      * Returns the supported extensions (<code>bmp</code>, <code>cut</code>,

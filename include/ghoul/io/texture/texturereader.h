@@ -70,6 +70,7 @@ public:
      * before (addReader)
      */
     std::unique_ptr<opengl::Texture> loadTexture(const std::string& filename);
+    std::unique_ptr<opengl::Texture> loadTextureFromMemory(const std::string& buffer);
     
     /**
      * Adds the \p reader to this TextureReader and makes it available through subsequent

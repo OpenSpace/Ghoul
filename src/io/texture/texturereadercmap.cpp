@@ -114,6 +114,10 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
 	return texture;
 }
 
+std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTextureFromMemory(const std::string& buffer) const {
+    return nullptr;
+}
+
 std::vector<std::string> TextureReaderCMAP::supportedExtensions() const {
 	return { "cmap" };
 }

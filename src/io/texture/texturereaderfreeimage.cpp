@@ -150,6 +150,11 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
     return std::make_unique<Texture>(data, size, format, static_cast<int>(format), type);
 }
 
+std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(const std::string& buffer) const {
+	LWARNING("Load texture from memory not yet supported with FreeImage");
+    return nullptr;
+}
+
 std::vector<std::string> TextureReaderFreeImage::supportedExtensions() const {
 	// @TODO detect the supporteded extensions loaded by modules ---abock
 	// Taken from http://freeimage.sourceforge.net/features.html

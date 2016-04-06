@@ -74,6 +74,7 @@ public:
      * \throw TextureLoadException If there was an error loading the texture
      */
     virtual std::unique_ptr<opengl::Texture> loadTexture(std::string filename) const = 0;
+    virtual std::unique_ptr<opengl::Texture> loadTextureFromMemory(const std::string& buffer) const = 0;
     
     /**
      * Returns a list of all extensions that this TextureReaderBase supports.

@@ -48,6 +48,7 @@ public:
      * \pre \p filename must not be empty
      */
     std::unique_ptr<opengl::Texture> loadTexture(std::string filename) const override;
+    std::unique_ptr<opengl::Texture> loadTextureFromMemory(const std::string& buffer) const override;
     
     /**
      * Returns the supported extension (<code>cmap</code>)
