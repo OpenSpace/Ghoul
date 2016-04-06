@@ -104,6 +104,7 @@ std::vector<std::string> TextureReaderSOIL::supportedExtensions() const {
 		"bmp",	// load & save					
         "png",  // load
         "jpg",  // load
+        "jpeg",
         "tga",  // load & save
         "dds",  // load & save
         "psd",
