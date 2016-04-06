@@ -223,7 +223,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(c
 		*/
 
 	if (imageType != FIT_BITMAP)
-        throw TextureLoadException(std::move("Memory"), "Could not read image", this);
+        throw TextureLoadException("Memory", "Could not read image", this);
     
     if (colorType == FIC_MINISBLACK || colorType == FIC_PALETTE) {
         colorType = FIC_RGB;
@@ -241,7 +241,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(c
 		format = Texture::Format::RGBA;
 		break;
 	default:
-        throw TextureLoadException(std::move("Memory"), "Could not read image", this);
+        throw TextureLoadException("Memory", "Could not read image", this);
 	}
 
     int imageByte = FreeImage_GetBPP(dib);
