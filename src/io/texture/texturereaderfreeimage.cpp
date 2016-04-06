@@ -115,11 +115,11 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
 	if (imageType != FIT_BITMAP)
         throw TextureLoadException(std::move(filename), "Could not read image", this);
     
-    if (colorType == FIC_MINISBLACK) {
+    if (colorType == FIC_MINISBLACK || colorType == FIC_PALETTE) {
         colorType = FIC_RGB;
         dib = FreeImage_ConvertTo24Bits(dib);
 //        dib = FreeImage_ConvertToRGBF(dib);
-    }
+	}
 
     GLenum type = GL_UNSIGNED_BYTE;
 	Texture::Format format;
