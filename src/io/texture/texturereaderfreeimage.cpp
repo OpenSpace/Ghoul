@@ -151,7 +151,6 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
 }
 
 std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(const std::string& buffer) const {
-	LWARNING("Load texture from memory not yet supported with FreeImage");
     return nullptr;
 }
 

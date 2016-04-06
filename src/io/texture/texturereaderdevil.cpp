@@ -136,7 +136,6 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(std::string fil
 }
 
 std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTextureFromMemory(const std::string& buffer) const {
-	LWARNING("Load texture from memory not yet supported with DevIL");
     return nullptr;
 }
 
