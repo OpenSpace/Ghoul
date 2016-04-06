@@ -222,14 +222,14 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(c
 
 		*/
 
-	// if (imageType != FIT_BITMAP)
- //        throw TextureLoadException(std::move(filename), "Could not read image", this);
+	if (imageType != FIT_BITMAP)
+        throw TextureLoadException(std::move("Memory"), "Could not read image", this);
     
-    if (colorType == FIC_MINISBLACK) {
+    if (colorType == FIC_MINISBLACK || colorType == FIC_PALETTE) {
         colorType = FIC_RGB;
         dib = FreeImage_ConvertTo24Bits(dib);
 //        dib = FreeImage_ConvertToRGBF(dib);
-    }
+	}
 
     GLenum type = GL_UNSIGNED_BYTE;
 	Texture::Format format;
@@ -240,9 +240,8 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(c
 	case FIC_RGBALPHA:
 		format = Texture::Format::RGBA;
 		break;
-	// default:
-
-        // throw TextureLoadException(std::move(filename), "Could not read image", this);
+	default:
+        throw TextureLoadException(std::move("Memory"), "Could not read image", this);
 	}
 
     int imageByte = FreeImage_GetBPP(dib);
@@ -259,7 +258,6 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(c
 	}
 
     return std::make_unique<Texture>(data, size, format, static_cast<int>(format), type);
-    // return nullptr;
 }
 
 std::vector<std::string> TextureReaderFreeImage::supportedExtensions() const {
