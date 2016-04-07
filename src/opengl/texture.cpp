@@ -42,6 +42,10 @@ using glm::vec4;
 using glm::compMul;
 using std::numeric_limits;
 
+namespace {
+    std::array<GLint, 4> DefaultSwizzleMask = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+}
+
 namespace ghoul {
 namespace opengl {
 
@@ -56,27 +60,26 @@ Texture::Texture(glm::uvec3 dimensions, Format format, GLint internalFormat,
     , _mipMapLevel(8)
     , _anisotropyLevel(-1.f)
     , _hasOwnershipOfData(false)
-    , _pixels(nullptr)
-{
+    , _pixels(nullptr) {
     ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.z >= 1, "Element of dimensions must be bigger or equal 1");
-    
+
     initialize(true);
 }
 
 Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLint internalFormat,
                  GLenum dataType, FilterMode filter, WrappingMode wrapping)
-     : _dimensions(std::move(dimensions))
-     , _format(format)
-     , _internalFormat(internalFormat)
-     , _dataType(dataType)
-     , _filter(filter)
-     , _wrapping(wrapping)
-     , _mipMapLevel(8)
-     , _anisotropyLevel(-1.f)
-     , _hasOwnershipOfData(true)
-     , _pixels(data)
+    : _dimensions(std::move(dimensions))
+    , _format(format)
+    , _internalFormat(internalFormat)
+    , _dataType(dataType)
+    , _filter(filter)
+    , _wrapping(wrapping)
+    , _mipMapLevel(8)
+    , _anisotropyLevel(-1.f)
+    , _hasOwnershipOfData(true)
+    , _pixels(data)
 {
     ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
@@ -191,10 +194,25 @@ void Texture::setFilter(FilterMode filter) {
     applyFilter();
 }
 
+void Texture::setSwizzleMask(std::array<GLint, 4> swizzleMask) {
+    _swizzleMask = std::move(swizzleMask);
+    _swizzleMaskChanged = true;
+    applySwizzleMask();
+}
+
+void Texture::setDefaultSwizzleMask() {
+    _swizzleMask = DefaultSwizzleMask;
+    _swizzleMaskChanged = false;
+}
+
+std::array<GLint, 4> Texture::swizzleMask() const {
+    return _swizzleMask;
+}
+
 void Texture::applyFilter() {
     bind();
 
-    switch(_filter) {
+    switch (_filter) {
         case FilterMode::Nearest:
             glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -203,23 +221,24 @@ void Texture::applyFilter() {
             glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             break;
-        case FilterMode::AnisotropicMipMap: {
-                glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-                glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameteri(_type, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
-                glGenerateMipmap(_type);
-                if (_anisotropyLevel == -1.f) {
-                    GLfloat maxTextureAnisotropy = 1.0;
-                    glGetFloatv(
-                        GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT,
-                        &maxTextureAnisotropy
-                    );
-                    _anisotropyLevel = maxTextureAnisotropy;
-                }
-                glTexParameterf(_type, GL_TEXTURE_MAX_ANISOTROPY_EXT, _anisotropyLevel);
-                glTexParameteri(_type, GL_TEXTURE_BASE_LEVEL, 0);
-                break;
+        case FilterMode::AnisotropicMipMap:
+        {
+            glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(_type, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
+            glGenerateMipmap(_type);
+            if (_anisotropyLevel == -1.f) {
+                GLfloat maxTextureAnisotropy = 1.0;
+                glGetFloatv(
+                    GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT,
+                    &maxTextureAnisotropy
+                );
+                _anisotropyLevel = maxTextureAnisotropy;
             }
+            glTexParameterf(_type, GL_TEXTURE_MAX_ANISOTROPY_EXT, _anisotropyLevel);
+            glTexParameteri(_type, GL_TEXTURE_BASE_LEVEL, 0);
+            break;
+        }
         default:
             assert(false);
     }
@@ -246,6 +265,7 @@ unsigned int Texture::numberOfChannels() const {
         case Format::Red:
         case Format::DepthComponent:
             return 1;
+            //case Format::LuminanceAlpha:
         case Format::RG:
             return 2;
         case Format::RGB:
@@ -327,8 +347,16 @@ void Texture::applyWrapping() {
     }
 }
 
+void Texture::applySwizzleMask() {
+    if (_swizzleMaskChanged) {
+        bind();
+        glTexParameteriv(_type, GL_TEXTURE_SWIZZLE_RGBA, _swizzleMask.data());
+    }
+}
+
 void Texture::uploadTexture() {
     bind();
+
     switch (_type) {
         case GL_TEXTURE_1D:
             glTexImage1D(
@@ -400,7 +428,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
     switch (_format) {
         case Format::Red:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
+                case GL_UNSIGNED_BYTE:
+                {
                     uint8 t = texel<uint8>(x);
                     result.r = static_cast<float>(t) / numeric_limits<uint8>::max();
                     result.g = 0.f;
@@ -408,7 +437,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_BYTE: {
+                case GL_BYTE:
+                {
                     int8 t = texel<int8>(x);
                     result.r = static_cast<float>(t) / numeric_limits<int8>::max();
                     result.g = 0.f;
@@ -416,7 +446,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
+                case GL_UNSIGNED_SHORT:
+                {
                     uint16 t = texel<uint16>(x);
                     result.r = static_cast<float>(t) / numeric_limits<uint16>::max();
                     result.g = 0.f;
@@ -424,7 +455,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_SHORT: {
+                case GL_SHORT:
+                {
                     int16 t = texel<int16>(x);
                     result.r = static_cast<float>(t) / numeric_limits<int16>::max();
                     result.g = 0.f;
@@ -432,7 +464,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_INT: {
+                case GL_UNSIGNED_INT:
+                {
                     uint32 t = texel<uint32>(x);
                     result.r = static_cast<float>(t) / numeric_limits<uint32>::max();
                     result.g = 0.f;
@@ -440,7 +473,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_INT: {
+                case GL_INT:
+                {
                     int32 t = texel<int32>(x);
                     result.r = static_cast<float>(t) / numeric_limits<int32>::max();
                     result.g = 0.f;
@@ -448,7 +482,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_FLOAT: {
+                case GL_FLOAT:
+                {
                     float t = texel<float>(x);
                     result.r = t;
                     result.g = 0.f;
@@ -460,7 +495,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
             break;
         case Format::RG:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
+                case GL_UNSIGNED_BYTE:
+                {
                     tvec2<uint8> t = texel<tvec2<uint8> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
@@ -468,7 +504,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_BYTE: {
+                case GL_BYTE:
+                {
                     tvec2<int8> t = texel<tvec2<int8> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
@@ -476,7 +513,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
+                case GL_UNSIGNED_SHORT:
+                {
                     tvec2<uint16> t = texel<tvec2<uint16> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
@@ -484,7 +522,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_SHORT: {
+                case GL_SHORT:
+                {
                     tvec2<int16> t = texel<tvec2<int16> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
@@ -492,7 +531,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_INT: {
+                case GL_UNSIGNED_INT:
+                {
                     tvec2<uint32> t = texel<tvec2<uint32> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint32>::max();
                     result.b = static_cast<float>(t.g) / numeric_limits<uint32>::max();
@@ -500,7 +540,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_INT: {
+                case GL_INT:
+                {
                     tvec2<int32> t = texel<tvec2<int32> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
@@ -508,7 +549,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_FLOAT: {
+                case GL_FLOAT:
+                {
                     vec2 t = texel<vec2>(x);
                     result.r = t.r;
                     result.g = t.g;
@@ -520,7 +562,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
             break;
         case Format::RGB:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
+                case GL_UNSIGNED_BYTE:
+                {
                     tvec3<uint8> t = texel<tvec3<uint8> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
@@ -528,7 +571,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_BYTE: {
+                case GL_BYTE:
+                {
                     tvec3<int8> t = texel<tvec3<int8> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
@@ -536,7 +580,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
+                case GL_UNSIGNED_SHORT:
+                {
                     tvec3<uint16> t = texel<tvec3<uint16> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
@@ -544,7 +589,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_SHORT: {
+                case GL_SHORT:
+                {
                     tvec3<int16> t = texel<tvec3<int16> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
@@ -552,7 +598,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_INT: {
+                case GL_UNSIGNED_INT:
+                {
                     tvec3<uint32> t = texel<tvec3<uint32> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
@@ -560,7 +607,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_INT: {
+                case GL_INT:
+                {
                     tvec3<int32> t = texel<tvec3<int32> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
@@ -568,7 +616,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_FLOAT: {
+                case GL_FLOAT:
+                {
                     vec3 t = texel<vec3>(x);
                     result.r = t.r;
                     result.g = t.g;
@@ -580,7 +629,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
             break;
         case Format::BGR:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
+                case GL_UNSIGNED_BYTE:
+                {
                     tvec3<uint8> t = texel<tvec3<uint8> >(x);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
@@ -588,7 +638,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_BYTE: {
+                case GL_BYTE:
+                {
                     tvec3<int8> t = texel<tvec3<int8> >(x);
                     result.r = static_cast<float>(t.b) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
@@ -596,7 +647,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
+                case GL_UNSIGNED_SHORT:
+                {
                     tvec3<uint16> t = texel<tvec3<uint16> >(x);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
@@ -604,7 +656,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_SHORT: {
+                case GL_SHORT:
+                {
                     tvec3<int16> t = texel<tvec3<int16> >(x);
                     result.r = static_cast<float>(t.b) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
@@ -612,7 +665,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_INT: {
+                case GL_UNSIGNED_INT:
+                {
                     tvec3<uint32> t = texel<tvec3<uint32> >(x);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
@@ -620,7 +674,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_INT: {
+                case GL_INT:
+                {
                     tvec3<int32> t = texel<tvec3<int32> >(x);
                     result.r = static_cast<float>(t.b) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
@@ -628,7 +683,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
-                case GL_FLOAT: {
+                case GL_FLOAT:
+                {
                     vec3 t = texel<vec3>(x);
                     result.r = t.b;
                     result.g = t.g;
@@ -640,7 +696,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
             break;
         case Format::RGBA:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
+                case GL_UNSIGNED_BYTE:
+                {
                     tvec4<uint8> t = texel<tvec4<uint8> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
@@ -648,7 +705,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = static_cast<float>(t.a) / numeric_limits<uint8>::max();
                     break;
                 }
-                case GL_BYTE: {
+                case GL_BYTE:
+                {
                     tvec4<int8> t = texel<tvec4<int8> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
@@ -656,7 +714,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = static_cast<float>(t.a) / numeric_limits<int8>::max();
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
+                case GL_UNSIGNED_SHORT:
+                {
                     tvec4<uint16> t = texel<tvec4<uint16> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
@@ -664,7 +723,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = static_cast<float>(t.a) / numeric_limits<uint16>::max();
                     break;
                 }
-                case GL_SHORT: {
+                case GL_SHORT:
+                {
                     tvec4<int16> t = texel<tvec4<int16> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
@@ -672,7 +732,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = static_cast<float>(t.a) / numeric_limits<int16>::max();
                     break;
                 }
-                case GL_UNSIGNED_INT: {
+                case GL_UNSIGNED_INT:
+                {
                     tvec4<uint32> t = texel<tvec4<uint32> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
@@ -680,7 +741,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = static_cast<float>(t.a) / numeric_limits<uint32>::max();
                     break;
                 }
-                case GL_INT: {
+                case GL_INT:
+                {
                     tvec4<int32> t = texel<tvec4<int32> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
@@ -688,7 +750,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = static_cast<float>(t.a) / numeric_limits<int32>::max();
                     break;
                 }
-                case GL_FLOAT: {
+                case GL_FLOAT:
+                {
                     vec4 t = texel<vec4>(x);
                     result.r = t.r;
                     result.g = t.g;
@@ -700,7 +763,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
             break;
         case Format::BGRA:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
+                case GL_UNSIGNED_BYTE:
+                {
                     tvec4<uint8> t = texel<tvec4<uint8> >(x);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
@@ -708,7 +772,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = static_cast<float>(t.a) / numeric_limits<uint8>::max();
                     break;
                 }
-                case GL_BYTE: {
+                case GL_BYTE:
+                {
                     tvec4<int8> t = texel<tvec4<int8> >(x);
                     result.r = static_cast<float>(t.b) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
@@ -716,7 +781,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = static_cast<float>(t.a) / numeric_limits<int8>::max();
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
+                case GL_UNSIGNED_SHORT:
+                {
                     tvec4<uint16> t = texel<tvec4<uint16> >(x);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
@@ -724,7 +790,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = static_cast<float>(t.a) / numeric_limits<uint16>::max();
                     break;
                 }
-                case GL_SHORT: {
+                case GL_SHORT:
+                {
                     tvec4<int16> t = texel<tvec4<int16> >(x);
                     result.r = static_cast<float>(t.b) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
@@ -732,7 +799,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = static_cast<float>(t.a) / numeric_limits<int16>::max();
                     break;
                 }
-                case GL_UNSIGNED_INT: {
+                case GL_UNSIGNED_INT:
+                {
                     tvec4<uint32> t = texel<tvec4<uint32> >(x);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
@@ -740,7 +808,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = static_cast<float>(t.a) / numeric_limits<uint32>::max();
                     break;
                 }
-                case GL_INT: {
+                case GL_INT:
+                {
                     tvec4<int32> t = texel<tvec4<int32> >(x);
                     result.r = static_cast<float>(t.b) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
@@ -748,7 +817,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = static_cast<float>(t.a) / numeric_limits<int32>::max();
                     break;
                 }
-                case GL_FLOAT: {
+                case GL_FLOAT:
+                {
                     vec4 t = texel<vec4>(x);
                     result.r = t.b;
                     result.g = t.g;
@@ -775,56 +845,63 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
     switch (_format) {
         case Format::Red:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
-                    uint8 t = texel<uint8>(x,y);
+                case GL_UNSIGNED_BYTE:
+                {
+                    uint8 t = texel<uint8>(x, y);
                     result.r = static_cast<float>(t) / numeric_limits<uint8>::max();
                     result.g = 0.f;
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_BYTE: {
-                    int8 t = texel<int8>(x,y);
+                case GL_BYTE:
+                {
+                    int8 t = texel<int8>(x, y);
                     result.r = static_cast<float>(t) / numeric_limits<int8>::max();
                     result.g = 0.f;
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
-                    uint16 t = texel<uint16>(x,y);
+                case GL_UNSIGNED_SHORT:
+                {
+                    uint16 t = texel<uint16>(x, y);
                     result.r = static_cast<float>(t) / numeric_limits<uint16>::max();
                     result.g = 0.f;
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_SHORT: {
-                    int16 t = texel<int16>(x,y);
+                case GL_SHORT:
+                {
+                    int16 t = texel<int16>(x, y);
                     result.r = static_cast<float>(t) / numeric_limits<int16>::max();
                     result.g = 0.f;
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_INT: {
-                    uint32 t = texel<uint32>(x,y);
+                case GL_UNSIGNED_INT:
+                {
+                    uint32 t = texel<uint32>(x, y);
                     result.r = static_cast<float>(t) / numeric_limits<uint32>::max();
                     result.g = 0.f;
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_INT: {
-                    int32 t = texel<int32>(x,y);
+                case GL_INT:
+                {
+                    int32 t = texel<int32>(x, y);
                     result.r = static_cast<float>(t) / numeric_limits<int32>::max();
                     result.g = 0.f;
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_FLOAT: {
-                    float t = texel<float>(x,y);
+                case GL_FLOAT:
+                {
+                    float t = texel<float>(x, y);
                     result.r = t;
                     result.g = 0.f;
                     result.b = 0.f;
@@ -835,56 +912,63 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
             break;
         case Format::RG:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
-                    tvec2<uint8> t = texel<tvec2<uint8> >(x,y);
+                case GL_UNSIGNED_BYTE:
+                {
+                    tvec2<uint8> t = texel<tvec2<uint8> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_BYTE: {
-                    tvec2<int8> t = texel<tvec2<int8> >(x,y);
+                case GL_BYTE:
+                {
+                    tvec2<int8> t = texel<tvec2<int8> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
-                    tvec2<uint16> t = texel<tvec2<uint16> >(x,y);
+                case GL_UNSIGNED_SHORT:
+                {
+                    tvec2<uint16> t = texel<tvec2<uint16> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_SHORT: {
-                    tvec2<int16> t = texel<tvec2<int16> >(x,y);
+                case GL_SHORT:
+                {
+                    tvec2<int16> t = texel<tvec2<int16> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_INT: {
-                    tvec2<uint32> t = texel<tvec2<uint32> >(x,y);
+                case GL_UNSIGNED_INT:
+                {
+                    tvec2<uint32> t = texel<tvec2<uint32> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint32>::max();
                     result.b = static_cast<float>(t.g) / numeric_limits<uint32>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_INT: {
-                    tvec2<int32> t = texel<tvec2<int32> >(x,y);
+                case GL_INT:
+                {
+                    tvec2<int32> t = texel<tvec2<int32> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_FLOAT: {
-                    vec2 t = texel<vec2>(x,y);
+                case GL_FLOAT:
+                {
+                    vec2 t = texel<vec2>(x, y);
                     result.r = t.r;
                     result.g = t.g;
                     result.b = 0.f;
@@ -895,56 +979,63 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
             break;
         case Format::RGB:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
-                    tvec3<uint8> t = texel<tvec3<uint8> >(x,y);
+                case GL_UNSIGNED_BYTE:
+                {
+                    tvec3<uint8> t = texel<tvec3<uint8> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<uint8>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_BYTE: {
-                    tvec3<int8> t = texel<tvec3<int8> >(x,y);
+                case GL_BYTE:
+                {
+                    tvec3<int8> t = texel<tvec3<int8> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<int8>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
-                    tvec3<uint16> t = texel<tvec3<uint16> >(x,y);
+                case GL_UNSIGNED_SHORT:
+                {
+                    tvec3<uint16> t = texel<tvec3<uint16> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<uint16>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_SHORT: {
-                    tvec3<int16> t = texel<tvec3<int16> >(x,y);
+                case GL_SHORT:
+                {
+                    tvec3<int16> t = texel<tvec3<int16> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<int16>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_INT: {
-                    tvec3<uint32> t = texel<tvec3<uint32> >(x,y);
+                case GL_UNSIGNED_INT:
+                {
+                    tvec3<uint32> t = texel<tvec3<uint32> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<uint32>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_INT: {
-                    tvec3<int32> t = texel<tvec3<int32> >(x,y);
+                case GL_INT:
+                {
+                    tvec3<int32> t = texel<tvec3<int32> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<int32>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_FLOAT: {
-                    vec3 t = texel<vec3>(x,y);
+                case GL_FLOAT:
+                {
+                    vec3 t = texel<vec3>(x, y);
                     result.r = t.r;
                     result.g = t.g;
                     result.b = t.b;
@@ -955,56 +1046,63 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
             break;
         case Format::BGR:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
-                    tvec3<uint8> t = texel<tvec3<uint8> >(x,y);
+                case GL_UNSIGNED_BYTE:
+                {
+                    tvec3<uint8> t = texel<tvec3<uint8> >(x, y);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<uint8>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_BYTE: {
-                    tvec3<int8> t = texel<tvec3<int8> >(x,y);
+                case GL_BYTE:
+                {
+                    tvec3<int8> t = texel<tvec3<int8> >(x, y);
                     result.r = static_cast<float>(t.b) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<int8>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
-                    tvec3<uint16> t = texel<tvec3<uint16> >(x,y);
+                case GL_UNSIGNED_SHORT:
+                {
+                    tvec3<uint16> t = texel<tvec3<uint16> >(x, y);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<uint16>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_SHORT: {
-                    tvec3<int16> t = texel<tvec3<int16> >(x,y);
+                case GL_SHORT:
+                {
+                    tvec3<int16> t = texel<tvec3<int16> >(x, y);
                     result.r = static_cast<float>(t.b) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<int16>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_INT: {
-                    tvec3<uint32> t = texel<tvec3<uint32> >(x,y);
+                case GL_UNSIGNED_INT:
+                {
+                    tvec3<uint32> t = texel<tvec3<uint32> >(x, y);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<uint32>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_INT: {
-                    tvec3<int32> t = texel<tvec3<int32> >(x,y);
+                case GL_INT:
+                {
+                    tvec3<int32> t = texel<tvec3<int32> >(x, y);
                     result.r = static_cast<float>(t.b) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<int32>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_FLOAT: {
-                    vec3 t = texel<vec3>(x,y);
+                case GL_FLOAT:
+                {
+                    vec3 t = texel<vec3>(x, y);
                     result.r = t.b;
                     result.g = t.g;
                     result.b = t.r;
@@ -1015,56 +1113,63 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
             break;
         case Format::RGBA:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
-                    tvec4<uint8> t = texel<tvec4<uint8> >(x,y);
+                case GL_UNSIGNED_BYTE:
+                {
+                    tvec4<uint8> t = texel<tvec4<uint8> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<uint8>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<uint8>::max();
                     break;
                 }
-                case GL_BYTE: {
-                    tvec4<int8> t = texel<tvec4<int8> >(x,y);
+                case GL_BYTE:
+                {
+                    tvec4<int8> t = texel<tvec4<int8> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<int8>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<int8>::max();
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
-                    tvec4<uint16> t = texel<tvec4<uint16> >(x,y);
+                case GL_UNSIGNED_SHORT:
+                {
+                    tvec4<uint16> t = texel<tvec4<uint16> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<uint16>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<uint16>::max();
                     break;
                 }
-                case GL_SHORT: {
-                    tvec4<int16> t = texel<tvec4<int16> >(x,y);
+                case GL_SHORT:
+                {
+                    tvec4<int16> t = texel<tvec4<int16> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<int16>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<int16>::max();
                     break;
                 }
-                case GL_UNSIGNED_INT: {
-                    tvec4<uint32> t = texel<tvec4<uint32> >(x,y);
+                case GL_UNSIGNED_INT:
+                {
+                    tvec4<uint32> t = texel<tvec4<uint32> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<uint32>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<uint32>::max();
                     break;
                 }
-                case GL_INT: {
-                    tvec4<int32> t = texel<tvec4<int32> >(x,y);
+                case GL_INT:
+                {
+                    tvec4<int32> t = texel<tvec4<int32> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<int32>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<int32>::max();
                     break;
                 }
-                case GL_FLOAT: {
-                    vec4 t = texel<vec4>(x,y);
+                case GL_FLOAT:
+                {
+                    vec4 t = texel<vec4>(x, y);
                     result.r = t.r;
                     result.g = t.g;
                     result.b = t.b;
@@ -1075,56 +1180,63 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
             break;
         case Format::BGRA:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
-                    tvec4<uint8> t = texel<tvec4<uint8> >(x,y);
+                case GL_UNSIGNED_BYTE:
+                {
+                    tvec4<uint8> t = texel<tvec4<uint8> >(x, y);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<uint8>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<uint8>::max();
                     break;
                 }
-                case GL_BYTE: {
-                    tvec4<int8> t = texel<tvec4<int8> >(x,y);
+                case GL_BYTE:
+                {
+                    tvec4<int8> t = texel<tvec4<int8> >(x, y);
                     result.r = static_cast<float>(t.b) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<int8>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<int8>::max();
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
-                    tvec4<uint16> t = texel<tvec4<uint16> >(x,y);
+                case GL_UNSIGNED_SHORT:
+                {
+                    tvec4<uint16> t = texel<tvec4<uint16> >(x, y);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<uint16>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<uint16>::max();
                     break;
                 }
-                case GL_SHORT: {
-                    tvec4<int16> t = texel<tvec4<int16> >(x,y);
+                case GL_SHORT:
+                {
+                    tvec4<int16> t = texel<tvec4<int16> >(x, y);
                     result.r = static_cast<float>(t.b) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<int16>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<int16>::max();
                     break;
                 }
-                case GL_UNSIGNED_INT: {
-                    tvec4<uint32> t = texel<tvec4<uint32> >(x,y);
+                case GL_UNSIGNED_INT:
+                {
+                    tvec4<uint32> t = texel<tvec4<uint32> >(x, y);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<uint32>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<uint32>::max();
                     break;
                 }
-                case GL_INT: {
-                    tvec4<int32> t = texel<tvec4<int32> >(x,y);
+                case GL_INT:
+                {
+                    tvec4<int32> t = texel<tvec4<int32> >(x, y);
                     result.r = static_cast<float>(t.b) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<int32>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<int32>::max();
                     break;
                 }
-                case GL_FLOAT: {
-                    vec4 t = texel<vec4>(x,y);
+                case GL_FLOAT:
+                {
+                    vec4 t = texel<vec4>(x, y);
                     result.r = t.b;
                     result.g = t.g;
                     result.b = t.r;
@@ -1142,7 +1254,7 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
 vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const {
     ghoul_assert(
         (z * _dimensions.x * _dimensions.y) + (y * _dimensions.x) + x
-            < glm::compMul(_dimensions),
+        < glm::compMul(_dimensions),
         "x, y, and z must be inside the texture dimensions"
     );
     ghoul_assert(_type == GL_TEXTURE_3D, "Function must be called on a 3D texture");
@@ -1151,56 +1263,63 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
     switch (_format) {
         case Format::Red:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
-                    uint8 t = texel<uint8>(x,y,z);
+                case GL_UNSIGNED_BYTE:
+                {
+                    uint8 t = texel<uint8>(x, y, z);
                     result.r = static_cast<float>(t) / numeric_limits<uint8>::max();
                     result.g = 0.f;
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_BYTE: {
-                    int8 t = texel<int8>(x,y,z);
+                case GL_BYTE:
+                {
+                    int8 t = texel<int8>(x, y, z);
                     result.r = static_cast<float>(t) / numeric_limits<int8>::max();
                     result.g = 0.f;
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
-                    uint16 t = texel<uint16>(x,y,z);
+                case GL_UNSIGNED_SHORT:
+                {
+                    uint16 t = texel<uint16>(x, y, z);
                     result.r = static_cast<float>(t) / numeric_limits<uint16>::max();
                     result.g = 0.f;
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_SHORT: {
-                    int16 t = texel<int16>(x,y,z);
+                case GL_SHORT:
+                {
+                    int16 t = texel<int16>(x, y, z);
                     result.r = static_cast<float>(t) / numeric_limits<int16>::max();
                     result.g = 0.f;
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_INT: {
-                    uint32 t = texel<uint32>(x,y,z);
+                case GL_UNSIGNED_INT:
+                {
+                    uint32 t = texel<uint32>(x, y, z);
                     result.r = static_cast<float>(t) / numeric_limits<uint32>::max();
                     result.g = 0.f;
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_INT: {
-                    int32 t = texel<int32>(x,y,z);
+                case GL_INT:
+                {
+                    int32 t = texel<int32>(x, y, z);
                     result.r = static_cast<float>(t) / numeric_limits<int32>::max();
                     result.g = 0.f;
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_FLOAT: {
-                    float t = texel<float>(x,y,z);
+                case GL_FLOAT:
+                {
+                    float t = texel<float>(x, y, z);
                     result.r = t;
                     result.g = 0.f;
                     result.b = 0.f;
@@ -1211,56 +1330,63 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
             break;
         case Format::RG:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
-                    tvec2<uint8> t = texel<tvec2<uint8> >(x,y,z);
+                case GL_UNSIGNED_BYTE:
+                {
+                    tvec2<uint8> t = texel<tvec2<uint8> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_BYTE: {
-                    tvec2<int8> t = texel<tvec2<int8> >(x,y,z);
+                case GL_BYTE:
+                {
+                    tvec2<int8> t = texel<tvec2<int8> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
-                    tvec2<uint16> t = texel<tvec2<uint16> >(x,y,z);
+                case GL_UNSIGNED_SHORT:
+                {
+                    tvec2<uint16> t = texel<tvec2<uint16> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_SHORT: {
-                    tvec2<int16> t = texel<tvec2<int16> >(x,y,z);
+                case GL_SHORT:
+                {
+                    tvec2<int16> t = texel<tvec2<int16> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_INT: {
-                    tvec2<uint32> t = texel<tvec2<uint32> >(x,y,z);
+                case GL_UNSIGNED_INT:
+                {
+                    tvec2<uint32> t = texel<tvec2<uint32> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint32>::max();
                     result.b = static_cast<float>(t.g) / numeric_limits<uint32>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_INT: {
-                    tvec2<int32> t = texel<tvec2<int32> >(x,y,z);
+                case GL_INT:
+                {
+                    tvec2<int32> t = texel<tvec2<int32> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
                 }
-                case GL_FLOAT: {
-                    vec2 t = texel<vec2>(x,y,z);
+                case GL_FLOAT:
+                {
+                    vec2 t = texel<vec2>(x, y, z);
                     result.r = t.r;
                     result.g = t.g;
                     result.b = 0.f;
@@ -1271,56 +1397,63 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
             break;
         case Format::RGB:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
-                    tvec3<uint8> t = texel<tvec3<uint8> >(x,y,z);
+                case GL_UNSIGNED_BYTE:
+                {
+                    tvec3<uint8> t = texel<tvec3<uint8> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<uint8>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_BYTE: {
-                    tvec3<int8> t = texel<tvec3<int8> >(x,y,z);
+                case GL_BYTE:
+                {
+                    tvec3<int8> t = texel<tvec3<int8> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<int8>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
-                    tvec3<uint16> t = texel<tvec3<uint16> >(x,y,z);
+                case GL_UNSIGNED_SHORT:
+                {
+                    tvec3<uint16> t = texel<tvec3<uint16> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<uint16>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_SHORT: {
-                    tvec3<int16> t = texel<tvec3<int16> >(x,y,z);
+                case GL_SHORT:
+                {
+                    tvec3<int16> t = texel<tvec3<int16> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<int16>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_INT: {
-                    tvec3<uint32> t = texel<tvec3<uint32> >(x,y,z);
+                case GL_UNSIGNED_INT:
+                {
+                    tvec3<uint32> t = texel<tvec3<uint32> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<uint32>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_INT: {
-                    tvec3<int32> t = texel<tvec3<int32> >(x,y,z);
+                case GL_INT:
+                {
+                    tvec3<int32> t = texel<tvec3<int32> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<int32>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_FLOAT: {
-                    vec3 t = texel<vec3>(x,y,z);
+                case GL_FLOAT:
+                {
+                    vec3 t = texel<vec3>(x, y, z);
                     result.r = t.r;
                     result.g = t.g;
                     result.b = t.b;
@@ -1331,56 +1464,63 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
             break;
         case Format::BGR:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
-                    tvec3<uint8> t = texel<tvec3<uint8> >(x,y,z);
+                case GL_UNSIGNED_BYTE:
+                {
+                    tvec3<uint8> t = texel<tvec3<uint8> >(x, y, z);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<uint8>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_BYTE: {
-                    tvec3<int8> t = texel<tvec3<int8> >(x,y,z);
+                case GL_BYTE:
+                {
+                    tvec3<int8> t = texel<tvec3<int8> >(x, y, z);
                     result.r = static_cast<float>(t.b) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<int8>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
-                    tvec3<uint16> t = texel<tvec3<uint16> >(x,y,z);
+                case GL_UNSIGNED_SHORT:
+                {
+                    tvec3<uint16> t = texel<tvec3<uint16> >(x, y, z);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<uint16>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_SHORT: {
-                    tvec3<int16> t = texel<tvec3<int16> >(x,y,z);
+                case GL_SHORT:
+                {
+                    tvec3<int16> t = texel<tvec3<int16> >(x, y, z);
                     result.r = static_cast<float>(t.b) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<int16>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_UNSIGNED_INT: {
-                    tvec3<uint32> t = texel<tvec3<uint32> >(x,y,z);
+                case GL_UNSIGNED_INT:
+                {
+                    tvec3<uint32> t = texel<tvec3<uint32> >(x, y, z);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<uint32>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_INT: {
-                    tvec3<int32> t = texel<tvec3<int32> >(x,y,z);
+                case GL_INT:
+                {
+                    tvec3<int32> t = texel<tvec3<int32> >(x, y, z);
                     result.r = static_cast<float>(t.b) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<int32>::max();
                     result.a = 1.f;
                     break;
                 }
-                case GL_FLOAT: {
-                    vec3 t = texel<vec3>(x,y,z);
+                case GL_FLOAT:
+                {
+                    vec3 t = texel<vec3>(x, y, z);
                     result.r = t.b;
                     result.g = t.g;
                     result.b = t.r;
@@ -1391,56 +1531,63 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
             break;
         case Format::RGBA:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
-                    tvec4<uint8> t = texel<tvec4<uint8> >(x,y,z);
+                case GL_UNSIGNED_BYTE:
+                {
+                    tvec4<uint8> t = texel<tvec4<uint8> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<uint8>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<uint8>::max();
                     break;
                 }
-                case GL_BYTE: {
-                    tvec4<int8> t = texel<tvec4<int8> >(x,y,z);
+                case GL_BYTE:
+                {
+                    tvec4<int8> t = texel<tvec4<int8> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<int8>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<int8>::max();
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
-                    tvec4<uint16> t = texel<tvec4<uint16> >(x,y,z);
+                case GL_UNSIGNED_SHORT:
+                {
+                    tvec4<uint16> t = texel<tvec4<uint16> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<uint16>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<uint16>::max();
                     break;
                 }
-                case GL_SHORT: {
-                    tvec4<int16> t = texel<tvec4<int16> >(x,y,z);
+                case GL_SHORT:
+                {
+                    tvec4<int16> t = texel<tvec4<int16> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<int16>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<int16>::max();
                     break;
                 }
-                case GL_UNSIGNED_INT: {
-                    tvec4<uint32> t = texel<tvec4<uint32> >(x,y,z);
+                case GL_UNSIGNED_INT:
+                {
+                    tvec4<uint32> t = texel<tvec4<uint32> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<uint32>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<uint32>::max();
                     break;
                 }
-                case GL_INT: {
-                    tvec4<int32> t = texel<tvec4<int32> >(x,y,z);
+                case GL_INT:
+                {
+                    tvec4<int32> t = texel<tvec4<int32> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
                     result.b = static_cast<float>(t.b) / numeric_limits<int32>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<int32>::max();
                     break;
                 }
-                case GL_FLOAT: {
-                    vec4 t = texel<vec4>(x,y,z);
+                case GL_FLOAT:
+                {
+                    vec4 t = texel<vec4>(x, y, z);
                     result.r = t.r;
                     result.g = t.g;
                     result.b = t.b;
@@ -1451,56 +1598,63 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
             break;
         case Format::BGRA:
             switch (_dataType) {
-                case GL_UNSIGNED_BYTE: {
-                    tvec4<uint8> t = texel<tvec4<uint8> >(x,y,z);
+                case GL_UNSIGNED_BYTE:
+                {
+                    tvec4<uint8> t = texel<tvec4<uint8> >(x, y, z);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint8>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<uint8>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<uint8>::max();
                     break;
                 }
-                case GL_BYTE: {
-                    tvec4<int8> t = texel<tvec4<int8> >(x,y,z);
+                case GL_BYTE:
+                {
+                    tvec4<int8> t = texel<tvec4<int8> >(x, y, z);
                     result.r = static_cast<float>(t.b) / numeric_limits<int8>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int8>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<int8>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<int8>::max();
                     break;
                 }
-                case GL_UNSIGNED_SHORT: {
-                    tvec4<uint16> t = texel<tvec4<uint16> >(x,y,z);
+                case GL_UNSIGNED_SHORT:
+                {
+                    tvec4<uint16> t = texel<tvec4<uint16> >(x, y, z);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint16>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<uint16>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<uint16>::max();
                     break;
                 }
-                case GL_SHORT: {
-                    tvec4<int16> t = texel<tvec4<int16> >(x,y,z);
+                case GL_SHORT:
+                {
+                    tvec4<int16> t = texel<tvec4<int16> >(x, y, z);
                     result.r = static_cast<float>(t.b) / numeric_limits<int16>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int16>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<int16>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<int16>::max();
                     break;
                 }
-                case GL_UNSIGNED_INT: {
-                    tvec4<uint32> t = texel<tvec4<uint32> >(x,y,z);
+                case GL_UNSIGNED_INT:
+                {
+                    tvec4<uint32> t = texel<tvec4<uint32> >(x, y, z);
                     result.r = static_cast<float>(t.b) / numeric_limits<uint32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<uint32>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<uint32>::max();
                     break;
                 }
-                case GL_INT: {
-                    tvec4<int32> t = texel<tvec4<int32> >(x,y,z);
+                case GL_INT:
+                {
+                    tvec4<int32> t = texel<tvec4<int32> >(x, y, z);
                     result.r = static_cast<float>(t.b) / numeric_limits<int32>::max();
                     result.g = static_cast<float>(t.g) / numeric_limits<int32>::max();
                     result.b = static_cast<float>(t.r) / numeric_limits<int32>::max();
                     result.a = static_cast<float>(t.a) / numeric_limits<int32>::max();
                     break;
                 }
-                case GL_FLOAT: {
-                    vec4 t = texel<vec4>(x,y,z);
+                case GL_FLOAT:
+                {
+                    vec4 t = texel<vec4>(x, y, z);
                     result.r = t.b;
                     result.g = t.g;
                     result.b = t.r;
