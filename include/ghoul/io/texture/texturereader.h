@@ -61,7 +61,7 @@ public:
     /**
      * Loads the provided \p filename into a Texture and returns it. The correct
      * TextureReaderBase is determined by the extension of the \p filename.
-     * \param filename The name of the file which should be loaded into a textrure
+     * \param filename The name of the file which should be loaded into a texture
      * \throw TextureLoadException If there was an error reading the \p filename
      * \throw MissingReaderException If there was no reader for the specified \p filename
      * \pre \p filename must not be empty
