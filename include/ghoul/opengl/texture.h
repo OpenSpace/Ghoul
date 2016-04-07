@@ -60,9 +60,7 @@ public:
         Red = GL_RED, ///< GL_RED
         RG = GL_RG, ///< GL_RG
         RGB = GL_RGB, ///< GL_RGB
-        BGR = GL_BGR, ///< GL_BGR
         RGBA = GL_RGBA, ///< GL_RGBA
-        BGRA = GL_BGRA, ///< GL_BGRA
         DepthComponent = GL_DEPTH_COMPONENT ///< GL_DEPTH_COMPONENT
     };
 
@@ -89,6 +87,8 @@ public:
         ClampToBorder = GL_CLAMP_TO_BORDER, ///< GL_CLAMP_TO_BORDER
         MirroredRepeat = GL_MIRRORED_REPEAT ///< GL_MIRRORED_REPEAT
     };
+
+    static int numberOfChannels(Format format);
 
     /**
      * This constructor will create storage internally to fit the amount of data that is
@@ -322,7 +322,7 @@ public:
      * triggered.
      * \return The number of channels that are stored in this texture
      */
-    unsigned int numberOfChannels() const;
+    int numberOfChannels() const;
 
     /*
      * Returns the number of bytes each pixel stores.
@@ -345,7 +345,7 @@ public:
      * \return The size of the pixel data according to the dimensionality and the bytes
      * per pixel
      */
-    unsigned int expectedPixelDataSize() const;
+    int expectedPixelDataSize() const;
 
     /**
      * Sets new data for the texture to use. If the dimensions are not updated and the new 
@@ -779,7 +779,7 @@ private:
 };
 
 } // namespace opengl
-} // namespace logging
+} // namespace ghoul
 
 #include "texture.inl"
 
