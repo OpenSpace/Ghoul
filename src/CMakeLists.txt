@@ -95,6 +95,7 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/src/opengl/shaderpreprocessor.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/texture.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/textureatlas.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/textureconversion.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/texturemanager.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/textureunit.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/vertexbufferobject.cpp
@@ -190,6 +191,7 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderpreprocessor.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureatlas.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureconversion.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.inl
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texturemanager.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureunit.h
