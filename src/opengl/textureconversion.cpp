@@ -27,6 +27,7 @@
 
 #include <ghoul/misc/assert.h>
 
+#include <cstring>
 #include <vector>
 
 namespace ghoul {
