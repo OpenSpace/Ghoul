@@ -173,7 +173,28 @@ public:
      * graphics card
      * \return The maximum number of texture units
      */
-    int maximumNumberOfTextureUnits() const;
+    int maxTextureUnits() const;
+
+    /**
+     * Returns the maximum number of atomic counter buffer bindings
+     * that are available on the main graphics card
+     * \return The maximum number of bindings
+     */
+    int maxAtomicCounterBufferBindings() const;
+
+    /**
+     * Returns the maximum number of shader storage bindings
+     * that are available on the main graphics card
+     * \return The maximum number of bindings
+     */
+    int maxShaderStorageBufferBindings() const;
+
+    /**
+     * Returns the maximum number of uniform buffer bindings
+     * that are available on the main graphics card
+     * \return The maximum number of bindings
+     */
+    int maxUniformBufferBindings() const;
 
     /**
      * Returns the <code>OpenGL</code> string.
@@ -228,6 +249,12 @@ protected:
     int _maxTextureSize3D = -1;
     /// The maximum number of texture units
     int _numTextureUnits = -1;
+    /// The maximum number of atomic counter buffer bindings
+    int _numAtomicCounterBufferBindings = -1;
+    /// The maximum number of shader storage buffer bindings
+    int _numShaderStorageBufferBindings = -1;
+    /// The maximum number of uniform buffer bindings
+    int _numUniformBufferBindings = -1;
     /// The maximum number of color attachments for an FBO
     int _maxFramebufferColorAttachments = -1;
     

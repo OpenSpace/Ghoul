@@ -88,6 +88,7 @@ endif ()
 if (GHOUL_MODULE_OPENGL)
     set(GHOUL_SOURCE
         ${GHOUL_SOURCE}
+        ${PROJECT_SOURCE_DIR}/src/opengl/bufferbinding.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/framebufferobject.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/programobject.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/shadermanager.cpp
@@ -182,6 +183,8 @@ endif ()
 if (GHOUL_MODULE_OPENGL)
     set(GHOUL_HEADER
         ${GHOUL_HEADER}
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/bufferbinding.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/bufferbinding.inl
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/framebufferobject.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/ghoul_gl.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/opengl
