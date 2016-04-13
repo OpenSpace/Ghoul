@@ -439,7 +439,8 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         // First generate the font without outline and store it in the font atlas
         // only if an outline is request, repeat the process for the outline
 
-        float leftBearing, topBearing;
+        float leftBearing = 0.f;
+        float topBearing = 0.f;;
         glm::vec2 topLeft, bottomRight;
         glm::vec2 outlineTopLeft, outlineBottomRight;
         unsigned int width = 0;
