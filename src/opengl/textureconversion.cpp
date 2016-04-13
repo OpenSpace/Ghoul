@@ -137,8 +137,8 @@ ConversionFunc conversionFunctionSelector(Texture::Format from, Texture::Format 
                     return &convert<Texture::Format::RGBA, Texture::Format::Red>;
                 case Texture::Format::RG:
                     return &convert<Texture::Format::RGBA, Texture::Format::RG>;
-                case Texture::Format::RGBA:
-                    return &convert<Texture::Format::RGBA, Texture::Format::RGBA>;
+                case Texture::Format::RGB:
+                    return &convert<Texture::Format::RGBA, Texture::Format::RGB>;
                 default:
                     ghoul_assert(false, "Missing case statement");
             }
