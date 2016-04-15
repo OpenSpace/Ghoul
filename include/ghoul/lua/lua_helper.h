@@ -178,15 +178,37 @@ std::string luaTypeToString(int type);
 /**
  * Creates a new Lua state and initializes it with the default Lua libraries.
  * \return A valid new Lua state initialized with the default Lua libraries
- * \throw LuaRuntimeException If there wa an error creating the new Lua state
+ * \throw LuaRuntimeException If there was an error creating the new Lua state
  */
 lua_State* createNewLuaState();
 
 /**
  * Destroys the passed lua state and frees all memory that is associated with it.
  * \param state The Lua state that is to be deleted
+ * \pre \p state must not be nullptr
  */
 void destroyLuaState(lua_State* state);
+    
+/**
+ * This function executes the Lua script pointed to by \p filename using the passed
+ * <code>lua_State</code> \p state.
+ * \throw LuaLoadingException If there was an error loading the script
+ * \throw LuaExecutionError If there was an error executing the script
+ * \pre \p state must not be nullptr
+ * \pre \p filename must not be empty
+ * \pre \p filename must be a valid file
+ */
+void runScriptFile(lua_State* state, const std::string& filename);
+    
+/**
+ * This function executres the Lua script provided as plain text in \p script using the
+ * passed <code>lua_State</code> \p state.
+ * \throw LuaLoadingException If there was an error loading the script
+ * \throw LuaExecutionError If there was an error executing the script
+ * \pre \p state must not be nullptr
+ * \pre \p script must not be empty
+ */
+void runScript(lua_State* state, const std::string& script);
 
 namespace internal {
     void deinitializeGlobalState();
