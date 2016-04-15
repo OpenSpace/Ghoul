@@ -137,13 +137,47 @@ EXTERN_TEMPLATE_DEFINITION(glm::dmat4x4)
     
 template <>
 bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& value) const {
-    ghoul_assert(&value != this, "Value argument must not be the this object");
+    ghoul_assert(&value != this, "Value argument must not be 'this' object");
     try {
         getValueHelper(key, value);
         return true;
     }
     catch (const DictionaryError&) {
         return false;
+    }
+}
+
+template <>
+bool Dictionary::getValue<std::string>(const std::string& key, std::string& value) const {
+    this;
+    bool str = hasValue<std::string>(key);
+    if (str) {
+        getValueHelper(key, value);
+        return true;
+    }
+    bool c = hasValue<const char*>(key);
+    if (c) {
+        const char* data;
+        getValueHelper<const char*>(key, data);
+        value = std::string(data);
+        return true;
+    }
+    return false;
+}
+    
+template <>
+std::string Dictionary::value<std::string>(const std::string& key) const {
+    std::string tmp;
+    bool s = getValue(key, tmp);
+    
+    if (s)
+        return tmp;
+    else {
+        throw ConversionError(
+            "Error converting key '" + key + "' from type '" +
+            find(key)->second.type().name() + "' to type '" +
+            typeid(std::string).name() + "'"
+        );
     }
 }
 

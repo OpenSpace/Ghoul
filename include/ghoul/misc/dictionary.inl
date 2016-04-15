@@ -457,7 +457,13 @@ EXTERN_TEMPLATE_DECLARATION(glm::dmat4x4);
 
 #undef EXTERN_TEMPLATE_DECLARATION
 
-template<>
+template <>
 bool Dictionary::getValue<Dictionary>(const std::string& key, Dictionary& value) const;
-
+    
+template <>
+bool Dictionary::getValue<std::string>(const std::string& key, std::string& value) const;
+    
+template <>
+std::string Dictionary::value<std::string>(const std::string& key) const;
+    
 } // namespace ghoul
