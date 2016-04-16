@@ -68,6 +68,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/misc/dictionary.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/exception.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/misc.cpp
+    ${PROJECT_SOURCE_DIR}/src/misc/onscopeexit.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/sharedmemory.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/templatefactory.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/typeinfo.cpp
@@ -159,6 +160,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/onscopeexit.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/sharedmemory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.inl
