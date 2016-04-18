@@ -266,7 +266,7 @@ glm::vec2 Font::boundingBox(const char* format, ...) {
     ghoul_assert(format != nullptr, "No format is provided");
     glm::vec2 result(0.f);
     
-    va_list args;	 // Pointer To List Of Arguments
+    va_list args;     // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables
     
     int size = 1 + vscprintf(format, args);

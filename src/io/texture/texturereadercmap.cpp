@@ -107,8 +107,8 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
     using opengl::Texture;
     std::unique_ptr<Texture> texture = std::make_unique<Texture>(
         values,                         // data
-        glm::size3_t(width, 1, 1),		// dimensions
-        Texture::Format::RGBA			// Format
+        glm::size3_t(width, 1, 1),        // dimensions
+        Texture::Format::RGBA            // Format
     );
 
     return texture;

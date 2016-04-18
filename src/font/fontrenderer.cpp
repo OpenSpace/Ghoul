@@ -188,7 +188,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 {
     ghoul_assert(format != nullptr, "No format is provided");
     
-    va_list args;	 // Pointer To List Of Arguments
+    va_list args;     // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables
     
     int size = 1 + vscprintf(format, args);
@@ -222,7 +222,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 {
     ghoul_assert(format != nullptr, "No format is provided");
     
-    va_list args;	 // Pointer To List Of Arguments
+    va_list args;     // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables
     
     int size = 1 + vscprintf(format, args);
@@ -254,7 +254,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 {
     ghoul_assert(format != nullptr, "No format is provided");
     
-    va_list args;	 // Pointer To List Of Arguments
+    va_list args;     // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables
     
     int size = 1 + vscprintf(format, args);

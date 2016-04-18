@@ -218,48 +218,48 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTextureFromMemory(const
 std::vector<std::string> TextureReaderDevIL::supportedExtensions() const {
     // Taken from http://openil.sourceforge.net/features.php
     return{
-        "bmp",						// Windows Bitmap
-        "cut",						// Dr. Halo
-        "dcx",						// Multi-PCX
-        "dicom", "dcm",				// Dicom
-        "dds",						// DirectDraw Surface
-        "exr",						// OpenEXR
-        "fits", "fit",				// Flexible Image Transport System
-        "ftx",						// Heavy Metal: FAKK 2
-        "hdr",						// Radiance High Dynamic
-        "icns",						// Macintosh icon
-        "ico", "cur",				// Windows icon/cursor
-        "iff",						// Interchange File Format
-        "iwi",						// Infinity Ward Image
-        "gif",						// Graphics Interchange Format
-        "jpg", "jpe", "jpeg",		// Jpeg
-        "jp2",						// Jpeg 2000
-        "lbm",						// Interlaced Bitmap
-        "lif",						// Homeworld texture
-        "mdl",						// Half-Life Model
-        "mp3",						// MPEG-1 Audio Layer 3
-        "pal",						// Palette
-        "pcd",						// Kodak PhotoCD
-        "pcx",						// ZSoft PCX
-        "pic",						// Softimage PIC
-        "png",						// Portable Network Graphics
-        "pbm", "pgm", "pnm",		// Portable Anymap
-        "pix",						// Alias | Wavefront
-        "psd",						// Adobe PhotoShop
-        "psp",						// PaintShop Pro
-        "pxr",						// Pixar
-        "raw",						// Raw data
-        "rot",						// Homeworld 2 Texture
-        "sgi", "bw", "rgb", "rgba"	// Silicon Graphics
-        "texture",					// Creative Assembly Texture
-        "tga",						// Truevision Targa
-        "tif", "tiff",				// Tagged Image File Format
-        "tpl",						// Gamecube Texture
-        "utx",						// Unreal Texture
-        "wal",						// Quake 2 Texture
-        "vtf",						// Valve Texture Format
-        "wdp", "hdp",				// HD Photo
-        "xpm"						// X Pixel Map
+        "bmp",                        // Windows Bitmap
+        "cut",                        // Dr. Halo
+        "dcx",                        // Multi-PCX
+        "dicom", "dcm",                // Dicom
+        "dds",                        // DirectDraw Surface
+        "exr",                        // OpenEXR
+        "fits", "fit",                // Flexible Image Transport System
+        "ftx",                        // Heavy Metal: FAKK 2
+        "hdr",                        // Radiance High Dynamic
+        "icns",                        // Macintosh icon
+        "ico", "cur",                // Windows icon/cursor
+        "iff",                        // Interchange File Format
+        "iwi",                        // Infinity Ward Image
+        "gif",                        // Graphics Interchange Format
+        "jpg", "jpe", "jpeg",        // Jpeg
+        "jp2",                        // Jpeg 2000
+        "lbm",                        // Interlaced Bitmap
+        "lif",                        // Homeworld texture
+        "mdl",                        // Half-Life Model
+        "mp3",                        // MPEG-1 Audio Layer 3
+        "pal",                        // Palette
+        "pcd",                        // Kodak PhotoCD
+        "pcx",                        // ZSoft PCX
+        "pic",                        // Softimage PIC
+        "png",                        // Portable Network Graphics
+        "pbm", "pgm", "pnm",        // Portable Anymap
+        "pix",                        // Alias | Wavefront
+        "psd",                        // Adobe PhotoShop
+        "psp",                        // PaintShop Pro
+        "pxr",                        // Pixar
+        "raw",                        // Raw data
+        "rot",                        // Homeworld 2 Texture
+        "sgi", "bw", "rgb", "rgba"    // Silicon Graphics
+        "texture",                    // Creative Assembly Texture
+        "tga",                        // Truevision Targa
+        "tif", "tiff",                // Tagged Image File Format
+        "tpl",                        // Gamecube Texture
+        "utx",                        // Unreal Texture
+        "wal",                        // Quake 2 Texture
+        "vtf",                        // Valve Texture Format
+        "wdp", "hdp",                // HD Photo
+        "xpm"                        // X Pixel Map
     };
 }
 

@@ -32,10 +32,10 @@ namespace ghoul {
 
 class VolumeReader {
 public:
-	VolumeReader();
-	virtual ~VolumeReader();
+    VolumeReader();
+    virtual ~VolumeReader();
 
-	virtual opengl::Texture* read(std::string filename) = 0;
+    virtual opengl::Texture* read(std::string filename) = 0;
 
 protected:
 

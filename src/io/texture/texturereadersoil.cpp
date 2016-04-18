@@ -101,7 +101,7 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTextureFromMemory(const 
 std::vector<std::string> TextureReaderSOIL::supportedExtensions() const {
     // taken from http://www.lonesock.net/soil.html
     return {
-        "bmp",	// load & save					
+        "bmp",    // load & save                    
         "png",  // load
         "jpg",  // load
         "jpeg",
