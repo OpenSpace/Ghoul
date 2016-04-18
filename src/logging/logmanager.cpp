@@ -34,74 +34,85 @@ namespace ghoul {
 namespace logging {
 
 std::string LogManager::stringFromLevel(LogLevel level) {
-	switch (level) {
-		case LogLevel::Debug:
-			return "Debug";
-		case LogLevel::Info:
-			return "Info";
-		case LogLevel::Warning:
-			return "Warning";
-		case LogLevel::Error:
-			return "Error";
-		case LogLevel::Fatal:
-			return "Fatal";
-		case LogLevel::NoLogging:
-			return "None";
-	}
-	assert(false);
-	return "";
+    switch (level) {
+        case LogLevel::Debug:
+            return "Debug";
+        case LogLevel::Info:
+            return "Info";
+        case LogLevel::Warning:
+            return "Warning";
+        case LogLevel::Error:
+            return "Error";
+        case LogLevel::Fatal:
+            return "Fatal";
+        case LogLevel::NoLogging:
+            return "None";
+    }
+    assert(false);
+    return "";
 }
 
 LogManager::LogLevel LogManager::levelFromString(const std::string& level) {
-	static const std::map<std::string, LogLevel> levels = {
-		{ "Debug"  , LogLevel::Debug },
-		{ "Info"   , LogLevel::Info },
-		{ "Warning", LogLevel::Warning },
-		{ "Error"  , LogLevel::Error },
-		{ "Fatal"  , LogLevel::Fatal },
-		{ "None"   , LogLevel::NoLogging }
-	};
+    static const std::map<std::string, LogLevel> levels = {
+        { "Debug"  , LogLevel::Debug },
+        { "Info"   , LogLevel::Info },
+        { "Warning", LogLevel::Warning },
+        { "Error"  , LogLevel::Error },
+        { "Fatal"  , LogLevel::Fatal },
+        { "None"   , LogLevel::NoLogging }
+    };
 
-	auto it = levels.find(level);
-	assert(it != levels.end());
-	return it->second;
+    auto it = levels.find(level);
+    assert(it != levels.end());
+    return it->second;
 }
 
 LogManager::LogManager(LogManager::LogLevel level, ImmediateFlush immediateFlush)
-	: _level(level)
-	, _immediateFlush(immediateFlush == ImmediateFlush::Yes)
+    : _level(level)
+    , _immediateFlush(immediateFlush == ImmediateFlush::Yes)
+    , _logCounter({0, 0, 0, 0, 0})
 {}
 
 void LogManager::addLog(std::shared_ptr<Log> log) {
-	auto it = std::find(_logs.begin(), _logs.end(), log);
-	if (it == _logs.end())
-		_logs.push_back(std::move(log));
+    auto it = std::find(_logs.begin(), _logs.end(), log);
+    if (it == _logs.end())
+        _logs.push_back(std::move(log));
 }
 
 void LogManager::removeLog(std::shared_ptr<Log> log) {
-	auto it = std::find(_logs.begin(), _logs.end(), log);
-	if (it != _logs.end())
-		_logs.erase(it);
+    auto it = std::find(_logs.begin(), _logs.end(), log);
+    if (it != _logs.end())
+        _logs.erase(it);
 }
 
 void LogManager::logMessage(LogManager::LogLevel level, const std::string& category,
-															   const std::string& message)
+                                                               const std::string& message)
 {
-	if (level >= _level) {
-		// Acquire lock, automatically released at end of scope
-		std::lock_guard<std::mutex> lock(_mutex);
+    if (level >= _level) {
+        // Acquire lock, automatically released at end of scope
+        std::lock_guard<std::mutex> lock(_mutex);
 
-		auto it = _logs.begin();
-		for (; it != _logs.end(); ++it) {
-			(*it)->log(level, category, message);
-			if (_immediateFlush)
-				(*it)->flush();
-		}
-	}
+        for (const auto& log : _logs) {
+            log->log(level, category, message);
+            if (_immediateFlush)
+                log->flush();
+        }
+
+        int l = std::underlying_type<LogLevel>::type(level);
+        ++(_logCounter[l]);
+    }
 }
 
 void LogManager::logMessage(LogManager::LogLevel level, const std::string& message) {
-	logMessage(level, "", message);
+    logMessage(level, "", message);
+}
+
+int LogManager::messageCounter(LogManager::LogLevel level) {
+    return _logCounter[std::underlying_type<LogLevel>::type(level)];
+}
+
+void LogManager::resetMessageCounters() {
+    _logCounter = { 0, 0, 0, 0, 0 };
 }
 
 } // namespace logging
