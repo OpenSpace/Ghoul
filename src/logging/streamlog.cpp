@@ -38,22 +38,7 @@ StreamLog::StreamLog(std::ostream& stream, TimeStamping timeStamping,
 void StreamLog::log(LogManager::LogLevel level, const std::string& category,
                                                                const std::string& message)
 {
-    std::string output;
-    if (isDateStamping())
-        output += "[" + getDateString();
-    if (isTimeStamping())
-        output += " | " + getTimeString();
-    
-    if (isDateStamping() || isTimeStamping())
-        output += "] ";
-    if (isCategoryStamping() && (category != ""))
-        output += category + " ";
-    if (isLogLevelStamping())
-        output += "(" + LogManager::stringFromLevel(level) + ")";
-    if (output != "")
-        output += "\t";
-    output += message;
-    _stream << std::move(output) << std::endl;
+    _stream << createFullMessageString(level, category, message) << std::endl;
 }
 
 void StreamLog::flush() {

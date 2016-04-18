@@ -126,6 +126,9 @@ protected:
      */
     std::string getDateString() const;
 
+    std::string createFullMessageString(LogManager::LogLevel level,
+        const std::string& category, const std::string& message) const;
+
 private:
     bool _timeStamping; ///< Is the log printing the time?
     bool _dateStamping; ///< Is the log printing the date?
