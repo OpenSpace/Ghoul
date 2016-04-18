@@ -59,6 +59,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/logging/logmanager.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/streamlog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/textlog.cpp
+    ${PROJECT_SOURCE_DIR}/src/logging/visualstudiooutputlog.cpp
     ${PROJECT_SOURCE_DIR}/src/lua/lua_helper.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/any.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/assert.cpp
@@ -146,6 +147,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/logmanager.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/streamlog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/textlog.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/logging/visualstudiooutputlog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/ghoul_lua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/any.h
@@ -217,4 +219,6 @@ if (MSVC)
         ${GHOUL_SOURCE}
         ${PROJECT_SOURCE_DIR}/ext/stackwalker/StackWalker.cpp
     )
+
+    source_group("External" FILES ${PROJECT_SOURCE_DIR}/ext/stackwalker/StackWalker.cpp)
 endif ()
