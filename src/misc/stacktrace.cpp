@@ -24,6 +24,8 @@
  *****************************************************************************************
  * The Linux/Mac code is taken from Sarang Baheti                                        *
  * www.nullptr.me/2013/04/14/generating-stack-trace-on-os-x/                             *
+ *****************************************************************************************
+ * The VectorStackWalker is taken from the Inviwo project found at http://www.inviwo.org *
  ****************************************************************************************/
 
 #include <ghoul/misc/stacktrace.h>
@@ -34,6 +36,40 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#elif defined _MSC_VER
+#include <StackWalker.h>
+#endif
+
+#ifdef _MSC_VER
+/**
+ * The internal class that is used by the StackWalker library to customize the output.
+ * In our case, we want to store each stackframe in a vector.
+ */
+class VectorStackWalker : public StackWalker {
+public:
+    VectorStackWalker(StackWalkOptions level, std::vector<std::string>& vector)
+        : StackWalker(level)
+        , _vector(vector)
+    {}
+
+    void setVector(std::vector<std::string>& vector) {
+        _vector = vector;
+    }
+
+protected:
+    void OnOutput(LPCSTR szText) override {
+        std::string str(szText);
+
+        // Remove trailing newline character
+        str = str.substr(0, str.size() - 1);
+
+        _vector.push_back(str);
+    }
+
+private:
+    std::vector<std::string>& _vector;
+};
+
 #endif
 
 
@@ -51,7 +87,7 @@ std::vector<std::string> stackTrace() {
     int nFrames = backtrace(reinterpret_cast<void**>(callstack), MaxCallStackDepth);
     
     // Unmangle the stacktrace to get it in a human-readable format
-    char** strs = backtrace_symbols((void**) callstack, nFrames);
+    char** strs = backtrace_symbols(reinterpret_cast<void**>(callstack), nFrames);
     
     stackFrames.reserve(nFrames);
     
@@ -115,7 +151,20 @@ std::vector<std::string> stackTrace() {
     }
     free(strs);
 #elif WIN32
-    ghoul_assert(false, "Missing implementation");
+    static VectorStackWalker sw(StackWalker::OptionsAll, stackFrames);
+    static bool IsInitialized = false;
+    if (!IsInitialized) {
+        // We only want to load the modules once as it is a very expensive operation
+        sw.LoadModules();
+        IsInitialized = true;
+    }
+
+    // The vector has to be set as the StackWalker library is statically initialized the
+    // first time this function is called (and thus with a different stackFrames
+    // reference. If this call is removed, invalid memory will be accessed
+    sw.setVector(stackFrames);
+
+    sw.ShowCallstack();
 #endif
     
     return stackFrames;

@@ -210,3 +210,11 @@ endif ()
 
 include (${GHOUL_CMAKE_DIR}/GroupFilesIntoFolders.cmake)
 group_files_into_folders(${GHOUL_SOURCE} ${GHOUL_HEADER})
+
+
+if (MSVC)
+    set(GHOUL_SOURCE
+        ${GHOUL_SOURCE}
+        ${PROJECT_SOURCE_DIR}/ext/stackwalker/StackWalker.cpp
+    )
+endif ()
