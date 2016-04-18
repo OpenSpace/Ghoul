@@ -109,8 +109,8 @@ void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {
             colorIndex = FOREGROUND_RED | FOREGROUND_BLUE| FOREGROUND_INTENSITY;
             break;
         case LogManager::LogLevel::NoLogging:
-			colorIndex = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN;
-			break;
+            colorIndex = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN;
+            break;
     }
     SetConsoleTextAttribute(hConsole, colorIndex);
 #elif __unix__
@@ -131,8 +131,8 @@ void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {
             _stream << "\033[22;35m";   // blue
             break;
         case LogManager::LogLevel::NoLogging:
-			_stream << "\033[0m";       // white
-			break;
+            _stream << "\033[0m";       // white
+            break;
     }
 #elif __APPLE__
     // The Xcode debugger is a bit strange with those control commands, so we have to

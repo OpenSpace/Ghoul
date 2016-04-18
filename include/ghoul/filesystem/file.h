@@ -160,12 +160,12 @@ public:
      */
     std::string fileExtension() const;
 
-	/**
-	 * This method returns the last-modified date of the file as an ISO 8601 string
-	 * \return The last-modified date of the file as an ISO 8601 string
+    /**
+     * This method returns the last-modified date of the file as an ISO 8601 string
+     * \return The last-modified date of the file as an ISO 8601 string
      * \throws FileException If there is an error accessing the file
-	 */
-	std::string lastModifiedDate() const;
+     */
+    std::string lastModifiedDate() const;
 
 private:
     /**

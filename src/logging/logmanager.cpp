@@ -34,22 +34,22 @@ namespace ghoul {
 namespace logging {
 
 std::string LogManager::stringFromLevel(LogLevel level) {
-    switch (level) {
-        case LogLevel::Debug:
-            return "Debug";
-        case LogLevel::Info:
-            return "Info";
-        case LogLevel::Warning:
-            return "Warning";
-        case LogLevel::Error:
-            return "Error";
-        case LogLevel::Fatal:
-            return "Fatal";
-        case LogLevel::NoLogging:
-            return "None";
-    }
-    assert(false);
-    return "";
+	switch (level) {
+		case LogLevel::Debug:
+			return "Debug";
+		case LogLevel::Info:
+			return "Info";
+		case LogLevel::Warning:
+			return "Warning";
+		case LogLevel::Error:
+			return "Error";
+		case LogLevel::Fatal:
+			return "Fatal";
+		case LogLevel::NoLogging:
+			return "None";
+	}
+	assert(false);
+	return "";
 }
 
 LogManager::LogLevel LogManager::levelFromString(const std::string& level) {
@@ -73,19 +73,19 @@ LogManager::LogManager(LogManager::LogLevel level, ImmediateFlush immediateFlush
 {}
 
 void LogManager::addLog(std::shared_ptr<Log> log) {
-    auto it = std::find(_logs.begin(), _logs.end(), log);
-    if (it == _logs.end())
-        _logs.push_back(std::move(log));
+	auto it = std::find(_logs.begin(), _logs.end(), log);
+	if (it == _logs.end())
+		_logs.push_back(std::move(log));
 }
 
 void LogManager::removeLog(std::shared_ptr<Log> log) {
-    auto it = std::find(_logs.begin(), _logs.end(), log);
-    if (it != _logs.end())
-        _logs.erase(it);
+	auto it = std::find(_logs.begin(), _logs.end(), log);
+	if (it != _logs.end())
+		_logs.erase(it);
 }
 
 void LogManager::logMessage(LogManager::LogLevel level, const std::string& category,
-                                                               const std::string& message)
+															   const std::string& message)
 {
 	if (level >= _level) {
 		// Acquire lock, automatically released at end of scope

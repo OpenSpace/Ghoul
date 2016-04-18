@@ -258,8 +258,8 @@ protected:
     /// The maximum number of color attachments for an FBO
     int _maxFramebufferColorAttachments = -1;
     
-	// Only used in WMI, but declared nevertheless to prevent a mismatch in compiler flags
-	// between the cpp file and an application including this header
+    // Only used in WMI, but declared nevertheless to prevent a mismatch in compiler flags
+    // between the cpp file and an application including this header
     /// Stores the version of the installed driver
     std::string _driverVersion;
     /// Stores the date of the installed driver

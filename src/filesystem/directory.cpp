@@ -79,7 +79,7 @@ Directory Directory::parentDirectory(AbsolutePath absolutePath) const {
         );
     }
 #else
-	(void)absolutePath; // remove unused argument warning ---abock
+    (void)absolutePath; // remove unused argument warning ---abock
     size_t length = _directoryPath.length();
     size_t position = _directoryPath.find_last_of(FileSystem::PathSeparator);
     if(position == length && length > 1)

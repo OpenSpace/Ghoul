@@ -184,8 +184,8 @@ public:
      * \tparam T The type of each object
      * \pre \p T must be a POD type
      */
-	template <typename T>
-	void serialize(const std::vector<T>& v);
+    template <typename T>
+    void serialize(const std::vector<T>& v);
     
     /**
      * Serializes the elements [begin, end) to the Buffer.
@@ -220,8 +220,8 @@ public:
      * \tparam T The type of each object
      * \pre \p T must be a POD type
      */
-	template <typename T>
-	void deserialize(std::vector<T>& v);
+    template <typename T>
+    void deserialize(std::vector<T>& v);
     
     /**
      * Deserializes the Buffer into the elements [begin, end).

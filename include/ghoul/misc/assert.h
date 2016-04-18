@@ -82,18 +82,18 @@ void internal_assert(std::string expression, std::string message, std::string fi
  */
 #define ghoul_assert(__condition__, __message__)                                         \
     do {                                                                                 \
-		if (!(__condition__)) {                                                          \
-			std::ostringstream oss;                                                      \
-			oss << __message__;                                                          \
-			ghoul::internal_assert(                                                      \
+        if (!(__condition__)) {                                                          \
+            std::ostringstream oss;                                                      \
+            oss << __message__;                                                          \
+            ghoul::internal_assert(                                                      \
                 #__condition__,                                                          \
                 oss.str(),                                                               \
                 __FILE__,                                                                \
                 GHL_ASSERT_FUNCTION,                                                     \
                 __LINE__                                                                 \
             );                                                                           \
-		}                                                                                \
-	} while (false)
+        }                                                                                \
+    } while (false)
 
 
 #else 

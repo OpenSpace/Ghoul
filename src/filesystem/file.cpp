@@ -83,12 +83,12 @@ File::File(const File& cpy)
 }
 
 File::~File() {
-	if (_fileChangedCallback)
-		removeFileChangeListener();
+    if (_fileChangedCallback)
+        removeFileChangeListener();
 }
 
 void File::setCallback(FileChangedCallback callback) {
-	if (_fileChangedCallback)
+    if (_fileChangedCallback)
         removeFileChangeListener();
     _fileChangedCallback = std::move(callback);
     if (_fileChangedCallback)
@@ -149,100 +149,100 @@ string File::fileExtension() const {
 }
     
 std::string File::lastModifiedDate() const {
-	if (!FileSys.fileExists(_filename)) {
+    if (!FileSys.fileExists(_filename)) {
         throw FileException(fmt::format(
             "Error retrieving last-modified date for file '{}'. File did not exist",
             _filename
         ));
-	}
+    }
 #ifdef WIN32
-	WIN32_FILE_ATTRIBUTE_DATA infoData;
-	BOOL success = GetFileAttributesEx(
-		_filename.c_str(),
-		GetFileExInfoStandard,
-		&infoData
-		);
-	if (!success) {
-		const DWORD error = GetLastError();
-		LPTSTR errorBuffer = nullptr;
-		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,
-			error,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			(LPTSTR)&errorBuffer,
-			0,
-			NULL);
-		if (errorBuffer != nullptr) {
-			std::string error(errorBuffer);
+    WIN32_FILE_ATTRIBUTE_DATA infoData;
+    BOOL success = GetFileAttributesEx(
+        _filename.c_str(),
+        GetFileExInfoStandard,
+        &infoData
+        );
+    if (!success) {
+        const DWORD error = GetLastError();
+        LPTSTR errorBuffer = nullptr;
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            error,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR)&errorBuffer,
+            0,
+            NULL);
+        if (errorBuffer != nullptr) {
+            std::string error(errorBuffer);
             LocalFree(errorBuffer);
             throw FileException(fmt::format(
                 "Could not retrieve last-modified date for file '{}': {}",
                 _filename,
                 error
             ));
-		}
+        }
         throw FileException(fmt::format(
             "Could not retrieve last-modified date for file '{}'",
             _filename
         ));
-	}
-	else {
-		FILETIME lastWriteTime = infoData.ftLastWriteTime;
-		SYSTEMTIME time;
-		//LPSYSTEMTIME time = NULL;
-		BOOL success = FileTimeToSystemTime(&lastWriteTime, &time);
-		if (!success) {
-			const DWORD error = GetLastError();
-			LPTSTR errorBuffer = nullptr;
-			DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-				FORMAT_MESSAGE_ALLOCATE_BUFFER |
-				FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL,
-				error,
-				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-				(LPTSTR)&errorBuffer,
-				0,
-				NULL);
-			if ((nValues > 0) && (errorBuffer != nullptr)) {
-				std::string error(errorBuffer);
+    }
+    else {
+        FILETIME lastWriteTime = infoData.ftLastWriteTime;
+        SYSTEMTIME time;
+        //LPSYSTEMTIME time = NULL;
+        BOOL success = FileTimeToSystemTime(&lastWriteTime, &time);
+        if (!success) {
+            const DWORD error = GetLastError();
+            LPTSTR errorBuffer = nullptr;
+            DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+                FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL,
+                error,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                (LPTSTR)&errorBuffer,
+                0,
+                NULL);
+            if ((nValues > 0) && (errorBuffer != nullptr)) {
+                std::string error(errorBuffer);
                 LocalFree(errorBuffer);
                 throw FileException(fmt::format(
                     "'FileTimeToSystemTime' failed for file '{}': {}",
                     _filename,
                     error
                 ));
-			}
+            }
             throw FileException(fmt::format(
                 "'FileTimeToSystemTime' failed for file '{}'",
                 _filename
             ));
-		}
-		else {
-			return std::to_string(time.wYear) + "-" + std::to_string(time.wMonth) + "-" +
-				std::to_string(time.wDay) + "T" + std::to_string(time.wHour) + ":" +
-				std::to_string(time.wMinute) + ":" + std::to_string(time.wSecond) + "." +
-				std::to_string(time.wMilliseconds);
-		}
-	}
+        }
+        else {
+            return std::to_string(time.wYear) + "-" + std::to_string(time.wMonth) + "-" +
+                std::to_string(time.wDay) + "T" + std::to_string(time.wHour) + ":" +
+                std::to_string(time.wMinute) + ":" + std::to_string(time.wSecond) + "." +
+                std::to_string(time.wMilliseconds);
+        }
+    }
 #else
-	struct stat attrib;
-	stat(_filename.c_str(), &attrib);
-	struct tm* time = gmtime(&(attrib.st_ctime));
-	char buffer[128];
-	strftime(buffer, 128, "%Y-%m-%dT%H:%M:%S", time);
-	return buffer;
+    struct stat attrib;
+    stat(_filename.c_str(), &attrib);
+    struct tm* time = gmtime(&(attrib.st_ctime));
+    char buffer[128];
+    strftime(buffer, 128, "%Y-%m-%dT%H:%M:%S", time);
+    return buffer;
 #endif
 }
 
 
 void File::installFileChangeListener() {
-	FileSys.addFileListener(this);
+    FileSys.addFileListener(this);
 }
 
 void File::removeFileChangeListener() {
-	FileSys.removeFileListener(this);
+    FileSys.removeFileListener(this);
 }
 
 std::ostream& operator<<(std::ostream& os, const File& f) {

@@ -50,9 +50,9 @@ namespace ghoul {
 template <class T>
 class Singleton {
 public:
-	/**
+    /**
      * Creates and initializes an empty singleton with the arguments passed to the 
-	 * template class T constructor.
+     * template class T constructor.
      * \pre The singleton must not have been initialized before
      */
     template <typename... Args>
@@ -61,17 +61,17 @@ public:
         _instance = new T(std::forward<Args>(args)...);
     }
     
-	/**
+    /**
      * Deinitializes and deletes the singleton.
      * \pre The singleton must have been initialized before
      */
-	static void deinitialize() {
-		ghoul_assert(isInitialized(), typeid(T).name() << " is not initialized!");
+    static void deinitialize() {
+        ghoul_assert(isInitialized(), typeid(T).name() << " is not initialized!");
         delete _instance;
         _instance = nullptr;
     }
     
-	/**
+    /**
      * Returns the initialization state of the singleton.
      * \return The initialization state of the singleton
      */
@@ -79,13 +79,13 @@ public:
         return (_instance != nullptr);
     }
     
-	/**
+    /**
      * Returns the reference to the singleton.
      * \return A reference to the singleton
      * \pre The singleton must have been initialized before
      */
-	static T& ref() {
-		ghoul_assert(isInitialized(), typeid(T).name() << " is not initialized!");
+    static T& ref() {
+        ghoul_assert(isInitialized(), typeid(T).name() << " is not initialized!");
         return *_instance;
     }
 

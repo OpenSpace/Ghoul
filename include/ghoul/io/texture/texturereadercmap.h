@@ -54,7 +54,7 @@ public:
      * Returns the supported extension (<code>cmap</code>)
      * \return The supported extension
      */
-	std::vector<std::string> supportedExtensions() const override;
+    std::vector<std::string> supportedExtensions() const override;
 };
 
 } // namespace io

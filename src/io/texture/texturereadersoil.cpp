@@ -40,7 +40,7 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     
-	using opengl::Texture;
+    using opengl::Texture;
  
     int width, height;
     unsigned char* image = SOIL_load_image(
@@ -99,9 +99,9 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTextureFromMemory(const 
 }
 
 std::vector<std::string> TextureReaderSOIL::supportedExtensions() const {
-	// taken from http://www.lonesock.net/soil.html
-	return {
-		"bmp",	// load & save					
+    // taken from http://www.lonesock.net/soil.html
+    return {
+        "bmp",	// load & save					
         "png",  // load
         "jpg",  // load
         "jpeg",
@@ -117,7 +117,7 @@ std::vector<std::string> TextureReaderSOIL::supportedExtensions() const {
     // DDS - DXT1/2/3/4/5, uncompressed, cubemaps (can't read 3D DDS files yet)
     // PSD - (from stb_image documentation)
     // HDR - converted to LDR, unless loaded with *HDR* functions (RGBE or RGBdivA or RGBdivA2) 
-	};
+    };
 }
 
 } // namespace opengl

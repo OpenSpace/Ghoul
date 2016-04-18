@@ -65,8 +65,8 @@ BufferBinding<T>::operator GLint() {
 
 template <bufferbinding::Buffer T>
 void BufferBinding<T>::deinitialize() {
-	for (size_t i = 0; i < _busyBindings.size(); ++i)
-		_busyBindings[i] = false;
+    for (size_t i = 0; i < _busyBindings.size(); ++i)
+        _busyBindings[i] = false;
     _totalActive = 0;
 }
 

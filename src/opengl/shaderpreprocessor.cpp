@@ -165,10 +165,10 @@ void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
     _onChangeCallback = changeCallback;
     for (auto& files : _includedFiles) {
         if (files.second.isTracked)
-			files.second.file.setCallback([this](const filesystem::File& file) {
-			(void) file; // Suppress compiler warning about unused parameter
-			_onChangeCallback();
-		});
+            files.second.file.setCallback([this](const filesystem::File& file) {
+            (void) file; // Suppress compiler warning about unused parameter
+            _onChangeCallback();
+        });
     }
 }
 
@@ -214,10 +214,10 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
             }
         ).first;
         if (trackChanges == TrackChanges::Yes)
-			it->second.file.setCallback([this](const filesystem::File& file) {
-			(void) file; // Suppress compiler warning about unused parameter
-			_onChangeCallback();
-		});
+            it->second.file.setCallback([this](const filesystem::File& file) {
+            (void) file; // Suppress compiler warning about unused parameter
+            _onChangeCallback();
+        });
     }
 
     std::ifstream stream(path);

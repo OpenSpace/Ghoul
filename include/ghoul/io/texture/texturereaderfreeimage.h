@@ -66,7 +66,7 @@ public:
      * \sa http://freeimage.sourceforge.net
      * \return The supported extension
      */
-	std::vector<std::string> supportedExtensions() const override;
+    std::vector<std::string> supportedExtensions() const override;
 };
 
 #endif // GHOUL_USE_FREEIMAGE

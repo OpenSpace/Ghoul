@@ -64,9 +64,9 @@ public:
     enum class Transpose { Yes, No };
 
     /**
-	* A type definition for a callback function that is called if any of the tracked files
+    * A type definition for a callback function that is called if any of the tracked files
     * is changed.
-	*/
+    */
     using ProgramObjectCallback = std::function<void(ProgramObject*)>;
     
     /// Main exception that is thrown by methods of the ProgramObject class

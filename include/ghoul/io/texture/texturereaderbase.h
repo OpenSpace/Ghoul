@@ -80,7 +80,7 @@ public:
      * Returns a list of all extensions that this TextureReaderBase supports.
      * \return A list of all extensions that this TextureReaderBase supports
      */
-	virtual std::vector<std::string> supportedExtensions() const = 0;
+    virtual std::vector<std::string> supportedExtensions() const = 0;
 };
 
 } // namespace io

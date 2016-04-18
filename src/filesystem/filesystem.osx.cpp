@@ -31,8 +31,8 @@
 
 namespace {
     const std::string _loggerCat = "FileSystem";
-	// the maximum latency allowed before a changed is registered
-	const CFAbsoluteTime Latency = 1.0;
+    // the maximum latency allowed before a changed is registered
+    const CFAbsoluteTime Latency = 1.0;
     
     enum Events {
         kFSEventStreamEventFlagNone = 0x00000000,
@@ -87,13 +87,13 @@ struct DirectoryHandle {
 };
 
 void FileSystem::deinitializeInternalApple() {
-	for (auto d : _directories) {
-		DirectoryHandle* dh = d.second;
-		FSEventStreamStop(dh->_eventStream);
-		FSEventStreamInvalidate(dh->_eventStream);
-		FSEventStreamRelease(dh->_eventStream);
-		delete dh;
-	}
+    for (auto d : _directories) {
+        DirectoryHandle* dh = d.second;
+        FSEventStreamStop(dh->_eventStream);
+        FSEventStreamInvalidate(dh->_eventStream);
+        FSEventStreamRelease(dh->_eventStream);
+        delete dh;
+    }
 }
 
 void FileSystem::addFileListener(File* file) {
@@ -105,58 +105,58 @@ void FileSystem::addFileListener(File* file) {
     }
 #endif
     
-	std::string d = file->directoryName();
-	auto f = _directories.find(d);
-	if (f == _directories.end()) {
-		bool alreadyTrackingParent = false;
-		for (auto dir : _directories) {
+    std::string d = file->directoryName();
+    auto f = _directories.find(d);
+    if (f == _directories.end()) {
+        bool alreadyTrackingParent = false;
+        for (auto dir : _directories) {
             if (d.length() > dir.first.length() && d.find(dir.first) != std::string::npos) {
-				alreadyTrackingParent = true;
-				break;
-			}
-		}
-		if (!alreadyTrackingParent) {
-			DirectoryHandle* handle = new DirectoryHandle;
+                alreadyTrackingParent = true;
+                break;
+            }
+        }
+        if (!alreadyTrackingParent) {
+            DirectoryHandle* handle = new DirectoryHandle;
 
-			// Create the FSEventStream responsible for this directory (Apple's callback system
-			// only works on the granularity of the directory)
-			CFStringRef path = CFStringCreateWithCString(NULL, d.c_str(),
+            // Create the FSEventStream responsible for this directory (Apple's callback system
+            // only works on the granularity of the directory)
+            CFStringRef path = CFStringCreateWithCString(NULL, d.c_str(),
                                                          kCFStringEncodingASCII);
-			CFArrayRef pathsToWatch = CFArrayCreate(NULL, (const void **)&path, 1, NULL);
-			FSEventStreamContext callbackInfo;
-			callbackInfo.version = 0;
-			callbackInfo.info = nullptr;
-			callbackInfo.release = NULL;
-			callbackInfo.retain = NULL;
-			callbackInfo.copyDescription = NULL;
+            CFArrayRef pathsToWatch = CFArrayCreate(NULL, (const void **)&path, 1, NULL);
+            FSEventStreamContext callbackInfo;
+            callbackInfo.version = 0;
+            callbackInfo.info = nullptr;
+            callbackInfo.release = NULL;
+            callbackInfo.retain = NULL;
+            callbackInfo.copyDescription = NULL;
 
-			handle->_eventStream = FSEventStreamCreate(
-				NULL,
-				&completionHandler,
-				&callbackInfo,
-				pathsToWatch,
-				kFSEventStreamEventIdSinceNow,
-				Latency,
-				kFSEventStreamCreateFlagFileEvents
+            handle->_eventStream = FSEventStreamCreate(
+                NULL,
+                &completionHandler,
+                &callbackInfo,
+                pathsToWatch,
+                kFSEventStreamEventIdSinceNow,
+                Latency,
+                kFSEventStreamCreateFlagFileEvents
             );
 
-			// Add checking the event stream to the current run loop
-			// If there is a performance bottleneck, this could be done on a separate thread?
-			FSEventStreamScheduleWithRunLoop(handle->_eventStream,
-				CFRunLoopGetCurrent(),
-				kCFRunLoopDefaultMode
+            // Add checking the event stream to the current run loop
+            // If there is a performance bottleneck, this could be done on a separate thread?
+            FSEventStreamScheduleWithRunLoop(handle->_eventStream,
+                CFRunLoopGetCurrent(),
+                kCFRunLoopDefaultMode
             );
-			// Start monitoring
-			FSEventStreamStart(handle->_eventStream);
-			_directories[d] = handle;
-		}
-	}
+            // Start monitoring
+            FSEventStreamStart(handle->_eventStream);
+            _directories[d] = handle;
+        }
+    }
 
-	_trackedFiles.insert({ file->path(), file });
+    _trackedFiles.insert({ file->path(), file });
 }
 
 void FileSystem::removeFileListener(File* file) {
-	ghoul_assert(file, "File must not be nullptr");
+    ghoul_assert(file, "File must not be nullptr");
 
     auto eqRange = _trackedFiles.equal_range(file->path());
 
@@ -165,14 +165,14 @@ void FileSystem::removeFileListener(File* file) {
         found |= (it->second == file);
     ghoul_assert(found, "File not previously registered");
     
-	for (auto it = eqRange.first; it != eqRange.second; ++it) {
-		//LDEBUG("comparing for removal, " << file << "==" << it->second);
-		if (it->second == file) {
-			//LWARNING("Removing tracking of " << file);
-			_trackedFiles.erase(it);
-			return;
-		}
-	}
+    for (auto it = eqRange.first; it != eqRange.second; ++it) {
+        //LDEBUG("comparing for removal, " << file << "==" << it->second);
+        if (it->second == file) {
+            //LWARNING("Removing tracking of " << file);
+            _trackedFiles.erase(it);
+            return;
+        }
+    }
 }
 
 void callbackHandler(const std::string& path) {

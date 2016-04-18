@@ -56,7 +56,7 @@ public:
      * \return The supported extensions
      * \sa http://lonesock.net/soil.html
      */
-	std::vector<std::string> supportedExtensions() const override;
+    std::vector<std::string> supportedExtensions() const override;
 };
 
 #endif // GHOUL_USE_SOIL

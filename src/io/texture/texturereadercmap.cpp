@@ -51,17 +51,17 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
     uint8_t* values = nullptr;
 //    std::vector<uint8_t> values;
 
-	std::string line;
-	int i = 0;
-	while (std::getline(file, line)) {
-		// Skip empty lines
-		if (line.empty() || line == "\r")
-			continue;
-		// # defines a comment
-		if (line[0] == '#')
-			continue;
+    std::string line;
+    int i = 0;
+    while (std::getline(file, line)) {
+        // Skip empty lines
+        if (line.empty() || line == "\r")
+            continue;
+        // # defines a comment
+        if (line[0] == '#')
+            continue;
 
-		std::stringstream s(line);
+        std::stringstream s(line);
         if (!values) {
             s >> width;
             values = new uint8_t[width * 4];
@@ -90,28 +90,28 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
             );
         }
 
-		values[i++] = static_cast<uint8_t>(color.r * 255);
-		values[i++] = static_cast<uint8_t>(color.g * 255);
-		values[i++] = static_cast<uint8_t>(color.b * 255);
-		values[i++] = static_cast<uint8_t>(color.a * 255);
-	}
+        values[i++] = static_cast<uint8_t>(color.r * 255);
+        values[i++] = static_cast<uint8_t>(color.g * 255);
+        values[i++] = static_cast<uint8_t>(color.b * 255);
+        values[i++] = static_cast<uint8_t>(color.a * 255);
+    }
 
-	if ((width * 4) != i) {
+    if ((width * 4) != i) {
         throw TextureLoadException(
             std::move(filename),
             fmt::format("Header assured '{}' values but '{}' were found", width, i / 4.f),
             this
         );
-	}
+    }
 
-	using opengl::Texture;
+    using opengl::Texture;
     std::unique_ptr<Texture> texture = std::make_unique<Texture>(
-		values,                         // data
-		glm::size3_t(width, 1, 1),		// dimensions
-		Texture::Format::RGBA			// Format
-	);
+        values,                         // data
+        glm::size3_t(width, 1, 1),		// dimensions
+        Texture::Format::RGBA			// Format
+    );
 
-	return texture;
+    return texture;
 }
 
 std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTextureFromMemory(const std::string& buffer) const {
@@ -119,7 +119,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTextureFromMemory(const 
 }
 
 std::vector<std::string> TextureReaderCMAP::supportedExtensions() const {
-	return { "cmap" };
+    return { "cmap" };
 }
 
 } // namespace io

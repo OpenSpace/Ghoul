@@ -50,7 +50,7 @@ using std::string;
 
 namespace {
     const string _loggerCat = "FileSystem";
-	const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW | IN_UNMOUNT | IN_ISDIR;
+    const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW | IN_UNMOUNT | IN_ISDIR;
 }
 
 namespace ghoul {
@@ -63,16 +63,16 @@ void FileSystem::initializeInternalLinux() {
 }
 
 void FileSystem::deinitializeInternalLinux() {
-	_keepGoing = false;
-	if (_t.joinable())
-		_t.join();
-	close(_inotifyHandle);
+    _keepGoing = false;
+    if (_t.joinable())
+        _t.join();
+    close(_inotifyHandle);
 }
 
 void FileSystem::addFileListener(File* file) {
-	assert(file != nullptr);
-	const std::string filename = file->path();
-	int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
+    assert(file != nullptr);
+    const std::string filename = file->path();
+    int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
     auto eqRange = _trackedFiles.equal_range(wd);
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
         if (it->second == file) {
@@ -80,11 +80,11 @@ void FileSystem::addFileListener(File* file) {
             return;
         }
     }
-	_trackedFiles.emplace(wd, file);
+    _trackedFiles.emplace(wd, file);
 }
 
 void FileSystem::removeFileListener(File* file) {
-	assert(file != nullptr);
+    assert(file != nullptr);
 
     const std::string filename = file->path();
     int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
@@ -100,7 +100,7 @@ void FileSystem::removeFileListener(File* file) {
 
 void FileSystem::inotifyWatcher() {
 
-	int fd = FileSys._inotifyHandle;
+    int fd = FileSys._inotifyHandle;
     char buffer[BUF_LEN];
     struct timeval tv;
     tv.tv_sec = 1;

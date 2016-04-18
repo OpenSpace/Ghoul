@@ -119,15 +119,15 @@ public:
     std::string relativePath(std::string path,
         const Directory& baseDirectory = Directory()) const;
 
-	/**
-	 * Appends the \p component to the \p path by using the appropriate path separator and
+    /**
+     * Appends the \p component to the \p path by using the appropriate path separator and
      * returns the complete path. This method does not check if the full path refers to a
      * valid file/directory in the system.
-	 * \param path The base path to which the \p component will be added
-	 * \param component The path component that should be added to the \p path
-	 * \return The full path composed of the \p path and the \p component
-	 */
-	std::string pathByAppendingComponent(std::string path, std::string component) const;
+     * \param path The base path to which the \p component will be added
+     * \param component The path component that should be added to the \p path
+     * \return The full path composed of the \p path and the \p component
+     */
+    std::string pathByAppendingComponent(std::string path, std::string component) const;
 
     /**
      * Returns the current working directory of this process.
@@ -154,20 +154,20 @@ public:
      * \throw FileSystemException If there is an error retrieving the file attribtues
      * for the \p path
      */
-	bool fileExists(const File& path) const;
+    bool fileExists(const File& path) const;
 
-	/**
+    /**
      * Checks if the file at the \p path exists or not. This method will also return
      * <code>false</code> if \p path points to a directory. This method will not expand
      * any tokens that are passed to it.
      * \param path The path that should be tested for existence
-	 * \param isRawPath A flag if the path is raw or have path tokens
+     * \param isRawPath A flag if the path is raw or have path tokens
      * \return <code>true</code> if \p path points to an existing file, <code>false</code>
      * otherwise
      * \throw FileSystemException If there is an error retrieving the file attributes
      * for the \p path
      */
-	bool fileExists(std::string path, RawPath isRawPath = RawPath::No) const;
+    bool fileExists(std::string path, RawPath isRawPath = RawPath::No) const;
     
     /**
      * Checks if the directory at the \p path exists or not. This method will return
@@ -189,17 +189,17 @@ public:
      */
     bool deleteFile(const File& path) const;
 
-	/**
-	 * Creates the directory pointed to by \p path. The method will return
+    /**
+     * Creates the directory pointed to by \p path. The method will return
      * <code>true</code> if the directory was created successfully. If \p recursive is
      * <code>true</code> all directories leading to the \p path will be created a well.
-	 * \param path The directory that is to be created
-	 * \param recursive If <code>true</code> all directories leading to the
-	 * \p path will be created; if <code>false</code> and the leading directories do not
+     * \param path The directory that is to be created
+     * \param recursive If <code>true</code> all directories leading to the
+     * \p path will be created; if <code>false</code> and the leading directories do not
      * exist, the method will fail and return <code>false</code>
      * \throw FileSystemException If there was an error creating the directory
-	 */
-	void createDirectory(const Directory& path,
+     */
+    void createDirectory(const Directory& path,
         Recursive recursive = Recursive::No) const;
 
     /**
@@ -216,7 +216,7 @@ public:
     void deleteDirectory(const Directory& path,
         Recursive recursive = Recursive::No) const;
 
-	/**
+    /**
      * Checks if the directory with \p path is empty. The method will return
      * <code>true</code> if the directory is empty, <code>false</code> otherwise.
      * \param path The directory that should be checked
@@ -233,7 +233,7 @@ public:
      * while others have not.
      * \param token The token in the form <code>${...}</code>
      * \param path The path the token should point to
-	 * \param override If <code>true</code> an existing token will be silently overriden
+     * \param override If <code>true</code> an existing token will be silently overriden
      * \pre \p token must not be empty
      * \pre \p token must start with FileSystem::TokenOpeningBrace and end with
      * FileSystem::TokenClosingBraces
@@ -253,11 +253,11 @@ public:
      */
     bool expandPathTokens(std::string& path) const;
 
-	/**
-	 * Returns a vector of all registered path tokens
-	 * \return A vector of all registered path tokens
-	 */
-	std::vector<std::string> tokens() const;
+    /**
+     * Returns a vector of all registered path tokens
+     * \return A vector of all registered path tokens
+     */
+    std::vector<std::string> tokens() const;
     
     /**
      * Checks whether the \p token has been registered to a path before.
@@ -312,38 +312,38 @@ public:
     /**
      * Listen to \p file for changes. When \p file is changed the File callback will be
      * called.
-	 * \param file The file object to be tracked
+     * \param file The file object to be tracked
      * \pre \p file must not be a <code>nullptr</code>
      * \pre \p file must not have been added before
      */
-	void addFileListener(File* file);
+    void addFileListener(File* file);
     
     /**
      * Removes the file object from tracking lists. The file on the filesystem may
-	 * still be tracked and other File objects may still have callbacks registered.
+     * still be tracked and other File objects may still have callbacks registered.
      * \pre \p file must not be a <code>nullptr</code>
      * \pre \p file must have been added before (addFileListener)
      */
-	void removeFileListener(File* file);
+    void removeFileListener(File* file);
     
     /**
      * Triggers callbacks on filesystem. May not be needed depending on environment.
      */
-	void triggerFilesystemEvents();
+    void triggerFilesystemEvents();
 
 private:
-	/**
-	 * Constructs a FileSystem object.
+    /**
+     * Constructs a FileSystem object.
      * \throw FileSystemException if the temporary folder cannot be found
-	 */
-	FileSystem();
+     */
+    FileSystem();
 
-	/**
+    /**
      * Deinitializes the FileSystem and removes all registered path tokens. As some tokens
      * might already have been resolved in some paths, deleting the tokens might lead to
      * inconsistencies.
      */
-	~FileSystem();
+    ~FileSystem();
 
     /**
      * This method cleans up a passed \p path by removing any double path separators and
@@ -390,32 +390,32 @@ private:
     /// This map stores all the tokens that are used in the FileSystem.
     std::map<std::string, std::string> _tokenMap;
 
-	/// The cache manager object, only allocated if createCacheManager is called
+    /// The cache manager object, only allocated if createCacheManager is called
     std::unique_ptr<CacheManager> _cacheManager;
 
 #ifdef WIN32
     /// Windows specific deinitialize function
-	void deinitializeInternalWindows();
+    void deinitializeInternalWindows();
 
     /// Starts watching a directory
-	void beginRead(DirectoryHandle* directoryHandle);
+    void beginRead(DirectoryHandle* directoryHandle);
 
     /// Handles the callback for a directory for the local file path
-	static void callbackHandler(DirectoryHandle* directoryHandle,
+    static void callbackHandler(DirectoryHandle* directoryHandle,
         const std::string& filepath);
-	
+    
     /// External function that calls beginRead
-	friend void readStarter(DirectoryHandle* directoryHandle);
+    friend void readStarter(DirectoryHandle* directoryHandle);
 
     /// External function that calls callbackHandler
-	friend void callbackHandler(DirectoryHandle* directoryHandle,
+    friend void callbackHandler(DirectoryHandle* directoryHandle,
         const std::string& filepath);
 
     /// The list of all tracked files
-	std::multimap<std::string, File*> _trackedFiles;
+    std::multimap<std::string, File*> _trackedFiles;
     
     /// The list of tracked directories
-	std::map<std::string, DirectoryHandle*> _directories;
+    std::map<std::string, DirectoryHandle*> _directories;
 
 #elif __APPLE__
     /// OS X specific deinitialize function
@@ -438,13 +438,13 @@ private:
     
 #else // Linux
     /// Linux specific initialize function
-	void initializeInternalLinux();
+    void initializeInternalLinux();
 
     /// Linux specific deinitialize function
-	void deinitializeInternalLinux();
+    void deinitializeInternalLinux();
 
     /// Function that run by the watcher thread
-	static void inotifyWatcher();
+    static void inotifyWatcher();
 
     int _inotifyHandle;
     bool _keepGoing;

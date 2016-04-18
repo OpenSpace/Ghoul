@@ -148,12 +148,12 @@ string stackInformation(lua_State* state) {
                 case LUA_TTABLE:
                     result << luaTableToString(state, i);
                     break;
-				case LUA_TTHREAD:
-				case LUA_TUSERDATA:
-				case LUA_TLIGHTUSERDATA:
-				case LUA_TFUNCTION:
-					result << luaTypeToString(t);
-					break;
+                case LUA_TTHREAD:
+                case LUA_TUSERDATA:
+                case LUA_TLIGHTUSERDATA:
+                case LUA_TFUNCTION:
+                    result << luaTypeToString(t);
+                    break;
                 default:
                     result << lua_typename(state, t);
                     break;

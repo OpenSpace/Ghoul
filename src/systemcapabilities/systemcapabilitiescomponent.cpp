@@ -232,7 +232,7 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
     if (FAILED(hr)) {
         VariantClear(result);
         throw WMIError("No WMI query result", hr);
-	}
+    }
 
     if (enumerator)
         enumerator->Release();

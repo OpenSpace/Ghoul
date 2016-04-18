@@ -99,7 +99,7 @@ public:
         NoLogging = 1 << 5
     };
 
-	/**
+    /**
      * Creates and initializes an empty LogManager with the passed LogManager::LogLevel.
      * \param level The lowest LogManager::LogLevel that will be passed to the containing
      * Log%s.
@@ -109,7 +109,7 @@ public:
      * Passing <code>true</code> will slow down the execution but guarantees that a crash
      * immediately after a log message won't lead to data loss.
      */
-	LogManager(LogLevel level = LogLevel::Info,
+    LogManager(LogLevel level = LogLevel::Info,
         ImmediateFlush immediateFlush = ImmediateFlush::No);
 
     /**
@@ -160,22 +160,22 @@ public:
      */
     static std::string stringFromLevel(LogLevel level);
 
-	/**
+    /**
      * Returns the LogManager::LogLevel for the passed string representation. The name of
      * each level is equal to its enum value.
      * \return The the LogManager::LogLevel for the passed string representation
      */
-	static LogLevel levelFromString(const std::string& level);
+    static LogLevel levelFromString(const std::string& level);
 
 private:
     /// The mutex that is protecting the #logMessage calls
-	std::mutex _mutex;
+    std::mutex _mutex;
     
     /// The LogLevel
-	LogManager::LogLevel _level;
+    LogManager::LogLevel _level;
     
     /// Whether all logs should be flushed immediately
-	bool _immediateFlush;
+    bool _immediateFlush;
     
     /// Stores the Logs which are managed by this LogManager
     std::vector<std::shared_ptr<Log>> _logs;

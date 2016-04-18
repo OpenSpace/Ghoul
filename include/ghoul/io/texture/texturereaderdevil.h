@@ -41,22 +41,22 @@ namespace io {
  */
 class TextureReaderDevIL : public TextureReaderBase {
 public:
-	/**
-	 * Loads the passed \p filename by using the DevIL library.
-	 * \param filename The file to load
-	 * \return The loaded Texture
-	 * \pre \p filename must not be empty
-	 * \throws TextureLoadException If there was an error loading the Texture file
-	 */
-	std::unique_ptr<opengl::Texture> loadTexture(std::string filename) const override;
+    /**
+     * Loads the passed \p filename by using the DevIL library.
+     * \param filename The file to load
+     * \return The loaded Texture
+     * \pre \p filename must not be empty
+     * \throws TextureLoadException If there was an error loading the Texture file
+     */
+    std::unique_ptr<opengl::Texture> loadTexture(std::string filename) const override;
     std::unique_ptr<opengl::Texture> loadTextureFromMemory(const std::string& buffer) const override;
 
-	/**
-	 * Returns the supported file extensions
-	 * \return The supported file extensions
-	 * \sa http://openil.sourceforge.net/features.php
-	 */
-	std::vector<std::string> supportedExtensions() const override;
+    /**
+     * Returns the supported file extensions
+     * \return The supported file extensions
+     * \sa http://openil.sourceforge.net/features.php
+     */
+    std::vector<std::string> supportedExtensions() const override;
 };
 
 #endif // GHOUL_USE_DEVIL

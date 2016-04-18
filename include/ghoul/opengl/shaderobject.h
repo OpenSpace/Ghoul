@@ -35,9 +35,9 @@
 #include <ghoul/opengl/shaderpreprocessor.h>
 
 namespace ghoul {
-	namespace filesystem {
-		class File;
-	}
+    namespace filesystem {
+        class File;
+    }
 namespace opengl {
 
 /**
@@ -90,15 +90,15 @@ public:
         , ShaderTypeGeometry = GL_GEOMETRY_SHADER
         , ShaderTypeFragment = GL_FRAGMENT_SHADER
 #ifdef GL_VERSION_4_3
-	    , ShaderTypeCompute = GL_COMPUTE_SHADER
+        , ShaderTypeCompute = GL_COMPUTE_SHADER
 #endif
     };
 
 
-	/**
-	* A type definition for a callback function that is called if any of
-	* the tracked files is changed.
-	*/
+    /**
+    * A type definition for a callback function that is called if any of
+    * the tracked files is changed.
+    */
     using ShaderObjectCallback = std::function<void()>;
 
     /**
@@ -156,13 +156,13 @@ public:
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
      * generated
      */
-	ShaderObject(const ShaderObject& cpy);
+    ShaderObject(const ShaderObject& cpy);
 
-	/**
-	 * A move constructor that will move all of the internal state, and the shader source,
-	 * but it will leave the other object in an invalid state
-	 */
-	ShaderObject(ShaderObject&& rhs);
+    /**
+     * A move constructor that will move all of the internal state, and the shader source,
+     * but it will leave the other object in an invalid state
+     */
+    ShaderObject(ShaderObject&& rhs);
 
     /**
      * The destructor will mark the OpenGL name as unused again. Because of the way the
@@ -188,13 +188,13 @@ public:
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
      * generated
      */
-	ShaderObject& operator=(const ShaderObject& rhs);
+    ShaderObject& operator=(const ShaderObject& rhs);
 
-	/**
-	 * A move assignment that will move all of the internal state, and the shader source,
-	 * but it will leave the other object in an invalid state
-	 */
-	ShaderObject& operator=(ShaderObject&& rhs);
+    /**
+     * A move assignment that will move all of the internal state, and the shader source,
+     * but it will leave the other object in an invalid state
+     */
+    ShaderObject& operator=(ShaderObject&& rhs);
 
     /**
      * Sets the internal name of this ShaderObject that changes the logging category by
@@ -226,13 +226,13 @@ public:
      * Sets the shader object callback.
      * \param changeCallback object
      */
-	void setShaderObjectCallback(ShaderObjectCallback changeCallback);
+    void setShaderObjectCallback(ShaderObjectCallback changeCallback);
 
     /**
      * Returns the filepath for the shader object file
      * \return The filename
      */
-	std::string filename();
+    std::string filename();
 
     /**
      * (Re)sets the \p filename this ShaderObject is based on. It will load the contents
