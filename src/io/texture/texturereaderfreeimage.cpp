@@ -138,16 +138,20 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
 
     int imageByte = FreeImage_GetBPP(dib);
     unsigned int pitch = FreeImage_GetPitch(dib);
-    BYTE* data = new BYTE[width * height * imageByte/8];
+    BYTE* data = new BYTE[height * pitch];
+
+    // Swap red and blue channels, cannot use GL_BGR in OpenGL core profile
+    for (unsigned y = 0; y < FreeImage_GetHeight(dib); y++) {
+        BYTE *bits = FreeImage_GetScanLine(dib, y);
+        for (unsigned x = 0; x < FreeImage_GetWidth(dib); x++) {
+            std::swap(bits[FI_RGBA_RED], bits[FI_RGBA_BLUE]);
+            // jump to next pixel
+            bits += imageByte / 8;
+        }
+    }
 
     FreeImage_ConvertToRawBits(data, dib, pitch, imageByte, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE);
     FreeImage_Unload(dib);
-
-    // Swap red and blue channels, cannot use GL_BGR in OpenGL core profile
-    for (size_t i = 0; i < width * height; ++i) {
-        size_t index = i * imageByte / 8;
-        std::swap(data[index], data[index + 2]);
-    }
 
     return std::make_unique<Texture>(data, size, format, static_cast<int>(format), type);
 }
@@ -246,16 +250,20 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(c
 
     int imageByte = FreeImage_GetBPP(dib);
     unsigned int pitch = FreeImage_GetPitch(dib);
-    BYTE* data = new BYTE[width * height * imageByte/8];
+    BYTE* data = new BYTE[height * pitch];
+
+    // Swap red and blue channels, cannot use GL_BGR in OpenGL core profile
+    for (unsigned y = 0; y < FreeImage_GetHeight(dib); y++) {
+        BYTE *bits = FreeImage_GetScanLine(dib, y);
+        for (unsigned x = 0; x < FreeImage_GetWidth(dib); x++) {
+            std::swap(bits[FI_RGBA_RED], bits[FI_RGBA_BLUE]);
+            // jump to next pixel
+            bits += imageByte / 8;
+        }
+    }
 
     FreeImage_ConvertToRawBits(data, dib, pitch, imageByte, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE);
     FreeImage_Unload(dib);
-
-    // Swap red and blue channels, cannot use GL_BGR in OpenGL core profile
-    for (size_t i = 0; i < width * height; ++i) {
-        size_t index = i * imageByte / 8;
-        std::swap(data[index], data[index + 2]);
-    }
 
     return std::make_unique<Texture>(data, size, format, static_cast<int>(format), type);
 }
