@@ -132,8 +132,9 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTextureFromMemory(const
     ilInit();
     iluInit();
 
-    //ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-    //ilEnable(IL_ORIGIN_SET);
+    // If this is not set, DevIL will load the images with an inverted y-axis
+    ilEnable(IL_ORIGIN_SET);
+    ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 
     ILboolean loadSuccess = ilLoadL(IL_TYPE_UNKNOWN, (ILubyte*)buffer.c_str(), buffer.size());
     if (!loadSuccess) {
