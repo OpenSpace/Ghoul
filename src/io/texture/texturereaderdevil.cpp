@@ -44,6 +44,10 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(std::string fil
     ilInit();
     iluInit();
 
+    // If this is not set, DevIL will load the images with an inverted y-axis
+    ilEnable(IL_ORIGIN_SET);
+    ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+
     ILboolean loadSuccess = ilLoadImage(filename.c_str());
     if (!loadSuccess) {
         ILenum error = ilGetError();
@@ -60,11 +64,6 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(std::string fil
     ILint width = ilGetInteger(IL_IMAGE_WIDTH);
     ILint height = ilGetInteger(IL_IMAGE_HEIGHT);
     ILint depth = ilGetInteger(IL_IMAGE_DEPTH);
-
-    //if (imageFormat == IL_LUMINANCE || imageFormat == IL_COLOUR_INDEX) {
-    //    imageFormat = IL_RGB;
-    //    imageByte *= 3;
-    //}
 
     // Copy data from common data store to own address space
     ILubyte* data = new ILubyte[width * height * imageByte];
