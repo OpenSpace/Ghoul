@@ -149,6 +149,11 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
             bits += imageByte / 8;
         }
     }
+    
+    bool flipSuccess = FreeImage_FlipVertical(dib);
+    if (!flipSuccess) {
+        throw TextureLoadException(std::move(filename), "Could not flip image", this);
+    }
 
     FreeImage_ConvertToRawBits(data, dib, pitch, imageByte, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE);
     FreeImage_Unload(dib);
@@ -262,6 +267,11 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(c
         }
     }
 
+    bool flipSuccess = FreeImage_FlipVertical(dib);
+    if (!flipSuccess) {
+        throw TextureLoadException("Memory", "Could not flip image", this);
+    }
+    
     FreeImage_ConvertToRawBits(data, dib, pitch, imageByte, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE);
     FreeImage_Unload(dib);
 
