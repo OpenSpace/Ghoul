@@ -315,6 +315,8 @@ void ProgramObject::rebuildFromFile() {
     p.compileShaderObjects();
     p.linkProgramObject();
 
+    LINFO("Successfully rebuilt ProgramObject");
+
     *this = std::move(p);
 }
 
