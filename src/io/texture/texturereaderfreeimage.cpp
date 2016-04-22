@@ -45,44 +45,44 @@ namespace ghoul {
 namespace io {
 
 std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
-                                                               std::string filename) const
+                                                        const std::string& filename) const
 {
     using opengl::Texture;
 
-    //pointer to the image, once loaded
+    // Pointer to the image, once loaded
     FIBITMAP* dib(0);
-    //pointer to the image data
+    // Pointer to the image data
     BYTE* bits(0);
     //image width and height
     unsigned int width(0), height(0);
 
-    //image format
-    //check the file signature and deduce its format
+    // Image format
+    // Check the file signature and deduce its format
     FREE_IMAGE_FORMAT fif = FreeImage_GetFileType(filename.c_str(), 0);
-    //if still unknown, try to guess the file format from the file extension
+    // If still unknown, try to guess the file format from the file extension
     if (fif == FIF_UNKNOWN)
         fif = FreeImage_GetFIFFromFilename(filename.c_str());
-    //if still unknown, return failure
+    // If still unknown, return failure
     if (fif == FIF_UNKNOWN)
-        return nullptr;
+        throw TextureLoadException(filename, "Could not determine file format", this);
 
-    //check that the plug-in has reading capabilities and load the file
+    // Check that the plug-in has reading capabilities and load the file
     if (FreeImage_FIFSupportsReading(fif))
         dib = FreeImage_Load(fif, filename.c_str());
-    //if the image failed to load, return failure
+    // If the image failed to load, return failure
     if (!dib)
-        return nullptr;
+        throw TextureLoadException(filename, "Could not load image", this);
 
-    //retrieve the image data
+    // Retrieve the image data
     bits = FreeImage_GetBits(dib);
-    //get the image width and height
+    // Get the image width and height
     width = FreeImage_GetWidth(dib);
     height = FreeImage_GetHeight(dib);
 
-    glm::size3_t size(width, height, 1);
-    //if this somehow one of these failed (they shouldn't), return failure
+    glm::size3_t imageSize(width, height, 1);
+    // If this somehow one of these failed (they shouldn't), return failure
     if ((bits == 0) || (width == 0) || (height == 0))
-        return nullptr;
+        throw TextureLoadException(filename, "Unable to ready bits or size", this);
 
 
     FREE_IMAGE_TYPE            imageType = FreeImage_GetImageType(dib);
@@ -155,37 +155,57 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
         throw TextureLoadException(std::move(filename), "Could not flip image", this);
     }
 
-    FreeImage_ConvertToRawBits(data, dib, pitch, imageByte, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE);
+    FreeImage_ConvertToRawBits(
+        data,
+        dib,
+        pitch,
+        imageByte,
+        FI_RGBA_RED_MASK,
+        FI_RGBA_GREEN_MASK,
+        FI_RGBA_BLUE_MASK,
+        TRUE
+    );
     FreeImage_Unload(dib);
 
-    return std::make_unique<Texture>(data, size, format, static_cast<int>(format), type);
+    return std::make_unique<Texture>(
+        data,
+        imageSize,
+        format,
+        static_cast<int>(format),
+        type
+    );
 }
 
-std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(const std::string& buffer) const {
+std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(void* memory,
+                                                                     size_t size) const
+{
     using opengl::Texture;
 
-    //pointer to the image, once loaded
+    // Pointer to the image, once loaded
     FIBITMAP* dib(0);
-    //pointer to the image data
+    // Pointer to the image data
     BYTE* bits(0);
-    //image width and height
+    // Image width and height
     unsigned int width(0), height(0);
 
-    //Open the a stream to memory
-    FIMEMORY* stream = FreeImage_OpenMemory((BYTE*)buffer.c_str(), buffer.size());
+    // Open the a stream to memory
+    FIMEMORY* stream = FreeImage_OpenMemory(
+        reinterpret_cast<BYTE*>(memory),
+        size
+    );
 
-    //check the file signature and deduce its format
+    // Check the file signature and deduce its format
     FREE_IMAGE_FORMAT fif = FreeImage_GetFileTypeFromMemory(stream, 0);
     //if it is unknown, return failure
     if (fif == FIF_UNKNOWN)
-        return nullptr;
+        throw TextureLoadException("Memory", "Could not deduce type information", this);
 
     //check that the plug-in has reading capabilities and load the file
     if (FreeImage_FIFSupportsReading(fif))
         dib = FreeImage_LoadFromMemory(fif, stream);
     //if the image failed to load, return failure
     if (!dib)
-        return nullptr;
+        throw TextureLoadException("Memory", "Could not load image", this);
 
     //close the memory stream
     FreeImage_CloseMemory(stream);
@@ -196,10 +216,10 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(c
     width = FreeImage_GetWidth(dib);
     height = FreeImage_GetHeight(dib);
 
-    glm::size3_t size(width, height, 1);
+    glm::size3_t imageSize(width, height, 1);
     //if this somehow one of these failed (they shouldn't), return failure
     if ((bits == 0) || (width == 0) || (height == 0))
-        return nullptr;
+        throw TextureLoadException("Memory", "Unable to ready bits or size", this);
 
 
     FREE_IMAGE_TYPE            imageType = FreeImage_GetImageType(dib);
@@ -259,7 +279,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(c
 
     // Swap red and blue channels, cannot use GL_BGR in OpenGL core profile
     for (unsigned y = 0; y < FreeImage_GetHeight(dib); y++) {
-        BYTE *bits = FreeImage_GetScanLine(dib, y);
+        BYTE* bits = FreeImage_GetScanLine(dib, y);
         for (unsigned x = 0; x < FreeImage_GetWidth(dib); x++) {
             std::swap(bits[FI_RGBA_RED], bits[FI_RGBA_BLUE]);
             // jump to next pixel
@@ -272,10 +292,25 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureFromMemory(c
         throw TextureLoadException("Memory", "Could not flip image", this);
     }
     
-    FreeImage_ConvertToRawBits(data, dib, pitch, imageByte, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE);
+    FreeImage_ConvertToRawBits(
+        data,
+        dib,
+        pitch,
+        imageByte,
+        FI_RGBA_RED_MASK,
+        FI_RGBA_GREEN_MASK,
+        FI_RGBA_BLUE_MASK,
+        TRUE
+    );
     FreeImage_Unload(dib);
 
-    return std::make_unique<Texture>(data, size, format, static_cast<int>(format), type);
+    return std::make_unique<Texture>(
+        data,
+        imageSize,
+        format,
+        static_cast<int>(format),
+        type
+    );
 }
 
 std::vector<std::string> TextureReaderFreeImage::supportedExtensions() const {

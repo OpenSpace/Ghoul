@@ -39,7 +39,9 @@
 namespace ghoul {
 namespace io {
 
-std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(std::string filename) const {
+std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(
+                                                        const std::string& filename) const
+{
     using opengl::Texture;
     ilInit();
     iluInit();
@@ -52,7 +54,7 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(std::string fil
     if (!loadSuccess) {
         ILenum error = ilGetError();
         throw TextureLoadException(
-            std::move(filename),
+            filename,
             fmt::format("Error loading image: {}", iluErrorString(error)),
             this
         );
@@ -87,7 +89,7 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(std::string fil
             break;
         default:
             throw TextureLoadException(
-                std::move(filename),
+                filename,
                 fmt::format("Error reading format: {}", imageFormat),
                 this
             );
@@ -118,7 +120,7 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(std::string fil
             break;
         default:
             throw TextureLoadException(
-                std::move(filename),
+                filename,
                 fmt::format("Error reading data type: {}", imageType),
                 this
             );
@@ -127,7 +129,9 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(std::string fil
     return std::make_unique<Texture>(data, size, format, static_cast<int>(format), type);
 }
 
-std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTextureFromMemory(const std::string& buffer) const {
+std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(void* memory,
+                                                                 size_t size) const
+{
     using opengl::Texture;
     ilInit();
     iluInit();
@@ -136,7 +140,12 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTextureFromMemory(const
     ilEnable(IL_ORIGIN_SET);
     ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 
-    ILboolean loadSuccess = ilLoadL(IL_TYPE_UNKNOWN, (ILubyte*)buffer.c_str(), buffer.size());
+    ILboolean loadSuccess = ilLoadL(
+        IL_TYPE_UNKNOWN,
+        reinterpret_cast<ILubyte*>(memory),
+        size
+    );
+
     if (!loadSuccess) {
         ILenum error = ilGetError();
         throw TextureLoadException(
@@ -162,7 +171,7 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTextureFromMemory(const
     ILubyte* data = new ILubyte[width * height * imageByte];
     ilCopyPixels(0, 0, 0, width, height, 1, imageFormat, IL_UNSIGNED_BYTE, data);
 
-    glm::size3_t size(width, height, depth);
+    glm::size3_t imageSize(width, height, depth);
 
     Texture::Format format;
     switch (imageFormat) {
@@ -212,7 +221,13 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTextureFromMemory(const
             );
     }
 
-    return std::make_unique<Texture>(data, size, format, static_cast<int>(format), type);
+    return std::make_unique<Texture>(
+        data,
+        imageSize,
+        format,
+        static_cast<int>(format),
+        type
+    );
 }
 
 std::vector<std::string> TextureReaderDevIL::supportedExtensions() const {

@@ -38,7 +38,7 @@ namespace ghoul {
 namespace io {
 
 std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
-                                                               std::string filename) const
+                                                        const std::string& filename) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     
@@ -70,7 +70,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         
         if (!values) {
             throw TextureLoadException(
-                std::move(filename),
+                filename,
                 "The first non-comment, non-empty line must contain the image width",
                 this
             );
@@ -84,7 +84,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         
         if (i > (width * 4)) {
             throw TextureLoadException(
-                std::move(filename),
+                filename,
                 fmt::format("Header assured '{}' values but more were found", width),
                 this
             );
@@ -98,7 +98,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
 
     if ((width * 4) != i) {
         throw TextureLoadException(
-            std::move(filename),
+            filename,
             fmt::format("Header assured '{}' values but '{}' were found", width, i / 4.f),
             this
         );
@@ -114,7 +114,10 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
     return texture;
 }
 
-std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTextureFromMemory(const std::string& buffer) const {
+std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(void* memory,
+                                                                size_t size) const
+{
+    ghoul_assert(false, "Implementation missing");
     return nullptr;
 }
 

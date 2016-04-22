@@ -56,17 +56,15 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& f
     return reader->loadTexture(filename);
 }
 
-std::unique_ptr<opengl::Texture> TextureReader::loadTextureFromMemory(const std::string& buffer) {
+std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory,
+                                                            size_t size,
+                                                            const std::string& format)
+{
+    ghoul_assert(memory, "Memory must not be nullptr");
+    ghoul_assert(size > 0, "Size must be > 0");
     ghoul_assert(!_readers.empty(), "No readers were registered before");
-    // ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
-    // const std::string& extension = ghoul::filesystem::File(filename).fileExtension();
-    // ghoul_assert(!extension.empty(), "Filename must have an extension");
-    
-    //temporary to get SOIL or FreeImage for linux --piwell
-    const std::string& extension = "jpg";
-    TextureReaderBase* reader = readerForExtension(extension);
-    return reader->loadTextureFromMemory(buffer);
+    TextureReaderBase* reader = readerForExtension(format);
+    return reader->loadTexture(memory, size);
 }
 
 void TextureReader::addReader(std::shared_ptr<TextureReaderBase> reader) {
