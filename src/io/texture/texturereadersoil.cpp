@@ -36,7 +36,7 @@ namespace ghoul {
 namespace io {
 
 std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(
-                                                               std::string filename) const
+                                                        const std::string& filename) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     
@@ -67,22 +67,24 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(
     );
 }
 
-std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTextureFromMemory(const std::string& buffer) const {
+std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTextureFromMemory(void* memory,
+                                                                        size_t size) const
+{
     ghoul_assert(!buffer.empty(), "Buffer must not be empty");
     
     using opengl::Texture;
  
     int width, height;
     unsigned char* image = SOIL_load_image_from_memory(
-        (unsigned char*)buffer.c_str(),
-        buffer.size(),
+        reinterpret_cast<unsigned char*>(memory),
+        size,
         &width,
         &height,
         0,
         SOIL_LOAD_RGBA
     );
 
-    glm::size3_t size(width, height, 1);
+    glm::size3_t imageSize(width, height, 1);
     Texture::Format format;
     format = Texture::Format::RGBA;
     GLenum type;
@@ -90,7 +92,7 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTextureFromMemory(const 
 
     return std::make_unique<Texture>(
         image,
-        size,
+        imageSize,
         format,
         static_cast<int>(format),
         type,
