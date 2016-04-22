@@ -67,8 +67,8 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(
     );
 }
 
-std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTextureFromMemory(void* memory,
-                                                                        size_t size) const
+std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(void* memory,
+                                                                size_t size) const
 {
     ghoul_assert(!buffer.empty(), "Buffer must not be empty");
     
