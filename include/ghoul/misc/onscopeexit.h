@@ -37,7 +37,7 @@ namespace ghoul {
  * \p func. Due to the usage of the <code>__LINE__</code> macro to create a unique
  * variable name, this macro cannot be used multiple times in the same row.
  */
-#define OnExit(func) OnScopeExit __LABEL(__LINE__)(func)
+#define OnExit(func) ghoul::OnScopeExit __LABEL(__LINE__)(func)
     
 /**
  * This structure makes it easy to execute a function, for example a lambda, at the end of
