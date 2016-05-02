@@ -122,21 +122,22 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
         dib = FreeImage_ConvertTo24Bits(dib);
 //        dib = FreeImage_ConvertToRGBF(dib);
     }
+    
+    int imageByte = FreeImage_GetBPP(dib);
 
     GLenum type = GL_UNSIGNED_BYTE;
     Texture::Format format;
-    switch (colorType) {
-    case FIC_RGB:
+    switch (imageByte) {
+    case 24:
         format = Texture::Format::RGB;
         break;
-    case FIC_RGBALPHA:
+    case 32:
         format = Texture::Format::RGBA;
         break;
     default:
-        throw TextureLoadException(std::move(filename), "Could not read image", this);
+        throw TextureLoadException("Memory", "Could not read image", this);
     }
 
-    int imageByte = FreeImage_GetBPP(dib);
     unsigned int pitch = FreeImage_GetPitch(dib);
     BYTE* data = new BYTE[height * pitch];
 
