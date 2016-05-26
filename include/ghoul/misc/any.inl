@@ -70,7 +70,7 @@ any::placeholder* any::holder<ValueType>::clone() const {
 }
 
 template <typename ValueType>
-ValueType* any_cast(any* operand) noexcept {
+ValueType* any_cast(any* operand) {
     ghoul_assert(operand, "Operand for any_cast must not be nullptr");
     if (operand->type() == typeid(ValueType)) {
         return &static_cast<
@@ -82,7 +82,7 @@ ValueType* any_cast(any* operand) noexcept {
 }
 
 template <typename ValueType>
-inline const ValueType* any_cast(const any* operand) noexcept {
+inline const ValueType* any_cast(const any* operand) {
     ghoul_assert(operand, "Operand for any_cast must not be nullptr");
     if (operand->type() == typeid(ValueType)) {
         return &static_cast<

@@ -36,8 +36,8 @@
 #include <algorithm>
 
 namespace {
-	const int CRCPOLY = 0x82f63b78;
-	const int CRCINIT = 0xFFFFFFFF;
+    const int CRCPOLY = 0x82f63b78;
+    const int CRCINIT = 0xFFFFFFFF;
 
     unsigned int CrcLookup[8][256];
     bool IsInitialized = false;

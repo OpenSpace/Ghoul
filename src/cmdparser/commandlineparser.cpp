@@ -233,7 +233,7 @@ bool CommandlineParser::execute() {
     }
 
     // Second step: Check if every command is happy with the parameters assigned to it
-	for (const auto& it : parameterMap)
+    for (const auto& it : parameterMap)
         it.first->checkParameters(it.second);
 
     // Second-and-a-half step: Display pairs for (command,argument) in debug level
@@ -242,7 +242,7 @@ bool CommandlineParser::execute() {
         s << " " << arg;
     LDEBUG(format("(Nameless argument: {})", s.str()));
     
-	for (const auto& it : parameterMap) {
+    for (const auto& it : parameterMap) {
         s.clear();
         for (const std::string& arg : it.second)
             s << " " << arg;
@@ -257,7 +257,7 @@ bool CommandlineParser::execute() {
 
     // Fourth step: Execute the commands (this step is only done if everyone is happy up
     // until now)
-	for (const auto& it : parameterMap)
+    for (const auto& it : parameterMap)
         it.first->execute(it.second);
     
     // If we made it this far it means that all commands have been executed successfully

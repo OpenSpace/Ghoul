@@ -141,21 +141,21 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
 }
 
 ShaderObject::ShaderObject(ShaderObject&& rhs) {
-	if (this != &rhs) {
+    if (this != &rhs) {
         _id = std::move(rhs._id);
 
-		_type = rhs._type;
-		_shaderName = std::move(rhs._shaderName);
-		_loggerCat = std::move(rhs._loggerCat);
+        _type = rhs._type;
+        _shaderName = std::move(rhs._shaderName);
+        _loggerCat = std::move(rhs._loggerCat);
         _onChangeCallback = std::move(rhs._onChangeCallback);
-		_preprocessor = std::move(rhs._preprocessor);
-		setShaderObjectCallback(rhs._onChangeCallback);
-	}
+        _preprocessor = std::move(rhs._preprocessor);
+        setShaderObjectCallback(rhs._onChangeCallback);
+    }
 }
 
 ShaderObject::~ShaderObject() {
     glDeleteShader(_id);
-	_id = 0;
+    _id = 0;
 }
 
 ShaderObject::operator GLuint() const {
@@ -186,26 +186,26 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
 }
 
 ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) {
-	if (this != &rhs) {
+    if (this != &rhs) {
         _id = std::move(rhs._id);
-		_type = rhs._type;
-		_shaderName = std::move(rhs._shaderName);
-		_loggerCat = std::move(rhs._loggerCat);
-		_onChangeCallback = std::move(rhs._onChangeCallback);
-		_preprocessor = std::move(rhs._preprocessor);
-		// Take ownership of the moved preprocessor
-		setShaderObjectCallback(_onChangeCallback);
+        _type = rhs._type;
+        _shaderName = std::move(rhs._shaderName);
+        _loggerCat = std::move(rhs._loggerCat);
+        _onChangeCallback = std::move(rhs._onChangeCallback);
+        _preprocessor = std::move(rhs._preprocessor);
+        // Take ownership of the moved preprocessor
+        setShaderObjectCallback(_onChangeCallback);
 
-	}
-	return *this;
+    }
+    return *this;
 }
 
 void ShaderObject::setName(std::string name) {
-	_shaderName = std::move(name);
-	_loggerCat = "ShaderObject['" + _shaderName + "']";
+    _shaderName = std::move(name);
+    _loggerCat = "ShaderObject['" + _shaderName + "']";
 #ifdef GL_VERSION_4_3
     if (glObjectLabel) {
-		glObjectLabel(
+        glObjectLabel(
             GL_SHADER,
             _id,
             GLsizei(_shaderName.length() + 1),
@@ -235,7 +235,7 @@ void ShaderObject::setFilename(const std::string& filename) {
 }
 
 std::string ShaderObject::filename() {
-	return _preprocessor.filename();
+    return _preprocessor.filename();
 }
 
 void ShaderObject::setDictionary(Dictionary dictionary) {
@@ -250,16 +250,16 @@ void ShaderObject::rebuildFromFile() {
     std::string contents;
     _preprocessor.process(contents);
 
-	// If in debug mode, output the source to file
+    // If in debug mode, output the source to file
 #ifdef GHL_DEBUG
-	std::string generatedFilename;
+    std::string generatedFilename;
 
     std::string baseName;
     if (_shaderName == "") {
-		filesystem::File ghlFile(filename());
-		baseName = ghlFile.baseName();
+        filesystem::File ghlFile(filename());
+        baseName = ghlFile.baseName();
     } else {
-		baseName = _shaderName;
+        baseName = _shaderName;
     }
 
     if (FileSys.cacheManager()) {
@@ -274,7 +274,7 @@ void ShaderObject::rebuildFromFile() {
         // filename could not be fetched
         generatedFilename += ".GhoulGenerated.glsl";
     }
-	
+    
     std::ofstream os;
     os.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     try {
@@ -287,7 +287,7 @@ void ShaderObject::rebuildFromFile() {
         f = f;
     }
 #endif // GHL_DEBUG
-	
+    
     const char* contentPtr =  contents.c_str();
     glShaderSource(_id, 1, &contentPtr, nullptr);
 }

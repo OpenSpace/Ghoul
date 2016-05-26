@@ -60,10 +60,10 @@ public:
      */
     VertexBufferObject& operator=(VertexBufferObject&& other);
 
-	/**
-	 * Default destructor.
-	 */
-	~VertexBufferObject();
+    /**
+     * Default destructor.
+     */
+    ~VertexBufferObject();
     
     /**
      * A runtime function that checks if initialize has been called.
@@ -85,7 +85,7 @@ public:
     void initialize(const std::vector<GLfloat>& vertexArray,
         const std::vector<GLint>& indexArray);
 
-	/**
+    /**
      * Initializes the VertexBufferObject with the provided \p vertexArray and
      * \p indexArray list. The structure of the vertex data can be arbitrary but correct
      * offsets must be specified using #vertexAttribPointer.
@@ -94,9 +94,9 @@ public:
      * \param vertexArray The vertex array used for this VertexBufferObject
      * \param indexArray The index list used for this VertexBufferObject
      * \pre VertexBufferObject must not have been initialized before
-	 */
-	template<typename T>
-	void initialize(const std::vector<T>& vertexArray,
+     */
+    template<typename T>
+    void initialize(const std::vector<T>& vertexArray,
         const std::vector<GLint>& indexArray);
 
     /**
@@ -109,41 +109,41 @@ public:
      */
     void setRenderMode(GLenum mode = GL_TRIANGLES);
 
-	/**
-	 * A wrapper function for <code>glEnableVertexAttribArray</code> and
+    /**
+     * A wrapper function for <code>glEnableVertexAttribArray</code> and
      * <code>glVertexAttribPointer</code> that defines how the values passed in the
      * #initialize method are interpreted.
-	 * \param index The index of the attribute to be modified
-	 * \param size The number of elements in this attribute
-	 * \param type The data type, for example <code>GL_FLOAT</code>
-	 * \param stride The size for all values of a vertex
-	 * \param offset The offset for the specific member
-	 * \param normalized flag weather the attribute should be normalized
-	 */
-	void vertexAttribPointer(GLuint index, GLint size, GLenum type, GLsizei stride,
-		GLuint offset, GLboolean normalized = GL_FALSE);
+     * \param index The index of the attribute to be modified
+     * \param size The number of elements in this attribute
+     * \param type The data type, for example <code>GL_FLOAT</code>
+     * \param stride The size for all values of a vertex
+     * \param offset The offset for the specific member
+     * \param normalized flag weather the attribute should be normalized
+     */
+    void vertexAttribPointer(GLuint index, GLint size, GLenum type, GLsizei stride,
+        GLuint offset, GLboolean normalized = GL_FALSE);
 
     /// Binds the VBO
-	void bind();
+    void bind();
 
     /// Unbinds the VBO
-	void unbind();
+    void unbind();
 
     /// Render the VBO using the provided mode through VertexBufferObject::setRenderMode.
-	void render();
+    void render();
 
 private:
-	/**
-	 * Constructs the internal GL objects by calling <code>glGenVertexArrays</code> and
+    /**
+     * Constructs the internal GL objects by calling <code>glGenVertexArrays</code> and
      * <code>glGenBuffers</code>
-	 */
-	void generateGLObjects();
+     */
+    void generateGLObjects();
 
     /// The vertex array object that stores the created VertexBufferObject
-	GLuint _vaoID;
+    GLuint _vaoID;
     
     /// The vertex buffer object
-	GLuint _vBufferID;
+    GLuint _vBufferID;
     
     /// The index buffer obejct
     GLuint _iBufferID;

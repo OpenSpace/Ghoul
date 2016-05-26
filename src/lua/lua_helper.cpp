@@ -148,12 +148,12 @@ string stackInformation(lua_State* state) {
                 case LUA_TTABLE:
                     result << luaTableToString(state, i);
                     break;
-				case LUA_TTHREAD:
-				case LUA_TUSERDATA:
-				case LUA_TLIGHTUSERDATA:
-				case LUA_TFUNCTION:
-					result << luaTypeToString(t);
-					break;
+                case LUA_TTHREAD:
+                case LUA_TUSERDATA:
+                case LUA_TLIGHTUSERDATA:
+                case LUA_TFUNCTION:
+                    result << luaTypeToString(t);
+                    break;
                 default:
                     result << lua_typename(state, t);
                     break;
@@ -333,8 +333,35 @@ lua_State* createNewLuaState() {
 }
 
 void destroyLuaState(lua_State* state) {
+    ghoul_assert(state, "State must not be nullptr");
     lua_close(state);
 }
+    
+void runScriptFile(lua_State* state, const std::string& filename) {
+    ghoul_assert(state, "State must not be nullptr");
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+    ghoul_assert(FileSys.fileExists(absPath(filename)), "Filename must be a file");
+    
+    int status = luaL_loadfile(state, filename.c_str());
+    if (status != LUA_OK)
+        throw LuaLoadingException(lua_tostring(state, -1));
+    
+    if (lua_pcall(state, 0, LUA_MULTRET, 0))
+        throw LuaExecutionException(lua_tostring(state, -1));
+}
+
+void runScript(lua_State* state, const std::string& script) {
+    ghoul_assert(state, "State must not be nullptr");
+    ghoul_assert(!script.empty(), "Script must not be empty");
+    
+    int status = luaL_loadstring(state, script.c_str());
+    if (status != LUA_OK)
+        throw LuaLoadingException(lua_tostring(state, -1));
+    
+    if (lua_pcall(state, 0, LUA_MULTRET, 0))
+        throw LuaExecutionException(lua_tostring(state, -1));
+}
+    
 
 namespace internal {
 

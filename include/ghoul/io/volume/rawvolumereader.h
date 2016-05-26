@@ -32,24 +32,24 @@ namespace ghoul {
 
 class RawVolumeReader : public VolumeReader {
 public:
-	struct ReadHints {
-		ReadHints(glm::ivec3 dimensions = glm::ivec3(0));
-		glm::ivec3 _dimensions;
-		opengl::Texture::Format _format;
-		GLenum _internalFormat;
-	};
+    struct ReadHints {
+        ReadHints(glm::ivec3 dimensions = glm::ivec3(0));
+        glm::ivec3 _dimensions;
+        opengl::Texture::Format _format;
+        GLenum _internalFormat;
+    };
 
-	RawVolumeReader();
-	RawVolumeReader(const ReadHints& hints);
-	~RawVolumeReader();
+    RawVolumeReader();
+    RawVolumeReader(const ReadHints& hints);
+    ~RawVolumeReader();
 
-	void setReadHints(glm::ivec3 dimension);
-	void setReadHints(const ReadHints& hints);
+    void setReadHints(glm::ivec3 dimension);
+    void setReadHints(const ReadHints& hints);
 
-	opengl::Texture* read(std::string filename);
+    opengl::Texture* read(std::string filename);
 protected:
 private:
-	ReadHints _hints;
+    ReadHints _hints;
 };
 
 } // namespace ghoul

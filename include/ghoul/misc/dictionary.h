@@ -241,8 +241,8 @@ public:
      * initializer list can be, for example, of the format
      * <code>{ { "a", 1 }, { "b", 2 } }</code> and it will add all of the
      * <code>std::pair</code>s provided to the Dictionary.
-	 * \param l The <code>std::initializer_list</code> that contains all of the values
-	 * that should be added to the Dictionary
+     * \param l The <code>std::initializer_list</code> that contains all of the values
+     * that should be added to the Dictionary
      */
     Dictionary(std::initializer_list<std::pair<std::string, ghoul::any>> l);
 
@@ -337,8 +337,8 @@ public:
      * <code>T</code>
      * \pre \p key must not be empty
      */
-	template <typename T>
-	T value(const std::string& key) const;
+    template <typename T>
+    T value(const std::string& key) const;
 
     /**
      * Returns <code>true</code> if the Dictionary stores a value at the provided
@@ -384,23 +384,23 @@ public:
      */
     void clear();
 
-	/**
-	 * Returns <code>true</code> if this Dictionary is empty; <code>false</code> otherwise
-	 * \return <code>true</code> if this Dictionary is empty; <code>false</code> otherwise
-	 */
-	bool empty() const;
+    /**
+     * Returns <code>true</code> if this Dictionary is empty; <code>false</code> otherwise
+     * \return <code>true</code> if this Dictionary is empty; <code>false</code> otherwise
+     */
+    bool empty() const;
 
-	/**
-	 * Removes key and value pair stored under the, potentially nested, \p key. If the
+    /**
+     * Removes key and value pair stored under the, potentially nested, \p key. If the
      * \p key was found and successfully removed, <code>true</code> is returned, otherwise
      * the method returns <code>false</code>. Under no circumstances an error is logged.
-	 * \param key The, potentially nested, key pointing to the object that should be
-	 * deleted
-	 * \return Returns <code>true</code> if the key was successfully found and removed,
-	 * <code>false</code> otherwise
+     * \param key The, potentially nested, key pointing to the object that should be
+     * deleted
+     * \return Returns <code>true</code> if the key was successfully found and removed,
+     * <code>false</code> otherwise
      * \pre \p key must not be empty
-	 */
-	bool removeKey(const std::string& key);
+     */
+    bool removeKey(const std::string& key);
 
 private:
     /**

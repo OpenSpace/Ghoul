@@ -93,7 +93,7 @@ public:
      * \throw ErrorLoadingCacheException If the previous cache could not be loaded
      * \pre \p directory must not be empty
      */
-	CacheManager(std::string directory, int version = -1);
+    CacheManager(std::string directory, int version = -1);
     
     /**
      * The destructor will save all information on persistent files in a
@@ -101,15 +101,15 @@ public:
      * so that they can be retrieved when the application is started up again. All
      * non-persistent files are automatically deleted in the destructor.
      */
-	~CacheManager();
+    ~CacheManager();
 
     /**
      * Returns the path to a storage location for the cached file. Depending on the
      * persistence (\p isPersistent), the directory and files will automatically be
      * cleaned on application end or be made available automatically on the next 
      * application run. The method will use the date of last modification as a unique
-	 * identifier for the file. Subsequent calls (in the same run or different) with the
-	 * same \p file will consistently produce the same file path until the last-modified
+     * identifier for the file. Subsequent calls (in the same run or different) with the
+     * same \p file will consistently produce the same file path until the last-modified
      * date changes. If the cached file was created before, the \p isPersistent parameter
      * is silently ignored.
      * \param file The file name of the file for which the cached entry is to be retrieved
@@ -193,12 +193,12 @@ public:
     std::string cachedFilename(const std::string& baseName,
         const std::string& information, Persistent isPersistent = Persistent::No);
 
-	/**
+    /**
      * This method checks if a cached \p file has been registered before in this 
      * application run (persistent and non-persistent files) or in a previous run
      * (persistent cache files only). Note that this only checks if a file has been
-	 * requested before, not if the cached file has actually been used. The method will
-	 * use the date of last modification as a unique identifier for the file.
+     * requested before, not if the cached file has actually been used. The method will
+     * use the date of last modification as a unique identifier for the file.
      * \param file The file for which the cached file should be searched
      * \return <code>true</code> if a cached file was requested before; <code>false</code>
      * otherwise
@@ -207,7 +207,7 @@ public:
      * <code>|</code>, <code>"</code>, <code>\<</code>, <code>\></code>, or <code>.</code>
      * ) in the \p file
      */
-	bool hasCachedFile(const File& file) const;
+    bool hasCachedFile(const File& file) const;
 
     /**
      * This method checks if a cached \p file has been registered before in this
@@ -243,18 +243,18 @@ public:
      */
     bool hasCachedFile(const std::string& baseName, const std::string& information) const;
 
-	/**
+    /**
      * Removes the cached file and deleted the entry from the CacheManager. If the
      * \p file has not previously been used to request a cache entry, no error
      * will be signaled. The method will use the date of last modification as a unique
-	 * identifier for the file.
+     * identifier for the file.
      * \param file The file for which the cache file should be deleted
      * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
      * <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>, <code>:</code>,
      * <code>|</code>, <code>"</code>, <code>\<</code>, <code>\></code>, or <code>.</code>
      * ) in the \p file
      */
-	void removeCacheFile(const File& file);
+    void removeCacheFile(const File& file);
 
     /**
      * Removes the cached file and deleted the entry from the CacheManager. If the
@@ -287,44 +287,44 @@ public:
     
 protected:
     /// This struct stores the cache information for a specific hash value.
-	struct CacheInformation {
+    struct CacheInformation {
         std::string file; ///< The path to the cached file
         bool isPersistent; ///< if the cached entry should be automatically deleted
-	};
+    };
     
     using LoadedCacheInfo = std::pair<unsigned int, std::string>;
     
-	/**
-	 * Generates a hash number from the file path and information string
-	 * \return A hash number
-	 */
-	unsigned int generateHash(std::string file, std::string information) const;
+    /**
+     * Generates a hash number from the file path and information string
+     * \return A hash number
+     */
+    unsigned int generateHash(std::string file, std::string information) const;
 
-	/**
-	 * Cleans a directory from files not flagged as persistent and removes 
-	 */
-	void cleanDirectory(const Directory& dir) const;
+    /**
+     * Cleans a directory from files not flagged as persistent and removes 
+     */
+    void cleanDirectory(const Directory& dir) const;
 
-	/**
-	 * Reads informations from a directory about the content and transofrms it to a
-	 * vector of content. This vector is compared with the cache description file
-	 * and used as a foundation for cleaning directories.
-	 */
+    /**
+     * Reads informations from a directory about the content and transofrms it to a
+     * vector of content. This vector is compared with the cache description file
+     * and used as a foundation for cleaning directories.
+     */
     std::vector<LoadedCacheInfo> cacheInformationFromDirectory(
         const Directory& dir) const;
 
-	CacheManager(const CacheManager& c) = delete;
-	CacheManager(CacheManager&& m) = delete;
-	CacheManager& operator=(const CacheManager& rhs) = delete;
+    CacheManager(const CacheManager& c) = delete;
+    CacheManager(CacheManager&& m) = delete;
+    CacheManager& operator=(const CacheManager& rhs) = delete;
 
-	/// The cache directory
-	Directory _directory;
+    /// The cache directory
+    Directory _directory;
 
     /// The cache version
     int _version;
 
-	/// A map containing file hashes and file information
-	std::map<unsigned int, CacheInformation> _files;
+    /// A map containing file hashes and file information
+    std::map<unsigned int, CacheInformation> _files;
 };
 
 } // namespace filesystem

@@ -38,7 +38,7 @@ namespace ghoul {
 namespace io {
 
 std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
-                                                               std::string filename) const
+                                                        const std::string& filename) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     
@@ -51,17 +51,17 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
     uint8_t* values = nullptr;
 //    std::vector<uint8_t> values;
 
-	std::string line;
-	int i = 0;
-	while (std::getline(file, line)) {
-		// Skip empty lines
-		if (line.empty() || line == "\r")
-			continue;
-		// # defines a comment
-		if (line[0] == '#')
-			continue;
+    std::string line;
+    int i = 0;
+    while (std::getline(file, line)) {
+        // Skip empty lines
+        if (line.empty() || line == "\r")
+            continue;
+        // # defines a comment
+        if (line[0] == '#')
+            continue;
 
-		std::stringstream s(line);
+        std::stringstream s(line);
         if (!values) {
             s >> width;
             values = new uint8_t[width * 4];
@@ -70,7 +70,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         
         if (!values) {
             throw TextureLoadException(
-                std::move(filename),
+                filename,
                 "The first non-comment, non-empty line must contain the image width",
                 this
             );
@@ -84,42 +84,45 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         
         if (i > (width * 4)) {
             throw TextureLoadException(
-                std::move(filename),
+                filename,
                 fmt::format("Header assured '{}' values but more were found", width),
                 this
             );
         }
 
-		values[i++] = static_cast<uint8_t>(color.r * 255);
-		values[i++] = static_cast<uint8_t>(color.g * 255);
-		values[i++] = static_cast<uint8_t>(color.b * 255);
-		values[i++] = static_cast<uint8_t>(color.a * 255);
-	}
+        values[i++] = static_cast<uint8_t>(color.r * 255);
+        values[i++] = static_cast<uint8_t>(color.g * 255);
+        values[i++] = static_cast<uint8_t>(color.b * 255);
+        values[i++] = static_cast<uint8_t>(color.a * 255);
+    }
 
-	if ((width * 4) != i) {
+    if ((width * 4) != i) {
         throw TextureLoadException(
-            std::move(filename),
+            filename,
             fmt::format("Header assured '{}' values but '{}' were found", width, i / 4.f),
             this
         );
-	}
+    }
 
-	using opengl::Texture;
+    using opengl::Texture;
     std::unique_ptr<Texture> texture = std::make_unique<Texture>(
-		values,                         // data
-		glm::size3_t(width, 1, 1),		// dimensions
-		Texture::Format::RGBA			// Format
-	);
+        values,                         // data
+        glm::size3_t(width, 1, 1),        // dimensions
+        Texture::Format::RGBA            // Format
+    );
 
-	return texture;
+    return texture;
 }
 
-std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTextureFromMemory(const std::string& buffer) const {
+std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(void* memory,
+                                                                size_t size) const
+{
+    ghoul_assert(false, "Implementation missing");
     return nullptr;
 }
 
 std::vector<std::string> TextureReaderCMAP::supportedExtensions() const {
-	return { "cmap" };
+    return { "cmap" };
 }
 
 } // namespace io

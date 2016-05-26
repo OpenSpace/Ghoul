@@ -59,6 +59,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/logging/logmanager.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/streamlog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/textlog.cpp
+    ${PROJECT_SOURCE_DIR}/src/logging/visualstudiooutputlog.cpp
     ${PROJECT_SOURCE_DIR}/src/lua/lua_helper.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/any.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/assert.cpp
@@ -68,8 +69,11 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/misc/dictionary.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/exception.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/misc.cpp
+    ${PROJECT_SOURCE_DIR}/src/misc/onscopeexit.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/sharedmemory.cpp
+    ${PROJECT_SOURCE_DIR}/src/misc/stacktrace.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/templatefactory.cpp
+    ${PROJECT_SOURCE_DIR}/src/misc/thread.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/typeinfo.cpp
     ${PROJECT_SOURCE_DIR}/src/systemcapabilities/generalcapabilitiescomponent.cpp
     ${PROJECT_SOURCE_DIR}/src/systemcapabilities/openglcapabilitiescomponent.cpp
@@ -88,6 +92,7 @@ endif ()
 if (GHOUL_MODULE_OPENGL)
     set(GHOUL_SOURCE
         ${GHOUL_SOURCE}
+        ${PROJECT_SOURCE_DIR}/src/opengl/bufferbinding.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/framebufferobject.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/programobject.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/shadermanager.cpp
@@ -95,6 +100,7 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/src/opengl/shaderpreprocessor.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/texture.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/textureatlas.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/textureconversion.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/texturemanager.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/textureunit.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/vertexbufferobject.cpp
@@ -110,6 +116,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/singleton.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/event.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/cachemanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/directory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/file.h
@@ -142,6 +149,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/logmanager.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/streamlog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/textlog.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/logging/visualstudiooutputlog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/ghoul_lua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/any.h
@@ -157,9 +165,12 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/onscopeexit.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/sharedmemory.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/stacktrace.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.inl
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/thread.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/typeinfo.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/typeinfo.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/generalcapabilitiescomponent.h
@@ -181,6 +192,8 @@ endif ()
 if (GHOUL_MODULE_OPENGL)
     set(GHOUL_HEADER
         ${GHOUL_HEADER}
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/bufferbinding.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/bufferbinding.inl
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/framebufferobject.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/ghoul_gl.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/opengl
@@ -190,6 +203,7 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderpreprocessor.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureatlas.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureconversion.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.inl
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texturemanager.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureunit.h
@@ -201,3 +215,13 @@ endif ()
 
 include (${GHOUL_CMAKE_DIR}/GroupFilesIntoFolders.cmake)
 group_files_into_folders(${GHOUL_SOURCE} ${GHOUL_HEADER})
+
+
+if (MSVC)
+    set(GHOUL_SOURCE
+        ${GHOUL_SOURCE}
+        ${PROJECT_SOURCE_DIR}/ext/stackwalker/StackWalker.cpp
+    )
+
+    source_group("External" FILES ${PROJECT_SOURCE_DIR}/ext/stackwalker/StackWalker.cpp)
+endif ()

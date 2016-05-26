@@ -29,32 +29,32 @@ template <typename T>
 void ghoul::opengl::VertexBufferObject::initialize(const std::vector<T>& vertexArray,
                                                    const std::vector<GLint>& indexArray)
 {
-	static_assert(std::is_pod<T>::value, "T has to be a POD");
+    static_assert(std::is_pod<T>::value, "T has to be a POD");
     ghoul_assert(!isInitialized(), "VertexBufferObject must not have been initialized");
     ghoul_assert(!vertexArray.empty(), "Vertex array must not be empty");
     ghoul_assert(!indexArray.empty(), "Index array must not be empty");
 
-	generateGLObjects();
+    generateGLObjects();
 
-	_isize = static_cast<unsigned int>(indexArray.size());
+    _isize = static_cast<unsigned int>(indexArray.size());
 
-	glBindVertexArray(_vaoID);
+    glBindVertexArray(_vaoID);
 
-	glBindBuffer(GL_ARRAY_BUFFER, _vBufferID);
-	glBufferData(
+    glBindBuffer(GL_ARRAY_BUFFER, _vBufferID);
+    glBufferData(
         GL_ARRAY_BUFFER,
         vertexArray.size() * sizeof(T),
         vertexArray.data(),
         GL_STATIC_DRAW
     );
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
-	glBufferData(
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
+    glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
         indexArray.size() * sizeof(GLint),
         indexArray.data(),
         GL_STATIC_DRAW
     );
 
-	glBindVertexArray(0);
+    glBindVertexArray(0);
 }

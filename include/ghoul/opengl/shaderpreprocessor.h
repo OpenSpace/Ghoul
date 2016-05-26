@@ -142,6 +142,7 @@ private:
     void popScope(ShaderPreprocessor::Env& env);
 
     bool tokenizeFor(const std::string& line, std::string& keyName, std::string& valueName, std::string& dictionaryName, ShaderPreprocessor::Env& env);
+    bool parseRange(const std::string& dictionaryName, Dictionary& dictionary, int& min, int& max);
     void addLineNumber(ShaderPreprocessor::Env& env);
     bool isInsideEmptyForStatement(ShaderPreprocessor::Env& env);
 

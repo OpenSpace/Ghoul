@@ -40,21 +40,36 @@ namespace io {
 class TextureReaderCMAP : public TextureReaderBase {
 public:
     /**
-     * Loads the passed CMAP file.
-     * \param filename The CMAP file that is loaded
-     * \return The loaded Texture
-     * \throws TextureLoadException If the file is malformed
-     * \throws std::ifstream::failure If the file could not be opened
-     * \pre \p filename must not be empty
-     */
-    std::unique_ptr<opengl::Texture> loadTexture(std::string filename) const override;
-    std::unique_ptr<opengl::Texture> loadTextureFromMemory(const std::string& buffer) const override;
-    
+    * Loads the texture \p filename in CMAP format from disk and returns the loaded
+    * Texture.
+    * \param filename The texture that should be loaded from the hard disk
+    * \return The loaded Texture object
+    * \throw TextureLoadException If there was an error loading the texture
+    * \pre \p filename must not be empty
+    * \pre The extension of \p filename must be among the supported extensions as
+    * reported by supportedExtensions
+    */
+    std::unique_ptr<opengl::Texture> loadTexture(
+        const std::string& filename) const override;
+
+
     /**
+    * Loads a Texture from the memory pointed at by \p memory in CMAP format. The memory
+    * block must contain at least \p size number of bytes.
+    * \param memory The memory that contains the bytes of the Texture to be loaded
+    * \param size The number of bytes contained in \p memory
+    * \throw TextureLoadException If there was an error reading the \p memory
+    * \pre \p memory must not be <code>nullptr</code>
+    * \pre \p size must be > 0
+    */
+    std::unique_ptr<opengl::Texture> loadTexture(void* memory,
+                                                 size_t size) const override;
+
+    /*
      * Returns the supported extension (<code>cmap</code>)
      * \return The supported extension
      */
-	std::vector<std::string> supportedExtensions() const override;
+    std::vector<std::string> supportedExtensions() const override;
 };
 
 } // namespace io

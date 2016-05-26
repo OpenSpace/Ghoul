@@ -34,33 +34,33 @@ namespace opengl {
 
 class FramebufferObject {
 public:
-	FramebufferObject();
-	~FramebufferObject();
+    FramebufferObject();
+    ~FramebufferObject();
 
-	void activate();
-	static void deactivate();
+    void activate();
+    static void deactivate();
 
-	bool isComplete() const;
-	bool isActive();
+    bool isComplete() const;
+    bool isActive();
 
-	void attachTexture(Texture* texture,
-					   GLenum attachment = GL_COLOR_ATTACHMENT0,
-					   int mipLevel 	 = 0,
-					   int zSlice		 = 0);
+    void attachTexture(Texture* texture,
+                       GLenum attachment = GL_COLOR_ATTACHMENT0,
+                       int mipLevel      = 0,
+                       int zSlice         = 0);
 
-	void detachTexture(GLenum attachment);
-	void detachAll();
+    void detachTexture(GLenum attachment);
+    void detachAll();
 
-	Texture* getTexture(GLenum attachment = GL_COLOR_ATTACHMENT0);
-	static GLuint getActiveObject();
+    Texture* getTexture(GLenum attachment = GL_COLOR_ATTACHMENT0);
+    static GLuint getActiveObject();
 
 private:
-	GLuint generateId();
+    GLuint generateId();
 
-	GLuint _id;
-	std::map<GLenum, Texture*> _attachedTextures;
+    GLuint _id;
+    std::map<GLenum, Texture*> _attachedTextures;
 
-	static const std::string _loggerCat;
+    static const std::string _loggerCat;
 };
 
 } // namespace opengl

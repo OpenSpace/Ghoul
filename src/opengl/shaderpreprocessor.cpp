@@ -165,10 +165,10 @@ void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
     _onChangeCallback = changeCallback;
     for (auto& files : _includedFiles) {
         if (files.second.isTracked)
-			files.second.file.setCallback([this](const filesystem::File& file) {
-			(void) file; // Suppress compiler warning about unused parameter
-			_onChangeCallback();
-		});
+            files.second.file.setCallback([this](const filesystem::File& file) {
+            (void) file; // Suppress compiler warning about unused parameter
+            _onChangeCallback();
+        });
     }
 }
 
@@ -214,10 +214,10 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
             }
         ).first;
         if (trackChanges == TrackChanges::Yes)
-			it->second.file.setCallback([this](const filesystem::File& file) {
-			(void) file; // Suppress compiler warning about unused parameter
-			_onChangeCallback();
-		});
+            it->second.file.setCallback([this](const filesystem::File& file) {
+            (void) file; // Suppress compiler warning about unused parameter
+            _onChangeCallback();
+        });
     }
 
     std::ifstream stream(path);
@@ -589,9 +589,16 @@ bool ShaderPreprocessor::tokenizeFor(const std::string& line, std::string& keyNa
     size_t keyPos = firstWsPos + keyOffset;
 
     size_t commaOffset = line.substr(keyPos).find_first_of(comma);
-    size_t commaPos = keyPos + commaOffset;
 
-    keyName = trim(line.substr(keyPos, commaOffset));
+    size_t commaPos;
+    if (commaOffset != std::string::npos) { // Found a comma
+        commaPos = keyPos + commaOffset;
+        keyName = trim(line.substr(keyPos, commaOffset));
+    }
+    else {
+        commaPos = keyPos - 1;
+        keyName = "";
+    }
 
     size_t valueOffset = line.substr(commaPos + 1).find_first_not_of(ws);
     size_t valuePos = commaPos + 1 + valueOffset;
@@ -617,10 +624,54 @@ bool ShaderPreprocessor::tokenizeFor(const std::string& line, std::string& keyNa
     return true;
 }
 
+bool ShaderPreprocessor::parseRange(const std::string& dictionaryName, Dictionary& dictionary, int& min, int& max) {
+    static const std::string twoDots = "..";
+    size_t minimumStart = 0;
+    size_t minimumEnd = dictionaryName.find(twoDots);
+
+    if (minimumEnd == std::string::npos) {
+        throw ParserError("Expected '..' in range. " + dictionaryName);
+    }
+    int minimum = std::stoi(dictionaryName.substr(minimumStart, minimumEnd - minimumStart));
+
+    size_t maximumStart = minimumEnd + 2;
+    size_t maximumEnd = dictionaryName.length();
+
+    int maximum = std::stoi(dictionaryName.substr(maximumStart, maximumEnd - maximumStart));
+
+    if (minimum > maximum) {
+        throw ParserError("Minimum value must be smaller than maximum value. " + dictionaryName);
+    }
+
+    // Create all the elements in the dictionary
+    for (int i = 0; i < maximum - minimum; i++) {
+        dictionary.setValue(std::to_string(i + 1), std::to_string(minimum + i));
+    }
+
+    // Everything went well. Write over min and max
+    min = minimum;
+    max = maximum;
+
+    return true;
+}
+
 bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     std::string keyName, valueName, dictionaryName;
     if (!tokenizeFor(env.line, keyName, valueName, dictionaryName, env))
          return false;
+    
+    if (keyName.empty()) { 
+        // No key means that the for statement can be created with a new dictionary
+        // from a range.
+        Dictionary rangeDictionary;
+        int min, max;
+        if (!parseRange(dictionaryName, rangeDictionary, min, max))
+            return false;
+        // Previous dictionary name is not valid as a key since it has dots in it. 
+        dictionaryName = "Range " + std::to_string(min) + " to " + std::to_string(max);
+        // Add the inner dictionary
+        _dictionary.setValue(dictionaryName, rangeDictionary);
+    }
 
     // The dictionary name can be an alias.
     // Resolve the real dictionary reference.
@@ -628,9 +679,8 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     if (!resolveAlias(dictionaryName, dictionaryRef, env)) {
         throw SubstitutionError(
             "Could not resolve variable '" + dictionaryName + "'. " + debugString(env)
-        );
+            );
     }
-
     // Fetch the dictionary to iterate over.
     Dictionary innerDictionary = _dictionary.value<Dictionary>(dictionaryRef);
 

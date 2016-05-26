@@ -88,59 +88,59 @@ public:
      */
     unsigned int installedMainMemory() const;
 
-	/**
-	 * Returns the number of cores
-	 * \return The number of cores
-	 */
-	unsigned int cores() const;
+    /**
+     * Returns the number of cores
+     * \return The number of cores
+     */
+    unsigned int cores() const;
 
-	/**
-	 * Returns the cache line size
-	 * \return The cache line size
-	 */
-	unsigned int cacheLineSize() const;
+    /**
+     * Returns the cache line size
+     * \return The cache line size
+     */
+    unsigned int cacheLineSize() const;
 
-	/**
-	 * Returns the L2 associativity
-	 * \return The L2 associativity
-	 */
-	unsigned int L2Associativity() const;
+    /**
+     * Returns the L2 associativity
+     * \return The L2 associativity
+     */
+    unsigned int L2Associativity() const;
 
-	/**
-	 * Returns the cache size
-	 * \return The cache size
-	 */
-	unsigned int cacheSize() const;
+    /**
+     * Returns the cache size
+     * \return The cache size
+     */
+    unsigned int cacheSize() const;
 
-	/**
-	 * Returns the number of cores as a string
-	 * \return The number of cores
-	 */
-	std::string coresAsString() const;
+    /**
+     * Returns the number of cores as a string
+     * \return The number of cores
+     */
+    std::string coresAsString() const;
 
-	/**
-	 * Returns the cache line size as a string
-	 * \return The cache line size
-	 */
-	std::string cacheLineSizeAsString() const;
+    /**
+     * Returns the cache line size as a string
+     * \return The cache line size
+     */
+    std::string cacheLineSizeAsString() const;
 
-	/**
-	 * Returns the L2 associativity as a string
-	 * \return The L2 associativity
-	 */
-	std::string L2AssiciativityAsString() const;
+    /**
+     * Returns the L2 associativity as a string
+     * \return The L2 associativity
+     */
+    std::string L2AssiciativityAsString() const;
 
-	/**
-	 * Returns the cache size in K as a string
-	 * \return The cache size
-	 */
-	std::string cacheSizeAsString() const;
+    /**
+     * Returns the cache size in K as a string
+     * \return The cache size
+     */
+    std::string cacheSizeAsString() const;
 
-	/**
-	 * Returns all supported exteions as commaseparated string
-	 * \return The extension
-	 */
-	std::string extensions() const;
+    /**
+     * Returns all supported exteions as commaseparated string
+     * \return The extension
+     */
+    std::string extensions() const;
 
     /**
      * Returns the amount of available, installed main memory (as reported by
@@ -180,7 +180,7 @@ protected:
     /**
      * Detects detailed information about the CPU on this computer.
      */
-	void detectCPU();
+    void detectCPU();
 
     /// Information about the operating system
     std::string _operatingSystem = "";
@@ -189,22 +189,22 @@ protected:
     unsigned int _installedMainMemory = 0;
     
     /// Information about the CPU
-	std::string _cpu = "";
+    std::string _cpu = "";
     
     /// Number of CPU cores
-	unsigned int _cores = 0;
+    unsigned int _cores = 0;
     
     /// The size of a cache line
-	unsigned int _cacheLineSize = 0;
+    unsigned int _cacheLineSize = 0;
     
     /// The associativity of the L2 cache
-	unsigned int _L2Associativity = 0;
+    unsigned int _L2Associativity = 0;
     
     /// The size of the cache
-	unsigned int _cacheSize = 0;
+    unsigned int _cacheSize = 0;
     
     /// Available CPU extensions
-	std::string _extensions = "";
+    std::string _extensions = "";
 
 };
 

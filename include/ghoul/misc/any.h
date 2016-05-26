@@ -214,7 +214,7 @@ public:
  * \post The return value is not <code>nullptr</code>
  */
 template <typename ValueType>
-ValueType* any_cast(any* operand) noexcept;
+ValueType* any_cast(any* operand);
 
 /**
 * This method casts an !any object \p operand into a type <code>ValueType</code> and
@@ -228,7 +228,7 @@ ValueType* any_cast(any* operand) noexcept;
 * \post The return value is not <code>nullptr</code>
 */
 template<typename ValueType>
-inline const ValueType* any_cast(const any* operand) noexcept;
+inline const ValueType* any_cast(const any* operand);
 
 /**
 * This method casts an !any object \p operand into a type <code>ValueType</code> and

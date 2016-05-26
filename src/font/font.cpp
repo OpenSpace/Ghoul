@@ -266,7 +266,7 @@ glm::vec2 Font::boundingBox(const char* format, ...) {
     ghoul_assert(format != nullptr, "No format is provided");
     glm::vec2 result(0.f);
     
-    va_list args;	 // Pointer To List Of Arguments
+    va_list args;     // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables
     
     int size = 1 + vscprintf(format, args);
@@ -439,7 +439,8 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         // First generate the font without outline and store it in the font atlas
         // only if an outline is request, repeat the process for the outline
 
-        float leftBearing, topBearing;
+        float leftBearing = 0.f;
+        float topBearing = 0.f;;
         glm::vec2 topLeft, bottomRight;
         glm::vec2 outlineTopLeft, outlineBottomRight;
         unsigned int width = 0;

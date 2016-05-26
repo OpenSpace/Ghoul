@@ -136,7 +136,7 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
         );
     }
 
-	for (const auto& obj : cpy._shaderObjects) {
+    for (const auto& obj : cpy._shaderObjects) {
         auto shaderCopy = std::make_shared<ShaderObject>(*obj);
         glAttachShader(_id, *shaderCopy);
         _shaderObjects.push_back(shaderCopy);
@@ -152,7 +152,7 @@ ProgramObject::operator GLuint() const {
 }
 
 ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
-	if (this != &rhs) {
+    if (this != &rhs) {
         _programName = rhs._programName;
         if (glObjectLabel) {
             glObjectLabel(
@@ -183,7 +183,7 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
             );
         }
 
-		for (const auto& obj : rhs._shaderObjects) {
+        for (const auto& obj : rhs._shaderObjects) {
             auto shaderCopy = std::make_shared<ShaderObject>(*obj);
             glAttachShader(_id, *shaderCopy);
             _shaderObjects.push_back(shaderCopy);
@@ -193,31 +193,31 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
 }
 
 ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) {
-	if (this != &rhs) {
-		glDeleteProgram(_id);
-		_id = rhs._id;
-		rhs._id = 0;
+    if (this != &rhs) {
+        glDeleteProgram(_id);
+        _id = rhs._id;
+        rhs._id = 0;
 
-		_programName = std::move(rhs._programName);
-		if (glObjectLabel) {
-			glObjectLabel(
-				GL_PROGRAM,
-				_id,
-				static_cast<GLsizei>(_programName.length() + 1),
-				_programName.c_str()
+        _programName = std::move(rhs._programName);
+        if (glObjectLabel) {
+            glObjectLabel(
+                GL_PROGRAM,
+                _id,
+                static_cast<GLsizei>(_programName.length() + 1),
+                _programName.c_str()
             );
-		}
-		_loggerCat = std::move(rhs._loggerCat);
-		_ignoreUniformLocationError = rhs._ignoreUniformLocationError;
-		_ignoreAttributeLocationError = rhs._ignoreAttributeLocationError;
-		_ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
-		_ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
+        }
+        _loggerCat = std::move(rhs._loggerCat);
+        _ignoreUniformLocationError = rhs._ignoreUniformLocationError;
+        _ignoreAttributeLocationError = rhs._ignoreAttributeLocationError;
+        _ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
+        _ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
         _programIsDirty = std::move(rhs._programIsDirty);
 
-		_shaderObjects.clear();
-		_shaderObjects = std::move(rhs._shaderObjects);
-	}
-	return *this;
+        _shaderObjects.clear();
+        _shaderObjects = std::move(rhs._shaderObjects);
+    }
+    return *this;
 }
 
 void ProgramObject::setName(string name) {
@@ -251,12 +251,12 @@ Dictionary ProgramObject::dictionary() {
 }
 
 void ProgramObject::setProgramObjectCallback(ProgramObjectCallback changeCallback) {
-	ShaderObject::ShaderObjectCallback c = [this, changeCallback](){
+    ShaderObject::ShaderObjectCallback c = [this, changeCallback](){
         _programIsDirty = true;
-		changeCallback(this);
-	};
-	for (const auto& shaderObject : _shaderObjects)
-		shaderObject->setShaderObjectCallback(c);
+        changeCallback(this);
+    };
+    for (const auto& shaderObject : _shaderObjects)
+        shaderObject->setShaderObjectCallback(c);
 }
 
 void ProgramObject::attachObject(std::shared_ptr<ShaderObject> shaderObject) {
@@ -270,7 +270,7 @@ void ProgramObject::attachObject(std::shared_ptr<ShaderObject> shaderObject) {
     shaderObject->setShaderObjectCallback(c);
 
     glAttachShader(_id, *shaderObject);
-	_shaderObjects.push_back(shaderObject);
+    _shaderObjects.push_back(shaderObject);
 }
 
 void ProgramObject::detachObject(std::shared_ptr<ShaderObject> shaderObject) {
@@ -283,7 +283,7 @@ void ProgramObject::detachObject(std::shared_ptr<ShaderObject> shaderObject) {
 }
 
 void ProgramObject::compileShaderObjects() {
-	for (const auto& obj : _shaderObjects)
+    for (const auto& obj : _shaderObjects)
         obj->compile();
 }
 
@@ -310,10 +310,12 @@ void ProgramObject::linkProgramObject() {
 void ProgramObject::rebuildFromFile() {
     // The copy constructor of ShaderObject (called by the copy constructor of
     // ProgramObject) will take care of the reloading from file
-	ProgramObject p(*this);
+    ProgramObject p(*this);
     
     p.compileShaderObjects();
     p.linkProgramObject();
+
+    LINFO("Successfully rebuilt ProgramObject");
 
     *this = std::move(p);
 }

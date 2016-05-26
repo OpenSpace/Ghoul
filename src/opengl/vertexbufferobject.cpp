@@ -29,10 +29,10 @@ namespace ghoul {
 namespace opengl {
 
 VertexBufferObject::VertexBufferObject()
-	: _vaoID(0)
-	, _vBufferID(0)
-	, _iBufferID(0)
-	, _isize(0)
+    : _vaoID(0)
+    , _vBufferID(0)
+    , _iBufferID(0)
+    , _isize(0)
     , _mode(GL_TRIANGLES)
 {
     
@@ -125,9 +125,9 @@ void VertexBufferObject::vertexAttribPointer(GLuint index, GLint size, GLenum ty
                                              GLsizei stride, GLuint offset,
                                              GLboolean normalized)
 {
-	glBindVertexArray(_vaoID);
-	glEnableVertexAttribArray(index);
-	glVertexAttribPointer(
+    glBindVertexArray(_vaoID);
+    glEnableVertexAttribArray(index);
+    glVertexAttribPointer(
         index,
         size,
         type,
@@ -135,28 +135,28 @@ void VertexBufferObject::vertexAttribPointer(GLuint index, GLint size, GLenum ty
         stride,
         reinterpret_cast<const GLvoid*>(offset)
     );
-	glBindVertexArray(0);
+    glBindVertexArray(0);
 }
 
 void VertexBufferObject::bind() {
-	glBindVertexArray(_vaoID);
+    glBindVertexArray(_vaoID);
 }
 
 void VertexBufferObject::unbind() {
-	glBindVertexArray(0);
+    glBindVertexArray(0);
 }
 
 void VertexBufferObject::render() {
-	glBindVertexArray(_vaoID);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
-	glDrawElements(_mode, _isize, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+    glBindVertexArray(_vaoID);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
+    glDrawElements(_mode, _isize, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }
 
 void VertexBufferObject::generateGLObjects() {
-	glGenVertexArrays(1, &_vaoID);
-	glGenBuffers(1, &_vBufferID);
-	glGenBuffers(1, &_iBufferID);
+    glGenVertexArrays(1, &_vaoID);
+    glGenBuffers(1, &_vBufferID);
+    glGenBuffers(1, &_iBufferID);
 }
 
 } // namespace opengl

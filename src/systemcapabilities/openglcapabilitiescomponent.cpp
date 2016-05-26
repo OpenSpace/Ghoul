@@ -71,6 +71,10 @@ void OpenGLCapabilitiesComponent::detectCapabilities() {
     glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &_maxTextureSize3D);
 
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &_numTextureUnits);
+    glGetIntegerv(GL_MAX_ATOMIC_COUNTER_BUFFER_BINDINGS, &_numAtomicCounterBufferBindings);
+    glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &_numShaderStorageBufferBindings);
+    glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &_numUniformBufferBindings);
+
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &_maxFramebufferColorAttachments);
 }
 
@@ -234,8 +238,20 @@ bool OpenGLCapabilitiesComponent::isExtensionSupported(const std::string& extens
     return (result != _extensions.end());
 }
 
-int OpenGLCapabilitiesComponent::maximumNumberOfTextureUnits() const {
+int OpenGLCapabilitiesComponent::maxTextureUnits() const {
     return _numTextureUnits;
+}
+
+int OpenGLCapabilitiesComponent::maxAtomicCounterBufferBindings() const {
+    return _numAtomicCounterBufferBindings;
+}
+
+int OpenGLCapabilitiesComponent::maxShaderStorageBufferBindings() const {
+    return _numShaderStorageBufferBindings;
+}
+
+int OpenGLCapabilitiesComponent::maxUniformBufferBindings() const {
+    return _numUniformBufferBindings;
 }
 
 std::string OpenGLCapabilitiesComponent::gpuVendorString() const {

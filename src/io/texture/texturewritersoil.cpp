@@ -78,9 +78,9 @@ std::vector<std::string> TextureWriterSOIL::supportedExtensions() const {
     // taken from http://www.lonesock.net/soil.html
     return {
         "bmp",
-		"tga",
+        "tga",
         "dds"
-	};
+    };
 }
     
 } // namespace opengl

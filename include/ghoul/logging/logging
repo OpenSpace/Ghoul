@@ -34,5 +34,6 @@
 #include "logmanager.h"
 #include "streamlog.h"
 #include "textlog.h"
+#include "visualstudiooutputlog.h"
 
 #endif // __GHOUL_LOGGING__

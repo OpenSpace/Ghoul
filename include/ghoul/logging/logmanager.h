@@ -28,6 +28,7 @@
 
 #include <ghoul/designpattern/singleton.h>
 
+#include <array>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -73,33 +74,33 @@ public:
         /**
          * Used for Debug output; will never be used in release
          */
-        Debug = 1 << 0,
+        Debug = 0,
         /**
          * Used for informational messages which can be ignored, but might be
          * informative
          */
-        Info = 1 << 1,
+        Info = 1,
         /**
          * Warnings which do not represent a problem in itself, but may hint to a wrong
          * configuration
          */
-        Warning = 1 << 2,
+        Warning = 2,
         /**
          * Errors which will pose problems, but do not necessarily require the immediate
          * end of the application
          */
-        Error = 1 << 3,
+        Error = 3,
         /**
          * Error which will be so severe that the application cannot recover from them
          */
-        Fatal = 1 << 4,
+        Fatal = 4,
         /**
          * Used as a placeholder to inhibit all LogMessages
          */
-        NoLogging = 1 << 5
+        NoLogging = 5
     };
 
-	/**
+    /**
      * Creates and initializes an empty LogManager with the passed LogManager::LogLevel.
      * \param level The lowest LogManager::LogLevel that will be passed to the containing
      * Log%s.
@@ -109,7 +110,7 @@ public:
      * Passing <code>true</code> will slow down the execution but guarantees that a crash
      * immediately after a log message won't lead to data loss.
      */
-	LogManager(LogLevel level = LogLevel::Info,
+    LogManager(LogLevel level = LogLevel::Info,
         ImmediateFlush immediateFlush = ImmediateFlush::No);
 
     /**
@@ -138,6 +139,19 @@ public:
     void logMessage(LogManager::LogLevel level, const std::string& message);
 
     /**
+     * Returns the message counter status for the passed LogLevel \p level.
+     * \param level The LogLevel for which the counter is returned
+     * \return The number of messages that have been logged for the passed \p level since
+     * creation of the LogManager or the last call to resetCounter
+     */
+    int messageCounter(LogManager::LogLevel level);
+
+    /**
+     * Resets the internal log message counting back to 0.
+     */
+    void resetMessageCounters();
+
+    /**
      * Adds the passed log to the list of managed Log%s. The ownership of the Log is
      * passed to the LogManager. The Log will be deleted when the LogManager is
      * #deinitialize%d. Adding the same Log twice has no effect and is permitted.
@@ -160,25 +174,27 @@ public:
      */
     static std::string stringFromLevel(LogLevel level);
 
-	/**
+    /**
      * Returns the LogManager::LogLevel for the passed string representation. The name of
      * each level is equal to its enum value.
      * \return The the LogManager::LogLevel for the passed string representation
      */
-	static LogLevel levelFromString(const std::string& level);
+    static LogLevel levelFromString(const std::string& level);
 
 private:
     /// The mutex that is protecting the #logMessage calls
-	std::mutex _mutex;
+    std::mutex _mutex;
     
     /// The LogLevel
-	LogManager::LogLevel _level;
+    LogManager::LogLevel _level;
     
     /// Whether all logs should be flushed immediately
-	bool _immediateFlush;
+    bool _immediateFlush;
     
     /// Stores the Logs which are managed by this LogManager
     std::vector<std::shared_ptr<Log>> _logs;
+
+    std::array<int, 5> _logCounter;
 };
 
 } // namespace logging

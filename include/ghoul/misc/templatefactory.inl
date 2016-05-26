@@ -131,7 +131,7 @@ BaseClass* TemplateFactory<BaseClass>::create(const std::string& className) cons
         throw TemplateClassNotFoundError(className);
     else
         // If 'className' is a valid name, we can use the stored function pointer to
-		// create the class using the 'createType' method
+        // create the class using the 'createType' method
         return it->second(false, {});
 }
 
@@ -146,7 +146,7 @@ BaseClass* TemplateFactory<BaseClass>::create(const std::string& className,
         throw TemplateClassNotFoundError(className);
     else
         // If 'className' is a valid name, we can use the stored function pointer to
-		// create the class using the 'createType' method
+        // create the class using the 'createType' method
         return it->second(true, dictionary);
 }
 
@@ -208,11 +208,11 @@ bool TemplateFactory<BaseClass>::hasClass(const std::string& className) const {
 
 template <typename BaseClass>
 std::vector<std::string> TemplateFactory<BaseClass>::registeredClasses() const {
-	std::vector<std::string> result;
-	result.reserve(_map.size());
-	for (const auto& it : _map)
-		result.push_back(it.first);
-	return result;
+    std::vector<std::string> result;
+    result.reserve(_map.size());
+    for (const auto& it : _map)
+        result.push_back(it.first);
+    return result;
 }
 
 template <typename BaseClass>

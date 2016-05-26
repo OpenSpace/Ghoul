@@ -38,9 +38,9 @@
 
     // These is for the 'warning C4996: 'GetVersionExA': was declared deprecated' which
     // is a known bug for VS2013
-	#pragma warning(push)
+    #pragma warning(push)
     #pragma warning(disable: 4996)
-	#pragma warning(suppress: 28159)
+    #pragma warning(suppress: 28159)
 
 #else
     #ifdef __APPLE__
@@ -81,18 +81,18 @@ void GeneralCapabilitiesComponent::detectCapabilities() {
     clearCapabilities();
     detectOS();
     detectMemory();
-	detectCPU();
+    detectCPU();
 }
 
 void GeneralCapabilitiesComponent::clearCapabilities() {
     _operatingSystem = "";
     _installedMainMemory = 0;
-	_cpu = "";
-	_cores = 0;
-	_cacheLineSize = 0;
-	_L2Associativity = 0;
-	_cacheSize = 0;
-	_extensions = "";
+    _cpu = "";
+    _cores = 0;
+    _cacheLineSize = 0;
+    _L2Associativity = 0;
+    _cacheSize = 0;
+    _extensions = "";
 }
 
 void GeneralCapabilitiesComponent::detectOS() {
@@ -278,11 +278,11 @@ void GeneralCapabilitiesComponent::detectMemory() {
     convert >> value;
     _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
 #else
-	ULONGLONG installedMainMemory;
-	// get installed memory in kB
-	BOOL success = GetPhysicallyInstalledSystemMemory(&installedMainMemory);
-	if (success == TRUE)
-		_installedMainMemory = static_cast<unsigned int>(installedMainMemory / 1024);
+    ULONGLONG installedMainMemory;
+    // get installed memory in kB
+    BOOL success = GetPhysicallyInstalledSystemMemory(&installedMainMemory);
+    if (success == TRUE)
+        _installedMainMemory = static_cast<unsigned int>(installedMainMemory / 1024);
     else
         throw MainMemoryError("Error reading about of physical memory");
 #endif
@@ -308,113 +308,113 @@ void GeneralCapabilitiesComponent::detectMemory() {
 void GeneralCapabilitiesComponent::detectCPU() {
     // @TODO This function needs cleanup ---abock
 #ifdef WIN32
-	const char* szFeatures[] =
-	{
-		"fpu",
-		"vme",
-		"de",
-		"pse",
-		"tsc",
-		"msr",
-		"pae",
-		"mce",
-		"cx8",
-		"apic",
-		"Unknown1",
-		"sep",
-		"mtrr",
-		"pge",
-		"mca",
-		"cmov",
-		"pat",
-		"pse36",
-		"psn",
-		"clflush",
-		"Unknown2",
-		"ds",
-		"acpi", //  @TODO: "Thermal Monitor and Clock Ctrl", is this correct? ---jonasstrandstedt
-		"mmx",
-		"fxsr",
-		"sse",
-		"sse2",
-		"ss",
-		"ht",
-		"tm",
-		"Unknown4",
-		"pbe"
-	};
+    const char* szFeatures[] =
+    {
+        "fpu",
+        "vme",
+        "de",
+        "pse",
+        "tsc",
+        "msr",
+        "pae",
+        "mce",
+        "cx8",
+        "apic",
+        "Unknown1",
+        "sep",
+        "mtrr",
+        "pge",
+        "mca",
+        "cmov",
+        "pat",
+        "pse36",
+        "psn",
+        "clflush",
+        "Unknown2",
+        "ds",
+        "acpi", //  @TODO: "Thermal Monitor and Clock Ctrl", is this correct? ---jonasstrandstedt
+        "mmx",
+        "fxsr",
+        "sse",
+        "sse2",
+        "ss",
+        "ht",
+        "tm",
+        "Unknown4",
+        "pbe"
+    };
 
-	char CPUString[0x20];
-	char CPUBrandString[0x40];
-	int CPUInfo[4] = { -1 };
-	int nFeatureInfo = 0;
-	unsigned    nIds, nExIds, i;
-	bool    bSSE3NewInstructions = false;
-	bool    bMONITOR_MWAIT = false;
-	bool    bCPLQualifiedDebugStore = false;
-	bool    bThermalMonitor2 = false;
+    char CPUString[0x20];
+    char CPUBrandString[0x40];
+    int CPUInfo[4] = { -1 };
+    int nFeatureInfo = 0;
+    unsigned    nIds, nExIds, i;
+    bool    bSSE3NewInstructions = false;
+    bool    bMONITOR_MWAIT = false;
+    bool    bCPLQualifiedDebugStore = false;
+    bool    bThermalMonitor2 = false;
 
 
-	// __cpuid with an InfoType argument of 0 returns the number of
-	// valid Ids in CPUInfo[0] and the CPU identification string in
-	// the other three array elements. The CPU identification string is
-	// not in linear order. The code below arranges the information 
-	// in a human readable form.
-	__cpuid(CPUInfo, 0);
-	nIds = CPUInfo[0];
-	memset(CPUString, 0, sizeof(CPUString));
-	*((int*)CPUString) = CPUInfo[1];
-	*((int*)(CPUString + 4)) = CPUInfo[3];
-	*((int*)(CPUString + 8)) = CPUInfo[2];
+    // __cpuid with an InfoType argument of 0 returns the number of
+    // valid Ids in CPUInfo[0] and the CPU identification string in
+    // the other three array elements. The CPU identification string is
+    // not in linear order. The code below arranges the information 
+    // in a human readable form.
+    __cpuid(CPUInfo, 0);
+    nIds = CPUInfo[0];
+    memset(CPUString, 0, sizeof(CPUString));
+    *((int*)CPUString) = CPUInfo[1];
+    *((int*)(CPUString + 4)) = CPUInfo[3];
+    *((int*)(CPUString + 8)) = CPUInfo[2];
 
-	// Get the information associated with each valid Id
-	for (i = 0; i <= nIds; ++i)
-	{
-		__cpuid(CPUInfo, i);
+    // Get the information associated with each valid Id
+    for (i = 0; i <= nIds; ++i)
+    {
+        __cpuid(CPUInfo, i);
 
-		// Interpret CPU feature information.
-		if (i == 1)
-		{
-			bSSE3NewInstructions = (CPUInfo[2] & 0x1) || false;
-			bMONITOR_MWAIT = (CPUInfo[2] & 0x8) || false;
-			bCPLQualifiedDebugStore = (CPUInfo[2] & 0x10) || false;
-			bThermalMonitor2 = (CPUInfo[2] & 0x100) || false;
-			nFeatureInfo = CPUInfo[3];
-		}
-	}
+        // Interpret CPU feature information.
+        if (i == 1)
+        {
+            bSSE3NewInstructions = (CPUInfo[2] & 0x1) || false;
+            bMONITOR_MWAIT = (CPUInfo[2] & 0x8) || false;
+            bCPLQualifiedDebugStore = (CPUInfo[2] & 0x10) || false;
+            bThermalMonitor2 = (CPUInfo[2] & 0x100) || false;
+            nFeatureInfo = CPUInfo[3];
+        }
+    }
 
-	// Calling __cpuid with 0x80000000 as the InfoType argument
-	// gets the number of valid extended IDs.
-	__cpuid(CPUInfo, 0x80000000);
-	nExIds = CPUInfo[0];
-	memset(CPUBrandString, 0, sizeof(CPUBrandString));
+    // Calling __cpuid with 0x80000000 as the InfoType argument
+    // gets the number of valid extended IDs.
+    __cpuid(CPUInfo, 0x80000000);
+    nExIds = CPUInfo[0];
+    memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
-	// Get the information associated with each extended ID.
-	for (i = 0x80000000; i <= nExIds; ++i)
-	{
-		__cpuid(CPUInfo, i);
+    // Get the information associated with each extended ID.
+    for (i = 0x80000000; i <= nExIds; ++i)
+    {
+        __cpuid(CPUInfo, i);
 
-		// Interpret CPU brand string and cache information.
-		if (i == 0x80000002)
-			memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-		else if (i == 0x80000003)
-			memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-		else if (i == 0x80000004)
-			memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
-		else if (i == 0x80000006)
-		{
-			_cacheLineSize = CPUInfo[2] & 0xff;
-			_L2Associativity = (CPUInfo[2] >> 12) & 0xf;
-			_cacheSize = (CPUInfo[2] >> 16) & 0xffff;
-		}
-	}
+        // Interpret CPU brand string and cache information.
+        if (i == 0x80000002)
+            memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+        else if (i == 0x80000003)
+            memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+        else if (i == 0x80000004)
+            memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+        else if (i == 0x80000006)
+        {
+            _cacheLineSize = CPUInfo[2] & 0xff;
+            _L2Associativity = (CPUInfo[2] >> 12) & 0xf;
+            _cacheSize = (CPUInfo[2] >> 16) & 0xffff;
+        }
+    }
 
-	// Get extensions list
-	std::stringstream extensions;
-	if (nFeatureInfo || bSSE3NewInstructions ||
-		bMONITOR_MWAIT || bCPLQualifiedDebugStore ||
-		bThermalMonitor2)
-	{
+    // Get extensions list
+    std::stringstream extensions;
+    if (nFeatureInfo || bSSE3NewInstructions ||
+        bMONITOR_MWAIT || bCPLQualifiedDebugStore ||
+        bThermalMonitor2)
+    {
 
         if (bSSE3NewInstructions)
             extensions << "sse3 ";
@@ -424,32 +424,32 @@ void GeneralCapabilitiesComponent::detectCPU() {
             extensions << "ds_cpl ";
         if (bThermalMonitor2)
             extensions << "tm2 ";
-		i = 0;
-		nIds = 1;
-		while (i < (sizeof(szFeatures) / sizeof(const char*)))
-		{
-			if (nFeatureInfo & nIds)
-			{
-				extensions << szFeatures[i] << " ";
-			}
+        i = 0;
+        nIds = 1;
+        while (i < (sizeof(szFeatures) / sizeof(const char*)))
+        {
+            if (nFeatureInfo & nIds)
+            {
+                extensions << szFeatures[i] << " ";
+            }
 
-			nIds <<= 1;
-			++i;
-		}
-	}
+            nIds <<= 1;
+            ++i;
+        }
+    }
 
-	// Set CPU name
-	_cpu = CPUBrandString;
+    // Set CPU name
+    _cpu = CPUBrandString;
 
-	// Set extensions and remove trailing ", "
-	_extensions = extensions.str();
-	if (_extensions.length() > 1)
-		_extensions = _extensions.substr(0, _extensions.length()-1);
+    // Set extensions and remove trailing ", "
+    _extensions = extensions.str();
+    if (_extensions.length() > 1)
+        _extensions = _extensions.substr(0, _extensions.length()-1);
 
-	// Get the cores
-	SYSTEM_INFO systemInfo;
-	GetNativeSystemInfo(&systemInfo);
-	_cores = systemInfo.dwNumberOfProcessors;
+    // Get the cores
+    SYSTEM_INFO systemInfo;
+    GetNativeSystemInfo(&systemInfo);
+    _cores = systemInfo.dwNumberOfProcessors;
 #elif defined(__APPLE__)
     int mib[2];
     size_t len = 512;
@@ -615,19 +615,19 @@ std::string GeneralCapabilitiesComponent::installedMainMemoryAsString() const {
 }
 
 unsigned int GeneralCapabilitiesComponent::cores() const {
-	return _cores;
+    return _cores;
 }
 
 unsigned int GeneralCapabilitiesComponent::cacheLineSize() const {
-	return _cacheLineSize;
+    return _cacheLineSize;
 }
 
 unsigned int GeneralCapabilitiesComponent::L2Associativity() const {
-	return _L2Associativity;
+    return _L2Associativity;
 }
 
 unsigned int GeneralCapabilitiesComponent::cacheSize() const {
-	return _cacheSize;
+    return _cacheSize;
 }
 
 std::string GeneralCapabilitiesComponent::coresAsString() const {
@@ -647,7 +647,7 @@ std::string GeneralCapabilitiesComponent::cacheSizeAsString() const {
 }
 
 std::string GeneralCapabilitiesComponent::extensions() const {
-	return _extensions;
+    return _extensions;
 }
 
 std::string GeneralCapabilitiesComponent::name() const {

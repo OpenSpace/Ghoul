@@ -29,112 +29,112 @@ namespace opengl {
 const std::string FramebufferObject::_loggerCat("ghoul.opengl.FramebufferObject");
 
 FramebufferObject::FramebufferObject() : _id(0) {
-	generateId();
+    generateId();
 }
 
 FramebufferObject::~FramebufferObject() {
-	glDeleteFramebuffers(1, &_id);
+    glDeleteFramebuffers(1, &_id);
 }
 
 void FramebufferObject::activate() {
-	glBindFramebuffer(GL_FRAMEBUFFER, _id);
+    glBindFramebuffer(GL_FRAMEBUFFER, _id);
 }
 
 void FramebufferObject::deactivate() {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 bool FramebufferObject::isComplete() const {
-	bool isComplete = false;
+    bool isComplete = false;
 
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	switch(status) {
-		case GL_FRAMEBUFFER_COMPLETE:
-			isComplete = true;
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-			LERROR("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-			LERROR("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-			LERROR("GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-			LERROR("GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-			LERROR("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-			LERROR("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
-			break;
-		case GL_FRAMEBUFFER_UNSUPPORTED:
-			LERROR("GL_FRAMEBUFFER_UNSUPPORTED");
-			break;
-		default:
-			LERROR("Unknown error!");
-			break;
-	}
-	return isComplete;
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    switch(status) {
+        case GL_FRAMEBUFFER_COMPLETE:
+            isComplete = true;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            LERROR("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            LERROR("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+            LERROR("GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+            LERROR("GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+            LERROR("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+            LERROR("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
+            break;
+        case GL_FRAMEBUFFER_UNSUPPORTED:
+            LERROR("GL_FRAMEBUFFER_UNSUPPORTED");
+            break;
+        default:
+            LERROR("Unknown error!");
+            break;
+    }
+    return isComplete;
 }
 
 bool FramebufferObject::isActive() {
-	return ((getActiveObject() == _id) && (_id != 0));
+    return ((getActiveObject() == _id) && (_id != 0));
 }
 
 void FramebufferObject::attachTexture(Texture* texture, GLenum attachment, int mipLevel, int zSlice) {
-	switch(texture->type()) {
-		case GL_TEXTURE_1D:
-			glFramebufferTexture1D( GL_FRAMEBUFFER, attachment, GL_TEXTURE_1D, *texture, mipLevel );
-			break;
-		case GL_TEXTURE_3D:
-			glFramebufferTexture3D( GL_FRAMEBUFFER, attachment, GL_TEXTURE_3D, *texture, mipLevel, zSlice );
-			break;
-		case GL_TEXTURE_2D_ARRAY:
-			glFramebufferTextureLayer( GL_FRAMEBUFFER, attachment, *texture, mipLevel, zSlice );
-			break;
-		default: //GL_TEXTURE_2D, GL_TEXTURE_RECTANGLE
-			glFramebufferTexture2D( GL_FRAMEBUFFER, attachment, texture->type(), GLuint(*texture), mipLevel );
-			break;
-	}
-	_attachedTextures[attachment] = texture;
+    switch(texture->type()) {
+        case GL_TEXTURE_1D:
+            glFramebufferTexture1D( GL_FRAMEBUFFER, attachment, GL_TEXTURE_1D, *texture, mipLevel );
+            break;
+        case GL_TEXTURE_3D:
+            glFramebufferTexture3D( GL_FRAMEBUFFER, attachment, GL_TEXTURE_3D, *texture, mipLevel, zSlice );
+            break;
+        case GL_TEXTURE_2D_ARRAY:
+            glFramebufferTextureLayer( GL_FRAMEBUFFER, attachment, *texture, mipLevel, zSlice );
+            break;
+        default: //GL_TEXTURE_2D, GL_TEXTURE_RECTANGLE
+            glFramebufferTexture2D( GL_FRAMEBUFFER, attachment, texture->type(), GLuint(*texture), mipLevel );
+            break;
+    }
+    _attachedTextures[attachment] = texture;
 }
 
 void FramebufferObject::detachTexture(GLenum attachment) {
-	auto iterator = _attachedTextures.find(attachment);
-	if( iterator != _attachedTextures.end() )
-		_attachedTextures.erase(iterator);
-	else
-		LWARNING("Trying to detach unknown texture!");
+    auto iterator = _attachedTextures.find(attachment);
+    if( iterator != _attachedTextures.end() )
+        _attachedTextures.erase(iterator);
+    else
+        LWARNING("Trying to detach unknown texture!");
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, 0, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, 0, 0);
 }
 
 void FramebufferObject::detachAll() {
-	while(!_attachedTextures.empty())
-			detachTexture(_attachedTextures.begin()->first);
+    while(!_attachedTextures.empty())
+            detachTexture(_attachedTextures.begin()->first);
 }
 
 Texture* FramebufferObject::getTexture(GLenum attachment) {
-	auto iterator = _attachedTextures.find(attachment);
-	if( iterator != _attachedTextures.end() )
-		return _attachedTextures[attachment];
-	else
-		return 0;
+    auto iterator = _attachedTextures.find(attachment);
+    if( iterator != _attachedTextures.end() )
+        return _attachedTextures[attachment];
+    else
+        return 0;
 }
 
 GLuint FramebufferObject::getActiveObject() {
-	GLint fbo;
-	glGetIntegerv (GL_FRAMEBUFFER_BINDING, &fbo);
-	return static_cast<GLuint>(fbo);
+    GLint fbo;
+    glGetIntegerv (GL_FRAMEBUFFER_BINDING, &fbo);
+    return static_cast<GLuint>(fbo);
 }
 
 GLuint FramebufferObject::generateId() {
-	_id = 0;
-	glGenFramebuffers(1, &_id);
-	return _id;
+    _id = 0;
+    glGenFramebuffers(1, &_id);
+    return _id;
 }
 
 } // namespace opengl

@@ -29,6 +29,8 @@
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/glm.h>
 #include <glm/gtx/std_based_type.hpp>
+
+#include <array>
 #include <string> 
 
 namespace ghoul {
@@ -58,9 +60,7 @@ public:
         Red = GL_RED, ///< GL_RED
         RG = GL_RG, ///< GL_RG
         RGB = GL_RGB, ///< GL_RGB
-        BGR = GL_BGR, ///< GL_BGR
         RGBA = GL_RGBA, ///< GL_RGBA
-        BGRA = GL_BGRA, ///< GL_BGRA
         DepthComponent = GL_DEPTH_COMPONENT ///< GL_DEPTH_COMPONENT
     };
 
@@ -87,6 +87,8 @@ public:
         ClampToBorder = GL_CLAMP_TO_BORDER, ///< GL_CLAMP_TO_BORDER
         MirroredRepeat = GL_MIRRORED_REPEAT ///< GL_MIRRORED_REPEAT
     };
+
+    static int numberOfChannels(Format format);
 
     /**
      * This constructor will create storage internally to fit the amount of data that is
@@ -273,6 +275,30 @@ public:
     void setFilter(FilterMode filter);
 
     /**
+     * Sets a swizzle mask that is applied to this Texture object. Each element of the
+     * <code>std::array</code> corresponds to one of the components, i.e., the first
+     * index of \p swizzleMask is the red channel and so on. The symbolic constants that
+     * are allowed in \p swizzleMask are: <code>GL_RED</code>, <code>GL_GREEN</code>,
+     * <code>GL_BLUE</code>, <code>GL_ALPHA</code>, <code>GL_ONE</code>, and
+     * <code>GL_ZERO</code>. See
+     * https://www.opengl.org/sdk/docs/man/html/glTexParameter.xhtml for more information.
+     * \param swizzleMask The swizzle mask that is applied to this Texture
+     */
+    void setSwizzleMask(std::array<GLint, 4> swizzleMask);
+
+    /**
+     * Reinstates the default swizzle mask of
+     * <code>{ GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA}</code>
+     */
+    void setDefaultSwizzleMask();
+
+    /**
+     * Returns the currently used swizzle mask for this Texture.
+     * \return The currently used swizzle mask for this Texture
+     */
+    std::array<GLint, 4> swizzleMask() const;
+
+    /**
      * Returns the storage data type for this Texture. For a complete list of available 
      * return values see http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for
      * more information.
@@ -296,7 +322,7 @@ public:
      * triggered.
      * \return The number of channels that are stored in this texture
      */
-    unsigned int numberOfChannels() const;
+    int numberOfChannels() const;
 
     /*
      * Returns the number of bytes each pixel stores.
@@ -319,7 +345,7 @@ public:
      * \return The size of the pixel data according to the dimensionality and the bytes
      * per pixel
      */
-    unsigned int expectedPixelDataSize() const;
+    int expectedPixelDataSize() const;
 
     /**
      * Sets new data for the texture to use. If the dimensions are not updated and the new 
@@ -716,6 +742,8 @@ protected:
      */
     void applyWrapping();
 
+    void applySwizzleMask();
+
     /**
      * Calculates the bytes each pixel needs to store its content. This is dependent on 
      * the number of channels as well as the data type this texture has. If an unknown 
@@ -734,6 +762,8 @@ private:
     glm::uvec3 _dimensions;
     Format _format;
     GLint _internalFormat;
+    bool _swizzleMaskChanged;
+    std::array<GLint, 4> _swizzleMask;
     GLenum _dataType;
     FilterMode _filter;
     WrappingMode _wrapping;
@@ -749,7 +779,7 @@ private:
 };
 
 } // namespace opengl
-} // namespace logging
+} // namespace ghoul
 
 #include "texture.inl"
 

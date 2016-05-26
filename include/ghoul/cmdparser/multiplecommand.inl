@@ -57,7 +57,7 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* 
 
 template<class T, class U, class V, class W>
 MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2,
-				std::vector<V>* ptr3, std::string name, std::string shortName,
+                std::vector<V>* ptr3, std::string name, std::string shortName,
                 std::string infoText, std::string parameterList)
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
                          std::move(parameterList), 3, MultipleCalls::Yes)

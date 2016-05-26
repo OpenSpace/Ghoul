@@ -71,27 +71,27 @@ void internal_assert(std::string expression, std::string message, std::string fi
     const std::string padding = "    ";
 
     std::cerr << std::endl
-		<< padding << "File:       " << file << ", line " << line << std::endl
-		<< padding << "Function:   " << function << std::endl
-		<< padding << "Assertion:  " << expression
+        << padding << "File:       " << file << ", line " << line << std::endl
+        << padding << "Function:   " << function << std::endl
+        << padding << "Assertion:  " << expression
         << padding << message        << std::endl;
 
     while (true) {
         std::cerr << "(I)gnore / Ignore (P)ermanently / (A)ssertionException / (E)xit: ";
         std::string inputLine;
-		std::getline(std::cin, inputLine);
+        std::getline(std::cin, inputLine);
 
-		// Transform to lower case
-		std::transform(inputLine.begin(), inputLine.end(), inputLine.begin(), ::tolower);
+        // Transform to lower case
+        std::transform(inputLine.begin(), inputLine.end(), inputLine.begin(), ::tolower);
 
-		if (inputLine == "i") {
-			break;
-		}
+        if (inputLine == "i") {
+            break;
+        }
         else if (inputLine == "p") {
             addPermanentlyIgnoredAssert(file, line);
             break;
         }
-		else if (inputLine == "a") {
+        else if (inputLine == "a") {
             throw AssertionException(
                 std::move(expression),
                 std::move(message),
@@ -99,11 +99,11 @@ void internal_assert(std::string expression, std::string message, std::string fi
                 std::move(function),
                 line
             );
-		}
-		else if (inputLine == "e") {
-			exit(EXIT_FAILURE);
-		}
-	}
+        }
+        else if (inputLine == "e") {
+            exit(EXIT_FAILURE);
+        }
+    }
 #else
     throw AssertionException(
         std::move(expression),

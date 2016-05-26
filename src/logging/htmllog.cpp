@@ -34,7 +34,7 @@ HTMLLog::HTMLLog(std::string filename, Append writeToAppend, TimeStamping timeSt
         DateStamping dateStamping, CategoryStamping categoryStamping,
         LogLevelStamping logLevelStamping)
     : TextLog(std::move(filename), writeToAppend, timeStamping, dateStamping,
-				categoryStamping, logLevelStamping)
+                categoryStamping, logLevelStamping)
 {    
     std::string output = \
         "<html>\n\

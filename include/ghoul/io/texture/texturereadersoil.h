@@ -42,21 +42,37 @@ namespace io {
 class TextureReaderSOIL : public TextureReaderBase {
 public:
     /**
-     * Loads the \p filename and creates a Texture from it.
-     * \param filename The texture file to be loaded
-     * \return The loaded Texture object
-     * \pre \p filename must not be empty
-     * \throw TextureLoadException If there was an error loading the Texture file
-     */
-    std::unique_ptr<opengl::Texture> loadTexture(std::string filename) const override;
-    std::unique_ptr<opengl::Texture> loadTextureFromMemory(const std::string& buffer) const override;
-    
+    * Loads the texture \p filename using the SOIL library from disk and returns the
+    * loaded Texture.
+    * \param filename The texture that should be loaded from the hard disk
+    * \return The loaded Texture object
+    * \throw TextureLoadException If there was an error loading the texture
+    * \pre \p filename must not be empty
+    * \pre The extension of \p filename must be among the supported extensions as
+    * reported by supportedExtensions
+    */
+    std::unique_ptr<opengl::Texture> loadTexture(
+        const std::string& filename) const override;
+
+
+    /**
+    * Loads a Texture from the memory pointed at by \p memory using the SOIL library.
+    * The memory block must contain at least \p size number of bytes.
+    * \param memory The memory that contains the bytes of the Texture to be loaded
+    * \param size The number of bytes contained in \p memory
+    * \throw TextureLoadException If there was an error reading the \p memory
+    * \pre \p memory must not be <code>nullptr</code>
+    * \pre \p size must be > 0
+    */
+    std::unique_ptr<opengl::Texture> loadTexture(void* memory,
+                                                 size_t size) const override;
+
     /**
      * Returns the supported extensions.
      * \return The supported extensions
      * \sa http://lonesock.net/soil.html
      */
-	std::vector<std::string> supportedExtensions() const override;
+    std::vector<std::string> supportedExtensions() const override;
 };
 
 #endif // GHOUL_USE_SOIL

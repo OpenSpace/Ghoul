@@ -89,6 +89,29 @@ std::string Log::getDateString() const {
     return ss.str();
 }
 
+std::string Log::createFullMessageString(LogManager::LogLevel level,
+                                         const std::string& category,
+                                         const std::string& message) const
+{
+    std::string output;
+    if (isDateStamping())
+        output += "[" + getDateString();
+    if (isTimeStamping())
+        output += " | " + getTimeString();
+
+    if (isDateStamping() || isTimeStamping())
+        output += "] ";
+    if (isCategoryStamping() && (category != ""))
+        output += category + " ";
+    if (isLogLevelStamping())
+        output += "(" + LogManager::stringFromLevel(level) + ")";
+    if (output != "")
+        output += "\t";
+    output += message;
+
+    return output;
+}
+
 void Log::flush() {}
 
 } // namespace logging

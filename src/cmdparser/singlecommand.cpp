@@ -29,11 +29,11 @@ namespace ghoul {
 namespace cmdparser {
 
 SingleCommandZeroArguments::SingleCommandZeroArguments(bool *ptr, std::string name,
-													   std::string shortName,
-													   std::string infoText)
+                                                       std::string shortName,
+                                                       std::string infoText)
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), "",
-						 0, CommandlineCommand::MultipleCalls::No)
-	, _ptr(ptr)
+                         0, CommandlineCommand::MultipleCalls::No)
+    , _ptr(ptr)
 {}
 
 void SingleCommandZeroArguments::execute(const std::vector<std::string>& /*parameters*/) {
