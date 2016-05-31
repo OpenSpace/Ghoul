@@ -644,7 +644,7 @@ bool ShaderPreprocessor::parseRange(const std::string& dictionaryName, Dictionar
     }
 
     // Create all the elements in the dictionary
-    for (int i = 0; i < maximum - minimum; i++) {
+    for (int i = 0; i <= maximum - minimum; i++) {
         dictionary.setValue(std::to_string(i + 1), std::to_string(minimum + i));
     }
 
@@ -661,14 +661,13 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
          return false;
     
     if (keyName.empty()) { 
-        // No key means that the for statement can be created with a new dictionary
-        // from a range.
+        // No key means that the for statement could possibly be a range.
         Dictionary rangeDictionary;
         int min, max;
         if (!parseRange(dictionaryName, rangeDictionary, min, max))
             return false;
         // Previous dictionary name is not valid as a key since it has dots in it. 
-        dictionaryName = "Range " + std::to_string(min) + " to " + std::to_string(max);
+        dictionaryName = "(Range " + std::to_string(min) + " to " + std::to_string(max) + ")";
         // Add the inner dictionary
         _dictionary.setValue(dictionaryName, rangeDictionary);
     }
