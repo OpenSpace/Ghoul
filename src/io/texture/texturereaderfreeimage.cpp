@@ -119,8 +119,11 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
     
     if (colorType == FIC_MINISBLACK || colorType == FIC_PALETTE) {
         colorType = FIC_RGB;
-        dib = FreeImage_ConvertTo24Bits(dib);
-//        dib = FreeImage_ConvertToRGBF(dib);
+
+        FIBITMAP* tempImage = dib;
+        dib = FreeImage_ConvertTo32Bits(tempImage);
+        dib = FreeImage_ConvertTo24Bits(tempImage);
+        FreeImage_Unload(tempImage);
     }
     
     int imageByte = FreeImage_GetBPP(dib);
@@ -257,10 +260,13 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(void* memor
     
     if (colorType == FIC_MINISBLACK || colorType == FIC_PALETTE) {
         colorType = FIC_RGB;
-        dib = FreeImage_ConvertTo24Bits(dib);
-//        dib = FreeImage_ConvertToRGBF(dib);
-    }
 
+        FIBITMAP* tempImage = dib;
+        dib = FreeImage_ConvertTo32Bits(tempImage);
+        dib = FreeImage_ConvertTo24Bits(tempImage);
+        FreeImage_Unload(tempImage);
+    }
+    
     int imageByte = FreeImage_GetBPP(dib);
 
     GLenum type = GL_UNSIGNED_BYTE;
