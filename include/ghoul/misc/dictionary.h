@@ -564,6 +564,42 @@ private:
     void getValueInternal(const std::string& key, T& value,
         IsStandardVectorType<T>* = nullptr) const;
     
+    template <typename T, glm::precision P>
+    void getValueInternal(const std::string& key, glm::tvec2<T, P>& value) const;
+
+    template <typename T, glm::precision P>
+    void getValueInternal(const std::string& key, glm::tvec3<T, P>& value) const;
+
+    template <typename T, glm::precision P>
+    void getValueInternal(const std::string& key, glm::tvec4<T, P>& value) const;
+
+    template <typename T, glm::precision P>
+    void getValueInternal(const std::string& key, glm::tmat2x2<T, P>& value) const;
+
+    template <typename T, glm::precision P>
+    void getValueInternal(const std::string& key, glm::tmat2x3<T, P>& value) const;
+
+    template <typename T, glm::precision P>
+    void getValueInternal(const std::string& key, glm::tmat2x4<T, P>& value) const;
+
+    template <typename T, glm::precision P>
+    void getValueInternal(const std::string& key, glm::tmat3x2<T, P>& value) const;
+
+    template <typename T, glm::precision P>
+    void getValueInternal(const std::string& key, glm::tmat3x3<T, P>& value) const;
+
+    template <typename T, glm::precision P>
+    void getValueInternal(const std::string& key, glm::tmat3x4<T, P>& value) const;
+
+    template <typename T, glm::precision P>
+    void getValueInternal(const std::string& key, glm::tmat4x2<T, P>& value) const;
+
+    template <typename T, glm::precision P>
+    void getValueInternal(const std::string& key, glm::tmat4x3<T, P>& value) const;
+
+    template <typename T, glm::precision P>
+    void getValueInternal(const std::string& key, glm::tmat4x4<T, P>& value) const;
+
     /**
      * Internal getValue implementation for types that are non-standard. The
      * <code>IsNonStandardType<T></code> parameter is only used for SFINAE evaluation to
