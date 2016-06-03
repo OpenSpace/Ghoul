@@ -785,18 +785,18 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x3<T, P>& va
         Array v;
         getValueHelper(key, v);
 
-        value[0][0] = static_cast<glm::tmat4x3<T, P>::value_type>(v[0]);
-        value[0][1] = static_cast<glm::tmat4x3<T, P>::value_type>(v[1]);
-        value[0][2] = static_cast<glm::tmat4x3<T, P>::value_type>(v[2]);
-        value[1][0] = static_cast<glm::tmat4x3<T, P>::value_type>(v[3]);
-        value[1][1] = static_cast<glm::tmat4x3<T, P>::value_type>(v[4]);
-        value[1][2] = static_cast<glm::tmat4x3<T, P>::value_type>(v[5]);
-        value[2][0] = static_cast<glm::tmat4x3<T, P>::value_type>(v[6]);
-        value[2][1] = static_cast<glm::tmat4x3<T, P>::value_type>(v[7]);
-        value[2][2] = static_cast<glm::tmat4x3<T, P>::value_type>(v[8]);
-        value[3][0] = static_cast<glm::tmat4x3<T, P>::value_type>(v[9]);
-        value[3][1] = static_cast<glm::tmat4x3<T, P>::value_type>(v[10]);
-        value[3][2] = static_cast<glm::tmat4x3<T, P>::value_type>(v[11]);
+        value[0][0] = static_cast<T>(v[0]);
+        value[0][1] = static_cast<T>(v[1]);
+        value[0][2] = static_cast<T>(v[2]);
+        value[1][0] = static_cast<T>(v[3]);
+        value[1][1] = static_cast<T>(v[4]);
+        value[1][2] = static_cast<T>(v[5]);
+        value[2][0] = static_cast<T>(v[6]);
+        value[2][1] = static_cast<T>(v[7]);
+        value[2][2] = static_cast<T>(v[8]);
+        value[3][0] = static_cast<T>(v[9]);
+        value[3][1] = static_cast<T>(v[10]);
+        value[3][2] = static_cast<T>(v[11]);
 
         return;
     }
