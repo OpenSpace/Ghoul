@@ -122,7 +122,6 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
 
         FIBITMAP* tempImage = dib;
         dib = FreeImage_ConvertTo32Bits(tempImage);
-        dib = FreeImage_ConvertTo24Bits(tempImage);
         FreeImage_Unload(tempImage);
     }
     
@@ -263,7 +262,6 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(void* memor
 
         FIBITMAP* tempImage = dib;
         dib = FreeImage_ConvertTo32Bits(tempImage);
-        dib = FreeImage_ConvertTo24Bits(tempImage);
         FreeImage_Unload(tempImage);
     }
     
