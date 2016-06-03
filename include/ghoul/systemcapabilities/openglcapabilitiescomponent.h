@@ -176,6 +176,18 @@ public:
     int maxTextureUnits() const;
 
     /**
+     * Returns the largest dimension for a 2D texture on this graphics card.
+     * \return The largest dimension for a 2D texture on this graphics card
+     */
+    int max2DTextureSize() const;
+
+    /**
+    * Returns the largest dimension for a 3D texture on this graphics card.
+    * \return The largest dimension for a 3D texture on this graphics card
+    */
+    int max3DTextureSize() const;
+
+    /**
      * Returns the maximum number of atomic counter buffer bindings
      * that are available on the main graphics card
      * \return The maximum number of bindings
