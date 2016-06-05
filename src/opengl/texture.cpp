@@ -109,6 +109,7 @@ void Texture::initialize(bool allocateData) {
 void Texture::allocateMemory() {
     unsigned int arraySize = compMul(_dimensions) * _bpp;
     _pixels = new GLubyte[arraySize];
+    std::memset(_pixels, 0, arraySize);
 }
 
 void Texture::destroyMemory() {
