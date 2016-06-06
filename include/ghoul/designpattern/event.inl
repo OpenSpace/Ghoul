@@ -24,7 +24,7 @@
 
 #include <ghoul/designpattern/event.h>
 #include <algorithm>
-
+#include <string>
 namespace ghoul {
 
     template<class... T>
