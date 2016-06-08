@@ -639,9 +639,9 @@ bool ShaderPreprocessor::parseRange(const std::string& dictionaryName, Dictionar
 
     int maximum = std::stoi(dictionaryName.substr(maximumStart, maximumEnd - maximumStart));
 
-    if (minimum > maximum) {
-        throw ParserError("Minimum value must be smaller than maximum value. " + dictionaryName);
-    }
+    //if (minimum > maximum) {
+    //    throw ParserError("Minimum value must be smaller than maximum value. " + dictionaryName);
+    //}
 
     // Create all the elements in the dictionary
     for (int i = 0; i <= maximum - minimum; i++) {
