@@ -24,7 +24,7 @@
  ****************************************************************************************/
 
 #include <ghoul/opengl/texture.h>
-
+#include <cstring>
 #include <ghoul/misc/assert.h>
 
 using glm::detail::int8;
