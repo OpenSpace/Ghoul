@@ -90,7 +90,7 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* 
 
 template<class T, class U, class V, class W>
 void MultipleCommand<T,U,V,W>::execute(const std::vector<std::string>& parameters) {
-    _ptr1->push_back(cast(parameters[0]));
+    _ptr1->push_back(cast<T>(parameters[0]));
     if (_ptr2 != nullptr)
         _ptr2->push_back(cast<U>(parameters[1]));
     if (_ptr3 != nullptr)
