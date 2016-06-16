@@ -471,8 +471,8 @@ void FileSystem::createDirectory(const Directory& path, Recursive recursive) con
 
 void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) const {
     ghoul_assert(directoryExists(path), "Path must be an existing directory");
-    if (recursive == Recursive::No)
-        ghoul_assert(emptyDirectory(path), "Path must be empty");
+    if ((recursive == Recursive::No) && (!emptyDirectory(path)))
+        throw FileSystemException("Directory must be empty");
 
 #ifdef WIN32
     const string& dirPath = path;
