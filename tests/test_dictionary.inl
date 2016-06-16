@@ -42,11 +42,11 @@ Test checklist:
 
 class DictionaryTest : public testing::Test {
 protected:
-	DictionaryTest() {
+    DictionaryTest() {
         _d = new ghoul::Dictionary;
     }
 
-	~DictionaryTest() {
+    ~DictionaryTest() {
         if (_d) {
             delete _d;
             _d = nullptr;
@@ -124,200 +124,200 @@ protected:
 #ifdef GHL_TIMING_TESTS
 
 TEST_F(DictionaryTest, TimingTest) {
-	std::ofstream logFile("DictionaryTest.timing");
+    std::ofstream logFile("DictionaryTest.timing");
 
-	START_TIMER(setValue, logFile, 25);
-	_d->setValue("a", 1);
-	FINISH_TIMER(setValue, logFile);
+    START_TIMER(setValue, logFile, 25);
+    _d->setValue("a", 1);
+    FINISH_TIMER(setValue, logFile);
 
-	int value;
-	START_TIMER_PREPARE(getValueCorrect, logFile, 25, { _d->setValue("a", 1); });
-	_d->getValue("a", value);
-	FINISH_TIMER(getValueCorrect, logFile);
+    int value;
+    START_TIMER_PREPARE(getValueCorrect, logFile, 25, { _d->setValue("a", 1); });
+    _d->getValue("a", value);
+    FINISH_TIMER(getValueCorrect, logFile);
 
-	START_TIMER_PREPARE(getValueWrong, logFile, 25, { _d->setValue("a", 1); });
-	_d->getValue("b", value);
-	FINISH_TIMER(getValueWrong, logFile);
+    START_TIMER_PREPARE(getValueWrong, logFile, 25, { _d->setValue("a", 1); });
+    _d->getValue("b", value);
+    FINISH_TIMER(getValueWrong, logFile);
 
-	START_TIMER_PREPARE(hasValueCorrect, logFile, 25, { _d->setValue("a", 1); });
-	_d->hasValue<int>("a");
-	FINISH_TIMER(hasValueCorrect, logFile);
+    START_TIMER_PREPARE(hasValueCorrect, logFile, 25, { _d->setValue("a", 1); });
+    _d->hasValue<int>("a");
+    FINISH_TIMER(hasValueCorrect, logFile);
 
-	START_TIMER_PREPARE(hasValueWrong, logFile, 25, { _d->setValue("a", 1); });
-	_d->hasValue<int>("b");
-	FINISH_TIMER(hasValueWrong, logFile);
+    START_TIMER_PREPARE(hasValueWrong, logFile, 25, { _d->setValue("a", 1); });
+    _d->hasValue<int>("b");
+    FINISH_TIMER(hasValueWrong, logFile);
 
-	START_TIMER(setValueNumber1, logFile, 25);
-	_d->setValue("a", 1);
-	FINISH_TIMER(setValueNumber1, logFile);
+    START_TIMER(setValueNumber1, logFile, 25);
+    _d->setValue("a", 1);
+    FINISH_TIMER(setValueNumber1, logFile);
 
-	START_TIMER_PREPARE(setValueNumber2, logFile, 25, { _d->setValue("a", 1); });
-	_d->setValue("b", 1);
-	FINISH_TIMER(setValueNumber2, logFile);
+    START_TIMER_PREPARE(setValueNumber2, logFile, 25, { _d->setValue("a", 1); });
+    _d->setValue("b", 1);
+    FINISH_TIMER(setValueNumber2, logFile);
 
-	START_TIMER_PREPARE(setValueNumber3, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1); });
-	_d->setValue("c", 1);
-	FINISH_TIMER(setValueNumber3, logFile);
+    START_TIMER_PREPARE(setValueNumber3, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1); });
+    _d->setValue("c", 1);
+    FINISH_TIMER(setValueNumber3, logFile);
 
-	START_TIMER_PREPARE(setValueNumber4, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1);	_d->setValue("c", 1); });
-	_d->setValue("d", 1);
-	FINISH_TIMER(setValueNumber4, logFile);
+    START_TIMER_PREPARE(setValueNumber4, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1);	_d->setValue("c", 1); });
+    _d->setValue("d", 1);
+    FINISH_TIMER(setValueNumber4, logFile);
 
-	START_TIMER_PREPARE(setValueNumber5, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1);
-	_d->setValue("c", 1); _d->setValue("d", 1); });
-	_d->setValue("e", 1);
-	FINISH_TIMER(setValueNumber5, logFile);
+    START_TIMER_PREPARE(setValueNumber5, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1);
+    _d->setValue("c", 1); _d->setValue("d", 1); });
+    _d->setValue("e", 1);
+    FINISH_TIMER(setValueNumber5, logFile);
 
-	START_TIMER_PREPARE(setValueNumber6, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
-	_d->setValue("d", 1); _d->setValue("e", 1); });
-	_d->setValue("f", 1);
-	FINISH_TIMER(setValueNumber6, logFile);
+    START_TIMER_PREPARE(setValueNumber6, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
+    _d->setValue("d", 1); _d->setValue("e", 1); });
+    _d->setValue("f", 1);
+    FINISH_TIMER(setValueNumber6, logFile);
 
-	START_TIMER_PREPARE(setValueNumber7, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
-	_d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1); });
-	_d->setValue("g", 1);
-	FINISH_TIMER(setValueNumber7, logFile);
+    START_TIMER_PREPARE(setValueNumber7, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
+    _d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1); });
+    _d->setValue("g", 1);
+    FINISH_TIMER(setValueNumber7, logFile);
 
-	START_TIMER_PREPARE(setValueNumber8, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
-	_d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1);
-	_d->setValue("g", 1); });
-	_d->setValue("h", 1);
-	FINISH_TIMER(setValueNumber8, logFile);
+    START_TIMER_PREPARE(setValueNumber8, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
+    _d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1);
+    _d->setValue("g", 1); });
+    _d->setValue("h", 1);
+    FINISH_TIMER(setValueNumber8, logFile);
 
-	START_TIMER_PREPARE(setValueNumber9, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
-	_d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1);
-	_d->setValue("g", 1); _d->setValue("h", 1); });
-	_d->setValue("i", 1);
-	FINISH_TIMER(setValueNumber9, logFile);
+    START_TIMER_PREPARE(setValueNumber9, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
+    _d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1);
+    _d->setValue("g", 1); _d->setValue("h", 1); });
+    _d->setValue("i", 1);
+    FINISH_TIMER(setValueNumber9, logFile);
 
-	START_TIMER_PREPARE(setValueNumber10, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
-	_d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1);
-	_d->setValue("g", 1); _d->setValue("h", 1); _d->setValue("i", 1); });
-	_d->setValue("j", 1);
-	FINISH_TIMER(setValueNumber10, logFile);
+    START_TIMER_PREPARE(setValueNumber10, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
+    _d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1);
+    _d->setValue("g", 1); _d->setValue("h", 1); _d->setValue("i", 1); });
+    _d->setValue("j", 1);
+    FINISH_TIMER(setValueNumber10, logFile);
 
-	ghoul::Dictionary d100;
-	std::stringstream s;
-	for (size_t i = 0; i < 100; ++i) {
-		s << "a" << i;
-		d100.setValue(s.str(), 1);
-		s.str(std::string());
-	}
+    ghoul::Dictionary d100;
+    std::stringstream s;
+    for (size_t i = 0; i < 100; ++i) {
+        s << "a" << i;
+        d100.setValue(s.str(), 1);
+        s.str(std::string());
+    }
 
-	ghoul::Dictionary d101 = d100;
-	d101.setValue("a100", 1);
+    ghoul::Dictionary d101 = d100;
+    d101.setValue("a100", 1);
 
-	ghoul::Dictionary d1000;
-	for (size_t i = 0; i < 1000; ++i) {
-		s << "a" << i;
-		d1000.setValue(s.str(), 1);
-		s.str(std::string());
-	}
+    ghoul::Dictionary d1000;
+    for (size_t i = 0; i < 1000; ++i) {
+        s << "a" << i;
+        d1000.setValue(s.str(), 1);
+        s.str(std::string());
+    }
 
-	ghoul::Dictionary d1001 = d1000;
-	d1001.setValue("a1000", 1);
+    ghoul::Dictionary d1001 = d1000;
+    d1001.setValue("a1000", 1);
 
 
-	START_TIMER_PREPARE(setValueNumber100, logFile, 25, { *_d = d100; });
-	_d->setValue("b", 1);
-	FINISH_TIMER(setValueNumber100, logFile);
+    START_TIMER_PREPARE(setValueNumber100, logFile, 25, { *_d = d100; });
+    _d->setValue("b", 1);
+    FINISH_TIMER(setValueNumber100, logFile);
 
-	START_TIMER_PREPARE(setValueNumber1000, logFile, 25, { *_d = d1000; });
-	_d->setValue("b", 1);
-	FINISH_TIMER(setValueNumber1000, logFile);
+    START_TIMER_PREPARE(setValueNumber1000, logFile, 25, { *_d = d1000; });
+    _d->setValue("b", 1);
+    FINISH_TIMER(setValueNumber1000, logFile);
 
-	START_TIMER_PREPARE(getValueNumber1, logFile, 25, { _d->setValue("a", 1); });
-	_d->getValue("a", value);
-	FINISH_TIMER(getValueNumber1, logFile);
+    START_TIMER_PREPARE(getValueNumber1, logFile, 25, { _d->setValue("a", 1); });
+    _d->getValue("a", value);
+    FINISH_TIMER(getValueNumber1, logFile);
 
-	START_TIMER_PREPARE(getValueNumber2, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1); });
-	_d->getValue("a", value);
-	FINISH_TIMER(getValueNumber2, logFile);
+    START_TIMER_PREPARE(getValueNumber2, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1); });
+    _d->getValue("a", value);
+    FINISH_TIMER(getValueNumber2, logFile);
 
-	START_TIMER_PREPARE(getValueNumber3, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1);	_d->setValue("c", 1); });
-	_d->getValue("a", value);
-	FINISH_TIMER(getValueNumber3, logFile);
+    START_TIMER_PREPARE(getValueNumber3, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1);	_d->setValue("c", 1); });
+    _d->getValue("a", value);
+    FINISH_TIMER(getValueNumber3, logFile);
 
-	START_TIMER_PREPARE(getValueNumber4, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1);
-	_d->setValue("c", 1); _d->setValue("d", 1); });
-	_d->getValue("a", value);
-	FINISH_TIMER(getValueNumber4, logFile);
+    START_TIMER_PREPARE(getValueNumber4, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1);
+    _d->setValue("c", 1); _d->setValue("d", 1); });
+    _d->getValue("a", value);
+    FINISH_TIMER(getValueNumber4, logFile);
 
-	START_TIMER_PREPARE(getValueNumber5, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
-	_d->setValue("d", 1); _d->setValue("e", 1); });
-	_d->getValue("a", value);
-	FINISH_TIMER(getValueNumber5, logFile);
+    START_TIMER_PREPARE(getValueNumber5, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
+    _d->setValue("d", 1); _d->setValue("e", 1); });
+    _d->getValue("a", value);
+    FINISH_TIMER(getValueNumber5, logFile);
 
-	START_TIMER_PREPARE(getValueNumber6, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
-	_d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1); });
-	_d->getValue("a", value);
-	FINISH_TIMER(getValueNumber6, logFile);
+    START_TIMER_PREPARE(getValueNumber6, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
+    _d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1); });
+    _d->getValue("a", value);
+    FINISH_TIMER(getValueNumber6, logFile);
 
-	START_TIMER_PREPARE(getValueNumber7, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
-	_d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1);
-	_d->setValue("g", 1); });
-	_d->getValue("a", value);
-	FINISH_TIMER(getValueNumber7, logFile);
+    START_TIMER_PREPARE(getValueNumber7, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
+    _d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1);
+    _d->setValue("g", 1); });
+    _d->getValue("a", value);
+    FINISH_TIMER(getValueNumber7, logFile);
 
-	START_TIMER_PREPARE(getValueNumber8, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
-	_d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1);
-	_d->setValue("g", 1); _d->setValue("h", 1); });
-	_d->getValue("a", value);
-	FINISH_TIMER(getValueNumber8, logFile);
+    START_TIMER_PREPARE(getValueNumber8, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
+    _d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1);
+    _d->setValue("g", 1); _d->setValue("h", 1); });
+    _d->getValue("a", value);
+    FINISH_TIMER(getValueNumber8, logFile);
 
-	START_TIMER_PREPARE(getValueNumber9, logFile, 25,
-	{ _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
-	_d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1);
-	_d->setValue("g", 1); _d->setValue("h", 1); _d->setValue("i", 1); });
-	_d->getValue("a", value);
-	FINISH_TIMER(getValueNumber9, logFile);
-	
-	START_TIMER_PREPARE(getValueNumber100a1, logFile, 25, { *_d = d101; });
-	_d->getValue("a1", value);
-	FINISH_TIMER(getValueNumber100a1, logFile);
+    START_TIMER_PREPARE(getValueNumber9, logFile, 25,
+    { _d->setValue("a", 1); _d->setValue("b", 1); _d->setValue("c", 1);
+    _d->setValue("d", 1); _d->setValue("e", 1); _d->setValue("f", 1);
+    _d->setValue("g", 1); _d->setValue("h", 1); _d->setValue("i", 1); });
+    _d->getValue("a", value);
+    FINISH_TIMER(getValueNumber9, logFile);
+    
+    START_TIMER_PREPARE(getValueNumber100a1, logFile, 25, { *_d = d101; });
+    _d->getValue("a1", value);
+    FINISH_TIMER(getValueNumber100a1, logFile);
 
-	START_TIMER_PREPARE(getValueNumber1000a1, logFile, 25, { *_d = d1001; });
-	_d->getValue("a1", value);
-	FINISH_TIMER(getValueNumber1000a1, logFile);
+    START_TIMER_PREPARE(getValueNumber1000a1, logFile, 25, { *_d = d1001; });
+    _d->getValue("a1", value);
+    FINISH_TIMER(getValueNumber1000a1, logFile);
 
-	START_TIMER_PREPARE(getValueNumber100a50, logFile, 25, { *_d = d101; });
-	_d->getValue("a50", value);
-	FINISH_TIMER(getValueNumber100a50, logFile);
+    START_TIMER_PREPARE(getValueNumber100a50, logFile, 25, { *_d = d101; });
+    _d->getValue("a50", value);
+    FINISH_TIMER(getValueNumber100a50, logFile);
 
-	START_TIMER_PREPARE(getValueNumber1000a50, logFile, 25, { *_d = d1001; });
-	_d->getValue("a50", value);
-	FINISH_TIMER(getValueNumber1000a50, logFile);
+    START_TIMER_PREPARE(getValueNumber1000a50, logFile, 25, { *_d = d1001; });
+    _d->getValue("a50", value);
+    FINISH_TIMER(getValueNumber1000a50, logFile);
 
-	START_TIMER_PREPARE(getValueNumber100a75, logFile, 25, { *_d = d101; });
-	_d->getValue("a75", value);
-	FINISH_TIMER(getValueNumber100a75, logFile);
+    START_TIMER_PREPARE(getValueNumber100a75, logFile, 25, { *_d = d101; });
+    _d->getValue("a75", value);
+    FINISH_TIMER(getValueNumber100a75, logFile);
 
-	START_TIMER_PREPARE(getValueNumber1000a75, logFile, 25, { *_d = d1001; });
-	_d->getValue("a75", value);
-	FINISH_TIMER(getValueNumber1000a75, logFile);
+    START_TIMER_PREPARE(getValueNumber1000a75, logFile, 25, { *_d = d1001; });
+    _d->getValue("a75", value);
+    FINISH_TIMER(getValueNumber1000a75, logFile);
 
-	START_TIMER_PREPARE(getValueNumber1000a500, logFile, 25, { *_d = d1001; });
-	_d->getValue("a500", value);
-	FINISH_TIMER(getValueNumber1000a500, logFile);
+    START_TIMER_PREPARE(getValueNumber1000a500, logFile, 25, { *_d = d1001; });
+    _d->getValue("a500", value);
+    FINISH_TIMER(getValueNumber1000a500, logFile);
 
-	START_TIMER_PREPARE(getValueNumber1000a750, logFile, 25, { *_d = d1001; });
-	_d->getValue("a750", value);
-	FINISH_TIMER(getValueNumber1000a750, logFile);
+    START_TIMER_PREPARE(getValueNumber1000a750, logFile, 25, { *_d = d1001; });
+    _d->getValue("a750", value);
+    FINISH_TIMER(getValueNumber1000a750, logFile);
 }
 
 #endif // GHL_TIMING_TESTS
@@ -334,108 +334,108 @@ TEST_F(DictionaryTest, ClearTest) {
 }
 
 TEST_F(DictionaryTest, InitializerLists) {
-	ghoul::Dictionary d = { { "a", 1 } };
-	ghoul::Dictionary d2 = { { "a", 1 }, { "b", 2 } };
-	ghoul::Dictionary d3 = { { "a", 1 }, { "b", 2 }, { "c", 3 } };
+    ghoul::Dictionary d = { { "a", 1 } };
+    ghoul::Dictionary d2 = { { "a", 1 }, { "b", 2 } };
+    ghoul::Dictionary d3 = { { "a", 1 }, { "b", 2 }, { "c", 3 } };
 
-	EXPECT_EQ(1, d.size());
-	EXPECT_EQ(2, d2.size());
-	EXPECT_EQ(3, d3.size());
+    EXPECT_EQ(1, d.size());
+    EXPECT_EQ(2, d2.size());
+    EXPECT_EQ(3, d3.size());
 }
 
 TEST_F(DictionaryTest, NestedDictionaries) {
-	ghoul::Dictionary d = { { "a", 1 } };
-	ghoul::Dictionary e = { { "a", 1 }, { "b", d } };
+    ghoul::Dictionary d = { { "a", 1 } };
+    ghoul::Dictionary e = { { "a", 1 }, { "b", d } };
 
-	EXPECT_EQ(2, e.size());
+    EXPECT_EQ(2, e.size());
 }
 
 TEST_F(DictionaryTest, AssignmentOperator) {
-	ghoul::Dictionary d = { { "a", 1 }, { "b", 2 } };
-	ghoul::Dictionary e = d;
-	EXPECT_EQ(2, e.size());
-	int value;
-	const bool successA = d.getValue("a", value);
-	EXPECT_EQ(true, successA) << "success 'a'";
-	EXPECT_EQ(1, value) << "value 'a'";
-	const bool successB = d.getValue("b", value);
-	EXPECT_EQ(true, successB) << "success 'b'";
-	EXPECT_EQ(2, value) << "value 'b'";
+    ghoul::Dictionary d = { { "a", 1 }, { "b", 2 } };
+    ghoul::Dictionary e = d;
+    EXPECT_EQ(2, e.size());
+    int value;
+    const bool successA = d.getValue("a", value);
+    EXPECT_EQ(true, successA) << "success 'a'";
+    EXPECT_EQ(1, value) << "value 'a'";
+    const bool successB = d.getValue("b", value);
+    EXPECT_EQ(true, successB) << "success 'b'";
+    EXPECT_EQ(2, value) << "value 'b'";
 }
 
 TEST_F(DictionaryTest, CopyConstructor) {
-	ghoul::Dictionary d = { { "a", 1 }, { "b", 2 } };
-	ghoul::Dictionary e(d);
-	EXPECT_EQ(2, e.size());
-	int value;
-	const bool successA = d.getValue("a", value);
-	EXPECT_EQ(true, successA) << "success 'a'";
-	EXPECT_EQ(1, value) << "value 'a'";
-	const bool successB = d.getValue("b", value);
-	EXPECT_EQ(true, successB) << "success 'b'";
-	EXPECT_EQ(2, value) << "value 'b'";
+    ghoul::Dictionary d = { { "a", 1 }, { "b", 2 } };
+    ghoul::Dictionary e(d);
+    EXPECT_EQ(2, e.size());
+    int value;
+    const bool successA = d.getValue("a", value);
+    EXPECT_EQ(true, successA) << "success 'a'";
+    EXPECT_EQ(1, value) << "value 'a'";
+    const bool successB = d.getValue("b", value);
+    EXPECT_EQ(true, successB) << "success 'b'";
+    EXPECT_EQ(2, value) << "value 'b'";
 }
 
 TEST_F(DictionaryTest, HasValue) {
-	createDefaultDictionary();
+    createDefaultDictionary();
 
-	// correct types
-	ASSERT_EQ(48, _d->size());
-	EXPECT_EQ(true, _d->hasValue<bool>("bool")) << "bool";
-	EXPECT_EQ(true, _d->hasValue<char>("char")) << "char";
-	EXPECT_EQ(true, _d->hasValue<signed char>("signed char")) << "signed char";
-	EXPECT_EQ(true, _d->hasValue<unsigned char>("unsigned char")) << "unsigned char";
-	EXPECT_EQ(true, _d->hasValue<wchar_t>("wchar_t")) << "wchar_t";
-	EXPECT_EQ(true, _d->hasValue<short>("short")) << "short";
-	EXPECT_EQ(true, _d->hasValue<unsigned short>("unsigned short")) << "unsigned short";
-	EXPECT_EQ(true, _d->hasValue<int>("int")) << "int";
-	EXPECT_EQ(true, _d->hasValue<unsigned int>("unsigned int")) << "unsigned int";
-	EXPECT_EQ(true, _d->hasValue<long long>("long long")) << "long long";
-	EXPECT_EQ(true, _d->hasValue<unsigned long long>("unsigned long long")) <<
-		"unsigned long long";
-	EXPECT_EQ(true, _d->hasValue<float>("float")) << "float";
-	EXPECT_EQ(true, _d->hasValue<double>("double")) << "double";
-	EXPECT_EQ(true, _d->hasValue<long double>("long double")) << "long double";
-	EXPECT_EQ(true, _d->hasValue<ghoul::Dictionary>("dictionary")) << "Dictionary";
-	EXPECT_EQ(true, _d->hasValue<glm::vec2>("vec2")) << "vec2";
-	EXPECT_EQ(true, _d->hasValue<glm::dvec2>("dvec2")) << "dvec2";
-	EXPECT_EQ(true, _d->hasValue<glm::ivec2>("ivec2")) << "ivec2";
-	EXPECT_EQ(true, _d->hasValue<glm::uvec2>("uvec2")) << "uvec2";
-	EXPECT_EQ(true, _d->hasValue<glm::bvec2>("bvec2")) << "bvec2";
-	EXPECT_EQ(true, _d->hasValue<glm::vec3>("vec3")) << "vec3";
-	EXPECT_EQ(true, _d->hasValue<glm::dvec3>("dvec3")) << "dvec3";
-	EXPECT_EQ(true, _d->hasValue<glm::ivec3>("ivec3")) << "ivec3";
-	EXPECT_EQ(true, _d->hasValue<glm::uvec3>("uvec3")) << "uvec3";
-	EXPECT_EQ(true, _d->hasValue<glm::bvec3>("bvec3")) << "bvec3";
-	EXPECT_EQ(true, _d->hasValue<glm::vec4>("vec4")) << "vec4";
-	EXPECT_EQ(true, _d->hasValue<glm::dvec4>("dvec4")) << "dvec4";
-	EXPECT_EQ(true, _d->hasValue<glm::ivec4>("ivec4")) << "ivec4";
-	EXPECT_EQ(true, _d->hasValue<glm::uvec4>("uvec4")) << "uvec4";
-	EXPECT_EQ(true, _d->hasValue<glm::bvec4>("bvec4")) << "bvec4";
-	EXPECT_EQ(true, _d->hasValue<glm::mat2x2>("mat2x2")) << "mat2x2";
-	EXPECT_EQ(true, _d->hasValue<glm::mat2x3>("mat2x3")) << "mat2x3";
-	EXPECT_EQ(true, _d->hasValue<glm::mat2x4>("mat2x4")) << "mat2x4";
-	EXPECT_EQ(true, _d->hasValue<glm::mat3x2>("mat3x2")) << "mat3x2";
-	EXPECT_EQ(true, _d->hasValue<glm::mat3x3>("mat3x3")) << "mat3x3";
-	EXPECT_EQ(true, _d->hasValue<glm::mat3x4>("mat3x4")) << "mat3x4";
-	EXPECT_EQ(true, _d->hasValue<glm::mat4x2>("mat4x2")) << "mat4x2";
-	EXPECT_EQ(true, _d->hasValue<glm::mat4x3>("mat4x3")) << "mat4x3";
-	EXPECT_EQ(true, _d->hasValue<glm::mat4x4>("mat4x4")) << "mat4x4";
-	EXPECT_EQ(true, _d->hasValue<glm::dmat2x2>("dmat2x2")) << "dmat2x2";
-	EXPECT_EQ(true, _d->hasValue<glm::dmat2x3>("dmat2x3")) << "dmat2x3";
-	EXPECT_EQ(true, _d->hasValue<glm::dmat2x4>("dmat2x4")) << "dmat2x4";
-	EXPECT_EQ(true, _d->hasValue<glm::dmat3x2>("dmat3x2")) << "dmat3x2";
-	EXPECT_EQ(true, _d->hasValue<glm::dmat3x3>("dmat3x3")) << "dmat3x3";
-	EXPECT_EQ(true, _d->hasValue<glm::dmat3x4>("dmat3x4")) << "dmat3x4";
-	EXPECT_EQ(true, _d->hasValue<glm::dmat4x2>("dmat4x2")) << "dmat4x2";
-	EXPECT_EQ(true, _d->hasValue<glm::dmat4x3>("dmat4x3")) << "dmat4x3";
-	EXPECT_EQ(true, _d->hasValue<glm::dmat4x4>("dmat4x4")) << "dmat4x4";
+    // correct types
+    ASSERT_EQ(48, _d->size());
+    EXPECT_EQ(true, _d->hasValue<bool>("bool")) << "bool";
+    EXPECT_EQ(true, _d->hasValue<char>("char")) << "char";
+    EXPECT_EQ(true, _d->hasValue<signed char>("signed char")) << "signed char";
+    EXPECT_EQ(true, _d->hasValue<unsigned char>("unsigned char")) << "unsigned char";
+    EXPECT_EQ(true, _d->hasValue<wchar_t>("wchar_t")) << "wchar_t";
+    EXPECT_EQ(true, _d->hasValue<short>("short")) << "short";
+    EXPECT_EQ(true, _d->hasValue<unsigned short>("unsigned short")) << "unsigned short";
+    EXPECT_EQ(true, _d->hasValue<int>("int")) << "int";
+    EXPECT_EQ(true, _d->hasValue<unsigned int>("unsigned int")) << "unsigned int";
+    EXPECT_EQ(true, _d->hasValue<long long>("long long")) << "long long";
+    EXPECT_EQ(true, _d->hasValue<unsigned long long>("unsigned long long")) <<
+        "unsigned long long";
+    EXPECT_EQ(true, _d->hasValue<float>("float")) << "float";
+    EXPECT_EQ(true, _d->hasValue<double>("double")) << "double";
+    EXPECT_EQ(true, _d->hasValue<long double>("long double")) << "long double";
+    EXPECT_EQ(true, _d->hasValue<ghoul::Dictionary>("dictionary")) << "Dictionary";
+    EXPECT_EQ(true, _d->hasValue<glm::vec2>("vec2")) << "vec2";
+    EXPECT_EQ(true, _d->hasValue<glm::dvec2>("dvec2")) << "dvec2";
+    EXPECT_EQ(true, _d->hasValue<glm::ivec2>("ivec2")) << "ivec2";
+    EXPECT_EQ(true, _d->hasValue<glm::uvec2>("uvec2")) << "uvec2";
+    EXPECT_EQ(true, _d->hasValue<glm::bvec2>("bvec2")) << "bvec2";
+    EXPECT_EQ(true, _d->hasValue<glm::vec3>("vec3")) << "vec3";
+    EXPECT_EQ(true, _d->hasValue<glm::dvec3>("dvec3")) << "dvec3";
+    EXPECT_EQ(true, _d->hasValue<glm::ivec3>("ivec3")) << "ivec3";
+    EXPECT_EQ(true, _d->hasValue<glm::uvec3>("uvec3")) << "uvec3";
+    EXPECT_EQ(true, _d->hasValue<glm::bvec3>("bvec3")) << "bvec3";
+    EXPECT_EQ(true, _d->hasValue<glm::vec4>("vec4")) << "vec4";
+    EXPECT_EQ(true, _d->hasValue<glm::dvec4>("dvec4")) << "dvec4";
+    EXPECT_EQ(true, _d->hasValue<glm::ivec4>("ivec4")) << "ivec4";
+    EXPECT_EQ(true, _d->hasValue<glm::uvec4>("uvec4")) << "uvec4";
+    EXPECT_EQ(true, _d->hasValue<glm::bvec4>("bvec4")) << "bvec4";
+    EXPECT_EQ(true, _d->hasValue<glm::mat2x2>("mat2x2")) << "mat2x2";
+    EXPECT_EQ(true, _d->hasValue<glm::mat2x3>("mat2x3")) << "mat2x3";
+    EXPECT_EQ(true, _d->hasValue<glm::mat2x4>("mat2x4")) << "mat2x4";
+    EXPECT_EQ(true, _d->hasValue<glm::mat3x2>("mat3x2")) << "mat3x2";
+    EXPECT_EQ(true, _d->hasValue<glm::mat3x3>("mat3x3")) << "mat3x3";
+    EXPECT_EQ(true, _d->hasValue<glm::mat3x4>("mat3x4")) << "mat3x4";
+    EXPECT_EQ(true, _d->hasValue<glm::mat4x2>("mat4x2")) << "mat4x2";
+    EXPECT_EQ(true, _d->hasValue<glm::mat4x3>("mat4x3")) << "mat4x3";
+    EXPECT_EQ(true, _d->hasValue<glm::mat4x4>("mat4x4")) << "mat4x4";
+    EXPECT_EQ(true, _d->hasValue<glm::dmat2x2>("dmat2x2")) << "dmat2x2";
+    EXPECT_EQ(true, _d->hasValue<glm::dmat2x3>("dmat2x3")) << "dmat2x3";
+    EXPECT_EQ(true, _d->hasValue<glm::dmat2x4>("dmat2x4")) << "dmat2x4";
+    EXPECT_EQ(true, _d->hasValue<glm::dmat3x2>("dmat3x2")) << "dmat3x2";
+    EXPECT_EQ(true, _d->hasValue<glm::dmat3x3>("dmat3x3")) << "dmat3x3";
+    EXPECT_EQ(true, _d->hasValue<glm::dmat3x4>("dmat3x4")) << "dmat3x4";
+    EXPECT_EQ(true, _d->hasValue<glm::dmat4x2>("dmat4x2")) << "dmat4x2";
+    EXPECT_EQ(true, _d->hasValue<glm::dmat4x3>("dmat4x3")) << "dmat4x3";
+    EXPECT_EQ(true, _d->hasValue<glm::dmat4x4>("dmat4x4")) << "dmat4x4";
 
-	// false types
-	EXPECT_EQ(false, _d->hasValue<int>("float")) << "int / float";
+    // false types
+    EXPECT_EQ(false, _d->hasValue<int>("float")) << "int / float";
 
-	// not existing
-	EXPECT_EQ(false, _d->hasValue<bool>("nokey")) << "not existing key";
+    // not existing
+    EXPECT_EQ(false, _d->hasValue<bool>("nokey")) << "not existing key";
 }
 
 TEST_F(DictionaryTest, GetValue) {
@@ -8771,87 +8771,85 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
 }
 
 TEST_F(DictionaryTest, RecursiveAccessHasValue) {
-	ghoul::Dictionary d = { { "a", 1 } };
-	ghoul::Dictionary e = d;
-	ghoul::Dictionary f = d;
-	ghoul::Dictionary g = d;
-	f.setValue("g", g);
-	e.setValue("f", f);
-	d.setValue("e", e);
+    ghoul::Dictionary d = { { "a", 1 } };
+    ghoul::Dictionary e = d;
+    ghoul::Dictionary f = d;
+    ghoul::Dictionary g = d;
+    f.setValue("g", g);
+    e.setValue("f", f);
+    d.setValue("e", e);
 
-	ASSERT_EQ(true, d.hasValue<int>("a")) << "a";
-	ASSERT_EQ(true, d.hasValue<ghoul::Dictionary>("e")) << "e";
-	ASSERT_EQ(true, d.hasValue<int>("e.a")) << "e.a";
-	ASSERT_EQ(true, d.hasValue<ghoul::Dictionary>("e.f")) << "e.f";
-	ASSERT_EQ(true, d.hasValue<int>("e.f.a")) << "e.f.a";
-	ASSERT_EQ(true, d.hasValue<ghoul::Dictionary>("e.f.g")) << "e.f.g";
-	ASSERT_EQ(true, d.hasValue<int>("e.f.g.a")) << "e.f.g.a";
+    ASSERT_EQ(true, d.hasValue<int>("a")) << "a";
+    ASSERT_EQ(true, d.hasValue<ghoul::Dictionary>("e")) << "e";
+    ASSERT_EQ(true, d.hasValue<int>("e.a")) << "e.a";
+    ASSERT_EQ(true, d.hasValue<ghoul::Dictionary>("e.f")) << "e.f";
+    ASSERT_EQ(true, d.hasValue<int>("e.f.a")) << "e.f.a";
+    ASSERT_EQ(true, d.hasValue<ghoul::Dictionary>("e.f.g")) << "e.f.g";
+    ASSERT_EQ(true, d.hasValue<int>("e.f.g.a")) << "e.f.g.a";
 
-	ASSERT_EQ(false, d.hasValue<int>("e.g")) << "e.g";
+    ASSERT_EQ(false, d.hasValue<int>("e.g")) << "e.g";
 }
 
 TEST_F(DictionaryTest, RecursiveAccessGetValue) {
-	ghoul::Dictionary d = { { "a", 1 } };
-	ghoul::Dictionary e = d;
-	ghoul::Dictionary f = d;
-	ghoul::Dictionary g = d;
-	f.setValue("g", g);
-	e.setValue("f", f);
-	d.setValue("e", e);
+    ghoul::Dictionary d = { { "a", 1 } };
+    ghoul::Dictionary e = d;
+    ghoul::Dictionary f = d;
+    ghoul::Dictionary g = d;
+    f.setValue("g", g);
+    e.setValue("f", f);
+    d.setValue("e", e);
 
-	int value;
-	ghoul::Dictionary dictValue;
-	bool success;
-	success = d.getValue("a", value);
-	ASSERT_EQ(true, success) << "success 'a'";
-	ASSERT_EQ(1, value) << "value 'a'";
-	success = d.getValue("e", dictValue);
-	ASSERT_EQ(true, success) << "success 'e'";
-	
-	success = d.getValue("e.a", value);
-	ASSERT_EQ(true, success) << "success 'e.a'";
-	ASSERT_EQ(1, value) << "value 'e.a'";
-	success = d.getValue("e.f", dictValue);
-	ASSERT_EQ(true, success) << "success 'e.f'";
+    int value;
+    ghoul::Dictionary dictValue;
+    bool success;
+    success = d.getValue("a", value);
+    ASSERT_EQ(true, success) << "success 'a'";
+    ASSERT_EQ(1, value) << "value 'a'";
+    success = d.getValue("e", dictValue);
+    ASSERT_EQ(true, success) << "success 'e'";
+    
+    success = d.getValue("e.a", value);
+    ASSERT_EQ(true, success) << "success 'e.a'";
+    ASSERT_EQ(1, value) << "value 'e.a'";
+    success = d.getValue("e.f", dictValue);
+    ASSERT_EQ(true, success) << "success 'e.f'";
 
-	success = d.getValue("e.f.a", value);
-	ASSERT_EQ(true, success) << "success 'e.f.a'";
-	ASSERT_EQ(1, value) << "value 'e.f.a'";
-	success = d.getValue("e.f.g", dictValue);
-	ASSERT_EQ(true, success) << "success 'e.f.g'";
+    success = d.getValue("e.f.a", value);
+    ASSERT_EQ(true, success) << "success 'e.f.a'";
+    ASSERT_EQ(1, value) << "value 'e.f.a'";
+    success = d.getValue("e.f.g", dictValue);
+    ASSERT_EQ(true, success) << "success 'e.f.g'";
 
-	success = d.getValue("e.f.g.a", value);
-	ASSERT_EQ(true, success) << "success 'e.f.g.a'";
-	ASSERT_EQ(1, value) << "value 'e.f.g.a'";
+    success = d.getValue("e.f.g.a", value);
+    ASSERT_EQ(true, success) << "success 'e.f.g.a'";
+    ASSERT_EQ(1, value) << "value 'e.f.g.a'";
 
 
-	// false values
-	success = d.getValue("e.g", value);
-	ASSERT_EQ(false, success) << "success 'e.g'";
+    // false values
+    success = d.getValue("e.g", value);
+    ASSERT_EQ(false, success) << "success 'e.g'";
 }
 
 TEST_F(DictionaryTest, RecursiveAccessSetValue) {
-	ghoul::Dictionary d = { { "a", 1 } };
-	ghoul::Dictionary e = d;
-	ghoul::Dictionary f = d;
-	ghoul::Dictionary g = d;
-	f.setValue("g", g);
-	e.setValue("f", f);
-	d.setValue("e", e);
+    ghoul::Dictionary d = { { "a", 1 } };
+    ghoul::Dictionary e = d;
+    ghoul::Dictionary f = d;
+    ghoul::Dictionary g = d;
+    f.setValue("g", g);
+    e.setValue("f", f);
+    d.setValue("e", e);
 
-	int value;
-	bool success;
-	success = d.getValue("e.f.g.a", value);
-	ASSERT_EQ(true, success) << "success 'e.f.g.a'";
-	ASSERT_EQ(1, value) << "value 'e.f.g.a'";
+    int value;
+    bool success;
+    success = d.getValue("e.f.g.a", value);
+    ASSERT_EQ(true, success) << "success 'e.f.g.a'";
+    ASSERT_EQ(1, value) << "value 'e.f.g.a'";
 
-	success = d.setValue("e.f.g.b", 2);
-	ASSERT_EQ(true, success) << "success set 'e.f.g.b'";
-	success = d.getValue("e.f.g.b", value);
-	ASSERT_EQ(true, success) << "success 'e.f.g.b'";
-	ASSERT_EQ(2, value) << "value 'e.f.g.b'";
+    ASSERT_NO_THROW(d.setValue("e.f.g.b", 2));
+    success = d.getValue("e.f.g.b", value);
+    ASSERT_EQ(true, success) << "success 'e.f.g.b'";
+    ASSERT_EQ(2, value) << "value 'e.f.g.b'";
 
-	// false values
-	success = d.setValue("e.g.a", 1);
-	ASSERT_EQ(false, success) << "success 'e.g.a'";
+    // false values
+    ASSERT_NO_THROW(d.setValue("e.g.a", 1));
 }

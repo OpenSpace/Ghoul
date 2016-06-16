@@ -76,42 +76,7 @@ TEST_F(CommandlineParserTest, UnknownCommandsUnhandled) {
     };
 
     _p->setCommandLine(5, argv);
-    const bool res = _p->execute();
-    ASSERT_EQ(false, res);
-}
-
-TEST_F(CommandlineParserTest, UnknownCommandsHandledWrongly1) {
-    //std::vector<std::string> arguments;
-    char* argv[] = {
-        "tests",
-        "-cmd1",
-        "arg",
-        "-cmd2",
-        "arg2"
-    };
-
-    //_p->setAllowUnknownCommands(true);
-    auto arguments = _p->setCommandLine(5, argv);
-    const bool res = _p->execute();
-    ASSERT_EQ(false, res);
-}
-
-TEST_F(CommandlineParserTest, UnknownCommandsHandledWrongly2) {
-    //std::vector<std::string> arguments;
-    char* argv[] = {
-        "tests",
-        "-cmd1",
-        "arg",
-        "-cmd2",
-        "arg2"
-    };
-
-    using ghoul::cmdparser::CommandlineParser;
-    _p->setAllowUnknownCommands(CommandlineParser::AllowUnknownCommands::Yes);
-    //_p->setCommandLine(5, argv, &arguments);
-    _p->setCommandLine(5, argv);
-    const bool res = _p->execute();
-    ASSERT_EQ(false, res);
+    EXPECT_THROW(_p->execute(), ghoul::cmdparser::CommandlineParser::CommandlineException);
 }
 
 TEST_F(CommandlineParserTest, UnknownCommandsHandledCorrectly) {
@@ -125,9 +90,8 @@ TEST_F(CommandlineParserTest, UnknownCommandsHandledCorrectly) {
 
     using ghoul::cmdparser::CommandlineParser;
     _p->setAllowUnknownCommands(CommandlineParser::AllowUnknownCommands::Yes);
-    auto arugments = _p->setCommandLine(5, argv);
-    const bool res = _p->execute();
-    ASSERT_EQ(true, res);
+    _p->setCommandLine(5, argv);
+    EXPECT_NO_THROW(_p->execute());
 }
 
 TEST_F(CommandlineParserTest, UnknownCommandsInterspersed) {
@@ -149,15 +113,16 @@ TEST_F(CommandlineParserTest, UnknownCommandsInterspersed) {
     using ghoul::cmdparser::CommandlineParser;
     _p->setAllowUnknownCommands(CommandlineParser::AllowUnknownCommands::Yes);
     auto arguments = _p->setCommandLine(8, argv);
-    const bool res = _p->execute();
-    ASSERT_EQ(true, res);
-    ASSERT_EQ(4, arguments->size());
-    ASSERT_EQ("-cmd1", arguments->at(0));
-    ASSERT_EQ("arg", arguments->at(1));
-    ASSERT_EQ("-cmd3", arguments->at(2));
-    ASSERT_EQ("arg4", arguments->at(3));
-    ASSERT_EQ("arg2", v1);
-    ASSERT_EQ("arg3", v2);
+    
+    ASSERT_NO_THROW(_p->execute());
+
+    EXPECT_EQ(4, arguments->size());
+    EXPECT_EQ("-cmd1", arguments->at(0));
+    EXPECT_EQ("arg", arguments->at(1));
+    EXPECT_EQ("-cmd3", arguments->at(2));
+    EXPECT_EQ("arg4", arguments->at(3));
+    EXPECT_EQ("arg2", v1);
+    EXPECT_EQ("arg3", v2);
 }
 
 TEST_F(CommandlineParserTest, SingleZeroCommandArguments) {
@@ -171,8 +136,7 @@ TEST_F(CommandlineParserTest, SingleZeroCommandArguments) {
     };
 
     _p->setCommandLine(2, argv);
-    const bool res = _p->execute();
-    ASSERT_EQ(true, res);
+    EXPECT_NO_THROW(_p->execute());
     EXPECT_EQ(true, v);
 }
 
@@ -190,9 +154,8 @@ TEST_F(CommandlineParserTest, SingleCommandOneArgumentBool) {
         };
 
         _p->setCommandLine(3, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res);
-        ASSERT_EQ(false, v) << "0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v) << "0";
     }
     {
         char* argv[] = {
@@ -202,9 +165,8 @@ TEST_F(CommandlineParserTest, SingleCommandOneArgumentBool) {
         };
 
         _p->setCommandLine(3, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res);
-        ASSERT_EQ(true, v) << "1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v) << "1";
     }
 }
 
@@ -223,8 +185,7 @@ TEST_F(CommandlineParserTest, SingleCommandCalledMultipleTimes) {
     };
 
     _p->setCommandLine(5, argv);
-    const bool res = _p->execute();
-    ASSERT_EQ(false, res);
+    EXPECT_THROW(_p->execute(), ghoul::cmdparser::CommandlineParser::CommandlineException);
 }
 
 TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
@@ -250,11 +211,10 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res);
-        ASSERT_EQ(1, v1) << "cmd1 cmd2 cmd3";
-        ASSERT_EQ(2, v2) << "cmd1 cmd2 cmd3";
-        ASSERT_EQ(3, v3) << "cmd1 cmd2 cmd3";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1) << "cmd1 cmd2 cmd3";
+        EXPECT_EQ(2, v2) << "cmd1 cmd2 cmd3";
+        EXPECT_EQ(3, v3) << "cmd1 cmd2 cmd3";
     }
     v1 = 0;
     v2 = 0;
@@ -271,11 +231,10 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res);
-        ASSERT_EQ(1, v1) << "cmd2 cmd1 cmd3";
-        ASSERT_EQ(2, v2) << "cmd2 cmd1 cmd3";
-        ASSERT_EQ(3, v3) << "cmd2 cmd1 cmd3";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1) << "cmd2 cmd1 cmd3";
+        EXPECT_EQ(2, v2) << "cmd2 cmd1 cmd3";
+        EXPECT_EQ(3, v3) << "cmd2 cmd1 cmd3";
     }
     v1 = 0;
     v2 = 0;
@@ -292,11 +251,10 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res);
-        ASSERT_EQ(1, v1) << "cmd3 cmd2 cmd1";
-        ASSERT_EQ(2, v2) << "cmd3 cmd2 cmd1";
-        ASSERT_EQ(3, v3) << "cmd3 cmd2 cmd1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1) << "cmd3 cmd2 cmd1";
+        EXPECT_EQ(2, v2) << "cmd3 cmd2 cmd1";
+        EXPECT_EQ(3, v3) << "cmd3 cmd2 cmd1";
     }
     v1 = 0;
     v2 = 0;
@@ -313,11 +271,10 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res);
-        ASSERT_EQ(1, v1) << "cmd3 cmd1 cmd2";
-        ASSERT_EQ(2, v2) << "cmd3 cmd1 cmd2";
-        ASSERT_EQ(3, v3) << "cmd3 cmd1 cmd2";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1) << "cmd3 cmd1 cmd2";
+        EXPECT_EQ(2, v2) << "cmd3 cmd1 cmd2";
+        EXPECT_EQ(3, v3) << "cmd3 cmd1 cmd2";
     }
 }
 
@@ -335,9 +292,8 @@ TEST_F(CommandlineParserTest, SingleCommandOneArgumentInt) {
         };
 
         _p->setCommandLine(3, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res);
-        ASSERT_EQ(1, v) << "1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v) << "1";
     }
     {
         char* argv[] = {
@@ -347,9 +303,8 @@ TEST_F(CommandlineParserTest, SingleCommandOneArgumentInt) {
         };
 
         _p->setCommandLine(3, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res);
-        ASSERT_EQ(0, v) << "0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(0, v) << "0";
     }
 }
 
