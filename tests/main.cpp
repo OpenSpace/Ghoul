@@ -69,8 +69,20 @@ int main(int argc, char** argv) {
         return 0;
     }
 
+    testing::internal::CaptureStdout();
+    testing::internal::CaptureStderr();
     testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    bool b = RUN_ALL_TESTS();
+    std::string output = testing::internal::GetCapturedStdout();
+    std::string error = testing::internal::GetCapturedStderr();
+
+    std::ofstream o("output.txt");
+    o << output;
+
+    std::ofstream e("error.txt");
+    e << error;
+
+    return b;
 }
 
 #ifdef __unix__
