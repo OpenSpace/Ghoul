@@ -51,7 +51,7 @@ using namespace ghoul::logging;
 
 int main(int argc, char** argv) {
     LogManager::initialize(LogManager::LogLevel::NoLogging);
-    LogMgr.addLog(new ConsoleLog);
+    LogMgr.addLog(std::make_shared<ConsoleLog>());
 
     FileSystem::initialize();
     

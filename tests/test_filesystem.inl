@@ -32,106 +32,109 @@
 #endif
 
 TEST(FileSystemTest, HasTestDirectory) {
-	EXPECT_EQ(FileSys.directoryExists("${TEST_DIR}"), true);
+    EXPECT_EQ(FileSys.directoryExists("${TEST_DIR}"), true);
 }
 
 TEST(FileSystemTest, CreateRemoveDirectory) {
-	const std::string tmp = absPath("${TEST_DIR}/tmp");
-	const std::string tmpRecursive1 = absPath("${TEST_DIR}/tmp/tmp2");
-	const std::string tmpRecursive2 = absPath("${TEST_DIR}/tmp/tmp2/tmp3");
+    using ghoul::filesystem::FileSystem;
 
-	EXPECT_EQ(FileSys.createDirectory(tmp), true);
-	EXPECT_EQ(FileSys.createDirectory(tmpRecursive2), false);
-	EXPECT_EQ(FileSys.createDirectory(tmpRecursive2, true), true);
+    const std::string tmp = absPath("${TEST_DIR}/tmp");
+    const std::string tmpRecursive1 = absPath("${TEST_DIR}/tmp/tmp2");
+    const std::string tmpRecursive2 = absPath("${TEST_DIR}/tmp/tmp2/tmp3");
 
-	EXPECT_EQ(FileSys.deleteDirectory(tmp), false);
-	EXPECT_EQ(FileSys.deleteDirectory(tmpRecursive2), true);
-	EXPECT_EQ(FileSys.deleteDirectory(tmp), false);
-	EXPECT_EQ(FileSys.deleteDirectory(tmp, true), true);
+    EXPECT_NO_THROW(FileSys.createDirectory(tmp));
+    EXPECT_THROW(FileSys.createDirectory(tmpRecursive2), FileSystem::FileSystemException);
+    EXPECT_NO_THROW(FileSys.createDirectory(tmpRecursive2, FileSystem::Recursive::Yes));
+
+    EXPECT_THROW(FileSys.deleteDirectory(tmp), FileSystem::FileSystemException);
+    EXPECT_NO_THROW(FileSys.deleteDirectory(tmpRecursive2));
+    EXPECT_THROW(FileSys.deleteDirectory(tmp), FileSystem::FileSystemException);
+    EXPECT_NO_THROW(FileSys.deleteDirectory(tmp, FileSystem::Recursive::Yes));
 }
 
 TEST(FileSystemTest, Path) {
-	using ghoul::filesystem::File;
+    using ghoul::filesystem::File;
 
-	std::string path = "${TEST_DIR}/tmpfil.txt";
-	std::string abspath = absPath(path);
+    std::string path = "${TEST_DIR}/tmpfil.txt";
+    std::string abspath = absPath(path);
 
-	File* f1 = new File(path);
-	File* f2 = new File(path, true);
-	File* f3 = new File(abspath, true);
+    File* f1 = new File(path);
+    File* f2 = new File(path, File::RawPath::Yes);
+    File* f3 = new File(abspath, File::RawPath::Yes);
 
-	EXPECT_NE(f1->path(), f2->path());
-	EXPECT_NE(f2->path(), f3->path());
-	EXPECT_EQ(f1->path(), f3->path());
+    EXPECT_NE(f1->path(), f2->path());
+    EXPECT_NE(f2->path(), f3->path());
+    EXPECT_EQ(f1->path(), f3->path());
 
-	delete f3;
-	delete f2;
-	delete f1;
+    delete f3;
+    delete f2;
+    delete f1;
 }
 
 TEST(FileSystemTest, OnChangeCallback) {
-	using ghoul::filesystem::File;
+    using ghoul::filesystem::File;
+    using ghoul::filesystem::FileSystem;
 
-	const char* cpath = "${TEST_DIR}/tmpfil.txt";
-	std::string path = absPath(cpath);
-	std::ofstream f;
-	f.open(path);
-	f << "tmp";
-	f.close();
-	bool b1 = false;
-	bool b2 = false;
+    const char* cpath = "${TEST_DIR}/tmpfil.txt";
+    std::string path = absPath(cpath);
+    std::ofstream f;
+    f.open(path);
+    f << "tmp";
+    f.close();
+    bool b1 = false;
+    bool b2 = false;
 
-	auto c1 = [&b1](const File&) {
-		b1 = true;
-	};
-	auto c2 = [&b2](const File&) {
-		b2 = true;
-	};
+    auto c1 = [&b1](const File&) {
+        b1 = true;
+    };
+    auto c2 = [&b2](const File&) {
+        b2 = true;
+    };
 
-	File* f1 = new File(path, false, c1);
-	File* f2 = new File(path, false, c1);
-	File* f3 = new File(path, false, c2);
+    File* f1 = new File(path, File::RawPath::No, c1);
+    File* f2 = new File(path, File::RawPath::No, c1);
+    File* f3 = new File(path, File::RawPath::No, c2);
 
-	// Check that the file exists
-	EXPECT_EQ(FileSys.fileExists(cpath, false), true);
-	EXPECT_EQ(FileSys.fileExists(path), true);
-	EXPECT_EQ(FileSys.fileExists(*f1), true);
+    // Check that the file exists
+    EXPECT_EQ(FileSys.fileExists(cpath, FileSystem::RawPath::No), true);
+    EXPECT_EQ(FileSys.fileExists(path), true);
+    EXPECT_EQ(FileSys.fileExists(*f1), true);
 
-	f2->setCallback(nullptr);
+    f2->setCallback(nullptr);
 
-	// Check that b still is false so no callback has been fired
-	EXPECT_EQ(b1, false);
-	EXPECT_EQ(b2, false);
+    // Check that b still is false so no callback has been fired
+    EXPECT_EQ(b1, false);
+    EXPECT_EQ(b2, false);
 
-	// overwrite the file
-	f.open(path);
-	f << "tmp";
-	f.close();
-	FileSys.triggerFilesystemEvents();
+    // overwrite the file
+    f.open(path);
+    f << "tmp";
+    f.close();
+    FileSys.triggerFilesystemEvents();
 
-	// Sleep the main thread to make sure the filesystem have time to respond
-	const int seconds = 4;
+    // Sleep the main thread to make sure the filesystem have time to respond
+    const int seconds = 4;
 #ifdef WIN32
-	int count = 0;
-	while ((b1 == false || b2 == false) && count < 100 * seconds) {
-		Sleep(10);
-		++count;
-	}
+    int count = 0;
+    while ((b1 == false || b2 == false) && count < 100 * seconds) {
+        Sleep(10);
+        ++count;
+    }
 #else
-	int count = 0;
-	while ((b1 == false || b2 == false) && count < 10000 * seconds) {
-		usleep(100);
-		FileSys.triggerFilesystemEvents();
-		++count;
-	}
+    int count = 0;
+    while ((b1 == false || b2 == false) && count < 10000 * seconds) {
+        usleep(100);
+        FileSys.triggerFilesystemEvents();
+        ++count;
+    }
 #endif
-	EXPECT_EQ(b1, true);
-	EXPECT_EQ(b2, true);
+    EXPECT_EQ(b1, true);
+    EXPECT_EQ(b2, true);
 
-	delete f3;
-	delete f2;
-	delete f1;
+    delete f3;
+    delete f2;
+    delete f1;
 
-	// Check that we can delete the file
-	EXPECT_EQ(FileSys.deleteFile(path), true);
+    // Check that we can delete the file
+    EXPECT_EQ(FileSys.deleteFile(path), true);
 }

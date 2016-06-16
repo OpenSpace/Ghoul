@@ -66,12 +66,11 @@ TEST_F(LuaToDictionaryTest, LoadTest1Cfg) {
     //}
 
     _d.clear();
-    bool success = ghoul::lua::loadDictionaryFromFile(_configuration1, _d);
-    ASSERT_EQ(true, success);
+    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_configuration1, _d));
     EXPECT_EQ(1, _d.size());
 
     double value;
-    success = _d.getValue("t", value);
+    bool success = _d.getValue("t", value);
     ASSERT_EQ(true, success);
     EXPECT_EQ(1.0, value);
 }
@@ -84,12 +83,11 @@ TEST_F(LuaToDictionaryTest, LoadTest2Cfg) {
     //}
 
     _d.clear();
-    bool success = ghoul::lua::loadDictionaryFromFile(_configuration2, _d);
-    ASSERT_EQ(true, success);
+    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_configuration2, _d));
     EXPECT_EQ(2, _d.size());
 
     double value;
-    success = _d.getValue("t", value);
+    bool success = _d.getValue("t", value);
     ASSERT_EQ(true, success);
     EXPECT_EQ(2.0, value);
 
@@ -130,12 +128,11 @@ TEST_F(LuaToDictionaryTest, LoadTest3Cfg) {
     //}
 
     _d.clear();
-    bool success = ghoul::lua::loadDictionaryFromFile(_configuration3, _d);
-    ASSERT_EQ(true, success);
+    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_configuration3, _d));
     EXPECT_EQ(2, _d.size());
 
     ghoul::Dictionary dict;
-    success = _d.getValue("s", dict);
+    bool success = _d.getValue("s", dict);
     ASSERT_EQ(true, success);
     ASSERT_EQ(3, dict.size());
     std::string strValue;
@@ -189,12 +186,11 @@ TEST_F(LuaToDictionaryTest, LoadTest4Cfg) {
     //    m4x4 = { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }
     //}
     _d.clear();
-    bool success = ghoul::lua::loadDictionaryFromFile(_configuration4, _d);
-    ASSERT_EQ(true, success);
+    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_configuration4, _d));
     ASSERT_EQ(25, _d.size());
 
     glm::vec2 vec2Value;
-    success = _d.getValue("n2", vec2Value);
+    bool success = _d.getValue("n2", vec2Value);
     EXPECT_EQ(true, success);
     success = _d.getValue("num2", vec2Value);
     EXPECT_EQ(true, success);
@@ -276,12 +272,11 @@ TEST_F(LuaToDictionaryTest, LoadTest1CfgDirect) {
     )script";
 
     _d.clear();
-    bool success = ghoul::lua::loadDictionaryFromString(script, _d);
-    ASSERT_EQ(true, success);
+    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromString(script, _d));
     EXPECT_EQ(1, _d.size());
 
     double value;
-    success = _d.getValue("t", value);
+    bool success = _d.getValue("t", value);
     ASSERT_EQ(true, success);
     EXPECT_EQ(1.0, value);
 }
@@ -300,12 +295,12 @@ TEST_F(LuaToDictionaryTest, LoadTest2CfgDirect) {
     //}
 
     _d.clear();
-    bool success = ghoul::lua::loadDictionaryFromString(script, _d);
-    ASSERT_EQ(true, success);
+
+    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromString(script, _d));
     EXPECT_EQ(2, _d.size());
 
     double value;
-    success = _d.getValue("t", value);
+    bool success = _d.getValue("t", value);
     ASSERT_EQ(true, success);
     EXPECT_EQ(2.0, value);
 
@@ -347,12 +342,11 @@ TEST_F(LuaToDictionaryTest, LoadTest3CfgDirect) {
     )script";
 
     _d.clear();
-    bool success = ghoul::lua::loadDictionaryFromString(script, _d);
-    ASSERT_EQ(true, success);
+    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromString(script, _d));
     EXPECT_EQ(2, _d.size());
 
     ghoul::Dictionary dict;
-    success = _d.getValue("s", dict);
+    bool success = _d.getValue("s", dict);
     ASSERT_EQ(true, success);
     ASSERT_EQ(3, dict.size());
     std::string strValue;
@@ -408,12 +402,11 @@ TEST_F(LuaToDictionaryTest, LoadTest4CfgDirect) {
     )script";
 
     _d.clear();
-    bool success = ghoul::lua::loadDictionaryFromString(script, _d);
-    ASSERT_EQ(true, success);
+    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromString(script, _d));
     ASSERT_EQ(25, _d.size());
 
     glm::vec2 vec2Value;
-    success = _d.getValue("n2", vec2Value);
+    bool success = _d.getValue("n2", vec2Value);
     EXPECT_EQ(true, success);
     success = _d.getValue("num2", vec2Value);
     EXPECT_EQ(true, success);

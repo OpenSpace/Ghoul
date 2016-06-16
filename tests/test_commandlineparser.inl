@@ -81,7 +81,7 @@ TEST_F(CommandlineParserTest, UnknownCommandsUnhandled) {
 }
 
 TEST_F(CommandlineParserTest, UnknownCommandsHandledWrongly1) {
-    std::vector<std::string> arguments;
+    //std::vector<std::string> arguments;
     char* argv[] = {
         "tests",
         "-cmd1",
@@ -91,7 +91,7 @@ TEST_F(CommandlineParserTest, UnknownCommandsHandledWrongly1) {
     };
 
     //_p->setAllowUnknownCommands(true);
-    _p->setCommandLine(5, argv, &arguments);
+    auto arguments = _p->setCommandLine(5, argv);
     const bool res = _p->execute();
     ASSERT_EQ(false, res);
 }
@@ -106,7 +106,8 @@ TEST_F(CommandlineParserTest, UnknownCommandsHandledWrongly2) {
         "arg2"
     };
 
-    _p->setAllowUnknownCommands(true);
+    using ghoul::cmdparser::CommandlineParser;
+    _p->setAllowUnknownCommands(CommandlineParser::AllowUnknownCommands::Yes);
     //_p->setCommandLine(5, argv, &arguments);
     _p->setCommandLine(5, argv);
     const bool res = _p->execute();
@@ -114,7 +115,6 @@ TEST_F(CommandlineParserTest, UnknownCommandsHandledWrongly2) {
 }
 
 TEST_F(CommandlineParserTest, UnknownCommandsHandledCorrectly) {
-    std::vector<std::string> arguments;
     char* argv[] = {
         "tests",
         "-cmd1",
@@ -123,14 +123,14 @@ TEST_F(CommandlineParserTest, UnknownCommandsHandledCorrectly) {
         "arg2"
     };
 
-    _p->setAllowUnknownCommands(true);
-    _p->setCommandLine(5, argv, &arguments);
+    using ghoul::cmdparser::CommandlineParser;
+    _p->setAllowUnknownCommands(CommandlineParser::AllowUnknownCommands::Yes);
+    auto arugments = _p->setCommandLine(5, argv);
     const bool res = _p->execute();
     ASSERT_EQ(true, res);
 }
 
 TEST_F(CommandlineParserTest, UnknownCommandsInterspersed) {
-    std::vector<std::string> arguments;
     char* argv[] = {
         "tests",
         "-cmd1",
@@ -143,28 +143,27 @@ TEST_F(CommandlineParserTest, UnknownCommandsInterspersed) {
     };
     std::string v1 = "";
     std::string v2 = "";
-    ghoul::cmdparser::SingleCommand<std::string>* c =
-        new ghoul::cmdparser::SingleCommand<std::string>(&v1, &v2, "-cmd2");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommand<std::string>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-cmd2"));
 
-    _p->setAllowUnknownCommands(true);
-    _p->setCommandLine(8, argv, &arguments);
+    using ghoul::cmdparser::CommandlineParser;
+    _p->setAllowUnknownCommands(CommandlineParser::AllowUnknownCommands::Yes);
+    auto arguments = _p->setCommandLine(8, argv);
     const bool res = _p->execute();
     ASSERT_EQ(true, res);
-    ASSERT_EQ(4, arguments.size());
-    ASSERT_EQ("-cmd1", arguments[0]);
-    ASSERT_EQ("arg", arguments[1]);
-    ASSERT_EQ("-cmd3", arguments[2]);
-    ASSERT_EQ("arg4", arguments[3]);
+    ASSERT_EQ(4, arguments->size());
+    ASSERT_EQ("-cmd1", arguments->at(0));
+    ASSERT_EQ("arg", arguments->at(1));
+    ASSERT_EQ("-cmd3", arguments->at(2));
+    ASSERT_EQ("arg4", arguments->at(3));
     ASSERT_EQ("arg2", v1);
     ASSERT_EQ("arg3", v2);
 }
 
 TEST_F(CommandlineParserTest, SingleZeroCommandArguments) {
     bool v = false;
-    ghoul::cmdparser::SingleCommandZeroArguments* c = 
-        new ghoul::cmdparser::SingleCommandZeroArguments(&v, "-zero");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommandZeroArguments;
+    _p->addCommand(std::make_unique<T>(&v, "-zero"));
 
     char* argv[] = {
         "tests",
@@ -180,9 +179,8 @@ TEST_F(CommandlineParserTest, SingleZeroCommandArguments) {
 TEST_F(CommandlineParserTest, SingleCommandOneArgumentBool) {
     // boolean
     bool v = true;
-    ghoul::cmdparser::SingleCommand<bool>* c =
-        new ghoul::cmdparser::SingleCommand<bool>(&v, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommand<bool>;
+    _p->addCommand(std::make_unique<T>(&v, "-single"));
 
     {
         char* argv[] = {
@@ -213,9 +211,8 @@ TEST_F(CommandlineParserTest, SingleCommandOneArgumentBool) {
 TEST_F(CommandlineParserTest, SingleCommandCalledMultipleTimes) {
     // boolean
     bool v = false;
-    ghoul::cmdparser::SingleCommand<bool>* c =
-        new ghoul::cmdparser::SingleCommand<bool>(&v, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommand<bool>;
+    _p->addCommand(std::make_unique<T>(&v, "-single"));
 
     char* argv[] = {
         "tests",
@@ -234,15 +231,12 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
     int v1 = 0;
     int v2 = 0;
     int v3 = 0;
-    ghoul::cmdparser::SingleCommand<int>* c1 =
-        new ghoul::cmdparser::SingleCommand<int>(&v1, "-cmd1");
-    ghoul::cmdparser::SingleCommand<int>* c2 =
-        new ghoul::cmdparser::SingleCommand<int>(&v2, "-cmd2");
-    ghoul::cmdparser::SingleCommand<int>* c3 =
-        new ghoul::cmdparser::SingleCommand<int>(&v3, "-cmd3");
-    _p->addCommand(c1);
-    _p->addCommand(c2);
-    _p->addCommand(c3);
+
+    using T = ghoul::cmdparser::SingleCommand<int>;
+
+    _p->addCommand(std::make_unique<T>(&v1, "-cmd1"));
+    _p->addCommand(std::make_unique<T>(&v2, "-cmd2"));
+    _p->addCommand(std::make_unique<T>(&v3, "-cmd3"));
 
     {
         char* argv[] = {
@@ -330,9 +324,8 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
 TEST_F(CommandlineParserTest, SingleCommandOneArgumentInt) {
     // int
     int v = 0;
-    ghoul::cmdparser::SingleCommand<int>* c =
-        new ghoul::cmdparser::SingleCommand<int>(&v, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommand<int>;
+    _p->addCommand(std::make_unique<T>(&v, "-single"));
 
     {
         char* argv[] = {
@@ -363,9 +356,8 @@ TEST_F(CommandlineParserTest, SingleCommandOneArgumentInt) {
 TEST_F(CommandlineParserTest, SingleCommandOneArgumentString) {
     // string
     std::string v = "";
-    ghoul::cmdparser::SingleCommand<std::string>* c =
-        new ghoul::cmdparser::SingleCommand<std::string>(&v, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommand<std::string>;
+    _p->addCommand(std::make_unique<T>(&v, "-single"));
 
     {
         char* argv[] = {
@@ -396,9 +388,8 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolBool) {
     // bool-bool
     bool v1 = true;
     bool v2 = true;
-    ghoul::cmdparser::SingleCommand<bool, bool>* c =
-        new ghoul::cmdparser::SingleCommand<bool, bool>(&v1, &v2, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommand<bool, bool>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
         char* argv[] = {
@@ -462,9 +453,8 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntInt) {
     // int-int
     int v1 = 1;
     int v2 = 1;
-    ghoul::cmdparser::SingleCommand<int, int>* c =
-        new ghoul::cmdparser::SingleCommand<int, int>(&v1, &v2, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommand<int, int>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
         char* argv[] = {
@@ -528,10 +518,8 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringString) {
     // int-int
     std::string v1 = "";
     std::string v2 = "";
-    ghoul::cmdparser::SingleCommand<std::string, std::string>* c =
-        new ghoul::cmdparser::SingleCommand<std::string, std::string>(&v1, &v2, 
-        "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommand<std::string, std::string>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
         char* argv[] = {
@@ -595,9 +583,8 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolInt) {
     // bool-int
     bool v1 = true;
     int v2 = 1;
-    ghoul::cmdparser::SingleCommand<bool, int>* c =
-        new ghoul::cmdparser::SingleCommand<bool, int>(&v1, &v2, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommand<bool, int>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
         char* argv[] = {
@@ -661,9 +648,8 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntBool) {
     // bool-int
     int v1 = 1;
     bool v2 = true;
-    ghoul::cmdparser::SingleCommand<int, bool>* c =
-        new ghoul::cmdparser::SingleCommand<int, bool>(&v1, &v2, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommand<int, bool>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
         char* argv[] = {
@@ -727,9 +713,8 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntString) {
     // bool-int
     int v1 = 1;
     std::string v2 = "";
-    ghoul::cmdparser::SingleCommand<int, std::string>* c =
-        new ghoul::cmdparser::SingleCommand<int, std::string>(&v1, &v2, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommand<int, std::string>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
         char* argv[] = {
@@ -793,9 +778,8 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringInt) {
     // bool-int
     std::string v1 = "";
     int v2 = 1;
-    ghoul::cmdparser::SingleCommand<std::string, int>* c =
-        new ghoul::cmdparser::SingleCommand<std::string, int>(&v1, &v2, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommand<std::string, int>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
         char* argv[] = {
@@ -859,10 +843,8 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
     bool v1 = true;
     int v2 = 1;
     std::string v3 = "";
-    ghoul::cmdparser::SingleCommand<bool, int, std::string>* c =
-        new ghoul::cmdparser::SingleCommand<bool, int, std::string>(
-                                                        &v1, &v2, &v3, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::SingleCommand<bool, int, std::string>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, &v3, "-single"));
 
     {
         char* argv[] = {
@@ -1004,10 +986,9 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
     int v2 = 1;
     std::string v3 = "";
     float v4 = 1.f;
-    ghoul::cmdparser::SingleCommand<bool, int, std::string, float>* c =
-        new ghoul::cmdparser::SingleCommand<bool, int, std::string, float>(
-        &v1, &v2, &v3, &v4, "-single");
-    _p->addCommand(c);
+
+    using T = ghoul::cmdparser::SingleCommand<bool, int, std::string, float>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, &v3, &v4, "-single"));
 
     {
         char* argv[] = {
@@ -1304,9 +1285,8 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
 
 TEST_F(CommandlineParserTest, MultipleZeroCommandArguments) {
     int v = 0;
-    ghoul::cmdparser::MultipleCommandZeroArguments* c = 
-        new ghoul::cmdparser::MultipleCommandZeroArguments(&v, "-zero");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::MultipleCommandZeroArguments;
+    _p->addCommand(std::make_unique<T>(&v, "-zero"));
 
     {
         char* argv[] = {
@@ -1342,9 +1322,8 @@ TEST_F(CommandlineParserTest, MultipleZeroCommandArguments) {
 
 TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
     std::vector<bool> v;
-    ghoul::cmdparser::MultipleCommand<bool>* c =
-        new ghoul::cmdparser::MultipleCommand<bool>(&v, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::MultipleCommand<bool>;
+    _p->addCommand(std::make_unique<T>(&v, "-single"));
 
     {
         char* argv[] = {
@@ -1446,9 +1425,8 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
 
 TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
     std::vector<int> v;
-    ghoul::cmdparser::MultipleCommand<int>* c =
-        new ghoul::cmdparser::MultipleCommand<int>(&v, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::MultipleCommand<int>;
+    _p->addCommand(std::make_unique<T>(&v, "-single"));
 
     {
         char* argv[] = {
@@ -1551,9 +1529,8 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
 
 TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
     std::vector<std::string> v;
-    ghoul::cmdparser::MultipleCommand<std::string>* c =
-        new ghoul::cmdparser::MultipleCommand<std::string>(&v, "-single");
-    _p->addCommand(c);
+    using T = ghoul::cmdparser::MultipleCommand<std::string>;
+    _p->addCommand(std::make_unique<T>(&v, "-single"));
 
     {
         char* argv[] = {
@@ -1656,10 +1633,9 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
     // bool-bool
     std::vector<bool> v1;
     std::vector<bool> v2;
-    ghoul::cmdparser::MultipleCommand<bool, bool>* c =
-        new ghoul::cmdparser::MultipleCommand<bool, bool>(&v1, &v2, "-single");
-    _p->addCommand(c);
-
+    using T = ghoul::cmdparser::MultipleCommand<bool, bool>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
+    
     {
         char* argv[] = {
             "tests",
@@ -1919,9 +1895,9 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
 TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
     std::vector<int> v1;
     std::vector<int> v2;
-    ghoul::cmdparser::MultipleCommand<int, int>* c =
-        new ghoul::cmdparser::MultipleCommand<int, int>(&v1, &v2, "-single");
-    _p->addCommand(c);
+
+    using T = ghoul::cmdparser::MultipleCommand<int, int>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
         char* argv[] = {
@@ -2184,10 +2160,9 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
     // int-int
     std::vector<std::string> v1;
     std::vector<std::string> v2;
-    ghoul::cmdparser::MultipleCommand<std::string, std::string>* c =
-        new ghoul::cmdparser::MultipleCommand<std::string, std::string>(&v1, &v2, 
-        "-single");
-    _p->addCommand(c);
+
+    using T = ghoul::cmdparser::MultipleCommand<std::string, std::string>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
         char* argv[] = {
@@ -2448,9 +2423,9 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
 TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
     std::vector<bool> v1;
     std::vector<int> v2;
-    ghoul::cmdparser::MultipleCommand<bool, int>* c =
-        new ghoul::cmdparser::MultipleCommand<bool, int>(&v1, &v2, "-single");
-    _p->addCommand(c);
+
+    using T = ghoul::cmdparser::MultipleCommand<bool, int>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
         char* argv[] = {
@@ -2711,9 +2686,9 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
 TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
     std::vector<int> v1;
     std::vector<bool> v2;
-    ghoul::cmdparser::MultipleCommand<int, bool>* c =
-        new ghoul::cmdparser::MultipleCommand<int, bool>(&v1, &v2, "-single");
-    _p->addCommand(c);
+
+    using T = ghoul::cmdparser::MultipleCommand<int, bool>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
         char* argv[] = {
@@ -2974,9 +2949,9 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
 TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
     std::vector<int> v1;
     std::vector<std::string> v2;
-    ghoul::cmdparser::MultipleCommand<int, std::string>* c =
-        new ghoul::cmdparser::MultipleCommand<int, std::string>(&v1, &v2, "-single");
-    _p->addCommand(c);
+
+    using T = ghoul::cmdparser::MultipleCommand<int, std::string>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
         char* argv[] = {
@@ -3237,9 +3212,9 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
 TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
     std::vector<std::string> v1;
     std::vector<int> v2;
-    ghoul::cmdparser::MultipleCommand<std::string, int>* c =
-        new ghoul::cmdparser::MultipleCommand<std::string, int>(&v1, &v2, "-single");
-    _p->addCommand(c);
+
+    using T = ghoul::cmdparser::MultipleCommand<std::string, int>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
         char* argv[] = {
@@ -3500,10 +3475,9 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     std::vector<bool> v1;
     std::vector<int> v2;
     std::vector<std::string> v3;
-    ghoul::cmdparser::MultipleCommand<bool, int, std::string>* c =
-        new ghoul::cmdparser::MultipleCommand<bool, int, std::string>(
-        &v1, &v2, &v3, "-single");
-    _p->addCommand(c);
+
+    using T = ghoul::cmdparser::MultipleCommand<bool, int, std::string>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, &v3, "-single"));
 
     {
         char* argv[] = {
@@ -4161,10 +4135,9 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     std::vector<int> v2;
     std::vector<std::string> v3;
     std::vector<float> v4;
-    ghoul::cmdparser::MultipleCommand<bool, int, std::string, float>* c =
-        new ghoul::cmdparser::MultipleCommand<bool, int, std::string, float>(
-        &v1, &v2, &v3, &v4, "-single");
-    _p->addCommand(c);
+
+    using T = ghoul::cmdparser::MultipleCommand<bool, int, std::string, float>;
+    _p->addCommand(std::make_unique<T>(&v1, &v2, &v3, &v4, "-single"));
 
     {
         char* argv[] = {
