@@ -8851,5 +8851,5 @@ TEST_F(DictionaryTest, RecursiveAccessSetValue) {
     ASSERT_EQ(2, value) << "value 'e.f.g.b'";
 
     // false values
-    ASSERT_NO_THROW(d.setValue("e.g.a", 1));
+    ASSERT_THROW(d.setValue("e.g.a", 1), ghoul::Dictionary::KeyError);
 }

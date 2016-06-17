@@ -322,8 +322,8 @@ TEST_F(CommandlineParserTest, SingleCommandOneArgumentString) {
         };
 
         _p->setCommandLine(3, argv);
-        _p->execute();
-        ASSERT_EQ("foo", v) << "foo";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ("foo", v) << "foo";
     }
     {
         char* argv[] = {
@@ -333,9 +333,8 @@ TEST_F(CommandlineParserTest, SingleCommandOneArgumentString) {
         };
 
         _p->setCommandLine(3, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res);
-        ASSERT_EQ("bar", v) << "bar";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ("bar", v) << "bar";
     }
 }
 
@@ -355,10 +354,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res);
-        ASSERT_EQ(false, v1) << "0 0";
-        ASSERT_EQ(false, v2) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 0";
+        EXPECT_EQ(false, v2) << "0 0";
     }
     {
         char* argv[] = {
@@ -369,10 +367,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res);
-        ASSERT_EQ(true, v1) << "1 0";
-        ASSERT_EQ(false, v2) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 0";
+        EXPECT_EQ(false, v2) << "1 0";
     }
     {
         char* argv[] = {
@@ -383,10 +380,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res);
-        ASSERT_EQ(false, v1) << "0 1";
-        ASSERT_EQ(true, v2) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 1";
+        EXPECT_EQ(true, v2) << "0 1";
     }
     {
         char* argv[] = {
@@ -397,10 +393,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res);
-        ASSERT_EQ(true, v1) << "1 1";
-        ASSERT_EQ(true, v2) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 1";
+        EXPECT_EQ(true, v2) << "1 1";
     }
 }
 
@@ -420,10 +415,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ(0, v1) << "0 0";
-        ASSERT_EQ(0, v2) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(0, v1) << "0 0";
+        EXPECT_EQ(0, v2) << "0 0";
     }
     {
         char* argv[] = {
@@ -434,10 +428,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << " 1 0";
-        ASSERT_EQ(1, v1) << "1 0";
-        ASSERT_EQ(0, v2) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1) << "1 0";
+        EXPECT_EQ(0, v2) << "1 0";
     }
     {
         char* argv[] = {
@@ -448,10 +441,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ(0, v1) << "0 1";
-        ASSERT_EQ(1, v2) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(0, v1) << "0 1";
+        EXPECT_EQ(1, v2) << "0 1";
     }
     {
         char* argv[] = {
@@ -462,10 +454,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ(1, v1) << "1 1";
-        ASSERT_EQ(1, v2) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1) << "1 1";
+        EXPECT_EQ(1, v2) << "1 1";
     }
 }
 
@@ -485,10 +476,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ("0", v1) << "0 0";
-        ASSERT_EQ("0", v2) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ("0", v1) << "0 0";
+        EXPECT_EQ("0", v2) << "0 0";
     }
     {
         char* argv[] = {
@@ -499,10 +489,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ("1", v1) << "1 0";
-        ASSERT_EQ("0", v2) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ("1", v1) << "1 0";
+        EXPECT_EQ("0", v2) << "1 0";
     }
     {
         char* argv[] = {
@@ -513,10 +502,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ("0", v1) << "0 1";
-        ASSERT_EQ("1", v2) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ("0", v1) << "0 1";
+        EXPECT_EQ("1", v2) << "0 1";
     }
     {
         char* argv[] = {
@@ -527,10 +515,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ("1", v1) << "1 1";
-        ASSERT_EQ("1", v2) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ("1", v1) << "1 1";
+        EXPECT_EQ("1", v2) << "1 1";
     }
 }
 
@@ -550,10 +537,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ(false, v1) << "0 0";
-        ASSERT_EQ(0, v2) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 0";
+        EXPECT_EQ(0, v2) << "0 0";
     }
     {
         char* argv[] = {
@@ -564,10 +550,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ(true, v1) << "1 0";
-        ASSERT_EQ(0, v2) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 0";
+        EXPECT_EQ(0, v2) << "1 0";
     }
     {
         char* argv[] = {
@@ -578,10 +563,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ(false, v1) << "0 1";
-        ASSERT_EQ(1, v2) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 1";
+        EXPECT_EQ(1, v2) << "0 1";
     }
     {
         char* argv[] = {
@@ -592,10 +576,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ(true, v1) << "1 1";
-        ASSERT_EQ(1, v2) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 1";
+        EXPECT_EQ(1, v2) << "1 1";
     }
 }
 
@@ -615,10 +598,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ(0, v1) << "0 0";
-        ASSERT_EQ(false, v2) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(0, v1) << "0 0";
+        EXPECT_EQ(false, v2) << "0 0";
     }
     {
         char* argv[] = {
@@ -629,10 +611,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ(1, v1) << "1 0";
-        ASSERT_EQ(false, v2) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1) << "1 0";
+        EXPECT_EQ(false, v2) << "1 0";
     }
     {
         char* argv[] = {
@@ -643,10 +624,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ(0, v1) << "0 1";
-        ASSERT_EQ(true, v2) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(0, v1) << "0 1";
+        EXPECT_EQ(true, v2) << "0 1";
     }
     {
         char* argv[] = {
@@ -657,10 +637,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ(1, v1) << "1 1";
-        ASSERT_EQ(true, v2) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1) << "1 1";
+        EXPECT_EQ(true, v2) << "1 1";
     }
 }
 
@@ -680,10 +659,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ(0, v1) << "0 0";
-        ASSERT_EQ("0", v2) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(0, v1) << "0 0";
+        EXPECT_EQ("0", v2) << "0 0";
     }
     {
         char* argv[] = {
@@ -694,10 +672,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ(1, v1) << "1 0";
-        ASSERT_EQ("0", v2) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1) << "1 0";
+        EXPECT_EQ("0", v2) << "1 0";
     }
     {
         char* argv[] = {
@@ -708,10 +685,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ(0, v1) << "0 1";
-        ASSERT_EQ("1", v2) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(0, v1) << "0 1";
+        EXPECT_EQ("1", v2) << "0 1";
     }
     {
         char* argv[] = {
@@ -722,10 +698,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ(1, v1) << "1 1";
-        ASSERT_EQ("1", v2) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1) << "1 1";
+        EXPECT_EQ("1", v2) << "1 1";
     }
 }
 
@@ -745,10 +720,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ("0", v1) << "0 0";
-        ASSERT_EQ(0, v2) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ("0", v1) << "0 0";
+        EXPECT_EQ(0, v2) << "0 0";
     }
     {
         char* argv[] = {
@@ -759,10 +733,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ("1", v1) << "1 0";
-        ASSERT_EQ(0, v2) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ("1", v1) << "1 0";
+        EXPECT_EQ(0, v2) << "1 0";
     }
     {
         char* argv[] = {
@@ -773,10 +746,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ("0", v1) << "0 1";
-        ASSERT_EQ(1, v2) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ("0", v1) << "0 1";
+        EXPECT_EQ(1, v2) << "0 1";
     }
     {
         char* argv[] = {
@@ -787,10 +759,9 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ("1", v1) << "1 1";
-        ASSERT_EQ(1, v2) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ("1", v1) << "1 1";
+        EXPECT_EQ(1, v2) << "1 1";
     }
 }
 
@@ -811,11 +782,10 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 0";
-        ASSERT_EQ(false, v1) << "0 0 0";
-        ASSERT_EQ(0, v2) << "0 0 0";
-        ASSERT_EQ("0", v3) << "0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 0 0";
+        EXPECT_EQ(0, v2) << "0 0 0";
+        EXPECT_EQ("0", v3) << "0 0 0";
     }
     {
         char* argv[] = {
@@ -827,11 +797,10 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 0";
-        ASSERT_EQ(true, v1) << "1 0 0";
-        ASSERT_EQ(0, v2) << "1 0 0";
-        ASSERT_EQ("0", v3) << "1 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 0 0";
+        EXPECT_EQ(0, v2) << "1 0 0";
+        EXPECT_EQ("0", v3) << "1 0 0";
     }
     {
         char* argv[] = {
@@ -844,11 +813,10 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 0";
-        ASSERT_EQ(false, v1) << "0 1 0";
-        ASSERT_EQ(1, v2) << "0 1 0";
-        ASSERT_EQ("0", v3) << "0 1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 1 0";
+        EXPECT_EQ(1, v2) << "0 1 0";
+        EXPECT_EQ("0", v3) << "0 1 0";
     }
     {
         char* argv[] = {
@@ -861,11 +829,10 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 0";
-        ASSERT_EQ(true, v1) << "1 1 0";
-        ASSERT_EQ(1, v2) << "1 1 0";
-        ASSERT_EQ("0", v3) << "1 1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 1 0";
+        EXPECT_EQ(1, v2) << "1 1 0";
+        EXPECT_EQ("0", v3) << "1 1 0";
     }
 
     {
@@ -878,11 +845,10 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 1";
-        ASSERT_EQ(false, v1) << "0 0 1";
-        ASSERT_EQ(0, v2) << "0 0 1";
-        ASSERT_EQ("1", v3) << "0 0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 0 1";
+        EXPECT_EQ(0, v2) << "0 0 1";
+        EXPECT_EQ("1", v3) << "0 0 1";
     }
     {
         char* argv[] = {
@@ -894,11 +860,10 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 1";
-        ASSERT_EQ(true, v1) << "1 0 1";
-        ASSERT_EQ(0, v2) << "1 0 1";
-        ASSERT_EQ("1", v3) << "1 0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 0 1";
+        EXPECT_EQ(0, v2) << "1 0 1";
+        EXPECT_EQ("1", v3) << "1 0 1";
     }
     {
         char* argv[] = {
@@ -911,11 +876,10 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 1";
-        ASSERT_EQ(false, v1) << "0 1 1";
-        ASSERT_EQ(1, v2) << "0 1 1";
-        ASSERT_EQ("1", v3) << "0 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 1 1";
+        EXPECT_EQ(1, v2) << "0 1 1";
+        EXPECT_EQ("1", v3) << "0 1 1";
     }
     {
         char* argv[] = {
@@ -928,11 +892,10 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 1";
-        ASSERT_EQ(true, v1) << "1 1 1";
-        ASSERT_EQ(1, v2) << "1 1 1";
-        ASSERT_EQ("1", v3) << "1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 1 1";
+        EXPECT_EQ(1, v2) << "1 1 1";
+        EXPECT_EQ("1", v3) << "1 1 1";
     }
 }
 
@@ -956,12 +919,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 0 0";
-        ASSERT_EQ(false, v1) << "0 0 0 0";
-        ASSERT_EQ(0, v2) << "0 0 0 0";
-        ASSERT_EQ("0", v3) << "0 0 0 0";
-        ASSERT_EQ(0.f, v4) << "0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 0 0 0";
+        EXPECT_EQ(0, v2) << "0 0 0 0";
+        EXPECT_EQ("0", v3) << "0 0 0 0";
+        EXPECT_EQ(0.f, v4) << "0 0 0 0";
     }
     {
         char* argv[] = {
@@ -974,12 +936,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 0 0";
-        ASSERT_EQ(true, v1) << "1 0 0 0";
-        ASSERT_EQ(0, v2) << "1 0 0 0";
-        ASSERT_EQ("0", v3) << "1 0 0 0";
-        ASSERT_EQ(0.f, v4) << "1 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 0 0 0";
+        EXPECT_EQ(0, v2) << "1 0 0 0";
+        EXPECT_EQ("0", v3) << "1 0 0 0";
+        EXPECT_EQ(0.f, v4) << "1 0 0 0";
     }
     {
         char* argv[] = {
@@ -992,12 +953,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 0 0";
-        ASSERT_EQ(false, v1) << "0 1 0 0";
-        ASSERT_EQ(1, v2) << "0 1 0 0";
-        ASSERT_EQ("0", v3) << "0 1 0 0";
-        ASSERT_EQ(0.f, v4) << "0 1 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 1 0 0";
+        EXPECT_EQ(1, v2) << "0 1 0 0";
+        EXPECT_EQ("0", v3) << "0 1 0 0";
+        EXPECT_EQ(0.f, v4) << "0 1 0 0";
     }
     {
         char* argv[] = {
@@ -1010,12 +970,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 0 0";
-        ASSERT_EQ(true, v1) << "1 1 0 0";
-        ASSERT_EQ(1, v2) << "1 1 0 0";
-        ASSERT_EQ("0", v3) << "1 1 0 0";
-        ASSERT_EQ(0.f, v4) << "1 1 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 1 0 0";
+        EXPECT_EQ(1, v2) << "1 1 0 0";
+        EXPECT_EQ("0", v3) << "1 1 0 0";
+        EXPECT_EQ(0.f, v4) << "1 1 0 0";
     }
 
     {
@@ -1029,12 +988,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 1 0";
-        ASSERT_EQ(false, v1) << "0 0 1 0";
-        ASSERT_EQ(0, v2) << "0 0 1 0";
-        ASSERT_EQ("1", v3) << "0 0 1 0";
-        ASSERT_EQ(0.f, v4) << "0 0 1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 0 1 0";
+        EXPECT_EQ(0, v2) << "0 0 1 0";
+        EXPECT_EQ("1", v3) << "0 0 1 0";
+        EXPECT_EQ(0.f, v4) << "0 0 1 0";
     }
     {
         char* argv[] = {
@@ -1047,12 +1005,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 1 0";
-        ASSERT_EQ(true, v1) << "1 0 1 0";
-        ASSERT_EQ(0, v2) << "1 0 1 0";
-        ASSERT_EQ("1", v3) << "1 0 1 0";
-        ASSERT_EQ(0.f, v4) << "1 0 1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 0 1 0";
+        EXPECT_EQ(0, v2) << "1 0 1 0";
+        EXPECT_EQ("1", v3) << "1 0 1 0";
+        EXPECT_EQ(0.f, v4) << "1 0 1 0";
     }
     {
         char* argv[] = {
@@ -1065,12 +1022,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 1 0";
-        ASSERT_EQ(false, v1) << "0 1 1 0";
-        ASSERT_EQ(1, v2) << "0 1 1 0";
-        ASSERT_EQ("1", v3) << "0 1 1 0";
-        ASSERT_EQ(0.f, v4) << "0 1 1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 1 1 0";
+        EXPECT_EQ(1, v2) << "0 1 1 0";
+        EXPECT_EQ("1", v3) << "0 1 1 0";
+        EXPECT_EQ(0.f, v4) << "0 1 1 0";
     }
     {
         char* argv[] = {
@@ -1083,12 +1039,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 1 0";
-        ASSERT_EQ(true, v1) << "1 1 1 0";
-        ASSERT_EQ(1, v2) << "1 1 1 0";
-        ASSERT_EQ("1", v3) << "1 1 1 0";
-        ASSERT_EQ(0.f, v4) << "1 1 1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 1 1 0";
+        EXPECT_EQ(1, v2) << "1 1 1 0";
+        EXPECT_EQ("1", v3) << "1 1 1 0";
+        EXPECT_EQ(0.f, v4) << "1 1 1 0";
     }
 
     {
@@ -1102,12 +1057,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 0 1";
-        ASSERT_EQ(false, v1) << "0 0 0 1";
-        ASSERT_EQ(0, v2) << "0 0 0 1";
-        ASSERT_EQ("0", v3) << "0 0 0 1";
-        ASSERT_EQ(1.f, v4) << "0 0 0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 0 0 1";
+        EXPECT_EQ(0, v2) << "0 0 0 1";
+        EXPECT_EQ("0", v3) << "0 0 0 1";
+        EXPECT_EQ(1.f, v4) << "0 0 0 1";
     }
     {
         char* argv[] = {
@@ -1120,12 +1074,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 0 1";
-        ASSERT_EQ(true, v1) << "1 0 0 1";
-        ASSERT_EQ(0, v2) << "1 0 0 1";
-        ASSERT_EQ("0", v3) << "1 0 0 1";
-        ASSERT_EQ(1.f, v4) << "1 0 0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 0 0 1";
+        EXPECT_EQ(0, v2) << "1 0 0 1";
+        EXPECT_EQ("0", v3) << "1 0 0 1";
+        EXPECT_EQ(1.f, v4) << "1 0 0 1";
     }
     {
         char* argv[] = {
@@ -1138,12 +1091,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 0 1";
-        ASSERT_EQ(false, v1) << "0 1 0 1";
-        ASSERT_EQ(1, v2) << "0 1 0 1";
-        ASSERT_EQ("0", v3) << "0 1 0 1";
-        ASSERT_EQ(1.f, v4) << "0 1 0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 1 0 1";
+        EXPECT_EQ(1, v2) << "0 1 0 1";
+        EXPECT_EQ("0", v3) << "0 1 0 1";
+        EXPECT_EQ(1.f, v4) << "0 1 0 1";
     }
     {
         char* argv[] = {
@@ -1156,12 +1108,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 0 1";
-        ASSERT_EQ(true, v1) << "1 1 0 1";
-        ASSERT_EQ(1, v2) << "1 1 0 1";
-        ASSERT_EQ("0", v3) << "1 1 0 1";
-        ASSERT_EQ(1.f, v4) << "1 1 0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 1 0 1";
+        EXPECT_EQ(1, v2) << "1 1 0 1";
+        EXPECT_EQ("0", v3) << "1 1 0 1";
+        EXPECT_EQ(1.f, v4) << "1 1 0 1";
     }
 
     {
@@ -1175,12 +1126,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 1 1";
-        ASSERT_EQ(false, v1) << "0 0 1 1";
-        ASSERT_EQ(0, v2) << "0 0 1 1";
-        ASSERT_EQ("1", v3) << "0 0 1 1";
-        ASSERT_EQ(1.f, v4) << "0 0 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 0 1 1";
+        EXPECT_EQ(0, v2) << "0 0 1 1";
+        EXPECT_EQ("1", v3) << "0 0 1 1";
+        EXPECT_EQ(1.f, v4) << "0 0 1 1";
     }
     {
         char* argv[] = {
@@ -1193,12 +1143,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 1 1";
-        ASSERT_EQ(true, v1) << "1 0 1 1";
-        ASSERT_EQ(0, v2) << "1 0 1 1";
-        ASSERT_EQ("1", v3) << "1 0 1 1";
-        ASSERT_EQ(1.f, v4) << "1 0 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 0 1 1";
+        EXPECT_EQ(0, v2) << "1 0 1 1";
+        EXPECT_EQ("1", v3) << "1 0 1 1";
+        EXPECT_EQ(1.f, v4) << "1 0 1 1";
     }
     {
         char* argv[] = {
@@ -1211,12 +1160,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 1 1";
-        ASSERT_EQ(false, v1) << "0 1 1 1";
-        ASSERT_EQ(1, v2) << "0 1 1 1";
-        ASSERT_EQ("1", v3) << "0 1 1 1";
-        ASSERT_EQ(1.f, v4) << "0 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(false, v1) << "0 1 1 1";
+        EXPECT_EQ(1, v2) << "0 1 1 1";
+        EXPECT_EQ("1", v3) << "0 1 1 1";
+        EXPECT_EQ(1.f, v4) << "0 1 1 1";
     }
     {
         char* argv[] = {
@@ -1229,12 +1177,11 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 1 1";
-        ASSERT_EQ(true, v1) << "1 1 1 1";
-        ASSERT_EQ(1, v2) << "1 1 1 1";
-        ASSERT_EQ("1", v3) << "1 1 1 1";
-        ASSERT_EQ(1.f, v4) << "1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(true, v1) << "1 1 1 1";
+        EXPECT_EQ(1, v2) << "1 1 1 1";
+        EXPECT_EQ("1", v3) << "1 1 1 1";
+        EXPECT_EQ(1.f, v4) << "1 1 1 1";
     }
 }
 
@@ -1251,8 +1198,7 @@ TEST_F(CommandlineParserTest, MultipleZeroCommandArguments) {
         };
 
         _p->setCommandLine(3, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "2x zero";
+        ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v) << "2x zero";
     }
 
@@ -1269,8 +1215,7 @@ TEST_F(CommandlineParserTest, MultipleZeroCommandArguments) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "6x zero";
+        ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(6, v) << "6x zero";
     }
 }
@@ -1288,10 +1233,9 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
         };
 
         _p->setCommandLine(3, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0";
-        ASSERT_EQ(1, v.size()) << "0";
-        ASSERT_EQ(false, v[0]) << "0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v.size()) << "0";
+        EXPECT_EQ(false, v[0]) << "0";
     }
     v.clear();
     {
@@ -1302,10 +1246,9 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
         };
 
         _p->setCommandLine(3, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1";
-        ASSERT_EQ(1, v.size()) << "1";
-        ASSERT_EQ(true, v[0]) << "1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v.size()) << "1";
+        EXPECT_EQ(true, v[0]) << "1";
     }
     v.clear();
     {
@@ -1318,11 +1261,10 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ(2, v.size()) << "0 0";
-        ASSERT_EQ(false, v[0]) << "0 0";
-        ASSERT_EQ(false, v[1]) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v.size()) << "0 0";
+        EXPECT_EQ(false, v[0]) << "0 0";
+        EXPECT_EQ(false, v[1]) << "0 0";
     }
     v.clear();
     {
@@ -1335,11 +1277,10 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ(2, v.size()) << "1 0";
-        ASSERT_EQ(true, v[0]) << "1 0";
-        ASSERT_EQ(false, v[1]) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v.size()) << "1 0";
+        EXPECT_EQ(true, v[0]) << "1 0";
+        EXPECT_EQ(false, v[1]) << "1 0";
     }
     v.clear();
     {
@@ -1352,11 +1293,10 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ(2, v.size()) << "0 1";
-        ASSERT_EQ(false, v[0]) << "0 1";
-        ASSERT_EQ(true, v[1]) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v.size()) << "0 1";
+        EXPECT_EQ(false, v[0]) << "0 1";
+        EXPECT_EQ(true, v[1]) << "0 1";
     }
     v.clear();
     {
@@ -1369,11 +1309,10 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ(2, v.size()) << "1 1";
-        ASSERT_EQ(true, v[0]) << "1 1";
-        ASSERT_EQ(false, v[1]) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v.size()) << "1 1";
+        EXPECT_EQ(true, v[0]) << "1 1";
+        EXPECT_EQ(false, v[1]) << "1 1";
     }
 
 }
@@ -1391,10 +1330,9 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
         };
 
         _p->setCommandLine(3, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1";
-        ASSERT_EQ(1, v.size()) << "1";
-        ASSERT_EQ(1, v[0]) << "1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v.size()) << "1";
+        EXPECT_EQ(1, v[0]) << "1";
     }
     v.clear();
     {
@@ -1405,10 +1343,9 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
         };
 
         _p->setCommandLine(3, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0";
-        ASSERT_EQ(1, v.size()) << "0";
-        ASSERT_EQ(0, v[0]) << "0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v.size()) << "0";
+        EXPECT_EQ(0, v[0]) << "0";
     }
     v.clear();
     {
@@ -1421,11 +1358,10 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ(2, v.size()) << "1 0";
-        ASSERT_EQ(1, v[0]) << "1 0";
-        ASSERT_EQ(0, v[1]) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v.size()) << "1 0";
+        EXPECT_EQ(1, v[0]) << "1 0";
+        EXPECT_EQ(0, v[1]) << "1 0";
     }
     v.clear();
     {
@@ -1438,11 +1374,10 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ(2, v.size()) << "0 0";
-        ASSERT_EQ(0, v[0]) << "0 0";
-        ASSERT_EQ(0, v[1]) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v.size()) << "0 0";
+        EXPECT_EQ(0, v[0]) << "0 0";
+        EXPECT_EQ(0, v[1]) << "0 0";
     }
     v.clear();
     {
@@ -1455,11 +1390,10 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ(2, v.size()) << "1 1";
-        ASSERT_EQ(1, v[0]) << "1 1";
-        ASSERT_EQ(1, v[1]) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v.size()) << "1 1";
+        EXPECT_EQ(1, v[0]) << "1 1";
+        EXPECT_EQ(1, v[1]) << "1 1";
     }
     v.clear();
     {
@@ -1472,12 +1406,11 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ(2, v.size()) << "0 1";
-        ASSERT_EQ(0, v[0]) << "0 1";
-        ASSERT_EQ(2, v.size()) << "0 1";
-        ASSERT_EQ(1, v[1]) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v.size()) << "0 1";
+        EXPECT_EQ(0, v[0]) << "0 1";
+        EXPECT_EQ(2, v.size()) << "0 1";
+        EXPECT_EQ(1, v[1]) << "0 1";
     }
 }
 
@@ -1495,10 +1428,9 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
         };
 
         _p->setCommandLine(3, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "foo";
-        ASSERT_EQ(1, v.size()) << "foo";
-        ASSERT_EQ("foo", v[0]) << "foo";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v.size()) << "foo";
+        EXPECT_EQ("foo", v[0]) << "foo";
     }
     v.clear();
     {
@@ -1509,10 +1441,9 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
         };
 
         _p->setCommandLine(3, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "bar";
-        ASSERT_EQ(1, v.size()) << "bar";
-        ASSERT_EQ("bar", v[0]) << "bar";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v.size()) << "bar";
+        EXPECT_EQ("bar", v[0]) << "bar";
     }
     v.clear();
     {
@@ -1525,11 +1456,10 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "foo foo";
-        ASSERT_EQ(2, v.size()) << "foo foo";
-        ASSERT_EQ("foo", v[0]) << "foo foo";
-        ASSERT_EQ("foo", v[1]) << "foo foo";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v.size()) << "foo foo";
+        EXPECT_EQ("foo", v[0]) << "foo foo";
+        EXPECT_EQ("foo", v[1]) << "foo foo";
     }
     v.clear();
     {
@@ -1542,11 +1472,10 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "bar foo";
-        ASSERT_EQ(2, v.size()) << "bar foo";
-        ASSERT_EQ("bar", v[0]) << "bar foo";
-        ASSERT_EQ("foo", v[1]) << "bar foo";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v.size()) << "bar foo";
+        EXPECT_EQ("bar", v[0]) << "bar foo";
+        EXPECT_EQ("foo", v[1]) << "bar foo";
     }
     v.clear();
     {
@@ -1559,11 +1488,10 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "foo bar";
-        ASSERT_EQ(2, v.size()) << "foo bar";
-        ASSERT_EQ("foo", v[0]) << "foo bar";
-        ASSERT_EQ("bar", v[1]) << "foo bar";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v.size()) << "foo bar";
+        EXPECT_EQ("foo", v[0]) << "foo bar";
+        EXPECT_EQ("bar", v[1]) << "foo bar";
     }
     v.clear();
     {
@@ -1576,11 +1504,10 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "bar bar";
-        ASSERT_EQ(2, v.size()) << "bar bar";
-        ASSERT_EQ("bar", v[0]) << "bar bar";
-        ASSERT_EQ("bar", v[1]) << "bar bar";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v.size()) << "bar bar";
+        EXPECT_EQ("bar", v[0]) << "bar bar";
+        EXPECT_EQ("bar", v[1]) << "bar bar";
     }
 }
 
@@ -1600,12 +1527,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ(1, v1.size()) << "0 0";
-        ASSERT_EQ(1, v2.size()) << "0 0";
-        ASSERT_EQ(false, v1[0]) << "0 0";
-        ASSERT_EQ(false, v2[0]) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 0";
+        EXPECT_EQ(1, v2.size()) << "0 0";
+        EXPECT_EQ(false, v1[0]) << "0 0";
+        EXPECT_EQ(false, v2[0]) << "0 0";
     }
     v1.clear();
     v2.clear();
@@ -1618,12 +1544,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ(1, v1.size()) << "1 0";
-        ASSERT_EQ(1, v2.size()) << "1 0";
-        ASSERT_EQ(true, v1[0]) << "1 0";
-        ASSERT_EQ(false, v2[0]) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 0";
+        EXPECT_EQ(1, v2.size()) << "1 0";
+        EXPECT_EQ(true, v1[0]) << "1 0";
+        EXPECT_EQ(false, v2[0]) << "1 0";
     }
     v1.clear();
     v2.clear();
@@ -1636,12 +1561,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ(1, v1.size()) << "0 1";
-        ASSERT_EQ(1, v2.size()) << "0 1";
-        ASSERT_EQ(false, v1[0]) << "0 1";
-        ASSERT_EQ(true, v2[0]) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 1";
+        EXPECT_EQ(1, v2.size()) << "0 1";
+        EXPECT_EQ(false, v1[0]) << "0 1";
+        EXPECT_EQ(true, v2[0]) << "0 1";
     }
     v1.clear();
     v2.clear();
@@ -1654,12 +1578,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ(1, v1.size()) << "1 1";
-        ASSERT_EQ(1, v2.size()) << "1 1";
-        ASSERT_EQ(true, v1[0]) << "1 1";
-        ASSERT_EQ(true, v2[0]) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 1";
+        EXPECT_EQ(1, v2.size()) << "1 1";
+        EXPECT_EQ(true, v1[0]) << "1 1";
+        EXPECT_EQ(true, v2[0]) << "1 1";
     }
     v1.clear();
     v2.clear();
@@ -1675,14 +1598,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 0 | 0 0";
-        ASSERT_EQ(false, v2[0]) << "0 0 | 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 0 | 0 0";
-        ASSERT_EQ(false, v2[1]) << "0 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 0 | 0 0";
+        EXPECT_EQ(false, v2[0]) << "0 0 | 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 0 | 0 0";
+        EXPECT_EQ(false, v2[1]) << "0 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -1698,14 +1620,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 0 | 0 0";
-        ASSERT_EQ(false, v2[0]) << "1 0 | 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 0 | 0 0";
-        ASSERT_EQ(false, v2[1]) << "1 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 0 | 0 0";
+        EXPECT_EQ(false, v2[0]) << "1 0 | 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 0 | 0 0";
+        EXPECT_EQ(false, v2[1]) << "1 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -1721,14 +1642,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 1 | 0 0";
-        ASSERT_EQ(true, v2[0]) << "0 1 | 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 1 | 0 0";
-        ASSERT_EQ(false, v2[1]) << "0 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 1 | 0 0";
+        EXPECT_EQ(true, v2[0]) << "0 1 | 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 1 | 0 0";
+        EXPECT_EQ(false, v2[1]) << "0 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -1744,14 +1664,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 1 | 0 0";
-        ASSERT_EQ(true, v2[0]) << "1 1 | 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 1 | 0 0";
-        ASSERT_EQ(false, v2[1]) << "1 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 1 | 0 0";
+        EXPECT_EQ(true, v2[0]) << "1 1 | 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 1 | 0 0";
+        EXPECT_EQ(false, v2[1]) << "1 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -1767,14 +1686,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 0 | 1 1";
-        ASSERT_EQ(false, v2[0]) << "0 0 | 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 0 | 1 1";
-        ASSERT_EQ(true, v2[1]) << "0 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 0 | 1 1";
+        EXPECT_EQ(false, v2[0]) << "0 0 | 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 0 | 1 1";
+        EXPECT_EQ(true, v2[1]) << "0 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -1790,14 +1708,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 0 | 1 1";
-        ASSERT_EQ(false, v2[0]) << "1 0 | 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 0 | 1 1";
-        ASSERT_EQ(true, v2[1]) << "1 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 0 | 1 1";
+        EXPECT_EQ(false, v2[0]) << "1 0 | 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 0 | 1 1";
+        EXPECT_EQ(true, v2[1]) << "1 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -1813,14 +1730,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 1 | 1 1";
-        ASSERT_EQ(true, v2[0]) << "0 1 | 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 1 | 1 1";
-        ASSERT_EQ(true, v2[1]) << "0 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 1 | 1 1";
+        EXPECT_EQ(true, v2[0]) << "0 1 | 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 1 | 1 1";
+        EXPECT_EQ(true, v2[1]) << "0 1 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -1836,14 +1752,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 1 | 1 1";
-        ASSERT_EQ(true, v2[0]) << "1 1 | 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 1 | 1 1";
-        ASSERT_EQ(true, v2[1]) << "1 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 1 | 1 1";
+        EXPECT_EQ(true, v2[0]) << "1 1 | 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 1 | 1 1";
+        EXPECT_EQ(true, v2[1]) << "1 1 | 1 1";
     }
 }
 
@@ -1863,12 +1778,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ(1, v1.size()) << "0 0";
-        ASSERT_EQ(1, v2.size()) << "0 0";
-        ASSERT_EQ(0, v1[0]) << "0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 0";
+        EXPECT_EQ(1, v2.size()) << "0 0";
+        EXPECT_EQ(0, v1[0]) << "0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0";
     }
     v1.clear();
     v2.clear();
@@ -1881,12 +1795,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ(1, v1.size()) << "1 0";
-        ASSERT_EQ(1, v2.size()) << "1 0";
-        ASSERT_EQ(1, v1[0]) << "1 0";
-        ASSERT_EQ(0, v2[0]) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 0";
+        EXPECT_EQ(1, v2.size()) << "1 0";
+        EXPECT_EQ(1, v1[0]) << "1 0";
+        EXPECT_EQ(0, v2[0]) << "1 0";
     }
     v1.clear();
     v2.clear();
@@ -1899,12 +1812,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ(1, v1.size()) << "0 1";
-        ASSERT_EQ(1, v2.size()) << "0 1";
-        ASSERT_EQ(0, v1[0]) << "0 1";
-        ASSERT_EQ(1, v2[0]) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 1";
+        EXPECT_EQ(1, v2.size()) << "0 1";
+        EXPECT_EQ(0, v1[0]) << "0 1";
+        EXPECT_EQ(1, v2[0]) << "0 1";
     }
     v1.clear();
     v2.clear();
@@ -1917,12 +1829,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ(1, v1.size()) << "1 1";
-        ASSERT_EQ(1, v2.size()) << "1 1";
-        ASSERT_EQ(1, v1[0]) << "1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 1";
+        EXPECT_EQ(1, v2.size()) << "1 1";
+        EXPECT_EQ(1, v1[0]) << "1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1";
     }
     v1.clear();
     v2.clear();
@@ -1938,14 +1849,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 0 0";
-        ASSERT_EQ(0, v1[0]) << "0 0 | 0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0 | 0 0";
-        ASSERT_EQ(0, v1[1]) << "0 0 | 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
+        EXPECT_EQ(0, v1[0]) << "0 0 | 0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0 | 0 0";
+        EXPECT_EQ(0, v1[1]) << "0 0 | 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -1961,14 +1871,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 0 0";
-        ASSERT_EQ(1, v1[0]) << "1 0 | 0 0";
-        ASSERT_EQ(0, v2[0]) << "1 0 | 0 0";
-        ASSERT_EQ(0, v1[1]) << "1 0 | 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
+        EXPECT_EQ(1, v1[0]) << "1 0 | 0 0";
+        EXPECT_EQ(0, v2[0]) << "1 0 | 0 0";
+        EXPECT_EQ(0, v1[1]) << "1 0 | 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -1984,14 +1893,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 0 0";
-        ASSERT_EQ(0, v1[0]) << "0 1 | 0 0";
-        ASSERT_EQ(1, v2[0]) << "0 1 | 0 0";
-        ASSERT_EQ(0, v1[1]) << "0 1 | 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
+        EXPECT_EQ(0, v1[0]) << "0 1 | 0 0";
+        EXPECT_EQ(1, v2[0]) << "0 1 | 0 0";
+        EXPECT_EQ(0, v1[1]) << "0 1 | 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2007,14 +1915,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 0 0";
-        ASSERT_EQ(1, v1[0]) << "1 1 | 0 0";
-        ASSERT_EQ(1, v2[0]) << "1 1 | 0 0";
-        ASSERT_EQ(0, v1[1]) << "1 1 | 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
+        EXPECT_EQ(1, v1[0]) << "1 1 | 0 0";
+        EXPECT_EQ(1, v2[0]) << "1 1 | 0 0";
+        EXPECT_EQ(0, v1[1]) << "1 1 | 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2030,14 +1937,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 1 1";
-        ASSERT_EQ(0, v1[0]) << "0 0 | 1 1";
-        ASSERT_EQ(0, v2[0]) << "0 0 | 1 1";
-        ASSERT_EQ(1, v1[1]) << "0 0 | 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
+        EXPECT_EQ(0, v1[0]) << "0 0 | 1 1";
+        EXPECT_EQ(0, v2[0]) << "0 0 | 1 1";
+        EXPECT_EQ(1, v1[1]) << "0 0 | 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -2053,14 +1959,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 1 1";
-        ASSERT_EQ(1, v1[0]) << "1 0 | 1 1";
-        ASSERT_EQ(0, v2[0]) << "1 0 | 1 1";
-        ASSERT_EQ(1, v1[1]) << "1 0 | 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
+        EXPECT_EQ(1, v1[0]) << "1 0 | 1 1";
+        EXPECT_EQ(0, v2[0]) << "1 0 | 1 1";
+        EXPECT_EQ(1, v1[1]) << "1 0 | 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -2076,14 +1981,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 1 1";
-        ASSERT_EQ(0, v1[0]) << "0 1 | 1 1";
-        ASSERT_EQ(1, v2[0]) << "0 1 | 1 1";
-        ASSERT_EQ(1, v1[1]) << "0 1 | 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
+        EXPECT_EQ(0, v1[0]) << "0 1 | 1 1";
+        EXPECT_EQ(1, v2[0]) << "0 1 | 1 1";
+        EXPECT_EQ(1, v1[1]) << "0 1 | 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 1 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -2099,14 +2003,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 1 1";
-        ASSERT_EQ(1, v1[0]) << "1 1 | 1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1 | 1 1";
-        ASSERT_EQ(1, v1[1]) << "1 1 | 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
+        EXPECT_EQ(1, v1[0]) << "1 1 | 1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1 | 1 1";
+        EXPECT_EQ(1, v1[1]) << "1 1 | 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 1 | 1 1";
     }
 }
 
@@ -2128,12 +2031,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ(1, v1.size()) << "0 0";
-        ASSERT_EQ(1, v2.size()) << "0 0";
-        ASSERT_EQ("0", v1[0]) << "0 0";
-        ASSERT_EQ("0", v2[0]) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 0";
+        EXPECT_EQ(1, v2.size()) << "0 0";
+        EXPECT_EQ("0", v1[0]) << "0 0";
+        EXPECT_EQ("0", v2[0]) << "0 0";
     }
     v1.clear();
     v2.clear();
@@ -2146,12 +2048,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ(1, v1.size()) << "1 0";
-        ASSERT_EQ(1, v2.size()) << "1 0";
-        ASSERT_EQ("1", v1[0]) << "1 0";
-        ASSERT_EQ("0", v2[0]) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 0";
+        EXPECT_EQ(1, v2.size()) << "1 0";
+        EXPECT_EQ("1", v1[0]) << "1 0";
+        EXPECT_EQ("0", v2[0]) << "1 0";
     }
     v1.clear();
     v2.clear();
@@ -2164,12 +2065,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ(1, v1.size()) << "0 1";
-        ASSERT_EQ(1, v2.size()) << "0 1";
-        ASSERT_EQ("0", v1[0]) << "0 1";
-        ASSERT_EQ("1", v2[0]) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 1";
+        EXPECT_EQ(1, v2.size()) << "0 1";
+        EXPECT_EQ("0", v1[0]) << "0 1";
+        EXPECT_EQ("1", v2[0]) << "0 1";
     }
     v1.clear();
     v2.clear();
@@ -2182,12 +2082,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ(1, v1.size()) << "1 1";
-        ASSERT_EQ(1, v2.size()) << "1 1";
-        ASSERT_EQ("1", v1[0]) << "1 1";
-        ASSERT_EQ("1", v2[0]) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 1";
+        EXPECT_EQ(1, v2.size()) << "1 1";
+        EXPECT_EQ("1", v1[0]) << "1 1";
+        EXPECT_EQ("1", v2[0]) << "1 1";
     }
     v1.clear();
     v2.clear();
@@ -2203,14 +2102,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 0 0";
-        ASSERT_EQ("0", v1[0]) << "0 0 | 0 0";
-        ASSERT_EQ("0", v2[0]) << "0 0 | 0 0";
-        ASSERT_EQ("0", v1[1]) << "0 0 | 0 0";
-        ASSERT_EQ("0", v2[1]) << "0 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
+        EXPECT_EQ("0", v1[0]) << "0 0 | 0 0";
+        EXPECT_EQ("0", v2[0]) << "0 0 | 0 0";
+        EXPECT_EQ("0", v1[1]) << "0 0 | 0 0";
+        EXPECT_EQ("0", v2[1]) << "0 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2226,14 +2124,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 0 0";
-        ASSERT_EQ("1", v1[0]) << "1 0 | 0 0";
-        ASSERT_EQ("0", v2[0]) << "1 0 | 0 0";
-        ASSERT_EQ("0", v1[1]) << "1 0 | 0 0";
-        ASSERT_EQ("0", v2[1]) << "1 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
+        EXPECT_EQ("1", v1[0]) << "1 0 | 0 0";
+        EXPECT_EQ("0", v2[0]) << "1 0 | 0 0";
+        EXPECT_EQ("0", v1[1]) << "1 0 | 0 0";
+        EXPECT_EQ("0", v2[1]) << "1 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2249,14 +2146,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 0 0";
-        ASSERT_EQ("0", v1[0]) << "0 1 | 0 0";
-        ASSERT_EQ("1", v2[0]) << "0 1 | 0 0";
-        ASSERT_EQ("0", v1[1]) << "0 1 | 0 0";
-        ASSERT_EQ("0", v2[1]) << "0 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
+        EXPECT_EQ("0", v1[0]) << "0 1 | 0 0";
+        EXPECT_EQ("1", v2[0]) << "0 1 | 0 0";
+        EXPECT_EQ("0", v1[1]) << "0 1 | 0 0";
+        EXPECT_EQ("0", v2[1]) << "0 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2272,14 +2168,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 0 0";
-        ASSERT_EQ("1", v1[0]) << "1 1 | 0 0";
-        ASSERT_EQ("1", v2[0]) << "1 1 | 0 0";
-        ASSERT_EQ("0", v1[1]) << "1 1 | 0 0";
-        ASSERT_EQ("0", v2[1]) << "1 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
+        EXPECT_EQ("1", v1[0]) << "1 1 | 0 0";
+        EXPECT_EQ("1", v2[0]) << "1 1 | 0 0";
+        EXPECT_EQ("0", v1[1]) << "1 1 | 0 0";
+        EXPECT_EQ("0", v2[1]) << "1 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2295,14 +2190,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 1 1";
-        ASSERT_EQ("0", v1[0]) << "0 0 | 1 1";
-        ASSERT_EQ("0", v2[0]) << "0 0 | 1 1";
-        ASSERT_EQ("1", v1[1]) << "0 0 | 1 1";
-        ASSERT_EQ("1", v2[1]) << "0 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
+        EXPECT_EQ("0", v1[0]) << "0 0 | 1 1";
+        EXPECT_EQ("0", v2[0]) << "0 0 | 1 1";
+        EXPECT_EQ("1", v1[1]) << "0 0 | 1 1";
+        EXPECT_EQ("1", v2[1]) << "0 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -2318,14 +2212,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 1 1";
-        ASSERT_EQ("1", v1[0]) << "1 0 | 1 1";
-        ASSERT_EQ("0", v2[0]) << "1 0 | 1 1";
-        ASSERT_EQ("1", v1[1]) << "1 0 | 1 1";
-        ASSERT_EQ("1", v2[1]) << "1 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
+        EXPECT_EQ("1", v1[0]) << "1 0 | 1 1";
+        EXPECT_EQ("0", v2[0]) << "1 0 | 1 1";
+        EXPECT_EQ("1", v1[1]) << "1 0 | 1 1";
+        EXPECT_EQ("1", v2[1]) << "1 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -2341,14 +2234,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 1 1";
-        ASSERT_EQ("0", v1[0]) << "0 1 | 1 1";
-        ASSERT_EQ("1", v2[0]) << "0 1 | 1 1";
-        ASSERT_EQ("1", v1[1]) << "0 1 | 1 1";
-        ASSERT_EQ("1", v2[1]) << "0 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
+        EXPECT_EQ("0", v1[0]) << "0 1 | 1 1";
+        EXPECT_EQ("1", v2[0]) << "0 1 | 1 1";
+        EXPECT_EQ("1", v1[1]) << "0 1 | 1 1";
+        EXPECT_EQ("1", v2[1]) << "0 1 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -2364,14 +2256,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 1 1";
-        ASSERT_EQ("1", v1[0]) << "1 1 | 1 1";
-        ASSERT_EQ("1", v2[0]) << "1 1 | 1 1";
-        ASSERT_EQ("1", v1[1]) << "1 1 | 1 1";
-        ASSERT_EQ("1", v2[1]) << "1 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
+        EXPECT_EQ("1", v1[0]) << "1 1 | 1 1";
+        EXPECT_EQ("1", v2[0]) << "1 1 | 1 1";
+        EXPECT_EQ("1", v1[1]) << "1 1 | 1 1";
+        EXPECT_EQ("1", v2[1]) << "1 1 | 1 1";
     }
 }
 
@@ -2391,12 +2282,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ(1, v1.size()) << "0 0";
-        ASSERT_EQ(1, v2.size()) << "0 0";
-        ASSERT_EQ(false, v1[0]) << "0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 0";
+        EXPECT_EQ(1, v2.size()) << "0 0";
+        EXPECT_EQ(false, v1[0]) << "0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0";
     }
     v1.clear();
     v2.clear();
@@ -2409,12 +2299,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ(1, v1.size()) << "1 0";
-        ASSERT_EQ(1, v2.size()) << "1 0";
-        ASSERT_EQ(true, v1[0]) << "1 0";
-        ASSERT_EQ(0, v2[0]) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 0";
+        EXPECT_EQ(1, v2.size()) << "1 0";
+        EXPECT_EQ(true, v1[0]) << "1 0";
+        EXPECT_EQ(0, v2[0]) << "1 0";
     }
     v1.clear();
     v2.clear();
@@ -2427,12 +2316,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ(1, v1.size()) << "0 1";
-        ASSERT_EQ(1, v2.size()) << "0 1";
-        ASSERT_EQ(false, v1[0]) << "0 1";
-        ASSERT_EQ(1, v2[0]) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 1";
+        EXPECT_EQ(1, v2.size()) << "0 1";
+        EXPECT_EQ(false, v1[0]) << "0 1";
+        EXPECT_EQ(1, v2[0]) << "0 1";
     }
     v1.clear();
     v2.clear();
@@ -2445,12 +2333,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ(1, v1.size()) << "1 1";
-        ASSERT_EQ(1, v2.size()) << "1 1";
-        ASSERT_EQ(true, v1[0]) << "1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 1";
+        EXPECT_EQ(1, v2.size()) << "1 1";
+        EXPECT_EQ(true, v1[0]) << "1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1";
     }
     v1.clear();
     v2.clear();
@@ -2466,14 +2353,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 0 | 0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0 | 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 0 | 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 0 | 0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0 | 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 0 | 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2489,14 +2375,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 0 | 0 0";
-        ASSERT_EQ(0, v2[0]) << "1 0 | 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 0 | 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 0 | 0 0";
+        EXPECT_EQ(0, v2[0]) << "1 0 | 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 0 | 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2512,14 +2397,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 1 | 0 0";
-        ASSERT_EQ(1, v2[0]) << "0 1 | 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 1 | 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 1 | 0 0";
+        EXPECT_EQ(1, v2[0]) << "0 1 | 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 1 | 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2535,14 +2419,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 1 | 0 0";
-        ASSERT_EQ(1, v2[0]) << "1 1 | 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 1 | 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 1 | 0 0";
+        EXPECT_EQ(1, v2[0]) << "1 1 | 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 1 | 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2558,14 +2441,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 0 | 1 1";
-        ASSERT_EQ(0, v2[0]) << "0 0 | 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 0 | 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 0 | 1 1";
+        EXPECT_EQ(0, v2[0]) << "0 0 | 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 0 | 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -2581,14 +2463,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 0 | 1 1";
-        ASSERT_EQ(0, v2[0]) << "1 0 | 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 0 | 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 0 | 1 1";
+        EXPECT_EQ(0, v2[0]) << "1 0 | 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 0 | 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -2604,14 +2485,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 1 | 1 1";
-        ASSERT_EQ(1, v2[0]) << "0 1 | 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 1 | 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 1 | 1 1";
+        EXPECT_EQ(1, v2[0]) << "0 1 | 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 1 | 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 1 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -2627,14 +2507,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 1 | 1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1 | 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 1 | 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 1 | 1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1 | 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 1 | 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 1 | 1 1";
     }
 }
 
@@ -2654,12 +2533,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ(1, v1.size()) << "0 0";
-        ASSERT_EQ(1, v2.size()) << "0 0";
-        ASSERT_EQ(0, v1[0]) << "0 0";
-        ASSERT_EQ(false, v2[0]) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 0";
+        EXPECT_EQ(1, v2.size()) << "0 0";
+        EXPECT_EQ(0, v1[0]) << "0 0";
+        EXPECT_EQ(false, v2[0]) << "0 0";
     }
     v1.clear();
     v2.clear();
@@ -2672,12 +2550,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ(1, v1.size()) << "1 0";
-        ASSERT_EQ(1, v2.size()) << "1 0";
-        ASSERT_EQ(1, v1[0]) << "1 0";
-        ASSERT_EQ(false, v2[0]) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 0";
+        EXPECT_EQ(1, v2.size()) << "1 0";
+        EXPECT_EQ(1, v1[0]) << "1 0";
+        EXPECT_EQ(false, v2[0]) << "1 0";
     }
     v1.clear();
     v2.clear();
@@ -2690,12 +2567,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ(1, v1.size()) << "0 1";
-        ASSERT_EQ(1, v2.size()) << "0 1";
-        ASSERT_EQ(0, v1[0]) << "0 1";
-        ASSERT_EQ(true, v2[0]) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 1";
+        EXPECT_EQ(1, v2.size()) << "0 1";
+        EXPECT_EQ(0, v1[0]) << "0 1";
+        EXPECT_EQ(true, v2[0]) << "0 1";
     }
     v1.clear();
     v2.clear();
@@ -2708,12 +2584,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ(1, v1.size()) << "1 1";
-        ASSERT_EQ(1, v2.size()) << "1 1";
-        ASSERT_EQ(1, v1[0]) << "1 1";
-        ASSERT_EQ(true, v2[0]) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 1";
+        EXPECT_EQ(1, v2.size()) << "1 1";
+        EXPECT_EQ(1, v1[0]) << "1 1";
+        EXPECT_EQ(true, v2[0]) << "1 1";
     }
     v1.clear();
     v2.clear();
@@ -2729,14 +2604,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 0 0";
-        ASSERT_EQ(0, v1[0]) << "0 0 | 0 0";
-        ASSERT_EQ(false, v2[0]) << "0 0 | 0 0";
-        ASSERT_EQ(0, v1[1]) << "0 0 | 0 0";
-        ASSERT_EQ(false, v2[1]) << "0 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
+        EXPECT_EQ(0, v1[0]) << "0 0 | 0 0";
+        EXPECT_EQ(false, v2[0]) << "0 0 | 0 0";
+        EXPECT_EQ(0, v1[1]) << "0 0 | 0 0";
+        EXPECT_EQ(false, v2[1]) << "0 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2752,14 +2626,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 0 0";
-        ASSERT_EQ(1, v1[0]) << "1 0 | 0 0";
-        ASSERT_EQ(false, v2[0]) << "1 0 | 0 0";
-        ASSERT_EQ(0, v1[1]) << "1 0 | 0 0";
-        ASSERT_EQ(false, v2[1]) << "1 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
+        EXPECT_EQ(1, v1[0]) << "1 0 | 0 0";
+        EXPECT_EQ(false, v2[0]) << "1 0 | 0 0";
+        EXPECT_EQ(0, v1[1]) << "1 0 | 0 0";
+        EXPECT_EQ(false, v2[1]) << "1 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2775,14 +2648,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 0 0";
-        ASSERT_EQ(0, v1[0]) << "0 1 | 0 0";
-        ASSERT_EQ(true, v2[0]) << "0 1 | 0 0";
-        ASSERT_EQ(0, v1[1]) << "0 1 | 0 0";
-        ASSERT_EQ(false, v2[1]) << "0 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
+        EXPECT_EQ(0, v1[0]) << "0 1 | 0 0";
+        EXPECT_EQ(true, v2[0]) << "0 1 | 0 0";
+        EXPECT_EQ(0, v1[1]) << "0 1 | 0 0";
+        EXPECT_EQ(false, v2[1]) << "0 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2798,14 +2670,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 0 0";
-        ASSERT_EQ(1, v1[0]) << "1 1 | 0 0";
-        ASSERT_EQ(true, v2[0]) << "1 1 | 0 0";
-        ASSERT_EQ(0, v1[1]) << "1 1 | 0 0";
-        ASSERT_EQ(false, v2[1]) << "1 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
+        EXPECT_EQ(1, v1[0]) << "1 1 | 0 0";
+        EXPECT_EQ(true, v2[0]) << "1 1 | 0 0";
+        EXPECT_EQ(0, v1[1]) << "1 1 | 0 0";
+        EXPECT_EQ(false, v2[1]) << "1 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -2821,14 +2692,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 1 1";
-        ASSERT_EQ(0, v1[0]) << "0 0 | 1 1";
-        ASSERT_EQ(false, v2[0]) << "0 0 | 1 1";
-        ASSERT_EQ(1, v1[1]) << "0 0 | 1 1";
-        ASSERT_EQ(true, v2[1]) << "0 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
+        EXPECT_EQ(0, v1[0]) << "0 0 | 1 1";
+        EXPECT_EQ(false, v2[0]) << "0 0 | 1 1";
+        EXPECT_EQ(1, v1[1]) << "0 0 | 1 1";
+        EXPECT_EQ(true, v2[1]) << "0 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -2844,14 +2714,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 1 1";
-        ASSERT_EQ(1, v1[0]) << "1 0 | 1 1";
-        ASSERT_EQ(false, v2[0]) << "1 0 | 1 1";
-        ASSERT_EQ(1, v1[1]) << "1 0 | 1 1";
-        ASSERT_EQ(true, v2[1]) << "1 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
+        EXPECT_EQ(1, v1[0]) << "1 0 | 1 1";
+        EXPECT_EQ(false, v2[0]) << "1 0 | 1 1";
+        EXPECT_EQ(1, v1[1]) << "1 0 | 1 1";
+        EXPECT_EQ(true, v2[1]) << "1 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -2867,14 +2736,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 1 1";
-        ASSERT_EQ(0, v1[0]) << "0 1 | 1 1";
-        ASSERT_EQ(true, v2[0]) << "0 1 | 1 1";
-        ASSERT_EQ(1, v1[1]) << "0 1 | 1 1";
-        ASSERT_EQ(true, v2[1]) << "0 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
+        EXPECT_EQ(0, v1[0]) << "0 1 | 1 1";
+        EXPECT_EQ(true, v2[0]) << "0 1 | 1 1";
+        EXPECT_EQ(1, v1[1]) << "0 1 | 1 1";
+        EXPECT_EQ(true, v2[1]) << "0 1 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -2890,14 +2758,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 1 1";
-        ASSERT_EQ(1, v1[0]) << "1 1 | 1 1";
-        ASSERT_EQ(true, v2[0]) << "1 1 | 1 1";
-        ASSERT_EQ(1, v1[1]) << "1 1 | 1 1";
-        ASSERT_EQ(true, v2[1]) << "1 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
+        EXPECT_EQ(1, v1[0]) << "1 1 | 1 1";
+        EXPECT_EQ(true, v2[0]) << "1 1 | 1 1";
+        EXPECT_EQ(1, v1[1]) << "1 1 | 1 1";
+        EXPECT_EQ(true, v2[1]) << "1 1 | 1 1";
     }
 }
 
@@ -2917,12 +2784,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ(1, v1.size()) << "0 0";
-        ASSERT_EQ(1, v2.size()) << "0 0";
-        ASSERT_EQ(0, v1[0]) << "0 0";
-        ASSERT_EQ("0", v2[0]) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 0";
+        EXPECT_EQ(1, v2.size()) << "0 0";
+        EXPECT_EQ(0, v1[0]) << "0 0";
+        EXPECT_EQ("0", v2[0]) << "0 0";
     }
     v1.clear();
     v2.clear();
@@ -2935,12 +2801,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ(1, v1.size()) << "1 0";
-        ASSERT_EQ(1, v2.size()) << "1 0";
-        ASSERT_EQ(1, v1[0]) << "1 0";
-        ASSERT_EQ("0", v2[0]) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 0";
+        EXPECT_EQ(1, v2.size()) << "1 0";
+        EXPECT_EQ(1, v1[0]) << "1 0";
+        EXPECT_EQ("0", v2[0]) << "1 0";
     }
     v1.clear();
     v2.clear();
@@ -2953,12 +2818,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ(1, v1.size()) << "0 1";
-        ASSERT_EQ(1, v2.size()) << "0 1";
-        ASSERT_EQ(0, v1[0]) << "0 1";
-        ASSERT_EQ("1", v2[0]) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 1";
+        EXPECT_EQ(1, v2.size()) << "0 1";
+        EXPECT_EQ(0, v1[0]) << "0 1";
+        EXPECT_EQ("1", v2[0]) << "0 1";
     }
     v1.clear();
     v2.clear();
@@ -2971,12 +2835,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ(1, v1.size()) << "1 1";
-        ASSERT_EQ(1, v2.size()) << "1 1";
-        ASSERT_EQ(1, v1[0]) << "1 1";
-        ASSERT_EQ("1", v2[0]) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 1";
+        EXPECT_EQ(1, v2.size()) << "1 1";
+        EXPECT_EQ(1, v1[0]) << "1 1";
+        EXPECT_EQ("1", v2[0]) << "1 1";
     }
     v1.clear();
     v2.clear();
@@ -2992,14 +2855,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 0 0";
-        ASSERT_EQ(0, v1[0]) << "0 0 | 0 0";
-        ASSERT_EQ("0", v2[0]) << "0 0 | 0 0";
-        ASSERT_EQ(0, v1[1]) << "0 0 | 0 0";
-        ASSERT_EQ("0", v2[1]) << "0 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
+        EXPECT_EQ(0, v1[0]) << "0 0 | 0 0";
+        EXPECT_EQ("0", v2[0]) << "0 0 | 0 0";
+        EXPECT_EQ(0, v1[1]) << "0 0 | 0 0";
+        EXPECT_EQ("0", v2[1]) << "0 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3015,14 +2877,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 0 0";
-        ASSERT_EQ(1, v1[0]) << "1 0 | 0 0";
-        ASSERT_EQ("0", v2[0]) << "1 0 | 0 0";
-        ASSERT_EQ(0, v1[1]) << "1 0 | 0 0";
-        ASSERT_EQ("0", v2[1]) << "1 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
+        EXPECT_EQ(1, v1[0]) << "1 0 | 0 0";
+        EXPECT_EQ("0", v2[0]) << "1 0 | 0 0";
+        EXPECT_EQ(0, v1[1]) << "1 0 | 0 0";
+        EXPECT_EQ("0", v2[1]) << "1 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3038,14 +2899,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 0 0";
-        ASSERT_EQ(0, v1[0]) << "0 1 | 0 0";
-        ASSERT_EQ("1", v2[0]) << "0 1 | 0 0";
-        ASSERT_EQ(0, v1[1]) << "0 1 | 0 0";
-        ASSERT_EQ("0", v2[1]) << "0 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
+        EXPECT_EQ(0, v1[0]) << "0 1 | 0 0";
+        EXPECT_EQ("1", v2[0]) << "0 1 | 0 0";
+        EXPECT_EQ(0, v1[1]) << "0 1 | 0 0";
+        EXPECT_EQ("0", v2[1]) << "0 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3061,14 +2921,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 0 0";
-        ASSERT_EQ(1, v1[0]) << "1 1 | 0 0";
-        ASSERT_EQ("1", v2[0]) << "1 1 | 0 0";
-        ASSERT_EQ(0, v1[1]) << "1 1 | 0 0";
-        ASSERT_EQ("0", v2[1]) << "1 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
+        EXPECT_EQ(1, v1[0]) << "1 1 | 0 0";
+        EXPECT_EQ("1", v2[0]) << "1 1 | 0 0";
+        EXPECT_EQ(0, v1[1]) << "1 1 | 0 0";
+        EXPECT_EQ("0", v2[1]) << "1 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3084,14 +2943,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 1 1";
-        ASSERT_EQ(0, v1[0]) << "0 0 | 1 1";
-        ASSERT_EQ("0", v2[0]) << "0 0 | 1 1";
-        ASSERT_EQ(1, v1[1]) << "0 0 | 1 1";
-        ASSERT_EQ("1", v2[1]) << "0 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
+        EXPECT_EQ(0, v1[0]) << "0 0 | 1 1";
+        EXPECT_EQ("0", v2[0]) << "0 0 | 1 1";
+        EXPECT_EQ(1, v1[1]) << "0 0 | 1 1";
+        EXPECT_EQ("1", v2[1]) << "0 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -3107,14 +2965,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 1 1";
-        ASSERT_EQ(1, v1[0]) << "1 0 | 1 1";
-        ASSERT_EQ("0", v2[0]) << "1 0 | 1 1";
-        ASSERT_EQ(1, v1[1]) << "1 0 | 1 1";
-        ASSERT_EQ("1", v2[1]) << "1 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
+        EXPECT_EQ(1, v1[0]) << "1 0 | 1 1";
+        EXPECT_EQ("0", v2[0]) << "1 0 | 1 1";
+        EXPECT_EQ(1, v1[1]) << "1 0 | 1 1";
+        EXPECT_EQ("1", v2[1]) << "1 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -3130,14 +2987,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 1 1";
-        ASSERT_EQ(0, v1[0]) << "0 1 | 1 1";
-        ASSERT_EQ("1", v2[0]) << "0 1 | 1 1";
-        ASSERT_EQ(1, v1[1]) << "0 1 | 1 1";
-        ASSERT_EQ("1", v2[1]) << "0 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
+        EXPECT_EQ(0, v1[0]) << "0 1 | 1 1";
+        EXPECT_EQ("1", v2[0]) << "0 1 | 1 1";
+        EXPECT_EQ(1, v1[1]) << "0 1 | 1 1";
+        EXPECT_EQ("1", v2[1]) << "0 1 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -3153,14 +3009,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 1 1";
-        ASSERT_EQ(1, v1[0]) << "1 1 | 1 1";
-        ASSERT_EQ("1", v2[0]) << "1 1 | 1 1";
-        ASSERT_EQ(1, v1[1]) << "1 1 | 1 1";
-        ASSERT_EQ("1", v2[1]) << "1 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
+        EXPECT_EQ(1, v1[0]) << "1 1 | 1 1";
+        EXPECT_EQ("1", v2[0]) << "1 1 | 1 1";
+        EXPECT_EQ(1, v1[1]) << "1 1 | 1 1";
+        EXPECT_EQ("1", v2[1]) << "1 1 | 1 1";
     }
 }
 
@@ -3180,12 +3035,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0";
-        ASSERT_EQ(1, v1.size()) << "0 0";
-        ASSERT_EQ(1, v2.size()) << "0 0";
-        ASSERT_EQ("0", v1[0]) << "0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 0";
+        EXPECT_EQ(1, v2.size()) << "0 0";
+        EXPECT_EQ("0", v1[0]) << "0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0";
     }
     v1.clear();
     v2.clear();
@@ -3198,12 +3052,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0";
-        ASSERT_EQ(1, v1.size()) << "1 0";
-        ASSERT_EQ(1, v2.size()) << "1 0";
-        ASSERT_EQ("1", v1[0]) << "1 0";
-        ASSERT_EQ(0, v2[0]) << "1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 0";
+        EXPECT_EQ(1, v2.size()) << "1 0";
+        EXPECT_EQ("1", v1[0]) << "1 0";
+        EXPECT_EQ(0, v2[0]) << "1 0";
     }
     v1.clear();
     v2.clear();
@@ -3216,12 +3069,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1";
-        ASSERT_EQ(1, v1.size()) << "0 1";
-        ASSERT_EQ(1, v2.size()) << "0 1";
-        ASSERT_EQ("0", v1[0]) << "0 1";
-        ASSERT_EQ(1, v2[0]) << "0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 1";
+        EXPECT_EQ(1, v2.size()) << "0 1";
+        EXPECT_EQ("0", v1[0]) << "0 1";
+        EXPECT_EQ(1, v2[0]) << "0 1";
     }
     v1.clear();
     v2.clear();
@@ -3234,12 +3086,11 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(4, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1";
-        ASSERT_EQ(1, v1.size()) << "1 1";
-        ASSERT_EQ(1, v2.size()) << "1 1";
-        ASSERT_EQ("1", v1[0]) << "1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 1";
+        EXPECT_EQ(1, v2.size()) << "1 1";
+        EXPECT_EQ("1", v1[0]) << "1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1";
     }
     v1.clear();
     v2.clear();
@@ -3255,14 +3106,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 0 0";
-        ASSERT_EQ("0", v1[0]) << "0 0 | 0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0 | 0 0";
-        ASSERT_EQ("0", v1[1]) << "0 0 | 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
+        EXPECT_EQ("0", v1[0]) << "0 0 | 0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0 | 0 0";
+        EXPECT_EQ("0", v1[1]) << "0 0 | 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3278,14 +3128,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 0 0";
-        ASSERT_EQ("1", v1[0]) << "1 0 | 0 0";
-        ASSERT_EQ(0, v2[0]) << "1 0 | 0 0";
-        ASSERT_EQ("0", v1[1]) << "1 0 | 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 0 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
+        EXPECT_EQ("1", v1[0]) << "1 0 | 0 0";
+        EXPECT_EQ(0, v2[0]) << "1 0 | 0 0";
+        EXPECT_EQ("0", v1[1]) << "1 0 | 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 0 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3301,14 +3150,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 0 0";
-        ASSERT_EQ("0", v1[0]) << "0 1 | 0 0";
-        ASSERT_EQ(1, v2[0]) << "0 1 | 0 0";
-        ASSERT_EQ("0", v1[1]) << "0 1 | 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
+        EXPECT_EQ("0", v1[0]) << "0 1 | 0 0";
+        EXPECT_EQ(1, v2[0]) << "0 1 | 0 0";
+        EXPECT_EQ("0", v1[1]) << "0 1 | 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3324,14 +3172,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 0 0";
-        ASSERT_EQ("1", v1[0]) << "1 1 | 0 0";
-        ASSERT_EQ(1, v2[0]) << "1 1 | 0 0";
-        ASSERT_EQ("0", v1[1]) << "1 1 | 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 1 | 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
+        EXPECT_EQ("1", v1[0]) << "1 1 | 0 0";
+        EXPECT_EQ(1, v2[0]) << "1 1 | 0 0";
+        EXPECT_EQ("0", v1[1]) << "1 1 | 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 1 | 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3347,14 +3194,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 0 | 1 1";
-        ASSERT_EQ("0", v1[0]) << "0 0 | 1 1";
-        ASSERT_EQ(0, v2[0]) << "0 0 | 1 1";
-        ASSERT_EQ("1", v1[1]) << "0 0 | 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
+        EXPECT_EQ("0", v1[0]) << "0 0 | 1 1";
+        EXPECT_EQ(0, v2[0]) << "0 0 | 1 1";
+        EXPECT_EQ("1", v1[1]) << "0 0 | 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -3370,14 +3216,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 0 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 0 | 1 1";
-        ASSERT_EQ("1", v1[0]) << "1 0 | 1 1";
-        ASSERT_EQ(0, v2[0]) << "1 0 | 1 1";
-        ASSERT_EQ("1", v1[1]) << "1 0 | 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 0 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
+        EXPECT_EQ("1", v1[0]) << "1 0 | 1 1";
+        EXPECT_EQ(0, v2[0]) << "1 0 | 1 1";
+        EXPECT_EQ("1", v1[1]) << "1 0 | 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 0 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -3393,14 +3238,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 1 | 1 1";
-        ASSERT_EQ("0", v1[0]) << "0 1 | 1 1";
-        ASSERT_EQ(1, v2[0]) << "0 1 | 1 1";
-        ASSERT_EQ("1", v1[1]) << "0 1 | 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
+        EXPECT_EQ("0", v1[0]) << "0 1 | 1 1";
+        EXPECT_EQ(1, v2[0]) << "0 1 | 1 1";
+        EXPECT_EQ("1", v1[1]) << "0 1 | 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 1 | 1 1";
     }
     v1.clear();
     v2.clear();
@@ -3416,14 +3260,13 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
         };
 
         _p->setCommandLine(7, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 | 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 1 | 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 1 | 1 1";
-        ASSERT_EQ("1", v1[0]) << "1 1 | 1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1 | 1 1";
-        ASSERT_EQ("1", v1[1]) << "1 1 | 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 1 | 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
+        EXPECT_EQ("1", v1[0]) << "1 1 | 1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1 | 1 1";
+        EXPECT_EQ("1", v1[1]) << "1 1 | 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 1 | 1 1";
     }}
 
 TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
@@ -3444,14 +3287,13 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 0";
-        ASSERT_EQ(1, v1.size()) << "0 0 0";
-        ASSERT_EQ(1, v2.size()) << "0 0 0";
-        ASSERT_EQ(1, v3.size()) << "0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0 0";
-        ASSERT_EQ("0", v3[0]) << "0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 0 0";
+        EXPECT_EQ(1, v2.size()) << "0 0 0";
+        EXPECT_EQ(1, v3.size()) << "0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0 0";
+        EXPECT_EQ("0", v3[0]) << "0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3466,14 +3308,13 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 0";
-        ASSERT_EQ(1, v1.size()) << "1 0 0";
-        ASSERT_EQ(1, v2.size()) << "1 0 0";
-        ASSERT_EQ(1, v3.size()) << "1 0 0";
-        ASSERT_EQ(true, v1[0]);
-        ASSERT_EQ(0, v2[0]);
-        ASSERT_EQ("0", v3[0]);
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 0 0";
+        EXPECT_EQ(1, v2.size()) << "1 0 0";
+        EXPECT_EQ(1, v3.size()) << "1 0 0";
+        EXPECT_EQ(true, v1[0]);
+        EXPECT_EQ(0, v2[0]);
+        EXPECT_EQ("0", v3[0]);
     }
     v1.clear();
     v2.clear();
@@ -3489,14 +3330,13 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 0";
-        ASSERT_EQ(1, v1.size()) << "0 1 0";
-        ASSERT_EQ(1, v2.size()) << "0 1 0";
-        ASSERT_EQ(1, v3.size()) << "0 1 0";
-        ASSERT_EQ(false, v1[0]);
-        ASSERT_EQ(1, v2[0]);
-        ASSERT_EQ("0", v3[0]);
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 1 0";
+        EXPECT_EQ(1, v2.size()) << "0 1 0";
+        EXPECT_EQ(1, v3.size()) << "0 1 0";
+        EXPECT_EQ(false, v1[0]);
+        EXPECT_EQ(1, v2[0]);
+        EXPECT_EQ("0", v3[0]);
     }
     v1.clear();
     v2.clear();
@@ -3512,14 +3352,13 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 0";
-        ASSERT_EQ(1, v1.size()) << "1 1 0";
-        ASSERT_EQ(1, v2.size()) << "1 1 0";
-        ASSERT_EQ(1, v3.size()) << "1 1 0";
-        ASSERT_EQ(true, v1[0]);
-        ASSERT_EQ(1, v2[0]);
-        ASSERT_EQ("0", v3[0]);
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 1 0";
+        EXPECT_EQ(1, v2.size()) << "1 1 0";
+        EXPECT_EQ(1, v3.size()) << "1 1 0";
+        EXPECT_EQ(true, v1[0]);
+        EXPECT_EQ(1, v2[0]);
+        EXPECT_EQ("0", v3[0]);
     }
     v1.clear();
     v2.clear();
@@ -3534,14 +3373,13 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 1";
-        ASSERT_EQ(1, v1.size()) << "0 0 1";
-        ASSERT_EQ(1, v2.size()) << "0 0 1";
-        ASSERT_EQ(1, v3.size()) << "0 0 1";
-        ASSERT_EQ(false, v1[0]);
-        ASSERT_EQ(0, v2[0]);
-        ASSERT_EQ("1", v3[0]);
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 0 1";
+        EXPECT_EQ(1, v2.size()) << "0 0 1";
+        EXPECT_EQ(1, v3.size()) << "0 0 1";
+        EXPECT_EQ(false, v1[0]);
+        EXPECT_EQ(0, v2[0]);
+        EXPECT_EQ("1", v3[0]);
     }
     v1.clear();
     v2.clear();
@@ -3556,14 +3394,13 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 1";
-        ASSERT_EQ(1, v1.size()) << "1 0 1";
-        ASSERT_EQ(1, v2.size()) << "1 0 1";
-        ASSERT_EQ(1, v3.size()) << "1 0 1";
-        ASSERT_EQ(true, v1[0]);
-        ASSERT_EQ(0, v2[0]);
-        ASSERT_EQ("1", v3[0]);
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 0 1";
+        EXPECT_EQ(1, v2.size()) << "1 0 1";
+        EXPECT_EQ(1, v3.size()) << "1 0 1";
+        EXPECT_EQ(true, v1[0]);
+        EXPECT_EQ(0, v2[0]);
+        EXPECT_EQ("1", v3[0]);
     }
     v1.clear();
     v2.clear();
@@ -3579,14 +3416,13 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 1";
-        ASSERT_EQ(1, v1.size()) << "0 1 1";
-        ASSERT_EQ(1, v2.size()) << "0 1 1";
-        ASSERT_EQ(1, v3.size()) << "0 1 1";
-        ASSERT_EQ(false, v1[0]);
-        ASSERT_EQ(1, v2[0]);
-        ASSERT_EQ("1", v3[0]);
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 1 1";
+        EXPECT_EQ(1, v2.size()) << "0 1 1";
+        EXPECT_EQ(1, v3.size()) << "0 1 1";
+        EXPECT_EQ(false, v1[0]);
+        EXPECT_EQ(1, v2[0]);
+        EXPECT_EQ("1", v3[0]);
     }
     v1.clear();
     v2.clear();
@@ -3602,14 +3438,13 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(5, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 1";
-        ASSERT_EQ(1, v1.size()) << "1 1 1";
-        ASSERT_EQ(1, v2.size()) << "1 1 1";
-        ASSERT_EQ(1, v3.size()) << "1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1 1";
-        ASSERT_EQ("1", v3[0]) << "1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 1 1";
+        EXPECT_EQ(1, v2.size()) << "1 1 1";
+        EXPECT_EQ(1, v3.size()) << "1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1 1";
+        EXPECT_EQ("1", v3[0]) << "1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -3628,17 +3463,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 0 | 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 0 0 | 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 0 0 | 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "0 0 0 | 0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 0 0 | 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0 0 | 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "0 0 0 | 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 0 0 | 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 0 0 | 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "0 0 0 | 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 0 | 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 0 0 | 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "0 0 0 | 0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 0 0 | 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0 0 | 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "0 0 0 | 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 0 0 | 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 0 0 | 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "0 0 0 | 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3657,17 +3491,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 0 | 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 0 0 | 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 0 0 | 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "1 0 0 | 0 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 0 0 | 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "1 0 0 | 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "1 0 0 | 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 0 0 | 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 0 0 | 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "1 0 0 | 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 0 | 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 0 0 | 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "1 0 0 | 0 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 0 0 | 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "1 0 0 | 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "1 0 0 | 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 0 0 | 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 0 0 | 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "1 0 0 | 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3687,17 +3520,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 0 | 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 1 0 | 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 1 0 | 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "0 1 0 | 0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 1 0 | 0 0 0";
-        ASSERT_EQ(1, v2[0]) << "0 1 0 | 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "0 1 0 | 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 1 0 | 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 1 0 | 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "0 1 0 | 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 0 | 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 1 0 | 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "0 1 0 | 0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 1 0 | 0 0 0";
+        EXPECT_EQ(1, v2[0]) << "0 1 0 | 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "0 1 0 | 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 1 0 | 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 1 0 | 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "0 1 0 | 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3717,17 +3549,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 0 | 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 1 0 | 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 1 0 | 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "1 1 0 | 0 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 1 0 | 0 0 0";
-        ASSERT_EQ(1, v2[0]) << "1 1 0 | 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "1 1 0 | 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 1 0 | 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 1 0 | 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "1 1 0 | 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 0 | 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 1 0 | 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "1 1 0 | 0 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 1 0 | 0 0 0";
+        EXPECT_EQ(1, v2[0]) << "1 1 0 | 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "1 1 0 | 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 1 0 | 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 1 0 | 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "1 1 0 | 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3746,17 +3577,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 1 | 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 0 1 | 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 0 1 | 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "0 0 1 | 0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 0 1 | 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0 1 | 0 0 0";
-        ASSERT_EQ("1", v3[0]) << "0 0 1 | 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 0 1 | 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 0 1 | 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "0 0 1 | 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 1 | 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 0 1 | 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "0 0 1 | 0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 0 1 | 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0 1 | 0 0 0";
+        EXPECT_EQ("1", v3[0]) << "0 0 1 | 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 0 1 | 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 0 1 | 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "0 0 1 | 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3775,17 +3605,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 1 | 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 0 1 | 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 0 1 | 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "1 0 1 | 0 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 0 1 | 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "1 0 1 | 0 0 0";
-        ASSERT_EQ("1", v3[0]) << "1 0 1 | 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 0 1 | 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 0 1 | 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "1 0 1 | 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 1 | 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 0 1 | 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "1 0 1 | 0 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 0 1 | 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "1 0 1 | 0 0 0";
+        EXPECT_EQ("1", v3[0]) << "1 0 1 | 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 0 1 | 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 0 1 | 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "1 0 1 | 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3805,17 +3634,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 1 | 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 1 1 | 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 1 1 | 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "0 1 1 | 0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 1 1 | 0 0 0";
-        ASSERT_EQ(1, v2[0]) << "0 1 1 | 0 0 0";
-        ASSERT_EQ("1", v3[0]) << "0 1 1 | 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 1 1 | 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 1 1 | 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "0 1 1 | 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 1 | 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 1 1 | 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "0 1 1 | 0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 1 1 | 0 0 0";
+        EXPECT_EQ(1, v2[0]) << "0 1 1 | 0 0 0";
+        EXPECT_EQ("1", v3[0]) << "0 1 1 | 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 1 1 | 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 1 1 | 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "0 1 1 | 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3835,17 +3663,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 1 | 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 1 1 | 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 1 1 | 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "1 1 1 | 0 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 1 1 | 0 0 0";
-        ASSERT_EQ(1, v2[0]) << "1 1 1 | 0 0 0";
-        ASSERT_EQ("1", v3[0]) << "1 1 1 | 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 1 1 | 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 1 1 | 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "1 1 1 | 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 1 | 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 1 1 | 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "1 1 1 | 0 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 1 1 | 0 0 0";
+        EXPECT_EQ(1, v2[0]) << "1 1 1 | 0 0 0";
+        EXPECT_EQ("1", v3[0]) << "1 1 1 | 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 1 1 | 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 1 1 | 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "1 1 1 | 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -3864,17 +3691,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 0 | 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 0 0 | 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 0 0 | 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "0 0 0 | 1 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 0 0 | 1 1 1";
-        ASSERT_EQ(0, v2[0]) << "0 0 0 | 1 1 1";
-        ASSERT_EQ("0", v3[0]) << "0 0 0 | 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 0 0 | 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 0 0 | 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "0 0 0 | 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 0 | 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 0 0 | 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "0 0 0 | 1 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 0 0 | 1 1 1";
+        EXPECT_EQ(0, v2[0]) << "0 0 0 | 1 1 1";
+        EXPECT_EQ("0", v3[0]) << "0 0 0 | 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 0 0 | 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 0 0 | 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "0 0 0 | 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -3893,17 +3719,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 0 | 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 0 0 | 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 0 0 | 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "1 0 0 | 1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 0 0 | 1 1 1";
-        ASSERT_EQ(0, v2[0]) << "1 0 0 | 1 1 1";
-        ASSERT_EQ("0", v3[0]) << "1 0 0 | 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 0 0 | 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 0 0 | 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "1 0 0 | 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 0 | 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 0 0 | 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "1 0 0 | 1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 0 0 | 1 1 1";
+        EXPECT_EQ(0, v2[0]) << "1 0 0 | 1 1 1";
+        EXPECT_EQ("0", v3[0]) << "1 0 0 | 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 0 0 | 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 0 0 | 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "1 0 0 | 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -3923,17 +3748,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 0 | 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 1 0 | 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 1 0 | 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "0 1 0 | 1 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 1 0 | 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "0 1 0 | 1 1 1";
-        ASSERT_EQ("0", v3[0]) << "0 1 0 | 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 1 0 | 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 1 0 | 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "0 1 0 | 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 0 | 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 1 0 | 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "0 1 0 | 1 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 1 0 | 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "0 1 0 | 1 1 1";
+        EXPECT_EQ("0", v3[0]) << "0 1 0 | 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 1 0 | 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 1 0 | 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "0 1 0 | 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -3953,17 +3777,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 0 | 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 1 0 | 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 1 0 | 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "1 1 0 | 1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 1 0 | 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1 0 | 1 1 1";
-        ASSERT_EQ("0", v3[0]) << "1 1 0 | 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 1 0 | 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 1 0 | 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "1 1 0 | 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 0 | 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 1 0 | 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "1 1 0 | 1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 1 0 | 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1 0 | 1 1 1";
+        EXPECT_EQ("0", v3[0]) << "1 1 0 | 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 1 0 | 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 1 0 | 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "1 1 0 | 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -3982,17 +3805,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 1 | 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 0 1 | 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 0 1 | 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "0 0 1 | 1 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 0 1 | 1 1 1";
-        ASSERT_EQ(0, v2[0]) << "0 0 1 | 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "0 0 1 | 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 0 1 | 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 0 1 | 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "0 0 1 | 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 1 | 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 0 1 | 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "0 0 1 | 1 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 0 1 | 1 1 1";
+        EXPECT_EQ(0, v2[0]) << "0 0 1 | 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "0 0 1 | 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 0 1 | 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 0 1 | 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "0 0 1 | 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -4011,17 +3833,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 1 | 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 0 1 | 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 0 1 | 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "1 0 1 | 1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 0 1 | 1 1 1";
-        ASSERT_EQ(0, v2[0]) << "1 0 1 | 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "1 0 1 | 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 0 1 | 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 0 1 | 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "1 0 1 | 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 1 | 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 0 1 | 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "1 0 1 | 1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 0 1 | 1 1 1";
+        EXPECT_EQ(0, v2[0]) << "1 0 1 | 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "1 0 1 | 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 0 1 | 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 0 1 | 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "1 0 1 | 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -4041,17 +3862,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 1 | 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 1 1 | 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 1 1 | 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "0 1 1 | 1 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 1 1 | 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "0 1 1 | 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "0 1 1 | 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 1 1 | 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 1 1 | 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "0 1 1 | 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 1 | 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 1 1 | 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "0 1 1 | 1 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 1 1 | 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "0 1 1 | 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "0 1 1 | 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 1 1 | 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 1 1 | 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "0 1 1 | 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -4071,17 +3891,16 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
         };
 
         _p->setCommandLine(9, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 1 | 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 1 1 | 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 1 1 | 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "1 1 1 | 1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 1 1 | 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1 1 | 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "1 1 1 | 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 1 1 | 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 1 1 | 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "1 1 1 | 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 1 | 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 1 1 | 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "1 1 1 | 1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 1 1 | 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1 1 | 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "1 1 1 | 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 1 1 | 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 1 1 | 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "1 1 1 | 1 1 1";
     }
 }
 
@@ -4105,16 +3924,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 0 0";
-        ASSERT_EQ(1, v1.size()) << "0 0 0 0";
-        ASSERT_EQ(1, v2.size()) << "0 0 0 0";
-        ASSERT_EQ(1, v3.size()) << "0 0 0 0";
-        ASSERT_EQ(1, v4.size()) << "0 0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "0 0 0 0";
-        ASSERT_EQ(0.f, v4[0]) << "0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 0 0 0";
+        EXPECT_EQ(1, v2.size()) << "0 0 0 0";
+        EXPECT_EQ(1, v3.size()) << "0 0 0 0";
+        EXPECT_EQ(1, v4.size()) << "0 0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "0 0 0 0";
+        EXPECT_EQ(0.f, v4[0]) << "0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4131,16 +3949,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 0 0";
-        ASSERT_EQ(1, v1.size()) << "1 0 0 0";
-        ASSERT_EQ(1, v2.size()) << "1 0 0 0";
-        ASSERT_EQ(1, v3.size()) << "1 0 0 0";
-        ASSERT_EQ(1, v4.size()) << "1 0 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "1 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "1 0 0 0";
-        ASSERT_EQ(0.f, v4[0]) << "1 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 0 0 0";
+        EXPECT_EQ(1, v2.size()) << "1 0 0 0";
+        EXPECT_EQ(1, v3.size()) << "1 0 0 0";
+        EXPECT_EQ(1, v4.size()) << "1 0 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "1 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "1 0 0 0";
+        EXPECT_EQ(0.f, v4[0]) << "1 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4157,16 +3974,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 0 0";
-        ASSERT_EQ(1, v1.size()) << "0 1 0 0";
-        ASSERT_EQ(1, v2.size()) << "0 1 0 0";
-        ASSERT_EQ(1, v3.size()) << "0 1 0 0";
-        ASSERT_EQ(1, v4.size()) << "0 1 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 1 0 0";
-        ASSERT_EQ(1, v2[0]) << "0 1 0 0";
-        ASSERT_EQ("0", v3[0]) << "0 1 0 0";
-        ASSERT_EQ(0.f, v4[0]) << "0 1 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 1 0 0";
+        EXPECT_EQ(1, v2.size()) << "0 1 0 0";
+        EXPECT_EQ(1, v3.size()) << "0 1 0 0";
+        EXPECT_EQ(1, v4.size()) << "0 1 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 1 0 0";
+        EXPECT_EQ(1, v2[0]) << "0 1 0 0";
+        EXPECT_EQ("0", v3[0]) << "0 1 0 0";
+        EXPECT_EQ(0.f, v4[0]) << "0 1 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4183,16 +3999,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 0 0";
-        ASSERT_EQ(1, v1.size()) << "1 1 0 0";
-        ASSERT_EQ(1, v2.size()) << "1 1 0 0";
-        ASSERT_EQ(1, v3.size()) << "1 1 0 0";
-        ASSERT_EQ(1, v4.size()) << "1 1 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 1 0 0";
-        ASSERT_EQ(1, v2[0]) << "1 1 0 0";
-        ASSERT_EQ("0", v3[0]) << "1 1 0 0";
-        ASSERT_EQ(0.f, v4[0]) << "1 1 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 1 0 0";
+        EXPECT_EQ(1, v2.size()) << "1 1 0 0";
+        EXPECT_EQ(1, v3.size()) << "1 1 0 0";
+        EXPECT_EQ(1, v4.size()) << "1 1 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 1 0 0";
+        EXPECT_EQ(1, v2[0]) << "1 1 0 0";
+        EXPECT_EQ("0", v3[0]) << "1 1 0 0";
+        EXPECT_EQ(0.f, v4[0]) << "1 1 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4209,16 +4024,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 1 0";
-        ASSERT_EQ(1, v1.size()) << "0 0 1 0";
-        ASSERT_EQ(1, v2.size()) << "0 0 1 0";
-        ASSERT_EQ(1, v3.size()) << "0 0 1 0";
-        ASSERT_EQ(1, v4.size()) << "0 0 1 0";
-        ASSERT_EQ(false, v1[0]) << "0 0 1 0";
-        ASSERT_EQ(0, v2[0]) << "0 0 1 0";
-        ASSERT_EQ("1", v3[0]) << "0 0 1 0";
-        ASSERT_EQ(0.f, v4[0]) << "0 0 1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 0 1 0";
+        EXPECT_EQ(1, v2.size()) << "0 0 1 0";
+        EXPECT_EQ(1, v3.size()) << "0 0 1 0";
+        EXPECT_EQ(1, v4.size()) << "0 0 1 0";
+        EXPECT_EQ(false, v1[0]) << "0 0 1 0";
+        EXPECT_EQ(0, v2[0]) << "0 0 1 0";
+        EXPECT_EQ("1", v3[0]) << "0 0 1 0";
+        EXPECT_EQ(0.f, v4[0]) << "0 0 1 0";
     }
     v1.clear();
     v2.clear();
@@ -4235,16 +4049,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 1 0";
-        ASSERT_EQ(1, v1.size()) << "1 0 1 0";
-        ASSERT_EQ(1, v2.size()) << "1 0 1 0";
-        ASSERT_EQ(1, v3.size()) << "1 0 1 0";
-        ASSERT_EQ(1, v4.size()) << "1 0 1 0";
-        ASSERT_EQ(true, v1[0]) << "1 0 1 0";
-        ASSERT_EQ(0, v2[0]) << "1 0 1 0";
-        ASSERT_EQ("1", v3[0]) << "1 0 1 0";
-        ASSERT_EQ(0.f, v4[0]) << "1 0 1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 0 1 0";
+        EXPECT_EQ(1, v2.size()) << "1 0 1 0";
+        EXPECT_EQ(1, v3.size()) << "1 0 1 0";
+        EXPECT_EQ(1, v4.size()) << "1 0 1 0";
+        EXPECT_EQ(true, v1[0]) << "1 0 1 0";
+        EXPECT_EQ(0, v2[0]) << "1 0 1 0";
+        EXPECT_EQ("1", v3[0]) << "1 0 1 0";
+        EXPECT_EQ(0.f, v4[0]) << "1 0 1 0";
     }
     v1.clear();
     v2.clear();
@@ -4261,16 +4074,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 1 0";
-        ASSERT_EQ(1, v1.size()) << "0 1 1 0";
-        ASSERT_EQ(1, v2.size()) << "0 1 1 0";
-        ASSERT_EQ(1, v3.size()) << "0 1 1 0";
-        ASSERT_EQ(1, v4.size()) << "0 1 1 0";
-        ASSERT_EQ(false, v1[0]) << "0 1 1 0";
-        ASSERT_EQ(1, v2[0]) << "0 1 1 0";
-        ASSERT_EQ("1", v3[0]) << "0 1 1 0";
-        ASSERT_EQ(0.f, v4[0]) << "0 1 1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 1 1 0";
+        EXPECT_EQ(1, v2.size()) << "0 1 1 0";
+        EXPECT_EQ(1, v3.size()) << "0 1 1 0";
+        EXPECT_EQ(1, v4.size()) << "0 1 1 0";
+        EXPECT_EQ(false, v1[0]) << "0 1 1 0";
+        EXPECT_EQ(1, v2[0]) << "0 1 1 0";
+        EXPECT_EQ("1", v3[0]) << "0 1 1 0";
+        EXPECT_EQ(0.f, v4[0]) << "0 1 1 0";
     }
     v1.clear();
     v2.clear();
@@ -4287,16 +4099,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 1 0";
-        ASSERT_EQ(1, v1.size()) << "1 1 1 0";
-        ASSERT_EQ(1, v2.size()) << "1 1 1 0";
-        ASSERT_EQ(1, v3.size()) << "1 1 1 0";
-        ASSERT_EQ(1, v4.size()) << "1 1 1 0";
-        ASSERT_EQ(true, v1[0]) << "1 1 1 0";
-        ASSERT_EQ(1, v2[0]) << "1 1 1 0";
-        ASSERT_EQ("1", v3[0]) << "1 1 1 0";
-        ASSERT_EQ(0.f, v4[0]) << "1 1 1 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 1 1 0";
+        EXPECT_EQ(1, v2.size()) << "1 1 1 0";
+        EXPECT_EQ(1, v3.size()) << "1 1 1 0";
+        EXPECT_EQ(1, v4.size()) << "1 1 1 0";
+        EXPECT_EQ(true, v1[0]) << "1 1 1 0";
+        EXPECT_EQ(1, v2[0]) << "1 1 1 0";
+        EXPECT_EQ("1", v3[0]) << "1 1 1 0";
+        EXPECT_EQ(0.f, v4[0]) << "1 1 1 0";
     }
     v1.clear();
     v2.clear();
@@ -4313,16 +4124,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 0 1";
-        ASSERT_EQ(1, v1.size()) << "0 0 0 1";
-        ASSERT_EQ(1, v2.size()) << "0 0 0 1";
-        ASSERT_EQ(1, v3.size()) << "0 0 0 1";
-        ASSERT_EQ(1, v4.size()) << "0 0 0 1";
-        ASSERT_EQ(false, v1[0]) << "0 0 0 1";
-        ASSERT_EQ(0, v2[0]) << "0 0 0 1";
-        ASSERT_EQ("0", v3[0]) << "0 0 0 1";
-        ASSERT_EQ(1.f, v4[0]) << "0 0 0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 0 0 1";
+        EXPECT_EQ(1, v2.size()) << "0 0 0 1";
+        EXPECT_EQ(1, v3.size()) << "0 0 0 1";
+        EXPECT_EQ(1, v4.size()) << "0 0 0 1";
+        EXPECT_EQ(false, v1[0]) << "0 0 0 1";
+        EXPECT_EQ(0, v2[0]) << "0 0 0 1";
+        EXPECT_EQ("0", v3[0]) << "0 0 0 1";
+        EXPECT_EQ(1.f, v4[0]) << "0 0 0 1";
     }
     v1.clear();
     v2.clear();
@@ -4339,16 +4149,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 0 1";
-        ASSERT_EQ(1, v1.size()) << "1 0 0 1";
-        ASSERT_EQ(1, v2.size()) << "1 0 0 1";
-        ASSERT_EQ(1, v3.size()) << "1 0 0 1";
-        ASSERT_EQ(1, v4.size()) << "1 0 0 1";
-        ASSERT_EQ(true, v1[0]) << "1 0 0 1";
-        ASSERT_EQ(0, v2[0]) << "1 0 0 1";
-        ASSERT_EQ("0", v3[0]) << "1 0 0 1";
-        ASSERT_EQ(1.f, v4[0]) << "1 0 0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 0 0 1";
+        EXPECT_EQ(1, v2.size()) << "1 0 0 1";
+        EXPECT_EQ(1, v3.size()) << "1 0 0 1";
+        EXPECT_EQ(1, v4.size()) << "1 0 0 1";
+        EXPECT_EQ(true, v1[0]) << "1 0 0 1";
+        EXPECT_EQ(0, v2[0]) << "1 0 0 1";
+        EXPECT_EQ("0", v3[0]) << "1 0 0 1";
+        EXPECT_EQ(1.f, v4[0]) << "1 0 0 1";
     }
     v1.clear();
     v2.clear();
@@ -4365,16 +4174,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 0 1";
-        ASSERT_EQ(1, v1.size()) << "0 1 0 1";
-        ASSERT_EQ(1, v2.size()) << "0 1 0 1";
-        ASSERT_EQ(1, v3.size()) << "0 1 0 1";
-        ASSERT_EQ(1, v4.size()) << "0 1 0 1";
-        ASSERT_EQ(false, v1[0]) << "0 1 0 1";
-        ASSERT_EQ(1, v2[0]) << "0 1 0 1";
-        ASSERT_EQ("0", v3[0]) << "0 1 0 1";
-        ASSERT_EQ(1.f, v4[0]) << "0 1 0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 1 0 1";
+        EXPECT_EQ(1, v2.size()) << "0 1 0 1";
+        EXPECT_EQ(1, v3.size()) << "0 1 0 1";
+        EXPECT_EQ(1, v4.size()) << "0 1 0 1";
+        EXPECT_EQ(false, v1[0]) << "0 1 0 1";
+        EXPECT_EQ(1, v2[0]) << "0 1 0 1";
+        EXPECT_EQ("0", v3[0]) << "0 1 0 1";
+        EXPECT_EQ(1.f, v4[0]) << "0 1 0 1";
     }
     v1.clear();
     v2.clear();
@@ -4391,16 +4199,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 0 1";
-        ASSERT_EQ(1, v1.size()) << "1 1 0 1";
-        ASSERT_EQ(1, v2.size()) << "1 1 0 1";
-        ASSERT_EQ(1, v3.size()) << "1 1 0 1";
-        ASSERT_EQ(1, v4.size()) << "1 1 0 1";
-        ASSERT_EQ(true, v1[0]) << "1 1 0 1";
-        ASSERT_EQ(1, v2[0]) << "1 1 0 1";
-        ASSERT_EQ("0", v3[0]) << "1 1 0 1";
-        ASSERT_EQ(1.f, v4[0]) << "1 1 0 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 1 0 1";
+        EXPECT_EQ(1, v2.size()) << "1 1 0 1";
+        EXPECT_EQ(1, v3.size()) << "1 1 0 1";
+        EXPECT_EQ(1, v4.size()) << "1 1 0 1";
+        EXPECT_EQ(true, v1[0]) << "1 1 0 1";
+        EXPECT_EQ(1, v2[0]) << "1 1 0 1";
+        EXPECT_EQ("0", v3[0]) << "1 1 0 1";
+        EXPECT_EQ(1.f, v4[0]) << "1 1 0 1";
     }
     v1.clear();
     v2.clear();
@@ -4417,16 +4224,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 1 1";
-        ASSERT_EQ(1, v1.size()) << "0 0 1 1";
-        ASSERT_EQ(1, v2.size()) << "0 0 1 1";
-        ASSERT_EQ(1, v3.size()) << "0 0 1 1";
-        ASSERT_EQ(1, v4.size()) << "0 0 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 0 1 1";
-        ASSERT_EQ(0, v2[0]) << "0 0 1 1";
-        ASSERT_EQ("1", v3[0]) << "0 0 1 1";
-        ASSERT_EQ(1.f, v4[0]) << "0 0 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 0 1 1";
+        EXPECT_EQ(1, v2.size()) << "0 0 1 1";
+        EXPECT_EQ(1, v3.size()) << "0 0 1 1";
+        EXPECT_EQ(1, v4.size()) << "0 0 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 0 1 1";
+        EXPECT_EQ(0, v2[0]) << "0 0 1 1";
+        EXPECT_EQ("1", v3[0]) << "0 0 1 1";
+        EXPECT_EQ(1.f, v4[0]) << "0 0 1 1";
     }
     v1.clear();
     v2.clear();
@@ -4443,16 +4249,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 1 1";
-        ASSERT_EQ(1, v1.size()) << "1 0 1 1";
-        ASSERT_EQ(1, v2.size()) << "1 0 1 1";
-        ASSERT_EQ(1, v3.size()) << "1 0 1 1";
-        ASSERT_EQ(1, v4.size()) << "1 0 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 0 1 1";
-        ASSERT_EQ(0, v2[0]) << "1 0 1 1";
-        ASSERT_EQ("1", v3[0]) << "1 0 1 1";
-        ASSERT_EQ(1.f, v4[0]) << "1 0 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 0 1 1";
+        EXPECT_EQ(1, v2.size()) << "1 0 1 1";
+        EXPECT_EQ(1, v3.size()) << "1 0 1 1";
+        EXPECT_EQ(1, v4.size()) << "1 0 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 0 1 1";
+        EXPECT_EQ(0, v2[0]) << "1 0 1 1";
+        EXPECT_EQ("1", v3[0]) << "1 0 1 1";
+        EXPECT_EQ(1.f, v4[0]) << "1 0 1 1";
     }
     v1.clear();
     v2.clear();
@@ -4469,16 +4274,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 1 1";
-        ASSERT_EQ(1, v1.size()) << "0 1 1 1";
-        ASSERT_EQ(1, v2.size()) << "0 1 1 1";
-        ASSERT_EQ(1, v3.size()) << "0 1 1 1";
-        ASSERT_EQ(1, v4.size()) << "0 1 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "0 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "0 1 1 1";
-        ASSERT_EQ(1.f, v4[0]) << "0 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "0 1 1 1";
+        EXPECT_EQ(1, v2.size()) << "0 1 1 1";
+        EXPECT_EQ(1, v3.size()) << "0 1 1 1";
+        EXPECT_EQ(1, v4.size()) << "0 1 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "0 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "0 1 1 1";
+        EXPECT_EQ(1.f, v4[0]) << "0 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -4495,16 +4299,15 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(6, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 1 1";
-        ASSERT_EQ(1, v1.size()) << "1 1 1 1";
-        ASSERT_EQ(1, v2.size()) << "1 1 1 1";
-        ASSERT_EQ(1, v3.size()) << "1 1 1 1";
-        ASSERT_EQ(1, v4.size()) << "1 1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "1 1 1 1";
-        ASSERT_EQ(1.f, v4[0]) << "1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(1, v1.size()) << "1 1 1 1";
+        EXPECT_EQ(1, v2.size()) << "1 1 1 1";
+        EXPECT_EQ(1, v3.size()) << "1 1 1 1";
+        EXPECT_EQ(1, v4.size()) << "1 1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "1 1 1 1";
+        EXPECT_EQ(1.f, v4[0]) << "1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -4526,20 +4329,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "0 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "0 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0 0 0 | 0 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "0 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[0]) << "0 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 0 0 0 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "0 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "0 0 0 0 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "0 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "0 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0 0 0 | 0 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "0 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[0]) << "0 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 0 0 0 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "0 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "0 0 0 0 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4561,20 +4363,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "1 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "1 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "1 0 0 0 | 0 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "1 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[0]) << "1 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 0 0 0 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "1 0 0 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "1 0 0 0 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "1 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "1 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "1 0 0 0 | 0 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "1 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[0]) << "1 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 0 0 0 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "1 0 0 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "1 0 0 0 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4596,20 +4397,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "0 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "0 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(1, v2[0]) << "0 1 0 0 | 0 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "0 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[0]) << "0 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 1 0 0 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "0 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "0 1 0 0 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "0 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "0 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(1, v2[0]) << "0 1 0 0 | 0 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "0 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[0]) << "0 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 1 0 0 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "0 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "0 1 0 0 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4631,20 +4431,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "1 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "1 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(1, v2[0]) << "1 1 0 0 | 0 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "1 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[0]) << "1 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 1 0 0 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "1 1 0 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "1 1 0 0 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "1 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "1 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(1, v2[0]) << "1 1 0 0 | 0 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "1 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[0]) << "1 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 1 0 0 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "1 1 0 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "1 1 0 0 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4666,20 +4465,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "0 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "0 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0 1 0 | 0 0 0 0";
-        ASSERT_EQ("1", v3[0]) << "0 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[0]) << "0 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 0 1 0 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "0 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "0 0 1 0 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "0 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "0 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0 1 0 | 0 0 0 0";
+        EXPECT_EQ("1", v3[0]) << "0 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[0]) << "0 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 0 1 0 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "0 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "0 0 1 0 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4701,20 +4499,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "1 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "1 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "1 0 1 0 | 0 0 0 0";
-        ASSERT_EQ("1", v3[0]) << "1 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[0]) << "1 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 0 1 0 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "1 0 1 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "1 0 1 0 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "1 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "1 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "1 0 1 0 | 0 0 0 0";
+        EXPECT_EQ("1", v3[0]) << "1 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[0]) << "1 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 0 1 0 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "1 0 1 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "1 0 1 0 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4736,20 +4533,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "0 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "0 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(1, v2[0]) << "0 1 1 0 | 0 0 0 0";
-        ASSERT_EQ("1", v3[0]) << "0 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[0]) << "0 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 1 1 0 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "0 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "0 1 1 0 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "0 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "0 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(1, v2[0]) << "0 1 1 0 | 0 0 0 0";
+        EXPECT_EQ("1", v3[0]) << "0 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[0]) << "0 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 1 1 0 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "0 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "0 1 1 0 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4771,20 +4567,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "1 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "1 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(1, v2[0]) << "1 1 1 0 | 0 0 0 0";
-        ASSERT_EQ("1", v3[0]) << "1 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[0]) << "1 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 1 1 0 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "1 1 1 0 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "1 1 1 0 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "1 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "1 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(1, v2[0]) << "1 1 1 0 | 0 0 0 0";
+        EXPECT_EQ("1", v3[0]) << "1 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[0]) << "1 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 1 1 0 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "1 1 1 0 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "1 1 1 0 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4806,20 +4601,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "0 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "0 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0 0 1 | 0 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "0 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(1.f, v4[0]) << "0 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 0 0 1 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "0 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "0 0 0 1 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "0 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "0 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0 0 1 | 0 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "0 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(1.f, v4[0]) << "0 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 0 0 1 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "0 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "0 0 0 1 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4841,20 +4635,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "1 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "1 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "1 0 0 1 | 0 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "1 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(1.f, v4[0]) << "1 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 0 0 1 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "1 0 0 1 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "1 0 0 1 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "1 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "1 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "1 0 0 1 | 0 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "1 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(1.f, v4[0]) << "1 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 0 0 1 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "1 0 0 1 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "1 0 0 1 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4876,20 +4669,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "0 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "0 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(1, v2[0]) << "0 1 0 1 | 0 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "0 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(1.f, v4[0]) << "0 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 1 0 1 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "0 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "0 1 0 1 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "0 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "0 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(1, v2[0]) << "0 1 0 1 | 0 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "0 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(1.f, v4[0]) << "0 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 1 0 1 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "0 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "0 1 0 1 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4911,20 +4703,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "1 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "1 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(1, v2[0]) << "1 1 0 1 | 0 0 0 0";
-        ASSERT_EQ("0", v3[0]) << "1 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(1.f, v4[0]) << "1 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 1 0 1 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "1 1 0 1 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "1 1 0 1 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "1 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "1 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(1, v2[0]) << "1 1 0 1 | 0 0 0 0";
+        EXPECT_EQ("0", v3[0]) << "1 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(1.f, v4[0]) << "1 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 1 0 1 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "1 1 0 1 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "1 1 0 1 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4946,20 +4737,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "0 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "0 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "0 0 1 1 | 0 0 0 0";
-        ASSERT_EQ("1", v3[0]) << "0 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(1.f, v4[0]) << "0 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 0 1 1 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "0 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "0 0 1 1 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "0 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "0 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "0 0 1 1 | 0 0 0 0";
+        EXPECT_EQ("1", v3[0]) << "0 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(1.f, v4[0]) << "0 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 0 1 1 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "0 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "0 0 1 1 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -4981,20 +4771,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "1 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "1 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(0, v2[0]) << "1 0 1 1 | 0 0 0 0";
-        ASSERT_EQ("1", v3[0]) << "1 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(1.f, v4[0]) << "1 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 0 1 1 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "1 0 1 1 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "1 0 1 1 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "1 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "1 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(0, v2[0]) << "1 0 1 1 | 0 0 0 0";
+        EXPECT_EQ("1", v3[0]) << "1 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(1.f, v4[0]) << "1 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 0 1 1 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "1 0 1 1 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "1 0 1 1 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -5016,20 +4805,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "0 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "0 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "0 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "0 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(false, v1[0]) << "0 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(1, v2[0]) << "0 1 1 1 | 0 0 0 0";
-        ASSERT_EQ("1", v3[0]) << "0 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(1.f, v4[0]) << "0 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "0 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "0 1 1 1 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "0 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "0 1 1 1 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "0 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "0 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "0 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(false, v1[0]) << "0 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(1, v2[0]) << "0 1 1 1 | 0 0 0 0";
+        EXPECT_EQ("1", v3[0]) << "0 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(1.f, v4[0]) << "0 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "0 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "0 1 1 1 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "0 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "0 1 1 1 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -5051,20 +4839,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v1.size()) << "1 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v2.size()) << "1 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v3.size()) << "1 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(2, v4.size()) << "1 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(true, v1[0]) << "1 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(1, v2[0]) << "1 1 1 1 | 0 0 0 0";
-        ASSERT_EQ("1", v3[0]) << "1 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(1.f, v4[0]) << "1 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(false, v1[1]) << "1 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(0, v2[1]) << "1 1 1 1 | 0 0 0 0";
-        ASSERT_EQ("0", v3[1]) << "1 1 1 1 | 0 0 0 0";
-        ASSERT_EQ(0.f, v4[1]) << "1 1 1 1 | 0 0 0 0";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(2, v2.size()) << "1 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(2, v3.size()) << "1 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(2, v4.size()) << "1 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(true, v1[0]) << "1 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(1, v2[0]) << "1 1 1 1 | 0 0 0 0";
+        EXPECT_EQ("1", v3[0]) << "1 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(1.f, v4[0]) << "1 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(false, v1[1]) << "1 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(0, v2[1]) << "1 1 1 1 | 0 0 0 0";
+        EXPECT_EQ("0", v3[1]) << "1 1 1 1 | 0 0 0 0";
+        EXPECT_EQ(0.f, v4[1]) << "1 1 1 1 | 0 0 0 0";
     }
     v1.clear();
     v2.clear();
@@ -5086,20 +4873,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "0 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "0 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(0, v2[0]) << "0 0 0 0 | 1 1 1 1";
-        ASSERT_EQ("0", v3[0]) << "0 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(0.f, v4[0]) << "0 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 0 0 0 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "0 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "0 0 0 0 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "0 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "0 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(0, v2[0]) << "0 0 0 0 | 1 1 1 1";
+        EXPECT_EQ("0", v3[0]) << "0 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(0.f, v4[0]) << "0 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 0 0 0 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "0 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "0 0 0 0 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5121,20 +4907,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "1 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "1 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(0, v2[0]) << "1 0 0 0 | 1 1 1 1";
-        ASSERT_EQ("0", v3[0]) << "1 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(0.f, v4[0]) << "1 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 0 0 0 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "1 0 0 0 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "1 0 0 0 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "1 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "1 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(0, v2[0]) << "1 0 0 0 | 1 1 1 1";
+        EXPECT_EQ("0", v3[0]) << "1 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(0.f, v4[0]) << "1 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 0 0 0 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "1 0 0 0 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "1 0 0 0 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5156,20 +4941,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "0 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "0 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "0 1 0 0 | 1 1 1 1";
-        ASSERT_EQ("0", v3[0]) << "0 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(0.f, v4[0]) << "0 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 1 0 0 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "0 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "0 1 0 0 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "0 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "0 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "0 1 0 0 | 1 1 1 1";
+        EXPECT_EQ("0", v3[0]) << "0 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(0.f, v4[0]) << "0 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 1 0 0 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "0 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "0 1 0 0 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5191,20 +4975,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "1 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "1 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1 0 0 | 1 1 1 1";
-        ASSERT_EQ("0", v3[0]) << "1 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(0.f, v4[0]) << "1 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 1 0 0 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "1 1 0 0 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "1 1 0 0 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "1 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "1 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1 0 0 | 1 1 1 1";
+        EXPECT_EQ("0", v3[0]) << "1 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(0.f, v4[0]) << "1 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 1 0 0 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "1 1 0 0 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "1 1 0 0 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5226,20 +5009,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "0 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "0 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(0, v2[0]) << "0 0 1 0 | 1 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "0 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(0.f, v4[0]) << "0 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 0 1 0 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "0 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "0 0 1 0 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "0 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "0 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(0, v2[0]) << "0 0 1 0 | 1 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "0 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(0.f, v4[0]) << "0 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 0 1 0 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "0 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "0 0 1 0 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5261,20 +5043,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "1 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "1 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(0, v2[0]) << "1 0 1 0 | 1 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "1 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(0.f, v4[0]) << "1 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 0 1 0 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "1 0 1 0 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "1 0 1 0 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "1 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "1 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(0, v2[0]) << "1 0 1 0 | 1 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "1 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(0.f, v4[0]) << "1 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 0 1 0 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "1 0 1 0 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "1 0 1 0 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5296,20 +5077,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "0 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "0 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "0 1 1 0 | 1 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "0 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(0.f, v4[0]) << "0 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 1 1 0 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "0 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "0 1 1 0 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "0 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "0 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "0 1 1 0 | 1 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "0 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(0.f, v4[0]) << "0 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 1 1 0 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "0 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "0 1 1 0 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5331,20 +5111,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "1 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "1 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1 1 0 | 1 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "1 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(0.f, v4[0]) << "1 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 1 1 0 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "1 1 1 0 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "1 1 1 0 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "1 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "1 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1 1 0 | 1 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "1 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(0.f, v4[0]) << "1 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 1 1 0 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "1 1 1 0 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "1 1 1 0 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5366,20 +5145,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "0 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "0 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(0, v2[0]) << "0 0 0 1 | 1 1 1 1";
-        ASSERT_EQ("0", v3[0]) << "0 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[0]) << "0 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 0 0 1 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "0 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "0 0 0 1 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "0 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "0 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(0, v2[0]) << "0 0 0 1 | 1 1 1 1";
+        EXPECT_EQ("0", v3[0]) << "0 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[0]) << "0 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 0 0 1 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "0 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "0 0 0 1 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5401,20 +5179,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "1 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "1 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(0, v2[0]) << "1 0 0 1 | 1 1 1 1";
-        ASSERT_EQ("0", v3[0]) << "1 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[0]) << "1 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 0 0 1 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "1 0 0 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "1 0 0 1 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "1 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "1 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(0, v2[0]) << "1 0 0 1 | 1 1 1 1";
+        EXPECT_EQ("0", v3[0]) << "1 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[0]) << "1 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 0 0 1 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "1 0 0 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "1 0 0 1 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5436,20 +5213,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "0 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "0 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "0 1 0 1 | 1 1 1 1";
-        ASSERT_EQ("0", v3[0]) << "0 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[0]) << "0 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 1 0 1 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "0 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "0 1 0 1 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "0 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "0 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "0 1 0 1 | 1 1 1 1";
+        EXPECT_EQ("0", v3[0]) << "0 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[0]) << "0 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 1 0 1 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "0 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "0 1 0 1 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5471,20 +5247,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "1 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "1 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1 0 1 | 1 1 1 1";
-        ASSERT_EQ("0", v3[0]) << "1 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[0]) << "1 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 1 0 1 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "1 1 0 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "1 1 0 1 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "1 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "1 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1 0 1 | 1 1 1 1";
+        EXPECT_EQ("0", v3[0]) << "1 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[0]) << "1 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 1 0 1 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "1 1 0 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "1 1 0 1 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5506,20 +5281,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "0 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "0 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(0, v2[0]) << "0 0 1 1 | 1 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "0 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[0]) << "0 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 0 1 1 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "0 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "0 0 1 1 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "0 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "0 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(0, v2[0]) << "0 0 1 1 | 1 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "0 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[0]) << "0 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 0 1 1 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "0 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "0 0 1 1 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5541,20 +5315,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "1 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "1 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(0, v2[0]) << "1 0 1 1 | 1 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "1 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[0]) << "1 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 0 1 1 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "1 0 1 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "1 0 1 1 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "1 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "1 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(0, v2[0]) << "1 0 1 1 | 1 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "1 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[0]) << "1 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 0 1 1 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "1 0 1 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "1 0 1 1 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5576,20 +5349,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "0 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "0 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "0 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "0 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "0 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(false, v1[0]) << "0 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "0 1 1 1 | 1 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "0 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[0]) << "0 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "0 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "0 1 1 1 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "0 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "0 1 1 1 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "0 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "0 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "0 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "0 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(false, v1[0]) << "0 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "0 1 1 1 | 1 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "0 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[0]) << "0 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "0 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "0 1 1 1 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "0 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "0 1 1 1 | 1 1 1 1";
     }
     v1.clear();
     v2.clear();
@@ -5611,20 +5383,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
         };
 
         _p->setCommandLine(11, argv);
-        const bool res = _p->execute();
-        ASSERT_EQ(true, res) << "1 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v1.size()) << "1 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v2.size()) << "1 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v3.size()) << "1 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(2, v4.size()) << "1 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(true, v1[0]) << "1 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(1, v2[0]) << "1 1 1 1 | 1 1 1 1";
-        ASSERT_EQ("1", v3[0]) << "1 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[0]) << "1 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(true, v1[1]) << "1 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(1, v2[1]) << "1 1 1 1 | 1 1 1 1";
-        ASSERT_EQ("1", v3[1]) << "1 1 1 1 | 1 1 1 1";
-        ASSERT_EQ(1.f, v4[1]) << "1 1 1 1 | 1 1 1 1";
+        ASSERT_NO_THROW(_p->execute());
+        EXPECT_EQ(2, v1.size()) << "1 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(2, v2.size()) << "1 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(2, v3.size()) << "1 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(2, v4.size()) << "1 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(true, v1[0]) << "1 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(1, v2[0]) << "1 1 1 1 | 1 1 1 1";
+        EXPECT_EQ("1", v3[0]) << "1 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[0]) << "1 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(true, v1[1]) << "1 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(1, v2[1]) << "1 1 1 1 | 1 1 1 1";
+        EXPECT_EQ("1", v3[1]) << "1 1 1 1 | 1 1 1 1";
+        EXPECT_EQ(1.f, v4[1]) << "1 1 1 1 | 1 1 1 1";
     }
 }
 
