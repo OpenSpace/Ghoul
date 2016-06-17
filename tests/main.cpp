@@ -69,18 +69,18 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    testing::internal::CaptureStdout();
-    testing::internal::CaptureStderr();
+    //testing::internal::CaptureStdout();
+    //testing::internal::CaptureStderr();
     testing::InitGoogleTest(&argc, argv);
     bool b = RUN_ALL_TESTS();
-    std::string output = testing::internal::GetCapturedStdout();
-    std::string error = testing::internal::GetCapturedStderr();
+    //std::string output = testing::internal::GetCapturedStdout();
+    //std::string error = testing::internal::GetCapturedStderr();
 
-    std::ofstream o("output.txt");
-    o << output;
+    //std::ofstream o("output.txt");
+    //o << output;
 
-    std::ofstream e("error.txt");
-    e << error;
+    //std::ofstream e("error.txt");
+    //e << error;
 
     return b;
 }
