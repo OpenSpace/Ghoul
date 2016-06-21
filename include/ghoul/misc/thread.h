@@ -31,12 +31,18 @@
 namespace ghoul {
 namespace thread {
 
-enum class ThreadPriority {
+enum class ThreadPriorityLevel {
     Lowest = 0,
     BelowNormal,
     Normal,
     AboveNormal,
     Highest
+};
+    
+enum class ThreadPriorityClass {
+    Idle = 0,
+    Normal,
+    High
 };
 
 enum class Background {
@@ -44,7 +50,7 @@ enum class Background {
     No
 };
 
-void setPriority(std::thread& t, ThreadPriority priority);
+void setPriority(std::thread& t, ThreadPriorityClass priorityClass, ThreadPriorityLevel priorityLevel);
 
 void setThreadBackground(std::thread& t, Background background);
 

@@ -25,40 +25,119 @@
 
 #include <ghoul/misc/thread.h>
 
+#include <ghoul/misc/exception.h>
+
 #ifdef WIN32
 #include <Windows.h>
+#else
+#include <pthread.h>
 #endif
 
 namespace ghoul {
 namespace thread {
 
-int convertThreadPriority(ThreadPriority p) {
+int convertThreadPriorityLevel(ThreadPriorityClass c, ThreadPriorityLevel p) {
 #ifdef WIN32
+    (void)c;
     switch (p) {
-        case ThreadPriority::Lowest:
+        case ThreadPriorityLevel::Lowest:
             return THREAD_PRIORITY_LOWEST;
-        case ThreadPriority::BelowNormal:
+        case ThreadPriorityLevel::BelowNormal:
             return THREAD_PRIORITY_BELOW_NORMAL;
-        case ThreadPriority::Normal:
+        case ThreadPriorityLevel::Normal:
             return THREAD_PRIORITY_NORMAL;
-        case ThreadPriority::AboveNormal:
+        case ThreadPriorityLevel::AboveNormal:
             return THREAD_PRIORITY_ABOVE_NORMAL;
-        case ThreadPriority::Highest:
+        case ThreadPriorityLevel::Highest:
             return THREAD_PRIORITY_HIGHEST;
     }
 #else
+    switch (c) {
+        case ThreadPriorityClass::Idle:
+        case ThreadPriorityClass::Normal:
+            return 0;
+        case ThreadPriorityClass::High:
+            switch (p) {
+                // min-max values come from the man page of getschedparam
+                // normal value was measured on macOS to be the default value
+                // below/above normal values are halfway between other values
+                case ThreadPriorityLevel::Lowest:
+                    return 1;
+                case ThreadPriorityLevel::BelowNormal:
+                    return 16;
+                case ThreadPriorityLevel::Normal:
+                    return 32;
+                case ThreadPriorityLevel::AboveNormal:
+                    return 66;
+                case ThreadPriorityLevel::Highest:
+                    return 99;
+            }
+    }
     return 0;
 #endif 
 }
 
+int convertThreadPriorityClass(ThreadPriorityClass c) {
+#ifdef WIN32
+    switch (c) {
+        case ThreadPriorityClass::Idle:
+            return IDLE_PRIORITY_CLASS;
+        case ThreadPriorityClass::Normal:
+            return NORMAL_PRIORITY_CLASS;
+        case ThreadPriorityClass::High:
+            return HIGH_PRIORITY_CLASS;
+    }
+#elif __APPLE__
+    switch (c) {
+        case ThreadPriorityClass::Idle:
+            return SCHED_OTHER;
+        case ThreadPriorityClass::Normal:
+            return SCHED_OTHER;
+        case ThreadPriorityClass::High:
+            return SCHED_RR;
+    }
+#else
+    switch (c) {
+        case ThreadPriorityClass::Idle:
+            return SCHED_IDLE;
+        case ThreadPriorityClass::Normal:
+            return SCHED_OTHER;
+        case ThreadPriorityClass::High:
+            return SCHED_RR;
+    }
+#endif
+}
+    
 
-void setPriority(std::thread& t, ThreadPriority priority) {
+void setPriority(std::thread& t, ThreadPriorityClass priorityClass, ThreadPriorityLevel priorityLevel) {
 #ifdef WIN32
     std::thread::native_handle_type h = t.native_handle();
-    //SetPriorityClass(h, IDLE_PRIORITY_CLASS);
-    SetThreadPriority(h, convertThreadPriority(priority));
+    
+    SetPriorityClass(h, convertThreadPriorityClass(priorityClass));
+    SetThreadPriority(h, convertThreadPriorityLevel(priorityClass, priorityLevel));
 #else
-    // TODO: Implement thread priority ---abock
+    int policy;
+    struct sched_param param;
+    int res = pthread_getschedparam(t.native_handle(), &policy, &param);
+    if (res != 0) {
+        throw ghoul::RuntimeError(
+            "Error accessing scheduling parameters with error " + std::to_string(res),
+            "Thread"
+        );
+    }
+
+    param.sched_priority = convertThreadPriorityLevel(priorityClass, priorityLevel);
+    res = pthread_setschedparam(
+        t.native_handle(),
+        policy,
+        &param
+    );
+    if (res != 0) {
+        throw ghoul::RuntimeError(
+            "Error setting scheduling parameters with error " + std::to_string(res),
+            "Thread"
+        );
+    }
 #endif
 }
 
@@ -71,7 +150,6 @@ void setThreadBackground(std::thread& t, Background background) {
         m = THREAD_MODE_BACKGROUND_END;
 
     std::thread::native_handle_type h = t.native_handle();
-    //SetPriorityClass(h, IDLE_PRIORITY_CLASS);
     SetThreadPriority(h, m);
 #else
 
