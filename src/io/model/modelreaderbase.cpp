@@ -25,7 +25,7 @@
 
 #include <ghoul/io/model/modelreaderbase.h>
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 using std::string;
 

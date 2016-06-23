@@ -29,7 +29,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 namespace {
     const std::string _loggerCat = "FontManager";

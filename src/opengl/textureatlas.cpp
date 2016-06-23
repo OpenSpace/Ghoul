@@ -29,7 +29,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/ghoul_gl.h>
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 namespace {
     const std::string _loggerCat = "TextureAtlas";

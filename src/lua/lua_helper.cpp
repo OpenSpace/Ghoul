@@ -28,7 +28,7 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/lua/ghoul_lua.h>
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 #include <sstream>
 #include <fstream>

@@ -28,7 +28,7 @@
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/logging/logmanager.h>
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <regex>
@@ -450,11 +450,11 @@ void FileSystem::createDirectory(const Directory& path, Recursive recursive) con
                     string errorMsg(errorBuffer);
                     LocalFree(errorBuffer);
                     throw FileSystemException(fmt::format(
-                        "Error creating directory '{}': {}", path, errorMsg
+                        "Error creating directory '{}': {}", path.path(), errorMsg
                     ));
                 }
                 throw FileSystemException(fmt::format(
-                    "Error creating directory '{}'", path
+                    "Error creating directory '{}'", path.path()
                 ));
             }
         }
@@ -503,7 +503,7 @@ void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) con
             if (rmFileResult != 0) {
                 FindClose(hFind);
                 throw FileSystemException(fmt::format(
-                    "Error removing directory '{}'", path
+                    "Error removing directory '{}'", path.path()
                 ));
             }
         }
@@ -514,7 +514,7 @@ void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) con
     const int rmDirResult = _rmdir(dirPath.c_str());
     if (rmDirResult == -1) {
         throw FileSystemException(fmt::format(
-            "Error removing directory '{}'", path
+            "Error removing directory '{}'", path.path()
         ));
     }
 #else

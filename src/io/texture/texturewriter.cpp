@@ -31,7 +31,7 @@
 #include <ghoul/io/texture/texturewriterbase.h>
 
 #include <algorithm>
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 using std::string;
 
