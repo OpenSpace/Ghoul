@@ -36,6 +36,8 @@
 #define IPC_R       000400  /* read permission */
 #define IPC_W       000200  /* write/alter permission */
 #define IPC_M       010000  /* permission to change control info */
+#else
+#include <Windows.h>
 #endif
 
 namespace ghoul {
