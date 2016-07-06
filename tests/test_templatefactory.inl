@@ -184,11 +184,10 @@ TEST_F(TemplateFactoryTest, DefaultConstructor) {
 TEST_F(TemplateFactoryTest, NoDefaultConstructorExists) {
     factory->registerClass<SubClassDictionary>("SubClassDictionary");
 
-    BaseClass* obj = factory->create("SubClassDictionary");
-    ASSERT_NE(nullptr, obj) << "Creation of SubClassDictionary failed";
-
-    EXPECT_EQ(-1, obj->value1) << "Value1 was modified";
-    EXPECT_EQ(-2, obj->value2) << "Value2 was modified";
+    EXPECT_THROW(
+        factory->create("SubClassDictionary"),
+        ghoul::TemplateFactoryBase::TemplateConstructionError
+    );
 }
 
 TEST_F(TemplateFactoryTest, DictionaryConstructor) {
@@ -214,13 +213,15 @@ TEST_F(TemplateFactoryTest, NoDictionaryConstructorExists) {
 }
 
 TEST_F(TemplateFactoryTest, ClassDoesNotExist) {
-    factory->registerClass<SubClassDictionary>("SubClassDictionary");
+    factory->registerClass<SubClassDefault>("SubClassDefault");
 
-    BaseClass* obj = factory->create("SubClassDictionary");
-    ASSERT_NE(nullptr, obj) << "Creation of SubClassDictionary failed";
+    BaseClass* obj = factory->create("SubClassDefault");
+    ASSERT_NE(nullptr, obj) << "Creation of SubClassDefault failed";
 
-    BaseClass* obj2 = factory->create("DoesNotExist");
-    EXPECT_EQ(nullptr, obj2);
+    EXPECT_THROW(
+        factory->create("DoesNotExist"),
+        ghoul::TemplateFactoryBase::TemplateClassNotFoundError
+    );
 }
 
 TEST_F(TemplateFactoryTest, DefaultDictionaryConstructor) {
@@ -261,11 +262,11 @@ TEST_F(TemplateFactoryTest, FunctionPointerConstruction) {
 
 TEST_F(TemplateFactoryTest, StdFunctionConstruction) {
     std::function<BaseClass*(bool, const ghoul::Dictionary&)> function =
-        [](bool use, const ghoul::Dictionary&) {
+        [](bool use, const ghoul::Dictionary&) -> BaseClass* {
         if (use)
             return new StdFunctionClass;
         else
-            return reinterpret_cast<StdFunctionClass*>(nullptr);
+            return nullptr;
     };
     factory->registerClass("ptr", function);
 

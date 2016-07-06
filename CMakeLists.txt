@@ -229,10 +229,15 @@ option(GHOUL_HAVE_TESTS "Activate the unit tests" OFF)
 if (GHOUL_HAVE_TESTS)
     file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
     add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})
+
+    set_property(TARGET GhoulTest PROPERTY CXX_STANDARD 14)
+    set_property(TARGET GhoulTest PROPERTY CXX_STANDARD_REQUIRED On)
+
     target_compile_definitions(GhoulTest PUBLIC
-        "DGHOUL_HAVE_TESTS"
-        "DGTEST_HAS_TR1_TUPLE=0"
-        "DGTEST_HAS_GLOBAL_STRING=0"
+        "GHOUL_HAVE_TESTS"
+        "GTEST_HAS_TR1_TUPLE=0"
+        "GTEST_HAS_GLOBAL_STRING=0"
+        "GHOUL_ROOT_DIR=\"${GHOUL_ROOT_DIR}\""
     )
     target_include_directories(GhoulTest PUBLIC "${GHOUL_ROOT_DIR}/ext/gtest/include" "${GHOUL_ROOT_DIR}")
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/gtest)

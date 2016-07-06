@@ -34,12 +34,14 @@
 #include <ghoul/filesystem/filesystem>
 #include <ghoul/logging/logging>
 
-#include "tests/test_common.inl"
 #include "tests/test_buffer.inl"
-#include "tests/test_luatodictionary.inl"
 #include "tests/test_commandlineparser.inl"
+#include "tests/test_common.inl"
+//#include "tests/test_configurationmanager.inl"
 #include "tests/test_dictionary.inl"
 #include "tests/test_filesystem.inl"
+#include "tests/test_luatodictionary.inl"
+#include "tests/test_templatefactory.inl"
 
 using namespace ghoul::cmdparser;
 using namespace ghoul::filesystem;
@@ -55,7 +57,7 @@ int main(int argc, char** argv) {
 
     FileSystem::initialize();
     
-    const std::string root = GHOUL_ROOT_DIR;
+    const std::string root = absPath(GHOUL_ROOT_DIR);
     const std::string testdir = root + "/tests";
     const std::string scriptdir = root + "/scripts";
 
