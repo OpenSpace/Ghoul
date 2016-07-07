@@ -116,12 +116,12 @@ FontRenderer::FontRenderer()
     glGenBuffers(1, &_ibo);
 }
     
-FontRenderer::FontRenderer(opengl::ProgramObject* program, glm::vec2 windowSize)
+FontRenderer::FontRenderer(opengl::ProgramObject* program, glm::vec2 framebufferSize)
     : FontRenderer()
 {
     ghoul_assert(program != nullptr, "No program provided");
     _program = std::unique_ptr<opengl::ProgramObject>(program);
-    setWindowSize(std::move(windowSize));
+    setFramebufferSize(std::move(framebufferSize));
     
 }
 FontRenderer::~FontRenderer() {
@@ -378,9 +378,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
     
     glm::mat4 projection = glm::ortho(
         0.f,
-        _windowSize.x,
+        _framebufferSize.x,
         0.f,
-        _windowSize.y
+        _framebufferSize.y
     );
     
     opengl::TextureUnit atlasUnit;
@@ -438,8 +438,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
     return { size, static_cast<int>(lines.size()) };
 }
     
-void FontRenderer::setWindowSize(glm::vec2 windowSize) {
-    _windowSize = std::move(windowSize);
+void FontRenderer::setFramebufferSize(glm::vec2 framebufferSize) {
+    _framebufferSize = std::move(framebufferSize);
 }
     
 } // namespace fontrendering

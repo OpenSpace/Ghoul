@@ -75,10 +75,10 @@ public:
      * font has an outline or not.
      * \param program The custom ProgramObject that is used to render any passed text.
      * This method takes the ownership of the ProgramObject.
-     * \param windowSize The size of the rendering window into which this FontRenderer
+     * \param framebufferSize The size of the framebuffer into which this FontRenderer
      * renders
      */
-    FontRenderer(opengl::ProgramObject* program, glm::vec2 windowSize);
+    FontRenderer(opengl::ProgramObject* program, glm::vec2 framebufferSize);
     
     /// Default destructor that cleans used OpenGL names and the ProgramObject
     ~FontRenderer();
@@ -119,12 +119,12 @@ public:
     static FontRenderer& defaultRenderer();
 
     /**
-     * Sets the window size of the framebuffer that is used as the target for this
-     * FontRenderer. It is used to convert the pixel coordinates (used in the #render)
-     * method to normalized device coordinates.
-     * \param windowSize The size of the target framebuffer
+     * Sets the size of the framebuffer that is used as the target for this FontRenderer.
+     * It is used to convert the pixel coordinates (used in the #render) method to
+     * normalized device coordinates.
+     * \param framebufferSize The size of the target framebuffer
      */
-    void setWindowSize(glm::vec2 windowSize);
+    void setFramebufferSize(glm::vec2 framebufferSize);
     
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -197,9 +197,9 @@ private:
     /// The singleton instance of the default FontRenderer
     static FontRenderer* _defaultRenderer;
     
-    /// The window size that is used to compute the transformation from pixel coordinates
-    /// to normalized device coordinates
-    glm::vec2 _windowSize;
+    /// The framebuffer size that is used to compute the transformation from pixel
+    /// coordinates to normalized device coordinates
+    glm::vec2 _framebufferSize;
     
     /// The ProgramObject that is used to render the text
     std::unique_ptr<opengl::ProgramObject> _program;
