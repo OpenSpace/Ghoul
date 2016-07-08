@@ -51,6 +51,9 @@ using namespace ghoul::logging;
 #define GHOUL_ROOT_DIR "../../../ext/ghoul"
 #endif
 
+//#define PRINT_OUTPUT
+
+
 int main(int argc, char** argv) {
     LogManager::initialize(LogManager::LogLevel::NoLogging);
     LogMgr.addLog(std::make_shared<ConsoleLog>());
@@ -71,18 +74,24 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    //testing::internal::CaptureStdout();
-    //testing::internal::CaptureStderr();
+#ifdef PRINT_OUTPUT
+    testing::internal::CaptureStdout();
+    testing::internal::CaptureStderr();
+#endif
+
     testing::InitGoogleTest(&argc, argv);
     bool b = RUN_ALL_TESTS();
-    //std::string output = testing::internal::GetCapturedStdout();
-    //std::string error = testing::internal::GetCapturedStderr();
 
-    //std::ofstream o("output.txt");
-    //o << output;
+#ifdef PRINT_OUTPUT
+    std::string output = testing::internal::GetCapturedStdout();
+    std::string error = testing::internal::GetCapturedStderr();
 
-    //std::ofstream e("error.txt");
-    //e << error;
+    std::ofstream o("output.txt");
+    o << output;
+
+    std::ofstream e("error.txt");
+    e << error;
+#endif
 
     return b;
 }
