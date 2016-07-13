@@ -125,7 +125,8 @@ void Buffer::write(const std::string& filename, Compress compress) {
     file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     file.open(filename, std::ios::binary | std::ios::out);
 
-    file.write(reinterpret_cast<const char*>(&compress), sizeof(bool));
+    bool c = compress == Compress::Yes;
+    file.write(reinterpret_cast<const char*>(&c), sizeof(bool));
     if (compress == Compress::Yes) {
         std::vector<value_type> buffer(size());
         int compressed_size = LZ4_compress(

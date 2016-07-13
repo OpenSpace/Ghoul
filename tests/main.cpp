@@ -34,12 +34,14 @@
 #include <ghoul/filesystem/filesystem>
 #include <ghoul/logging/logging>
 
-#include "tests/test_common.inl"
 #include "tests/test_buffer.inl"
-#include "tests/test_luatodictionary.inl"
 #include "tests/test_commandlineparser.inl"
-//#include "tests/test_dictionary.inl"  Disabled until "Bus error" crash is fixed ---abock
+#include "tests/test_common.inl"
+//#include "tests/test_configurationmanager.inl"
+#include "tests/test_dictionary.inl"
 #include "tests/test_filesystem.inl"
+#include "tests/test_luatodictionary.inl"
+#include "tests/test_templatefactory.inl"
 
 using namespace ghoul::cmdparser;
 using namespace ghoul::filesystem;
@@ -49,13 +51,16 @@ using namespace ghoul::logging;
 #define GHOUL_ROOT_DIR "../../../ext/ghoul"
 #endif
 
+//#define PRINT_OUTPUT
+
+
 int main(int argc, char** argv) {
     LogManager::initialize(LogManager::LogLevel::NoLogging);
-    LogMgr.addLog(new ConsoleLog);
+    LogMgr.addLog(std::make_shared<ConsoleLog>());
 
     FileSystem::initialize();
     
-    const std::string root = GHOUL_ROOT_DIR;
+    const std::string root = absPath(GHOUL_ROOT_DIR);
     const std::string testdir = root + "/tests";
     const std::string scriptdir = root + "/scripts";
 
@@ -69,8 +74,26 @@ int main(int argc, char** argv) {
         return 0;
     }
 
+#ifdef PRINT_OUTPUT
+    testing::internal::CaptureStdout();
+    testing::internal::CaptureStderr();
+#endif
+
     testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    bool b = RUN_ALL_TESTS();
+
+#ifdef PRINT_OUTPUT
+    std::string output = testing::internal::GetCapturedStdout();
+    std::string error = testing::internal::GetCapturedStderr();
+
+    std::ofstream o("output.txt");
+    o << output;
+
+    std::ofstream e("error.txt");
+    e << error;
+#endif
+
+    return b;
 }
 
 #ifdef __unix__

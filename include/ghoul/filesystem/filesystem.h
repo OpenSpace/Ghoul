@@ -210,8 +210,9 @@ public:
      * \param path The directory that should be deleted
      * \param recursive  True if content should be removed as well, default is false
      * \throw FileSystemException If there was an error deleting the directory
+     * \throw FileSystemException If \p path is not an empty directory and \p recursive
+     * is <code>false</code>
      * \pre \p path must be an existing directory
-     * \pre \p path must be an empty directory if \p recursive is <code>false</code>
      */
     void deleteDirectory(const Directory& path,
         Recursive recursive = Recursive::No) const;

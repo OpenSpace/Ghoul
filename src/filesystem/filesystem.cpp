@@ -28,7 +28,7 @@
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/logging/logmanager.h>
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <regex>
@@ -450,11 +450,11 @@ void FileSystem::createDirectory(const Directory& path, Recursive recursive) con
                     string errorMsg(errorBuffer);
                     LocalFree(errorBuffer);
                     throw FileSystemException(fmt::format(
-                        "Error creating directory '{}': {}", path, errorMsg
+                        "Error creating directory '{}': {}", path.path(), errorMsg
                     ));
                 }
                 throw FileSystemException(fmt::format(
-                    "Error creating directory '{}'", path
+                    "Error creating directory '{}'", path.path()
                 ));
             }
         }
@@ -462,7 +462,7 @@ void FileSystem::createDirectory(const Directory& path, Recursive recursive) con
         int success = mkdir(path.path().c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         if (success != 0 && errno != EEXIST) {
             throw FileSystemException(fmt::format(
-                "Error creating diretory '{}': {}", path, strerror(errno)
+                "Error creating diretory '{}': {}", path.path(), strerror(errno)
             ));
         }
 #endif
@@ -471,8 +471,8 @@ void FileSystem::createDirectory(const Directory& path, Recursive recursive) con
 
 void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) const {
     ghoul_assert(directoryExists(path), "Path must be an existing directory");
-    if (recursive == Recursive::No)
-        ghoul_assert(emptyDirectory(path), "Path must be empty");
+    if ((recursive == Recursive::No) && (!emptyDirectory(path)))
+        throw FileSystemException("Directory must be empty");
 
 #ifdef WIN32
     const string& dirPath = path;
@@ -503,7 +503,7 @@ void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) con
             if (rmFileResult != 0) {
                 FindClose(hFind);
                 throw FileSystemException(fmt::format(
-                    "Error removing directory '{}'", path
+                    "Error removing directory '{}'", path.path()
                 ));
             }
         }
@@ -514,7 +514,7 @@ void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) con
     const int rmDirResult = _rmdir(dirPath.c_str());
     if (rmDirResult == -1) {
         throw FileSystemException(fmt::format(
-            "Error removing directory '{}'", path
+            "Error removing directory '{}'", path.path()
         ));
     }
 #else
@@ -525,7 +525,7 @@ void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) con
         
         if (!directory) {
             throw FileSystemException(fmt::format(
-                "Error removing directory '{}': {}", path, strerror(errno)
+                "Error removing directory '{}': {}", path.path(), strerror(errno)
             ));
         }
     
@@ -549,7 +549,7 @@ void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) con
                     if (removeSuccess != -1) {
                         throw FileSystemException(fmt::format(
                             "Error deleting file '{}' in directory '{}': {}",
-                            fullName, path, strerror(errno)
+                            fullName, path.path(), strerror(errno)
                         ));
                     }
                 }
@@ -557,7 +557,7 @@ void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) con
             else {
                 throw FileSystemException(fmt::format(
                     "Error getting information about file '{}' in directory '{}': {}",
-                    fullName, path, strerror(errno)
+                    fullName, path.path(), strerror(errno)
                 ));
             }
         }
@@ -566,7 +566,7 @@ void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) con
     int rmdirSuccess = rmdir(dirPath.c_str());
     if (rmdirSuccess == -1) {
         throw FileSystemException(fmt::format(
-            "Error deleting directory '{}': {}", path, strerror(errno)
+            "Error deleting directory '{}': {}", path.path(), strerror(errno)
         ));
     }
 #endif

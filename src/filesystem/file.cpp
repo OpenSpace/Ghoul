@@ -28,7 +28,7 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 #ifdef WIN32
 #include <windows.h>

@@ -31,10 +31,6 @@
 #include <map>
 #include <string>
 
-#ifdef WIN32
-#include <Windows.h>
-#endif
-
 namespace ghoul {
 
 /**
@@ -197,15 +193,15 @@ private:
      * The handle to the memory mapped file that backs this SharedMemory object. Only a
      * virtual file is used, so there is no disk IO necessary.
      */
-    HANDLE _sharedMemoryHandle;
+    void* _sharedMemoryHandle;
 
     /**
      * Stores a mapping from name (as specified in the #create method) to the acquired
      * handle. This is necessary as each new CreateFileMapping call will create new
-     * <code>HANDLE</code>, making it impossible to acquire the <code>HANDLE</code> for a
+     * handle of type <code>void*</code>, making it impossible to acquire the handle for a
      * specific name otherwise.
      */
-    static std::map<const std::string, HANDLE> _createdSections;
+    static std::map<const std::string, void*> _createdSections;
 #else
     /// The full allocated size of the shared memory block
     size_t _size;

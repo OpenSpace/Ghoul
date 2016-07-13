@@ -29,7 +29,7 @@
 #include <ghoul/opengl/texture.h>
 #include <ghoul/glm.h>
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 #include <fstream>
 #include <sstream>

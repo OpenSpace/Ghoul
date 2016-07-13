@@ -25,7 +25,7 @@
 
 #include <ghoul/io/texture/texturereaderbase.h>
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 namespace ghoul {
 namespace io {

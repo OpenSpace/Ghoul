@@ -56,6 +56,10 @@ Directory::Directory(std::string path, RawPath isRawPath) {
         _directoryPath = std::move(FileSys.absolutePath(path.empty() ? "." : path));
 }
 
+Directory::Directory(const char* path, RawPath isRawPath)
+    : Directory(std::string(path), isRawPath)
+{}
+
 Directory::operator const std::string&() const {
     return _directoryPath;
 }

@@ -28,7 +28,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/logging/logmanager.h>
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <array>

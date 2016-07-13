@@ -242,6 +242,14 @@ int OpenGLCapabilitiesComponent::maxTextureUnits() const {
     return _numTextureUnits;
 }
 
+int OpenGLCapabilitiesComponent::max2DTextureSize() const {
+    return _maxTextureSize;
+}
+
+int OpenGLCapabilitiesComponent::max3DTextureSize() const {
+    return _maxTextureSize3D;
+}
+
 int OpenGLCapabilitiesComponent::maxAtomicCounterBufferBindings() const {
     return _numAtomicCounterBufferBindings;
 }

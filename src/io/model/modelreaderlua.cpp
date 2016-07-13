@@ -31,7 +31,7 @@
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/vertexbufferobject.h>
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 #include <map>
 #include <vector>
 

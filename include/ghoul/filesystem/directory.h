@@ -70,6 +70,21 @@ public:
     Directory(std::string path, RawPath isRawPath = RawPath::No);
 
     /**
+    * This constructor creates a Directory object pointing to the \p path. If
+    * \p isRawPath is <code>true</code>, the \p path is used as-is and not modified. If
+    * it is <code>false</code>, the default setting, the provided \p path is
+    * automatically changed into the absolute path representation, removing all tokens,
+    * if present, in the process.
+    * \param path The path this Directory should point to as a null terminated string. Can
+    * contain tokens and be specified relative to the current working directory
+    * \param isRawPath If <code>false</code> the \p path parameter is converted into an
+    * absolute path, removing all tokens in the process. If <code>true</code>,
+    * the path is used as-is without changes. This might make the Directory object
+    * outdated if the current working directory is subsequently changed.
+    */
+    Directory(const char* path, RawPath isRawPath = RawPath::No);
+
+    /**
      * Operator that returns the path this directory points to. This can, depending on the
      * constructor that was used, be either an absolute path or a relative path. If the
      * current working directory has been changed, and the Directory has been created

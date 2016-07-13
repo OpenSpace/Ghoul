@@ -33,7 +33,7 @@
 
 #include <ghoul/misc/exception.h>
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <sstream>

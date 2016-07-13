@@ -218,6 +218,687 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
     );
 }
 
+template <typename T, glm::precision P>
+void Dictionary::getValueInternal(const std::string& key, glm::tvec2<T, P>& value) const {
+    using Array = std::array<
+        typename internal::StorageTypeConverter<glm::tvec2<T, P>>::type,
+        internal::StorageTypeConverter<glm::tvec2<T, P>>::size
+    >;
+
+    bool success = hasValueHelper<Array>(key);
+    if (success) {
+        Array v;
+        getValueHelper(key, v);
+
+        value.x = static_cast<T>(v[0]);
+        value.y = static_cast<T>(v[1]);
+
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper<Dictionary>(key, dict);
+            bool canConvert = isConvertible<glm::tvec2<T, P>>(dict);
+            if (canConvert) {
+                std::vector<std::string> keys = dict.keys();
+                // sort numerically rather than by ASCII value
+                std::sort(keys.begin(), keys.end(), [](const auto& k1, const auto& k2) {
+                    try {
+                        return std::stoi(k1) < std::stoi(k2);
+                    }
+                    catch (const std::invalid_argument&) {
+                        return k1 < k2;
+                    }
+                });
+                for (size_t i = 0;
+                     i < internal::StorageTypeConverter<glm::tvec2<T, P>>::size;
+                     ++i)
+                {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, glm::value_ptr(value)[i]);
+                }
+                return;
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" +
+        typeid(glm::tvec2<T, P>).name() + "'"
+    );
+}
+
+template <typename T, glm::precision P>
+void Dictionary::getValueInternal(const std::string& key, glm::tvec3<T, P>& value) const {
+    using Array = std::array<
+        typename internal::StorageTypeConverter<glm::tvec3<T, P>>::type,
+        internal::StorageTypeConverter<glm::tvec3<T, P>>::size
+    >;
+
+    bool success = hasValueHelper<Array>(key);
+    if (success) {
+        Array v;
+        getValueHelper(key, v);
+
+        value.x = static_cast<T>(v[0]);
+        value.y = static_cast<T>(v[1]);
+        value.z = static_cast<T>(v[2]);
+
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper<Dictionary>(key, dict);
+            bool canConvert = isConvertible<glm::tvec3<T, P>>(dict);
+            if (canConvert) {
+                std::vector<std::string> keys = dict.keys();
+                // sort numerically rather than by ASCII value
+                std::sort(keys.begin(), keys.end(), [](const auto& k1, const auto& k2) {
+                    try {
+                        return std::stoi(k1) < std::stoi(k2);
+                    }
+                    catch (const std::invalid_argument&) {
+                        return k1 < k2;
+                    }
+                });
+                for (size_t i = 0;
+                     i < internal::StorageTypeConverter<glm::tvec3<T, P>>::size;
+                     ++i)
+                {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, glm::value_ptr(value)[i]);
+                }
+                return;
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" +
+        typeid(glm::tvec3<T, P>).name() + "'"
+    );
+}
+
+template <typename T, glm::precision P>
+void Dictionary::getValueInternal(const std::string& key, glm::tvec4<T, P>& value) const {
+    using Array = std::array<
+        typename internal::StorageTypeConverter<glm::tvec4<T, P>>::type,
+        internal::StorageTypeConverter<glm::tvec4<T, P>>::size
+    >;
+
+    bool success = hasValueHelper<Array>(key);
+    if (success) {
+        Array v;
+        getValueHelper(key, v);
+
+        value.x = static_cast<T>(v[0]);
+        value.y = static_cast<T>(v[1]);
+        value.z = static_cast<T>(v[2]);
+        value.w = static_cast<T>(v[3]);
+
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper<Dictionary>(key, dict);
+            bool canConvert = isConvertible<glm::tvec4<T, P>>(dict);
+            if (canConvert) {
+                std::vector<std::string> keys = dict.keys();
+                // sort numerically rather than by ASCII value
+                std::sort(keys.begin(), keys.end(), [](const auto& k1, const auto& k2) {
+                    try {
+                        return std::stoi(k1) < std::stoi(k2);
+                    }
+                    catch (const std::invalid_argument&) {
+                        return k1 < k2;
+                    }
+                });
+                for (size_t i = 0;
+                     i < internal::StorageTypeConverter<glm::tvec4<T, P>>::size;
+                     ++i) {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, glm::value_ptr(value)[i]);
+                }
+                return;
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" +
+        typeid(glm::tvec4<T, P>).name() + "'"
+    );
+}
+
+template <typename T, glm::precision P>
+void Dictionary::getValueInternal(const std::string& key, glm::tmat2x2<T, P>& value) const
+{
+    using Array = std::array<
+        typename internal::StorageTypeConverter<glm::tmat2x2<T, P>>::type,
+        internal::StorageTypeConverter<glm::tmat2x2<T, P>>::size
+    >;
+
+    bool success = hasValueHelper<Array>(key);
+    if (success) {
+        Array v;
+        getValueHelper(key, v);
+
+        value[0][0] = static_cast<T>(v[0]);
+        value[0][1] = static_cast<T>(v[1]);
+        value[1][0] = static_cast<T>(v[2]);
+        value[1][1] = static_cast<T>(v[3]);
+
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper<Dictionary>(key, dict);
+            bool canConvert = isConvertible<glm::tmat2x2<T, P>>(dict);
+            if (canConvert) {
+                std::vector<std::string> keys = dict.keys();
+                // sort numerically rather than by ASCII value
+                std::sort(keys.begin(), keys.end(), [](const auto& k1, const auto& k2) {
+                    try {
+                        return std::stoi(k1) < std::stoi(k2);
+                    }
+                    catch (const std::invalid_argument&) {
+                        return k1 < k2;
+                    }
+                });
+                for (size_t i = 0;
+                     i < internal::StorageTypeConverter<glm::tmat2x2<T, P>>::size;
+                     ++i) {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, glm::value_ptr(value)[i]);
+                }
+                return;
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" +
+        typeid(glm::tmat2x2<T, P>).name() + "'"
+    );
+}
+
+template <typename T, glm::precision P>
+void Dictionary::getValueInternal(const std::string& key, glm::tmat2x3<T, P>& value) const {
+    using Array = std::array<
+        typename internal::StorageTypeConverter<glm::tmat2x3<T, P>>::type,
+        internal::StorageTypeConverter<glm::tmat2x3<T, P>>::size
+    >;
+
+    bool success = hasValueHelper<Array>(key);
+    if (success) {
+        Array v;
+        getValueHelper(key, v);
+
+        value[0][0] = static_cast<T>(v[0]);
+        value[0][1] = static_cast<T>(v[1]);
+        value[0][2] = static_cast<T>(v[2]);
+        value[1][0] = static_cast<T>(v[3]);
+        value[1][1] = static_cast<T>(v[4]);
+        value[1][2] = static_cast<T>(v[5]);
+
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper<Dictionary>(key, dict);
+            bool canConvert = isConvertible<glm::tmat2x3<T, P>>(dict);
+            if (canConvert) {
+                std::vector<std::string> keys = dict.keys();
+                // sort numerically rather than by ASCII value
+                std::sort(keys.begin(), keys.end(), [](const auto& k1, const auto& k2) {
+                    try {
+                        return std::stoi(k1) < std::stoi(k2);
+                    }
+                    catch (const std::invalid_argument&) {
+                        return k1 < k2;
+                    }
+                });
+                for (size_t i = 0;
+                     i < internal::StorageTypeConverter<glm::tmat2x3<T, P>>::size;
+                     ++i) {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, glm::value_ptr(value)[i]);
+                }
+                return;
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" +
+        typeid(glm::tmat2x3<T, P>).name() + "'"
+    );
+}
+
+template <typename T, glm::precision P>
+void Dictionary::getValueInternal(const std::string& key, glm::tmat2x4<T, P>& value) const {
+    using Array = std::array<
+        typename internal::StorageTypeConverter<glm::tmat2x4<T, P>>::type,
+        internal::StorageTypeConverter<glm::tmat2x4<T, P>>::size
+    >;
+
+    bool success = hasValueHelper<Array>(key);
+    if (success) {
+        Array v;
+        getValueHelper(key, v);
+
+        value[0][0] = static_cast<T>(v[0]);
+        value[0][1] = static_cast<T>(v[1]);
+        value[0][2] = static_cast<T>(v[2]);
+        value[0][3] = static_cast<T>(v[3]);
+        value[1][0] = static_cast<T>(v[4]);
+        value[1][1] = static_cast<T>(v[5]);
+        value[1][2] = static_cast<T>(v[6]);
+        value[1][3] = static_cast<T>(v[7]);
+
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper<Dictionary>(key, dict);
+            bool canConvert = isConvertible<glm::tmat2x4<T, P>>(dict);
+            if (canConvert) {
+                std::vector<std::string> keys = dict.keys();
+                // sort numerically rather than by ASCII value
+                std::sort(keys.begin(), keys.end(), [](const auto& k1, const auto& k2) {
+                    try {
+                        return std::stoi(k1) < std::stoi(k2);
+                    }
+                    catch (const std::invalid_argument&) {
+                        return k1 < k2;
+                    }
+                });
+                for (size_t i = 0;
+                     i < internal::StorageTypeConverter<glm::tmat2x4<T, P>>::size;
+                     ++i) {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, glm::value_ptr(value)[i]);
+                }
+                return;
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" +
+        typeid(glm::tmat2x4<T, P>).name() + "'"
+    );
+}
+
+template <typename T, glm::precision P>
+void Dictionary::getValueInternal(const std::string& key, glm::tmat3x2<T, P>& value) const {
+    using Array = std::array<
+        typename internal::StorageTypeConverter<glm::tmat3x2<T, P>>::type,
+        internal::StorageTypeConverter<glm::tmat3x2<T, P>>::size
+    >;
+
+    bool success = hasValueHelper<Array>(key);
+    if (success) {
+        Array v;
+        getValueHelper(key, v);
+
+        value[0][0] = static_cast<T>(v[0]);
+        value[0][1] = static_cast<T>(v[1]);
+        value[1][0] = static_cast<T>(v[2]);
+        value[1][1] = static_cast<T>(v[3]);
+        value[2][0] = static_cast<T>(v[4]);
+        value[2][1] = static_cast<T>(v[5]);
+
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper<Dictionary>(key, dict);
+            bool canConvert = isConvertible<glm::tmat3x2<T, P>>(dict);
+            if (canConvert) {
+                std::vector<std::string> keys = dict.keys();
+                // sort numerically rather than by ASCII value
+                std::sort(keys.begin(), keys.end(), [](const auto& k1, const auto& k2) {
+                    try {
+                        return std::stoi(k1) < std::stoi(k2);
+                    }
+                    catch (const std::invalid_argument&) {
+                        return k1 < k2;
+                    }
+                });
+                for (size_t i = 0;
+                     i < internal::StorageTypeConverter<glm::tmat3x2<T, P>>::size;
+                     ++i) {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, glm::value_ptr(value)[i]);
+                }
+                return;
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" +
+        typeid(glm::tmat3x2<T, P>).name() + "'"
+    );
+}
+
+template <typename T, glm::precision P>
+void Dictionary::getValueInternal(const std::string& key, glm::tmat3x3<T, P>& value) const {
+    using Array = std::array<
+        typename internal::StorageTypeConverter<glm::tmat3x3<T, P>>::type,
+        internal::StorageTypeConverter<glm::tmat3x3<T, P>>::size
+    >;
+
+    bool success = hasValueHelper<Array>(key);
+    if (success) {
+        Array v;
+        getValueHelper(key, v);
+
+        value[0][0] = static_cast<T>(v[0]);
+        value[0][1] = static_cast<T>(v[1]);
+        value[0][2] = static_cast<T>(v[2]);
+        value[1][0] = static_cast<T>(v[3]);
+        value[1][1] = static_cast<T>(v[4]);
+        value[1][2] = static_cast<T>(v[5]);
+        value[2][0] = static_cast<T>(v[6]);
+        value[2][1] = static_cast<T>(v[7]);
+        value[2][2] = static_cast<T>(v[8]);
+
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper<Dictionary>(key, dict);
+            bool canConvert = isConvertible<glm::tmat3x3<T, P>>(dict);
+            if (canConvert) {
+                std::vector<std::string> keys = dict.keys();
+                // sort numerically rather than by ASCII value
+                std::sort(keys.begin(), keys.end(), [](const auto& k1, const auto& k2) {
+                    try {
+                        return std::stoi(k1) < std::stoi(k2);
+                    }
+                    catch (const std::invalid_argument&) {
+                        return k1 < k2;
+                    }
+                });
+                for (size_t i = 0;
+                     i < internal::StorageTypeConverter<glm::tmat3x3<T, P>>::size;
+                     ++i) {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, glm::value_ptr(value)[i]);
+                }
+                return;
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" +
+        typeid(glm::tmat3x3<T, P>).name() + "'"
+    );
+}
+
+template <typename T, glm::precision P>
+void Dictionary::getValueInternal(const std::string& key, glm::tmat3x4<T, P>& value) const {
+    using Array = std::array<
+        typename internal::StorageTypeConverter<glm::tmat3x4<T, P>>::type,
+        internal::StorageTypeConverter<glm::tmat3x4<T, P>>::size
+    >;
+
+    bool success = hasValueHelper<Array>(key);
+    if (success) {
+        Array v;
+        getValueHelper(key, v);
+
+        value[0][0] = static_cast<T>(v[0]);
+        value[0][1] = static_cast<T>(v[1]);
+        value[0][2] = static_cast<T>(v[2]);
+        value[0][3] = static_cast<T>(v[3]);
+        value[1][0] = static_cast<T>(v[4]);
+        value[1][1] = static_cast<T>(v[5]);
+        value[1][2] = static_cast<T>(v[6]);
+        value[1][3] = static_cast<T>(v[7]);
+        value[2][0] = static_cast<T>(v[8]);
+        value[2][1] = static_cast<T>(v[9]);
+        value[2][2] = static_cast<T>(v[10]);
+        value[2][3] = static_cast<T>(v[11]);
+
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper<Dictionary>(key, dict);
+            bool canConvert = isConvertible<glm::tmat3x4<T, P>>(dict);
+            if (canConvert) {
+                std::vector<std::string> keys = dict.keys();
+                // sort numerically rather than by ASCII value
+                std::sort(keys.begin(), keys.end(), [](const auto& k1, const auto& k2) {
+                    try {
+                        return std::stoi(k1) < std::stoi(k2);
+                    }
+                    catch (const std::invalid_argument&) {
+                        return k1 < k2;
+                    }
+                });
+                for (size_t i = 0;
+                     i < internal::StorageTypeConverter<glm::tmat3x4<T, P>>::size;
+                     ++i) {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, glm::value_ptr(value)[i]);
+                }
+                return;
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" +
+        typeid(glm::tmat3x4<T, P>).name() + "'"
+    );
+}
+
+template <typename T, glm::precision P>
+void Dictionary::getValueInternal(const std::string& key, glm::tmat4x2<T, P>& value) const {
+    using Array = std::array<
+        typename internal::StorageTypeConverter<glm::tmat4x2<T, P>>::type,
+        internal::StorageTypeConverter<glm::tmat4x2<T, P>>::size
+    >;
+
+    bool success = hasValueHelper<Array>(key);
+    if (success) {
+        Array v;
+        getValueHelper(key, v);
+
+        value[0][0] = static_cast<T>(v[0]);
+        value[0][1] = static_cast<T>(v[1]);
+        value[1][0] = static_cast<T>(v[2]);
+        value[1][1] = static_cast<T>(v[3]);
+        value[2][0] = static_cast<T>(v[4]);
+        value[2][1] = static_cast<T>(v[5]);
+        value[3][0] = static_cast<T>(v[6]);
+        value[3][1] = static_cast<T>(v[7]);
+
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper<Dictionary>(key, dict);
+            bool canConvert = isConvertible<glm::tmat4x2<T, P>>(dict);
+            if (canConvert) {
+                std::vector<std::string> keys = dict.keys();
+                // sort numerically rather than by ASCII value
+                std::sort(keys.begin(), keys.end(), [](const auto& k1, const auto& k2) {
+                    try {
+                        return std::stoi(k1) < std::stoi(k2);
+                    }
+                    catch (const std::invalid_argument&) {
+                        return k1 < k2;
+                    }
+                });
+                for (size_t i = 0;
+                     i < internal::StorageTypeConverter<glm::tmat4x2<T, P>>::size;
+                     ++i) {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, glm::value_ptr(value)[i]);
+                }
+                return;
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" +
+        typeid(glm::tmat4x2<T, P>).name() + "'"
+    );
+}
+
+template <typename T, glm::precision P>
+void Dictionary::getValueInternal(const std::string& key, glm::tmat4x3<T, P>& value) const {
+    using Array = std::array<
+        typename internal::StorageTypeConverter<glm::tmat4x3<T, P>>::type,
+        internal::StorageTypeConverter<glm::tmat4x3<T, P>>::size
+    >;
+
+    bool success = hasValueHelper<Array>(key);
+    if (success) {
+        Array v;
+        getValueHelper(key, v);
+
+        value[0][0] = static_cast<T>(v[0]);
+        value[0][1] = static_cast<T>(v[1]);
+        value[0][2] = static_cast<T>(v[2]);
+        value[1][0] = static_cast<T>(v[3]);
+        value[1][1] = static_cast<T>(v[4]);
+        value[1][2] = static_cast<T>(v[5]);
+        value[2][0] = static_cast<T>(v[6]);
+        value[2][1] = static_cast<T>(v[7]);
+        value[2][2] = static_cast<T>(v[8]);
+        value[3][0] = static_cast<T>(v[9]);
+        value[3][1] = static_cast<T>(v[10]);
+        value[3][2] = static_cast<T>(v[11]);
+
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper<Dictionary>(key, dict);
+            bool canConvert = isConvertible<glm::tmat4x3<T, P>>(dict);
+            if (canConvert) {
+                std::vector<std::string> keys = dict.keys();
+                // sort numerically rather than by ASCII value
+                std::sort(keys.begin(), keys.end(), [](const auto& k1, const auto& k2) {
+                    try {
+                        return std::stoi(k1) < std::stoi(k2);
+                    }
+                    catch (const std::invalid_argument&) {
+                        return k1 < k2;
+                    }
+                });
+                for (size_t i = 0;
+                     i < internal::StorageTypeConverter<glm::tmat4x3<T, P>>::size;
+                     ++i) {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, glm::value_ptr(value)[i]);
+                }
+                return;
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" +
+        typeid(glm::tmat3x3<T, P>).name() + "'"
+    );
+}
+
+template <typename T, glm::precision P>
+void Dictionary::getValueInternal(const std::string& key, glm::tmat4x4<T, P>& value) const {
+    using Array = std::array<
+        typename internal::StorageTypeConverter<glm::tmat4x4<T, P>>::type,
+        internal::StorageTypeConverter<glm::tmat4x4<T, P>>::size
+    >;
+
+    bool success = hasValueHelper<Array>(key);
+    if (success) {
+        Array v;
+        getValueHelper(key, v);
+
+        value[0][0] = static_cast<T>(v[0]);
+        value[0][1] = static_cast<T>(v[1]);
+        value[0][2] = static_cast<T>(v[2]);
+        value[0][3] = static_cast<T>(v[3]);
+        value[1][0] = static_cast<T>(v[4]);
+        value[1][1] = static_cast<T>(v[5]);
+        value[1][2] = static_cast<T>(v[6]);
+        value[1][3] = static_cast<T>(v[7]);
+        value[2][0] = static_cast<T>(v[8]);
+        value[2][1] = static_cast<T>(v[9]);
+        value[2][2] = static_cast<T>(v[10]);
+        value[2][3] = static_cast<T>(v[11]);
+        value[3][0] = static_cast<T>(v[12]);
+        value[3][1] = static_cast<T>(v[13]);
+        value[3][2] = static_cast<T>(v[14]);
+        value[3][3] = static_cast<T>(v[15]);
+
+        return;
+    }
+    else {
+        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        if (hasDictionary) {
+            Dictionary dict;
+            getValueHelper<Dictionary>(key, dict);
+            bool canConvert = isConvertible<glm::tmat4x4<T, P>>(dict);
+            if (canConvert) {
+                std::vector<std::string> keys = dict.keys();
+                // sort numerically rather than by ASCII value
+                std::sort(keys.begin(), keys.end(), [](const auto& k1, const auto& k2) {
+                    try {
+                        return std::stoi(k1) < std::stoi(k2);
+                    }
+                    catch (const std::invalid_argument&) {
+                        return k1 < k2;
+                    }
+                });
+                for (size_t i = 0;
+                     i < internal::StorageTypeConverter<glm::tmat4x4<T, P>>::size;
+                     ++i) {
+                    const std::string& key = keys[i];
+                    dict.getValue(key, glm::value_ptr(value)[i]);
+                }
+                return;
+            }
+        }
+    }
+    throw ConversionError(
+        "Error converting key '" + key + "' from type '" +
+        find(key)->second.type().name() + "' to type '" +
+        typeid(glm::tmat4x4<T, P>).name() + "'"
+    );
+}
+
 template <typename T>
 void Dictionary::getValueInternal(const std::string& key, T& value,
                                                            IsStandardVectorType<T>*) const
@@ -231,6 +912,7 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
     if (success) {
         Array v;
         getValueHelper(key, v);
+
         memcpy(glm::value_ptr(value), v.data(), sizeof(T));
         return;
     }

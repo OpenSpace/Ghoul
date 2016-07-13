@@ -118,7 +118,7 @@ public:
      * executed, thus leaving the CommandlineCommands in an undefined state. In the case
      * of any other exception, none of the CommandlineCommands have been executed.
      * \return <code>true</code> if the help message should be displayed by the caller
-     * using the displayHelp method. The method will return <code>false</code> if the 
+     * using the displayHelp method.
      * \throws CommandlineException If there are malformed commandline parameters that
      * were passed in the setCommandLine method. Malformed parameters may be due to
      * invalid commands, multiple commands for commands that do not allow for multiple

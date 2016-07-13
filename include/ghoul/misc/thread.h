@@ -31,21 +31,62 @@
 namespace ghoul {
 namespace thread {
 
-enum class ThreadPriority {
+/**
+ * Determines the priority class for a specific threads. The available classes described
+ * in this enum are most likely to be a subset of the supported classes for a specific
+ * operating system. However, they represent a greatest common factor for Windows and
+ * POSIX threads.
+ */
+enum class ThreadPriorityClass {
+    Idle = 0,
+    Normal,
+    High
+};
+    
+
+/**
+ * Determines the priority level of a thread within a ThreadPriorityClass. The available
+ * levels in this enum are most likely to be a subset of the supported classes for a
+ * specific operating system. However, they represent a reasonable subset for Windows and
+ * POSIX threads.
+ */
+enum class ThreadPriorityLevel {
     Lowest = 0,
     BelowNormal,
     Normal,
     AboveNormal,
     Highest
 };
-
+    
 enum class Background {
     Yes = 0,
     No
 };
 
-void setPriority(std::thread& t, ThreadPriority priority);
+/**
+ * This method sets the priorty of the thread \p t to the ThreadPriorityClass
+ * \p priorityClass and the ThreadPriorityLevel to \p priorityLevel.
+ * \param t The thread for which to set the priority class and level
+ * \param priorityClass The ThreadPriorityClass that is to be set for \p t
+ * \param priorityLevel The ThreadPriorityLevel that is to be set for \p t
+ * \throws ghoul::RuntimeError If a non-recoverable error occurs while setting the thread
+ * class or level
+ */
+void setPriority(
+    std::thread& t,
+    ThreadPriorityClass priorityClass,
+    ThreadPriorityLevel priorityLevel
+);
 
+/**
+ * This method enables or disables the background threading for a specific thread \p t.
+ * This function might not be supported on all platforms and reverts to a no-op on
+ * platforms that are not supported. On platforms that are supported, a background state
+ * will cause the schedule to reduce the resource allocation for the specific thread.
+ * \param t The thread for which to enable the background state
+ * \param background Background::Yes if the background state should be enabled or 
+ * Background::No if the state should be disabled
+ */
 void setThreadBackground(std::thread& t, Background background);
 
 } // namespace thread

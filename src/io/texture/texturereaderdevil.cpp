@@ -31,7 +31,7 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/glm.h>
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 #include <IL/il.h>
 #include <IL/ilu.h>
@@ -174,8 +174,8 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(void* memory,
     ILint depth = ilGetInteger(IL_IMAGE_DEPTH);
 
     if (imageFormat == IL_LUMINANCE || imageFormat == IL_COLOUR_INDEX) {
-        imageFormat = IL_RGB;
-        imageByte *= 3;
+        imageFormat = IL_RGBA;
+        imageByte *= 4;
     }
 
     // Copy data from common data store to own address space

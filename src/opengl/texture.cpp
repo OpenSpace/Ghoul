@@ -24,7 +24,7 @@
  ****************************************************************************************/
 
 #include <ghoul/opengl/texture.h>
-
+#include <cstring>
 #include <ghoul/misc/assert.h>
 
 using glm::detail::int8;
@@ -109,6 +109,7 @@ void Texture::initialize(bool allocateData) {
 void Texture::allocateMemory() {
     unsigned int arraySize = compMul(_dimensions) * _bpp;
     _pixels = new GLubyte[arraySize];
+    std::memset(_pixels, 0, arraySize);
 }
 
 void Texture::destroyMemory() {
