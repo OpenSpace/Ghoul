@@ -130,10 +130,7 @@ FontRenderer::~FontRenderer() {
     glDeleteBuffers(1, &_ibo);
 }
 
-bool FontRenderer::initialize() {
-    LDEBUG("Creating default FontRenderer");
-    ghoul_assert(!_defaultRenderer, "Default FontRenderer was already initialized");
-
+FontRenderer* FontRenderer::createDefault() {
     std::string vsPath = absPath(DefaultVertexShaderPath);
     LDEBUG("Writing default vertex shader to '" << vsPath << "'");
     std::ofstream file(vsPath);
@@ -156,10 +153,17 @@ bool FontRenderer::initialize() {
     
     LDEBUG("Link default font shader");
     program->linkProgramObject();
-    
-    _defaultRenderer = new FontRenderer;
-    _defaultRenderer->_program = std::move(program);
-    
+
+    FontRenderer* fontRenderer = new FontRenderer;
+    fontRenderer->_program = std::move(program);
+
+    return std::move(fontRenderer);
+}
+
+bool FontRenderer::initialize() {
+    LDEBUG("Creating default FontRenderer");
+    ghoul_assert(!_defaultRenderer, "Default FontRenderer was already initialized");    
+    _defaultRenderer = createDefault(); 
     return true;
 }
     
