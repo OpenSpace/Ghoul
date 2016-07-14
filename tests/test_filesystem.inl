@@ -138,3 +138,13 @@ TEST(FileSystemTest, OnChangeCallback) {
     // Check that we can delete the file
     EXPECT_EQ(FileSys.deleteFile(path), true);
 }
+
+TEST(FileSystemTest, OverrideNonExistingPathToken) {
+    EXPECT_NO_THROW(
+        FileSys.registerPathToken(
+            "${AddExistingPathToken}",
+            absPath("${TEST_DIR}"),
+            ghoul::filesystem::FileSystem::Override::Yes
+        )
+    );
+}

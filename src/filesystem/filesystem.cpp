@@ -611,7 +611,8 @@ void FileSystem::registerPathToken(string token, string path, Override override)
 
     if (override == Override::Yes) {
         auto it = _tokenMap.find(token);
-        _tokenMap.erase(it);
+        if (it != _tokenMap.end())
+            _tokenMap.erase(it);
     }
     _tokenMap.emplace(token, path);
 }
