@@ -82,6 +82,15 @@ public:
     
     /// Default destructor that cleans used OpenGL names and the ProgramObject
     ~FontRenderer();
+
+    /**
+    * Creates a new instnace of the FontRenderer with a default ProgramObject.
+    * This method requires the FileSystem to be initialized, as temporary
+    * files containing the source code of the ShaderObjects will be created. 
+    * This method requires a valid OpenGL state.
+    * \return a raw pointer to the new default instance
+    */
+    static FontRenderer* createDefault();
     
     /**
      * Initializes the singleton variant of the FontRenderer with the default
