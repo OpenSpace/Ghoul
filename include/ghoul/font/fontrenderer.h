@@ -134,6 +134,20 @@ public:
      * \param framebufferSize The size of the target framebuffer
      */
     void setFramebufferSize(glm::vec2 framebufferSize);
+
+    /**
+     * Returns the size in pixels that the text would require if it were rendered to
+     * screen.
+     * \param font The Font that is used to render the provided text
+     * \param format The format text that is rendered to the screen. This text can contain
+     * symbolic constants (the same as in printf) to refer to later variable arguments,
+     * which are substituted. The <code>text</code> can also contain '\\n' to have a
+     * linebreak, which is of the correct length with regard to the selected font. This
+     * parameter cannot be a <code>nullptr</code>.
+     * \return A tuple containing the bounding box of the text that was printed and the
+     * number of lines that were printed
+     */
+    BoundingBoxInformation boundingBox(Font& font, const char* format, ...) const;
     
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -146,7 +160,7 @@ public:
      * \param color The base color that is used to render the text
      * \param outlineColor The outline color that is used to render the text if the Font
      * has an outline
-     * \param text The format text that is rendered to the screen. This text can contain
+     * \param format The format text that is rendered to the screen. This text can contain
      * symbolic constants (the same as in printf) to refer to later variable arguments,
      * which are substituted. The <code>text</code> can also contain '\\n' to have a
      * linebreak, which is of the correct length with regard to the selected font. This
@@ -155,7 +169,7 @@ public:
      * number of lines that were printed
      */
     BoundingBoxInformation render(Font& font, glm::vec2 pos, glm::vec4 color,
-        glm::vec4 outlineColor, const char* text, ...) const;
+        glm::vec4 outlineColor, const char* format, ...) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel

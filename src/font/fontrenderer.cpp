@@ -183,6 +183,114 @@ FontRenderer& FontRenderer::defaultRenderer() {
     return *_defaultRenderer;
 }
     
+FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
+                                                               const char* format,
+                                                               ...) const 
+{
+    ghoul_assert(format != nullptr, "No format is provided");
+
+    va_list args;     // Pointer To List Of Arguments
+    va_start(args, format); // Parses The String For Variables
+
+    int s = 1 + vscprintf(format, args);
+    char* buffer = new char[s];
+
+    memset(buffer, 0, s);
+
+#if (_MSC_VER >= 1400) //visual studio 2005 or later
+    vsprintf_s(buffer, s, format, args);
+#else
+    vsprintf(buffer, format, args);
+#endif
+    va_end(args);
+
+    float h = font.height();
+
+    // Splitting the text into separate lines
+    const char* start_line = buffer;
+    std::vector<std::string> lines;
+    const char* c;
+    for (c = buffer; *c; c++) {
+        if (*c == '\n') {
+            std::string line;
+            for (const char* n = start_line; n < c; ++n)
+                line.append(1, *n);
+            lines.push_back(line);
+            start_line = c + 1;
+        }
+    }
+    if (start_line) {
+        std::string line;
+        for (const char* n = start_line; n < c; ++n)
+            line.append(1, *n);
+        lines.push_back(line);
+    }
+
+    unsigned int vertexIndex = 0;
+    std::vector<GLuint> indices;
+    std::vector<GLfloat> vertices;
+    glm::vec2 movingPos = glm::vec2(0.f);
+
+    glm::vec2 size = glm::vec2(0.f);
+    for (const std::string& line : lines) {
+        movingPos.x = 0.f;
+        float width = 0.f;
+        float height = 0.f;
+        for (size_t j = 0; j < line.size(); ++j) {
+            try {
+                wchar_t character = line[j];
+                if (character == wchar_t('\t'))
+                    character = wchar_t(' ');
+
+                const Font::Glyph* glyph = font.glyph(character);
+                if (j > 0)
+                    movingPos.x += glyph->kerning(line[j - 1]);
+
+                float x0 = movingPos.x + glyph->leftBearing();
+                float y0 = movingPos.y + glyph->topBearing();
+                float s0 = glyph->topLeft().x;
+                float t0 = glyph->topLeft().y;
+                float outlineS0 = glyph->outlineTopLeft().x;
+                float outlineT0 = glyph->outlineTopLeft().y;
+
+                float x1 = x0 + glyph->width();
+                float y1 = y0 - glyph->height();
+                float s1 = glyph->bottomRight().x;
+                float t1 = glyph->bottomRight().y;
+                float outlineS1 = glyph->outlineBottomRight().x;
+                float outlineT1 = glyph->outlineBottomRight().y;
+
+                indices.insert(indices.end(), {
+                    vertexIndex, vertexIndex + 1, vertexIndex + 2,
+                    vertexIndex, vertexIndex + 2, vertexIndex + 3
+                });
+                vertexIndex += 4;
+                vertices.insert(vertices.end(), {
+                    x0, y0, s0, t0, outlineS0, outlineT0,
+                    x0, y1, s0, t1, outlineS0, outlineT1,
+                    x1, y1, s1, t1, outlineS1, outlineT1,
+                    x1, y0, s1, t0, outlineS1, outlineT0
+                });
+                movingPos.x += glyph->horizontalAdvance();
+
+                width += glyph->horizontalAdvance();
+                height = std::max(height, static_cast<float>(glyph->height()));
+            }
+            catch (const Font::FontException& e) {
+                LERROR("No glyph for '" << line[j] << " in font '" << font.name() << "'");
+            }
+        }
+        size.x = std::max(size.x, width);
+        size.y += height;
+        movingPos.y -= h;
+    }
+    size.y = (lines.size() - 1) * font.height();
+
+    return { size, static_cast<int>(lines.size()) };
+
+}
+
+
 // I wish I didn't have to copy-n-paste the render function, but *sigh* ---abock
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec2 pos,
