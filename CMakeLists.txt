@@ -49,17 +49,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
 include (${GHOUL_CMAKE_DIR}/handle_external_library.cmake)
 
 #############################
-# Including the source files (with source groups already defined)
-#############################
-include(src/CMakeLists.txt)
-
-#############################
-# Declare the library
-#############################
-add_library(Ghoul STATIC ${GHOUL_SOURCE} ${GHOUL_HEADER})
-target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
-
-#############################
 # Options
 #############################
 if (WIN32)
@@ -77,6 +66,17 @@ option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
 option(GHOUL_MODULE_OPENGL "Enable OpenGL" ON)
 
 option(BUILD_SHARED_LIBS "Build package with shared libraries." OFF)
+
+#############################
+# Including the source files (with source groups already defined)
+#############################
+include(src/CMakeLists.txt)
+
+#############################
+# Declare the library
+#############################
+add_library(Ghoul STATIC ${GHOUL_SOURCE} ${GHOUL_HEADER})
+target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 #############################
 # Compile settings
