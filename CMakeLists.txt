@@ -46,17 +46,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_CMAKE_DIR} ${GHOUL_ROOT_DIR}/
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
 
-include (${GHOUL_CMAKE_DIR}/handle_external_library.cmake)
+include(${GHOUL_CMAKE_DIR}/handle_external_library.cmake)
 
 #############################
 # Options
 #############################
 if (WIN32)
     option(GHOUL_USE_WMI "Use Windows Management Instrumentation" ON)
-    if (GHOUL_USE_WMI)
-        target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_WMI")
-        target_link_libraries(Ghoul "WbemUuid.lib" "shlwapi")
-    endif ()
 endif ()
 option(GHOUL_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
@@ -83,6 +79,13 @@ target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
 #############################
 set_property(TARGET Ghoul PROPERTY CXX_STANDARD 14)
 set_property(TARGET Ghoul PROPERTY CXX_STANDARD_REQUIRED On)
+
+if (WIN32)
+    if (GHOUL_USE_WMI)
+        target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_WMI")
+        target_link_libraries(Ghoul "WbemUuid.lib" "shlwapi")
+    endif ()
+endif ()
 
 if (MSVC)
     target_compile_options(Ghoul PUBLIC "/MP" "/W4" "/wd4201" "/wd4127")
