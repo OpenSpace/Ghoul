@@ -32,15 +32,15 @@
 #endif
 
 TEST(FileSystemTest, HasTestDirectory) {
-    EXPECT_EQ(FileSys.directoryExists("${TEST_DIR}"), true);
+    EXPECT_EQ(FileSys.directoryExists("${TEMPORARY}"), true);
 }
 
 TEST(FileSystemTest, CreateRemoveDirectory) {
     using ghoul::filesystem::FileSystem;
 
-    const std::string tmp = absPath("${TEST_DIR}/tmp");
-    const std::string tmpRecursive1 = absPath("${TEST_DIR}/tmp/tmp2");
-    const std::string tmpRecursive2 = absPath("${TEST_DIR}/tmp/tmp2/tmp3");
+    const std::string tmp = absPath("${TEMPORARY}/tmp");
+    const std::string tmpRecursive1 = absPath("${TEMPORARY}/tmp/tmp2");
+    const std::string tmpRecursive2 = absPath("${TEMPORARY}/tmp/tmp2/tmp3");
 
     EXPECT_NO_THROW(FileSys.createDirectory(tmp));
     EXPECT_THROW(FileSys.createDirectory(tmpRecursive2), FileSystem::FileSystemException);
@@ -55,7 +55,7 @@ TEST(FileSystemTest, CreateRemoveDirectory) {
 TEST(FileSystemTest, Path) {
     using ghoul::filesystem::File;
 
-    std::string path = "${TEST_DIR}/tmpfil.txt";
+    std::string path = "${TEMPORARY}/tmpfil.txt";
     std::string abspath = absPath(path);
 
     File* f1 = new File(path);
@@ -75,7 +75,7 @@ TEST(FileSystemTest, OnChangeCallback) {
     using ghoul::filesystem::File;
     using ghoul::filesystem::FileSystem;
 
-    const char* cpath = "${TEST_DIR}/tmpfil.txt";
+    const char* cpath = "${TEMPORARY}/tmpfil.txt";
     std::string path = absPath(cpath);
     std::ofstream f;
     f.open(path);
@@ -143,7 +143,7 @@ TEST(FileSystemTest, OverrideNonExistingPathToken) {
     EXPECT_NO_THROW(
         FileSys.registerPathToken(
             "${AddExistingPathToken}",
-            absPath("${TEST_DIR}"),
+            absPath("${TEMPORARY}"),
             ghoul::filesystem::FileSystem::Override::Yes
         )
     );

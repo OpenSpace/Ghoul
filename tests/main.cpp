@@ -61,13 +61,11 @@ int main(int argc, char** argv) {
     FileSystem::initialize();
     
     const std::string root = absPath(GHOUL_ROOT_DIR);
-    const std::string testdir = root + "/tests";
     const std::string scriptdir = root + "/scripts";
 
-    const bool extDir = FileSys.directoryExists(testdir);
+    const bool extDir = FileSys.directoryExists(scriptdir);
     if (extDir) {
         FileSys.registerPathToken("${SCRIPTS_DIR}", scriptdir);
-        FileSys.registerPathToken("${TEST_DIR}", testdir);
     }
     else {
         LFATALC("main", "Fix me");
