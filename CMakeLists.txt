@@ -228,7 +228,7 @@ endif ()
 #############################
 # Other applications
 #############################
-option(GHOUL_HAVE_TESTS "Activate the unit tests" OFF)
+option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
 if (GHOUL_HAVE_TESTS)
     file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
     add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})
