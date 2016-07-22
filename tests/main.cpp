@@ -51,21 +51,23 @@ using namespace ghoul::logging;
 #define GHOUL_ROOT_DIR "../../../ext/ghoul"
 #endif
 
-//#define PRINT_OUTPUT
+// #define PRINT_OUTPUT
 
 
 int main(int argc, char** argv) {
-    LogManager::initialize(LogManager::LogLevel::NoLogging);
+    LogManager::initialize(LogManager::LogLevel::Fatal);
     LogMgr.addLog(std::make_shared<ConsoleLog>());
 
     FileSystem::initialize();
     
     const std::string root = absPath(GHOUL_ROOT_DIR);
+    const std::string testdir = root + "/tests";
     const std::string scriptdir = root + "/scripts";
 
-    const bool extDir = FileSys.directoryExists(scriptdir);
+    const bool extDir = FileSys.directoryExists(testdir);
     if (extDir) {
         FileSys.registerPathToken("${SCRIPTS_DIR}", scriptdir);
+        FileSys.registerPathToken("${TEST_DIR}", testdir);
     }
     else {
         LFATALC("main", "Fix me");
