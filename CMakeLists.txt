@@ -23,7 +23,7 @@
 #########################################################################################
 
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
-
+ 
 # Remove RelMinSize configuration option
 set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo CACHE TYPE INTERNAL FORCE)
 mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
