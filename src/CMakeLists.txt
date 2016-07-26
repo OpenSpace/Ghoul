@@ -34,9 +34,6 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.linux.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.osx.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.windows.cpp
-    ${PROJECT_SOURCE_DIR}/src/font/font.cpp
-    ${PROJECT_SOURCE_DIR}/src/font/fontmanager.cpp
-    ${PROJECT_SOURCE_DIR}/src/font/fontrenderer.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderbase.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderlua.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreadermultiformat.cpp
@@ -86,6 +83,8 @@ if (GHOUL_MODULE_FONTRENDERING)
     set(GHOUL_SOURCE
         ${GHOUL_SOURCE}
         ${PROJECT_SOURCE_DIR}/src/font/font.cpp
+        ${PROJECT_SOURCE_DIR}/src/font/fontmanager.cpp
+        ${PROJECT_SOURCE_DIR}/src/font/fontrenderer.cpp
     )
 endif ()
 
@@ -122,9 +121,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/file.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontmanager.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontrenderer.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderlua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreadermultiformat.h
@@ -186,6 +182,8 @@ if (GHOUL_MODULE_FONTRENDERING)
     set(GHOUL_HEADER
         ${GHOUL_HEADER}
         ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontmanager.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontrenderer.h
     )
 endif ()
 
