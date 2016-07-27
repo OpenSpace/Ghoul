@@ -114,7 +114,6 @@ elseif (APPLE)
         "-Wnon-virtual-dtor"
         "-Wold-style-cast"
         "-Woverloaded-virtual"
-        "-Wmisleading-indentation"
     )
     target_compile_definitions(Ghoul PUBLIC "__gl_h_")
 
