@@ -145,7 +145,6 @@ elseif (UNIX) # The order is important as UNIX is also true on MacOS
         "-Wnon-virtual-dtor"
         "-Wold-style-cast"
         "-Woverloaded-virtual"
-        "-Wmisleading-indentation"
         "-Wno-long-long"
         "-pedantic"
     )
