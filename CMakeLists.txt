@@ -88,12 +88,34 @@ if (WIN32)
 endif ()
 
 if (MSVC)
-    target_compile_options(Ghoul PUBLIC "/MP" "/W4" "/wd4201" "/wd4127")
+    target_compile_options(
+        Ghoul
+        PUBLIC
+        "/MP"
+        "/W4"
+        "/w14265"
+        "/wd4201"
+        "/wd4127"
+        "/we4289"
+
+    )
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(Ghoul PUBLIC "/WX")
     endif ()
 elseif (APPLE)
-    target_compile_options(Ghoul PUBLIC "-stdlib=libc++" "-Wno-write-strings" "-Wall")
+    target_compile_options(
+        Ghoul
+        PUBLIC
+        "-stdlib=libc++"
+        "-Wall"
+        "-Wextra"
+        "-Wno-write-strings"
+        "-Wshadow"
+        "-Wnon-virtual-dtor"
+        "-Wold-style-cast"
+        "-Woverloaded-virtual"
+        "-Wmisleading-indentation"
+    )
     target_compile_definitions(Ghoul PUBLIC "__gl_h_")
 
     if (GHOUL_WARNINGS_AS_ERRORS)
@@ -113,7 +135,21 @@ elseif (APPLE)
         ${APP_SERVICES_LIBRARY}
     )
 elseif (UNIX) # The order is important as UNIX is also true on MacOS
-    target_compile_options(Ghoul PUBLIC "-ggdb" "-Wall" "-Wno-long-long" "-pedantic" "-Wextra")
+    target_compile_options(
+        Ghoul
+        PUBLIC
+        "-ggdb"
+        "-Wall"
+        "-Wextra"
+        "-Wno-write-strings"
+        "-Wshadow"
+        "-Wnon-virtual-dtor"
+        "-Wold-style-cast"
+        "-Woverloaded-virtual"
+        "-Wmisleading-indentation"
+        "-Wno-long-long"
+        "-pedantic"
+    )
 
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(Ghoul PUBLIC "-Werror")
