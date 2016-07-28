@@ -74,7 +74,7 @@ std::string glslVersionString() {
     bool isCompatibility = profileMask & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT;
 
     ss << "#version " << versionMajor << versionMinor << "0";
-    ss << (isCore ? "core" : (isCompatibility ? "compatibility" : ""));
+    ss << (isCore ? " core" : (isCompatibility ? " compatibility" : ""));
     return ss.str();
 }
 
