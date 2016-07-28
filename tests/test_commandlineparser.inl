@@ -25,6 +25,8 @@
 
 #include <ghoul/cmdparser/cmdparser>
 
+#include <memory>
+
 // GCC throws a lot of unnecessary
 // warning: deprecated conversion from string constant to ‘char*’
 // warnings
@@ -52,18 +54,14 @@ Test checklist:
 class CommandlineParserTest : public testing::Test {
 protected:
     CommandlineParserTest() {
-        _p = new ghoul::cmdparser::CommandlineParser;
-    }
-
-    ~CommandlineParserTest() {
+        _p = std::make_unique<ghoul::cmdparser::CommandlineParser>();
     }
 
     void reset() {
-        delete _p;
-        _p = new ghoul::cmdparser::CommandlineParser;
+        _p = std::make_unique<ghoul::cmdparser::CommandlineParser>();
     }
 
-    ghoul::cmdparser::CommandlineParser* _p;
+    std::unique_ptr<ghoul::cmdparser::CommandlineParser> _p;
 };
 
 TEST_F(CommandlineParserTest, UnknownCommandsUnhandled) {
