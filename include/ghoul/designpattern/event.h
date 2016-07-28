@@ -45,7 +45,7 @@ namespace ghoul {
          *
          * @param name the unique name of the subscriber
          * @param topic the event topic to subscribe to
-         * @param Listener function that should be called when the event is published
+         * @param listener function that should be called when the event is published
          */
         void subscribe(std::string name, std::string topic, Listener listener);
 

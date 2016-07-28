@@ -33,16 +33,6 @@
 namespace ghoul {
 namespace opengl {
 
-/**
- * This class manages buffer bindings for ATOMIC_COUNTER_BUFFER,
- * GL_SHADER_STORAGE_BUFFER, GL_TRANSFORM_FEEDBACK_BUFFER and GL_UNIFORM_BUFFER.
- * It manages which bindings are currently active and which bindings are free to use.
- * To use a BufferBinding, it has to be #activate%d, and then the #bindingNumber
- * can be retrieved so that it can be used in a block binding.
- * A block binding number is assigned as soon as the first call to #activate,
- * #glEnum, or #bindingNumber is made. If there are no free binding numbers left, an
- * <code>std::runtime_error</code> will be thrown.
- */
 namespace bufferbinding {
     enum class Buffer {
         AtomicCounter,
@@ -51,6 +41,16 @@ namespace bufferbinding {
     };
 }
     
+/**
+ * This class manages buffer bindings for ATOMIC_COUNTER_BUFFER,
+ * GL_SHADER_STORAGE_BUFFER, GL_TRANSFORM_FEEDBACK_BUFFER and GL_UNIFORM_BUFFER.
+ * It manages which bindings are currently active and which bindings are free to use.
+ * To use a BufferBinding, it has to be #ProgramObject::activate%d, and then the
+ * #bindingNumber can be retrieved so that it can be used in a block binding.
+ * A block binding number is assigned as soon as the first call to
+ * #ProgramObject::activate, #ProgramObject::glEnum, or #bindingNumber is made. If there
+ * are no free binding numbers left, an <code>std::runtime_error</code> will be thrown.
+*/
 template <bufferbinding::Buffer T>
 class BufferBinding {
 public:
@@ -103,6 +103,7 @@ public:
     * \return The number of buffer bindings in use
     */
     static unsigned int maxBufferBindings();
+
 private:
     /**
      * This method is called the first time #bindingNumber is

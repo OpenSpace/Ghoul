@@ -44,7 +44,7 @@ namespace fontrendering {
  * 2. Instances of the FontRenderer can be instatiatd that need a custom ProgramObject
  * that handles the rendering. As the rendering is performed in screen space, the
  * size of the rendering window in pixels has to be provided to the FontRenderer
- * (#setWindowSize) for a correct rendering.
+ * (#setFramebufferSize) for a correct rendering.
  * The main methods for rendering are the #render methods and their varieties.
  */
 class FontRenderer {
