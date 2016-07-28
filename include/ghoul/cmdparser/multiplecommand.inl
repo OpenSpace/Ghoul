@@ -33,9 +33,6 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::string name
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
                          std::move(parameterList), 1, MultipleCalls::Yes)
     , _ptr1(ptr1)
-    , _ptr2(nullptr)
-    , _ptr3(nullptr)
-    , _ptr4(nullptr)
 {
     ghoul_assert(_ptr1, "Ptr1 must not be empty");
 }
@@ -48,8 +45,6 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* 
                          std::move(parameterList), 2, MultipleCalls::Yes)
     , _ptr1(ptr1)
     , _ptr2(ptr2)
-    , _ptr3(nullptr)
-    , _ptr4(nullptr)
 {
     ghoul_assert(_ptr1, "Ptr1 must not be empty");
     ghoul_assert(_ptr2, "Ptr2 must not be empty");
@@ -64,7 +59,6 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* 
     , _ptr1(ptr1)
     , _ptr2(ptr2)
     , _ptr3(ptr3)
-    , _ptr4(nullptr)
 {
     ghoul_assert(_ptr1, "Ptr1 must not be empty");
     ghoul_assert(_ptr2, "Ptr2 must not be empty");

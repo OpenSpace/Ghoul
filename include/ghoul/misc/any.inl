@@ -75,7 +75,7 @@ ValueType* any_cast(any* operand) {
     if (operand->type() == typeid(ValueType)) {
         return &static_cast<
             any::holder<typename std::remove_cv_t<ValueType>>*
-        >(operand->content)->held;
+        >(operand->content.get())->held;
     }
     else
         throw bad_any_cast();
@@ -87,7 +87,7 @@ inline const ValueType* any_cast(const any* operand) {
     if (operand->type() == typeid(ValueType)) {
         return &static_cast<
             any::holder<typename std::remove_cv_t<ValueType>>*
-        >(operand->content)->held;
+        >(operand->content.get())->held;
     }
     else
         throw bad_any_cast();

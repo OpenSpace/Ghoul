@@ -277,15 +277,9 @@ void ShaderObject::rebuildFromFile() {
     
     std::ofstream os;
     os.exceptions(std::ofstream::failbit | std::ofstream::badbit);
-    try {
-        os.open(generatedFilename);
-        os << contents;
-        os.close();
-    }
-    catch (const std::ios_base::failure& e) {
-        std::string f = e.what();
-        f = f;
-    }
+    os.open(generatedFilename);
+    os << contents;
+    os.close();
 #endif // GHL_DEBUG
     
     const char* contentPtr =  contents.c_str();
@@ -296,7 +290,6 @@ void ShaderObject::deleteShader() {
     glDeleteShader(_id);
     _id = 0;
 }
-
 
 void ShaderObject::compile() {
     glCompileShader(_id);

@@ -76,7 +76,7 @@ public:
 
 struct SubClassDictionary : public BaseClass {
 public:
-    SubClassDictionary(const ghoul::Dictionary& dict)
+    explicit SubClassDictionary(const ghoul::Dictionary& dict)
         : BaseClass()
     {
         dict.getValue("value1", value1);
@@ -92,7 +92,7 @@ public:
         value1 = 31;
         value2 = 32;
     };
-    SubClassDefaultDictionary(const ghoul::Dictionary& dict) 
+    explicit SubClassDefaultDictionary(const ghoul::Dictionary& dict)
         : BaseClass()
     {
         dict.getValue("value1", value1);

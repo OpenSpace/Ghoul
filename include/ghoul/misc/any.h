@@ -34,6 +34,7 @@
 #define __ANY_H__
 
 #include <algorithm>
+#include <memory>
 #include <type_traits>
 #include <typeinfo>
 
@@ -191,7 +192,7 @@ public:
 
     };
 
-    placeholder* content;
+    std::unique_ptr<placeholder> content;
 };
 
 /**

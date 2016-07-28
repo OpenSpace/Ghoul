@@ -32,9 +32,6 @@ SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, std::string name, std::string 
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), 
                          std::move(parameterList), 1, MultipleCalls::No)
     , _ptr1(ptr1)
-    , _ptr2(nullptr)
-    , _ptr3(nullptr)
-    , _ptr4(nullptr)
 {
     ghoul_assert(_ptr1, "Ptr1 must not be empty");
 }
@@ -47,8 +44,6 @@ SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, std::string name,
                          std::move(parameterList), 2, MultipleCalls::No)
     , _ptr1(ptr1)
     , _ptr2(ptr2)
-    , _ptr3(nullptr)
-    , _ptr4(nullptr)
 {
     ghoul_assert(_ptr1, "Ptr1 must not be empty");
     ghoul_assert(_ptr2, "Ptr2 must not be empty");
@@ -63,7 +58,6 @@ SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, U* ptr2, V* ptr3, std::string 
     , _ptr1(ptr1)
     , _ptr2(ptr2)
     , _ptr3(ptr3)
-    , _ptr4(nullptr)
 {
     ghoul_assert(_ptr1, "Ptr1 must not be empty");
     ghoul_assert(_ptr2, "Ptr2 must not be empty");

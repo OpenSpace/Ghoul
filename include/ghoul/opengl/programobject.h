@@ -3567,7 +3567,7 @@ private:
 
     /// A flag indicating whether the program needs to be recompiled
     /// due to a change in the shader source or in the dictionary.
-    bool _programIsDirty;
+    bool _programIsDirty = true;
 };
 
 } // namespace opengl

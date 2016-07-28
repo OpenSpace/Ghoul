@@ -122,7 +122,6 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
     , _ignoreAttributeLocationError(cpy._ignoreAttributeLocationError)
     , _ignoreSubroutineLocationError(cpy._ignoreSubroutineLocationError)
     , _ignoreSubroutineUniformLocationError(cpy._ignoreSubroutineUniformLocationError)
-    , _programIsDirty(true)
 {
     _id = glCreateProgram();
     if (_id == 0)

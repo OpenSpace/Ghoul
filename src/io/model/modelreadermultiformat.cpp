@@ -55,13 +55,7 @@ namespace ghoul {
             std::vector<Vertex> vertices;
             std::vector<int> indices;
 
-            try {
-                loadModel(filename, vertices, indices);
-            }
-            catch (ghoul::io::ModelReaderBase::ModelReaderException & e)
-            {
-                throw e;
-            }
+            loadModel(filename, vertices, indices);
 
             auto vbo = std::make_unique<opengl::VertexBufferObject>();
             vbo->initialize(vertices, indices);

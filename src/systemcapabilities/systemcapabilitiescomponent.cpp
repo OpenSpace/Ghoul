@@ -70,8 +70,9 @@ void SystemCapabilitiesComponent::initializeWMI() {
     // All rights remain with their original copyright owners
 
     HRESULT hRes = CoInitializeEx(0, COINIT_APARTMENTTHREADED);
-    if (FAILED(hRes))
+    if (FAILED(hRes)) {
         throw WMIError("WMI initialization failed. 'CoInitializeEx' failed", hRes);
+    }
     hRes = CoInitializeSecurity(
         NULL, 
         -1,                          // COM authentication
@@ -82,9 +83,10 @@ void SystemCapabilitiesComponent::initializeWMI() {
         NULL,                        // Authentication info
         EOAC_NONE,                   // Additional capabilities 
         NULL                         // Reserved
-        );
-    if (FAILED(hRes))
+    );
+    if (FAILED(hRes)) {
         throw WMIError("CoInitializeSecurity failed with error code", hRes);
+    }
     LDEBUG("CoInitializeSecurity successful.");
 
     hRes = CoCreateInstance(
@@ -92,7 +94,8 @@ void SystemCapabilitiesComponent::initializeWMI() {
         0,
         CLSCTX_INPROC_SERVER,
         IID_IWbemLocator,
-        reinterpret_cast<LPVOID*>(&_iwbemLocator));
+        reinterpret_cast<LPVOID*>(&_iwbemLocator)
+    );
     if (FAILED(hRes)) {
         _iwbemLocator = nullptr;
         CoUninitialize();
@@ -113,7 +116,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         0,                       // Authority (for example, Kerberos)
         0,                       // Context object 
         &_iwbemServices          // pointer to IWbemServices proxy
-        );
+    );
     if (FAILED(hRes)) {
         _iwbemLocator->Release();
         _iwbemLocator = nullptr;
@@ -135,7 +138,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
         NULL,                        // client identity
         EOAC_NONE                    // proxy capabilities 
-        );
+    );
     if (FAILED(hRes)) {
         _iwbemServices->Release();
         _iwbemServices = nullptr;

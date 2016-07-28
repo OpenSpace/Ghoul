@@ -160,10 +160,10 @@ public:
     void checkParameters(const std::vector<std::string>& parameters) const override;
 
 protected:
-    std::vector<T>* _ptr1;
-    std::vector<U>* _ptr2;
-    std::vector<V>* _ptr3;
-    std::vector<W>* _ptr4;
+    std::vector<T>* _ptr1 = nullptr;
+    std::vector<U>* _ptr2 = nullptr;
+    std::vector<V>* _ptr3 = nullptr;
+    std::vector<W>* _ptr4 = nullptr;
 };
 
 /**
@@ -197,7 +197,7 @@ public:
     void execute(const std::vector<std::string>& /*parameters*/) override;
 
 protected:
-    int* _ptr;
+    int* _ptr = nullptr;
 };
 
 } // namespace cmdparser

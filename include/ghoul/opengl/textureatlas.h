@@ -76,7 +76,7 @@ public:
      * thank the GPU limit for 2D textures. The \p size's depth has to be <code>1</code>,
      * <code>2</code>, <code>3</code>, or <code>4</code>
      */
-    TextureAtlas(glm::ivec3 size);
+    explicit TextureAtlas(glm::ivec3 size);
     
     /**
      * The constructor completely initializes the Texture Atlas. No additional

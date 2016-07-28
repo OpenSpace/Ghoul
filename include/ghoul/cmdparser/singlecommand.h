@@ -158,10 +158,10 @@ public:
     void checkParameters(const std::vector<std::string>& parameters) const override;
 
 protected:
-    T* _ptr1;
-    U* _ptr2;
-    V* _ptr3;
-    W* _ptr4;
+    T* _ptr1 = nullptr;
+    U* _ptr2 = nullptr;
+    V* _ptr3 = nullptr;
+    W* _ptr4 = nullptr;
 };
 
 
@@ -193,7 +193,7 @@ public:
     void execute(const std::vector<std::string>& /*parameters*/);
 
 protected:
-    bool* _ptr;
+    bool* _ptr = nullptr;
 };
 
 } // namespace cmdparser

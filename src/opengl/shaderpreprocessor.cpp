@@ -69,9 +69,12 @@ std::string glslVersionString() {
     glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
     glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profileMask);
     std::stringstream ss;
-    ss << "#version " << versionMajor << versionMinor << "0" << // version is set
-        (profileMask & GL_CONTEXT_CORE_PROFILE_BIT ? " core" :
-         (profileMask & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT ? " compatibility" : ""));
+
+    bool isCore = profileMask & GL_CONTEXT_CORE_PROFILE_BIT;
+    bool isCompatibility = profileMask & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT;
+
+    ss << "#version " << versionMajor << versionMinor << "0";
+    ss << (isCore ? "core" : (isCompatibility ? "compatibility" : ""));
     return ss.str();
 }
 

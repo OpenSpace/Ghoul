@@ -308,8 +308,7 @@ void GeneralCapabilitiesComponent::detectMemory() {
 void GeneralCapabilitiesComponent::detectCPU() {
     // @TODO This function needs cleanup ---abock
 #ifdef WIN32
-    const char* szFeatures[] =
-    {
+    static const std::vector<std::string> szFeatures = {
         "fpu",
         "vme",
         "de",

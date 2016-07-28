@@ -27,23 +27,19 @@
 
 namespace ghoul {
 
-any::any() noexcept
-    : content(0)
-{}
+any::any() noexcept {}
 
 any::any(const any& other)
     : content(other.content ? other.content->clone() : nullptr)
 {}
 
 any::any(any&& other) noexcept
-    : content(other.content)
+    : content(std::move(other.content))
 {
     other.content = nullptr;
 }
 
-any::~any() noexcept {
-    delete content;
-}
+any::~any() noexcept {}
 
 any& any::swap(any& rhs) noexcept {
     std::swap(content, rhs.content);

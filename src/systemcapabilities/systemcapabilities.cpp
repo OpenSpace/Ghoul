@@ -71,24 +71,26 @@ SystemCapabilities& SystemCapabilities::ref() {
 
 void SystemCapabilities::detectCapabilities() {
     clearCapabilities();
-    for (auto& component : _components)
+    for (const auto& component : _components)
         component->detectCapabilities();
 }
 
 void SystemCapabilities::clearCapabilities() {
-    for (auto& component : _components)
+    for (const auto& component : _components)
         component->clearCapabilities();
 }
 
 void SystemCapabilities::logCapabilities(
                                   SystemCapabilitiesComponent::Verbosity verbosity) const
 {
-    for (auto& c : _components) {
-        const std::string _loggerCat = "SystemCapabilitiesComponent." + c->name();
+    for (const auto& c : _components) {
         auto capabilities = c->capabilities();
-        for (SystemCapabilitiesComponent::CapabilityInformation cap : capabilities) {
+        for (const auto& cap : capabilities) {
             if (verbosity >= cap.verbosity)
-                LINFO(cap.description << ": " << cap.value);
+                LINFOC(
+                    "SystemCapabilitiesComponent." + c->name(),
+                    cap.description << ": " << cap.value
+                );
         }
     }
 }
