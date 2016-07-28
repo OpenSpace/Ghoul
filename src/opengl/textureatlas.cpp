@@ -111,9 +111,8 @@ TextureAtlas::TextureAtlas(const TextureAtlas& rhs)
     , _size(rhs._size)
     , _nUsed(rhs._nUsed)
     , _texture(new Texture(*rhs._texture.get()))
-{
-    _data = rhs._data;
-}
+    , _data(rhs._data)
+{}
     
 TextureAtlas::TextureAtlas(TextureAtlas&& rhs)
     : _nodes(std::move(rhs._nodes))

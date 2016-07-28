@@ -53,9 +53,9 @@ Test checklist:
 
 class CommandlineParserTest : public testing::Test {
 protected:
-    CommandlineParserTest() {
-        _p = std::make_unique<ghoul::cmdparser::CommandlineParser>();
-    }
+    CommandlineParserTest()
+        : _p(std::make_unique<ghoul::cmdparser::CommandlineParser>())
+    {}
 
     void reset() {
         _p = std::make_unique<ghoul::cmdparser::CommandlineParser>();
