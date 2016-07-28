@@ -83,6 +83,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         s >> color.a;
         
         if (i > (width * 4)) {
+            delete[] values;
             throw TextureLoadException(
                 filename,
                 fmt::format("Header assured '{}' values but more were found", width),
@@ -97,6 +98,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
     }
 
     if ((width * 4) != i) {
+        delete[] values;
         throw TextureLoadException(
             filename,
             fmt::format("Header assured '{}' values but '{}' were found", width, i / 4.f),
