@@ -154,6 +154,10 @@ template <typename BaseClass>
 template <typename Class>
 void TemplateFactory<BaseClass>::registerClass(std::string className) {
     static_assert(
+        !std::is_abstract<Class>::value,
+        "Class must not be an abstract class"
+    );
+    static_assert(
         std::is_base_of<BaseClass, Class>::value,
         "BaseClass must be the base class of Class"
     );
