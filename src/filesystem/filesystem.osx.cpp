@@ -192,11 +192,7 @@ void FileSystem::callbackHandler(const std::string& path) {
     }
 }
 
-void FileSystem::triggerFilesystemEventsInternalApple() {
-    for (auto d: _directories) {
-        FSEventStreamFlushSync(d.second->_eventStream);
-    }
-}
+void FileSystem::triggerFilesystemEventsInternalApple() {}
 
 } // namespace filesystem
 } // namespace ghoul
