@@ -237,48 +237,50 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
         float width = 0.f;
         float height = 0.f;
         for (size_t j = 0; j < line.size(); ++j) {
+            wchar_t character = line[j];
+            if (character == wchar_t('\t'))
+                character = wchar_t(' ');
+            const Font::Glyph* glyph;
+            
             try {
-                wchar_t character = line[j];
-                if (character == wchar_t('\t'))
-                    character = wchar_t(' ');
-
-                const Font::Glyph* glyph = font.glyph(character);
-                if (j > 0)
-                    movingPos.x += glyph->kerning(line[j - 1]);
-
-                float x0 = movingPos.x + glyph->leftBearing();
-                float y0 = movingPos.y + glyph->topBearing();
-                float s0 = glyph->topLeft().x;
-                float t0 = glyph->topLeft().y;
-                float outlineS0 = glyph->outlineTopLeft().x;
-                float outlineT0 = glyph->outlineTopLeft().y;
-
-                float x1 = x0 + glyph->width();
-                float y1 = y0 - glyph->height();
-                float s1 = glyph->bottomRight().x;
-                float t1 = glyph->bottomRight().y;
-                float outlineS1 = glyph->outlineBottomRight().x;
-                float outlineT1 = glyph->outlineBottomRight().y;
-
-                indices.insert(indices.end(), {
-                    vertexIndex, vertexIndex + 1, vertexIndex + 2,
-                    vertexIndex, vertexIndex + 2, vertexIndex + 3
-                });
-                vertexIndex += 4;
-                vertices.insert(vertices.end(), {
-                    x0, y0, s0, t0, outlineS0, outlineT0,
-                    x0, y1, s0, t1, outlineS0, outlineT1,
-                    x1, y1, s1, t1, outlineS1, outlineT1,
-                    x1, y0, s1, t0, outlineS1, outlineT0
-                });
-                movingPos.x += glyph->horizontalAdvance();
-
-                width += glyph->horizontalAdvance();
-                height = std::max(height, static_cast<float>(glyph->height()));
+                glyph = font.glyph(character);
             }
             catch (const Font::FontException& e) {
-                LERROR("No glyph for '" << line[j] << " in font '" << font.name() << "'");
+                glyph = font.glyph(wchar_t(' '));
             }
+
+            if (j > 0)
+                movingPos.x += glyph->kerning(line[j - 1]);
+
+            float x0 = movingPos.x + glyph->leftBearing();
+            float y0 = movingPos.y + glyph->topBearing();
+            float s0 = glyph->topLeft().x;
+            float t0 = glyph->topLeft().y;
+            float outlineS0 = glyph->outlineTopLeft().x;
+            float outlineT0 = glyph->outlineTopLeft().y;
+
+            float x1 = x0 + glyph->width();
+            float y1 = y0 - glyph->height();
+            float s1 = glyph->bottomRight().x;
+            float t1 = glyph->bottomRight().y;
+            float outlineS1 = glyph->outlineBottomRight().x;
+            float outlineT1 = glyph->outlineBottomRight().y;
+
+            indices.insert(indices.end(), {
+                vertexIndex, vertexIndex + 1, vertexIndex + 2,
+                vertexIndex, vertexIndex + 2, vertexIndex + 3
+            });
+            vertexIndex += 4;
+            vertices.insert(vertices.end(), {
+                x0, y0, s0, t0, outlineS0, outlineT0,
+                x0, y1, s0, t1, outlineS0, outlineT1,
+                x1, y1, s1, t1, outlineS1, outlineT1,
+                x1, y0, s1, t0, outlineS1, outlineT0
+            });
+            movingPos.x += glyph->horizontalAdvance();
+
+            width += glyph->horizontalAdvance();
+            height = std::max(height, static_cast<float>(glyph->height()));
         }
         size.x = std::max(size.x, width);
         size.y += height;
@@ -439,48 +441,50 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
         float width = 0.f;
         float height = 0.f;
         for (size_t j = 0 ; j < line.size(); ++j) {
-            try {
-                wchar_t character = line[j];
-                if (character == wchar_t('\t'))
-                    character = wchar_t(' ');
+            wchar_t character = line[j];
+            if (character == wchar_t('\t'))
+                character = wchar_t(' ');
 
-                const Font::Glyph* glyph = font.glyph(character);
-                if (j > 0)
-                    movingPos.x += glyph->kerning(line[j-1]);
-                
-                float x0 = movingPos.x + glyph->leftBearing();
-                float y0 = movingPos.y + glyph->topBearing();
-                float s0 = glyph->topLeft().x;
-                float t0 = glyph->topLeft().y;
-                float outlineS0 = glyph->outlineTopLeft().x;
-                float outlineT0 = glyph->outlineTopLeft().y;
-                
-                float x1 = x0 + glyph->width();
-                float y1 = y0 - glyph->height();
-                float s1 = glyph->bottomRight().x;
-                float t1 = glyph->bottomRight().y;
-                float outlineS1 = glyph->outlineBottomRight().x;
-                float outlineT1 = glyph->outlineBottomRight().y;
-                
-                indices.insert(indices.end(), {
-                    vertexIndex, vertexIndex + 1, vertexIndex + 2,
-                    vertexIndex, vertexIndex + 2, vertexIndex + 3
-                });
-                vertexIndex += 4;
-                vertices.insert(vertices.end(), {
-                    x0, y0, s0, t0, outlineS0, outlineT0,
-                    x0, y1, s0, t1, outlineS0, outlineT1,
-                    x1, y1, s1, t1, outlineS1, outlineT1,
-                    x1, y0, s1, t0, outlineS1, outlineT0
-                });
-                movingPos.x += glyph->horizontalAdvance();
-                
-                width += glyph->horizontalAdvance();
-                height = std::max(height, static_cast<float>(glyph->height()));
+        const Font::Glyph* glyph;
+            try {
+                glyph = font.glyph(character);
             }
             catch (const Font::FontException& e) {
-                LERROR("No glyph for '" << line[j] << " in font '" << font.name() << "'");
+                glyph = font.glyph(wchar_t(' '));
             }
+        
+            if (j > 0)
+                movingPos.x += glyph->kerning(line[j-1]);
+            
+            float x0 = movingPos.x + glyph->leftBearing();
+            float y0 = movingPos.y + glyph->topBearing();
+            float s0 = glyph->topLeft().x;
+            float t0 = glyph->topLeft().y;
+            float outlineS0 = glyph->outlineTopLeft().x;
+            float outlineT0 = glyph->outlineTopLeft().y;
+            
+            float x1 = x0 + glyph->width();
+            float y1 = y0 - glyph->height();
+            float s1 = glyph->bottomRight().x;
+            float t1 = glyph->bottomRight().y;
+            float outlineS1 = glyph->outlineBottomRight().x;
+            float outlineT1 = glyph->outlineBottomRight().y;
+            
+            indices.insert(indices.end(), {
+                vertexIndex, vertexIndex + 1, vertexIndex + 2,
+                vertexIndex, vertexIndex + 2, vertexIndex + 3
+            });
+            vertexIndex += 4;
+            vertices.insert(vertices.end(), {
+                x0, y0, s0, t0, outlineS0, outlineT0,
+                x0, y1, s0, t1, outlineS0, outlineT1,
+                x1, y1, s1, t1, outlineS1, outlineT1,
+                x1, y0, s1, t0, outlineS1, outlineT0
+            });
+            movingPos.x += glyph->horizontalAdvance();
+            
+            width += glyph->horizontalAdvance();
+            height = std::max(height, static_cast<float>(glyph->height()));
         }
         size.x = std::max(size.x, width);
         size.y += height;
