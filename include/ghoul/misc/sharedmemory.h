@@ -174,6 +174,13 @@ public:
      */
     void releaseLock();
     
+    /**
+     * Returns the name for the SharedMemory object that can be used to remove the data
+     * that this object depends on.
+     * \return The name for this SharedMemory object
+     */
+    std::string name() const;
+    
 private:
     /**
      * This pointer points to the location in local address space where the shared memory

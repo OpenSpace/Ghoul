@@ -275,6 +275,10 @@ size_t SharedMemory::size() const {
 #endif
 }
     
+std::string SharedMemory::name() const {
+    return _name;
+}
+    
 void SharedMemory::acquireLock() {
     Header* h = header(_memory);
     while (h->mutex.test_and_set()) {}
