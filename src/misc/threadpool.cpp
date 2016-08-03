@@ -25,6 +25,8 @@
 
 #include <ghoul/misc/threadpool.h>
 
+#include <mutex>
+
 namespace ghoul {
 
 ThreadPool::ThreadPool(size_t numThreads) {
