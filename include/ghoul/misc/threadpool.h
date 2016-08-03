@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2014                                                               *
+ * Copyright (c) 2012-2016                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -23,80 +23,46 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifdef __unix__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion-null"
-#endif // __unix__
+#ifndef __THREADPOOL_H__
+#define __THREADPOOL_H__
 
-#include "gtest/gtest.h"
+#include <memory>
+#include <thread>
+#include <queue>
 
-#include <ghoul/cmdparser/cmdparser>
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
+// Implementation based on http://progsch.net/wordpress/?p=81
 
-#include "tests/test_buffer.inl"
-#include "tests/test_commandlineparser.inl"
-#include "tests/test_common.inl"
-//#include "tests/test_configurationmanager.inl"
-#include "tests/test_dictionary.inl"
-#include "tests/test_filesystem.inl"
-#include "tests/test_luatodictionary.inl"
-#include "tests/test_templatefactory.inl"
-#include "tests/test_threadpool.inl"
+namespace ghoul {
 
-using namespace ghoul::cmdparser;
-using namespace ghoul::filesystem;
-using namespace ghoul::logging;
+class ThreadPool {
+public:
+    ThreadPool(size_t numThreads);
+    ~ThreadPool();
 
-#ifndef GHOUL_ROOT_DIR
-#define GHOUL_ROOT_DIR "../../../ext/ghoul"
-#endif
+    void enqueue(std::function<void()> f);
+    void clearTasks();
 
-// #define PRINT_OUTPUT
+private:
+    class Worker {
+    public:
+        Worker(ThreadPool& pool);
+        void operator()();
 
-
-int main(int argc, char** argv) {
-    LogManager::initialize(LogManager::LogLevel::Fatal);
-    LogMgr.addLog(std::make_shared<ConsoleLog>());
-
-    FileSystem::initialize();
+        ThreadPool& pool;
+    };
     
-    const std::string root = absPath(GHOUL_ROOT_DIR);
-    const std::string testdir = root + "/tests";
-    const std::string scriptdir = root + "/scripts";
+    friend class Worker;
+    
+    std::vector<std::thread> _workers;
 
-    const bool extDir = FileSys.directoryExists(testdir);
-    if (extDir) {
-        FileSys.registerPathToken("${SCRIPTS_DIR}", scriptdir);
-        FileSys.registerPathToken("${TEST_DIR}", testdir);
-    }
-    else {
-        LFATALC("main", "Fix me");
-        return 0;
-    }
+    std::deque<std::function<void()>> _tasks;
 
-#ifdef PRINT_OUTPUT
-    testing::internal::CaptureStdout();
-    testing::internal::CaptureStderr();
-#endif
+    std::mutex _queueMutex;
+    std::condition_variable _condition;
 
-    testing::InitGoogleTest(&argc, argv);
-    bool b = RUN_ALL_TESTS();
+    bool _stopping;
+};
 
-#ifdef PRINT_OUTPUT
-    std::string output = testing::internal::GetCapturedStdout();
-    std::string error = testing::internal::GetCapturedStderr();
+} // namespace openspace
 
-    std::ofstream o("output.txt");
-    o << output;
-
-    std::ofstream e("error.txt");
-    e << error;
-#endif
-
-    return b;
-}
-
-#ifdef __unix__
-#pragma GCC diagnostic pop
-#endif // __unix__
+#endif // __THREAD_POOL_H__

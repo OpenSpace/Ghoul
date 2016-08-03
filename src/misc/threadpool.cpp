@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2014                                                               *
+ * Copyright (c) 2012-2016                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -23,80 +23,84 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifdef __unix__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion-null"
-#endif // __unix__
+#include <ghoul/misc/threadpool.h>
 
-#include "gtest/gtest.h"
+namespace ghoul {
 
-#include <ghoul/cmdparser/cmdparser>
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
-
-#include "tests/test_buffer.inl"
-#include "tests/test_commandlineparser.inl"
-#include "tests/test_common.inl"
-//#include "tests/test_configurationmanager.inl"
-#include "tests/test_dictionary.inl"
-#include "tests/test_filesystem.inl"
-#include "tests/test_luatodictionary.inl"
-#include "tests/test_templatefactory.inl"
-#include "tests/test_threadpool.inl"
-
-using namespace ghoul::cmdparser;
-using namespace ghoul::filesystem;
-using namespace ghoul::logging;
-
-#ifndef GHOUL_ROOT_DIR
-#define GHOUL_ROOT_DIR "../../../ext/ghoul"
-#endif
-
-// #define PRINT_OUTPUT
-
-
-int main(int argc, char** argv) {
-    LogManager::initialize(LogManager::LogLevel::Fatal);
-    LogMgr.addLog(std::make_shared<ConsoleLog>());
-
-    FileSystem::initialize();
-    
-    const std::string root = absPath(GHOUL_ROOT_DIR);
-    const std::string testdir = root + "/tests";
-    const std::string scriptdir = root + "/scripts";
-
-    const bool extDir = FileSys.directoryExists(testdir);
-    if (extDir) {
-        FileSys.registerPathToken("${SCRIPTS_DIR}", scriptdir);
-        FileSys.registerPathToken("${TEST_DIR}", testdir);
+ThreadPool::ThreadPool(size_t numThreads) {
+    for (size_t i = 0; i < numThreads; ++i) {
+        _workers.push_back(std::thread(Worker(*this)));
     }
-    else {
-        LFATALC("main", "Fix me");
-        return 0;
-    }
-
-#ifdef PRINT_OUTPUT
-    testing::internal::CaptureStdout();
-    testing::internal::CaptureStderr();
-#endif
-
-    testing::InitGoogleTest(&argc, argv);
-    bool b = RUN_ALL_TESTS();
-
-#ifdef PRINT_OUTPUT
-    std::string output = testing::internal::GetCapturedStdout();
-    std::string error = testing::internal::GetCapturedStderr();
-
-    std::ofstream o("output.txt");
-    o << output;
-
-    std::ofstream e("error.txt");
-    e << error;
-#endif
-
-    return b;
 }
 
-#ifdef __unix__
-#pragma GCC diagnostic pop
-#endif // __unix__
+// the destructor joins all threads
+ThreadPool::~ThreadPool() {
+    // stop all threads
+    
+    _stopping = true;
+    _condition.notify_all();
+    
+    // join them
+    for (size_t i = 0; i < _workers.size(); ++i) {
+        _workers[i].join();
+    }
+}
+
+    
+    
+ThreadPool::Worker::Worker(ThreadPool& pool)
+    : pool(pool)
+{
+
+}
+
+void ThreadPool::Worker::operator()() {
+    std::function<void()> task;
+    while (true) {
+        // acquire lock
+        {
+            std::unique_lock<std::mutex> lock(pool._queueMutex);
+
+            // look for a work item
+            while (!pool._stopping && pool._tasks.empty()) {
+                // if there are none wait for notification
+                pool._condition.wait(lock);
+            }
+
+            if (pool._stopping) { // exit if the pool is stopped
+                return;
+            }
+
+            // get the task from the queue
+            task = pool._tasks.front();
+            pool._tasks.pop_front();
+
+        }// release lock
+
+        // execute the task
+        task();
+    }
+}
+
+
+// add new work item to the pool
+void ThreadPool::enqueue(std::function<void()> f) {
+    { // acquire lock
+        std::unique_lock<std::mutex> lock(_queueMutex);
+
+        // add the task
+        _tasks.push_back(f);
+    } // release lock
+
+      // wake up one thread
+    _condition.notify_one();
+}
+
+void ThreadPool::clearTasks() {
+    { // acquire lock
+        std::unique_lock<std::mutex> lock(_queueMutex);
+        _tasks.clear();
+    } // release lock
+}
+
+} // namespace openspace

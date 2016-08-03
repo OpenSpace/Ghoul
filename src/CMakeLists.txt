@@ -71,6 +71,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/misc/stacktrace.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/templatefactory.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/thread.cpp
+    ${PROJECT_SOURCE_DIR}/src/misc/threadpool.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/typeinfo.cpp
     ${PROJECT_SOURCE_DIR}/src/systemcapabilities/generalcapabilitiescomponent.cpp
     ${PROJECT_SOURCE_DIR}/src/systemcapabilities/openglcapabilitiescomponent.cpp
@@ -167,6 +168,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/thread.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/threadpool.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/typeinfo.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/typeinfo.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/generalcapabilitiescomponent.h

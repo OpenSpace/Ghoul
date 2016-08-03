@@ -23,80 +23,30 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifdef __unix__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion-null"
-#endif // __unix__
-
 #include "gtest/gtest.h"
 
-#include <ghoul/cmdparser/cmdparser>
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
-
-#include "tests/test_buffer.inl"
-#include "tests/test_commandlineparser.inl"
-#include "tests/test_common.inl"
-//#include "tests/test_configurationmanager.inl"
-#include "tests/test_dictionary.inl"
-#include "tests/test_filesystem.inl"
-#include "tests/test_luatodictionary.inl"
-#include "tests/test_templatefactory.inl"
-#include "tests/test_threadpool.inl"
-
-using namespace ghoul::cmdparser;
-using namespace ghoul::filesystem;
-using namespace ghoul::logging;
-
-#ifndef GHOUL_ROOT_DIR
-#define GHOUL_ROOT_DIR "../../../ext/ghoul"
-#endif
-
-// #define PRINT_OUTPUT
+#include <ghoul/misc/threadpool.h>
 
 
-int main(int argc, char** argv) {
-    LogManager::initialize(LogManager::LogLevel::Fatal);
-    LogMgr.addLog(std::make_shared<ConsoleLog>());
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <glm/glm.hpp>
 
-    FileSystem::initialize();
+class ThreadPoolTest : public testing::Test {};
+
+
+TEST_F(ThreadPoolTest, Basic) {
+    ghoul::ThreadPool pool(5);
+
+    int val = 0;
     
-    const std::string root = absPath(GHOUL_ROOT_DIR);
-    const std::string testdir = root + "/tests";
-    const std::string scriptdir = root + "/scripts";
-
-    const bool extDir = FileSys.directoryExists(testdir);
-    if (extDir) {
-        FileSys.registerPathToken("${SCRIPTS_DIR}", scriptdir);
-        FileSys.registerPathToken("${TEST_DIR}", testdir);
-    }
-    else {
-        LFATALC("main", "Fix me");
-        return 0;
+    for (int i = 0; i < 10; ++i) {
+        pool.enqueue([&val, i]() {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100 + 10*i));
+            val++;
+        });
     }
 
-#ifdef PRINT_OUTPUT
-    testing::internal::CaptureStdout();
-    testing::internal::CaptureStderr();
-#endif
-
-    testing::InitGoogleTest(&argc, argv);
-    bool b = RUN_ALL_TESTS();
-
-#ifdef PRINT_OUTPUT
-    std::string output = testing::internal::GetCapturedStdout();
-    std::string error = testing::internal::GetCapturedStderr();
-
-    std::ofstream o("output.txt");
-    o << output;
-
-    std::ofstream e("error.txt");
-    e << error;
-#endif
-
-    return b;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    EXPECT_EQ(10, val) << "10 tasks taking 100 to 190 ms on 5 threads should take less than 1000 ms";
 }
-
-#ifdef __unix__
-#pragma GCC diagnostic pop
-#endif // __unix__
