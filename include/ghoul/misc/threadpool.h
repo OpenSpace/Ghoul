@@ -26,6 +26,7 @@
 #ifndef __THREADPOOL_H__
 #define __THREADPOOL_H__
 
+#include <condition_variable>
 #include <mutex>
 #include <thread>
 #include <queue>
