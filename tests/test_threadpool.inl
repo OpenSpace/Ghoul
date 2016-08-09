@@ -27,21 +27,38 @@
 
 #include <ghoul/misc/threadpool.h>
 
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-#include <glm/glm.hpp>
-
 class ThreadPoolTest : public testing::Test {};
 
+TEST_F(ThreadPoolTest, Invariants) {
+    ghoul::ThreadPool pool(1);
+    
+    ASSERT_EQ(1, pool.nIdle());
+    ASSERT_EQ(1, pool.size());
+}
+
+TEST_F(ThreadPoolTest, ResizeExpand) {
+    ghoul::ThreadPool pool(1);
+    
+    ASSERT_EQ(1, pool.size());
+    
+    pool.resize(5);
+    ASSERT_EQ(5, pool.size());
+}
+
+TEST_F(ThreadPoolTest, ResizeShrink) {
+    ghoul::ThreadPool pool(5);
+    
+    pool.resize(1);
+    ASSERT_EQ(1, pool.size());
+}
 
 TEST_F(ThreadPoolTest, Basic) {
     ghoul::ThreadPool pool(5);
 
-    int val = 0;
-    
+    std::atomic_int val(0);
+
     for (int i = 0; i < 10; ++i) {
-        pool.enqueue([&val, i]() {
+        pool.push([&val, i]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(100 + 10*i));
             val++;
         });
@@ -49,4 +66,66 @@ TEST_F(ThreadPoolTest, Basic) {
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     EXPECT_EQ(10, val) << "10 tasks taking 100 to 190 ms on 5 threads should take less than 1000 ms";
+}
+
+TEST_F(ThreadPoolTest, ReturnValue) {
+    // Checking whether the return value is set correctly
+    
+    ghoul::ThreadPool pool(1);
+    
+    std::future<int> f = pool.push([]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        return 1337;
+    });
+    ASSERT_EQ(true, f.valid());
+    
+    f.wait();
+    
+    EXPECT_EQ(true, f.valid());
+    EXPECT_EQ(1337, f.get());
+}
+
+TEST_F(ThreadPoolTest, Parallelism) {
+    // Queueing 5 tasks that take a second each on a thread pool with five workers
+    // should take about 1 second
+    
+    const int Epsilon = 10;
+    
+    ghoul::ThreadPool pool(5);
+    
+    auto start = std::chrono::high_resolution_clock::now();
+    
+    pool.push([](){ std::this_thread::sleep_for(std::chrono::seconds(1)); });
+    pool.push([](){ std::this_thread::sleep_for(std::chrono::seconds(1)); });
+    pool.push([](){ std::this_thread::sleep_for(std::chrono::seconds(1)); });
+    pool.push([](){ std::this_thread::sleep_for(std::chrono::seconds(1)); });
+    pool.push([](){ std::this_thread::sleep_for(std::chrono::seconds(1)); });
+    
+    pool.stop(ghoul::ThreadPool::Waiting::Yes);
+    
+    auto end = std::chrono::high_resolution_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    EXPECT_GE(1000 + Epsilon, ms) << "Queuing operation took longer than 1000 ms";
+    EXPECT_LE(1000 - Epsilon, ms) << "Queuing operation took less than 1000 ms";
+}
+
+TEST_F(ThreadPoolTest, MissingParallelism) {
+    // Queueing 2 tasks that take a second each on a thread pool with only one
+    // workers should take about 2 seconds
+    
+    const int Epsilon = 10;
+
+    ghoul::ThreadPool pool(1);
+    
+    auto start = std::chrono::high_resolution_clock::now();
+    
+    pool.push([](){ std::this_thread::sleep_for(std::chrono::seconds(1)); });
+    pool.push([](){ std::this_thread::sleep_for(std::chrono::seconds(1)); });
+    
+    pool.stop(ghoul::ThreadPool::Waiting::Yes);
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    EXPECT_GE(2000 + Epsilon, ms) << "Queuing operation took longer than 5 ms";
+    EXPECT_LE(2000 - Epsilon, ms) << "Queuing operation took longer than 5 ms";
 }

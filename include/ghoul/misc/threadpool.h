@@ -21,49 +21,103 @@
  * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
+ *****************************************************************************************
+ * Based on the CPTL implementation by Vitaliy Vitsentiy found here:                     *
+ *
+ *****************************************************************************************
+ *                                                                                       *
+ *  Copyright (C) 2014 by Vitaliy Vitsentiy                                              *
+ *                                                                                       *
+ *  Licensed under the Apache License, Version 2.0 (the "License");                      *
+ *  you may not use this file except in compliance with the License.                     *
+ *  You may obtain a copy of the License at                                              *
+ *                                                                                       *
+ *     http://www.apache.org/licenses/LICENSE-2.0                                        *
+ *                                                                                       *
+ *  Unless required by applicable law or agreed to in writing, software                  *
+ *  distributed under the License is distributed on an "AS IS" BASIS,                    *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.             *
+ *  See the License for the specific language governing permissions and                  *
+ *  limitations under the License.                                                       *
+ *                                                                                       *
  ****************************************************************************************/
 
 #ifndef __THREADPOOL_H__
 #define __THREADPOOL_H__
 
-#include <condition_variable>
+#include <future>
+#include <memory>
 #include <mutex>
-#include <thread>
 #include <queue>
-
-// Implementation based on http://progsch.net/wordpress/?p=81
+#include <thread>
 
 namespace ghoul {
-
+    
 class ThreadPool {
 public:
-    ThreadPool(size_t numThreads);
+    enum class Waiting { Yes, No };
+    
+    ThreadPool(int nThreads = 1);
+    
     ~ThreadPool();
+    
+    int size() const;
+    
+    int nIdle() const;
+    
+    void resize(int nThreads);
+    
+    void clearQueue();
+    
+    void stop(Waiting shouldWait = Waiting::Yes);
 
-    void enqueue(std::function<void()> f);
-    void clearTasks();
-
+    template<typename F, typename... Rest>
+    auto push(F&& f, Rest&&... rest) -> std::future<decltype(f(rest...))>; 
+    
 private:
-    class Worker {
-    public:
-        Worker(ThreadPool& pool);
-        void operator()();
+    using Task = std::function<void()>;
 
-        ThreadPool& pool;
+    struct Worker {
+        std::unique_ptr<std::thread> thread;
+        std::shared_ptr<std::atomic<bool>> shouldStop;
     };
     
-    friend class Worker;
+    class TaskQueue {
+    public:
+        std::tuple<Task, bool> pop();
+        void push(Task task);
+        bool isEmpty() const;
+        size_t size() const;
     
-    std::vector<std::thread> _workers;
+    private:
+        std::queue<ThreadPool::Task> _queue;
 
-    std::deque<std::function<void()>> _tasks;
+        mutable std::mutex _mutex;
+    };
+    
+    ThreadPool(const ThreadPool&) = delete;
+    ThreadPool(ThreadPool&&) = delete;
+    ThreadPool& operator=(const ThreadPool&) = delete;
+    ThreadPool& operator=(ThreadPool&&) = delete;
+    
+    void setThread(int i);
+    
+    
+    std::vector<Worker> _workers;
 
-    std::mutex _queueMutex;
-    std::condition_variable _condition;
+    TaskQueue _taskQueue;
 
-    bool _stopping;
+    std::atomic_bool _isDone;
+    std::atomic_bool _isStop;
+    std::atomic_int _nWaiting;  // how many threads are waiting
+    
+    std::mutex _mutex;
+    std::condition_variable _cv;
+    
 };
 
-} // namespace openspace
+} // namespace ghoul
 
-#endif // __THREAD_POOL_H__
+#include "threadpool.inl"
+
+#endif // __THREADPOOL_H__

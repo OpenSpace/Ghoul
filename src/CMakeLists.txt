@@ -169,6 +169,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/thread.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/threadpool.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/threadpool.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/typeinfo.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/typeinfo.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/generalcapabilitiescomponent.h

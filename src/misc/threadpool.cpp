@@ -27,80 +27,165 @@
 
 namespace ghoul {
 
-ThreadPool::ThreadPool(size_t numThreads) {
-    for (size_t i = 0; i < numThreads; ++i) {
-        _workers.push_back(std::thread(Worker(*this)));
-    }
-}
-
-// the destructor joins all threads
-ThreadPool::~ThreadPool() {
-    // stop all threads
-    
-    _stopping = true;
-    _condition.notify_all();
-    
-    // join them
-    for (size_t i = 0; i < _workers.size(); ++i) {
-        _workers[i].join();
-    }
-}
-
-    
-    
-ThreadPool::Worker::Worker(ThreadPool& pool)
-    : pool(pool)
+ThreadPool::ThreadPool(int nThreads)
+    : _nWaiting(nThreads)
+    , _isStop(false)
+    , _isDone(false)
 {
-
+    resize(nThreads);
+}
+    
+ThreadPool::~ThreadPool() {
+    stop(Waiting::Yes);
+}
+    
+int ThreadPool::size() const {
+    return static_cast<int>(_workers.size());
 }
 
-void ThreadPool::Worker::operator()() {
-    std::function<void()> task;
-    while (true) {
-        // acquire lock
-        {
-            std::unique_lock<std::mutex> lock(pool._queueMutex);
+int ThreadPool::nIdle() const {
+    return _nWaiting;
+}
 
-            // look for a work item
-            while (!pool._stopping && pool._tasks.empty()) {
-                // if there are none wait for notification
-                pool._condition.wait(lock);
+void ThreadPool::resize(int nThreads) {
+    if (!_isStop && !_isDone) {
+        int oldNThreads = size();
+        if (oldNThreads <= nThreads) {
+            // if the number of threads is increased
+            _workers.resize(nThreads);
+            
+            for (int i = oldNThreads; i < nThreads; ++i) {
+                setThread(i);
             }
+        }
+        else {
+            // the number of threads is decreased
+            for (int i = oldNThreads - 1; i >= nThreads; --i) {
+                // this thread will finish
+                *(_workers[i].shouldStop) = true;
+                _workers[i].thread->detach();
+            }
+            {
+                // stop the detached threads that were waiting
+                std::unique_lock<std::mutex> lock(_mutex);
+                _cv.notify_all();
+            }
+            // safe to delete because the threads are detached
+            _workers.resize(nThreads);
+        }
+    }
+    
+}
+    
+void ThreadPool::clearQueue() {
+    std::packaged_task<void()> dummy;
+    while (!_taskQueue.isEmpty()) {
+        _taskQueue.pop();
+    }
+}
 
-            if (pool._stopping) { // exit if the pool is stopped
+void ThreadPool::stop(Waiting shouldWait) {
+    if (shouldWait == Waiting::No) {
+        if (_isStop)
+            return;
+        _isStop = true;
+        for (int i = 0, n = this->size(); i < n; ++i) {
+            *(_workers[i].shouldStop) = true;
+        }
+        clearQueue();  // empty the queue
+    }
+    else {
+        if (_isDone || _isStop)
+            return;
+        _isDone = true;  // give the waiting threads a command to finish
+    }
+    {
+        std::unique_lock<std::mutex> lock(_mutex);
+        _cv.notify_all();  // stop all waiting threads
+    }
+    for (int i = 0; i < size(); ++i) {  // wait for the computing threads to finish
+        if (_workers[i].thread->joinable()) {
+            _workers[i].thread->join();
+        }
+    }
+    // if there were no threads in the pool but some functors in the queue, the functors are not deleted by the threads
+    // therefore delete them here
+    clearQueue();
+    _workers.clear();
+}
+
+
+void ThreadPool::setThread(int i) {
+    // a copy of the shared ptr to the flag
+    auto shouldTerminate = std::make_shared<std::atomic_bool>(false);
+    // capturing the flag by value to maintain a copy of the shared_ptr
+    auto workerLoop = [this, shouldTerminate]() {
+        std::function<void()> f;
+        bool hasItem;
+        std::tie(f, hasItem) = _taskQueue.pop();
+        
+        while (true) {
+            while (hasItem) {
+                // if there is anything in the queue
+                f();
+                
+                if (*shouldTerminate) {
+                    return;
+                }
+                else {
+                    std::tie(f, hasItem) = _taskQueue.pop();
+                }
+            }
+            
+            // the queue is empty here, wait for the next command
+            std::unique_lock<std::mutex> lock(_mutex);
+            ++_nWaiting;
+            _cv.wait(
+                     lock,
+                     [this, &f, &hasItem, shouldTerminate]() {
+                         std::tie(f, hasItem) = _taskQueue.pop();
+                         return hasItem || _isDone || *shouldTerminate;
+                     }
+                     );
+            --_nWaiting;
+            if (!hasItem) {
+                // if the queue is empty and this->isDone == true or *flag then return
                 return;
             }
+        }
+    };
+    
+    _workers[i] = {
+        std::make_unique<std::thread>(workerLoop),
+        std::move(shouldTerminate)
+    };
+}
 
-            // get the task from the queue
-            task = pool._tasks.front();
-            pool._tasks.pop_front();
-
-        }// release lock
-
-        // execute the task
-        task();
+std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
+    std::unique_lock<std::mutex> lock(_mutex);
+    if (_queue.empty()) {
+        return { Task(), false };
+    }
+    else {
+        Task t = std::move(_queue.front());
+        _queue.pop();
+        return { std::move(t), true };
     }
 }
-
-
-// add new work item to the pool
-void ThreadPool::enqueue(std::function<void()> f) {
-    { // acquire lock
-        std::unique_lock<std::mutex> lock(_queueMutex);
-
-        // add the task
-        _tasks.push_back(f);
-    } // release lock
-
-      // wake up one thread
-    _condition.notify_one();
+    
+void ThreadPool::TaskQueue::push(ThreadPool::Task task) {
+    std::unique_lock<std::mutex> lock(_mutex);
+    _queue.push(std::move(task));
 }
-
-void ThreadPool::clearTasks() {
-    { // acquire lock
-        std::unique_lock<std::mutex> lock(_queueMutex);
-        _tasks.clear();
-    } // release lock
+    
+bool ThreadPool::TaskQueue::isEmpty() const {
+    std::unique_lock<std::mutex> lock(_mutex);
+    return _queue.empty();
+}
+    
+size_t ThreadPool::TaskQueue::size() const {
+    std::unique_lock<std::mutex> lock(_mutex);
+    return _queue.size();
 }
 
 } // namespace openspace
