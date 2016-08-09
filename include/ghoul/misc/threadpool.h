@@ -80,6 +80,8 @@ public:
     
     int nIdleThreads() const;
     
+    int nRemainingTasks() const;
+    
     void clearQueue();
     
     template<typename F, typename... Rest>

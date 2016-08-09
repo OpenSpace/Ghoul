@@ -46,7 +46,10 @@ ThreadPool::ThreadPool(int nThreads, Func workerInit, Func workerDeinit)
     
 ThreadPool::~ThreadPool() {
     if (isRunning()) {
-        stop();
+        // We have to wait for the remaining tasks and cannot detach as the lambda
+        // expressions for the Workers have a copy of 'this'. So if we don't exist
+        // anymore when they are destroyed, it is a problem
+        stop(RunRemainingTasks::Yes, DetachThreads::No);
     }
 }
 
@@ -97,36 +100,36 @@ int ThreadPool::nIdleThreads() const {
     return _nWaiting;
 }
 
+int ThreadPool::nRemainingTasks() const {
+    return static_cast<int>(_taskQueue.size());
+}
+    
 void ThreadPool::resize(int nThreads) {
     ghoul_assert(nThreads > 0, "nThreads must be bigger than 0");
-    
-//    if (_isRunning) {
-        int oldNThreads = size();
-        if (oldNThreads <= nThreads) {
-            // if the number of threads is increased
-            _workers.resize(nThreads);
-            
-            for (int i = oldNThreads; i < nThreads; ++i) {
-                activateWorker(_workers[i]);
-            }
+
+    int oldNThreads = size();
+    if (oldNThreads <= nThreads) {
+        // if the number of threads has increased
+        _workers.resize(nThreads);
+        
+        for (int i = oldNThreads; i < nThreads; ++i) {
+            activateWorker(_workers[i]);
         }
-        else {
-            // the number of threads is decreased
-            for (int i = oldNThreads - 1; i >= nThreads; --i) {
-                // this thread will finish
-                *(_workers[i].shouldStop) = true;
-                _workers[i].thread->detach();
-            }
-//            {
-                // stop the detached threads that were waiting
-//                std::unique_lock<std::mutex> lock(_mutex);
-                _cv.notify_all();
-//            }
-            // safe to delete because the threads are detached
-            _workers.resize(nThreads);
+    }
+    else {
+        // the number of threads has decreased
+        for (int i = oldNThreads - 1; i >= nThreads; --i) {
+            // Tell the superfluous threads to finish
+            *(_workers[i].shouldStop) = true;
+            _workers[i].thread->detach();
         }
-//    }
-    
+        // The notification will do nothing for the first 'nThreads' threads, but it
+        // will cause the remaining 'nThreads - oldNThreads' to return
+        _cv.notify_all();
+        
+        // safe to delete because the threads are detached
+        _workers.resize(nThreads);
+    }
 }
     
 void ThreadPool::clearQueue() {
@@ -134,7 +137,6 @@ void ThreadPool::clearQueue() {
         _taskQueue.pop();
     }
 }
-
 
 void ThreadPool::activateWorker(Worker& worker) {
     // a copy of the shared ptr to the flag
