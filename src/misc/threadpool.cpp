@@ -25,37 +25,89 @@
 
 #include <ghoul/misc/threadpool.h>
 
+#include <ghoul/misc/assert.h>
+
 namespace ghoul {
 
-ThreadPool::ThreadPool(int nThreads)
-    : _nWaiting(nThreads)
-    , _isStop(false)
-    , _isDone(false)
+using Func = std::function<void()>;
+    
+ThreadPool::ThreadPool(int nThreads, Func workerInit, Func workerDeinit)
+    : _nWaiting(0)
+    , _isRunning(true)
+    , _workerInitialization(std::move(workerInit))
+    , _workerDeinitialization(std::move(workerDeinit))
 {
+    ghoul_assert(nThreads > 0, "nThreads must be bigger than 0");
+    ghoul_assert(workerInit, "workerInit must be a valid function");
+    ghoul_assert(workerDeinit, "workerDeinit must be a valid function");
+    
     resize(nThreads);
 }
     
 ThreadPool::~ThreadPool() {
-    stop(Waiting::Yes);
+    if (isRunning()) {
+        stop();
+    }
+}
+
+void ThreadPool::start() {
+    ghoul_assert(!isRunning(), "ThreadPool must not be running");
+    
+    _isRunning = true;
+    for (Worker& w : _workers) {
+        activateWorker(w);
+    }
 }
     
+void ThreadPool::stop(RunRemainingTasks runTasks, DetachThreads detachThreads) {
+    ghoul_assert(isRunning(), "ThreadPool must be running");
+    ghoul_assert(
+        !(runTasks == RunRemainingTasks::Yes && detachThreads == DetachThreads::Yes),
+        "Cannot run remaining tasks and detach threads"
+    );
+
+    _isRunning = false;
+
+    if (runTasks == RunRemainingTasks::No) {
+        clearQueue();
+    }
+    
+    _cv.notify_all();
+    for (Worker& w : _workers) {
+        if (detachThreads == DetachThreads::Yes) {
+            w.thread->detach();
+        }
+        else {
+            w.thread->join();
+        }
+    }
+    
+    _workers.clear();
+}
+
+bool ThreadPool::isRunning() const {
+    return _isRunning;
+}
+
 int ThreadPool::size() const {
     return static_cast<int>(_workers.size());
 }
 
-int ThreadPool::nIdle() const {
+int ThreadPool::nIdleThreads() const {
     return _nWaiting;
 }
 
 void ThreadPool::resize(int nThreads) {
-    if (!_isStop && !_isDone) {
+    ghoul_assert(nThreads > 0, "nThreads must be bigger than 0");
+    
+//    if (_isRunning) {
         int oldNThreads = size();
         if (oldNThreads <= nThreads) {
             // if the number of threads is increased
             _workers.resize(nThreads);
             
             for (int i = oldNThreads; i < nThreads; ++i) {
-                setThread(i);
+                activateWorker(_workers[i]);
             }
         }
         else {
@@ -65,61 +117,32 @@ void ThreadPool::resize(int nThreads) {
                 *(_workers[i].shouldStop) = true;
                 _workers[i].thread->detach();
             }
-            {
+//            {
                 // stop the detached threads that were waiting
-                std::unique_lock<std::mutex> lock(_mutex);
+//                std::unique_lock<std::mutex> lock(_mutex);
                 _cv.notify_all();
-            }
+//            }
             // safe to delete because the threads are detached
             _workers.resize(nThreads);
         }
-    }
+//    }
     
 }
     
 void ThreadPool::clearQueue() {
-    std::packaged_task<void()> dummy;
     while (!_taskQueue.isEmpty()) {
         _taskQueue.pop();
     }
 }
 
-void ThreadPool::stop(Waiting shouldWait) {
-    if (shouldWait == Waiting::No) {
-        if (_isStop)
-            return;
-        _isStop = true;
-        for (int i = 0, n = this->size(); i < n; ++i) {
-            *(_workers[i].shouldStop) = true;
-        }
-        clearQueue();  // empty the queue
-    }
-    else {
-        if (_isDone || _isStop)
-            return;
-        _isDone = true;  // give the waiting threads a command to finish
-    }
-    {
-        std::unique_lock<std::mutex> lock(_mutex);
-        _cv.notify_all();  // stop all waiting threads
-    }
-    for (int i = 0; i < size(); ++i) {  // wait for the computing threads to finish
-        if (_workers[i].thread->joinable()) {
-            _workers[i].thread->join();
-        }
-    }
-    // if there were no threads in the pool but some functors in the queue, the functors are not deleted by the threads
-    // therefore delete them here
-    clearQueue();
-    _workers.clear();
-}
 
-
-void ThreadPool::setThread(int i) {
+void ThreadPool::activateWorker(Worker& worker) {
     // a copy of the shared ptr to the flag
     auto shouldTerminate = std::make_shared<std::atomic_bool>(false);
     // capturing the flag by value to maintain a copy of the shared_ptr
     auto workerLoop = [this, shouldTerminate]() {
+        _workerInitialization();
+        
         std::function<void()> f;
         bool hasItem;
         std::tie(f, hasItem) = _taskQueue.pop();
@@ -141,28 +164,30 @@ void ThreadPool::setThread(int i) {
             std::unique_lock<std::mutex> lock(_mutex);
             ++_nWaiting;
             _cv.wait(
-                     lock,
-                     [this, &f, &hasItem, shouldTerminate]() {
-                         std::tie(f, hasItem) = _taskQueue.pop();
-                         return hasItem || _isDone || *shouldTerminate;
-                     }
-                     );
+                 lock,
+                 [this, &f, &hasItem, shouldTerminate]() {
+                     std::tie(f, hasItem) = _taskQueue.pop();
+                     return hasItem || *shouldTerminate || !_isRunning;
+                 }
+             );
             --_nWaiting;
             if (!hasItem) {
                 // if the queue is empty and this->isDone == true or *flag then return
                 return;
             }
         }
+        
+        _workerDeinitialization();
     };
     
-    _workers[i] = {
+    worker = {
         std::make_unique<std::thread>(workerLoop),
         std::move(shouldTerminate)
     };
 }
 
 std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
-    std::unique_lock<std::mutex> lock(_mutex);
+    std::lock_guard<std::mutex> lock(_queueMutex);
     if (_queue.empty()) {
         return { Task(), false };
     }
@@ -173,18 +198,18 @@ std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
     }
 }
     
-void ThreadPool::TaskQueue::push(ThreadPool::Task task) {
-    std::unique_lock<std::mutex> lock(_mutex);
-    _queue.push(std::move(task));
+void ThreadPool::TaskQueue::push(ThreadPool::Task&& task) {
+    std::lock_guard<std::mutex> lock(_queueMutex);
+    _queue.push(task);
 }
     
 bool ThreadPool::TaskQueue::isEmpty() const {
-    std::unique_lock<std::mutex> lock(_mutex);
+    std::lock_guard<std::mutex> lock(_queueMutex);
     return _queue.empty();
 }
     
 size_t ThreadPool::TaskQueue::size() const {
-    std::unique_lock<std::mutex> lock(_mutex);
+    std::lock_guard<std::mutex> lock(_queueMutex);
     return _queue.size();
 }
 

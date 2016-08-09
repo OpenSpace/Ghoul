@@ -50,27 +50,38 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <tuple>
 
 namespace ghoul {
     
 class ThreadPool {
 public:
-    enum class Waiting { Yes, No };
+    enum class RunRemainingTasks { Yes, No };
+    enum class DetachThreads { Yes, No };
     
-    ThreadPool(int nThreads = 1);
+    ThreadPool(
+        int nThreads = 1,
+        std::function<void ()> workerInitialization = [](){},
+        std::function<void ()> workerDeinitialization = [](){}
+    );
     
     ~ThreadPool();
-    
-    int size() const;
-    
-    int nIdle() const;
+
+    void start();
+    void stop(
+        RunRemainingTasks runTasks = RunRemainingTasks::Yes,
+        DetachThreads detachThreads = DetachThreads::No
+    );
+    bool isRunning() const;
     
     void resize(int nThreads);
     
+    int size() const;
+    
+    int nIdleThreads() const;
+    
     void clearQueue();
     
-    void stop(Waiting shouldWait = Waiting::Yes);
-
     template<typename F, typename... Rest>
     auto push(F&& f, Rest&&... rest) -> std::future<decltype(f(rest...))>; 
     
@@ -85,14 +96,13 @@ private:
     class TaskQueue {
     public:
         std::tuple<Task, bool> pop();
-        void push(Task task);
+        void push(Task&& task);
         bool isEmpty() const;
         size_t size() const;
     
     private:
         std::queue<ThreadPool::Task> _queue;
-
-        mutable std::mutex _mutex;
+        mutable std::mutex _queueMutex;
     };
     
     ThreadPool(const ThreadPool&) = delete;
@@ -100,20 +110,20 @@ private:
     ThreadPool& operator=(const ThreadPool&) = delete;
     ThreadPool& operator=(ThreadPool&&) = delete;
     
-    void setThread(int i);
-    
+    void activateWorker(Worker& worker);
     
     std::vector<Worker> _workers;
 
     TaskQueue _taskQueue;
 
-    std::atomic_bool _isDone;
-    std::atomic_bool _isStop;
+    std::atomic_bool _isRunning;
     std::atomic_int _nWaiting;  // how many threads are waiting
     
     std::mutex _mutex;
     std::condition_variable _cv;
     
+    std::function<void ()> _workerInitialization;
+    std::function<void ()> _workerDeinitialization;
 };
 
 } // namespace ghoul

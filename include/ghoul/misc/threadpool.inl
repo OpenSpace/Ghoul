@@ -38,7 +38,6 @@ auto ThreadPool::push(F&& f, Rest&&... rest) ->std::future<decltype(f(rest...))>
         [pck]() { (*pck)(); }
     );
     
-    std::unique_lock<std::mutex> lock(_mutex);
     _cv.notify_one();
     return future;
 }
