@@ -30,7 +30,7 @@
 namespace {
     const int Epsilon = 10;
 
-    const std::chrono::microseconds SchedulingWaitTime(250);
+    const std::chrono::microseconds SchedulingWaitTime(500);
     const std::chrono::milliseconds DefaultTaskTime(500);
 
     void threadSleep(std::chrono::microseconds waitTime) {
