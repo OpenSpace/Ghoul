@@ -74,6 +74,7 @@ TEST_F(ThreadPoolTest, CustomInitializer) {
         std::atomic_int counter(0);
 
         ghoul::ThreadPool pool(5, [&counter]() { ++counter; });
+        threadSleep(SchedulingWaitTime);
         EXPECT_EQ(5, counter);
     }
 
@@ -81,6 +82,7 @@ TEST_F(ThreadPoolTest, CustomInitializer) {
         std::atomic_int counter(0);
 
         ghoul::ThreadPool pool(2, [&counter]() { ++counter; });
+        threadSleep(SchedulingWaitTime);
         EXPECT_EQ(2, counter);
     }
 }
