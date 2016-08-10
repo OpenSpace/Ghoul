@@ -28,7 +28,7 @@
 #include <ghoul/misc/threadpool.h>
 
 namespace {
-    const int Epsilon = 10;
+    const int Epsilon = 20;
 
     const std::chrono::microseconds SchedulingWaitTime(500);
     const std::chrono::milliseconds DefaultTaskTime(500);
@@ -42,12 +42,12 @@ namespace {
     }
     
     void pushWait(ghoul::ThreadPool& pool, int ms) {
-        pool.push([ms](){
+        pool.queue([ms](){
             threadSleep(std::chrono::milliseconds(ms));
         });
     }
     void pushWait(ghoul::ThreadPool& pool, int ms, std::atomic_int& counter) {
-        pool.push([&counter, ms](){
+        pool.queue([&counter, ms](){
             threadSleep(std::chrono::milliseconds(ms));
             ++counter;
         });
@@ -63,10 +63,54 @@ TEST_F(ThreadPoolTest, Invariants) {
     // and scheduled so that it registers itself as waiting
     threadSleep(SchedulingWaitTime);
     
-    ASSERT_EQ(1, pool.nIdleThreads());
+    ASSERT_EQ(1, pool.idleThreads());
     ASSERT_EQ(1, pool.size());
-    ASSERT_EQ(0, pool.nRemainingTasks());
+    ASSERT_EQ(0, pool.remainingTasks());
     ASSERT_TRUE(pool.isRunning());
+}
+
+TEST_F(ThreadPoolTest, CustomInitializer) {
+    {
+        std::atomic_int counter(0);
+
+        ghoul::ThreadPool pool(5, [&counter]() { ++counter; });
+        EXPECT_EQ(5, counter);
+    }
+
+    {
+        std::atomic_int counter(0);
+
+        ghoul::ThreadPool pool(2, [&counter]() { ++counter; });
+        EXPECT_EQ(2, counter);
+    }
+}
+
+TEST_F(ThreadPoolTest, CustomDeinitializer) {
+    std::atomic_int counter(0);
+    {
+        ghoul::ThreadPool pool(5, [](){}, [&counter]() { ++counter; });
+    }
+    EXPECT_EQ(5, counter);
+
+    counter = 0;
+    {
+        ghoul::ThreadPool pool(2, [](){}, [&counter]() { ++counter; });
+    }
+    EXPECT_EQ(2, counter);
+}
+
+TEST_F(ThreadPoolTest, CustomInitDeinit) {
+    std::atomic_int counter(0);
+    {
+        ghoul::ThreadPool pool(5, [&counter](){++counter; }, [&counter]() { --counter; });
+    }
+    EXPECT_EQ(0, counter);
+
+    counter = 0;
+    {
+        ghoul::ThreadPool pool(2, [&counter]() { ++counter; }, [&counter]() { --counter; });
+    }
+    EXPECT_EQ(0, counter);
 }
 
 TEST_F(ThreadPoolTest, ResizeExpand) {
@@ -85,64 +129,75 @@ TEST_F(ThreadPoolTest, ResizeShrink) {
     ASSERT_EQ(1, pool.size());
 }
 
+TEST_F(ThreadPoolTest, CorrectSizes) {
+    ghoul::ThreadPool pool(5);
+    EXPECT_EQ(5, pool.size());
+
+    pool.stop();
+    EXPECT_EQ(5, pool.size());
+
+    pool.start();
+    EXPECT_EQ(5, pool.size());
+}
+
 TEST_F(ThreadPoolTest, IdleThreads) {
     ghoul::ThreadPool pool(2);
 
     // We have to wait for a short moment for the thread in the pool to be created
     // and scheduled so that it registers itself as waiting
     threadSleep(SchedulingWaitTime);
-    EXPECT_EQ(2, pool.nIdleThreads());
+    EXPECT_EQ(2, pool.idleThreads());
     
     pushWait(pool, 100);
     threadSleep(SchedulingWaitTime);
-    EXPECT_EQ(1, pool.nIdleThreads());
+    EXPECT_EQ(1, pool.idleThreads());
 
     pushWait(pool, 250);
     threadSleep(SchedulingWaitTime);
-    EXPECT_EQ(0, pool.nIdleThreads());
+    EXPECT_EQ(0, pool.idleThreads());
     
     threadSleep(std::chrono::milliseconds(110));
-    EXPECT_EQ(1, pool.nIdleThreads());
+    EXPECT_EQ(1, pool.idleThreads());
     
     threadSleep(std::chrono::milliseconds(260));
-    EXPECT_EQ(2, pool.nIdleThreads());
+    EXPECT_EQ(2, pool.idleThreads());
 }
 
 TEST_F(ThreadPoolTest, RemainingTasks) {
     ghoul::ThreadPool pool(1);
     ASSERT_TRUE(pool.isRunning());
     
-    ASSERT_EQ(0, pool.nRemainingTasks());
+    ASSERT_EQ(0, pool.remainingTasks());
     pushWait(pool, 100);
     pushWait(pool, 100);
     pushWait(pool, 100);
     
     // Wait for the scheduler to pick up one of the threads
     threadSleep(SchedulingWaitTime);
-    ASSERT_EQ(2, pool.nRemainingTasks());
+    ASSERT_EQ(2, pool.remainingTasks());
     
     threadSleep(std::chrono::milliseconds(110));
-    ASSERT_EQ(1, pool.nRemainingTasks());
+    ASSERT_EQ(1, pool.remainingTasks());
     
     threadSleep(std::chrono::milliseconds(110));
-    ASSERT_EQ(0, pool.nRemainingTasks());
+    ASSERT_EQ(0, pool.remainingTasks());
 }
 
 TEST_F(ThreadPoolTest, ClearQueue) {
     ghoul::ThreadPool pool(1);
     ASSERT_TRUE(pool.isRunning());
     
-    ASSERT_EQ(0, pool.nRemainingTasks());
+    ASSERT_EQ(0, pool.remainingTasks());
     pushWait(pool, 100);
     pushWait(pool, 100);
     pushWait(pool, 100);
 
     // Wait for the scheduler to pick up one of the threads
     threadSleep(SchedulingWaitTime);
-    ASSERT_EQ(2, pool.nRemainingTasks());
+    ASSERT_EQ(2, pool.remainingTasks());
     
-    pool.clearQueue();
-    ASSERT_EQ(0, pool.nRemainingTasks());
+    pool.clearRemainingTasks();
+    ASSERT_EQ(0, pool.remainingTasks());
     
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -162,16 +217,19 @@ TEST_F(ThreadPoolTest, StartStopWithRemaining) {
     ghoul::ThreadPool pool(1);
     
     ASSERT_TRUE(pool.isRunning());
-    
-    pushWait(pool, 100);
+
+    std::atomic_int counter(0);
+    pushWait(pool, 100, counter);
     threadSleep(SchedulingWaitTime);
     pool.stop(ghoul::ThreadPool::RunRemainingTasks::Yes);
-    threadSleep(SchedulingWaitTime);
-    
     ASSERT_FALSE(pool.isRunning());
+    EXPECT_EQ(1, counter);
     
-    threadSleep(std::chrono::milliseconds(110));
-    ASSERT_FALSE(pool.isRunning());
+    pool.start();
+    ASSERT_TRUE(pool.isRunning());
+    pushWait(pool, 100, counter);
+    pool.stop();
+    EXPECT_EQ(2, counter);
 }
 
 TEST_F(ThreadPoolTest, Basic) {
@@ -192,8 +250,7 @@ TEST_F(ThreadPoolTest, ReturnValue) {
     
     ghoul::ThreadPool pool(1);
     
-    std::future<int> f = pool.push([]() {
-        threadSleep(std::chrono::milliseconds(100));
+    std::future<int> f = pool.queue([]() {
         return 1337;
     });
     ASSERT_TRUE(f.valid());
@@ -202,6 +259,65 @@ TEST_F(ThreadPoolTest, ReturnValue) {
     
     EXPECT_TRUE(f.valid());
     EXPECT_EQ(1337, f.get());
+
+    auto g = pool.queue([]() {
+        return std::string("foobar");
+    });
+    ASSERT_TRUE(g.valid());
+    g.wait();
+    EXPECT_TRUE(g.valid());
+    EXPECT_EQ("foobar", g.get());
+}
+
+TEST_F(ThreadPoolTest, VarArgs) {
+    ghoul::ThreadPool pool(1);
+
+    auto func = [](int i, float f, std::string s) {
+        return std::make_tuple(s, f, i);
+    };
+
+    std::future<std::tuple<std::string, float, int>> ret = pool.queue(func, 1, 2.f, "3");
+    ASSERT_TRUE(ret.valid());
+    ret.wait();
+    ASSERT_TRUE(ret.valid());
+    std::tuple<std::string, float, int> val = ret.get();
+    EXPECT_EQ("3", std::get<0>(val));
+    EXPECT_EQ(2.f, std::get<1>(val));
+    EXPECT_EQ(1, std::get<2>(val));
+}
+
+TEST_F(ThreadPoolTest, TaskOrdering) {
+    // Tests whether the pushed tasks are performed in the correct FIFO order
+
+    ghoul::ThreadPool pool(1);
+
+    std::vector<int> res;
+    auto func = [&res](int i) {
+        threadSleep(SchedulingWaitTime);
+        res.push_back(i);
+    };
+
+    pool.queue(func, 4);
+    pool.queue(func, 3);
+    pool.queue(func, 2);
+    pool.queue(func, 1);
+    pool.queue(func, 0);
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+    pool.stop();
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    EXPECT_GE(Epsilon, ms);
+
+    ASSERT_EQ(5, res.size());
+    EXPECT_EQ(4, res[0]);
+    EXPECT_EQ(3, res[1]);
+    EXPECT_EQ(2, res[2]);
+    EXPECT_EQ(1, res[3]);
+    EXPECT_EQ(0, res[4]);
 }
 
 TEST_F(ThreadPoolTest, Parallelism) {

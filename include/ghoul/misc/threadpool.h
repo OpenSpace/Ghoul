@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  *****************************************************************************************
  * Based on the CPTL implementation by Vitaliy Vitsentiy found here:                     *
- *
+ * https://github.com/vit-vit/CTPL                                                       *
  *****************************************************************************************
  *                                                                                       *
  *  Copyright (C) 2014 by Vitaliy Vitsentiy                                              *
@@ -45,6 +45,8 @@
 #ifndef __THREADPOOL_H__
 #define __THREADPOOL_H__
 
+#include <ghoul/misc/thread.h>
+
 #include <future>
 #include <memory>
 #include <mutex>
@@ -53,79 +55,320 @@
 #include <tuple>
 
 namespace ghoul {
-    
+ 
+/**
+ * The ThreadPool is a class that manages a list of threads (= ThreadPool::Worker%s) that
+ * will perform tasks from a list. A ThreadPool is created with a specific number of
+ * threads but can be #resize%d after the fact, which will change the number of active
+ * threads managed by this ThreadPool. Tasks can be queued by the #pushTask function,
+ * which returns a <code>std::future</code> object that contains the possible return value
+ * of the passed task. 
+ *
+ * Example use-case:
+ *\verbatim
+ghoul::ThreadPool pool(2);
+
+{
+    std::future<int> ret = pool.pushTask([](){ return 1337; });
+    auto urn = pool.pushTask([](){ return "foobar"; });
+    assert(ret.get() == 1337);
+    assert(urn.get() == "foobar");
+}
+
+{
+    auto func = [](int i, float f, std::string s) {
+        return std::make_tuple(s, f, i);
+    };
+
+    std::future<std::tuple<std::string, float, int>> ret = pool.queue(func, 1, 2.f, "3");
+    std::tuple<std::string, float, int> val = ret.get();
+    assert("3" == std::get<0>(val));
+    assert(2.f == std::get<1>(val));
+    assert(1 == std::get<2>(val));
+}
+
+\endverbatim 
+ *
+ * Tasks passed to the ThreadPool as started in order a strict FIFO ordering.
+ * 
+ * Workers can be initialized with custom functions that are passed to the ThreadPool
+ * during construction. These functions are called once for each Worker at the beginning
+ * and at the end of its lifetime.
+ *
+ * A ThreadPool can be running or stopped (#isRunning, #start, #stop). The ThreadPool is
+ * automatically stopped in the destructor if it was running before (and will block and
+ * wait for all remaining tasks to be finished. If this behavior is not desired, the
+ * ThreadPool should be #stop%ped manually before destruction.
+ */
 class ThreadPool {
 public:
     enum class RunRemainingTasks { Yes, No };
     enum class DetachThreads { Yes, No };
     
+    /**
+     * Constructor that initializes and starts \p nThreads Worker objects.
+     * \param nThreads The number of parallel threads of execution managed by the
+     * ThreadPool
+     * \param workerInitialization The additional initialize function for each Worker that
+     * gets called once for each Worker when it is created
+     * \param workerDeinitialization The additional deinitialize function for each Worker
+     * that gets called once for each Worken when it is destroyed
+     * \param priorityClass The ghoul::thread::ThreadPriorityClass of the worker threads
+     * managed by the ThreadPool
+     * \param priorityLevel The ghoul::thread::ThreadPriorityLevel of the worker threads
+     * managed by the ThreadPool
+     * \param background Whether the worker threads managed by this thread pool are run in
+     * a background mode (depending on the support of the operating system)
+     * \pre \p nThreads must be bigger than 0
+     * \pre \p workerInitialization must not be empty
+     * \pre \p workerDeinitialization must not be empty
+     * \post The ThreadPool is running
+     */
     ThreadPool(
         int nThreads = 1,
         std::function<void ()> workerInitialization = [](){},
-        std::function<void ()> workerDeinitialization = [](){}
+        std::function<void ()> workerDeinitialization = [](){},
+        thread::ThreadPriorityClass priorityClass = thread::ThreadPriorityClass::Normal,
+        thread::ThreadPriorityLevel priorityLevel = thread::ThreadPriorityLevel::Normal,
+        thread::Background background = thread::Background::No
     );
     
+    /**
+     * Destructor that will block and wait for all remaining Tasks to be finished if the
+     * ThreadPool is still running by calling the #stop method. If the ThreadPool has been
+     * stopped, it will not call this function and thus not block.
+     */
     ~ThreadPool();
 
+    /**
+     * Starts the previously #stop%ped ThreadPool and activates its Worker%s.
+     * \pre The ThreadPool must not be running
+     * \post The ThreadPool is running
+     */
     void start();
+
+    /**
+     * Stops the previously running ThreadPool. Depending on the passed parameters, this
+     * function might block until all remaining tasks have been processed.
+     * \param runTasks If RunRemainingTasks::Yes, all remaining tasks in the queue will be
+     * finished; if RunRemainingTasks::No, they will be discarded
+     * \param detachThreads If DetachThreads::Yes, the worker threads will be detached and
+     * finish their job independently from the current thread and, thus, this function
+     * will return immediately. if DetachThreads::No, this function will block until all
+     * workers have finished. Potential exceptions that occur during detaching or joining
+     * will be caught and an error message will be logged.
+     * \pre The ThreadPool must be running
+     * \pre Cannot run remaining tasks and detach threads
+     * <code>!(runTasks == Yes && detachThreads == Yes)</code>
+     * \post The ThreadPool is stopped
+     */
     void stop(
         RunRemainingTasks runTasks = RunRemainingTasks::Yes,
         DetachThreads detachThreads = DetachThreads::No
     );
+
+    /**
+     * Returns <code>true</code> if the ThreadPool is running, <code>false</code>
+     * otherwise.
+     * \return <code>true</code> if the ThreadPool is running, <code>false</code>
+     * otherwise
+     */
     bool isRunning() const;
     
+    /**
+     * Resizes the ThreadPool such that the number of workers in the pool is \p nThreads
+     * after this function call. If \p nThreads is bigger than the current number of 
+     * workers, additional workers are created and initialized, if \p nThreads is smaller
+     * the extra workers detach and finish their work before being terminated. This
+     * function can be called whether the ThreadPool is running or stopped.
+     * \param nThreads The new number of worker threads in this ThreadPool
+     * \pre nThreads must be bigger than 0
+     * \post The ThreadPool contains \p nThreads workers
+     */
     void resize(int nThreads);
-    
+
+    /**
+     * Returns the number of workers that are managed by this ThreadPool.
+     * \return The number of workers that are managed by this ThreadPool
+     */
     int size() const;
     
-    int nIdleThreads() const;
+    /**
+     * Returns the number of currently idle workers in this ThreadPool.
+     * \return The number of currently idle workers in this ThreadPool
+     */
+    int idleThreads() const;
+
+    /**
+     * Returns the number of remaining tasks waiting to be processed by this ThreadPool.
+     * \return The number of remaining tasks waiting to be processed by this ThreadPool
+     */
+    int remainingTasks() const;
+
+    /**
+     * Removes the remaining tasks from the waiting list, discarding them.
+     * \post The number of remaining tasks is empty
+     */
+    void clearRemainingTasks();
     
-    int nRemainingTasks() const;
-    
-    void clearQueue();
-    
-    template<typename F, typename... Rest>
-    auto push(F&& f, Rest&&... rest) -> std::future<decltype(f(rest...))>; 
+    /**
+     * This function queues a task and returns an <code>std::future</code> object that
+     * holds a potential return value of the function. The common use-case is passing a
+     * lambda expression to this function that either returns a value or just performs its
+     * task on the referenced values. All tasks passed to this functions are potentially 
+     * executed in parallel unless this ThreadPool was initialized with only a single
+     * worker in the constructor or a subsequent call to #resize. The template parameters
+     * of this function are best to be automatically determined. Example use-case:
+     * \verbatim
+ghoul::ThreadPool pool(2);
+
+{
+    std::future<int> ret = pool.pushTask([](){ return 1337; });
+    auto urn = pool.pushTask([](){ return "foobar"; });
+    assert(ret.get() == 1337);
+    assert(urn.get() == "foobar");
+}
+
+{
+    auto func = [](int i, float f, std::string s) {
+        return std::make_tuple(s, f, i);
+    };
+
+    std::future<std::tuple<std::string, float, int>> ret = pool.queue(func, 1, 2.f, "3");
+    std::tuple<std::string, float, int> val = ret.get();
+    assert("3" == std::get<0>(val));
+    assert(2.f == std::get<1>(val));
+    assert(1 == std::get<2>(val));
+}
+
+\endverbatim 
+     * \tparam Function The description of the \p function%'s signature that will be 
+     * called
+     * \tparam Args A variable list of arguments that can be passed to the \p function
+     * \param function The function that will be called. This can be any callable object,
+     * such as <code>std::function</code>, a <code>lamdba</code> expression, a
+     * <code>struct</code> with overloaded <code>operator()</code> or others
+     * \param arguments The potential list of arguments passed to the \p function
+     * \return A future containing the result of the evaluation of \p function with the
+     * passed \p arguments. If the function does not return anything, an
+     * <code>std::future<void></code> is returned
+     */
+    template<typename Function, typename... Args>
+    auto queue(
+        Function&& function, Args&&... arguments
+    ) -> std::future<decltype(function(arguments...))>;
     
 private:
-    using Task = std::function<void()>;
-
-    struct Worker {
-        std::unique_ptr<std::thread> thread;
-        std::shared_ptr<std::atomic<bool>> shouldStop;
-    };
-    
-    class TaskQueue {
-    public:
-        std::tuple<Task, bool> pop();
-        void push(Task&& task);
-        bool isEmpty() const;
-        size_t size() const;
-    
-    private:
-        std::queue<ThreadPool::Task> _queue;
-        mutable std::mutex _queueMutex;
-    };
-    
     ThreadPool(const ThreadPool&) = delete;
     ThreadPool(ThreadPool&&) = delete;
     ThreadPool& operator=(const ThreadPool&) = delete;
     ThreadPool& operator=(ThreadPool&&) = delete;
+
+    /// A single task that is executed. This is a functional wrapper around the function +
+    /// arguments that are passed in the queue method so that we can store all tasks in a
+    /// single list
+    using Task = std::function<void()>;
+
+    /// A worker object that consists of a thread and a boolean flag that determines
+    /// whether the worker should terminatate (or rather return out of the infinite loop).
+    struct Worker {
+        // The thread that grabs a task from the ThreadPool or waits until there is a
+        // task. This is stored as a unique_ptr in order to make the storage in a vector
+        // easier
+        std::unique_ptr<std::thread> thread;
+        // If this is 'true', the thread will return, and thus end, instead of working on
+        // a new task. This is stored as a shared_pointer as this value is used in the
+        // ThreadPool as well as the lambda expression that drives the thread.
+        std::shared_ptr<std::atomic<bool>> shouldTerminate;
+    };
     
+    /**
+     * This class represents a thin wrapper around <code>std::queue</code> that provides
+     * <code>std::mutex</code> protection for the available methods, thus making them
+     * thread-safe to use. As soon as there is a better adapter pattern for the STL
+     * classes that works in a concurrent environment, this class is not needed anymore.
+     */
+    class TaskQueue {
+    public:
+        /**
+         * Returns the top element of the queue and whether this item existed. If the
+         * queue was empty, <code>{ Task(), false}</code> is returned, otherwise the
+         * second argument to the <code>tuple</code> is <code>true</code>.
+         * \return A tuple containing either the top element of the queue and
+         * <code>true</code>, or a default constructed Task and <code>false</code>
+         */
+        std::tuple<Task, bool> pop();
+
+        /**
+         * Pushes the \p task to the bottom of the <code>std::queue</code>.
+         * \param task The task to be pushed onto the queue
+         */
+        void push(Task&& task);
+
+        /**
+         * Returns whether the queue is empty.
+         * \return <code>true</code> if the queue is empty
+         */
+        bool isEmpty() const;
+        
+        /**
+         * Returns the size of the queue.
+         * \return The size of the queue
+         */
+        int size() const;
+    
+    private:
+        // The queue of tasks
+        std::queue<ThreadPool::Task> _queue;
+        // The mutex protecting the queue. As the mutex is also required by const
+        // functions, it is declared 'mutable'
+        mutable std::mutex _queueMutex;
+    };
+    
+    /**
+     * Activate the \p worker by creating a <code>std::thread</code> with the lambda
+     * expression that will do all of the work inside the Worker. This function will
+     * overwrite the values of the passed \p worker
+     * \param worker The worker to be set by this function
+     */
     void activateWorker(Worker& worker);
-    
+
+    /// The list of all workers managed by this ThreadPool
     std::vector<Worker> _workers;
 
+    /// The list of remaining tasks that might be addressed by the available Worker%s
     TaskQueue _taskQueue;
 
+    /// <code>true</code> if the ThreadPool is currently running, <code>false</code
+    /// otherwise
     std::atomic_bool _isRunning;
-    std::atomic_int _nWaiting;  // how many threads are waiting
     
+    /// The number of Worker%s that are currently waiting for a task
+    std::atomic_int _nWaiting;
+    
+    /// The mutex used by the <code>condition_variable</code> \m _cv used to wait for and
+    /// wake up Worker%s based on incoming Task%s
     std::mutex _mutex;
+
+    /// The condition variable that is used to wake up Worker%s when new Task%s are
+    /// incoming. Used in combination with \m _mutex
     std::condition_variable _cv;
     
+    /// The user-defined function that is called at initialization for each of the Worker
+    /// threads
     std::function<void ()> _workerInitialization;
+
+    /// The user-defined function that is called at deinitialization at the end of each
+    /// Worker%s lifetime
     std::function<void ()> _workerDeinitialization;
+
+    /// The ghoul::thread::ThreadPriorityClass of all the Worker%s of this ThreadPool
+    thread::ThreadPriorityClass _threadPriorityClass;
+    /// The ghoul::thread::ThreadPriorityLevel of all the Worker%s of this ThreadPool
+    thread::ThreadPriorityLevel _threadPriorityLevel;
+    /// Whether all Worker%s of this ThreadPool are started in the background mode
+    /// (if supported by the operating system)
+    thread::Background _threadBackground;
 };
 
 } // namespace ghoul
