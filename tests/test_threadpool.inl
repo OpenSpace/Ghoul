@@ -244,7 +244,7 @@ TEST_F(ThreadPoolTest, MissingParallelismWithWait) {
 
     auto end = std::chrono::high_resolution_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    ASSERT_EQ(2, counter);
+    EXPECT_EQ(2, counter);
     EXPECT_GE(200 + Epsilon, ms);
     EXPECT_LE(200 - Epsilon, ms);
 }
@@ -264,13 +264,13 @@ TEST_F(ThreadPoolTest, MissingParallelismWithoutWait) {
     // We have to wait for a short moment to give one of the threads the chance to
     // wake up and grab one of the tasks. Otherwise, the ThreadPool might be stopped
     // before the first thread had the chance be scheduled
-    threadSleep(SchedulingWaitTime);
+    threadSleep(std::chrono::milliseconds(1));
     
     pool.stop(ghoul::ThreadPool::RunRemainingTasks::No);
     
     auto end = std::chrono::high_resolution_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    ASSERT_EQ(1, counter);
+    EXPECT_EQ(1, counter);
     EXPECT_GE(100 + Epsilon, ms);
     EXPECT_LE(100 - Epsilon, ms);
 }
@@ -292,7 +292,7 @@ TEST_F(ThreadPoolTest, BlockingStop) {
     auto end = std::chrono::high_resolution_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     
-    ASSERT_EQ(2, counter);
+    EXPECT_EQ(2, counter);
     EXPECT_GE(200 + Epsilon, ms);
     EXPECT_LE(200 - Epsilon, ms);
 }
@@ -319,7 +319,7 @@ TEST_F(ThreadPoolTest, DetachingStop) {
     
     threadSleep(std::chrono::milliseconds(250));
     
-    ASSERT_EQ(2, counter);
+    EXPECT_EQ(2, counter);
     // As it is not blocking, the operation shouldn't take any time at all
     EXPECT_GE(Epsilon, ms);
 }
