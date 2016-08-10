@@ -382,7 +382,7 @@ TEST_F(ThreadPoolTest, MissingParallelismWithoutWait) {
     // We have to wait for a short moment to give one of the threads the chance to
     // wake up and grab one of the tasks. Otherwise, the ThreadPool might be stopped
     // before the first thread had the chance be scheduled
-    threadSleep(std::chrono::milliseconds(1));
+    threadSleep(std::chrono::milliseconds(25));
     
     pool.stop(ghoul::ThreadPool::RunRemainingTasks::No);
     
