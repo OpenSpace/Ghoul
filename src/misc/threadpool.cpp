@@ -191,12 +191,12 @@ void ThreadPool::activateWorker(Worker& worker) {
 std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
     std::lock_guard<std::mutex> lock(_queueMutex);
     if (_queue.empty()) {
-        return { Task(), false };
+        return std::make_tuple(Task(), false);
     }
     else {
         Task t = std::move(_queue.front());
         _queue.pop();
-        return { std::move(t), true };
+        return std::make_tuple(std::move(t), true);
     }
 }
     
