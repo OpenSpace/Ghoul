@@ -38,8 +38,8 @@ ThreadPool::ThreadPool(int nThreads, Func workerInit, Func workerDeinit)
     , _workerDeinitialization(std::move(workerDeinit))
 {
     ghoul_assert(nThreads > 0, "nThreads must be bigger than 0");
-    ghoul_assert(workerInit, "workerInit must be a valid function");
-    ghoul_assert(workerDeinit, "workerDeinit must be a valid function");
+    ghoul_assert(_workerInitialization, "workerInit must be a valid function");
+    ghoul_assert(_workerDeinitialization, "workerDeinit must be a valid function");
     
     resize(nThreads);
 }
