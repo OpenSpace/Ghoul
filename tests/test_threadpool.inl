@@ -32,15 +32,23 @@ namespace {
 
     const std::chrono::microseconds SchedulingWaitTime(250);
     const std::chrono::milliseconds DefaultTaskTime(500);
+
+    void threadSleep(std::chrono::microseconds waitTime) {
+        auto start = std::chrono::high_resolution_clock::now();
+        auto end = start + waitTime;
+        do {
+            std::this_thread::yield();
+        } while (std::chrono::high_resolution_clock::now() < end);
+    }
     
     void pushWait(ghoul::ThreadPool& pool, int ms) {
         pool.push([ms](){
-            std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+            threadSleep(std::chrono::milliseconds(ms));
         });
     }
     void pushWait(ghoul::ThreadPool& pool, int ms, std::atomic_int& counter) {
         pool.push([&counter, ms](){
-            std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+            threadSleep(std::chrono::milliseconds(ms));
             ++counter;
         });
     }
@@ -53,7 +61,7 @@ TEST_F(ThreadPoolTest, Invariants) {
     
     // We have to wait for a short moment for the thread in the pool to be created
     // and scheduled so that it registers itself as waiting
-    std::this_thread::sleep_for(SchedulingWaitTime);
+    threadSleep(SchedulingWaitTime);
     
     ASSERT_EQ(1, pool.nIdleThreads());
     ASSERT_EQ(1, pool.size());
@@ -82,21 +90,21 @@ TEST_F(ThreadPoolTest, IdleThreads) {
 
     // We have to wait for a short moment for the thread in the pool to be created
     // and scheduled so that it registers itself as waiting
-    std::this_thread::sleep_for(SchedulingWaitTime);
+    threadSleep(SchedulingWaitTime);
     EXPECT_EQ(2, pool.nIdleThreads());
     
     pushWait(pool, 100);
-    std::this_thread::sleep_for(SchedulingWaitTime);
+    threadSleep(SchedulingWaitTime);
     EXPECT_EQ(1, pool.nIdleThreads());
 
     pushWait(pool, 250);
-    std::this_thread::sleep_for(SchedulingWaitTime);
+    threadSleep(SchedulingWaitTime);
     EXPECT_EQ(0, pool.nIdleThreads());
     
-    std::this_thread::sleep_for(std::chrono::milliseconds(110));
+    threadSleep(std::chrono::milliseconds(110));
     EXPECT_EQ(1, pool.nIdleThreads());
     
-    std::this_thread::sleep_for(std::chrono::milliseconds(260));
+    threadSleep(std::chrono::milliseconds(260));
     EXPECT_EQ(2, pool.nIdleThreads());
 }
 
@@ -110,13 +118,13 @@ TEST_F(ThreadPoolTest, RemainingTasks) {
     pushWait(pool, 100);
     
     // Wait for the scheduler to pick up one of the threads
-    std::this_thread::sleep_for(SchedulingWaitTime);
+    threadSleep(SchedulingWaitTime);
     ASSERT_EQ(2, pool.nRemainingTasks());
     
-    std::this_thread::sleep_for(std::chrono::milliseconds(110));
+    threadSleep(std::chrono::milliseconds(110));
     ASSERT_EQ(1, pool.nRemainingTasks());
     
-    std::this_thread::sleep_for(std::chrono::milliseconds(110));
+    threadSleep(std::chrono::milliseconds(110));
     ASSERT_EQ(0, pool.nRemainingTasks());
 }
 
@@ -130,7 +138,7 @@ TEST_F(ThreadPoolTest, ClearQueue) {
     pushWait(pool, 100);
 
     // Wait for the scheduler to pick up one of the threads
-    std::this_thread::sleep_for(SchedulingWaitTime);
+    threadSleep(SchedulingWaitTime);
     ASSERT_EQ(2, pool.nRemainingTasks());
     
     pool.clearQueue();
@@ -156,13 +164,13 @@ TEST_F(ThreadPoolTest, StartStopWithRemaining) {
     ASSERT_TRUE(pool.isRunning());
     
     pushWait(pool, 100);
-    std::this_thread::sleep_for(SchedulingWaitTime);
+    threadSleep(SchedulingWaitTime);
     pool.stop(ghoul::ThreadPool::RunRemainingTasks::Yes);
-    std::this_thread::sleep_for(SchedulingWaitTime);
+    threadSleep(SchedulingWaitTime);
     
     ASSERT_FALSE(pool.isRunning());
     
-    std::this_thread::sleep_for(std::chrono::milliseconds(110));
+    threadSleep(std::chrono::milliseconds(110));
     ASSERT_FALSE(pool.isRunning());
 }
 
@@ -175,7 +183,7 @@ TEST_F(ThreadPoolTest, Basic) {
         pushWait(pool, 20 + 10 * i, counter);
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    threadSleep(std::chrono::milliseconds(500));
     EXPECT_EQ(10, counter);
 }
 
@@ -185,7 +193,7 @@ TEST_F(ThreadPoolTest, ReturnValue) {
     ghoul::ThreadPool pool(1);
     
     std::future<int> f = pool.push([]() {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        threadSleep(std::chrono::milliseconds(100));
         return 1337;
     });
     ASSERT_TRUE(f.valid());
@@ -199,7 +207,6 @@ TEST_F(ThreadPoolTest, ReturnValue) {
 TEST_F(ThreadPoolTest, Parallelism) {
     // Queueing 5 tasks that take 100 milliseconds each on a thread pool with five
     // workers should take about 100 milliseconds
-    
     
     ghoul::ThreadPool pool(5);
     
@@ -257,7 +264,7 @@ TEST_F(ThreadPoolTest, MissingParallelismWithoutWait) {
     // We have to wait for a short moment to give one of the threads the chance to
     // wake up and grab one of the tasks. Otherwise, the ThreadPool might be stopped
     // before the first thread had the chance be scheduled
-    std::this_thread::sleep_for(SchedulingWaitTime);
+    threadSleep(SchedulingWaitTime);
     
     pool.stop(ghoul::ThreadPool::RunRemainingTasks::No);
     
@@ -309,7 +316,8 @@ TEST_F(ThreadPoolTest, DetachingStop) {
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     
     // We have to wait for the detached thread to finish
-    std::this_thread::sleep_for(std::chrono::milliseconds(250));
+    
+    threadSleep(std::chrono::milliseconds(250));
     
     ASSERT_EQ(2, counter);
     // As it is not blocking, the operation shouldn't take any time at all
