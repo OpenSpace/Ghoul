@@ -30,7 +30,7 @@
 namespace {
     const int Epsilon = 20;
 
-    const std::chrono::milliseconds SchedulingWaitTime(2);
+    const std::chrono::milliseconds SchedulingWaitTime(25);
 
     void threadSleep(std::chrono::microseconds waitTime) {
         auto start = std::chrono::high_resolution_clock::now();
