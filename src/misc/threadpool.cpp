@@ -193,8 +193,11 @@ void ThreadPool::clearRemainingTasks() {
 void ThreadPool::activateWorker(Worker& worker) {
     // a copy of the shared ptr to the flag
     auto shouldTerminate = std::make_shared<std::atomic_bool>(false);
+
+    bool finishedInitializing = false;
+
     // capturing the flag by value to maintain a copy of the shared_ptr
-    auto workerLoop = [this, shouldTerminate]() {
+    auto workerLoop = [this, shouldTerminate, &finishedInitializing]() {
         // Invoke the user-defined initialization function
         _workerInitialization();
         // And invoke the user-defined deinitialization function when the scope is exited
@@ -209,6 +212,8 @@ void ThreadPool::activateWorker(Worker& worker) {
         while (true) {  // loop #1
             // If there is something in the queue
             while (hasTask) { // loop #2
+                finishedInitializing = true;
+                
                 // Do the task
                 task();
                 
@@ -235,6 +240,8 @@ void ThreadPool::activateWorker(Worker& worker) {
             // still running, so we can sleep until there is more work
             ++_nWaiting;
             while (true) { // loop #3
+                finishedInitializing = true;
+                
                 // We are doing this in an infinite loop, as we want to check regularly
                 // if there is more work. This shouldn't be necessary in normal cases, but
                 // is more of a last resort protection
@@ -282,6 +289,8 @@ void ThreadPool::activateWorker(Worker& worker) {
         std::move(thread),
         std::move(shouldTerminate)
     };
+
+    while (!finishedInitializing) {}
 }
 
 std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
