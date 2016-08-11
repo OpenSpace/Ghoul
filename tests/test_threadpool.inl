@@ -28,7 +28,7 @@
 #include <ghoul/misc/threadpool.h>
 
 namespace {
-    const int Epsilon = 20;
+    const int Epsilon = 50;
 
     const std::chrono::milliseconds SchedulingWaitTime(25);
 
@@ -294,7 +294,6 @@ TEST_F(ThreadPoolTest, TaskOrdering) {
 
     std::vector<int> res;
     auto func = [&res](int i) {
-        threadSleep(SchedulingWaitTime);
         res.push_back(i);
     };
 
