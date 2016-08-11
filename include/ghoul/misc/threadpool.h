@@ -66,24 +66,26 @@ namespace ghoul {
  *
  * Example use-case:
  *\verbatim
-ghoul::ThreadPool pool(2);
+ ghoul::ThreadPool pool(2);
 
 {
     std::future<int> ret = pool.queue([](){ return 1337; });
     auto urn = pool.queue([](){ return "foobar"; });
     assert(ret.get() == 1337);
     assert(urn.get() == "foobar");
-}
+ }
 
-{
-    auto func = [](int i, float f, std::string s) { return std::make_tuple(s, f, i); };
+ {
+    auto func = [](int i, float f, std::string s) -> std::tuple<std::string, float, int> {
+    return std::make_tuple(s, f, i);
+ };
 
     std::future<std::tuple<std::string, float, int>> ret = pool.queue(func, 1, 2.f, "3");
     std::tuple<std::string, float, int> val = ret.get();
     assert("3" == std::get<0>(val));
     assert(2.f == std::get<1>(val));
     assert(1 == std::get<2>(val));
-}
+ }
 
 \endverbatim 
  *
@@ -221,14 +223,14 @@ public:
 ghoul::ThreadPool pool(2);
 
 {
-    std::future<int> ret = pool.pushTask([](){ return 1337; });
-    auto urn = pool.pushTask([](){ return "foobar"; });
+    std::future<int> ret = pool.queue([](){ return 1337; });
+    auto urn = pool.queue([](){ return "foobar"; });
     assert(ret.get() == 1337);
     assert(urn.get() == "foobar");
 }
 
 {
-    auto func = [](int i, float f, std::string s) {
+    auto func = [](int i, float f, std::string s) -> std::tuple<std::string, float, int> {
         return std::make_tuple(s, f, i);
     };
 

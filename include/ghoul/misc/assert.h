@@ -77,8 +77,10 @@ void internal_assert(std::string expression, std::string message, std::string fi
 #endif
 
 /**
- * Assertion that prints the message (if provided) and gives the option of aborting,
- * exiting or ignoring the assertion. Not defined in release mode.
+ * This macro asserts on the <code>__condition__</code> and prints the optional
+ * <code>__message__</code>. In addition, it gives the option of aborting, exiting, or
+ * ignoring the assertion. The macro is optimized away in Release mode. Due to this fact,
+ * the <code>__condition__</code> must not have any sideeffects.
  */
 #define ghoul_assert(__condition__, __message__)                                         \
     do {                                                                                 \
