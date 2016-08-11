@@ -60,7 +60,7 @@ namespace ghoul {
  * The ThreadPool is a class that manages a list of threads (= ThreadPool::Worker%s) that
  * will perform tasks from a list. A ThreadPool is created with a specific number of
  * threads but can be #resize%d after the fact, which will change the number of active
- * threads managed by this ThreadPool. Tasks can be queued by the #pushTask function,
+ * threads managed by this ThreadPool. Tasks can be queued by the #queue function,
  * which returns a <code>std::future</code> object that contains the possible return value
  * of the passed task. 
  *
@@ -69,16 +69,14 @@ namespace ghoul {
 ghoul::ThreadPool pool(2);
 
 {
-    std::future<int> ret = pool.pushTask([](){ return 1337; });
-    auto urn = pool.pushTask([](){ return "foobar"; });
+    std::future<int> ret = pool.queue([](){ return 1337; });
+    auto urn = pool.queue([](){ return "foobar"; });
     assert(ret.get() == 1337);
     assert(urn.get() == "foobar");
 }
 
 {
-    auto func = [](int i, float f, std::string s) {
-        return std::make_tuple(s, f, i);
-    };
+    auto func = [](int i, float f, std::string s) { return std::make_tuple(s, f, i); };
 
     std::future<std::tuple<std::string, float, int>> ret = pool.queue(func, 1, 2.f, "3");
     std::tuple<std::string, float, int> val = ret.get();
@@ -339,19 +337,19 @@ private:
     /// The list of remaining tasks that might be addressed by the available Worker%s
     TaskQueue _taskQueue;
 
-    /// <code>true</code> if the ThreadPool is currently running, <code>false</code
+    /// <code>true</code> if the ThreadPool is currently running, <code>false</code>
     /// otherwise
     std::atomic_bool _isRunning;
     
     /// The number of Worker%s that are currently waiting for a task
     std::atomic_int _nWaiting;
     
-    /// The mutex used by the <code>condition_variable</code> \m _cv used to wait for and
-    /// wake up Worker%s based on incoming Task%s
+    /// The mutex used by the <code>condition_variable</code> <code>_cv</code> used to
+    /// wait for and wake up Worker%s based on incoming Task%s
     std::mutex _mutex;
 
     /// The condition variable that is used to wake up Worker%s when new Task%s are
-    /// incoming. Used in combination with \m _mutex
+    /// incoming. Used in combination with <code>_mutex</code>
     std::condition_variable _cv;
     
     /// The user-defined function that is called at initialization for each of the Worker
