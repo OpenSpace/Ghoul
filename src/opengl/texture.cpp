@@ -539,7 +539,7 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                 {
                     tvec2<uint32> t = texel<tvec2<uint32> >(x);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint32>::max();
-                    result.b = static_cast<float>(t.g) / numeric_limits<uint32>::max();
+                    result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
@@ -822,7 +822,7 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                 {
                     tvec2<uint32> t = texel<tvec2<uint32> >(x, y);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint32>::max();
-                    result.b = static_cast<float>(t.g) / numeric_limits<uint32>::max();
+                    result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
@@ -1106,7 +1106,7 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                 {
                     tvec2<uint32> t = texel<tvec2<uint32> >(x, y, z);
                     result.r = static_cast<float>(t.r) / numeric_limits<uint32>::max();
-                    result.b = static_cast<float>(t.g) / numeric_limits<uint32>::max();
+                    result.g = static_cast<float>(t.g) / numeric_limits<uint32>::max();
                     result.b = 0.f;
                     result.a = 1.f;
                     break;
