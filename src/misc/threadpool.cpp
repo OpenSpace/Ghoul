@@ -199,26 +199,30 @@ void ThreadPool::activateWorker(Worker& worker) {
     // a copy of the shared ptr to the flag
     auto shouldTerminate = std::make_shared<std::atomic_bool>(false);
 
+    // We create local copies of the important variables so that we are guaranteed that
+    // they continue to exist when we pass them to the 'workerLoop' lamdba. Otherwise,
+    // the ThreadPool might be destructed before the workers have finished (for example
+    // when they are detached) and would then access already freed memory
     std::shared_ptr<std::atomic_bool> threadPoolIsRunning = _isRunning;
     std::shared_ptr<std::atomic_int> nWaiting = _nWaiting;
     std::shared_ptr<TaskQueue> taskQueue = _taskQueue;
     std::shared_ptr<std::mutex> mutex = _mutex;
     std::shared_ptr<std::condition_variable> cv = _cv;
 
+    std::function<void()> workerInitialization = _workerInitialization;
+    std::function<void()> workerDeinitialization = _workerDeinitialization;
+
     bool finishedInitializing = false;
 
-    // capturing the flag by value to maintain a copy of the shared_ptr
+    // capturing the shared_ptrs by value to maintain a copy
     auto workerLoop = [
         shouldTerminate, threadPoolIsRunning, &finishedInitializing, nWaiting, taskQueue,
-        mutex, cv
-    ](
-        std::function<void ()> workerInitialization,
-        std::function<void ()> workerDeinitialization
-    ) {
+        mutex, cv, workerInitialization, workerDeinitialization
+    ]() {
         // Invoke the user-defined initialization function
         workerInitialization();
         // And invoke the user-defined deinitialization function when the scope is exited
-        OnExit([workerDeinitialization]() { workerDeinitialization(); });
+        OnExit([&]() { workerDeinitialization(); });
         
         std::function<void()> task;
         bool hasTask;
@@ -292,11 +296,7 @@ void ThreadPool::activateWorker(Worker& worker) {
 
     // We create the thread running our worker loop. It will start immediately, but that
     // is not a problem
-    std::unique_ptr<std::thread> thread = std::make_unique<std::thread>(
-        workerLoop,
-        _workerInitialization,
-        _workerDeinitialization
-    );
+    std::unique_ptr<std::thread> thread = std::make_unique<std::thread>(workerLoop);
 
     // Set the threa priority to the desired class and level
     thread::setPriority(*thread, _threadPriorityClass, _threadPriorityLevel);
@@ -316,11 +316,9 @@ void ThreadPool::activateWorker(Worker& worker) {
 }
 
 std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
-    _queueMutex.lock();
-    //std::lock_guard<std::mutex> lock(_queueMutex);
+    std::lock_guard<std::mutex> lock(_queueMutex);
     if (_queue.empty()) {
         // No work to be done, the default constructed Task is never read
-        _queueMutex.unlock();
         return std::make_tuple(Task(), false);
     }
     else {
@@ -328,33 +326,24 @@ std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
         Task t = std::move(_queue.front());
         // and remove the item
         _queue.pop();
-        _queueMutex.unlock();
         // and return the task together with a positive reply
         return std::make_tuple(std::move(t), true);
     }
 }
     
 void ThreadPool::TaskQueue::push(ThreadPool::Task&& task) {
-    _queueMutex.lock();
-    //std::lock_guard<std::mutex> lock(_queueMutex);
+    std::lock_guard<std::mutex> lock(_queueMutex);
     _queue.push(task);
-    _queueMutex.unlock();
 }
     
 bool ThreadPool::TaskQueue::isEmpty() const {
-    _queueMutex.lock();
-    bool empty = _queue.empty();
-    _queueMutex.unlock();
-    //std::lock_guard<std::mutex> lock(_queueMutex);
-    return empty;
+    std::lock_guard<std::mutex> lock(_queueMutex);
+    return _queue.empty();
 }
     
 int ThreadPool::TaskQueue::size() const {
-    _queueMutex.lock();
-    size_t s = _queue.size();
-    _queueMutex.unlock();
-    //std::lock_guard<std::mutex> lock(_queueMutex);
-    return s;
+    std::lock_guard<std::mutex> lock(_queueMutex);
+    return _queue.size();
 }
 
 } // namespace openspace
