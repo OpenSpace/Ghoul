@@ -276,6 +276,21 @@ if (GHOUL_HAVE_TESTS)
         "GTEST_HAS_GLOBAL_STRING=0"
         "GHOUL_ROOT_DIR=\"${GHOUL_ROOT_DIR}\""
     )
+
+    if (WIN32)
+        target_compile_options(
+            GhoulTest
+            PUBLIC
+            "-Od"
+        )
+    else ()
+        target_compile_options(
+            GhoulTest
+            PUBLIC
+            "-O0"
+        )
+    endif ()
+
     target_include_directories(GhoulTest PUBLIC "${GHOUL_ROOT_DIR}/ext/gtest/include" "${GHOUL_ROOT_DIR}")
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/gtest)
     target_link_libraries(GhoulTest gtest Ghoul Lua)

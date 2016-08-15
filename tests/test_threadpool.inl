@@ -255,17 +255,19 @@ TEST_F(ThreadPoolTest, ReturnValue) {
         return 1337;
     });
     ASSERT_TRUE(f.valid());
-    
+
     f.wait();
-    
+
     EXPECT_TRUE(f.valid());
     EXPECT_EQ(1337, f.get());
 
     auto g = pool.queue([]() {
         return std::string("foobar");
     });
+
     ASSERT_TRUE(g.valid());
     g.wait();
+
     EXPECT_TRUE(g.valid());
     EXPECT_EQ("foobar", g.get());
 }

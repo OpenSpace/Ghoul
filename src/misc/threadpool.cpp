@@ -44,8 +44,11 @@ using namespace thread;
 ThreadPool::ThreadPool(int nThreads, Func workerInit, Func workerDeinit,
                        ThreadPriorityClass tpc, ThreadPriorityLevel tpl, Background bg)
     : _workers(nThreads)
-    , _isRunning(true)
-    , _nWaiting(0)
+    , _taskQueue(std::make_shared<TaskQueue>())
+    , _isRunning(std::make_shared<std::atomic_bool>(true))
+    , _nWaiting(std::make_shared<std::atomic_int>(0))
+    , _mutex(std::make_shared<std::mutex>())
+    , _cv(std::make_shared<std::condition_variable>())
     , _workerInitialization(std::move(workerInit))
     , _workerDeinitialization(std::move(workerDeinit))
     , _threadPriorityClass(tpc)
@@ -84,7 +87,7 @@ ThreadPool::~ThreadPool() {
 void ThreadPool::start() {
     ghoul_assert(!isRunning(), "ThreadPool must not be running");
     
-    _isRunning = true;
+    *_isRunning = true;
 
     for (Worker& w : _workers) {
         activateWorker(w);
@@ -107,12 +110,12 @@ void ThreadPool::stop(RunRemainingTasks runTasks, DetachThreads detachThreads) {
 
     // We first have to set '_isRunning' to false before waking up all threads as they
     // otherwise might go to sleep immediately again
-    _isRunning = false;
+    *_isRunning = false;
 
     // Wake up all of the threads, all of the threads that cannot find tasks will
     // terminate
-    _cv.notify_all();
     for (Worker& w : _workers) {
+        _cv->notify_all();
         if (detachThreads == DetachThreads::Yes) {
             // Detaching the thread to let it finish it's work independently
             w.thread->detach();
@@ -121,6 +124,8 @@ void ThreadPool::stop(RunRemainingTasks runTasks, DetachThreads detachThreads) {
             // Block until the thread is finished
             w.thread->join();
         }
+
+
     }
 
     // Delete all the workers. We don't want to actually delete them as we would otherwise
@@ -133,7 +138,7 @@ void ThreadPool::stop(RunRemainingTasks runTasks, DetachThreads detachThreads) {
 }
 
 bool ThreadPool::isRunning() const {
-    return _isRunning;
+    return *_isRunning;
 }
 
 void ThreadPool::resize(int nThreads) {
@@ -145,7 +150,7 @@ void ThreadPool::resize(int nThreads) {
         _workers.resize(nThreads);
 
         // We only want to activate the new workers if we are not currently running
-        if (_isRunning) {
+        if (*_isRunning) {
             for (int i = oldNThreads; i < nThreads; ++i) {
                 activateWorker(_workers[i]);
             }
@@ -162,7 +167,7 @@ void ThreadPool::resize(int nThreads) {
         }
         // The notification will do nothing for the first 'nThreads' threads, but it
         // will cause the remaining 'nThreads - oldNThreads' to return
-        _cv.notify_all();
+        _cv->notify_all();
 
         // safe to delete because the threads are detached
         _workers.resize(nThreads);
@@ -175,37 +180,49 @@ int ThreadPool::size() const {
 }
 
 int ThreadPool::idleThreads() const {
-    return _nWaiting;
+    return *_nWaiting;
 }
 
 int ThreadPool::remainingTasks() const {
-    return _taskQueue.size();
+    return _taskQueue->size();
 }
 
 void ThreadPool::clearRemainingTasks() {
-    while (!_taskQueue.isEmpty()) {
-        _taskQueue.pop();
+    while (!_taskQueue->isEmpty()) {
+        _taskQueue->pop();
     }
 
-    ghoul_assert(_taskQueue.isEmpty(), "Task queue is not empty");
+    ghoul_assert(_taskQueue->isEmpty(), "Task queue is not empty");
 }
 
 void ThreadPool::activateWorker(Worker& worker) {
     // a copy of the shared ptr to the flag
     auto shouldTerminate = std::make_shared<std::atomic_bool>(false);
 
+    std::shared_ptr<std::atomic_bool> threadPoolIsRunning = _isRunning;
+    std::shared_ptr<std::atomic_int> nWaiting = _nWaiting;
+    std::shared_ptr<TaskQueue> taskQueue = _taskQueue;
+    std::shared_ptr<std::mutex> mutex = _mutex;
+    std::shared_ptr<std::condition_variable> cv = _cv;
+
     bool finishedInitializing = false;
 
     // capturing the flag by value to maintain a copy of the shared_ptr
-    auto workerLoop = [this, shouldTerminate, &finishedInitializing]() {
+    auto workerLoop = [
+        shouldTerminate, threadPoolIsRunning, &finishedInitializing, nWaiting, taskQueue,
+        mutex, cv
+    ](
+        std::function<void ()> workerInitialization,
+        std::function<void ()> workerDeinitialization
+    ) {
         // Invoke the user-defined initialization function
-        _workerInitialization();
+        workerInitialization();
         // And invoke the user-defined deinitialization function when the scope is exited
-        OnExit([this]() { _workerDeinitialization(); });
+        OnExit([workerDeinitialization]() { workerDeinitialization(); });
         
         std::function<void()> task;
         bool hasTask;
-        std::tie(task, hasTask) = _taskQueue.pop();
+        std::tie(task, hasTask) = taskQueue->pop();
         
         // Infinite look that only gets broken if this thread should terminate or if it
         // gets woken up without there being a task
@@ -227,42 +244,43 @@ void ThreadPool::activateWorker(Worker& worker) {
                 // If we shouldn't terminate, we can check if there is more work
                 // if there is, we stay in this inner loop until there is no more work to
                 // be done
-                std::tie(task, hasTask) = _taskQueue.pop();
+                std::tie(task, hasTask) = taskQueue->pop();
             }
 
             // If the ThreadPool has stopped running and there are no more tasks, we don't
             // need to sleep first, but can return immediately
-            if (!_isRunning) {
+            if (!*threadPoolIsRunning) {
+                finishedInitializing = true;
                 return;
             }
 
             // If we get here, there is no more work to be done and the ThreadPool is
             // still running, so we can sleep until there is more work
-            ++_nWaiting;
+            (*nWaiting)++;
             while (true) { // loop #3
                 finishedInitializing = true;
                 
                 // We are doing this in an infinite loop, as we want to check regularly
                 // if there is more work. This shouldn't be necessary in normal cases, but
                 // is more of a last resort protection
-                std::unique_lock<std::mutex> lock(_mutex);
-                _cv.wait_for(
+                std::unique_lock<std::mutex> lock(*mutex);
+                cv->wait_for(
                     lock,
                     WaitTime
                 );
 
                 // We woke up, so either there is work to be done
-                std::tie(task, hasTask) = _taskQueue.pop();
+                std::tie(task, hasTask) = taskQueue->pop();
                 if (hasTask) {
-                    --_nWaiting;
+                    (*nWaiting)--;
                     // We have a task now, so if we break we start over with loop #1 and
                     // do the work as we enter loop #2
                     break;
                 }
 
                 // Or we were asked to terminate or the ThreadPool is finished
-                if (*shouldTerminate || !_isRunning) {
-                    --_nWaiting;
+                if (*shouldTerminate || !*threadPoolIsRunning) {
+                    (*nWaiting)--;
                     return;
                 }
 
@@ -274,7 +292,11 @@ void ThreadPool::activateWorker(Worker& worker) {
 
     // We create the thread running our worker loop. It will start immediately, but that
     // is not a problem
-    std::unique_ptr<std::thread> thread = std::make_unique<std::thread>(workerLoop);
+    std::unique_ptr<std::thread> thread = std::make_unique<std::thread>(
+        workerLoop,
+        _workerInitialization,
+        _workerDeinitialization
+    );
 
     // Set the threa priority to the desired class and level
     thread::setPriority(*thread, _threadPriorityClass, _threadPriorityLevel);
@@ -294,9 +316,11 @@ void ThreadPool::activateWorker(Worker& worker) {
 }
 
 std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
-    std::lock_guard<std::mutex> lock(_queueMutex);
+    _queueMutex.lock();
+    //std::lock_guard<std::mutex> lock(_queueMutex);
     if (_queue.empty()) {
         // No work to be done, the default constructed Task is never read
+        _queueMutex.unlock();
         return std::make_tuple(Task(), false);
     }
     else {
@@ -304,24 +328,33 @@ std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
         Task t = std::move(_queue.front());
         // and remove the item
         _queue.pop();
+        _queueMutex.unlock();
         // and return the task together with a positive reply
         return std::make_tuple(std::move(t), true);
     }
 }
     
 void ThreadPool::TaskQueue::push(ThreadPool::Task&& task) {
-    std::lock_guard<std::mutex> lock(_queueMutex);
+    _queueMutex.lock();
+    //std::lock_guard<std::mutex> lock(_queueMutex);
     _queue.push(task);
+    _queueMutex.unlock();
 }
     
 bool ThreadPool::TaskQueue::isEmpty() const {
-    std::lock_guard<std::mutex> lock(_queueMutex);
-    return _queue.empty();
+    _queueMutex.lock();
+    bool empty = _queue.empty();
+    _queueMutex.unlock();
+    //std::lock_guard<std::mutex> lock(_queueMutex);
+    return empty;
 }
     
 int ThreadPool::TaskQueue::size() const {
-    std::lock_guard<std::mutex> lock(_queueMutex);
-    return _queue.size();
+    _queueMutex.lock();
+    size_t s = _queue.size();
+    _queueMutex.unlock();
+    //std::lock_guard<std::mutex> lock(_queueMutex);
+    return s;
 }
 
 } // namespace openspace

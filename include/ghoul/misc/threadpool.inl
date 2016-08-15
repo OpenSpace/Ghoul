@@ -26,7 +26,7 @@
 namespace ghoul {
 
 template <typename F, typename... Arg>
-auto ThreadPool::queue(F&& f, Arg&&... arg)->std::future<decltype(f(arg...))> {
+auto ThreadPool::queue(F&& f, Arg&&... arg) -> std::future<decltype(f(arg...))> {
     using ReturnType = decltype(f(arg...));
     // We wrap the packaged_task into a shared pointer so that we can store it in the
     // lambda expression below. The capture of the lambda expression will keep this
@@ -36,7 +36,7 @@ auto ThreadPool::queue(F&& f, Arg&&... arg)->std::future<decltype(f(arg...))> {
     );
     
     // Push the packaged packaged_task onto the queue of work items
-    _taskQueue.push(
+    _taskQueue->push(
         [pck]() { (*pck)(); }
     );
     
@@ -45,7 +45,7 @@ auto ThreadPool::queue(F&& f, Arg&&... arg)->std::future<decltype(f(arg...))> {
     auto future = pck->get_future();
 
     // Notify a potentially waiting thread that a new task is available
-    _cv.notify_one();
+    _cv->notify_one();
 
     // And return the future back to the caller
     return future;

@@ -337,22 +337,22 @@ private:
     std::vector<Worker> _workers;
 
     /// The list of remaining tasks that might be addressed by the available Worker%s
-    TaskQueue _taskQueue;
+    std::shared_ptr<TaskQueue> _taskQueue;
 
     /// <code>true</code> if the ThreadPool is currently running, <code>false</code>
     /// otherwise
-    std::atomic_bool _isRunning;
+    std::shared_ptr<std::atomic_bool> _isRunning;
     
     /// The number of Worker%s that are currently waiting for a task
-    std::atomic_int _nWaiting;
+    std::shared_ptr<std::atomic_int> _nWaiting;
     
     /// The mutex used by the <code>condition_variable</code> <code>_cv</code> used to
     /// wait for and wake up Worker%s based on incoming Task%s
-    std::mutex _mutex;
+    std::shared_ptr<std::mutex> _mutex;
 
     /// The condition variable that is used to wake up Worker%s when new Task%s are
     /// incoming. Used in combination with <code>_mutex</code>
-    std::condition_variable _cv;
+    std::shared_ptr<std::condition_variable> _cv;
     
     /// The user-defined function that is called at initialization for each of the Worker
     /// threads
