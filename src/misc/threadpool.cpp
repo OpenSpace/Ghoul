@@ -212,7 +212,8 @@ void ThreadPool::activateWorker(Worker& worker) {
     std::function<void()> workerInitialization = _workerInitialization;
     std::function<void()> workerDeinitialization = _workerDeinitialization;
 
-    bool finishedInitializing = false;
+
+    volatile bool finishedInitializing = false;
 
     // capturing the shared_ptrs by value to maintain a copy
     auto workerLoop = [
