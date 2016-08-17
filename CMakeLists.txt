@@ -91,8 +91,9 @@ if (MSVC)
     target_compile_options(
         Ghoul
         PUBLIC
-        "/MP"
-        "/W4"
+        "/ZI"       # Edit and continue support
+        "/MP"       # Multi-threading support
+        "/W4"       # Highest warning level
         "/w14265"
         "/wd4201"
         "/wd4127"

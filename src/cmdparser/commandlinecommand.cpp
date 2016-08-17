@@ -110,8 +110,7 @@ std::string CommandlineCommand::help() const {
     return result;
 }
 
-void CommandlineCommand::checkParameters(
-                                     const std::vector<std::string>& parameters) const
+void CommandlineCommand::checkParameters(const std::vector<std::string>& parameters) const
 {
     if (parameters.size() != static_cast<size_t>(argumentNumber())) {
         throw CommandParameterException(fmt::format(
