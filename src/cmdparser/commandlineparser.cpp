@@ -54,19 +54,22 @@ int extractArguments(const std::vector<std::string>& in, std::vector<std::string
 {
     int num = 0;
     if (count == -1) {
-        for (size_t i = 0; (i < in.size()) && ((begin+1+i) < in.size()) ; ++i, ++num)
-            out.push_back(in[begin+1+i]);
+        for (size_t i = 0; (i < in.size()) && ((begin + 1 + i) < in.size()); ++i, ++num) {
+            out.push_back(in[begin + 1 + i]);
+        }
     }
     else
         if (count == -2) {
             // Extract arguments until a new command is found
             // The '-' restriction is enforced in the #addCommand method
-            for (size_t i = begin; (i < in.size()) && (in[i][0] != '-'); ++i, ++num)
+            for (size_t i = begin; (i < in.size()) && (in[i][0] != '-'); ++i, ++num) {
                 out.push_back(in[i]);
+            }
         }
     else {
-        for (int i = 0; (i < count) && ((begin+1+i) < in.size()) ; ++i, ++num)
-            out.push_back(in[begin+1+i]);
+        for (int i = 0; (i < count) && ((begin + 1 + i) < in.size()); ++i, ++num) {
+            out.push_back(in[begin + 1 + i]);
+        }
     }
     return num;
 }
@@ -97,7 +100,7 @@ CommandlineParser::~CommandlineParser() {
 }
     
 void CommandlineParser::setAllowUnknownCommands(AllowUnknownCommands unknownCommands) {
-    _allowUnknownCommands = unknownCommands == AllowUnknownCommands::Yes ? true : false;
+    _allowUnknownCommands = (unknownCommands == AllowUnknownCommands::Yes) ? true : false;
 }
 
 bool CommandlineParser::allowsUnknownCommands() const {
@@ -109,36 +112,33 @@ const std::string& CommandlineParser::programPath() const {
 }
 
 std::shared_ptr<const std::vector<std::string>> CommandlineParser::setCommandLine(
-    int argc, char** argv)
+    std::vector<std::string> arguments)
 {
-    ghoul_assert(argv, "Argv cannot be a nullptr");
+    // arguments[0] = program name
+    // arguments[i] = i-th argument
+    ghoul_assert(!arguments.empty(), "Arguments must not be empty");
+    _programPath = arguments.front();
 
-    // argv[0] = program name
-    // argv[i] = i-th argument
-    if (argc > 0 && argv && argv[0])
-        _programPath = argv[0];
-    else
-        _programPath = "";
-    
     // Might be possible that someone calls us multiple times
     _arguments.clear();
     _remainingArguments->clear();
     
     // Just add the arguments to the vector
-    for (int i = 1; i < argc; ++i)
-        _arguments.push_back(argv[i]);
+    _arguments.assign(arguments.begin() + 1, arguments.end());
     
     return _remainingArguments;
 }
 
 bool CommandlineParser::execute() {
-    if (_arguments.empty())
+    if (_arguments.empty()) {
         return false;
+    }
 
     // There is only one argument and this is either "-h" or "--help"
     // so display the help
-    if (hasOnlyHelpCommand())
+    if (hasOnlyHelpCommand()) {
         return true;
+    }
 
     std::vector<std::string> argumentsForNameless;
 
@@ -166,8 +166,9 @@ bool CommandlineParser::execute() {
                 if (_allowUnknownCommands) {
                     std::vector<std::string> arguments;
                     int number = extractArguments(_arguments, arguments, i, -2);
-                    for (const std::string& arg : arguments)
-                        _remainingArguments->push_back(arg);                    
+                    for (const std::string& arg : arguments) {
+                        _remainingArguments->push_back(arg);
+                    }
                     i += (number - 1);
                 }
             }
@@ -184,8 +185,9 @@ bool CommandlineParser::execute() {
                     std::vector<std::string> arguments;
                     int number = extractArguments(_arguments, arguments, i, -2);
                     _remainingArguments->push_back(_arguments[i]);
-                    for (const std::string& arg : arguments)
+                    for (const std::string& arg : arguments) {
                         _remainingArguments->push_back(arg);
+                    }
                     i += number;
                     continue;
                 }
@@ -197,8 +199,9 @@ bool CommandlineParser::execute() {
             }
 
             std::vector<std::string> parameters;
-            int number = extractArguments(_arguments, parameters, i,
-                                          currentCommand->argumentNumber());
+            int number = extractArguments(
+                _arguments, parameters, i, currentCommand->argumentNumber()
+            );
             i += number;
 
             // don't insert if the command doesn't allow multiple calls and already is in
@@ -222,8 +225,9 @@ bool CommandlineParser::execute() {
     // command. If so, bail out
     if (!argumentsForNameless.empty() && (!_commandForNamelessArguments)) {
         if (_allowUnknownCommands) {
-            for (std::string arg : argumentsForNameless)
+            for (std::string arg : argumentsForNameless) {
                 _remainingArguments->push_back(arg);
+            }
         }
         else {
             throw CommandlineException(
@@ -233,19 +237,22 @@ bool CommandlineParser::execute() {
     }
 
     // Second step: Check if every command is happy with the parameters assigned to it
-    for (const auto& it : parameterMap)
+    for (const auto& it : parameterMap) {
         it.first->checkParameters(it.second);
+    }
 
     // Second-and-a-half step: Display pairs for (command,argument) in debug level
     std::stringstream s;
-    for (const std::string& arg : argumentsForNameless)
+    for (const std::string& arg : argumentsForNameless) {
         s << " " << arg;
+    }
     LDEBUG(format("(Nameless argument: {})", s.str()));
     
     for (const auto& it : parameterMap) {
         s.clear();
-        for (const std::string& arg : it.second)
+        for (const std::string& arg : it.second) {
             s << " " << arg;
+        }
         LDEBUG(format("({}: {})", it.first->name(), s.str()));
     }
 
@@ -257,8 +264,9 @@ bool CommandlineParser::execute() {
 
     // Fourth step: Execute the commands (this step is only done if everyone is happy up
     // until now)
-    for (const auto& it : parameterMap)
+    for (const auto& it : parameterMap) {
         it.first->execute(it.second);
+    }
     
     // If we made it this far it means that all commands have been executed successfully
     return false;
@@ -268,8 +276,9 @@ bool CommandlineParser::addCommand(std::unique_ptr<CommandlineCommand> cmd) {
     ghoul_assert(cmd, "Command must not be empty");
     ghoul_assert(!getCommand(cmd->name()), "Name was previously registered");
     
-    if (!cmd->shortName().empty())
+    if (!cmd->shortName().empty()) {
         ghoul_assert(!getCommand(cmd->shortName()), "Shortname was previously registered");
+    }
     
     _commands.push_back(std::move(cmd));
     return true;
@@ -306,20 +315,24 @@ void CommandlineParser::displayUsage(const std::string& command,
     std::string usageString = "Usage: ";
 
     if (command.empty()) {
-        if (!_programName.empty())
+        if (!_programName.empty()) {
             usageString += _programName + " ";
+        }
 
-        if (_commandForNamelessArguments)
+        if (_commandForNamelessArguments) {
             usageString += _commandForNamelessArguments->usage() + " ";
+        }
 
         for (auto& it : _commands) {
-            if (it)
+            if (it) {
                 usageString += "\n" + it->usage() + " ";
+            }
         }
     } else {
         for (auto& it : _commands) {
-            if (it && (it->name() == command || it->shortName() == command))
+            if (it && (it->name() == command || it->shortName() == command)) {
                 usageString += "\n" + it->usage() + " ";
+            }
         }
     }
 
@@ -332,16 +345,19 @@ void CommandlineParser::displayHelp(std::ostream& stream) const {
     stream << std::endl << std::endl <<
         "Help:" << std::endl << "-----" << std::endl;
 
-    for (auto& it : _commands)
+    for (auto& it : _commands) {
         stream << it->help() << std::endl;
+    }
 }
 
 CommandlineCommand* CommandlineParser::getCommand(const std::string& shortOrLongName) {
-    if (shortOrLongName.empty())
+    if (shortOrLongName.empty()) {
         return nullptr;
+    }
     for (auto& it : _commands) {
-        if ((it->name() == shortOrLongName) || (it->shortName() == shortOrLongName))
+        if ((it->name() == shortOrLongName) || (it->shortName() == shortOrLongName)) {
             return it.get();
+        }
     }
     return nullptr;
 }
