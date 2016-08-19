@@ -76,7 +76,7 @@ TextureAtlas::TextureAtlas(glm::ivec3 size)
             format = Texture::Format::RGBA;
             break;
         default:
-            ghoul_assert(false, "Wrong texture depth");
+            throw ghoul::RuntimeError("Wrong texture depth", "TextureAtlas");
     }
     GLuint internalFormat = format;
     

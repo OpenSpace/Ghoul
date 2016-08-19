@@ -98,15 +98,16 @@ public:
 
     /**
      * Sets the command-line given from the main function.
-     * \param argc The number of arguments
-     * \param argv The arguments themselves, this argument cannot be a
-     * <code>nullptr</code>
+     * \param arguments The commandline arguments, beginning with the name of the
+     * application
      * \return The storage for the commands that have not been consumed by the
      * CommandlineParser. The <code>vector</code> will be cleared by this function and
      * will be filled by the execute method
-     * \pre \p argv must not be a <code>nullptr</code>
+     * \pre \p arguments must not be empty
      */
-    std::shared_ptr<const std::vector<std::string>> setCommandLine(int argc, char** argv);
+    std::shared_ptr<const std::vector<std::string>> setCommandLine(
+        std::vector<std::string> arguments
+    );
 
     /**
      * Parses the command-line (setCommandLine), evaluates all the commands

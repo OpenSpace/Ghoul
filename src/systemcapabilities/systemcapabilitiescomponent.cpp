@@ -55,8 +55,9 @@ SystemCapabilitiesComponent::SystemCapabilitiesComponent(InitializeWMI initializ
 
 SystemCapabilitiesComponent::~SystemCapabilitiesComponent() {
 #ifdef GHOUL_USE_WMI
-    if (isWMIInitialized())
+    if (isWMIInitialized()) {
         deinitializeWMI();
+    }
 #endif
 }
 
@@ -155,11 +156,13 @@ void SystemCapabilitiesComponent::deinitializeWMI() {
     ghoul_assert(isWMIInitialized(), "WMI must have been initialized");
 
     LDEBUG("Deinitializing WMI.");
-    if (_iwbemLocator)
+    if (_iwbemLocator) {
         _iwbemLocator->Release();
+    }
     _iwbemLocator = nullptr;
-    if (_iwbemServices)
+    if (_iwbemServices) {
         _iwbemServices->Release();
+    }
     _iwbemServices = nullptr;
 
     CoUninitialize();
@@ -190,25 +193,25 @@ bool SystemCapabilitiesComponent::isWMIInitialized() {
 }
 
 VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
-                                               const std::string& attribute)
-{
+                                               const std::string& attribute) {
     const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
     ghoul_assert(isWMIInitialized(), "WMI must have been initialized");
     ghoul_assert(!wmiClass.empty(), "wmiClass must not be empty");
     ghoul_assert(!attribute.empty(), "Attribute must not be empty");
-    
+
     VARIANT* result = nullptr;
     IEnumWbemClassObject* enumerator = nullptr;
     std::string query = "SELECT " + attribute + " FROM " + wmiClass;
     HRESULT hRes = _iwbemServices->ExecQuery(
         bstr_t("WQL"),
         bstr_t(query.c_str()),
-        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, 
+        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
         NULL,
         &enumerator
     );
-    if (FAILED(hRes))
+    if (FAILED(hRes)) {
         throw WMIError("WMI query failed", hRes);
+    }
 
     IWbemClassObject* pclsObject = nullptr;
     ULONG returnValue = 0;
@@ -233,14 +236,18 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
     }
 
     if (FAILED(hr)) {
-        VariantClear(result);
+        if (result != 0) {
+            VariantClear(result);
+        }
         throw WMIError("No WMI query result", hr);
     }
 
-    if (enumerator)
+    if (enumerator) {
         enumerator->Release();
-    if (pclsObject)
+    }
+    if (pclsObject) {
         pclsObject->Release();
+    }
 
     return result;
 }
