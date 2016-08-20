@@ -65,7 +65,7 @@ protected:
 };
 
 TEST_F(CommandlineParserTest, UnknownCommandsUnhandled) {
-    char* argv[] = {
+    std::vector<std::string> argv = {
         "tests",
         "-cmd1",
         "arg",
@@ -73,12 +73,12 @@ TEST_F(CommandlineParserTest, UnknownCommandsUnhandled) {
         "arg2"
     };
 
-    _p->setCommandLine(5, argv);
+    _p->setCommandLine(argv);
     EXPECT_THROW(_p->execute(), ghoul::cmdparser::CommandlineParser::CommandlineException);
 }
 
 TEST_F(CommandlineParserTest, UnknownCommandsHandledCorrectly) {
-    char* argv[] = {
+    std::vector<std::string> argv = {
         "tests",
         "-cmd1",
         "arg",
@@ -88,12 +88,12 @@ TEST_F(CommandlineParserTest, UnknownCommandsHandledCorrectly) {
 
     using ghoul::cmdparser::CommandlineParser;
     _p->setAllowUnknownCommands(CommandlineParser::AllowUnknownCommands::Yes);
-    _p->setCommandLine(5, argv);
+    _p->setCommandLine(argv);
     EXPECT_NO_THROW(_p->execute());
 }
 
 TEST_F(CommandlineParserTest, UnknownCommandsInterspersed) {
-    char* argv[] = {
+    std::vector<std::string> argv = {
         "tests",
         "-cmd1",
         "arg",
@@ -110,7 +110,7 @@ TEST_F(CommandlineParserTest, UnknownCommandsInterspersed) {
 
     using ghoul::cmdparser::CommandlineParser;
     _p->setAllowUnknownCommands(CommandlineParser::AllowUnknownCommands::Yes);
-    auto arguments = _p->setCommandLine(8, argv);
+    auto arguments = _p->setCommandLine(argv);
     
     ASSERT_NO_THROW(_p->execute());
 
@@ -128,12 +128,12 @@ TEST_F(CommandlineParserTest, SingleZeroCommandArguments) {
     using T = ghoul::cmdparser::SingleCommandZeroArguments;
     _p->addCommand(std::make_unique<T>(&v, "-zero"));
 
-    char* argv[] = {
+    std::vector<std::string> argv = {
         "tests",
         "-zero"
     };
 
-    _p->setCommandLine(2, argv);
+    _p->setCommandLine(argv);
     EXPECT_NO_THROW(_p->execute());
     EXPECT_EQ(true, v);
 }
@@ -145,24 +145,24 @@ TEST_F(CommandlineParserTest, SingleCommandOneArgumentBool) {
     _p->addCommand(std::make_unique<T>(&v, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0"
         };
 
-        _p->setCommandLine(3, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v) << "0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1"
         };
 
-        _p->setCommandLine(3, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v) << "1";
     }
@@ -174,7 +174,7 @@ TEST_F(CommandlineParserTest, SingleCommandCalledMultipleTimes) {
     using T = ghoul::cmdparser::SingleCommand<bool>;
     _p->addCommand(std::make_unique<T>(&v, "-single"));
 
-    char* argv[] = {
+    std::vector<std::string> argv = {
         "tests",
         "-single",
         "0",
@@ -182,7 +182,7 @@ TEST_F(CommandlineParserTest, SingleCommandCalledMultipleTimes) {
         "0"
     };
 
-    _p->setCommandLine(5, argv);
+    _p->setCommandLine(argv);
     EXPECT_THROW(_p->execute(), ghoul::cmdparser::CommandlineParser::CommandlineException);
 }
 
@@ -198,7 +198,7 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
     _p->addCommand(std::make_unique<T>(&v3, "-cmd3"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-cmd1",
             "1",
@@ -208,7 +208,7 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
             "3"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1) << "cmd1 cmd2 cmd3";
         EXPECT_EQ(2, v2) << "cmd1 cmd2 cmd3";
@@ -218,7 +218,7 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
     v2 = 0;
     v3 = 0;
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-cmd2",
             "2",
@@ -228,7 +228,7 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
             "3"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1) << "cmd2 cmd1 cmd3";
         EXPECT_EQ(2, v2) << "cmd2 cmd1 cmd3";
@@ -238,7 +238,7 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
     v2 = 0;
     v3 = 0;
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-cmd3",
             "3",
@@ -248,7 +248,7 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1) << "cmd3 cmd2 cmd1";
         EXPECT_EQ(2, v2) << "cmd3 cmd2 cmd1";
@@ -258,7 +258,7 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
     v2 = 0;
     v3 = 0;
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-cmd3",
             "3",
@@ -268,7 +268,7 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
             "2"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1) << "cmd3 cmd1 cmd2";
         EXPECT_EQ(2, v2) << "cmd3 cmd1 cmd2";
@@ -283,24 +283,24 @@ TEST_F(CommandlineParserTest, SingleCommandOneArgumentInt) {
     _p->addCommand(std::make_unique<T>(&v, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1"
         };
 
-        _p->setCommandLine(3, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v) << "1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0"
         };
 
-        _p->setCommandLine(3, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(0, v) << "0";
     }
@@ -313,24 +313,24 @@ TEST_F(CommandlineParserTest, SingleCommandOneArgumentString) {
     _p->addCommand(std::make_unique<T>(&v, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "foo"
         };
 
-        _p->setCommandLine(3, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ("foo", v) << "foo";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "bar"
         };
 
-        _p->setCommandLine(3, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ("bar", v) << "bar";
     }
@@ -344,53 +344,53 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolBool) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 0";
         EXPECT_EQ(false, v2) << "0 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 0";
         EXPECT_EQ(false, v2) << "1 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 1";
         EXPECT_EQ(true, v2) << "0 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 1";
         EXPECT_EQ(true, v2) << "1 1";
@@ -405,53 +405,53 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntInt) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(0, v1) << "0 0";
         EXPECT_EQ(0, v2) << "0 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1) << "1 0";
         EXPECT_EQ(0, v2) << "1 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(0, v1) << "0 1";
         EXPECT_EQ(1, v2) << "0 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1) << "1 1";
         EXPECT_EQ(1, v2) << "1 1";
@@ -466,53 +466,53 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringString) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ("0", v1) << "0 0";
         EXPECT_EQ("0", v2) << "0 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ("1", v1) << "1 0";
         EXPECT_EQ("0", v2) << "1 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ("0", v1) << "0 1";
         EXPECT_EQ("1", v2) << "0 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ("1", v1) << "1 1";
         EXPECT_EQ("1", v2) << "1 1";
@@ -527,53 +527,53 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolInt) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 0";
         EXPECT_EQ(0, v2) << "0 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 0";
         EXPECT_EQ(0, v2) << "1 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 1";
         EXPECT_EQ(1, v2) << "0 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 1";
         EXPECT_EQ(1, v2) << "1 1";
@@ -588,53 +588,53 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntBool) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(0, v1) << "0 0";
         EXPECT_EQ(false, v2) << "0 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1) << "1 0";
         EXPECT_EQ(false, v2) << "1 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(0, v1) << "0 1";
         EXPECT_EQ(true, v2) << "0 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1) << "1 1";
         EXPECT_EQ(true, v2) << "1 1";
@@ -649,53 +649,53 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntString) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(0, v1) << "0 0";
         EXPECT_EQ("0", v2) << "0 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1) << "1 0";
         EXPECT_EQ("0", v2) << "1 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(0, v1) << "0 1";
         EXPECT_EQ("1", v2) << "0 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1) << "1 1";
         EXPECT_EQ("1", v2) << "1 1";
@@ -710,53 +710,53 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringInt) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ("0", v1) << "0 0";
         EXPECT_EQ(0, v2) << "0 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ("1", v1) << "1 0";
         EXPECT_EQ(0, v2) << "1 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ("0", v1) << "0 1";
         EXPECT_EQ(1, v2) << "0 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ("1", v1) << "1 1";
         EXPECT_EQ(1, v2) << "1 1";
@@ -771,7 +771,7 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, &v3, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -779,14 +779,14 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 0 0";
         EXPECT_EQ(0, v2) << "0 0 0";
         EXPECT_EQ("0", v3) << "0 0 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -794,14 +794,14 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 0 0";
         EXPECT_EQ(0, v2) << "1 0 0";
         EXPECT_EQ("0", v3) << "1 0 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -810,14 +810,14 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 1 0";
         EXPECT_EQ(1, v2) << "0 1 0";
         EXPECT_EQ("0", v3) << "0 1 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -826,7 +826,7 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 1 0";
         EXPECT_EQ(1, v2) << "1 1 0";
@@ -834,7 +834,7 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
     }
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -842,14 +842,14 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 0 1";
         EXPECT_EQ(0, v2) << "0 0 1";
         EXPECT_EQ("1", v3) << "0 0 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -857,14 +857,14 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 0 1";
         EXPECT_EQ(0, v2) << "1 0 1";
         EXPECT_EQ("1", v3) << "1 0 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -873,14 +873,14 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 1 1";
         EXPECT_EQ(1, v2) << "0 1 1";
         EXPECT_EQ("1", v3) << "0 1 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -889,7 +889,7 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 1 1";
         EXPECT_EQ(1, v2) << "1 1 1";
@@ -907,7 +907,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, &v3, &v4, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -916,7 +916,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 0 0 0";
         EXPECT_EQ(0, v2) << "0 0 0 0";
@@ -924,7 +924,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         EXPECT_EQ(0.f, v4) << "0 0 0 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -933,7 +933,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 0 0 0";
         EXPECT_EQ(0, v2) << "1 0 0 0";
@@ -941,7 +941,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         EXPECT_EQ(0.f, v4) << "1 0 0 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -950,7 +950,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 1 0 0";
         EXPECT_EQ(1, v2) << "0 1 0 0";
@@ -958,7 +958,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         EXPECT_EQ(0.f, v4) << "0 1 0 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -967,7 +967,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 1 0 0";
         EXPECT_EQ(1, v2) << "1 1 0 0";
@@ -976,7 +976,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
     }
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -985,7 +985,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 0 1 0";
         EXPECT_EQ(0, v2) << "0 0 1 0";
@@ -993,7 +993,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         EXPECT_EQ(0.f, v4) << "0 0 1 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1002,7 +1002,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 0 1 0";
         EXPECT_EQ(0, v2) << "1 0 1 0";
@@ -1010,7 +1010,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         EXPECT_EQ(0.f, v4) << "1 0 1 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1019,7 +1019,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 1 1 0";
         EXPECT_EQ(1, v2) << "0 1 1 0";
@@ -1027,7 +1027,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         EXPECT_EQ(0.f, v4) << "0 1 1 0";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1036,7 +1036,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 1 1 0";
         EXPECT_EQ(1, v2) << "1 1 1 0";
@@ -1045,7 +1045,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
     }
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1054,7 +1054,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 0 0 1";
         EXPECT_EQ(0, v2) << "0 0 0 1";
@@ -1062,7 +1062,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         EXPECT_EQ(1.f, v4) << "0 0 0 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1071,7 +1071,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 0 0 1";
         EXPECT_EQ(0, v2) << "1 0 0 1";
@@ -1079,7 +1079,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         EXPECT_EQ(1.f, v4) << "1 0 0 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1088,7 +1088,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 1 0 1";
         EXPECT_EQ(1, v2) << "0 1 0 1";
@@ -1096,7 +1096,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         EXPECT_EQ(1.f, v4) << "0 1 0 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1105,7 +1105,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 1 0 1";
         EXPECT_EQ(1, v2) << "1 1 0 1";
@@ -1114,7 +1114,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
     }
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1123,7 +1123,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 0 1 1";
         EXPECT_EQ(0, v2) << "0 0 1 1";
@@ -1131,7 +1131,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         EXPECT_EQ(1.f, v4) << "0 0 1 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1140,7 +1140,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 0 1 1";
         EXPECT_EQ(0, v2) << "1 0 1 1";
@@ -1148,7 +1148,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         EXPECT_EQ(1.f, v4) << "1 0 1 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1157,7 +1157,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(false, v1) << "0 1 1 1";
         EXPECT_EQ(1, v2) << "0 1 1 1";
@@ -1165,7 +1165,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
         EXPECT_EQ(1.f, v4) << "0 1 1 1";
     }
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1174,7 +1174,7 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(true, v1) << "1 1 1 1";
         EXPECT_EQ(1, v2) << "1 1 1 1";
@@ -1189,20 +1189,20 @@ TEST_F(CommandlineParserTest, MultipleZeroCommandArguments) {
     _p->addCommand(std::make_unique<T>(&v, "-zero"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-zero",
             "-zero"
         };
 
-        _p->setCommandLine(3, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v) << "2x zero";
     }
 
     v = 0;
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-zero",
             "-zero",
@@ -1212,7 +1212,7 @@ TEST_F(CommandlineParserTest, MultipleZeroCommandArguments) {
             "-zero"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(6, v) << "6x zero";
     }
@@ -1224,33 +1224,33 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
     _p->addCommand(std::make_unique<T>(&v, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0"
         };
 
-        _p->setCommandLine(3, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v.size()) << "0";
         EXPECT_EQ(false, v[0]) << "0";
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1"
         };
 
-        _p->setCommandLine(3, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v.size()) << "1";
         EXPECT_EQ(true, v[0]) << "1";
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1258,7 +1258,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
             "0"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v.size()) << "0 0";
         EXPECT_EQ(false, v[0]) << "0 0";
@@ -1266,7 +1266,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1274,7 +1274,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
             "0"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v.size()) << "1 0";
         EXPECT_EQ(true, v[0]) << "1 0";
@@ -1282,7 +1282,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1290,7 +1290,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
             "1"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v.size()) << "0 1";
         EXPECT_EQ(false, v[0]) << "0 1";
@@ -1298,7 +1298,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1306,7 +1306,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
             "0"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v.size()) << "1 1";
         EXPECT_EQ(true, v[0]) << "1 1";
@@ -1321,33 +1321,33 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
     _p->addCommand(std::make_unique<T>(&v, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1"
         };
 
-        _p->setCommandLine(3, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v.size()) << "1";
         EXPECT_EQ(1, v[0]) << "1";
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0"
         };
 
-        _p->setCommandLine(3, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v.size()) << "0";
         EXPECT_EQ(0, v[0]) << "0";
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1355,7 +1355,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
             "0"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v.size()) << "1 0";
         EXPECT_EQ(1, v[0]) << "1 0";
@@ -1363,7 +1363,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1371,7 +1371,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
             "0"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v.size()) << "0 0";
         EXPECT_EQ(0, v[0]) << "0 0";
@@ -1379,7 +1379,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1387,7 +1387,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
             "1"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v.size()) << "1 1";
         EXPECT_EQ(1, v[0]) << "1 1";
@@ -1395,7 +1395,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1403,7 +1403,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
             "1"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v.size()) << "0 1";
         EXPECT_EQ(0, v[0]) << "0 1";
@@ -1419,33 +1419,33 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
     _p->addCommand(std::make_unique<T>(&v, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "foo"
         };
 
-        _p->setCommandLine(3, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v.size()) << "foo";
         EXPECT_EQ("foo", v[0]) << "foo";
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "bar"
         };
 
-        _p->setCommandLine(3, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v.size()) << "bar";
         EXPECT_EQ("bar", v[0]) << "bar";
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "foo",
@@ -1453,7 +1453,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
             "foo"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v.size()) << "foo foo";
         EXPECT_EQ("foo", v[0]) << "foo foo";
@@ -1461,7 +1461,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "bar",
@@ -1469,7 +1469,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
             "foo"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v.size()) << "bar foo";
         EXPECT_EQ("bar", v[0]) << "bar foo";
@@ -1477,7 +1477,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "foo",
@@ -1485,7 +1485,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
             "bar"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v.size()) << "foo bar";
         EXPECT_EQ("foo", v[0]) << "foo bar";
@@ -1493,7 +1493,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
     }
     v.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "bar",
@@ -1501,7 +1501,7 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
             "bar"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v.size()) << "bar bar";
         EXPECT_EQ("bar", v[0]) << "bar bar";
@@ -1517,14 +1517,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
     
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 0";
         EXPECT_EQ(1, v2.size()) << "0 0";
@@ -1534,14 +1534,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 0";
         EXPECT_EQ(1, v2.size()) << "1 0";
@@ -1551,14 +1551,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 1";
         EXPECT_EQ(1, v2.size()) << "0 1";
@@ -1568,14 +1568,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 1";
         EXPECT_EQ(1, v2.size()) << "1 1";
@@ -1585,7 +1585,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1595,7 +1595,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
@@ -1607,7 +1607,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1617,7 +1617,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
@@ -1629,7 +1629,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1639,7 +1639,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
@@ -1651,7 +1651,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1661,7 +1661,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
@@ -1673,7 +1673,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1683,7 +1683,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
@@ -1695,7 +1695,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1705,7 +1705,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
@@ -1717,7 +1717,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1727,7 +1727,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
@@ -1739,7 +1739,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1749,7 +1749,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
@@ -1768,14 +1768,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 0";
         EXPECT_EQ(1, v2.size()) << "0 0";
@@ -1785,14 +1785,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 0";
         EXPECT_EQ(1, v2.size()) << "1 0";
@@ -1802,14 +1802,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 1";
         EXPECT_EQ(1, v2.size()) << "0 1";
@@ -1819,14 +1819,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 1";
         EXPECT_EQ(1, v2.size()) << "1 1";
@@ -1836,7 +1836,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1846,7 +1846,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
@@ -1858,7 +1858,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1868,7 +1868,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
@@ -1880,7 +1880,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1890,7 +1890,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
@@ -1902,7 +1902,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1912,7 +1912,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
@@ -1924,7 +1924,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1934,7 +1934,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
@@ -1946,7 +1946,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1956,7 +1956,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
@@ -1968,7 +1968,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1978,7 +1978,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
@@ -1990,7 +1990,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2000,7 +2000,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
@@ -2021,14 +2021,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 0";
         EXPECT_EQ(1, v2.size()) << "0 0";
@@ -2038,14 +2038,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 0";
         EXPECT_EQ(1, v2.size()) << "1 0";
@@ -2055,14 +2055,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 1";
         EXPECT_EQ(1, v2.size()) << "0 1";
@@ -2072,14 +2072,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 1";
         EXPECT_EQ(1, v2.size()) << "1 1";
@@ -2089,7 +2089,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2099,7 +2099,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
@@ -2111,7 +2111,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2121,7 +2121,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
@@ -2133,7 +2133,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2143,7 +2143,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
@@ -2155,7 +2155,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2165,7 +2165,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
@@ -2177,7 +2177,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2187,7 +2187,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
@@ -2199,7 +2199,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2209,7 +2209,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
@@ -2221,7 +2221,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2231,7 +2231,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
@@ -2243,7 +2243,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2253,7 +2253,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
@@ -2272,14 +2272,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 0";
         EXPECT_EQ(1, v2.size()) << "0 0";
@@ -2289,14 +2289,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 0";
         EXPECT_EQ(1, v2.size()) << "1 0";
@@ -2306,14 +2306,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 1";
         EXPECT_EQ(1, v2.size()) << "0 1";
@@ -2323,14 +2323,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 1";
         EXPECT_EQ(1, v2.size()) << "1 1";
@@ -2340,7 +2340,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2350,7 +2350,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
@@ -2362,7 +2362,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2372,7 +2372,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
@@ -2384,7 +2384,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2394,7 +2394,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
@@ -2406,7 +2406,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2416,7 +2416,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
@@ -2428,7 +2428,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2438,7 +2438,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
@@ -2450,7 +2450,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2460,7 +2460,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
@@ -2472,7 +2472,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2482,7 +2482,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
@@ -2494,7 +2494,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2504,7 +2504,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
@@ -2523,14 +2523,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 0";
         EXPECT_EQ(1, v2.size()) << "0 0";
@@ -2540,14 +2540,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 0";
         EXPECT_EQ(1, v2.size()) << "1 0";
@@ -2557,14 +2557,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 1";
         EXPECT_EQ(1, v2.size()) << "0 1";
@@ -2574,14 +2574,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 1";
         EXPECT_EQ(1, v2.size()) << "1 1";
@@ -2591,7 +2591,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2601,7 +2601,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
@@ -2613,7 +2613,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2623,7 +2623,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
@@ -2635,7 +2635,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2645,7 +2645,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
@@ -2657,7 +2657,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2667,7 +2667,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
@@ -2679,7 +2679,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2689,7 +2689,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
@@ -2701,7 +2701,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2711,7 +2711,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
@@ -2723,7 +2723,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2733,7 +2733,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
@@ -2745,7 +2745,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2755,7 +2755,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
@@ -2774,14 +2774,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 0";
         EXPECT_EQ(1, v2.size()) << "0 0";
@@ -2791,14 +2791,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 0";
         EXPECT_EQ(1, v2.size()) << "1 0";
@@ -2808,14 +2808,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 1";
         EXPECT_EQ(1, v2.size()) << "0 1";
@@ -2825,14 +2825,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 1";
         EXPECT_EQ(1, v2.size()) << "1 1";
@@ -2842,7 +2842,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2852,7 +2852,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
@@ -2864,7 +2864,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2874,7 +2874,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
@@ -2886,7 +2886,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2896,7 +2896,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
@@ -2908,7 +2908,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2918,7 +2918,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
@@ -2930,7 +2930,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2940,7 +2940,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
@@ -2952,7 +2952,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2962,7 +2962,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
@@ -2974,7 +2974,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2984,7 +2984,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
@@ -2996,7 +2996,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3006,7 +3006,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
@@ -3025,14 +3025,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 0";
         EXPECT_EQ(1, v2.size()) << "0 0";
@@ -3042,14 +3042,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "0"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 0";
         EXPECT_EQ(1, v2.size()) << "1 0";
@@ -3059,14 +3059,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 1";
         EXPECT_EQ(1, v2.size()) << "0 1";
@@ -3076,14 +3076,14 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1"
         };
 
-        _p->setCommandLine(4, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 1";
         EXPECT_EQ(1, v2.size()) << "1 1";
@@ -3093,7 +3093,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3103,7 +3103,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
@@ -3115,7 +3115,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3125,7 +3125,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
@@ -3137,7 +3137,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3147,7 +3147,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
@@ -3159,7 +3159,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3169,7 +3169,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "0"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
         EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
@@ -3181,7 +3181,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3191,7 +3191,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
@@ -3203,7 +3203,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3213,7 +3213,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
@@ -3225,7 +3225,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3235,7 +3235,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
@@ -3247,7 +3247,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
     v1.clear();
     v2.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3257,7 +3257,7 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "1"
         };
 
-        _p->setCommandLine(7, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
         EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
@@ -3276,7 +3276,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, &v3, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3284,7 +3284,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 0 0";
         EXPECT_EQ(1, v2.size()) << "0 0 0";
@@ -3297,7 +3297,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3305,7 +3305,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 0 0";
         EXPECT_EQ(1, v2.size()) << "1 0 0";
@@ -3318,7 +3318,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3327,7 +3327,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 1 0";
         EXPECT_EQ(1, v2.size()) << "0 1 0";
@@ -3340,7 +3340,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3349,7 +3349,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 1 0";
         EXPECT_EQ(1, v2.size()) << "1 1 0";
@@ -3362,7 +3362,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3370,7 +3370,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 0 1";
         EXPECT_EQ(1, v2.size()) << "0 0 1";
@@ -3383,7 +3383,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3391,7 +3391,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 0 1";
         EXPECT_EQ(1, v2.size()) << "1 0 1";
@@ -3404,7 +3404,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3413,7 +3413,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 1 1";
         EXPECT_EQ(1, v2.size()) << "0 1 1";
@@ -3426,7 +3426,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3435,7 +3435,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(5, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 1 1";
         EXPECT_EQ(1, v2.size()) << "1 1 1";
@@ -3448,7 +3448,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3460,7 +3460,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 0 | 0 0 0";
         EXPECT_EQ(2, v2.size()) << "0 0 0 | 0 0 0";
@@ -3476,7 +3476,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3488,7 +3488,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 0 | 0 0 0";
         EXPECT_EQ(2, v2.size()) << "1 0 0 | 0 0 0";
@@ -3504,7 +3504,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3517,7 +3517,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 0 | 0 0 0";
         EXPECT_EQ(2, v2.size()) << "0 1 0 | 0 0 0";
@@ -3533,7 +3533,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3546,7 +3546,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 0 | 0 0 0";
         EXPECT_EQ(2, v2.size()) << "1 1 0 | 0 0 0";
@@ -3562,7 +3562,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3574,7 +3574,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 1 | 0 0 0";
         EXPECT_EQ(2, v2.size()) << "0 0 1 | 0 0 0";
@@ -3590,7 +3590,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3602,7 +3602,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 1 | 0 0 0";
         EXPECT_EQ(2, v2.size()) << "1 0 1 | 0 0 0";
@@ -3618,7 +3618,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3631,7 +3631,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 1 | 0 0 0";
         EXPECT_EQ(2, v2.size()) << "0 1 1 | 0 0 0";
@@ -3647,7 +3647,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3660,7 +3660,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 1 | 0 0 0";
         EXPECT_EQ(2, v2.size()) << "1 1 1 | 0 0 0";
@@ -3676,7 +3676,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3688,7 +3688,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 0 | 1 1 1";
         EXPECT_EQ(2, v2.size()) << "0 0 0 | 1 1 1";
@@ -3704,7 +3704,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3716,7 +3716,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 0 | 1 1 1";
         EXPECT_EQ(2, v2.size()) << "1 0 0 | 1 1 1";
@@ -3732,7 +3732,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3745,7 +3745,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 0 | 1 1 1";
         EXPECT_EQ(2, v2.size()) << "0 1 0 | 1 1 1";
@@ -3761,7 +3761,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3774,7 +3774,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 0 | 1 1 1";
         EXPECT_EQ(2, v2.size()) << "1 1 0 | 1 1 1";
@@ -3790,7 +3790,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3802,7 +3802,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 1 | 1 1 1";
         EXPECT_EQ(2, v2.size()) << "0 0 1 | 1 1 1";
@@ -3818,7 +3818,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3830,7 +3830,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 1 | 1 1 1";
         EXPECT_EQ(2, v2.size()) << "1 0 1 | 1 1 1";
@@ -3846,7 +3846,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3859,7 +3859,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 1 | 1 1 1";
         EXPECT_EQ(2, v2.size()) << "0 1 1 | 1 1 1";
@@ -3875,7 +3875,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
     v2.clear();
     v3.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3888,7 +3888,7 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
 
         };
 
-        _p->setCommandLine(9, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 1 | 1 1 1";
         EXPECT_EQ(2, v2.size()) << "1 1 1 | 1 1 1";
@@ -3912,7 +3912,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     _p->addCommand(std::make_unique<T>(&v1, &v2, &v3, &v4, "-single"));
 
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3921,7 +3921,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 0 0 0";
         EXPECT_EQ(1, v2.size()) << "0 0 0 0";
@@ -3937,7 +3937,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3946,7 +3946,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 0 0 0";
         EXPECT_EQ(1, v2.size()) << "1 0 0 0";
@@ -3962,7 +3962,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3971,7 +3971,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 1 0 0";
         EXPECT_EQ(1, v2.size()) << "0 1 0 0";
@@ -3987,7 +3987,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3996,7 +3996,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 1 0 0";
         EXPECT_EQ(1, v2.size()) << "1 1 0 0";
@@ -4012,7 +4012,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4021,7 +4021,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 0 1 0";
         EXPECT_EQ(1, v2.size()) << "0 0 1 0";
@@ -4037,7 +4037,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4046,7 +4046,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 0 1 0";
         EXPECT_EQ(1, v2.size()) << "1 0 1 0";
@@ -4062,7 +4062,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4071,7 +4071,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 1 1 0";
         EXPECT_EQ(1, v2.size()) << "0 1 1 0";
@@ -4087,7 +4087,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4096,7 +4096,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 1 1 0";
         EXPECT_EQ(1, v2.size()) << "1 1 1 0";
@@ -4112,7 +4112,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4121,7 +4121,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 0 0 1";
         EXPECT_EQ(1, v2.size()) << "0 0 0 1";
@@ -4137,7 +4137,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4146,7 +4146,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 0 0 1";
         EXPECT_EQ(1, v2.size()) << "1 0 0 1";
@@ -4162,7 +4162,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4171,7 +4171,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 1 0 1";
         EXPECT_EQ(1, v2.size()) << "0 1 0 1";
@@ -4187,7 +4187,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4196,7 +4196,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 1 0 1";
         EXPECT_EQ(1, v2.size()) << "1 1 0 1";
@@ -4212,7 +4212,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4221,7 +4221,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 0 1 1";
         EXPECT_EQ(1, v2.size()) << "0 0 1 1";
@@ -4237,7 +4237,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4246,7 +4246,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 0 1 1";
         EXPECT_EQ(1, v2.size()) << "1 0 1 1";
@@ -4262,7 +4262,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4271,7 +4271,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "0 1 1 1";
         EXPECT_EQ(1, v2.size()) << "0 1 1 1";
@@ -4287,7 +4287,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4296,7 +4296,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(6, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(1, v1.size()) << "1 1 1 1";
         EXPECT_EQ(1, v2.size()) << "1 1 1 1";
@@ -4312,7 +4312,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4326,7 +4326,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 0 0 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "0 0 0 0 | 0 0 0 0";
@@ -4346,7 +4346,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4360,7 +4360,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 0 0 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "1 0 0 0 | 0 0 0 0";
@@ -4380,7 +4380,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4394,7 +4394,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 0 0 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "0 1 0 0 | 0 0 0 0";
@@ -4414,7 +4414,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4428,7 +4428,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 0 0 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "1 1 0 0 | 0 0 0 0";
@@ -4448,7 +4448,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4462,7 +4462,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 1 0 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "0 0 1 0 | 0 0 0 0";
@@ -4482,7 +4482,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4496,7 +4496,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 1 0 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "1 0 1 0 | 0 0 0 0";
@@ -4516,7 +4516,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4530,7 +4530,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 1 0 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "0 1 1 0 | 0 0 0 0";
@@ -4550,7 +4550,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4564,7 +4564,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 1 0 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "1 1 1 0 | 0 0 0 0";
@@ -4584,7 +4584,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4598,7 +4598,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 0 1 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "0 0 0 1 | 0 0 0 0";
@@ -4618,7 +4618,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4632,7 +4632,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 0 1 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "1 0 0 1 | 0 0 0 0";
@@ -4652,7 +4652,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4666,7 +4666,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 0 1 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "0 1 0 1 | 0 0 0 0";
@@ -4686,7 +4686,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4700,7 +4700,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 0 1 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "1 1 0 1 | 0 0 0 0";
@@ -4720,7 +4720,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4734,7 +4734,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 1 1 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "0 0 1 1 | 0 0 0 0";
@@ -4754,7 +4754,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4768,7 +4768,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 1 1 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "1 0 1 1 | 0 0 0 0";
@@ -4788,7 +4788,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4802,7 +4802,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 1 1 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "0 1 1 1 | 0 0 0 0";
@@ -4822,7 +4822,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4836,7 +4836,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 1 1 | 0 0 0 0";
         EXPECT_EQ(2, v2.size()) << "1 1 1 1 | 0 0 0 0";
@@ -4856,7 +4856,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4870,7 +4870,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 0 0 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "0 0 0 0 | 1 1 1 1";
@@ -4890,7 +4890,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4904,7 +4904,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 0 0 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "1 0 0 0 | 1 1 1 1";
@@ -4924,7 +4924,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4938,7 +4938,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 0 0 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "0 1 0 0 | 1 1 1 1";
@@ -4958,7 +4958,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4972,7 +4972,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 0 0 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "1 1 0 0 | 1 1 1 1";
@@ -4992,7 +4992,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -5006,7 +5006,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 1 0 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "0 0 1 0 | 1 1 1 1";
@@ -5026,7 +5026,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -5040,7 +5040,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 1 0 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "1 0 1 0 | 1 1 1 1";
@@ -5060,7 +5060,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -5074,7 +5074,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 1 0 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "0 1 1 0 | 1 1 1 1";
@@ -5094,7 +5094,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -5108,7 +5108,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 1 0 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "1 1 1 0 | 1 1 1 1";
@@ -5128,7 +5128,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -5142,7 +5142,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 0 1 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "0 0 0 1 | 1 1 1 1";
@@ -5162,7 +5162,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -5176,7 +5176,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 0 1 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "1 0 0 1 | 1 1 1 1";
@@ -5196,7 +5196,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -5210,7 +5210,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 0 1 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "0 1 0 1 | 1 1 1 1";
@@ -5230,7 +5230,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -5244,7 +5244,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 0 1 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "1 1 0 1 | 1 1 1 1";
@@ -5264,7 +5264,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -5278,7 +5278,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 0 1 1 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "0 0 1 1 | 1 1 1 1";
@@ -5298,7 +5298,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -5312,7 +5312,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 0 1 1 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "1 0 1 1 | 1 1 1 1";
@@ -5332,7 +5332,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -5346,7 +5346,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "0 1 1 1 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "0 1 1 1 | 1 1 1 1";
@@ -5366,7 +5366,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
     v3.clear();
     v4.clear();
     {
-        char* argv[] = {
+        std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -5380,7 +5380,7 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(11, argv);
+        _p->setCommandLine(argv);
         ASSERT_NO_THROW(_p->execute());
         EXPECT_EQ(2, v1.size()) << "1 1 1 1 | 1 1 1 1";
         EXPECT_EQ(2, v2.size()) << "1 1 1 1 | 1 1 1 1";

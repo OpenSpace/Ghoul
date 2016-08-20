@@ -283,6 +283,7 @@ if (GHOUL_HAVE_TESTS)
             GhoulTest
             PUBLIC
             "-Od"
+            "/bigobj"
         )
     else ()
         target_compile_options(
