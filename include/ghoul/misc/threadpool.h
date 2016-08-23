@@ -253,10 +253,29 @@ ghoul::ThreadPool pool(2);
      * passed \p arguments. If the function does not return anything, an
      * <code>std::future<void></code> is returned
      */
-    template<typename Function, typename... Args>
+    template <typename Function, typename... Args>
     auto queue(
         Function&& function, Args&&... arguments
     ) -> std::future<decltype(function(arguments...))>;
+
+    /**
+    * This function queues a <code>std::packaged_task</code> and returns its 
+    * <code>std::future</code> object that holds a potential return value. All tasks
+    * passed to this functions are potentially executed in parallel unless this ThreadPool
+    * was initialized with only a single worker in the constructor or a subsequent call
+    * to #resize. The template parameters of this function are best to be automatically
+    * determined.
+    * \tparam T The type information of the <code>std::packaged_task</code> that is to be
+    * executed
+    * \tparam Args A variable list of arguments that can be passed to the \p task
+    * \param task The task that will be executed.
+    * \param arguments The potential list of arguments passed to the \p task
+    * \return A future containing the result of the evaluation of \p task with the
+    * passed \p arguments.
+    */
+    template <typename T, typename... Args>
+    auto queue(std::packaged_task<T>&& task, Args&&... args
+        ) -> decltype(task.get_future());
     
 private:
     ThreadPool(const ThreadPool&) = delete;

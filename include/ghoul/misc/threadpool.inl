@@ -51,4 +51,24 @@ auto ThreadPool::queue(F&& f, Arg&&... arg) -> std::future<decltype(f(arg...))> 
     return future;
 }
 
+// We need a separate overload as we cannot use decltype(task(args...)) to determine the
+// result type of the execution
+template <typename T, typename... Args>
+auto ThreadPool::queue(std::packaged_task<T>&& task, Args&&... args)
+    -> decltype(task.get_future())
+{
+
+
+    auto pck = std::make_shared<std::packaged_task<T>>(std::move(task));
+    _taskQueue->push(
+        [pck]() { (*pck)(); }
+    );
+
+    auto future = pck->get_future();
+
+    _cv->notify_one();
+
+    return future;
+}
+
 } // namespace ghoul
