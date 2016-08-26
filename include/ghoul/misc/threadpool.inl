@@ -57,8 +57,6 @@ template <typename T, typename... Args>
 auto ThreadPool::queue(std::packaged_task<T>&& task, Args&&... args)
     -> decltype(task.get_future())
 {
-
-
     auto pck = std::make_shared<std::packaged_task<T>>(std::move(task));
     _taskQueue->push(
         [pck]() { (*pck)(); }
