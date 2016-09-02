@@ -64,7 +64,6 @@ AssertionException::AssertionException(std::string exp, std::string msg,
 void internal_assert(std::string expression, std::string message, std::string file,
                                                            std::string function, int line)
 {
-#ifdef GHL_DEBUG
     if (isPermanentlyIgnored(file, line))
         return;
     
@@ -104,15 +103,6 @@ void internal_assert(std::string expression, std::string message, std::string fi
             exit(EXIT_FAILURE);
         }
     }
-#else
-    throw AssertionException(
-        std::move(expression),
-        std::move(message),
-        std::move(file),
-        std::move(function),
-        line
-    );
-#endif
 }
 
 } // namespace ghoul

@@ -82,6 +82,23 @@ void internal_assert(std::string expression, std::string message, std::string fi
  * ignoring the assertion. The macro is optimized away in Release mode. Due to this fact,
  * the <code>__condition__</code> must not have any sideeffects.
  */
+
+#ifdef GHL_THROW_ON_ASSERT
+#define ghoul_assert(__condition__, __message__)                                         \
+    do {                                                                                 \
+        if (!(__condition__)) {                                                          \
+            std::ostringstream oss;                                                      \
+            oss << __message__;                                                          \
+            throw ghoul::AssertionException(                                             \
+                #__condition__,                                                          \
+                oss.str(),                                                               \
+                __FILE__,                                                                \
+                GHL_ASSERT_FUNCTION,                                                     \
+                __LINE__                                                                 \
+            );                                                                           \
+        }                                                                                \
+    } while (false)
+#else
 #define ghoul_assert(__condition__, __message__)                                         \
     do {                                                                                 \
         if (!(__condition__)) {                                                          \
@@ -97,6 +114,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
         }                                                                                \
     } while (false)
 
+#endif
 
 #else 
 
