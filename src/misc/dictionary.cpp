@@ -79,54 +79,54 @@ template bool isConvertible<__TYPE__>(const Dictionary&);                       
 template void Dictionary::setValueHelper<__TYPE__>(std::string, __TYPE__,                \
     CreateIntermediate);                                                                 \
 template void Dictionary::getValueHelper<__TYPE__>(const std::string&, __TYPE__&) const; \
-template bool Dictionary::hasValueHelper<__TYPE__>(const std::string&) const;
+template bool Dictionary::hasValueHelper<__TYPE__>(const std::string&) const
 
-EXTERN_TEMPLATE_DEFINITION(bool)
-EXTERN_TEMPLATE_DEFINITION(char)
-EXTERN_TEMPLATE_DEFINITION(signed char)
-EXTERN_TEMPLATE_DEFINITION(unsigned char)
-EXTERN_TEMPLATE_DEFINITION(wchar_t)
-EXTERN_TEMPLATE_DEFINITION(short)
-EXTERN_TEMPLATE_DEFINITION(unsigned short)
-EXTERN_TEMPLATE_DEFINITION(int)
-EXTERN_TEMPLATE_DEFINITION(unsigned int)
-EXTERN_TEMPLATE_DEFINITION(long long)
-EXTERN_TEMPLATE_DEFINITION(unsigned long long)
-EXTERN_TEMPLATE_DEFINITION(float)
-EXTERN_TEMPLATE_DEFINITION(double)
-EXTERN_TEMPLATE_DEFINITION(glm::vec2)
-EXTERN_TEMPLATE_DEFINITION(glm::dvec2)
-EXTERN_TEMPLATE_DEFINITION(glm::ivec2)
-EXTERN_TEMPLATE_DEFINITION(glm::uvec2)
-EXTERN_TEMPLATE_DEFINITION(glm::bvec2)
-EXTERN_TEMPLATE_DEFINITION(glm::vec3)
-EXTERN_TEMPLATE_DEFINITION(glm::dvec3)
-EXTERN_TEMPLATE_DEFINITION(glm::ivec3)
-EXTERN_TEMPLATE_DEFINITION(glm::uvec3)
-EXTERN_TEMPLATE_DEFINITION(glm::bvec3)
-EXTERN_TEMPLATE_DEFINITION(glm::vec4)
-EXTERN_TEMPLATE_DEFINITION(glm::dvec4)
-EXTERN_TEMPLATE_DEFINITION(glm::ivec4)
-EXTERN_TEMPLATE_DEFINITION(glm::uvec4)
-EXTERN_TEMPLATE_DEFINITION(glm::bvec4)
-EXTERN_TEMPLATE_DEFINITION(glm::mat2x2)
-EXTERN_TEMPLATE_DEFINITION(glm::mat2x3)
-EXTERN_TEMPLATE_DEFINITION(glm::mat2x4)
-EXTERN_TEMPLATE_DEFINITION(glm::mat3x2)
-EXTERN_TEMPLATE_DEFINITION(glm::mat3x3)
-EXTERN_TEMPLATE_DEFINITION(glm::mat3x4)
-EXTERN_TEMPLATE_DEFINITION(glm::mat4x2)
-EXTERN_TEMPLATE_DEFINITION(glm::mat4x3)
-EXTERN_TEMPLATE_DEFINITION(glm::mat4x4)
-EXTERN_TEMPLATE_DEFINITION(glm::dmat2x2)
-EXTERN_TEMPLATE_DEFINITION(glm::dmat2x3)
-EXTERN_TEMPLATE_DEFINITION(glm::dmat2x4)
-EXTERN_TEMPLATE_DEFINITION(glm::dmat3x2)
-EXTERN_TEMPLATE_DEFINITION(glm::dmat3x3)
-EXTERN_TEMPLATE_DEFINITION(glm::dmat3x4)
-EXTERN_TEMPLATE_DEFINITION(glm::dmat4x2)
-EXTERN_TEMPLATE_DEFINITION(glm::dmat4x3)
-EXTERN_TEMPLATE_DEFINITION(glm::dmat4x4)
+EXTERN_TEMPLATE_DEFINITION(bool);
+EXTERN_TEMPLATE_DEFINITION(char);
+EXTERN_TEMPLATE_DEFINITION(signed char);
+EXTERN_TEMPLATE_DEFINITION(unsigned char);
+EXTERN_TEMPLATE_DEFINITION(wchar_t);
+EXTERN_TEMPLATE_DEFINITION(short);
+EXTERN_TEMPLATE_DEFINITION(unsigned short);
+EXTERN_TEMPLATE_DEFINITION(int);
+EXTERN_TEMPLATE_DEFINITION(unsigned int);
+EXTERN_TEMPLATE_DEFINITION(long long);
+EXTERN_TEMPLATE_DEFINITION(unsigned long long);
+EXTERN_TEMPLATE_DEFINITION(float);
+EXTERN_TEMPLATE_DEFINITION(double);
+EXTERN_TEMPLATE_DEFINITION(glm::vec2);
+EXTERN_TEMPLATE_DEFINITION(glm::dvec2);
+EXTERN_TEMPLATE_DEFINITION(glm::ivec2);
+EXTERN_TEMPLATE_DEFINITION(glm::uvec2);
+EXTERN_TEMPLATE_DEFINITION(glm::bvec2);
+EXTERN_TEMPLATE_DEFINITION(glm::vec3);
+EXTERN_TEMPLATE_DEFINITION(glm::dvec3);
+EXTERN_TEMPLATE_DEFINITION(glm::ivec3);
+EXTERN_TEMPLATE_DEFINITION(glm::uvec3);
+EXTERN_TEMPLATE_DEFINITION(glm::bvec3);
+EXTERN_TEMPLATE_DEFINITION(glm::vec4);
+EXTERN_TEMPLATE_DEFINITION(glm::dvec4);
+EXTERN_TEMPLATE_DEFINITION(glm::ivec4);
+EXTERN_TEMPLATE_DEFINITION(glm::uvec4);
+EXTERN_TEMPLATE_DEFINITION(glm::bvec4);
+EXTERN_TEMPLATE_DEFINITION(glm::mat2x2);
+EXTERN_TEMPLATE_DEFINITION(glm::mat2x3);
+EXTERN_TEMPLATE_DEFINITION(glm::mat2x4);
+EXTERN_TEMPLATE_DEFINITION(glm::mat3x2);
+EXTERN_TEMPLATE_DEFINITION(glm::mat3x3);
+EXTERN_TEMPLATE_DEFINITION(glm::mat3x4);
+EXTERN_TEMPLATE_DEFINITION(glm::mat4x2);
+EXTERN_TEMPLATE_DEFINITION(glm::mat4x3);
+EXTERN_TEMPLATE_DEFINITION(glm::mat4x4);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat2x2);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat2x3);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat2x4);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat3x2);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat3x3);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat3x4);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat4x2);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat4x3);
+EXTERN_TEMPLATE_DEFINITION(glm::dmat4x4);
     
 #undef EXTERN_TEMPLATE_DEFINITION
 #undef EXTERN_TEMPLATE_DEFINITION_SCALAR
@@ -170,8 +170,9 @@ std::string Dictionary::value<std::string>(const std::string& key) const {
     std::string tmp;
     bool s = getValue(key, tmp);
     
-    if (s)
+    if (s) {
         return tmp;
+    }
     else {
         throw ConversionError(
             "Error converting key '" + key + "' from type '" +
@@ -182,16 +183,18 @@ std::string Dictionary::value<std::string>(const std::string& key) const {
 }
 
 Dictionary::Dictionary(std::initializer_list<std::pair<std::string, ghoul::any>> l) {
-    for (auto p : l)
+    for (auto& p : l) {
         setValueAnyHelper(std::move(p.first), std::move(p.second));
+    }
 }
 
 std::vector<string> Dictionary::keys(const string& location) const {
     if (location.empty()) {
         std::vector<string> result;
         result.reserve(size());
-        for (const auto& it : *this)
+        for (const auto& it : *this) {
             result.push_back(it.first);
+        }
         return result;
     }
 
@@ -200,8 +203,9 @@ std::vector<string> Dictionary::keys(const string& location) const {
     splitKey(location, first, rest);
 
     auto keyIt = find(first);
-    if (keyIt == cend())
+    if (keyIt == cend()) {
         throw KeyError("Key '" + first + "' was not found");
+    }
 
     const Dictionary* const dict = ghoul::any_cast<Dictionary>(&(keyIt->second));
     if (!dict) {
@@ -217,20 +221,23 @@ bool Dictionary::hasKey(const string& key) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
     
     auto it = find(key);
-    if (it != cend())
+    if (it != cend()) {
         return true;
+    }
 
     std::string first;
     std::string rest;
     splitKey(key, first, rest);
 
     auto keyIt = find(first);
-    if (keyIt == cend())
+    if (keyIt == cend()) {
         return false;
+    }
 
     const Dictionary* const dict = ghoul::any_cast<Dictionary>(&(keyIt->second));
-    if (!dict)
+    if (!dict) {
         return false;
+    }
     return dict->hasKey(rest);
 }
 
@@ -270,98 +277,144 @@ void Dictionary::setValueAnyHelper(std::string key, ghoul::any value) {
     // Ugly if-else statement is necessary as 'type' cannot be not constexpr
     const std::type_info& type = value.type();
 
-    if (type == typeid(bool))
+    if (type == typeid(bool)) {
         setValue(std::move(key), std::move(ghoul::any_cast<bool>(value)));
-    else if (type == typeid(char))
+    }
+    else if (type == typeid(char)) {
         setValue(std::move(key), std::move(ghoul::any_cast<char>(value)));
-    else if (type == typeid(signed char))
+    }
+    else if (type == typeid(signed char)) {
         setValue(std::move(key), std::move(ghoul::any_cast<signed char>(value)));
-    else if (type == typeid(unsigned char))
+    }
+    else if (type == typeid(unsigned char)) {
         setValue(std::move(key), std::move(ghoul::any_cast<unsigned char>(value)));
-    else if (type == typeid(wchar_t))
+    }
+    else if (type == typeid(wchar_t)) {
         setValue(std::move(key), std::move(ghoul::any_cast<wchar_t>(value)));
-    else if (type == typeid(short))
+    }
+    else if (type == typeid(short)) {
         setValue(std::move(key), std::move(ghoul::any_cast<short>(value)));
-    else if (type == typeid(unsigned short))
+    }
+    else if (type == typeid(unsigned short)) {
         setValue(std::move(key), std::move(ghoul::any_cast<unsigned short>(value)));
-    else if (type == typeid(int))
+    }
+    else if (type == typeid(int)) {
         setValue(std::move(key), std::move(ghoul::any_cast<int>(value)));
-    else if (type == typeid(unsigned int))
+    }
+    else if (type == typeid(unsigned int)) {
         setValue(std::move(key), std::move(ghoul::any_cast<unsigned int>(value)));
-    else if (type == typeid(long long))
+    }
+    else if (type == typeid(long long)) {
         setValue(std::move(key), std::move(ghoul::any_cast<long long>(value)));
-    else if (type == typeid(unsigned long long))
+    }
+    else if (type == typeid(unsigned long long)) {
         setValue(std::move(key), std::move(ghoul::any_cast<unsigned long long>(value)));
-    else if (type == typeid(float))
+    }
+    else if (type == typeid(float)) {
         setValue(std::move(key), std::move(ghoul::any_cast<float>(value)));
-    else if (type == typeid(glm::vec2))
+    }
+    else if (type == typeid(glm::vec2)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::vec2>(value)));
-    else if (type == typeid(glm::dvec2))
+    }
+    else if (type == typeid(glm::dvec2)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::dvec2>(value)));
-    else if (type == typeid(glm::ivec2))
+    }
+    else if (type == typeid(glm::ivec2)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::ivec2>(value)));
-    else if (type == typeid(glm::uvec2))
+    }
+    else if (type == typeid(glm::uvec2)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::uvec2>(value)));
-    else if (type == typeid(glm::bvec2))
+    }
+    else if (type == typeid(glm::bvec2)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::bvec2>(value)));
-    else if (type == typeid(glm::vec3))
+    }
+    else if (type == typeid(glm::vec3)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::vec3>(value)));
-    else if (type == typeid(glm::dvec3))
+    }
+    else if (type == typeid(glm::dvec3)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::dvec3>(value)));
-    else if (type == typeid(glm::ivec3))
+    }
+    else if (type == typeid(glm::ivec3)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::ivec3>(value)));
-    else if (type == typeid(glm::uvec3))
+    }
+    else if (type == typeid(glm::uvec3)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::uvec3>(value)));
-    else if (type == typeid(glm::bvec3))
+    }
+    else if (type == typeid(glm::bvec3)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::bvec3>(value)));
-    else if (type == typeid(glm::vec4))
+    }
+    else if (type == typeid(glm::vec4)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::vec4>(value)));
-    else if (type == typeid(glm::dvec4))
+    }
+    else if (type == typeid(glm::dvec4)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::dvec4>(value)));
-    else if (type == typeid(glm::ivec4))
+    }
+    else if (type == typeid(glm::ivec4)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::ivec4>(value)));
-    else if (type == typeid(glm::uvec4))
+    }
+    else if (type == typeid(glm::uvec4)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::uvec4>(value)));
-    else if (type == typeid(glm::bvec4))
+    }
+    else if (type == typeid(glm::bvec4)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::bvec4>(value)));
-    else if (type == typeid(glm::mat2x2))
+    }
+    else if (type == typeid(glm::mat2x2)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::mat2x2>(value)));
-    else if (type == typeid(glm::mat2x3))
+    }
+    else if (type == typeid(glm::mat2x3)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::mat2x3>(value)));
-    else if (type == typeid(glm::mat2x4))
+    }
+    else if (type == typeid(glm::mat2x4)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::mat2x4>(value)));
-    else if (type == typeid(glm::mat3x2))
+    }
+    else if (type == typeid(glm::mat3x2)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::mat3x2>(value)));
-    else if (type == typeid(glm::mat3x3))
+    }
+    else if (type == typeid(glm::mat3x3)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::mat3x3>(value)));
-    else if (type == typeid(glm::mat3x4))
+    }
+    else if (type == typeid(glm::mat3x4)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::mat3x4>(value)));
-    else if (type == typeid(glm::mat4x2))
+    }
+    else if (type == typeid(glm::mat4x2)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::mat4x2>(value)));
-    else if (type == typeid(glm::mat4x3))
+    }
+    else if (type == typeid(glm::mat4x3)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::mat4x3>(value)));
-    else if (type == typeid(glm::mat4x4))
+    }
+    else if (type == typeid(glm::mat4x4)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::mat4x4>(value)));
-    else if (type == typeid(glm::dmat2x2))
+    }
+    else if (type == typeid(glm::dmat2x2)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat2x2>(value)));
-    else if (type == typeid(glm::dmat2x3))
+    }
+    else if (type == typeid(glm::dmat2x3)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat2x3>(value)));
-    else if (type == typeid(glm::dmat2x4))
+    }
+    else if (type == typeid(glm::dmat2x4)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat2x4>(value)));
-    else if (type == typeid(glm::dmat3x2))
+    }
+    else if (type == typeid(glm::dmat3x2)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat3x2>(value)));
-    else if (type == typeid(glm::dmat3x3))
+    }
+    else if (type == typeid(glm::dmat3x3)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat3x3>(value)));
-    else if (type == typeid(glm::dmat3x4))
+    }
+    else if (type == typeid(glm::dmat3x4)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat3x4>(value)));
-    else if (type == typeid(glm::dmat4x2))
+    }
+    else if (type == typeid(glm::dmat4x2)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat4x2>(value)));
-    else if (type == typeid(glm::dmat4x3))
+    }
+    else if (type == typeid(glm::dmat4x3)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat4x3>(value)));
-    else if (type == typeid(glm::dmat4x4))
+    }
+    else if (type == typeid(glm::dmat4x4)) {
         setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat4x4>(value)));
-    else
+    }
+    else {
         setValue(key, value, CreateIntermediate::No);
+    }
 }
 
 }  // namespace ghoul

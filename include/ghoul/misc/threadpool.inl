@@ -54,7 +54,7 @@ auto ThreadPool::queue(F&& f, Arg&&... arg) -> std::future<decltype(f(arg...))> 
 // We need a separate overload as we cannot use decltype(task(args...)) to determine the
 // result type of the execution
 template <typename T, typename... Args>
-auto ThreadPool::queue(std::packaged_task<T>&& task, Args&&... args)
+auto ThreadPool::queue(std::packaged_task<T>&& task, Args&&... arguments)
     -> decltype(task.get_future())
 {
     auto pck = std::make_shared<std::packaged_task<T>>(std::move(task));

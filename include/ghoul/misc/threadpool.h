@@ -274,7 +274,7 @@ ghoul::ThreadPool pool(2);
     * passed \p arguments.
     */
     template <typename T, typename... Args>
-    auto queue(std::packaged_task<T>&& task, Args&&... args
+    auto queue(std::packaged_task<T>&& task, Args&&... arguments
         ) -> decltype(task.get_future());
     
 private:
