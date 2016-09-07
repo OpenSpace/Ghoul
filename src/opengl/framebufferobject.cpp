@@ -28,6 +28,29 @@ namespace opengl {
 
 const std::string FramebufferObject::_loggerCat("ghoul.opengl.FramebufferObject");
 
+std::string FramebufferObject::errorChecking(GLenum status) {
+    switch (status) {
+        case GL_FRAMEBUFFER_COMPLETE:
+            return "";
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            return "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            return "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
+        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+            return "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT";
+        case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+            return "GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT";
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+            return "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER";
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+            return "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER";
+        case GL_FRAMEBUFFER_UNSUPPORTED:
+            return "GL_FRAMEBUFFER_UNSUPPORTED";
+        default:
+            return "Unknown error!";
+    }
+}
+
 FramebufferObject::FramebufferObject() : _id(0) {
     generateId();
 }
@@ -45,39 +68,17 @@ void FramebufferObject::deactivate() {
 }
 
 bool FramebufferObject::isComplete() const {
-    bool isComplete = false;
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    switch(status) {
-        case GL_FRAMEBUFFER_COMPLETE:
-            isComplete = true;
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-            LERROR("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-            LERROR("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-            LERROR("GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT");
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-            LERROR("GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT");
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-            LERROR("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-            LERROR("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
-            break;
-        case GL_FRAMEBUFFER_UNSUPPORTED:
-            LERROR("GL_FRAMEBUFFER_UNSUPPORTED");
-            break;
-        default:
-            LERROR("Unknown error!");
-            break;
+    std::string error = errorChecking(status);
+
+    if (error.empty()) {
+        return true;
     }
-    return isComplete;
+    else {
+        LERROR(error);
+        return false;
+    }
 }
 
 bool FramebufferObject::isActive() {

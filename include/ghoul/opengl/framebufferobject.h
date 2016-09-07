@@ -34,6 +34,8 @@ namespace opengl {
 
 class FramebufferObject {
 public:
+    static std::string errorChecking(GLenum status);
+
     FramebufferObject();
     ~FramebufferObject();
 
