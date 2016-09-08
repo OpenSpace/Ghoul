@@ -26,6 +26,8 @@
 #ifndef __DIRECTORY_H__
 #define __DIRECTORY_H__
 
+#include <ghoul/misc/boolean.h>
+
 #include <string>
 #include <vector>
 
@@ -43,10 +45,10 @@ namespace filesystem {
  */
 class Directory {
 public:
-    enum class RawPath { Yes, No };
-    enum class AbsolutePath { Yes, No };
-    enum class Recursive { Yes, No };
-    enum class Sort { Yes, No };
+    using RawPath = ghoul::Boolean;
+    using AbsolutePath = ghoul::Boolean;
+    using Recursive = ghoul::Boolean;
+    using Sort = ghoul::Boolean;
 
     /**
      * This constructor creates a Directory object pointing to the absolute path of the

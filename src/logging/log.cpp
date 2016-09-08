@@ -33,10 +33,10 @@ namespace logging {
 
 Log::Log(TimeStamping timeStamping, DateStamping dateStamping, 
          CategoryStamping categoryStamping, LogLevelStamping logLevelStamping)
-    : _timeStamping(timeStamping == TimeStamping::Yes ? true : false)
-    , _dateStamping(dateStamping == DateStamping::Yes ? true : false)
-    , _categoryStamping(categoryStamping == CategoryStamping::Yes ? true : false)
-    , _logLevelStamping(logLevelStamping == LogLevelStamping::Yes ? true : false)
+    : _timeStamping(timeStamping)
+    , _dateStamping(dateStamping)
+    , _categoryStamping(categoryStamping)
+    , _logLevelStamping(logLevelStamping)
 {}
 
 bool Log::isTimeStamping() const {
@@ -44,7 +44,7 @@ bool Log::isTimeStamping() const {
 }
 
 void Log::setTimeStamping(TimeStamping timeStamping) {
-    _timeStamping = timeStamping == TimeStamping::Yes ? true : false;
+    _timeStamping = timeStamping;
 }
 
 bool Log::isDateStamping() const {
@@ -52,7 +52,7 @@ bool Log::isDateStamping() const {
 }
 
 void Log::setDateStamping(DateStamping dateStamping) {
-    _dateStamping = dateStamping == DateStamping::Yes ? true : false;
+    _dateStamping = dateStamping;
 }
 
 bool Log::isCategoryStamping() const {
@@ -60,7 +60,7 @@ bool Log::isCategoryStamping() const {
 }
 
 void Log::setCategoryStamping(CategoryStamping categoryStamping) {
-    _categoryStamping = categoryStamping == CategoryStamping::Yes ? true : false;
+    _categoryStamping = categoryStamping;
 }
 
 bool Log::isLogLevelStamping() const {
@@ -68,7 +68,7 @@ bool Log::isLogLevelStamping() const {
 }
 
 void Log::setLogLevelStamping(LogLevelStamping logLevelStamping) {
-    _logLevelStamping = logLevelStamping == LogLevelStamping::Yes ? true : false;
+    _logLevelStamping = logLevelStamping;
 }
 
 std::string Log::getTimeString() const {
@@ -94,19 +94,25 @@ std::string Log::createFullMessageString(LogManager::LogLevel level,
                                          const std::string& message) const
 {
     std::string output;
-    if (isDateStamping())
+    if (isDateStamping()) {
         output += "[" + getDateString();
-    if (isTimeStamping())
+    }
+    if (isTimeStamping()) {
         output += " | " + getTimeString();
+    }
 
-    if (isDateStamping() || isTimeStamping())
+    if (isDateStamping() || isTimeStamping()) {
         output += "] ";
-    if (isCategoryStamping() && (category != ""))
+    }
+    if (isCategoryStamping() && (category != "")) {
         output += category + " ";
-    if (isLogLevelStamping())
+    }
+    if (isLogLevelStamping()) {
         output += "(" + LogManager::stringFromLevel(level) + ")";
-    if (output != "")
+    }
+    if (output != "") {
         output += "\t";
+    }
     output += message;
 
     return output;

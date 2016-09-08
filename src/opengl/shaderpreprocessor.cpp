@@ -213,10 +213,10 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
             FileStruct {
                 filesystem::File(path),
                 _includedFiles.size(),
-                trackChanges == TrackChanges::Yes
+                trackChanges
             }
         ).first;
-        if (trackChanges == TrackChanges::Yes)
+        if (trackChanges)
             it->second.file.setCallback([this](const filesystem::File& file) {
             (void) file; // Suppress compiler warning about unused parameter
             _onChangeCallback();

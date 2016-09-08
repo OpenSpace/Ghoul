@@ -40,8 +40,8 @@
 #pragma warning(default : 4800)
 #endif
 
+#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
-
 #include <ghoul/misc/any.h>
 
 #include <map>
@@ -53,13 +53,13 @@ namespace ghoul {
     
 namespace internal {
     // The storage type for integral values (char, short, int, long long, ...)
-    typedef long long IntegralType;
+    using IntegralType = long long;
     
     // The storage type for unsigned integral values
-    typedef unsigned long long UnsignedIntegralType;
+    using UnsignedIntegralType = unsigned long long;
     
     // The storage type for floating point values
-    typedef double FloatingType;
+    using FloatingType = double;
     
     // Default struct that defines the type to void
     template <typename InputType>
@@ -214,7 +214,7 @@ using has_storage_converter = static_not<
  */
 class Dictionary : private std::map<std::string, ghoul::any> {
 public:
-    enum class CreateIntermediate { Yes, No };
+    using CreateIntermediate = ghoul::Boolean;
 
     /// Base class for all Dictionary%-based exceptions
     struct DictionaryError : public RuntimeError {

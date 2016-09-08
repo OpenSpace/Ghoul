@@ -91,7 +91,7 @@ unsigned int FontManager::registerFontPath(const std::string& fontName,
 }
     
 std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
-                                        Outline withOutline, Glyph loadGlyphs)
+                                        Outline withOutline, LoadGlyphs loadGlyphs)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
     
@@ -107,7 +107,7 @@ std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
 }
     
 std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
-                                        Outline withOutline, Glyph loadGlyphs)
+                                        Outline withOutline, LoadGlyphs loadGlyphs)
 {
     auto itPath = _fontPaths.find(hashName);
     if (itPath == _fontPaths.end()) {
@@ -119,7 +119,7 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     auto fonts = _fonts.equal_range(hashName);
     for (auto it = fonts.first; it != fonts.second; ++it) {
         if (it->second->pointSize() == fontSize &&
-            it->second->hasOutline() == (withOutline == Outline::Yes))
+            it->second->hasOutline() == withOutline)
         {
             return it->second;
         }
@@ -134,9 +134,10 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
         outline
     );
     
-    if (loadGlyphs == Glyph::Yes)
+    if (loadGlyphs) {
         f->loadGlyphs(_defaultCharacterSet);
-    
+    }
+        
     _fonts.emplace(hashName, f);
     return f;
 }

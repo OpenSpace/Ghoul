@@ -27,6 +27,7 @@
 #define __SHADERPREPROCESSOR_H__
 
 #include <ghoul/filesystem/file.h>
+#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
 
@@ -41,7 +42,7 @@ namespace opengl {
 
 class ShaderPreprocessor {
 public:
-    enum class TrackChanges { Yes, No };
+    using TrackChanges = ghoul::Boolean;
 
     using ShaderChangedCallback = std::function<void ()>;
     

@@ -28,6 +28,7 @@
 
 #include <ghoul/filesystem/directory.h>
 #include <ghoul/filesystem/file.h>
+#include <ghoul/misc/boolean.h>
 
 #include <map>
 #include <string>
@@ -55,7 +56,7 @@ namespace filesystem {
  */
 class CacheManager {
 public:
-    enum class Persistent { Yes, No };
+    using Persistent = ghoul::Boolean;
 
     /// Superclass for all cache-related exceptions
     struct CacheException : public RuntimeError {

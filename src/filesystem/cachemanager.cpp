@@ -225,7 +225,7 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
     // Store the cache information in the map
     CacheInformation info = {
         cachedFileName,
-        isPersistent == Persistent::Yes ? true : false
+        isPersistent
     };
     _files.emplace(hash, info);
     return cachedFileName;

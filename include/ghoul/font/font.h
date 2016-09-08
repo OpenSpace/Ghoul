@@ -27,6 +27,7 @@
 #define __FONT_H__
 
 #include <ghoul/glm.h>
+#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/textureatlas.h>
 
@@ -52,7 +53,7 @@ namespace fontrendering {
  */
 class Font {
 public:
-    enum class Outline { Yes, No };
+    using Outline = ghoul::Boolean;
 
     /// Superclass for all font-related exceptions that this class throws
     struct FontException : public RuntimeError {

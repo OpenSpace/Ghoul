@@ -448,7 +448,7 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
 }
 
 void ProgramObject::setIgnoreUniformLocationError(IgnoreError ignoreError) {
-    _ignoreUniformLocationError = ignoreError == IgnoreError::Yes;
+    _ignoreUniformLocationError = ignoreError;
 }
 
 bool ProgramObject::ignoreUniformLocationError() const {
@@ -2056,7 +2056,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat2x2& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2067,7 +2067,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat2x2& value,
         glUniformMatrix2fv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2085,7 +2085,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat2x3& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2096,7 +2096,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat2x3& value,
         glUniformMatrix2x3fv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2113,7 +2113,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat2x4& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2124,7 +2124,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat2x4& value,
         glUniformMatrix2x4fv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2141,7 +2141,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat3x2& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2152,7 +2152,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat3x2& value,
         glUniformMatrix3x2fv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2169,7 +2169,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat3x3& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2180,7 +2180,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat3x3& value,
         glUniformMatrix3fv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2197,7 +2197,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat3x4& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2208,7 +2208,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat3x4& value,
         glUniformMatrix3x4fv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2225,7 +2225,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat4x2& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2236,7 +2236,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat4x2& value,
         glUniformMatrix4x2fv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2253,7 +2253,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat4x3& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2264,7 +2264,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat4x3& value,
         glUniformMatrix4x3fv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2281,7 +2281,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat4x4& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2292,7 +2292,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat4x4& value,
         glUniformMatrix4fv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2309,7 +2309,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat2x2& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2320,7 +2320,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat2x2& value,
         glUniformMatrix2dv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2337,7 +2337,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat2x3& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2348,7 +2348,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat2x3& value,
         glUniformMatrix2x3dv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2365,7 +2365,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat2x4& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2376,7 +2376,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat2x4& value,
         glUniformMatrix2x4dv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2393,7 +2393,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat3x2& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2404,7 +2404,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat3x2& value,
         glUniformMatrix3x2dv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2421,7 +2421,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat3x3& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2432,7 +2432,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat3x3& value,
         glUniformMatrix3dv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2449,7 +2449,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat3x4& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2460,7 +2460,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat3x4& value,
         glUniformMatrix3x4dv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2477,7 +2477,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat4x2& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2488,7 +2488,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat4x2& value,
         glUniformMatrix4x2dv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2505,7 +2505,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat4x3& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2516,7 +2516,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat4x3& value,
         glUniformMatrix4x3dv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2533,7 +2533,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat4x4& value,
             _id,
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
     }
@@ -2544,7 +2544,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat4x4& value,
         glUniformMatrix4dv(
             location,
             1,
-            transpose == Transpose::Yes,
+            transpose,
             value_ptr(value)
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
@@ -2581,7 +2581,7 @@ bool ProgramObject::ignoreAttributeLocationError() const {
 }
 
 void ProgramObject::setIgnoreAttributeLocationError(IgnoreError ignoreError) {
-    _ignoreAttributeLocationError = ignoreError == IgnoreError::Yes;
+    _ignoreAttributeLocationError = ignoreError;
 }
 
 bool ProgramObject::setAttribute(const std::string& name, bool value) {
@@ -3517,7 +3517,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat4x4& value,
 }
 
 void ProgramObject::setIgnoreSubroutineLocationError(IgnoreError ignoreError) {
-    _ignoreSubroutineLocationError = ignoreError == IgnoreError::Yes;
+    _ignoreSubroutineLocationError = ignoreError;
 }
 
 bool ProgramObject::ignoreSubroutineLocationError() const {
@@ -3525,7 +3525,7 @@ bool ProgramObject::ignoreSubroutineLocationError() const {
 }
 
 void ProgramObject::setIgnoreSubroutineUniformLocationError(IgnoreError ignoreError) {
-    _ignoreSubroutineUniformLocationError = ignoreError == IgnoreError::Yes;
+    _ignoreSubroutineUniformLocationError = ignoreError;
 }
 
 bool ProgramObject::ignoreSubroutineUniformLocationError() const {

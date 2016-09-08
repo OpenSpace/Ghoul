@@ -286,8 +286,9 @@ bool FileSystem::fileExists(const File& path) const {
 }
 
 bool FileSystem::fileExists(std::string path, RawPath isRawPath) const {
-    if (isRawPath == RawPath::No)
+    if (!isRawPath) {
         path = absolutePath(std::move(path));
+    }
 #ifdef WIN32
     BOOL exists = PathFileExists(path.c_str());
     if (exists == FALSE) {
@@ -409,7 +410,7 @@ bool FileSystem::deleteFile(const File& path) const {
 }
     
 void FileSystem::createDirectory(const Directory& path, Recursive recursive) const {
-    if (recursive == Recursive::Yes) {
+    if (recursive) {
         std::vector<Directory> directories;
         Directory dir = path;
         while (!FileSys.directoryExists(dir)) {
@@ -471,8 +472,9 @@ void FileSystem::createDirectory(const Directory& path, Recursive recursive) con
 
 void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) const {
     ghoul_assert(directoryExists(path), "Path must be an existing directory");
-    if ((recursive == Recursive::No) && (!emptyDirectory(path)))
+    if ((!recursive) && (!emptyDirectory(path))) {
         throw FileSystemException("Directory must be empty");
+    }
 
 #ifdef WIN32
     const string& dirPath = path;
@@ -520,7 +522,7 @@ void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) con
 #else
     const string& dirPath = path;
 
-    if (recursive == Recursive::Yes) {
+    if (recursive) {
         DIR* directory = opendir(dirPath.c_str());
         
         if (!directory) {
@@ -603,13 +605,13 @@ void FileSystem::registerPathToken(string token, string path, Override override)
         "Token must be enclosed by TokenBraces"
     );
     
-    if (override == Override::No) {
+    if (!override) {
         ghoul_assert(_tokenMap.find(token) == _tokenMap.end(),
                      "Token must not have been registered before"
         );
     }
 
-    if (override == Override::Yes) {
+    if (override) {
         auto it = _tokenMap.find(token);
         if (it != _tokenMap.end())
             _tokenMap.erase(it);

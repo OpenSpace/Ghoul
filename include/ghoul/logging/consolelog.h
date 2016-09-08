@@ -27,6 +27,7 @@
 #define __CONSOLELOG_H__
 
 #include <ghoul/logging/streamlog.h>
+#include <ghoul/misc/boolean.h>
 
 namespace ghoul {
 namespace logging {
@@ -52,7 +53,7 @@ namespace logging {
 
 class ConsoleLog : public StreamLog {
 public:
-    enum class ColorOutput { Yes, No };
+    using ColorOutput = ghoul::Boolean;
 
     /**
      * Constructor that calls Log constructor.

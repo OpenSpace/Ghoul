@@ -51,12 +51,13 @@ CommandlineCommand::CommandlineCommand(std::string name,
     , _infoText(std::move(infoText))
     , _parameterList(std::move(parameterList))
     , _argumentNum(argumentNum)
-    , _allowsMultipleCalls(allowMultipleCalls == MultipleCalls::Yes ? true : false)
+    , _allowsMultipleCalls(allowMultipleCalls)
 {
     ghoul_assert(!_name.empty(), "Name must not be empty");
     ghoul_assert(_name[0] == '-', "Name must start with a '-'");
-    if (!_shortName.empty())
+    if (!_shortName.empty()) {
         ghoul_assert(_shortName[0] == '-', "Short name must start with a '-'");
+    }
 }
 
 CommandlineCommand::~CommandlineCommand() {}
@@ -87,13 +88,16 @@ bool CommandlineCommand::allowsMultipleCalls() const {
 
 std::string CommandlineCommand::usage() const {
     std::string result = "[";
-    if (shortName() != "")
+    if (shortName() != "") {
         result += "<" + shortName() + "|" + name() + ">";
-    else
+    }
+    else {
         result += name();
+    }
 
-    if (parameterList() != "")
+    if (parameterList() != "") {
         result = result + " " + parameterList();
+    }
 
     result += "]";
 
@@ -102,21 +106,22 @@ std::string CommandlineCommand::usage() const {
 
 std::string CommandlineCommand::help() const {
     std::string result;
-    if (shortName() != "")
+    if (shortName() != "") {
         result = shortName() + "|" + name() + ": \t" + infoText();
-    else
+    }
+    else {
         result = name() + ": \t" + infoText();
+    }
 
     return result;
 }
 
-void CommandlineCommand::checkParameters(const std::vector<std::string>& parameters) const
-{
-    if (parameters.size() != static_cast<size_t>(argumentNumber())) {
+void CommandlineCommand::checkParameters(const std::vector<std::string>& param) const {
+    if (param.size() != static_cast<size_t>(argumentNumber())) {
         throw CommandParameterException(fmt::format(
             "Wrong number of arguments. Expected {} got {}",
             argumentNumber(),
-            parameters.size()
+            param.size()
         ));
     }
 }

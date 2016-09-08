@@ -65,34 +65,41 @@ File::File(std::string filename, RawPath isRawPath,
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     
-    if (isRawPath == RawPath::Yes)
+    if (isRawPath) {
         _filename = std::move(filename);
-    else
+    }
+    else {
         _filename = std::move(FileSys.absolutePath(std::move(filename)));
+    }
 
-    if (_fileChangedCallback)
+    if (_fileChangedCallback) {
         installFileChangeListener();
+    }
 }
 
 File::File(const File& cpy)
     : _filename(cpy._filename)
     , _fileChangedCallback(cpy._fileChangedCallback)
 {
-    if (_fileChangedCallback)
+    if (_fileChangedCallback) {
         installFileChangeListener();
+    }
 }
 
 File::~File() {
-    if (_fileChangedCallback)
+    if (_fileChangedCallback) {
         removeFileChangeListener();
+    }
 }
 
 void File::setCallback(FileChangedCallback callback) {
-    if (_fileChangedCallback)
+    if (_fileChangedCallback) {
         removeFileChangeListener();
+    }
     _fileChangedCallback = std::move(callback);
-    if (_fileChangedCallback)
+    if (_fileChangedCallback) {
         installFileChangeListener();
+    }
 }
 
 const File::FileChangedCallback& File::callback() const {
@@ -109,43 +116,53 @@ const std::string& File::path() const {
 
 std::string File::filename() const {
     string::size_type separator = _filename.rfind(FileSystem::PathSeparator);
-    if (separator != string::npos)
+    if (separator != string::npos) {
         return _filename.substr(separator + 1);
-    else
+    }
+    else {
         return _filename;
+    }
 }
 
 string File::baseName() const {
     string fileName = filename();
     string::size_type dot = fileName.rfind(".");
-    if (dot != string::npos)
+    if (dot != string::npos) {
         return fileName.substr(0, dot);
-    else
+    }
+    else {
         return fileName;
+    }
 }
 
 string File::fullBaseName() const {
     string::size_type dot = _filename.rfind(".");
-    if (dot != string::npos)
+    if (dot != string::npos) {
         return _filename.substr(0, dot);
-    else
+    }
+    else {
         return _filename;
+    }
 }
 
 string File::directoryName() const {
     string::size_type separator = _filename.rfind(FileSystem::PathSeparator);
-    if (separator != string::npos)
+    if (separator != string::npos) {
         return _filename.substr(0, separator);
-    else
+    }
+    else {
         return _filename;
+    }
 }
 
 string File::fileExtension() const {
     string::size_type dot = _filename.rfind(".");
-    if (dot != string::npos)
+    if (dot != string::npos) {
         return _filename.substr(dot + 1);
-    else
+    }
+    else {
         return _filename;
+    }
 }
     
 std::string File::lastModifiedDate() const {
@@ -161,7 +178,7 @@ std::string File::lastModifiedDate() const {
         _filename.c_str(),
         GetFileExInfoStandard,
         &infoData
-        );
+    );
     if (!success) {
         const DWORD error = GetLastError();
         LPTSTR errorBuffer = nullptr;
@@ -173,7 +190,8 @@ std::string File::lastModifiedDate() const {
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
             (LPTSTR)&errorBuffer,
             0,
-            NULL);
+            NULL
+        );
         if (errorBuffer != nullptr) {
             std::string error(errorBuffer);
             LocalFree(errorBuffer);
@@ -204,7 +222,8 @@ std::string File::lastModifiedDate() const {
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                 (LPTSTR)&errorBuffer,
                 0,
-                NULL);
+                NULL
+            );
             if ((nValues > 0) && (errorBuffer != nullptr)) {
                 std::string error(errorBuffer);
                 LocalFree(errorBuffer);

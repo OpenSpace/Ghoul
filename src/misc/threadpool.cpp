@@ -99,12 +99,12 @@ void ThreadPool::start() {
 void ThreadPool::stop(RunRemainingTasks runTasks, DetachThreads detachThreads) {
     ghoul_assert(isRunning(), "ThreadPool must be running");
     ghoul_assert(
-        !(runTasks == RunRemainingTasks::Yes && detachThreads == DetachThreads::Yes),
+        !(runTasks && detachThreads),
         "Cannot run remaining tasks and detach threads"
     );
 
     // If we don't want to complete the remaining tasks, we'll get rid of them here
-    if (runTasks == RunRemainingTasks::No) {
+    if (!runTasks) {
         clearRemainingTasks();
     }
 
@@ -116,7 +116,7 @@ void ThreadPool::stop(RunRemainingTasks runTasks, DetachThreads detachThreads) {
     // terminate
     for (Worker& w : _workers) {
         _cv->notify_all();
-        if (detachThreads == DetachThreads::Yes) {
+        if (detachThreads) {
             // Detaching the thread to let it finish it's work independently
             w.thread->detach();
         }

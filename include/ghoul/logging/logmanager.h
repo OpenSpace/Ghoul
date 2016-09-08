@@ -28,6 +28,8 @@
 
 #include <ghoul/designpattern/singleton.h>
 
+#include <ghoul/misc/boolean.h>
+
 #include <array>
 #include <memory>
 #include <mutex>
@@ -64,7 +66,7 @@ class Log;
  */
 class LogManager: public Singleton<LogManager> {
 public:
-    enum class ImmediateFlush { Yes, No };
+    using ImmediateFlush = ghoul::Boolean;
 
     /**
      * Enumerates all available LogLevel for the LogManager. The LogLevels are guaranteed

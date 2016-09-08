@@ -26,6 +26,7 @@
 #ifndef __PROGRAMOBJECT_H__
 #define __PROGRAMOBJECT_H__
 
+#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/shaderobject.h>
@@ -60,8 +61,8 @@ namespace opengl {
  */
 class ProgramObject {
 public:
-    enum class IgnoreError { Yes, No };
-    enum class Transpose { Yes, No };
+    using IgnoreError = ghoul::Boolean;
+    using Transpose = ghoul::Boolean;
 
     /**
     * A type definition for a callback function that is called if any of the tracked files

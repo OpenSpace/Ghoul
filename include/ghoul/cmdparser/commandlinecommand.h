@@ -27,6 +27,7 @@
 #define __COMMANDLINECOMMAND_H__
 
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 
 #include <sstream>
@@ -57,7 +58,7 @@ namespace cmdparser {
  */
 class CommandlineCommand {
 public:
-    enum class MultipleCalls { Yes, No };
+    using MultipleCalls = ghoul::Boolean;
 
     /**
      * Exception that gets thrown if an error occurs in the CommandlineCommand::execute

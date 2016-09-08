@@ -26,6 +26,7 @@
 #ifndef __CMDLINEPARSER_H__
 #define __CMDLINEPARSER_H__
 
+#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 
 #include <iostream>
@@ -40,7 +41,7 @@ class CommandlineCommand;
 
 class CommandlineParser {
 public:
-    enum class AllowUnknownCommands { Yes, No };
+    using AllowUnknownCommands = ghoul::Boolean;
 
     /**
      * The exception that is thrown in the CommandlineParser::execute method when an

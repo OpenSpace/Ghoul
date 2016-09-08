@@ -35,43 +35,53 @@ TextLog::TextLog(const std::string& filename, Append writeToAppend,
         TimeStamping timeStamping, DateStamping dateStamping,
         CategoryStamping categoryStamping, LogLevelStamping logLevelStamping)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
-    , _printFooter(writeToAppend == Append::Yes)
+    , _printFooter(writeToAppend)
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     
     _file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
 
-    if (writeToAppend == Append::Yes)
+    if (writeToAppend) {
         _file.open(filename, std::ofstream::out | std::ofstream::app);
-    else
+    }
+    else {
         _file.open(filename, std::ofstream::out | std::ostream::trunc);
+    }
 }
 
 TextLog::~TextLog() {
-    if (_printFooter)
+    if (_printFooter) {
         _file << "--------" << std::endl;
+    }
 }
 
 void TextLog::log(LogManager::LogLevel level, const std::string& category,
                                                                const std::string& message)
 {
-    if (category.empty() && message.empty())
+    if (category.empty() && message.empty()) {
         writeLine("\n");
+    }
     else {
         std::string output;
-        if (isDateStamping())
+        if (isDateStamping()) {
             output += "[" + getDateString();
-        if (isTimeStamping())
+        }
+        if (isTimeStamping()) {
             output += " | " + getTimeString();
-
-        if (isDateStamping() || isTimeStamping())
+        }
+        
+        if (isDateStamping() || isTimeStamping()) {
             output += "] ";
-        if (isCategoryStamping() && !category.empty())
+        }
+        if (isCategoryStamping() && !category.empty()) {
             output += category + " ";
-        if (isLogLevelStamping())
+        }
+        if (isLogLevelStamping()) {
             output += "(" + LogManager::stringFromLevel(level) + ") ";
-        if (output != "")
+        }
+        if (output != "") {
             output += ":\t";
+        }
         output += message + '\n';
         writeLine(std::move(output));
     }

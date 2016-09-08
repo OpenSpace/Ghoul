@@ -26,6 +26,7 @@
 #ifndef __FILE_H__
 #define __FILE_H__
 
+#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 
 #include <functional>
@@ -51,7 +52,7 @@ class FileSystem;
  */
 class File {
 public:
-    enum class RawPath { Yes, No };
+    using RawPath = ghoul::Boolean;
 
      /// Exception that gets thrown if there is a file-related error in any of the methods
     struct FileException : public RuntimeError {

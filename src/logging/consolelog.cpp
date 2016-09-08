@@ -72,20 +72,22 @@ ConsoleLog::ConsoleLog(ColorOutput colorOutput, TimeStamping timeStamping,
             DateStamping dateStamping, CategoryStamping categoryStamping,
             LogLevelStamping logLevelStamping)
     : StreamLog(std::cout, timeStamping, dateStamping, categoryStamping, logLevelStamping)
-    , _colorOutput(colorOutput == ColorOutput::Yes)
+    , _colorOutput(colorOutput)
 {
 }
 
 void ConsoleLog::log(LogManager::LogLevel level, const std::string& category,
                      const std::string& message)
 {
-    if (_colorOutput)
+    if (_colorOutput) {
         setColorForLevel(level);
+    }
 
     StreamLog::log(level, category, message);
 
-    if (_colorOutput)
+    if (_colorOutput) {
         resetColor();
+    }
 }
 
 void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {

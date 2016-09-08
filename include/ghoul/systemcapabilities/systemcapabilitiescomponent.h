@@ -26,6 +26,7 @@
 #ifndef __SYSTEMCAPABILITIESCOMPONENT_H__
 #define __SYSTEMCAPABILITIESCOMPONENT_H__
 
+#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 
 #include <string>
@@ -58,7 +59,7 @@ namespace systemcapabilities {
  */
 class SystemCapabilitiesComponent {
 public:
-    enum class InitializeWMI { Yes, No };
+    using InitializeWMI = ghoul::Boolean;
 
     /// The verbosity that is used in the #capabilities method
     enum class Verbosity {

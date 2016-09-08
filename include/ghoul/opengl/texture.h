@@ -26,6 +26,7 @@
 #ifndef __TEXTURE_H__
 #define __TEXTURE_H__
 
+#include <ghoul/misc/boolean.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/glm.h>
 #include <glm/gtx/std_based_type.hpp>
@@ -49,7 +50,7 @@ namespace opengl {
  */
 class Texture {
 public:
-    enum class TakeOwnership { Yes, No };
+    using TakeOwnership = ghoul::Boolean;
 
     /**
      * This enum specifies the allowed formats for the Texture%s. These are directly

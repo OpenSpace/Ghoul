@@ -220,7 +220,7 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
     , _name(std::move(filename))
     , _pointSize(pointSize)
     , _height(0.f)
-    , _hasOutline(hasOutline == Outline::Yes ? true : false)
+    , _hasOutline(hasOutline)
     , _outlineThickness(outlineThickness)
 {
     ghoul_assert(!_name.empty(), "Filename must not be empty");

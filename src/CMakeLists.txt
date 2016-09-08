@@ -152,6 +152,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/any.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/any.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/assert.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/boolean.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/buffer.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/buffer.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/clipboard.h

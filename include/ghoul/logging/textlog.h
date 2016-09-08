@@ -28,6 +28,8 @@
 
 #include <ghoul/logging/log.h>
 
+#include <ghoul/misc/boolean.h>
+
 #include <fstream>
 
 namespace ghoul {
@@ -50,7 +52,7 @@ namespace logging {
  */
 class TextLog : public Log {
 public:
-    enum class Append { Yes, No };
+    using Append = ghoul::Boolean;
 
     /**
     * Constructor that calls Log constructor and opens the file that will log the

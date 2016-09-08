@@ -29,6 +29,7 @@
 #include <ghoul/designpattern/singleton.h>
 #include <ghoul/filesystem/directory.h>
 #include <ghoul/filesystem/file.h>
+#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 
 #include <map>
@@ -72,9 +73,9 @@ class CacheManager;
  */
 class FileSystem : public Singleton<FileSystem> {
 public:
-    enum class RawPath { Yes, No };
-    enum class Recursive { Yes, No };
-    enum class Override { Yes, No };
+    using RawPath = ghoul::Boolean;
+    using Recursive = ghoul::Boolean;
+    using Override = ghoul::Boolean;
 
     friend class Singleton<FileSystem>;
 

@@ -26,6 +26,7 @@
 #ifndef __LOG_H__
 #define __LOG_H__
 
+#include <ghoul/misc/boolean.h>
 #include <ghoul/logging/logmanager.h>
 #include <string>
 
@@ -48,10 +49,10 @@ namespace logging {
  */
 class Log {
 public:
-    enum class TimeStamping { Yes, No };
-    enum class DateStamping { Yes, No };
-    enum class CategoryStamping { Yes, No };
-    enum class LogLevelStamping { Yes, No };
+    using TimeStamping = ghoul::Boolean;
+    using DateStamping = ghoul::Boolean;
+    using CategoryStamping = ghoul::Boolean;
+    using LogLevelStamping = ghoul::Boolean;
 
     virtual ~Log() = default;
 

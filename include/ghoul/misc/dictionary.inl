@@ -77,7 +77,7 @@ void Dictionary::setValueHelper(std::string key, T value,
     auto keyIt = find(first);
     if (keyIt == cend()) {
         // didn't find the Dictionary
-        if (createIntermediate == CreateIntermediate::Yes) {
+        if (createIntermediate) {
             (*this)[first] = ghoul::Dictionary();
             keyIt = find(first);
         }

@@ -69,7 +69,7 @@ LogManager::LogLevel LogManager::levelFromString(const std::string& level) {
 
 LogManager::LogManager(LogManager::LogLevel level, ImmediateFlush immediateFlush)
     : _level(level)
-    , _immediateFlush(immediateFlush == ImmediateFlush::Yes)
+    , _immediateFlush(immediateFlush)
     , _logCounter({0, 0, 0, 0, 0})
 {}
 
@@ -94,8 +94,9 @@ void LogManager::logMessage(LogManager::LogLevel level, const std::string& categ
 
         for (const auto& log : _logs) {
             log->log(level, category, message);
-            if (_immediateFlush)
+            if (_immediateFlush) {
                 log->flush();
+            }
         }
 
         int l = std::underlying_type<LogLevel>::type(level);

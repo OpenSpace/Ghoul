@@ -295,7 +295,7 @@ void Texture::setType(GLenum type) {
 }
 
 void Texture::setDataOwnership(TakeOwnership hasOwnership) {
-    _hasOwnershipOfData = hasOwnership == TakeOwnership::Yes;
+    _hasOwnershipOfData = hasOwnership;
 }
 
 bool Texture::dataOwnership() const {
@@ -307,9 +307,10 @@ const void* Texture::pixelData() const {
 }
 
 void Texture::setPixelData(void* pixels, TakeOwnership takeOwnership) {
-    if (_hasOwnershipOfData)
+    if (_hasOwnershipOfData) {
         delete reinterpret_cast<GLubyte*>(_pixels);
-    _hasOwnershipOfData = takeOwnership == TakeOwnership::Yes;
+    }
+    _hasOwnershipOfData = takeOwnership;
     _pixels = pixels;
 }
 

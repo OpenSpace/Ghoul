@@ -45,6 +45,7 @@
 #ifndef __THREADPOOL_H__
 #define __THREADPOOL_H__
 
+#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/thread.h>
 
 #include <future>
@@ -102,8 +103,8 @@ namespace ghoul {
  */
 class ThreadPool {
 public:
-    enum class RunRemainingTasks { Yes, No };
-    enum class DetachThreads { Yes, No };
+    using RunRemainingTasks = ghoul::Boolean;
+    using DetachThreads = ghoul::Boolean;
     
     /**
      * Constructor that initializes and starts \p nThreads Worker objects.

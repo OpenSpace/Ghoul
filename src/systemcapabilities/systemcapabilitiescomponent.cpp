@@ -44,7 +44,7 @@ SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, HRESULT code)
 
 SystemCapabilitiesComponent::SystemCapabilitiesComponent(InitializeWMI initializeWMI) {
 #ifdef GHOUL_USE_WMI
-    if (initializeWMI == InitializeWMI::Yes && !isWMIInitialized()) {
+    if (initializeWMI && !isWMIInitialized()) {
         SystemCapabilitiesComponent::initializeWMI();
     }
 #else

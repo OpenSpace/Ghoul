@@ -29,6 +29,7 @@
 #include <ghoul/font/font.h>
 #include <ghoul/glm.h>
 #include <ghoul/opengl/textureatlas.h>
+#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 
 #include <map>
@@ -49,8 +50,8 @@ namespace fontrendering {
  */
 class FontManager {
 public:
-    enum class Outline { Yes, No };
-    enum class Glyph { Yes, No };
+    using Outline = ghoul::Boolean;
+    using LoadGlyphs = ghoul::Boolean;
 
     /// This exception is thrown if registering a Font fails
     struct FontRegistrationException : public RuntimeError {
@@ -107,7 +108,8 @@ public:
      * \pre \p name must not be empty
      */
     std::shared_ptr<Font> font(const std::string& name, float fontSize,
-        Outline withOutline = Outline::Yes, Glyph loadGlyphs = Glyph::Yes);
+        Outline withOutline = Outline::Yes,
+        LoadGlyphs loadGlyphs = LoadGlyphs::Yes);
 
     /**
      * Retrieves the Font with the hashed name <code>hashName</code>, which must have been
@@ -129,7 +131,8 @@ public:
      * error occurred
      */
     std::shared_ptr<Font> font(unsigned int hashName, float fontSize,
-        Outline withOutline = Outline::Yes, Glyph loadGlyphs = Glyph::Yes);
+        Outline withOutline = Outline::Yes,
+        LoadGlyphs loadGlyphs = LoadGlyphs::Yes);
     
 private:
     FontManager(const FontManager& rhs) = delete;
