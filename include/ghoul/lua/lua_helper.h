@@ -90,7 +90,7 @@ std::string stackInformation(lua_State* state);
 
 
 /**
- * Loads a Lua configuration into the given #ghoul::Dictionary%, extending the passed in
+ * Loads a Lua script into the given #ghoul::Dictionary%, extending the passed in
  * dictionary. This method will overwrite values with the same keys, but will not remove
  * any other keys from the dictionary. The script contained in the file must return a
  * single table, which is then parsed and included into the #ghoul::Dictionary. The single
@@ -117,6 +117,33 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
     lua_State* state = nullptr);
 
 /**
+ * Loads a Lua script and returns it as a #ghoul::Dictionary%. The script contained in the
+ * file must return a single table, which is then parsed and included into the
+ * #ghoul::Dictionary. The single restriction on the script is that it can only contain a
+ * pure array-style table (= only indexed by numbers) or a pure dictionary-style table
+ * (= no numbering indices).
+ * \param filename The filename pointing to the script that is executed. Any
+ * #ghoul::filesystem::FileSystem path tokesn will be resolved by this function.
+ * \param dictionary The #ghoul::Dictionary into which the values from the script are
+ * added
+ * \param state If this is set to a valid lua_State, this state is used instead of
+ * creating a new state. It is the callers responsibility to ensure that the passed state
+ * is valid if this parameter is not <code>nullptr</code>. After calling this method, the
+ * stack of the passed state will be empty after this function returns.
+ * \return The ghoul::Dictionary described by the Lua script
+ * \throws FormattingException If the #ghoul::Dictionary contains mixed keys of both type
+ * <code>string</code> and type <code>number</code>
+ * \throws FormattingException If the script did not return anything else but a table
+ * \throws LuaRuntimeException If there was an error initializing a new Lua state if it
+ * was necessary
+ * \pre \p filename must not be empty
+ * \pre \p filename must be a path to an existing file
+ * \post The \p state%'s stack is empty
+ */
+ghoul::Dictionary loadDictionaryFromFile(const std::string& filename,
+    lua_State* state = nullptr);
+
+/**
  * Loads a Lua configuration into the given #ghoul::Dictionary%, extending the passed in
  * dictionary. This method will overwrite values with the same keys, but will not remove
  * any other keys from the dictionary. The script contained in the string must return a
@@ -129,8 +156,6 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
  * \param state If this is set to a valid lua_State, this state is used instead of
  * creating a new state. It is the callers responsibility to ensure that the passed state
  * is valid. After calling this method, the stack of the passed state will be empty.
- * \return Returns <code>true</code> if the loading succeeded; <code>false</code>
- * otherwise.
  * \throws ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
  * keys of both type <code>string</code> and type <code>number</code>
  * \throws FormattingException If the script did not return anything else but a table
@@ -140,6 +165,25 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
 void loadDictionaryFromString(const std::string& script, ghoul::Dictionary& dictionary,
     lua_State* state = nullptr);
 
+/**
+ * Loads a Lua script and returns it as a #ghoul::Dictionary%. The script contained in the
+ * string must return a single table, which is then parsed. The single restriction on the
+ * script is that it can only contain a pure array-style table (= onl indexed by numbers)
+ * or a pure dictionary-style table (= no numbering indices).
+ * \param script The source code of the script that is executed
+ * \param state If this is set to a valid lua_State, this state is used instead of
+ * creating a new state. It is the callers responsibility to ensure that the passed state
+ * is valid. After calling this method, the stack of the passed state will be empty.
+ * \return The ghoul::Dictionary described by the Lua script
+ * \throws ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
+ * keys of both type <code>string</code> and type <code>number</code>
+ * \throws FormattingException If the script did not return anything else but a table
+ * \pre \p script must not be empty
+ * \post \p state%'s stack is empty
+ */
+ghoul::Dictionary loadDictionaryFromString(const std::string& script,
+    lua_State* state = nullptr);
+    
 /**
  * Uses the Lua \p state to populate the provided ghoul::Dictionary%, extending the passed
  * \p dictionary. This method will overwrite values with the same keys, but will not

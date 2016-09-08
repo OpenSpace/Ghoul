@@ -88,8 +88,9 @@ namespace lua {
 static lua_State* _state = nullptr;
     
 lua_State* staticLuaState() {
-    if (_state == nullptr)
+    if (_state != nullptr) {
         _state = createNewLuaState();
+    }
     return _state;
 }
 
@@ -128,8 +129,9 @@ string stackInformation(lua_State* state) {
     
     std::stringstream result;
     int top = lua_gettop(state);
-    if (top == 0)
+    if (top == 0) {
         result << "Lua Stack (empty)";
+    }
     else {
         result << "Lua Stack\n";
         for (int i = 1; i <= top; ++i) {
@@ -170,27 +172,38 @@ void loadDictionaryFromFile(const string& filename, ghoul::Dictionary& dictionar
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     ghoul_assert(FileSys.fileExists(absPath(filename)), "Filename must be a file");
     
-    if (state == nullptr)
+    if (state == nullptr) {
         state = staticLuaState();
+    }
 
     int status = luaL_loadfile(state, absPath(filename).c_str());
-    if (status != LUA_OK)
+    if (status != LUA_OK) {
         throw LuaLoadingException(lua_tostring(state, -1), absPath(filename));
+    }
 
     status = lua_pcall(state, 0, LUA_MULTRET, 0);
-    if (status != LUA_OK)
+    if (status != LUA_OK) {
         throw LuaExecutionException(lua_tostring(state, -1), absPath(filename));
+    }
 
-    if (lua_isnil(state, -1))
+    if (lua_isnil(state, -1)) {
         throw LuaFormatException("Script did not return anything", absPath(filename));
+    }
 
-    if (!lua_istable(state, -1))
+    if (!lua_istable(state, -1)) {
         throw LuaFormatException("Script did not return a table", absPath(filename));
+    }
 
     luaDictionaryFromState(state, dictionary);
 
     // Clean up after ourselves by cleaning the stack
     lua_settop(state, 0);
+}
+    
+ghoul::Dictionary loadDictionaryFromFile(const string& filename, lua_State* state) {
+    ghoul::Dictionary result;
+    loadDictionaryFromFile(filename, result, state);
+    return result;
 }
 
 void loadDictionaryFromString(const string& script, Dictionary& dictionary,
@@ -198,26 +211,37 @@ void loadDictionaryFromString(const string& script, Dictionary& dictionary,
 {
     ghoul_assert(!script.empty(), "Script must not be empty");
     
-    if (state == nullptr)
+    if (state == nullptr) {
         state = staticLuaState();
+    }
 
     int status = luaL_loadstring(state, script.c_str());
-    if (status != LUA_OK)
+    if (status != LUA_OK) {
         throw LuaLoadingException(lua_tostring(state, -1));
+    }
 
-    if (lua_pcall(state, 0, LUA_MULTRET, 0))
+    if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
         throw LuaExecutionException(lua_tostring(state, -1));
+    }
 
-    if (lua_isnil(state, -1))
+    if (lua_isnil(state, -1)) {
         throw LuaFormatException("Script did not return anything");
+    }
 
-    if (!lua_istable(state, -1))
+    if (!lua_istable(state, -1)) {
         throw LuaFormatException("Script did not return a table");
+    }
 
     luaDictionaryFromState(state, dictionary);
 
     // Clean up after ourselves by cleaning the stack
     lua_settop(state, 0);
+}
+    
+Dictionary loadDictionaryFromString(const string& script, lua_State* state) {
+    Dictionary result;
+    loadDictionaryFromString(script, result, state);
+    return result;
 }
     
 void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
@@ -323,9 +347,7 @@ lua_State* createNewLuaState() {
     LDEBUGC("Lua", "Creating Lua state");
     s = luaL_newstate();
     if (s == nullptr) {
-        throw LuaRuntimeException(
-            "Error creating new Lua state: Memory allocation error"
-        );
+        throw LuaRuntimeException("Error creating Lua state: Memory allocation");
     }
     LDEBUGC("Lua", "Open libraries");
     luaL_openlibs(s);
@@ -343,11 +365,13 @@ void runScriptFile(lua_State* state, const std::string& filename) {
     ghoul_assert(FileSys.fileExists(absPath(filename)), "Filename must be a file");
     
     int status = luaL_loadfile(state, filename.c_str());
-    if (status != LUA_OK)
+    if (status != LUA_OK) {
         throw LuaLoadingException(lua_tostring(state, -1));
+    }
     
-    if (lua_pcall(state, 0, LUA_MULTRET, 0))
+    if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
         throw LuaExecutionException(lua_tostring(state, -1));
+    }
 }
 
 void runScript(lua_State* state, const std::string& script) {
@@ -355,19 +379,22 @@ void runScript(lua_State* state, const std::string& script) {
     ghoul_assert(!script.empty(), "Script must not be empty");
     
     int status = luaL_loadstring(state, script.c_str());
-    if (status != LUA_OK)
+    if (status != LUA_OK) {
         throw LuaLoadingException(lua_tostring(state, -1));
+    }
     
-    if (lua_pcall(state, 0, LUA_MULTRET, 0))
+    if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
         throw LuaExecutionException(lua_tostring(state, -1));
+    }
 }
     
 
 namespace internal {
 
 void deinitializeGlobalState() {
-    if (_state)
+    if (_state) {
         lua_close(_state);
+    }
     _state = nullptr;
 }
 
