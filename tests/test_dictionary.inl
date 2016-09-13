@@ -1232,28 +1232,28 @@ TEST_F(DictionaryTest, hasValueTypeCast) {
     EXPECT_EQ(true, success) << "bool -> bool";
 
     success = _d->hasValue<bool>("char");
-    EXPECT_EQ(true, success) << "char -> bool";
+    EXPECT_EQ(false, success) << "char -> bool";
 
     success = _d->hasValue<bool>("unsigned char");
     EXPECT_EQ(false, success) << "unsigned char -> bool";
 
     success = _d->hasValue<bool>("wchar_t");
-    EXPECT_EQ(true, success) << "wchar_t -> bool";
+    EXPECT_EQ(false, success) << "wchar_t -> bool";
 
     success = _d->hasValue<bool>("short");
-    EXPECT_EQ(true, success) << "short -> bool";
+    EXPECT_EQ(false, success) << "short -> bool";
 
     success = _d->hasValue<bool>("unsigned short");
     EXPECT_EQ(false, success) << "unsigned short -> bool";
 
     success = _d->hasValue<bool>("int");
-    EXPECT_EQ(true, success) << "int -> bool";
+    EXPECT_EQ(false, success) << "int -> bool";
 
     success = _d->hasValue<bool>("unsigned int");
     EXPECT_EQ(false, success) << "unsigned int -> bool";
 
     success = _d->hasValue<bool>("long long");
-    EXPECT_EQ(true, success) << "long long -> bool";
+    EXPECT_EQ(false, success) << "long long -> bool";
 
     success = _d->hasValue<bool>("unsigned long long");
     EXPECT_EQ(false, success) << "unsigned long long -> bool";
@@ -1370,7 +1370,7 @@ TEST_F(DictionaryTest, hasValueTypeCast) {
     EXPECT_EQ(false, success) << "dmat4x4 -> bool";
 
     success = _d->hasValue<char>("bool");
-    EXPECT_EQ(true, success) << "bool -> char";
+    EXPECT_EQ(false, success) << "bool -> char";
 
     success = _d->hasValue<char>("char");
     EXPECT_EQ(true, success) << "char -> char";
@@ -1652,7 +1652,7 @@ TEST_F(DictionaryTest, hasValueTypeCast) {
     EXPECT_EQ(false, success) << "dmat4x4 -> unsigned char";
 
     success = _d->hasValue<wchar_t>("bool");
-    EXPECT_EQ(true, success) << "bool -> wchar_t";
+    EXPECT_EQ(false, success) << "bool -> wchar_t";
 
     success = _d->hasValue<wchar_t>("char");
     EXPECT_EQ(true, success) << "char -> wchar_t";
@@ -1793,7 +1793,7 @@ TEST_F(DictionaryTest, hasValueTypeCast) {
     EXPECT_EQ(false, success) << "dmat4x4 -> wchar_t";
 
     success = _d->hasValue<short>("bool");
-    EXPECT_EQ(true, success) << "bool -> short";
+    EXPECT_EQ(false, success) << "bool -> short";
 
     success = _d->hasValue<short>("char");
     EXPECT_EQ(true, success) << "char -> short";
@@ -2075,7 +2075,7 @@ TEST_F(DictionaryTest, hasValueTypeCast) {
     EXPECT_EQ(false, success) << "dmat4x4 -> unsigned short";
 
     success = _d->hasValue<int>("bool");
-    EXPECT_EQ(true, success) << "bool -> int";
+    EXPECT_EQ(false, success) << "bool -> int";
 
     success = _d->hasValue<int>("char");
     EXPECT_EQ(true, success) << "char -> int";
@@ -2357,7 +2357,7 @@ TEST_F(DictionaryTest, hasValueTypeCast) {
     EXPECT_EQ(false, success) << "dmat4x4 -> unsigned int";
 
     success = _d->hasValue<long long>("bool");
-    EXPECT_EQ(true, success) << "bool -> long long";
+    EXPECT_EQ(false, success) << "bool -> long long";
 
     success = _d->hasValue<long long>("char");
     EXPECT_EQ(true, success) << "char -> long long";
@@ -7963,7 +7963,7 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
 
     bool success;
     success = d.hasValue<bool>("1int");
-    ASSERT_EQ(true, success) << "hasValue<bool>(\"1int\")";
+    ASSERT_EQ(false, success) << "hasValue<bool>(\"1int\")";
     success = d.hasValue<bool>("1uint");
     EXPECT_EQ(false, success) << "hasValue<bool>(\"1uint\")";
     success = d.hasValue<bool>("1float");

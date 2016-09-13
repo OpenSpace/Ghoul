@@ -74,7 +74,6 @@ namespace internal {
         static const size_t size = S;                                                    \
     };
     
-    DEF_STORAGE_CONVERTER(bool, IntegralType, 1);
     DEF_STORAGE_CONVERTER(char, IntegralType, 1);
     DEF_STORAGE_CONVERTER(signed char, IntegralType, 1);
     DEF_STORAGE_CONVERTER(unsigned char, UnsignedIntegralType, 1);
@@ -149,7 +148,6 @@ using has_storage_converter = static_not<
  * retrieved as a <code>short</code>. The table of all types is:
  * | <code>Type</code>               | <code>StorageType</code>  | <code>\#Values</code>|
  * |:-------------------------------:|:-------------------------:|:--------------------:|
- * | <code>bool</code>               | <code>IntegralType</code>         |  1           |
  * | <code>char</code>               | <code>IntegralType</code>         |  1           |
  * | <code>signed char</code>        | <code>IntegralType</code>         |  1           |
  * | <code>unsigned char</code>      | <code>UnsignedIntegralType</code> |  1           |

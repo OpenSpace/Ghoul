@@ -81,7 +81,6 @@ template void Dictionary::setValueHelper<__TYPE__>(std::string, __TYPE__,       
 template void Dictionary::getValueHelper<__TYPE__>(const std::string&, __TYPE__&) const; \
 template bool Dictionary::hasValueHelper<__TYPE__>(const std::string&) const
 
-EXTERN_TEMPLATE_DEFINITION(bool);
 EXTERN_TEMPLATE_DEFINITION(char);
 EXTERN_TEMPLATE_DEFINITION(signed char);
 EXTERN_TEMPLATE_DEFINITION(unsigned char);
