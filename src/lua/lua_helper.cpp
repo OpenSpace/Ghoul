@@ -88,7 +88,7 @@ namespace lua {
 static lua_State* _state = nullptr;
     
 lua_State* staticLuaState() {
-    if (_state != nullptr) {
+    if (_state == nullptr) {
         _state = createNewLuaState();
     }
     return _state;
