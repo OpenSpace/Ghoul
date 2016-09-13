@@ -183,7 +183,9 @@ std::string Dictionary::value<std::string>(const std::string& key) const {
 
 Dictionary::Dictionary(std::initializer_list<std::pair<std::string, ghoul::any>> l) {
     for (auto& p : l) {
-        setValueAnyHelper(std::move(p.first), std::move(p.second));
+        if (!p.first.empty()) {
+            setValueAnyHelper(std::move(p.first), std::move(p.second));
+        }
     }
 }
 
