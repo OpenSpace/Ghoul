@@ -93,6 +93,14 @@ public:
         const std::string& format = "");
     
     /**
+     * Returns a list of all the extensions that are supported by registered readers. If
+     * a file with an extension included in this list is passed to the loadTexture file
+     * and the file is not corrupted, it will be successfully loaded.
+     * \return A list of all supported extensions
+     */
+    std::vector<std::string> supportedExtensions();
+
+    /**
      * Adds the \p reader to this TextureReader and makes it available through subsequent
      * calls to loadTexture. If an extension is supported by multiple TextureReaderBases,
      * the TextureReaderBase that was added first will be used.

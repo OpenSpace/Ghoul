@@ -67,6 +67,15 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory,
     return reader->loadTexture(memory, size);
 }
 
+std::vector<std::string> TextureReader::supportedExtensions() {
+    std::vector<std::string> result;
+    for (const std::shared_ptr<TextureReaderBase>& i : _readers) {
+        std::vector<std::string> extensions = i->supportedExtensions();
+        result.insert(result.end(), extensions.begin(), extensions.end());
+    }
+    return result;
+}
+
 void TextureReader::addReader(std::shared_ptr<TextureReaderBase> reader) {
     ghoul_assert(
         std::none_of(
