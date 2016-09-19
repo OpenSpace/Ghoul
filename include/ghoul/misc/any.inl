@@ -77,8 +77,9 @@ ValueType* any_cast(any* operand) {
             any::holder<typename std::remove_cv_t<ValueType>>*
         >(operand->content.get())->held;
     }
-    else
-        throw bad_any_cast();
+    else {
+        return nullptr;
+    }
 }
 
 template <typename ValueType>
@@ -89,8 +90,9 @@ inline const ValueType* any_cast(const any* operand) {
             any::holder<typename std::remove_cv_t<ValueType>>*
         >(operand->content.get())->held;
     }
-    else
-        throw bad_any_cast();
+    else {
+        return nullptr;
+    }
 }
 
 template<typename ValueType>
@@ -98,8 +100,9 @@ ValueType any_cast(any& operand) {
     typedef typename std::remove_reference<ValueType>::type nonref;
 
     nonref* result = any_cast<nonref>(&operand);
-    if (!result)
+    if (!result) {
         throw bad_any_cast();
+    }
 
     // Attempt to avoid construction of a temporary object in cases when 
     // `ValueType` is not a reference. Example:
@@ -119,8 +122,9 @@ inline ValueType any_cast(const any& operand) {
     typedef typename std::remove_reference<ValueType>::type nonref;
 
     nonref* result = any_cast<nonref>(&operand);
-    if (!result)
+    if (!result) {
         throw bad_any_cast();
+    }
 
     // Attempt to avoid construction of a temporary object in cases when 
     // `ValueType` is not a reference. Example:
