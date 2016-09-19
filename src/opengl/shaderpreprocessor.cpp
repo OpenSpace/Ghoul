@@ -390,7 +390,9 @@ std::string ShaderPreprocessor::substitute(const std::string& in, ShaderPreproce
     if (isString(resolved)) {
         ss << resolved.substr(1, resolved.length() - 2);
     }
-    else if (_dictionary.hasValue<std::string>(resolved)) {
+    else if (_dictionary.hasValue<bool>(resolved)) {
+        ss << _dictionary.value<bool>(resolved);
+    } else if (_dictionary.hasValue<std::string>(resolved)) {
         ss << _dictionary.value<std::string>(resolved);
     } else if (_dictionary.hasValue<const char*>(resolved)) {
         ss << _dictionary.value<const char*>(resolved);

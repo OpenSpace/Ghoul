@@ -166,7 +166,6 @@ endif()
 set(GLM_ROOT_DIR "${GHOUL_ROOT_DIR}/ext/glm")
 find_package(GLM REQUIRED)
 target_include_directories(Ghoul SYSTEM PUBLIC ${GLM_INCLUDE_DIRS})
-target_compile_definitions(Ghoul PUBLIC "GLM_SWIZZLE")
 
 if (GHOUL_MODULE_OPENGL)
     # OpenGL
