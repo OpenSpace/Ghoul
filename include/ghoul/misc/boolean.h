@@ -60,15 +60,7 @@ struct Boolean {
      * <code>Yes</code>.
      */
     operator bool() { return value == Yes; };
-    
-    /// Tests for equality between this and the right hand side
-//    bool operator==(const Boolean& rhs) { return value == rhs.value; }
-    
-    /// Tests for inequality between this and the right hand side
-//    bool operator!=(const Boolean& rhs) { return value != rhs.value; }
-    
-    /// Inverts the value of the Boolean
-//    Boolean operator!() { return (value == Yes) ? No : Yes; };
+    operator bool() const { return value == Yes; };
 };
     
 } // namespace ghoul

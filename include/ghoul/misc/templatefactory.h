@@ -55,6 +55,9 @@ public:
     
     virtual const std::type_info& baseClassType() const = 0;
     virtual ~TemplateFactoryBase();
+
+    virtual bool hasClass(const std::string& className) const = 0;
+    virtual std::vector<std::string> registeredClasses() const = 0;
 };
 
 /**
@@ -215,14 +218,14 @@ public:
      * before; <code>false</code> otherwise
      * \pre \p className must not be empty
      */
-    bool hasClass(const std::string& className) const;
+    bool hasClass(const std::string& className) const override;
     
     /**
      * Returns the list of all registered classes. All values in this vector can be used
      * to instantiate a new class sing the #create method
      * \return The list of all registered classes
      */
-    std::vector<std::string> registeredClasses() const;
+    std::vector<std::string> registeredClasses() const override;
 
     /**
      * Returns the <code>type_info</code> of the baseclass for this factory, i.e., the
