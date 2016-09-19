@@ -7973,8 +7973,7 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
     {
         bool value;
         success = d.getValue("1int", value);
-        ASSERT_EQ(true, success) << "success getValue<bool>";
-        EXPECT_EQ(true, value) << "correct getValue<bool>";
+        EXPECT_EQ(false, success) << "success getValue<bool>";
     }
 
     success = d.hasValue<char>("1int");
@@ -8252,8 +8251,8 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
         bvec2 value;
         success = d.getValue("2int", value);
         ASSERT_EQ(true, success) << "success getValue<bvec2>";
-        EXPECT_EQ(bvec2(true, true), value)
-            << "correct getValue<bvec2>";
+        EXPECT_TRUE(value.x) << "correct getValue<bvec2>";
+        EXPECT_TRUE(value.y) << "correct getValue<bvec2>";
     }
 
     using glm::vec3;
@@ -8342,8 +8341,9 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
         bvec3 value;
         success = d.getValue("3int", value);
         ASSERT_EQ(true, success) << "success getValue<bvec3>";
-        EXPECT_EQ(bvec3(true, true, true), value)
-            << "correct getValue<bvec3>";
+        EXPECT_TRUE(value.x) << "correct getValue<bvec2>";
+        EXPECT_TRUE(value.y) << "correct getValue<bvec2>";
+        EXPECT_TRUE(value.z) << "correct getValue<bvec2>";
     }
 
     using glm::vec4;
@@ -8432,8 +8432,10 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
         bvec4 value;
         success = d.getValue("4int", value);
         ASSERT_EQ(true, success) << "success getValue<bvec4>";
-        EXPECT_EQ(bvec4(true, true, true, true), value)
-            << "correct getValue<bvec4>";
+        EXPECT_TRUE(value.x) << "correct getValue<bvec2>";
+        EXPECT_TRUE(value.y) << "correct getValue<bvec2>";
+        EXPECT_TRUE(value.z) << "correct getValue<bvec2>";
+        EXPECT_TRUE(value.w) << "correct getValue<bvec2>";
     }
 
     using glm::mat2x2;

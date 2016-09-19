@@ -257,7 +257,9 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec2<T, P>& valu
                      ++i)
                 {
                     const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    T v;
+                    dict.getValue(key, v);
+                    value[i] = std::move(v);
                 }
                 return;
             }
@@ -310,7 +312,9 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec3<T, P>& valu
                      ++i)
                 {
                     const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    T v;
+                    dict.getValue(key, v);
+                    value[i] = std::move(v);
                 }
                 return;
             }
@@ -363,7 +367,9 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec4<T, P>& valu
                      i < internal::StorageTypeConverter<glm::tvec4<T, P>>::size;
                      ++i) {
                     const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    T v;
+                    dict.getValue(key, v);
+                    value[i] = std::move(v);
                 }
                 return;
             }
