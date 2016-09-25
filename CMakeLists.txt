@@ -293,8 +293,17 @@ if (GHOUL_HAVE_TESTS)
         )
     endif ()
 
-    target_include_directories(GhoulTest PUBLIC "${GHOUL_ROOT_DIR}/ext/gtest/include" "${GHOUL_ROOT_DIR}")
-    add_subdirectory(${GHOUL_ROOT_DIR}/ext/gtest)
+    target_include_directories(GhoulTest PUBLIC "${GHOUL_ROOT_DIR}/ext/googletest/googletest/include" "${GHOUL_ROOT_DIR}")
+    
+    set(BUILD_GTEST ON CACHE BOOL "")
+    set(BUILD_GMOCK OFF CACHE BOOL "")
+    set(gtest_force_shared_crt ON CACHE BOOL "")
+    # set(BUILD_SHARED_LIBS ON CACHE BOOL "")
+
+    # option(BUILD_GTEST "Builds the googletest subproject" CACHE ON)
+    # option(BUILD_GMOCK "Builds the googlemock subproject" CACHE OFF)
+    # option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." CACHE ON)
+    add_subdirectory(${GHOUL_ROOT_DIR}/ext/googletest)
     target_link_libraries(GhoulTest gtest Ghoul Lua)
 
     if (APPLE)
