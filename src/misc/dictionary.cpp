@@ -137,11 +137,12 @@ EXTERN_TEMPLATE_DEFINITION(glm::dmat4x4);
 template <>
 bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& value) const {
     ghoul_assert(&value != this, "Value argument must not be 'this' object");
-    try {
+    bool dict = hasKeyAndValue<Dictionary>(key);
+    if (dict) {
         getValueHelper(key, value);
         return true;
     }
-    catch (const DictionaryError&) {
+    else {
         return false;
     }
 }
