@@ -423,7 +423,9 @@ void FileSystem::createDirectory(const Directory& path, Recursive recursive) con
             directories.rbegin(),
             directories.rend(),
             [this](const Directory& d) {
-                createDirectory(d, Recursive::No);
+                if (!FileSys.directoryExists(d)) {
+                    createDirectory(d, Recursive::No);
+                }
             });
         
         return;
