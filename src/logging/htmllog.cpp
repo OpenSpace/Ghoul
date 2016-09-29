@@ -30,33 +30,57 @@
 namespace ghoul {
 namespace logging {
 
-HTMLLog::HTMLLog(std::string filename, Append writeToAppend, TimeStamping timeStamping,
+HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend, TimeStamping timeStamping,
         DateStamping dateStamping, CategoryStamping categoryStamping,
-        LogLevelStamping logLevelStamping)
+        LogLevelStamping logLevelStamping, const std::vector<std::string>& cssIncludes,
+        const std::vector<std::string>& jsIncludes)
     : TextLog(std::move(filename), writeToAppend, timeStamping, dateStamping,
                 categoryStamping, logLevelStamping)
 {    
+    _customStyling = cssIncludes.size() > 1 || jsIncludes.size() > 1;
+
     std::string output = \
         "<html>\n\
         \t<head>\n\
-        \t\t<title>Log File</title>\n\
+        \t\t<title>Log File</title>\
+        \t\t<style>\n";
+
+    std::back_insert_iterator<std::string> backInserter(output);
+
+    for (const std::string& c : cssIncludes) {
+        std::ifstream cssInput(c);
+        std::copy(std::istreambuf_iterator<char>{cssInput}, std::istreambuf_iterator<char>(), backInserter);
+    }
+
+    output += \
+        "\t\t</style>\n\
+        \t\t<script>\n\
+        " ;
+
+    for (const std::string& j : jsIncludes) {
+        std::ifstream jsInput(j);
+        std::copy(std::istreambuf_iterator<char>{jsInput}, std::istreambuf_iterator<char>(), backInserter);
+    }
+
+    output += \
+        "\t\t</script>\n\
         \t</head>\n\
         \t<body>\n\
         \n\
-        \t<table cellpadding=3 cellspacing=0 border=1>\n\
-        \t\t<CAPTION>Log File</CAPTION>\n\
+        \t\t<h1>Log File</h1>\n\
+        \t<table>\n\
         \n\
-        \t\t<THEAD>\n\
-        \t\t\t<TR>\n";
+        \t\t<thead>\n\
+        \t\t\t<tr>\n";
     if (isDateStamping())
-        output += "\t\t\t\t<th>Date</th>\n";
+        output += "\t\t\t\t<th class=\"log-date\">Date</th>\n";
     if (isTimeStamping())
-        output += "\t\t\t\t<th>Time</th>\n";
+        output += "\t\t\t\t<th class=\"log-time\">Time</th>\n";
     if (isCategoryStamping())
-        output += "\t\t\t\t<th>Category</th>\n";
+        output += "\t\t\t\t<th class=\"log-category\">Category</th>\n";
     if (isLogLevelStamping())
-        output += "\t\t\t\t<th>Level</th>\n";
-    output += "\t\t\t\t<th>Message</th>\n\
+        output += "\t\t\t\t<th class=\"log-level\">Level</th>\n";
+    output += "\t\t\t\t<th class=\"log-message\">Message</th>\n\
               \t\t\t</tr>\n\
               \t\t<tbody>\n";
     writeLine(std::move(output));
@@ -74,18 +98,41 @@ HTMLLog::~HTMLLog() {
 void HTMLLog::log(LogManager::LogLevel level, const std::string& category,
                   const std::string& message)
 {
-    std::string output = "\t\t\t<tr bgcolor=\"" + colorForLevel(level) + "\">\n";
+    std::string output;
+    if (_customStyling) {
+        output = "\t\t\t<tr class=\"" + classForLevel(level) + "\">\n"; 
+    } else {
+        output = "\t\t\t<tr bgcolor=\"" + colorForLevel(level) + "\">\n";
+    }
     if (isDateStamping())
-        output += "\t\t\t\t<td>" + getDateString() + "</td>\n";
+        output += "\t\t\t\t<td class=\"log-date\">" + getDateString() + "</td>\n";
     if (isTimeStamping())
-        output += "\t\t\t\t<td>" + getTimeString() + "</td>\n";
+        output += "\t\t\t\t<td class=\"log-time\">" + getTimeString() + "</td>\n";
     if (isCategoryStamping())
-        output += "\t\t\t\t<td>" + category + "</td>\n";
+        output += "\t\t\t\t<td class=\"log-category\">" + category + "</td>\n";
     if (isLogLevelStamping())
-        output += "\t\t\t\t<td>" + LogManager::stringFromLevel(level) + "</td>\n";
-    output += "\t\t\t\t<td>" + message + "</td>\n\t\t\t</tr>\n";
+        output += "\t\t\t\t<td class=\"log-level\">" + LogManager::stringFromLevel(level) + "</td>\n";
+    output += "\t\t\t\t<td class=\"log-message\">" + message + "</td>\n\t\t\t</tr>\n";
 
     writeLine(std::move(output));
+}
+
+std::string HTMLLog::classForLevel(LogManager::LogLevel level) {
+    switch (level) {
+    case LogManager::LogLevel::Debug:
+        return "log-level-debug";
+    case LogManager::LogLevel::Info:
+        return "log-level-info";
+    case LogManager::LogLevel::Warning:
+        return "log-level-warning";
+    case LogManager::LogLevel::Error:
+        return "log-level-error";
+    case LogManager::LogLevel::Fatal:
+        return "log-level-fatal";
+    case LogManager::LogLevel::NoLogging:
+        return "log-level-no-logging";
+    }
+    return "";
 }
 
 std::string HTMLLog::colorForLevel(LogManager::LogLevel level) {

@@ -65,11 +65,14 @@ public:
      * messages
      * \pre \p filename must not be empty
      */
-    HTMLLog(std::string filename, Append writeToAppend = Append::Yes,
+    HTMLLog(const std::string& filename, Append writeToAppend = Append::Yes,
         TimeStamping timeStamping = TimeStamping::Yes,
         DateStamping dateStamping = DateStamping::Yes,
         CategoryStamping categoryStamping = CategoryStamping::Yes,
-        LogLevelStamping logLevelStamping = LogLevelStamping::Yes);
+        LogLevelStamping logLevelStamping = LogLevelStamping::Yes,
+        const std::vector<std::string>& cssIncludes = std::vector<std::string>(),
+        const std::vector<std::string>& jsIncludes = std::vector<std::string>()
+        );
 
     /// Destructor that closes and finalizes the HTML file
     ~HTMLLog();
@@ -87,6 +90,15 @@ public:
 
 protected:
     /**
+    * Returns a css class string for the passed level
+    * LogManager::LogLevel::Debug -> log-level-debug<br>
+    * LogManager::LogLevel::Info -> log-level-info<br>
+    * LogManager::LogLevel::Warning -> log-level-warning<br>
+    * LogManager::LogLevel::Error -> log-level-error<br>
+    * LogManager::LogLevel::Fatal -> log-level-fatal<br>
+    */
+    static std::string classForLevel(LogManager::LogLevel level);
+    /**
      * Returns a HTML color string for the passed color.
      * LogManager::LogLevel::Debug -> Green<br>
      * LogManager::LogLevel::Info -> Black<br>
@@ -95,6 +107,9 @@ protected:
      * LogManager::LogLevel::Fatal -> Cyan<br>
      */
     static std::string colorForLevel(LogManager::LogLevel level);
+
+private: 
+    bool _customStyling;
 };
 
 } // namespace logging
