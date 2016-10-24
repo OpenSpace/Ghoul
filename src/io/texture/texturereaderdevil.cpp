@@ -87,11 +87,11 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(
             break;
         case IL_LUMINANCE:
             format = Texture::Format::Red;
-            internalFormat = GL_LUMINANCE;
+            internalFormat = GL_RED;
             break;
         case IL_LUMINANCE_ALPHA:
             format = Texture::Format::RG;
-            internalFormat = GL_LUMINANCE_ALPHA;
+            internalFormat = GL_RG;
             break;
         default:
             throw TextureLoadException(
@@ -198,11 +198,11 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(void* memory,
         break;
     case IL_LUMINANCE:
         format = Texture::Format::Red;
-        internalFormat = GL_LUMINANCE;
+        internalFormat = GL_RED;
         break;
     case IL_LUMINANCE_ALPHA:
         format = Texture::Format::RG;
-        internalFormat = GL_LUMINANCE_ALPHA;
+        internalFormat = GL_RG;
         break;
     default:
         throw TextureLoadException(
