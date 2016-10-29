@@ -310,8 +310,9 @@ void ShaderObject::compile() {
         
         std::vector<GLchar> log(logLength);
         glGetShaderInfoLog(_id, logLength, nullptr, log.data());
+        std::string logMessage(log.data());
         throw ShaderCompileError(
-            std::string(log.data()),
+            logMessage,
             _preprocessor.getFileIdentifiersString(),
             name()
         );

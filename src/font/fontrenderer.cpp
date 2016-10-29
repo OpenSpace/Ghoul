@@ -56,48 +56,48 @@ namespace {
     const std::string DefaultFragmentShaderPath = "${TEMPORARY}/defaultfontrenderer_fs.glsl";
 
     const std::string DefaultVertexShaderSource = "\
-    #version __CONTEXT__ \n\
-    \n\
-    layout (location = 0) in vec2 in_position; \n\
-    layout (location = 1) in vec2 in_texCoords; \n\
-    layout (location = 2) in vec2 in_outlineTexCoords; \n\
-    \n\
-    layout (location = 0) out vec2 texCoords; \n\
-    layout (location = 1) out vec2 outlineTexCoords; \n\
-    \n\
-    uniform mat4 projection; \n\
-    \n\
-    void main() { \n\
-        texCoords = in_texCoords; \n\
-        outlineTexCoords = in_outlineTexCoords; \n\
-        gl_Position = projection * vec4(in_position, 0.0, 1.0); \n\
-    } \n\
-    ";
+#version __CONTEXT__ \n\
+\n\
+in vec2 in_position; \n\
+in vec2 in_texCoords; \n\
+in vec2 in_outlineTexCoords; \n\
+\n\
+out vec2 texCoords; \n\
+out vec2 outlineTexCoords; \n\
+\n\
+uniform mat4 projection; \n\
+\n\
+void main() { \n\
+    texCoords = in_texCoords; \n\
+    outlineTexCoords = in_outlineTexCoords; \n\
+    gl_Position = projection * vec4(in_position, 0.0, 1.0); \n\
+} \n\
+";
     
     const std::string DefaultFragmentShaderSource = "\
-    #version __CONTEXT__ \n\
-    \n\
-    layout (location = 0) in vec2 texCoords; \n\
-    layout (location = 1) in vec2 outlineTexCoords; \n\
-    \n\
-    out vec4 FragColor; \n\
-    \n\
-    uniform sampler2D tex; \n\
-    uniform vec4 baseColor; \n\
-    uniform vec4 outlineColor; \n\
-    uniform bool hasOutline; \n\
-    \n\
-    void main() { \n\
-        if (hasOutline) { \n\
-            float inside = texture(tex, texCoords).r;\n\
-            float outline = texture(tex, outlineTexCoords).r;\n\
-            vec4 blend = mix(outlineColor, baseColor, inside);\n\
-            FragColor = blend * vec4(1.0, 1.0, 1.0, outline);\n\
-        } \n\
-        else { \n\
-            FragColor = vec4(baseColor.rgb, baseColor * texture(tex, texCoords).r); \n\
-        } \n\
-    }";
+#version __CONTEXT__ \n\
+\n\
+in vec2 texCoords; \n\
+in vec2 outlineTexCoords; \n\
+\n\
+out vec4 FragColor; \n\
+\n\
+uniform sampler2D tex; \n\
+uniform vec4 baseColor; \n\
+uniform vec4 outlineColor; \n\
+uniform bool hasOutline; \n\
+\n\
+void main() { \n\
+    if (hasOutline) { \n\
+        float inside = texture(tex, texCoords).r;\n\
+        float outline = texture(tex, outlineTexCoords).r;\n\
+        vec4 blend = mix(outlineColor, baseColor, inside);\n\
+        FragColor = blend * vec4(1.0, 1.0, 1.0, outline);\n\
+    } \n\
+    else { \n\
+        FragColor = vec4(baseColor.rgb, baseColor * texture(tex, texCoords).r); \n\
+    } \n\
+}";
 }
 
 namespace ghoul {
