@@ -35,7 +35,12 @@ function (include_external_library target_name library_name path)
         target_include_directories(${target_name} PUBLIC SYSTEM ${INCLUDE_DIR} ${extra_macro_args})
         set_property(TARGET ${library_name} PROPERTY FOLDER "External")
         if (MSVC)
-            target_compile_options(${library_name} PUBLIC "/MP")
+            target_compile_options(
+                ${library_name}
+                PUBLIC
+                "/MP"
+                "/bigobj"
+            )
         endif ()
         if (GHOUL_DISABLE_EXTERNAL_WARNINGS)
             if (MSVC)
