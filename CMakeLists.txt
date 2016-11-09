@@ -23,7 +23,7 @@
 #########################################################################################
 
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
- 
+
 # Remove the RelMinSize configuration option
 set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo CACHE TYPE INTERNAL FORCE)
 mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
@@ -83,8 +83,9 @@ set_property(TARGET Ghoul PROPERTY CXX_STANDARD_REQUIRED On)
 if (WIN32)
     if (GHOUL_USE_WMI)
         target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_WMI")
-        target_link_libraries(Ghoul "WbemUuid.lib" "shlwapi")
+        target_link_libraries(Ghoul "WbemUuid.lib")
     endif ()
+    target_link_libraries(Ghoul "shlwapi")
 endif ()
 
 if (MSVC)
@@ -294,7 +295,7 @@ if (GHOUL_HAVE_TESTS)
     endif ()
 
     target_include_directories(GhoulTest PUBLIC "${GHOUL_ROOT_DIR}/ext/googletest/googletest/include" "${GHOUL_ROOT_DIR}")
-    
+
     set(BUILD_GTEST ON CACHE BOOL "")
     set(BUILD_GMOCK OFF CACHE BOOL "")
     set(gtest_force_shared_crt ON CACHE BOOL "")
