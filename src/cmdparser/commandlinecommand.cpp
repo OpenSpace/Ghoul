@@ -60,8 +60,6 @@ CommandlineCommand::CommandlineCommand(std::string name,
     }
 }
 
-CommandlineCommand::~CommandlineCommand() {}
-
 const std::string& CommandlineCommand::name() const {
     return _name;
 }

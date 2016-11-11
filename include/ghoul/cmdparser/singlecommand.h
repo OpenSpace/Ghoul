@@ -27,7 +27,6 @@
 #define __SINGLECOMMAND_H__
 
 #include <ghoul/cmdparser/commandlinecommand.h>
-#include <ghoul/logging/logmanager.h>
 
 namespace ghoul {
 namespace cmdparser {

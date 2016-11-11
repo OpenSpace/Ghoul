@@ -111,6 +111,7 @@ endif ()
 set(GHOUL_HEADER 
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/cmdparser
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlineparser.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/multiplecommand.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/multiplecommand.inl
@@ -118,6 +119,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/singleton.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/event.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/event.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/cachemanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/directory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/file.h

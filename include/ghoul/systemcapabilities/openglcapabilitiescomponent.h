@@ -285,6 +285,9 @@ protected:
 } // namespace systemcapabilities
 } // namespace ghoul
 
-#define OpenGLCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::OpenGLCapabilitiesComponent>()))
+#define OpenGLCap (                                                                      \
+    ghoul::systemcapabilities::SystemCapabilities::ref().component<                      \
+        ghoul::systemcapabilities::OpenGLCapabilitiesComponent                           \
+    >())
 
 #endif // __OPENGLCAPABILITIESCOMPONENT_H__

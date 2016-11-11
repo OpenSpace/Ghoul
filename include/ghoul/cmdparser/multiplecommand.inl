@@ -34,7 +34,7 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::string name
                          std::move(parameterList), 1, MultipleCalls::Yes)
     , _ptr1(ptr1)
 {
-    ghoul_assert(_ptr1, "Ptr1 must not be empty");
+    ghoul_assert(_ptr1, "Ptr1 must not be nullptr");
 }
 
 template<class T, class U, class V, class W>
@@ -46,8 +46,8 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* 
     , _ptr1(ptr1)
     , _ptr2(ptr2)
 {
-    ghoul_assert(_ptr1, "Ptr1 must not be empty");
-    ghoul_assert(_ptr2, "Ptr2 must not be empty");
+    ghoul_assert(_ptr1, "Ptr1 must not be nullptr");
+    ghoul_assert(_ptr2, "Ptr2 must not be nullptr");
 }
 
 template<class T, class U, class V, class W>
@@ -60,9 +60,9 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* 
     , _ptr2(ptr2)
     , _ptr3(ptr3)
 {
-    ghoul_assert(_ptr1, "Ptr1 must not be empty");
-    ghoul_assert(_ptr2, "Ptr2 must not be empty");
-    ghoul_assert(_ptr3, "Ptr3 must not be empty");
+    ghoul_assert(_ptr1, "Ptr1 must not be nullptr");
+    ghoul_assert(_ptr2, "Ptr2 must not be nullptr");
+    ghoul_assert(_ptr3, "Ptr3 must not be nullptr");
 }
 
 template<class T, class U, class V, class W>
@@ -76,21 +76,24 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* 
     , _ptr3(ptr3)
     , _ptr4(ptr4)
 {
-    ghoul_assert(_ptr1, "Ptr1 must not be empty");
-    ghoul_assert(_ptr2, "Ptr2 must not be empty");
-    ghoul_assert(_ptr3, "Ptr3 must not be empty");
-    ghoul_assert(_ptr4, "Ptr4 must not be empty");
+    ghoul_assert(_ptr1, "Ptr1 must not be nullptr");
+    ghoul_assert(_ptr2, "Ptr2 must not be nullptr");
+    ghoul_assert(_ptr3, "Ptr3 must not be nullptr");
+    ghoul_assert(_ptr4, "Ptr4 must not be nullptr");
 }
 
 template<class T, class U, class V, class W>
 void MultipleCommand<T,U,V,W>::execute(const std::vector<std::string>& parameters) {
     _ptr1->push_back(cast<T>(parameters[0]));
-    if (_ptr2 != nullptr)
+    if (_ptr2) {
         _ptr2->push_back(cast<U>(parameters[1]));
-    if (_ptr3 != nullptr)
+    }
+    if (_ptr3) {
         _ptr3->push_back(cast<V>(parameters[2]));
-    if (_ptr4 != nullptr)
+    }
+    if (_ptr4) {
         _ptr4->push_back(cast<W>(parameters[3]));
+    }
 }
 
 template<class T, class U, class V, class W>
@@ -100,12 +103,15 @@ void MultipleCommand<T,U,V,W>::checkParameters(
     CommandlineCommand::checkParameters(parameters);
 
     is<T>(parameters[0]);
-    if (_ptr2 != nullptr)
+    if (_ptr2) {
         is<U>(parameters[1]);
-    if (_ptr3 != nullptr)
+    }
+    if (_ptr3) {
         is<V>(parameters[2]);
-    if (_ptr4 != nullptr)
+    }
+    if (_ptr4) {
         is<W>(parameters[3]);
+    }
 }
 
 } // namespace cmdparser

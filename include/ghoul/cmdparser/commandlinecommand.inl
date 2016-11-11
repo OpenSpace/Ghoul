@@ -23,28 +23,32 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <ghoul/misc/assert.h>
+
 namespace ghoul {
-namespace systemcapabilities {
+namespace cmdparser {
 
-template <typename T>
-T& SystemCapabilities::component() {
-    static_assert(
-        !std::is_pointer<T>::value,
-        "Template parameter must not be a pointer"
-    );
-    static_assert(
-        std::is_base_of<SystemCapabilitiesComponent, T>::value,
-        "Template parameter must be a subclass of SystemCapabilitiesComponent"
-    );
-
-    for (auto& c : _components) {
-        T* r = dynamic_cast<T*>(c.get());
-        if (r) {
-            return *r;
-        }
+template <class T>
+T CommandlineCommand::cast(const std::string& s) const {
+    ghoul_assert(!s.empty(), "s must not be empty");
+    std::istringstream iss(s);
+    T t;
+    iss >> std::dec >> t;
+    if (iss.fail()) {
+        throw CommandExecutionException("Illegal conversion");
     }
-    throw CapabilitiesComponentNotFoundError();
+    return t;
 }
 
-} // namespace systemcapabilities
-} // namespace ghoul
+template <class T>
+void CommandlineCommand::is(const std::string& s) const {
+    std::istringstream iss(s);
+    T t;
+    iss >> std::dec >> t;
+    if (iss.fail()) {
+        throw CommandParameterException("Conversion failed");
+    }
+}
+
+}  // namespace cmdparser
+}  // namespace ghoul

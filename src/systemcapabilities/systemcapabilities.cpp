@@ -23,74 +23,60 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/systemcapabilities/systemcapabilities.h"
+#include <ghoul/systemcapabilities/systemcapabilities.h>
 
-#include "ghoul/logging/logmanager.h"
-#include "ghoul/systemcapabilities/systemcapabilitiescomponent.h"
-#include "ghoul/systemcapabilities/generalcapabilitiescomponent.h"
-#include "ghoul/systemcapabilities/openglcapabilitiescomponent.h"
-
-#include <assert.h>
-#include <sstream>
-#include <typeinfo>
-#include <algorithm>
+#include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
+
+#include <algorithm>
+#include <typeinfo>
 
 namespace ghoul {
 namespace systemcapabilities {
 
-SystemCapabilities* SystemCapabilities::_systemCapabilities = nullptr;
+SystemCapabilities SystemCapabilities::_systemCapabilities;
+bool SystemCapabilities::_isInitialized = false;
 
-void SystemCapabilities::initialize() {
-    ghoul_assert(
-        _systemCapabilities == nullptr,
-        "Static SystemCapabilities must not have been initialized"
-    );
-    if (_systemCapabilities == nullptr)
-        _systemCapabilities = new SystemCapabilities;
-}
+SystemCapabilities::CapabilitiesComponentNotFoundError::
+CapabilitiesComponentNotFoundError()
+    : ghoul::RuntimeError("SystemCapabilities not found", "SystemCapabilities")
+{}
 
-void SystemCapabilities::deinitialize() {
-    ghoul_assert(
-        _systemCapabilities, "Static SystemCapabilities must have been initialized"
-    );
-    delete _systemCapabilities;
-    _systemCapabilities = nullptr;
+SystemCapabilities& SystemCapabilities::ref() {
+    return _systemCapabilities;
 }
 
 bool SystemCapabilities::isInitialized() {
-    return (_systemCapabilities != nullptr);
-}
-
-SystemCapabilities& SystemCapabilities::ref() {
-    ghoul_assert(
-        _systemCapabilities, "Static SystemCapabilities must have been initialized"
-    );
-    return *_systemCapabilities;
+    return _isInitialized;
 }
 
 void SystemCapabilities::detectCapabilities() {
     clearCapabilities();
-    for (const auto& component : _components)
+    for (const auto& component : _components) {
         component->detectCapabilities();
+    }
+    _isInitialized = true;
 }
 
 void SystemCapabilities::clearCapabilities() {
-    for (const auto& component : _components)
+    for (const auto& component : _components) {
         component->clearCapabilities();
+    }
+    _isInitialized = false;
 }
 
 void SystemCapabilities::logCapabilities(
                                   SystemCapabilitiesComponent::Verbosity verbosity) const
 {
     for (const auto& c : _components) {
-        auto capabilities = c->capabilities();
+        const auto& capabilities = c->capabilities();
         for (const auto& cap : capabilities) {
-            if (verbosity >= cap.verbosity)
+            if (verbosity >= cap.verbosity) {
                 LINFOC(
                     "SystemCapabilitiesComponent." + c->name(),
                     cap.description << ": " << cap.value
                 );
+            }
         }
     }
 }

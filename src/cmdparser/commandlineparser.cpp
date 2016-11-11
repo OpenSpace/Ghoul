@@ -24,6 +24,7 @@
  ****************************************************************************************/
 
 #include <ghoul/cmdparser/commandlineparser.h>
+
 #include <ghoul/cmdparser/commandlinecommand.h>
 #include <ghoul/logging/logmanager.h>
 
@@ -31,7 +32,6 @@
 #include <fmt/format.h>
 
 #include <algorithm>
-#include <iostream>
 #include <map>
 
 using fmt::format;

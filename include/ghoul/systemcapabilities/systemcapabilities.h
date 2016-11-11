@@ -28,6 +28,8 @@
 
 #include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
 
+#include <ghoul/misc/exception.h>
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -49,19 +51,12 @@ namespace systemcapabilities {
 class SystemCapabilities {
 public:
     /**
-     * Initializes the static member variable and makes the global SystemCapabilities
-     * available via the #ref method.
-     * \pre The static SystemCapabilities must not have been initialized
+     * The error that is returned when a requested SystemCapabilitiesComponent could not
+     * be found.
      */
-    static void initialize();
-
-    /**
-     * Destroys the static member variable and cleans up all the
-     * SystemCapabilitiesComponent%s that have been added to this SystemCapabilities
-     * (#addComponent).
-     * \pre The static SystemCapabilities must have been initialized
-     */
-    static void deinitialize();
+    struct CapabilitiesComponentNotFoundError : public RuntimeError {
+        explicit CapabilitiesComponentNotFoundError();
+    };
 
     /**
      * Returns a reference to the global SystemCapabilities object.
@@ -112,14 +107,14 @@ public:
     void addComponent(std::unique_ptr<SystemCapabilitiesComponent> component);
 
     /**
-     * Returns the component of type <code>T</code> or <code>nullptr</code> if no such 
-     * component exists.
+     * Returns the component of type <code>T</code>.
      * \tparam T The subclass of SystemCapabilitiesComponent that should be retrieved
+     * \throws CapabilitiesComponentNotFoundError If no component of type T could be found
      * \return The SystemCapabilitiesComponent that should be retrieved or
      * <code>nullptr</code> if no such type exists
      */
     template <typename T>
-    T* component();
+    T& component();
 
 private:
     /// Clears the capabilities of all components
@@ -129,7 +124,8 @@ private:
     std::vector<std::unique_ptr<SystemCapabilitiesComponent>> _components;
 
     /// The static singleton member
-    static SystemCapabilities* _systemCapabilities;
+    static SystemCapabilities _systemCapabilities;
+    static bool _isInitialized;
 };
 
 } // namespace systemcapabilities

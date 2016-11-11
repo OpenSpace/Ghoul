@@ -26,7 +26,6 @@
 #ifndef __COMMANDLINECOMMAND_H__
 #define __COMMANDLINECOMMAND_H__
 
-#include <ghoul/misc/assert.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 
@@ -97,7 +96,8 @@ public:
                        std::string infoText = "", std::string parameterList = "",
                        int argumentNum = 1,
                        MultipleCalls allowMultipleCalls = MultipleCalls::No);
-    virtual ~CommandlineCommand();
+    
+    virtual ~CommandlineCommand() = default;
 
     /**
      * Return the full name of this command.
@@ -185,15 +185,7 @@ protected:
      * \pre \p s must not be empty
      */
     template <class T>
-    T cast(const std::string& s) const {
-        ghoul_assert(!s.empty(), "s must not be empty");
-        std::istringstream iss(s);
-        T t;
-        iss >> std::dec >> t;
-        if (iss.fail())
-            throw CommandExecutionException("Illegal conversion");
-        return t;
-    }
+    T cast(const std::string& s) const;
 
     /**
      * Checks if the string value \p s can be cast into the type <code>T</code>. It only
@@ -205,13 +197,7 @@ protected:
      * otherwise
      */
     template <class T>
-    void is(const std::string& s) const {
-        std::istringstream iss(s);
-        T t;
-        iss >> std::dec >> t;
-        if (iss.fail())
-            throw CommandParameterException("Conversion failed");
-    }
+    void is(const std::string& s) const;
 
     /// Name of the command used on command-line level
     std::string _name;
@@ -231,5 +217,7 @@ protected:
 
 }  // namespace cmdparser
 }  // namespace ghoul
+
+#include "commandlinecommand.inl"
 
 #endif  //__COMMANDLINECOMMAND_H__

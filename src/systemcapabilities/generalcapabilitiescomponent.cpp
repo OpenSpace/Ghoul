@@ -35,13 +35,6 @@
     #pragma comment(lib, "Kernel32.lib")
     typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
     typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD);
-
-    // These is for the 'warning C4996: 'GetVersionExA': was declared deprecated' which
-    // is a known bug for VS2013
-    #pragma warning(push)
-    #pragma warning(disable: 4996)
-    #pragma warning(suppress: 28159)
-
 #else
     #ifdef __APPLE__
         #include <sys/sysctl.h>
@@ -53,10 +46,6 @@
 
     #include <sys/utsname.h>
 #endif
-
-namespace {
-    const std::string _loggerCat = "GeneralCapabilitiesComponents";
-}
 
 namespace ghoul {
 namespace systemcapabilities {
@@ -111,7 +100,8 @@ void GeneralCapabilitiesComponent::detectOS() {
     if (osVersionInfoEx == 0) {
         DWORD error = GetLastError();
         LPTSTR errorBuffer = nullptr;
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+        FormatMessage(
+            FORMAT_MESSAGE_FROM_SYSTEM |
             FORMAT_MESSAGE_ALLOCATE_BUFFER |
             FORMAT_MESSAGE_IGNORE_INSERTS,
             NULL,
@@ -119,14 +109,15 @@ void GeneralCapabilitiesComponent::detectOS() {
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
             (LPTSTR)&errorBuffer,
             0,
-            NULL);
+            NULL
+        );
         if (errorBuffer != nullptr) {
             std::string errorMsg(errorBuffer);
             LocalFree(errorBuffer);
             throw OperatingSystemError(
                 "Retrieving OS version failed. 'GetVersionEx' returned 0.",
                 errorMsg
-                );
+            );
         }
         throw OperatingSystemError(
             "Retrieving OS version failed. 'GetVersionEx' returned 0.",
@@ -137,7 +128,8 @@ void GeneralCapabilitiesComponent::detectOS() {
     if (module == 0) {
         DWORD error = GetLastError();
         LPTSTR errorBuffer = nullptr;
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+        FormatMessage(
+            FORMAT_MESSAGE_FROM_SYSTEM |
             FORMAT_MESSAGE_ALLOCATE_BUFFER |
             FORMAT_MESSAGE_IGNORE_INSERTS,
             NULL,
@@ -145,101 +137,147 @@ void GeneralCapabilitiesComponent::detectOS() {
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
             (LPTSTR)&errorBuffer,
             0,
-            NULL);
+            NULL
+        );
         if (errorBuffer != nullptr) {
             std::string errorMsg(errorBuffer);
             LocalFree(errorBuffer);
             throw OperatingSystemError(
                 "Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0.",
                 errorMsg
-                );
+            );
         }
         throw OperatingSystemError(
             "Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0.",
             ""
         );
     }
-    PGNSI procedureGetNativeSystemInfo = (PGNSI) GetProcAddress(
+    PGNSI procedureGetNativeSystemInfo = reinterpret_cast<PGNSI>(GetProcAddress(
         module,
         "GetNativeSystemInfo"
-    );
-    if (procedureGetNativeSystemInfo != 0)
+    ));
+    if (procedureGetNativeSystemInfo != nullptr) {
         procedureGetNativeSystemInfo(&systemInfo);
-    else
+    }
+    else {
         GetSystemInfo(&systemInfo);
+    }
 
     std::stringstream resultStream;
     if ((osVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) &&
         (osVersionInfo.dwMajorVersion > 4))
     {
         resultStream << "Microsoft ";
-        // @TODO Add Windows 10 support ---abock
-        if (osVersionInfo.dwMajorVersion == 6) {
+        // From Microsoft:
+        // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
+        // For applications that have been manifested for Windows 8.1 or Windows 10.
+        // Applications not manifested for Windows 8.1 or Windows 10 will return the
+        // Windows 8 OS version value (6.2). 
+        if (osVersionInfo.dwMajorVersion == 10) {
             if (osVersionInfo.dwMinorVersion == 0) {
-                if (osVersionInfo.wProductType == VER_NT_WORKSTATION)
+                if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
+                    resultStream << "Windows 10 ";
+                }
+                else {
+                    resultStream << "Windows Server 2016 ";
+                }
+            }
+        }
+        else if (osVersionInfo.dwMajorVersion == 6) {
+            if (osVersionInfo.dwMinorVersion == 0) {
+                if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
                     resultStream << "Windows Vista ";
-                else
+                }
+                else {
                     resultStream << "Windows Server 2008 ";
+                }
             }
             else if (osVersionInfo.dwMinorVersion == 1) {
-                if (osVersionInfo.wProductType == VER_NT_WORKSTATION)
+                if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
                     resultStream << "Windows 7 ";
-                else
+                }
+                else {
                     resultStream << "Windows Server 2008 R2 ";
+                }
             }
             else if (osVersionInfo.dwMinorVersion == 2) {
-                if (osVersionInfo.wProductType == VER_NT_WORKSTATION)
+                if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
                     resultStream << "Windows 8 ";
-                else
+                }
+                else {
                     resultStream << "Windows Server 2012 ";
+                }
+            }
+            else if (osVersionInfo.dwMinorVersion == 3) {
+                if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
+                    resultStream << "Windows 8.1 ";
+                }
+                else {
+                    resultStream << "Windows Server 2012 R2 ";
+                }
             }
         }
         else if (osVersionInfo.dwMajorVersion == 5 && osVersionInfo.dwMinorVersion == 2) {
-            if (GetSystemMetrics(SM_SERVERR2))
+            if (GetSystemMetrics(SM_SERVERR2)) {
                 resultStream << "Windows Server 2003 R2";
-            else if (osVersionInfo.wSuiteMask & VER_SUITE_STORAGE_SERVER)
+            }
+            else if (osVersionInfo.wSuiteMask & VER_SUITE_STORAGE_SERVER) {
                 resultStream << "Windows Storage Server 2003";
+            }
             else if (osVersionInfo.wProductType == VER_NT_WORKSTATION &&
-                systemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
+                     systemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
+            {
                 resultStream << "Windows XP Professional x64 Edition";
-            else
+            }
+            else {
                 resultStream << "Windows Server 2003";
+            }
         }
         else if (osVersionInfo.dwMajorVersion == 5 && osVersionInfo.dwMinorVersion == 1) {
             resultStream << "Windows XP ";
-            if (osVersionInfo.wSuiteMask & VER_SUITE_PERSONAL)
+            if (osVersionInfo.wSuiteMask & VER_SUITE_PERSONAL) {
                 resultStream << "Home Edition";
-            else
+            }
+            else {
                 resultStream << "Professional";
+            }
         }
         else if (osVersionInfo.dwMajorVersion == 5 && osVersionInfo.dwMinorVersion == 0) {
             resultStream << "Windows 2000 ";
-            if (osVersionInfo.wProductType == VER_NT_WORKSTATION)
+            if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
                 resultStream << "Professional";
+            }
             else {
-                if (osVersionInfo.wSuiteMask & VER_SUITE_DATACENTER)
+                if (osVersionInfo.wSuiteMask & VER_SUITE_DATACENTER) {
                     resultStream << "Datacenter Server";
-                else if (osVersionInfo.wSuiteMask & VER_SUITE_ENTERPRISE)
+                }
+                else if (osVersionInfo.wSuiteMask & VER_SUITE_ENTERPRISE) {
                     resultStream << "Advanced Server";
-                else
+                }
+                else {
                     resultStream << "Server";
+                }
             }
         }
 
-        if (_tcslen(osVersionInfo.szCSDVersion) > 0)
+        if (_tcslen(osVersionInfo.szCSDVersion) > 0) {
             resultStream << " " << osVersionInfo.szCSDVersion;
+        }
 
         resultStream << " (build " << osVersionInfo.dwBuildNumber << ")";
         
         if (osVersionInfo.dwMajorVersion >= 6) {
-            if (systemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
+            if (systemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64) {
                 resultStream << ", 64-bit";
-            else if (systemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
+            }
+            else if (systemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL) {
                 resultStream << ", 32-bit";
+            }
         }
     }
-    else
+    else {
         resultStream << "OS detection failed. Version of Windows is too old.";
+    }
 
     _operatingSystem = resultStream.str();
 #else
@@ -281,10 +319,12 @@ void GeneralCapabilitiesComponent::detectMemory() {
     ULONGLONG installedMainMemory;
     // get installed memory in kB
     BOOL success = GetPhysicallyInstalledSystemMemory(&installedMainMemory);
-    if (success == TRUE)
+    if (success == TRUE) {
         _installedMainMemory = static_cast<unsigned int>(installedMainMemory / 1024);
-    else
+    }
+    else {
         throw MainMemoryError("Error reading about of physical memory");
+    }
 #endif
 #elif defined(__APPLE__)
     int mib[2];
@@ -347,7 +387,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     char CPUBrandString[0x40];
     int CPUInfo[4] = { -1 };
     int nFeatureInfo = 0;
-    unsigned    nIds, nExIds, i;
+    unsigned    nIds, nExIds;
     bool    bSSE3NewInstructions = false;
     bool    bMONITOR_MWAIT = false;
     bool    bCPLQualifiedDebugStore = false;
@@ -367,13 +407,11 @@ void GeneralCapabilitiesComponent::detectCPU() {
     *((int*)(CPUString + 8)) = CPUInfo[2];
 
     // Get the information associated with each valid Id
-    for (i = 0; i <= nIds; ++i)
-    {
+    for (unsigned i = 0; i <= nIds; ++i) {
         __cpuid(CPUInfo, i);
 
         // Interpret CPU feature information.
-        if (i == 1)
-        {
+        if (i == 1) {
             bSSE3NewInstructions = (CPUInfo[2] & 0x1) || false;
             bMONITOR_MWAIT = (CPUInfo[2] & 0x8) || false;
             bCPLQualifiedDebugStore = (CPUInfo[2] & 0x10) || false;
@@ -389,8 +427,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
     // Get the information associated with each extended ID.
-    for (i = 0x80000000; i <= nExIds; ++i)
-    {
+    for (unsigned i = 0x80000000; i <= nExIds; ++i) {
         __cpuid(CPUInfo, i);
 
         // Interpret CPU brand string and cache information.
@@ -423,7 +460,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
             extensions << "ds_cpl ";
         if (bThermalMonitor2)
             extensions << "tm2 ";
-        i = 0;
+        unsigned i = 0;
         nIds = 1;
         while (i < (sizeof(szFeatures) / sizeof(const char*)))
         {
@@ -442,8 +479,9 @@ void GeneralCapabilitiesComponent::detectCPU() {
 
     // Set extensions and remove trailing ", "
     _extensions = extensions.str();
-    if (_extensions.length() > 1)
-        _extensions = _extensions.substr(0, _extensions.length()-1);
+    if (_extensions.length() > 1) {
+        _extensions = _extensions.substr(0, _extensions.length() - 1);
+    }
 
     // Get the cores
     SYSTEM_INFO systemInfo;
@@ -535,7 +573,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 
     // We must use c-style file opening because /proc is no ordinary filesystem
     file = fopen("/proc/cpuinfo", "r");
-    if(file) {
+    if (file) {
         while(fgets(line, maxSize, file) != NULL){
             if (strncmp(line, "processor", 9) == 0) ++_cores;
             if (strncmp(line, "model name", 10) == 0) {
@@ -558,16 +596,16 @@ void GeneralCapabilitiesComponent::detectCPU() {
     }
 
     file = fopen("/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size", "r");
-    if(file) {
-        if(fgets(line, maxSize, file) != NULL){
+    if (file) {
+        if (fgets(line, maxSize, file) != NULL){
             _cacheLineSize = static_cast<unsigned int>(strtol(line, NULL, 0));
         }
         fclose(file);
     }
 
     file = fopen("/sys/devices/system/cpu/cpu0/cache/index0/ways_of_associativity", "r");
-    if(file) {
-        if(fgets(line, maxSize, file) != NULL){
+    if (file) {
+        if (fgets(line, maxSize, file) != NULL){
             _L2Associativity = static_cast<unsigned int>(strtol(line, NULL, 0));
         }
         fclose(file);
@@ -575,30 +613,19 @@ void GeneralCapabilitiesComponent::detectCPU() {
 #endif
 }
 
-struct Foo {
-    std::string a;
-    std::string b;
-    SystemCapabilitiesComponent::Verbosity c;
-};
-
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
-    GeneralCapabilitiesComponent::capabilities() const
+GeneralCapabilitiesComponent::capabilities() const
 {   
-    std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
-
-    Foo f = {"1", "2", SystemCapabilitiesComponent::Verbosity::Minimal };
-
-    SystemCapabilitiesComponent::CapabilityInformation i = { std::string("foo"), std::string("bar"), SystemCapabilitiesComponent::Verbosity::Minimal };
-
-    result.push_back({ "Operating System", _operatingSystem, Verbosity::Minimal });
-    result.push_back({ "CPU", _cpu, Verbosity::Default });
-    result.push_back({ "Cores", coresAsString(), Verbosity::Default });
-    result.push_back({ "Cache line size", cacheLineSizeAsString(), Verbosity::Full });
-    result.push_back({ "L2 Associativity", L2AssiciativityAsString(), Verbosity::Full });
-    result.push_back({ "Cache size", cacheSizeAsString(), Verbosity::Full });
-    result.push_back({ "Extensions", _extensions,Verbosity::Full });
-    result.push_back({ "Main Memory", installedMainMemoryAsString(), Verbosity::Default });
-    return result;
+    return {
+        { "Operating System", _operatingSystem, Verbosity::Minimal },
+        { "CPU", _cpu, Verbosity::Default },
+        { "Cores", coresAsString(), Verbosity::Default },
+        { "Cache line size", cacheLineSizeAsString(), Verbosity::Full },
+        { "L2 Associativity", L2AssiciativityAsString(), Verbosity::Full },
+        { "Cache size", cacheSizeAsString(), Verbosity::Full },
+        { "Extensions", _extensions,Verbosity::Full },
+        { "Main Memory", installedMainMemoryAsString(), Verbosity::Default }
+    };
 }
 
 const std::string& GeneralCapabilitiesComponent::operatingSystem() const {
@@ -655,7 +682,3 @@ std::string GeneralCapabilitiesComponent::name() const {
 
 } // namespace systemcapabilities
 } // namespace ghoul
-
-#ifdef WIN32
-#pragma warning(pop)
-#endif // WIN32

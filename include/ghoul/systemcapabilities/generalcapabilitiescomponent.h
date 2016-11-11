@@ -211,6 +211,9 @@ protected:
 } // namespace systemcapabilities
 } // namespace ghoul
 
-#define CpuCap (*(ghoul::systemcapabilities::SystemCapabilities::ref().component<ghoul::systemcapabilities::GeneralCapabilitiesComponent>()))
+#define CpuCap (                                                                         \
+    ghoul::systemcapabilities::SystemCapabilities::ref().component<                      \
+        ghoul::systemcapabilities::GeneralCapabilitiesComponent                          \
+    >())
 
 #endif // __GeneralCapabilitiesComponent_H__

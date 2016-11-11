@@ -34,7 +34,9 @@ SingleCommandZeroArguments::SingleCommandZeroArguments(bool *ptr, std::string na
     : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), "",
                          0, CommandlineCommand::MultipleCalls::No)
     , _ptr(ptr)
-{}
+{
+    ghoul_assert(ptr, "Pointer must not be a nullptr");
+}
 
 void SingleCommandZeroArguments::execute(const std::vector<std::string>& /*parameters*/) {
     *_ptr = true;
