@@ -44,11 +44,12 @@
 
 namespace {
 #ifndef WIN32
-    // Dangerous as fuck (if malicious input)
+   // This is called with a specific input, but has the potential to be very dangerous
     bool exec(const std::string& cmd, std::string& value) {
         FILE* pipe = popen(cmd.c_str(), "r");
-        if (!pipe)
+        if (!pipe) {
             return false;
+        }
 
         const int buffer_size = 1024;
         char buffer[buffer_size];
@@ -68,18 +69,21 @@ namespace ghoul {
 std::string clipboardText() {
 #ifdef WIN32
     // Try opening the clipboard
-    if (!OpenClipboard(nullptr))
+    if (!OpenClipboard(nullptr)) {
         return "";
+    }
 
     // Get handle of clipboard object for ANSI text
     HANDLE hData = GetClipboardData(CF_TEXT);
-    if (hData == nullptr)
+    if (hData == nullptr) {
         return "";
+    }
 
     // Lock the handle to get the actual text pointer
     char* pszText = static_cast<char*>(GlobalLock(hData));
-    if (pszText == nullptr)
+    if (pszText == nullptr) {
         return "";
+    }
 
     // Save text in a string class instance
     std::string text(pszText);
@@ -94,13 +98,15 @@ std::string clipboardText() {
     return text;
 #elif defined(__APPLE__)
     std::string text;
-    if (exec("pbpaste", text))
+    if (exec("pbpaste", text)) {
         return text.substr(0, text.length()); // remove a line ending
+    }
     return "";
 #else
     std::string text;
-    if (exec("xclip -o -sel c -f", text))
+    if (exec("xclip -o -sel c -f", text)) {
         return text.substr(0, text.length());  // remove a line ending
+    }
     return "";
 #endif
 }
@@ -108,8 +114,9 @@ std::string clipboardText() {
 void setClipboardText(std::string text) {
 #ifdef WIN32
     HANDLE hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, text.length() + 1);
-    if (hData == nullptr)
+    if (hData == nullptr) {
         throw RuntimeError("Error allocating memory", "Clipboard");
+    }
 
     char* ptrData = static_cast<char*>(GlobalLock(hData));
     if (ptrData == nullptr) {
@@ -120,24 +127,28 @@ void setClipboardText(std::string text) {
 
     GlobalUnlock(hData);
 
-    if (!OpenClipboard(nullptr))
+    if (!OpenClipboard(nullptr)) {
         throw RuntimeError("Error opening clipboard", "Clipboard");
+    }
 
-    if (!EmptyClipboard())
+    if (!EmptyClipboard()) {
         throw RuntimeError("Error cleaning clipboard", "Clipboard");
+    }
 
     SetClipboardData(CF_TEXT, hData);
     CloseClipboard();
 #elif defined(__APPLE__)
     std::string buf;
     bool success = exec(fmt::format("echo \"{}\" | pbcopy", text), buf);
-    if (!success)
+    if (!success) {
         throw RuntimeError("Error setting text to clipboard", "Clipboard");
+    }
 #else
     std::string buf;
     bool success = exec(fmt::format("echo \"{}\" | xclip -i -sel c -f", text), buf);
-    if (!success)
+    if (!success) {
         throw RuntimeError("Error setting text to clipboard", "Clipboard");
+    }
 #endif
 }
 

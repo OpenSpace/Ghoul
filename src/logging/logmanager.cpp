@@ -23,9 +23,10 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/logging/logmanager.h"
+#include <ghoul/logging/logmanager.h>
+
 #include "ghoul/logging/log.h"
-#include <cassert>
+
 #include <algorithm>
 #include <map>
 #include <vector>
@@ -48,8 +49,7 @@ std::string LogManager::stringFromLevel(LogLevel level) {
         case LogLevel::NoLogging:
             return "None";
     }
-    assert(false);
-    return "";
+    ghoul_assert(false, "Missing case label");
 }
 
 LogManager::LogLevel LogManager::levelFromString(const std::string& level) {
@@ -63,7 +63,7 @@ LogManager::LogLevel LogManager::levelFromString(const std::string& level) {
     };
 
     auto it = levels.find(level);
-    assert(it != levels.end());
+    ghoul_assert(it != levels.end(), "Missing entry in 'levels' map");
     return it->second;
 }
 
@@ -75,14 +75,16 @@ LogManager::LogManager(LogManager::LogLevel level, ImmediateFlush immediateFlush
 
 void LogManager::addLog(std::shared_ptr<Log> log) {
     auto it = std::find(_logs.begin(), _logs.end(), log);
-    if (it == _logs.end())
+    if (it == _logs.end()) {
         _logs.push_back(std::move(log));
+    }
 }
 
 void LogManager::removeLog(std::shared_ptr<Log> log) {
     auto it = std::find(_logs.begin(), _logs.end(), log);
-    if (it != _logs.end())
+    if (it != _logs.end()) {
         _logs.erase(it);
+    }
 }
 
 void LogManager::logMessage(LogManager::LogLevel level, const std::string& category,

@@ -73,8 +73,7 @@ ConsoleLog::ConsoleLog(ColorOutput colorOutput, TimeStamping timeStamping,
             LogLevelStamping logLevelStamping)
     : StreamLog(std::cout, timeStamping, dateStamping, categoryStamping, logLevelStamping)
     , _colorOutput(colorOutput)
-{
-}
+{}
 
 void ConsoleLog::log(LogManager::LogLevel level, const std::string& category,
                      const std::string& message)

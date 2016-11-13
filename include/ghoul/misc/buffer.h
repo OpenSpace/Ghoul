@@ -28,7 +28,6 @@
 #ifndef __BUFFER_H__
 #define __BUFFER_H__
 
-#include <ghoul/misc/assert.h>
 #include <ghoul/misc/exception.h>
 
 #include <string>

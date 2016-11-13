@@ -101,7 +101,7 @@ protected:
     /**
      * Writes the passed 'line' to the opened file. The line will be printed 'as-is' and
      * no endline or other control sequence will be added.
-     * \param [in] line The line of text that should be printed to the file
+     * \param line The line of text that should be printed to the file
      */
     void writeLine(std::string line);
 

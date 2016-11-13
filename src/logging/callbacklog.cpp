@@ -39,20 +39,27 @@ void CallbackLog::log(LogManager::LogLevel level, const std::string& category,
                       const std::string& message)
 {
     std::string output;
-    if (isDateStamping())
+    if (isDateStamping()) {
         output += "[" + getDateString();
-    if (isTimeStamping())
+    }
+    if (isTimeStamping()) {
         output += " | " + getTimeString();
+    }
 
-    if (isDateStamping() || isTimeStamping())
+    if (isDateStamping() || isTimeStamping()) {
         output += "] ";
-    if (isCategoryStamping() && (category != ""))
+    }
+    if (isCategoryStamping() && (category != "")) {
         output += category + " ";
-    if (isLogLevelStamping())
+    }
+    if (isLogLevelStamping()) {
         output += "(" + LogManager::stringFromLevel(level) + ")";
-    if (output != "")
+    }
+    if (output != "") {
         output += "\t";
+    }
     output += message;
+
     _callbackFunction(std::move(output));
 }
 

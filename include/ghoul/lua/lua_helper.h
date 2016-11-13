@@ -26,7 +26,6 @@
 #ifndef __LUAHELPER_H__
 #define __LUAHELPER_H__
 
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
 

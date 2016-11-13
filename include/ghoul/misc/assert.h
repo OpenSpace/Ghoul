@@ -26,8 +26,6 @@
 #ifndef __ASSERT_H__
 #define __ASSERT_H__
 
-#include <ghoul/misc/exception.h>
-
 #include <string>
 #include <sstream>
 

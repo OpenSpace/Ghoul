@@ -77,7 +77,7 @@ Buffer::Buffer(Buffer&& other) {
 }
 
 Buffer& Buffer::operator=(const Buffer& rhs) {
-    if(this != &rhs) {
+    if (this != &rhs) {
         // copy memory
         _data = rhs._data;
         _offsetWrite = rhs._offsetWrite;
@@ -87,7 +87,7 @@ Buffer& Buffer::operator=(const Buffer& rhs) {
 }
 
 Buffer& Buffer::operator=(Buffer&& rhs) {
-    if(this != &rhs) {
+    if (this != &rhs) {
         // move memory
         _data = std::move(rhs._data);
         _offsetWrite = rhs._offsetWrite;
@@ -108,6 +108,7 @@ void Buffer::reset() {
 const Buffer::value_type* Buffer::data() const {
     return _data.data();
 }
+
 Buffer::value_type* Buffer::data() {
     return _data.data();
 }
@@ -134,8 +135,9 @@ void Buffer::write(const std::string& filename, Compress compress) {
             reinterpret_cast<char*>(buffer.data()),
             static_cast<int>(_offsetWrite)
         );
-        if (compressed_size <= 0)
+        if (compressed_size <= 0) {
             throw RuntimeError("Error compressing Buffer using LZ4", "Buffer");
+        }
 
         size_t size = compressed_size;
         // orginal size
@@ -245,8 +247,9 @@ void Buffer::serialize(const std::vector<std::string>& v) {
     
     std::memcpy(_data.data() + _offsetWrite, &length, sizeof(size_t));
     _offsetWrite += sizeof(size_t);
-    for (const auto& e : v)
+    for (const auto& e : v) {
         serialize(e);
+    }
 }
 
 template <>

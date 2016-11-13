@@ -149,7 +149,7 @@ public:
     int messageCounter(LogManager::LogLevel level);
 
     /**
-     * Resets the internal log message counting back to 0.
+     * Resets the internal log message counting back to 0 for all log levels.
      */
     void resetMessageCounters();
 
@@ -196,6 +196,7 @@ private:
     /// Stores the Logs which are managed by this LogManager
     std::vector<std::shared_ptr<Log>> _logs;
 
+    /// Stores the number of messages for each log level (5)
     std::array<int, 5> _logCounter;
 };
 

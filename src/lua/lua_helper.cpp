@@ -26,6 +26,7 @@
 #include <ghoul/lua/lua_helper.h>
 
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/logging/logmanager.h>
 #include <ghoul/lua/ghoul_lua.h>
 
 #include <fmt/format.h>
@@ -336,16 +337,13 @@ string luaTypeToString(int type) {
             return "UserData";
         case LUA_TTHREAD:
             return "Thread";
-        default:
-            ghoul_assert(false, "Missing type in switch-case");
-            return "";
     }
+    ghoul_assert(false, "Missing type in switch-case");
 }
 
 lua_State* createNewLuaState() {
-    lua_State* s;
     LDEBUGC("Lua", "Creating Lua state");
-    s = luaL_newstate();
+    lua_State* s = luaL_newstate();
     if (s == nullptr) {
         throw LuaRuntimeException("Error creating Lua state: Memory allocation");
     }
@@ -387,7 +385,6 @@ void runScript(lua_State* state, const std::string& script) {
         throw LuaExecutionException(lua_tostring(state, -1));
     }
 }
-    
 
 namespace internal {
 
