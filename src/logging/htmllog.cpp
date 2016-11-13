@@ -25,15 +25,14 @@
 
 #include <ghoul/logging/htmllog.h>
 
-#include <cassert>
-
 namespace ghoul {
 namespace logging {
 
-HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend, TimeStamping timeStamping,
-        DateStamping dateStamping, CategoryStamping categoryStamping,
-        LogLevelStamping logLevelStamping, const std::vector<std::string>& cssIncludes,
-        const std::vector<std::string>& jsIncludes)
+HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend,
+                 TimeStamping timeStamping, DateStamping dateStamping,
+                 CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
+                 const std::vector<std::string>& cssIncludes,
+                 const std::vector<std::string>& jsIncludes)
     : TextLog(std::move(filename), writeToAppend, timeStamping, dateStamping,
                 categoryStamping, logLevelStamping)
 {    
@@ -49,7 +48,11 @@ HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend, TimeStamping
 
     for (const std::string& c : cssIncludes) {
         std::ifstream cssInput(c);
-        std::copy(std::istreambuf_iterator<char>{cssInput}, std::istreambuf_iterator<char>(), backInserter);
+        std::copy(
+            std::istreambuf_iterator<char>{cssInput},
+            std::istreambuf_iterator<char>(),
+            backInserter
+        );
     }
 
     output += \
@@ -59,7 +62,11 @@ HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend, TimeStamping
 
     for (const std::string& j : jsIncludes) {
         std::ifstream jsInput(j);
-        std::copy(std::istreambuf_iterator<char>{jsInput}, std::istreambuf_iterator<char>(), backInserter);
+        std::copy(
+            std::istreambuf_iterator<char>{jsInput},
+            std::istreambuf_iterator<char>(),
+            backInserter
+        );
     }
 
     output += \
@@ -72,14 +79,18 @@ HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend, TimeStamping
         \n\
         \t\t<thead>\n\
         \t\t\t<tr>\n";
-    if (isDateStamping())
+    if (isDateStamping()) {
         output += "\t\t\t\t<th class=\"log-date\">Date</th>\n";
-    if (isTimeStamping())
+    }
+    if (isTimeStamping()) {
         output += "\t\t\t\t<th class=\"log-time\">Time</th>\n";
-    if (isCategoryStamping())
+    }
+    if (isCategoryStamping()) {
         output += "\t\t\t\t<th class=\"log-category\">Category</th>\n";
-    if (isLogLevelStamping())
+    }
+    if (isLogLevelStamping()) {
         output += "\t\t\t\t<th class=\"log-level\">Level</th>\n";
+    }
     output += "\t\t\t\t<th class=\"log-message\">Message</th>\n\
               \t\t\t</tr>\n\
               \t\t<tbody>\n";
@@ -94,7 +105,6 @@ HTMLLog::~HTMLLog() {
     );
 }
 
-
 void HTMLLog::log(LogManager::LogLevel level, const std::string& category,
                   const std::string& message)
 {
@@ -104,14 +114,19 @@ void HTMLLog::log(LogManager::LogLevel level, const std::string& category,
     } else {
         output = "\t\t\t<tr bgcolor=\"" + colorForLevel(level) + "\">\n";
     }
-    if (isDateStamping())
+    if (isDateStamping()) {
         output += "\t\t\t\t<td class=\"log-date\">" + getDateString() + "</td>\n";
-    if (isTimeStamping())
+    }
+    if (isTimeStamping()) {
         output += "\t\t\t\t<td class=\"log-time\">" + getTimeString() + "</td>\n";
-    if (isCategoryStamping())
+    }
+    if (isCategoryStamping()) {
         output += "\t\t\t\t<td class=\"log-category\">" + category + "</td>\n";
-    if (isLogLevelStamping())
-        output += "\t\t\t\t<td class=\"log-level\">" + LogManager::stringFromLevel(level) + "</td>\n";
+    }
+    if (isLogLevelStamping()) {
+        output += "\t\t\t\t<td class=\"log-level\">" +
+            LogManager::stringFromLevel(level) + "</td>\n";
+    }
     output += "\t\t\t\t<td class=\"log-message\">" + message + "</td>\n\t\t\t</tr>\n";
 
     writeLine(std::move(output));
@@ -132,7 +147,7 @@ std::string HTMLLog::classForLevel(LogManager::LogLevel level) {
     case LogManager::LogLevel::NoLogging:
         return "log-level-no-logging";
     }
-    return "";
+    ghoul_assert(false, "Missing case label");
 }
 
 std::string HTMLLog::colorForLevel(LogManager::LogLevel level) {
@@ -150,7 +165,7 @@ std::string HTMLLog::colorForLevel(LogManager::LogLevel level) {
         case LogManager::LogLevel::NoLogging:
             return "#FFFFFF";
     }
-    return "";
+    ghoul_assert(false, "Missing case label");
 }
 
 } // namespace logging

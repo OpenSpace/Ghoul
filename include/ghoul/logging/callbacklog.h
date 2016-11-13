@@ -80,7 +80,7 @@ public:
 
     /**
      * Replaces the old callback with this <code>callbackFunction</code>. This function
-     * is not checked and it is the caller`s responsiblity to assure that the function
+     * is not checked and it is the caller's responsiblity to assure that the function
      * object is callable.
      * \param callbackFunction The new callback function that will be called henceforth
      */

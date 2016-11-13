@@ -147,9 +147,10 @@ void BufferLog::resetBuffer() {
     while (h->mutex.test_and_set() && !_inCallbackStack) {}
     // the moment we return, we own the mutex
     h->firstEmptyByte = 0;
-    if (!_inCallbackStack)
+    if (!_inCallbackStack) {
         // only release the mutex if we are not in the callback stack
         h->mutex.clear();
+    }
 }
     
 void BufferLog::log(unsigned long long timestamp, std::string message) {
@@ -186,8 +187,11 @@ void BufferLog::log(unsigned long long timestamp, std::string message) {
         }
     }
     // Copy the values of the timestamp
-    memcpy(firstEmptyMemory(_buffer),
-           reinterpret_cast<void*>(&timestamp), sizeof(unsigned long long));
+    memcpy(
+        firstEmptyMemory(_buffer),
+        reinterpret_cast<void*>(&timestamp),
+        sizeof(unsigned long long)
+    );
     // Advance the empty pointer
     h->firstEmptyByte += sizeof(unsigned long long);
     
@@ -232,9 +236,10 @@ void BufferLog::setBuffer(void* buffer, size_t bufferSize) {
     _totalSize = bufferSize;
     initializeBuffer();
     
-    if (!_inCallbackStack)
+    if (!_inCallbackStack) {
         // only release the mutex if we are not in the callback stack
         h->mutex.clear();
+    }
 }
     
 void BufferLog::writeToDisk(const std::string& filename) {
@@ -248,9 +253,10 @@ void BufferLog::writeToDisk(const std::string& filename) {
     while (h->mutex.test_and_set() && !_inCallbackStack) {}
     // the moment we return, we own the mutex
     file.write(reinterpret_cast<char*>(_buffer), usedSize());
-    if (!_inCallbackStack)
+    if (!_inCallbackStack) {
         // only release the mutex if we are not in the callback stack
         h->mutex.clear();
+    }
 }
 
 } // namespace ghoul
