@@ -25,6 +25,7 @@
 
 #include <ghoul/filesystem/cachemanager.h>
 
+#include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/crc32.h>
@@ -113,18 +114,24 @@ CacheManager::CacheManager(std::string directory, int version)
 
             CacheInformation info;
             std::getline(file, info.file);
-            if (!file.good())
+            if (!file.good()) {
                 throw MalformedCacheException(path);
+            }
             
             info.isPersistent = true;
             _files.emplace(hash, info);
 
             // If the current hash + file is contained in the cache state, we have to
             // remove it
-            cacheState.erase(std::remove_if(cacheState.begin(), cacheState.end(), 
-                [hash, &info](const LoadedCacheInfo& i) {
-                    return hash == i.first && info.file == i.second;
-                }), cacheState.end());
+            cacheState.erase(
+                std::remove_if(
+                    cacheState.begin(), cacheState.end(), 
+                    [hash, &info](const LoadedCacheInfo& i) {
+                        return hash == i.first && info.file == i.second;
+                    }
+                ),
+                cacheState.end()
+            );
         }
     }
     
@@ -159,15 +166,16 @@ CacheManager::~CacheManager() {
                 // Delete all the non-persistent files
                 FileSys.deleteFile(p.second.file);
             }
-            else
+            else {
                 // Save the persistent files in the cache file
-                file << p.first << std::endl <<
-                        p.second.file << std::endl;
+                file << p.first << '\n' << p.second.file << '\n';
+            }
         }
         file.close();
     }
-    else
+    else {
         LERROR("Could not open file '" << path << "' for writing permanent cache files");
+    }
     cleanDirectory(_directory);
 }
 
@@ -175,7 +183,6 @@ std::string CacheManager::cachedFilename(const File& file, Persistent isPersiste
     std::string lastModifiedTime = file.lastModifiedDate();
     return cachedFilename(file, lastModifiedTime, isPersistent);
 }
-
 
 std::string CacheManager::cachedFilename(const File& file, const std::string& information,
                                          Persistent isPersistent)
@@ -188,8 +195,9 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
                                          Persistent isPersistent)
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
-    if (pos != std::string::npos)
+    if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
+    }
     
     unsigned int hash = generateHash(baseName, information);
 
@@ -209,8 +217,9 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
     // The new destination should always not exist, since we checked before if we have the
     // value in the map and only get here if it isn't; persistent cache entries are always
     // in the map and non-persistent entries should have been deleted on application close
-    if (!FileSys.directoryExists(destination))
+    if (!FileSys.directoryExists(destination)) {
         FileSys.createDirectory(destination);
+    }
 
     auto it = _files.find(hash);
     if (it != _files.end()) {
@@ -244,8 +253,9 @@ bool CacheManager::hasCachedFile(const std::string& baseName,
                                  const std::string& information) const
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
-    if (pos != std::string::npos)
+    if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
+    }
     
     unsigned int hash = generateHash(baseName, information);    
     return _files.find(hash) != _files.end();
@@ -264,8 +274,9 @@ void CacheManager::removeCacheFile(const std::string& baseName,
                          const std::string& information)
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
-    if (pos != std::string::npos)
+    if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
+    }
     
     unsigned int hash = generateHash(baseName, information);
 
@@ -290,8 +301,9 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
     // First search for all subdirectories and call this function recursively on them
     std::vector<std::string> contents = dir.readDirectories();
     for (const auto& content : contents) {
-        if (FileSys.directoryExists(content))
+        if (FileSys.directoryExists(content)) {
             cleanDirectory(content);
+        }
     }
     // We get to this point in the recursion if either all subdirectories have been
     // deleted or there exists a file somewhere in the directory tree
@@ -350,9 +362,10 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
                         directoryName
                     ));
                 }
-                else
+                else {
                     // Adding the absPath to normalize all / and \ for Windows 
                     result.emplace_back(std::stoul(hashName), absPath(files[0]));
+                }
             }
         }
     }

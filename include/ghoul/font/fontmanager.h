@@ -26,7 +26,6 @@
 #ifndef __FONTMANAGER_H__
 #define __FONTMANAGER_H__
 
-#include <ghoul/font/font.h>
 #include <ghoul/glm.h>
 #include <ghoul/opengl/textureatlas.h>
 #include <ghoul/misc/boolean.h>
@@ -39,7 +38,9 @@
 
 namespace ghoul {
 namespace fontrendering {
-    
+
+class Font;
+
 /**
  * This class manages different Font objects, stores them in a TextureAtlas and provides
  * access to these fonts based a user-defined, unique name. The paths to fonts must be

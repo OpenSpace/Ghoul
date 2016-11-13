@@ -73,8 +73,9 @@ namespace {
             const bool iNode = eventFlags[i] & kFSEventStreamEventFlagItemInodeMetaMod;
             const bool file = eventFlags[i] & kFSEventStreamEventFlagItemIsFile;
 
-            if ((mod || iNode) && file)
+            if ((mod || iNode) && file) {
                 ghoul::filesystem::callbackHandler(paths[i]);
+            }
         }
     }
 }
@@ -87,7 +88,7 @@ struct DirectoryHandle {
 };
 
 void FileSystem::deinitializeInternalApple() {
-    for (auto d : _directories) {
+    for (const auto& d : _directories) {
         DirectoryHandle* dh = d.second;
         FSEventStreamStop(dh->_eventStream);
         FSEventStreamInvalidate(dh->_eventStream);
@@ -161,8 +162,9 @@ void FileSystem::removeFileListener(File* file) {
     auto eqRange = _trackedFiles.equal_range(file->path());
 
     bool found = false;
-    for (auto it = eqRange.first; it != eqRange.second; ++it)
+    for (auto it = eqRange.first; it != eqRange.second; ++it) {
         found |= (it->second == file);
+    }
     ghoul_assert(found, "File not previously registered");
     
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
@@ -182,8 +184,9 @@ void callbackHandler(const std::string& path) {
 void FileSystem::callbackHandler(const std::string& path) {
     auto files = FileSys._trackedFiles;
     size_t n = files.count(path);
-    if (n == 0)
+    if (n == 0) {
         return;
+    }
     
     auto eqRange = files.equal_range(path);
     for (auto it = eqRange.first; it != eqRange.second; ++it) {

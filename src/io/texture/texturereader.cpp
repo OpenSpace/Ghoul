@@ -28,6 +28,7 @@
 #include <ghoul/filesystem/file.h>
 #include <ghoul/io/texture/texturereaderbase.h>
 #include <ghoul/misc/assert.h>
+ #include <ghoul/opengl/texture.h>
 
 #include <algorithm>
 #include <fmt/format.h>
@@ -63,6 +64,7 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory,
     ghoul_assert(memory, "Memory must not be nullptr");
     ghoul_assert(size > 0, "Size must be > 0");
     ghoul_assert(!_readers.empty(), "No readers were registered before");
+
     TextureReaderBase* reader = readerForExtension(format);
     return reader->loadTexture(memory, size);
 }
@@ -96,11 +98,12 @@ std::vector<std::shared_ptr<TextureReaderBase>> TextureReader::readers() const {
 }
     
 TextureReaderBase* TextureReader::readerForExtension(const std::string& extension) {
-    for (const auto& reader : _readers) {
+    for (const std::shared_ptr<TextureReaderBase>& reader : _readers) {
         auto extensions = reader->supportedExtensions();
         auto it = std::find(extensions.begin(), extensions.end(), extension);
-        if (it != extensions.end())
+        if (it != extensions.end()) {
             return reader.get();
+        }
     }
     throw MissingReaderException(extension);
 }

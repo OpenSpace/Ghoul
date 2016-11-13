@@ -25,6 +25,7 @@
 
 #include <ghoul/font/fontmanager.h>
 
+#include <ghoul/font/font.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
@@ -72,7 +73,7 @@ unsigned int FontManager::registerFontPath(const std::string& fontName,
     auto it = _fontPaths.find(hash);
     if (it != _fontPaths.end()) {
         const std::string& registeredPath = it->second;
-        
+
         if (registeredPath == filePath) {
             return hash;
         }
@@ -94,7 +95,7 @@ std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
                                         Outline withOutline, LoadGlyphs loadGlyphs)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     unsigned int hash = hashCRC32(name);
     try {
         return font(hash, fontSize, withOutline, loadGlyphs);
@@ -115,7 +116,7 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
             "Error retrieving font with hash '{}' for size '{}'", hashName, fontSize
         ));
     }
-    
+
     auto fonts = _fonts.equal_range(hashName);
     for (auto it = fonts.first; it != fonts.second; ++it) {
         if (it->second->pointSize() == fontSize &&
@@ -124,7 +125,7 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
             return it->second;
         }
     }
-    
+
     Font::Outline outline =
         withOutline == Outline::Yes ? Font::Outline::Yes : Font::Outline::No;
     auto f = std::make_shared<Font>(
@@ -133,15 +134,14 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
         _textureAtlas,
         outline
     );
-    
+
     if (loadGlyphs) {
         f->loadGlyphs(_defaultCharacterSet);
     }
-        
+
     _fonts.emplace(hashName, f);
     return f;
 }
-    
-   
+
 } // namespace fontrendering
 } // namespace ghoul

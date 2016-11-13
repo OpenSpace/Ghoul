@@ -49,7 +49,7 @@ namespace filesystem {
 
 Directory::Directory() : _directoryPath(FileSys.absolutePath(".")) {}
 
-Directory::Directory(std::string path, RawPath isRawPath) {
+Directory::Directory(string path, RawPath isRawPath) {
     if (isRawPath) {
         _directoryPath = path.empty() ? "." : std::move(path);
     }
@@ -61,14 +61,14 @@ Directory::Directory(std::string path, RawPath isRawPath) {
 }
 
 Directory::Directory(const char* path, RawPath isRawPath)
-    : Directory(std::string(path), isRawPath)
+    : Directory(string(path), isRawPath)
 {}
 
-Directory::operator const std::string&() const {
+Directory::operator const string&() const {
     return _directoryPath;
 }
 
-const std::string& Directory::path() const {
+const string& Directory::path() const {
     return _directoryPath;
 }
 
@@ -101,8 +101,9 @@ vector<string> Directory::read(Recursive search, Sort sort) const {
     vector<string> result;
     readDirectories(result, _directoryPath, search);
     readFiles(result, _directoryPath, search);
-    if (sort == Sort::Yes)
+    if (sort == Sort::Yes) {
         std::sort(result.begin(), result.end());
+    }
     return result;
 }
 
@@ -128,10 +129,12 @@ void Directory::readFiles(vector<string>& result, const string& path,
         do {
             string file(findFileData.cFileName);
             const DWORD isDir = findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
-            if (!isDir)
+            if (!isDir) {
                 result.push_back(path + "/" + file);
-            if (recursiveSearch && isDir && file != "." && file != "..")
+            }
+            if (recursiveSearch && isDir && file != "." && file != "..") {
                 directories.push(path + "/" + file);
+            }
         } while (FindNextFile(findHandle, &findFileData) != 0);
     }
     FindClose(findHandle);
@@ -143,10 +146,12 @@ void Directory::readFiles(vector<string>& result, const string& path,
         while ((ent = readdir(dir))) {
             name = ent->d_name;
             if ((name != ".") && (name != "..")) {
-                if (ent->d_type != DT_DIR) 
+                if (ent->d_type != DT_DIR) {
                     result.push_back(path + "/" + ent->d_name);
-                if (recursiveSearch && (ent->d_type == DT_DIR))
+                }
+                if (recursiveSearch && (ent->d_type == DT_DIR)) {
                     directories.push(path + "/" + ent->d_name);
+                }
             }
         }
         closedir(dir);
@@ -219,5 +224,5 @@ std::ostream& operator<<(std::ostream& os, const Directory& d) {
     return os << d.path();
 }
 
-} // filesystem
-} // ghoul
+} // namespace filesystem
+} // namespace ghoul

@@ -73,6 +73,9 @@ public:
      * \sa http://openil.sourceforge.net/features.php
      */
     std::vector<std::string> supportedExtensions() const override;
+
+private:
+    std::unique_ptr<opengl::Texture> loadTextureInternal(const std::string& source) const;
 };
 
 #endif // GHOUL_USE_DEVIL

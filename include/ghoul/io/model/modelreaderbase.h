@@ -28,6 +28,7 @@
 
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/ghoul_gl.h>
+
 #include <memory>
 #include <string>
 
@@ -56,7 +57,6 @@ public:
         GLfloat normal[3];
     };
 
-public:
     /**
      * The exception that gets thrown if there is an error loading a model from the
      * provided \p file. The \p error message is contained in the exception.

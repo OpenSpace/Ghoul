@@ -111,10 +111,12 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
         iarray.push_back(static_cast<GLint>(d));
     }
     
-    if (varray.empty())
+    if (varray.empty()) {
         throw ModelReaderException(filename, "No vertices specified");
-    if (iarray.empty())
+    }
+    if (iarray.empty()) {
         throw ModelReaderException(filename, "No indices specified");
+    }
 
     // Create the resulting VBO
     auto vbo = std::make_unique<opengl::VertexBufferObject>();
@@ -124,7 +126,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     auto attribKeys = attribPointers.keys();
     for (const auto& key : attribKeys) {
         ghoul::Dictionary d;
-        if(attribPointers.getValue(key, d)) {
+        if (attribPointers.getValue(key, d)) {
             double position = 0.0;
             attribPointers.getValue(keyPosition, position);
             

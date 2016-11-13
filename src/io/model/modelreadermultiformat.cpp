@@ -47,168 +47,187 @@ namespace {
 }
 
 namespace ghoul {
-    namespace io {
+    
+namespace io {
 
-        std::unique_ptr<opengl::VertexBufferObject> ModelReaderMultiFormat::loadModel(
-            const std::string& filename) const
-        {
-            std::vector<Vertex> vertices;
-            std::vector<int> indices;
+    std::unique_ptr<opengl::VertexBufferObject> ModelReaderMultiFormat::loadModel(
+        const std::string& filename) const
+    {
+        std::vector<Vertex> vertices;
+        std::vector<int> indices;
 
-            loadModel(filename, vertices, indices);
+        loadModel(filename, vertices, indices);
 
-            auto vbo = std::make_unique<opengl::VertexBufferObject>();
-            vbo->initialize(vertices, indices);
-            vbo->vertexAttribPointer(0, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, location));
-            vbo->vertexAttribPointer(1, 2, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, tex));
-            vbo->vertexAttribPointer(2, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, normal));
-            return vbo;
+        auto vbo = std::make_unique<opengl::VertexBufferObject>();
+        vbo->initialize(vertices, indices);
+        vbo->vertexAttribPointer(
+            0,
+            3,
+            GL_FLOAT,
+            sizeof(Vertex),
+            offsetof(Vertex, location)
+        );
+        vbo->vertexAttribPointer(
+            1,
+            2,
+            GL_FLOAT,
+            sizeof(Vertex),
+            offsetof(Vertex, tex)
+        );
+        vbo->vertexAttribPointer(
+            2,
+            3,
+            GL_FLOAT,
+            sizeof(Vertex),
+            offsetof(Vertex, normal)
+        );
+        return vbo;
+    }
+
+    void getMeshesInScene(size_t& totalSizeIndex, size_t& totalSizeVertex,
+                          std::vector<const aiMesh*>& meshArray, const aiNode* currNode,
+                          const aiScene* scene)
+    {
+        for (auto i = 0; i < scene->mNumMeshes; ++i) {
+            meshArray.push_back(scene->mMeshes[i]);
+            totalSizeIndex += meshArray.back()->mNumFaces * 3;
+            totalSizeVertex += meshArray.back()->mNumVertices;
         }
 
-        void ModelReaderMultiFormat::loadModel(
-            const std::string& filename,
-            std::vector<Vertex> & vertexArray,
-            std::vector<int> & indexArray) const
+        /*for (auto m = 0; m < currNode->mNumMeshes; ++m)
         {
-            ghoul_assert(!filename.empty(), "Filename must not be empty");
+        meshArray.push_back(scene->mMeshes[currNode->mMeshes[m]]);
 
-            // Create an instance of the Importer class
-            Assimp::Importer importer;
+        for (auto nf = 0; nf < meshArray.back()->mNumFaces; ++nf)
+        {
+        const struct aiFace* face = &meshArray.back()->mFaces[nf];
 
-            // Rendering only triangle meshes.
-            const aiScene* scene = importer.ReadFile(filename,
-                aiProcess_GenNormals |
-                aiProcess_Triangulate |
-                aiProcess_JoinIdenticalVertices);
+        *totalSizeIndex += face->mNumIndices;
+        }
 
-            if (!scene)
-            {
-                throw ModelReaderException(
-                    filename,
-                    importer.GetErrorString()
-                    );
+        *totalSizeVertex += meshArray.back()->mNumVertices;
+        }
+
+        for (auto nc = 0; nc < currNode->mNumChildren; ++nc)
+        {
+        const aiNode * nextNode = currNode->mChildren[nc];
+        getMeshesInScene(totalSizeIndex, totalSizeVertex, meshArray, nextNode, scene);
+        }*/
+    }
+
+    void ModelReaderMultiFormat::loadModel(
+        const std::string& filename,
+        std::vector<Vertex> & vertexArray,
+        std::vector<int> & indexArray) const
+    {
+        ghoul_assert(!filename.empty(), "Filename must not be empty");
+
+        // Create an instance of the Importer class
+        Assimp::Importer importer;
+
+        // Rendering only triangle meshes.
+        const aiScene* scene = importer.ReadFile(filename,
+            aiProcess_GenNormals |
+            aiProcess_Triangulate |
+            aiProcess_JoinIdenticalVertices);
+
+        if (!scene) {
+            throw ModelReaderException(
+                filename,
+                importer.GetErrorString()
+            );
+        }
+
+        // Get info from all models in the scene
+        size_t totalSizeIndex = 0;
+        size_t totalSizeVertex = 0;
+        std::vector< const struct aiMesh *> meshArray;
+
+        getMeshesInScene(
+            totalSizeIndex,
+            totalSizeVertex,
+            meshArray,
+            scene->mRootNode,
+            scene
+        );
+
+        vertexArray.reserve(totalSizeVertex);
+        indexArray.reserve(totalSizeIndex);
+
+        // We add all shapes of the model into the same vertex array, one after the other.
+        // Here we are also including more than a mesh when they are present. This should
+        // be avoided if possible.
+        size_t positionIndex = 0;
+        //size_t indicesIndex = 0;
+
+        for (auto meshPtr : meshArray) {
+            // Walk through each of the mesh's vertices
+            for (auto i = 0; i < meshPtr->mNumVertices; i++) {                    
+                Vertex vTmp;
+
+                // Positions
+                vTmp.location[0] = meshPtr->mVertices[i].x;
+                vTmp.location[1] = meshPtr->mVertices[i].y;
+                vTmp.location[2] = meshPtr->mVertices[i].z;
+
+                // Normals
+                vTmp.normal[0] = meshPtr->mNormals[i].x;
+                vTmp.normal[1] = meshPtr->mNormals[i].y;
+                vTmp.normal[2] = meshPtr->mNormals[i].z;
+
+                // Texture Coordinates
+                if (meshPtr->mTextureCoords[0]) {
+                    // Each vertex can have at most 8 different texture coordinates. 
+                    // We are using only the first one provided.
+                    vTmp.tex[0] = meshPtr->mTextureCoords[0][i].x;
+                    vTmp.tex[1] = meshPtr->mTextureCoords[0][i].y;
+                }
+                else {
+                    vTmp.tex[0] = 0.0;
+                    vTmp.tex[1] = 0.0;
+                }
+
+                vertexArray.push_back(vTmp);
             }
 
-            // Get info from all models in the scene
-            size_t totalSizeIndex = 0;
-            size_t totalSizeVertex = 0;
-            std::vector< const struct aiMesh *> meshArray;
+            // Walking through the mesh faces and get the vertexes indices
+            for (auto nf = 0; nf < meshPtr->mNumFaces; ++nf) {
+                const struct aiFace* face = &meshPtr->mFaces[nf];
 
-            getMeshesInScene(&totalSizeIndex, &totalSizeVertex, meshArray, scene->mRootNode, scene);
-
-            vertexArray.reserve(totalSizeVertex);
-            indexArray.reserve(totalSizeIndex);
-
-            // We add all shapes of the model into the same vertex array, one after the other.
-            // Here we are also including more than a mesh when they are present. This should
-            // be avoided if possible.
-            size_t positionIndex = 0;
-            //size_t indicesIndex = 0;
-
-            for (auto meshPtr : meshArray)
-            {
-                // Walk through each of the mesh's vertices
-                for (auto i = 0; i < meshPtr->mNumVertices; i++)
-                {                    
-                    Vertex vTmp;
-
-                    // Positions
-                    vTmp.location[0] = meshPtr->mVertices[i].x;
-                    vTmp.location[1] = meshPtr->mVertices[i].y;
-                    vTmp.location[2] = meshPtr->mVertices[i].z;
-
-                    // Normals
-                    vTmp.normal[0] = meshPtr->mNormals[i].x;
-                    vTmp.normal[1] = meshPtr->mNormals[i].y;
-                    vTmp.normal[2] = meshPtr->mNormals[i].z;
-
-                    // Texture Coordinates
-                    if (meshPtr->mTextureCoords[0])
-                    {
-                        // Each vertex can have at most 8 different texture coordinates. 
-                        // We are using only the first one provided.
-                        vTmp.tex[0] = meshPtr->mTextureCoords[0][i].x;
-                        vTmp.tex[1] = meshPtr->mTextureCoords[0][i].y;
+                if (face->mNumIndices == 3) {
+                    for (auto ii = 0; ii < face->mNumIndices; ii++) {
+                        indexArray.push_back(face->mIndices[ii] + positionIndex);
                     }
-                    else
-                        vTmp.tex[0] = vTmp.tex[1] = 0.0;
-
-                    vertexArray.push_back(vTmp);
                 }
-
-                // Walking through the mesh faces and get the vertexes indices
-                for (auto nf = 0; nf < meshPtr->mNumFaces; ++nf)
-                {
-                    const struct aiFace* face = &meshPtr->mFaces[nf];
-
-                    if (face->mNumIndices == 3)
-                    {
-                        for (auto ii = 0; ii < face->mNumIndices; ii++)
-                            indexArray.push_back(face->mIndices[ii] + positionIndex);
-                    }
-                }
-
-                // Process materials (Not in use now)
-                //if (meshPtr->mMaterialIndex >= 0)
-                //{
-                //    aiMaterial* material = scene->mMaterials[meshPtr->mMaterialIndex];
-                //    // We assume a convention for sampler names in the shaders. Each diffuse texture should be named
-                //    // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
-                //    // Same applies to other texture as the following list summarizes:
-                //    // Diffuse: texture_diffuseN
-                //    // Specular: texture_specularN
-                //    // Normal: texture_normalN
-
-                //    // 1. Diffuse maps
-                //    vector<Texture> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-                //    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-                //    // 2. Specular maps
-                //    vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-                //    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-                //    // 3. Reflection maps (Note that ASSIMP doesn't load reflection maps properly from wavefront objects, so we'll cheat a little by defining the reflection maps as ambient maps in the .obj file, which ASSIMP is able to load)
-                //    vector<Texture> reflectionMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_reflection");
-                //    textures.insert(textures.end(), reflectionMaps.begin(), reflectionMaps.end());
-                //}
-
-                positionIndex += meshPtr->mNumVertices;
             }
+
+            // Process materials (Not in use now)
+            //if (meshPtr->mMaterialIndex >= 0)
+            //{
+            //    aiMaterial* material = scene->mMaterials[meshPtr->mMaterialIndex];
+            //    // We assume a convention for sampler names in the shaders. Each diffuse texture should be named
+            //    // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
+            //    // Same applies to other texture as the following list summarizes:
+            //    // Diffuse: texture_diffuseN
+            //    // Specular: texture_specularN
+            //    // Normal: texture_normalN
+
+            //    // 1. Diffuse maps
+            //    vector<Texture> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+            //    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+            //    // 2. Specular maps
+            //    vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+            //    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+            //    // 3. Reflection maps (Note that ASSIMP doesn't load reflection maps properly from wavefront objects, so we'll cheat a little by defining the reflection maps as ambient maps in the .obj file, which ASSIMP is able to load)
+            //    vector<Texture> reflectionMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_reflection");
+            //    textures.insert(textures.end(), reflectionMaps.begin(), reflectionMaps.end());
+            //}
+
+            positionIndex += meshPtr->mNumVertices;
         }
+    }
 
-        void ModelReaderMultiFormat::getMeshesInScene(
-            size_t * totalSizeIndex,
-            size_t * totalSizeVertex, 
-            std::vector<const struct aiMesh *> & meshArray, 
-            const struct aiNode * currNode, 
-            const aiScene * scene) const
-        {
-            for (auto i = 0; i < scene->mNumMeshes; ++i)
-            {
-                meshArray.push_back(scene->mMeshes[i]);
-                *totalSizeIndex += meshArray.back()->mNumFaces * 3;
-                *totalSizeVertex += meshArray.back()->mNumVertices;
-            }
-            
-            /*for (auto m = 0; m < currNode->mNumMeshes; ++m)
-            {
-                meshArray.push_back(scene->mMeshes[currNode->mMeshes[m]]);
 
-                for (auto nf = 0; nf < meshArray.back()->mNumFaces; ++nf)
-                {
-                    const struct aiFace* face = &meshArray.back()->mFaces[nf];
 
-                    *totalSizeIndex += face->mNumIndices;                    
-                }
-
-                *totalSizeVertex += meshArray.back()->mNumVertices;                
-            }
-
-            for (auto nc = 0; nc < currNode->mNumChildren; ++nc)
-            {
-                const aiNode * nextNode = currNode->mChildren[nc];
-                getMeshesInScene(totalSizeIndex, totalSizeVertex, meshArray, nextNode, scene);
-            }*/
-        }
-
-    } // namespace io
+} // namespace io
 } // namespace ghoul
-

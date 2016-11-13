@@ -27,14 +27,16 @@
 #define __CACHEMANAGER_H__
 
 #include <ghoul/filesystem/directory.h>
-#include <ghoul/filesystem/file.h>
 #include <ghoul/misc/boolean.h>
+#include <ghoul/misc/exception.h>
 
 #include <map>
 #include <string>
 
 namespace ghoul {
 namespace filesystem {
+
+class File;
 
 /**
  * The CacheManager allows users to request a storage location for an, optionally

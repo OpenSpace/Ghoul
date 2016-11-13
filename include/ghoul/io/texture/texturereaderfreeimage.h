@@ -31,6 +31,8 @@
 #include <memory>
 #include <string>
 
+struct FIBITMAP;
+
 namespace ghoul {
 namespace io {
 
@@ -83,6 +85,10 @@ public:
      * \return The supported extension
      */
     std::vector<std::string> supportedExtensions() const override;
+
+private:
+    std::unique_ptr<opengl::Texture> loadTextureInternal(const std::string& source,
+                                                         FIBITMAP* dib) const;
 };
 
 #endif // GHOUL_USE_FREEIMAGE

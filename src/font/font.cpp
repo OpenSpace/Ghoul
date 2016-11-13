@@ -184,10 +184,12 @@ float Font::Glyph::topBearing() const {
     
 float Font::Glyph::kerning(wchar_t character) const {
     auto it = _kerning.find(character);
-    if (it != _kerning.end())
+    if (it != _kerning.end()) {
         return it->second;
-    else
+    }
+    else {
         return 0.f;
+    }
 }
     
 float Font::Glyph::horizontalAdvance() const {
@@ -287,16 +289,18 @@ glm::vec2 Font::boundingBox(const char* format, ...) {
     for (c = buffer.data(); *c; c++) {
         if (*c == '\n') {
             std::string line;
-            for (const char* n = start_line; n < c; ++n)
+            for (const char* n = start_line; n < c; ++n) {
                 line.append(1, *n);
+            }
             lines.push_back(line);
             start_line = c+1;
         }
     }
     if (start_line) {
         std::string line;
-        for(const char* n = start_line; n < c; ++n)
+        for (const char* n = start_line; n < c; ++n) {
             line.append(1, *n);
+        }
         lines.push_back(line);
     }
     
@@ -306,9 +310,9 @@ glm::vec2 Font::boundingBox(const char* format, ...) {
         for (size_t j = 0 ; j < line.size(); ++j) {
             const Font::Glyph* g = glyph(line[j]);
             if (g != nullptr) {
-                if (j > 0)
-                    width += g->kerning(line[j-1]);
-                
+                if (j > 0) {
+                    width += g->kerning(line[j - 1]);
+                }
                 width += g->horizontalAdvance();
                 height = std::max(height, static_cast<float>(g->height()));
             }
@@ -327,8 +331,9 @@ const Font::Glyph* Font::glyph(wchar_t character) {
     
     // Check if charcode has been already loaded
     for (const Glyph& g : _glyphs) {
-        if (g._charcode == character)
+        if (g._charcode == character) {
             return &g;
+        }
     }
     
     // charcode -1 is special: it is used for line drawing (overline, underline,
@@ -372,12 +377,13 @@ float Font::computeLeftBearing(wchar_t charcode) const {
         FT_Stroker_New(library, &stroker);
         
         float t = _outlineThickness * HighResolutionFactor * PointConversionFactor;
-        FT_Stroker_Set(stroker,
-                       static_cast<int>(t),
-                       FT_STROKER_LINECAP_ROUND,
-                       FT_STROKER_LINEJOIN_ROUND,
-                       0
-                       );
+        FT_Stroker_Set(
+            stroker,
+            static_cast<int>(t),
+            FT_STROKER_LINECAP_ROUND,
+            FT_STROKER_LINEJOIN_ROUND,
+            0
+        );
         
         FT_Glyph_Stroke(&outlineGlyph, stroker, 1);
         FT_Stroker_Done(stroker);
@@ -433,8 +439,9 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             _glyphs.end(),
             [charcode](const Glyph& glyph) { return glyph._charcode == charcode; }
         );
-        if (it != _glyphs.end())
+        if (it != _glyphs.end()) {
             continue;
+        }
         
         // First generate the font without outline and store it in the font atlas
         // only if an outline is request, repeat the process for the outline
@@ -489,15 +496,16 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             HandleError(error);
             
             FT_BitmapGlyph outlineBitmap = reinterpret_cast<FT_BitmapGlyph>(outlineGlyph);
-            topBearing    = outlineBitmap->top;
+            topBearing  = outlineBitmap->top;
             leftBearing = computeLeftBearing(charcode);
             
             width = outlineBitmap->bitmap.width / atlasDepth;
             height = outlineBitmap->bitmap.rows;
             
             TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
-            if (outlineBitmap->bitmap.buffer)
+            if (outlineBitmap->bitmap.buffer) {
                 _atlas.setRegionData(handle, outlineBitmap->bitmap.buffer);
+            }
             auto res = _atlas.textureCoordinates(handle);
             outlineTopLeft = res.topLeft;
             outlineBottomRight = res.bottomRight;
@@ -555,8 +563,9 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
                 }
             }
             
-            if (!buffer.empty())
+            if (!buffer.empty()) {
                 _atlas.setRegionData(handle, buffer.data());
+            }
             
             // We need to offset the texture coordinates by half of the width and height
             // differences
@@ -598,8 +607,9 @@ void Font::generateKerning() {
     loadFace(_name, _pointSize, library, face);
     
     bool hasKerning = FT_HAS_KERNING(face);
-    if (!hasKerning)
+    if (!hasKerning) {
         return;
+    }
     
     // For each combination of Glyphs, determine the kerning factors. The index starts at
     // 1 as 0 is reserved for the special background glyph
@@ -613,8 +623,10 @@ void Font::generateKerning() {
             FT_UInt prevIndex = FT_Get_Char_Index(face, prevGlyph._charcode);
             FT_Vector kerning;
             FT_Get_Kerning(face, prevIndex, glyphIndex, FT_KERNING_DEFAULT, &kerning);
-            if (kerning.x != 0)
-                glyph._kerning[prevGlyph._charcode] = kerning.x / (PointConversionFactor * PointConversionFactor);
+            if (kerning.x != 0) {
+                glyph._kerning[prevGlyph._charcode] =
+                    kerning.x / (PointConversionFactor * PointConversionFactor);
+            }
         }
     }
     

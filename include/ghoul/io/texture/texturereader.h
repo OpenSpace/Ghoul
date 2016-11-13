@@ -31,9 +31,13 @@
 #include <vector>
 
 #include <ghoul/misc/exception.h>
-#include <ghoul/opengl/texture.h>
+//#include <ghoul/opengl/texture.h>
 
 namespace ghoul {
+namespace opengl {
+class Texture;
+}
+
 namespace io {
 
 class TextureReaderBase;

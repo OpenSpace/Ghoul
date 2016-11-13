@@ -24,10 +24,12 @@
  ****************************************************************************************/
 
 #if !defined(WIN32) && !defined(__APPLE__)
+
 #include <ghoul/filesystem/filesystem.h>
 
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
 
 #include <algorithm>
 #include <cassert>
@@ -64,13 +66,14 @@ void FileSystem::initializeInternalLinux() {
 
 void FileSystem::deinitializeInternalLinux() {
     _keepGoing = false;
-    if (_t.joinable())
+    if (_t.joinable()) {
         _t.join();
+    }
     close(_inotifyHandle);
 }
 
 void FileSystem::addFileListener(File* file) {
-    assert(file != nullptr);
+    ghoul_assert(file != nullptr, "File cannot be nullptr");
     const std::string filename = file->path();
     int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
     auto eqRange = _trackedFiles.equal_range(wd);
@@ -84,7 +87,7 @@ void FileSystem::addFileListener(File* file) {
 }
 
 void FileSystem::removeFileListener(File* file) {
-    assert(file != nullptr);
+    ghoul_assert(file != nullptr, "File cannot be nullptr");
 
     const std::string filename = file->path();
     int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
@@ -99,14 +102,13 @@ void FileSystem::removeFileListener(File* file) {
 }
 
 void FileSystem::inotifyWatcher() {
-
     int fd = FileSys._inotifyHandle;
     char buffer[BUF_LEN];
     struct timeval tv;
     tv.tv_sec = 1;
     tv.tv_usec = 0;
     fd_set rfds;
-    while(FileSys._keepGoing) {
+    while (FileSys._keepGoing) {
         FD_ZERO (&rfds);
         FD_SET (fd, &rfds);
         if(select (FD_SETSIZE, &rfds, NULL, NULL, &tv) < 1) continue; 
@@ -116,59 +118,52 @@ void FileSystem::inotifyWatcher() {
         
         int offset = 0;
         while (offset < length) {
-            struct inotify_event *event = reinterpret_cast<inotify_event*>(buffer + offset);
-            switch (event->mask )
-            {
-
+            struct inotify_event* e = reinterpret_cast<inotify_event*>(buffer + offset);
+            switch (e->mask) {
                 case IN_MODIFY:
                 case IN_ATTRIB:
                 {
-                    int wd = event->wd;
+                    int wd = e->wd;
                     auto eqRange = FileSys._trackedFiles.equal_range(wd);
                     for (auto it = eqRange.first; it != eqRange.second; ++it) {
                         File* fileobject = it->second;
                         fileobject->callback()(*fileobject);
                     }
-                    
-                }
-
                     break;
-
+                }
                 case IN_IGNORED:
                 {
-                    int wd = event->wd;
+                    int wd = e->wd;
 
                     auto eqRange = FileSys._trackedFiles.equal_range(wd);
                     auto it = eqRange.first;
 
                     // remove tracking of the removed descriptor
-                    ( void ) inotify_rm_watch( fd, wd );
+                    inotify_rm_watch(fd, wd);
 
                     // if there are files tracking
-                    if(it != eqRange.second) {
+                    if (it != eqRange.second) {
                         // add new tracking
                         int new_wd = inotify_add_watch( fd, it->second->path().c_str(), mask);
 
                         // save all files
                         std::vector<File*> v;
-                        for (;it != eqRange.second; ++it) {
+                        for (; it != eqRange.second; ++it) {
                             v.push_back(it->second);
                         }
 
                         // erase all previous files and add them again
                         FileSys._trackedFiles.erase(eqRange.first, eqRange.second);
-                        for(auto f: v) {
+                        for (auto f : v) {
                             FileSys._trackedFiles.emplace(new_wd, f);
                         }
                     }
-                    
-                }
-                    //printf ("IN_IGNORED\n");
                     break;
+                }
                 default:
                     break;
             }
-            offset += EVENT_SIZE + event->len;
+            offset += EVENT_SIZE + e->len;
         }
     }
 }
@@ -177,7 +172,3 @@ void FileSystem::inotifyWatcher() {
 } // namespace ghoul
 
 #endif
-
-
-
-

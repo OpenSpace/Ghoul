@@ -33,8 +33,9 @@
 #include <vector>
 
 namespace ghoul {
+
 namespace opengl {
-class Texture;
+    class Texture;
 }
     
 namespace io {

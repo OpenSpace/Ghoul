@@ -78,7 +78,7 @@ void FileSystem::deinitializeInternalWindows() {
 }
 
 void FileSystem::addFileListener(File* file) {
-    assert(file != nullptr);
+    ghoul_assert(file != nullptr, "File must not be nullptr");
     //LDEBUG("Trying to insert  " << file);
     std::string d = file->directoryName();
     auto f = _directories.find(d);
@@ -120,7 +120,7 @@ void FileSystem::addFileListener(File* file) {
 }
 
 void FileSystem::removeFileListener(File* file) {
-    assert(file != nullptr);
+    ghoul_assert(file != nullptr, "File must not be nullptr");
     auto eqRange = _trackedFiles.equal_range(file->path());
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
         if (it->second == file) {
@@ -134,8 +134,9 @@ void FileSystem::removeFileListener(File* file) {
 void FileSystem::callbackHandler(DirectoryHandle* directoryHandle, const std::string& file) {
     std::string fullPath;
     for (const auto& d : FileSys._directories) {
-        if (d.second == directoryHandle)
+        if (d.second == directoryHandle) {
             fullPath = d.first + PathSeparator + file;
+        }
     }
 
     size_t n = FileSys._trackedFiles.count(fullPath);
@@ -157,7 +158,6 @@ void readStarter(DirectoryHandle* directoryHandle) {
 }
 
 void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
-
     DirectoryHandle* directoryHandle = static_cast<DirectoryHandle*>(lpOverlapped->hEvent);
 
     unsigned char currentBuffer = directoryHandle->_activeBuffer;
@@ -177,34 +177,32 @@ void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
             reinterpret_cast<FILE_NOTIFY_INFORMATION&>(*buffer);
         
         if (information.Action == FILE_ACTION_MODIFIED) {
-
-            char* currentFilenameBuffer = new char[information.FileNameLength];
+            std::vector<char> currentFilenameBuffer(information.FileNameLength);
 
             // Convert from DWORD to char*
             size_t i;
-            wcstombs_s(&i, currentFilenameBuffer, information.FileNameLength,
+            wcstombs_s(&i, currentFilenameBuffer.data(), information.FileNameLength,
                 information.FileName, information.FileNameLength);
             if (i > 0) {
                 // make sure the last char is string terminating
                 currentFilenameBuffer[i - 1] = '\0';
-                const string currentFilename(currentFilenameBuffer, i - 1);
+                const string currentFilename(currentFilenameBuffer.data(), i - 1);
 
                 callbackHandler(directoryHandle, currentFilename);
             }
-            delete[] currentFilenameBuffer;
         }
-        if (!information.NextEntryOffset)
+        if (!information.NextEntryOffset) {
             // we are done with all entries and didn't find our file
             break;
-        else
+        }
+        else {
             //continue with the next entry
             buffer += information.NextEntryOffset;
+        }
     }
 }
 
 void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
-
-
     HANDLE handle = directoryHandle->_handle;
     unsigned char activeBuffer = directoryHandle->_activeBuffer;
     std::vector<BYTE>* changeBuffer = directoryHandle->_changeBuffer;

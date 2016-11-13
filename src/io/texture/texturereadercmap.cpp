@@ -55,11 +55,13 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
     int i = 0;
     while (std::getline(file, line)) {
         // Skip empty lines
-        if (line.empty() || line == "\r")
+        if (line.empty() || line == "\r") {
             continue;
+        }
         // # defines a comment
-        if (line[0] == '#')
+        if (line[0] == '#') {
             continue;
+        }
 
         std::stringstream s(line);
         if (!values) {

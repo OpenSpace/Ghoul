@@ -27,16 +27,19 @@
 #define __FONTRENDERER_H__
 
 #include <ghoul/glm.h>
-#include <ghoul/font/font.h>
+
+#include <memory>
 
 namespace ghoul {
 
 namespace opengl {
-    class ProgramObject;
+class ProgramObject;
 }
 
 namespace fontrendering {
-    
+
+class Font;
+
 /**
  * The FontRenderer is a class that can take a Font object and renderer it at a given
  * position. It has two separate usage modes; 1. it works as a singleton that has a
@@ -49,6 +52,9 @@ namespace fontrendering {
  */
 class FontRenderer {
 public:
+    /**
+     * Information about the bounding box for a rendered text.
+     */
     struct BoundingBoxInformation {
         glm::vec2 boundingBox;
         int numberOfLines;
@@ -74,11 +80,11 @@ public:
      * <code>hasOutline</code> (<code>bool</code>) is <code>true</code> whether the passed
      * font has an outline or not.
      * \param program The custom ProgramObject that is used to render any passed text.
-     * This method takes the ownership of the ProgramObject.
      * \param framebufferSize The size of the framebuffer into which this FontRenderer
      * renders
      */
-    FontRenderer(opengl::ProgramObject* program, glm::vec2 framebufferSize);
+    FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
+        glm::vec2 framebufferSize);
     
     /// Default destructor that cleans used OpenGL names and the ProgramObject
     ~FontRenderer();
@@ -90,7 +96,7 @@ public:
     * This method requires a valid OpenGL state.
     * \return a raw pointer to the new default instance
     */
-    static FontRenderer* createDefault();
+    static std::unique_ptr<FontRenderer> createDefault();
     
     /**
      * Initializes the singleton variant of the FontRenderer with the default
@@ -209,7 +215,6 @@ public:
     BoundingBoxInformation render(Font& font, glm::vec2 pos,
         const char* format, ...) const;
     
-    
 private:
     /// Private constructor that is used in the #initialize static method
     FontRenderer();
@@ -218,7 +223,7 @@ private:
         glm::vec4 outlineColor, const char* buffer) const;
     
     /// The singleton instance of the default FontRenderer
-    static FontRenderer* _defaultRenderer;
+    static std::unique_ptr<FontRenderer> _defaultRenderer;
     
     /// The framebuffer size that is used to compute the transformation from pixel
     /// coordinates to normalized device coordinates

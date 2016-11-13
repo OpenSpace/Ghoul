@@ -26,7 +26,6 @@
 #include <ghoul/filesystem/file.h>
 
 #include <ghoul/filesystem/filesystem.h>
-#include <ghoul/logging/logmanager.h>
 
 #include <fmt/format.h>
 
@@ -65,12 +64,9 @@ File::File(std::string filename, RawPath isRawPath,
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     
-    if (isRawPath) {
-        _filename = std::move(filename);
-    }
-    else {
-        _filename = std::move(FileSys.absolutePath(std::move(filename)));
-    }
+    _filename = isRawPath ?
+        std::move(filename) :
+        std::move(FileSys.absolutePath(std::move(filename)));
 
     if (_fileChangedCallback) {
         installFileChangeListener();

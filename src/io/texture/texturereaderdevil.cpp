@@ -39,26 +39,9 @@
 namespace ghoul {
 namespace io {
 
-std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(
-                                                        const std::string& filename) const
+std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTextureInternal(
+    const std::string& source) const
 {
-    using opengl::Texture;
-    ilInit();
-    iluInit();
-
-    // If this is not set, DevIL will load the images with an inverted y-axis
-    ilEnable(IL_ORIGIN_SET);
-    ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-
-    ILboolean loadSuccess = ilLoadImage(filename.c_str());
-    if (!loadSuccess) {
-        ILenum error = ilGetError();
-        throw TextureLoadException(
-            filename,
-            fmt::format("Error loading image: {}", iluErrorString(error)),
-            this
-        );
-    }
     ILint imageFormat = ilGetInteger(IL_IMAGE_FORMAT);
 
     ILint imageType = ilGetInteger(IL_IMAGE_TYPE);
@@ -67,35 +50,40 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(
     ILint height = ilGetInteger(IL_IMAGE_HEIGHT);
     ILint depth = ilGetInteger(IL_IMAGE_DEPTH);
 
+    if (imageFormat == IL_LUMINANCE || imageFormat == IL_COLOUR_INDEX) {
+        imageFormat = IL_RGBA;
+        imageByte *= 4;
+    }
+
     // Copy data from common data store to own address space
     ILubyte* data = new ILubyte[width * height * imageByte];
     ilCopyPixels(0, 0, 0, width, height, 1, imageFormat, imageType, data);
 
     glm::size3_t size(width, height, depth);
 
-    Texture::Format format;
+    opengl::Texture::Format format;
     GLenum internalFormat;
 
     switch (imageFormat) {
         case IL_RGB:
-            format = Texture::Format::RGB;
+            format = opengl::Texture::Format::RGB;
             internalFormat = GL_RGB;
             break;
         case IL_RGBA:
-            format = Texture::Format::RGBA;
+            format = opengl::Texture::Format::RGBA;
             internalFormat = GL_RGBA;
             break;
         case IL_LUMINANCE:
-            format = Texture::Format::Red;
+            format = opengl::Texture::Format::Red;
             internalFormat = GL_RED;
             break;
         case IL_LUMINANCE_ALPHA:
-            format = Texture::Format::RG;
+            format = opengl::Texture::Format::RG;
             internalFormat = GL_RG;
             break;
         default:
-            throw TextureLoadException(
-                filename,
+            throw TextureReaderBase::TextureLoadException(
+                source,
                 fmt::format("Error reading format: {}", imageFormat),
                 this
             );
@@ -126,18 +114,42 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(
             break;
         default:
             throw TextureLoadException(
-                filename,
+                source,
                 fmt::format("Error reading data type: {}", imageType),
                 this
             );
     }
 
     // Some sized internal formats need to be setup manually.
-    if (type == GL_FLOAT && format == Texture::Format::RGBA) {
+    if (type == GL_FLOAT && format == opengl::Texture::Format::RGBA) {
         internalFormat = GL_RGBA32F;
     }
 
-    return std::make_unique<Texture>(data, size, format, internalFormat, type);
+    return std::make_unique<opengl::Texture>(data, size, format, internalFormat, type);
+}
+
+std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(
+                                                        const std::string& filename) const
+{
+    using opengl::Texture;
+    ilInit();
+    iluInit();
+
+    // If this is not set, DevIL will load the images with an inverted y-axis
+    ilEnable(IL_ORIGIN_SET);
+    ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+
+    ILboolean loadSuccess = ilLoadImage(filename.c_str());
+    if (!loadSuccess) {
+        ILenum error = ilGetError();
+        throw TextureLoadException(
+            filename,
+            fmt::format("Error loading image: {}", iluErrorString(error)),
+            this
+        );
+    }
+
+    return loadTextureInternal(filename);
 }
 
 std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(void* memory,
@@ -165,97 +177,8 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(void* memory,
             this
             );
     }
-    ILint imageFormat = ilGetInteger(IL_IMAGE_FORMAT);
 
-    ILint imageType = ilGetInteger(IL_IMAGE_TYPE);
-    ILint imageByte = ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL);
-    ILint width = ilGetInteger(IL_IMAGE_WIDTH);
-    ILint height = ilGetInteger(IL_IMAGE_HEIGHT);
-    ILint depth = ilGetInteger(IL_IMAGE_DEPTH);
-
-    if (imageFormat == IL_LUMINANCE || imageFormat == IL_COLOUR_INDEX) {
-        imageFormat = IL_RGBA;
-        imageByte *= 4;
-    }
-
-    // Copy data from common data store to own address space
-    ILubyte* data = new ILubyte[width * height * imageByte];
-    ilCopyPixels(0, 0, 0, width, height, 1, imageFormat, imageType, data);
-
-    glm::size3_t imageSize(width, height, depth);
-
-    Texture::Format format;
-    GLenum internalFormat;
-
-    switch (imageFormat) {
-    case IL_RGB:
-        format = Texture::Format::RGB;
-        internalFormat = GL_RGB;
-        break;
-    case IL_RGBA:
-        format = Texture::Format::RGBA;
-        internalFormat = GL_RGBA;
-        break;
-    case IL_LUMINANCE:
-        format = Texture::Format::Red;
-        internalFormat = GL_RED;
-        break;
-    case IL_LUMINANCE_ALPHA:
-        format = Texture::Format::RG;
-        internalFormat = GL_RG;
-        break;
-    default:
-        throw TextureLoadException(
-            "Memory",
-            fmt::format("Error reading format: {}", imageFormat),
-            this
-        );
-    }
-
-
-    GLenum type;
-    switch (imageType) {
-    case IL_UNSIGNED_BYTE:
-        type = GL_UNSIGNED_BYTE;
-        break;
-    case IL_BYTE:
-        type = GL_BYTE;
-        break;
-    case IL_UNSIGNED_SHORT:
-        type = GL_UNSIGNED_SHORT;
-        break;
-    case IL_SHORT:
-        type = GL_SHORT;
-        break;
-    case IL_UNSIGNED_INT:
-        type = GL_UNSIGNED_INT;
-        break;
-    case IL_INT:
-        type = GL_INT;
-        break;
-    case IL_FLOAT:
-        type = GL_FLOAT;
-        break;
-        default:
-        throw TextureLoadException(
-            "Memory",
-            fmt::format("Error reading data type: {}", imageType),
-            this
-            );
-    }
-
-    // Some sized internal formats need to be setup manually.
-    if (type == GL_FLOAT && format == Texture::Format::RGBA) {
-        internalFormat = GL_RGBA32F;
-    }
-
-    return std::make_unique<Texture>(
-        data,
-        imageSize,
-        format,
-        static_cast<int>(format),
-        type
-    );
+    return loadTextureInternal("Memory");
 }
 
 std::vector<std::string> TextureReaderDevIL::supportedExtensions() const {

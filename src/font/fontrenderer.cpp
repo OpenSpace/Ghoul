@@ -25,6 +25,8 @@
 
 #include <ghoul/font/fontrenderer.h>
 
+#include <ghoul/font/font.h>
+
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
@@ -103,7 +105,7 @@ namespace {
 namespace ghoul {
 namespace fontrendering {
     
-FontRenderer* FontRenderer::_defaultRenderer = nullptr;
+std::unique_ptr<FontRenderer> FontRenderer::_defaultRenderer = nullptr;
     
 FontRenderer::FontRenderer()
     : _program(nullptr)
@@ -116,21 +118,22 @@ FontRenderer::FontRenderer()
     glGenBuffers(1, &_ibo);
 }
     
-FontRenderer::FontRenderer(opengl::ProgramObject* program, glm::vec2 framebufferSize)
+FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
+                           glm::vec2 framebufferSize)
     : FontRenderer()
 {
     ghoul_assert(program != nullptr, "No program provided");
-    _program = std::unique_ptr<opengl::ProgramObject>(program);
+    _program = std::move(program);
     setFramebufferSize(std::move(framebufferSize));
-    
 }
+
 FontRenderer::~FontRenderer() {
     glDeleteVertexArrays(1, &_vao);
     glDeleteBuffers(1, &_vbo);
     glDeleteBuffers(1, &_ibo);
 }
 
-FontRenderer* FontRenderer::createDefault() {
+std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     std::string vsPath = absPath(DefaultVertexShaderPath);
     LDEBUG("Writing default vertex shader to '" << vsPath << "'");
     std::ofstream file(vsPath);
@@ -154,10 +157,9 @@ FontRenderer* FontRenderer::createDefault() {
     LDEBUG("Link default font shader");
     program->linkProgramObject();
 
-    FontRenderer* fontRenderer = new FontRenderer;
+    auto fontRenderer = new FontRenderer;
     fontRenderer->_program = std::move(program);
-
-    return std::move(fontRenderer);
+    return std::unique_ptr<FontRenderer>(fontRenderer);
 }
 
 bool FontRenderer::initialize() {
@@ -168,9 +170,7 @@ bool FontRenderer::initialize() {
 }
     
 bool FontRenderer::deinitialize() {
-    delete _defaultRenderer;
     _defaultRenderer = nullptr;
-    
     return true;
 }
     
@@ -340,13 +340,13 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     va_start(args, format); // Parses The String For Variables
     
     int size = 1 + vscprintf(format, args);
-    char* buffer = new char[size];
-    memset(buffer, 0, size);
+    std::vector<char> buffer(size);
+    memset(buffer.data(), 0, size);
     
 #if WIN32 //visual studio 2005 or later
-    vsprintf_s(buffer, size, format, args);
+    vsprintf_s(buffer.data(), size, format, args);
 #else
-    vsprintf(buffer, format, args);
+    vsprintf(buffer.data(), format, args);
 #endif
     va_end(args);
     
@@ -355,9 +355,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         std::move(pos),
         color,
         glm::vec4(0.f, 0.f, 0.f, color.a),
-        buffer
+        buffer.data()
     );
-    delete[] buffer;
     
     return res;
 }
@@ -372,14 +371,14 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     va_start(args, format); // Parses The String For Variables
     
     int size = 1 + vscprintf(format, args);
-    char* buffer = new char[size];
-    
-    memset(buffer, 0, size);
+    std::vector<char> buffer(size);
+
+    memset(buffer.data(), 0, size);
     
 #if (_MSC_VER >= 1400) //visual studio 2005 or later
-    vsprintf_s(buffer, size, format, args);
+    vsprintf_s(buffer.data(), size, format, args);
 #else
-    vsprintf(buffer, format, args);
+    vsprintf(buffer.data(), format, args);
 #endif
     va_end(args);
     
@@ -388,9 +387,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         std::move(pos),
         glm::vec4(1.f),
         glm::vec4(0.f, 0.f, 0.f, 1.f),
-        buffer
+        buffer.data()
     );
-    delete[] buffer;
     
     return res;
 }
