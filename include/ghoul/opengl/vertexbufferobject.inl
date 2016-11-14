@@ -36,7 +36,7 @@ void ghoul::opengl::VertexBufferObject::initialize(const std::vector<T>& vertexA
 
     generateGLObjects();
 
-    _isize = static_cast<unsigned int>(indexArray.size());
+    _iSize = static_cast<unsigned int>(indexArray.size());
 
     glBindVertexArray(_vaoID);
 

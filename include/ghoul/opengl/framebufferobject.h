@@ -45,10 +45,8 @@ public:
     bool isComplete() const;
     bool isActive();
 
-    void attachTexture(Texture* texture,
-                       GLenum attachment = GL_COLOR_ATTACHMENT0,
-                       int mipLevel      = 0,
-                       int zSlice         = 0);
+    void attachTexture(Texture* texture, GLenum attachment = GL_COLOR_ATTACHMENT0,
+        int mipLevel = 0, int zSlice = 0);
 
     void detachTexture(GLenum attachment);
     void detachAll();
@@ -61,8 +59,6 @@ private:
 
     GLuint _id;
     std::map<GLenum, Texture*> _attachedTextures;
-
-    static const std::string _loggerCat;
 };
 
 } // namespace opengl

@@ -26,18 +26,20 @@
 #ifndef __SHADEROBJECT_H__
 #define __SHADEROBJECT_H__
 
-#include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/misc/exception.h>
-
-#include <string>
-#include <vector>
-#include <functional>
+#include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/shaderpreprocessor.h>
 
+#include <functional>
+#include <string>
+#include <vector>
+
 namespace ghoul {
-    namespace filesystem {
-        class File;
-    }
+
+namespace filesystem {
+    class File;
+}
+
 namespace opengl {
 
 /**
@@ -58,7 +60,6 @@ public:
         explicit ShaderObjectError(std::string message);
     };
 
-    
     /// The exception that is thrown if the compilation of a ShaderObject failed
     struct ShaderCompileError : public ShaderObjectError {
         /**
@@ -258,13 +259,6 @@ public:
      * ProgramObject prior to deleting.
      */
     void deleteShader();
-
-    /**
-     * This method will reload the shader source from the file specified earlier. The 
-     * OpenGL name will not change by this operation. After loading, the ShaderObject is 
-     * not compiled.
-     */
-    //void reloadFromFile();
 
     /**
      * This method will compile the shader source in this ShaderObject and returns the 

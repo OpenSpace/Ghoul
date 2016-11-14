@@ -26,14 +26,16 @@
 #ifndef __TEMPLATEFACTORY_H__
 #define __TEMPLATEFACTORY_H__
 
-#include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
 
+#include <functional>
 #include <map>
 #include <string>
-#include <functional>
+#include <vector>
 
 namespace ghoul {
+
+class Dictionary;
 
 class TemplateFactoryBase {
 public:

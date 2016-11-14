@@ -171,21 +171,17 @@ void SystemCapabilitiesComponent::deinitializeWMI() {
 std::wstring str2wstr(const std::string& str) {
     int stringLength = static_cast<int>(str.length() + 1);
     int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), stringLength, 0, 0); 
-    wchar_t* buf = new wchar_t[len];
-    MultiByteToWideChar(CP_ACP, 0, str.c_str(), stringLength, buf, len);
-    std::wstring r(buf);
-    delete[] buf;
-    return r;
+    std::vector<wchar_t> buf(len);
+    MultiByteToWideChar(CP_ACP, 0, str.c_str(), stringLength, buf.data(), len);
+    return std::wstring(buf.begin(), buf.end());
 }
 
 std::string wstr2str(const std::wstring& wstr) {
     int stringLength = static_cast<int>(wstr.length() + 1);
     int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), stringLength, 0, 0, 0, 0); 
-    char* buf = new char[len];
-    WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), stringLength, buf, len, 0, 0);
-    std::string r(buf);
-    delete[] buf;
-    return r;
+    std::vector<char> buf(len);
+    WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), stringLength, buf.data(), len, 0, 0);
+    return std::string(buf.begin(), buf.end());
 }
 
 bool SystemCapabilitiesComponent::isWMIInitialized() {

@@ -37,20 +37,9 @@ TextureManager::TextureManagerError::TextureManagerError(std::string message)
     
 TextureManager* TextureManager::_manager = nullptr;
     
-void TextureManager::initialize() {
-    ghoul_assert(_manager == nullptr, "Static manager must not have been initialized");
-    _manager = new TextureManager;
-}
-
-void TextureManager::deinitialize() {
-    ghoul_assert(_manager, "Static manager must have been intialized");
-    delete _manager;
-    _manager = nullptr;
-}
-
 TextureManager& TextureManager::ref() {
-    ghoul_assert(_manager, "Static manager must have been initialized");
-    return *_manager;
+    static TextureManager manager;
+    return manager;
 }
 
 Texture* TextureManager::texture(unsigned int hashedName) {
@@ -70,6 +59,7 @@ Texture* TextureManager::texture(const std::string& name) {
         return texture(hash);
     }
     catch (const TextureManagerError&) {
+        // Repackage the exception as otherwise only the hash value would get returned
         throw TextureManagerError("Could not find Texture for '" + name + "'");
     }
 }
@@ -83,8 +73,9 @@ unsigned int TextureManager::registerTexture(const std::string& name,
         _textures[hashedName] = std::move(texture);
         return hashedName;
     }
-    else
+    else {
         throw TextureManagerError("Name '" + name + "' was already registered");
+    }
 }
 
 std::unique_ptr<Texture> TextureManager::unregisterTexture(const std::string& name) {
@@ -94,8 +85,9 @@ std::unique_ptr<Texture> TextureManager::unregisterTexture(const std::string& na
 
 std::unique_ptr<Texture> TextureManager::unregisterTexture(unsigned int hashedName) {
     auto it = _textures.find(hashedName);
-    if (it == _textures.end())
+    if (it == _textures.end()) {
         return nullptr;
+    }
         
     auto tmp = std::move(it->second);
     _textures.erase(hashedName);

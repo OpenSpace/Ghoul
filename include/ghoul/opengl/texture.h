@@ -26,9 +26,10 @@
 #ifndef __TEXTURE_H__
 #define __TEXTURE_H__
 
+#include <ghoul/glm.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/opengl/ghoul_gl.h>
-#include <ghoul/glm.h>
+
 #include <glm/gtx/std_based_type.hpp>
 
 #include <array>

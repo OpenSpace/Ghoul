@@ -24,6 +24,7 @@
  ****************************************************************************************/
 
 #include <ghoul/opengl/bufferbinding.h>
+
 namespace ghoul {
 namespace opengl {
 
@@ -42,5 +43,6 @@ unsigned int BufferBinding<bufferbinding::Buffer::Uniform>::maxBufferBindings() 
     return OpenGLCap.maxUniformBufferBindings();
 }
 
-}
-}
+} // namespace opengl
+} // namespace ghoul
+

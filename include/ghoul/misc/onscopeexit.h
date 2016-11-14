@@ -54,7 +54,7 @@ struct OnScopeExit {
      * \p function The function that will be executed when this object is destroyed. As
      * this function is executed in the destructor, it may never throw an exception.
      */
-    OnScopeExit(std::function<void()> function);
+    explicit OnScopeExit(std::function<void()> function);
     
     /**
      * Executes the function passed in the constructor if it is a valid function.

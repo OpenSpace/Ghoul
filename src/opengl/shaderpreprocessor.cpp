@@ -24,6 +24,7 @@
  ****************************************************************************************/
 
 #include <ghoul/opengl/shaderpreprocessor.h>
+
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/logging/log.h>

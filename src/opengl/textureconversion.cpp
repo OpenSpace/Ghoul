@@ -40,10 +40,12 @@ template <Texture::Format from, Texture::Format to>
 void convert(char* dst, const char* src, int nSourceChannels, int nDestinationChannels,
              int nBytesPerChannel)
 {
-    if (nSourceChannels <= nDestinationChannels)
+    if (nSourceChannels <= nDestinationChannels) {
         std::memcpy(dst, src, nSourceChannels * nBytesPerChannel);
-    else
+    }
+    else {
         std::memcpy(dst, src, nDestinationChannels * nBytesPerChannel);
+    }
 }
 
 template <>
@@ -145,14 +147,15 @@ ConversionFunc conversionFunctionSelector(Texture::Format from, Texture::Format 
     }
 }
 
-void convertTextureFormat(Texture::Format newFormat, Texture& texture) {
+void convertTextureFormat(Texture& texture, Texture::Format newFormat) {
     ghoul_assert(
         texture.dataOwnership(),
         "Texture must have ownership of its data for successful conversion"
     );
 
-    if (newFormat == texture.format())
+    if (newFormat == texture.format()) {
         return;
+    }
 
     int nPixels = glm::compMul(texture.dimensions());
     int bytesPerChannel = texture.bytesPerPixel() / texture.numberOfChannels();

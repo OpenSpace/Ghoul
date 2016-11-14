@@ -24,8 +24,10 @@
  ****************************************************************************************/
 
 #include <ghoul/opengl/texture.h>
-#include <cstring>
+
 #include <ghoul/misc/assert.h>
+
+#include <cstring>
 
 using glm::detail::int8;
 using glm::detail::int16;
@@ -89,19 +91,22 @@ Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLint interna
 }
 
 Texture::~Texture() {
-    if (_id)
+    if (_id) {
         glDeleteTextures(1, &_id);
+    }
 
-    if (_hasOwnershipOfData)
-        delete[] (GLubyte*)_pixels;
+    if (_hasOwnershipOfData) {
+        delete[](GLubyte*)_pixels;
+    }
 }
 
 void Texture::initialize(bool allocateData) {
     determineTextureType();
     calculateBytesPerPixel();
     generateId();
-    if (allocateData)
+    if (allocateData) {
         allocateMemory();
+    }
     applyFilter();
     applyWrapping();
 }
@@ -185,7 +190,6 @@ GLint Texture::internalFormat() const {
 
 void Texture::setInternalFormat(GLint internalFormat) {
     _internalFormat = internalFormat;
-
 }
 
 Texture::FilterMode Texture::filter() const {
@@ -243,7 +247,7 @@ void Texture::applyFilter() {
             break;
         }
         default:
-            assert(false);
+            ghoul_assert(false, "Missing case label");
     }
 }
 
@@ -257,10 +261,12 @@ void Texture::setDataType(GLenum dataType) {
 }
 
 int Texture::expectedPixelDataSize() const {
-    if (_pixels)
+    if (_pixels) {
         return compMul(_dimensions) * _bpp;
-    else
+    }
+    else {
         return 0;
+    }
 }
 
 int Texture::numberOfChannels(Format format) {
@@ -409,20 +415,24 @@ void Texture::uploadTexture() {
 
 void Texture::downloadTexture() {
     bind();
-    if (!_pixels)
+    if (!_pixels) {
         allocateMemory();
+    }
     glGetTexImage(_type, 0, GLint(_format), _dataType, _pixels);
 }
 
 void Texture::determineTextureType() {
     if (_dimensions.z == 1) {
-        if (_dimensions.y == 1)
+        if (_dimensions.y == 1) {
             _type = GL_TEXTURE_1D;
-        else
+        }
+        else {
             _type = GL_TEXTURE_2D;
+        }
     }
-    else
+    else {
         _type = GL_TEXTURE_3D;
+    }
 }
 
 vec4 Texture::texelAsFloat(unsigned int x) const {

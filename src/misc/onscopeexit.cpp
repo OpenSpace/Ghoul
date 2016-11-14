@@ -32,8 +32,9 @@ OnScopeExit::OnScopeExit(std::function<void()> function)
 {}
     
 OnScopeExit::~OnScopeExit() {
-    if (_function)
+    if (_function) {
         _function();
+    }
 }
 
 void OnScopeExit::clear() {

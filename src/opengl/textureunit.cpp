@@ -44,8 +44,9 @@ TextureUnit::TextureUnit()
     , _glEnum(0)
     , _assigned(false)
 {
-    if (!_initialized)
+    if (!_initialized) {
         initialize();
+    }
 }
 
 TextureUnit::~TextureUnit() {
@@ -56,20 +57,23 @@ TextureUnit::~TextureUnit() {
 }
 
 void TextureUnit::activate() {
-    if (!_assigned)
+    if (!_assigned) {
         assignUnit();
+    }
     glActiveTexture(_glEnum);
 }
 
 GLint TextureUnit::glEnum() {
-    if (!_assigned)
+    if (!_assigned) {
         assignUnit();
+    }
     return _glEnum;
 }
 
 GLint TextureUnit::unitNumber() {
-    if (!_assigned)
+    if (!_assigned) {
         assignUnit();
+    }
     return _number;
 }
 
@@ -103,10 +107,12 @@ void TextureUnit::assignUnit() {
 }
 
 void TextureUnit::initialize() {
-    if (systemcapabilities::SystemCapabilities::isInitialized())
+    if (systemcapabilities::SystemCapabilities::isInitialized()) {
         _maxTexUnits = OpenGLCap.maxTextureUnits();
-    else
+    }
+    else {
         _maxTexUnits = 8; // Reasonable default setting for OpenGL
+    }
     _busyUnits = std::vector<bool>(_maxTexUnits, false);
     _initialized = true;
 }

@@ -65,7 +65,8 @@ namespace {
 #ifdef WIN32
     std::string lastErrorToString(DWORD error) {
         LPTSTR errorBuffer = nullptr;
-        DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+        DWORD nValues = FormatMessage(
+            FORMAT_MESSAGE_FROM_SYSTEM |
             FORMAT_MESSAGE_ALLOCATE_BUFFER |
             FORMAT_MESSAGE_IGNORE_INSERTS,
             NULL,
@@ -73,17 +74,16 @@ namespace {
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
             (LPTSTR)&errorBuffer,
             0,
-            NULL);
+            NULL
+        );
         if ((nValues > 0) && (errorBuffer != nullptr)) {
             std::string errorMsg(errorBuffer);
             LocalFree(errorBuffer);
             return errorMsg;
         }
         else {
-            return std::string(
-                "Error constructing format message for error: ") +
-                std::to_string(error)
-            ;
+            return std::string("Error constructing format message for error: ") +
+                std::to_string(error);
         }
     }
 #endif
@@ -98,7 +98,6 @@ SharedMemory::SharedMemoryNotFoundError::SharedMemoryNotFoundError()
 {}
     
 void SharedMemory::create(const std::string& name, size_t size) {
-//    const std::string _loggerCat = "SharedMemory(" + name + ")";
     // adjust for the header size
     size += sizeof(Header);
 #ifdef WIN32
@@ -161,8 +160,9 @@ void SharedMemory::create(const std::string& name, size_t size) {
  
 void SharedMemory::remove(const std::string& name) {
 #ifdef WIN32
-    if (_createdSections.find(name) == _createdSections.end())
+    if (_createdSections.find(name) == _createdSections.end()) {
         throw SharedMemoryNotFoundError();
+    }
     
     HANDLE h = _createdSections[name];
     _createdSections.erase(name);
@@ -201,8 +201,9 @@ bool SharedMemory::exists(const std::string& name) {
         // The handle doesn't exist, which can mean two things: the memory mapped file
         // doesn't exist or it exists but there was an error accessing it
         const DWORD error = GetLastError();
-        if (error == ERROR_FILE_NOT_FOUND)
+        if (error == ERROR_FILE_NOT_FOUND) {
             return false;
+        }
         else {
             std::string errorMsg = lastErrorToString(error);
             throw SharedMemoryError(

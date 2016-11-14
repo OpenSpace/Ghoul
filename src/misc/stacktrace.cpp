@@ -59,10 +59,8 @@ public:
 protected:
     void OnOutput(LPCSTR szText) override {
         std::string str(szText);
-
         // Remove trailing newline character
         str = str.substr(0, str.size() - 1);
-
         _vector.push_back(str);
     }
 
@@ -144,8 +142,9 @@ std::vector<std::string> stackTrace() {
                     moduleName, addr, functionName, offset);
         }
         
-        if (functionName)
+        if (functionName) {
             free(functionName);
+        }
         
         stackFrames.push_back(std::string(stackFrame));
     }

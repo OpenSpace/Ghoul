@@ -25,6 +25,8 @@
 
 #include <ghoul/misc/templatefactory.h>
 
+#include <ghoul/misc/dictionary.h>
+
 namespace ghoul {
 
 TemplateFactoryBase::~TemplateFactoryBase() {}

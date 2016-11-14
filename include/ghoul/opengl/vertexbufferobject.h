@@ -149,7 +149,7 @@ private:
     GLuint _iBufferID;
     
     /// The size of the index buffer, determining how many vertices are drawn
-    unsigned int _isize;
+    unsigned int _iSize;
     
     /// The rendering mode of this VertexBufferObject
     GLenum _mode;

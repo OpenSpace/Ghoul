@@ -33,7 +33,13 @@
 namespace ghoul {
 namespace opengl {
 
- void convertTextureFormat(Texture::Format newFormat, Texture& texture);
+/**
+ * Converts the \p texture into a \p newFormat, replacing the backend storage of the
+ * Texture and converting the individual pixels.
+ * \param texture The texture to convert
+ * \param newFormat The new format of the texture
+ */
+void convertTextureFormat(Texture& texture, Texture::Format newFormat);
 
 
 } // namespace opengl

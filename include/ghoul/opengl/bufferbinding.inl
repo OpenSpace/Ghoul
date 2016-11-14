@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/opengl/bufferbinding.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
 
@@ -32,8 +31,9 @@ namespace opengl {
 
 template <bufferbinding::Buffer T>
 BufferBinding<T>::BufferBinding()
-    : _number(0) {
-    if(!_initialized) {
+    : _number(0)
+{
+    if (!_initialized) {
         initialize();
     }
 }
@@ -48,8 +48,9 @@ BufferBinding<T>::~BufferBinding() {
 
 template <bufferbinding::Buffer T>
 GLint BufferBinding<T>::bindingNumber() {
-    if (!_assigned)
+    if (!_assigned) {
         assignBinding();
+    }
     return _number;
 }
 
@@ -65,8 +66,9 @@ BufferBinding<T>::operator GLint() {
 
 template <bufferbinding::Buffer T>
 void BufferBinding<T>::deinitialize() {
-    for (size_t i = 0; i < _busyBindings.size(); ++i)
+    for (size_t i = 0; i < _busyBindings.size(); ++i) {
         _busyBindings[i] = false;
+    }
     _totalActive = 0;
 }
 
@@ -96,10 +98,12 @@ void BufferBinding<T>::assignBinding() {
 
 template <bufferbinding::Buffer T>
 void BufferBinding<T>::initialize() {
-    if (systemcapabilities::SystemCapabilities::isInitialized())
-        _maxBufferBindings = maxBufferBindings(); 
-    else
+    if (systemcapabilities::SystemCapabilities::isInitialized()) {
+        _maxBufferBindings = maxBufferBindings();
+    }
+    else {
         _maxBufferBindings = 8; // Reasonable default setting for OpenGL
+    }
     _busyBindings = std::vector<bool>(_maxBufferBindings, false);
     _initialized = true;
 }
@@ -116,9 +120,6 @@ std::vector<bool> BufferBinding<T>::_busyBindings = std::vector<bool>();
 template <bufferbinding::Buffer T>
 bool BufferBinding<T>::_initialized = false;
 
-}
-}
+} // namespace opengl
 
-
-
-
+} // namespace ghoul

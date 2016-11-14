@@ -27,6 +27,8 @@
 
 #include <ghoul/misc/exception.h>
 
+#include <thread>
+
 #ifdef WIN32
 #include <Windows.h>
 #else
@@ -144,10 +146,12 @@ void setPriority(std::thread& t, ThreadPriorityClass priorityClass, ThreadPriori
 void setThreadBackground(std::thread& t, Background background) {
 #ifdef WIN32
     int m;
-    if (background == Background::Yes)
+    if (background) {
         m = THREAD_MODE_BACKGROUND_BEGIN;
-    else
+    }
+    else {
         m = THREAD_MODE_BACKGROUND_END;
+    }
 
     std::thread::native_handle_type h = t.native_handle();
     SetThreadPriority(h, m);

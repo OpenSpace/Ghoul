@@ -86,15 +86,19 @@ void OpenGLCapabilitiesComponent::detectGLSLVersion() {
 void OpenGLCapabilitiesComponent::detectGPUVendor() {
     const char* vendor =
         reinterpret_cast<const char*>(glGetString(GL_VENDOR));
-    if (vendor)
+    if (vendor) {
         _glslCompiler = std::string(vendor);
-    else
+    }
+    else {
         throw GPUVendorError("Detection the GPU Vendor failed");
+    }
 
-    if (_glslCompiler.find("NVIDIA") != std::string::npos)
+    if (_glslCompiler.find("NVIDIA") != std::string::npos) {
         _vendor = Vendor::Nvidia;
-    else if (_glslCompiler.find("ATI") != std::string::npos)
+    }
+    else if (_glslCompiler.find("ATI") != std::string::npos) {
         _vendor = Vendor::ATI;
+    }
     else if ((_glslCompiler.find("INTEL") != std::string::npos)
         || (_glslCompiler.find("Intel") != std::string::npos))
     {
@@ -208,8 +212,9 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
 
     std::stringstream s;
     if (!_extensions.empty()) {
-        for (size_t i = 0; i < _extensions.size() - 1; ++i)
+        for (size_t i = 0; i < _extensions.size() - 1; ++i) {
             s << _extensions[i] << ", ";
+        }
         s << _extensions[_extensions.size() - 1] << "\n";
     }
     result.push_back({ "Extensions", s.str(), Verbosity::Full });
@@ -329,10 +334,12 @@ bool OpenGLCapabilitiesComponent::Version::operator>=(const Version& rhs) const 
 
 std::string OpenGLCapabilitiesComponent::Version::toString() const {
     using std::to_string;
-    if (_release != 0)
+    if (_release != 0) {
         return to_string(_major) + "." + to_string(_minor) + "." + to_string(_release);
-    else
+    }
+    else {
         return to_string(_major) + "." + to_string(_minor);
+    }
 }
 
 } // namespace ghoul

@@ -54,21 +54,6 @@ public:
     };
     
     /**
-     * Static initializer that initializes the static member. This needs to be done before
-     * the ShaderManager can be used.
-     * \pre The static ShaderManager must not have been initialized before
-     */
-    static void initialize();
-    
-    /**
-     * Static deinitializer that will remove all of the registered ShaderObject%s. The
-     * manager will be deleted and will be unavailable until it is re-initialized
-     * (#initialize).
-     * \pre The static ShaderManager must have been initialized before
-     */
-    static void deinitialize();
-    
-    /**
      * This method returns a reference to the initialized ShaderManager.
      * \return An initialized reference to the singleton manager
      * \pre The static ShaderManager must have been initialized before
@@ -143,9 +128,6 @@ public:
     unsigned int hashedNameForName(const std::string& name) const;
     
 private:
-    /// The singleton member
-    static ShaderManager* _manager;
-    
     /// Map containing all the registered ShaderObject%s
     std::map<unsigned int, std::unique_ptr<ShaderObject>> _objects;
 };

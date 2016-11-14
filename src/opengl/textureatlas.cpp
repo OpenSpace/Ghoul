@@ -27,7 +27,6 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
-#include <ghoul/opengl/ghoul_gl.h>
 
 #include <fmt/format.h>
 
@@ -221,11 +220,13 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
                 _nodes.erase(_nodes.begin() + i);
                 --i;
             }
-            else
+            else {
                 break;
+            }
         }
-        else
+        else {
             break;
+        }
     }
     atlasMerge();
     _nUsed += width * height;
@@ -305,10 +306,12 @@ int TextureAtlas::atlasFit(size_t index, int width, int height) {
     while (remainingWidth > 0) {
         const glm::ivec3& node = _nodes[index];
         
-        if (node.y > y)
+        if (node.y > y) {
             y = node.y;
-        if ((y + height) > (_size.y - 1))
+        }
+        if ((y + height) > (_size.y - 1)) {
             return -1;
+        }
         remainingWidth -= node.z;
         ++index;
     }

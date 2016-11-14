@@ -54,20 +54,6 @@ public:
     };
     
     /**
-     * Static initializer that initializes the static member. This needs to be done before
-     * the TextureManager can be used.
-     * \pre The static TextureManager must not have been initialized before
-     */
-    static void initialize();
-
-    /**
-     * Static deinitializer that will remove all of the registered textures. The manager
-     * will be deleted and will be unavailable until it is re-initialized (#initialize).
-     * \pre The static TextureManager must have been initialized before
-     */
-    static void deinitialize();
-
-    /**
      * This method returns a reference to the initialized TextureManager.
      * \return An initialized reference to the singleton manager
      * \pre The static TextureManager must have been initialized before

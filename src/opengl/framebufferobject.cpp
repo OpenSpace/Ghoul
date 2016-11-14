@@ -21,12 +21,15 @@
  *************************************************************************************************/
 
 #include <ghoul/opengl/framebufferobject.h>
+
 #include <ghoul/logging/logmanager.h>
+
+namespace {
+const std::string _loggerCat = "ghoul.opengl.FramebufferObject";
+}
 
 namespace ghoul {
 namespace opengl {
-
-const std::string FramebufferObject::_loggerCat("ghoul.opengl.FramebufferObject");
 
 std::string FramebufferObject::errorChecking(GLenum status) {
     switch (status) {
@@ -68,7 +71,6 @@ void FramebufferObject::deactivate() {
 }
 
 bool FramebufferObject::isComplete() const {
-
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     std::string error = errorChecking(status);
 
@@ -86,7 +88,7 @@ bool FramebufferObject::isActive() {
 }
 
 void FramebufferObject::attachTexture(Texture* texture, GLenum attachment, int mipLevel, int zSlice) {
-    switch(texture->type()) {
+    switch (texture->type()) {
         case GL_TEXTURE_1D:
             glFramebufferTexture1D( GL_FRAMEBUFFER, attachment, GL_TEXTURE_1D, *texture, mipLevel );
             break;
@@ -105,35 +107,39 @@ void FramebufferObject::attachTexture(Texture* texture, GLenum attachment, int m
 
 void FramebufferObject::detachTexture(GLenum attachment) {
     auto iterator = _attachedTextures.find(attachment);
-    if( iterator != _attachedTextures.end() )
+    if (iterator != _attachedTextures.end()) {
         _attachedTextures.erase(iterator);
-    else
+    }
+    else {
         LWARNING("Trying to detach unknown texture!");
+    }
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, 0, 0);
 }
 
 void FramebufferObject::detachAll() {
-    while(!_attachedTextures.empty())
-            detachTexture(_attachedTextures.begin()->first);
+    while (!_attachedTextures.empty()) {
+        detachTexture(_attachedTextures.begin()->first);
+    }
 }
 
 Texture* FramebufferObject::getTexture(GLenum attachment) {
     auto iterator = _attachedTextures.find(attachment);
-    if( iterator != _attachedTextures.end() )
+    if (iterator != _attachedTextures.end()) {
         return _attachedTextures[attachment];
-    else
-        return 0;
+    }
+    else {
+        return nullptr;
+    }
 }
 
 GLuint FramebufferObject::getActiveObject() {
     GLint fbo;
-    glGetIntegerv (GL_FRAMEBUFFER_BINDING, &fbo);
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo);
     return static_cast<GLuint>(fbo);
 }
 
 GLuint FramebufferObject::generateId() {
-    _id = 0;
     glGenFramebuffers(1, &_id);
     return _id;
 }

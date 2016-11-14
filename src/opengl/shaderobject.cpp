@@ -33,11 +33,6 @@
 #include <functional>
 #include <fstream>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4996)
-#endif
-
 namespace {
 const std::string _loggerCat = "ShaderObject";
 }
@@ -73,8 +68,9 @@ ShaderObject::ShaderObject(ShaderType shaderType, Dictionary dictionary)
     _preprocessor.setDictionary(std::move(dictionary));
     _preprocessor.setFilename("");
 
-    if (_id == 0)
+    if (_id == 0) {
         throw ShaderObjectError("glCreateShader returned 0");
+    }
 }
 
 ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
@@ -88,8 +84,9 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
     _id = glCreateShader(_type);
-    if (_id == 0)
+    if (_id == 0) {
         throw ShaderObjectError("glCreateShader returned 0");
+    }
     _preprocessor.setDictionary(std::move(dictionary));
     _preprocessor.setFilename(std::move(filename));
 
@@ -107,12 +104,18 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
     _id = glCreateShader(_type);
-    if (_id == 0)
+    if (_id == 0) {
         throw ShaderObjectError("glCreateShader returned 0");
+    }
 #ifdef GL_VERSION_4_3
-    if (glObjectLabel)
-        glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1),
-                      _shaderName.c_str());
+    if (glObjectLabel) {
+        glObjectLabel(
+            GL_SHADER,
+            _id,
+            GLsizei(_shaderName.length() + 1),
+            _shaderName.c_str()
+        );
+    }
 #endif
     _preprocessor.setFilename(std::move(filename));
     _preprocessor.setDictionary(std::move(dictionary));
@@ -129,12 +132,18 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
     , _preprocessor(cpy._preprocessor)
 {
     _id = glCreateShader(_type);
-    if (_id == 0)
+    if (_id == 0) {
         throw ShaderObjectError("glCreateShader returned 0");
+    }
 #ifdef GL_VERSION_4_3
-    if (glObjectLabel)
-        glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1),
-                      _shaderName.c_str());
+    if (glObjectLabel) {
+        glObjectLabel(
+            GL_SHADER,
+            _id,
+            GLsizei(_shaderName.length() + 1),
+            _shaderName.c_str()
+        );
+    }
 #endif
     setShaderObjectCallback(_onChangeCallback);
     rebuildFromFile();
@@ -173,12 +182,18 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
 
         glDeleteShader(_id);
         _id = glCreateShader(_type);
-        if (_id == 0)
+        if (_id == 0) {
             throw ShaderObjectError("glCreateShader returned 0");
+        }
 #ifdef GL_VERSION_4_3
-        if (glObjectLabel)
-            glObjectLabel(GL_SHADER, _id, GLsizei(_shaderName.length() + 1)
-                          , _shaderName.c_str());
+        if (glObjectLabel) {
+            glObjectLabel(
+                GL_SHADER,
+                _id,
+                GLsizei(_shaderName.length() + 1),
+                _shaderName.c_str()
+            );
+        }
 #endif
         rebuildFromFile();
     }
@@ -228,8 +243,9 @@ void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) 
 
 void ShaderObject::setFilename(const std::string& filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    if (!FileSys.fileExists(filename))
+    if (!FileSys.fileExists(filename)) {
         throw FileNotFoundError(filename);
+    }
 
     _preprocessor.setFilename(filename);
 }
@@ -339,15 +355,9 @@ std::string ShaderObject::stringForShaderType(ShaderType type) {
         case ShaderTypeCompute:
             return "Compute shader";
 #endif
-        default:
-            assert(false);
-            return "";
     }
+    ghoul_assert(false, "Missing case label");
 }
 
 } // namespace opengl
 } // namespace ghoul
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif

@@ -49,10 +49,10 @@ T interpolateCatmullRom(double t, const T& p0, const T& p1, const T& p2, const T
     double t3 = t2*t;
     
     return 0.5 * (
-        2.0*p1 +
-        t*(p2 - p0) +
-        t2*(2.0*p0 - 5.0*p1 + 4.0*p2 - p3) +
-        t3*(3.0*p1 - p0  - 3.0*p2 + p3)
+        2.0 * p1 +
+        t * (p2 - p0) +
+        t2 * (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) +
+        t3 * (3.0 * p1 - p0  - 3.0 * p2 + p3)
     );
 }
 

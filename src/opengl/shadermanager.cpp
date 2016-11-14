@@ -36,22 +36,9 @@ ShaderManager::ShaderManagerError::ShaderManagerError(std::string message)
     : RuntimeError(std::move(message), "ShaderManager")
 {}
     
-ShaderManager* ShaderManager::_manager = nullptr;
-    
-void ShaderManager::initialize() {
-    ghoul_assert(_manager == nullptr, "Static manager must not have been initialized");
-    _manager = new ShaderManager;
-}
-
-void ShaderManager::deinitialize() {
-    ghoul_assert(_manager, "Static manager must have been intialized");
-    delete _manager;
-    _manager = nullptr;
-}
-
 ShaderManager& ShaderManager::ref() {
-    ghoul_assert(_manager, "Static manager must have been intialized");
-    return *_manager;
+    static ShaderManager manager;
+    return manager;
 }
 
 ShaderObject* ShaderManager::shaderObject(unsigned int hashedName) {
@@ -71,6 +58,7 @@ ShaderObject* ShaderManager::shaderObject(const std::string& name) {
         return shaderObject(hash);
     }
     catch (const ShaderManagerError&) {
+        // Repackage the exception as it would otherwise contain only the hash
         throw ShaderManagerError("Could not find ShaderObject for '" + name + "'");
     }
 }
@@ -84,8 +72,9 @@ unsigned int ShaderManager::registerShaderObject(const std::string& name,
         _objects[hashedName] = std::move(shader);
         return hashedName;
     }
-    else
+    else {
         throw ShaderManagerError("Name '" + name + "' was already registered");
+    }
 }
 
 std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(
@@ -99,8 +88,9 @@ std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(
                                                                   unsigned int hashedName)
 {
     auto it = _objects.find(hashedName);
-    if (it == _objects.end())
+    if (it == _objects.end()) {
         return nullptr;
+    }
     
     auto tmp = std::move(it->second);
     _objects.erase(hashedName);

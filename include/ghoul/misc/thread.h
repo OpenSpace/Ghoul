@@ -26,7 +26,11 @@
 #ifndef __THREAD_H__
 #define __THREAD_H__
 
-#include <thread>
+#include <ghoul/misc/boolean.h>
+
+namespace std {
+class thread;
+}
 
 namespace ghoul {
 namespace thread {
@@ -57,12 +61,9 @@ enum class ThreadPriorityLevel {
     AboveNormal,
     Highest
 };
-    
-enum class Background {
-    Yes = 0,
-    No
-};
 
+using Background = ghoul::Boolean;
+    
 /**
  * This method sets the priorty of the thread \p t to the ThreadPriorityClass
  * \p priorityClass and the ThreadPriorityLevel to \p priorityLevel.

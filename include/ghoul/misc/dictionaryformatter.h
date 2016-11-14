@@ -26,12 +26,24 @@
 #ifndef __DICTIONARYFORMATTER_H__
 #define __DICTIONARYFORMATTER_H__
 
+#include <string>
+
 namespace ghoul {
     
 class Dictionary;
 
+/**
+ * A DictionaryFormatter will take a Dictionary and convert it into an
+ * <code>std::string</code>. The resulting format of the string will be determined by the
+ * concrete implementation of the subclass.
+ */
 class DictionaryFormatter {
 public:
+    /**
+     * Converts the passed \p dictionary into a string representation.
+     * \param dictionary The Dictionary to convert
+     * \return A string representing the \p dictionary
+     */
     virtual std::string format(const Dictionary& dictionary) const = 0;
 };
 

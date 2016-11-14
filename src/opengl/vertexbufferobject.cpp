@@ -32,35 +32,33 @@ VertexBufferObject::VertexBufferObject()
     : _vaoID(0)
     , _vBufferID(0)
     , _iBufferID(0)
-    , _isize(0)
+    , _iSize(0)
     , _mode(GL_TRIANGLES)
-{
-    
-}
+{}
 
 VertexBufferObject::VertexBufferObject(VertexBufferObject&& other) {
     _vaoID = other._vaoID;
     _vBufferID = other._vBufferID;
     _iBufferID = other._iBufferID;
-    _isize = other._isize;
+    _iSize = other._iSize;
     
     other._vaoID = 0;
     other._vBufferID = 0;
     other._iBufferID = 0;
-    other._isize = 0;
+    other._iSize = 0;
 }
 
 VertexBufferObject& VertexBufferObject::operator=(VertexBufferObject&& other) {
-    if(this != &other) {
+    if (this != &other) {
         _vaoID = other._vaoID;
         _vBufferID = other._vBufferID;
         _iBufferID = other._iBufferID;
-        _isize = other._isize;
+        _iSize = other._iSize;
         
         other._vaoID = 0;
         other._vBufferID = 0;
         other._iBufferID = 0;
-        other._isize = 0;
+        other._iSize = 0;
     }
     return *this;
 }
@@ -73,7 +71,7 @@ VertexBufferObject::~VertexBufferObject() {
     _vBufferID = 0;
     _iBufferID = 0;
     _vaoID = 0;
-    _isize = 0;
+    _iSize = 0;
 }
 
 bool VertexBufferObject::isInitialized() const {
@@ -81,7 +79,7 @@ bool VertexBufferObject::isInitialized() const {
     initialized &= (_vaoID != 0);
     initialized &= (_vBufferID != 0);
     initialized &= (_iBufferID != 0);
-    initialized &= (_isize > 0);
+    initialized &= (_iSize > 0);
     return initialized;
 }
 
@@ -94,7 +92,7 @@ void VertexBufferObject::initialize(const std::vector<GLfloat>& vertexArray,
     
     generateGLObjects();
     
-    _isize = static_cast<unsigned int>(indexArray.size());
+    _iSize = static_cast<unsigned int>(indexArray.size());
     
     glBindVertexArray(_vaoID);
     
@@ -149,7 +147,7 @@ void VertexBufferObject::unbind() {
 void VertexBufferObject::render() {
     glBindVertexArray(_vaoID);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
-    glDrawElements(_mode, _isize, GL_UNSIGNED_INT, 0);
+    glDrawElements(_mode, _iSize, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 

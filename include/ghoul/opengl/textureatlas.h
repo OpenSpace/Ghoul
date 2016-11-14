@@ -238,13 +238,19 @@ private:
     
     std::vector<glm::ivec3> _nodes;
     
+    /// All of the individual elements that are stored in the atlas
     std::vector<glm::ivec4> _handleInformation;
     
+    /// Size of the texture
     glm::ivec3 _size;
-    
-    int _nUsed; ///< Allocated surface size
-    
+
+    /// Allocated surface size
+    int _nUsed;
+
+    /// Pointer to the texture that is used as the atlas
     std::unique_ptr<Texture> _texture;
+
+    /// Backend data storage for the texture
     std::vector<unsigned char> _data;
 };
 

@@ -34,11 +34,13 @@ namespace ghoul {
 namespace opengl {
 
 namespace bufferbinding {
-    enum class Buffer {
-        AtomicCounter,
-        ShaderStorage,
-        Uniform
-    };
+
+enum class Buffer {
+    AtomicCounter,
+    ShaderStorage,
+    Uniform
+};
+
 }
     
 /**
@@ -54,11 +56,6 @@ namespace bufferbinding {
 template <bufferbinding::Buffer T>
 class BufferBinding {
 public:
-
-    /*struct MaxBufferBindingsExceeded : public RuntimeError {
-        explicit MaxBufferBindingsExceeded();
-    };*/
-
     /**
      * The constructor will initialize the static variables when the first BufferBinding
      * is created and the non-static variables are initiated.
@@ -94,12 +91,12 @@ public:
 
     /**
      * This method returns the number of bindings that have been marked as used.
+     * \return The number of bindings that have been marked as used
      */
     static int numberActiveBindings();
 
     /**
     * This method returns the maximum number of buffer bindings that is avalable.
- 
     * \return The number of buffer bindings in use
     */
     static unsigned int maxBufferBindings();
@@ -107,8 +104,8 @@ public:
 private:
     /**
      * This method is called the first time #bindingNumber is
-     * called. It will assign a new OpenGL buffer binding to this BufferBinding and mark this
-     * new binding as used until this BufferBinding is destroyed.
+     * called. It will assign a new OpenGL buffer binding to this BufferBinding and mark
+     * this new binding as used until this BufferBinding is destroyed.
      */
     void assignBinding();
 
@@ -127,8 +124,8 @@ private:
     /// The number in <code>[0, maxBindings]</code> referring to this BufferBinding
     GLint _number = -1;
     
-    /// <code>true</code> if the list of busy bindings and the maximum number of bindings have
-    /// been initialized
+    /// <code>true</code> if the list of busy bindings and the maximum number of bindings
+    /// have been initialized
     static bool _initialized;
 
     // assigned
@@ -148,8 +145,7 @@ private:
 };
 
 } // namespace opengl
-}// namespace ghoul
-
+} // namespace ghoul
 
 #include "bufferbinding.inl"
 
