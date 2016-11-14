@@ -43,7 +43,8 @@ namespace ghoul {
  * \param len The length of the string \p s
  * \return The hash value for the passed string
  */
-unsigned int hashCRC32(const char* s, size_t len);
+constexpr unsigned int hashCRC32(const char* s);
+//unsigned int hashCRC32(const char* s, size_t len);
 
 /**
  * Computes the CRC-32 hash of the string \p s.
@@ -52,6 +53,10 @@ unsigned int hashCRC32(const char* s, size_t len);
  */
 unsigned int hashCRC32(const std::string& s);
 
+constexpr unsigned int operator "" _crc32(const char* s, size_t len);
+
 } // namespace ghoul
+
+#include "crc32.inl"
 
 #endif

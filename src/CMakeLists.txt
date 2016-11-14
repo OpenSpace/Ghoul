@@ -160,6 +160,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/buffer.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/clipboard.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/crc32.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/crc32.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionaryformatter.h

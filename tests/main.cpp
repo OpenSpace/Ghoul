@@ -43,6 +43,7 @@
 #include "tests/test_luatodictionary.inl"
 #include "tests/test_templatefactory.inl"
 #include "tests/test_threadpool.inl"
+#include "tests/test_crc32.inl"
 
 using namespace ghoul::cmdparser;
 using namespace ghoul::filesystem;

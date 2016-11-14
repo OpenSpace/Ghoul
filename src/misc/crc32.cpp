@@ -33,91 +33,10 @@
 
 #include <ghoul/misc/assert.h>
 
-#include <algorithm>
-
-namespace {
-    const int CRCPOLY = 0x82f63b78;
-    const int CRCINIT = 0xFFFFFFFF;
-
-    unsigned int CrcLookup[8][256];
-    bool IsInitialized = false;
-
-    void initializeLookupTable() {
-        ghoul_assert(!IsInitialized, "Lookup table already initialized");
-        for (int i = 0; i <= 0xFF; ++i) {
-            unsigned int x = i;
-            for (int j = 0; j < 8; ++j)
-                x = (x>>1) ^ (CRCPOLY & (-(int)(x & 1)));
-            CrcLookup[0][i] = x;
-        }
-        
-        for (int i = 0; i <= 0xFF; ++i) {
-            unsigned int c = CrcLookup[0][i];
-            for (int j = 1; j < 8; ++j) {
-                c = CrcLookup[0][c & 0xFF] ^ (c >> 8);
-                CrcLookup[j][i] = c;
-            }
-        }
-        
-        IsInitialized = true;
-    }
-}
-
 namespace ghoul {
 
-unsigned int hashCRC32(const char* s, size_t len) {
-    if (!IsInitialized)
-        initializeLookupTable();
-
-    int crc = CRCINIT;
-    // Align to DWORD boundary
-    size_t align = (sizeof(unsigned long) - (size_t)s) & (sizeof(unsigned long) - 1);
-    align = std::min(align, len);
-    len -= align;
-    for (; align; align--)
-        crc = CrcLookup[0][(crc ^ *s++) & 0xFF] ^ (crc >> 8);
-
-#if 0
-    // TODO: reliable check for architecture needed here (ab)
-    // hardware acceleration only available on newer Core i5/i7
-    SIZE_T ndwords = len / sizeof(unsigned long);
-    for (; ndwords; ndwords--) {
-        crc = _mm_crc32_u32(crc, *(unsigned long*)s);
-        s += sizeof(unsigned long);
-    }
-
-    len &= sizeof(unsigned long) - 1;
-    for (; len; len--)
-        crc = _mm_crc32_u8(crc, *s++);
-#else
-    // Slicing-by-8
-    size_t nqwords = len / (sizeof(unsigned int) + sizeof(unsigned int));
-    for (; nqwords; nqwords--) {
-        crc ^= *(unsigned int*)s;
-        s += sizeof(unsigned int);
-        unsigned int next = *(unsigned int*)s;
-        s += sizeof(unsigned int);
-        crc =
-            CrcLookup[7][(crc      ) & 0xFF] ^
-            CrcLookup[6][(crc >>  8) & 0xFF] ^
-            CrcLookup[5][(crc >> 16) & 0xFF] ^
-            CrcLookup[4][(crc >> 24)] ^
-            CrcLookup[3][(next      ) & 0xFF] ^
-            CrcLookup[2][(next >>  8) & 0xFF] ^
-            CrcLookup[1][(next >> 16) & 0xFF] ^
-            CrcLookup[0][(next >> 24)];
-    }
-
-    len &= sizeof(unsigned int) * 2 - 1;
-    for (; len; len--)
-        crc = CrcLookup[0][(crc ^ *s++) & 0xFF] ^ (crc >> 8);
-
-#endif
-    return ~crc;
-}
-
 unsigned int hashCRC32(const std::string& s) {
-    return hashCRC32(s.c_str(), s.length());
+    return crc32Internal(0xFFFFFFFF, s.c_str());
 }
 
 } // namespace ghoul
