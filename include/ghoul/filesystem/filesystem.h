@@ -131,6 +131,15 @@ public:
     std::string pathByAppendingComponent(std::string path, std::string component) const;
 
     /**
+     * Converts the \p path's path separators from the native path separator to the
+     * provided \p separator.
+     * \param path The path that should be converted to use the new \p separator
+     * \param separator The new path separator for the returned path
+     * \return The \p path with all native path separators replaced to the \p separator
+     */
+    std::string convertPathSeparator(std::string path, char separator) const;
+
+    /**
      * Returns the current working directory of this process.
      * \return The current working directory of this process
      * \throw FileSystemException If the current directory could not be determined

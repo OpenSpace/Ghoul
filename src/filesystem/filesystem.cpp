@@ -208,6 +208,11 @@ string FileSystem::pathByAppendingComponent(string path, string component) const
     return std::move(path) + PathSeparator + std::move(component);
 }
 
+std::string FileSystem::convertPathSeparator(std::string path, char separator) const {
+    std::replace(path.begin(), path.end(), PathSeparator, separator);
+    return path;
+}
+
 Directory FileSystem::currentDirectory() const {
 #ifdef WIN32
     // Get the size of the directory
