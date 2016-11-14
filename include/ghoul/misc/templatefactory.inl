@@ -26,6 +26,7 @@
 #include <type_traits>
 
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/dictionary.h>
 
 namespace ghoul {
 
