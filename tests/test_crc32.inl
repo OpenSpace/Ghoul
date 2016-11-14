@@ -34,6 +34,7 @@ struct Data {
     unsigned int hash;
 };
 
+// Just a list of random strings to test
 constexpr Data TestStrings[] = {
     { "Ghoul",  2275704949 }, { "String", 2568140703 }, { "TestString", 1470758616 },
     { "Hashing" , 107888401 }, { "HashingString", 2912793972 }, { "C++", 1464987298 },
@@ -208,18 +209,22 @@ constexpr Data TestStrings[] = {
 }
 
 TEST(CRC32Test, HashFixedEquality) {
-    for (int i = 0; i < 100; ++i) {
-        for (const Data& d : TestStrings) {
-            unsigned int stringHash = ghoul::hashCRC32(std::string(d.string));
-            unsigned int charHash = ghoul::hashCRC32(d.string);
-            EXPECT_EQ(stringHash, charHash) << d.string;
-            EXPECT_EQ(stringHash, d.hash) << d.string;
-        }
+    for (const Data& d : TestStrings) {
+        unsigned int stringHash = ghoul::hashCRC32(std::string(d.string));
+        unsigned int charHash = ghoul::hashCRC32(d.string);
+        EXPECT_EQ(stringHash, charHash) << d.string;
+        EXPECT_EQ(stringHash, d.hash) << d.string;
     }
 }
 
 TEST(CRC32Test, StaticTest) {
-    static_assert(ghoul::hashCRC32("T33FH0acrS") == 203057196, "T33FH0acrS");
+    // This stops compiling when hashCRC32 stops being constexpr
+    static_assert(ghoul::hashCRC32("spCfJJa98L") == 1031192370, "spCfJJa98L");
+    static_assert(ghoul::hashCRC32("erNxvzgXcX") == 1755727136, "erNxvzgXcX");
+    static_assert(ghoul::hashCRC32("fvGbUrm730") == 1714459546, "fvGbUrm730");
+    static_assert(ghoul::hashCRC32("WxeFIFoXPL") == 2000045289, "WxeFIFoXPL");
+    static_assert(ghoul::hashCRC32("hr2LmF9FjL") == 3241800974, "hr2LmF9FjL");
+    static_assert(ghoul::hashCRC32("AMv6Kg4gaJ") == 2316368142, "AMv6Kg4gaJ");
 }
 
 TEST(CRC32Test, HashRandomEquality) {
@@ -232,6 +237,7 @@ TEST(CRC32Test, HashRandomEquality) {
     std::default_random_engine e(r());
     std::uniform_int_distribution<int> dist(0, alphanum.length());
 
+    // Create nTests number of random strings to test
     for (int i = 0; i < nTests; ++i) {
         for (int j = 0; j < nTests; ++j) {
             std::vector<char> data(j);

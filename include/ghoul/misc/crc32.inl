@@ -22,12 +22,19 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  *****************************************************************************************
- * Code taken frm https://gist.github.com/oktal/5573082
+ * The code is adapted from Gary S. Brown                                                *
+ * https://opensource.apple.com/source/xnu/xnu-1456.1.26/bsd/libkern/crc32.c             *
+ * Licensed under the "You may use this program, or code or tables extracted from it, as *
+ * desired without restriction." license.                                                *
  ****************************************************************************************/
 
 namespace ghoul {
 
 namespace {
+
+// The CRC32 table is based on the polynomial
+// X^32 + X^26 + X^23 + X^22 + X^16 + X^12 + X^11 + X^10 +
+// X^8 + X^7 + X^5 + X^4 + X^2 + X^1 + X^0
 constexpr unsigned int CRC32Table[] = {
     0, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
     0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988, 0x09B64C2B, 0x7EB17CBD, 0xE7B82D07,
@@ -83,7 +90,7 @@ constexpr unsigned int hashCRC32(const char* s) {
 }
 
 constexpr unsigned int operator "" _crc32(const char* s, size_t) {
-    return crc32Internal(0xFFFFFFFF, s);
+    return hashCRC32(s);
 }
 
 } // namespace ghoul

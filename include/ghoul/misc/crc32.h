@@ -37,14 +37,13 @@
 namespace ghoul {
 
 /**
- * Computes the CRC-32 hash of the string \p s with the length \p len. If the string is
- * longer than <code>len</code>, the behavior is undefined.
+ * Computes the CRC-32 hash of the zero terminated string \p s If the string is longer
+ * than <code>len</code>, the behavior is undefined. If the passed value \p s is a compile
+ * constant, the crc32 hash will also be computed at compile time.
  * \param s The string for which to compute the CRC-32 hash
- * \param len The length of the string \p s
  * \return The hash value for the passed string
  */
 constexpr unsigned int hashCRC32(const char* s);
-//unsigned int hashCRC32(const char* s, size_t len);
 
 /**
  * Computes the CRC-32 hash of the string \p s.
@@ -53,6 +52,13 @@ constexpr unsigned int hashCRC32(const char* s);
  */
 unsigned int hashCRC32(const std::string& s);
 
+/**
+ * A postfix operator that will convert a string into a crc32 at compile time. This is
+ * functionally equivalent to calling #hashCRC32 with the string \p s.
+ * \param s The character array that is converted
+ * \param len The length of the character array
+ * \return The CRC32 hash of \p s
+ */
 constexpr unsigned int operator "" _crc32(const char* s, size_t len);
 
 } // namespace ghoul
