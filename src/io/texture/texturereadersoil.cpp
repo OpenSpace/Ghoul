@@ -101,22 +101,21 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(void* memory,
 std::vector<std::string> TextureReaderSOIL::supportedExtensions() const {
     // taken from http://www.lonesock.net/soil.html
     return {
-        "bmp",    // load & save                    
-        "png",  // load
-        "jpg",  // load
+        // BMP - non-1bpp, non-RLE (from stb_image documentation)
+        "bmp",
+        // PNG - non-interlaced (from stb_image documentation)
+        "png",
+        // JPG - JPEG baseline (from stb_image documentation)
+        "jpg",
         "jpeg",
-        "tga",  // load & save
-        "dds",  // load & save
+        // TGA - greyscale or RGB or RGBA or indexed, uncompressed or RLE
+        "tga",
+        // DDS - DXT1/2/3/4/5, uncompressed, cubemaps (can't read 3D DDS files yet)
+        "dds",
+        // PSD - (from stb_image documentation)
         "psd",
+        // HDR - converted to LDR
         "hdr",
-
-    // BMP - non-1bpp, non-RLE (from stb_image documentation)
-    // PNG - non-interlaced (from stb_image documentation)
-    // JPG - JPEG baseline (from stb_image documentation)
-    // TGA - greyscale or RGB or RGBA or indexed, uncompressed or RLE
-    // DDS - DXT1/2/3/4/5, uncompressed, cubemaps (can't read 3D DDS files yet)
-    // PSD - (from stb_image documentation)
-    // HDR - converted to LDR, unless loaded with *HDR* functions (RGBE or RGBdivA or RGBdivA2) 
     };
 }
 

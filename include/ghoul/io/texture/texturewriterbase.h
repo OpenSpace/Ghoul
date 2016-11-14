@@ -35,12 +35,17 @@
 namespace ghoul {
 namespace io {
 
+/**
+ * This is the base class for all classes that cna be used to write textures to disk. Each
+ * reader needs to list all supported extensions (#supportedExtensions) and overwrite the
+ * saveTexture method.
+ */
 class TextureWriterBase {
 public:
     /// The exception that gets thrown if there was an error writing the Texture
     struct TextureWriteException : public RuntimeError {
         explicit TextureWriteException(std::string name, std::string message,
-            const TextureWriterBase* writer);
+            const TextureWriterBase& writer);
         
         /// The filename that caused the exception to be thrown
         std::string filename;
@@ -49,7 +54,7 @@ public:
         std::string message;
         
         /// The TextureWriterBase that caused the exception
-        const TextureWriterBase* writer;
+        const TextureWriterBase& writer;
     };
 
     /// Default virtual destructor

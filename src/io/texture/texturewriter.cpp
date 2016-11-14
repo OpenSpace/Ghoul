@@ -84,8 +84,9 @@ TextureWriterBase* TextureWriter::writerForExtension(const std::string& extensio
     for (const auto& writer : _writers) {
         auto extensions = writer->supportedExtensions();
         auto it = std::find(extensions.begin(), extensions.end(), extension);
-        if (it != extensions.end())
+        if (it != extensions.end()) {
             return writer.get();
+        }
     }
     throw MissingWriterException(extension);
 }

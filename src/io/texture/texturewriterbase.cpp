@@ -32,7 +32,7 @@ namespace io {
  
 TextureWriterBase::TextureWriteException::TextureWriteException(std::string n,
                                                               std::string m,
-                                                              const TextureWriterBase* w)
+                                                              const TextureWriterBase& w)
     : RuntimeError(fmt::format("Error writing texture '{}'", n), "TextureWriter")
     , filename(std::move(n))
     , message(std::move(m))
