@@ -27,6 +27,7 @@
 #define __FONTRENDERER_H__
 
 #include <ghoul/glm.h>
+#include <ghoul/font/font.h>
 
 #include <memory>
 
@@ -37,9 +38,6 @@ class ProgramObject;
 }
 
 namespace fontrendering {
-
-class Font;
-
 /**
  * The FontRenderer is a class that can take a Font object and renderer it at a given
  * position. It has two separate usage modes; 1. it works as a singleton that has a
