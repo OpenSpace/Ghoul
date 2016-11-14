@@ -29,22 +29,32 @@
 
 #include <glm/glm.hpp>
 
+#include <numeric>
 #include <string>
 
 namespace ghoul {
 
 std::string DictionaryJsonFormatter::format(const Dictionary& dictionary) const {
-    std::string out = "{";
-    std::vector<std::string> keys = dictionary.keys();
-    for (const std::string& key : keys) {
-        out += "\"" + key + "\":";
-        out += formatValue(dictionary, key);
-        if (key != keys.back()) {
-            out += ",";
-        }
+    if (dictionary.empty()) {
+        return "{}";
     }
-    out += "}";
-    return out;
+
+    auto convert = [this, dictionary](const std::string& key) -> std::string {
+        return "\"" + key + "\":" + formatValue(dictionary, key);
+    };
+
+    std::vector<std::string> keys = dictionary.keys();
+    
+    std::string json = std::accumulate(
+        std::next(keys.begin()),
+        keys.end(),
+        convert(*keys.begin()),
+        [convert](std::string a, std::string key) {
+            return a + "," + convert(key);
+        }
+    );
+
+    return "{" + json + "}";
 }
 
 std::string DictionaryJsonFormatter::formatValue(const Dictionary& dictionary,
