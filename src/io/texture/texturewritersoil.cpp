@@ -70,8 +70,9 @@ void TextureWriterSOIL::saveTexture(const opengl::Texture& texture,
         texture.numberOfChannels(),
         data
     );
-    if (result == 0)
-        throw TextureWriteException(filename, "Error writing Texture", this);
+    if (result == 0) {
+        throw TextureWriteException(filename, "Error writing Texture", *this);
+    }
 }
     
 std::vector<std::string> TextureWriterSOIL::supportedExtensions() const {
