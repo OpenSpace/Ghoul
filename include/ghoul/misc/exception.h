@@ -26,7 +26,7 @@
 #ifndef __EXCEPTION_H__
 #define __EXCEPTION_H__
 
-#include <exception>
+#include <stdexcept>
 #include <string>
 
 namespace ghoul {
