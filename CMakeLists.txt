@@ -307,6 +307,8 @@ if (GHOUL_HAVE_TESTS)
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/googletest)
     target_link_libraries(GhoulTest gtest Ghoul Lua)
 
+    set_property(TARGET gtest_main PROPERTY FOLDER "External")
+
     if (APPLE)
         target_link_libraries(GhoulTest
             ${CARBON_LIBRARY}
