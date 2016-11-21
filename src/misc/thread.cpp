@@ -27,8 +27,6 @@
 
 #include <ghoul/misc/exception.h>
 
-#include <thread>
-
 #ifdef WIN32
 #include <Windows.h>
 #else

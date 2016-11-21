@@ -28,9 +28,7 @@
 
 #include <ghoul/misc/boolean.h>
 
-namespace std {
-class thread;
-}
+#include <thread>
 
 namespace ghoul {
 namespace thread {
