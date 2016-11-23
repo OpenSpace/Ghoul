@@ -98,9 +98,11 @@ std::vector<std::shared_ptr<TextureReaderBase>> TextureReader::readers() const {
 }
     
 TextureReaderBase* TextureReader::readerForExtension(const std::string& extension) {
+    std::string lowerExtension = extension;
+    std::transform(extension.begin(), extension.end(), lowerExtension.begin(), ::tolower);
     for (const std::shared_ptr<TextureReaderBase>& reader : _readers) {
         auto extensions = reader->supportedExtensions();
-        auto it = std::find(extensions.begin(), extensions.end(), extension);
+        auto it = std::find(extensions.begin(), extensions.end(), lowerExtension);
         if (it != extensions.end()) {
             return reader.get();
         }
