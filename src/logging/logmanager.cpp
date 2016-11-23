@@ -110,6 +110,13 @@ void LogManager::logMessage(LogManager::LogLevel level, const std::string& messa
     logMessage(level, "", message);
 }
 
+void LogManager::flushLogs() {
+    for (const auto& log : _logs) {
+        log->flush();
+    }
+}
+
+
 int LogManager::messageCounter(LogManager::LogLevel level) {
     return _logCounter[std::underlying_type<LogLevel>::type(level)];
 }

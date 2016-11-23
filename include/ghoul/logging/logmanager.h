@@ -64,7 +64,7 @@ class Log;
  * versions without the C require an <code>std::string</code> variable named
  * <code>_loggerCat</code> to be defined in the scope of the macro "call".
  */
-class LogManager: public Singleton<LogManager> {
+class LogManager : public Singleton<LogManager> {
 public:
     using ImmediateFlush = ghoul::Boolean;
 
@@ -168,6 +168,13 @@ public:
      * \param log The Log that should be removed from this LogManager
      */
     void removeLog(std::shared_ptr<Log> log);
+
+    /**
+     * Flushes all of the registered Log%s. This can be useful in cases when an
+     * unscheduled shutdown is imminent, but all messages must be written first. Will call
+     * the Log::flush method on all logs.
+     */
+    void flushLogs();
 
     /**
      * Returns the string representation of the passed LogManager::LogLevel. The name of
