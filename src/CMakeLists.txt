@@ -168,7 +168,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/exception.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
-    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/mathconstants.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/onscopeexit.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/sharedmemory.h
