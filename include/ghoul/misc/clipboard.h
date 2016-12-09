@@ -21,16 +21,10 @@
  * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
- *****************************************************************************************
- * This file is inspired by Peter Kankowski (kankowski@narod.ru) and his work available  *
- * at http://www.strchr.com/hash_functions and http://www.strchr.com/crc32_popcnt        *
- *****************************************************************************************
- * Slicing-by-8 algorithms by Michael E. Kounavis and Frank L. Berry from Intel Corp.    *
- * http://www.intel.com/technology/comms/perfnet/download/CRC_generators.pdf             *
  ****************************************************************************************/
 
-#ifndef __CLIPBOARD_H__
-#define __CLIPBOARD_H__
+#ifndef __GHOUL___CLIPBOARD___H__
+#define __GHOUL___CLIPBOARD___H__
 
 #include <string>
 
@@ -53,4 +47,4 @@ void setClipboardText(std::string text);
 
 } // namespace ghoul
 
-#endif // __CLIPBOARD_H__
+#endif // __GHOUL___CLIPBOARD___H__

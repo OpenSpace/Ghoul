@@ -42,8 +42,8 @@
  *                                                                                       *
  ****************************************************************************************/
 
-#ifndef __THREADPOOL_H__
-#define __THREADPOOL_H__
+#ifndef __GHOUL___THREADPOOL___H__
+#define __GHOUL___THREADPOOL___H__
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/thread.h>
@@ -395,4 +395,4 @@ private:
 
 #include "threadpool.inl"
 
-#endif // __THREADPOOL_H__
+#endif // __GHOUL___THREADPOOL___H__

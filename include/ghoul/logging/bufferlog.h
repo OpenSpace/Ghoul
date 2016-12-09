@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __BUFFERLOG_H__
-#define __BUFFERLOG_H__
+#ifndef __GHOUL___BUFFERLOG___H__
+#define __GHOUL___BUFFERLOG___H__
 
 #include <ghoul/misc/exception.h>
 
@@ -213,4 +213,4 @@ protected:
     
 } // namespace ghoul
 
-#endif // __BUFFERLOG_H__
+#endif // __GHOUL___BUFFERLOG___H__

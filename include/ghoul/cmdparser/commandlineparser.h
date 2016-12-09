@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __CMDLINEPARSER_H__
-#define __CMDLINEPARSER_H__
+#ifndef __GHOUL___CMDLINEPARSER___H__
+#define __GHOUL___CMDLINEPARSER___H__
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
@@ -252,4 +252,4 @@ protected:
 } // namespace cmdparser
 } // namespace ghoul
 
-#endif // __CMDLINEPARSER_H__
+#endif // __GHOUL___CMDLINEPARSER___H__

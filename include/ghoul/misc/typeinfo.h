@@ -25,8 +25,8 @@
  * The original of this file is found in the owl library maintained by Jonas Strandstedt *
  ****************************************************************************************/
 
-#ifndef __TYPEINFO_H__
-#define __TYPEINFO_H__
+#ifndef __GHOUL___TYPEINFO___H__
+#define __GHOUL___TYPEINFO___H__
 
 #include <typeinfo>
 #include <string>
@@ -61,6 +61,6 @@ public:
     
 };
 
-}  // ghoul
+} // namespace ghoul
 
-#endif // __TYPEINFO_H__
+#endif // __GHOUL___TYPEINFO___H__

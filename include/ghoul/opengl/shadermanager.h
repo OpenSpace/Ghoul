@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __SHADERMANAGER_H__
-#define __SHADERMANAGER_H__
+#ifndef __GHOUL___SHADERMANAGER___H__
+#define __GHOUL___SHADERMANAGER___H__
 
 #include <ghoul/misc/exception.h>
 
@@ -137,4 +137,4 @@ private:
 } // namespace opengl
 } // namespace ghoul
 
-#endif // __SHADERMANGER_H__
+#endif // __GHOUL___SHADERMANAGER___H__

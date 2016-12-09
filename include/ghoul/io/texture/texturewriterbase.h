@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __TEXTUREWRITERBASE_H__
-#define __TEXTUREWRITERBASE_H__
+#ifndef __GHOUL___TEXTUREWRITERBASE___H__
+#define __GHOUL___TEXTUREWRITERBASE___H__
 
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/texture.h>
@@ -82,4 +82,4 @@ public:
 } // namespace io
 } // namespace ghoul
 
-#endif // __TEXTUREWRITERBASE_H__
+#endif // __GHOUL___TEXTUREWRITERBASE___H__

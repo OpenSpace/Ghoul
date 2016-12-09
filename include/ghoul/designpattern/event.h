@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __EVENT_H__
-#define __EVENT_H__
+#ifndef __GHOUL___EVENT___H__
+#define __GHOUL___EVENT___H__
 
 #include <functional>
 #include <string>
@@ -91,5 +91,5 @@ private:
 
 #include "event.inl"
 
-#endif //__EVENT_H__
+#endif //__GHOUL___EVENT___H__
 

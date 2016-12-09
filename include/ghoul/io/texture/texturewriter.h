@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __TEXTUREWRITER_H__
-#define __TEXTUREWRITER_H__
+#ifndef __GHOUL___TEXTUREWRITER___H__
+#define __GHOUL___TEXTUREWRITER___H__
 
 #include <memory>
 #include <string>
@@ -103,5 +103,4 @@ private:
 } // namespace io
 } // namespace ghoul
 
-#endif // __TEXTUREWRITER_H__
-
+#endif // __GHOUL___TEXTUREWRITER___H__

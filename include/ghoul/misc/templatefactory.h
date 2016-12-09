@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __TEMPLATEFACTORY_H__
-#define __TEMPLATEFACTORY_H__
+#ifndef __GHOUL___TEMPLATEFACTORY___H__
+#define __GHOUL___TEMPLATEFACTORY___H__
 
 #include <ghoul/misc/exception.h>
 
@@ -248,4 +248,4 @@ private:
 
 #include "ghoul/misc/templatefactory.inl"
 
-#endif // __TEMPLATEFACTORY_H__
+#endif // __GHOUL___TEMPLATEFACTORY___H__

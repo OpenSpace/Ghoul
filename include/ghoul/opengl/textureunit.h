@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __TEXTUREUNIT_H__
-#define __TEXTUREUNIT_H__
+#ifndef __GHOUL___TEXTUREUNIT___H__
+#define __GHOUL___TEXTUREUNIT___H__
 
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/ghoul_gl.h>
@@ -162,4 +162,4 @@ private:
 } // namespace opengl
 } // namespace ghoul
 
-#endif // __TEXTUREUNIT_H__
+#endif // __GHOUL___TEXTUREUNIT___H__

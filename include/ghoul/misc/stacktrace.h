@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __STACKTRACE_H__
-#define __STACKTRACE_H__
+#ifndef __GHOUL___STACKTRACE___H__
+#define __GHOUL___STACKTRACE___H__
 
 #include <string>
 #include <vector>
@@ -42,4 +42,4 @@ std::vector<std::string> stackTrace();
     
 } // namespace ghoul
 
-#endif // __STACKTRACE_H__
+#endif // __GHOUL___STACKTRACE___H__

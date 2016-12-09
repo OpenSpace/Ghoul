@@ -23,12 +23,12 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL_FILESYSTEM__
-#define __GHOUL_FILESYSTEM__
+#ifndef __GHOUL___FILESYSTEM_COLLECTION___H__
+#define __GHOUL___FILESYSTEM_COLLECTION___H__
 
 #include "cachemanager.h"
 #include "directory.h"
 #include "filesystem.h"
 #include "file.h"
 
-#endif // __GHOUL_FILESYSTEM__
+#endif // __GHOUL___FILESYSTEM_COLLECTION___H__

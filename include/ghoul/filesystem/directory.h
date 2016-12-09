@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __DIRECTORY_H__
-#define __DIRECTORY_H__
+#ifndef __GHOUL___DIRECTORY___H__
+#define __GHOUL___DIRECTORY___H__
 
 #include <ghoul/misc/boolean.h>
 
@@ -205,4 +205,4 @@ std::ostream& operator<<(std::ostream& os, const Directory& d);
 } // namespace filesystem
 } // namespace ghoul
 
-#endif // __DIRECTORY_H__
+#endif // __GHOUL___DIRECTORY___H__

@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __EXCEPTION_H__
-#define __EXCEPTION_H__
+#ifndef __GHOUL___EXCEPTION___H__
+#define __GHOUL___EXCEPTION___H__
 
 #include <stdexcept>
 #include <string>
@@ -72,4 +72,4 @@ struct FileNotFoundError : public RuntimeError {
     
 } // namespace ghoul
 
-#endif // __EXCEPTION_H__
+#endif // __GHOUL___EXCEPTION___H__

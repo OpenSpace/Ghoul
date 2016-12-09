@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL_OPENGL__
-#define __GHOUL_OPENGL__
+#ifndef __GHOUL___OPENGL_COLLECTION___H__
+#define __GHOUL___OPENGL_COLLECTION___H__
 
 #include "framebufferobject.h"
 #include "programobject.h"
@@ -34,4 +34,4 @@
 #include "texturemanager.h"
 #include "textureunit.h"
 
-#endif // __GHOUL_OPENGL__
+#endif // __GHOUL___OPENGL_COLLECTION___H__

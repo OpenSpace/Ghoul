@@ -30,8 +30,8 @@
  * http://www.boost.org/LICENSE_1_0.txt)                                                 *
  ****************************************************************************************/
 
-#ifndef __ANY_H__
-#define __ANY_H__
+#ifndef __GHOUL___ANY___H__
+#define __GHOUL___ANY___H__
 
 #include <algorithm>
 #include <memory>
@@ -271,4 +271,4 @@ inline ValueType any_cast(any&& operand);
 
 #include "any.inl"
 
-#endif // __ANY_H__
+#endif // __GHOUL___ANY___H__

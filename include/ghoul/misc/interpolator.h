@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __INTERPOLATOR_H__
-#define __INTERPOLATOR_H__
+#ifndef __GHOUL___INTERPOLATOR___H__
+#define __GHOUL___INTERPOLATOR___H__
 
 namespace ghoul {
     
@@ -60,4 +60,4 @@ T interpolateCatmullRom(double t, const T& p0, const T& p1, const T& p2, const T
 
 #include "interpolator.inl"
 
-#endif
+#endif // __GHOUL___INTERPOLATOR___H__

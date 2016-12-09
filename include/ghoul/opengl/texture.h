@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __TEXTURE_H__
-#define __TEXTURE_H__
+#ifndef __GHOUL___TEXTURE___H__
+#define __GHOUL___TEXTURE___H__
 
 #include <ghoul/glm.h>
 #include <ghoul/misc/boolean.h>
@@ -785,4 +785,4 @@ private:
 
 #include "texture.inl"
 
-#endif
+#endif // __GHOUL___TEXTURE___H__

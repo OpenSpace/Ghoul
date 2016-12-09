@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __FILESYSTEM_H__
-#define __FILESYSTEM_H__
+#ifndef __GHOUL___FILESYSTEM___H__
+#define __GHOUL___FILESYSTEM___H__
 
 #include <ghoul/designpattern/singleton.h>
 #include <ghoul/filesystem/directory.h>
@@ -472,4 +472,4 @@ private:
 } // namespace filesystem
 } // namespace ghoul
 
-#endif // __FILESYSTEM_H__
+#endif // __GHOUL___FILESYSTEM___H__

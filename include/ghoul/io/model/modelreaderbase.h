@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __MODELREADERBASE_H__
-#define __MODELREADERBASE_H__
+#ifndef __GHOUL___MODELREADERBASE___H__
+#define __GHOUL___MODELREADERBASE___H__
 
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/ghoul_gl.h>
@@ -89,4 +89,4 @@ public:
 } // namespace io
 } // namespace ghoul
 
-#endif // __MODELREADERBASE_H__
+#endif // __GHOUL___MODELREADERBASE___H__

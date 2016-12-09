@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __SYSTEMCAPABILITIESCOMPONENT_H__
-#define __SYSTEMCAPABILITIESCOMPONENT_H__
+#ifndef __GHOUL___SYSTEMCAPABILITIESCOMPONENT___H__
+#define __GHOUL___SYSTEMCAPABILITIESCOMPONENT___H__
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
@@ -259,4 +259,4 @@ protected:
 } // namespace systemcapabilities
 } // namespace ghoul
 
-#endif // __SYSTEMCAPABILITIESCOMPONENT_H__
+#endif // __GHOUL___SYSTEMCAPABILITIESCOMPONENT___H__

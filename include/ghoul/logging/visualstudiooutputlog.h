@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __VISUALSTUDIOOUTPUTLOG_H__
-#define __VISUALSTUDIOOUTPUTLOG_H__
+#ifndef __GHOUL___VISUALSTUDIOOUTPUTLOG___H__
+#define __GHOUL___VISUALSTUDIOOUTPUTLOG___H__
 
 #include <ghoul/logging/log.h>
 
@@ -73,4 +73,4 @@ public:
 } // namespace logging
 } // namespace ghoul
 
-#endif // __VISUALSTUDIOOUTPUTLOG_H__
+#endif // __GHOUL___VISUALSTUDIOOUTPUTLOG___H__

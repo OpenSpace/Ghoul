@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __DICTIONARYFORMATTER_H__
-#define __DICTIONARYFORMATTER_H__
+#ifndef __GHOUL___DICTIONARYFORMATTER___H__
+#define __GHOUL___DICTIONARYFORMATTER___H__
 
 #include <string>
 
@@ -49,4 +49,4 @@ public:
 
 }  // namespace ghoul
 
-#endif
+#endif // __GHOUL___DICTIONARYFORMATTER___H__

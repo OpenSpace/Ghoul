@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __TEXTURECONVERSION_H__
-#define __TEXTURECONVERSION_H__
+#ifndef __GHOUL___TEXTURECONVERSION___H__
+#define __GHOUL___TEXTURECONVERSION___H__
 
 #include <ghoul/opengl/texture.h>
 
@@ -41,8 +41,7 @@ namespace opengl {
  */
 void convertTextureFormat(Texture& texture, Texture::Format newFormat);
 
-
 } // namespace opengl
 } // namespace ghoul
 
-#endif
+#endif // __GHOUL___TEXTURECONVERSION___H__

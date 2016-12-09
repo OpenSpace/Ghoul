@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __DICTIONARYJSONFORMATTER_H__
-#define __DICTIONARYJSONFORMATTER_H__
+#ifndef __GHOUL___DICTIONARYJSONFORMATTER___H__
+#define __GHOUL___DICTIONARYJSONFORMATTER___H__
 
 #include <ghoul/misc/dictionaryformatter.h>
 
@@ -74,4 +74,4 @@ private:
 
 }  // namespace ghoul
 
-#endif
+#endif // __GHOUL___DICTIONARYJSONFORMATTER___H__

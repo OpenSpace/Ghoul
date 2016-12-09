@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __TEXTUREREADERDEVIL_H__
-#define __TEXTUREREADERDEVIL_H__
+#ifndef __GHOUL___TEXTUREREADERDEVIL___H__
+#define __GHOUL___TEXTUREREADERDEVIL___H__
 
 #include <ghoul/io/texture/texturereaderbase.h>
 
@@ -83,4 +83,4 @@ private:
 } // namespace io
 } // namespace ghoul
 
-#endif // __TEXTUREREADERDEVIL_H__
+#endif // __GHOUL___TEXTUREREADERDEVIL___H__

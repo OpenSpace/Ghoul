@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOULGL_H__
-#define __GHOULGL_H__
+#ifndef __GHOUL___GHOULGL___H__
+#define __GHOUL___GHOULGL___H__
 
 #ifdef __APPLE__
     #define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
@@ -38,4 +38,4 @@
     #include <GL/glu.h>
 #endif
 
-#endif // __GHOULGL_H__
+#endif // __GHOUL___GHOULGL___H__

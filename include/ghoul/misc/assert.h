@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __ASSERT_H__
-#define __ASSERT_H__
+#ifndef __GHOUL___ASSERT___H__
+#define __GHOUL___ASSERT___H__
 
 #include <string>
 #include <sstream>
@@ -122,4 +122,4 @@ void internal_assert(std::string expression, std::string message, std::string fi
 
 /** @}  */
 
-#endif // __ASSERT_H__
+#endif // __GHOUL___ASSERT___H__

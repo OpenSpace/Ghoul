@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __CONSOLELOG_H__
-#define __CONSOLELOG_H__
+#ifndef __GHOUL___CONSOLELOG___H__
+#define __GHOUL___CONSOLELOG___H__
 
 #include <ghoul/logging/streamlog.h>
 #include <ghoul/misc/boolean.h>
@@ -109,4 +109,4 @@ protected:
 } // namespace logging
 } // namespace ghoul
 
-#endif // __CONSOLELOG_H__
+#endif // __GHOUL___CONSOLELOG___H__

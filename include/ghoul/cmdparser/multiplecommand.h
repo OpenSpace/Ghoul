@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __MULTIPLECOMMAND_H__
-#define __MULTIPLECOMMAND_H__
+#ifndef __GHOUL___MULTIPLECOMMAND___H__
+#define __GHOUL___MULTIPLECOMMAND___H__
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 
@@ -205,4 +205,4 @@ protected:
 
 #include "multiplecommand.inl"
 
-#endif // __MULTIPLECOMMAND_H__
+#endif // __GHOUL___MULTIPLECOMMAND___H__

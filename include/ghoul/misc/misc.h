@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __MISC_H__
-#define __MISC_H__
+#ifndef __GHOUL___MISC___H__
+#define __GHOUL___MISC___H__
 
 #include <string>
 #include <vector>
@@ -47,4 +47,4 @@ std::vector<std::string> tokenizeString(
 
 } // namespace ghoul
 
-#endif // __MISC_H__
+#endif // __GHOUL___MISC___H__

@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __ONSCOPEEXIT_H__
-#define __ONSCOPEEXIT_H__
+#ifndef __GHOUL___ONSCOPEEXIT___H__
+#define __GHOUL___ONSCOPEEXIT___H__
 
 #include <functional>
 
@@ -80,4 +80,4 @@ private:
     
 } // namespace ghoul
 
-#endif // __ONSCOPEEXIT_H__
+#endif // __GHOUL___ONSCOPEEXIT___H__

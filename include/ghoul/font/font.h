@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __FONT_H__
-#define __FONT_H__
+#ifndef __GHOUL___FONT___H__
+#define __GHOUL___FONT___H__
 
 #include <ghoul/glm.h>
 #include <ghoul/misc/boolean.h>
@@ -355,4 +355,4 @@ private:
 } // namespace fontrendering
 } // namespace ghoul
 
-#endif // __FONT_H__
+#endif // __GHOUL___FONT___H__

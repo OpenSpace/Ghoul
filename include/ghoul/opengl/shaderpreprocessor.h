@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __SHADERPREPROCESSOR_H__
-#define __SHADERPREPROCESSOR_H__
+#ifndef __GHOUL___SHADERPREPROCESSOR___H__
+#define __GHOUL___SHADERPREPROCESSOR___H__
 
 #include <ghoul/filesystem/file.h>
 #include <ghoul/misc/boolean.h>
@@ -165,4 +165,4 @@ private:
 } // namespace opengl
 } // namespace ghoul
 
-#endif // __SHADERPREPROCESSOR_H__
+#endif // __GHOUL___SHADERPREPROCESSOR___H__

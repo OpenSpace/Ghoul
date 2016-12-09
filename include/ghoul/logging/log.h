@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __LOG_H__
-#define __LOG_H__
+#ifndef __GHOUL___LOG___H__
+#define __GHOUL___LOG___H__
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/logging/logmanager.h>
@@ -140,4 +140,4 @@ private:
 } // namespace logging
 } // namespace ghoul
 
-#endif // __LOG_H__
+#endif // __GHOUL___LOG___H__

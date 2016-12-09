@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __LUAHELPER_H__
-#define __LUAHELPER_H__
+#ifndef __GHOUL___LUAHELPER___H__
+#define __GHOUL___LUAHELPER___H__
 
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
@@ -261,4 +261,4 @@ namespace internal {
 } // namespace lua
 } // namespace ghoul
 
-#endif // __LUAHELPER_H__
+#endif // __GHOUL___LUAHELPER___H__

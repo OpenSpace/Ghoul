@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __BUFFERBINDING_H__
-#define __BUFFERBINDING_H__
+#ifndef __GHOUL___BUFFERBINDING___H__
+#define __GHOUL___BUFFERBINDING___H__
 
 #include "ghoul/opengl/ghoul_gl.h"
 
@@ -149,4 +149,4 @@ private:
 
 #include "bufferbinding.inl"
 
-#endif // __BUFFERBINDING_H__
+#endif // __GHOUL___BUFFERBINDING___H__

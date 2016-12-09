@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __DICTIONARY_H__
-#define __DICTIONARY_H__
+#ifndef __GHOUL___DICTIONARY___H__
+#define __GHOUL___DICTIONARY___H__
 
 // Removes a warning that occurs when trying to convert int directly to bool values in the
 // glm::bvecX template specializations
@@ -669,4 +669,4 @@ private:
 
 #include "dictionary.inl"
 
-#endif
+#endif // __GHOUL___DICTIONARY___H__

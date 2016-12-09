@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __SINGLECOMMAND_H__
-#define __SINGLECOMMAND_H__
+#ifndef __GHOUL___SINGLECOMMAND___H__
+#define __GHOUL___SINGLECOMMAND___H__
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 
@@ -200,4 +200,4 @@ protected:
 
 #include "singlecommand.inl"
 
-#endif // VRN_SINGLECOMMAND_H
+#endif // __GHOUL___SINGLECOMMAND___H__

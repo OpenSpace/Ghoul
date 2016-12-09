@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __LOGMANAGER_H__
-#define __LOGMANAGER_H__
+#ifndef __GHOUL___LOGMANAGER___H__
+#define __GHOUL___LOGMANAGER___H__
 
 #include <ghoul/designpattern/singleton.h>
 
@@ -214,4 +214,4 @@ private:
 
 #include "logmanager.inl"
 
-#endif // __LOGMANAGER_H__
+#endif // __GHOUL___LOGMANAGER___H__

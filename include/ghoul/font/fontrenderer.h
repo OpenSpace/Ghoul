@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __FONTRENDERER_H__
-#define __FONTRENDERER_H__
+#ifndef __GHOUL___FONTRENDERER___H__
+#define __GHOUL___FONTRENDERER___H__
 
 #include <ghoul/glm.h>
 #include <ghoul/font/font.h>
@@ -305,4 +305,4 @@ glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos, Args.
 } // namespace fontrendering
 } // namespace ghoul
 
-#endif // __FONTRENDERER_H__
+#endif // __GHOUL___FONTRENDERER___H__

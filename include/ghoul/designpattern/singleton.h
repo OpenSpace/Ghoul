@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __SINGLETON_H__
-#define __SINGLETON_H__
+#ifndef __GHOUL___SINGLETON___H__
+#define __GHOUL___SINGLETON___H__
 
 #include <ghoul/misc/assert.h>
 #include <typeinfo>
@@ -108,4 +108,5 @@ private:
 template <class T> T* Singleton<T>::_instance = nullptr;
 
 } // namespace ghoul
-#endif
+
+#endif // __GHOUL___SINGLETON___H__

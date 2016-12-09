@@ -23,10 +23,10 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOULLUA_H__
-#define __GHOULLUA_H__
+#ifndef __GHOUL___GHOULLUA___H__
+#define __GHOUL___GHOULLUA___H__
 
 #include <lua.hpp>
 #include <ghoul/lua/lua_helper.h>
 
-#endif // __GHOULLUA_H__
+#endif // __GHOUL___GHOULLUA___H__

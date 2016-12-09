@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __SYSTEMCAPABILITIES_H__
-#define __SYSTEMCAPABILITIES_H__
+#ifndef __GHOUL___SYSTEMCAPABILITIES___H__
+#define __GHOUL___SYSTEMCAPABILITIES___H__
 
 #include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
 

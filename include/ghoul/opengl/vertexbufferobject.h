@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __VERTEXBUFFEROBJECT_H__
-#define __VERTEXBUFFEROBJECT_H__
+#ifndef __GHOUL___VERTEXBUFFEROBJECT___H__
+#define __GHOUL___VERTEXBUFFEROBJECT___H__
 
 #include <ghoul/opengl/ghoul_gl.h>
 
@@ -160,4 +160,4 @@ private:
 
 #include "vertexbufferobject.inl"
 
-#endif // __VERTEXBUFFEROBJECT_H__
+#endif // __GHOUL___VERTEXBUFFEROBJECT___H__

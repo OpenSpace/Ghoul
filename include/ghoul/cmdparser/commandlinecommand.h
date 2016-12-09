@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __COMMANDLINECOMMAND_H__
-#define __COMMANDLINECOMMAND_H__
+#ifndef __GHOUL___COMMANDLINECOMMAND___H__
+#define __GHOUL___COMMANDLINECOMMAND___H__
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
@@ -220,4 +220,4 @@ protected:
 
 #include "commandlinecommand.inl"
 
-#endif  //__COMMANDLINECOMMAND_H__
+#endif  //__GHOUL___COMMANDLINECOMMAND___H__

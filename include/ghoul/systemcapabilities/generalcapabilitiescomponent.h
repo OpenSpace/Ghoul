@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GENERALCAPABILITIESCOMPONENT_H__
-#define __GENERALCAPABILITIESCOMPONENT_H__
+#ifndef __GHOUL___GENERALCAPABILITIESCOMPONENT___H__
+#define __GHOUL___GENERALCAPABILITIESCOMPONENT___H__
 
 #include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
 
@@ -216,4 +216,4 @@ protected:
         ghoul::systemcapabilities::GeneralCapabilitiesComponent                          \
     >())
 
-#endif // __GeneralCapabilitiesComponent_H__
+#endif // __GHOUL___GENERALCAPABILITIESCOMPONENT___H__

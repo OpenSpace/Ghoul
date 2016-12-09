@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __TEXTUREREADERCMAP_H__
-#define __TEXTUREREADERCMAP_H__
+#ifndef __GHOUL___TEXTUREREADERCMAP___H__
+#define __GHOUL___TEXTUREREADERCMAP___H__
 
 #include <ghoul/io/texture/texturereaderbase.h>
 
@@ -75,4 +75,4 @@ public:
 } // namespace io
 } // namespace ghoul
 
-#endif // __TEXTUREREADERCMAP_H__
+#endif // __GHOUL___TEXTUREREADERCMAP___H__

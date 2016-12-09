@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __FONTMANAGER_H__
-#define __FONTMANAGER_H__
+#ifndef __GHOUL___FONTMANAGER___H__
+#define __GHOUL___FONTMANAGER___H__
 
 #include <ghoul/glm.h>
 #include <ghoul/opengl/textureatlas.h>
@@ -157,4 +157,4 @@ private:
 } // namespace fontrendering
 } // namespace ghoul
 
-#endif // __FONTMANAGER_H__
+#endif // __GHOUL___FONTMANAGER___H__

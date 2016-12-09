@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __CALLBACKLOG_H__
-#define __CALLBACKLOG_H__
+#ifndef __GHOUL___CALLBACKLOG___H__
+#define __GHOUL___CALLBACKLOG___H__
 
 #include <ghoul/logging/log.h>
 
@@ -99,4 +99,4 @@ protected:
 } // namespace logging
 } // namespace ghoul
 
-#endif // __CALLBACKLOG_H__
+#endif // __GHOUL___CALLBACKLOG___H__

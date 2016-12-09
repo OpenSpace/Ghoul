@@ -231,5 +231,15 @@ if (MSVC)
         ${PROJECT_SOURCE_DIR}/ext/stackwalker/StackWalker.cpp
     )
 
-    source_group("External" FILES ${PROJECT_SOURCE_DIR}/ext/stackwalker/StackWalker.cpp)
+    set(GHOUL_HEADER
+        ${GHOUL_HEADER}
+        ${PROJECT_SOURCE_DIR}/ext/stackwalker/StackWalker.h
+    )
+
+    source_group(
+        "External"
+        FILES
+        ${PROJECT_SOURCE_DIR}/ext/stackwalker/StackWalker.cpp
+        ${PROJECT_SOURCE_DIR}/ext/stackwalker/StackWalker.h
+    )
 endif ()

@@ -23,8 +23,8 @@
 * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
 ****************************************************************************************/
 
-#ifndef __MODELREADERMULTIFORMAT_H__
-#define __MODELREADERMULTIFORMAT_H__
+#ifndef __GHOUL___MODELREADERMULTIFORMAT___H__
+#define __GHOUL___MODELREADERMULTIFORMAT___H__
 
 #include <ghoul/io/model/modelreaderbase.h>
 #include <vector>
@@ -97,4 +97,4 @@ namespace io {
 } // namespace io
 } // namespace ghoul
 
-#endif // __MODELREADERMULTIFORMAT_H__
+#endif // __GHOUL___MODELREADERMULTIFORMAT___H__

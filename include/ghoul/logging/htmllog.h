@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __HTMLLOG_H__
-#define __HTMLLOG_H__
+#ifndef __GHOUL___HTMLLOG___H__
+#define __GHOUL___HTMLLOG___H__
 
 #include <ghoul/logging/textlog.h>
 
@@ -115,4 +115,4 @@ private:
 } // namespace logging
 } // namespace ghoul
 
-#endif // __HTMLLOG_H__
+#endif // __GHOUL___HTMLLOG___H__

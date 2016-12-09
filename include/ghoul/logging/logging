@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
- #ifndef __GHOUL_LOGGING__
- #define __GHOUL_LOGGING__
+ #ifndef __GHOUL___LOG_COLLECTION___H__
+ #define __GHOUL___LOG_COLLECTION___H__
 
 #include "bufferlog.h"
 #include "callbacklog.h"
@@ -36,4 +36,4 @@
 #include "textlog.h"
 #include "visualstudiooutputlog.h"
 
-#endif // __GHOUL_LOGGING__
+#endif // __GHOUL___LOG_COLLECTION___H__

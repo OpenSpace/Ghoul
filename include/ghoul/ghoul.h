@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL_H__
-#define __GHOUL_H__
+#ifndef __GHOUL___GHOUL___H__
+#define __GHOUL___GHOUL___H__
 
 #include <string>
 
@@ -36,9 +36,9 @@ void deinitialize();
 std::string licenseText();
 
 const int GHOUL_MAJOR_VERSION = 0;
-const int GHOUL_MINOR_VERSION = 9;
+const int GHOUL_MINOR_VERSION = 16;
 const int GHOUL_PATCH_VERSION = 0;
 
 } // namespace ghoul
 
-#endif // __GHOUL_H__
+#endif // __GHOUL___GHOUL___H__

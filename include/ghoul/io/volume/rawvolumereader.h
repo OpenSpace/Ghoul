@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef RAWVOLUMEREADER_H_
-#define RAWVOLUMEREADER_H_
+#ifndef __GHOUL___RAWVOLUMEREADER___H__
+#define __GHOUL___RAWVOLUMEREADER___H__
 
 #include <ghoul/io/volume/volumereader.h>
 
@@ -47,11 +47,11 @@ public:
     void setReadHints(const ReadHints& hints);
 
     opengl::Texture* read(std::string filename);
-protected:
+
 private:
     ReadHints _hints;
 };
 
 } // namespace ghoul
 
-#endif /* RAWVOLUMEREADER_H_ */
+#endif // __GHOUL___RAWVOLUMEREADER___H__

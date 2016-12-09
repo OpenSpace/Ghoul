@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __MODELREADERLUA_H__
-#define __MODELREADERLUA_H__
+#ifndef __GHOUL___MODELREADERLUA___H__
+#define __GHOUL___MODELREADERLUA___H__
 
 #include <ghoul/io/model/modelreaderbase.h>
 
@@ -70,4 +70,4 @@ public:
 } // namespace io
 } // namespace ghoul
 
-#endif // __MODELREADERLUA_H__
+#endif // __GHOUL___MODELREADERLUA___H__

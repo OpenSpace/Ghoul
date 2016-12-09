@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef VOLUMEREADER_H_
-#define VOLUMEREADER_H_
+#ifndef __GHOUL___VOLUMEREADER___H__
+#define __GHOUL___VOLUMEREADER___H__
 
 #include <ghoul/opengl/texture.h>
 
@@ -36,12 +36,8 @@ public:
     virtual ~VolumeReader();
 
     virtual opengl::Texture* read(std::string filename) = 0;
-
-protected:
-
-private:
 };
 
 } // namespace ghoul
 
-#endif /* VOLUMEREADER_H_ */
+#endif // __GHOUL___VOLUMEREADER___H__

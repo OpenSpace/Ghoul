@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __CACHEMANAGER_H__
-#define __CACHEMANAGER_H__
+#ifndef __GHOUL___CACHEMANAGER___H__
+#define __GHOUL___CACHEMANAGER___H__
 
 #include <ghoul/filesystem/directory.h>
 #include <ghoul/misc/boolean.h>
@@ -333,4 +333,4 @@ protected:
 } // namespace filesystem
 } // namespace ghoul
 
-#endif // __CACHEMANAGER_H__
+#endif // __GHOUL___CACHEMANAGER___H__

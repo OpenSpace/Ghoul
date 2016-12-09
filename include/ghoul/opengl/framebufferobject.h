@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __FRAMEBUFFEROBJECT_H__
-#define __FRAMEBUFFEROBJECT_H__
+#ifndef __GHOUL___FRAMEBUFFEROBJECT___H__
+#define __GHOUL___FRAMEBUFFEROBJECT___H__
 
 #include <ghoul/opengl/texture.h>
 #include <map>
@@ -64,4 +64,4 @@ private:
 } // namespace opengl
 } // namespace ghoul
 
-#endif // __FRAMEBUFFEROBJECT_H__
+#endif // __GHOUL___FRAMEBUFFEROBJECT___H__

@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __PROGRAMOBJECT_H__
-#define __PROGRAMOBJECT_H__
+#ifndef __GHOUL___PROGRAMOBJECT___H__
+#define __GHOUL___PROGRAMOBJECT___H__
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
@@ -3574,4 +3574,4 @@ private:
 } // namespace opengl
 } // namespace ghoul
 
-#endif
+#endif // __GHOUL___PROGRAMOBJECT___H__

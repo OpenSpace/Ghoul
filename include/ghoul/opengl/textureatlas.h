@@ -32,8 +32,8 @@
  * http://clb.demon.fi/files/RectangleBinPack/                                           *
  ****************************************************************************************/
 
-#ifndef __TEXTUREATLAS_H__
-#define __TEXTUREATLAS_H__
+#ifndef __GHOUL___TEXTUREATLAS___H__
+#define __GHOUL___TEXTUREATLAS___H__
 
 #include <ghoul/glm.h>
 #include <ghoul/misc/exception.h>
@@ -257,4 +257,4 @@ private:
 } // namespace opengl
 } // namespace ghoul
 
-#endif // __TEXTUREATLAS_H__
+#endif // __GHOUL___TEXTUREATLAS___H__

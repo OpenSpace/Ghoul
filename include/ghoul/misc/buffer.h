@@ -25,8 +25,8 @@
  * The original of this file is found in the owl library maintained by Jonas Strandstedt *
  ****************************************************************************************/
 
-#ifndef __BUFFER_H__
-#define __BUFFER_H__
+#ifndef __GHOUL___BUFFER___H__
+#define __GHOUL___BUFFER___H__
 
 #include <ghoul/misc/exception.h>
 
@@ -262,4 +262,4 @@ void Buffer::deserialize(std::vector<std::string>& v);
 
 #include "buffer.inl"
 
-#endif // __BUFFER_H__
+#endif // __GHOUL___BUFFER___H__

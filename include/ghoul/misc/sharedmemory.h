@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __SHAREDMEMORY_H__
-#define __SHAREDMEMORY_H__
+#ifndef __GHOUL___SHAREDMEMORY___H__
+#define __GHOUL___SHAREDMEMORY___H__
 
 #include <ghoul/misc/exception.h>
 
@@ -222,4 +222,4 @@ private:
     
 } // namespace ghoul
 
-#endif // __SHAREDMEMORY_H__
+#endif // __GHOUL___SHAREDMEMORY___H__

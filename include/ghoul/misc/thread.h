@@ -23,8 +23,8 @@
 * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
 ****************************************************************************************/
 
-#ifndef __THREAD_H__
-#define __THREAD_H__
+#ifndef __GHOUL___THREAD___H__
+#define __GHOUL___THREAD___H__
 
 #include <ghoul/misc/boolean.h>
 
@@ -91,4 +91,4 @@ void setThreadBackground(std::thread& t, Background background);
 } // namespace thread
 } // namespace ghoul
 
-#endif // __THREAD_H__
+#endif // __GHOUL___THREAD___H__

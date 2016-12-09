@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __STREAMLOG_H__
-#define __STREAMLOG_H__
+#ifndef __GHOUL___STREAMLOG___H__
+#define __GHOUL___STREAMLOG___H__
 
 #include <ghoul/logging/log.h>
 #include <ostream>
@@ -84,4 +84,4 @@ protected:
 } // namespace logging
 } // namespace ghoul
 
-#endif // __STREAMLOG_H__
+#endif // __GHOUL___STREAMLOG___H__

@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __BOOLEAN_H__
-#define __BOOLEAN_H__
+#ifndef __GHOUL___BOOLEAN___H__
+#define __GHOUL___BOOLEAN___H__
 
 namespace ghoul {
 
@@ -65,4 +65,4 @@ struct Boolean {
     
 } // namespace ghoul
 
-#endif // __BOOLEAN_H__
+#endif // __GHOUL___BOOLEAN___H__
