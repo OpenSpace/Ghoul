@@ -34,40 +34,7 @@
 namespace ghoul {
 namespace logging {
 
-std::string LogManager::stringFromLevel(LogLevel level) {
-    switch (level) {
-        case LogLevel::Debug:
-            return "Debug";
-        case LogLevel::Info:
-            return "Info";
-        case LogLevel::Warning:
-            return "Warning";
-        case LogLevel::Error:
-            return "Error";
-        case LogLevel::Fatal:
-            return "Fatal";
-        case LogLevel::NoLogging:
-            return "None";
-    }
-    ghoul_assert(false, "Missing case label");
-}
-
-LogManager::LogLevel LogManager::levelFromString(const std::string& level) {
-    static const std::map<std::string, LogLevel> levels = {
-        { "Debug"  , LogLevel::Debug },
-        { "Info"   , LogLevel::Info },
-        { "Warning", LogLevel::Warning },
-        { "Error"  , LogLevel::Error },
-        { "Fatal"  , LogLevel::Fatal },
-        { "None"   , LogLevel::NoLogging }
-    };
-
-    auto it = levels.find(level);
-    ghoul_assert(it != levels.end(), "Missing entry in 'levels' map");
-    return it->second;
-}
-
-LogManager::LogManager(LogManager::LogLevel level, ImmediateFlush immediateFlush)
+LogManager::LogManager(LogLevel level, ImmediateFlush immediateFlush)
     : _level(level)
     , _immediateFlush(immediateFlush)
     , _logCounter({0, 0, 0, 0, 0})
@@ -87,17 +54,19 @@ void LogManager::removeLog(std::shared_ptr<Log> log) {
     }
 }
 
-void LogManager::logMessage(LogManager::LogLevel level, const std::string& category,
+void LogManager::logMessage(LogLevel level, const std::string& category,
                                                                const std::string& message)
 {
     if (level >= _level) {
         // Acquire lock, automatically released at end of scope
         std::lock_guard<std::mutex> lock(_mutex);
 
-        for (const auto& log : _logs) {
-            log->log(level, category, message);
-            if (_immediateFlush) {
-                log->flush();
+        for (const std::shared_ptr<Log>& log : _logs) {
+            if (level >= log->logLevel()) {
+                log->log(level, category, message);
+                if (_immediateFlush) {
+                    log->flush();
+                }
             }
         }
 
@@ -106,7 +75,7 @@ void LogManager::logMessage(LogManager::LogLevel level, const std::string& categ
     }
 }
 
-void LogManager::logMessage(LogManager::LogLevel level, const std::string& message) {
+void LogManager::logMessage(LogLevel level, const std::string& message) {
     logMessage(level, "", message);
 }
 
@@ -117,7 +86,7 @@ void LogManager::flushLogs() {
 }
 
 
-int LogManager::messageCounter(LogManager::LogLevel level) {
+int LogManager::messageCounter(LogLevel level) {
     return _logCounter[std::underlying_type<LogLevel>::type(level)];
 }
 

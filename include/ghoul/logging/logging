@@ -31,6 +31,7 @@
 #include "consolelog.h"
 #include "htmllog.h"
 #include "log.h"
+#include "loglevel.h"
 #include "logmanager.h"
 #include "streamlog.h"
 #include "textlog.h"

@@ -57,7 +57,8 @@ public:
     VisualStudioOutputLog(TimeStamping timeStamping = TimeStamping::No,
         DateStamping dateStamping = DateStamping::No,
         CategoryStamping categoryStamping = CategoryStamping::Yes,
-        LogLevelStamping logLevelStamping = LogLevelStamping::Yes);
+        LogLevelStamping logLevelStamping = LogLevelStamping::Yes,
+        LogLevel minimumLogLevel = LogLevel::AllLogging);
 
     /**
      * Method that logs a message with a given level and category to the console.
@@ -66,7 +67,7 @@ public:
      * individually
      * \param message The message body of the log message
      */
-    void log(LogManager::LogLevel level, const std::string& category,
+    void log(LogLevel level, const std::string& category,
         const std::string& message) override;
 };
 

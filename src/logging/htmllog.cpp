@@ -25,6 +25,10 @@
 
 #include <ghoul/logging/htmllog.h>
 
+#include <ghoul/misc/assert.h>
+
+#include <iterator>
+
 namespace ghoul {
 namespace logging {
 
@@ -32,9 +36,10 @@ HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend,
                  TimeStamping timeStamping, DateStamping dateStamping,
                  CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
                  const std::vector<std::string>& cssIncludes,
-                 const std::vector<std::string>& jsIncludes)
+                 const std::vector<std::string>& jsIncludes,
+                 LogLevel minimumLogLevel)
     : TextLog(std::move(filename), writeToAppend, timeStamping, dateStamping,
-                categoryStamping, logLevelStamping)
+                categoryStamping, logLevelStamping, minimumLogLevel)
 {    
     _customStyling = cssIncludes.size() > 1 || jsIncludes.size() > 1;
 
@@ -105,7 +110,7 @@ HTMLLog::~HTMLLog() {
     );
 }
 
-void HTMLLog::log(LogManager::LogLevel level, const std::string& category,
+void HTMLLog::log(LogLevel level, const std::string& category,
                   const std::string& message)
 {
     std::string output;
@@ -125,44 +130,44 @@ void HTMLLog::log(LogManager::LogLevel level, const std::string& category,
     }
     if (isLogLevelStamping()) {
         output += "\t\t\t\t<td class=\"log-level\">" +
-            LogManager::stringFromLevel(level) + "</td>\n";
+            stringFromLevel(level) + "</td>\n";
     }
     output += "\t\t\t\t<td class=\"log-message\">" + message + "</td>\n\t\t\t</tr>\n";
 
     writeLine(std::move(output));
 }
 
-std::string HTMLLog::classForLevel(LogManager::LogLevel level) {
+std::string HTMLLog::classForLevel(LogLevel level) {
     switch (level) {
-    case LogManager::LogLevel::Debug:
+    case LogLevel::Debug:
         return "log-level-debug";
-    case LogManager::LogLevel::Info:
+    case LogLevel::Info:
         return "log-level-info";
-    case LogManager::LogLevel::Warning:
+    case LogLevel::Warning:
         return "log-level-warning";
-    case LogManager::LogLevel::Error:
+    case LogLevel::Error:
         return "log-level-error";
-    case LogManager::LogLevel::Fatal:
+    case LogLevel::Fatal:
         return "log-level-fatal";
-    case LogManager::LogLevel::NoLogging:
+    case LogLevel::NoLogging:
         return "log-level-no-logging";
     }
     ghoul_assert(false, "Missing case label");
 }
 
-std::string HTMLLog::colorForLevel(LogManager::LogLevel level) {
+std::string HTMLLog::colorForLevel(LogLevel level) {
     switch (level) {
-        case LogManager::LogLevel::Debug:
+        case LogLevel::Debug:
             return "#00CC00";
-        case LogManager::LogLevel::Info:
+        case LogLevel::Info:
             return "#FFFFFF";
-        case LogManager::LogLevel::Warning:
+        case LogLevel::Warning:
             return "#FFFF00";
-        case LogManager::LogLevel::Error:
+        case LogLevel::Error:
             return "#FF0000";
-        case LogManager::LogLevel::Fatal:
+        case LogLevel::Fatal:
             return "#00FFFF";
-        case LogManager::LogLevel::NoLogging:
+        case LogLevel::NoLogging:
             return "#FFFFFF";
     }
     ghoul_assert(false, "Missing case label");

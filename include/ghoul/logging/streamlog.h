@@ -61,7 +61,8 @@ public:
     StreamLog(std::ostream& stream, TimeStamping timeStamping = TimeStamping::No,
         DateStamping dateStamping = DateStamping::No,
         CategoryStamping categoryStamping = CategoryStamping::Yes,
-        LogLevelStamping logLevelStamping = LogLevelStamping::Yes);
+        LogLevelStamping logLevelStamping = LogLevelStamping::Yes,
+        LogLevel minimumLogLevel = LogLevel::AllLogging);
 
     /**
      * Method that logs a <code>message</code> with a given <code>level</code> and
@@ -71,7 +72,7 @@ public:
      * individually
      * \param message The message body of the log message
      */
-    virtual void log(LogManager::LogLevel level, const std::string& category,
+    virtual void log(LogLevel level, const std::string& category,
         const std::string& message) override;
 
     /// Flushes the stream and, thereby, all messages that are in the associated buffer

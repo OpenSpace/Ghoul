@@ -35,11 +35,12 @@ namespace logging {
 VisualStudioOutputLog::VisualStudioOutputLog(TimeStamping timeStamping,
                                              DateStamping dateStamping,
                                              CategoryStamping categoryStamping,
-                                             LogLevelStamping logLevelStamping)
-    : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
+                                             LogLevelStamping logLevelStamping,
+                                             LogLevel logLevel)
+    : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, logLevel)
 {}
 
-void VisualStudioOutputLog::log(LogManager::LogLevel level, const std::string& category,
+void VisualStudioOutputLog::log(LogLevel level, const std::string& category,
                      const std::string& message)
 {
 #ifdef WIN32

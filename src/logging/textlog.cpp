@@ -25,16 +25,16 @@
 
 #include <ghoul/logging/textlog.h>
 
-#include <cstdio>
+#include <ghoul/misc/assert.h>
 
 namespace ghoul {
 namespace logging {
 
-
 TextLog::TextLog(const std::string& filename, Append writeToAppend,
         TimeStamping timeStamping, DateStamping dateStamping,
-        CategoryStamping categoryStamping, LogLevelStamping logLevelStamping)
-    : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
+        CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
+        LogLevel minimumLogLevel)
+    : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, minimumLogLevel)
     , _printFooter(writeToAppend)
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
@@ -55,7 +55,7 @@ TextLog::~TextLog() {
     }
 }
 
-void TextLog::log(LogManager::LogLevel level, const std::string& category,
+void TextLog::log(LogLevel level, const std::string& category,
                                                                const std::string& message)
 {
     if (category.empty() && message.empty()) {
@@ -77,7 +77,7 @@ void TextLog::log(LogManager::LogLevel level, const std::string& category,
             output += category + " ";
         }
         if (isLogLevelStamping()) {
-            output += "(" + LogManager::stringFromLevel(level) + ") ";
+            output += "(" + stringFromLevel(level) + ") ";
         }
         if (output != "") {
             output += ":\t";

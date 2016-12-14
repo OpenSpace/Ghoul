@@ -53,6 +53,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/logging/consolelog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/htmllog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/log.cpp
+    ${PROJECT_SOURCE_DIR}/src/logging/loglevel.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/logmanager.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/streamlog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/textlog.cpp
@@ -145,6 +146,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/htmllog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/log.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/logging
+    ${PROJECT_SOURCE_DIR}/include/ghoul/logging/loglevel.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/logmanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/logmanager.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/streamlog.h

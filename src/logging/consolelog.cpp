@@ -70,12 +70,13 @@ namespace logging {
 
 ConsoleLog::ConsoleLog(ColorOutput colorOutput, TimeStamping timeStamping,
             DateStamping dateStamping, CategoryStamping categoryStamping,
-            LogLevelStamping logLevelStamping)
-    : StreamLog(std::cout, timeStamping, dateStamping, categoryStamping, logLevelStamping)
+            LogLevelStamping logLevelStamping, LogLevel logLevel)
+    : StreamLog(std::cout, timeStamping, dateStamping, categoryStamping, logLevelStamping,
+                logLevel)
     , _colorOutput(colorOutput)
 {}
 
-void ConsoleLog::log(LogManager::LogLevel level, const std::string& category,
+void ConsoleLog::log(LogLevel level, const std::string& category,
                      const std::string& message)
 {
     if (_colorOutput) {
@@ -89,49 +90,49 @@ void ConsoleLog::log(LogManager::LogLevel level, const std::string& category,
     }
 }
 
-void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {
+void ConsoleLog::setColorForLevel(LogLevel level) {
 #ifdef WIN32
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     WORD colorIndex = 0;
     switch (level) {
-     case LogManager::LogLevel::Debug:
+     case LogLevel::Debug:
             colorIndex = FOREGROUND_GREEN;
             break;
-        case LogManager::LogLevel::Info:
+        case LogLevel::Info:
             colorIndex = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN;
             break;
-        case LogManager::LogLevel::Warning:
+        case LogLevel::Warning:
             colorIndex = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
             break;
-        case LogManager::LogLevel::Error:
+        case LogLevel::Error:
             colorIndex = FOREGROUND_RED | FOREGROUND_INTENSITY;
             break;
-        case LogManager::LogLevel::Fatal:
+        case LogLevel::Fatal:
             colorIndex = FOREGROUND_RED | FOREGROUND_BLUE| FOREGROUND_INTENSITY;
             break;
-        case LogManager::LogLevel::NoLogging:
+        case LogLevel::NoLogging:
             colorIndex = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN;
             break;
     }
     SetConsoleTextAttribute(hConsole, colorIndex);
 #elif __unix__
     switch (level) {
-        case LogManager::LogLevel::Debug:
+        case LogLevel::Debug:
             _stream << "\033[22;32m";   // green
             break;
-        case LogManager::LogLevel::Info:
+        case LogLevel::Info:
             _stream << "\033[0m";       // white
             break;
-        case LogManager::LogLevel::Warning:
+        case LogLevel::Warning:
             _stream << "\033[01;40;33m";// yellow on black
             break;
-        case LogManager::LogLevel::Error:
+        case LogLevel::Error:
             _stream << "\033[22;31m";   // red
             break;
-        case LogManager::LogLevel::Fatal:
+        case LogLevel::Fatal:
             _stream << "\033[22;35m";   // blue
             break;
-        case LogManager::LogLevel::NoLogging:
+        case LogLevel::NoLogging:
             _stream << "\033[0m";       // white
             break;
     }
@@ -141,22 +142,22 @@ void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {
     bool inDebugger = runningInDebugger();
     if (!inDebugger) {
         switch (level) {
-            case LogManager::LogLevel::Debug:
+            case LogLevel::Debug:
                 _stream << "\033[22;32m";   // green
                 break;
-            case LogManager::LogLevel::Info:
+            case LogLevel::Info:
                 _stream << "\033[0m";       // white
                 break;
-            case LogManager::LogLevel::Warning:
+            case LogLevel::Warning:
                 _stream << "\033[01;40;33m";// yellow on black
                 break;
-            case LogManager::LogLevel::Error:
+            case LogLevel::Error:
                 _stream << "\033[22;31m";   // red
                 break;
-            case LogManager::LogLevel::Fatal:
+            case LogLevel::Fatal:
                 _stream << "\033[22;35m";   // blue
                 break;
-            case LogManager::LogLevel::NoLogging:
+            case LogLevel::NoLogging:
                 _stream << "\033[0m";       // white
                 break;
         }
@@ -165,7 +166,7 @@ void ConsoleLog::setColorForLevel(LogManager::LogLevel level) {
 }
 
 void ConsoleLog::resetColor() {
-    setColorForLevel(LogManager::LogLevel::Info);
+    setColorForLevel(LogLevel::Info);
 }
 
 } // namespace logging

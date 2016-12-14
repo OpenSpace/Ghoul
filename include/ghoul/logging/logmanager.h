@@ -28,6 +28,7 @@
 
 #include <ghoul/designpattern/singleton.h>
 
+#include <ghoul/logging/loglevel.h>
 #include <ghoul/misc/boolean.h>
 
 #include <array>
@@ -45,18 +46,18 @@ class Log;
  * The central singleton class that is responsible for handling Log%s and logging methods.
  * This singleton class provides methods to add new Log%s, remove Log%s, and relay
  * messages to all Log%s added to the LogManager. A log message consists of a
- * LogManager::LogLevel, a category and a message. The category is mainly used as a prefix
+ * LogLevel, a category and a message. The category is mainly used as a prefix
  * and/or grouping within the log files and may have other meanings depending on the
  * specific Log%s. The LogManager instance has to be initialized with the #initialize
  * method and can be accessed using the #ref method afterwards. Initializing an instance
  * twice or accessing an uninitialized LogManager will result in an assertion. The logging
  * is performed thread-safe.
  *
- * The different LogManager::LogLevel available are: LogManager::LogLevel::Debug,
- * LogManager::LogLevel::Info, LogManager::LogLevel::Warning, LogManager::LogLevel::Error,
- * LogManager::LogLevel::Fatal.
- * If a LogManager was created with a LogManager::LogLevel x, all messages with
- * LogManager::LogLevel y <= x will be passed to Log handler.
+ * The different LogLevel available are: LogLevel::Debug,
+ * LogLevel::Info, LogLevel::Warning, LogLevel::Error,
+ * LogLevel::Fatal.
+ * If a LogManager was created with a LogLevel x, all messages with
+ * LogLevel y <= x will be passed to Log handler.
  *
  * Macros are defined to make logging messages easier. These macros are: #LDEBUG,
  * #LDEBUGC, #LINFO, #LINFOC, #LWARNING, #LWARNINGC, #LERROR, #LERRORC, #LFATAL, #LFATALC.
@@ -69,42 +70,8 @@ public:
     using ImmediateFlush = ghoul::Boolean;
 
     /**
-     * Enumerates all available LogLevel for the LogManager. The LogLevels are guaranteed
-     * to be strictly ordered from least important to important.
-     */
-    enum class LogLevel {
-        /**
-         * Used for Debug output; will never be used in release
-         */
-        Debug = 0,
-        /**
-         * Used for informational messages which can be ignored, but might be
-         * informative
-         */
-        Info = 1,
-        /**
-         * Warnings which do not represent a problem in itself, but may hint to a wrong
-         * configuration
-         */
-        Warning = 2,
-        /**
-         * Errors which will pose problems, but do not necessarily require the immediate
-         * end of the application
-         */
-        Error = 3,
-        /**
-         * Error which will be so severe that the application cannot recover from them
-         */
-        Fatal = 4,
-        /**
-         * Used as a placeholder to inhibit all LogMessages
-         */
-        NoLogging = 5
-    };
-
-    /**
-     * Creates and initializes an empty LogManager with the passed LogManager::LogLevel.
-     * \param level The lowest LogManager::LogLevel that will be passed to the containing
+     * Creates and initializes an empty LogManager with the passed LogLevel.
+     * \param level The lowest LogLevel that will be passed to the containing
      * Log%s.
      * \param immediateFlush Determines if all Log%s will be flushed out immediately
      * after a message was received. In the case of file-backed logs, the files will be
@@ -126,7 +93,7 @@ public:
      * \param message The message that will be passed to the Log%s. May contain
      * control sequences.
      */
-    void logMessage(LogManager::LogLevel level, const std::string& category,
+    void logMessage(LogLevel level, const std::string& category,
         const std::string& message);
 
     /**
@@ -138,7 +105,7 @@ public:
      * \param message The message that will be passed to the Log%s. May contain
      * control sequences.
      */
-    void logMessage(LogManager::LogLevel level, const std::string& message);
+    void logMessage(LogLevel level, const std::string& message);
 
     /**
      * Returns the message counter status for the passed LogLevel \p level.
@@ -146,7 +113,7 @@ public:
      * \return The number of messages that have been logged for the passed \p level since
      * creation of the LogManager or the last call to resetCounter
      */
-    int messageCounter(LogManager::LogLevel level);
+    int messageCounter(LogLevel level);
 
     /**
      * Resets the internal log message counting back to 0 for all log levels.
@@ -176,26 +143,12 @@ public:
      */
     void flushLogs();
 
-    /**
-     * Returns the string representation of the passed LogManager::LogLevel. The name of
-     * each level is equal to its enum value.
-     * \return The string representation of the passed LogManager::LogLevel
-     */
-    static std::string stringFromLevel(LogLevel level);
-
-    /**
-     * Returns the LogManager::LogLevel for the passed string representation. The name of
-     * each level is equal to its enum value.
-     * \return The the LogManager::LogLevel for the passed string representation
-     */
-    static LogLevel levelFromString(const std::string& level);
-
 private:
     /// The mutex that is protecting the #logMessage calls
     std::mutex _mutex;
     
     /// The LogLevel
-    LogManager::LogLevel _level;
+    LogLevel _level;
     
     /// Whether all logs should be flushed immediately
     bool _immediateFlush;
@@ -203,8 +156,8 @@ private:
     /// Stores the Logs which are managed by this LogManager
     std::vector<std::shared_ptr<Log>> _logs;
 
-    /// Stores the number of messages for each log level (5)
-    std::array<int, 5> _logCounter;
+    /// Stores the number of messages for each log level (6)
+    std::array<int, 6> _logCounter;
 };
 
 } // namespace logging

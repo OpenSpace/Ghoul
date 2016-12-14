@@ -23,82 +23,67 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifdef __unix__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion-null"
-#endif // __unix__
+#ifndef __GHOUL___LOGLEVEL___H__
+#define __GHOUL___LOGLEVEL___H__
 
-#include "gtest/gtest.h"
+#include <string>
 
-#include <ghoul/cmdparser/cmdparser>
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
+namespace ghoul {
+namespace logging {
 
-#include "tests/test_buffer.inl"
-#include "tests/test_commandlineparser.inl"
-#include "tests/test_common.inl"
-//#include "tests/test_configurationmanager.inl"
-#include "tests/test_dictionary.inl"
-#include "tests/test_filesystem.inl"
-#include "tests/test_luatodictionary.inl"
-#include "tests/test_templatefactory.inl"
-#include "tests/test_threadpool.inl"
-#include "tests/test_crc32.inl"
-#include "tests/test_dictionaryjsonformatter.inl"
+/**
+ * Enumerates all available LogLevel for the LogManager. The LogLevels are guaranteed
+ * to be strictly ordered from least important to important.
+ */
+enum class LogLevel {
+    /**
+     * All log messages are accepted
+     */
+    AllLogging = 0,
+    /**
+     * Used for Debug output; will never be used in release
+     */
+    Debug = 1,
+    /**
+     * Used for informational messages which can be ignored, but might be
+     * informative
+     */
+    Info = 2,
+    /**
+     * Warnings which do not represent a problem in itself, but may hint to a wrong
+     * configuration
+     */
+    Warning = 3,
+    /**
+     * Errors which will pose problems, but do not necessarily require the immediate
+     * end of the application
+     */
+    Error = 4,
+    /**
+     * Error which will be so severe that the application cannot recover from them
+     */
+    Fatal = 5,
+    /**
+     * Used as a placeholder to inhibit all LogMessages
+     */
+    NoLogging = 6
+};
 
-using namespace ghoul::cmdparser;
-using namespace ghoul::filesystem;
-using namespace ghoul::logging;
+/**
+* Returns the string representation of the passed LogLevel. The name of
+* each level is equal to its enum value.
+* \return The string representation of the passed LogLevel
+*/
+std::string stringFromLevel(LogLevel level);
 
-#ifndef GHOUL_ROOT_DIR
-#define GHOUL_ROOT_DIR "../../../ext/ghoul"
-#endif
+/**
+* Returns the LogLevel for the passed string representation. The name of
+* each level is equal to its enum value.
+* \return The the LogLevel for the passed string representation
+*/
+LogLevel levelFromString(const std::string& level);
 
-// #define PRINT_OUTPUT
+} // namespace logging
+} // namespace ghoul
 
-
-int main(int argc, char** argv) {
-    LogManager::initialize(LogLevel::Fatal);
-    LogMgr.addLog(std::make_shared<ConsoleLog>());
-
-    FileSystem::initialize();
-    
-    const std::string root = absPath(GHOUL_ROOT_DIR);
-    const std::string testdir = root + "/tests";
-    const std::string scriptdir = root + "/scripts";
-
-    const bool extDir = FileSys.directoryExists(testdir);
-    if (extDir) {
-        FileSys.registerPathToken("${SCRIPTS_DIR}", scriptdir);
-        FileSys.registerPathToken("${TEST_DIR}", testdir);
-    }
-    else {
-        LFATALC("main", "Fix me");
-        return 0;
-    }
-
-#ifdef PRINT_OUTPUT
-    testing::internal::CaptureStdout();
-    testing::internal::CaptureStderr();
-#endif
-
-    testing::InitGoogleTest(&argc, argv);
-    bool b = RUN_ALL_TESTS();
-
-#ifdef PRINT_OUTPUT
-    std::string output = testing::internal::GetCapturedStdout();
-    std::string error = testing::internal::GetCapturedStderr();
-
-    std::ofstream o("output.txt");
-    o << output;
-
-    std::ofstream e("error.txt");
-    e << error;
-#endif
-
-    return b;
-}
-
-#ifdef __unix__
-#pragma GCC diagnostic pop
-#endif // __unix__
+#endif // __GHOUL___LOGLEVEL___H__

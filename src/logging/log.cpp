@@ -27,16 +27,19 @@
 
 #include <chrono>
 #include <iomanip>
+#include <sstream>
 
 namespace ghoul {
 namespace logging {
 
 Log::Log(TimeStamping timeStamping, DateStamping dateStamping, 
-         CategoryStamping categoryStamping, LogLevelStamping logLevelStamping)
+         CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
+         LogLevel minimumLogLevel)
     : _timeStamping(timeStamping)
     , _dateStamping(dateStamping)
     , _categoryStamping(categoryStamping)
     , _logLevelStamping(logLevelStamping)
+    , _logLevel(minimumLogLevel)
 {}
 
 bool Log::isTimeStamping() const {
@@ -71,6 +74,10 @@ void Log::setLogLevelStamping(LogLevelStamping logLevelStamping) {
     _logLevelStamping = logLevelStamping;
 }
 
+LogLevel Log::logLevel() const {
+    return _logLevel;
+}
+
 std::string Log::getTimeString() const {
     auto now = std::chrono::system_clock::now();
     time_t time = std::chrono::system_clock::to_time_t(now);
@@ -89,7 +96,7 @@ std::string Log::getDateString() const {
     return ss.str();
 }
 
-std::string Log::createFullMessageString(LogManager::LogLevel level,
+std::string Log::createFullMessageString(LogLevel level,
                                          const std::string& category,
                                          const std::string& message) const
 {
@@ -108,7 +115,7 @@ std::string Log::createFullMessageString(LogManager::LogLevel level,
         output += category + " ";
     }
     if (isLogLevelStamping()) {
-        output += "(" + LogManager::stringFromLevel(level) + ")";
+        output += "(" + stringFromLevel(level) + ")";
     }
     if (output != "") {
         output += "\t";

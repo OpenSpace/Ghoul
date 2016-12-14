@@ -78,7 +78,8 @@ public:
         TimeStamping timeStamping = TimeStamping::Yes,
         DateStamping dateStamping = DateStamping::Yes,
         CategoryStamping categoryStamping = CategoryStamping::Yes,
-        LogLevelStamping logLevelStamping = LogLevelStamping::Yes);
+        LogLevelStamping logLevelStamping = LogLevelStamping::Yes,
+        LogLevel minimumLogLevel = LogLevel::AllLogging);
     
     /// Destructor closing and releasing the file handle
     ~TextLog();
@@ -91,7 +92,7 @@ public:
      * individually
      * \param message The message body of the log message
      */
-    virtual void log(LogManager::LogLevel level, const std::string& category,
+    virtual void log(LogLevel level, const std::string& category,
                      const std::string& message);
 
     /// Flushes the text file and, thereby, all messages that are in the associated buffer

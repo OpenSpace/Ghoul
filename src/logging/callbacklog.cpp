@@ -30,12 +30,13 @@ namespace logging {
 
 CallbackLog::CallbackLog(CallbackFunction callbackFunction, TimeStamping timeStamping,
             DateStamping dateStamping, CategoryStamping categoryStamping,
-            LogLevelStamping logLevelStamping)
-    : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
+            LogLevelStamping logLevelStamping,
+            LogLevel logLevel)
+    : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, logLevel)
     , _callbackFunction(std::move(callbackFunction))
 {}
 
-void CallbackLog::log(LogManager::LogLevel level, const std::string& category,
+void CallbackLog::log(LogLevel level, const std::string& category,
                       const std::string& message)
 {
     std::string output;
@@ -53,7 +54,7 @@ void CallbackLog::log(LogManager::LogLevel level, const std::string& category,
         output += category + " ";
     }
     if (isLogLevelStamping()) {
-        output += "(" + LogManager::stringFromLevel(level) + ")";
+        output += "(" + stringFromLevel(level) + ")";
     }
     if (output != "") {
         output += "\t";

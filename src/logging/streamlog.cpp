@@ -30,12 +30,12 @@ namespace logging {
 
 StreamLog::StreamLog(std::ostream& stream, TimeStamping timeStamping,
         DateStamping dateStamping, CategoryStamping categoryStamping,
-        LogLevelStamping logLevelStamping)
-    : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping)
+        LogLevelStamping logLevelStamping, LogLevel logLevel)
+    : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, logLevel)
     , _stream(stream)
 {}
 
-void StreamLog::log(LogManager::LogLevel level, const std::string& category,
+void StreamLog::log(LogLevel level, const std::string& category,
                                                                const std::string& message)
 {
     _stream << createFullMessageString(level, category, message) << std::endl;

@@ -28,6 +28,8 @@
 
 #include <ghoul/logging/textlog.h>
 
+#include <vector>
+
 namespace ghoul {
 namespace logging {
 
@@ -71,8 +73,8 @@ public:
         CategoryStamping categoryStamping = CategoryStamping::Yes,
         LogLevelStamping logLevelStamping = LogLevelStamping::Yes,
         const std::vector<std::string>& cssIncludes = std::vector<std::string>(),
-        const std::vector<std::string>& jsIncludes = std::vector<std::string>()
-        );
+        const std::vector<std::string>& jsIncludes = std::vector<std::string>(),
+        LogLevel minimumLogLevel = LogLevel::AllLogging);
 
     /// Destructor that closes and finalizes the HTML file
     ~HTMLLog();
@@ -85,28 +87,28 @@ public:
      * individually
      * \param message The message body of the log message
      */
-    void log(LogManager::LogLevel level, const std::string& category,
+    void log(LogLevel level, const std::string& category,
         const std::string& message) override;
 
 protected:
     /**
     * Returns a css class string for the passed level
-    * LogManager::LogLevel::Debug -> log-level-debug<br>
-    * LogManager::LogLevel::Info -> log-level-info<br>
-    * LogManager::LogLevel::Warning -> log-level-warning<br>
-    * LogManager::LogLevel::Error -> log-level-error<br>
-    * LogManager::LogLevel::Fatal -> log-level-fatal<br>
+    * LogLevel::Debug -> log-level-debug<br>
+    * LogLevel::Info -> log-level-info<br>
+    * LogLevel::Warning -> log-level-warning<br>
+    * LogLevel::Error -> log-level-error<br>
+    * LogLevel::Fatal -> log-level-fatal<br>
     */
-    static std::string classForLevel(LogManager::LogLevel level);
+    static std::string classForLevel(LogLevel level);
     /**
      * Returns a HTML color string for the passed color.
-     * LogManager::LogLevel::Debug -> Green<br>
-     * LogManager::LogLevel::Info -> Black<br>
-     * LogManager::LogLevel::Warning -> Yellow<br>
-     * LogManager::LogLevel::Error -> Red<br>
-     * LogManager::LogLevel::Fatal -> Cyan<br>
+     * LogLevel::Debug -> Green<br>
+     * LogLevel::Info -> Black<br>
+     * LogLevel::Warning -> Yellow<br>
+     * LogLevel::Error -> Red<br>
+     * LogLevel::Fatal -> Cyan<br>
      */
-    static std::string colorForLevel(LogManager::LogLevel level);
+    static std::string colorForLevel(LogLevel level);
 
 private: 
     bool _customStyling;

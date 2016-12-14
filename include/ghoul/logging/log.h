@@ -27,7 +27,7 @@
 #define __GHOUL___LOG___H__
 
 #include <ghoul/misc/boolean.h>
-#include <ghoul/logging/logmanager.h>
+#include <ghoul/logging/loglevel.h>
 #include <string>
 
 namespace ghoul {
@@ -36,7 +36,7 @@ namespace logging {
 /**
  * Abstract base class for all Log%s that can be added to a LogManager. Base classes must
  * implement the #log and #flush methods. The log message will only be called with
- * LogManager::LogLevel levels which were filtered by the LogManager the Log belongs to.
+ * LogLevel levels which were filtered by the LogManager the Log belongs to.
  * After finishing the #flush method, all previously written log messages should be
  * stored/printed/transmitted even if the program crashes immediately after the logging.
  * All subclasses are usable without a LogManager as well by directly instantiating them.
@@ -64,8 +64,13 @@ public:
      * individually
      * \param message The message body of the log message
      */
-    virtual void log(LogManager::LogLevel level, const std::string& category,
+    virtual void log(LogLevel level, const std::string& category,
         const std::string& message) = 0;
+    
+    /**
+     * Returns the minimum LogLevel that this Log accepts
+     */
+    LogLevel logLevel() const;
 
     /**
      * Flushes the Log. This has different effects on different subclasses, but after this
@@ -84,11 +89,14 @@ protected:
      * the log messages
      * \param logLevelStamping Determines if the log should print the log level in
      * the log messages
+     * \param minimumLogLevel The minimum level for Log messages that are processed by
+     * this Log
      */
     Log(TimeStamping timeStamping = TimeStamping::Yes,
         DateStamping dateStamping = DateStamping::Yes,
         CategoryStamping categoryStamping = CategoryStamping::Yes,
-        LogLevelStamping logLevelStamping = LogLevelStamping::Yes);
+        LogLevelStamping logLevelStamping = LogLevelStamping::Yes,
+        LogLevel minimumLogLevel = LogLevel::AllLogging);
 
     /// Is the log printing the logging time?
     bool isTimeStamping() const;
@@ -113,7 +121,7 @@ protected:
 
     /// Set the log printing of the log level
     void setLogLevelStamping(LogLevelStamping logLevelStamping);
-
+    
     /**
      * Returns the current time as a string. The format for the time is "HH:MM:SS" and the
      * clock is 24h.
@@ -127,7 +135,7 @@ protected:
      */
     std::string getDateString() const;
 
-    std::string createFullMessageString(LogManager::LogLevel level,
+    std::string createFullMessageString(LogLevel level,
         const std::string& category, const std::string& message) const;
 
 private:
@@ -135,6 +143,8 @@ private:
     bool _dateStamping; ///< Is the log printing the date?
     bool _categoryStamping; ///< Is the log printing the category?
     bool _logLevelStamping; ///< Is the log printing the log level?
+
+    LogLevel _logLevel; ///< The minimum allowed log level for this Log
 };
 
 } // namespace logging

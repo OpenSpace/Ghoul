@@ -43,12 +43,12 @@ namespace logging {
  \endverbatim
  * And the remaining possibilities with <code>CATEGORY</code> and <code>LEVEL</code>
  * missing. A parameter in the constructor determines if the output text will be colored
- * according to the LogManager::LogLevel:<br>
- * LogManager::LogLevel::Debug -> Green<br>
- * LogManager::LogLevel::Info -> Default color scheme of the console<br>
- * LogManager::LogLevel::Warning -> Yellow<br>
- * LogManager::LogLevel::Error -> Red<br>
- * LogManager::LogLevel::Fatal -> Cyan<br>
+ * according to the LogLevel:<br>
+ * LogLevel::Debug -> Green<br>
+ * LogLevel::Info -> Default color scheme of the console<br>
+ * LogLevel::Warning -> Yellow<br>
+ * LogLevel::Error -> Red<br>
+ * LogLevel::Fatal -> Cyan<br>
  */
 
 class ConsoleLog : public StreamLog {
@@ -71,7 +71,8 @@ public:
         TimeStamping timeStamping = TimeStamping::No,
         DateStamping dateStamping = DateStamping::No,
         CategoryStamping categoryStamping = CategoryStamping::Yes,
-        LogLevelStamping logLevelStamping = LogLevelStamping::Yes);
+        LogLevelStamping logLevelStamping = LogLevelStamping::Yes,
+        LogLevel minimumLogLevel = LogLevel::AllLogging);
 
     /**
      * Method that logs a message with a given level and category to the console.
@@ -80,21 +81,21 @@ public:
      * individually
      * \param message The message body of the log message
      */
-    void log(LogManager::LogLevel level, const std::string& category,
+    void log(LogLevel level, const std::string& category,
         const std::string& message) override;
 
 protected:
     /**
      * Prepares the console to print the next messages in the color according to the
-     * LogManager::LogLevel:<br>
-     * LogManager::LogLevel::Debug -> Green<br>
-     * LogManager::LogLevel::Info -> Default color scheme of the console<br>
-     * LogManager::LogLevel::Warning -> Yellow<br>
-     * LogManager::LogLevel::Error -> Red<br>
-     * LogManager::LogLevel::Fatal -> Cyan<br>
+     * LogLevel:<br>
+     * LogLevel::Debug -> Green<br>
+     * LogLevel::Info -> Default color scheme of the console<br>
+     * LogLevel::Warning -> Yellow<br>
+     * LogLevel::Error -> Red<br>
+     * LogLevel::Fatal -> Cyan<br>
      * \param level The level that determines the color scheme for the console
      */
-    void setColorForLevel(LogManager::LogLevel level);
+    void setColorForLevel(LogLevel level);
 
     /**
      * Resets the console to the default color scheme (*nix) or the color scheme it had

@@ -23,82 +23,50 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifdef __unix__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion-null"
-#endif // __unix__
+#include <ghoul/logging/loglevel.h>
 
-#include "gtest/gtest.h"
+#include <ghoul/misc/assert.h>
 
-#include <ghoul/cmdparser/cmdparser>
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
+#include <map>
 
-#include "tests/test_buffer.inl"
-#include "tests/test_commandlineparser.inl"
-#include "tests/test_common.inl"
-//#include "tests/test_configurationmanager.inl"
-#include "tests/test_dictionary.inl"
-#include "tests/test_filesystem.inl"
-#include "tests/test_luatodictionary.inl"
-#include "tests/test_templatefactory.inl"
-#include "tests/test_threadpool.inl"
-#include "tests/test_crc32.inl"
-#include "tests/test_dictionaryjsonformatter.inl"
+namespace ghoul {
+namespace logging {
 
-using namespace ghoul::cmdparser;
-using namespace ghoul::filesystem;
-using namespace ghoul::logging;
-
-#ifndef GHOUL_ROOT_DIR
-#define GHOUL_ROOT_DIR "../../../ext/ghoul"
-#endif
-
-// #define PRINT_OUTPUT
-
-
-int main(int argc, char** argv) {
-    LogManager::initialize(LogLevel::Fatal);
-    LogMgr.addLog(std::make_shared<ConsoleLog>());
-
-    FileSystem::initialize();
-    
-    const std::string root = absPath(GHOUL_ROOT_DIR);
-    const std::string testdir = root + "/tests";
-    const std::string scriptdir = root + "/scripts";
-
-    const bool extDir = FileSys.directoryExists(testdir);
-    if (extDir) {
-        FileSys.registerPathToken("${SCRIPTS_DIR}", scriptdir);
-        FileSys.registerPathToken("${TEST_DIR}", testdir);
+std::string stringFromLevel(LogLevel level) {
+    switch (level) {
+        case LogLevel::AllLogging:
+            return "All";
+        case LogLevel::Debug:
+            return "Debug";
+        case LogLevel::Info:
+            return "Info";
+        case LogLevel::Warning:
+            return "Warning";
+        case LogLevel::Error:
+            return "Error";
+        case LogLevel::Fatal:
+            return "Fatal";
+        case LogLevel::NoLogging:
+            return "None";
     }
-    else {
-        LFATALC("main", "Fix me");
-        return 0;
-    }
-
-#ifdef PRINT_OUTPUT
-    testing::internal::CaptureStdout();
-    testing::internal::CaptureStderr();
-#endif
-
-    testing::InitGoogleTest(&argc, argv);
-    bool b = RUN_ALL_TESTS();
-
-#ifdef PRINT_OUTPUT
-    std::string output = testing::internal::GetCapturedStdout();
-    std::string error = testing::internal::GetCapturedStderr();
-
-    std::ofstream o("output.txt");
-    o << output;
-
-    std::ofstream e("error.txt");
-    e << error;
-#endif
-
-    return b;
+    ghoul_assert(false, "Missing case label");
 }
 
-#ifdef __unix__
-#pragma GCC diagnostic pop
-#endif // __unix__
+LogLevel levelFromString(const std::string& level) {
+    static const std::map<std::string, LogLevel> levels = {
+        { "All"    , LogLevel::AllLogging },
+        { "Debug"  , LogLevel::Debug },
+        { "Info"   , LogLevel::Info },
+        { "Warning", LogLevel::Warning },
+        { "Error"  , LogLevel::Error },
+        { "Fatal"  , LogLevel::Fatal },
+        { "None"   , LogLevel::NoLogging }
+    };
+
+    auto it = levels.find(level);
+    ghoul_assert(it != levels.end(), "Missing entry in 'levels' map");
+    return it->second;
+}
+
+} // namespace logging
+} // namespace ghoul
