@@ -39,7 +39,7 @@ std::string DictionaryLuaFormatter::format(const Dictionary& dictionary) const {
     }
 
     auto convert = [this, dictionary](const std::string& key) -> std::string {
-        return key + " = " + formatValue(dictionary, key);
+        return key + "=" + formatValue(dictionary, key);
     };
 
     std::vector<std::string> keys = dictionary.keys();

@@ -45,6 +45,7 @@
 #include "tests/test_threadpool.inl"
 #include "tests/test_crc32.inl"
 #include "tests/test_dictionaryjsonformatter.inl"
+#include "tests/test_dictionaryluaformatter.inl"
 
 using namespace ghoul::cmdparser;
 using namespace ghoul::filesystem;
