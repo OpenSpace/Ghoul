@@ -103,13 +103,12 @@ std::string stackInformation(lua_State* state);
  * creating a new state. It is the callers responsibility to ensure that the passed state
  * is valid if this parameter is not <code>nullptr</code>. After calling this method, the
  * stack of the passed state will be empty after this function returns.
+ * \throws FileNotFoundError If the file does not exist
  * \throws FormattingException If the #ghoul::Dictionary contains mixed keys of both type
  * <code>string</code> and type <code>number</code>
  * \throws FormattingException If the script did not return anything else but a table
  * \throws LuaRuntimeException If there was an error initializing a new Lua state if it 
  * was necessary
- * \pre \p filename must not be empty
- * \pre \p filename must be a path to an existing file
  * \post The \p state%'s stack is empty
  */
 void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dictionary,
@@ -237,9 +236,8 @@ void destroyLuaState(lua_State* state);
  * <code>lua_State</code> \p state.
  * \throw LuaLoadingException If there was an error loading the script
  * \throw LuaExecutionError If there was an error executing the script
+ * \throw FileNotFoundError If the file does not exist
  * \pre \p state must not be nullptr
- * \pre \p filename must not be empty
- * \pre \p filename must be a valid file
  */
 void runScriptFile(lua_State* state, const std::string& filename);
     

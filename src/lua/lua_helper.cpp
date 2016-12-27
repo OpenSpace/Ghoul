@@ -170,29 +170,35 @@ string stackInformation(lua_State* state) {
 void loadDictionaryFromFile(const string& filename, ghoul::Dictionary& dictionary,
                                                                          lua_State* state)
 {
-    ghoul_assert(!filename.empty(), "Filename must not be empty");
-    ghoul_assert(FileSys.fileExists(absPath(filename)), "Filename must be a file");
+    if (filename.empty()) {
+        throw ghoul::FileNotFoundError(filename, "Filename is an empty string");
+    }
+
+    std::string absFilename = absPath(filename);
+    if (!FileSys.fileExists(absFilename)) {
+        throw ghoul::FileNotFoundError(absFilename);
+    }
     
     if (state == nullptr) {
         state = staticLuaState();
     }
 
-    int status = luaL_loadfile(state, absPath(filename).c_str());
+    int status = luaL_loadfile(state, absFilename.c_str());
     if (status != LUA_OK) {
-        throw LuaLoadingException(lua_tostring(state, -1), absPath(filename));
+        throw LuaLoadingException(lua_tostring(state, -1), absFilename);
     }
 
     status = lua_pcall(state, 0, LUA_MULTRET, 0);
     if (status != LUA_OK) {
-        throw LuaExecutionException(lua_tostring(state, -1), absPath(filename));
+        throw LuaExecutionException(lua_tostring(state, -1), absFilename);
     }
 
     if (lua_isnil(state, -1)) {
-        throw LuaFormatException("Script did not return anything", absPath(filename));
+        throw LuaFormatException("Script did not return anything", absFilename);
     }
 
     if (!lua_istable(state, -1)) {
-        throw LuaFormatException("Script did not return a table", absPath(filename));
+        throw LuaFormatException("Script did not return a table", absFilename);
     }
 
     luaDictionaryFromState(state, dictionary);
@@ -359,9 +365,16 @@ void destroyLuaState(lua_State* state) {
     
 void runScriptFile(lua_State* state, const std::string& filename) {
     ghoul_assert(state, "State must not be nullptr");
-    ghoul_assert(!filename.empty(), "Filename must not be empty");
-    ghoul_assert(FileSys.fileExists(absPath(filename)), "Filename must be a file");
     
+    if (filename.empty()) {
+        throw ghoul::FileNotFoundError(filename, "Filename is an empty string");
+    }
+
+    std::string absFilename = absPath(filename);
+    if (!FileSys.fileExists(absFilename)) {
+        throw ghoul::FileNotFoundError(absFilename);
+    }
+
     int status = luaL_loadfile(state, filename.c_str());
     if (status != LUA_OK) {
         throw LuaLoadingException(lua_tostring(state, -1));
