@@ -131,7 +131,7 @@ std::string DictionaryLuaFormatter::formatValue(const Dictionary& dictionary,
     }
 
     throw LuaFormattingError(
-        "Key '" + key + "' has invalid type for formatting dictionary as json"
+        "Key '" + key + "' has invalid type for formatting dictionary as lua"
     );
 }
 

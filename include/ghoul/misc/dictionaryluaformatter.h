@@ -52,10 +52,10 @@ public:
     };
 
     /**
-     * Converts the passed \p dictionary into a JSON string representation.
+     * Converts the passed \p dictionary into a Lua string representation.
      * \param dictionary The Dictionary that should be converted
-     * \return A JSON string representing the Dictionary
-     * \throw JsonFormattingError If the \p key points to a type that cannot be converted
+     * \return A Lua string representing the Dictionary
+     * \throw LuaFormattingError If the \p key points to a type that cannot be converted
      */
     std::string format(const Dictionary& dictionary) const override;
 
@@ -66,8 +66,8 @@ private:
      * \param dictionary The Dictionary from which the \p key should be extracted and
      * converted
      * \param key The key in the Dictionary that should be converted
-     * \return A JSON representation of the \p key's value
-     * \throw JsonFormattingError If the \p key points to a type that cannot be converted
+     * \return A Lua representation of the \p key's value
+     * \throw LuaFormattingError If the \p key points to a type that cannot be converted
      */
     std::string formatValue(const Dictionary& dictionary, const std::string& key) const;
 };
