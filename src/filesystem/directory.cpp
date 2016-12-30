@@ -130,10 +130,10 @@ void Directory::readFiles(vector<string>& result, const string& path,
             string file(findFileData.cFileName);
             const DWORD isDir = findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
             if (!isDir) {
-                result.push_back(path + "/" + file);
+                result.push_back(path + "\\" + file);
             }
             if (recursiveSearch && isDir && file != "." && file != "..") {
-                directories.push(path + "/" + file);
+                directories.push(path + "\\" + file);
             }
         } while (FindNextFile(findHandle, &findFileData) != 0);
     }
