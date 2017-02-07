@@ -59,6 +59,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/logging/textlog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/visualstudiooutputlog.cpp
     ${PROJECT_SOURCE_DIR}/src/lua/lua_helper.cpp
+    ${PROJECT_SOURCE_DIR}/src/lua/luastate.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/any.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/assert.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/buffer.cpp
@@ -155,6 +156,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/visualstudiooutputlog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/ghoul_lua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/lua/luastate.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/any.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/any.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/assert.h
