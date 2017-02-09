@@ -26,7 +26,7 @@
 #ifndef __GHOUL___LUASTATE___H__
 #define __GHOUL___LUASTATE___H__
 
-class lua_State;
+struct lua_State;
 
 namespace ghoul {
 namespace lua {
