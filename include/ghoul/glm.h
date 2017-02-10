@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2015                                                               *
+ * Copyright (c) 2012-2017                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GLM_H__
-#define __GLM_H__
+#ifndef __GHOUL___GLM___H__
+#define __GHOUL___GLM___H__
 
 #ifdef __APPLE__
 // The GLM header throw 'anonymous struct' warnings that we do not want. By marking the following
@@ -529,4 +529,4 @@ std::ostream& operator<<(std::ostream& out, const glm::tmat4x4<T,P>& val) {
 #pragma GCC diagnostic pop
 #endif // __unix__
 
-#endif // __GLM_H__
+#endif // __GHOUL___GLM___H__

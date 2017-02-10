@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __MODELREADERWAVEFRONT_H__
-#define __MODELREADERWAVEFRONT_H__
+#ifndef __GHOUL___MODELREADERWAVEFRONT___H__
+#define __GHOUL___MODELREADERWAVEFRONT___H__
 
 #include <ghoul/io/model/modelreaderbase.h>
 
@@ -56,4 +56,4 @@ public:
 } // namespace io
 } // namespace ghoul
 
-#endif // __MODELREADERWAVEFRONT_H__
+#endif // __GHOUL___MODELREADERWAVEFRONT___H__

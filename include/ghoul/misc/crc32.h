@@ -29,8 +29,8 @@
  * http://www.intel.com/technology/comms/perfnet/download/CRC_generators.pdf             *
  ****************************************************************************************/
 
-#ifndef __CRC32_H__
-#define __CRC32_H__
+#ifndef __GHOUL___CRC32___H__
+#define __GHOUL___CRC32___H__
 
 #include <string>
 
@@ -65,4 +65,4 @@ constexpr unsigned int operator "" _crc32(const char* s, size_t len);
 
 #include "crc32.inl"
 
-#endif // __CRC32_H__
+#endif // __GHOUL___CRC32___H__
