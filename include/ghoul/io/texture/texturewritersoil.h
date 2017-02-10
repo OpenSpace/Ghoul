@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___TEXTUREWRITERDSOIL___H__
-#define __GHOUL___TEXTUREWRITERDSOIL___H__
+#ifndef __GHOUL___TEXTUREWRITERSOIL___H__
+#define __GHOUL___TEXTUREWRITERSOIL___H__
 
 #include <ghoul/io/texture/texturewriterbase.h>
 
@@ -63,4 +63,4 @@ public:
 } // namespace io
 } // namespace ghoul
 
-#endif // __GHOUL___TEXTUREWRITERDSOIL___H__
+#endif // __GHOUL___TEXTUREWRITERSOIL___H__
