@@ -135,4 +135,4 @@ private:
 
 #include "systemcapabilities.inl"
 
-#endif // __SYSTEMCAPABILITIES_H__
+#endif // __GHOUL___SYSTEMCAPABILITIES___H__

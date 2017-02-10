@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __TEXTUREREADERDSOIL_H__
-#define __TEXTUREREADERDSOIL_H__
+#ifndef __TEXTUREREADERSOIL_H__
+#define __TEXTUREREADERSOIL_H__
 
 #include <ghoul/io/texture/texturereaderbase.h>
 

@@ -65,4 +65,4 @@ constexpr unsigned int operator "" _crc32(const char* s, size_t len);
 
 #include "crc32.inl"
 
-#endif
+#endif // __CRC32_H__

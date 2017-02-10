@@ -220,4 +220,4 @@ protected:
 
 #include "commandlinecommand.inl"
 
-#endif  //__GHOUL___COMMANDLINECOMMAND___H__
+#endif // __GHOUL___COMMANDLINECOMMAND___H__

@@ -91,5 +91,5 @@ private:
 
 #include "event.inl"
 
-#endif //__GHOUL___EVENT___H__
+#endif // __GHOUL___EVENT___H__
 
