@@ -56,6 +56,7 @@ if (WIN32)
 endif ()
 option(GHOUL_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
+option(GHOUL_LOGGING_ENABLE_TRACE "Enables the LTRACE macro" ON)
 option(GHOUL_DISABLE_EXTERNAL_WARNINGS "Disable warnings in external libraries" ON)
 
 option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
@@ -157,8 +158,12 @@ elseif (UNIX) # The order is important as UNIX is also true on MacOS
 endif ()
 
 if (GHOUL_HIGH_DEBUG_MODE)
-    target_compile_definitions(Ghoul PRIVATE "GHL_DEBUG")
-endif()
+    target_compile_definitions(Ghoul PUBLIC "GHL_DEBUG")
+endif ()
+
+if (GHOUL_LOGGING_ENABLE_TRACE)
+    target_compile_definitions(Ghoul PUBLIC "GHOUL_LOGGING_ENABLE_TRACE")
+endif ()
 
 #############################
 # Dependencies

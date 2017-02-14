@@ -26,6 +26,16 @@
 #include <iostream>
 #include <sstream>
 
+namespace ghoul {
+namespace logging {
+    
+LogLevel LogManager::logLevel() const {
+    return _level;
+}
+
+} // namespace logging
+} // namespace ghoul
+
 /**
  * @defgroup LOGGING_MACRO_GROUP Logging Macros
  *
@@ -35,20 +45,34 @@
 /// Logs the 'message' with the 'category' at a level of 'logLevel'
 #define LOGC(__loglevel__, __category__, __message__) \
     do { \
-        std::ostringstream __tmp__; __tmp__ << __message__; \
-        if (ghoul::logging::LogManager::isInitialized()) \
-            LogMgr.logMessage( \
-                (__loglevel__), \
-                (__category__), \
-                __tmp__.str() \
-            ); \
-        else { \
+        if (ghoul::logging::LogManager::isInitialized()) { \
+            if (__loglevel__ >= LogMgr.logLevel()) { \
+                std::ostringstream __tmp__; \
+                __tmp__ << __message__; \
+                LogMgr.logMessage( \
+                    (__loglevel__), \
+                    (__category__), \
+                    __tmp__.str() \
+                ); \
+            } \
+        } else { \
+            std::ostringstream __tmp__; \
+            __tmp__ << __message__; \
             std::cout << (__category__) << " (" << \
             ghoul::logging::stringFromLevel(__loglevel__) << \
             ") : " << __tmp__.str() << std::endl; \
         } \
     } while (false)
 
+
+#ifdef GHOUL_LOGGING_ENABLE_TRACE
+/// Logs the 'message' with the 'category' at a level of LogLevel::Trace
+#define LTRACEC(__category__, __message__) \
+LOGC(ghoul::logging::LogLevel::Trace, __category__, __message__)
+#else
+// If we compile without trace, we remove all trace code
+#define LTRACEC(__category, __message)
+#endif
 
 /// Logs the 'message' with the 'category' at a level of LogLevel::Debug
 #define LDEBUGC(__category__, __message__) \
@@ -72,6 +96,12 @@
 
 #define LOG(__loglevel__, __message__) LOGC(__loglevel__, _loggerCat, __message__)
 
+/**
+ * Logs the 'message' with a level of LogLevel::Trace. A variable called
+ * _loggerCat needs to be defined and should contain the category.
+ */
+#define LTRACE(__message__) LTRACEC(_loggerCat, __message__)
+                
 /**
  * Logs the 'message' with a level of LogLevel::Debug. A variable called
  * _loggerCat needs to be defined and should contain the category.

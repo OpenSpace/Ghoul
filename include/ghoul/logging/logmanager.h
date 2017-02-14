@@ -28,6 +28,7 @@
 
 #include <ghoul/designpattern/singleton.h>
 
+#include <ghoul/logging/log.h>
 #include <ghoul/logging/loglevel.h>
 #include <ghoul/misc/boolean.h>
 
@@ -106,6 +107,14 @@ public:
      * control sequences.
      */
     void logMessage(LogLevel level, const std::string& message);
+    
+    /**
+     * Returns the LogLevel that this LogManager has been initialized with. This method is
+     * inlined as it is used in the LOGC macro and it might lead the compiler to do some
+     * optimization for loglevels that are unwanted.
+     * \return The LogLevel that this LogManager has been initialized with
+     */
+    inline LogLevel logLevel() const;
 
     /**
      * Returns the message counter status for the passed LogLevel \p level.
@@ -156,8 +165,8 @@ private:
     /// Stores the Logs which are managed by this LogManager
     std::vector<std::shared_ptr<Log>> _logs;
 
-    /// Stores the number of messages for each log level (6)
-    std::array<int, 6> _logCounter;
+    /// Stores the number of messages for each log level (7)
+    std::array<int, 7> _logCounter;
 };
 
 } // namespace logging
