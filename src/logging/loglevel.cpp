@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2016                                                               *
+ * Copyright (c) 2012-2017                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -36,6 +36,8 @@ std::string stringFromLevel(LogLevel level) {
     switch (level) {
         case LogLevel::AllLogging:
             return "All";
+        case LogLevel::Trace:
+            return "Trace";
         case LogLevel::Debug:
             return "Debug";
         case LogLevel::Info:
@@ -55,6 +57,7 @@ std::string stringFromLevel(LogLevel level) {
 LogLevel levelFromString(const std::string& level) {
     static const std::map<std::string, LogLevel> levels = {
         { "All"    , LogLevel::AllLogging },
+        { "Trace"  , LogLevel::Trace },
         { "Debug"  , LogLevel::Debug },
         { "Info"   , LogLevel::Info },
         { "Warning", LogLevel::Warning },

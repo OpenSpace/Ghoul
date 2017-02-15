@@ -23,20 +23,29 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/io/model/modelreaderbase.h>
+#ifndef __GHOUL___LUASTATE___H__
+#define __GHOUL___LUASTATE___H__
 
-#include <fmt/format.h>
-
-using std::string;
+struct lua_State;
 
 namespace ghoul {
-namespace io {
+namespace lua {
 
-ModelReaderBase::ModelReaderException::ModelReaderException(string file, string error)
-    : RuntimeError(fmt::format("Error reading model '{}': {}", file, error), "IO")
-    , fileName(std::move(file))
-    , errorMessage(std::move(error))
-{}
+class LuaState {
+public:
+    LuaState();
+    ~LuaState();
     
-} // namespace io
-} // namespace ghoul
+    // Conversion operator
+    operator lua_State*() const;
+    
+private:
+    lua_State* _state;
+};
+    
+        
+}  // namespace lua
+}  // namespace ghoul
+
+
+#endif // __GHOUL___LUASTATE___H__

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2016                                                               *
+ * Copyright (c) 2012-2017                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -41,32 +41,36 @@ enum class LogLevel {
      */
     AllLogging = 0,
     /**
-     * Used for Debug output; will never be used in release
+     * Used for high-throughput messages, for example to trace function calls
      */
-    Debug = 1,
+    Trace = 1,
+    /**
+     * Used for Debug output
+     */
+    Debug = 2,
     /**
      * Used for informational messages which can be ignored, but might be
      * informative
      */
-    Info = 2,
+    Info = 3,
     /**
      * Warnings which do not represent a problem in itself, but may hint to a wrong
      * configuration
      */
-    Warning = 3,
+    Warning = 4,
     /**
      * Errors which will pose problems, but do not necessarily require the immediate
      * end of the application
      */
-    Error = 4,
+    Error = 5,
     /**
      * Error which will be so severe that the application cannot recover from them
      */
-    Fatal = 5,
+    Fatal = 6,
     /**
      * Used as a placeholder to inhibit all LogMessages
      */
-    NoLogging = 6
+    NoLogging = 7
 };
 
 /**

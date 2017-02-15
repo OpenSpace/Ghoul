@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2016                                                               *
+ * Copyright (c) 2012-2017                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -92,16 +92,19 @@ public:
 
 protected:
     /**
-    * Returns a css class string for the passed level
-    * LogLevel::Debug -> log-level-debug<br>
-    * LogLevel::Info -> log-level-info<br>
-    * LogLevel::Warning -> log-level-warning<br>
-    * LogLevel::Error -> log-level-error<br>
-    * LogLevel::Fatal -> log-level-fatal<br>
-    */
+     * Returns a css class string for the passed level
+     * LogLevel::Trace -> log-level-trace<br>
+     * LogLevel::Debug -> log-level-debug<br>
+     * LogLevel::Info -> log-level-info<br>
+     * LogLevel::Warning -> log-level-warning<br>
+     * LogLevel::Error -> log-level-error<br>
+     * LogLevel::Fatal -> log-level-fatal<br>
+     */
     static std::string classForLevel(LogLevel level);
+    
     /**
      * Returns a HTML color string for the passed color.
+     * LogLevel::Trace -> Grey<br>
      * LogLevel::Debug -> Green<br>
      * LogLevel::Info -> Black<br>
      * LogLevel::Warning -> Yellow<br>

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2016                                                               *
+ * Copyright (c) 2012-2017                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -29,8 +29,8 @@
  * http://www.intel.com/technology/comms/perfnet/download/CRC_generators.pdf             *
  ****************************************************************************************/
 
-#ifndef __CRC32_H__
-#define __CRC32_H__
+#ifndef __GHOUL___CRC32___H__
+#define __GHOUL___CRC32___H__
 
 #include <string>
 
@@ -65,4 +65,4 @@ constexpr unsigned int operator "" _crc32(const char* s, size_t len);
 
 #include "crc32.inl"
 
-#endif
+#endif // __GHOUL___CRC32___H__

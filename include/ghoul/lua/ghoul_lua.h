@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2016                                                               *
+ * Copyright (c) 2012-2017                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -23,10 +23,10 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___GHOULLUA___H__
-#define __GHOUL___GHOULLUA___H__
+#ifndef __GHOUL___GHOUL_LUA___H__
+#define __GHOUL___GHOUL_LUA___H__
 
 #include <lua.hpp>
 #include <ghoul/lua/lua_helper.h>
 
-#endif // __GHOUL___GHOULLUA___H__
+#endif // __GHOUL___GHOUL_LUA___H__

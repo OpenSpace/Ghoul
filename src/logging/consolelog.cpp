@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2016                                                               *
+ * Copyright (c) 2012-2017                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -95,7 +95,10 @@ void ConsoleLog::setColorForLevel(LogLevel level) {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     WORD colorIndex = 0;
     switch (level) {
-     case LogLevel::Debug:
+        case LogLevel::Trace:
+            colorIndex = FOREGROUND_INTENSITY;
+            break;
+        case LogLevel::Debug:
             colorIndex = FOREGROUND_GREEN;
             break;
         case LogLevel::Info:
@@ -117,6 +120,9 @@ void ConsoleLog::setColorForLevel(LogLevel level) {
     SetConsoleTextAttribute(hConsole, colorIndex);
 #elif __unix__
     switch (level) {
+        case LogLevel::Trace:
+            _stream << "\033[0;37m";    // grey
+            break;
         case LogLevel::Debug:
             _stream << "\033[22;32m";   // green
             break;
@@ -142,6 +148,9 @@ void ConsoleLog::setColorForLevel(LogLevel level) {
     bool inDebugger = runningInDebugger();
     if (!inDebugger) {
         switch (level) {
+            case LogLevel::Trace:
+                _stream << "\033[0;37m";    // grey
+                break;
             case LogLevel::Debug:
                 _stream << "\033[22;32m";   // green
                 break;

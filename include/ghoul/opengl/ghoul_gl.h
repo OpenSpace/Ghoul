@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2016                                                               *
+ * Copyright (c) 2012-2017                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___GHOULGL___H__
-#define __GHOUL___GHOULGL___H__
+#ifndef __GHOUL___GHOUL_GL___H__
+#define __GHOUL___GHOUL_GL___H__
 
 #ifdef __APPLE__
     #define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
@@ -38,4 +38,4 @@
     #include <GL/glu.h>
 #endif
 
-#endif // __GHOUL___GHOULGL___H__
+#endif // __GHOUL___GHOUL_GL___H__

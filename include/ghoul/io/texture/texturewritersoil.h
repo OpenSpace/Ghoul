@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2016                                                               *
+ * Copyright (c) 2012-2017                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___TEXTUREWRITERDSOIL___H__
-#define __GHOUL___TEXTUREWRITERDSOIL___H__
+#ifndef __GHOUL___TEXTUREWRITERSOIL___H__
+#define __GHOUL___TEXTUREWRITERSOIL___H__
 
 #include <ghoul/io/texture/texturewriterbase.h>
 
@@ -63,4 +63,4 @@ public:
 } // namespace io
 } // namespace ghoul
 
-#endif // __GHOUL___TEXTUREWRITERDSOIL___H__
+#endif // __GHOUL___TEXTUREWRITERSOIL___H__

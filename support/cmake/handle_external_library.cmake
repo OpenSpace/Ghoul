@@ -22,6 +22,14 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         #
 #########################################################################################
 
+function(disable_external_warnings library_name)
+    if (MSVC)
+        target_compile_options(${library_name} PUBLIC "/W0")
+    else ()
+        target_compile_options(${library_name} PUBLIC "-w")
+    endif ()
+endfunction ()
+
 # Includes an external library by adding its subdirectory using 'add_subdirectory'
 # target_name: Target to which the library is added
 # library_name: The library that is added by including 'path'
@@ -43,11 +51,7 @@ function (include_external_library target_name library_name path)
             )
         endif ()
         if (GHOUL_DISABLE_EXTERNAL_WARNINGS)
-            if (MSVC)
-                target_compile_options(${library_name} PUBLIC "/W0")
-            else ()
-                target_compile_options(${library_name} PUBLIC "-w")
-            endif ()
+            disable_external_warnings(${library_name})
         endif ()
     endif ()
 endfunction ()
