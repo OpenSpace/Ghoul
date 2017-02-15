@@ -230,10 +230,10 @@ void Texture::applyFilter() {
             break;
         case FilterMode::AnisotropicMipMap:
         {
+            glGenerateMipmap(_type);
             glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(_type, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
-            glGenerateMipmap(_type);
             if (_anisotropyLevel == -1.f) {
                 GLfloat maxTextureAnisotropy = 1.0;
                 glGetFloatv(
