@@ -271,7 +271,7 @@ void GeneralCapabilitiesComponent::detectOS() {
                     _operatingSystem = OperatingSystem::Windows81;
                 }
                 else {
-                    _operatingSystem = OperatingSystem::Windows2012R2;
+                    _operatingSystem = OperatingSystem::WindowsServer2012R2;
                 }
             }
         }
