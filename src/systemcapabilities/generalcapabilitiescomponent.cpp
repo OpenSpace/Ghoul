@@ -47,6 +47,63 @@
     #include <sys/utsname.h>
 #endif
 
+namespace std {
+    std::string to_string(
+        ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem os)
+    {
+        using OS =
+            ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem;
+        switch (os) {
+            case OS::Windows10:
+                return "Windows 10";
+            case OS::WindowsServer2016:
+                return "Windows Server 2016";
+            case OS::WindowsVista:
+                return "Windows Vista";
+            case OS::WindowsServer2008:
+                return "Windows Server 2008";
+            case OS::Windows7:
+                return "Windows 7";
+            case OS::WindowsServer2008R2:
+                return "Windows Server 2008 R2";
+            case OS::Windows8:
+                return "Windows 8";
+            case OS::WindowsServer2012:
+                return "Windows Server 2012";
+            case OS::Windows81:
+                return "Windows 8.1";
+            case OS::WindowsServer2012R2:
+                return "Windows Server 2012 R2";
+            case OS::WindowsServer2003R2:
+                return "Windows Server 2003 R2";
+            case OS::WindowsStorageServer2003:
+                return "Windows Storage Server 2003";
+            case OS::WindowsXPProfx64:
+                return "Windows XP Professional x64";
+            case OS::WindowsServer2003:
+                return "Windows Server 2003";
+            case OS::WindowsXPHome:
+                return "Windows XP Home Edition";
+            case OS::WindowsXPProf:
+                return "Windows XP Professional Edition";
+            case OS::Windows2000Prof:
+                return "Windows 2000 Professional";
+            case OS::Windows2000DatacenterServer:
+                return "Windows 2000 Datacenter Server";
+            case OS::Windows2000AdvancedServer:
+                return "Windows 2000 Advanced Server";
+            case OS::Windows2000Server:
+                return "Windows 2000 Server";
+            case OS::Linux: // @TODO we need more variety here
+                return "Linux";
+            case OS::MacOS:
+                return "MacOS";
+            case OS::Unknown:
+                return "";
+        }
+    }
+} // namespace std
+
 namespace ghoul {
 namespace systemcapabilities {
     
@@ -74,7 +131,9 @@ void GeneralCapabilitiesComponent::detectCapabilities() {
 }
 
 void GeneralCapabilitiesComponent::clearCapabilities() {
-    _operatingSystem = "";
+    _operatingSystem = OperatingSystem::Unknown;
+    _operatingSystemExtra = "";
+    _fullOperatingSystem = "";
     _installedMainMemory = 0;
     _cpu = "";
     _cores = 0;
@@ -167,7 +226,6 @@ void GeneralCapabilitiesComponent::detectOS() {
     if ((osVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) &&
         (osVersionInfo.dwMajorVersion > 4))
     {
-        resultStream << "Microsoft ";
         // From Microsoft:
         // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
         // For applications that have been manifested for Windows 8.1 or Windows 10.
@@ -176,95 +234,89 @@ void GeneralCapabilitiesComponent::detectOS() {
         if (osVersionInfo.dwMajorVersion == 10) {
             if (osVersionInfo.dwMinorVersion == 0) {
                 if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
-                    resultStream << "Windows 10 ";
+                    _operatingSystem = OperatingSystem::Windows10;
                 }
                 else {
-                    resultStream << "Windows Server 2016 ";
+                    _operatingSystem = OperatingSystem::WindowsServer2016;
                 }
             }
         }
         else if (osVersionInfo.dwMajorVersion == 6) {
             if (osVersionInfo.dwMinorVersion == 0) {
                 if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
-                    resultStream << "Windows Vista ";
+                    _operatingSystem = OperatingSystem::WindowsVista;
                 }
                 else {
-                    resultStream << "Windows Server 2008 ";
+                    _operatingSystem = OperatingSystem::WindowsServer2008;
                 }
             }
             else if (osVersionInfo.dwMinorVersion == 1) {
                 if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
-                    resultStream << "Windows 7 ";
+                    _operatingSystem = OperatingSystem::Windows7;
                 }
                 else {
-                    resultStream << "Windows Server 2008 R2 ";
+                    _operatingSystem = OperatingSystem::WindowsServer2008R2;
                 }
             }
             else if (osVersionInfo.dwMinorVersion == 2) {
                 if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
-                    resultStream << "Windows 8 ";
+                    _operatingSystem = OperatingSystem::Windows8;
                 }
                 else {
-                    resultStream << "Windows Server 2012 ";
+                    _operatingSystem = OperatingSystem::WindowsServer2012;
                 }
             }
             else if (osVersionInfo.dwMinorVersion == 3) {
                 if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
-                    resultStream << "Windows 8.1 ";
+                    _operatingSystem = OperatingSystem::Windows81;
                 }
                 else {
-                    resultStream << "Windows Server 2012 R2 ";
+                    _operatingSystem = OperatingSystem::Windows2012R2;
                 }
             }
         }
         else if (osVersionInfo.dwMajorVersion == 5 && osVersionInfo.dwMinorVersion == 2) {
             if (GetSystemMetrics(SM_SERVERR2)) {
-                resultStream << "Windows Server 2003 R2";
+                _operatingSystem = OperatingSystem::WindowsServer2003R2;
             }
             else if (osVersionInfo.wSuiteMask & VER_SUITE_STORAGE_SERVER) {
-                resultStream << "Windows Storage Server 2003";
+                _operatingSystem = OperatingSystem::WindowsStorageServer2003;
             }
             else if (osVersionInfo.wProductType == VER_NT_WORKSTATION &&
                      systemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
             {
-                resultStream << "Windows XP Professional x64 Edition";
+                _operatingSystem = OperatingSystem::WindowsXPProfx64;
             }
             else {
-                resultStream << "Windows Server 2003";
+                _operatingSystem = OperatingSystem::WindowsServer2003;
             }
         }
         else if (osVersionInfo.dwMajorVersion == 5 && osVersionInfo.dwMinorVersion == 1) {
-            resultStream << "Windows XP ";
             if (osVersionInfo.wSuiteMask & VER_SUITE_PERSONAL) {
-                resultStream << "Home Edition";
+                _operatingSystem = OperatingSystem::WindowsXPHome;
             }
             else {
-                resultStream << "Professional";
+                _operatingSystem = OperatingSystem::WindowsXPProf;
             }
         }
         else if (osVersionInfo.dwMajorVersion == 5 && osVersionInfo.dwMinorVersion == 0) {
-            resultStream << "Windows 2000 ";
             if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
-                resultStream << "Professional";
+                _operatingSystem = OperatingSystem::Windows2000Prof;
             }
             else {
                 if (osVersionInfo.wSuiteMask & VER_SUITE_DATACENTER) {
-                    resultStream << "Datacenter Server";
+                    _operatingSystem = OperatingSystem::Windows2000DatacenterServer;
                 }
                 else if (osVersionInfo.wSuiteMask & VER_SUITE_ENTERPRISE) {
-                    resultStream << "Advanced Server";
+                    _operatingSystem = OperatingSystem::Windows2000AdvancedServer;
                 }
                 else {
-                    resultStream << "Server";
+                    _operatingSystem = OperatingSystem::Windows2000Server;
                 }
             }
         }
 
-        if (_tcslen(osVersionInfo.szCSDVersion) > 0) {
-            resultStream << " " << osVersionInfo.szCSDVersion;
-        }
-
-        resultStream << " (build " << osVersionInfo.dwBuildNumber << ")";
+        resultStream << "(build " << osVersionInfo.dwBuildNumber << ")";
         
         if (osVersionInfo.dwMajorVersion >= 6) {
             if (systemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64) {
@@ -279,7 +331,8 @@ void GeneralCapabilitiesComponent::detectOS() {
         resultStream << "OS detection failed. Version of Windows is too old.";
     }
 
-    _operatingSystem = resultStream.str();
+    _operatingSystemExtra = resultStream.str();
+    _fullOperatingSystem = std::to_string(_operatingSystem) + " " + _operatingSystemExtra;
 #else
     utsname name;
     auto res = uname(&name);
@@ -289,11 +342,15 @@ void GeneralCapabilitiesComponent::detectOS() {
             std::to_string(res)
         );
     }
+    
+    
     std::stringstream resultStream;
     resultStream << name.sysname << " " << name.release << " "
         << name.version << " " << name.machine;
 
-    _operatingSystem = resultStream.str();
+    _operatingSystem = OperatingSystem::Unknown;
+    _operatingSystemExtra = resultStream.str();
+    _fullOperatingSystem = _operatingSystemExtra;
 #endif
 }
 
@@ -617,27 +674,33 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
 GeneralCapabilitiesComponent::capabilities() const
 {   
     return {
-        { "Operating System", _operatingSystem, Verbosity::Minimal },
+        { "Operating System", operatingSystemString(), Verbosity::Minimal },
         { "CPU", _cpu, Verbosity::Default },
-        { "Cores", coresAsString(), Verbosity::Default },
-        { "Cache line size", cacheLineSizeAsString(), Verbosity::Full },
-        { "L2 Associativity", L2AssiciativityAsString(), Verbosity::Full },
-        { "Cache size", cacheSizeAsString(), Verbosity::Full },
+        { "Cores", std::to_string(_cores), Verbosity::Default },
+        { "Cache line size", std::to_string(_cacheLineSize), Verbosity::Full },
+        { "L2 Associativity", std::to_string(_L2Associativity), Verbosity::Full },
+        { "Cache size", std::to_string(_cacheSize) + " KB", Verbosity::Full },
         { "Extensions", _extensions,Verbosity::Full },
-        { "Main Memory", installedMainMemoryAsString(), Verbosity::Default }
+        { "Main Memory", std::to_string(_installedMainMemory) + " MB", Verbosity::Default}
     };
 }
 
-const std::string& GeneralCapabilitiesComponent::operatingSystem() const {
+GeneralCapabilitiesComponent::OperatingSystem
+GeneralCapabilitiesComponent::operatingSystem() const
+{
     return _operatingSystem;
+}
+    
+std::string GeneralCapabilitiesComponent::operatingSystemString() const {
+    return std::to_string(_operatingSystem) + " " + _operatingSystemExtra;
+}
+    
+std::string GeneralCapabilitiesComponent::fullOperatingSystem() const {
+    return _fullOperatingSystem;
 }
 
 unsigned int GeneralCapabilitiesComponent::installedMainMemory() const {
     return _installedMainMemory;
-}
-
-std::string GeneralCapabilitiesComponent::installedMainMemoryAsString() const {
-    return std::to_string(_installedMainMemory) + " MB";
 }
 
 unsigned int GeneralCapabilitiesComponent::cores() const {
@@ -654,22 +717,6 @@ unsigned int GeneralCapabilitiesComponent::L2Associativity() const {
 
 unsigned int GeneralCapabilitiesComponent::cacheSize() const {
     return _cacheSize;
-}
-
-std::string GeneralCapabilitiesComponent::coresAsString() const {
-    return std::to_string(_cores);
-}
-
-std::string GeneralCapabilitiesComponent::cacheLineSizeAsString() const {
-    return std::to_string(_cacheLineSize);
-}
-
-std::string GeneralCapabilitiesComponent::L2AssiciativityAsString() const {
-    return std::to_string(_L2Associativity);
-}
-
-std::string GeneralCapabilitiesComponent::cacheSizeAsString() const {
-    return std::to_string(_cacheSize) + " KB";
 }
 
 std::string GeneralCapabilitiesComponent::extensions() const {

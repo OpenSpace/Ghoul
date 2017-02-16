@@ -65,6 +65,33 @@ public:
         explicit MainMemoryError(std::string message);
     };
     
+    /// This enum stores the possible operating systems that can be detected
+    enum class OperatingSystem {
+        Windows10,
+        WindowsServer2016,
+        WindowsVista,
+        WindowsServer2008,
+        Windows7,
+        WindowsServer2008R2,
+        Windows8,
+        WindowsServer2012,
+        Windows81,
+        WindowsServer2012R2,
+        WindowsServer2003R2,
+        WindowsStorageServer2003,
+        WindowsXPProfx64,
+        WindowsServer2003,
+        WindowsXPHome,
+        WindowsXPProf,
+        Windows2000Prof,
+        Windows2000DatacenterServer,
+        Windows2000AdvancedServer,
+        Windows2000Server,
+        Linux, // @TODO we need more variety here
+        MacOS, // @TODO we need more variety here
+        Unknown
+    };
+    
     /**
      * Returns the list of all capabilities that were detected by this
      * SystemCapabilitiesComponent.
@@ -73,12 +100,25 @@ public:
     std::vector<CapabilityInformation> capabilities() const override;
 
     /**
-     * Returns the operating system as a parsed string. The exact format of the returned
-     * string is implementation and operating system-dependent but it should contain the
+     * Returns the operating system version.
+     * \return The operating system version
+     */
+    OperatingSystem operatingSystem() const;
+    
+    /**
+     * Returns the operating system as a parsed string. It should contain the
+     * manufacturer and the version.
+     * \return The operating system
+     */
+    std::string operatingSystemString() const;
+
+    /**
+     * Returns the full operating system. The exact format of the returned string is 
+     * implementation and operating system-dependent but it should contain the 
      * manufacturer and the version.
      * \return The operating system as a parsed string
      */
-    const std::string& operatingSystem() const;
+    std::string fullOperatingSystem() const;
 
     /**
      * Returns the amount of available, installed main memory (RAM) on the system in MB.
@@ -113,41 +153,10 @@ public:
     unsigned int cacheSize() const;
 
     /**
-     * Returns the number of cores as a string
-     * \return The number of cores
-     */
-    std::string coresAsString() const;
-
-    /**
-     * Returns the cache line size as a string
-     * \return The cache line size
-     */
-    std::string cacheLineSizeAsString() const;
-
-    /**
-     * Returns the L2 associativity as a string
-     * \return The L2 associativity
-     */
-    std::string L2AssiciativityAsString() const;
-
-    /**
-     * Returns the cache size in K as a string
-     * \return The cache size
-     */
-    std::string cacheSizeAsString() const;
-
-    /**
      * Returns all supported exteions as commaseparated string
      * \return The extension
      */
     std::string extensions() const;
-
-    /**
-     * Returns the amount of available, installed main memory (as reported by
-     * #installedMainMemory) in a <code>string</code> with an <code>"MB"</code> suffix;
-     * \return The amount of available, installed main memory
-     */
-    std::string installedMainMemoryAsString() const;
 
     /**
      * Returns the <code>CPU</code> string.
@@ -183,7 +192,9 @@ protected:
     void detectCPU();
 
     /// Information about the operating system
-    std::string _operatingSystem = "";
+    OperatingSystem _operatingSystem;
+    std::string _operatingSystemExtra;
+    std::string _fullOperatingSystem;
     
     /// The amount of RAM that is installed
     unsigned int _installedMainMemory = 0;
