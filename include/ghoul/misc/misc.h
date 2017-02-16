@@ -45,6 +45,14 @@ std::vector<std::string> tokenizeString(
     const std::string& input,
     char separator = '.');
 
+/**
+ * Joins the strings located in the \p input using the provided \p separator and returns
+ * the joined list.
+ * \param input The list of strings that will be joined
+ * \param separator The separator that will be used in the joined string
+ */
+std::string join(std::vector<std::string> input, const std::string& separator = ".");
+    
 } // namespace ghoul
 
 #endif // __GHOUL___MISC___H__

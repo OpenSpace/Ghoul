@@ -44,5 +44,14 @@ std::vector<std::string> tokenizeString(const std::string& input, char separator
         return result;
     }
 }
+    
+std::string join(std::vector<std::string> input, const std::string& separator) {
+    std::string result;
+    for (std::string& s : input) {
+        result += std::move(s) + separator;
+    }
+
+    return result.substr(0, result.size() - 1);
+}
 
 } // namespace ghoul
