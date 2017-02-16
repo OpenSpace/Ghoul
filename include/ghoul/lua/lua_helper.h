@@ -219,10 +219,12 @@ std::string luaTypeToString(int type);
 
 /**
  * Creates a new Lua state and initializes it with the default Lua libraries.
+ * \param loadStandardLibraries If \c true, the Lua standard libraries will be loaded into
+ * the newly created state by means of a \c luaL_openlibs call 
  * \return A valid new Lua state initialized with the default Lua libraries
  * \throw LuaRuntimeException If there was an error creating the new Lua state
  */
-lua_State* createNewLuaState();
+lua_State* createNewLuaState(bool loadStandardLibraries = true);
 
 /**
  * Destroys the passed lua state and frees all memory that is associated with it.

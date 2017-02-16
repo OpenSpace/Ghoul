@@ -30,11 +30,9 @@
 namespace ghoul {
 namespace lua {
     
-LuaState::LuaState()
-    : _state(nullptr)
-{
-    _state = ghoul::lua::createNewLuaState();
-}
+LuaState::LuaState(bool includeStandardLibraries)
+    : _state(ghoul::lua::createNewLuaState(includeStandardLibraries))
+{}
     
 LuaState::~LuaState() {
     if (_state) {

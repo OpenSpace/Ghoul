@@ -347,14 +347,16 @@ string luaTypeToString(int type) {
     ghoul_assert(false, "Missing type in switch-case");
 }
 
-lua_State* createNewLuaState() {
+lua_State* createNewLuaState(bool loadStandardLibraries) {
     LDEBUGC("Lua", "Creating Lua state");
     lua_State* s = luaL_newstate();
     if (s == nullptr) {
         throw LuaRuntimeException("Error creating Lua state: Memory allocation");
     }
-    LDEBUGC("Lua", "Open libraries");
-    luaL_openlibs(s);
+    if (loadStandardLibraries) {
+        LDEBUGC("Lua", "Open libraries");
+        luaL_openlibs(s);
+    }
     return s;
 }
 

@@ -31,15 +31,36 @@ struct lua_State;
 namespace ghoul {
 namespace lua {
 
+/**
+ * This class is a thin RAII wrapper around a lua_State pointer as returned by the Lua
+ * library. The constructor will create a new state with optionally registering the
+ * default Lua standard libraries. The destructor will destroy the created state.
+ */
 class LuaState {
 public:
-    LuaState();
+    /**
+     * The constructor will create a new Lua state and optionally fill it with the Lua
+     * standard libraries, if \p includeStandardLibraries is \c true.
+     * \param includeStandardLibraries If \c true, the created Lua state will contain the
+     * set of Lua standard libraries.
+     * \throw LuaRuntimeException If an error occurs during the state creation
+     */
+    explicit LuaState(bool includeStandardLibraries = true);
+    
+    /**
+     * Destroys the created Lua state and frees all the related memory.
+     */
     ~LuaState();
     
-    // Conversion operator
+    /**
+     * Converts this LuaState into a \c lua_State pointer for compatibility with other
+     * parts that might still rely on bare \c lua_State pointers
+     * \return The contained \c lua_State pointer
+     */
     operator lua_State*() const;
     
 private:
+    /// The stored \c lua_State
     lua_State* _state;
 };
     
