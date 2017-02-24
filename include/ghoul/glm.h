@@ -44,6 +44,10 @@
 #define GLM_META_PROG_HELPERS
 #endif // GLM_META_PROG_HELPERS
 
+#ifndef GLM_ENABLE_EXPERIMENTAL
+#define GLM_ENABLE_EXPERIMENTAL
+#endif // GLM_ENABLE_EXPERIMENTAL
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
