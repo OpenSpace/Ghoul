@@ -48,6 +48,10 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #endif // GLM_ENABLE_EXPERIMENTAL
 
+#ifndef GLM_FORCE_CXX14
+#define GLM_FORCE_CXX14
+#endif // GLM_FORCE_CXX14
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
