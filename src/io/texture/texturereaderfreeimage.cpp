@@ -92,8 +92,6 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
         throw TextureLoadException("Memory", "Could not read image", this);
 
     if (colorType == FIC_MINISBLACK || colorType == FIC_PALETTE) {
-        colorType = FIC_RGB;
-
         FIBITMAP* tempImage = dib;
         dib = FreeImage_ConvertTo32Bits(tempImage);
         FreeImage_Unload(tempImage);
