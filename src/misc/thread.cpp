@@ -87,7 +87,7 @@ int convertThreadPriorityClass(ThreadPriorityClass c) {
         case ThreadPriorityClass::High:
             return HIGH_PRIORITY_CLASS;
     }
-#elif __APPLE__
+#elif __APPLE__ || __FreeBSD__
     switch (c) {
         case ThreadPriorityClass::Idle:
             return SCHED_OTHER;
