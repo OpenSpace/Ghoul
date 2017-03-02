@@ -137,20 +137,20 @@ protected:
 TEST_F(TemplateFactoryTest, CorrectnessDirectSublass) {
     factory->registerClass<SubClassDefault>("SubClassDefault");
     
-    BaseClass* obj = factory->create("SubClassDefault");
+    std::unique_ptr<BaseClass> obj = factory->create("SubClassDefault");
     ASSERT_NE(nullptr, obj) << "Creation of SubClassDefault failed";
     
-    SubClassDefault* derived = dynamic_cast<SubClassDefault*>(obj);
+    SubClassDefault* derived = dynamic_cast<SubClassDefault*>(obj.get());
     EXPECT_NE(nullptr, derived) << "Cast to SubClassDefault failed";
 }
 
 TEST_F(TemplateFactoryTest, CorrectnessDeepSubClass) {
     factory->registerClass<SubClassMultipleLayers>("SubClassMultipleLayers");
     
-    BaseClass* obj = factory->create("SubClassMultipleLayers");
+    std::unique_ptr<BaseClass> obj = factory->create("SubClassMultipleLayers");
     ASSERT_NE(nullptr, obj) << "Creation of SubClassMultipleLayers failed";
     
-    SubClassMultipleLayers* derived = dynamic_cast<SubClassMultipleLayers*>(obj);
+    SubClassMultipleLayers* derived = dynamic_cast<SubClassMultipleLayers*>(obj.get());
     EXPECT_NE(nullptr, derived) << "Cast to SubClassMultipleLayers failed";
 }
 
@@ -158,23 +158,23 @@ TEST_F(TemplateFactoryTest, NonInterference) {
     factory->registerClass<SubClassDefault>("SubClassDefault");
     factory->registerClass<SubClassDefault2>("SubClassDefault2");
 
-    BaseClass* obj = factory->create("SubClassDefault");
+    std::unique_ptr<BaseClass> obj = factory->create("SubClassDefault");
     ASSERT_NE(nullptr, obj) << "Creation of SubClassDefault failed";
-    BaseClass* obj2 = factory->create("SubClassDefault2");
+    std::unique_ptr<BaseClass> obj2 = factory->create("SubClassDefault2");
     ASSERT_NE(nullptr, obj2) << "Creation of SubClassDefault2 failed";
     ASSERT_NE(obj, obj2) << "Pointer addresses were equal";
 
-    SubClassDefault* derived = dynamic_cast<SubClassDefault*>(obj);
+    SubClassDefault* derived = dynamic_cast<SubClassDefault*>(obj.get());
     EXPECT_NE(nullptr, derived) << "Cast to SubClassDefault failed";
 
-    SubClassDefault2* derived2 = dynamic_cast<SubClassDefault2*>(obj2);
+    SubClassDefault2* derived2 = dynamic_cast<SubClassDefault2*>(obj2.get());
     EXPECT_NE(nullptr, derived2) << "Cast to SubClassDefault2 failed";
 }
 
 TEST_F(TemplateFactoryTest, DefaultConstructor) {
     factory->registerClass<SubClassDefault>("SubClassDefault");
 
-    BaseClass* obj = factory->create("SubClassDefault");
+    std::unique_ptr<BaseClass> obj = factory->create("SubClassDefault");
     ASSERT_NE(nullptr, obj) << "Creation of SubClassDefault failed";
 
     EXPECT_EQ(1, obj->value1);
@@ -194,7 +194,7 @@ TEST_F(TemplateFactoryTest, DictionaryConstructor) {
     factory->registerClass<SubClassDefault>("SubClassDefault");
 
     ghoul::Dictionary dict = { { "value1", 100 }, { "value2", 200 } };
-    BaseClass* obj = factory->create("SubClassDefault", dict);
+    std::unique_ptr<BaseClass> obj = factory->create("SubClassDefault", dict);
     ASSERT_NE(nullptr, obj) << "Creation of SubClassDefault failed";
 
     EXPECT_EQ(1, obj->value1) << "Value1 was modified";
@@ -205,7 +205,7 @@ TEST_F(TemplateFactoryTest, NoDictionaryConstructorExists) {
     factory->registerClass<SubClassDefault>("SubClassDefault");
 
     ghoul::Dictionary dict = { { "value1", 100 }, { "value2", 200 } };
-    BaseClass* obj = factory->create("SubClassDefault", dict);
+    std::unique_ptr<BaseClass> obj = factory->create("SubClassDefault", dict);
     ASSERT_NE(nullptr, obj) << "Creation of SubClassDefault failed";
 
     EXPECT_EQ(1, obj->value1) << "Value1 was not modified";
@@ -215,7 +215,7 @@ TEST_F(TemplateFactoryTest, NoDictionaryConstructorExists) {
 TEST_F(TemplateFactoryTest, ClassDoesNotExist) {
     factory->registerClass<SubClassDefault>("SubClassDefault");
 
-    BaseClass* obj = factory->create("SubClassDefault");
+    std::unique_ptr<BaseClass> obj = factory->create("SubClassDefault");
     ASSERT_NE(nullptr, obj) << "Creation of SubClassDefault failed";
 
     EXPECT_THROW(
@@ -228,13 +228,13 @@ TEST_F(TemplateFactoryTest, DefaultDictionaryConstructor) {
     //SubClassDefaultDictionary 31 32
     factory->registerClass<SubClassDefaultDictionary>("class");
 
-    BaseClass* obj = factory->create("class");
+    std::unique_ptr<BaseClass> obj = factory->create("class");
     ASSERT_NE(nullptr, obj) << "Creation of SubClassDefaultDictionary failed";
     EXPECT_EQ(31, obj->value1);
     EXPECT_EQ(32, obj->value2);
 
     ghoul::Dictionary dict = { { "value1", 41 }, { "value2", 42 } };
-    BaseClass* obj2 = factory->create("class", dict);
+    std::unique_ptr<BaseClass> obj2 = factory->create("class", dict);
     ASSERT_NE(nullptr, obj2) << "Creation of SubClassDefaultDictionary failed";
     EXPECT_EQ(41, obj2->value1);
     EXPECT_EQ(42, obj2->value2);
@@ -253,10 +253,10 @@ TEST_F(TemplateFactoryTest, CorrectnessForHasClass) {
 TEST_F(TemplateFactoryTest, FunctionPointerConstruction) {
     factory->registerClass("ptr", &createFunctionPointerClass);
 
-    BaseClass* obj = factory->create("ptr");
+    std::unique_ptr<BaseClass> obj = factory->create("ptr");
     EXPECT_EQ(nullptr, obj) << "'useDictionary' was passed wrongly";
 
-    BaseClass* obj2 = factory->create("ptr", {});
+    std::unique_ptr<BaseClass> obj2 = factory->create("ptr", {});
     EXPECT_NE(nullptr, obj2) << "'useDictionary' was passed wrongly";
 }
 
@@ -270,9 +270,9 @@ TEST_F(TemplateFactoryTest, StdFunctionConstruction) {
     };
     factory->registerClass("ptr", function);
 
-    BaseClass* obj = factory->create("ptr");
+    std::unique_ptr<BaseClass> obj = factory->create("ptr");
     EXPECT_EQ(nullptr, obj) << "'useDictionary' was passed wrongly";
 
-    BaseClass* obj2 = factory->create("ptr", {});
+    std::unique_ptr<BaseClass> obj2 = factory->create("ptr", {});
     EXPECT_NE(nullptr, obj2) << "'useDictionary' was passed wrongly";
 }
