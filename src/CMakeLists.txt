@@ -81,6 +81,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/systemcapabilities/openglcapabilitiescomponent.cpp
     ${PROJECT_SOURCE_DIR}/src/systemcapabilities/systemcapabilities.cpp
     ${PROJECT_SOURCE_DIR}/src/systemcapabilities/systemcapabilitiescomponent.cpp
+    ${PROJECT_SOURCE_DIR}/src/systemcapabilities/version.cpp
     ${PROJECT_SOURCE_DIR}/src/ghoul.cpp
 )
 
@@ -191,6 +192,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilitiescomponent.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/version.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/ghoul.h
 )
 

@@ -79,8 +79,8 @@ void OpenGLCapabilitiesComponent::detectCapabilities() {
 }
 
 void OpenGLCapabilitiesComponent::detectGLSLVersion() {
-    glGetIntegerv(GL_MAJOR_VERSION, &(_glVersion._major));
-    glGetIntegerv(GL_MINOR_VERSION, &(_glVersion._minor));
+    glGetIntegerv(GL_MAJOR_VERSION, &(_glVersion.major));
+    glGetIntegerv(GL_MINOR_VERSION, &(_glVersion.minor));
 }
 
 void OpenGLCapabilitiesComponent::detectGPUVendor() {
@@ -126,9 +126,9 @@ void OpenGLCapabilitiesComponent::detectExtensions() {
 }
 
 void OpenGLCapabilitiesComponent::detectGLEWVersion() {
-    _glewVersion._major = GLEW_VERSION_MAJOR;
-    _glewVersion._minor = GLEW_VERSION_MINOR;
-    _glewVersion._release = GLEW_VERSION_MICRO;
+    _glewVersion.major = GLEW_VERSION_MAJOR;
+    _glewVersion.minor = GLEW_VERSION_MINOR;
+    _glewVersion.release = GLEW_VERSION_MICRO;
 }
 
 void OpenGLCapabilitiesComponent::detectDriverInformation() {
@@ -154,16 +154,12 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
 }
 
 void OpenGLCapabilitiesComponent::clearCapabilities() {
-    _glVersion._major = 0;
-    _glVersion._minor = 0;
-    _glVersion._release = 0;
+    _glVersion = { 0, 0, 0 };
     _glslCompiler.clear();
     _vendor = Vendor::Other;
     _glRenderer = "";
     _extensions.clear();
-    _glewVersion._major = 0;
-    _glewVersion._minor = 0;
-    _glewVersion._release = 0;
+    _glewVersion = { 0, 0, 0 };
 
     _maxTextureSize = -1;
     _maxTextureSize3D = -1;
@@ -181,11 +177,11 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
     OpenGLCapabilitiesComponent::capabilities() const
 {
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
-    result.push_back({ "OpenGL Version", _glVersion.toString(), Verbosity::Minimal });
+    result.push_back({ "OpenGL Version", std::to_string(_glVersion), Verbosity::Minimal });
     result.push_back({ "OpenGL Compiler", _glslCompiler, Verbosity::Minimal });
     result.push_back({ "OpenGL Renderer", _glRenderer, Verbosity::Minimal });
     result.push_back({"GPU Vendor", gpuVendorString(), Verbosity::Minimal });
-    result.push_back({"GLEW Version", _glewVersion.toString(),Verbosity::Minimal });     
+    result.push_back({"GLEW Version", std::to_string(_glewVersion),Verbosity::Minimal });     
 #ifdef GHOUL_USE_WMI
     result.push_back({ "GPU Name", _adapterName, Verbosity::Minimal });
     result.push_back({ "GPU Driver Version", _driverVersion, Verbosity::Minimal });
@@ -221,7 +217,7 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
     return result;
 }
 
-OpenGLCapabilitiesComponent::Version OpenGLCapabilitiesComponent::openGLVersion() const {
+Version OpenGLCapabilitiesComponent::openGLVersion() const {
     return _glVersion;
 }
 
@@ -282,64 +278,6 @@ std::string OpenGLCapabilitiesComponent::gpuVendorString() const {
 
 std::string OpenGLCapabilitiesComponent::name() const {
     return "OpenGL";
-}
-
-/////////////////////////////
-/// OpenGLVersion
-/////////////////////////////
-
-unsigned int packVersion(int major, int minor, int release) {
-    // safe since: 2^8 * 1000 * 1000 < 2^32
-    return
-        major * 1000 * 1000 +
-        minor * 1000        +
-        release;
-}
-
-bool OpenGLCapabilitiesComponent::Version::operator==(const Version& rhs) const {
-    return (_major == rhs._major) && (_minor == rhs._minor) && (_release == rhs._release);
-}
-
-bool OpenGLCapabilitiesComponent::Version::operator!=(const Version& rhs) const {
-    return !(*this == rhs);
-}
-
-bool OpenGLCapabilitiesComponent::Version::operator<(const Version& rhs) const {
-    const unsigned int numThis = packVersion(_major, _minor, _release);
-    const unsigned int numRhs = packVersion(rhs._major, rhs._minor, rhs._release);
-
-    return numThis < numRhs;
-}
-
-bool OpenGLCapabilitiesComponent::Version::operator<=(const Version& rhs) const {
-    const unsigned int numThis = packVersion(_major, _minor, _release);
-    const unsigned int numRhs = packVersion(rhs._major, rhs._minor, rhs._release);
-
-    return numThis <= numRhs;
-}
-
-bool OpenGLCapabilitiesComponent::Version::operator>(const Version& rhs) const {
-    const unsigned int numThis = packVersion(_major, _minor, _release);
-    const unsigned int numRhs = packVersion(rhs._major, rhs._minor, rhs._release);
-
-    return numThis > numRhs;
-}
-
-bool OpenGLCapabilitiesComponent::Version::operator>=(const Version& rhs) const {
-    const unsigned int numThis = packVersion(_major, _minor, _release);
-    const unsigned int numRhs = packVersion(rhs._major, rhs._minor, rhs._release);
-
-    return numThis >= numRhs;
-}
-
-std::string OpenGLCapabilitiesComponent::Version::toString() const {
-    using std::to_string;
-    if (_release != 0) {
-        return to_string(_major) + "." + to_string(_minor) + "." + to_string(_release);
-    }
-    else {
-        return to_string(_major) + "." + to_string(_minor);
-    }
 }
 
 } // namespace ghoul

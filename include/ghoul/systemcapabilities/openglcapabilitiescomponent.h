@@ -30,6 +30,7 @@
 
 #include <ghoul/misc/exception.h>
 #include <ghoul/systemcapabilities/systemcapabilities.h>
+#include <ghoul/systemcapabilities/version.h>
 
 #include <string>
 #include <vector>
@@ -53,71 +54,6 @@ public:
         explicit GPUVendorError(std::string message);
     };
     
-    /**
-     * This struct stores the detected version of the GLSL driver
-     */
-    struct Version {
-        /**
-         * Returns the stored GLSL version in the format <code>major.minor.release</code>.
-         * \return The GLSL version as a string
-         */
-        std::string toString() const;
-
-        /**
-         * Returns <code>true</code>, if major, minor, and release version parts are the
-         * same.
-         * \return <code>True</code> if both versions are the same
-         */
-        bool operator==(const Version& rhs) const;
-
-        /**
-         * Returns <code>true</code>, if major, minor, or release version parts are
-         * different.
-         * \return <code>True</code> if either major, minor, or release version is
-         * different
-         */
-        bool operator!=(const Version& rhs) const;
-
-        /**
-         * First compares major version against major version, then minor against minor
-         * and finally release against release.
-         * \return <code>True</code> if <code>this</code> is a smaller version than
-         * <code>rhs</code>
-         */
-        bool operator<(const Version& rhs) const;
-
-        /**
-         * First compares major version against major version, then minor against minor
-         * and finally release against release.
-         * \return <code>True</code> if <code>this</code> is a smaller or equal version
-         * than <code>rhs</code>
-         */
-        bool operator<=(const Version& rhs) const;
-
-        /**
-         * First compares major version against major version, then minor against minor
-         * and finally release against release.
-         * \return <code>True</code> if <code>this</code> is a greater version than
-         * <code>rhs</code>
-         */
-        bool operator>(const Version& rhs) const;
-
-        /**
-         * First compares major version against major version, then minor against minor
-         * and finally release against release.
-         * \return <code>True</code> if <code>this</code> is a greater or equal version
-         * than <code>rhs</code>
-         */
-        bool operator>=(const Version& rhs) const;
-
-        /// The <code>major</code> part of the version
-        int _major;
-        /// The <code>minor</code> part of the version
-        int _minor;
-        /// The <code>release</code> part of the version
-        int _release;
-    };
-
     /// This enum stores the possible vendors of graphics cards that can be detected
     enum class Vendor {
         Nvidia, ///< Nvidia
