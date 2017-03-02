@@ -26,7 +26,7 @@
 #include <ghoul/misc/dictionaryluaformatter.h>
 #include <ghoul/misc/dictionary.h>
 
-#include <glm/glm.hpp>
+#include <ghoul/glm.h>
 
 #include <numeric>
 #include <string>
