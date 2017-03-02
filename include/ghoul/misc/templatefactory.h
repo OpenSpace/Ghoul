@@ -30,6 +30,7 @@
 
 #include <functional>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -133,7 +134,7 @@ public:
      * not have a default constructor
      * \pre \p className must not be empty
      */
-    BaseClass* create(const std::string& className) const;
+    std::unique_ptr<BaseClass> create(const std::string& className) const;
 
     /**
      * Creates an instance of the class which was registered under the provided
@@ -151,7 +152,8 @@ public:
      * not have a constructor using a Dictionary object
      * \pre \p className must not be empty
      */
-    BaseClass* create(const std::string& className, const Dictionary& dictionary) const;
+    std::unique_ptr<BaseClass> create(const std::string& className,
+        const Dictionary& dictionary) const;
 
     /**
      * Registers a <code>Class</code> with the provided \p className so that it can later

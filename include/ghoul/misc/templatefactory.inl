@@ -72,10 +72,12 @@ BaseClass* createDefault(bool useDictionary, const Dictionary& dict) {
 // Create Class using the default constructor or the Dictionary
 template <typename BaseClass, typename Class>
 BaseClass* createDefaultAndDictionary(bool useDictionary, const Dictionary& dict) {
-    if (useDictionary)
+    if (useDictionary) {
         return new Class(dict);
-    else
+    }
+    else {
         return new Class;
+    }
 }
 
 // Create Class using only the Dictionary constructor
@@ -124,31 +126,38 @@ struct CreateHelper<BaseClass, Class, DICTIONARY_CONSTRUCTOR> {
 } // namespace
 
 template <typename BaseClass>
-BaseClass* TemplateFactory<BaseClass>::create(const std::string& className) const {
+std::unique_ptr<BaseClass> TemplateFactory<BaseClass>::create(
+                                                       const std::string& className) const
+{
     ghoul_assert(!className.empty(), "Classname must not be empty");
     
     auto it = _map.find(className);
-    if (it == _map.end())
+    if (it == _map.end()) {
         throw TemplateClassNotFoundError(className);
-    else
+    }
+    else {
         // If 'className' is a valid name, we can use the stored function pointer to
         // create the class using the 'createType' method
-        return it->second(false, {});
+        return std::unique_ptr<BaseClass>(it->second(false, {}));
+    }
 }
 
 template <typename BaseClass>
-BaseClass* TemplateFactory<BaseClass>::create(const std::string& className,
-                                              const Dictionary& dictionary) const
+std::unique_ptr<BaseClass> TemplateFactory<BaseClass>::create(
+                                                             const std::string& className,
+                                                       const Dictionary& dictionary) const
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
 
     auto it = _map.find(className);
-    if (it == _map.end())
+    if (it == _map.end()) {
         throw TemplateClassNotFoundError(className);
-    else
+    }
+    else {
         // If 'className' is a valid name, we can use the stored function pointer to
         // create the class using the 'createType' method
-        return it->second(true, dictionary);
+        return std::unique_ptr<BaseClass>(it->second(true, dictionary));
+    }
 }
 
 template <typename BaseClass>
@@ -198,10 +207,12 @@ void TemplateFactory<BaseClass>::registerClass(std::string className,
     ghoul_assert(!className.empty(), "Classname must not be empty");
     ghoul_assert(factoryFunction != nullptr, "Factory function must not be nullptr");
 
-    if (_map.find(className) != _map.end())
+    if (_map.find(className) != _map.end()) {
         throw TemplateFactoryError("Class '" + className + "' was registered before");
-    else
+    }
+    else {
         _map.emplace(std::move(className), std::move(factoryFunction));
+    }
 }
 
 template <typename BaseClass>
@@ -215,8 +226,9 @@ template <typename BaseClass>
 std::vector<std::string> TemplateFactory<BaseClass>::registeredClasses() const {
     std::vector<std::string> result;
     result.reserve(_map.size());
-    for (const auto& it : _map)
+    for (const auto& it : _map) {
         result.push_back(it.first);
+    }
     return result;
 }
 
