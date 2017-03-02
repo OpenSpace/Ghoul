@@ -50,17 +50,21 @@ struct Boolean {
         No = 0
     };
    
-    // Non-explicit constructor so that we c
-    Boolean(Value v) : value(v) {}
-    
-    Value value;
+    /// Non-explicit constructor so that we can automatically convert between different
+    /// aliases of Boolean
+    constexpr Boolean(Value v) : value(v) {}
+
+    /// Explicit constructor to convert from \c bool into Boolean
+    constexpr explicit Boolean(bool v) : value(v ? Yes : No) {}
     
     /**
      * This operator returns <code>true</code> if the stored value is equal to
      * <code>Yes</code>.
      */
-    operator bool() { return value == Yes; };
-    operator bool() const { return value == Yes; };
+    operator bool() { return value == Yes; }
+    constexpr operator bool() const { return value == Yes; }
+
+    Value value;
 };
     
 } // namespace ghoul
