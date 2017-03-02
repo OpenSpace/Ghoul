@@ -26,12 +26,14 @@
 #ifndef __GHOUL___LUA_HELPER___H__
 #define __GHOUL___LUA_HELPER___H__
 
-#include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
 
 struct lua_State;
 
 namespace ghoul {
+
+class Dictionary;
+
 namespace lua {
 
 struct LuaRuntimeException : public RuntimeError {
