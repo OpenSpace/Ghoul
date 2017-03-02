@@ -95,7 +95,7 @@ public:
      * \return <code>true</code> if unknown command-line arguments are allowed by this
      * CommandlineParser; <code>false</code> otherwise
      */
-    bool allowsUnknownCommands() const;
+    AllowUnknownCommands allowsUnknownCommands() const;
 
     /**
      * Sets the command-line given from the main function.
@@ -240,7 +240,7 @@ protected:
     std::string _programName;
     
     /// Should the CommandlineParser allow unknown commands or throw an error in that case
-    bool _allowUnknownCommands;
+    AllowUnknownCommands _allowUnknownCommands;
     
     /// Short version of the command to request help information
     std::string _shortHelpCommand;

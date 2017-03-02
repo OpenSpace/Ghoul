@@ -31,21 +31,18 @@ namespace ghoul {
 namespace cmdparser {
     
 CommandlineCommand::CommandExecutionException::CommandExecutionException(
-                                                                 const std::string& msg)
+                                                                   const std::string& msg)
     : RuntimeError(msg, "Command")
 {}
     
 CommandlineCommand::CommandParameterException::CommandParameterException(
-                                                                 const std::string& msg)
+                                                                   const std::string& msg)
     : RuntimeError(msg, "Command")
 {}
 
-CommandlineCommand::CommandlineCommand(std::string name,
-                                       std::string shortName,
-                                       std::string infoText,
-                                       std::string parameterList,
-                                       int argumentNum,
-                                       MultipleCalls allowMultipleCalls)
+CommandlineCommand::CommandlineCommand(std::string name, std::string shortName,
+                                       std::string infoText, std::string parameterList,
+                                       int argumentNum, MultipleCalls allowMultipleCalls)
     : _name(std::move(name))
     , _shortName(std::move(shortName))
     , _infoText(std::move(infoText))
@@ -80,7 +77,7 @@ int CommandlineCommand::argumentNumber() const {
     return _argumentNum;
 }
 
-bool CommandlineCommand::allowsMultipleCalls() const {
+CommandlineCommand::MultipleCalls CommandlineCommand::allowsMultipleCalls() const {
     return _allowsMultipleCalls;
 }
 

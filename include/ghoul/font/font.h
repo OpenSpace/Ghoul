@@ -346,7 +346,7 @@ private:
     float _height;
     
     /// Whether this Font has an outline or not
-    bool _hasOutline;
+    Outline _hasOutline;
     
     /// The thickness of the outline
     float _outlineThickness;

@@ -37,7 +37,7 @@ namespace logging {
 LogManager::LogManager(LogLevel level, ImmediateFlush immediateFlush)
     : _level(level)
     , _immediateFlush(immediateFlush)
-    , _logCounter({0, 0, 0, 0, 0})
+    , _logCounter({0, 0, 0, 0, 0, 0, 0})
 {}
 
 void LogManager::addLog(std::shared_ptr<Log> log) {

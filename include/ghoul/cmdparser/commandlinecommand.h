@@ -93,9 +93,8 @@ public:
      * \pre If the \p shortName is not empty, it must start with a '-'
      */
     CommandlineCommand(std::string name, std::string shortName = "",
-                       std::string infoText = "", std::string parameterList = "",
-                       int argumentNum = 1,
-                       MultipleCalls allowMultipleCalls = MultipleCalls::No);
+        std::string infoText = "", std::string parameterList = "", int argumentNum = 1,
+        MultipleCalls allowMultipleCalls = MultipleCalls::No);
     
     virtual ~CommandlineCommand() = default;
 
@@ -134,7 +133,7 @@ public:
      * Returns if the command can be called more than once in a single command line
      * \return If the command can be called more than once in a single command line
      */
-    bool allowsMultipleCalls() const;
+    MultipleCalls allowsMultipleCalls() const;
 
     /**
      * Executes this command with the given parameters. Each subclass must implement this
@@ -212,7 +211,7 @@ protected:
     /// Stores the number of arguments this command accepts
     int _argumentNum;
     /// Stores, if the command can be called multiple times in a single command line
-    bool _allowsMultipleCalls;
+    MultipleCalls _allowsMultipleCalls;
 };
 
 }  // namespace cmdparser

@@ -160,7 +160,7 @@ private:
     LogLevel _level;
     
     /// Whether all logs should be flushed immediately
-    bool _immediateFlush;
+    ImmediateFlush _immediateFlush;
     
     /// Stores the Logs which are managed by this LogManager
     std::vector<std::shared_ptr<Log>> _logs;

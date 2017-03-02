@@ -139,10 +139,10 @@ protected:
         const std::string& category, const std::string& message) const;
 
 private:
-    bool _timeStamping; ///< Is the log printing the time?
-    bool _dateStamping; ///< Is the log printing the date?
-    bool _categoryStamping; ///< Is the log printing the category?
-    bool _logLevelStamping; ///< Is the log printing the log level?
+    TimeStamping _timeStamping; ///< Is the log printing the time?
+    DateStamping _dateStamping; ///< Is the log printing the date?
+    CategoryStamping _categoryStamping; ///< Is the log printing the category?
+    LogLevelStamping _logLevelStamping; ///< Is the log printing the log level?
 
     LogLevel _logLevel; ///< The minimum allowed log level for this Log
 };

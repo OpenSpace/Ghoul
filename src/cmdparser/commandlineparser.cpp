@@ -103,7 +103,7 @@ void CommandlineParser::setAllowUnknownCommands(AllowUnknownCommands unknownComm
     _allowUnknownCommands = unknownCommands;
 }
 
-bool CommandlineParser::allowsUnknownCommands() const {
+CommandlineParser::AllowUnknownCommands CommandlineParser::allowsUnknownCommands() const {
     return _allowUnknownCommands;
 }
 
