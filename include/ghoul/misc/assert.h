@@ -27,7 +27,6 @@
 #define __GHOUL___ASSERT___H__
 
 #include <string>
-#include <sstream>
 
 namespace ghoul {
 
@@ -37,7 +36,7 @@ namespace ghoul {
  */
 struct AssertionException : public std::runtime_error {
     explicit AssertionException(std::string expression, std::string message,
-                                std::string file, std::string function, int line);
+        std::string file, std::string function, int line);
 };
 
 /**
@@ -85,11 +84,9 @@ void internal_assert(std::string expression, std::string message, std::string fi
 #define ghoul_assert(__condition__, __message__)                                         \
     do {                                                                                 \
         if (!(__condition__)) {                                                          \
-            std::ostringstream oss;                                                      \
-            oss << __message__;                                                          \
             throw ghoul::AssertionException(                                             \
                 #__condition__,                                                          \
-                oss.str(),                                                               \
+                __message__,                                                             \
                 __FILE__,                                                                \
                 GHL_ASSERT_FUNCTION,                                                     \
                 __LINE__                                                                 \
@@ -100,11 +97,9 @@ void internal_assert(std::string expression, std::string message, std::string fi
 #define ghoul_assert(__condition__, __message__)                                         \
     do {                                                                                 \
         if (!(__condition__)) {                                                          \
-            std::ostringstream oss;                                                      \
-            oss << __message__;                                                          \
             ghoul::internal_assert(                                                      \
                 #__condition__,                                                          \
-                oss.str(),                                                               \
+                __message__,                                                             \
                 __FILE__,                                                                \
                 GHL_ASSERT_FUNCTION,                                                     \
                 __LINE__                                                                 \

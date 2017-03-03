@@ -57,7 +57,10 @@ public:
      */
     template <typename... Args>
     static void initialize(Args... args) {
-        ghoul_assert(!isInitialized(), typeid(T).name() << " is already initialized!");
+        ghoul_assert(
+            !isInitialized(),
+            std::string(typeid(T).name()) + " is already initialized!"
+        );
         _instance = new T(std::forward<Args>(args)...);
     }
     
@@ -66,7 +69,10 @@ public:
      * \pre The singleton must have been initialized before
      */
     static void deinitialize() {
-        ghoul_assert(isInitialized(), typeid(T).name() << " is not initialized!");
+        ghoul_assert(
+            isInitialized(),
+            std::string(typeid(T).name()) + " is not initialized!"
+        );
         delete _instance;
         _instance = nullptr;
     }
@@ -85,7 +91,10 @@ public:
      * \pre The singleton must have been initialized before
      */
     static T& ref() {
-        ghoul_assert(isInitialized(), typeid(T).name() << " is not initialized!");
+        ghoul_assert(
+            isInitialized(),
+            std::string(typeid(T).name()) + " is not initialized!"
+        );
         return *_instance;
     }
 
