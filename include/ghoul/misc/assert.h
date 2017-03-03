@@ -27,6 +27,7 @@
 #define __GHOUL___ASSERT___H__
 
 #include <string>
+#include <stdexcept>
 
 namespace ghoul {
 
