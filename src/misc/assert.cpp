@@ -64,43 +64,47 @@ AssertionException::AssertionException(std::string exp, std::string msg,
 void internal_assert(std::string expression, std::string message, std::string file,
                                                            std::string function, int line)
 {
-    if (isPermanentlyIgnored(file, line))
-        return;
-    
-    const std::string padding = "    ";
+    if (!isPermanentlyIgnored(file, line)) {
+        const std::string padding = "    ";
 
-    std::cerr << std::endl
-        << padding << "File:       " << file << ", line " << line << std::endl
-        << padding << "Function:   " << function << std::endl
-        << padding << "Assertion:  " << expression
-        << padding << message        << std::endl;
+        std::cerr << std::endl
+            << padding << "File:       " << file << ", line " << line << std::endl
+            << padding << "Function:   " << function << std::endl
+            << padding << "Assertion:  " << expression
+            << padding << message << std::endl;
 
-    while (true) {
-        std::cerr << "(I)gnore / Ignore (P)ermanently / (A)ssertionException / (E)xit: ";
-        std::string inputLine;
-        std::getline(std::cin, inputLine);
+        while (true) {
+            std::cerr << "(I)gnore / Ignore (P)ermanently / (A)ssert/ (E)xit: ";
+            std::string inputLine;
+            std::getline(std::cin, inputLine);
 
-        // Transform to lower case
-        std::transform(inputLine.begin(), inputLine.end(), inputLine.begin(), ::tolower);
-
-        if (inputLine == "i") {
-            break;
-        }
-        else if (inputLine == "p") {
-            addPermanentlyIgnoredAssert(file, line);
-            break;
-        }
-        else if (inputLine == "a") {
-            throw AssertionException(
-                std::move(expression),
-                std::move(message),
-                std::move(file),
-                std::move(function),
-                line
+            // Transform to lower case
+            std::transform(
+                inputLine.begin(),
+                inputLine.end(),
+                inputLine.begin(),
+                ::tolower
             );
-        }
-        else if (inputLine == "e") {
-            exit(EXIT_FAILURE);
+
+            if (inputLine == "i") {
+                break;
+            }
+            else if (inputLine == "p") {
+                addPermanentlyIgnoredAssert(file, line);
+                break;
+            }
+            else if (inputLine == "a") {
+                throw AssertionException(
+                    std::move(expression),
+                    std::move(message),
+                    std::move(file),
+                    std::move(function),
+                    line
+                );
+            }
+            else if (inputLine == "e") {
+                exit(EXIT_FAILURE);
+            }
         }
     }
 }

@@ -241,7 +241,7 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
     FT_Done_FreeType(library);
     
     // -1 is a special glyph
-    glyph(-1);
+    glyph(static_cast<wchar_t>(-1));
 }
 
 std::string Font::name() const {
@@ -431,9 +431,10 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
     FT_Face face = nullptr;
     loadFace(_name, _pointSize, library, face);
 
-    for (size_t i = 0; i < characters.size(); ++i) {
+    for (wchar_t charcode : characters) {
+    //for (size_t ss = 0; i < characters.size(); ++i) {
         // Search through the loaded glyphs to avoid duplicates
-        wchar_t charcode = characters[i];
+        //wchar_t charcode = characters[i];
         auto it = std::find_if(
             _glyphs.begin(),
             _glyphs.end(),
@@ -496,7 +497,7 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             HandleError(error);
             
             FT_BitmapGlyph outlineBitmap = reinterpret_cast<FT_BitmapGlyph>(outlineGlyph);
-            topBearing  = outlineBitmap->top;
+            topBearing  = static_cast<float>(outlineBitmap->top);
             leftBearing = computeLeftBearing(charcode);
             
             width = outlineBitmap->bitmap.width / atlasDepth;

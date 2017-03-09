@@ -158,8 +158,8 @@ void Directory::readFiles(vector<string>& result, const string& path,
     }
 #endif
     while (!directories.empty()) {
-        const string& directory = directories.top();
-        readFiles(result, directory, recursiveSearch);
+        const string& d = directories.top();
+        readFiles(result, d, recursiveSearch);
         directories.pop();
     }
 }
@@ -214,8 +214,8 @@ void Directory::readDirectories(vector<string>& result, const string& path,
     }
 #endif
     while (!directories.empty()) {
-        const string& directory = directories.top();
-        readDirectories(result, directory, recursiveSearch);
+        const string& d = directories.top();
+        readDirectories(result, d, recursiveSearch);
         directories.pop();
     }
 }

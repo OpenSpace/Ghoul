@@ -108,7 +108,7 @@ CacheManager::CacheManager(std::string directory, int version)
             unsigned int hash;
             try {
                 hash = std::stoul(line);
-            } catch (const std::invalid_argument& e) {
+            } catch (const std::invalid_argument&) {
                 throw MalformedCacheException(path);
             }
 

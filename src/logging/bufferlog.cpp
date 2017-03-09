@@ -177,13 +177,19 @@ void BufferLog::log(unsigned long long timestamp, std::string message) {
             if (h->firstEmptyByte + fullSize > _totalSize) {
                 // The callback failed to clear the memory
                 h->mutex.clear();
-                throw MemoryExhaustionException(_totalSize, requestedSize);
+                throw MemoryExhaustionException(
+                    static_cast<int>(_totalSize),
+                    static_cast<int>(requestedSize)
+                );
             }
         }
         else {
             // We have to fail if there is no callback
             h->mutex.clear();
-            throw MemoryExhaustionException(_totalSize, requestedSize);
+            throw MemoryExhaustionException(
+                static_cast<int>(_totalSize),
+                static_cast<int>(requestedSize)
+            );
         }
     }
     // Copy the values of the timestamp

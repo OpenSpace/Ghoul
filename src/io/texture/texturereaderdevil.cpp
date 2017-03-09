@@ -166,7 +166,7 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(void* memory,
     ILboolean loadSuccess = ilLoadL(
         IL_TYPE_UNKNOWN,
         reinterpret_cast<ILubyte*>(memory),
-        size
+        static_cast<ILuint>(size)
     );
 
     if (!loadSuccess) {

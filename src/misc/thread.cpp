@@ -25,6 +25,7 @@
 
 #include <ghoul/misc/thread.h>
 
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/exception.h>
 
 #ifdef WIN32
@@ -86,6 +87,8 @@ int convertThreadPriorityClass(ThreadPriorityClass c) {
             return NORMAL_PRIORITY_CLASS;
         case ThreadPriorityClass::High:
             return HIGH_PRIORITY_CLASS;
+        default:
+            ghoul_assert(false, "Missing case label");
     }
 #elif __APPLE__
     switch (c) {
@@ -95,6 +98,8 @@ int convertThreadPriorityClass(ThreadPriorityClass c) {
             return SCHED_OTHER;
         case ThreadPriorityClass::High:
             return SCHED_RR;
+        default:
+            ghoul_assert(false, "Missing case label");
     }
 #else
     switch (c) {
@@ -104,7 +109,9 @@ int convertThreadPriorityClass(ThreadPriorityClass c) {
             return SCHED_OTHER;
         case ThreadPriorityClass::High:
             return SCHED_RR;
-    }
+        default:
+        ghoul_assert(false, "Missing case label");
+}
 #endif
 }
     

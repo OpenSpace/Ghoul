@@ -118,8 +118,8 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
     return texture;
 }
 
-std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(void* memory,
-                                                                size_t size) const
+std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(void* /*memory*/,
+                                                                size_t /*size*/) const
 {
     ghoul_assert(false, "Implementation missing");
     return nullptr;

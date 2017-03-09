@@ -143,7 +143,14 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
             attribPointers.getValue(keyNormalized, normalized);
             
             GLenum type = GL_FLOAT;
-            vbo->vertexAttribPointer(position, size, type, stride, offset, normalized);
+            vbo->vertexAttribPointer(
+                static_cast<GLuint>(position),
+                static_cast<GLint>(size),
+                type,
+                static_cast<GLsizei>(stride),
+                static_cast<GLuint>(offset),
+                static_cast<GLboolean>(normalized)
+            );
         }
     }
     

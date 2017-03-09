@@ -277,7 +277,7 @@ if (GHOUL_HAVE_TESTS)
     set_property(TARGET GhoulTest PROPERTY CXX_STANDARD_REQUIRED On)
 
     target_compile_definitions(GhoulTest PUBLIC
-        "GHL_THROW_ON_ASSERT" # We don't want Jenkins to ask for asserts when they happen, but just throw
+        "GHL_THROW_ON_ASSERT" # Jenkins shouldn't ask for asserts when they happen, but just throw
         "GHOUL_HAVE_TESTS"
         "GTEST_HAS_TR1_TUPLE=0"
         "GTEST_HAS_GLOBAL_STRING=0"

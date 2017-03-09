@@ -189,12 +189,12 @@ std::string File::lastModifiedDate() const {
             NULL
         );
         if (errorBuffer != nullptr) {
-            std::string error(errorBuffer);
+            std::string msg(errorBuffer);
             LocalFree(errorBuffer);
             throw FileException(fmt::format(
                 "Could not retrieve last-modified date for file '{}': {}",
                 _filename,
-                error
+                msg
             ));
         }
         throw FileException(fmt::format(
@@ -206,7 +206,7 @@ std::string File::lastModifiedDate() const {
         FILETIME lastWriteTime = infoData.ftLastWriteTime;
         SYSTEMTIME time;
         //LPSYSTEMTIME time = NULL;
-        BOOL success = FileTimeToSystemTime(&lastWriteTime, &time);
+        success = FileTimeToSystemTime(&lastWriteTime, &time);
         if (!success) {
             const DWORD error = GetLastError();
             LPTSTR errorBuffer = nullptr;
@@ -221,12 +221,12 @@ std::string File::lastModifiedDate() const {
                 NULL
             );
             if ((nValues > 0) && (errorBuffer != nullptr)) {
-                std::string error(errorBuffer);
+                std::string msg(errorBuffer);
                 LocalFree(errorBuffer);
                 throw FileException(fmt::format(
                     "'FileTimeToSystemTime' failed for file '{}': {}",
                     _filename,
-                    error
+                    msg
                 ));
             }
             throw FileException(fmt::format(

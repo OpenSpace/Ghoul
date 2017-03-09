@@ -80,7 +80,8 @@ FileSystem::FileSystem()
 {
     std::string temporaryPath;
 #ifdef WIN32
-    DWORD result = GetTempPath(0, "");
+    std::vector<char> ptr;
+    DWORD result = GetTempPath(0, ptr.data());
     if (result != 0) {
         std::vector<TCHAR> tempPath(result);
         result = GetTempPath(result, tempPath.data());
@@ -234,11 +235,11 @@ Directory FileSystem::currentDirectory() const {
             NULL
         );
         if ((nValues > 0) && (errorBuffer != nullptr)) {
-            string error(errorBuffer);
+            string msg(errorBuffer);
             LocalFree(errorBuffer);
             throw FileSystemException(fmt::format(
                 "Error retrieving current directory: {}",
-                error
+                msg
             ));
         }
         throw FileSystemException("Error retrieving current directory");
@@ -275,10 +276,10 @@ void FileSystem::setCurrentDirectory(const Directory& directory) const {
             NULL
         );
         if ((nValues > 0) && (errorBuffer != nullptr)) {
-            string error(errorBuffer);
+            string msg(errorBuffer);
             LocalFree(errorBuffer);
             throw FileSystemException(fmt::format(
-                "Error setting current directory: {}", error
+                "Error setting current directory: {}", msg
             ));
         }
     }
@@ -323,10 +324,10 @@ bool FileSystem::fileExists(std::string path, RawPath isRawPath) const {
                     NULL
                 );
                 if ((nValues > 0) && (errorBuffer != nullptr)) {
-                    string error(errorBuffer);
+                    string msg(errorBuffer);
                     LocalFree(errorBuffer);
                     throw FileSystemException(fmt::format(
-                        "Error retrieving file attributes: {}", error
+                        "Error retrieving file attributes: {}", msg
                     ));
                 }
             }

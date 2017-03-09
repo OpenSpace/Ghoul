@@ -25,12 +25,15 @@
 
 #include <ghoul/systemcapabilities/generalcapabilitiescomponent.h>
 
+#include <ghoul/misc/assert.h>
+
 #include <algorithm>
 #include <sstream>
 
 #ifdef WIN32
     #include <Windows.h>
     #include <tchar.h>
+    #include <intrin.h>  
     #pragma comment(lib, "User32.lib")
     #pragma comment(lib, "Kernel32.lib")
     typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
@@ -101,6 +104,7 @@ namespace std {
             case OS::Unknown:
                 return "";
         }
+        ghoul_assert(false, "Missing case label");
     }
 } // namespace std
 

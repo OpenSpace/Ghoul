@@ -52,6 +52,10 @@ struct AssertionException : public std::runtime_error {
 // This tells the clang static analyzer that internal_assert is just like assert itself
 void internal_assert(std::string expression, std::string message, std::string file,
     std::string function, int line) __attribute__((analyzer_noreturn));
+#elif WIN32
+// This tells Visual studio that internal_assert is just like assert itself
+__declspec(noreturn) void internal_assert(std::string expression, std::string message,
+    std::string file, std::string function, int line);
 #else
 void internal_assert(std::string expression, std::string message, std::string file,
     std::string function, int line);

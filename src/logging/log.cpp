@@ -83,7 +83,14 @@ std::string Log::getTimeString() const {
     time_t time = std::chrono::system_clock::to_time_t(now);
     
     std::stringstream ss;
+
+#if WIN32
+    tm t;
+    localtime_s(&t, &time);
+    ss << std::put_time(&t, "%T");
+#else
     ss << std::put_time(std::localtime(&time), "%T");
+#endif
     return ss.str();
 }
 
@@ -92,12 +99,18 @@ std::string Log::getDateString() const {
     time_t time = std::chrono::system_clock::to_time_t(now);
     
     std::stringstream ss;
+
+#if WIN32
+    tm t;
+    localtime_s(&t, &time);
+    ss << std::put_time(&t, "%F");
+#else
     ss << std::put_time(std::localtime(&time), "%F");
+#endif
     return ss.str();
 }
 
-std::string Log::createFullMessageString(LogLevel level,
-                                         const std::string& category,
+std::string Log::createFullMessageString(LogLevel level, const std::string& category,
                                          const std::string& message) const
 {
     std::string output;

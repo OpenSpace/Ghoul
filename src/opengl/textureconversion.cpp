@@ -51,7 +51,7 @@ void convert(char* dst, const char* src, int nSourceChannels, int nDestinationCh
 template <>
 void convert<Texture::Format::Red, Texture::Format::RG>(char* dst, const char* src,
                                                         int nSourceChannels,
-                                                        int nDestinationChannels,
+                                                        int /*nDestinationChannels*/,
                                                         int nBytesPerChannel)
 {
     int sourceSize = nSourceChannels * nBytesPerChannel;
@@ -62,8 +62,8 @@ void convert<Texture::Format::Red, Texture::Format::RG>(char* dst, const char* s
 
 template <>
 void convert<Texture::Format::Red, Texture::Format::RGB>(char* dst, const char* src,
-                                                         int nSourceChannels,
-                                                         int nDestinationChannels,
+                                                         int /*nSourceChannels*/,
+                                                         int /*nDestinationChannels*/,
                                                          int nBytesPerChannel)
 {
     std::memcpy(dst, src, nBytesPerChannel);
@@ -73,8 +73,8 @@ void convert<Texture::Format::Red, Texture::Format::RGB>(char* dst, const char* 
 
 template <>
 void convert<Texture::Format::Red, Texture::Format::RGBA>(char* dst, const char* src,
-                                                          int nSourceChannels,
-                                                          int nDestinationChannels,
+                                                          int /*nSourceChannels*/,
+                                                          int /*nDestinationChannels*/,
                                                           int nBytesPerChannel)
 {
     std::memcpy(dst, src, nBytesPerChannel);
@@ -85,8 +85,8 @@ void convert<Texture::Format::Red, Texture::Format::RGBA>(char* dst, const char*
 
 template <>
 void convert<Texture::Format::RG, Texture::Format::RGBA>(char* dst, const char* src,
-                                                        int nSourceChannels,
-                                                        int nDestinationChannels,
+                                                        int /*nSourceChannels*/,
+                                                        int /*nDestinationChannels*/,
                                                         int nBytesPerChannel)
 {
     // Copying R into RGB
@@ -144,6 +144,8 @@ ConversionFunc conversionFunctionSelector(Texture::Format from, Texture::Format 
                 default:
                     ghoul_assert(false, "Missing case statement");
             }
+        default:
+            ghoul_assert(false, "Missing case statement");
     }
 }
 

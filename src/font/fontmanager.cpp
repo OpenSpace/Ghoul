@@ -100,7 +100,7 @@ std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
     try {
         return font(hash, fontSize, withOutline, loadGlyphs);
     }
-    catch (const FontAccessException& e) {
+    catch (const FontAccessException&) {
         throw FontAccessException(fmt::format(
             "Error retrieving Font '{}' for size '{}'", name, fontSize
         ));

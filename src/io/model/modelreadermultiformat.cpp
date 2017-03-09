@@ -85,10 +85,10 @@ namespace io {
     }
 
     void getMeshesInScene(size_t& totalSizeIndex, size_t& totalSizeVertex,
-                          std::vector<const aiMesh*>& meshArray, const aiNode* currNode,
+                          std::vector<const aiMesh*>& meshArray, const aiNode* /*currNode*/,
                           const aiScene* scene)
     {
-        for (auto i = 0; i < scene->mNumMeshes; ++i) {
+        for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
             meshArray.push_back(scene->mMeshes[i]);
             totalSizeIndex += meshArray.back()->mNumFaces * 3;
             totalSizeVertex += meshArray.back()->mNumVertices;
@@ -157,12 +157,12 @@ namespace io {
         // We add all shapes of the model into the same vertex array, one after the other.
         // Here we are also including more than a mesh when they are present. This should
         // be avoided if possible.
-        size_t positionIndex = 0;
+        unsigned int positionIndex = 0;
         //size_t indicesIndex = 0;
 
-        for (auto meshPtr : meshArray) {
+        for (const aiMesh* meshPtr : meshArray) {
             // Walk through each of the mesh's vertices
-            for (auto i = 0; i < meshPtr->mNumVertices; i++) {                    
+            for (unsigned int i = 0; i < meshPtr->mNumVertices; i++) {                    
                 Vertex vTmp;
 
                 // Positions
@@ -191,12 +191,12 @@ namespace io {
             }
 
             // Walking through the mesh faces and get the vertexes indices
-            for (auto nf = 0; nf < meshPtr->mNumFaces; ++nf) {
+            for (unsigned int nf = 0; nf < meshPtr->mNumFaces; ++nf) {
                 const struct aiFace* face = &meshPtr->mFaces[nf];
 
                 if (face->mNumIndices == 3) {
-                    for (auto ii = 0; ii < face->mNumIndices; ii++) {
-                        indexArray.push_back(face->mIndices[ii] + positionIndex);
+                    for (unsigned int ii = 0; ii < face->mNumIndices; ii++) {
+                        indexArray.push_back(static_cast<GLint>(face->mIndices[ii] + positionIndex));
                     }
                 }
             }

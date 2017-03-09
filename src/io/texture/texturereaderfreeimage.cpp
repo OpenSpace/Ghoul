@@ -117,11 +117,11 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
 
     // Swap red and blue channels, cannot use GL_BGR in OpenGL core profile
     for (unsigned y = 0; y < FreeImage_GetHeight(dib); y++) {
-        BYTE* bits = FreeImage_GetScanLine(dib, y);
+        BYTE* line = FreeImage_GetScanLine(dib, y);
         for (unsigned x = 0; x < FreeImage_GetWidth(dib); x++) {
-            std::swap(bits[FI_RGBA_RED], bits[FI_RGBA_BLUE]);
+            std::swap(line[FI_RGBA_RED], line[FI_RGBA_BLUE]);
             // jump to next pixel
-            bits += imageByte / 8;
+            line += imageByte / 8;
         }
     }
 

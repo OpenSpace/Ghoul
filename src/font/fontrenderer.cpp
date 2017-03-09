@@ -245,7 +245,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
             try {
                 glyph = font.glyph(character);
             }
-            catch (const Font::FontException& e) {
+            catch (const Font::FontException&) {
                 glyph = font.glyph(wchar_t(' '));
             }
 
@@ -447,7 +447,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
             try {
                 glyph = font.glyph(character);
             }
-            catch (const Font::FontException& e) {
+            catch (const Font::FontException&) {
                 glyph = font.glyph(wchar_t(' '));
             }
         
@@ -542,7 +542,12 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
         6 * sizeof(float), reinterpret_cast<const void*>(4 * sizeof(float))
     );
     
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(
+        GL_TRIANGLES,
+        static_cast<GLsizei>(indices.size()),
+        GL_UNSIGNED_INT,
+        0
+    );
     
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -56,7 +56,7 @@ TextureAtlas::TextureAtlas(glm::ivec3 size)
     
     _nodes.emplace_back(1, 1, _size.x - 2);
     _data.resize(_size.x * _size.y * _size.z);
-    std::fill(_data.begin(), _data.end(), 0);
+    std::fill(_data.begin(), _data.end(), unsigned char(0));
  
     // Create texture
     Texture::Format format;
@@ -170,7 +170,7 @@ void TextureAtlas::clear() {
 
     _nUsed = 0;
     
-    std::fill(_data.begin(), _data.end(), 0);
+    std::fill(_data.begin(), _data.end(), unsigned char(0));
 }
     
 TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
@@ -192,7 +192,7 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
                 (((y + height) == bestHeight) && (node.z < bestWidth)))
             {
                 bestHeight = y + height;
-                bestIndex = i;
+                bestIndex = static_cast<int>(i);
                 bestWidth = node.z;
                 region.x = node.x;
                 region.y = y;
