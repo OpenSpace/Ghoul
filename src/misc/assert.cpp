@@ -74,7 +74,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
             << padding << message << std::endl;
 
         while (true) {
-            std::cerr << "(I)gnore / Ignore (P)ermanently / (A)ssert/ (E)xit: ";
+            std::cerr << "(I)gnore / Ignore (P)ermanently / (A)ssertion / (E)xit: ";
             std::string inputLine;
             std::getline(std::cin, inputLine);
 
