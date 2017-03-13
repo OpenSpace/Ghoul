@@ -28,6 +28,10 @@
 #pragma GCC diagnostic ignored "-Wconversion-null"
 #endif // __unix__
 
+// When running the unit tests we don't want to be asked what to do in the case of an
+// assertion
+#define GHL_THROW_ON_ASSERT
+
 #include "gtest/gtest.h"
 
 #include <ghoul/cmdparser/cmdparser>
