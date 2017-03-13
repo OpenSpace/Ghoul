@@ -191,25 +191,25 @@ TEST_F(TemplateFactoryTest, NoDefaultConstructorExists) {
 }
 
 TEST_F(TemplateFactoryTest, DictionaryConstructor) {
-    factory->registerClass<SubClassDefault>("SubClassDefault");
+    factory->registerClass<SubClassDictionary>("SubClassDictionary");
 
     ghoul::Dictionary dict = { { "value1", 100 }, { "value2", 200 } };
-    std::unique_ptr<BaseClass> obj = factory->create("SubClassDefault", dict);
-    ASSERT_NE(nullptr, obj) << "Creation of SubClassDefault failed";
+    std::unique_ptr<BaseClass> obj = factory->create("SubClassDictionary", dict);
+    ASSERT_NE(nullptr, obj) << "Creation of SubClassDictionary failed";
 
-    EXPECT_EQ(1, obj->value1) << "Value1 was modified";
-    EXPECT_EQ(2, obj->value2) << "Value2 was modified";
+    EXPECT_EQ(100, obj->value1) << "Value1 was not modified";
+    EXPECT_EQ(200, obj->value2) << "Value2 was not modified";
 }
 
 TEST_F(TemplateFactoryTest, NoDictionaryConstructorExists) {
     factory->registerClass<SubClassDefault>("SubClassDefault");
 
     ghoul::Dictionary dict = { { "value1", 100 }, { "value2", 200 } };
-    std::unique_ptr<BaseClass> obj = factory->create("SubClassDefault", dict);
-    ASSERT_NE(nullptr, obj) << "Creation of SubClassDefault failed";
 
-    EXPECT_EQ(1, obj->value1) << "Value1 was not modified";
-    EXPECT_EQ(2, obj->value2) << "Value2 was not modified";
+    EXPECT_THROW(
+        factory->create("SubClassDefault", dict),
+        ghoul::TemplateFactoryBase::TemplateConstructionError
+    );
 }
 
 TEST_F(TemplateFactoryTest, ClassDoesNotExist) {
