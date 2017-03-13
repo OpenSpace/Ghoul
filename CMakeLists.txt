@@ -58,6 +58,7 @@ option(GHOUL_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
 option(GHOUL_LOGGING_ENABLE_TRACE "Enables the LTRACE macro" ON)
 option(GHOUL_DISABLE_EXTERNAL_WARNINGS "Disable warnings in external libraries" ON)
+option(GHOUL_THROW_ON_ASSERT "Disables the feedback on asserts; for use in unit tests" OFF)
 
 option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
 option(GHOUL_MODULE_OPENGL "Enable OpenGL" ON)
@@ -163,6 +164,10 @@ endif ()
 
 if (GHOUL_LOGGING_ENABLE_TRACE)
     target_compile_definitions(Ghoul PUBLIC "GHOUL_LOGGING_ENABLE_TRACE")
+endif ()
+
+if (GHOUL_THROW_ON_ASSERT)
+    target_compile_definitions(Ghoul PUBLIC "GHL_THROW_ON_ASSERT")
 endif ()
 
 #############################
