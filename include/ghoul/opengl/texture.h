@@ -62,7 +62,9 @@ public:
         Red = GL_RED, ///< GL_RED
         RG = GL_RG, ///< GL_RG
         RGB = GL_RGB, ///< GL_RGB
+        BGR = GL_BGR, ///< GL_BGR
         RGBA = GL_RGBA, ///< GL_RGBA
+        BGRA = GL_BGRA, ///< GL_BGRA
         DepthComponent = GL_DEPTH_COMPONENT ///< GL_DEPTH_COMPONENT
     };
 
