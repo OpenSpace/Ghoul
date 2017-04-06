@@ -24,9 +24,9 @@
 
 function(disable_external_warnings library_name)
     if (MSVC)
-        target_compile_options(${library_name} PUBLIC "/W0")
+        target_compile_options(${library_name} PRIVATE "/W0")
     else ()
-        target_compile_options(${library_name} PUBLIC "-w")
+        target_compile_options(${library_name} PRIVATE "-w")
     endif ()
 endfunction ()
 
