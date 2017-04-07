@@ -51,6 +51,8 @@ int convertThreadPriorityLevel(ThreadPriorityClass c, ThreadPriorityLevel p) {
             return THREAD_PRIORITY_ABOVE_NORMAL;
         case ThreadPriorityLevel::Highest:
             return THREAD_PRIORITY_HIGHEST;
+        default:
+            ghoul_assert(false, "Missing case label");
     }
 #else
     switch (c) {
@@ -72,6 +74,8 @@ int convertThreadPriorityLevel(ThreadPriorityClass c, ThreadPriorityLevel p) {
                     return 66;
                 case ThreadPriorityLevel::Highest:
                     return 99;
+                default:
+                    ghoul_assert(false, "Missing case label");
             }
     }
     return 0;

@@ -344,7 +344,7 @@ bool ThreadPool::TaskQueue::isEmpty() const {
     
 int ThreadPool::TaskQueue::size() const {
     std::lock_guard<std::mutex> lock(_queueMutex);
-    return _queue.size();
+    return static_cast<int>(_queue.size());
 }
 
 } // namespace openspace

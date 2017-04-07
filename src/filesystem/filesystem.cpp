@@ -686,7 +686,7 @@ string FileSystem::cleanupPath(string path) const {
             path.begin(),
             path.begin() + 1,
             path.begin(),
-            toupper
+            [](char v) { return static_cast<char>(toupper(v)); }
         );
     }
 #else

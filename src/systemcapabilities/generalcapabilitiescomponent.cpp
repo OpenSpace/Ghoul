@@ -158,7 +158,11 @@ void GeneralCapabilitiesComponent::detectOS() {
     ZeroMemory(&systemInfo, sizeof(SYSTEM_INFO));
     ZeroMemory(&osVersionInfo, sizeof(OSVERSIONINFOEX));
     osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+
+#pragma warning (push)
+#pragma warning (disable : 4996) 
     BOOL osVersionInfoEx = GetVersionEx((OSVERSIONINFO*) &osVersionInfo);
+#pragma warning (pop)
 
     if (osVersionInfoEx == 0) {
         DWORD error = GetLastError();

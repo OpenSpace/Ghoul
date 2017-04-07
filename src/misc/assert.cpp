@@ -83,7 +83,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
                 inputLine.begin(),
                 inputLine.end(),
                 inputLine.begin(),
-                ::tolower
+                [](char v) { return static_cast<char>(tolower(v)); }
             );
 
             if (inputLine == "i") {

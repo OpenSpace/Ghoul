@@ -37,10 +37,11 @@
 #else
 #define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_RGB
 #endif
+
 #include <FreeImage.h>
 
-
 #include <iostream>
+
 namespace ghoul {
 namespace io {
 
@@ -55,8 +56,13 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
 
     glm::size3_t imageSize(width, height, 1);
     //if this somehow one of these failed (they shouldn't), return failure
-    if ((bits == 0) || (width == 0) || (height == 0))
-        throw TextureLoadException("Memory", "Unable to ready bits or size", this);
+    if ((bits == 0) || (width == 0) || (height == 0)) {
+        throw TextureLoadException(
+            "Memory",
+            "Unable to ready bits or size (" + source + ")",
+            this
+        );
+    }
 
 
     FREE_IMAGE_TYPE            imageType = FreeImage_GetImageType(dib);
@@ -88,8 +94,13 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
 
     */
 
-    if (imageType != FIT_BITMAP)
-        throw TextureLoadException("Memory", "Could not read image", this);
+    if (imageType != FIT_BITMAP) {
+        throw TextureLoadException(
+            "Memory",
+            "Could not read image (" + source + ")",
+            this
+        );
+    }
 
     if (colorType == FIC_MINISBLACK || colorType == FIC_PALETTE) {
         FIBITMAP* tempImage = dib;
@@ -109,7 +120,11 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
             format = opengl::Texture::Format::RGBA;
             break;
         default:
-            throw TextureLoadException("Memory", "Could not read image", this);
+            throw TextureLoadException(
+                "Memory",
+                "Could not read image (" + source + ")",
+                this
+            );
     }
 
     unsigned int pitch = FreeImage_GetPitch(dib);
@@ -127,7 +142,11 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
 
     bool flipSuccess = FreeImage_FlipVertical(dib);
     if (!flipSuccess) {
-        throw TextureLoadException("Memory", "Could not flip image", this);
+        throw TextureLoadException(
+            "Memory",
+            "Could not flip image (" + source + ")",
+            this
+        );
     }
 
     FreeImage_ConvertToRawBits(
@@ -166,7 +185,11 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
     }
     // If still unknown, return failure
     if (fif == FIF_UNKNOWN) {
-        throw TextureLoadException(filename, "Could not determine file format", this);
+        throw TextureLoadException(
+            filename,
+            "Could not determine file format (" + filename + ")",
+            this
+        );
     }
 
     // Check that the plug-in has reading capabilities and load the file
@@ -175,7 +198,11 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
     }
     // If the image failed to load, return failure
     if (!dib) {
-        throw TextureLoadException(filename, "Could not load image", this);
+        throw TextureLoadException(
+            filename,
+            "Could not load image (" + filename + ")",
+            this
+        );
     }
 
     return loadTextureInternal(filename, dib);
@@ -192,7 +219,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(void* memor
     // Open the a stream to memory
     FIMEMORY* stream = FreeImage_OpenMemory(
         reinterpret_cast<BYTE*>(memory),
-        size
+        static_cast<DWORD>(size)
     );
 
     // Check the file signature and deduce its format
