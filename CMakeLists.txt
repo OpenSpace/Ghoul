@@ -101,7 +101,6 @@ if (MSVC)
         "/wd4201"
         "/wd4127"
         "/we4289"
-
     )
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(Ghoul PUBLIC "/WX")

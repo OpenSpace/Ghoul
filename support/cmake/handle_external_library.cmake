@@ -25,6 +25,7 @@
 function(disable_external_warnings library_name)
     if (MSVC)
         target_compile_options(${library_name} PRIVATE "/W0")
+        target_compile_definitions(${library_name} PRIVATE "_SCL_SECURE_NO_WARNINGS")
     else ()
         target_compile_options(${library_name} PRIVATE "-w")
     endif ()
