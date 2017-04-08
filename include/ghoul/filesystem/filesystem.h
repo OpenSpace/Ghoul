@@ -106,12 +106,16 @@ public:
     /**
      * Returns the absolute path to the passed \p path, resolving any tokens (if present)
      * in the process. The current working directory (#currentDirectory) is used as a base
-     * path for this.
+     * path for this. All tokens contained in the \p ignoredTokens are ignored from the
+     * token resolving
      * \param path The path that should be converted into an absolute path
+     * \param ignoredTokens All tokens contained in this list are ignored during the
+     * resolving of path tokens
      * \return The absolute path to the passed \p path
      * \pre \p path must not be empty
      */
-    std::string absolutePath(std::string path) const;
+    std::string absolutePath(std::string path,
+        const std::vector<std::string>& ignoredTokens = std::vector<std::string>()) const;
     
     /**
      * Returns the path of the passed \p path relative to the passed \p baseDirectory. All
@@ -266,10 +270,13 @@ public:
      * returned, one or more tokens could not be replaced. In this case, only part of the
      * path is modified.
      * \param path The path whose tokens should be replaced
+     * \param ignoredTokens All tokens contained in this list are ignored during the
+     * resolving of path tokens
      * \return <code>true</code> if all tokens were replaced successfully,
      * <code>false</code> otherwise
      */
-    bool expandPathTokens(std::string& path) const;
+    bool expandPathTokens(std::string& path,
+        const std::vector<std::string>& ignoredTokens = std::vector<std::string>()) const;
 
     /**
      * Returns a vector of all registered path tokens

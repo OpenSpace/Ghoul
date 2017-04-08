@@ -37,6 +37,11 @@
 #include <ghoul/filesystem/filesystem>
 #include <ghoul/logging/logging>
 
+namespace constants {
+    static std::string TestDirectory;
+    static std::string ScriptDirectory;
+} // namespace constants
+
 #include "tests/test_buffer.inl"
 #include "tests/test_commandlineparser.inl"
 #include "tests/test_common.inl"
@@ -45,7 +50,7 @@
 #include "tests/test_filesystem.inl"
 #include "tests/test_luatodictionary.inl"
 #include "tests/test_templatefactory.inl"
-#include "tests/test_threadpool.inl"
+//#include "tests/test_threadpool.inl"
 #include "tests/test_crc32.inl"
 #include "tests/test_dictionaryjsonformatter.inl"
 #include "tests/test_dictionaryluaformatter.inl"
@@ -68,15 +73,10 @@ int main(int argc, char** argv) {
     FileSystem::initialize();
     
     const std::string root = absPath(GHOUL_ROOT_DIR);
-    const std::string testdir = root + "/tests";
-    const std::string scriptdir = root + "/scripts";
+    constants::TestDirectory = root + "/tests";
+    constants::ScriptDirectory = root + "/scripts";
 
-    const bool extDir = FileSys.directoryExists(testdir);
-    if (extDir) {
-        FileSys.registerPathToken("${SCRIPTS_DIR}", scriptdir);
-        FileSys.registerPathToken("${TEST_DIR}", testdir);
-    }
-    else {
+    if (!FileSys.directoryExists(constants::TestDirectory)) {
         LFATALC("main", "Fix me");
         return 0;
     }

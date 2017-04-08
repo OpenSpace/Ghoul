@@ -31,11 +31,19 @@
 #include <windows.h>
 #endif
 
-TEST(FileSystemTest, HasTestDirectory) {
+class FileSystemTest : public testing::Test {
+protected:
+    void SetUp() override {
+        ghoul::filesystem::FileSystem::deinitialize();
+        ghoul::filesystem::FileSystem::initialize();
+    }
+};
+
+TEST_F(FileSystemTest, HasTestDirectory) {
     EXPECT_EQ(FileSys.directoryExists("${TEMPORARY}"), true);
 }
 
-TEST(FileSystemTest, CreateRemoveDirectory) {
+TEST_F(FileSystemTest, CreateRemoveDirectory) {
     using ghoul::filesystem::FileSystem;
 
     const std::string tmp = absPath("${TEMPORARY}/tmp");
@@ -52,7 +60,7 @@ TEST(FileSystemTest, CreateRemoveDirectory) {
     EXPECT_NO_THROW(FileSys.deleteDirectory(tmp, FileSystem::Recursive::Yes));
 }
 
-TEST(FileSystemTest, Path) {
+TEST_F(FileSystemTest, Path) {
     using ghoul::filesystem::File;
 
     std::string path = "${TEMPORARY}/tmpfil.txt";
@@ -71,7 +79,7 @@ TEST(FileSystemTest, Path) {
     delete f1;
 }
 
-TEST(FileSystemTest, OnChangeCallback) {
+TEST_F(FileSystemTest, OnChangeCallback) {
     using ghoul::filesystem::File;
     using ghoul::filesystem::FileSystem;
 
@@ -139,7 +147,12 @@ TEST(FileSystemTest, OnChangeCallback) {
     EXPECT_EQ(FileSys.deleteFile(path), true);
 }
 
-TEST(FileSystemTest, OverrideNonExistingPathToken) {
+TEST_F(FileSystemTest, TokenDefaultState) {
+    ASSERT_EQ(FileSys.tokens().size(), 1);
+    ASSERT_EQ(FileSys.tokens()[0], "${TEMPORARY}");
+}
+
+TEST_F(FileSystemTest, OverrideNonExistingPathToken) {
     EXPECT_NO_THROW(
         FileSys.registerPathToken(
             "${AddExistingPathToken}",
@@ -147,4 +160,209 @@ TEST(FileSystemTest, OverrideNonExistingPathToken) {
             ghoul::filesystem::FileSystem::Override::Yes
         )
     );
+}
+
+TEST_F(FileSystemTest, OverrideExistingPathToken) {
+    FileSys.registerPathToken("${A}", "a");
+
+    {
+        std::string p = "${A}";
+        FileSys.expandPathTokens(p);
+        EXPECT_EQ(p, "a") << "Before";
+    }
+
+    EXPECT_NO_THROW(
+        FileSys.registerPathToken(
+            "${A}",
+            "b",
+            ghoul::filesystem::FileSystem::Override::Yes
+        )
+    );
+
+    {
+        std::string p = "${A}";
+        FileSys.expandPathTokens(p);
+        EXPECT_EQ(p, "b") << "After";
+    }
+
+    //EXPECT_THROW(
+    //    FileSys.registerPathToken(
+    //        "${A}",
+    //        "b",
+    //        ghoul::filesystem::FileSystem::Override::No
+    //    ),
+
+    //);
+}
+
+TEST_F(FileSystemTest, ExpandingTokensNonExistingToken) {
+    std::string p = "${NOTFOUND}";
+    EXPECT_THROW(
+        FileSys.expandPathTokens(p),
+        ghoul::filesystem::FileSystem::ResolveTokenException
+    );
+}
+
+TEST_F(FileSystemTest, ExpandingTokens) {
+    FileSys.registerPathToken(
+        "${A}",
+        "${B}/bar"
+    );
+
+    FileSys.registerPathToken(
+        "${B}",
+        "${C}/foo"
+    );
+
+    FileSys.registerPathToken(
+        "${C}",
+        "${D}/fob"
+    );
+
+    FileSys.registerPathToken(
+        "${D}",
+        "foobar"
+    );
+
+    {
+        std::string p = "${D}";
+        FileSys.expandPathTokens(p);
+        EXPECT_EQ(p, "foobar") << "Single";
+    }
+
+    {
+        std::string p = "${C}/fob";
+        FileSys.expandPathTokens(p);
+        EXPECT_EQ(p, "foobar/fob/fob") << "Recursive1";
+    }
+
+    {
+        std::string p = "${B}/final";
+        FileSys.expandPathTokens(p);
+        EXPECT_EQ(p, "foobar/fob/foo/final") << "Recursive2";
+    }
+
+    {
+        std::string p = "${A}/final";
+        FileSys.expandPathTokens(p);
+        EXPECT_EQ(p, "foobar/fob/foo/bar/final") << "Recursive3";
+    }
+
+    {
+        std::string p = "initial/${A}";
+        FileSys.expandPathTokens(p);
+        EXPECT_EQ(p, "initial/foobar/fob/foo/bar") << "Noninitial";
+    }
+
+    {
+        std::string p = "initial/${B}/barbar";
+        FileSys.expandPathTokens(p);
+        EXPECT_EQ(p, "initial/foobar/fob/foo/barbar") << "Middle";
+    }
+
+    {
+        std::string p = "initial/${C}/middle/${B}/barbar";
+        FileSys.expandPathTokens(p);
+        EXPECT_EQ(p, "initial/foobar/fob/middle/foobar/fob/foo/barbar") << "Multiple1";
+    }
+
+    {
+        std::string p = "${D}/a/${D}/b/${D}/c/${D}";
+        FileSys.expandPathTokens(p);
+        EXPECT_EQ(p, "foobar/a/foobar/b/foobar/c/foobar") << "Multiple2";
+    }
+}
+
+TEST_F(FileSystemTest, ExpandingTokensIgnoredRegistered) {
+    FileSys.registerPathToken(
+        "${B}",
+        "${C}/foo"
+    );
+
+    FileSys.registerPathToken(
+        "${C}",
+        "${D}/fob"
+    );
+
+    FileSys.registerPathToken(
+        "${D}",
+        "foobar"
+    );
+
+    {
+        std::string p = "${D}";
+        FileSys.expandPathTokens(p, { "${D}" });
+        EXPECT_EQ(p, "${D}");
+    }
+
+    {
+        std::string p = "${C}";
+        FileSys.expandPathTokens(p, { "${D}" });
+        EXPECT_EQ(p, "${D}/fob");
+    }
+
+    {
+        std::string p = "${B}";
+        FileSys.expandPathTokens(p, { "${D}" });
+        EXPECT_EQ(p, "${D}/fob/foo");
+    }
+
+    {
+        std::string p = "1/${D}/2";
+        FileSys.expandPathTokens(p, { "${D}" });
+        EXPECT_EQ(p, "1/${D}/2");
+    }
+
+    {
+        std::string p = "1/${C}/2";
+        FileSys.expandPathTokens(p, { "${D}" });
+        EXPECT_EQ(p, "1/${D}/fob/2");
+    }
+
+    {
+        std::string p = "1/${B}/2";
+        FileSys.expandPathTokens(p, { "${D}" });
+        EXPECT_EQ(p, "1/${D}/fob/foo/2");
+    }
+}
+
+TEST_F(FileSystemTest, ExpandingTokensIgnoredUnregistered) {
+    FileSys.registerPathToken(
+        "${B}",
+        "${C}/foo"
+    );
+
+    FileSys.registerPathToken(
+        "${C}",
+        "${D}/fob"
+    );
+
+    FileSys.registerPathToken(
+        "${D}",
+        "foobar"
+    );
+
+    {
+        std::string p = "${X}";
+        EXPECT_NO_THROW(FileSys.expandPathTokens(p, { "${X}" }));
+        EXPECT_EQ(p, "${X}") << "Single";
+    }
+
+    {
+        std::string p = "${D}/${X}/${C}";
+        EXPECT_NO_THROW(FileSys.expandPathTokens(p, { "${X}" }));
+        EXPECT_EQ(p, "foobar/${X}/foobar/fob") << "Single";
+    }
+
+    {
+        std::string p = "${X}${Y}";
+        EXPECT_NO_THROW(FileSys.expandPathTokens(p, { "${X}", "${Y}" }));
+        EXPECT_EQ(p, "${X}${Y}") << "Multiple";
+    }
+
+    {
+        std::string p = "${D}/${X}/${C}/${Y}/${B}";
+        EXPECT_NO_THROW(FileSys.expandPathTokens(p, { "${X}", "${Y}" }));
+        EXPECT_EQ(p, "foobar/${X}/foobar/fob/${Y}/foobar/fob/foo") << "Multiple";
+    }
 }

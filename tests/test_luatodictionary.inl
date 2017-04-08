@@ -29,33 +29,29 @@
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/lua/lua_helper.h>
 
-namespace {
-    // A non-existing configuration file
-    const std::string _configuration0 = "${TEST_DIR}/luatodictionary/test0.cfg";
-
-    // The configuration1 test configuration has one key "t" = 1
-    const std::string _configuration1 = "${TEST_DIR}/luatodictionary/test1.cfg";
-
-    // The configuration1 test configuration has two keys "t" and "s"
-    const std::string _configuration2 = "${TEST_DIR}/luatodictionary/test2.cfg";
-
-    // More complicated configuration file with nested tables
-    const std::string _configuration3 = "${TEST_DIR}/luatodictionary/test3.cfg";
-
-    // Deeply nested configuration file with 12 level
-    const std::string _configuration4 = "${TEST_DIR}/luatodictionary/test4.cfg";
-
-    // Testfile with glm::vecX, glm::matX
-    const std::string _configuration5 = "${TEST_DIR}/luatodictionary/test5.cfg";
-}
-
 class LuaToDictionaryTest : public testing::Test {
 protected:
-    void reset() {
+    void SetUp() override {
         _d.clear();
+
+        // This is not necessary to do every SetUp phase, but I don't know of a better
+        // way to do it once per fixture ---abock
+        _test0 = constants::TestDirectory + "/luatodictionary/test0.cfg";
+        _test1 = constants::TestDirectory + "/luatodictionary/test1.cfg";
+        _test2 = constants::TestDirectory + "/luatodictionary/test2.cfg";
+        _test3 = constants::TestDirectory + "/luatodictionary/test3.cfg";
+        _test4 = constants::TestDirectory + "/luatodictionary/test4.cfg";
+        _test5 = constants::TestDirectory + "/luatodictionary/test5.cfg";
     }
 
     ghoul::Dictionary _d;
+
+    std::string _test0;
+    std::string _test1;
+    std::string _test2;
+    std::string _test3;
+    std::string _test4;
+    std::string _test5;
 };
 
 
@@ -66,7 +62,7 @@ TEST_F(LuaToDictionaryTest, LoadTest1Cfg) {
     //}
 
     _d.clear();
-    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_configuration1, _d));
+    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_test1, _d));
     EXPECT_EQ(1, _d.size());
 
     double value;
@@ -83,7 +79,8 @@ TEST_F(LuaToDictionaryTest, LoadTest2Cfg) {
     //}
 
     _d.clear();
-    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_configuration2, _d));
+    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_test2, _d));
+
     EXPECT_EQ(2, _d.size());
 
     double value;
@@ -128,7 +125,8 @@ TEST_F(LuaToDictionaryTest, LoadTest3Cfg) {
     //}
 
     _d.clear();
-    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_configuration3, _d));
+    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_test3, _d));
+
     EXPECT_EQ(2, _d.size());
 
     ghoul::Dictionary dict;
@@ -186,7 +184,8 @@ TEST_F(LuaToDictionaryTest, LoadTest4Cfg) {
     //    m4x4 = { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }
     //}
     _d.clear();
-    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_configuration4, _d));
+    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_test4, _d));
+
     ASSERT_EQ(25, _d.size());
 
     glm::vec2 vec2Value;

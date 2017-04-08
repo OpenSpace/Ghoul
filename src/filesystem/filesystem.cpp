@@ -53,6 +53,7 @@
 #endif
 
 using std::string;
+using std::vector;
 
 namespace {
     const char* _loggerCat = "FileSystem";
@@ -127,9 +128,9 @@ FileSystem::~FileSystem() {
 #endif
 }
 
-string FileSystem::absolutePath(string path) const {
+string FileSystem::absolutePath(string path, const vector<string>& ignoredTokens) const {
     ghoul_assert(!path.empty(), "Path must not be empty");
-    expandPathTokens(path);
+    expandPathTokens(path, ignoredTokens);
     
     const int PathBufferSize = 4096;
     std::vector<char> buffer(PathBufferSize);
@@ -530,28 +531,28 @@ void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) con
             }
 
             struct stat statbuf;
-            string fullName = dirPath + "/" + name;
-            int statResult = stat(fullName.c_str(), &statbuf);
-            if (statResult == 0) {
-                if (S_ISDIR(statbuf.st_mode)) {
-                    deleteDirectory(fullName);
-                }
-                else {
-                    int removeSuccess = remove(fullName.c_str());
-                    if (removeSuccess != -1) {
-                        throw FileSystemException(fmt::format(
-                            "Error deleting file '{}' in directory '{}': {}",
-                            fullName, path.path(), strerror(errno)
-                        ));
-                    }
-                }
-            }
-            else {
-                throw FileSystemException(fmt::format(
-                    "Error getting information about file '{}' in directory '{}': {}",
-                    fullName, path.path(), strerror(errno)
-                ));
-            }
+string fullName = dirPath + "/" + name;
+int statResult = stat(fullName.c_str(), &statbuf);
+if (statResult == 0) {
+    if (S_ISDIR(statbuf.st_mode)) {
+        deleteDirectory(fullName);
+    }
+    else {
+        int removeSuccess = remove(fullName.c_str());
+        if (removeSuccess != -1) {
+            throw FileSystemException(fmt::format(
+                "Error deleting file '{}' in directory '{}': {}",
+                fullName, path.path(), strerror(errno)
+            ));
+        }
+    }
+}
+else {
+    throw FileSystemException(fmt::format(
+        "Error getting information about file '{}' in directory '{}': {}",
+        fullName, path.path(), strerror(errno)
+    ));
+}
         }
         closedir(directory);
     }
@@ -594,16 +595,16 @@ bool FileSystem::emptyDirectory(const Directory& path) const {
 
 void FileSystem::registerPathToken(string token, string path, Override override) {
     ghoul_assert(!token.empty(), "Token must not be empty");
-    
+
     ghoul_assert(
         (token.substr(0, TokenOpeningBraces.size()) == TokenOpeningBraces) &&
         (token.substr(token.size() - TokenClosingBraces.size()) == TokenClosingBraces),
         "Token must be enclosed by TokenBraces"
     );
-    
+
     if (!override) {
         ghoul_assert(_tokenMap.find(token) == _tokenMap.end(),
-                     "Token must not have been registered before"
+            "Token must not have been registered before"
         );
     }
 
@@ -616,26 +617,84 @@ void FileSystem::registerPathToken(string token, string path, Override override)
     _tokenMap.emplace(token, path);
 }
 
-bool FileSystem::expandPathTokens(string& path) const {
-    while (containsToken(path)) {
-        string::size_type beginning = path.find(TokenOpeningBraces);
-        string::size_type closing = path.find(
-            TokenClosingBraces, beginning + TokenOpeningBraces.size()
-        );
-        string::size_type closingLocation = closing + TokenClosingBraces.size();
-        std::string currentToken = path.substr(beginning, closingLocation - beginning);
-        const std::string& replacement = resolveToken(currentToken);
-        if (replacement == currentToken) {
-            // replacement == currentToken will be true if the respective token could not
-            // be found;  resolveToken will print an error in that case
-            return false;
+bool FileSystem::expandPathTokens(string& path,
+    const vector<string>& ignoredTokens) const
+{
+
+    // TokenInformation = <token, beginning position, length>
+    struct TokenInformation {
+        string token;
+        string::size_type beginning;
+        string::size_type length;
+    };
+    auto nextToken = [this, ignoredTokens, &path]() -> TokenInformation {
+        string::size_type currentPosition = 0;
+        while (true) {
+            string::size_type beginning = path.find(TokenOpeningBraces, currentPosition);
+            string::size_type closing = path.find(
+                TokenClosingBraces, beginning + TokenOpeningBraces.size()
+            );
+            string::size_type closingLocation = closing + TokenClosingBraces.size();
+
+            if (beginning == string::npos || closing == string::npos) {
+                // There is no token left
+                return { "", string::npos, 0 };
+            }
+
+            std::string currentToken = path.substr(beginning, closingLocation - beginning);
+
+            auto it = std::find(ignoredTokens.begin(), ignoredTokens.end(), currentToken);
+            if (it != ignoredTokens.end()) {
+                // The found token is an ignored one
+                currentPosition = closingLocation;
+                continue;
+            }
+            else {
+                return { currentToken, beginning, closingLocation - beginning };
+            }
         }
+    };
+
+    while (true) {
+        TokenInformation tokenInformation = nextToken();
+        if (tokenInformation.token.empty()) {
+            break;
+        }
+
+        const std::string& replacement = resolveToken(tokenInformation.token);
         path.replace(
-            beginning,
-            closing + TokenClosingBraces.size() - beginning,
+            tokenInformation.beginning,
+            tokenInformation.length,
             replacement
         );
     }
+
+    //while (containsToken(path)) {
+    //    string::size_type beginning = path.find(TokenOpeningBraces, currentPosition);
+    //    string::size_type closing = path.find(
+    //        TokenClosingBraces, beginning + TokenOpeningBraces.size()
+    //    );
+    //    string::size_type closingLocation = closing + TokenClosingBraces.size();
+    //    std::string currentToken = path.substr(beginning, closingLocation - beginning);
+
+    //    currentPosition = closingLocation;
+    //    auto it = std::find(ignoredTokens.begin(), ignoredTokens.end(), currentToken);
+    //    if (it != ignoredTokens.end()) {
+    //        // The token we have found has to be ignored
+    //        continue;
+    //    }
+    //    const std::string& replacement = resolveToken(currentToken);
+    //    if (replacement == currentToken) {
+    //        // replacement == currentToken will be true if the respective token could not
+    //        // be found;  resolveToken will print an error in that case
+    //        return false;
+    //    }
+    //    path.replace(
+    //        beginning,
+    //        closing + TokenClosingBraces.size() - beginning,
+    //        replacement
+    //    );
+    //}
     return true;
 }
 

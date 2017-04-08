@@ -235,7 +235,7 @@ TEST(CRC32Test, HashRandomEquality) {
 
     std::random_device r;
     std::default_random_engine e(r());
-    std::uniform_int_distribution<int> dist(0, alphanum.length());
+    std::uniform_int_distribution<int> dist(0, static_cast<int>(alphanum.length()));
 
     // Create nTests number of random strings to test
     for (int i = 0; i < nTests; ++i) {
