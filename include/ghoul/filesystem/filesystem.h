@@ -83,6 +83,13 @@ public:
     struct FileSystemException : RuntimeError {
         explicit FileSystemException(const std::string& msg);
     };
+
+    /// Exception that gets thrown if a file system token could not be resolved
+    struct ResolveTokenException : FileSystemException {
+        explicit ResolveTokenException(std::string token);
+
+        std::string token;
+    };
     
     /**
      * The token used to separate individual path elements (<code>\\</code> or

@@ -55,8 +55,8 @@
 using std::string;
 
 namespace {
-    const string _loggerCat = "FileSystem";
-    const string TemporaryPathToken = "TEMPORARY";
+    const char* _loggerCat = "FileSystem";
+    const char* TemporaryPathToken = "TEMPORARY";
 }
 
 namespace ghoul {
@@ -73,6 +73,11 @@ const char FileSystem::PathSeparator = '/';
 
 FileSystem::FileSystemException::FileSystemException(const string& msg)
     : RuntimeError(msg, "FileSystem")
+{}
+
+FileSystem::ResolveTokenException::ResolveTokenException(string token)
+    : FileSystemException(fmt::format("Token '{}' could not be resolved", token))
+    , token(std::move(token))
 {}
     
 FileSystem::FileSystem()
@@ -614,9 +619,11 @@ void FileSystem::registerPathToken(string token, string path, Override override)
 bool FileSystem::expandPathTokens(string& path) const {
     while (containsToken(path)) {
         string::size_type beginning = path.find(TokenOpeningBraces);
-        string::size_type closing = path.find(TokenClosingBraces);
+        string::size_type closing = path.find(
+            TokenClosingBraces, beginning + TokenOpeningBraces.size()
+        );
         string::size_type closingLocation = closing + TokenClosingBraces.size();
-        std::string currentToken = path.substr(beginning, closingLocation);
+        std::string currentToken = path.substr(beginning, closingLocation - beginning);
         const std::string& replacement = resolveToken(currentToken);
         if (replacement == currentToken) {
             // replacement == currentToken will be true if the respective token could not
@@ -771,9 +778,7 @@ string FileSystem::resolveToken(const string& token) const {
     
     auto it = _tokenMap.find(token);
     if (it == _tokenMap.end()) {
-        throw FileSystemException(fmt::format(
-            "Token '{}' could not be resolved", token
-        ));
+        throw ResolveTokenException(token);
     }
     else {
         return it->second;
