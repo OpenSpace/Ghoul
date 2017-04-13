@@ -177,6 +177,7 @@ void setDebugMessageControl(Source source, Type type,
 //using Callback = void *(Source source, Type type, Severity severity, unsigned int id
 //  std::string message);
 void setDebugCallback(CallbackFunction callback) {
+#ifdef WIN32
     auto internalCallback = [](GLenum source, GLenum type, GLuint id, GLenum severity,
         GLsizei, const GLchar* message, GLvoid* userParam) -> void
     {
@@ -189,11 +190,29 @@ void setDebugCallback(CallbackFunction callback) {
             std::string(message)
         );
     };
+#else 
+    auto internalCallback = [](GLenum source, GLenum type, GLuint id, GLenum severity,
+        GLsizei, const GLchar* message, const GLvoid* userParam) -> void
+    {
+        const CallbackFunction& cb = *reinterpret_cast<const CallbackFunction*>(
+            userParam
+        );
+
+        cb(
+            Source(source),
+            Type(type),
+            Severity(severity),
+            static_cast<unsigned int>(id),
+            std::string(message)
+        );
+    };
+#endif
 
     // This looks dangerous, but the callback that is passed in must persist throughout
     // the lifetime of the program regardless of how it is created.
     // If it is a regular C-function, it will not be modified anyway, a state-less
     // lambda expression is the same
+
     glDebugMessageCallback(internalCallback, &callback);
 }
 
