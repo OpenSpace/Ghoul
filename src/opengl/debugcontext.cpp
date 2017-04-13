@@ -86,11 +86,12 @@ opengl::debug::Source from_string(const std::string& source) {
         { "Don't care", opengl::debug::Source::DontCare }
     };
 
+    // Throws a std::out_of_range exception if the source could not be found
     return Map.at(source);
 }
 
 template <>
-opengl::debug::Type from_string(const std::string& source) {
+opengl::debug::Type from_string(const std::string& type) {
     static const std::map<std::string, opengl::debug::Type> Map = {
         { "Error", opengl::debug::Type::Error },
         { "Deprecated", opengl::debug::Type::Deprecated },
@@ -104,11 +105,12 @@ opengl::debug::Type from_string(const std::string& source) {
         { "Don't care", opengl::debug::Type::DontCare }
     };
 
-    return Map.at(source);
+    // Throws a std::out_of_range exception if the type could not be found
+    return Map.at(type);
 }
 
 template <>
-opengl::debug::Severity from_string(const std::string& source) {
+opengl::debug::Severity from_string(const std::string& severity) {
     static const std::map<std::string, opengl::debug::Severity> Map = {
         { "High", opengl::debug::Severity::High },
         { "Medium", opengl::debug::Severity::Medium },
@@ -116,7 +118,8 @@ opengl::debug::Severity from_string(const std::string& source) {
         { "Notification", opengl::debug::Severity::Notification }
     };
 
-    return Map.at(source);
+    // Throws a std::out_of_range exception if the severity could not be found
+    return Map.at(severity);
 }
 
 
@@ -169,6 +172,29 @@ void setDebugMessageControl(Source source, Type type,
         identifiers.data(),
         enabled ? GL_TRUE : GL_FALSE
     );
+}
+
+//using Callback = void *(Source source, Type type, Severity severity, unsigned int id
+//  std::string message);
+void setDebugCallback(CallbackFunction callback) {
+    auto internalCallback = [](GLenum source, GLenum type, GLuint id, GLenum severity,
+        GLsizei, const GLchar* message, GLvoid* userParam) -> void
+    {
+        CallbackFunction& cb = *reinterpret_cast<CallbackFunction*>(userParam);
+        cb(
+            Source(source),
+            Type(type),
+            Severity(severity),
+            static_cast<unsigned int>(id),
+            std::string(message)
+        );
+    };
+
+    // This looks dangerous, but the callback that is passed in must persist throughout
+    // the lifetime of the program regardless of how it is created.
+    // If it is a regular C-function, it will not be modified anyway, a state-less
+    // lambda expression is the same
+    glDebugMessageCallback(internalCallback, &callback);
 }
 
 } // namespace debug
