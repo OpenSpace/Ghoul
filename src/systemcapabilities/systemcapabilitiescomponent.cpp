@@ -75,27 +75,6 @@ void SystemCapabilitiesComponent::initializeWMI() {
     if (FAILED(hRes)) {
         throw WMIError("WMI initialization failed. 'CoInitializeEx' failed", hRes);
     }
-    //LDEBUG("Begin coinitialize security");
-    //hRes = CoInitializeSecurity(
-    //    NULL, 
-    //    -1,                          // COM authentication
-    //    NULL,                        // Authentication services
-    //    NULL,                        // Reserved
-    //    RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
-    //    RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
-    //    NULL,                        // Authentication info
-    //    EOAC_NONE,                   // Additional capabilities 
-    //    NULL                         // Reserved
-    //);
-    //LDEBUG("S_OK " << (hRes == S_OK));
-    //LDEBUG("E_INVALIDARG " << (hRes == E_INVALIDARG));
-    //LDEBUG("RPC_E_TOO_LATE " << (hRes == RPC_E_TOO_LATE));
-    //LDEBUG("RPC_E_NO_GOOD_SECURITY_PACKAGES " << (hRes == RPC_E_NO_GOOD_SECURITY_PACKAGES));
-
-    //if (FAILED(hRes)) {
-    //    throw WMIError("CoInitializeSecurity failed with error code", hRes);
-    //}
-    //LDEBUG("CoInitializeSecurity successful.");
 
     hRes = CoCreateInstance(
         CLSID_WbemLocator,
@@ -107,7 +86,6 @@ void SystemCapabilitiesComponent::initializeWMI() {
     if (FAILED(hRes)) {
         _iwbemLocator = nullptr;
         CoUninitialize();
-
         throw WMIError(
             "WMI initialization failed. Failed to create IWbemLocator object", hRes
         );
