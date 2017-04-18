@@ -33,40 +33,40 @@
 namespace std {
 std::string to_string(ghoul::opengl::debug::Source source) {
     switch (source) {
-        case ghoul::opengl::debug::Source::API:             return "API";
-        case ghoul::opengl::debug::Source::WindowSystem:    return "Window System";
-        case ghoul::opengl::debug::Source::ShaderCompiler:  return "Shader Compiler";
-        case ghoul::opengl::debug::Source::ThirdParty:      return "Third Party";
-        case ghoul::opengl::debug::Source::Application:     return "Application";
-        case ghoul::opengl::debug::Source::Other:           return "Other";
-        case ghoul::opengl::debug::Source::DontCare:        return "Don't care";
-        default:                                ghoul_assert(false, "Missing case label");
+    case ghoul::opengl::debug::Source::API:             return "API";
+    case ghoul::opengl::debug::Source::WindowSystem:    return "Window System";
+    case ghoul::opengl::debug::Source::ShaderCompiler:  return "Shader Compiler";
+    case ghoul::opengl::debug::Source::ThirdParty:      return "Third Party";
+    case ghoul::opengl::debug::Source::Application:     return "Application";
+    case ghoul::opengl::debug::Source::Other:           return "Other";
+    case ghoul::opengl::debug::Source::DontCare:        return "Don't care";
+    default:                                    ghoul_assert(false, "Missing case label");
     }
 }
 
 std::string to_string(ghoul::opengl::debug::Type type) {
     switch (type) {
-        case ghoul::opengl::debug::Type::Error:         return "Error";
-        case ghoul::opengl::debug::Type::Deprecated:    return "Deprecated";
-        case ghoul::opengl::debug::Type::Undefined:     return "Undefined";
-        case ghoul::opengl::debug::Type::Portability:   return "Portability";
-        case ghoul::opengl::debug::Type::Performance:   return "Performance";
-        case ghoul::opengl::debug::Type::Marker:        return "Marker";
-        case ghoul::opengl::debug::Type::PushGroup:     return "Push group";
-        case ghoul::opengl::debug::Type::PopGroup:      return "Pop group";
-        case ghoul::opengl::debug::Type::Other:         return "Other";
-        case ghoul::opengl::debug::Type::DontCare:      return "Don't care";
-        default:                                ghoul_assert(false, "Missing case label");
+    case ghoul::opengl::debug::Type::Error:         return "Error";
+    case ghoul::opengl::debug::Type::Deprecated:    return "Deprecated";
+    case ghoul::opengl::debug::Type::Undefined:     return "Undefined";
+    case ghoul::opengl::debug::Type::Portability:   return "Portability";
+    case ghoul::opengl::debug::Type::Performance:   return "Performance";
+    case ghoul::opengl::debug::Type::Marker:        return "Marker";
+    case ghoul::opengl::debug::Type::PushGroup:     return "Push group";
+    case ghoul::opengl::debug::Type::PopGroup:      return "Pop group";
+    case ghoul::opengl::debug::Type::Other:         return "Other";
+    case ghoul::opengl::debug::Type::DontCare:      return "Don't care";
+    default:                                    ghoul_assert(false, "Missing case label");
     }
 }
 
 std::string to_string(ghoul::opengl::debug::Severity severity) {
     switch (severity) {
-        case ghoul::opengl::debug::Severity::High:          return "High";
-        case ghoul::opengl::debug::Severity::Medium:        return "Medium";
-        case ghoul::opengl::debug::Severity::Low:           return "Low";
-        case ghoul::opengl::debug::Severity::Notification:  return "Notification";
-        default:                                ghoul_assert(false, "Missing case label");
+    case ghoul::opengl::debug::Severity::High:          return "High";
+    case ghoul::opengl::debug::Severity::Medium:        return "Medium";
+    case ghoul::opengl::debug::Severity::Low:           return "Low";
+    case ghoul::opengl::debug::Severity::Notification:  return "Notification";
+    default:                                    ghoul_assert(false, "Missing case label");
     }
 }
 
@@ -77,13 +77,13 @@ namespace ghoul {
 template <>
 opengl::debug::Source from_string(const std::string& source) {
     static const std::map<std::string, opengl::debug::Source> Map = {
-        { "API", opengl::debug::Source::API },
-        { "Window System", opengl::debug::Source::WindowSystem },
+        { "API",             opengl::debug::Source::API },
+        { "Window System",   opengl::debug::Source::WindowSystem },
         { "Shader Compiler", opengl::debug::Source::ShaderCompiler },
-        { "Third Party", opengl::debug::Source::ThirdParty },
-        { "Application", opengl::debug::Source::Application },
-        { "Other", opengl::debug::Source::Other },
-        { "Don't care", opengl::debug::Source::DontCare }
+        { "Third Party",     opengl::debug::Source::ThirdParty },
+        { "Application",     opengl::debug::Source::Application },
+        { "Other",           opengl::debug::Source::Other },
+        { "Don't care",      opengl::debug::Source::DontCare }
     };
 
     // Throws a std::out_of_range exception if the source could not be found
@@ -93,16 +93,16 @@ opengl::debug::Source from_string(const std::string& source) {
 template <>
 opengl::debug::Type from_string(const std::string& type) {
     static const std::map<std::string, opengl::debug::Type> Map = {
-        { "Error", opengl::debug::Type::Error },
-        { "Deprecated", opengl::debug::Type::Deprecated },
-        { "Undefined", opengl::debug::Type::Undefined },
-        { "Portability", opengl::debug::Type::Portability },
-        { "Performance", opengl::debug::Type::Performance },
-        { "Marker", opengl::debug::Type::Marker },
-        { "Push group", opengl::debug::Type::PushGroup },
-        { "Pop group", opengl::debug::Type::PopGroup },
-        { "Other", opengl::debug::Type::Other },
-        { "Don't care", opengl::debug::Type::DontCare }
+        { "Error",          opengl::debug::Type::Error },
+        { "Deprecated",     opengl::debug::Type::Deprecated },
+        { "Undefined",      opengl::debug::Type::Undefined },
+        { "Portability",    opengl::debug::Type::Portability },
+        { "Performance",    opengl::debug::Type::Performance },
+        { "Marker",         opengl::debug::Type::Marker },
+        { "Push group",     opengl::debug::Type::PushGroup },
+        { "Pop group",      opengl::debug::Type::PopGroup },
+        { "Other",          opengl::debug::Type::Other },
+        { "Don't care",     opengl::debug::Type::DontCare }
     };
 
     // Throws a std::out_of_range exception if the type could not be found
@@ -112,10 +112,10 @@ opengl::debug::Type from_string(const std::string& type) {
 template <>
 opengl::debug::Severity from_string(const std::string& severity) {
     static const std::map<std::string, opengl::debug::Severity> Map = {
-        { "High", opengl::debug::Severity::High },
-        { "Medium", opengl::debug::Severity::Medium },
-        { "Low", opengl::debug::Severity::Low },
-        { "Notification", opengl::debug::Severity::Notification }
+        { "High",           opengl::debug::Severity::High },
+        { "Medium",         opengl::debug::Severity::Medium },
+        { "Low",            opengl::debug::Severity::Low },
+        { "Notification",   opengl::debug::Severity::Notification }
     };
 
     // Throws a std::out_of_range exception if the severity could not be found
@@ -177,6 +177,10 @@ void setDebugMessageControl(Source source, Type type,
 //using Callback = void *(Source source, Type type, Severity severity, unsigned int id
 //  std::string message);
 void setDebugCallback(CallbackFunction callback) {
+    // For some reason, the GLEW version I tested with on Windows does not define the
+    // callback correctly (using GLvoid* instead of const GLvoid*), so we have to make
+    // a conditional compilation on that. When (if) this changes, the same callback can
+    // be used on all platforms
 #ifdef WIN32
     auto internalCallback = [](GLenum source, GLenum type, GLuint id, GLenum severity,
         GLsizei, const GLchar* message, GLvoid* userParam) -> void
