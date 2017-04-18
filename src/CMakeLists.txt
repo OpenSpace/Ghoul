@@ -98,6 +98,7 @@ if (GHOUL_MODULE_OPENGL)
     set(GHOUL_SOURCE
         ${GHOUL_SOURCE}
         ${PROJECT_SOURCE_DIR}/src/opengl/bufferbinding.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/debugcontext.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/framebufferobject.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/programobject.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/shadermanager.cpp
@@ -173,6 +174,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionaryjsonformatter.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionaryluaformatter.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/exception.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/fromstring.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/invariants.h
@@ -211,6 +213,7 @@ if (GHOUL_MODULE_OPENGL)
         ${GHOUL_HEADER}
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/bufferbinding.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/bufferbinding.inl
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/debugcontext.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/framebufferobject.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/ghoul_gl.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/opengl
