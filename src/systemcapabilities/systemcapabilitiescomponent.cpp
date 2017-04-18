@@ -66,6 +66,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
     const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
     ghoul_assert(!isWMIInitialized(), "WMI must not have been initialized");
     
+    LDEBUG("Begin initializing WMI");
     // This code is based on
     // http://msdn.microsoft.com/en-us/library/aa390423.aspx
     // All rights remain with their original copyright owners
@@ -74,21 +75,6 @@ void SystemCapabilitiesComponent::initializeWMI() {
     if (FAILED(hRes)) {
         throw WMIError("WMI initialization failed. 'CoInitializeEx' failed", hRes);
     }
-    hRes = CoInitializeSecurity(
-        NULL, 
-        -1,                          // COM authentication
-        NULL,                        // Authentication services
-        NULL,                        // Reserved
-        RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
-        RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
-        NULL,                        // Authentication info
-        EOAC_NONE,                   // Additional capabilities 
-        NULL                         // Reserved
-    );
-    if (FAILED(hRes)) {
-        throw WMIError("CoInitializeSecurity failed with error code", hRes);
-    }
-    LDEBUG("CoInitializeSecurity successful.");
 
     hRes = CoCreateInstance(
         CLSID_WbemLocator,
@@ -100,7 +86,6 @@ void SystemCapabilitiesComponent::initializeWMI() {
     if (FAILED(hRes)) {
         _iwbemLocator = nullptr;
         CoUninitialize();
-
         throw WMIError(
             "WMI initialization failed. Failed to create IWbemLocator object", hRes
         );

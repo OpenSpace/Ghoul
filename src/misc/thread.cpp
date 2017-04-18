@@ -94,7 +94,7 @@ int convertThreadPriorityClass(ThreadPriorityClass c) {
         default:
             ghoul_assert(false, "Missing case label");
     }
-#elif __APPLE__
+#elif __APPLE__ || __FreeBSD__
     switch (c) {
         case ThreadPriorityClass::Idle:
             return SCHED_OTHER;
