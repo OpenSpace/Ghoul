@@ -212,12 +212,13 @@ void setDebugCallback(CallbackFunction callback) {
     };
 #endif
 
-    // This looks dangerous, but the callback that is passed in must persist throughout
-    // the lifetime of the program regardless of how it is created.
-    // If it is a regular C-function, it will not be modified anyway, a state-less
-    // lambda expression is the same
-
-    glDebugMessageCallback(internalCallback, &callback);
+    // We have to store the function pointer that is passed into this function locally as
+    // it might otherwise be destroyed (and still be referenced by \c internalCallback.
+    // In a perfect world, we'd want to capture the function pointer, but the OpenGL
+    // callback only allows pure C functions
+    static CallbackFunction storage;
+    storage = callback;
+    glDebugMessageCallback(internalCallback, &storage);
 }
 
 } // namespace debug
