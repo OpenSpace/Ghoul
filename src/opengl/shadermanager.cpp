@@ -94,7 +94,7 @@ std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(
     
     auto tmp = std::move(it->second);
     _objects.erase(hashedName);
-    return std::move(tmp);
+    return tmp;
 }
 
 unsigned int ShaderManager::hashedNameForName(const std::string& name) const {

@@ -181,7 +181,7 @@ void setDebugCallback(CallbackFunction callback) {
     // callback correctly (using GLvoid* instead of const GLvoid*), so we have to make
     // a conditional compilation on that. When (if) this changes, the same callback can
     // be used on all platforms
-#ifdef WIN32
+#if defined WIN32 || defined __APPLE__
     auto internalCallback = [](GLenum source, GLenum type, GLuint id, GLenum severity,
         GLsizei, const GLchar* message, GLvoid* userParam) -> void
     {

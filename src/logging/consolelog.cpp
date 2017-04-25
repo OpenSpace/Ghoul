@@ -141,6 +141,8 @@ void ConsoleLog::setColorForLevel(LogLevel level) {
         case LogLevel::NoLogging:
             _stream << "\033[0m";       // white
             break;
+        case LogLevel::AllLogging:
+            break;
     }
 #elif __APPLE__
     // The Xcode debugger is a bit strange with those control commands, so we have to
@@ -168,6 +170,8 @@ void ConsoleLog::setColorForLevel(LogLevel level) {
                 break;
             case LogLevel::NoLogging:
                 _stream << "\033[0m";       // white
+                break;
+            case LogLevel::AllLogging:
                 break;
         }
     }

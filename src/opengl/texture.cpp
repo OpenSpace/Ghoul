@@ -96,7 +96,7 @@ Texture::~Texture() {
     }
 
     if (_hasOwnershipOfData) {
-        delete[](GLubyte*)_pixels;
+        delete[] reinterpret_cast<GLubyte*>(_pixels);
     }
 }
 
@@ -277,8 +277,10 @@ int Texture::numberOfChannels(Format format) {
         case Format::RG:
             return 2;
         case Format::RGB:
+        case Format::BGR:
             return 3;
         case Format::RGBA:
+        case Format::BGRA:
             return 4;
     }
     return 0;

@@ -153,8 +153,9 @@ std::string HTMLLog::classForLevel(LogLevel level) {
             return "log-level-fatal";
         case LogLevel::NoLogging:
             return "log-level-no-logging";
+        default:
+            ghoul_assert(false, "Missing case label");
     }
-    ghoul_assert(false, "Missing case label");
 }
 
 std::string HTMLLog::colorForLevel(LogLevel level) {
@@ -173,8 +174,9 @@ std::string HTMLLog::colorForLevel(LogLevel level) {
             return "#00FFFF";
         case LogLevel::NoLogging:
             return "#FFFFFF";
+        default:
+            ghoul_assert(false, "Missing case label");
     }
-    ghoul_assert(false, "Missing case label");
 }
 
 } // namespace logging

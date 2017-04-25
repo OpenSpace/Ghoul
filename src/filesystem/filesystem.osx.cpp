@@ -123,7 +123,12 @@ void FileSystem::addFileListener(File* file) {
             // only works on the granularity of the directory)
             CFStringRef path = CFStringCreateWithCString(NULL, d.c_str(),
                                                          kCFStringEncodingASCII);
-            CFArrayRef pathsToWatch = CFArrayCreate(NULL, (const void **)&path, 1, NULL);
+            CFArrayRef pathsToWatch = CFArrayCreate(
+                NULL,
+                reinterpret_cast<const void **>(&path),
+                1,
+                NULL
+            );
             FSEventStreamContext callbackInfo;
             callbackInfo.version = 0;
             callbackInfo.info = nullptr;
