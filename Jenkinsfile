@@ -28,6 +28,7 @@ stage('Build') {
 			checkout scm
 			sh '''
 				git submodule update --init --recursive
+				mkdir -p build
 				export PATH=${PATH}:/usr/local/bin:/Applications/CMake.app/Contents/bin
 				export CMAKE_BUILD_TOOL=/Applications/CMake.app/Contents/bin/CMake
 				srcDir=$PWD
