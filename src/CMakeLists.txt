@@ -30,6 +30,8 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.linux.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.osx.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.windows.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/socket/tcpsocketserver.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/socket/tcpsocket.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderbase.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreadermultiformat.cpp
     ${PROJECT_SOURCE_DIR}/src/io/volume/rawvolumereader.cpp
@@ -140,6 +142,9 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/file.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/tcpsocket.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/tcpsocket.inl
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/tcpsocketserver.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreadermultiformat.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/volume/rawvolumereader.h
