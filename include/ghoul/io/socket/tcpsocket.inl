@@ -30,7 +30,10 @@ template <typename T>
 bool TcpSocket::get(T* getBuffer, size_t nItems) {
     size_t nBytesToRead = sizeof(T) * nItems;
     waitForInput(nBytesToRead);
-    if (!_connected) {
+    if (_shouldDisconnect) {
+        disconnect();
+    }
+    if (!_isConnected && !_isConnecting) {
         return false;
     }
     std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
@@ -43,7 +46,10 @@ template <typename T>
 bool TcpSocket::peek(T* peekBuffer, size_t nItems) {
     size_t nBytesToRead = sizeof(T) * nItems;
     waitForInput(nBytesToRead);
-    if (!_connected) {
+    if (_shouldDisconnect) {
+        disconnect();
+    }
+    if (!_isConnected && !_isConnecting) {
         return false;
     }
     std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
@@ -55,7 +61,10 @@ template <typename T>
 bool TcpSocket::skip(size_t nItems) {
     size_t nBytesToSkip = sizeof(T) * nItems;
     waitForInput(nBytesToSkip);
-    if (!_connected) {
+    if (_shouldDisconnect) {
+        disconnect();
+    }
+    if (!_isConnected && !_isConnecting) {
         return false;
     }
     std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
@@ -65,6 +74,9 @@ bool TcpSocket::skip(size_t nItems) {
 
 template <typename T>
 bool TcpSocket::put(const T* buffer, size_t nItems) {
+    if (_shouldDisconnect) {
+        disconnect();
+    }
     std::lock_guard<std::mutex> outputLock(_outputQueueMutex);
     _outputQueue.insert(
         _outputQueue.end(),
@@ -72,7 +84,7 @@ bool TcpSocket::put(const T* buffer, size_t nItems) {
         reinterpret_cast<const char*>(buffer + nItems)
     );
     _outputNotifier.notify_one();
-    return _connected;
+    return _isConnected || _isConnecting;
 }
 
 } // namespace io

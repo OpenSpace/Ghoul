@@ -33,9 +33,6 @@ TcpSocketServer::TcpSocketServer()
     , _port(0)
     , _listening(false)
 {
-    if (!TcpSocket::initializedNetworkApi()) {
-        TcpSocket::initializeNetworkApi();
-    }
 }
 
 std::string TcpSocketServer::address() const {
@@ -74,7 +71,10 @@ void TcpSocketServer::listen(std::string address, int port) {
     if (_listening) {
         throw TcpSocket::TcpSocketError("Socket is already listening.");
     }
-    
+    if (!TcpSocket::initializedNetworkApi()) {
+        TcpSocket::initializeNetworkApi();
+    }
+
     std::lock_guard<std::mutex> settingsLock(_settingsMutex);
     _address = address;
     _port = port;
@@ -202,7 +202,7 @@ void TcpSocketServer::waitForConnections() {
         std::string address = addressBuffer;
         int port = static_cast<int>(clientInfo.sin_port);
 
-        std::unique_ptr<TcpSocket> socket = std::make_unique<TcpSocket>(socketHandle, address, port);
+        std::unique_ptr<TcpSocket> socket = std::make_unique<TcpSocket>(address, port, socketHandle);
         
         std::lock_guard<std::mutex> lock(_connectionMutex);
         _pendingConnections.push_back(std::move(socket));

@@ -98,12 +98,13 @@ public:
         explicit TcpSocketError(std::string message, std::string component = "");
     };
 
-	TcpSocket();
-	TcpSocket(_SOCKET socket, std::string address, int port);
+	TcpSocket(std::string address, int port);
+	TcpSocket(std::string address, int port, _SOCKET socket);
     ~TcpSocket();
-	void connect(std::string address, int port);
+	void connect();
 	void disconnect();
-    bool connected() const;
+    bool isConnected();
+    bool isConnecting();
     int socketId() const;
 
     /*
@@ -142,20 +143,20 @@ public:
     static void initializeNetworkApi();
     static bool initializedNetworkApi();
 private:
+    void establishConnection(addrinfo *info);
     void streamInput();
     void streamOutput();
     bool waitForInput(size_t nBytes);
     bool waitForOutput(size_t nBytes);
-    
 
-    std::atomic<bool> _connected;
+    const std::string _address;
+    const int _port;
+    std::atomic<bool> _shouldDisconnect;
+    std::atomic<bool> _isConnecting;
+    std::atomic<bool> _isConnected;
     std::atomic<bool> _error;
     const int _socketId;
 
-    mutable std::mutex _settingsMutex;
-    std::string _address;
-    int _port;
-    
 	_SOCKET _socket;
 	TcpSocketServer* _server;
     std::unique_ptr<std::thread> _inputThread;
