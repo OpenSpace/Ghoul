@@ -152,8 +152,8 @@ void setPriority(std::thread& t, ThreadPriorityClass priorityClass, ThreadPriori
 #endif
 }
 
-void setThreadBackground(std::thread& t, Background background) {
 #ifdef WIN32
+void setThreadBackground(std::thread& t, Background background) {
     int m;
     if (background) {
         m = THREAD_MODE_BACKGROUND_BEGIN;
@@ -164,10 +164,10 @@ void setThreadBackground(std::thread& t, Background background) {
 
     std::thread::native_handle_type h = t.native_handle();
     SetThreadPriority(h, m);
-#else
-
-#endif
 }
+#else
+void setThreadBackground(std::thread&, Background) {}
+#endif
 
 } // namespace thread
 } // namespace ghoul

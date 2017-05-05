@@ -763,13 +763,13 @@ string FileSystem::cleanupPath(string path) const {
         char dualSeparator[] = { PathSeparator, PathSeparator };
         position = path.find(dualSeparator);
         if (position != string::npos) {
-            path = std::move(path.substr(0, position) + path.substr(position + 1));
+            path = path.substr(0, position) + path.substr(position + 1);
         }
     }
     
     // Remove trailing separator
     if (path[path.size() - 1] == PathSeparator) {
-        path = std::move(path.substr(0, path.size() - 1));
+        path = path.substr(0, path.size() - 1);
     }
     
     return path;

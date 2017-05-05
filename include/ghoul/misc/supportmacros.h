@@ -52,4 +52,4 @@
 #define RESTORE_OPTIMIZATION #pragma optimize on
 #endif
 
-#endif // __GHOUL___SUPPORTMACROS___H__#endif 
+#endif // __GHOUL___SUPPORTMACROS___H__

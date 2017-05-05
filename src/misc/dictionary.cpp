@@ -149,7 +149,6 @@ bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& value) cons
 
 template <>
 bool Dictionary::getValue<std::string>(const std::string& key, std::string& value) const {
-    this;
     bool str = hasValue<std::string>(key);
     if (str) {
         getValueHelper(key, value);

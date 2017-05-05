@@ -99,7 +99,13 @@ namespace {
         }
         
         // Set char size
-        error = FT_Set_Char_Size(face, (int)(size * PointConversionFactor), 0, DPI , DPI);
+        error = FT_Set_Char_Size(
+            face,
+            static_cast<int>(size * PointConversionFactor),
+            0,
+            DPI,
+            DPI
+        );
         if (error) {
             FT_Done_Face(face);
             FT_Done_FreeType(library);

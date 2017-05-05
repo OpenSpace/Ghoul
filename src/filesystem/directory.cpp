@@ -54,9 +54,7 @@ Directory::Directory(string path, RawPath isRawPath) {
         _directoryPath = path.empty() ? "." : std::move(path);
     }
     else {
-        _directoryPath = std::move(
-            FileSys.absolutePath(path.empty() ? "." : path)
-        );
+        _directoryPath = FileSys.absolutePath(path.empty() ? "." : path);
     }
 }
 

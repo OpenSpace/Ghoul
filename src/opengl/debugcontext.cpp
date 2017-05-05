@@ -72,6 +72,7 @@ std::string to_string(ghoul::opengl::debug::Severity severity) {
 
 } // namespace std
 
+
 namespace ghoul {
 
 template <>
@@ -125,6 +126,50 @@ opengl::debug::Severity from_string(const std::string& severity) {
 
 namespace opengl {
 namespace debug {
+    
+namespace {
+    // The GLDEBUGPROC was defined with a GLvoid* userParam in OpenGL 4.3, which was changed
+    // to const GLvoid* in 4.4 and 4.5. Therefore, there are some GLEW version that report
+    // one or the other, since we include two GLEW headers and the include order is not
+    // defined, we need to disambiguate them here
+    
+    typedef void (*testFunc)(GLenum source, GLenum type, GLuint id, GLenum severity,
+    GLsizei length, const GLchar* message, const GLvoid* userParam);
+    
+    template <typename T = std::enable_if<std::is_same<GLDEBUGPROC, testFunc>::value>>
+    void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei,
+                          const GLchar* message, const GLvoid* userParam)
+    {
+        const CallbackFunction& cb = *reinterpret_cast<const CallbackFunction*>(
+            userParam
+        );
+        
+        cb(
+           Source(source),
+           Type(type),
+           Severity(severity),
+           static_cast<unsigned int>(id),
+           std::string(message)
+       );
+    }
+    
+    template <typename T = std::enable_if<!std::is_same<GLDEBUGPROC, testFunc>::value>>
+    void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei,
+                          const GLchar* message, GLvoid* userParam)
+    {
+        CallbackFunction& cb = *reinterpret_cast<CallbackFunction*>(
+            userParam
+        );
+        
+        cb(
+           Source(source),
+           Type(type),
+           Severity(severity),
+           static_cast<unsigned int>(id),
+           std::string(message)
+       );
+    }
+} // namespace
 
 void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous) {
     if (debug) {
@@ -174,51 +219,20 @@ void setDebugMessageControl(Source source, Type type,
     );
 }
 
+    
 //using Callback = void *(Source source, Type type, Severity severity, unsigned int id
 //  std::string message);
 void setDebugCallback(CallbackFunction callback) {
-    // For some reason, the GLEW version I tested with on Windows does not define the
-    // callback correctly (using GLvoid* instead of const GLvoid*), so we have to make
-    // a conditional compilation on that. When (if) this changes, the same callback can
-    // be used on all platforms
-#ifdef WIN32
-    auto internalCallback = [](GLenum source, GLenum type, GLuint id, GLenum severity,
-        GLsizei, const GLchar* message, GLvoid* userParam) -> void
-    {
-        CallbackFunction& cb = *reinterpret_cast<CallbackFunction*>(userParam);
-        cb(
-            Source(source),
-            Type(type),
-            Severity(severity),
-            static_cast<unsigned int>(id),
-            std::string(message)
-        );
-    };
-#else 
-    auto internalCallback = [](GLenum source, GLenum type, GLuint id, GLenum severity,
-        GLsizei, const GLchar* message, const GLvoid* userParam) -> void
-    {
-        const CallbackFunction& cb = *reinterpret_cast<const CallbackFunction*>(
-            userParam
-        );
-
-        cb(
-            Source(source),
-            Type(type),
-            Severity(severity),
-            static_cast<unsigned int>(id),
-            std::string(message)
-        );
-    };
-#endif
-
     // We have to store the function pointer that is passed into this function locally as
     // it might otherwise be destroyed (and still be referenced by \c internalCallback.
     // In a perfect world, we'd want to capture the function pointer, but the OpenGL
     // callback only allows pure C functions
     static CallbackFunction storage;
     storage = callback;
-    glDebugMessageCallback(internalCallback, &storage);
+    glDebugMessageCallback(
+        internalCallback,
+        &storage
+    );
 }
 
 } // namespace debug

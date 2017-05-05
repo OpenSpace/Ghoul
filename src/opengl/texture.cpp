@@ -98,7 +98,7 @@ Texture::~Texture() {
     }
 
     if (_hasOwnershipOfData) {
-        delete[](GLubyte*)_pixels;
+        delete[] reinterpret_cast<GLubyte*>(_pixels);
     }
 }
 
