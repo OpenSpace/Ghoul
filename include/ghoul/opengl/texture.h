@@ -172,6 +172,8 @@ public:
     /// Binds this texture to the texture type by calling <code>glBindTexture</code>
     void bind() const;
 
+    void invalidateForNumberOfBindCalls(size_t nTextureCalls);
+
     /// Returns the OpenGL name of this texture.
     operator GLuint() const;
     
@@ -401,6 +403,12 @@ public:
      * provided dimensions
      */
     void uploadTexture();
+
+    void reUploadTexture();
+
+    void uploadTextureFromPBO(GLuint pbo);
+
+    void reUploadTextureFromPBO(GLuint pbo);
 
     /**
      * Downloads the texture from graphics memory and makes it available using the 
@@ -758,6 +766,10 @@ protected:
     /// Determines from the dimensions whether this is a 1D, 2D, or 3D texture
     void determineTextureType();
 
+    void uploadDataToTexture(void* pixelData);
+
+    void reUploadDataToTexture(void* pixelData);
+
 private:
     /**
      * Stores the dimensions of the texture, <code>y</code> and <code>z</code> may be
@@ -780,6 +792,8 @@ private:
 
     bool _hasOwnershipOfData;
     void* _pixels;
+
+    mutable size_t _bindCallsUntilValid;
 };
 
 } // namespace opengl

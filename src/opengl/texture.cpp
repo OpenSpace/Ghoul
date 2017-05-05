@@ -62,7 +62,8 @@ Texture::Texture(glm::uvec3 dimensions, Format format, GLint internalFormat,
     , _mipMapLevel(8)
     , _anisotropyLevel(-1.f)
     , _hasOwnershipOfData(false)
-    , _pixels(nullptr) {
+    , _pixels(nullptr)
+    , _bindCallsUntilValid(0) {
     ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.z >= 1, "Element of dimensions must be bigger or equal 1");
@@ -82,6 +83,7 @@ Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLint interna
     , _anisotropyLevel(-1.f)
     , _hasOwnershipOfData(true)
     , _pixels(data)
+    , _bindCallsUntilValid(0)
 {
     ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
@@ -136,8 +138,18 @@ void Texture::disable()  const {
 }
 
 void Texture::bind() const {
-    glBindTexture(_type, _id);
+    if (_bindCallsUntilValid > 0) {
+        _bindCallsUntilValid--;
+        glBindTexture(_type, 0);
+    }
+    else {
+        glBindTexture(_type, _id);
+    }
 }
+
+void Texture::invalidateForNumberOfBindCalls(size_t nBindCalls) {
+    _bindCallsUntilValid = nBindCalls;
+};
 
 Texture::operator GLuint() const {
     return _id;
@@ -276,10 +288,12 @@ int Texture::numberOfChannels(Format format) {
             return 1;
         case Format::RG:
             return 2;
-        case Format::RGB:
-            return 3;
-        case Format::RGBA:
-            return 4;
+		case Format::RGB: // Intentional fallthrough
+        case Format::BGR:
+			return 3;
+		case Format::RGBA: // Intentional fallthrough
+        case Format::BGRA:
+			return 4;
     }
     return 0;
 }
@@ -318,6 +332,7 @@ void Texture::setPixelData(void* pixels, TakeOwnership takeOwnership) {
     }
     _hasOwnershipOfData = takeOwnership;
     _pixels = pixels;
+    calculateBytesPerPixel();
 }
 
 bool Texture::isResident() const {
@@ -365,7 +380,7 @@ void Texture::applySwizzleMask() {
     }
 }
 
-void Texture::uploadTexture() {
+void Texture::uploadDataToTexture(void* pixelData) {
     bind();
 
     switch (_type) {
@@ -378,7 +393,7 @@ void Texture::uploadTexture() {
                 0,
                 GLint(_format),
                 _dataType,
-                _pixels
+                pixelData
             );
             break;
         case GL_TEXTURE_2D:
@@ -391,7 +406,7 @@ void Texture::uploadTexture() {
                 0,
                 GLint(_format),
                 _dataType,
-                _pixels
+                pixelData
             );
             break;
         case GL_TEXTURE_3D:
@@ -405,12 +420,80 @@ void Texture::uploadTexture() {
                 0,
                 GLint(_format),
                 _dataType,
-                _pixels
+                pixelData
             );
             break;
         default:
             assert(false);
     }
+}
+
+void Texture::reUploadDataToTexture(void* pixelData) {
+    bind();
+
+    switch (_type) {
+        case GL_TEXTURE_1D:
+            glTexSubImage1D(
+                _type,
+                0,
+                0,
+                GLsizei(_dimensions.x),
+                GLint(_format),
+                _dataType,
+                pixelData
+            );
+            break;
+        case GL_TEXTURE_2D:
+            glTexSubImage2D(
+                _type,
+                0,
+                0,
+                0,
+                GLsizei(_dimensions.x),
+                GLsizei(_dimensions.y),
+                GLint(_format),
+                _dataType,
+                pixelData
+            );
+            break;
+        case GL_TEXTURE_3D:
+            glTexSubImage3D(
+                _type,
+                0,
+                0,
+                0,
+                0,
+                GLsizei(_dimensions.x),
+                GLsizei(_dimensions.y),
+                GLsizei(_dimensions.z),
+                GLint(_format),
+                _dataType,
+                pixelData
+            );
+            break;
+        default:
+            assert(false);
+    }
+}
+
+void Texture::uploadTexture() {
+    uploadDataToTexture(_pixels);
+}
+
+void Texture::reUploadTexture() {
+    reUploadDataToTexture(_pixels);
+}
+
+void Texture::uploadTextureFromPBO(GLuint pbo) {
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
+    uploadDataToTexture(nullptr);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+}
+
+void Texture::reUploadTextureFromPBO(GLuint pbo) {
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
+    reUploadDataToTexture(nullptr);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
 void Texture::downloadTexture() {
@@ -575,7 +658,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                 }
             }
             break;
-        case Format::RGB:
+        case Format::RGB: // Intentional fallthrough
+        case Format::BGR:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:
                 {
@@ -642,7 +726,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                 }
             }
             break;
-        case Format::RGBA:
+        case Format::RGBA: // Intentional fallthrough
+        case Format::BGRA:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:
                 {
@@ -858,7 +943,8 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                 }
             }
             break;
-        case Format::RGB:
+        case Format::RGB: // Intentional fallthrough
+        case Format::BGR:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:
                 {
@@ -925,7 +1011,8 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                 }
             }
             break;
-        case Format::RGBA:
+        case Format::RGBA: // Intentional fallthrough
+        case Format::BGRA:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:
                 {
@@ -1142,7 +1229,8 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                 }
             }
             break;
-        case Format::RGB:
+        case Format::RGB: // Intentional fallthrough
+        case Format::BGR:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:
                 {
@@ -1209,7 +1297,8 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                 }
             }
             break;
-        case Format::RGBA:
+        case Format::RGBA: // Intentional fallthrough
+        case Format::BGRA:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:
                 {
