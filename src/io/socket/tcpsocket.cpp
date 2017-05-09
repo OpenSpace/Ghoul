@@ -30,8 +30,8 @@
 namespace ghoul {
 namespace io {
 
-std::atomic<bool> TcpSocket::_initializedNetworkApi = false;
-std::atomic<int> TcpSocket::_nextSocketId = 0;
+std::atomic<bool> TcpSocket::_initializedNetworkApi{false};
+std::atomic<int> TcpSocket::_nextSocketId{0};
 
 TcpSocket::TcpSocketError::TcpSocketError(std::string message, std::string component)
     : RuntimeError(message, component) {}
