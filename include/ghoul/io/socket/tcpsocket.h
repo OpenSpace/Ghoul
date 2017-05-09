@@ -34,16 +34,9 @@
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
+#include <algorithm>
 
  // OS specific socket implementation normalization.
-
-#ifdef WIN32
-typedef size_t _SOCKET;
-typedef int _SOCKLEN;
-#else //linux & macOS
-typedef int _SOCKET;
-typedef socklen_t _SOCKLEN;
-#endif
 
 #ifdef WIN32
 #define NOMINMAX
@@ -85,6 +78,15 @@ typedef socklen_t _SOCKLEN;
 #ifndef _ERRNO
 #define _ERRNO errno
 #endif
+#endif
+
+#ifdef WIN32
+typedef size_t _SOCKET;
+typedef int _SOCKLEN;
+#else //linux & macOS
+
+typedef int _SOCKET;
+typedef socklen_t _SOCKLEN;
 #endif
 
 namespace ghoul {

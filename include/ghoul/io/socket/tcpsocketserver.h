@@ -68,7 +68,7 @@ private:
     std::unique_ptr<std::thread> _serverThread;
     _SOCKET _serverSocket;
     void waitForConnections();
-    void TcpSocketServer::setOptions(_SOCKET socket);
+    void setOptions(_SOCKET socket);
 };
 
 } // namespace io

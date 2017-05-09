@@ -52,7 +52,7 @@ void TcpSocketServer::closeSocket(_SOCKET socket) {
         closesocket(socket);
 #else
         shutdown(socket, SHUT_RDWR);
-        ::closeSocket(socket);
+        close(socket);
 #endif
     }
 }
@@ -84,7 +84,7 @@ void TcpSocketServer::listen(std::string address, int port) {
     struct addrinfo* result = nullptr;
     struct addrinfo hints;
 
-    std::memset(&hints, 0, sizeof(hints));
+    memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
@@ -115,7 +115,7 @@ void TcpSocketServer::listen(std::string address, int port) {
     setOptions(_serverSocket);
 
     // Setup the TCP listening socket
-    iResult = bind(_serverSocket, result->ai_addr, (int)result->ai_addrlen);
+    iResult = bind(_serverSocket, result->ai_addr, static_cast<int>(result->ai_addrlen));
     if (iResult == SOCKET_ERROR) {
         freeaddrinfo(result);
         closeSocket(_serverSocket);
@@ -213,23 +213,23 @@ void TcpSocketServer::waitForConnections() {
 }
 
 void TcpSocketServer::setOptions(_SOCKET socket) {
-    int flag = 1;
+    char trueFlag = 1;
     int iResult;
 
     //set no delay
     iResult = setsockopt(socket, /* socket affected */
         IPPROTO_TCP,     /* set option at TCP level */
         TCP_NODELAY,     /* name of option */
-        (char *)&flag,  /* the cast is historical cruft */
+        &trueFlag,       /* the cast is historical cruft */
         sizeof(int));    /* length of option value */
 
-                         //set send timeout
-    int timeout = 0; //infinite
+    //set send timeout
+    char timeout = 0; //infinite
     iResult = setsockopt(
         socket,
         SOL_SOCKET,
         SO_SNDTIMEO,
-        (char *)&timeout,
+        &timeout,
         sizeof(timeout));
 
     //set receive timeout
@@ -237,15 +237,15 @@ void TcpSocketServer::setOptions(_SOCKET socket) {
         socket,
         SOL_SOCKET,
         SO_RCVTIMEO,
-        (char *)&timeout,
+        &timeout,
         sizeof(timeout));
 
-    iResult = setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(int));
+    iResult = setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &trueFlag, sizeof(int));
     if (iResult == SOCKET_ERROR) {
         //LERROR("Failed to set reuse address with error: " << _ERRNO);
     }
 
-    iResult = setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, (char*)&flag, sizeof(int));
+    iResult = setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(int));
     if (iResult == SOCKET_ERROR) {
         //LERROR("Failed to set keep alive with error: " << _ERRNO);
     }
