@@ -32,10 +32,10 @@
 #if !(defined(NDEBUG) || defined(DEBUG))
 
 #define ghoul_precondition(__condition__, __message__) \
-    ghoul_assert(__condition__, "Precondition failed: " ## __message__)
+    ghoul_assert(__condition__, "Precondition failed: " __message__)
 
 #define ghoul_postcondition(__condition__, __message__) \
-    OnExit([&](){ ghoul_assert(__condition__, "Postcondition failed: " ## __message__); })
+    OnExit([&](){ ghoul_assert(__condition__, "Postcondition failed: " __message__); })
 
 #else
 
