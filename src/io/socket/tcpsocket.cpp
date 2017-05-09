@@ -214,6 +214,7 @@ void TcpSocket::streamInput() {
         if (nReadBytes <= 0) {
             _error = true;
             _shouldDisconnect = true;
+            _inputNotifier.notify_one();
             return;
         }
 
@@ -244,6 +245,7 @@ void TcpSocket::streamOutput() {
             if (nSentBytes <= 0) {
                 _error = true;
                 _shouldDisconnect = true;
+                _inputNotifier.notify_one();
                 return;
             }
             _outputQueue.erase(
