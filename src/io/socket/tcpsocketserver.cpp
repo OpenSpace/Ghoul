@@ -25,6 +25,8 @@
 
 #include <ghoul/io/socket/tcpsocketserver.h>
 
+#include <cstring>
+
 namespace ghoul {
 namespace io {
 
@@ -52,7 +54,7 @@ void TcpSocketServer::closeSocket(_SOCKET socket) {
         closesocket(socket);
 #else
         shutdown(socket, SHUT_RDWR);
-        close(socket);
+        ::close(socket);
 #endif
     }
 }
@@ -84,7 +86,7 @@ void TcpSocketServer::listen(std::string address, int port) {
     struct addrinfo* result = nullptr;
     struct addrinfo hints;
 
-    memset(&hints, 0, sizeof(hints));
+    std::memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;

@@ -25,6 +25,7 @@
 
 #include <ghoul/io/socket/tcpsocket.h>
 
+#include <cstring>
 
 namespace ghoul {
 namespace io {
@@ -83,7 +84,7 @@ void TcpSocket::connect() {
     }
 
     struct addrinfo *addresult = NULL, hints;
-    memset(&hints, 0, sizeof(hints));
+    std::memset(&hints, 0, sizeof(hints));
 
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
