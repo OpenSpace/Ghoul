@@ -98,11 +98,11 @@ public:
         explicit TcpSocketError(std::string message, std::string component = "");
     };
 
-	TcpSocket(std::string address, int port);
-	TcpSocket(std::string address, int port, _SOCKET socket);
+    TcpSocket(std::string address, int port);
+    TcpSocket(std::string address, int port, _SOCKET socket);
     ~TcpSocket();
-	void connect();
-	void disconnect();
+    void connect();
+    void disconnect();
     bool isConnected();
     bool isConnecting();
     int socketId() const;
@@ -157,8 +157,8 @@ private:
     std::atomic<bool> _error;
     const int _socketId;
 
-	_SOCKET _socket;
-	TcpSocketServer* _server;
+    _SOCKET _socket;
+    TcpSocketServer* _server;
     std::unique_ptr<std::thread> _inputThread;
     std::unique_ptr<std::thread> _outputThread;
 

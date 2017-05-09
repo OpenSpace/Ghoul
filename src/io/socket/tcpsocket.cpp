@@ -46,8 +46,7 @@ TcpSocket::TcpSocket(std::string address, int port)
     , _inputThread(nullptr)
     , _outputThread(nullptr)
     , _socketId(++_nextSocketId)
-{
-}
+{}
 
 TcpSocket::TcpSocket(std::string address, int port, _SOCKET socket)
     : _address(address)
@@ -92,15 +91,12 @@ void TcpSocket::connect() {
     hints.ai_flags = AI_PASSIVE;
 
     int result = getaddrinfo(_address.c_str(), std::to_string(_port).c_str(), &hints, &addresult);
-    if (result != 0)
-    {
-        //LERROR("Failed to parse hints for Parallel Connection");
+    if (result != 0) {
         return;
     }
 
     _isConnecting = true;
 
-    //start output thread. First 
     _outputThread = std::make_unique<std::thread>([this, addresult]() {
         establishConnection(addresult);
         _inputThread = std::make_unique<std::thread>(
@@ -110,7 +106,6 @@ void TcpSocket::connect() {
     });
 
     _error = false;
-    // todo: connect.
 }
 
 void TcpSocket::disconnect() {
@@ -165,7 +160,6 @@ void TcpSocket::establishConnection(addrinfo *info) {
 
     if (_socket == INVALID_SOCKET) {
         freeaddrinfo(info);
-        //LERROR("Failed to create client socket, disconnecting.");
         _error = true;
         _shouldDisconnect = true;
         return;
@@ -186,14 +180,13 @@ void TcpSocket::establishConnection(addrinfo *info) {
     // Disable address reuse
     result = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &falseFlag, sizeof(falseFlag));
     if (result == SOCKET_ERROR) {
-        //LERROR("Failed to set socket option 'reuse address'. Error code: " << _ERRNO);
+        return;
     }
-
+    // Keep alive
     result = setsockopt(_socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(trueFlag));
     if (result == SOCKET_ERROR) {
-        //LERROR("Failed to set socket option 'keep alive'. Error code: " << _ERRNO);
+        return;
     }
-    //LINFO("Attempting to connect to server " << _address << " on port " << _port);
 
     // Try to connect
     result = ::connect(_socket, info->ai_addr, static_cast<int>(info->ai_addrlen));

@@ -43,10 +43,10 @@ public:
     TcpSocketServer();
     std::string address() const;
     int port() const;
-	void close();
-	void listen(std::string address, int port);
-	bool listening() const;
-	bool hasPendingConnections() const;
+    void close();
+    void listen(std::string address, int port);
+    bool listening() const;
+    bool hasPendingConnections() const;
     std::unique_ptr<TcpSocket> nextPendingConnection();
 
     // Blocking methods
@@ -60,7 +60,7 @@ private:
     bool _listening;
 
     mutable std::mutex _connectionMutex;
-	std::deque<std::unique_ptr<TcpSocket>> _pendingConnections;
+    std::deque<std::unique_ptr<TcpSocket>> _pendingConnections;
 
     std::mutex _connectionNotificationMutex;
     std::condition_variable _connectionNotifier;
