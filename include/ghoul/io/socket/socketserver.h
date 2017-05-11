@@ -23,59 +23,37 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___TCPSOCKETSERVER___H__
-#define __GHOUL___TCPSOCKETSERVER___H__
-
-#include <ghoul/misc/exception.h>
-#include <ghoul/io/socket/tcpsocket.h>
-#include <ghoul/io/socket/socketserver.h>
+#ifndef __GHOUL___SOCKETSERVER___H__
+#define __GHOUL___SOCKETSERVER___H__
 
 #include <memory>
-#include <vector>
-#include <thread>
-#include <atomic>
-#include <mutex>
+#include <string>
 
 namespace ghoul {
 namespace io {
 
-class TcpSocketServer : public SocketServer {
+class Socket;
+
+class SocketServer {
 public:
-    TcpSocketServer();
-    ~TcpSocketServer();
-    virtual std::string address() const;
-    virtual int port() const;
-    virtual void close();
-    virtual void listen(std::string address, int port);
-    virtual bool isListening() const;
-    virtual bool hasPendingConnections() const;
-    std::unique_ptr<TcpSocket> nextPendingTcpSocket();
-    virtual std::unique_ptr<Socket> nextPendingSocket();
+    virtual std::string address() const = 0;
+    virtual int port() const = 0;
+    virtual void close() = 0;
+    virtual void listen(std::string address, int port) = 0;
+    virtual bool isListening() const = 0;
+    virtual bool hasPendingConnections() const = 0;
+    // Get next pending connection. Non-blocking. Can return nullptr.
+    virtual std::unique_ptr<Socket> nextPendingSocket() = 0;
 
-    // Blocking methods
-    std::unique_ptr<TcpSocket> awaitPendingTcpSocket();
-    virtual std::unique_ptr<Socket> awaitPendingSocket();
-private:
-    void closeSocket(_SOCKET socket);
+    // Get next pending connection. Blocking.
+    // Only returns nullptr if the socket server closes.
+    virtual std::unique_ptr<Socket> awaitPendingSocket() = 0;
 
-    mutable std::mutex _settingsMutex;
-    std::string _address;
-    int _port;
-    bool _listening;
-
-    mutable std::mutex _connectionMutex;
-    std::deque<std::unique_ptr<TcpSocket>> _pendingConnections;
-
-    std::mutex _connectionNotificationMutex;
-    std::condition_variable _connectionNotifier;
-
-    std::unique_ptr<std::thread> _serverThread;
-    _SOCKET _serverSocket;
-    void waitForConnections();
-    void setOptions(_SOCKET socket);
 };
 
 } // namespace io
 } // namespace ghoul
 
-#endif // __GHOUL___TCPSOCKETSERVER___H__
+#endif //  __GHOUL___SOCKETSERVER___H__
+
+

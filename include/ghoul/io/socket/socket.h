@@ -23,59 +23,62 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___TCPSOCKETSERVER___H__
-#define __GHOUL___TCPSOCKETSERVER___H__
+#ifndef __GHOUL___SOCKET___H__
+#define __GHOUL___SOCKET___H__
 
-#include <ghoul/misc/exception.h>
-#include <ghoul/io/socket/tcpsocket.h>
-#include <ghoul/io/socket/socketserver.h>
 
-#include <memory>
-#include <vector>
-#include <thread>
 #include <atomic>
-#include <mutex>
+#include <memory>
 
 namespace ghoul {
 namespace io {
 
-class TcpSocketServer : public SocketServer {
+
+class Socket {
 public:
-    TcpSocketServer();
-    ~TcpSocketServer();
-    virtual std::string address() const;
-    virtual int port() const;
-    virtual void close();
-    virtual void listen(std::string address, int port);
-    virtual bool isListening() const;
-    virtual bool hasPendingConnections() const;
-    std::unique_ptr<TcpSocket> nextPendingTcpSocket();
-    virtual std::unique_ptr<Socket> nextPendingSocket();
+    Socket()
+        : _socketId(_nextSocketId++)
+    {}
+    virtual void disconnect() = 0;
+    virtual bool isConnected() = 0;
+    virtual bool isConnecting() = 0;
+    int socketId() const {
+        return _socketId;
+    }
 
-    // Blocking methods
-    std::unique_ptr<TcpSocket> awaitPendingTcpSocket();
-    virtual std::unique_ptr<Socket> awaitPendingSocket();
+    template <typename T = char>
+    bool get(T* buffer, size_t nItems = 1) {
+        return getBytes(reinterpret_cast<char*>(buffer), nItems * sizeof(T));
+    }
+
+    template <typename T = char>
+    bool peek(T* buffer, size_t nItems = 1) {
+        return peekBytes(reinterpret_cast<char*>(buffer), nItems * sizeof(T));
+    }
+
+    template <typename T = char>
+    bool skip(size_t nItems = 1) {
+        return skipBytes(nItems * sizeof(T));
+    }
+
+    template <typename T = char>
+    bool put(const T* buffer, size_t nItems = 1) {
+        return putBytes(reinterpret_cast<const char*>(buffer), nItems * sizeof(T));
+    }
+
+protected:
+    virtual bool getBytes(char* buffer, size_t nItems) = 0;
+    virtual bool peekBytes(char* buffer, size_t nItems) = 0;
+    virtual bool skipBytes(size_t nItems) = 0;
+    virtual bool putBytes(const char* buffer, size_t nItems) = 0;
+
 private:
-    void closeSocket(_SOCKET socket);
-
-    mutable std::mutex _settingsMutex;
-    std::string _address;
-    int _port;
-    bool _listening;
-
-    mutable std::mutex _connectionMutex;
-    std::deque<std::unique_ptr<TcpSocket>> _pendingConnections;
-
-    std::mutex _connectionNotificationMutex;
-    std::condition_variable _connectionNotifier;
-
-    std::unique_ptr<std::thread> _serverThread;
-    _SOCKET _serverSocket;
-    void waitForConnections();
-    void setOptions(_SOCKET socket);
+    const int _socketId;
+    static std::atomic<int> _nextSocketId;
 };
 
-} // namespace io
-} // namespace ghoul
+}
+}
 
-#endif // __GHOUL___TCPSOCKETSERVER___H__
+
+#endif //  __GHOUL___SOCKET___H__

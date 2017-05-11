@@ -31,37 +31,36 @@ namespace ghoul {
 namespace io {
 
 std::atomic<bool> TcpSocket::_initializedNetworkApi{false};
-std::atomic<int> TcpSocket::_nextSocketId{0};
 
 TcpSocket::TcpSocketError::TcpSocketError(std::string message, std::string component)
     : RuntimeError(message, component) {}
 
 TcpSocket::TcpSocket(std::string address, int port)
-    : _address(address)
+    : Socket()
+    , _address(address)
     , _port(port)
     , _isConnected(false)
     , _isConnecting(false)
     , _shouldDisconnect(false)
     , _error(false)
     , _socket(INVALID_SOCKET)
-    , _inputThread(nullptr)
-    , _outputThread(nullptr)
-    , _socketId(++_nextSocketId)
+    , _inputThread(std::thread())
+    , _outputThread(std::thread())
 {}
 
 TcpSocket::TcpSocket(std::string address, int port, _SOCKET socket)
-    : _address(address)
+    : Socket()
+    , _address(address)
     , _port(port)
     , _isConnected(true)
     , _isConnecting(false)
     , _error(false)
     , _socket(socket) 
-    , _socketId(++_nextSocketId)
 {
-    _inputThread = std::make_unique<std::thread>(
+    _inputThread = std::thread(
         [this]() { streamInput(); }
     );
-    _outputThread = std::make_unique<std::thread>(
+    _outputThread = std::thread(
         [this]() { streamOutput(); }
     );
 }
@@ -98,9 +97,9 @@ void TcpSocket::connect() {
 
     _isConnecting = true;
 
-    _outputThread = std::make_unique<std::thread>([this, addresult]() {
+    _outputThread = std::thread([this, addresult]() {
         establishConnection(addresult);
-        _inputThread = std::make_unique<std::thread>(
+        _inputThread = std::thread(
             [this]() { streamInput(); }
         );
         streamOutput();
@@ -127,15 +126,12 @@ void TcpSocket::disconnect() {
     _inputNotifier.notify_all();
     _outputNotifier.notify_all();
 
-    if (_inputThread && _inputThread->joinable()) {
-        _inputThread->join();
+    if (_inputThread.joinable()) {
+        _inputThread.join();
     }
-    _inputThread = nullptr;
-
-    if (_outputThread && _outputThread->joinable()) {
-        _outputThread->join();
+    if (_outputThread.joinable()) {
+        _outputThread.join();
     }
-    _outputThread = nullptr;
 }
 
 bool TcpSocket::isConnected() {
@@ -150,10 +146,6 @@ bool TcpSocket::isConnecting() {
         disconnect();
     }
     return _isConnecting;
-}
-
-int TcpSocket::socketId() const {
-    return _socketId;
 }
 
 void TcpSocket::establishConnection(addrinfo *info) {
@@ -322,6 +314,62 @@ void TcpSocket::initializeNetworkApi() {
 bool TcpSocket::initializedNetworkApi() {
     return _initializedNetworkApi;
 }
+
+
+bool TcpSocket::getBytes(char* getBuffer, size_t size) {
+    waitForInput(size);
+    if (_shouldDisconnect) {
+        disconnect();
+    }
+    if (!_isConnected && !_isConnecting) {
+        return false;
+    }
+    std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
+    std::copy_n(_inputQueue.begin(), size, getBuffer);
+    _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + size);
+    return true;
+}
+
+bool TcpSocket::peekBytes(char* peekBuffer, size_t size) {
+    waitForInput(size);
+    if (_shouldDisconnect) {
+        disconnect();
+    }
+    if (!_isConnected && !_isConnecting) {
+        return false;
+    }
+    std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
+    std::copy_n(_inputQueue.begin(), size, peekBuffer);
+    return true;
+}
+
+bool TcpSocket::skipBytes(size_t size) {
+    waitForInput(size);
+    if (_shouldDisconnect) {
+        disconnect();
+    }
+    if (!_isConnected && !_isConnecting) {
+        return false;
+    }
+    std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
+    _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + size);
+    return true;
+}
+
+bool TcpSocket::putBytes(const char* buffer, size_t size) {
+    if (_shouldDisconnect) {
+        disconnect();
+    }
+    std::lock_guard<std::mutex> outputLock(_outputQueueMutex);
+    _outputQueue.insert(
+        _outputQueue.end(),
+        buffer,
+        buffer + size
+    );
+    _outputNotifier.notify_one();
+    return _isConnected || _isConnecting;
+}
+
 
 }
 }

@@ -23,59 +23,56 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___TCPSOCKETSERVER___H__
-#define __GHOUL___TCPSOCKETSERVER___H__
+#ifndef __GHOUL___WEBSOCKET___H__
+#define __GHOUL___WEBSOCKET___H__
 
-#include <ghoul/misc/exception.h>
-#include <ghoul/io/socket/tcpsocket.h>
-#include <ghoul/io/socket/socketserver.h>
+#include <libwebsockets.h>
 
-#include <memory>
-#include <vector>
-#include <thread>
-#include <atomic>
-#include <mutex>
+#include <ghoul/io/socket/socket.h>
 
 namespace ghoul {
 namespace io {
 
-class TcpSocketServer : public SocketServer {
+class WebSocket : public Socket {
 public:
-    TcpSocketServer();
-    ~TcpSocketServer();
-    virtual std::string address() const;
-    virtual int port() const;
-    virtual void close();
-    virtual void listen(std::string address, int port);
-    virtual bool isListening() const;
-    virtual bool hasPendingConnections() const;
-    std::unique_ptr<TcpSocket> nextPendingTcpSocket();
-    virtual std::unique_ptr<Socket> nextPendingSocket();
+    WebSocket();
+    void disconnect() override;
+    bool isConnected() override;
+    bool isConnecting() override;
+protected:
+    /*
+    * Read size bytes from the socket, store them in buffer and dequeue them from input.
+    * Block until size bytes have been read.
+    * Return false if this fails. Use error() to get the socket error code.
+    */
+    virtual bool getBytes(char* buffer, size_t nItems = 1);
 
-    // Blocking methods
-    std::unique_ptr<TcpSocket> awaitPendingTcpSocket();
-    virtual std::unique_ptr<Socket> awaitPendingSocket();
-private:
-    void closeSocket(_SOCKET socket);
+    /*
+    * Read size bytes from the socket, store them in buffer.
+    * Do NOT dequeue them from input.
+    * Block until size bytes have been read.
+    * Return false if this fails. Use error() to get the socket error code.
+    */
+    virtual bool peekBytes(char* buffer, size_t nItems);
 
-    mutable std::mutex _settingsMutex;
-    std::string _address;
-    int _port;
-    bool _listening;
+    /*
+    * Skip size bytes from the socket.
+    * Block until size bytes have been read.
+    * Return false if this fails. Use error() to get the socket error code.
+    */
+    virtual bool skipBytes(size_t nItems);
 
-    mutable std::mutex _connectionMutex;
-    std::deque<std::unique_ptr<TcpSocket>> _pendingConnections;
+    /**
+    * Write size bytes from buffer into the socket.
+    * Return false if this fails. Use error() to get the socket error code.
+    */
+    virtual bool putBytes(const char* buffer, size_t size = 1);
 
-    std::mutex _connectionNotificationMutex;
-    std::condition_variable _connectionNotifier;
 
-    std::unique_ptr<std::thread> _serverThread;
-    _SOCKET _serverSocket;
-    void waitForConnections();
-    void setOptions(_SOCKET socket);
 };
+
 
 } // namespace io
 } // namespace ghoul
 
-#endif // __GHOUL___TCPSOCKETSERVER___H__
+#endif // __GHOUL___WEBSOCKET___H__

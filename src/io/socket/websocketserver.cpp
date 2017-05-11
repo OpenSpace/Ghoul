@@ -23,59 +23,62 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___TCPSOCKETSERVER___H__
-#define __GHOUL___TCPSOCKETSERVER___H__
-
-#include <ghoul/misc/exception.h>
-#include <ghoul/io/socket/tcpsocket.h>
-#include <ghoul/io/socket/socketserver.h>
-
-#include <memory>
-#include <vector>
-#include <thread>
-#include <atomic>
-#include <mutex>
+#include <ghoul/io/socket/websocketserver.h>
 
 namespace ghoul {
 namespace io {
 
-class TcpSocketServer : public SocketServer {
-public:
-    TcpSocketServer();
-    ~TcpSocketServer();
-    virtual std::string address() const;
-    virtual int port() const;
-    virtual void close();
-    virtual void listen(std::string address, int port);
-    virtual bool isListening() const;
-    virtual bool hasPendingConnections() const;
-    std::unique_ptr<TcpSocket> nextPendingTcpSocket();
-    virtual std::unique_ptr<Socket> nextPendingSocket();
+WebSocketServer::WebSocketServer() {
+}
 
-    // Blocking methods
-    std::unique_ptr<TcpSocket> awaitPendingTcpSocket();
-    virtual std::unique_ptr<Socket> awaitPendingSocket();
-private:
-    void closeSocket(_SOCKET socket);
+WebSocketServer::~WebSocketServer() {}
 
-    mutable std::mutex _settingsMutex;
-    std::string _address;
-    int _port;
-    bool _listening;
+std::string WebSocketServer::address() const {
+    return "";
+}
 
-    mutable std::mutex _connectionMutex;
-    std::deque<std::unique_ptr<TcpSocket>> _pendingConnections;
+int WebSocketServer::port() const {
+    return 0;
+}
 
-    std::mutex _connectionNotificationMutex;
-    std::condition_variable _connectionNotifier;
+void WebSocketServer::close() {
+    // todo.
+}
 
-    std::unique_ptr<std::thread> _serverThread;
-    _SOCKET _serverSocket;
-    void waitForConnections();
-    void setOptions(_SOCKET socket);
-};
+void WebSocketServer::listen(std::string address, int port)
+{
+}
 
-} // namespace io
-} // namespace ghoul
+bool WebSocketServer::isListening() const
+{
+    return false;
+}
 
-#endif // __GHOUL___TCPSOCKETSERVER___H__
+bool WebSocketServer::hasPendingConnections() const
+{
+    return false;
+}
+
+std::unique_ptr<WebSocket> WebSocketServer::nextPendingWebSocket()
+{
+    return std::unique_ptr<WebSocket>();
+}
+
+std::unique_ptr<Socket> WebSocketServer::nextPendingSocket()
+{
+    return std::unique_ptr<Socket>();
+}
+
+std::unique_ptr<WebSocket> WebSocketServer::awaitPendingWebSocket()
+{
+    return std::unique_ptr<WebSocket>();
+}
+
+std::unique_ptr<Socket> WebSocketServer::awaitPendingSocket()
+{
+    return std::unique_ptr<Socket>();
+}
+
+
+}
+}

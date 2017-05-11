@@ -27,6 +27,7 @@
 #define __GHOUL___TCPSOCKET___H__
 
 #include <ghoul/misc/exception.h>
+#include <ghoul/io/socket/socket.h>
 
 #include <thread>
 #include <deque>
@@ -95,7 +96,7 @@ namespace io {
 
 class TcpSocketServer;
 
-class TcpSocket {
+class TcpSocket : public Socket {
 public:
     struct TcpSocketError : public ghoul::RuntimeError {
         explicit TcpSocketError(std::string message, std::string component = "");
@@ -103,20 +104,22 @@ public:
 
     TcpSocket(std::string address, int port);
     TcpSocket(std::string address, int port, _SOCKET socket);
-    ~TcpSocket();
-    void connect();
-    void disconnect();
-    bool isConnected();
-    bool isConnecting();
-    int socketId() const;
+    virtual ~TcpSocket();
+    virtual void connect();
+    virtual void disconnect();
+    virtual bool isConnected();
+    virtual bool isConnecting();
 
+    static void initializeNetworkApi();
+    static bool initializedNetworkApi();
+
+protected:
     /*
     * Read size bytes from the socket, store them in buffer and dequeue them from input.
     * Block until size bytes have been read.
     * Return false if this fails. Use error() to get the socket error code.
     */
-    template <typename T = char>
-    bool get(T* buffer, size_t nItems = 1);
+    virtual bool getBytes(char* buffer, size_t nItems = 1);
 
     /*
     * Read size bytes from the socket, store them in buffer.
@@ -124,27 +127,21 @@ public:
     * Block until size bytes have been read.
     * Return false if this fails. Use error() to get the socket error code.
     */
-    template <typename T = char>
-    bool peek(T* buffer, size_t nItems);
+    virtual bool peekBytes(char* buffer, size_t nItems);
 
     /*
     * Skip size bytes from the socket.
     * Block until size bytes have been read.
     * Return false if this fails. Use error() to get the socket error code.
     */
-    template <typename T = char>
-    bool skip(size_t nItems);
+    virtual bool skipBytes(size_t nItems);
 
     /**
     * Write size bytes from buffer into the socket.
     * Return false if this fails. Use error() to get the socket error code.
     */
-    template <typename T = char>
-    bool put(const T* buffer, size_t size = 1);
+    virtual bool putBytes(const char* buffer, size_t size = 1);
 
-
-    static void initializeNetworkApi();
-    static bool initializedNetworkApi();
 private:
     void establishConnection(addrinfo *info);
     void streamInput();
@@ -158,12 +155,11 @@ private:
     std::atomic<bool> _isConnecting;
     std::atomic<bool> _isConnected;
     std::atomic<bool> _error;
-    const int _socketId;
-
+ 
     _SOCKET _socket;
     TcpSocketServer* _server;
-    std::unique_ptr<std::thread> _inputThread;
-    std::unique_ptr<std::thread> _outputThread;
+    std::thread _inputThread;
+    std::thread _outputThread;
 
     std::mutex _inputBufferMutex;
     std::mutex _inputQueueMutex;
@@ -177,13 +173,10 @@ private:
     std::deque<char> _outputQueue;
     std::array<char, 4096> _outputBuffer;
 
-    static std::atomic<int> _nextSocketId;
     static std::atomic<bool> _initializedNetworkApi;
 };
 
 } // namespace io
 } // namespace ghoul
-
-#include "tcpsocket.inl"
 
 #endif // __GHOUL___TCPSOCKET___H__

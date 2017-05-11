@@ -23,59 +23,43 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___TCPSOCKETSERVER___H__
-#define __GHOUL___TCPSOCKETSERVER___H__
+#ifndef __GHOUL___WEBSOCKETSERVER___H__
+#define __GHOUL___WEBSOCKETSERVER___H__
 
-#include <ghoul/misc/exception.h>
-#include <ghoul/io/socket/tcpsocket.h>
+#include <libwebsockets.h>
+
 #include <ghoul/io/socket/socketserver.h>
+#include <ghoul/io/socket/websocket.h>
 
+#include <string>
 #include <memory>
-#include <vector>
-#include <thread>
-#include <atomic>
-#include <mutex>
 
 namespace ghoul {
 namespace io {
 
-class TcpSocketServer : public SocketServer {
+class WebSocketServer : public SocketServer {
 public:
-    TcpSocketServer();
-    ~TcpSocketServer();
+    WebSocketServer();
+    virtual ~WebSocketServer();
     virtual std::string address() const;
     virtual int port() const;
     virtual void close();
     virtual void listen(std::string address, int port);
     virtual bool isListening() const;
     virtual bool hasPendingConnections() const;
-    std::unique_ptr<TcpSocket> nextPendingTcpSocket();
+    // Get next pending connection. Non-blocking. Can return nullptr.
+    std::unique_ptr<WebSocket> nextPendingWebSocket();
     virtual std::unique_ptr<Socket> nextPendingSocket();
 
-    // Blocking methods
-    std::unique_ptr<TcpSocket> awaitPendingTcpSocket();
+    // Get next pending connection. Blocking.
+    // Only returns nullptr if the socket server closes.
+    std::unique_ptr<WebSocket> awaitPendingWebSocket();
     virtual std::unique_ptr<Socket> awaitPendingSocket();
-private:
-    void closeSocket(_SOCKET socket);
 
-    mutable std::mutex _settingsMutex;
-    std::string _address;
-    int _port;
-    bool _listening;
-
-    mutable std::mutex _connectionMutex;
-    std::deque<std::unique_ptr<TcpSocket>> _pendingConnections;
-
-    std::mutex _connectionNotificationMutex;
-    std::condition_variable _connectionNotifier;
-
-    std::unique_ptr<std::thread> _serverThread;
-    _SOCKET _serverSocket;
-    void waitForConnections();
-    void setOptions(_SOCKET socket);
 };
+
 
 } // namespace io
 } // namespace ghoul
 
-#endif // __GHOUL___TCPSOCKETSERVER___H__
+#endif // __GHOUL___WEBSOCKETSERVER___H__

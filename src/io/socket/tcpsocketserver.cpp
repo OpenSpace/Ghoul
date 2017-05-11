@@ -1,27 +1,27 @@
 /*****************************************************************************************
-*                                                                                       *
-* GHOUL                                                                                 *
-* General Helpful Open Utility Library                                                  *
-*                                                                                       *
-* Copyright (c) 2012-2017                                                               *
-*                                                                                       *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
-* software and associated documentation files (the "Software"), to deal in the Software *
-* without restriction, including without limitation the rights to use, copy, modify,    *
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to    *
-* permit persons to whom the Software is furnished to do so, subject to the following   *
-* conditions:                                                                           *
-*                                                                                       *
-* The above copyright notice and this permission notice shall be included in all copies *
-* or substantial portions of the Software.                                              *
-*                                                                                       *
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,   *
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A         *
-* PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT    *
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
-* CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
-* OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
-****************************************************************************************/
+ *                                                                                       *
+ * GHOUL                                                                                 *
+ * General Helpful Open Utility Library                                                  *
+ *                                                                                       *
+ * Copyright (c) 2012-2017                                                               *
+ *                                                                                       *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
+ * software and associated documentation files (the "Software"), to deal in the Software *
+ * without restriction, including without limitation the rights to use, copy, modify,    *
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to    *
+ * permit persons to whom the Software is furnished to do so, subject to the following   *
+ * conditions:                                                                           *
+ *                                                                                       *
+ * The above copyright notice and this permission notice shall be included in all copies *
+ * or substantial portions of the Software.                                              *
+ *                                                                                       *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,   *
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A         *
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT    *
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
+ ****************************************************************************************/
 
 #include <ghoul/io/socket/tcpsocketserver.h>
 
@@ -36,6 +36,8 @@ TcpSocketServer::TcpSocketServer()
     , _listening(false)
 {
 }
+
+TcpSocketServer::~TcpSocketServer() {}
 
 std::string TcpSocketServer::address() const {
     std::lock_guard<std::mutex> settingsLock(_settingsMutex);
@@ -145,7 +147,7 @@ void TcpSocketServer::listen(std::string address, int port) {
     );
 }
 
-bool TcpSocketServer::listening() const {
+bool TcpSocketServer::isListening() const {
     std::lock_guard<std::mutex> settingsLock(_settingsMutex);
     return _listening;
 }
@@ -158,7 +160,7 @@ bool TcpSocketServer::hasPendingConnections() const {
     return _pendingConnections.size() > 0;
 }
 
-std::unique_ptr<TcpSocket> TcpSocketServer::nextPendingConnection() {
+std::unique_ptr<TcpSocket> TcpSocketServer::nextPendingTcpSocket() {
     if (!_listening) {
         return nullptr;
     }
@@ -171,7 +173,11 @@ std::unique_ptr<TcpSocket> TcpSocketServer::nextPendingConnection() {
     return nullptr;
 }
 
-std::unique_ptr<TcpSocket> TcpSocketServer::awaitPendingConnection() {
+std::unique_ptr<Socket> TcpSocketServer::nextPendingSocket() {
+    return static_cast<std::unique_ptr<Socket>>(nextPendingTcpSocket());
+}
+
+std::unique_ptr<TcpSocket> TcpSocketServer::awaitPendingTcpSocket() {
     if (!_listening) {
         return nullptr;
     }
@@ -181,11 +187,11 @@ std::unique_ptr<TcpSocket> TcpSocketServer::awaitPendingConnection() {
         return hasPendingConnections() || !_listening;
     });
 
-    if (!_listening) {
-        return nullptr;
-    }
+    return nextPendingTcpSocket();
+}
 
-    return nextPendingConnection();
+std::unique_ptr<Socket> TcpSocketServer::awaitPendingSocket() {
+    return static_cast<std::unique_ptr<Socket>>(awaitPendingTcpSocket());
 }
 
 void TcpSocketServer::waitForConnections() {

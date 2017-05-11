@@ -23,69 +23,65 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <ghoul/io/socket/websocket.h>
+
+
 namespace ghoul {
 namespace io {
 
-template <typename T>
-bool TcpSocket::get(T* getBuffer, size_t nItems) {
-    size_t nBytesToRead = sizeof(T) * nItems;
-    waitForInput(nBytesToRead);
-    if (_shouldDisconnect) {
-        disconnect();
-    }
-    if (!_isConnected && !_isConnecting) {
-        return false;
-    }
-    std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
-    std::copy_n(_inputQueue.begin(), nBytesToRead, reinterpret_cast<char*>(getBuffer));
-    _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + nBytesToRead);
-    return true;
+
+
+WebSocket::WebSocket() {
+
+    // protocol types for websockets
+    struct lws_protocols protocols[] =
+    {
+        {
+            "http-only",
+            nullptr,
+            0
+        },
+        {
+            "sgct",
+            nullptr,
+            0
+        },
+        {
+            NULL, NULL, 0
+        }
+    };
+
+
+    // server url will be ws://localhost:9000
+    const char *interface = NULL;
+    struct lws_context *context = NULL;
+
+    // we're not using ssl
+    const char *cert_path = NULL;
+    const char *key_path = NULL;
+
+    //lws_set_log_level(7, lwsl_emit_syslog);
+    //lws_set_log_level(1, lwsl_emit_syslog);
+
+    // no special options
+    int opts = 0;
+
+    // create connection struct
+    struct lws_context_creation_info info;
+    memset(&info, 0, sizeof info);
+
+    info.port = 8000;
+    info.iface = interface;
+    info.protocols = protocols;
+    info.extensions = NULL;
+    info.ssl_cert_filepath = cert_path;
+    info.ssl_private_key_filepath = key_path;
+    info.options = opts;
+    info.gid = -1;
+    info.uid = -1;
+
+    context = lws_create_context(&info);
 }
 
-template <typename T>
-bool TcpSocket::peek(T* peekBuffer, size_t nItems) {
-    size_t nBytesToRead = sizeof(T) * nItems;
-    waitForInput(nBytesToRead);
-    if (_shouldDisconnect) {
-        disconnect();
-    }
-    if (!_isConnected && !_isConnecting) {
-        return false;
-    }
-    std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
-    std::copy_n(_inputQueue.begin(), nBytesToRead, reinterpret_cast<char*>(peekBuffer));
-    return true;
 }
-
-template <typename T>
-bool TcpSocket::skip(size_t nItems) {
-    size_t nBytesToSkip = sizeof(T) * nItems;
-    waitForInput(nBytesToSkip);
-    if (_shouldDisconnect) {
-        disconnect();
-    }
-    if (!_isConnected && !_isConnecting) {
-        return false;
-    }
-    std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
-    _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + nBytesToSkip);
-    return true;
 }
-
-template <typename T>
-bool TcpSocket::put(const T* buffer, size_t nItems) {
-    if (_shouldDisconnect) {
-        disconnect();
-    }
-    std::lock_guard<std::mutex> outputLock(_outputQueueMutex);
-    _outputQueue.insert(
-        _outputQueue.end(),
-        reinterpret_cast<const char*>(buffer),
-        reinterpret_cast<const char*>(buffer + nItems)
-    );
-    _outputNotifier.notify_one();
-    return _isConnected || _isConnecting;
-}
-
-} // namespace io
-} // namespace ghoul
