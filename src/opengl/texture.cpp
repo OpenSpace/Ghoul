@@ -52,7 +52,8 @@ namespace ghoul {
 namespace opengl {
 
 Texture::Texture(glm::uvec3 dimensions, Format format, GLint internalFormat,
-                 GLenum dataType, FilterMode filter, WrappingMode wrapping)
+                 GLenum dataType, FilterMode filter, WrappingMode wrapping,
+                 AllocateData allocate, TakeOwnership takeOwnership)
     : _dimensions(std::move(dimensions))
     , _format(format)
     , _internalFormat(internalFormat)
@@ -61,18 +62,23 @@ Texture::Texture(glm::uvec3 dimensions, Format format, GLint internalFormat,
     , _wrapping(wrapping)
     , _mipMapLevel(8)
     , _anisotropyLevel(-1.f)
-    , _hasOwnershipOfData(false)
+    , _hasOwnershipOfData(takeOwnership)
     , _pixels(nullptr)
-    , _bindCallsUntilValid(0) {
+{
     ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.z >= 1, "Element of dimensions must be bigger or equal 1");
 
-    initialize(true);
+    if (!allocate && takeOwnership) {
+        _hasOwnershipOfData = TakeOwnership::No;
+    }
+
+    initialize(allocate);
 }
 
 Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLint internalFormat,
-                 GLenum dataType, FilterMode filter, WrappingMode wrapping)
+                 GLenum dataType, FilterMode filter, WrappingMode wrapping,
+                 TakeOwnership takeOwnership)
     : _dimensions(std::move(dimensions))
     , _format(format)
     , _internalFormat(internalFormat)
@@ -83,7 +89,6 @@ Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLint interna
     , _anisotropyLevel(-1.f)
     , _hasOwnershipOfData(true)
     , _pixels(data)
-    , _bindCallsUntilValid(0)
 {
     ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
@@ -138,18 +143,8 @@ void Texture::disable()  const {
 }
 
 void Texture::bind() const {
-    if (_bindCallsUntilValid > 0) {
-        _bindCallsUntilValid--;
-        glBindTexture(_type, 0);
-    }
-    else {
-        glBindTexture(_type, _id);
-    }
+    glBindTexture(_type, _id);
 }
-
-void Texture::invalidateForNumberOfBindCalls(size_t nBindCalls) {
-    _bindCallsUntilValid = nBindCalls;
-};
 
 Texture::operator GLuint() const {
     return _id;
@@ -522,6 +517,10 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
     ghoul_assert(x < compMul(_dimensions), "x must be inside the texture dimensions");
     ghoul_assert(_type == GL_TEXTURE_1D, "Function must be called on a 1D texture");
 
+    if (!_pixels) {
+        return vec4(0.f);
+    }
+
     vec4 result(0.f);
     switch (_format) {
         case Format::Red:
@@ -806,6 +805,10 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
         "x and y must be inside the texture dimensions"
     );
     ghoul_assert(_type == GL_TEXTURE_2D, "Function must be called on a 2D texture");
+
+    if (!_pixels) {
+        return vec4(0.f);
+    }
 
     vec4 result(0.f);
     switch (_format) {
@@ -1093,6 +1096,10 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
     );
     ghoul_assert(_type == GL_TEXTURE_3D, "Function must be called on a 3D texture");
 
+    if (!_pixels) {
+        return vec4(0.f);
+    }
+    
     vec4 result(0.f);
     switch (_format) {
         case Format::Red:
