@@ -54,6 +54,7 @@ TcpSocket::TcpSocket(std::string address, int port, _SOCKET socket)
     , _port(port)
     , _isConnected(true)
     , _isConnecting(false)
+    , _shouldDisconnect(false)
     , _error(false)
     , _socket(socket) 
 {
