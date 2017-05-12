@@ -37,7 +37,11 @@ TcpSocketServer::TcpSocketServer()
 {
 }
 
-TcpSocketServer::~TcpSocketServer() {}
+TcpSocketServer::~TcpSocketServer() {
+    if (_listening) {
+        close();
+    }
+}
 
 std::string TcpSocketServer::address() const {
     std::lock_guard<std::mutex> settingsLock(_settingsMutex);
@@ -152,7 +156,7 @@ bool TcpSocketServer::isListening() const {
     return _listening;
 }
 
-bool TcpSocketServer::hasPendingConnections() const {
+bool TcpSocketServer::hasPendingSockets() const {
     if (!_listening) {
         return false;
     }
@@ -184,7 +188,7 @@ std::unique_ptr<TcpSocket> TcpSocketServer::awaitPendingTcpSocket() {
     std::unique_lock<std::mutex> lock(_connectionNotificationMutex);
     // Block execution until there is a pending connection or until the server stops listening.
     _connectionNotifier.wait(lock, [this]() {
-        return hasPendingConnections() || !_listening;
+        return hasPendingSockets() || !_listening;
     });
 
     return nextPendingTcpSocket();

@@ -24,6 +24,7 @@
  ****************************************************************************************/
 
 #include <ghoul/io/socket/websocketserver.h>
+#include <iostream>
 
 namespace ghoul {
 namespace io {
@@ -47,6 +48,7 @@ void WebSocketServer::close() {
 
 void WebSocketServer::listen(std::string address, int port)
 {
+    std::cout << "websocket server listening on" << address << ":" << port << std::endl;
 }
 
 bool WebSocketServer::isListening() const
@@ -54,7 +56,7 @@ bool WebSocketServer::isListening() const
     return false;
 }
 
-bool WebSocketServer::hasPendingConnections() const
+bool WebSocketServer::hasPendingSockets() const
 {
     return false;
 }

@@ -48,7 +48,7 @@ public:
     virtual void close();
     virtual void listen(std::string address, int port);
     virtual bool isListening() const;
-    virtual bool hasPendingConnections() const;
+    virtual bool hasPendingSockets() const;
     std::unique_ptr<TcpSocket> nextPendingTcpSocket();
     virtual std::unique_ptr<Socket> nextPendingSocket();
 

@@ -41,7 +41,7 @@ public:
     virtual void close() = 0;
     virtual void listen(std::string address, int port) = 0;
     virtual bool isListening() const = 0;
-    virtual bool hasPendingConnections() const = 0;
+    virtual bool hasPendingSockets() const = 0;
     // Get next pending connection. Non-blocking. Can return nullptr.
     virtual std::unique_ptr<Socket> nextPendingSocket() = 0;
 

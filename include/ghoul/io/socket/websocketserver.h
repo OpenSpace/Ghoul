@@ -46,7 +46,7 @@ public:
     virtual void close();
     virtual void listen(std::string address, int port);
     virtual bool isListening() const;
-    virtual bool hasPendingConnections() const;
+    virtual bool hasPendingSockets() const;
     // Get next pending connection. Non-blocking. Can return nullptr.
     std::unique_ptr<WebSocket> nextPendingWebSocket();
     virtual std::unique_ptr<Socket> nextPendingSocket();
