@@ -130,7 +130,7 @@ void TcpSocketServer::listen(std::string address, int port) {
 #if defined(WIN32)
         WSACleanup();
 #endif
-        TcpSocket::TcpSocketError("Bind failed with error: " + std::to_string(_ERRNO));
+        throw TcpSocket::TcpSocketError("Bind failed with error: " + std::to_string(_ERRNO));
     }
 
     //cleanup
