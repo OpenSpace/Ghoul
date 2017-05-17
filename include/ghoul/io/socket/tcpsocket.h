@@ -105,10 +105,14 @@ public:
     TcpSocket(std::string address, int port);
     TcpSocket(std::string address, int port, _SOCKET socket);
     virtual ~TcpSocket();
-    virtual void connect();
-    virtual void disconnect();
-    virtual bool isConnected();
-    virtual bool isConnecting();
+    void connect();
+    void disconnect() override;
+    bool isConnected() override;
+    bool isConnecting() override;
+
+    bool getMessage(std::string& message) override;
+    bool putMessage(const std::string& message) override;
+    void setDelimiter(char delim);
 
     static void initializeNetworkApi();
     static bool initializedNetworkApi();
@@ -146,6 +150,7 @@ private:
     void establishConnection(addrinfo *info);
     void streamInput();
     void streamOutput();
+    int waitForDelimiter();
     bool waitForInput(size_t nBytes);
     bool waitForOutput(size_t nBytes);
 
@@ -172,6 +177,8 @@ private:
     std::condition_variable _outputNotifier;
     std::deque<char> _outputQueue;
     std::array<char, 4096> _outputBuffer;
+
+    std::atomic<char> _delimiter;
 
     static std::atomic<bool> _initializedNetworkApi;
 };

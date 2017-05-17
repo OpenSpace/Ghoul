@@ -39,6 +39,8 @@ public:
     void disconnect() override;
     bool isConnected() override;
     bool isConnecting() override;
+    bool getMessage(std::string& message) override;
+    bool putMessage(const std::string& message) override;
 protected:
     /*
     * Read size bytes from the socket, store them in buffer and dequeue them from input.

@@ -83,5 +83,15 @@ WebSocket::WebSocket() {
     context = lws_create_context(&info);
 }
 
+bool WebSocket::getMessage(std::string& message)
+{
+    return false;
+}
+
+bool WebSocket::putMessage(const std::string& message)
+{
+    return false;
+}
+
 }
 }

@@ -27,6 +27,10 @@
 
 #include <cstring>
 
+namespace {
+    const char DefaultDelimiter = '\n';
+}
+
 namespace ghoul {
 namespace io {
 
@@ -46,6 +50,7 @@ TcpSocket::TcpSocket(std::string address, int port)
     , _socket(INVALID_SOCKET)
     , _inputThread(std::thread())
     , _outputThread(std::thread())
+    , _delimiter(DefaultDelimiter)
 {}
 
 TcpSocket::TcpSocket(std::string address, int port, _SOCKET socket)
@@ -56,7 +61,8 @@ TcpSocket::TcpSocket(std::string address, int port, _SOCKET socket)
     , _isConnecting(false)
     , _shouldDisconnect(false)
     , _error(false)
-    , _socket(socket) 
+    , _socket(socket)
+    , _delimiter(DefaultDelimiter)
 {
     _inputThread = std::thread(
         [this]() { streamInput(); }
@@ -149,6 +155,29 @@ bool TcpSocket::isConnecting() {
     return _isConnecting;
 }
 
+bool TcpSocket::getMessage(std::string& message) {
+    int delimiterIndex = waitForDelimiter();
+    if (delimiterIndex == -1) {
+        return false;
+    }
+    std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
+    message = std::string(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex);
+    _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex + 1);
+    return true;
+}
+
+bool TcpSocket::putMessage(const std::string& message) {
+    if (!putBytes(message.data(), message.size())) {
+        return false;
+    }
+    char delimiter = _delimiter;
+    return putBytes(&delimiter);   
+}
+
+void TcpSocket::setDelimiter(char delimiter) {
+    _delimiter = delimiter;
+}
+
 void TcpSocket::establishConnection(addrinfo *info) {
     _socket = socket(info->ai_family, info->ai_socktype, info->ai_protocol);
 
@@ -216,7 +245,7 @@ void TcpSocket::streamInput() {
 }
 
 void TcpSocket::streamOutput() {
-    while (_isConnected  && !_shouldDisconnect) {
+    while (_isConnected && !_shouldDisconnect) {
         waitForOutput(1);
 
         int nBytesToSend = 0;
@@ -263,6 +292,31 @@ bool TcpSocket::waitForInput(size_t nBytes) {
     }
 
     return !_error;
+}
+
+int TcpSocket::waitForDelimiter() {
+    char delimiter = _delimiter;
+    int currentIndex = 0;
+    auto receivedRequestedInputOrDisconnected = [this, &currentIndex, delimiter]() {
+        if (_shouldDisconnect || (!_isConnected && !_isConnecting)) {
+            return true;
+        }
+        std::lock_guard<std::mutex> queueMutex(_inputQueueMutex);
+        auto it = std::find(_inputQueue.begin() + currentIndex, _inputQueue.end(), delimiter);
+        currentIndex = it - _inputQueue.begin();
+        return it != _inputQueue.end();
+    };
+
+    // Block execution until the delimiter character was found in the input queue.
+    if (!receivedRequestedInputOrDisconnected()) {
+        std::unique_lock<std::mutex> lock(_inputBufferMutex);
+        _inputNotifier.wait(lock, receivedRequestedInputOrDisconnected);
+    }
+    if (_error) {
+        return -1;
+    } else {
+        return currentIndex;
+    }
 }
 
 bool TcpSocket::waitForOutput(size_t nBytes) {

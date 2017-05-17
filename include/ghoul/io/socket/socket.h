@@ -26,7 +26,7 @@
 #ifndef __GHOUL___SOCKET___H__
 #define __GHOUL___SOCKET___H__
 
-
+#include <string>
 #include <atomic>
 #include <memory>
 
@@ -46,6 +46,9 @@ public:
         return _socketId;
     }
 
+    /**
+     * Methods for binary communication
+     */
     template <typename T = char>
     bool get(T* buffer, size_t nItems = 1) {
         return getBytes(reinterpret_cast<char*>(buffer), nItems * sizeof(T));
@@ -66,7 +69,16 @@ public:
         return putBytes(reinterpret_cast<const char*>(buffer), nItems * sizeof(T));
     }
 
+    /**
+     * Methods for text based communication.
+     */
+    virtual bool getMessage(std::string& message) = 0;
+    virtual bool putMessage(const std::string& message) = 0;
+
 protected:
+    /**
+     * Methods for binary communication
+     */
     virtual bool getBytes(char* buffer, size_t nItems) = 0;
     virtual bool peekBytes(char* buffer, size_t nItems) = 0;
     virtual bool skipBytes(size_t nItems) = 0;
