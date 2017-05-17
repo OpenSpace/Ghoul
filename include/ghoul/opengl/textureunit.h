@@ -72,6 +72,12 @@ public:
     void activate();
 
     /**
+    * This method will deactivate the enum assigned to this TextureUnit and mark it as
+    * free again. 
+    */
+    void deactivate();
+
+    /**
      * This method returns the texture unit enum that was assigned to this TextureUnit. If 
      * this is the first call to either #activate, glEnum, or #unitNumber, a free unit
      * enum will be assigned to this object. The returned enum is equivalent to

@@ -50,10 +50,7 @@ TextureUnit::TextureUnit()
 }
 
 TextureUnit::~TextureUnit() {
-    if (_assigned) {
-        _busyUnits.at(_number) = false;
-        --_totalActive;
-    }
+    deactivate();
 }
 
 void TextureUnit::activate() {
@@ -61,6 +58,14 @@ void TextureUnit::activate() {
         assignUnit();
     }
     glActiveTexture(_glEnum);
+}
+
+void TextureUnit::deactivate() {
+    if (_assigned) {
+        _assigned = false;
+        _busyUnits.at(_number) = false;
+        --_totalActive;        
+    }
 }
 
 GLint TextureUnit::glEnum() {
