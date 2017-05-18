@@ -283,12 +283,12 @@ int Texture::numberOfChannels(Format format) {
             return 1;
         case Format::RG:
             return 2;
-		case Format::RGB: // Intentional fallthrough
+        case Format::RGB: // Intentional fallthrough
         case Format::BGR:
-			return 3;
-		case Format::RGBA: // Intentional fallthrough
+            return 3;
+        case Format::RGBA: // Intentional fallthrough
         case Format::BGRA:
-			return 4;
+            return 4;
     }
     return 0;
 }
