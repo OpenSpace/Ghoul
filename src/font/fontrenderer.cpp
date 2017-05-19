@@ -97,7 +97,7 @@ namespace {
             FragColor = blend * vec4(1.0, 1.0, 1.0, outline);\n\
         } \n\
         else { \n\
-            FragColor = vec4(baseColor.rgb, baseColor * texture(tex, texCoords).r); \n\
+            FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r); \n\
         } \n\
     }";
 }
