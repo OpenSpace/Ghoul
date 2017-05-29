@@ -51,6 +51,7 @@ namespace opengl {
  */
 class Texture {
 public:
+    using AllocateData = ghoul::Boolean;
     using TakeOwnership = ghoul::Boolean;
 
     /**
@@ -116,12 +117,19 @@ public:
      * \param filter The Texture::FilterMode that will be used to interpolate between texels
      * \param wrapping The Texture::WrappingMode that will be used to generate values on
      * the border of the texture
+     * \param allocate Sets whether or not the texture object should allocate texture
+     * data itself
+     * \param takeOwnership Sets whether or not the Texture object should take ownership
+     * of the data allocated. In case there is no data allocated, the Texture will
+     * automatically not take ownership
      * \pre Element of \p dimensions must be bigger or equal <code>1</code>
      */
     Texture(glm::uvec3 dimensions, Format format = Format::RGBA,
             GLint internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
             FilterMode filter = FilterMode::Linear,
-            WrappingMode wrapping = WrappingMode::Repeat);
+            WrappingMode wrapping = WrappingMode::Repeat,
+            AllocateData allocate = AllocateData::Yes,
+            TakeOwnership takeOwnership = TakeOwnership::Yes);
 
     /**
      * This constructor will generate a Texture out of the passed data. The data should 
@@ -152,11 +160,14 @@ public:
      * texels
      * \param wrapping The Texture::WrappingMode that will be used to generate values on
      * the border of the texture
+     * \param takeOwnership Sets whether or not the Texture object should take ownership
+     * of the data.
      */
     Texture(void* data, glm::uvec3 dimensions, Format format = Format::RGBA,
             GLint internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
             FilterMode filter = FilterMode::Linear,
-            WrappingMode wrapping = WrappingMode::Repeat);
+            WrappingMode wrapping = WrappingMode::Repeat,
+            TakeOwnership takeOwnership = TakeOwnership::Yes);
 
     /**
      * Unloads the Texture from GPU memory and destroys the id. The destructor will also 
@@ -401,6 +412,40 @@ public:
      * provided dimensions
      */
     void uploadTexture();
+
+    /**
+     * Binds and uploads the texture to graphics memory. The Texture has to be of type
+     * <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code>, or
+     * <code>GL_TEXTURE_3D</code>. The type will be determined automatically based on the
+     * provided dimensions.
+     * The function calls glTexSubImage which means that the texture will already have
+     * to be existing in graphics memory.
+     */
+    void reUploadTexture();
+
+    /**
+     * Binds and uploads the texture to graphics memory using a pixel buffer object.
+     * The Texture has to be of type
+     * <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code>, or
+     * <code>GL_TEXTURE_3D</code>. The type will be determined automatically based on the
+     * provided dimensions.
+     * The data pointer will not be used. Intead it is assumed that the provided pixel
+     * buffer object contains the data of the right size and format.
+     */
+    void uploadTextureFromPBO(GLuint pbo);
+
+    /**
+     * Binds and uploads the texture to graphics memory using a pixel buffer object.
+     * The Texture has to be of type
+     * <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code>, or
+     * <code>GL_TEXTURE_3D</code>. The type will be determined automatically based on the
+     * provided dimensions.
+     * The data pointer will not be used. Intead it is assumed that the provided pixel
+     * buffer object contains the data of the right size and format.
+     * The function calls glTexSubImage which means that the texture will already have
+     * to be existing in graphics memory.
+     */
+    void reUploadTextureFromPBO(GLuint pbo);
 
     /**
      * Downloads the texture from graphics memory and makes it available using the 
@@ -757,6 +802,12 @@ protected:
 
     /// Determines from the dimensions whether this is a 1D, 2D, or 3D texture
     void determineTextureType();
+
+    /// Upload the passed data pointer to graphics memory by calling glTexImage.
+    void uploadDataToTexture(void* pixelData);
+
+    /// Re-upload the passed data pointer to graphics memory by calling glTexSubImage.
+    void reUploadDataToTexture(void* pixelData);
 
 private:
     /**
