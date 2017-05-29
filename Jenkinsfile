@@ -39,7 +39,7 @@ stage('Build') {
 				  mkdir ${srcDir}/build
 				fi
 				cd ${srcDir}/build
-				/Applications/CMake.app/Contents/bin/cmake -G Xcode
+				/Applications/CMake.app/Contents/bin/cmake -G Xcode ..
 				xcodebuild
 			'''
 		}
