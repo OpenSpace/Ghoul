@@ -6,7 +6,7 @@
 	url = https://github.com/g-truc/glm.git
 [submodule "ext/freetype2"]
 	path = ext/freetype2
-url=https://git.savannah.gnu.org/git/freetype/freetype2.git
+url=http://git.sv.nongnu.org/r/freetype/freetype2.git
 [submodule "ext/cppformat"]
 	path = ext/cppformat
 	url = https://github.com/cppformat/cppformat.git

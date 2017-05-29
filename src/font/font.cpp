@@ -542,7 +542,9 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         // atlas, so we need to copy the values from the buffer into the atlas region
         // first
         if (!_hasOutline) {
-            _atlas.setRegionData(handle, insideBitmap->bitmap.buffer);
+            if (insideBitmap->bitmap.buffer) {
+                _atlas.setRegionData(handle, insideBitmap->bitmap.buffer);
+            }
             auto res = _atlas.textureCoordinates(handle);
             topLeft = res.topLeft;
             bottomRight = res.bottomRight;
