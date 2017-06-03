@@ -342,9 +342,8 @@ std::string ShaderPreprocessor::debugString(ShaderPreprocessor::Env& env) {
 
 bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
     std::string& line = env.line;
-    std::stringstream processed;
-
     size_t beginOffset;
+
     while ((beginOffset = line.rfind("#{")) != std::string::npos) {
         size_t endOffset = line.substr(beginOffset).find("}");
         if (endOffset == std::string::npos) {
