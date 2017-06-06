@@ -22,7 +22,7 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         #
 #########################################################################################
 
-set(GHOUL_SOURCE 
+set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/cmdparser/commandlinecommand.cpp
     ${PROJECT_SOURCE_DIR}/src/cmdparser/commandlineparser.cpp
     ${PROJECT_SOURCE_DIR}/src/cmdparser/multiplecommand.cpp
@@ -109,11 +109,12 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/src/opengl/textureconversion.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/texturemanager.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/textureunit.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/texturearray.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/vertexbufferobject.cpp
     )
 endif ()
 
-set(GHOUL_HEADER 
+set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/cmdparser
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.inl
@@ -228,6 +229,7 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.inl
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texturemanager.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureunit.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texturearray.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.inl
     )
