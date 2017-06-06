@@ -22,7 +22,7 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         #
 #########################################################################################
 
-function (copy_files target)
+function (ghl_copy_files target)
     # Add the copy command
     foreach(file_i ${ARGN})
         add_custom_command(TARGET ${target} POST_BUILD
@@ -57,6 +57,6 @@ macro (ghl_copy_shared_libraries target ghoul_dir)
             set(SHARED_LIBS ${SHARED_LIBS} ${FREEIMAGE_DLL_DIR}/FreeImage.dll)
         endif ()
 
-        copy_files(${target} ${SHARED_LIBS})
+        ghl_copy_files(${target} ${SHARED_LIBS})
     endif (WIN32)
 endmacro ()

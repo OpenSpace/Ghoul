@@ -384,7 +384,8 @@ void runScriptFile(lua_State* state, const std::string& filename) {
     }
     
     if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
-        throw LuaExecutionException(lua_tostring(state, -1));
+        const std::string error = lua_tostring(state, -1);
+        throw LuaExecutionException(error);
     }
 }
 

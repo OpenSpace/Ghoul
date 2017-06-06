@@ -64,29 +64,29 @@ std::string DictionaryLuaFormatter::formatValue(const Dictionary& dictionary,
         return format(subDictionary);
     }
 
-    if (dictionary.hasValue<glm::vec4>(key)) {
-        glm::vec4 vec = dictionary.value<glm::vec4>(key);
+    if (dictionary.hasValue<glm::dvec4>(key)) {
+        glm::dvec4 vec = dictionary.value<glm::dvec4>(key);
         return "{" + std::to_string(vec.x) + "," +
             std::to_string(vec.y) + "," +
             std::to_string(vec.z) + "," +
             std::to_string(vec.w) + "}";
     }
 
-    if (dictionary.hasValue<glm::vec3>(key)) {
-        glm::vec3 vec = dictionary.value<glm::vec3>(key);
+    if (dictionary.hasValue<glm::dvec3>(key)) {
+        glm::dvec3 vec = dictionary.value<glm::dvec3>(key);
         return "{" + std::to_string(vec.x) + "," +
             std::to_string(vec.y) + "," +
             std::to_string(vec.z) + "}";
     }
 
-    if (dictionary.hasValue<glm::vec2>(key)) {
-        glm::vec2 vec = dictionary.value<glm::vec2>(key);
+    if (dictionary.hasValue<glm::dvec2>(key)) {
+        glm::dvec2 vec = dictionary.value<glm::dvec2>(key);
         return "{" + std::to_string(vec.x) + "," +
             std::to_string(vec.y) + "}";
     }
 
-    if (dictionary.hasValue<float>(key)) {
-        float value = dictionary.value<float>(key);
+    if (dictionary.hasValue<double>(key)) {
+        double value = dictionary.value<double>(key);
         return std::to_string(value);
     }
 

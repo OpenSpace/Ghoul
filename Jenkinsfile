@@ -1,7 +1,7 @@
 stage('Build') {
 	parallel linux: {
-		timeout(time: 15, unit: 'MINUTES') {
-			node('linux') {
+		node('linux') {
+			timeout(time: 15, unit: 'MINUTES') {
 				checkout scm
 				sh '''
 					git submodule update --init --recursive
@@ -14,8 +14,8 @@ stage('Build') {
 		}
 	},
 	windows: {
-		timeout(time: 15, unit: 'MINUTES') {
-			node('windows') {
+		node('windows') {
+			timeout(time: 15, unit: 'MINUTES') {
 				checkout scm
 				bat '''
 					git submodule update --init --recursive
@@ -28,8 +28,8 @@ stage('Build') {
 		}
 	},
 	osx: {
-		timeout(time: 15, unit: 'MINUTES') {
-			node('osx') {
+		node('osx') {
+			timeout(time: 15, unit: 'MINUTES') {
 				checkout scm
 				sh '''
 					git submodule update --init --recursive
@@ -44,7 +44,7 @@ stage('Build') {
 					  mkdir ${srcDir}/build
 					fi
 					cd ${srcDir}/build
-					/Applications/CMake.app/Contents/bin/cmake -G Xcode
+					/Applications/CMake.app/Contents/bin/cmake -G Xcode ..
 					xcodebuild
 				'''
 			}

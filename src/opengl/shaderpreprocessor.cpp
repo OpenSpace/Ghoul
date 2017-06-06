@@ -342,21 +342,22 @@ std::string ShaderPreprocessor::debugString(ShaderPreprocessor::Env& env) {
 
 bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
     std::string& line = env.line;
-    std::stringstream processed;
-    int beginOffset;
-    while ((beginOffset = static_cast<int>(line.find("#{"))) != -1) {
-        int endOffset = static_cast<int>(line.substr(beginOffset).find("}"));
-        if (endOffset == -1)
+    size_t beginOffset;
+
+    while ((beginOffset = line.rfind("#{")) != std::string::npos) {
+        size_t endOffset = line.substr(beginOffset).find("}");
+        if (endOffset == std::string::npos) {
             throw ParserError("Could not parse line. " + debugString(env));
+        }
 
         std::string in = line.substr(beginOffset + 2, endOffset - 2);
         std::string out = substitute(in, env);
-        processed << line.substr(0, beginOffset) << out;
-        line = line.substr(beginOffset + endOffset + 1);
+      
+        std::string first = line.substr(0, beginOffset);
+        std::string last = line.substr(beginOffset + endOffset + 1, line.length() - 1 - (beginOffset + endOffset));
+      
+        line = first + out + last;
     }
-
-    processed << line;
-    line = processed.str();
     return true;
 }
 
