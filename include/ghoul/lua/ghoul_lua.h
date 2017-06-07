@@ -26,7 +26,12 @@
 #ifndef __GHOUL___GHOUL_LUA___H__
 #define __GHOUL___GHOUL_LUA___H__
 
-#include <lua.hpp>
+extern "C" {
+    #include <lua.h>
+    #include <lualib.h>
+    #include <lauxlib.h>
+} // extern
+
 #include <ghoul/lua/lua_helper.h>
 
 #endif // __GHOUL___GHOUL_LUA___H__
