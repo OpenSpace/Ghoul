@@ -10,10 +10,13 @@ file(GLOB LUA_HEADER ${LUA_ROOT_DIR}/src/*.h)
 
 list(REMOVE_ITEM LUA_SOURCE "${LUA_ROOT_DIR}/src/lua.c" "${LUA_ROOT_DIR}/src/luac.c")
 
-add_library(Lua STATIC ${LUA_SOURCE})
+add_library(Lua SHARED ${LUA_SOURCE})
 
 if (WIN32)
     target_compile_definitions(Lua PRIVATE "_CRT_SECURE_NO_WARNINGS")
+
+    set_target_properties(Lua PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+
 elseif (UNIX)
     target_compile_definitions(Lua PRIVATE "LUA_USE_POSIX")
 endif()

@@ -57,6 +57,8 @@ macro (ghl_copy_shared_libraries target ghoul_dir)
             set(SHARED_LIBS ${SHARED_LIBS} ${FREEIMAGE_DLL_DIR}/FreeImage.dll)
         endif ()
 
+        ghl_copy_files(${target} $<TARGET_FILE:Lua>)
+
         ghl_copy_files(${target} ${SHARED_LIBS})
     endif (WIN32)
 endmacro ()
