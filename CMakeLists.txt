@@ -261,6 +261,7 @@ endif ()
 if (MSVC)
     target_include_directories(Ghoul PUBLIC ${GHOUL_ROOT_DIR}/ext/stackwalker)
     include_external_library(Ghoul StackWalker ${GHOUL_ROOT_DIR}/ext/stackwalker ${GHOUL_ROOT_DIR}/ext/stackwalker)
+    
 endif ()
 
 if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE AND NOT GHOUL_USE_SOIL)

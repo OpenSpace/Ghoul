@@ -33,4 +33,3 @@ project(StackWalker)
 
 add_library(StackWalker StackWalker.cpp)
 target_include_directories(StackWalker PUBLIC ${PROJECT_SOURCE_DIR})
-

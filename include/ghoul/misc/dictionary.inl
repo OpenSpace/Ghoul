@@ -182,6 +182,10 @@ void ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
     dict->getValue<T>(rest, value);
 }
 
+#ifdef _MSC_VER 
+#pragma warning(push)
+#pragma warning(disable : 4702)
+#endif // _MSC_VER 
 template <typename T>
 void Dictionary::getValueInternal(const std::string& key, T& value,
                                                            IsStandardScalarType<T>*) const
@@ -205,8 +209,8 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
             if (canConvert) {
                 const std::vector<std::string>& keys = dict.keys();
                 for (size_t i = 0; i < internal::StorageTypeConverter<T>::size; ++i) {
-                    const std::string& key = keys[i];
-                    dict.getValue(key, value);
+                    const std::string& k = keys[i];
+                    dict.getValue(k, value);
                     return;
                 }
             }
@@ -217,6 +221,9 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
         find(key)->second.type().name() + "' to type '" + typeid(T).name() + "'"
     );
 }
+#ifdef _MSC_VER 
+#pragma warning(pop)
+#endif // _MSC_VER 
 
 template <typename T, glm::precision P>
 void Dictionary::getValueInternal(const std::string& key, glm::tvec2<T, P>& value) const {
@@ -256,10 +263,10 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec2<T, P>& valu
                      i < internal::StorageTypeConverter<glm::tvec2<T, P>>::size;
                      ++i)
                 {
-                    const std::string& key = keys[i];
+                    const std::string& k = keys[i];
                     T v;
-                    dict.getValue(key, v);
-                    value[i] = std::move(v);
+                    dict.getValue(k, v);
+                    value[static_cast<glm::tvec2<T, P>::length_type>(i)] = std::move(v);
                 }
                 return;
             }
@@ -311,10 +318,10 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec3<T, P>& valu
                      i < internal::StorageTypeConverter<glm::tvec3<T, P>>::size;
                      ++i)
                 {
-                    const std::string& key = keys[i];
+                    const std::string& k = keys[i];
                     T v;
-                    dict.getValue(key, v);
-                    value[i] = std::move(v);
+                    dict.getValue(k, v);
+                    value[static_cast<glm::tvec3<T, P>::length_type>(i)] = std::move(v);
                 }
                 return;
             }
@@ -366,10 +373,10 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec4<T, P>& valu
                 for (size_t i = 0;
                      i < internal::StorageTypeConverter<glm::tvec4<T, P>>::size;
                      ++i) {
-                    const std::string& key = keys[i];
+                    const std::string& k = keys[i];
                     T v;
-                    dict.getValue(key, v);
-                    value[i] = std::move(v);
+                    dict.getValue(k, v);
+                    value[static_cast<glm::tvec4<T, P>::length_type>(i)] = std::move(v);
                 }
                 return;
             }
@@ -422,8 +429,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x2<T, P>& va
                 for (size_t i = 0;
                      i < internal::StorageTypeConverter<glm::tmat2x2<T, P>>::size;
                      ++i) {
-                    const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    const std::string& k = keys[i];
+                    dict.getValue(k, glm::value_ptr(value)[i]);
                 }
                 return;
             }
@@ -477,8 +484,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x3<T, P>& va
                 for (size_t i = 0;
                      i < internal::StorageTypeConverter<glm::tmat2x3<T, P>>::size;
                      ++i) {
-                    const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    const std::string& k = keys[i];
+                    dict.getValue(k, glm::value_ptr(value)[i]);
                 }
                 return;
             }
@@ -534,8 +541,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x4<T, P>& va
                 for (size_t i = 0;
                      i < internal::StorageTypeConverter<glm::tmat2x4<T, P>>::size;
                      ++i) {
-                    const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    const std::string& k = keys[i];
+                    dict.getValue(k, glm::value_ptr(value)[i]);
                 }
                 return;
             }
@@ -589,8 +596,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x2<T, P>& va
                 for (size_t i = 0;
                      i < internal::StorageTypeConverter<glm::tmat3x2<T, P>>::size;
                      ++i) {
-                    const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    const std::string& k = keys[i];
+                    dict.getValue(k, glm::value_ptr(value)[i]);
                 }
                 return;
             }
@@ -647,8 +654,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x3<T, P>& va
                 for (size_t i = 0;
                      i < internal::StorageTypeConverter<glm::tmat3x3<T, P>>::size;
                      ++i) {
-                    const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    const std::string& k = keys[i];
+                    dict.getValue(k, glm::value_ptr(value)[i]);
                 }
                 return;
             }
@@ -708,8 +715,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x4<T, P>& va
                 for (size_t i = 0;
                      i < internal::StorageTypeConverter<glm::tmat3x4<T, P>>::size;
                      ++i) {
-                    const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    const std::string& k = keys[i];
+                    dict.getValue(k, glm::value_ptr(value)[i]);
                 }
                 return;
             }
@@ -765,8 +772,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x2<T, P>& va
                 for (size_t i = 0;
                      i < internal::StorageTypeConverter<glm::tmat4x2<T, P>>::size;
                      ++i) {
-                    const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    const std::string& k = keys[i];
+                    dict.getValue(k, glm::value_ptr(value)[i]);
                 }
                 return;
             }
@@ -826,8 +833,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x3<T, P>& va
                 for (size_t i = 0;
                      i < internal::StorageTypeConverter<glm::tmat4x3<T, P>>::size;
                      ++i) {
-                    const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    const std::string& k = keys[i];
+                    dict.getValue(k, glm::value_ptr(value)[i]);
                 }
                 return;
             }
@@ -891,8 +898,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x4<T, P>& va
                 for (size_t i = 0;
                      i < internal::StorageTypeConverter<glm::tmat4x4<T, P>>::size;
                      ++i) {
-                    const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    const std::string& k = keys[i];
+                    dict.getValue(k, glm::value_ptr(value)[i]);
                 }
                 return;
             }

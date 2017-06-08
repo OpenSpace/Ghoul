@@ -77,8 +77,7 @@ Texture::Texture(glm::uvec3 dimensions, Format format, GLint internalFormat,
 }
 
 Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLint internalFormat,
-                 GLenum dataType, FilterMode filter, WrappingMode wrapping,
-                 TakeOwnership takeOwnership)
+                 GLenum dataType, FilterMode filter, WrappingMode wrapping)
     : _dimensions(std::move(dimensions))
     , _format(format)
     , _internalFormat(internalFormat)

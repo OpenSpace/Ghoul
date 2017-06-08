@@ -166,8 +166,7 @@ public:
     Texture(void* data, glm::uvec3 dimensions, Format format = Format::RGBA,
             GLint internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
             FilterMode filter = FilterMode::Linear,
-            WrappingMode wrapping = WrappingMode::Repeat,
-            TakeOwnership takeOwnership = TakeOwnership::Yes);
+            WrappingMode wrapping = WrappingMode::Repeat);
 
     /**
      * Unloads the Texture from GPU memory and destroys the id. The destructor will also 

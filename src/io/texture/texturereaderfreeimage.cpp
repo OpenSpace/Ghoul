@@ -38,7 +38,17 @@
 #define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_RGB
 #endif
 
+
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable : 4005)
+#endif // _MSC_VER
+
 #include <FreeImage.h>
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif // _MSC_VER
 
 #include <iostream>
 
