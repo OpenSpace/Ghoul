@@ -60,6 +60,10 @@ AssertionException::AssertionException(std::string exp, std::string msg,
         std::move(exp), std::move(msg), std::move(file), line, std::move(func)
     ))
 {}
+
+MissingCaseException::MissingCaseException()
+    : std::runtime_error("Missing case label")
+{}
     
 void internal_assert(std::string expression, std::string message, std::string file,
                                                            std::string function, int line)

@@ -33,40 +33,40 @@
 namespace std {
 std::string to_string(ghoul::opengl::debug::Source source) {
     switch (source) {
-    case ghoul::opengl::debug::Source::API:             return "API";
-    case ghoul::opengl::debug::Source::WindowSystem:    return "Window System";
-    case ghoul::opengl::debug::Source::ShaderCompiler:  return "Shader Compiler";
-    case ghoul::opengl::debug::Source::ThirdParty:      return "Third Party";
-    case ghoul::opengl::debug::Source::Application:     return "Application";
-    case ghoul::opengl::debug::Source::Other:           return "Other";
-    case ghoul::opengl::debug::Source::DontCare:        return "Don't care";
-    default:                                    ghoul_assert(false, "Missing case label");
+        case ghoul::opengl::debug::Source::API:             return "API";
+        case ghoul::opengl::debug::Source::WindowSystem:    return "Window System";
+        case ghoul::opengl::debug::Source::ShaderCompiler:  return "Shader Compiler";
+        case ghoul::opengl::debug::Source::ThirdParty:      return "Third Party";
+        case ghoul::opengl::debug::Source::Application:     return "Application";
+        case ghoul::opengl::debug::Source::Other:           return "Other";
+        case ghoul::opengl::debug::Source::DontCare:        return "Don't care";
+        default:                                      throw ghoul::MissingCaseException();
     }
 }
 
 std::string to_string(ghoul::opengl::debug::Type type) {
     switch (type) {
-    case ghoul::opengl::debug::Type::Error:         return "Error";
-    case ghoul::opengl::debug::Type::Deprecated:    return "Deprecated";
-    case ghoul::opengl::debug::Type::Undefined:     return "Undefined";
-    case ghoul::opengl::debug::Type::Portability:   return "Portability";
-    case ghoul::opengl::debug::Type::Performance:   return "Performance";
-    case ghoul::opengl::debug::Type::Marker:        return "Marker";
-    case ghoul::opengl::debug::Type::PushGroup:     return "Push group";
-    case ghoul::opengl::debug::Type::PopGroup:      return "Pop group";
-    case ghoul::opengl::debug::Type::Other:         return "Other";
-    case ghoul::opengl::debug::Type::DontCare:      return "Don't care";
-    default:                                    ghoul_assert(false, "Missing case label");
+        case ghoul::opengl::debug::Type::Error:         return "Error";
+        case ghoul::opengl::debug::Type::Deprecated:    return "Deprecated";
+        case ghoul::opengl::debug::Type::Undefined:     return "Undefined";
+        case ghoul::opengl::debug::Type::Portability:   return "Portability";
+        case ghoul::opengl::debug::Type::Performance:   return "Performance";
+        case ghoul::opengl::debug::Type::Marker:        return "Marker";
+        case ghoul::opengl::debug::Type::PushGroup:     return "Push group";
+        case ghoul::opengl::debug::Type::PopGroup:      return "Pop group";
+        case ghoul::opengl::debug::Type::Other:         return "Other";
+        case ghoul::opengl::debug::Type::DontCare:      return "Don't care";
+        default:                                      throw ghoul::MissingCaseException();
     }
 }
 
 std::string to_string(ghoul::opengl::debug::Severity severity) {
     switch (severity) {
-    case ghoul::opengl::debug::Severity::High:          return "High";
-    case ghoul::opengl::debug::Severity::Medium:        return "Medium";
-    case ghoul::opengl::debug::Severity::Low:           return "Low";
-    case ghoul::opengl::debug::Severity::Notification:  return "Notification";
-    default:                                    ghoul_assert(false, "Missing case label");
+        case ghoul::opengl::debug::Severity::High:          return "High";
+        case ghoul::opengl::debug::Severity::Medium:        return "Medium";
+        case ghoul::opengl::debug::Severity::Low:           return "Low";
+        case ghoul::opengl::debug::Severity::Notification:  return "Notification";
+        default:                                      throw ghoul::MissingCaseException();
     }
 }
 

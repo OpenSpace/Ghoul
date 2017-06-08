@@ -34,24 +34,17 @@ namespace logging {
 
 std::string stringFromLevel(LogLevel level) {
     switch (level) {
-        case LogLevel::AllLogging:
-            return "All";
-        case LogLevel::Trace:
-            return "Trace";
-        case LogLevel::Debug:
-            return "Debug";
-        case LogLevel::Info:
-            return "Info";
-        case LogLevel::Warning:
-            return "Warning";
-        case LogLevel::Error:
-            return "Error";
-        case LogLevel::Fatal:
-            return "Fatal";
-        case LogLevel::NoLogging:
-            return "None";
+        case LogLevel::AllLogging: return "All";
+        case LogLevel::Trace:      return "Trace";
+        case LogLevel::Debug:      return "Debug";
+        case LogLevel::Info:       return "Info";
+        case LogLevel::Warning:    return "Warning";
+        case LogLevel::Error:      return "Error";
+        case LogLevel::Fatal:      return "Fatal";
+        case LogLevel::NoLogging:  return "None";
+        default:                   throw MissingCaseException();
+
     }
-    ghoul_assert(false, "Missing case label");
 }
 
 LogLevel levelFromString(const std::string& level) {

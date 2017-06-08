@@ -145,7 +145,7 @@ ConversionFunc conversionFunctionSelector(Texture::Format from, Texture::Format 
                     ghoul_assert(false, "Missing case statement");
             }
         default:
-            ghoul_assert(false, "Missing case statement");
+            throw MissingCaseException();
     }
 }
 

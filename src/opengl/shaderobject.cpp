@@ -341,22 +341,17 @@ std::string ShaderObject::typeAsString() const {
 
 std::string ShaderObject::stringForShaderType(ShaderType type) {
     switch (type) {
-        case ShaderTypeVertex:
-            return "Vertex shader";
-        case ShaderTypeTesselationControl:
-            return "Tesselation Control shader";
-        case ShaderTypeTesselationEvaluation:
-            return "Tesselation Evaluation shader";
-        case ShaderTypeGeometry:
-            return "Geometry shader";
-        case ShaderTypeFragment:
-            return "Fragment shader";
+        case ShaderTypeVertex:                return "Vertex shader";
+        case ShaderTypeTesselationControl:    return "Tesselation Control shader";
+        case ShaderTypeTesselationEvaluation: return "Tesselation Evaluation shader";
+        case ShaderTypeGeometry:              return "Geometry shader";
+        case ShaderTypeFragment:              return "Fragment shader";
 #ifdef GL_VERSION_4_3
-        case ShaderTypeCompute:
-            return "Compute shader";
+        case ShaderTypeCompute:               return "Compute shader";
 #endif
+        default:                              throw MissingCaseException();
+
     }
-    ghoul_assert(false, "Missing case label");
 }
 
 } // namespace opengl

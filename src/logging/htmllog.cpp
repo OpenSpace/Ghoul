@@ -139,43 +139,27 @@ void HTMLLog::log(LogLevel level, const std::string& category,
 
 std::string HTMLLog::classForLevel(LogLevel level) {
     switch (level) {
-        case LogLevel::Trace:
-            return "log-level-trace";
-        case LogLevel::Debug:
-            return "log-level-debug";
-        case LogLevel::Info:
-            return "log-level-info";
-        case LogLevel::Warning:
-            return "log-level-warning";
-        case LogLevel::Error:
-            return "log-level-error";
-        case LogLevel::Fatal:
-            return "log-level-fatal";
-        case LogLevel::NoLogging:
-            return "log-level-no-logging";
-        default:
-            ghoul_assert(false, "Missing case label");
+        case LogLevel::Trace:     return "log-level-trace";
+        case LogLevel::Debug:     return "log-level-debug";
+        case LogLevel::Info:      return "log-level-info";
+        case LogLevel::Warning:   return "log-level-warning";
+        case LogLevel::Error:     return "log-level-error";
+        case LogLevel::Fatal:     return "log-level-fatal";
+        case LogLevel::NoLogging: return "log-level-no-logging";
+        default:                  throw MissingCaseException();
     }
 }
 
 std::string HTMLLog::colorForLevel(LogLevel level) {
     switch (level) {
-        case LogLevel::Trace:
-            return "#999999";
-        case LogLevel::Debug:
-            return "#00CC00";
-        case LogLevel::Info:
-            return "#FFFFFF";
-        case LogLevel::Warning:
-            return "#FFFF00";
-        case LogLevel::Error:
-            return "#FF0000";
-        case LogLevel::Fatal:
-            return "#00FFFF";
-        case LogLevel::NoLogging:
-            return "#FFFFFF";
-        default:
-            ghoul_assert(false, "Missing case label");
+        case LogLevel::Trace:     return "#999999";
+        case LogLevel::Debug:     return "#00CC00";
+        case LogLevel::Info:      return "#FFFFFF";
+        case LogLevel::Warning:   return "#FFFF00";
+        case LogLevel::Error:     return "#FF0000";
+        case LogLevel::Fatal:     return "#00FFFF";
+        case LogLevel::NoLogging: return "#FFFFFF";
+        default:                  throw MissingCaseException();
     }
 }
 

@@ -450,6 +450,7 @@ void ShaderPreprocessor::pushScope(std::map<std::string, std::string> map, Shade
 void ShaderPreprocessor::popScope(ShaderPreprocessor::Env& env) {
     ghoul_assert(!env.scopes.empty(), "Environment must have open scope");
     for (const auto& key : env.scopes.back()) {
+        (void)key; // unused variable in Release build
         ghoul_assert(env.aliases.find(key) != env.aliases.end(), "Key not found");
         ghoul_assert(!env.aliases.at(key).empty(), "No aliases for key");
     }

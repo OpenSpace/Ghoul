@@ -324,28 +324,18 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
 
 string luaTypeToString(int type) {
     switch (type) {
-        case LUA_TNONE:
-            return "None";
-        case LUA_TNIL:
-            return "Nil";
-        case LUA_TBOOLEAN:
-            return "Boolean";
-        case LUA_TLIGHTUSERDATA:
-            return "Light UserData";
-        case LUA_TNUMBER:
-            return "Number";
-        case LUA_TSTRING:
-            return "String";
-        case LUA_TTABLE:
-            return "Table";
-        case LUA_TFUNCTION:
-            return "Function";
-        case LUA_TUSERDATA:
-            return "UserData";
-        case LUA_TTHREAD:
-            return "Thread";
+        case LUA_TNONE:          return "None";
+        case LUA_TNIL:           return "Nil";
+        case LUA_TBOOLEAN:       return "Boolean";
+        case LUA_TLIGHTUSERDATA: return "Light UserData";
+        case LUA_TNUMBER:        return "Number";
+        case LUA_TSTRING:        return "String";
+        case LUA_TTABLE:         return "Table";
+        case LUA_TFUNCTION:      return "Function";
+        case LUA_TUSERDATA:      return "UserData";
+        case LUA_TTHREAD:        return "Thread";
+        default:                 throw MissingCaseException();
     }
-    ghoul_assert(false, "Missing type in switch-case");
 }
 
 lua_State* createNewLuaState(bool loadStandardLibraries) {
