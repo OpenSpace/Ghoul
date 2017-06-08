@@ -23,10 +23,6 @@
 #########################################################################################
 
 set(GHOUL_SOURCE 
-    ${PROJECT_SOURCE_DIR}/src/cmdparser/commandlinecommand.cpp
-    ${PROJECT_SOURCE_DIR}/src/cmdparser/commandlineparser.cpp
-    ${PROJECT_SOURCE_DIR}/src/cmdparser/multiplecommand.cpp
-    ${PROJECT_SOURCE_DIR}/src/cmdparser/singlecommand.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/cachemanager.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/directory.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/file.cpp
@@ -35,17 +31,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.osx.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.windows.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderbase.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderlua.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreadermultiformat.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereader.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderbase.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadercmap.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderdevil.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderfreeimage.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadersoil.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriter.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriterbase.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturewritersoil.cpp
     ${PROJECT_SOURCE_DIR}/src/io/volume/rawvolumereader.cpp
     ${PROJECT_SOURCE_DIR}/src/io/volume/volumereader.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/bufferlog.cpp
@@ -58,8 +44,6 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/logging/streamlog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/textlog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/visualstudiooutputlog.cpp
-    ${PROJECT_SOURCE_DIR}/src/lua/lua_helper.cpp
-    ${PROJECT_SOURCE_DIR}/src/lua/luastate.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/any.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/assert.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/buffer.cpp
@@ -77,13 +61,18 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/misc/thread.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/threadpool.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/typeinfo.cpp
-    ${PROJECT_SOURCE_DIR}/src/systemcapabilities/generalcapabilitiescomponent.cpp
-    ${PROJECT_SOURCE_DIR}/src/systemcapabilities/openglcapabilitiescomponent.cpp
-    ${PROJECT_SOURCE_DIR}/src/systemcapabilities/systemcapabilities.cpp
-    ${PROJECT_SOURCE_DIR}/src/systemcapabilities/systemcapabilitiescomponent.cpp
-    ${PROJECT_SOURCE_DIR}/src/systemcapabilities/version.cpp
     ${PROJECT_SOURCE_DIR}/src/ghoul.cpp
 )
+
+if (GHOUL_MODULE_COMMANDLINEPARSER)
+    set(GHOUL_SOURCE
+        ${GHOUL_SOURCE}
+        ${PROJECT_SOURCE_DIR}/src/cmdparser/commandlinecommand.cpp
+        ${PROJECT_SOURCE_DIR}/src/cmdparser/commandlineparser.cpp
+        ${PROJECT_SOURCE_DIR}/src/cmdparser/multiplecommand.cpp
+        ${PROJECT_SOURCE_DIR}/src/cmdparser/singlecommand.cpp
+    )
+endif ()
 
 if (GHOUL_MODULE_FONTRENDERING)
     set(GHOUL_SOURCE
@@ -91,6 +80,15 @@ if (GHOUL_MODULE_FONTRENDERING)
         ${PROJECT_SOURCE_DIR}/src/font/font.cpp
         ${PROJECT_SOURCE_DIR}/src/font/fontmanager.cpp
         ${PROJECT_SOURCE_DIR}/src/font/fontrenderer.cpp
+    )
+endif ()
+
+if (GHOUL_MODULE_LUA)
+    set(GHOUL_SOURCE
+        ${GHOUL_SOURCE}
+        ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderlua.cpp
+        ${PROJECT_SOURCE_DIR}/src/lua/lua_helper.cpp
+        ${PROJECT_SOURCE_DIR}/src/lua/luastate.cpp
     )
 endif ()
 
@@ -110,18 +108,30 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/src/opengl/texturemanager.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/textureunit.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/vertexbufferobject.cpp
+        ${PROJECT_SOURCE_DIR}/src/io/texture/texturereader.cpp
+        ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderbase.cpp
+        ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadercmap.cpp
+        ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderdevil.cpp
+        ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderfreeimage.cpp
+        ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadersoil.cpp
+        ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriter.cpp
+        ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriterbase.cpp
+        ${PROJECT_SOURCE_DIR}/src/io/texture/texturewritersoil.cpp
+    )
+endif ()
+
+if (GHOUL_MODULE_SYSTEMCAPABILITIES)
+    set(GHOUL_SOURCE
+        ${GHOUL_SOURCE}
+        ${PROJECT_SOURCE_DIR}/src/systemcapabilities/generalcapabilitiescomponent.cpp
+        ${PROJECT_SOURCE_DIR}/src/systemcapabilities/openglcapabilitiescomponent.cpp
+        ${PROJECT_SOURCE_DIR}/src/systemcapabilities/systemcapabilities.cpp
+        ${PROJECT_SOURCE_DIR}/src/systemcapabilities/systemcapabilitiescomponent.cpp
+        ${PROJECT_SOURCE_DIR}/src/systemcapabilities/version.cpp
     )
 endif ()
 
 set(GHOUL_HEADER 
-    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/cmdparser
-    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.inl
-    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlineparser.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/multiplecommand.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/multiplecommand.inl
-    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/singleton.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/event.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/event.inl
@@ -131,17 +141,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderlua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreadermultiformat.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereader.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderbase.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadercmap.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderdevil.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderfreeimage.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadersoil.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriter.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterbase.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewritersoil.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/volume/rawvolumereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/volume/volumereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/bufferlog.h
@@ -156,9 +156,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/streamlog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/textlog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/visualstudiooutputlog.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/lua/ghoul_lua.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/lua/luastate.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/any.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/any.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/assert.h
@@ -190,15 +187,22 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/threadpool.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/typeinfo.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/typeinfo.inl
-    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/generalcapabilitiescomponent.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/openglcapabilitiescomponent.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities
-    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities.inl
-    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilitiescomponent.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/version.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/ghoul.h
 )
+
+if (GHOUL_MODULE_COMMANDLINEPARSER)
+    set(GHOUL_HEADER
+        ${GHOUL_HEADER}
+        ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/cmdparser
+        ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.inl
+        ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlineparser.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/multiplecommand.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/multiplecommand.inl
+        ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.inl
+    )
+endif ()
 
 if (GHOUL_MODULE_FONTRENDERING)
     set(GHOUL_HEADER
@@ -206,6 +210,16 @@ if (GHOUL_MODULE_FONTRENDERING)
         ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontmanager.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontrenderer.h
+    )
+endif ()
+
+if (GHOUL_MODULE_LUA)
+    set(GHOUL_HEADER
+        ${GHOUL_HEADER}
+        ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderlua.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/lua/ghoul_lua.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/lua/luastate.h
     )
 endif ()
 
@@ -230,6 +244,29 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureunit.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.inl
+        ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereader.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderbase.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadercmap.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderdevil.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderfreeimage.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadersoil.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriter.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterbase.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewritersoil.h
+    )
+endif ()
+
+
+if (GHOUL_MODULE_SYSTEMCAPABILITIES)
+    set(GHOUL_HEADER
+        ${GHOUL_HEADER}
+        ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/generalcapabilitiescomponent.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/openglcapabilitiescomponent.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities
+        ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities.inl
+        ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilitiescomponent.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/version.h
     )
 endif ()
 

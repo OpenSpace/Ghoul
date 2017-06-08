@@ -60,8 +60,11 @@ option(GHOUL_LOGGING_ENABLE_TRACE "Enables the LTRACE macro" ON)
 option(GHOUL_DISABLE_EXTERNAL_WARNINGS "Disable warnings in external libraries" ON)
 option(GHOUL_THROW_ON_ASSERT "Disables the feedback on asserts; for use in unit tests" OFF)
 
+option(GHOUL_MODULE_COMMANDLINEPARSER "Enable Commandlineparser" ON)
 option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
+option(GHOUL_MODULE_LUA "Enable Lua" ON)
 option(GHOUL_MODULE_OPENGL "Enable OpenGL" ON)
+option(GHOUL_MODULE_SYSTEMCAPABILITIES "Enable System Capabilities" ON)
 
 option(BUILD_SHARED_LIBS "Build package with shared libraries." OFF)
 
@@ -196,8 +199,10 @@ target_include_directories(Ghoul SYSTEM PUBLIC ${LZ4_INCLUDE_DIR})
 target_link_libraries(Ghoul ${LZ4_LIBRARIES})
 
 
-# Lua
-include_external_library(Ghoul Lua ${GHOUL_ROOT_DIR}/ext/lua)
+if (GHOUL_MODULE_LUA)
+    # Lua
+    include_external_library(Ghoul Lua ${GHOUL_ROOT_DIR}/ext/lua)
+endif ()
 
 # Assimp
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "We don't build assimp tools because they need DirectX.")
