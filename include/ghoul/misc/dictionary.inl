@@ -266,7 +266,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec2<T, P>& valu
                     const std::string& k = keys[i];
                     T v;
                     dict.getValue(k, v);
-                    value[static_cast<glm::tvec2<T, P>::length_type>(i)] = std::move(v);
+                    value[static_cast<typename glm::tvec2<T, P>::length_type>(i)] =
+                        std::move(v);
                 }
                 return;
             }
@@ -321,7 +322,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec3<T, P>& valu
                     const std::string& k = keys[i];
                     T v;
                     dict.getValue(k, v);
-                    value[static_cast<glm::tvec3<T, P>::length_type>(i)] = std::move(v);
+                    value[static_cast<typename glm::tvec3<T, P>::length_type>(i)] =
+                        std::move(v);
                 }
                 return;
             }
@@ -376,7 +378,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec4<T, P>& valu
                     const std::string& k = keys[i];
                     T v;
                     dict.getValue(k, v);
-                    value[static_cast<glm::tvec4<T, P>::length_type>(i)] = std::move(v);
+                    value[static_cast<typename glm::tvec4<T, P>::length_type>(i)] =
+                        std::move(v);
                 }
                 return;
             }
