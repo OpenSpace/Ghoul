@@ -82,7 +82,7 @@ target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
 #############################
 # Compile settings
 #############################
-set_property(TARGET Ghoul PROPERTY CXX_STANDARD 14)
+set_property(TARGET Ghoul PROPERTY CXX_STANDARD 17)
 set_property(TARGET Ghoul PROPERTY CXX_STANDARD_REQUIRED On)
 
 if (WIN32)
@@ -96,7 +96,7 @@ endif ()
 if (MSVC)
     target_compile_options(
         Ghoul
-        PUBLIC
+        PRIVATE
         "/ZI"       # Edit and continue support
         "/MP"       # Multi-threading support
         "/W4"       # Highest warning level
@@ -104,14 +104,16 @@ if (MSVC)
         "/wd4201"
         "/wd4127"
         "/we4289"
+        "/std:c++latest"
+        "/permissive-"        
     )
     if (GHOUL_WARNINGS_AS_ERRORS)
-        target_compile_options(Ghoul PUBLIC "/WX")
+        target_compile_options(Ghoul PRIVATE "/WX")
     endif ()
 elseif (APPLE)
     target_compile_options(
         Ghoul
-        PUBLIC
+        PRIVATE
         "-stdlib=libc++"
         "-Wall"
         "-Wextra"
@@ -121,10 +123,10 @@ elseif (APPLE)
         "-Wold-style-cast"
         "-Woverloaded-virtual"
     )
-    target_compile_definitions(Ghoul PUBLIC "__gl_h_")
+    target_compile_definitions(Ghoul PRIVATE "__gl_h_")
 
     if (GHOUL_WARNINGS_AS_ERRORS)
-        target_compile_options(Ghoul PUBLIC "-Werror")
+        target_compile_options(Ghoul PRIVATE "-Werror")
     endif ()
 
     target_include_directories(Ghoul PUBLIC "/Developer/Headers/FlatCarbon")
@@ -142,7 +144,7 @@ elseif (APPLE)
 elseif (UNIX) # The order is important as UNIX is also true on MacOS
     target_compile_options(
         Ghoul
-        PUBLIC
+        PRIVATE
         "-ggdb"
         "-Wall"
         "-Wextra"
@@ -156,7 +158,7 @@ elseif (UNIX) # The order is important as UNIX is also true on MacOS
     )
 
     if (GHOUL_WARNINGS_AS_ERRORS)
-        target_compile_options(Ghoul PUBLIC "-Werror")
+        target_compile_options(Ghoul PRIVATE "-Werror")
     endif ()
 endif ()
 
