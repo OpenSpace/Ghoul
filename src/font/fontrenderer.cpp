@@ -200,7 +200,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
 #if (_MSC_VER >= 1400) //visual studio 2005 or later
     vsprintf_s(buffer.data(), s, format, args);
 #else
-    vsprintf(buffer, format, args);
+    vsprintf(buffer.data(), format, args);
 #endif
     va_end(args);
 
