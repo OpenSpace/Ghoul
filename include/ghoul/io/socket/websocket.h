@@ -27,20 +27,22 @@
 #define __GHOUL___WEBSOCKET___H__
 
 #include <libwebsockets.h>
-
 #include <ghoul/io/socket/socket.h>
+#include <ghoul/logging/logmanager.h>
 
 namespace ghoul {
 namespace io {
 
 class WebSocket : public Socket {
 public:
-    WebSocket();
+    WebSocket(int portNumber = 8000);
+    bool initialize();
     void disconnect() override;
     bool isConnected() override;
     bool isConnecting() override;
     bool getMessage(std::string& message) override;
     bool putMessage(const std::string& message) override;
+
 protected:
     /*
     * Read size bytes from the socket, store them in buffer and dequeue them from input.
@@ -70,7 +72,18 @@ protected:
     */
     virtual bool putBytes(const char* buffer, size_t size = 1);
 
+private:
+    struct lws_context_creation_info info;
+    bool use_ssl = false;
+    int port;
+    int clientCount = 0;
 
+    static int callbackHttp(struct lws* wsi,
+                     enum lws_callback_reasons reason, void *user,
+                     void *in, size_t len);
+    static int callbackWS(struct lws* wsi,
+                   enum lws_callback_reasons reason, void *user,
+                   void *in, size_t len);
 };
 
 

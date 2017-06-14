@@ -24,53 +24,58 @@
  ****************************************************************************************/
 
 #include <ghoul/io/socket/websocket.h>
+#include <fmt/format.h>
 
+namespace {
+    const std::string _loggerCat = "WebSocket";
+}
 
 namespace ghoul {
 namespace io {
 
+WebSocket::WebSocket(int portNumber) : port(portNumber) {
+    // protocol types for WebSockets
+    struct lws_protocols protocols[] = {
+            {
+                "http-only",
+                (lws_callback_function*) WebSocket::callbackHttp,
+                0
+            }, {
+                "sgct",
+                nullptr,
+                0
+            }, {
+                "webgui",
+                (lws_callback_function*) WebSocket::callbackWS,
+                0
+            }, {
+                NULL, NULL, 0
+            }
+        };
 
-
-WebSocket::WebSocket() {
-
-    // protocol types for websockets
-    struct lws_protocols protocols[] =
-    {
-        {
-            "http-only",
-            nullptr,
-            0
-        },
-        {
-            "sgct",
-            nullptr,
-            0
-        },
-        {
-            NULL, NULL, 0
-        }
-    };
-
-
-    // server url will be ws://localhost:9000
+    // server url will be ws://localhost:<port>
     const char *interface = NULL;
-    struct lws_context *context = NULL;
 
     // we're not using ssl
-    const char *cert_path = NULL;
-    const char *key_path = NULL;
+    char *cert_path;
+    char *key_path;
+    if (use_ssl) {
+        // TODO: we really should use ssl
+    } else {
+        cert_path = NULL;
+        key_path = NULL;
+    }
 
     //lws_set_log_level(7, lwsl_emit_syslog);
     //lws_set_log_level(1, lwsl_emit_syslog);
 
     // no special options
-    int opts = 0;
+    unsigned int opts = 0;
 
-    // create connection struct
-    struct lws_context_creation_info info;
+    // initiate connection struct
     memset(&info, 0, sizeof info);
 
-    info.port = 8000;
+    info.port = port;
     info.iface = interface;
     info.protocols = protocols;
     info.extensions = NULL;
@@ -79,8 +84,20 @@ WebSocket::WebSocket() {
     info.options = opts;
     info.gid = -1;
     info.uid = -1;
+}
 
+bool WebSocket::initialize() {
+    struct lws_context *context = NULL;
     context = lws_create_context(&info);
+
+    if (context == NULL) {
+        LERROR("Could not create LibWebSocket context.");
+        return false;
+    }
+
+    LDEBUG(fmt::format("WebSocket available on port {}.", port));
+
+    return true;
 }
 
 bool WebSocket::getMessage(std::string& message)
@@ -91,6 +108,39 @@ bool WebSocket::getMessage(std::string& message)
 bool WebSocket::putMessage(const std::string& message)
 {
     return false;
+}
+
+bool WebSocket::isConnected() {
+    return clientCount > 0;
+}
+
+int WebSocket::callbackHttp(struct lws* wsi,
+                            enum lws_callback_reasons reason, void *user,
+                            void *in, size_t len) {
+    LERROR("HTTP connections not supported.");
+    return 0;
+}
+
+int WebSocket::callbackWS(struct lws* wsi,
+                          enum lws_callback_reasons reason, void *user,
+                          void *in, size_t len) {
+    LERROR("Received poke at callbackWS");
+
+    switch(reason) {
+        case LWS_CALLBACK_CLIENT_WRITEABLE:
+//            clientCount++;
+//            LDEBUG(fmt::format("Client connected. Client count: {}", clientCount));
+            LDEBUG("Client connected.");
+            break;
+        case LWS_CALLBACK_RECEIVE:
+            LDEBUG("Receiving message from WS Client.");
+//            auto msg = (char*) in;
+            break;
+        default:
+            LWARNING(fmt::format("Unhandled callback in callbackWS: {}", reason));
+    }
+
+    return 0;
 }
 
 }

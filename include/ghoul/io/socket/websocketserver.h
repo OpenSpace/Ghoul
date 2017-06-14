@@ -33,6 +33,7 @@
 
 #include <string>
 #include <memory>
+#include <thread>
 
 namespace ghoul {
 namespace io {
@@ -56,6 +57,14 @@ public:
     std::unique_ptr<WebSocket> awaitPendingWebSocket();
     virtual std::unique_ptr<Socket> awaitPendingSocket();
 
+private:
+    std::string _address;
+    int _port;
+    bool _listening = false;
+
+    std::unique_ptr<std::thread> _serverThread;
+
+    void waitForConnections();
 };
 
 

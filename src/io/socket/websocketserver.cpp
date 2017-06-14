@@ -35,50 +35,58 @@ WebSocketServer::WebSocketServer() {
 WebSocketServer::~WebSocketServer() {}
 
 std::string WebSocketServer::address() const {
-    return "";
+    return _address;
 }
 
 int WebSocketServer::port() const {
-    return 0;
+    return _port;
 }
 
 void WebSocketServer::close() {
     // todo.
 }
 
-void WebSocketServer::listen(std::string address, int port)
-{
-    std::cout << "websocket server listening on" << address << ":" << port << std::endl;
+void WebSocketServer::listen(std::string address, int port) {
+    _address = address;
+    _port = port;
+
+    // mark itself as active and fire up separate thread for incoming connections
+    _listening = true;
+    _serverThread = std::make_unique<std::thread>(
+            [this]() { waitForConnections(); }
+    );
 }
 
-bool WebSocketServer::isListening() const
-{
+bool WebSocketServer::isListening() const {
+    return _listening;
+}
+
+bool WebSocketServer::hasPendingSockets() const {
     return false;
 }
 
-bool WebSocketServer::hasPendingSockets() const
-{
-    return false;
-}
+std::unique_ptr<WebSocket> WebSocketServer::nextPendingWebSocket() {
+    if (!isListening()) {
+        return nullptr;
+    }
 
-std::unique_ptr<WebSocket> WebSocketServer::nextPendingWebSocket()
-{
     return std::unique_ptr<WebSocket>();
 }
 
-std::unique_ptr<Socket> WebSocketServer::nextPendingSocket()
-{
+std::unique_ptr<Socket> WebSocketServer::nextPendingSocket() {
     return std::unique_ptr<Socket>();
 }
 
-std::unique_ptr<WebSocket> WebSocketServer::awaitPendingWebSocket()
-{
+std::unique_ptr<WebSocket> WebSocketServer::awaitPendingWebSocket() {
     return std::unique_ptr<WebSocket>();
 }
 
-std::unique_ptr<Socket> WebSocketServer::awaitPendingSocket()
-{
+std::unique_ptr<Socket> WebSocketServer::awaitPendingSocket() {
     return std::unique_ptr<Socket>();
+}
+
+void WebSocketServer::waitForConnections() {
+
 }
 
 
