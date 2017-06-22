@@ -42,6 +42,7 @@ public:
     virtual void disconnect() = 0;
     virtual bool isConnected() = 0;
     virtual bool isConnecting() = 0;
+    virtual void startStreams() = 0;
     int socketId() const {
         return _socketId;
     }

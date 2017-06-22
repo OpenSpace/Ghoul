@@ -30,117 +30,108 @@ namespace {
     const std::string _loggerCat = "WebSocket";
 }
 
+using websocketpp::lib::placeholders::_1;
+using websocketpp::lib::placeholders::_2;
+using websocketpp::lib::bind;
+
 namespace ghoul {
 namespace io {
 
-WebSocket::WebSocket(int portNumber) : port(portNumber) {
-    // protocol types for WebSockets
-    struct lws_protocols protocols[] = {
-            {
-                "http-only",
-                (lws_callback_function*) WebSocket::callbackHttp,
-                0
-            }, {
-                "sgct",
-                nullptr,
-                0
-            }, {
-                "webgui",
-                (lws_callback_function*) WebSocket::callbackWS,
-                0
-            }, {
-                NULL, NULL, 0
-            }
-        };
+WebSocket::WebSocketError::WebSocketError(std::string message, std::string component)
+        : RuntimeError(message, component) {}
 
-    // server url will be ws://localhost:<port>
-    const char *interface = NULL;
-
-    // we're not using ssl
-    char *cert_path;
-    char *key_path;
-    if (use_ssl) {
-        // TODO: we really should use ssl
-    } else {
-        cert_path = NULL;
-        key_path = NULL;
-    }
-
-    //lws_set_log_level(7, lwsl_emit_syslog);
-    //lws_set_log_level(1, lwsl_emit_syslog);
-
-    // no special options
-    unsigned int opts = 0;
-
-    // initiate connection struct
-    memset(&info, 0, sizeof info);
-
-    info.port = port;
-    info.iface = interface;
-    info.protocols = protocols;
-    info.extensions = NULL;
-    info.ssl_cert_filepath = cert_path;
-    info.ssl_private_key_filepath = key_path;
-    info.options = opts;
-    info.gid = -1;
-    info.uid = -1;
+WebSocket::WebSocket(std::string address, int port) : TcpSocket(address, port) {
+    LDEBUG(fmt::format("WebSocket started on {}:{}.", address, port));
+    // starting ws server needs to be handled here
 }
 
-bool WebSocket::initialize() {
-    struct lws_context *context = NULL;
-    context = lws_create_context(&info);
+WebSocket::WebSocket(std::string address, int port, _SOCKET socket)
+        : TcpSocket(address, port, socket)
+{
+    LDEBUG(fmt::format("WebSocket started on port {}. Client: {}. Socket provided.", port, address));
+//    server.set_message_handler(bind(&WebSocket::onMessage, &server, ::_1, ::_2));
 
-    if (context == NULL) {
-        LERROR("Could not create LibWebSocket context.");
+    server.set_message_handler([this](websocketpp::connection_hdl hdl, WsServer::message_ptr msg) {
+        onMessage(&server, hdl, msg);
+    });
+    server.set_close_handler([this](websocketpp::connection_hdl hdl) {
+        _shouldDisconnect = true;
+    });
+
+    server.register_ostream(&outputStream);
+    socketConnection = server.get_connection();
+    socketConnection->start();
+
+    startStreams();
+}
+
+WebSocket::~WebSocket() {
+    socketConnection->eof();
+//     socketConnection->terminate();
+}
+
+void WebSocket::startStreams() {
+    _inputThread = std::thread(
+            [this]() { streamInput(); }
+    );
+    _outputThread = std::thread(
+            [this]() { streamOutput(); }
+    );
+}
+
+bool WebSocket::getMessage(std::string &message) {
+    return false;
+}
+
+bool WebSocket::putMessage(const std::string &message) {
+    if (!_isConnected) {
+        LERROR("Cannot send message when not connected.");
         return false;
     }
-
-    LDEBUG(fmt::format("WebSocket available on port {}.", port));
-
+    outputStream << message;
     return true;
 }
 
-bool WebSocket::getMessage(std::string& message)
-{
-    return false;
-}
+void WebSocket::streamInput() {
+    // feed to server somehow
+    int nReadBytes = 0;
 
-bool WebSocket::putMessage(const std::string& message)
-{
-    return false;
-}
+    while (_isConnected && !_shouldDisconnect) {
+        std::lock_guard<std::mutex> inputBufferGuard(_inputBufferMutex);
 
-bool WebSocket::isConnected() {
-    return clientCount > 0;
-}
+        nReadBytes = recv(
+                _socket,
+                _inputBuffer.data(),
+                static_cast<int>(_inputBuffer.size()),
+                0);
 
-int WebSocket::callbackHttp(struct lws* wsi,
-                            enum lws_callback_reasons reason, void *user,
-                            void *in, size_t len) {
-    LERROR("HTTP connections not supported.");
-    return 0;
-}
+        if (nReadBytes <= 0) {
+            _error = true;
+            _shouldDisconnect = true;
+            _inputNotifier.notify_one();
+            return;
+        }
 
-int WebSocket::callbackWS(struct lws* wsi,
-                          enum lws_callback_reasons reason, void *user,
-                          void *in, size_t len) {
-    LERROR("Received poke at callbackWS");
-
-    switch(reason) {
-        case LWS_CALLBACK_CLIENT_WRITEABLE:
-//            clientCount++;
-//            LDEBUG(fmt::format("Client connected. Client count: {}", clientCount));
-            LDEBUG("Client connected.");
-            break;
-        case LWS_CALLBACK_RECEIVE:
-            LDEBUG("Receiving message from WS Client.");
-//            auto msg = (char*) in;
-            break;
-        default:
-            LWARNING(fmt::format("Unhandled callback in callbackWS: {}", reason));
+        socketConnection->read_some(_inputBuffer.data(), nReadBytes);
     }
+}
 
-    return 0;
+void WebSocket::streamOutput() {
+
+}
+
+/**
+ * Callback for incoming messages
+ * @param s   - server pointer
+ * @param hdl - A handle to uniquely identify a connection.
+ * @param msg - the message
+ */
+void WebSocket::onMessage(WsServer *s, websocketpp::connection_hdl hdl, WsServer::message_ptr msg) {
+    std::string msgContent = msg->get_payload();
+    LDEBUG(fmt::format("Message received: {}", msgContent));
+    std::lock_guard<std::mutex> guard(_inputQueueMutex);
+    // store message
+    _inputNotifier.notify_one();
 }
 
 }

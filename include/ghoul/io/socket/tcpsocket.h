@@ -86,7 +86,6 @@
 typedef size_t _SOCKET;
 typedef int _SOCKLEN;
 #else //linux & macOS
-
 typedef int _SOCKET;
 typedef socklen_t _SOCKLEN;
 #endif
@@ -106,6 +105,7 @@ public:
     TcpSocket(std::string address, int port, _SOCKET socket);
     virtual ~TcpSocket();
     void connect();
+    void startStreams();
     void disconnect() override;
     bool isConnected() override;
     bool isConnecting() override;
@@ -146,6 +146,18 @@ protected:
     */
     virtual bool putBytes(const char* buffer, size_t size = 1);
 
+    const std::string _address;
+    const int _port;
+    std::atomic<bool> _shouldDisconnect;
+    std::atomic<bool> _isConnecting;
+    std::atomic<bool> _isConnected;
+    std::atomic<bool> _error;
+
+    _SOCKET _socket;
+    TcpSocketServer* _server;
+    std::thread _inputThread;
+    std::thread _outputThread;
+
 private:
     void establishConnection(addrinfo *info);
     void streamInput();
@@ -153,18 +165,6 @@ private:
     int waitForDelimiter();
     bool waitForInput(size_t nBytes);
     bool waitForOutput(size_t nBytes);
-
-    const std::string _address;
-    const int _port;
-    std::atomic<bool> _shouldDisconnect;
-    std::atomic<bool> _isConnecting;
-    std::atomic<bool> _isConnected;
-    std::atomic<bool> _error;
- 
-    _SOCKET _socket;
-    TcpSocketServer* _server;
-    std::thread _inputThread;
-    std::thread _outputThread;
 
     std::mutex _inputBufferMutex;
     std::mutex _inputQueueMutex;

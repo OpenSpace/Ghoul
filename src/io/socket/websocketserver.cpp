@@ -24,7 +24,11 @@
  ****************************************************************************************/
 
 #include <ghoul/io/socket/websocketserver.h>
-#include <iostream>
+#include <cstring>
+
+namespace {
+    std::string _loggerCat = "WebSocketServer";
+}
 
 namespace ghoul {
 namespace io {
@@ -32,7 +36,11 @@ namespace io {
 WebSocketServer::WebSocketServer() {
 }
 
-WebSocketServer::~WebSocketServer() {}
+WebSocketServer::~WebSocketServer() {
+    if (_listening) {
+        close();
+    }
+}
 
 std::string WebSocketServer::address() const {
     return _address;
@@ -43,12 +51,81 @@ int WebSocketServer::port() const {
 }
 
 void WebSocketServer::close() {
-    // todo.
+    std::lock_guard<std::mutex> guard(_settingsMutex);
+    _listening = false;
+
+    // flush out pending connections
+    _clientConnectionNotifier.notify_all();
+    closesocket(_serverSocket);
+
+    // wait for server thread to exit
+    _serverThread->join();
 }
 
 void WebSocketServer::listen(std::string address, int port) {
+    if (_listening) {
+        throw WebSocket::WebSocketError("WebSocket is already listening");
+    }
+    if (!TcpSocket::initializedNetworkApi()) {
+        TcpSocket::initializeNetworkApi();
+    }
+
+    std::lock_guard<std::mutex> settingsLock(_settingsMutex);
     _address = address;
     _port = port;
+
+    struct addrinfo* result = nullptr;
+    struct addrinfo hints;
+
+    std::memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM; // TODO(klas): verify correct socktype
+    hints.ai_protocol = IPPROTO_TCP;
+    hints.ai_flags = AI_PASSIVE;
+
+    // find the local address and port to be used by the server
+    int iResult;
+    iResult = getaddrinfo(nullptr, std::to_string(_port).c_str(), &hints, &result);
+    if (iResult != 0) {
+#if defined(WIN32)
+        WSACleanup();
+#endif
+        throw WebSocket::WebSocketError("Failed to parse hints for web socket connection");
+    }
+
+    // create a socket for the server to listen for client connections
+    _serverSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    if (_serverSocket == INVALID_SOCKET) {
+        freeaddrinfo(result);
+#if defined(WIN32)
+        WSACleanup();
+#endif
+        throw WebSocket::WebSocketError("Failed to initiate server web socket");
+    }
+
+    setOptions(_serverSocket);
+
+    // setup listening on the TCP socket
+    iResult = bind(_serverSocket, result->ai_addr, static_cast<int>(result->ai_addrlen));
+    if (iResult == SOCKET_ERROR) {
+        freeaddrinfo(result);
+        closesocket(_serverSocket);
+#if defined(WIN32)
+        WSACleanup();
+#endif
+        throw WebSocket::WebSocketError("Listen failed with error: " + std::to_string(_ERRNO));
+    }
+
+    //cleanup
+    freeaddrinfo(result);
+
+    if (::listen(_serverSocket, SOMAXCONN) == SOCKET_ERROR) {
+        closesocket(_serverSocket);
+#if defined(WIN32)
+        WSACleanup();
+#endif
+        WebSocket::WebSocketError("Listen failed with error: " + std::to_string(_ERRNO));
+    }
 
     // mark itself as active and fire up separate thread for incoming connections
     _listening = true;
@@ -62,7 +139,13 @@ bool WebSocketServer::isListening() const {
 }
 
 bool WebSocketServer::hasPendingSockets() const {
-    return false;
+    if (!_listening) {
+        return false;
+    }
+
+    // TODO(klas): Understand why thi wont compile
+//    std::lock_guard<std::mutex> guard(_connectionMutex);
+    return _pendingClientConnections.size() > 0;
 }
 
 std::unique_ptr<WebSocket> WebSocketServer::nextPendingWebSocket() {
@@ -70,23 +153,128 @@ std::unique_ptr<WebSocket> WebSocketServer::nextPendingWebSocket() {
         return nullptr;
     }
 
-    return std::unique_ptr<WebSocket>();
+    std::lock_guard<std::mutex> guard(_connectionMutex);
+    if (_pendingClientConnections.size() > 0) {
+        std::unique_ptr<WebSocket> connection = std::move(_pendingClientConnections.front());
+        _pendingClientConnections.pop_front();
+        return connection;
+    }
+
+    return nullptr;
 }
 
 std::unique_ptr<Socket> WebSocketServer::nextPendingSocket() {
-    return std::unique_ptr<Socket>();
+    return static_cast<std::unique_ptr<Socket>>(nextPendingWebSocket());
 }
 
 std::unique_ptr<WebSocket> WebSocketServer::awaitPendingWebSocket() {
-    return std::unique_ptr<WebSocket>();
+    if (!_listening) {
+        return nullptr;
+    }
+
+    // block execution until we have a pending connection
+    std::unique_lock<std::mutex> lock(_connectionNotificationMutex);
+    _clientConnectionNotifier.wait(lock, [this]() {
+        return hasPendingSockets() || !_listening;
+    });
+
+    // no longer blocked -- there might be a waiting connection for us
+    return nextPendingWebSocket();
 }
 
 std::unique_ptr<Socket> WebSocketServer::awaitPendingSocket() {
-    return std::unique_ptr<Socket>();
+    return std::unique_ptr<Socket>(awaitPendingWebSocket());
 }
 
 void WebSocketServer::waitForConnections() {
+    while (_listening) {
+        sockaddr_in clientInfo = { 0 };
+        _SOCKLEN clientInfoSize = sizeof(clientInfo);
 
+        _SOCKET socketHandle = accept((int)_serverSocket, (sockaddr*)&clientInfo, &clientInfoSize);
+        if (socketHandle == INVALID_SOCKET) {
+            // no client wanted this socket -- continue loop
+#if defined(WIN32) 
+			LERROR(fmt::format("Could not start socket: ERROR {}", WSAGetLastError()));
+			char val;
+			socklen_t len = sizeof(val);
+			if (getsockopt(_serverSocket, SOL_SOCKET, SO_ACCEPTCONN, &val, &len) == -1)
+				LERROR(fmt::format("_serverSocket {} is not a socket", _serverSocket));
+			else if (val)
+				LERROR(fmt::format("_serverSocket {} is a listening socket", _serverSocket));
+			else
+				LERROR(fmt::format("_serverSocket {} is a non-listening socket", _serverSocket));
+#endif
+            continue;
+        }
+
+        // get client address and port
+        char addressBuffer[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &(clientInfo.sin_addr), addressBuffer, INET_ADDRSTRLEN);
+        std::string address = addressBuffer;
+        int port = static_cast<int>(clientInfo.sin_port);
+
+        // create client socket
+        std::unique_ptr<WebSocket> socket = std::make_unique<WebSocket>(address, port, socketHandle);
+
+        // store client
+        std::lock_guard<std::mutex> guard(_connectionMutex);
+        _pendingClientConnections.push_back(std::move(socket));
+
+        // Notify `awaitPendingConnection` to return the acquired connection.
+        _clientConnectionNotifier.notify_one();
+    }
+}
+
+void WebSocketServer::setOptions(_SOCKET socket) {
+    char trueFlag = 1;
+    int iResult;
+
+    //set no delay
+    iResult = setsockopt(socket, /* socket affected */
+                         IPPROTO_TCP,     /* set option at TCP level */
+                         TCP_NODELAY,     /* name of option */
+                         &trueFlag,       /* the cast is historical cruft */
+                         sizeof(int));    /* length of option value */
+
+    //set send timeout
+    char timeout = 0; //infinite
+    iResult = setsockopt(
+            socket,
+            SOL_SOCKET,
+            SO_SNDTIMEO,
+            &timeout,
+            sizeof(timeout));
+
+    //set receive timeout
+    iResult = setsockopt(
+            socket,
+            SOL_SOCKET,
+            SO_RCVTIMEO,
+            &timeout,
+            sizeof(timeout));
+
+    iResult = setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &trueFlag, sizeof(int));
+    if (iResult == SOCKET_ERROR) {
+        LERROR("Failed to set reuse address with error: " << _ERRNO);
+    }
+
+    iResult = setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(int));
+    if (iResult == SOCKET_ERROR) {
+        LERROR("Failed to set keep alive with error: " << _ERRNO);
+    }
+}
+
+void WebSocketServer::closeSocket(_SOCKET socket) {
+    if (socket != INVALID_SOCKET) {
+#ifdef WIN32
+        shutdown(socket, SD_BOTH);
+        closesocket(socket);
+#else
+        shutdown(socket, SHUT_RDWR);
+        ::close(socket);
+#endif
+    }
 }
 
 

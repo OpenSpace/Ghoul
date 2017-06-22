@@ -62,20 +62,21 @@ TcpSocket::TcpSocket(std::string address, int port, _SOCKET socket)
     , _shouldDisconnect(false)
     , _error(false)
     , _socket(socket)
-    , _delimiter(DefaultDelimiter)
-{
-    _inputThread = std::thread(
-        [this]() { streamInput(); }
-    );
-    _outputThread = std::thread(
-        [this]() { streamOutput(); }
-    );
-}
+    , _delimiter(DefaultDelimiter) {}
 
 TcpSocket::~TcpSocket() {
     if (_isConnected) {
         disconnect();
     }
+}
+
+void TcpSocket::startStreams() {
+    _inputThread = std::thread(
+            [this]() { streamInput(); }
+    );
+    _outputThread = std::thread(
+            [this]() { streamOutput(); }
+    );
 }
 
 void TcpSocket::connect() {

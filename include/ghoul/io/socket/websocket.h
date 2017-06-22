@@ -26,64 +26,65 @@
 #ifndef __GHOUL___WEBSOCKET___H__
 #define __GHOUL___WEBSOCKET___H__
 
-#include <libwebsockets.h>
-#include <ghoul/io/socket/socket.h>
+#include <ghoul/io/socket/tcpsocket.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/exception.h>
+#include <websocketpp/config/core.hpp>
+#include <websocketpp/server.hpp>
+#include <websocketpp/common/functional.hpp>
 
 namespace ghoul {
 namespace io {
 
-class WebSocket : public Socket {
+typedef websocketpp::server<websocketpp::config::core> WsServer;
+
+/**
+ * WebSockets are essentially a wrapper around regular TCP sockets.
+ * The difference is how the messages are interpeted. In TCP sockets,
+ * we delimit the messages using `_delimiter`.
+ *
+ * In WebSockets however, the message delimiting is handled by a
+ * message header.
+ */
+class WebSocket : public TcpSocket {
 public:
-    WebSocket(int portNumber = 8000);
-    bool initialize();
-    void disconnect() override;
-    bool isConnected() override;
-    bool isConnecting() override;
+    struct WebSocketError : public ghoul::RuntimeError {
+        explicit WebSocketError(std::string message, std::string component = "");
+    };
+
+    WebSocket(std::string address, int portNumber);
+    WebSocket(std::string address, int portNumber, _SOCKET socket);
+
+    virtual ~WebSocket();
+
     bool getMessage(std::string& message) override;
     bool putMessage(const std::string& message) override;
-
-protected:
-    /*
-    * Read size bytes from the socket, store them in buffer and dequeue them from input.
-    * Block until size bytes have been read.
-    * Return false if this fails. Use error() to get the socket error code.
-    */
-    virtual bool getBytes(char* buffer, size_t nItems = 1);
-
-    /*
-    * Read size bytes from the socket, store them in buffer.
-    * Do NOT dequeue them from input.
-    * Block until size bytes have been read.
-    * Return false if this fails. Use error() to get the socket error code.
-    */
-    virtual bool peekBytes(char* buffer, size_t nItems);
-
-    /*
-    * Skip size bytes from the socket.
-    * Block until size bytes have been read.
-    * Return false if this fails. Use error() to get the socket error code.
-    */
-    virtual bool skipBytes(size_t nItems);
-
-    /**
-    * Write size bytes from buffer into the socket.
-    * Return false if this fails. Use error() to get the socket error code.
-    */
-    virtual bool putBytes(const char* buffer, size_t size = 1);
+    void startStreams();
 
 private:
-    struct lws_context_creation_info info;
-    bool use_ssl = false;
-    int port;
-    int clientCount = 0;
+    void streamInput();
+    void streamOutput();
 
-    static int callbackHttp(struct lws* wsi,
-                     enum lws_callback_reasons reason, void *user,
-                     void *in, size_t len);
-    static int callbackWS(struct lws* wsi,
-                   enum lws_callback_reasons reason, void *user,
-                   void *in, size_t len);
+    std::thread _inputThread;
+    std::thread _outputThread;
+
+    std::stringstream outputStream;
+
+    WsServer server;
+    WsServer::connection_ptr socketConnection;
+    void onMessage(WsServer* s, websocketpp::connection_hdl hdl, WsServer::message_ptr msg);
+
+    std::mutex _inputBufferMutex;
+    std::mutex _inputQueueMutex;
+    std::condition_variable _inputNotifier;
+    std::deque<char> _inputQueue;
+    std::array<char, 4096> _inputBuffer;
+
+    std::mutex _outputBufferMutex;
+    std::mutex _outputQueueMutex;
+    std::condition_variable _outputNotifier;
+    std::deque<char> _outputQueue;
+    std::array<char, 4096> _outputBuffer;
 };
 
 

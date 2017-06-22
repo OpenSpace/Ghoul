@@ -87,8 +87,6 @@ void TcpSocketServer::listen(std::string address, int port) {
     _address = address;
     _port = port;
 
-    TcpSocket::initializeNetworkApi();
-
     struct addrinfo* result = nullptr;
     struct addrinfo hints;
 
@@ -215,6 +213,7 @@ void TcpSocketServer::waitForConnections() {
         int port = static_cast<int>(clientInfo.sin_port);
 
         std::unique_ptr<TcpSocket> socket = std::make_unique<TcpSocket>(address, port, socketHandle);
+        socket->startStreams();
         
         std::lock_guard<std::mutex> lock(_connectionMutex);
         _pendingConnections.push_back(std::move(socket));

@@ -26,14 +26,18 @@
 #ifndef __GHOUL___WEBSOCKETSERVER___H__
 #define __GHOUL___WEBSOCKETSERVER___H__
 
-#include <libwebsockets.h>
-
+#include <ghoul/misc/exception.h>
 #include <ghoul/io/socket/socketserver.h>
 #include <ghoul/io/socket/websocket.h>
 
 #include <string>
 #include <memory>
 #include <thread>
+#include <atomic>
+#include <mutex>
+#include <vector>
+
+#include <fmt/format.h>
 
 namespace ghoul {
 namespace io {
@@ -63,8 +67,19 @@ private:
     bool _listening = false;
 
     std::unique_ptr<std::thread> _serverThread;
+    _SOCKET _serverSocket;
+
+    std::mutex _settingsMutex;
+    std::mutex _connectionMutex;
+    std::mutex _connectionNotificationMutex;
+
+    std::condition_variable _clientConnectionNotifier;
+
+    std::deque<std::unique_ptr<WebSocket>> _pendingClientConnections;
 
     void waitForConnections();
+    void setOptions(_SOCKET);
+    void WebSocketServer::closeSocket(_SOCKET socket);
 };
 
 

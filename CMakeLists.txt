@@ -462,6 +462,23 @@ endif()
 target_include_directories(Ghoul SYSTEM PUBLIC ${LIBWEBSOCKETS_INCLUDE_DIRS})
 target_link_libraries(Ghoul ${LIBWEBSOCKETS_STATIC_LIBRARIES})
 
+# WebSocket++ / WebSocketPP
+
+set(WEBSOCKETPP_ROOT_DIR ${GHOUL_ROOT_DIR}/ext/websocketpp)
+ExternalProject_Add(websocketpp
+    SOURCE_DIR ${WEBSOCKETPP_ROOT_DIR}
+    CMAKE_GENERATOR "${CMAKE_GENERATOR}"
+    CMAKE_ARGS ${EXTERNAL_TOOLCHAIN} ${EXTRA_EXTERNAL_ARGS} -DBUILD_TESTS=OFF -DBUILD_EXAMPLES=OFF
+    INSTALL_COMMAND ""
+    LOG_CONFIGURE 1
+    LOG_BUILD 1
+    STEP_TARGETS configure build
+    )
+
+#include_directories(${WEBSOCKETPP_ROOT_DIR})
+add_dependencies(Ghoul websocketpp)
+target_include_directories(Ghoul SYSTEM PUBLIC ${WEBSOCKETPP_ROOT_DIR})
+
 # Freetype
 if (GHOUL_MODULE_FONTRENDERING)
     set(FREETYPE_NO_DIST ON CACHE BOOL "Generate the dist target.")
