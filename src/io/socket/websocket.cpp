@@ -48,24 +48,20 @@ WebSocket::WebSocket(std::string address, int port) : TcpSocket(address, port) {
 WebSocket::WebSocket(std::string address, int port, _SOCKET socket)
         : TcpSocket(address, port, socket)
 {
-    LDEBUG(fmt::format("WebSocket started on port {}. Client: {}. Socket provided.", port, address));
-//    server.set_message_handler(bind(&WebSocket::onMessage, &server, ::_1, ::_2));
+    server.set_message_handler(bind(&WebSocket::onMessage, this, ::_1, ::_2));
+    server.set_open_handler(bind(&WebSocket::onOpen,this,::_1));
+    server.set_open_handler(bind(&WebSocket::onClose,this,::_1));
 
-    server.set_message_handler([this](websocketpp::connection_hdl hdl, WsServer::message_ptr msg) {
-        onMessage(&server, hdl, msg);
-    });
-    server.set_close_handler([this](websocketpp::connection_hdl hdl) {
-        _shouldDisconnect = true;
-    });
-
-    server.register_ostream(&outputStream);
+    server.register_ostream(&_outputStream);
     socketConnection = server.get_connection();
     socketConnection->start();
 
     startStreams();
+    LDEBUG(fmt::format("WebSocket started. Client: {}:{}.", address, port));
 }
 
 WebSocket::~WebSocket() {
+    LDEBUG("Destroying socket connection");
     socketConnection->eof();
 //     socketConnection->terminate();
 }
@@ -88,7 +84,9 @@ bool WebSocket::putMessage(const std::string &message) {
         LERROR("Cannot send message when not connected.");
         return false;
     }
-    outputStream << message;
+    std::lock_guard<std::mutex> guard(_outputStreamMutex);
+    _outputStream << message;
+    _outputNotifier.notify_one();
     return true;
 }
 
@@ -107,31 +105,107 @@ void WebSocket::streamInput() {
 
         if (nReadBytes <= 0) {
             _error = true;
+			LDEBUG("Received graceful close request.");
             _shouldDisconnect = true;
             _inputNotifier.notify_one();
             return;
         }
 
         socketConnection->read_some(_inputBuffer.data(), nReadBytes);
+
+        // Also poke output notifier, as the received message
+        // might trigger something like a handshake or similar.
+        _outputNotifier.notify_one();
     }
 }
 
 void WebSocket::streamOutput() {
+    while (_isConnected && !_shouldDisconnect) {
+        waitForOutput(1);
 
+        int bytesToSend = 0;
+        std::lock_guard<std::mutex> streamGuard(_outputStreamMutex);
+        std::lock_guard<std::mutex> queueGuard(_outputQueueMutex);
+        while ((bytesToSend = outputStreamSize()) > 0) {
+            // copy from outputStream to outputBuffer
+
+//            int sentBytes = send(_socket, _outputBuffer.data(), bytesToSend, 0);
+            std::string output = _outputStream.str();
+            LDEBUG(fmt::format("Sending \"{}\" to client {}:{}.", output, _address, _port));
+            int sentBytes = send(_socket, output.c_str(), bytesToSend, 0);
+
+            if (sentBytes <= 0) {
+                LDEBUG("Sent 0 bytes, disconnecting!");
+                _error = true;
+                _shouldDisconnect = true;
+                _inputNotifier.notify_one(); // ????
+                return;
+            }
+
+            // empty outputqueue?
+
+            // empty outputStream
+            _outputStream.clear();
+            _outputStream.str(std::string());
+        }
+    }
+}
+
+int WebSocket::outputStreamSize() {
+	if (!_outputStream) {
+		return 0;
+	}
+
+//    std::lock_guard<std::mutex> guard(_outputStreamMutex); // causes crash??
+    _outputStream.seekg(0, std::ios::end);
+    int size = _outputStream.tellg();
+    _outputStream.seekg(0, std::ios::beg);
+    return size;
 }
 
 /**
  * Callback for incoming messages
- * @param s   - server pointer
  * @param hdl - A handle to uniquely identify a connection.
  * @param msg - the message
  */
-void WebSocket::onMessage(WsServer *s, websocketpp::connection_hdl hdl, WsServer::message_ptr msg) {
+void WebSocket::onMessage(websocketpp::connection_hdl hdl, WsServer::message_ptr msg) {
     std::string msgContent = msg->get_payload();
     LDEBUG(fmt::format("Message received: {}", msgContent));
     std::lock_guard<std::mutex> guard(_inputQueueMutex);
     // store message
     _inputNotifier.notify_one();
+}
+
+void WebSocket::onOpen(websocketpp::connection_hdl hdl) {
+    LDEBUG(fmt::format("WebSocket opened. Client: {}:{}.", _address, _port));
+}
+
+void WebSocket::onClose(websocketpp::connection_hdl hdl) {
+    LDEBUG(fmt::format("WebSocket closing. Client: {}:{}.", _address, _port));
+    _shouldDisconnect = true;
+}
+
+bool WebSocket::waitForOutput(size_t nBytes) {
+    if (nBytes == 0) {
+        return false;
+    }
+
+    auto receivedRequestedOutputOrDisconnected = [this, nBytes]() {
+        if (_shouldDisconnect || (!_isConnected && !_isConnecting)) {
+            return true;
+        }
+        std::lock_guard<std::mutex> streamGuard(_outputStreamMutex);
+        std::lock_guard<std::mutex> queueGuard(_outputQueueMutex);
+        return _outputQueue.size() >= nBytes || outputStreamSize() >= nBytes;
+    };
+
+    // Block execution until enough data has come into the output queue.
+    if (!receivedRequestedOutputOrDisconnected()) {
+        std::unique_lock<std::mutex> lock(_outputBufferMutex);
+        _outputNotifier.wait(lock, receivedRequestedOutputOrDisconnected);
+    }
+
+    return !_error;
 }
 
 }

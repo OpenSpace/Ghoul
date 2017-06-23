@@ -64,23 +64,29 @@ public:
 private:
     void streamInput();
     void streamOutput();
+    bool waitForOutput(size_t nBytes);
 
     std::thread _inputThread;
     std::thread _outputThread;
 
-    std::stringstream outputStream;
-
     WsServer server;
+
     WsServer::connection_ptr socketConnection;
-    void onMessage(WsServer* s, websocketpp::connection_hdl hdl, WsServer::message_ptr msg);
+//    void onMessage(WsServer* s, websocketpp::connection_hdl hdl, WsServer::message_ptr msg);
+    void onMessage(websocketpp::connection_hdl hdl, WsServer::message_ptr msg);
+    void onOpen(websocketpp::connection_hdl hdl);
+    void onClose(websocketpp::connection_hdl hdl);
 
     std::mutex _inputBufferMutex;
     std::mutex _inputQueueMutex;
     std::condition_variable _inputNotifier;
     std::deque<char> _inputQueue;
     std::array<char, 4096> _inputBuffer;
-
     std::mutex _outputBufferMutex;
+
+    std::stringstream _outputStream;
+    std::mutex _outputStreamMutex;
+    int outputStreamSize();
     std::mutex _outputQueueMutex;
     std::condition_variable _outputNotifier;
     std::deque<char> _outputQueue;
