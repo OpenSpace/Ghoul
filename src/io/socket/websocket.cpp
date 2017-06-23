@@ -50,7 +50,7 @@ WebSocket::WebSocket(std::string address, int port, _SOCKET socket)
 {
     server.set_message_handler(bind(&WebSocket::onMessage, this, ::_1, ::_2));
     server.set_open_handler(bind(&WebSocket::onOpen,this,::_1));
-    server.set_open_handler(bind(&WebSocket::onClose,this,::_1));
+    server.set_close_handler(bind(&WebSocket::onClose,this,::_1));
 
     server.register_ostream(&_outputStream);
     socketConnection = server.get_connection();
@@ -177,12 +177,18 @@ void WebSocket::onMessage(websocketpp::connection_hdl hdl, WsServer::message_ptr
 }
 
 void WebSocket::onOpen(websocketpp::connection_hdl hdl) {
-    LDEBUG(fmt::format("WebSocket opened. Client: {}:{}.", _address, _port));
+    LDEBUG(fmt::format("onOpen: WebSocket opened. Client: {}:{}.", _address, _port));
+
+    std::lock_guard<std::mutex> guard(_connectionHandlesMutex);
+    _connectionHandles.insert(hdl);
 }
 
 void WebSocket::onClose(websocketpp::connection_hdl hdl) {
-    LDEBUG(fmt::format("WebSocket closing. Client: {}:{}.", _address, _port));
+    LDEBUG(fmt::format("onClose: WebSocket closing. Client: {}:{}.", _address, _port));
     _shouldDisconnect = true;
+
+    std::lock_guard<std::mutex> guard(_connectionHandlesMutex);
+    _connectionHandles.erase(hdl);
 }
 
 bool WebSocket::waitForOutput(size_t nBytes) {

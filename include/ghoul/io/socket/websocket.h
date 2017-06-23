@@ -32,6 +32,7 @@
 #include <websocketpp/config/core.hpp>
 #include <websocketpp/server.hpp>
 #include <websocketpp/common/functional.hpp>
+#include <set>
 
 namespace ghoul {
 namespace io {
@@ -76,6 +77,9 @@ private:
     void onMessage(websocketpp::connection_hdl hdl, WsServer::message_ptr msg);
     void onOpen(websocketpp::connection_hdl hdl);
     void onClose(websocketpp::connection_hdl hdl);
+
+    std::mutex _connectionHandlesMutex;
+    std::set<websocketpp::connection_hdl,std::owner_less<websocketpp::connection_hdl> > _connectionHandles;
 
     std::mutex _inputBufferMutex;
     std::mutex _inputQueueMutex;
