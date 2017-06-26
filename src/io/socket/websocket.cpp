@@ -106,7 +106,16 @@ void WebSocket::disconnect(const int reason) {
 }
 
 bool WebSocket::getMessage(std::string &message) {
-    return false;
+    waitForInput();
+    std::lock_guard<std::mutex> guard(_inputQueueMutex);
+
+    if (_inputQueue.size() == 0) {
+        return false;
+    }
+
+    message = _inputQueue.front();
+    _inputQueue.pop_front();
+    return true;
 }
 
 bool WebSocket::putMessage(const std::string &message) {
@@ -138,7 +147,7 @@ void WebSocket::streamInput() {
 			LDEBUG("Received graceful close request.");
             _shouldDisconnect = true;
             _inputNotifier.notify_one();
-            return; // TODO(klas): it gets stuck here!
+            return;
         }
 
         socketConnection->read_some(_inputBuffer.data(), nReadBytes);
@@ -154,9 +163,9 @@ void WebSocket::streamOutput() {
         waitForOutput(1);
 
         int bytesToSend = 0;
-        std::lock_guard<std::mutex> streamGuard(_outputStreamMutex);
         std::lock_guard<std::mutex> queueGuard(_outputQueueMutex);
         while ((bytesToSend = outputStreamSize()) > 0) {
+            std::lock_guard<std::mutex> streamGuard(_outputStreamMutex);
             std::string output = _outputStream.str();
             LDEBUG(fmt::format("Sending \"{}\" to client {}:{}.", output, _address, _port));
             int sentBytes = send(_socket, output.c_str(), bytesToSend, 0);
@@ -165,7 +174,7 @@ void WebSocket::streamOutput() {
                 LERROR(fmt::format("Bad send return code: {}. Disconnecting!", errorCode()));
                 _error = true;
                 _shouldDisconnect = true;
-                _inputNotifier.notify_one(); // TODO(klas): Why????
+                _inputNotifier.notify_one();
                 return;
             }
 
@@ -189,7 +198,7 @@ int WebSocket::outputStreamSize() {
 		return 0;
 	}
 
-//    std::lock_guard<std::mutex> guard(_outputStreamMutex); // TODO(klas): causes crash??
+    std::lock_guard<std::mutex> guard(_outputStreamMutex);
     _outputStream.seekg(0, std::ios::end);
     int size = _outputStream.tellg();
     _outputStream.seekg(0, std::ios::beg);
@@ -233,7 +242,6 @@ bool WebSocket::waitForOutput(size_t nBytes) {
         if (_shouldDisconnect || (!_isConnected && !_isConnecting)) {
             return true;
         }
-        std::lock_guard<std::mutex> streamGuard(_outputStreamMutex);
         return outputStreamSize() >= nBytes;
     };
 
@@ -241,6 +249,22 @@ bool WebSocket::waitForOutput(size_t nBytes) {
     if (!receivedRequestedOutputOrDisconnected()) {
         std::unique_lock<std::mutex> lock(_outputBufferMutex);
         _outputNotifier.wait(lock, receivedRequestedOutputOrDisconnected);
+    }
+
+    return !_error;
+}
+
+bool WebSocket::waitForInput(size_t nBytes) {
+    auto hasInputOrDisconnected = [this]() {
+        if (_shouldDisconnect || (!_isConnected && !_isConnecting)) {
+            return true;
+        }
+        return _inputQueue.size() > 0;
+    };
+
+    if (!hasInputOrDisconnected()) {
+        std::unique_lock<std::mutex> lock(_inputQueueMutex);
+        _inputNotifier.wait(lock, hasInputOrDisconnected);
     }
 
     return !_error;
