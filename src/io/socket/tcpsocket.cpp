@@ -116,7 +116,7 @@ void TcpSocket::connect() {
     _error = false;
 }
 
-void TcpSocket::disconnect() {
+void TcpSocket::disconnect(const int reason) {
     if (!_isConnected) return;
 
 #ifdef WIN32

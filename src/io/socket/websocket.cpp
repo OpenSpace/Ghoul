@@ -75,6 +75,36 @@ void WebSocket::startStreams() {
     );
 }
 
+void WebSocket::disconnect(const int reason) {
+    if (!_isConnected) return;
+
+    socketConnection->close(reason, "");
+    socketConnection->eof();
+    _outputNotifier.notify_all();
+    if (_outputThread.joinable()) {
+        _outputThread.join();
+    }
+
+#ifdef WIN32
+    shutdown(_socket, SD_BOTH);
+    closesocket(_socket);
+#else
+    shutdown(_socket, SHUT_RDWR);
+    close(_socket);
+#endif
+    _socket = INVALID_SOCKET;
+
+    _shouldDisconnect = false;
+    _isConnected = false;
+    _isConnecting = false;
+    _inputNotifier.notify_all();
+    if (_inputThread.joinable()) {
+        _inputThread.join();
+    }
+
+	LDEBUG(fmt::format("Disconnected client {}:{}.", _address, _port));
+}
+
 bool WebSocket::getMessage(std::string &message) {
     return false;
 }
@@ -108,7 +138,7 @@ void WebSocket::streamInput() {
 			LDEBUG("Received graceful close request.");
             _shouldDisconnect = true;
             _inputNotifier.notify_one();
-            return;
+            return; // TODO(klas): it gets stuck here!
         }
 
         socketConnection->read_some(_inputBuffer.data(), nReadBytes);
@@ -127,22 +157,17 @@ void WebSocket::streamOutput() {
         std::lock_guard<std::mutex> streamGuard(_outputStreamMutex);
         std::lock_guard<std::mutex> queueGuard(_outputQueueMutex);
         while ((bytesToSend = outputStreamSize()) > 0) {
-            // copy from outputStream to outputBuffer
-
-//            int sentBytes = send(_socket, _outputBuffer.data(), bytesToSend, 0);
             std::string output = _outputStream.str();
             LDEBUG(fmt::format("Sending \"{}\" to client {}:{}.", output, _address, _port));
             int sentBytes = send(_socket, output.c_str(), bytesToSend, 0);
 
             if (sentBytes <= 0) {
-                LDEBUG("Sent 0 bytes, disconnecting!");
+                LERROR(fmt::format("Bad send return code: {}. Disconnecting!", errorCode()));
                 _error = true;
                 _shouldDisconnect = true;
-                _inputNotifier.notify_one(); // ????
+                _inputNotifier.notify_one(); // TODO(klas): Why????
                 return;
             }
-
-            // empty outputqueue?
 
             // empty outputStream
             _outputStream.clear();
@@ -151,12 +176,20 @@ void WebSocket::streamOutput() {
     }
 }
 
+int WebSocket::errorCode() {
+#if defined(WIN32)
+    return WSAGetLastError();
+#else
+    return 0;
+#endif
+}
+
 int WebSocket::outputStreamSize() {
 	if (!_outputStream) {
 		return 0;
 	}
 
-//    std::lock_guard<std::mutex> guard(_outputStreamMutex); // causes crash??
+//    std::lock_guard<std::mutex> guard(_outputStreamMutex); // TODO(klas): causes crash??
     _outputStream.seekg(0, std::ios::end);
     int size = _outputStream.tellg();
     _outputStream.seekg(0, std::ios::beg);
@@ -172,13 +205,12 @@ void WebSocket::onMessage(websocketpp::connection_hdl hdl, WsServer::message_ptr
     std::string msgContent = msg->get_payload();
     LDEBUG(fmt::format("Message received: {}", msgContent));
     std::lock_guard<std::mutex> guard(_inputQueueMutex);
-    // store message
+    _inputQueue.push_back(msgContent);
     _inputNotifier.notify_one();
 }
 
 void WebSocket::onOpen(websocketpp::connection_hdl hdl) {
     LDEBUG(fmt::format("onOpen: WebSocket opened. Client: {}:{}.", _address, _port));
-
     std::lock_guard<std::mutex> guard(_connectionHandlesMutex);
     _connectionHandles.insert(hdl);
 }
@@ -189,6 +221,7 @@ void WebSocket::onClose(websocketpp::connection_hdl hdl) {
 
     std::lock_guard<std::mutex> guard(_connectionHandlesMutex);
     _connectionHandles.erase(hdl);
+
 }
 
 bool WebSocket::waitForOutput(size_t nBytes) {
@@ -201,8 +234,7 @@ bool WebSocket::waitForOutput(size_t nBytes) {
             return true;
         }
         std::lock_guard<std::mutex> streamGuard(_outputStreamMutex);
-        std::lock_guard<std::mutex> queueGuard(_outputQueueMutex);
-        return _outputQueue.size() >= nBytes || outputStreamSize() >= nBytes;
+        return outputStreamSize() >= nBytes;
     };
 
     // Block execution until enough data has come into the output queue.

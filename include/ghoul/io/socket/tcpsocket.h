@@ -106,7 +106,7 @@ public:
     virtual ~TcpSocket();
     void connect();
     void startStreams();
-    void disconnect() override;
+    void disconnect(const int reason = 0) override;
     bool isConnected() override;
     bool isConnecting() override;
 

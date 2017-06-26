@@ -53,10 +53,23 @@ public:
         explicit WebSocketError(std::string message, std::string component = "");
     };
 
+    /**
+     * WebSocket close event reason: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
+     */
+    struct ClosingReason {
+        static const enum CLOSING_REASON {
+            Normal      = 1000,
+            GoingAway   = 1001,
+            // custom app-specific reasons
+            ClosingAll  = 4000
+        };
+    };
+
     WebSocket(std::string address, int portNumber);
     WebSocket(std::string address, int portNumber, _SOCKET socket);
 
     virtual ~WebSocket();
+    void disconnect(const int reason = WebSocket::ClosingReason::Normal);
 
     bool getMessage(std::string& message) override;
     bool putMessage(const std::string& message) override;
@@ -66,6 +79,7 @@ private:
     void streamInput();
     void streamOutput();
     bool waitForOutput(size_t nBytes);
+    int errorCode();
 
     std::thread _inputThread;
     std::thread _outputThread;
@@ -73,7 +87,6 @@ private:
     WsServer server;
 
     WsServer::connection_ptr socketConnection;
-//    void onMessage(WsServer* s, websocketpp::connection_hdl hdl, WsServer::message_ptr msg);
     void onMessage(websocketpp::connection_hdl hdl, WsServer::message_ptr msg);
     void onOpen(websocketpp::connection_hdl hdl);
     void onClose(websocketpp::connection_hdl hdl);
@@ -84,17 +97,15 @@ private:
     std::mutex _inputBufferMutex;
     std::mutex _inputQueueMutex;
     std::condition_variable _inputNotifier;
-    std::deque<char> _inputQueue;
+    std::deque<std::string> _inputQueue;
     std::array<char, 4096> _inputBuffer;
-    std::mutex _outputBufferMutex;
 
     std::stringstream _outputStream;
     std::mutex _outputStreamMutex;
+    std::mutex _outputBufferMutex;
     int outputStreamSize();
     std::mutex _outputQueueMutex;
     std::condition_variable _outputNotifier;
-    std::deque<char> _outputQueue;
-    std::array<char, 4096> _outputBuffer;
 };
 
 
