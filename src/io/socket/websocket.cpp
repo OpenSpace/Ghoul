@@ -123,8 +123,7 @@ bool WebSocket::putMessage(const std::string &message) {
         LERROR("Cannot send message when not connected.");
         return false;
     }
-    std::lock_guard<std::mutex> guard(_outputStreamMutex);
-    _outputStream << message;
+    socketConnection->send(message);
     _outputNotifier.notify_one();
     return true;
 }
