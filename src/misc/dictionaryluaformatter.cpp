@@ -56,6 +56,13 @@ std::string DictionaryLuaFormatter::format(const Dictionary& dictionary) const {
     return "{" + lua + "}";
 }
 
+std::string DictionaryLuaFormatter::formatDouble(double d) const {
+    if (d == 0) return "0";
+    int exponent = std::log10(std::abs(d));
+    double base = d / std::pow(10, exponent);
+    return std::to_string(base) + "E" + std::to_string(exponent);
+}
+
 std::string DictionaryLuaFormatter::formatValue(const Dictionary& dictionary,
                                                  const std::string& key) const
 {
@@ -66,28 +73,28 @@ std::string DictionaryLuaFormatter::formatValue(const Dictionary& dictionary,
 
     if (dictionary.hasValue<glm::dvec4>(key)) {
         glm::dvec4 vec = dictionary.value<glm::dvec4>(key);
-        return "{" + std::to_string(vec.x) + "," +
-            std::to_string(vec.y) + "," +
-            std::to_string(vec.z) + "," +
-            std::to_string(vec.w) + "}";
+        return "{" + formatDouble(vec.x) + "," +
+            formatDouble(vec.y) + "," +
+            formatDouble(vec.z) + "," +
+            formatDouble(vec.w) + "}";
     }
 
     if (dictionary.hasValue<glm::dvec3>(key)) {
         glm::dvec3 vec = dictionary.value<glm::dvec3>(key);
-        return "{" + std::to_string(vec.x) + "," +
-            std::to_string(vec.y) + "," +
-            std::to_string(vec.z) + "}";
+        return "{" + formatDouble(vec.x) + "," +
+            formatDouble(vec.y) + "," +
+            formatDouble(vec.z) + "}";
     }
 
     if (dictionary.hasValue<glm::dvec2>(key)) {
         glm::dvec2 vec = dictionary.value<glm::dvec2>(key);
-        return "{" + std::to_string(vec.x) + "," +
-            std::to_string(vec.y) + "}";
+        return "{" + formatDouble(vec.x) + "," +
+            formatDouble(vec.y) + "}";
     }
 
     if (dictionary.hasValue<double>(key)) {
         double value = dictionary.value<double>(key);
-        return std::to_string(value);
+        return formatDouble(value);
     }
 
     if (dictionary.hasValue<int>(key)) {
