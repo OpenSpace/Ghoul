@@ -193,24 +193,24 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
     va_start(args, format); // Parses The String For Variables
 
     int s = 1 + vscprintf(format, args);
-    char* buffer = new char[s];
+    std::vector<char> buffer(s);
 
-    memset(buffer, 0, s);
+    memset(buffer.data(), 0, s);
 
 #if (_MSC_VER >= 1400) //visual studio 2005 or later
-    vsprintf_s(buffer, s, format, args);
+    vsprintf_s(buffer.data(), s, format, args);
 #else
-    vsprintf(buffer, format, args);
+    vsprintf(buffer.data(), format, args);
 #endif
     va_end(args);
 
     float h = font.height();
 
     // Splitting the text into separate lines
-    const char* start_line = buffer;
+    const char* start_line = buffer.data();
     std::vector<std::string> lines;
     const char* c;
-    for (c = buffer; *c; c++) {
+    for (c = buffer.data(); *c; c++) {
         if (*c == '\n') {
             std::string line;
             for (const char* n = start_line; n < c; ++n)
