@@ -426,44 +426,9 @@ if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE AND NOT GHOUL_USE_SOIL)
     message(FATAL_ERROR "Ghoul needs to be built with DevIL, FreeImage, or SoIL")
 endif ()
 
-# LibWebSockets
-
-if (CMAKE_TOOLCHAIN_FILE)
-set(EXTERNAL_TOOLCHAIN "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
-endif()
-
-include(ExternalProject)
-
-ExternalProject_Add(libwebsockets
-    SOURCE_DIR ${GHOUL_ROOT_DIR}/ext/libwebsockets
-    CMAKE_GENERATOR "${CMAKE_GENERATOR}"
-    CMAKE_ARGS ${EXTERNAL_TOOLCHAIN} ${EXTRA_EXTERNAL_ARGS} -DLWS_SSL_CLIENT_USE_OS_CA_CERTS=ON -DLWS_WITHOUT_TESTAPPS=ON -DCMAKE_BUILD_TYPE=MinSizeRel -DLWS_WITH_SSL=0
-    INSTALL_COMMAND ""
-    LOG_CONFIGURE 1
-    LOG_BUILD 1
-    STEP_TARGETS configure build
-    )
-
-add_dependencies(Ghoul libwebsockets)
-
-ExternalProject_Get_Property(libwebsockets SOURCE_DIR)
-ExternalProject_Get_Property(libwebsockets BINARY_DIR)
-
-set(LIBWEBSOCKETS_INCLUDE_DIRS
-    "${SOURCE_DIR}/lib/"
-    "${BINARY_DIR}")
-
-if (WIN32)
-    set(LIBWEBSOCKETS_STATIC_LIBRARIES "${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/websockets_static.lib" ${ZLIB_LIBRARIES})
-else()
-    set(LIBWEBSOCKETS_STATIC_LIBRARIES "${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/libwebsockets.a" ${ZLIB_LIBRARIES})
-endif()
-
-target_include_directories(Ghoul SYSTEM PUBLIC ${LIBWEBSOCKETS_INCLUDE_DIRS})
-target_link_libraries(Ghoul ${LIBWEBSOCKETS_STATIC_LIBRARIES})
-
 # WebSocket++ / WebSocketPP
 
+include(ExternalProject)
 set(WEBSOCKETPP_ROOT_DIR ${GHOUL_ROOT_DIR}/ext/websocketpp)
 ExternalProject_Add(websocketpp
     SOURCE_DIR ${WEBSOCKETPP_ROOT_DIR}
