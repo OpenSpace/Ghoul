@@ -106,6 +106,7 @@ if (MSVC)
         "/we4289"
         "/std:c++latest"
         "/permissive-"
+        "/Zc:strictStrings-"    # Windows header don't adhere to this
     )
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(Ghoul PRIVATE "/WX")
