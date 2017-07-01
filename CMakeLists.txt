@@ -105,7 +105,7 @@ if (MSVC)
         "/wd4127"
         "/we4289"
         "/std:c++latest"
-        "/permissive-"        
+        "/permissive-"
     )
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(Ghoul PRIVATE "/WX")
