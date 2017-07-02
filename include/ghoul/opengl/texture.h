@@ -59,14 +59,14 @@ public:
      * mapped to the appropriate OpenGL constants.
      * \sa http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml
      */
-    enum Format {
-        Red = GL_RED, ///< GL_RED
-        RG = GL_RG, ///< GL_RG
-        RGB = GL_RGB, ///< GL_RGB
-        BGR = GL_BGR, ///< GL_BGR
-        RGBA = GL_RGBA, ///< GL_RGBA
-        BGRA = GL_BGRA, ///< GL_BGRA
-        DepthComponent = GL_DEPTH_COMPONENT ///< GL_DEPTH_COMPONENT
+    enum class Format : std::underlying_type_t<GLenum> {
+        Red = static_cast<std::underlying_type_t<GLenum>>(GL_RED),
+        RG = static_cast<std::underlying_type_t<GLenum>>(GL_RG),
+        RGB = static_cast<std::underlying_type_t<GLenum>>(GL_RGB),
+        BGR = static_cast<std::underlying_type_t<GLenum>>(GL_BGR),
+        RGBA = static_cast<std::underlying_type_t<GLenum>>(GL_RGBA),
+        BGRA = static_cast<std::underlying_type_t<GLenum>>(GL_BGRA),
+        DepthComponent = static_cast<std::underlying_type_t<GLenum>>(GL_DEPTH_COMPONENT)
     };
 
     /**
@@ -85,12 +85,12 @@ public:
      * texture. The values for this enum correspond directly to OpenGL settings. See the
      * OpenGL specification for details.
      */
-    enum class WrappingMode {
-        Repeat = GL_REPEAT, ///< GL_REPEAT
-        Clamp = GL_CLAMP, ///< GL_CLAMP
-        ClampToEdge = GL_CLAMP_TO_EDGE, ///< GL_CLAMP_TO_EDGE
-        ClampToBorder = GL_CLAMP_TO_BORDER, ///< GL_CLAMP_TO_BORDER
-        MirroredRepeat = GL_MIRRORED_REPEAT ///< GL_MIRRORED_REPEAT
+    enum class WrappingMode : std::underlying_type_t<GLenum> {
+        Repeat = static_cast<std::underlying_type_t<GLenum>>(GL_REPEAT),
+        Clamp = static_cast<std::underlying_type_t<GLenum>>(GL_CLAMP),
+        ClampToEdge = static_cast<std::underlying_type_t<GLenum>>(GL_CLAMP_TO_EDGE),
+        ClampToBorder = static_cast<std::underlying_type_t<GLenum>>(GL_CLAMP_TO_BORDER),
+        MirroredRepeat = static_cast<std::underlying_type_t<GLenum>>(GL_MIRRORED_REPEAT)
     };
 
     static int numberOfChannels(Format format);
