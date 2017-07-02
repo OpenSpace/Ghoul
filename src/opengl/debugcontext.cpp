@@ -189,9 +189,9 @@ void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous) {
 
 void setDebugMessageControl(Source source, Type type, Severity severity, Enabled enabled) {
     glDebugMessageControl(
-        static_cast<std::underlying_type_t<Source>>(source),
-        static_cast<std::underlying_type_t<Type>>(type),
-        static_cast<std::underlying_type_t<Severity>>(severity),
+        static_cast<GLenum>(source),
+        static_cast<GLenum>(type),
+        static_cast<GLenum>(severity),
         0,
         nullptr,
         enabled ? GL_TRUE : GL_FALSE
@@ -210,8 +210,8 @@ void setDebugMessageControl(Source source, Type type,
     );
 
     glDebugMessageControl(
-        static_cast<std::underlying_type_t<Source>>(source),
-        static_cast<std::underlying_type_t<Type>>(type),
+        static_cast<GLenum>(source),
+        static_cast<GLenum>(type),
         GL_DONT_CARE,
         static_cast<GLsizei>(identifiers.size()),
         identifiers.data(),

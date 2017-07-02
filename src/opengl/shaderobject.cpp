@@ -64,7 +64,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, Dictionary dictionary)
     , _loggerCat("ShaderObject")
     , _onChangeCallback(nullptr)
 {
-    _id = glCreateShader(_type);
+    _id = glCreateShader(static_cast<GLenum>(_type));
     _preprocessor.setDictionary(std::move(dictionary));
     _preprocessor.setFilename("");
 
@@ -83,7 +83,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-    _id = glCreateShader(_type);
+    _id = glCreateShader(static_cast<GLenum>(_type));
     if (_id == 0) {
         throw ShaderObjectError("glCreateShader returned 0");
     }
@@ -103,7 +103,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-    _id = glCreateShader(_type);
+    _id = glCreateShader(static_cast<GLenum>(_type));
     if (_id == 0) {
         throw ShaderObjectError("glCreateShader returned 0");
     }
@@ -131,7 +131,7 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
     , _onChangeCallback(cpy._onChangeCallback)
     , _preprocessor(cpy._preprocessor)
 {
-    _id = glCreateShader(_type);
+    _id = glCreateShader(static_cast<GLenum>(_type));
     if (_id == 0) {
         throw ShaderObjectError("glCreateShader returned 0");
     }
@@ -181,7 +181,7 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
         setShaderObjectCallback(rhs._onChangeCallback);
 
         glDeleteShader(_id);
-        _id = glCreateShader(_type);
+        _id = glCreateShader(static_cast<GLenum>(_type));
         if (_id == 0) {
             throw ShaderObjectError("glCreateShader returned 0");
         }
@@ -312,7 +312,7 @@ void ShaderObject::compile() {
 
     GLint compilationStatus;
     glGetShaderiv(_id, GL_COMPILE_STATUS, &compilationStatus);
-    if (compilationStatus == GL_FALSE) {
+    if (static_cast<GLboolean>(compilationStatus) == GL_FALSE) {
         GLint logLength;
         glGetShaderiv(_id, GL_INFO_LOG_LENGTH, &logLength);
 
@@ -341,15 +341,13 @@ std::string ShaderObject::typeAsString() const {
 
 std::string ShaderObject::stringForShaderType(ShaderType type) {
     switch (type) {
-        case ShaderTypeVertex:                return "Vertex shader";
-        case ShaderTypeTesselationControl:    return "Tesselation Control shader";
-        case ShaderTypeTesselationEvaluation: return "Tesselation Evaluation shader";
-        case ShaderTypeGeometry:              return "Geometry shader";
-        case ShaderTypeFragment:              return "Fragment shader";
-#ifdef GL_VERSION_4_3
-        case ShaderTypeCompute:               return "Compute shader";
-#endif
-        default:                              throw MissingCaseException();
+        case ShaderType::Vertex:                return "Vertex shader";
+        case ShaderType::TesselationControl:    return "Tesselation Control shader";
+        case ShaderType::TesselationEvaluation: return "Tesselation Evaluation shader";
+        case ShaderType::Geometry:              return "Geometry shader";
+        case ShaderType::Fragment:              return "Fragment shader";
+        case ShaderType::Compute:               return "Compute shader";
+        default:                                throw MissingCaseException();
 
     }
 }

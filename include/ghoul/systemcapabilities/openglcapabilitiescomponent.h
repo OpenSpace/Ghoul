@@ -169,8 +169,7 @@ protected:
     void detectGLRenderer();
     /// Detect all available extensions
     void detectExtensions();
-    /// Detect the available GLEW version
-    void detectGLEWVersion();
+
     /**
      * Use WMI (on Windows) to retrieve information about the installed driver
      * \throws WMIError If there was an error accessing the Windows Management

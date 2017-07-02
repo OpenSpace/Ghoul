@@ -84,15 +84,23 @@ public:
      * used interchangeably in native OpenGL calls, too. Compute shaders are only 
      * available if OpenGL 4.3 is available.
      */
-    enum ShaderType {
-        ShaderTypeVertex = GL_VERTEX_SHADER
-        , ShaderTypeTesselationControl = GL_TESS_CONTROL_SHADER
-        , ShaderTypeTesselationEvaluation = GL_TESS_EVALUATION_SHADER
-        , ShaderTypeGeometry = GL_GEOMETRY_SHADER
-        , ShaderTypeFragment = GL_FRAGMENT_SHADER
-#ifdef GL_VERSION_4_3
-        , ShaderTypeCompute = GL_COMPUTE_SHADER
-#endif
+    enum class ShaderType : std::underlying_type_t<GLenum> {
+        Vertex = static_cast<std::underlying_type_t<GLenum>>(GL_VERTEX_SHADER),
+        TesselationControl = static_cast<std::underlying_type_t<GLenum>>(
+            GL_TESS_CONTROL_SHADER
+        ),
+        TesselationEvaluation = static_cast<std::underlying_type_t<GLenum>>(
+            GL_TESS_EVALUATION_SHADER
+        ),
+        Geometry = static_cast<std::underlying_type_t<GLenum>>(
+            GL_GEOMETRY_SHADER
+        ),
+        Fragment = static_cast<std::underlying_type_t<GLenum>>(
+            GL_FRAGMENT_SHADER
+        ),
+        Compute = static_cast<std::underlying_type_t<GLenum>>(
+            GL_COMPUTE_SHADER
+        )
     };
 
 

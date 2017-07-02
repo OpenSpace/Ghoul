@@ -148,8 +148,12 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     
     using namespace opengl;
     std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>("Font");
-    program->attachObject(std::make_unique<ShaderObject>(ShaderObject::ShaderTypeVertex, vsPath));
-    program->attachObject(std::make_unique<ShaderObject>(ShaderObject::ShaderTypeFragment, fsPath));
+    program->attachObject(
+        std::make_unique<ShaderObject>(ShaderObject::ShaderType::Vertex, vsPath)
+    );
+    program->attachObject(
+        std::make_unique<ShaderObject>(ShaderObject::ShaderType::Fragment, fsPath)
+    );
 
     LDEBUG("Compile default font shader");
     program->compileShaderObjects();

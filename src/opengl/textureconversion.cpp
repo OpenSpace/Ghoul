@@ -180,7 +180,7 @@ void convertTextureFormat(Texture& texture, Texture::Format newFormat) {
     }
 
     texture.setFormat(newFormat);
-    texture.setInternalFormat(newFormat);
+    texture.setInternalFormat(static_cast<GLenum>(newFormat));
 
     texture.setPixelData(newData);
 }

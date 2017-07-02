@@ -71,8 +71,15 @@ std::string glslVersionString() {
     glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profileMask);
     std::stringstream ss;
 
-    bool isCore = profileMask & GL_CONTEXT_CORE_PROFILE_BIT;
-    bool isCompatibility = profileMask & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT;
+    const ContextProfileMask cpm = ContextProfileMask(profileMask);
+    const bool isCore = cpm == ContextProfileMask::GL_CONTEXT_CORE_PROFILE_BIT;
+    const bool isCompatibility =
+        cpm == ContextProfileMask::GL_CONTEXT_COMPATIBILITY_PROFILE_BIT;
+
+    ghoul_assert(
+        isCore || isCompatibility,
+        "OpenGL context is neither core nor compatibility"
+    );
 
     ss << "#version " << versionMajor << versionMinor << "0";
     ss << (isCore ? " core" : (isCompatibility ? " compatibility" : ""));

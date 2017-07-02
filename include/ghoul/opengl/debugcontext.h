@@ -47,21 +47,27 @@ using Enabled = ghoul::Boolean;
 /**
  * The different sources from which a debug message in OpenGL can originate.
  */
-enum class Source : GLenum {
+enum class Source : std::underlying_type_t<GLenum> {
     /// Originating from the OpenGL API itself
-    API = GL_DEBUG_SOURCE_API,
+    API = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_SOURCE_API),
     /// Originating from the windowing system
-    WindowSystem = GL_DEBUG_SOURCE_WINDOW_SYSTEM,
+    WindowSystem = static_cast<std::underlying_type_t<GLenum>>(
+        GL_DEBUG_SOURCE_WINDOW_SYSTEM
+    ),
     /// Originating from the shader compiler
-    ShaderCompiler = GL_DEBUG_SOURCE_SHADER_COMPILER,
+    ShaderCompiler = static_cast<std::underlying_type_t<GLenum>>(
+        GL_DEBUG_SOURCE_SHADER_COMPILER
+    ),
     /// Originating from a third party library that is not the application itself
-    ThirdParty = GL_DEBUG_SOURCE_THIRD_PARTY,
+    ThirdParty = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_SOURCE_THIRD_PARTY),
     /// Originating from the application managing the OpenGL context
-    Application = GL_DEBUG_SOURCE_APPLICATION,
+    Application = static_cast<std::underlying_type_t<GLenum>>(
+        GL_DEBUG_SOURCE_APPLICATION
+    ),
     /// Originating from other sources
-    Other = GL_DEBUG_SOURCE_OTHER,
+    Other = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_SOURCE_OTHER),
     /// Used in the setDebugMessageControl functions to refer to any source
-    DontCare = GL_DONT_CARE
+    DontCare = static_cast<std::underlying_type_t<GLenum>>(GL_DONT_CARE)
 };
 
 /**
@@ -69,48 +75,53 @@ enum class Source : GLenum {
  * for individual values are taken from:
  * https://www.khronos.org/registry/OpenGL/extensions/KHR/KHR_debug.txt
  */
-enum class Type : GLenum {
+enum class Type : std::underlying_type_t<GLenum> {
     /// Events that generated an error
-    Error = GL_DEBUG_TYPE_ERROR,
+    Error = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_TYPE_ERROR),
     /// Behavior that has been marked for deprecation
-    Deprecated = GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR,
+    Deprecated = static_cast<std::underlying_type_t<GLenum>>(
+        GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR
+    ),
     /// Behavior that is undefined according to the specification
-    Undefined = GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR,
+    Undefined = static_cast<std::underlying_type_t<GLenum>>(
+        GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR
+    ),
     /// Use of extensions or shaders in a way that is highly vendor-specific
-    Portability = GL_DEBUG_TYPE_PORTABILITY,
+    Portability = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_TYPE_PORTABILITY),
     /// Implementation-dependent performance warnings
-    Performance = GL_DEBUG_TYPE_PERFORMANCE,
-#ifdef GL_DEBUG_TYPE_MARKER
+    Performance = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_TYPE_PERFORMANCE),
     // These three values are not available on OpenGL prior to 4.3
     /// Annotation of the command stream
-    Marker = GL_DEBUG_TYPE_MARKER,
+    Marker = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_TYPE_MARKER),
     /// Entering a debug group
-    PushGroup = GL_DEBUG_TYPE_PUSH_GROUP,
+    PushGroup = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_TYPE_PUSH_GROUP),
     /// Leaving a debug group
-    PopGroup = GL_DEBUG_TYPE_POP_GROUP,
-#endif // GL_DEBUG_TYPE_MARKER
-    Other = GL_DEBUG_TYPE_OTHER,
+    PopGroup = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_TYPE_POP_GROUP),
+    /// Other type
+    Other = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_TYPE_OTHER),
     /// Used in the setDebugMessageControl functions to refer to any type
-    DontCare = GL_DONT_CARE
+    DontCare = static_cast<std::underlying_type_t<GLenum>>(GL_DONT_CARE)
 };
 
 /**
  * The severity of the emitted message. Descriptions for individual values are taken from:
  * https://www.khronos.org/registry/OpenGL/extensions/KHR/KHR_debug.txt
  */
-enum class Severity : GLenum {
+enum class Severity : std::underlying_type_t<GLenum> {
     /// Any GL error; dangerous undefined behavior; any GLSL or ARB shader compiler and
     /// linker errors
-    High = GL_DEBUG_SEVERITY_HIGH,
+    High = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_SEVERITY_HIGH),
     /// Severe performance warnings; GLSL or other shader compiler and linker warnings;
     ///use of currently deprecated behavior
-    Medium = GL_DEBUG_SEVERITY_MEDIUM,
+    Medium = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_SEVERITY_MEDIUM),
     /// Performance warnings from redundant state changes; trivial undefined behavior
-    Low = GL_DEBUG_SEVERITY_LOW,
+    Low = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_SEVERITY_LOW),
     /// Any message which is not an error or performance concern
-    Notification = GL_DEBUG_SEVERITY_NOTIFICATION,
+    Notification = static_cast<std::underlying_type_t<GLenum>>(
+        GL_DEBUG_SEVERITY_NOTIFICATION
+    ),
     /// Used in the setDebugMessageControl functions to refer to any severity
-    Dontcare = GL_DONT_CARE
+    Dontcare = static_cast<std::underlying_type_t<GLenum>>(GL_DONT_CARE)
 };
 
 /**

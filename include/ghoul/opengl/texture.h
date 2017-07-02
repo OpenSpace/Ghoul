@@ -125,7 +125,7 @@ public:
      * \pre Element of \p dimensions must be bigger or equal <code>1</code>
      */
     Texture(glm::uvec3 dimensions, Format format = Format::RGBA,
-            GLint internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
+            GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
             FilterMode filter = FilterMode::Linear,
             WrappingMode wrapping = WrappingMode::Repeat,
             AllocateData allocate = AllocateData::Yes,
@@ -164,7 +164,7 @@ public:
      * of the data.
      */
     Texture(void* data, glm::uvec3 dimensions, Format format = Format::RGBA,
-            GLint internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
+            GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
             FilterMode filter = FilterMode::Linear,
             WrappingMode wrapping = WrappingMode::Repeat);
 
@@ -261,7 +261,7 @@ public:
      * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for more information and
      * the possible return values.
      */
-    GLint internalFormat() const;
+    GLenum internalFormat() const;
 
     /**
      * Sets the new internal format for this texture. This only updates the internal state
@@ -272,7 +272,7 @@ public:
      * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1, 2, and 3 for
      * possible values.
      */
-    void setInternalFormat(GLint internalFormat);
+    void setInternalFormat(GLenum internalFormat);
 
     /**
      * Returns the Texture::FilterMode used by this texture.
@@ -298,7 +298,7 @@ public:
      * https://www.opengl.org/sdk/docs/man/html/glTexParameter.xhtml for more information.
      * \param swizzleMask The swizzle mask that is applied to this Texture
      */
-    void setSwizzleMask(std::array<GLint, 4> swizzleMask);
+    void setSwizzleMask(std::array<GLenum, 4> swizzleMask);
 
     /**
      * Reinstates the default swizzle mask of
@@ -310,7 +310,7 @@ public:
      * Returns the currently used swizzle mask for this Texture.
      * \return The currently used swizzle mask for this Texture
      */
-    std::array<GLint, 4> swizzleMask() const;
+    std::array<GLenum, 4> swizzleMask() const;
 
     /**
      * Returns the storage data type for this Texture. For a complete list of available 
@@ -815,9 +815,9 @@ private:
      */
     glm::uvec3 _dimensions;
     Format _format;
-    GLint _internalFormat;
+    GLenum _internalFormat;
     bool _swizzleMaskChanged;
-    std::array<GLint, 4> _swizzleMask;
+    std::array<GLenum, 4> _swizzleMask;
     GLenum _dataType;
     FilterMode _filter;
     WrappingMode _wrapping;

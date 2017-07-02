@@ -172,12 +172,12 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
     FreeImage_Unload(dib);
 
     return std::make_unique<opengl::Texture>(
-        data,
+        reinterpret_cast<void*>(data),
         imageSize,
         format,
-        static_cast<int>(format),
+        static_cast<GLenum>(format),
         type
-        );
+    );
 }
 
 std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(

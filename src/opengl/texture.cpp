@@ -45,13 +45,13 @@ using glm::compMul;
 using std::numeric_limits;
 
 namespace {
-    std::array<GLint, 4> DefaultSwizzleMask = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+    std::array<GLenum, 4> DefaultSwizzleMask = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
 }
 
 namespace ghoul {
 namespace opengl {
 
-Texture::Texture(glm::uvec3 dimensions, Format format, GLint internalFormat,
+Texture::Texture(glm::uvec3 dimensions, Format format, GLenum internalFormat,
                  GLenum dataType, FilterMode filter, WrappingMode wrapping,
                  AllocateData allocate, TakeOwnership takeOwnership)
     : _dimensions(std::move(dimensions))
@@ -76,7 +76,7 @@ Texture::Texture(glm::uvec3 dimensions, Format format, GLint internalFormat,
     initialize(allocate);
 }
 
-Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLint internalFormat,
+Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLenum internalFormat,
                  GLenum dataType, FilterMode filter, WrappingMode wrapping)
     : _dimensions(std::move(dimensions))
     , _format(format)
@@ -190,11 +190,11 @@ void Texture::setFormat(Texture::Format format) {
     calculateBytesPerPixel();
 }
 
-GLint Texture::internalFormat() const {
+GLenum Texture::internalFormat() const {
     return _internalFormat;
 }
 
-void Texture::setInternalFormat(GLint internalFormat) {
+void Texture::setInternalFormat(GLenum internalFormat) {
     _internalFormat = internalFormat;
 }
 
@@ -207,7 +207,7 @@ void Texture::setFilter(FilterMode filter) {
     applyFilter();
 }
 
-void Texture::setSwizzleMask(std::array<GLint, 4> swizzleMask) {
+void Texture::setSwizzleMask(std::array<GLenum, 4> swizzleMask) {
     _swizzleMask = std::move(swizzleMask);
     _swizzleMaskChanged = true;
     applySwizzleMask();
@@ -218,7 +218,7 @@ void Texture::setDefaultSwizzleMask() {
     _swizzleMaskChanged = false;
 }
 
-std::array<GLint, 4> Texture::swizzleMask() const {
+std::array<GLenum, 4> Texture::swizzleMask() const {
     return _swizzleMask;
 }
 
@@ -333,7 +333,7 @@ void Texture::setPixelData(void* pixels, TakeOwnership takeOwnership) {
 bool Texture::isResident() const {
     GLint resident;
     glGetTexParameteriv(_type, GL_TEXTURE_RESIDENT, &resident);
-    return (resident == GL_TRUE);
+    return (static_cast<GLboolean>(resident) == GL_TRUE);
 }
 
 void Texture::setWrapping(WrappingMode wrapping) {
@@ -386,7 +386,7 @@ void Texture::uploadDataToTexture(void* pixelData) {
                 _internalFormat,
                 GLsizei(_dimensions.x),
                 0,
-                GLint(_format),
+                GLenum(_format),
                 _dataType,
                 pixelData
             );
@@ -399,7 +399,7 @@ void Texture::uploadDataToTexture(void* pixelData) {
                 GLsizei(_dimensions.x),
                 GLsizei(_dimensions.y),
                 0,
-                GLint(_format),
+                GLenum(_format),
                 _dataType,
                 pixelData
             );
@@ -413,7 +413,7 @@ void Texture::uploadDataToTexture(void* pixelData) {
                 GLsizei(_dimensions.y),
                 GLsizei(_dimensions.z),
                 0,
-                GLint(_format),
+                GLenum(_format),
                 _dataType,
                 pixelData
             );
@@ -433,7 +433,7 @@ void Texture::reUploadDataToTexture(void* pixelData) {
                 0,
                 0,
                 GLsizei(_dimensions.x),
-                GLint(_format),
+                GLenum(_format),
                 _dataType,
                 pixelData
             );
@@ -446,7 +446,7 @@ void Texture::reUploadDataToTexture(void* pixelData) {
                 0,
                 GLsizei(_dimensions.x),
                 GLsizei(_dimensions.y),
-                GLint(_format),
+                GLenum(_format),
                 _dataType,
                 pixelData
             );
@@ -461,7 +461,7 @@ void Texture::reUploadDataToTexture(void* pixelData) {
                 GLsizei(_dimensions.x),
                 GLsizei(_dimensions.y),
                 GLsizei(_dimensions.z),
-                GLint(_format),
+                GLenum(_format),
                 _dataType,
                 pixelData
             );
@@ -496,7 +496,7 @@ void Texture::downloadTexture() {
     if (!_pixels) {
         allocateMemory();
     }
-    glGetTexImage(_type, 0, GLint(_format), _dataType, _pixels);
+    glGetTexImage(_type, 0, GLenum(_format), _dataType, _pixels);
 }
 
 void Texture::determineTextureType() {

@@ -77,7 +77,7 @@ TextureAtlas::TextureAtlas(glm::ivec3 size)
         default:
             throw ghoul::RuntimeError("Wrong texture depth", "TextureAtlas");
     }
-    GLuint internalFormat = format;
+    GLenum internalFormat = GLenum(format);
     
     // Normally, we want to store data as single bytes, but if the reversed format is
     // supported, we can use that for depth==4 atlasses

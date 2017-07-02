@@ -41,7 +41,7 @@ std::vector<bool> TextureUnit::_busyUnits = std::vector<bool>();
 
 TextureUnit::TextureUnit()
     : _number(0)
-    , _glEnum(0)
+    , _glEnum(GLenum(0))
     , _assigned(false)
 {
     if (!_initialized) {
@@ -68,7 +68,7 @@ void TextureUnit::deactivate() {
     }
 }
 
-GLint TextureUnit::glEnum() {
+GLenum TextureUnit::glEnum() {
     if (!_assigned) {
         assignUnit();
     }

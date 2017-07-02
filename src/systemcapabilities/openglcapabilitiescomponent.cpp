@@ -64,7 +64,6 @@ void OpenGLCapabilitiesComponent::detectCapabilities() {
     detectGPUVendor();
     detectGLRenderer();
     detectExtensions();
-    detectGLEWVersion();
     detectDriverInformation();
 
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_maxTextureSize);
@@ -123,12 +122,6 @@ void OpenGLCapabilitiesComponent::detectExtensions() {
         const std::string extension = std::string(reinterpret_cast<const char*>(ext));
         _extensions.push_back(extension);
     }
-}
-
-void OpenGLCapabilitiesComponent::detectGLEWVersion() {
-    _glewVersion.major = GLEW_VERSION_MAJOR;
-    _glewVersion.minor = GLEW_VERSION_MINOR;
-    _glewVersion.release = GLEW_VERSION_MICRO;
 }
 
 void OpenGLCapabilitiesComponent::detectDriverInformation() {

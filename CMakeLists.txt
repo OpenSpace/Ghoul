@@ -189,11 +189,18 @@ if (GHOUL_MODULE_OPENGL)
     target_include_directories(Ghoul SYSTEM PUBLIC ${OPENGL_INCLUDE_DIR})
     target_link_libraries(Ghoul ${OPENGL_LIBRARIES})
 
+    # glbindings
+    set(OPTION_BUILD_GPU_TESTS OFF CACHE BOOL "")
+    set(OPTION_BUILD_TESTS OFF CACHE BOOL "")
+    add_subdirectory(${GHOUL_ROOT_DIR}/ext/glbinding)
+    target_include_directories(Ghoul SYSTEM PUBLIC ${GHOUL_ROOT_DIR}/ext/glbindings/source/glbindings/include)
+    target_link_libraries(Ghoul glbinding::glbinding)
+
     # GLEW
-    find_package(GLEW REQUIRED)
-    target_include_directories(Ghoul SYSTEM PUBLIC ${GLEW_INCLUDE_DIRS})
-    target_compile_definitions(Ghoul PUBLIC "GLEW_STATIC")
-    target_link_libraries(Ghoul ${GLEW_LIBRARIES})
+    # find_package(GLEW REQUIRED)
+    # target_include_directories(Ghoul SYSTEM PUBLIC ${GLEW_INCLUDE_DIRS})
+    # target_compile_definitions(Ghoul PUBLIC "GLEW_STATIC")
+    # target_link_libraries(Ghoul ${GLEW_LIBRARIES})
 endif ()
 
 # LZ4

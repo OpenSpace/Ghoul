@@ -16,3 +16,6 @@ url=http://git.sv.nongnu.org/r/freetype/freetype2.git
 [submodule "ext/lua/src"]
 	path = ext/lua/src
 	url = https://github.com/Lua/Lua.git
+[submodule "ext/glbinding"]
+	path = ext/glbinding
+	url = https://github.com/cginternals/glbinding.git

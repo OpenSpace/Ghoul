@@ -33,9 +33,12 @@
     #include <OpenGL/gl3.h>
     #include <OpenGL/glu.h>
 #else
-    #include <GL/glew.h>
-    #include <GL/gl.h>
-    #include <GL/glu.h>
+    #include <glbinding/gl41core/gl.h>
+    #include <glbinding/Binding.h>
+
+    // Evil 'using namespace' in the header to make the transition from GLEW to glbinding
+    // as easy as possible
+    using namespace gl;
 #endif
 
 #endif // __GHOUL___GHOUL_GL___H__

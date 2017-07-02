@@ -84,7 +84,7 @@ public:
      * <code>GL_TEXTURE0 + unitNumber()</code>.
      * \return The unit enum that was assigned to this TextureUnit
      */
-    GLint glEnum();
+    GLenum glEnum();
 
     /**
      * This method returns the texture unit number that was assigned to this TextureUnit.
@@ -143,7 +143,7 @@ private:
      * The enum in <code>[GL_TEXTURE0, GL_TEXTURE0 + maxTexUnits]</code> referring to this
      * TextureUnit
      */
-    GLint _glEnum;
+    GLenum _glEnum;
     
     /// <code>true</code> if this TextureUnit has been assigned
     bool _assigned;
