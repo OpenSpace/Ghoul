@@ -25,6 +25,7 @@
 
 #include <ghoul/ghoul.h>
 
+#include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/lua/lua_helper.h>
 
@@ -32,6 +33,10 @@ namespace ghoul {
 
 void initialize() {
     ghoul::filesystem::FileSystem::initialize();
+
+#ifdef GHOUL_MODULE_OPENGL
+    glbinding::Binding::initialize();
+#endif // GHOUL_MODULE_OPENGL
 }
 
 void deinitialize() {

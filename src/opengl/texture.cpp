@@ -588,6 +588,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
+                default:
+                    ghoul_assert(false, "Missing case label");
             }
             break;
         case Format::RG:
@@ -655,6 +657,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
+                default:
+                    ghoul_assert(false, "Missing case label");
             }
             break;
         case Format::RGB: // Intentional fallthrough
@@ -723,6 +727,8 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = 1.f;
                     break;
                 }
+                default:
+                    ghoul_assert(false, "Missing case label");
             }
             break;
         case Format::RGBA: // Intentional fallthrough
@@ -791,10 +797,14 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     result.a = t.a;
                     break;
                 }
+                default:
+                    ghoul_assert(false, "Missing case label");
             }
             break;
         case Format::DepthComponent:
             break;
+        default:
+            ghoul_assert(false, "Missing case label");
     }
     return result;
 }
@@ -877,6 +887,8 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                     result.a = 1.f;
                     break;
                 }
+                default:
+                    ghoul_assert(false, "Missing case label");
             }
             break;
         case Format::RG:
@@ -944,6 +956,8 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                     result.a = 1.f;
                     break;
                 }
+                default:
+                    ghoul_assert(false, "Missing case label");
             }
             break;
         case Format::RGB: // Intentional fallthrough
@@ -1012,6 +1026,8 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                     result.a = 1.f;
                     break;
                 }
+                default:
+                    ghoul_assert(false, "Missing case label");
             }
             break;
         case Format::RGBA: // Intentional fallthrough
@@ -1080,6 +1096,8 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                     result.a = t.a;
                     break;
                 }
+                default:
+                    ghoul_assert(false, "Missing case label");
             }
             break;
         case Format::DepthComponent:
@@ -1167,6 +1185,8 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                     result.a = 1.f;
                     break;
                 }
+                default:
+                    ghoul_assert(false, "Missing case label");
             }
             break;
         case Format::RG:
@@ -1234,6 +1254,8 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                     result.a = 1.f;
                     break;
                 }
+                default:
+                    ghoul_assert(false, "Missing case label");
             }
             break;
         case Format::RGB: // Intentional fallthrough
@@ -1302,6 +1324,8 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                     result.a = 1.f;
                     break;
                 }
+                default:
+                    ghoul_assert(false, "Missing case label");
             }
             break;
         case Format::RGBA: // Intentional fallthrough
@@ -1370,6 +1394,8 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                     result.a = t.a;
                     break;
                 }
+                default:
+                    ghoul_assert(false, "Missing case label");
             }
             break;
         case Format::DepthComponent:
@@ -1418,7 +1444,7 @@ void Texture::calculateBytesPerPixel() {
             szType = 4;
             break;
         default:
-            assert(false);
+            ghoul_assert(false, "Missing case label");
     }
 
     _bpp = static_cast<GLubyte>(szType * numChannels);

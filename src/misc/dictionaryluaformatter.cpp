@@ -57,8 +57,10 @@ std::string DictionaryLuaFormatter::format(const Dictionary& dictionary) const {
 }
 
 std::string DictionaryLuaFormatter::formatDouble(double d) const {
-    if (d == 0) return "0";
-    int exponent = std::log10(std::abs(d));
+    if (d == 0) {
+        return "0";
+    }
+    double exponent = std::log10(std::abs(d));
     double base = d / std::pow(10, exponent);
     return std::to_string(base) + "E" + std::to_string(exponent);
 }
