@@ -1,8 +1,7 @@
 stage('Build') {
     parallel linux: {
         node('linux') {
-            timeout(time: 15, unit: 'MINUTES') {
-                deleteDir()
+            timeout(time: 30, unit: 'MINUTES') {
                 checkout scm
                 sh '''
                     git submodule update --init --recursive
@@ -16,8 +15,7 @@ stage('Build') {
     },
     windows: {
         node('windows') {
-            timeout(time: 15, unit: 'MINUTES') {
-                deleteDir()
+            timeout(time: 30, unit: 'MINUTES') {
                 checkout scm
                 bat '''
                     git submodule update --init --recursive
@@ -31,8 +29,7 @@ stage('Build') {
     },
     osx: {
         node('osx') {
-            timeout(time: 15, unit: 'MINUTES') {
-                deleteDir()
+            timeout(time: 30, unit: 'MINUTES') {
                 checkout scm
                 sh '''
                     git submodule update --init --recursive
