@@ -2,6 +2,7 @@ stage('Build') {
     parallel linux: {
         node('linux') {
             timeout(time: 30, unit: 'MINUTES') {
+                deleteDir()
                 checkout scm
                 sh '''
                     git submodule update --init --recursive
@@ -16,12 +17,13 @@ stage('Build') {
     windows: {
         node('windows') {
             timeout(time: 30, unit: 'MINUTES') {
+                deleteDir()
                 checkout scm
                 bat '''
                     git submodule update --init --recursive
                     if not exist "build" mkdir "build"
                     cd build
-                    cmake -G "Visual Studio 14 2015 Win64" .. 
+                    cmake -G "Visual Studio 15 2017 Win64" .. 
                     msbuild.exe Ghoul.sln /m:8 /p:Configuration=Debug
                 '''
             }
@@ -30,6 +32,7 @@ stage('Build') {
     osx: {
         node('osx') {
             timeout(time: 30, unit: 'MINUTES') {
+                deleteDir()
                 checkout scm
                 sh '''
                     git submodule update --init --recursive
