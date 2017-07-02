@@ -29,7 +29,8 @@
 #ifdef __APPLE__
     #define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
     #undef __gl_h_
-    #include <GL/glew.h>
+    #include <glbinding/gl41core/gl.h>
+    #include <glbinding/Binding.h>
     #include <OpenGL/gl3.h>
     #include <OpenGL/glu.h>
 #else
