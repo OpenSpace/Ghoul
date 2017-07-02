@@ -29,17 +29,13 @@
 #ifdef __APPLE__
     #define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
     #undef __gl_h_
-    #include <glbinding/gl41core/gl.h>
-    #include <glbinding/Binding.h>
-    #include <OpenGL/gl3.h>
-    #include <OpenGL/glu.h>
-#else
-    #include <glbinding/gl41core/gl.h>
-    #include <glbinding/Binding.h>
-
-    // Evil 'using namespace' in the header to make the transition from GLEW to glbinding
-    // as easy as possible
-    using namespace gl;
 #endif
+
+#include <glbinding/gl41core/gl.h>
+#include <glbinding/Binding.h>
+
+// Evil 'using namespace' in the header to make the transition from GLEW to glbinding
+// as easy as possible
+using namespace gl;
 
 #endif // __GHOUL___GHOUL_GL___H__
