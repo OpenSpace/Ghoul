@@ -54,14 +54,13 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(
     glm::size3_t size(width, height, 1);
     Texture::Format format;
     format = Texture::Format::RGBA;
-    GLenum type;
-    type = GL_UNSIGNED_BYTE;
+    GLenum type = GL_UNSIGNED_BYTE;
 
     return std::make_unique<Texture>(
-        image,
+        reinterpret_cast<void*>(image),
         size,
         format,
-        static_cast<int>(format),
+        static_cast<GLenum>(format),
         type,
         Texture::FilterMode::Linear
     );
@@ -85,14 +84,13 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(void* memory,
     glm::size3_t imageSize(width, height, 1);
     Texture::Format format;
     format = Texture::Format::RGBA;
-    GLenum type;
-    type = GL_UNSIGNED_BYTE;
+    GLenum type = GL_UNSIGNED_BYTE;
 
     return std::make_unique<Texture>(
-        image,
+        reinterpret_cast<void*>(image),
         imageSize,
         format,
-        static_cast<int>(format),
+        static_cast<GLenum>(format),
         type,
         Texture::FilterMode::Linear
     );

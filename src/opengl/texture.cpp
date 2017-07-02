@@ -1374,6 +1374,8 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
             break;
         case Format::DepthComponent:
             break;
+        default:
+            ghoul_assert(false, "Missing case label");
     }
     return result;
 }
