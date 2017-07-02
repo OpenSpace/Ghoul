@@ -33,10 +33,6 @@ namespace ghoul {
 
 void initialize() {
     ghoul::filesystem::FileSystem::initialize();
-
-#ifdef GHOUL_MODULE_OPENGL
-    glbinding::Binding::initialize();
-#endif // GHOUL_MODULE_OPENGL
 }
 
 void deinitialize() {
