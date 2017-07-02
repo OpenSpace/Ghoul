@@ -192,9 +192,21 @@ if (GHOUL_MODULE_OPENGL)
     # glbindings
     set(OPTION_BUILD_GPU_TESTS OFF CACHE BOOL "")
     set(OPTION_BUILD_TESTS OFF CACHE BOOL "")
+    set(OPTION_BUILD_TOOLS OFF CACHE BOOL "")
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/glbinding)
     target_include_directories(Ghoul SYSTEM PUBLIC ${GHOUL_ROOT_DIR}/ext/glbindings/source/glbindings/include)
     target_link_libraries(Ghoul glbinding::glbinding)
+    set_property(TARGET glbinding PROPERTY FOLDER "External")
+    set_property(TARGET check-glbinding PROPERTY FOLDER "External/glbinding")
+    set_property(TARGET component_install PROPERTY FOLDER "External/glbinding")
+    set_property(TARGET generate PROPERTY FOLDER "External/glbinding")
+    set_property(TARGET pack PROPERTY FOLDER "External/glbinding")
+    set_property(TARGET pack-glbinding PROPERTY FOLDER "External/glbinding")
+    set_property(TARGET update PROPERTY FOLDER "External/glbinding")
+    set_property(TARGET check-all PROPERTY FOLDER "External/glbinding")
+    set_property(TARGET check-template PROPERTY FOLDER "External/glbinding")
+    set_property(TARGET cppcheck-glbinding PROPERTY FOLDER "External/glbinding")
+
 
     # GLEW
     # find_package(GLEW REQUIRED)
@@ -207,7 +219,7 @@ endif ()
 find_package(LZ4 REQUIRED)
 target_include_directories(Ghoul SYSTEM PUBLIC ${LZ4_INCLUDE_DIR})
 target_link_libraries(Ghoul ${LZ4_LIBRARIES})
-
+set_property(TARGET lz4 PROPERTY FOLDER "External")
 
 if (GHOUL_MODULE_LUA)
     # Lua
@@ -333,6 +345,7 @@ if (GHOUL_HAVE_TESTS)
     target_link_libraries(GhoulTest gtest Ghoul Lua)
 
     set_property(TARGET gtest_main PROPERTY FOLDER "External")
+    set_property(TARGET gtest PROPERTY FOLDER "External")
 
     if (APPLE)
         target_link_libraries(GhoulTest
