@@ -30,7 +30,7 @@
 namespace {
 
 struct Data {
-    char* string;
+    const char* string;
     unsigned int hash;
 };
 

@@ -45,7 +45,7 @@ stage('Build') {
                     fi
                     cd ${srcDir}/build
                     /Applications/CMake.app/Contents/bin/cmake -G Xcode ..
-                    xcodebuild
+                    xcodebuild -quiet
                 '''
             }
         }
