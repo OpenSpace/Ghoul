@@ -119,8 +119,10 @@ void OpenGLCapabilitiesComponent::detectExtensions() {
     glGetIntegerv(GL_NUM_EXTENSIONS, &nExtensions);
     for (GLint i = 0; i < nExtensions; ++i) {
         const GLubyte* ext = glGetStringi(GL_EXTENSIONS, i);
-        const std::string extension = std::string(reinterpret_cast<const char*>(ext));
-        _extensions.push_back(extension);
+        if (ext) {
+            const std::string extension = std::string(reinterpret_cast<const char*>(ext));
+            _extensions.push_back(extension);
+        }
     }
 }
 
