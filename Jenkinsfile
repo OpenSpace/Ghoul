@@ -22,7 +22,7 @@ stage('Build') {
                     if not exist "build" mkdir "build"
                     cd build
                     cmake -G "Visual Studio 15 2017 Win64" .. 
-                    msbuild.exe Ghoul.sln /m:2 /p:Configuration=Debug
+                    msbuild.exe Ghoul.sln /nologo /verbosity:minimal /m:2 /p:Configuration=Debug
                 '''
             }
         }
