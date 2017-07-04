@@ -43,8 +43,6 @@ Test checklist:
  +++ Custom factory std::function
 */
 
-namespace {
-
 struct BaseClass {
 public:
     BaseClass() : value1(-1), value2(-2) {};
@@ -112,8 +110,6 @@ BaseClass* createFunctionPointerClass(bool useDictionary, const ghoul::Dictionar
         return new FunctionPointerClass;
     else
         return nullptr;
-}
-
 }
 
 class TemplateFactoryTest : public testing::Test {

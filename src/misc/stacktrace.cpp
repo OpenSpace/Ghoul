@@ -94,9 +94,9 @@ std::vector<std::string> stackTrace() {
         const int MaxModuleNameLength = 1024;
         const int MaxAddressLength = 48;
         
-        char functionSymbol[MaxFunctionSymbolLength] = {};
-        char moduleName[MaxModuleNameLength] = {};
-        char addr[MaxAddressLength] = {};
+        std::vector<char> functionSymbol(MaxFunctionSymbolLength);
+        std::vector<char> moduleName(MaxModuleNameLength);
+        std::vector<char> addr(MaxAddressLength);
         int  offset = 0;
         
         //
@@ -118,13 +118,13 @@ std::vector<std::string> stackTrace() {
         // split the string, take out chunks out of stack trace
         // we are primarily interested in module, function and address
         sscanf(strs[i], "%*s %s %s %s %*s %d",
-               &moduleName, &addr, &functionSymbol, &offset);
+               moduleName.data(), addr.data(), functionSymbol.data(), &offset);
         
         int isValidCppName = 0;
         //  if this is a C++ library, symbol will be demangled
         //  on success function returns 0
         //
-        char* functionName = abi::__cxa_demangle(functionSymbol,
+        char* functionName = abi::__cxa_demangle(functionSymbol.data(),
                                                  NULL, 0, &isValidCppName);
         
         const int MaxStackFrameSize = 4096;
@@ -132,14 +132,14 @@ std::vector<std::string> stackTrace() {
         if (isValidCppName == 0) {
             // success
             sprintf(stackFrame, "(%s)\t0x%s — %s + %d",
-                    moduleName, addr, functionName, offset);
+                    moduleName.data(), addr.data(), functionName, offset);
         }
         else {
             //  in the above traceback (in comments) last entry is not
             //  from C++ binary, last frame, libdyld.dylib, is printed
             //  from here
             sprintf(stackFrame, "(%s)\t0x%s — %s + %d",
-                    moduleName, addr, functionName, offset);
+                    moduleName.data(), addr.data(), functionName, offset);
         }
         
         if (functionName) {

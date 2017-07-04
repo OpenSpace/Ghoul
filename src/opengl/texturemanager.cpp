@@ -31,8 +31,8 @@
 namespace ghoul {
 namespace opengl {
 
-TextureManager::TextureManagerError::TextureManagerError(std::string message)
-    : RuntimeError(std::move(message), "TextureManager")
+TextureManager::TextureManagerError::TextureManagerError(std::string msg)
+    : RuntimeError(std::move(msg), "TextureManager")
 {}
     
 TextureManager* TextureManager::_manager = nullptr;

@@ -144,9 +144,8 @@ std::string DictionaryLuaFormatter::formatValue(const Dictionary& dictionary,
     );
 }
 
-DictionaryLuaFormatter::LuaFormattingError::LuaFormattingError(
-    const std::string& message)
-    : RuntimeError(message, "Dictionary")
+DictionaryLuaFormatter::LuaFormattingError::LuaFormattingError(const std::string& msg)
+    : RuntimeError(msg, "Dictionary")
 {}
 
 }  // namespace ghoul

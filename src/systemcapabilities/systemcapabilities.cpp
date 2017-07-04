@@ -52,15 +52,15 @@ bool SystemCapabilities::isInitialized() {
 
 void SystemCapabilities::detectCapabilities() {
     clearCapabilities();
-    for (const auto& component : _components) {
-        component->detectCapabilities();
+    for (const std::unique_ptr<SystemCapabilitiesComponent>& c : _components) {
+        c->detectCapabilities();
     }
     _isInitialized = true;
 }
 
 void SystemCapabilities::clearCapabilities() {
-    for (const auto& component : _components) {
-        component->clearCapabilities();
+    for (const std::unique_ptr<SystemCapabilitiesComponent>& c : _components) {
+        c->clearCapabilities();
     }
     _isInitialized = false;
 }
@@ -68,9 +68,10 @@ void SystemCapabilities::clearCapabilities() {
 void SystemCapabilities::logCapabilities(
                                   SystemCapabilitiesComponent::Verbosity verbosity) const
 {
-    for (const auto& c : _components) {
-        const auto& capabilities = c->capabilities();
-        for (const auto& cap : capabilities) {
+    for (const std::unique_ptr<SystemCapabilitiesComponent>& c : _components) {
+        std::vector<SystemCapabilitiesComponent::CapabilityInformation> caps =
+            c->capabilities();
+        for (const SystemCapabilitiesComponent::CapabilityInformation& cap : caps) {
             if (verbosity >= cap.verbosity) {
                 LINFOC(
                     "SystemCapabilitiesComponent." + c->name(),
@@ -81,23 +82,22 @@ void SystemCapabilities::logCapabilities(
     }
 }
 
-void SystemCapabilities::addComponent(
-                                  std::unique_ptr<SystemCapabilitiesComponent> component)
+void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponent> comp)
 {
-    ghoul_assert(component != nullptr, "Component must not be nullptr");
+    ghoul_assert(comp != nullptr, "Component must not be nullptr");
     
     auto it = std::find_if(
         _components.begin(),
         _components.end(),
-        [&component](const std::unique_ptr<SystemCapabilitiesComponent>& rhs) {
-            auto& c = *component;
+        [&comp](const std::unique_ptr<SystemCapabilitiesComponent>& rhs) {
+            auto& c = *comp;
             auto& r = *rhs;
             return typeid(c) == typeid(r);
         }
     );
     
     ghoul_assert(it == _components.end(), "Component must not have been added before");
-    _components.push_back(std::move(component));
+    _components.push_back(std::move(comp));
 }
 
 } // namespace systemcapabilities

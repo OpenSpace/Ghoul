@@ -93,16 +93,16 @@ namespace opengl {
 
 std::vector<std::string> ShaderPreprocessor::_includePaths = std::vector<std::string>();
     
-ShaderPreprocessor::ShaderPreprocessorError::ShaderPreprocessorError(std::string message)
-    : RuntimeError(std::move(message), "ShaderPreprocessor")
+ShaderPreprocessor::ShaderPreprocessorError::ShaderPreprocessorError(std::string msg)
+    : RuntimeError(std::move(msg), "ShaderPreprocessor")
 {}
 
-ShaderPreprocessor::SubstitutionError::SubstitutionError(std::string message)
-    : ShaderPreprocessorError(std::move(message))
+ShaderPreprocessor::SubstitutionError::SubstitutionError(std::string msg)
+    : ShaderPreprocessorError(std::move(msg))
 {}
 
-ShaderPreprocessor::ParserError::ParserError(std::string message)
-    : ShaderPreprocessorError(std::move(message))
+ShaderPreprocessor::ParserError::ParserError(std::string msg)
+    : ShaderPreprocessorError(std::move(msg))
 {}
     
 ShaderPreprocessor::ShaderPreprocessor(std::string shaderPath, Dictionary dictionary)

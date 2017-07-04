@@ -36,8 +36,8 @@
 #include <fstream>
 
 namespace {
-    const std::string _loggerCat = "CacheManager";
-    const std::string _cacheFile = "cache";
+    const char* _loggerCat = "CacheManager";
+    const char* _cacheFile = "cache";
     const char _hashDelimiter = '|'; // something that cannot occur in the filesystem
 }
 
@@ -56,8 +56,8 @@ CacheManager::MalformedCacheException::MalformedCacheException(std::string file,
 {}
   
 CacheManager::ErrorLoadingCacheException::ErrorLoadingCacheException(
-                                                             const std::string& message)
-    : CacheException(message)
+                                                             const std::string& msg)
+    : CacheException(msg)
 {}
     
 CacheManager::IllegalArgumentException::IllegalArgumentException(std::string argument)

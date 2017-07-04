@@ -30,8 +30,8 @@
 namespace ghoul {
 namespace opengl {
 
-TextureUnit::TextureUnitError::TextureUnitError(std::string message)
-    : RuntimeError(std::move(message), "TextureUnit")
+TextureUnit::TextureUnitError::TextureUnitError(std::string msg)
+    : RuntimeError(std::move(msg), "TextureUnit")
 {}
     
 bool TextureUnit::_initialized = false;

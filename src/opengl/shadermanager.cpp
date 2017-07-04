@@ -32,8 +32,8 @@
 namespace ghoul {
 namespace opengl {
     
-ShaderManager::ShaderManagerError::ShaderManagerError(std::string message)
-    : RuntimeError(std::move(message), "ShaderManager")
+ShaderManager::ShaderManagerError::ShaderManagerError(std::string msg)
+    : RuntimeError(std::move(msg), "ShaderManager")
 {}
     
 ShaderManager& ShaderManager::ref() {

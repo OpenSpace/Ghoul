@@ -76,9 +76,9 @@ FileSystem::FileSystemException::FileSystemException(const string& msg)
     : RuntimeError(msg, "FileSystem")
 {}
 
-FileSystem::ResolveTokenException::ResolveTokenException(string token)
-    : FileSystemException(fmt::format("Token '{}' could not be resolved", token))
-    , token(std::move(token))
+FileSystem::ResolveTokenException::ResolveTokenException(string t)
+    : FileSystemException(fmt::format("Token '{}' could not be resolved", t))
+    , token(std::move(t))
 {}
     
 FileSystem::FileSystem()

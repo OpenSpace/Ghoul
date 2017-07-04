@@ -96,12 +96,12 @@ lua_State* staticLuaState() {
     return _state;
 }
 
-LuaRuntimeException::LuaRuntimeException(string message)
-    : RuntimeError(std::move(message), "Lua")
+LuaRuntimeException::LuaRuntimeException(string msg)
+    : RuntimeError(std::move(msg), "Lua")
 {}
 
-LuaFormatException::LuaFormatException(string message, string file)
-    : LuaRuntimeException(std::move(message))
+LuaFormatException::LuaFormatException(string msg, string file)
+    : LuaRuntimeException(std::move(msg))
     , filename(std::move(file))
 {}
     

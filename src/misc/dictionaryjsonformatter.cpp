@@ -145,9 +145,8 @@ std::string DictionaryJsonFormatter::formatValue(const Dictionary& dictionary,
     );
 }
 
-DictionaryJsonFormatter::JsonFormattingError::JsonFormattingError(
-    const std::string& message)
-    : RuntimeError(message, "Dictionary")
+DictionaryJsonFormatter::JsonFormattingError::JsonFormattingError(const std::string& msg)
+    : RuntimeError(msg, "Dictionary")
 {}
 
 }  // namespace ghoul

@@ -134,14 +134,14 @@ Font::GlyphException::GlyphException(std::string name, float size, wchar_t chara
 {}
     
 Font::FreeTypeException::FreeTypeException(std::string name, float size, int code,
-                                           std::string message)
+                                           std::string msg)
     : FontException(fmt::format(
         "Error loading font '{}' for size '{}': ({}) {}",
         name, size, code, message))
     , fontName(std::move(name))
     , fontSize(size)
     , errorCode(code)
-    , errorMessage(std::move(message))
+    , errorMessage(std::move(msg))
 {}
     
 Font::Glyph::Glyph(wchar_t character,

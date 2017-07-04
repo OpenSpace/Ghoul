@@ -89,8 +89,8 @@ namespace {
 #endif
 }
     
-SharedMemory::SharedMemoryError::SharedMemoryError(std::string message)
-    : RuntimeError(std::move(message), "SharedMemory")
+SharedMemory::SharedMemoryError::SharedMemoryError(std::string msg)
+    : RuntimeError(std::move(msg), "SharedMemory")
 {}
     
 SharedMemory::SharedMemoryNotFoundError::SharedMemoryNotFoundError()

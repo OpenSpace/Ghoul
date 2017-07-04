@@ -49,12 +49,12 @@ namespace ghoul {
 namespace systemcapabilities {
     
 OpenGLCapabilitiesComponent::OpenGLCapabilitiesComponentError::
-    OpenGLCapabilitiesComponentError(std::string message)
-    : RuntimeError(std::move(message), "OpenGLCapabilitiesComponent")
+    OpenGLCapabilitiesComponentError(std::string msg)
+    : RuntimeError(std::move(msg), "OpenGLCapabilitiesComponent")
 {}
 
-OpenGLCapabilitiesComponent::GPUVendorError::GPUVendorError(std::string message)
-    : OpenGLCapabilitiesComponentError(std::move(message))
+OpenGLCapabilitiesComponent::GPUVendorError::GPUVendorError(std::string msg)
+    : OpenGLCapabilitiesComponentError(std::move(msg))
 {}
 
 void OpenGLCapabilitiesComponent::detectCapabilities() {

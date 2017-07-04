@@ -73,8 +73,8 @@ using glm::value_ptr;
 namespace ghoul {
 namespace opengl {
 
-ProgramObject::ProgramObjectError::ProgramObjectError(std::string message)
-    : RuntimeError(std::move(message), "ProgramObject")
+ProgramObject::ProgramObjectError::ProgramObjectError(std::string msg)
+    : RuntimeError(std::move(msg), "ProgramObject")
 {}
     
 ProgramObject::ProgramObjectLinkingError::ProgramObjectLinkingError(std::string msg,

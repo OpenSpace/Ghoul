@@ -95,8 +95,8 @@ namespace ghoul {
 namespace systemcapabilities {
     
 GeneralCapabilitiesComponent::GeneralCapabilitiesComponentError::
-    GeneralCapabilitiesComponentError(std::string message)
-    : RuntimeError(std::move(message), "GeneralCapabilitiesComponent")
+    GeneralCapabilitiesComponentError(std::string msg)
+    : RuntimeError(std::move(msg), "GeneralCapabilitiesComponent")
 {}
     
 GeneralCapabilitiesComponent::OperatingSystemError::OperatingSystemError(std::string d,
@@ -106,8 +106,8 @@ GeneralCapabilitiesComponent::OperatingSystemError::OperatingSystemError(std::st
     , errorMessage(std::move(e))
 {}
     
-GeneralCapabilitiesComponent::MainMemoryError::MainMemoryError(std::string message)
-    : GeneralCapabilitiesComponentError(std::move(message))
+GeneralCapabilitiesComponent::MainMemoryError::MainMemoryError(std::string msg)
+    : GeneralCapabilitiesComponentError(std::move(msg))
 {}
 
 void GeneralCapabilitiesComponent::detectCapabilities() {
