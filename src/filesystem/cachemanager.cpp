@@ -105,7 +105,7 @@ CacheManager::CacheManager(std::string directory, int version)
             // for each file:
             //   hash number\n
             //   filepath\n
-            unsigned int hash;
+            unsigned long hash;
             try {
                 hash = std::stoul(line);
             } catch (const std::invalid_argument&) {

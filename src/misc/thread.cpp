@@ -37,6 +37,8 @@
 namespace ghoul {
 namespace thread {
 
+namespace {
+
 int convertThreadPriorityLevel(ThreadPriorityClass c, ThreadPriorityLevel p) {
 #ifdef WIN32
     (void)c;
@@ -72,8 +74,8 @@ int convertThreadPriorityLevel(ThreadPriorityClass c, ThreadPriorityLevel p) {
 #endif 
 }
 
-int convertThreadPriorityClass(ThreadPriorityClass c) {
-#ifdef WIN32
+[[maybe_unused]] int convertThreadPriorityClass(ThreadPriorityClass c) {
+#if defined WIN32
     switch (c) {
         case ThreadPriorityClass::Idle:   return IDLE_PRIORITY_CLASS;
         case ThreadPriorityClass::Normal: return NORMAL_PRIORITY_CLASS;
@@ -81,7 +83,7 @@ int convertThreadPriorityClass(ThreadPriorityClass c) {
         default:                          throw MissingCaseException();
 
     }
-#elif __APPLE__ || __FreeBSD__
+#elif defined __APPLE__ || defined __FreeBSD__
     switch (c) {
         case ThreadPriorityClass::Idle:   return SCHED_OTHER;
         case ThreadPriorityClass::Normal: return SCHED_OTHER;
@@ -99,6 +101,7 @@ int convertThreadPriorityClass(ThreadPriorityClass c) {
 #endif
 }
     
+} // namespace
 
 void setPriority(std::thread& t, ThreadPriorityClass priorityClass, 
                  ThreadPriorityLevel priorityLevel)

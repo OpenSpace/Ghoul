@@ -37,6 +37,8 @@
 
 using std::string;
 
+static lua_State* _state = nullptr;
+
 namespace {
     
 static const int KeyTableIndex = -2;
@@ -82,19 +84,18 @@ string luaTableToString(lua_State* state, int tableLocation) {
     result << "}";
     return result.str();
 }
-}
 
-namespace ghoul {
-namespace lua {
-
-static lua_State* _state = nullptr;
-    
 lua_State* staticLuaState() {
     if (_state == nullptr) {
-        _state = createNewLuaState();
+        _state = ghoul::lua::createNewLuaState();
     }
     return _state;
 }
+
+} // namespace
+
+namespace ghoul {
+namespace lua {
 
 LuaRuntimeException::LuaRuntimeException(string msg)
     : RuntimeError(std::move(msg), "Lua")

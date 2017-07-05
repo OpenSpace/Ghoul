@@ -150,7 +150,7 @@ void SharedMemory::create(const std::string& name, size_t size) {
             "Error creating shared memory '" + name + "': " + errorMsg
         );
     }
-    void* memory = shmat(result, NULL, SHM_R | SHM_W);
+    void* memory = shmat(result, nullptr, SHM_R | SHM_W);
     Header* memoryHeader = header(memory);
     
     memoryHeader->mutex.clear();
@@ -253,7 +253,7 @@ SharedMemory::SharedMemory(std::string name)
         );
     }
     else {
-        _memory = shmat(_sharedMemoryHandle, NULL, SHM_R | SHM_W);
+        _memory = shmat(_sharedMemoryHandle, nullptr, SHM_R | SHM_W);
         if (_memory == reinterpret_cast<void*>(-1)) {
             std::string errorMsg = strerror(errno);
             throw SharedMemoryError(

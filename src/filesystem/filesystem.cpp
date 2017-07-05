@@ -119,9 +119,9 @@ FileSystem::FileSystem()
 }
 
 FileSystem::~FileSystem() {
-#ifdef WIN32
+#if defined WIN32
     deinitializeInternalWindows();
-#elif __APPLE__
+#elif defined __APPLE__
     deinitializeInternalApple();
 #else
     deinitializeInternalLinux();

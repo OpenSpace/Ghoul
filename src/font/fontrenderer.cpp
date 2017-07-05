@@ -201,7 +201,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
 
     memset(buffer.data(), 0, s);
 
-#if (_MSC_VER >= 1400) //visual studio 2005 or later
+#ifdef _MSC_VER
     vsprintf_s(buffer.data(), s, format, args);
 #else
     vsprintf(buffer.data(), format, args);
@@ -314,7 +314,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     
     memset(buffer, 0, size);
     
-#if (_MSC_VER >= 1400) //visual studio 2005 or later
+#ifdef _MSC_VER
     vsprintf_s(buffer, size, format, args);
 #else
     vsprintf(buffer, format, args);
@@ -347,7 +347,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     std::vector<char> buffer(size);
     memset(buffer.data(), 0, size);
     
-#if WIN32 //visual studio 2005 or later
+#ifdef _MSC_VER
     vsprintf_s(buffer.data(), size, format, args);
 #else
     vsprintf(buffer.data(), format, args);
@@ -379,7 +379,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     memset(buffer.data(), 0, size);
     
-#if (_MSC_VER >= 1400) //visual studio 2005 or later
+#ifdef _MSC_VER
     vsprintf_s(buffer.data(), size, format, args);
 #else
     vsprintf(buffer.data(), format, args);
@@ -532,7 +532,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
     );
     
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
     
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(
@@ -550,7 +550,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
         GL_TRIANGLES,
         static_cast<GLsizei>(indices.size()),
         GL_UNSIGNED_INT,
-        0
+        nullptr
     );
     
     glBindVertexArray(0);

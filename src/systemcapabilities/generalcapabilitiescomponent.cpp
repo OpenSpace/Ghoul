@@ -52,6 +52,10 @@
 
 namespace std {
     std::string to_string(
+        ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem os);
+
+
+    std::string to_string(
         ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem os)
     {
         using OS =
@@ -631,7 +635,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
             if (strncmp(line, "cache size", 10) == 0) {
                 std::string tmp = line;
                 tmp = tmp.substr(13, tmp.length() - 14);
-                _cacheSize = static_cast<unsigned int>(strtol(tmp.c_str(), NULL, 0));
+                _cacheSize = static_cast<unsigned int>(strtol(tmp.c_str(), nullptr, 0));
 
             }
             if (strncmp(line, "flags", 5) == 0) {
@@ -646,7 +650,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     file = fopen("/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size", "r");
     if (file) {
         if (fgets(line, maxSize, file) != NULL){
-            _cacheLineSize = static_cast<unsigned int>(strtol(line, NULL, 0));
+            _cacheLineSize = static_cast<unsigned int>(strtol(line, nullptr, 0));
         }
         fclose(file);
     }
@@ -654,7 +658,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     file = fopen("/sys/devices/system/cpu/cpu0/cache/index0/ways_of_associativity", "r");
     if (file) {
         if (fgets(line, maxSize, file) != NULL){
-            _L2Associativity = static_cast<unsigned int>(strtol(line, NULL, 0));
+            _L2Associativity = static_cast<unsigned int>(strtol(line, nullptr, 0));
         }
         fclose(file);
     }

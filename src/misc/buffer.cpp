@@ -139,7 +139,7 @@ void Buffer::write(const std::string& filename, Compress compress) {
             throw RuntimeError("Error compressing Buffer using LZ4", "Buffer");
         }
 
-        size_t size = compressed_size;
+        std::streamsize size(compressed_size);
         // orginal size
         file.write(reinterpret_cast<const char*>(&_offsetWrite), sizeof(size_t));
         
@@ -148,7 +148,10 @@ void Buffer::write(const std::string& filename, Compress compress) {
         file.write(reinterpret_cast<const char*>(buffer.data()), size); // compressed data
     } else {
         file.write(reinterpret_cast<const char*>(&_offsetWrite), sizeof(size_t));
-        file.write(reinterpret_cast<const char*>(_data.data()), _offsetWrite);
+        file.write(
+            reinterpret_cast<const char*>(_data.data()),
+            static_cast<std::streamsize>(_offsetWrite)
+        );
     }
 }
 
@@ -160,11 +163,11 @@ void Buffer::read(const std::string& filename) {
     file.open(filename, std::ios::binary | std::ios::in);
     
     _offsetRead = 0;
-    size_t size;
     bool compressed;
     file.read(reinterpret_cast<char*>(&compressed), sizeof(bool));
     if (compressed) {
         // read original size
+        size_t size;
         file.read(reinterpret_cast<char*>(&size), sizeof(size_t));
         _data.resize(size);
         
@@ -183,9 +186,13 @@ void Buffer::read(const std::string& filename) {
             static_cast<int>(_data.size())
         );
     } else {
+        size_t size;
         file.read(reinterpret_cast<char*>(&size), sizeof(size_t));
         _data.resize(size);
-        file.read(reinterpret_cast<char*>(_data.data()), size);
+        file.read(
+            reinterpret_cast<char*>(_data.data()),
+            size
+        );
         _offsetWrite = size;
     }
 }

@@ -66,7 +66,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
 
     glm::size3_t imageSize(width, height, 1);
     //if this somehow one of these failed (they shouldn't), return failure
-    if ((bits == 0) || (width == 0) || (height == 0)) {
+    if ((bits == nullptr) || (width == 0) || (height == 0)) {
         throw TextureLoadException(
             "Memory",
             "Unable to ready bits or size (" + source + ")",
@@ -184,7 +184,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
                                                         const std::string& filename) const
 {
     // Pointer to the image, once loaded
-    FIBITMAP* dib(0);
+    FIBITMAP* dib = nullptr;
 
     // Image format
     // Check the file signature and deduce its format
@@ -224,7 +224,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(void* memor
     using opengl::Texture;
 
     // Pointer to the image, once loaded
-    FIBITMAP* dib(0);
+    FIBITMAP* dib = nullptr;
 
     // Open the a stream to memory
     FIMEMORY* stream = FreeImage_OpenMemory(

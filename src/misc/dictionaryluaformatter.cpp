@@ -28,6 +28,7 @@
 
 #include <ghoul/glm.h>
 
+#include <functional>
 #include <numeric>
 #include <string>
 
@@ -57,7 +58,8 @@ std::string DictionaryLuaFormatter::format(const Dictionary& dictionary) const {
 }
 
 std::string DictionaryLuaFormatter::formatDouble(double d) const {
-    if (d == 0) {
+    // This check is to silence -Wfloat-equal on GCC due to floating point comparison
+    if (std::equal_to<>()(d, 0.0)) {
         return "0";
     }
     double exponent = std::log10(std::abs(d));

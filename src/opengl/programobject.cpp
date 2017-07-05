@@ -309,7 +309,7 @@ void ProgramObject::linkProgramObject() {
         }
 
         std::vector<GLchar> rawLog(logLength);
-        glGetProgramInfoLog(_id, logLength, NULL, rawLog.data());
+        glGetProgramInfoLog(_id, logLength, nullptr, rawLog.data());
         string log(rawLog.data());
         throw ProgramObjectLinkingError(log, name());
     }

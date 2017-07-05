@@ -51,14 +51,15 @@ void RawVolumeReader::setReadHints(const ReadHints& hints) {
     _hints = hints;
 }
 
-opengl::Texture* RawVolumeReader::read(std::string filename) {
+opengl::Texture* RawVolumeReader::read(const std::string& filename) {
     if (_hints._dimensions != glm::ivec3(0)) {
-        int size = _hints._dimensions.x*_hints._dimensions.y*_hints._dimensions.z;
-        GLubyte *data = new GLubyte[size];
+        unsigned int size =
+            _hints._dimensions.x * _hints._dimensions.y * _hints._dimensions.z;
+        GLubyte* data = new GLubyte[size];
 
         std::ifstream fin(filename, std::ios::in | std::ios::binary);
         if( fin.good() ){
-            fin.read(reinterpret_cast<char*>(data), sizeof(unsigned char)*size);
+            fin.read(reinterpret_cast<char*>(data), sizeof(unsigned char) * size);
             fin.close();
         } else {
             fprintf( stderr, "Could not open file '%s'\n", filename.c_str() );

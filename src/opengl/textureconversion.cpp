@@ -36,6 +36,8 @@ namespace opengl {
 using ConversionFunc = void(*)(char* dst, const char* src, int nSourceChannels,
                                int nDestinationChannels, int nBytesPerChannel);
 
+namespace {
+
 template <Texture::Format from, Texture::Format to>
 void convert(char* dst, const char* src, int nSourceChannels, int nDestinationChannels,
              int nBytesPerChannel)
@@ -100,54 +102,56 @@ void convert<Texture::Format::RG, Texture::Format::RGBA>(char* dst, const char* 
 
 ConversionFunc conversionFunctionSelector(Texture::Format from, Texture::Format to) {
     switch (from) {
-        case Texture::Format::Red:
-            switch (to) {
-                case Texture::Format::RG:
-                    return &convert<Texture::Format::Red, Texture::Format::RG>;
-                case Texture::Format::RGB:
-                    return &convert<Texture::Format::Red, Texture::Format::RGB>;
-                case Texture::Format::RGBA:
-                    return &convert<Texture::Format::Red, Texture::Format::RGBA>;
-                default:
-                    ghoul_assert(false, "Missing case statement");
-            }
+    case Texture::Format::Red:
+        switch (to) {
         case Texture::Format::RG:
-            switch (to) {
-                case Texture::Format::Red:
-                    return &convert<Texture::Format::RG, Texture::Format::Red>;
-                case Texture::Format::RGB:
-                    return &convert<Texture::Format::RG, Texture::Format::RGB>;
-                case Texture::Format::RGBA:
-                    return &convert<Texture::Format::RG, Texture::Format::RGBA>;
-                default:
-                    ghoul_assert(false, "Missing case statement");
-            }
+            return &convert<Texture::Format::Red, Texture::Format::RG>;
         case Texture::Format::RGB:
-            switch (to) {
-                case Texture::Format::Red:
-                    return &convert<Texture::Format::RGB, Texture::Format::Red>;
-                case Texture::Format::RG:
-                    return &convert<Texture::Format::RGB, Texture::Format::RG>;
-                case Texture::Format::RGBA:
-                    return &convert<Texture::Format::RGB, Texture::Format::RGBA>;
-                default:
-                    ghoul_assert(false, "Missing case statement");
-            }
+            return &convert<Texture::Format::Red, Texture::Format::RGB>;
         case Texture::Format::RGBA:
-            switch (to) {
-                case Texture::Format::Red:
-                    return &convert<Texture::Format::RGBA, Texture::Format::Red>;
-                case Texture::Format::RG:
-                    return &convert<Texture::Format::RGBA, Texture::Format::RG>;
-                case Texture::Format::RGB:
-                    return &convert<Texture::Format::RGBA, Texture::Format::RGB>;
-                default:
-                    ghoul_assert(false, "Missing case statement");
-            }
+            return &convert<Texture::Format::Red, Texture::Format::RGBA>;
         default:
-            throw MissingCaseException();
+            ghoul_assert(false, "Missing case statement");
+        }
+    case Texture::Format::RG:
+        switch (to) {
+        case Texture::Format::Red:
+            return &convert<Texture::Format::RG, Texture::Format::Red>;
+        case Texture::Format::RGB:
+            return &convert<Texture::Format::RG, Texture::Format::RGB>;
+        case Texture::Format::RGBA:
+            return &convert<Texture::Format::RG, Texture::Format::RGBA>;
+        default:
+            ghoul_assert(false, "Missing case statement");
+        }
+    case Texture::Format::RGB:
+        switch (to) {
+        case Texture::Format::Red:
+            return &convert<Texture::Format::RGB, Texture::Format::Red>;
+        case Texture::Format::RG:
+            return &convert<Texture::Format::RGB, Texture::Format::RG>;
+        case Texture::Format::RGBA:
+            return &convert<Texture::Format::RGB, Texture::Format::RGBA>;
+        default:
+            ghoul_assert(false, "Missing case statement");
+        }
+    case Texture::Format::RGBA:
+        switch (to) {
+        case Texture::Format::Red:
+            return &convert<Texture::Format::RGBA, Texture::Format::Red>;
+        case Texture::Format::RG:
+            return &convert<Texture::Format::RGBA, Texture::Format::RG>;
+        case Texture::Format::RGB:
+            return &convert<Texture::Format::RGBA, Texture::Format::RGB>;
+        default:
+            ghoul_assert(false, "Missing case statement");
+        }
+    default:
+        throw MissingCaseException();
     }
 }
+
+} // namespace
 
 void convertTextureFormat(Texture& texture, Texture::Format newFormat) {
     ghoul_assert(

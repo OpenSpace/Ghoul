@@ -84,7 +84,7 @@ std::string Log::getTimeString() const {
     
     std::stringstream ss;
 
-#if WIN32
+#ifdef WIN32
     tm t;
     localtime_s(&t, &time);
     ss << std::put_time(&t, "%T");
@@ -100,7 +100,7 @@ std::string Log::getDateString() const {
     
     std::stringstream ss;
 
-#if WIN32
+#ifdef WIN32
     tm t;
     localtime_s(&t, &time);
     ss << std::put_time(&t, "%F");

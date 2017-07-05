@@ -47,7 +47,7 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(
         filename.c_str(),
         &width,
         &height,
-        0,
+        nullptr,
         SOIL_LOAD_RGBA
     );
 
@@ -77,7 +77,7 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(void* memory,
         size,
         &width,
         &height,
-        0,
+        nullptr,
         SOIL_LOAD_RGBA
     );
 

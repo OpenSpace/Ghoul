@@ -119,7 +119,8 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
 
     auto fonts = _fonts.equal_range(hashName);
     for (auto it = fonts.first; it != fonts.second; ++it) {
-        if (it->second->pointSize() == fontSize &&
+        const float delta = 1e-6f; // Font sizes are 1-1000, so a delta of 1/e6 is fine
+        if ((it->second->pointSize() - fontSize < delta) &&
             it->second->hasOutline() == withOutline)
         {
             return it->second;

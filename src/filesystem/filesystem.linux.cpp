@@ -111,13 +111,17 @@ void FileSystem::inotifyWatcher() {
     while (FileSys._keepGoing) {
         FD_ZERO (&rfds);
         FD_SET (fd, &rfds);
-        if(select (FD_SETSIZE, &rfds, NULL, NULL, &tv) < 1) continue; 
+        if (select(FD_SETSIZE, &rfds, nullptr, nullptr, &tv) < 1) {
+            continue;
+        }
         
-        int length = read( fd, buffer, BUF_LEN );
-        if ( length < 0 ) continue;
+        ssize_t length = read(fd, buffer, BUF_LEN );
+        if (length < 0) {
+            continue;
+        }
         
-        int offset = 0;
-        while (offset < length) {
+        long unsigned int offset = 0;
+        while (offset < static_cast<long unsigned int>(length)) {
             struct inotify_event* e = reinterpret_cast<inotify_event*>(buffer + offset);
             switch (e->mask) {
                 case IN_MODIFY:

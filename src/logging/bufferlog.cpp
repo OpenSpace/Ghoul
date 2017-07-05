@@ -35,7 +35,7 @@
 namespace ghoul {
     
 namespace {
-    const glm::detail::uint8 CURRENT_VERSION = 1;
+    const uint8_t CURRENT_VERSION = 1;
     
     const std::string _loggerCat = "BufferLog";
     
@@ -45,7 +45,7 @@ namespace {
          * general layout of the buffer in this BufferLog. The size of the header and,
          * thus, the offset into the data block may depend on the version.
          */
-        glm::detail::uint8 version;
+        uint8_t version;
         
         /**
          * This atomic is set to <code>true</code> if some process is currently writing to
@@ -58,7 +58,7 @@ namespace {
          * The attributes are used for user-defined behavior. Information that is
          * necessary to interpret the buffer may be put in here.
          */
-        glm::detail::uint8 attributes;
+        uint8_t attributes;
         
         /**
          * This value provides an offset to find the first byte in the buffer that has not
@@ -66,7 +66,7 @@ namespace {
          * <code>_buffer + sizeof(Header) + firstEmptyByte</code> are the logs that have 
          * been stored before.
          */
-        glm::detail::uint32 firstEmptyByte;
+        uint32_t firstEmptyByte;
     };
     
     /**
@@ -209,7 +209,7 @@ void BufferLog::log(unsigned long long timestamp, std::string message) {
     strcpy(destination, message.c_str());
 #endif
     // Advance the empty pointer; +1 for the \0 terminator
-    h->firstEmptyByte += glm::detail::uint32(message.length() + 1);
+    h->firstEmptyByte += uint32_t(message.length() + 1);
     
     h->mutex.clear();
 }
