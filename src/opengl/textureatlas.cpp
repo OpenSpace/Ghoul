@@ -31,8 +31,6 @@
 #include <fmt/format.h>
 
 namespace {
-    const std::string _loggerCat = "TextureAtlas";
-    
     const glm::ivec4 InvalidRegionLocation = glm::ivec4(-1, -1, 0, 0);
 }
 

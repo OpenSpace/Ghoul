@@ -30,7 +30,6 @@
 #include <CoreServices/CoreServices.h>
 
 namespace {
-    const std::string _loggerCat = "FileSystem";
     // the maximum latency allowed before a changed is registered
     const CFAbsoluteTime Latency = 1.0;
     

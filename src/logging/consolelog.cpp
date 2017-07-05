@@ -118,7 +118,7 @@ void ConsoleLog::setColorForLevel(LogLevel level) {
             break;
     }
     SetConsoleTextAttribute(hConsole, colorIndex);
-#elif __unix__
+#elif defined __unix__
     switch (level) {
         case LogLevel::Trace:
             _stream << "\033[0;37m";    // grey

@@ -32,10 +32,6 @@
 
 #include <fmt/format.h>
 
-namespace {
-    const std::string _loggerCat = "FontManager";
-}
-
 namespace ghoul {
 namespace fontrendering {
     

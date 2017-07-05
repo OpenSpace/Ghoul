@@ -33,10 +33,6 @@
 #include <functional>
 #include <fstream>
 
-namespace {
-const std::string _loggerCat = "ShaderObject";
-}
-
 namespace ghoul {
 namespace opengl {
 

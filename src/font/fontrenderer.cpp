@@ -52,12 +52,12 @@ static int vscprintf(const char* format, va_list pargs) {
 
 
 namespace {
-    const std::string _loggerCat = "FontRenderer";
+    const char* _loggerCat = "FontRenderer";
     
-    const std::string DefaultVertexShaderPath = "${TEMPORARY}/defaultfontrenderer_vs.glsl";
-    const std::string DefaultFragmentShaderPath = "${TEMPORARY}/defaultfontrenderer_fs.glsl";
+    const char* DefaultVertexShaderPath = "${TEMPORARY}/defaultfontrenderer_vs.glsl";
+    const char* DefaultFragmentShaderPath = "${TEMPORARY}/defaultfontrenderer_fs.glsl";
 
-    const std::string DefaultVertexShaderSource = "\
+    const char* DefaultVertexShaderSource = "\
     #version __CONTEXT__ \n\
     \n\
     layout (location = 0) in vec2 in_position; \n\
@@ -76,7 +76,7 @@ namespace {
     } \n\
     ";
     
-    const std::string DefaultFragmentShaderSource = "\
+    const char* DefaultFragmentShaderSource = "\
     #version __CONTEXT__ \n\
     \n\
     layout (location = 0) in vec2 texCoords; \n\

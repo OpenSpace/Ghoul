@@ -18,7 +18,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,   *
  * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A         *
  * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT    *
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR .OTHER LIABILITY, WHETHER IN AN ACTION OF  *
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
@@ -356,10 +356,10 @@ void Texture::applyWrapping() {
     switch (_type) {
         case GL_TEXTURE_3D:
             glTexParameteri(_type, GL_TEXTURE_WRAP_R, wrapping);
-            // Intentional fallthrough
+            [[fallthrough]];
         case GL_TEXTURE_2D:
             glTexParameteri(_type, GL_TEXTURE_WRAP_T, wrapping);
-            // Intentional fallthrough
+            [[fallthrough]];
         case GL_TEXTURE_1D:
             glTexParameteri(_type, GL_TEXTURE_WRAP_S, wrapping);
             break;

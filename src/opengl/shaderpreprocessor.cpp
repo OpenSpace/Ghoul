@@ -35,56 +35,54 @@
 #include <ghoul/opengl/ghoul_gl.h>
 
 namespace {
-const std::string _loggerCat = "ShaderPreprocessor";
-
-bool isString(std::string str) {
-    return str.length() > 1 && str[0] == '"' && str[str.length() - 1] == '"';
-}
-
-std::string trim(const std::string& str, std::string* before = nullptr, std::string* after = nullptr) {
-    static const std::string ws = " \n\r\t";
-    size_t startPos = str.find_first_not_of(ws);
-    if (startPos == std::string::npos)
-        startPos = 0;
-    size_t endPos = str.find_last_not_of(ws);
-    if (endPos == std::string::npos)
-        endPos = str.length();
-    else
-        endPos += 1;
-
-    size_t length = endPos - startPos;
-    if (before != nullptr) {
-        *before = str.substr(0, startPos);
+    bool isString(std::string str) {
+        return str.length() > 1 && str[0] == '"' && str[str.length() - 1] == '"';
     }
-    if (after != nullptr) {
-        *after = str.substr(endPos);
+
+    std::string trim(const std::string& str, std::string* before = nullptr, std::string* after = nullptr) {
+        static const std::string ws = " \n\r\t";
+        size_t startPos = str.find_first_not_of(ws);
+        if (startPos == std::string::npos)
+            startPos = 0;
+        size_t endPos = str.find_last_not_of(ws);
+        if (endPos == std::string::npos)
+            endPos = str.length();
+        else
+            endPos += 1;
+
+        size_t length = endPos - startPos;
+        if (before != nullptr) {
+            *before = str.substr(0, startPos);
+        }
+        if (after != nullptr) {
+            *after = str.substr(endPos);
+        }
+        return str.substr(startPos, length);
     }
-    return str.substr(startPos, length);
-}
 
-std::string glslVersionString() {
-    int versionMajor;
-    int versionMinor;
-    int profileMask;
-    glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
-    glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
-    glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profileMask);
-    std::stringstream ss;
+    std::string glslVersionString() {
+        int versionMajor;
+        int versionMinor;
+        int profileMask;
+        glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
+        glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
+        glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profileMask);
+        std::stringstream ss;
 
-    const ContextProfileMask cpm = ContextProfileMask(profileMask);
-    const bool isCore = cpm == ContextProfileMask::GL_CONTEXT_CORE_PROFILE_BIT;
-    const bool isCompatibility =
-        cpm == ContextProfileMask::GL_CONTEXT_COMPATIBILITY_PROFILE_BIT;
+        const ContextProfileMask cpm = ContextProfileMask(profileMask);
+        const bool isCore = cpm == ContextProfileMask::GL_CONTEXT_CORE_PROFILE_BIT;
+        const bool isCompatibility =
+            cpm == ContextProfileMask::GL_CONTEXT_COMPATIBILITY_PROFILE_BIT;
 
-    ghoul_assert(
-        isCore || isCompatibility,
-        "OpenGL context is neither core nor compatibility"
-    );
+        ghoul_assert(
+            isCore || isCompatibility,
+            "OpenGL context is neither core nor compatibility"
+        );
 
-    ss << "#version " << versionMajor << versionMinor << "0";
-    ss << (isCore ? " core" : (isCompatibility ? " compatibility" : ""));
-    return ss.str();
-}
+        ss << "#version " << versionMajor << versionMinor << "0";
+        ss << (isCore ? " core" : (isCompatibility ? " compatibility" : ""));
+        return ss.str();
+    }
 
 }
 

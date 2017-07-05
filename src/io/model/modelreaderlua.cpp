@@ -38,16 +38,15 @@
 using fmt::format;
 
 namespace {
-    const std::string keyMode = "Mode";
-    const std::string keyVertices = "Vertices";
-    const std::string keyIndices = "Indices";
-    const std::string keyAttribPointers = "VertexAttribPointers";
-    const std::string keyPosition = "Position";
-    const std::string keySize = "Size";
-    const std::string keyType = "Type";
-    const std::string keyStride = "Stride";
-    const std::string keyOffset = "Offset";
-    const std::string keyNormalized = "Normalized";
+    const char* keyMode = "Mode";
+    const char* keyVertices = "Vertices";
+    const char* keyIndices = "Indices";
+    const char* keyAttribPointers = "VertexAttribPointers";
+    const char* keyPosition = "Position";
+    const char* keySize = "Size";
+    const char* keyStride = "Stride";
+    const char* keyOffset = "Offset";
+    const char* keyNormalized = "Normalized";
 }
 
 namespace ghoul {

@@ -61,7 +61,6 @@ static int vscprintf(const char* format, va_list pargs) {
 #endif
 
 namespace {
-    const std::string _loggerCat = "Font";
     const float PointConversionFactor = 64.f;  // Sizes in FT are given in 1/64th of pt
     const int DPI = 96;
     
