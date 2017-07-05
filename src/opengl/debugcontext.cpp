@@ -128,47 +128,21 @@ namespace opengl {
 namespace debug {
     
 namespace {
-    // The GLDEBUGPROC was defined with a GLvoid* userParam in OpenGL 4.3, which was changed
-    // to const GLvoid* in 4.4 and 4.5. Therefore, there are some GLEW version that report
-    // one or the other, since we include two GLEW headers and the include order is not
-    // defined, we need to disambiguate them here
-    
-    typedef void (*testFunc)(GLenum source, GLenum type, GLuint id, GLenum severity,
-    GLsizei length, const GLchar* message, const GLvoid* userParam);
-    
-    template <typename T = std::enable_if<std::is_same<GLDEBUGPROC, testFunc>::value>>
-    void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei,
-                          const GLchar* message, const GLvoid* userParam)
-    {
-        const CallbackFunction& cb = *reinterpret_cast<const CallbackFunction*>(
-            userParam
-        );
+void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei,
+                        const GLchar* message, const GLvoid* userParam)
+{
+    const CallbackFunction& cb = *reinterpret_cast<const CallbackFunction*>(
+        userParam
+    );
         
-        cb(
-           Source(source),
-           Type(type),
-           Severity(severity),
-           static_cast<unsigned int>(id),
-           std::string(message)
-       );
-    }
-    
-    template <typename T = std::enable_if<!std::is_same<GLDEBUGPROC, testFunc>::value>>
-    void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei,
-                          const GLchar* message, GLvoid* userParam)
-    {
-        CallbackFunction& cb = *reinterpret_cast<CallbackFunction*>(
-            userParam
-        );
-        
-        cb(
-           Source(source),
-           Type(type),
-           Severity(severity),
-           static_cast<unsigned int>(id),
-           std::string(message)
-       );
-    }
+    cb(
+        Source(source),
+        Type(type),
+        Severity(severity),
+        static_cast<unsigned int>(id),
+        std::string(message)
+    );
+}
 } // namespace
 
 void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous) {
