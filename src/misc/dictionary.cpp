@@ -66,10 +66,6 @@ Dictionary::ConversionError::ConversionError(std::string msg)
     : DictionaryError(std::move(msg))
 {}
 
-#ifdef WIN32
-#pragma warning(disable : 4800)
-#endif
-
 #define EXTERN_TEMPLATE_DEFINITION(__TYPE__) \
 template void Dictionary::setValue<__TYPE__>(std::string, __TYPE__, CreateIntermediate); \
 template bool Dictionary::getValue<__TYPE__>(const std::string&, __TYPE__&) const;       \
@@ -130,10 +126,6 @@ EXTERN_TEMPLATE_DEFINITION(glm::dmat4x4);
 #undef EXTERN_TEMPLATE_DEFINITION
 #undef EXTERN_TEMPLATE_DEFINITION_SCALAR
 
-#ifdef WIN32
-#pragma warning ( default : 4800 )
-#endif
-    
 template <>
 bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& val) const {
     ghoul_assert(&val != this, "Value argument must not be 'this' object");

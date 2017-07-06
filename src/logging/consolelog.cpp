@@ -116,6 +116,8 @@ void ConsoleLog::setColorForLevel(LogLevel level) {
         case LogLevel::NoLogging:
             colorIndex = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN;
             break;
+        case LogLevel::AllLogging:
+            return;
     }
     SetConsoleTextAttribute(hConsole, colorIndex);
 #elif defined __unix__

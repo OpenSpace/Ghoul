@@ -35,7 +35,7 @@ public:
     VolumeReader();
     virtual ~VolumeReader();
 
-    virtual opengl::Texture* read(std::string filename) = 0;
+    virtual opengl::Texture* read(const std::string& filename) = 0;
 };
 
 } // namespace ghoul

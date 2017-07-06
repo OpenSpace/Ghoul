@@ -761,7 +761,7 @@ string FileSystem::cleanupPath(string path) const {
     size_t position = 0;
     while (position != string::npos) {
         char dualSeparator[] = { PathSeparator, PathSeparator };
-        position = path.find(dualSeparator);
+        position = path.find(dualSeparator, 0, 2);
         if (position != string::npos) {
             path = path.substr(0, position) + path.substr(position + 1);
         }

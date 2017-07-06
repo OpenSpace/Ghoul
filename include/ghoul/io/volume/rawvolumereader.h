@@ -46,7 +46,7 @@ public:
     void setReadHints(glm::ivec3 dimension);
     void setReadHints(const ReadHints& hints);
 
-    opengl::Texture* read(const std::string& filename);
+    opengl::Texture* read(const std::string& filename) override;
 
 private:
     ReadHints _hints;

@@ -26,19 +26,8 @@
 #ifndef __GHOUL___DICTIONARY___H__
 #define __GHOUL___DICTIONARY___H__
 
-// Removes a warning that occurs when trying to convert int directly to bool values in the
-// glm::bvecX template specializations
-#ifdef WIN32
-#pragma warning(disable : 4800)
-#endif
-
 #include <ghoul/glm.h>
 #include <glm/gtc/type_ptr.hpp>
-
-
-#ifdef WIN32
-#pragma warning(default : 4800)
-#endif
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
