@@ -1,0 +1,81 @@
+* text=auto
+
+# GitHub files
+ATTRIBUTION text
+AUTHORS text
+CHANGELOG text
+CHANGES text
+CONTRIBUTING text
+COPYING text
+copyright text
+*COPYRIGHT* text
+INSTALL text
+LICENSE text
+NEWS text
+readme text
+*README* text
+TODO text
+
+# Other helpers
+.clang-format text
+.gitattributes text
+.gitconfig text
+.gitignore text
+Doxyfile text
+Jenkinsfile text
+
+# Documents
+*.cfg text
+*.csv text
+*.markdown text
+*.md text
+
+# Graphics
+*.eps binary
+*.gif binary
+*.ico binary
+*.jpeg binary
+*.jpg binary
+*.png binary
+*.svg text
+*.tif binary
+*.tiff binary
+
+# C++ sources
+*.c text
+*.cc text
+*.cxx text
+*.cpp text
+*.c++ text
+*.h text
+*.hh text
+*.hpp text
+*.h++ text
+*.in text
+*.inl text
+
+# CMake
+*.cmake text
+
+# HTML
+*.css text
+*.htm text
+*.html text
+
+# Python
+*.py text
+
+# Compiled Dynamic libraries
+*.dll binary
+*.dylib binary
+*.so binary
+
+# Compiled Static libraries
+*.a binary
+*.la binary
+*.lai binary
+*.lib binary
+
+# Fonts
+*.otf binary
+*.ttf binary
