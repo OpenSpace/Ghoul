@@ -79,7 +79,7 @@ private:
 
     void waitForConnections();
     void setOptions(_SOCKET);
-    void WebSocketServer::closeSocket(_SOCKET socket);
+    void closeSocket(_SOCKET socket);
 };
 
 
