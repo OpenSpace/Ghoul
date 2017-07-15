@@ -97,25 +97,25 @@ Directory Directory::parentDirectory(AbsolutePath absolutePath) const {
 
 vector<string> Directory::read(Recursive search, Sort sort) const {
     vector<string> result;
-    readDirectories(result, _directoryPath, search);
-    readFiles(result, _directoryPath, search);
+    internalReadDirectories(result, _directoryPath, search);
+    internalReadFiles(result, _directoryPath, search);
     if (sort == Sort::Yes) {
         std::sort(result.begin(), result.end());
     }
     return result;
 }
 
-vector<string> Directory::readFiles(Recursive search, Sort sort) const{
+vector<string> Directory::readFiles(Recursive search, Sort sort) const {
     vector<string> result;
-    readFiles(result, _directoryPath, search);
+    internalReadFiles(result, _directoryPath, search);
     if (sort) {
         std::sort(result.begin(), result.end());
     }
     return result;
 }
 
-void Directory::readFiles(vector<string>& result, const string& path,
-                          Recursive recursiveSearch) const
+void Directory::internalReadFiles(vector<string>& result, const string& path,
+                                  Recursive recursiveSearch) const
 {
     std::stack<string> directories;
 #ifdef WIN32
@@ -157,22 +157,22 @@ void Directory::readFiles(vector<string>& result, const string& path,
 #endif
     while (!directories.empty()) {
         const string& d = directories.top();
-        readFiles(result, d, recursiveSearch);
+        internalReadFiles(result, d, recursiveSearch);
         directories.pop();
     }
 }
 
 vector<string> Directory::readDirectories(Recursive search, Sort sort) const {
     std::vector<std::string> result;
-    readDirectories(result, _directoryPath, search);
+    internalReadDirectories(result, _directoryPath, search);
     if (sort) {
         std::sort(result.begin(), result.end());
     }
     return result;
 }
 
-void Directory::readDirectories(vector<string>& result, const string& path,
-                                Recursive recursiveSearch) const
+void Directory::internalReadDirectories(vector<string>& result, const string& path,
+                                        Recursive recursiveSearch) const
 {
     std::stack<string> directories;
 
@@ -213,7 +213,7 @@ void Directory::readDirectories(vector<string>& result, const string& path,
 #endif
     while (!directories.empty()) {
         const string& d = directories.top();
-        readDirectories(result, d, recursiveSearch);
+        internalReadDirectories(result, d, recursiveSearch);
         directories.pop();
     }
 }
