@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -51,12 +51,11 @@
 using std::string;
 
 namespace {
-    const string _loggerCat = "FileSystem";
+    const char* _loggerCat = "FileSystem";
     const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW | IN_UNMOUNT | IN_ISDIR;
-}
+} // namespace
 
-namespace ghoul {
-namespace filesystem {
+namespace ghoul::filesystem {
 
 void FileSystem::initializeInternalLinux() {
     _inotifyHandle = inotify_init();
@@ -172,7 +171,6 @@ void FileSystem::inotifyWatcher() {
     }
 }
 
-} // namespace filesystem
-} // namespace ghoul
+} // namespace ghoul::filesystem
 
 #endif

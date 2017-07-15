@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -27,8 +27,7 @@
 
 #include <ghoul/misc/assert.h>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 TextLog::TextLog(const std::string& filename, Append writeToAppend,
         TimeStamping timeStamping, DateStamping dateStamping,
@@ -95,5 +94,4 @@ void TextLog::writeLine(std::string line) {
     _file << std::move(line);
 }
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging

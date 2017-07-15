@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -30,11 +30,9 @@
 
 struct lua_State;
 
-namespace ghoul {
+namespace ghoul { class Dictionary; }
 
-class Dictionary;
-
-namespace lua {
+namespace ghoul::lua {
 
 struct LuaRuntimeException : public RuntimeError {
     explicit LuaRuntimeException(std::string message);
@@ -260,7 +258,6 @@ namespace internal {
 } // namespace internal
 
 
-} // namespace lua
-} // namespace ghoul
+} // namespace ghoul::lua
 
 #endif // __GHOUL___LUA_HELPER___H__

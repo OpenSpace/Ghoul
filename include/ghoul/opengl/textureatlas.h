@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -43,8 +43,7 @@
 #include <memory>
 #include <vector>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
     
 /**
  * This class represents a texture atlas which automatically organizes smaller textures
@@ -254,7 +253,6 @@ private:
     std::vector<unsigned char> _data;
 };
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl
 
 #endif // __GHOUL___TEXTUREATLAS___H__

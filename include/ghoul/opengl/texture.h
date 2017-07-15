@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -35,8 +35,7 @@
 #include <array>
 #include <string> 
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 /**
  * This class is a wrapper for an OpenGL texture. It wraps the OpenGL method for
@@ -832,8 +831,7 @@ private:
     void* _pixels;
 };
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl
 
 #include "texture.inl"
 

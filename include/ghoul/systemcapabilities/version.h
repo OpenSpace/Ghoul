@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * OpenSpace                                                                             *
  *                                                                                       *
@@ -27,8 +27,7 @@
 
 #include <string>
 
-namespace ghoul {
-namespace systemcapabilities {
+namespace ghoul::systemcapabilities {
 
 /**
 * This struct stores the detected version of the GLSL driver
@@ -89,8 +88,7 @@ struct Version {
     int release;
 };
 
-} // namespace systemcapabilities
-} // namespace ghoul
+} // namespace ghoul::systemcapabilities
 
 namespace std {
 

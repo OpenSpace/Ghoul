@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -29,8 +29,7 @@
 #include <Windows.h>
 #endif
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 VisualStudioOutputLog::VisualStudioOutputLog(TimeStamping timeStamping,
                                              DateStamping dateStamping,
@@ -51,5 +50,4 @@ void VisualStudioOutputLog::log(LogLevel level, const std::string& category,
 void VisualStudioOutputLog::log(LogLevel, const std::string&, const std::string&) {}
 #endif
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging

@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -25,8 +25,7 @@
 
 #include <ghoul/logging/streamlog.h>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 StreamLog::StreamLog(std::ostream& stream, TimeStamping timeStamping,
         DateStamping dateStamping, CategoryStamping categoryStamping,
@@ -45,5 +44,4 @@ void StreamLog::flush() {
     _stream.flush();
 }
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging

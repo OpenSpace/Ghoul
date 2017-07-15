@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -28,8 +28,7 @@
 
 #include <ghoul/io/texture/texturewriterbase.h>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 #ifdef GHOUL_USE_SOIL
 
@@ -60,7 +59,6 @@ public:
 
 #endif // GHOUL_USE_SOIL
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___TEXTUREWRITERSOIL___H__

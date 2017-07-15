@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -29,8 +29,7 @@
 
 using std::string;
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 ModelReaderBase::ModelReaderException::ModelReaderException(string file, string error)
     : RuntimeError(fmt::format("Error reading model '{}': {}", file, error), "IO")
@@ -38,5 +37,4 @@ ModelReaderBase::ModelReaderException::ModelReaderException(string file, string 
     , errorMessage(std::move(error))
 {}
     
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io

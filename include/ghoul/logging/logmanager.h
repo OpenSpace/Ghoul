@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -38,8 +38,7 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 class Log;
 
@@ -169,8 +168,7 @@ private:
     std::array<int, 7> _logCounter;
 };
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging
 
 #define LogMgr (ghoul::logging::LogManager::ref())
 

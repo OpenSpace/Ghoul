@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -48,8 +48,7 @@ namespace {
     std::array<GLenum, 4> DefaultSwizzleMask = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
 }
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 Texture::Texture(glm::uvec3 dimensions, Format format, GLenum internalFormat,
                  GLenum dataType, FilterMode filter, WrappingMode wrapping,
@@ -1450,5 +1449,4 @@ void Texture::calculateBytesPerPixel() {
     _bpp = static_cast<GLubyte>(szType * numChannels);
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl

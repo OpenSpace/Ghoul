@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -30,8 +30,7 @@
 
 #include <functional>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 /**
  * A concrete subclass of Log that passes logs to the provided callback function. The
@@ -97,7 +96,6 @@ protected:
     CallbackFunction _callbackFunction;
 };
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging
 
 #endif // __GHOUL___CALLBACKLOG___H__

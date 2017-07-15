@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -32,8 +32,7 @@
 #include <memory>
 #include <string>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 class ShaderObject;
 
@@ -134,7 +133,6 @@ private:
     
 #define ShdrMgr (ghoul::opengl::ShaderManager::ref())
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl
 
 #endif // __GHOUL___SHADERMANAGER___H__

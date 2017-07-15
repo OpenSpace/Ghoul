@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -32,10 +32,9 @@
 
 namespace {
     const glm::ivec4 InvalidRegionLocation = glm::ivec4(-1, -1, 0, 0);
-}
+} // namespace
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
     
 TextureAtlas::InvalidRegionException::InvalidRegionException(const std::string& msg)
     : RuntimeError(msg, "TextureAtlas")
@@ -328,5 +327,4 @@ void TextureAtlas::atlasMerge() {
     }
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl

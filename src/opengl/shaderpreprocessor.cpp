@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -83,11 +83,9 @@ namespace {
         ss << (isCore ? " core" : (isCompatibility ? " compatibility" : ""));
         return ss.str();
     }
+} // namespace
 
-}
-
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 std::vector<std::string> ShaderPreprocessor::_includePaths = std::vector<std::string>();
     
@@ -731,7 +729,6 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     return true;
 }
 
-
 bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
     static const std::string endForString = "#endfor";
 
@@ -790,5 +787,4 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
     return false;
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl

@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -25,8 +25,7 @@
 
 #include "ghoul/cmdparser/multiplecommand.h"
 
-namespace ghoul {
-namespace cmdparser {
+namespace ghoul::cmdparser {
 
 MultipleCommandZeroArguments::MultipleCommandZeroArguments(int* ptr, std::string name,
                                               std::string shortName, std::string infoText)
@@ -42,5 +41,4 @@ void MultipleCommandZeroArguments::execute(const std::vector<std::string>& /*par
     ++(*_ptr);
 }
 
-} // namespace cmdparser
-} // namespace ghoul
+} // namespace ghoul::cmdparser

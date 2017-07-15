@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * OpenSpace                                                                             *
  *                                                                                       *
@@ -49,8 +49,7 @@ string to_string(const ghoul::systemcapabilities::Version& v) {
 
 } // namespace std
 
-namespace ghoul {
-namespace systemcapabilities {
+namespace ghoul::systemcapabilities {
 
 bool Version::operator==(const Version& rhs) const {
     return (major == rhs.major) && (minor == rhs.minor) && (release == rhs.release);
@@ -88,5 +87,4 @@ bool Version::operator>=(const Version& rhs) const {
     return numThis >= numRhs;
 }
 
-} // namespace systemcapabilities
-} // namespace ghoul
+} // namespace ghoul::systemcapabilities

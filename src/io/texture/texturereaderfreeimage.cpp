@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -52,8 +52,7 @@
 
 #include <iostream>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
     const std::string& source, FIBITMAP* dib) const
@@ -289,7 +288,6 @@ std::vector<std::string> TextureReaderFreeImage::supportedExtensions() const {
     };
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // GHOUL_USE_DEVIL

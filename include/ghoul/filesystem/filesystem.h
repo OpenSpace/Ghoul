@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -41,8 +41,7 @@
 #include <thread>
 #endif
 
-namespace ghoul {
-namespace filesystem {
+namespace ghoul::filesystem {
 
 #ifdef WIN32
 struct DirectoryHandle;
@@ -483,7 +482,6 @@ private:
 #define FileSys (ghoul::filesystem::FileSystem::ref())
 #define absPath(__path__) ghoul::filesystem::FileSystem::ref().absolutePath(__path__)
 
-} // namespace filesystem
-} // namespace ghoul
+} // namespace ghoul::filesystem
 
 #endif // __GHOUL___FILESYSTEM___H__

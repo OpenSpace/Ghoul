@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -28,8 +28,7 @@
 
 #include <ghoul/io/model/modelreaderbase.h>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
     
 /**
  * This model reader reads a model that is specified as a Lua table. The Lua file must
@@ -67,7 +66,6 @@ public:
         const std::string& filename) const;
 };
     
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___MODELREADERLUA___H__

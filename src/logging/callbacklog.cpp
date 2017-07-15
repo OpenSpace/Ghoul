@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -25,8 +25,7 @@
 
 #include <ghoul/logging/callbacklog.h>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 CallbackLog::CallbackLog(CallbackFunction callbackFunction, TimeStamping timeStamping,
             DateStamping dateStamping, CategoryStamping categoryStamping,
@@ -72,5 +71,4 @@ const CallbackLog::CallbackFunction& CallbackLog::callback() const {
     return _callbackFunction;
 }
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging

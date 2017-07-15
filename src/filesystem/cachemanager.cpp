@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -39,10 +39,9 @@ namespace {
     const char* _loggerCat = "CacheManager";
     const char* _cacheFile = "cache";
     const char _hashDelimiter = '|'; // something that cannot occur in the filesystem
-}
+} // namespace
 
-namespace ghoul {
-namespace filesystem {
+namespace ghoul::filesystem {
 
 CacheManager::CacheException::CacheException(const std::string& msg)
     : RuntimeError(msg, "Cache")
@@ -373,5 +372,4 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
     return result;
 }
 
-} // namespace filesystem
-} // namespace ghoul
+} // namespace ghoul::filesystem

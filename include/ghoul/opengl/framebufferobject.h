@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -29,8 +29,7 @@
 #include <ghoul/opengl/texture.h>
 #include <map>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 class FramebufferObject {
 public:
@@ -61,7 +60,6 @@ private:
     std::map<GLenum, Texture*> _attachedTextures;
 };
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl
 
 #endif // __GHOUL___FRAMEBUFFEROBJECT___H__

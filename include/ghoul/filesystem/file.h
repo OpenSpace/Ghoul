@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -32,8 +32,7 @@
 #include <functional>
 #include <string>
 
-namespace ghoul {
-namespace filesystem {
+namespace ghoul::filesystem {
 
 class FileSystem;
 
@@ -200,7 +199,6 @@ private:
  */
 std::ostream& operator<<(std::ostream& os, const File& f);
 
-} // namespace filesystem
-} // namespace ghoul
+} // namespace ghoul::filesystem
 
 #endif // __GHOUL___FILE___H__

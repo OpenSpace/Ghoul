@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -30,8 +30,7 @@
 
 #include <thread>
 
-namespace ghoul {
-namespace thread {
+namespace ghoul::thread {
 
 /**
  * Determines the priority class for a specific threads. The available classes described
@@ -88,7 +87,6 @@ void setPriority(
  */
 void setThreadBackground(std::thread& t, Background background);
 
-} // namespace thread
-} // namespace ghoul
+} // namespace ghoul::thread
 
 #endif // __GHOUL___THREAD___H__

@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -25,8 +25,7 @@
 
 #include <ghoul/misc/assert.h>
 
-namespace ghoul {
-namespace cmdparser {
+namespace ghoul::cmdparser {
 
 template <class T>
 T CommandlineCommand::cast(const std::string& s) const {
@@ -50,5 +49,4 @@ void CommandlineCommand::is(const std::string& s) const {
     }
 }
 
-}  // namespace cmdparser
-}  // namespace ghoul
+}  // namespace ghoul::cmdparser

@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -29,8 +29,7 @@
 #include <iomanip>
 #include <sstream>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 Log::Log(TimeStamping timeStamping, DateStamping dateStamping, 
          CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
@@ -140,5 +139,4 @@ std::string Log::createFullMessageString(LogLevel level, const std::string& cate
 
 void Log::flush() {}
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging

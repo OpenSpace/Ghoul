@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -50,7 +50,7 @@ namespace {
         );
         return it != PermanentlyIgnoredAsserts.end();
     }
-}
+} // namespace
 
 namespace ghoul {
 

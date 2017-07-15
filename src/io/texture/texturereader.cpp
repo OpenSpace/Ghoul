@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -33,8 +33,7 @@
 #include <algorithm>
 #include <fmt/format.h>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
     
 TextureReader::MissingReaderException::MissingReaderException(std::string extension)
     : RuntimeError(fmt::format("No reader was found for extension '{}'", extension), "IO")
@@ -115,5 +114,4 @@ TextureReaderBase* TextureReader::readerForExtension(const std::string& extensio
     throw MissingReaderException(extension);
 }
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io

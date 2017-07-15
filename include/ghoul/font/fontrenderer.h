@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -31,13 +31,10 @@
 
 #include <memory>
 
-namespace ghoul {
+namespace ghoul::opengl { class ProgramObject; }
 
-namespace opengl {
-class ProgramObject;
-}
+namespace ghoul::fontrendering {
 
-namespace fontrendering {
 /**
  * The FontRenderer is a class that can take a Font object and renderer it at a given
  * position. It has two separate usage modes; 1. it works as a singleton that has a
@@ -302,7 +299,6 @@ glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos, Args.
     return res.boundingBox;
 }
 
-} // namespace fontrendering
-} // namespace ghoul
+} // namespace ghoul::fontrendering
 
 #endif // __GHOUL___FONTRENDERER___H__

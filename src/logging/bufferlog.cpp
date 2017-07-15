@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -32,64 +32,64 @@
 #include <fmt/format.h>
 #include <fstream>
 
-namespace ghoul {
-    
 namespace {
     const uint8_t CURRENT_VERSION = 1;
-    
+
     const std::string _loggerCat = "BufferLog";
-    
+
     struct Header {
         /**
-         * The version header contains in increasing unsigned integer, which specifies the
-         * general layout of the buffer in this BufferLog. The size of the header and,
-         * thus, the offset into the data block may depend on the version.
-         */
+        * The version header contains in increasing unsigned integer, which specifies the
+        * general layout of the buffer in this BufferLog. The size of the header and,
+        * thus, the offset into the data block may depend on the version.
+        */
         uint8_t version;
-        
+
         /**
-         * This atomic is set to <code>true</code> if some process is currently writing to
-         * the log, otherwise it is <code>false</code>. It is not guaranteed that this
-         * value is usable when the buffer is written to disk in its entirety.
-         */
+        * This atomic is set to <code>true</code> if some process is currently writing to
+        * the log, otherwise it is <code>false</code>. It is not guaranteed that this
+        * value is usable when the buffer is written to disk in its entirety.
+        */
         std::atomic_flag mutex;
-        
+
         /**
-         * The attributes are used for user-defined behavior. Information that is
-         * necessary to interpret the buffer may be put in here.
-         */
+        * The attributes are used for user-defined behavior. Information that is
+        * necessary to interpret the buffer may be put in here.
+        */
         uint8_t attributes;
-        
+
         /**
-         * This value provides an offset to find the first byte in the buffer that has not
-         * been used already. The values between <code>_buffer + sizeof(Header)</code> and
-         * <code>_buffer + sizeof(Header) + firstEmptyByte</code> are the logs that have 
-         * been stored before.
-         */
+        * This value provides an offset to find the first byte in the buffer that has not
+        * been used already. The values between <code>_buffer + sizeof(Header)</code> and
+        * <code>_buffer + sizeof(Header) + firstEmptyByte</code> are the logs that have
+        * been stored before.
+        */
         uint32_t firstEmptyByte;
     };
-    
+
     /**
-     * This method returns the beginning part of the buffer that contains the header
-     * information.
-     */
+    * This method returns the beginning part of the buffer that contains the header
+    * information.
+    */
     Header* header(void* buffer) {
         return reinterpret_cast<Header*>(buffer);
     }
-    
+
     /**
-     This method returns the buffer block that begins at the first empty byte. This offset
-     * is guaranteed to be in valid memory if the values provided in the constructor or
-     * the \see setBuffer function were correct.
-     */
+    This method returns the buffer block that begins at the first empty byte. This offset
+    * is guaranteed to be in valid memory if the values provided in the constructor or
+    * the \see setBuffer function were correct.
+    */
     void* firstEmptyMemory(void* buffer) {
         const Header* const h = header(buffer);
-        
+
         return reinterpret_cast<void*>(
-                 reinterpret_cast<char*>(buffer) + sizeof(Header) + h->firstEmptyByte
-                                       );
+            reinterpret_cast<char*>(buffer) + sizeof(Header) + h->firstEmptyByte
+            );
     }
-}
+} // namespace
+
+namespace ghoul::logging {
     
 BufferLog::MemoryExhaustionException::MemoryExhaustionException(int total, int requested)
     : RuntimeError(
@@ -265,4 +265,4 @@ void BufferLog::writeToDisk(const std::string& filename) {
     }
 }
 
-} // namespace ghoul
+} // namespace ghoul::logging

@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -33,8 +33,7 @@
 #include <map>
 #include <string>
 
-namespace ghoul {
-namespace filesystem {
+namespace ghoul::filesystem {
 
 class File;
 
@@ -330,7 +329,6 @@ protected:
     std::map<unsigned int, CacheInformation> _files;
 };
 
-} // namespace filesystem
-} // namespace ghoul
+} // namespace ghoul::filesystem
 
 #endif // __GHOUL___CACHEMANAGER___H__

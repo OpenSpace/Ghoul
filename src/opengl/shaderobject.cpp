@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -33,8 +33,7 @@
 #include <functional>
 #include <fstream>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 ShaderObject::ShaderObjectError::ShaderObjectError(std::string msg)
     : RuntimeError(std::move(msg), "ShaderObject")
@@ -348,5 +347,4 @@ std::string ShaderObject::stringForShaderType(ShaderType type) {
     }
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl

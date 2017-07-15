@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -32,8 +32,7 @@
 #include <memory>
 #include <string>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 class Texture;
 
@@ -133,7 +132,6 @@ private:
 
 #define TexMgr (ghoul::opengl::TextureManager::ref())
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl
 
 #endif // __GHOUL___TEXTUREMANAGER___H__

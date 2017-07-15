@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -65,8 +65,7 @@ static bool runningInDebugger() {
 }
 #endif
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 ConsoleLog::ConsoleLog(ColorOutput colorOutput, TimeStamping timeStamping,
             DateStamping dateStamping, CategoryStamping categoryStamping,
@@ -191,5 +190,4 @@ void ConsoleLog::resetColor() {
     setColorForLevel(LogLevel::Info);
 }
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging

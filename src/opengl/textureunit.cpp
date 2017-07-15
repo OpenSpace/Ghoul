@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -27,8 +27,7 @@
 
 #include <ghoul/systemcapabilities/systemcapabilities>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 TextureUnit::TextureUnitError::TextureUnitError(std::string msg)
     : RuntimeError(std::move(msg), "TextureUnit")
@@ -122,5 +121,4 @@ void TextureUnit::initialize() {
     _initialized = true;
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl

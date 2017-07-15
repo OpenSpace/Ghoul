@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -26,15 +26,13 @@
 #include <iostream>
 #include <sstream>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
     
 LogLevel LogManager::logLevel() const {
     return _level;
 }
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging
 
 /**
  * @defgroup LOGGING_MACRO_GROUP Logging Macros

@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -40,8 +40,7 @@
 // X11 #defines 'None' in its X.h header file. We don't want it here ---abock
 #undef None
 
-namespace ghoul {
-namespace systemcapabilities {
+namespace ghoul::systemcapabilities {
 
 /**
  * This class is the base class of all components that can detect a specific set of
@@ -256,7 +255,6 @@ protected:
 #endif
 };
 
-} // namespace systemcapabilities
-} // namespace ghoul
+} // namespace ghoul::systemcapabilities
 
 #endif // __GHOUL___SYSTEMCAPABILITIESCOMPONENT___H__

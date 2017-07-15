@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -29,8 +29,7 @@
 
 #include <iterator>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend,
                  TimeStamping timeStamping, DateStamping dateStamping,
@@ -163,5 +162,4 @@ std::string HTMLLog::colorForLevel(LogLevel level) {
     }
 }
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging

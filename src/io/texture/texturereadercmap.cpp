@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -34,8 +34,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
                                                         const std::string& filename) const
@@ -129,5 +128,4 @@ std::vector<std::string> TextureReaderCMAP::supportedExtensions() const {
     return { "cmap" };
 }
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io

@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -31,8 +31,7 @@
 #include <ghoul/misc/exception.h>
 #include <ghoul/systemcapabilities/systemcapabilities.h>
 
-namespace ghoul {
-namespace systemcapabilities {
+namespace ghoul::systemcapabilities {
 
 /**
  * This subclass of SystemCapabilitiesComponent detects CPU-related capabilities, like CPU
@@ -219,8 +218,7 @@ protected:
 
 };
 
-} // namespace systemcapabilities
-} // namespace ghoul
+} // namespace ghoul::systemcapabilities
 
 #define CpuCap (                                                                         \
     ghoul::systemcapabilities::SystemCapabilities::ref().component<                      \

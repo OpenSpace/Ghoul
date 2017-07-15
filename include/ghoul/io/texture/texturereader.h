@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -31,14 +31,10 @@
 #include <vector>
 
 #include <ghoul/misc/exception.h>
-//#include <ghoul/opengl/texture.h>
 
-namespace ghoul {
-namespace opengl {
-class Texture;
-}
+namespace ghoul::opengl { class Texture; }
 
-namespace io {
+namespace ghoul::io {
 
 class TextureReaderBase;
 
@@ -131,7 +127,6 @@ private:
     std::vector<std::shared_ptr<TextureReaderBase>> _readers;
 };
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___TEXTUREREADER___H__

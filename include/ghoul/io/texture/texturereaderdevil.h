@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -30,8 +30,7 @@
 
 #include <memory>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 #ifdef GHOUL_USE_DEVIL
 
@@ -80,7 +79,6 @@ private:
 
 #endif // GHOUL_USE_DEVIL
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___TEXTUREREADERDEVIL___H__

@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -29,8 +29,7 @@
 
 #include <map>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 std::string stringFromLevel(LogLevel level) {
     switch (level) {
@@ -64,5 +63,4 @@ LogLevel levelFromString(const std::string& level) {
     return it->second;
 }
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging

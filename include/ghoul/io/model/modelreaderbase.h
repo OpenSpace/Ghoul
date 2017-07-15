@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -32,13 +32,9 @@
 #include <memory>
 #include <string>
 
-namespace ghoul {
+namespace ghoul::opengl { class VertexBufferObject; }
 
-namespace opengl {
-    class VertexBufferObject;
-}
-
-namespace io {
+namespace ghoul::io {
     
 /**
  * Concrete instantiations of this abstract base class provide the ability to load
@@ -71,7 +67,6 @@ public:
         std::string errorMessage;
     };
     
-    
     /// Default virtual destructor
     virtual ~ModelReaderBase() = default;
     
@@ -86,7 +81,6 @@ public:
         const std::string& filename) const = 0;
 };
     
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___MODELREADERBASE___H__

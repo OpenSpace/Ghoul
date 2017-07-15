@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -28,8 +28,7 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 
-namespace ghoul {
-namespace systemcapabilities {
+namespace ghoul::systemcapabilities {
 
 #ifdef GHOUL_USE_WMI
     IWbemLocator* SystemCapabilitiesComponent::_iwbemLocator = nullptr;
@@ -270,5 +269,4 @@ void SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
 
 #endif
 
-} // namespace systemcapabilities
-} // namespace ghoul
+} // namespace ghoul::systemcapabilities

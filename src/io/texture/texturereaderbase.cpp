@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -27,8 +27,7 @@
 
 #include <fmt/format.h>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
  
 TextureReaderBase::TextureLoadException::TextureLoadException(std::string n,
                                                               std::string m,
@@ -41,5 +40,4 @@ TextureReaderBase::TextureLoadException::TextureLoadException(std::string n,
     
 TextureReaderBase::~TextureReaderBase() {}
     
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io

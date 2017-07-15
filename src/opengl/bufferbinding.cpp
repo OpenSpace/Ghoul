@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -25,8 +25,7 @@
 
 #include <ghoul/opengl/bufferbinding.h>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 template<>
 unsigned int BufferBinding<bufferbinding::Buffer::AtomicCounter>::maxBufferBindings() {
@@ -43,6 +42,4 @@ unsigned int BufferBinding<bufferbinding::Buffer::Uniform>::maxBufferBindings() 
     return OpenGLCap.maxUniformBufferBindings();
 }
 
-} // namespace opengl
-} // namespace ghoul
-
+} // namespace ghoul::opengl

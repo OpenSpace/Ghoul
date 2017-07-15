@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -77,10 +77,9 @@ namespace {
             }
         }
     }
-}
+} // namespace
 
-namespace ghoul {
-namespace filesystem {
+namespace ghoul::filesystem {
 
 struct DirectoryHandle {
     FSEventStreamRef _eventStream;
@@ -201,7 +200,6 @@ void FileSystem::callbackHandler(const std::string& path) {
 
 void FileSystem::triggerFilesystemEventsInternalApple() {}
 
-} // namespace filesystem
-} // namespace ghoul
+} // namespace ghoul::filesystem
 
 #endif

@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -26,8 +26,7 @@
 #include <ghoul/misc/assert.h>
 #include <glm/gtx/component_wise.hpp>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 template <class T>
 T& Texture::texel(unsigned int x) {
@@ -155,5 +154,4 @@ const T& Texture::texel(const glm::uvec3& position) const {
         (position.y * _dimensions.x) + position.x]);
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl

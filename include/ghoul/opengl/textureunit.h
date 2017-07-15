@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -32,8 +32,7 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 /**
  * This class manages Texture Units and is a wrapper around <code>GL_TEXTURE0</code>, 
@@ -165,7 +164,6 @@ private:
     static std::vector<bool> _busyUnits;
 };
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl
 
 #endif // __GHOUL___TEXTUREUNIT___H__

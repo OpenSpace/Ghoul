@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -29,19 +29,13 @@
 
 namespace ghoul {
 
-RawVolumeReader::ReadHints::ReadHints(glm::ivec3 dimensions) : _dimensions(dimensions) {
-}
+RawVolumeReader::ReadHints::ReadHints(glm::ivec3 dimensions) : _dimensions(dimensions) {}
 
-RawVolumeReader::RawVolumeReader() 
-    : _hints(ReadHints())
-{}
+RawVolumeReader::RawVolumeReader() : _hints(ReadHints()) {}
 
-RawVolumeReader::RawVolumeReader(const ReadHints& hints) 
-: _hints(hints)
-{}
+RawVolumeReader::RawVolumeReader(const ReadHints& hints)  : _hints(hints) {}
 
-RawVolumeReader::~RawVolumeReader() {
-}
+RawVolumeReader::~RawVolumeReader() {}
 
 void RawVolumeReader::setReadHints(glm::ivec3 dimension) {
     _hints._dimensions = dimension;

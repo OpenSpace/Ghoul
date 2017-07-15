@@ -1,4 +1,4 @@
-/*****************************************************************************************
+﻿/*****************************************************************************************
  *                                                                                       *
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
@@ -44,8 +44,7 @@
 using std::string;
 using std::vector;
 
-namespace ghoul {
-namespace filesystem {
+namespace ghoul::filesystem {
 
 Directory::Directory() : _directoryPath(FileSys.absolutePath(".")) {}
 
@@ -222,5 +221,4 @@ std::ostream& operator<<(std::ostream& os, const Directory& d) {
     return os << d.path();
 }
 
-} // namespace filesystem
-} // namespace ghoul
+} // namespace ghoul::filesystem
