@@ -441,7 +441,7 @@ if (GHOUL_HAVE_TESTS)
     file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
     add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})
 
-    set_property(TARGET GhoulTest PROPERTY CXX_STANDARD 14)
+    set_property(TARGET GhoulTest PROPERTY CXX_STANDARD 17)
     set_property(TARGET GhoulTest PROPERTY CXX_STANDARD_REQUIRED On)
 
     target_compile_definitions(GhoulTest PRIVATE
