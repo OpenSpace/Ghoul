@@ -244,7 +244,7 @@ elseif (APPLE)
         ${COREFOUNDATION_LIBRARY}
         ${COCOA_LIBRARY}
         ${APP_SERVICES_LIBRARY}
-    )
+        )
 elseif (UNIX) # The order is important as UNIX is also true on MacOS
     target_compile_options(
         Ghoul
@@ -419,29 +419,28 @@ endif ()
 if (MSVC)
     target_include_directories(Ghoul PUBLIC ${GHOUL_ROOT_DIR}/ext/stackwalker)
     include_external_library(Ghoul StackWalker ${GHOUL_ROOT_DIR}/ext/stackwalker ${GHOUL_ROOT_DIR}/ext/stackwalker)
-    
-endif ()
 
-if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE AND NOT GHOUL_USE_SOIL)
-    message(FATAL_ERROR "Ghoul needs to be built with DevIL, FreeImage, or SoIL")
 endif ()
 
 # WebSocket++ / WebSocketPP
 include(ExternalProject)
 set(WEBSOCKETPP_ROOT_DIR ${GHOUL_ROOT_DIR}/ext/websocketpp)
 ExternalProject_Add(websocketpp
-SOURCE_DIR ${WEBSOCKETPP_ROOT_DIR}
-CMAKE_GENERATOR "${CMAKE_GENERATOR}"
-CMAKE_ARGS ${EXTERNAL_TOOLCHAIN} ${EXTRA_EXTERNAL_ARGS} -DBUILD_TESTS=OFF -DBUILD_EXAMPLES=OFF
-INSTALL_COMMAND ""
-LOG_CONFIGURE 1
-LOG_BUILD 1
-STEP_TARGETS configure build
-)
-
+    SOURCE_DIR ${WEBSOCKETPP_ROOT_DIR}
+    CMAKE_GENERATOR "${CMAKE_GENERATOR}"
+    CMAKE_ARGS ${EXTERNAL_TOOLCHAIN} ${EXTRA_EXTERNAL_ARGS} -DBUILD_TESTS=OFF -DBUILD_EXAMPLES=OFF
+    INSTALL_COMMAND ""
+    LOG_CONFIGURE 1
+    LOG_BUILD 1
+    STEP_TARGETS configure build
+    )
 #include_directories(${WEBSOCKETPP_ROOT_DIR})
 add_dependencies(Ghoul websocketpp)
 target_include_directories(Ghoul SYSTEM PUBLIC ${WEBSOCKETPP_ROOT_DIR})
+
+if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE AND NOT GHOUL_USE_SOIL)
+    message(FATAL_ERROR "Ghoul needs to be built with DevIL, FreeImage, or SoIL")
+endif ()
 
 if (GHOUL_MODULE_FONTRENDERING)
     set(FREETYPE_DIST OFF CACHE BOOL "Generate the dist target.")
@@ -467,7 +466,7 @@ if (GHOUL_HAVE_TESTS)
         "GTEST_HAS_TR1_TUPLE=0"
         "GTEST_HAS_GLOBAL_STRING=0"
         "GHOUL_ROOT_DIR=\"${GHOUL_ROOT_DIR}\""
-    )
+        )
 
     if (WIN32)
         target_compile_options(
@@ -506,6 +505,6 @@ if (GHOUL_HAVE_TESTS)
             ${COREFOUNDATION_LIBRARY}
             ${COCOA_LIBRARY}
             ${APP_SERVICES_LIBRARY}
-        )
+            )
     endif ()
 endif ()
