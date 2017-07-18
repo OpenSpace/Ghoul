@@ -82,6 +82,8 @@ private:
     bool waitForInput(size_t nBytes = 0);
     int errorCode();
 
+    bool socketHasConnection();
+
     std::thread _inputThread;
     std::thread _outputThread;
 

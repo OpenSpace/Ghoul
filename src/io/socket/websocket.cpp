@@ -78,7 +78,10 @@ void WebSocket::startStreams() {
 void WebSocket::disconnect(const int reason) {
     if (!_isConnected) return;
 
-    socketConnection->close(reason, "");
+    if (socketHasConnection()) {
+        socketConnection->close(reason, "");
+    }
+
     socketConnection->eof();
     _outputNotifier.notify_all();
     if (_outputThread.joinable()) {
@@ -103,6 +106,10 @@ void WebSocket::disconnect(const int reason) {
     }
 
 	LDEBUG(fmt::format("Disconnected client {}:{}.", _address, _port));
+}
+
+bool WebSocket::socketHasConnection() {
+    return socketConnection->get_state() == websocketpp::session::state::open;
 }
 
 bool WebSocket::getMessage(std::string &message) {
@@ -229,7 +236,6 @@ void WebSocket::onClose(websocketpp::connection_hdl hdl) {
 
     std::lock_guard<std::mutex> guard(_connectionHandlesMutex);
     _connectionHandles.erase(hdl);
-
 }
 
 bool WebSocket::waitForOutput(size_t nBytes) {
