@@ -52,6 +52,12 @@ WebSocket::WebSocket(std::string address, int port, _SOCKET socket)
     server.set_open_handler(bind(&WebSocket::onOpen,this,::_1));
     server.set_close_handler(bind(&WebSocket::onClose,this,::_1));
 
+    // set up WebSocket++ logging
+    server.clear_access_channels(websocketpp::log::alevel::all);
+    server.set_access_channels(websocketpp::log::alevel::connect);
+    server.set_access_channels(websocketpp::log::alevel::disconnect);
+    server.set_access_channels(websocketpp::log::alevel::app);
+
     server.register_ostream(&_outputStream);
     socketConnection = server.get_connection();
     socketConnection->start();
