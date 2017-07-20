@@ -173,7 +173,6 @@ void WebSocket::streamOutput() {
         while ((bytesToSend = outputStreamSize()) > 0) {
             std::lock_guard<std::mutex> streamGuard(_outputStreamMutex);
             std::string output = _outputStream.str();
-            LDEBUG(fmt::format("Sending \"{}\" to client {}:{}.", output, _address, _port));
             int sentBytes = send(_socket, output.c_str(), bytesToSend, 0);
 
             if (sentBytes <= 0) {
@@ -218,7 +217,6 @@ int WebSocket::outputStreamSize() {
  */
 void WebSocket::onMessage(websocketpp::connection_hdl hdl, WsServer::message_ptr msg) {
     std::string msgContent = msg->get_payload();
-    LDEBUG(fmt::format("Message received: {}", msgContent));
     std::lock_guard<std::mutex> guard(_inputQueueMutex);
     _inputQueue.push_back(msgContent);
     _inputNotifier.notify_one();

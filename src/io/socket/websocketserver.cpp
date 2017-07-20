@@ -143,9 +143,9 @@ bool WebSocketServer::hasPendingSockets() const {
         return false;
     }
 
-    // TODO(klas): Understand why thi wont compile
+    // TODO(klas): Understand why this mutex wont compile
 //    std::lock_guard<std::mutex> guard(_connectionMutex);
-    return _pendingClientConnections.size() > 0;
+    return !_pendingClientConnections.empty();
 }
 
 std::unique_ptr<WebSocket> WebSocketServer::nextPendingWebSocket() {
@@ -154,7 +154,7 @@ std::unique_ptr<WebSocket> WebSocketServer::nextPendingWebSocket() {
     }
 
     std::lock_guard<std::mutex> guard(_connectionMutex);
-    if (_pendingClientConnections.size() > 0) {
+    if (!_pendingClientConnections.empty()) {
         std::unique_ptr<WebSocket> connection = std::move(_pendingClientConnections.front());
         _pendingClientConnections.pop_front();
         return connection;
@@ -212,7 +212,7 @@ void WebSocketServer::waitForConnections() {
         char addressBuffer[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, &(clientInfo.sin_addr), addressBuffer, INET_ADDRSTRLEN);
         std::string address = addressBuffer;
-        int port = static_cast<int>(clientInfo.sin_port);
+        auto port = static_cast<int>(clientInfo.sin_port);
 
         // create client socket
         std::unique_ptr<WebSocket> socket = std::make_unique<WebSocket>(address, port, socketHandle);
