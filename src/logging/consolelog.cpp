@@ -119,7 +119,14 @@ void ConsoleLog::setColorForLevel(LogLevel level) {
         case LogLevel::AllLogging:
             return;
     }
-    SetConsoleTextAttribute(hConsole, colorIndex);
+    // Get the old color information
+    CONSOLE_SCREEN_BUFFER_INFO csbiInfo = { 0 };
+    GetConsoleScreenBufferInfo(hConsole, &csbiInfo);
+
+    // Or-ing the new foreground color with the old values for the background
+    const WORD Background = BACKGROUND_BLUE | BACKGROUND_GREEN |
+        BACKGROUND_RED | BACKGROUND_INTENSITY;
+    SetConsoleTextAttribute(hConsole, colorIndex | (csbiInfo.wAttributes & Background));
 #elif defined __unix__
     switch (level) {
         case LogLevel::Trace:

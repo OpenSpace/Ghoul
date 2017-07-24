@@ -172,7 +172,7 @@ private:
      * for each directory in the current directory, combining all results in the
      * \p result> vector
      */
-    void readFiles(std::vector<std::string>& result, const std::string& path,
+    void internalReadFiles(std::vector<std::string>& result, const std::string& path,
         Recursive recursiveSearch = Recursive::No) const;
 
     /**
@@ -186,8 +186,8 @@ private:
      * for each directory in the current directory, combining all results in the
      * \p result vector.
      */
-    void readDirectories(std::vector<std::string>& result, const std::string& path,
-        Recursive recursiveSearch = Recursive::No) const;
+    void internalReadDirectories(std::vector<std::string>& result,
+        const std::string& path, Recursive recursiveSearch = Recursive::No) const;
 
     /// The path in the filesystem to this Directory object. May be absolute or relative
     std::string _directoryPath;
