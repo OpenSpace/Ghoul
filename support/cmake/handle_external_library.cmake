@@ -31,6 +31,26 @@ function(disable_external_warnings library_name)
     endif ()
 endfunction ()
 
+
+function(disable_external_warnings_for_file file_name)
+    if (MSVC)
+        set_source_files_properties(
+            ${file_name}
+            PROPERTIES COMPILE_FLAGS "/W0"
+        )
+
+        set_source_files_properties(
+            ${file_name}
+            PROPERTIES COMPILE_DEFINITIONS "_SCL_SECURE_NO_WARNINGS"
+        )
+    else ()
+        set_source_files_properties(
+            ${file_name}
+            PROPERTIES COMPILE_FLAGS "-w"
+        )
+    endif ()
+endfunction ()
+
 # Includes an external library by adding its subdirectory using 'add_subdirectory'
 # target_name: Target to which the library is added
 # library_name: The library that is added by including 'path'
