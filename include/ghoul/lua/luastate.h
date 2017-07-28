@@ -28,8 +28,7 @@
 
 struct lua_State;
 
-namespace ghoul {
-namespace lua {
+namespace ghoul::lua {
 
 /**
  * This class is a thin RAII wrapper around a lua_State pointer as returned by the Lua
@@ -64,9 +63,6 @@ private:
     lua_State* _state;
 };
     
-        
-}  // namespace lua
-}  // namespace ghoul
-
+}  // namespace ghoul::lua
 
 #endif // __GHOUL___LUASTATE___H__

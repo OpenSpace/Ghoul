@@ -30,8 +30,7 @@
 #include <cstring>
 #include <vector>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 using ConversionFunc = void(*)(char* dst, const char* src, int nSourceChannels,
                                int nDestinationChannels, int nBytesPerChannel);
@@ -189,5 +188,4 @@ void convertTextureFormat(Texture& texture, Texture::Format newFormat) {
     texture.setPixelData(newData);
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl

@@ -62,7 +62,7 @@ namespace {
         return true;
     }
 #endif
-}
+} // namespace
 
 namespace ghoul {
     

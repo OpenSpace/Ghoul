@@ -94,8 +94,7 @@ lua_State* staticLuaState() {
 
 } // namespace
 
-namespace ghoul {
-namespace lua {
+namespace ghoul::lua {
 
 LuaRuntimeException::LuaRuntimeException(string msg)
     : RuntimeError(std::move(msg), "Lua")
@@ -405,5 +404,4 @@ void deinitializeGlobalState() {
 
 } // namespace internal
 
-}  // namespace lua
-}  // namespace ghoul
+}  // namespace ghoul::lua

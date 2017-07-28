@@ -26,7 +26,7 @@
 
 namespace ghoul {
 
-template<class... T>
+template <class... T>
 void Event<T...>::subscribe(std::string name, std::string topic, Callback callback) {
     auto it = _topics.find(topic);
     if (it == _topics.end()) {
@@ -43,7 +43,7 @@ void Event<T...>::subscribe(std::string name, std::string topic, Callback callba
     }
 }
 
-template<class... T>
+template <class... T>
 void Event<T...>::publish(const std::string& topic, T... message) {
     // if the topic exists
     if (_topics.find(topic) != _topics.end()) {
@@ -54,7 +54,7 @@ void Event<T...>::publish(const std::string& topic, T... message) {
     }
 }
 
-template<class... T>
+template <class... T>
 void Event<T...>::unsubscribe(const std::string& name, const std::string& topic) {
     if (_topics.find(topic) != _topics.end()) {
         // Search through the whole array of subscribers to given topic and remove all
@@ -73,7 +73,7 @@ void Event<T...>::unsubscribe(const std::string& name, const std::string& topic)
     }
 }
 
-template<class... T>
+template <class... T>
 void Event<T...>::unsubscribe(const std::string& name) {
     // Search through all topics to erase all callbacks that belong to the 
     // object with given name

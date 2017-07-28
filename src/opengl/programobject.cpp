@@ -69,9 +69,7 @@ using glm::dmat4x4;
 using glm::value_ptr;
 
 
-
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 ProgramObject::ProgramObjectError::ProgramObjectError(std::string msg)
     : RuntimeError(std::move(msg), "ProgramObject")
@@ -4008,5 +4006,4 @@ void ProgramObject::bindFragDataLocation(const std::string& name, GLuint colorNu
     glBindFragDataLocation(_id, colorNumber, name.c_str());
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl

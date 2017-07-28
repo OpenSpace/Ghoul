@@ -28,8 +28,7 @@
 
 #include <string>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 /**
  * Enumerates all available LogLevel for the LogManager. The LogLevels are guaranteed
@@ -87,7 +86,6 @@ std::string stringFromLevel(LogLevel level);
 */
 LogLevel levelFromString(const std::string& level);
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging
 
 #endif // __GHOUL___LOGLEVEL___H__

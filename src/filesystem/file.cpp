@@ -49,10 +49,9 @@ namespace {
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 #endif
-}
+} // namespace
 
-namespace ghoul {
-namespace filesystem {
+namespace ghoul::filesystem {
 
 File::FileException::FileException(const std::string& msg)
     : RuntimeError(msg, "File")
@@ -264,5 +263,4 @@ std::ostream& operator<<(std::ostream& os, const File& f) {
     return os << f.path();
 }
 
-} // namespace filesystem
-} // namespace ghoul
+} // namespace ghoul::filesystem

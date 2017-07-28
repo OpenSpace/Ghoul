@@ -23,9 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-
-namespace ghoul {
-namespace cmdparser {
+namespace ghoul::cmdparser {
 
 template<class T, class U, class V, class W>
 MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::string name,
@@ -114,5 +112,4 @@ void MultipleCommand<T,U,V,W>::checkParameters(
     }
 }
 
-} // namespace cmdparser
-} // namespace ghoul
+} // namespace ghoul::cmdparser

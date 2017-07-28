@@ -33,8 +33,7 @@
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/texture.h>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 class TextureWriterBase;
 
@@ -100,7 +99,6 @@ private:
     std::vector<std::shared_ptr<TextureWriterBase>> _writers;
 };
  
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___TEXTUREWRITER___H__

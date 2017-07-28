@@ -25,8 +25,7 @@
 
 #include "ghoul/cmdparser/singlecommand.h"
 
-namespace ghoul {
-namespace cmdparser {
+namespace ghoul::cmdparser {
 
 SingleCommandZeroArguments::SingleCommandZeroArguments(bool *ptr, std::string name,
                                                        std::string shortName,
@@ -42,5 +41,4 @@ void SingleCommandZeroArguments::execute(const std::vector<std::string>& /*param
     *_ptr = true;
 }
 
-} // namespace cmdparser
-} // namespace ghoul
+} // namespace ghoul::cmdparser

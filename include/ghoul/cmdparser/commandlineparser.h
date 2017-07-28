@@ -34,8 +34,7 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
-namespace cmdparser {
+namespace ghoul::cmdparser {
 
 class CommandlineCommand;
 
@@ -249,7 +248,6 @@ protected:
     std::string _longHelpCommand;
 };
 
-} // namespace cmdparser
-} // namespace ghoul
+} // namespace ghoul::cmdparser
 
 #endif // __GHOUL___COMMANDLINEPARSER___H__

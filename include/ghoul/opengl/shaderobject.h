@@ -34,13 +34,9 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
+namespace ghoul::filesystem { class File; }
 
-namespace filesystem {
-    class File;
-}
-
-namespace opengl {
+namespace ghoul::opengl {
 
 /**
  * This class is a wrapper for an OpenGL shader object. It represents a single shader
@@ -307,7 +303,6 @@ private:
     ShaderPreprocessor _preprocessor;
 };
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl
 
 #endif // __GHOUL___SHADEROBJECT___H__

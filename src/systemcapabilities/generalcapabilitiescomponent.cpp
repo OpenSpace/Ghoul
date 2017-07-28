@@ -95,8 +95,7 @@ namespace std {
     }
 } // namespace std
 
-namespace ghoul {
-namespace systemcapabilities {
+namespace ghoul::systemcapabilities {
     
 GeneralCapabilitiesComponent::GeneralCapabilitiesComponentError::
     GeneralCapabilitiesComponentError(std::string msg)
@@ -722,5 +721,4 @@ std::string GeneralCapabilitiesComponent::name() const {
     return "CPU";
 }
 
-} // namespace systemcapabilities
-} // namespace ghoul
+} // namespace ghoul::systemcapabilities

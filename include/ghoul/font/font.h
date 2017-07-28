@@ -35,8 +35,7 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
-namespace fontrendering {
+namespace ghoul::fontrendering {
 
 /**
  * The Font class encapsulates a single fontface for a specific font size. It contains all
@@ -352,7 +351,6 @@ private:
     float _outlineThickness;
 };
     
-} // namespace fontrendering
-} // namespace ghoul
+} // namespace ghoul::fontrendering
 
 #endif // __GHOUL___FONT___H__

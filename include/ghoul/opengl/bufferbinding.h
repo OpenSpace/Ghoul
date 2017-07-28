@@ -30,18 +30,15 @@
 
 #include <vector>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl::bufferbinding {
+    enum class Buffer {
+        AtomicCounter,
+        ShaderStorage,
+        Uniform
+    };
+} // namespace ghoul::opengl::bufferbinding 
 
-namespace bufferbinding {
-
-enum class Buffer {
-    AtomicCounter,
-    ShaderStorage,
-    Uniform
-};
-
-}
+namespace ghoul::opengl {
     
 /**
  * This class manages buffer bindings for ATOMIC_COUNTER_BUFFER,
@@ -144,8 +141,7 @@ private:
     static std::vector<bool> _busyBindings;
 };
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl
 
 #include "bufferbinding.inl"
 

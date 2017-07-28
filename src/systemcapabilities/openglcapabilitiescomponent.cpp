@@ -42,11 +42,10 @@
 #endif
 
 namespace {
-    const std::string _loggerCat = "OpenGLCapabilities";
-}
+    const char* _loggerCat = "OpenGLCapabilities";
+} // namespace
 
-namespace ghoul {
-namespace systemcapabilities {
+namespace ghoul::systemcapabilities {
     
 OpenGLCapabilitiesComponent::OpenGLCapabilitiesComponentError::
     OpenGLCapabilitiesComponentError(std::string msg)
@@ -275,5 +274,4 @@ std::string OpenGLCapabilitiesComponent::name() const {
     return "OpenGL";
 }
 
-} // namespace ghoul
-} // namespace systemcapabilities
+} // namespace ghoul::systemcapabilities

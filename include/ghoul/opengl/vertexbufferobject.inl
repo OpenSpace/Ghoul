@@ -25,8 +25,10 @@
 
 #include <ghoul/misc/assert.h>
 
+namespace ghoul::opengl {
+
 template <typename T>
-void ghoul::opengl::VertexBufferObject::initialize(const std::vector<T>& vertexArray,
+void VertexBufferObject::initialize(const std::vector<T>& vertexArray,
                                                    const std::vector<GLint>& indexArray)
 {
     static_assert(std::is_pod<T>::value, "T has to be a POD");
@@ -58,3 +60,5 @@ void ghoul::opengl::VertexBufferObject::initialize(const std::vector<T>& vertexA
 
     glBindVertexArray(0);
 }
+
+} // namespace ghoul::opengl

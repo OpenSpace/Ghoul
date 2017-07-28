@@ -100,10 +100,9 @@ namespace {
             FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r); \n\
         } \n\
     }";
-}
+} // namespace
 
-namespace ghoul {
-namespace fontrendering {
+namespace ghoul::fontrendering {
     
 std::unique_ptr<FontRenderer> FontRenderer::_defaultRenderer = nullptr;
     
@@ -565,5 +564,4 @@ void FontRenderer::setFramebufferSize(glm::vec2 framebufferSize) {
     _framebufferSize = std::move(framebufferSize);
 }
     
-} // namespace fontrendering
-} // namespace ghoul
+} // namespace ghoul::fontrendering

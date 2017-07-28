@@ -113,11 +113,9 @@ namespace {
             );
         }
     }
-}
+} // namespace
 
-
-namespace ghoul {
-namespace fontrendering {
+namespace ghoul::fontrendering {
     
 Font::FontException::FontException(const std::string& msg)
     : RuntimeError(msg, "Font")
@@ -642,5 +640,4 @@ void Font::generateKerning() {
     FT_Done_FreeType(library);
 }
 
-} // namespace fontrendering
-} // namespace ghoul
+} // namespace ghoul::fontrendering

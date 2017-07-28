@@ -27,8 +27,7 @@
 
 #include <ghoul/lua/lua_helper.h>
 
-namespace ghoul {
-namespace lua {
+namespace ghoul::lua {
     
 LuaState::LuaState(bool includeStandardLibraries)
     : _state(ghoul::lua::createNewLuaState(includeStandardLibraries))
@@ -44,5 +43,4 @@ LuaState::operator lua_State*() const {
     return _state;
 }
 
-}  // namespace lua
-}  // namespace ghoul
+}  // namespace ghoul::lua

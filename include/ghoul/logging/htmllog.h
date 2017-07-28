@@ -30,8 +30,7 @@
 
 #include <vector>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 /**
  * A subclass of TextLog that logs the messages to a structured HTML file on hard disk.
@@ -117,7 +116,6 @@ private:
     bool _customStyling;
 };
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging
 
 #endif // __GHOUL___HTMLLOG___H__

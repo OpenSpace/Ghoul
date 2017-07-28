@@ -32,8 +32,7 @@
 
 #include <SOIL.h>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(
                                                         const std::string& filename) const
@@ -117,7 +116,6 @@ std::vector<std::string> TextureReaderSOIL::supportedExtensions() const {
     };
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // GHOUL_USE_SOIL

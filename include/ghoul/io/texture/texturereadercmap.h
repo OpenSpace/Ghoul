@@ -28,8 +28,7 @@
 
 #include <ghoul/io/texture/texturereaderbase.h>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 /**
  * Reads a one dimensional texture from a cmap (color map) file. The format of the cmap
@@ -72,7 +71,6 @@ public:
     std::vector<std::string> supportedExtensions() const override;
 };
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___TEXTUREREADERCMAP___H__

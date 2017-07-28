@@ -56,10 +56,9 @@ namespace {
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
-}
+} // namespace
 
-namespace ghoul {
-namespace filesystem {
+namespace ghoul::filesystem {
 
 struct DirectoryHandle {
     HANDLE _handle;
@@ -262,7 +261,6 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
     }
 }
 
-} // namespace filesystem
-} // namespace ghoul
+} // namespace ghoul::filesystem
 
 #endif

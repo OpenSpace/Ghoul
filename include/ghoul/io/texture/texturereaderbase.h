@@ -32,13 +32,9 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
-
-namespace opengl {
-    class Texture;
-}
+namespace ghoul::opengl { class Texture; }
     
-namespace io {
+namespace ghoul::io {
 
 /**
  * The base class for reading textures from hard disk into a Texture object. Each reader
@@ -97,7 +93,6 @@ public:
     virtual std::vector<std::string> supportedExtensions() const = 0;
 };
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___TEXTUREREADERBASE___H__

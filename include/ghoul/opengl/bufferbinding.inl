@@ -26,8 +26,7 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 template <bufferbinding::Buffer T>
 BufferBinding<T>::BufferBinding()
@@ -120,6 +119,4 @@ std::vector<bool> BufferBinding<T>::_busyBindings = std::vector<bool>();
 template <bufferbinding::Buffer T>
 bool BufferBinding<T>::_initialized = false;
 
-} // namespace opengl
-
-} // namespace ghoul
+} // namespace ghoul::opengl

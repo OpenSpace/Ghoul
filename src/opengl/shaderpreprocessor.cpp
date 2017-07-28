@@ -83,11 +83,9 @@ namespace {
         ss << (isCore ? " core" : (isCompatibility ? " compatibility" : ""));
         return ss.str();
     }
+} // namespace
 
-}
-
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 std::vector<std::string> ShaderPreprocessor::_includePaths = std::vector<std::string>();
     
@@ -403,6 +401,8 @@ std::string ShaderPreprocessor::substitute(const std::string& in, ShaderPreproce
         ss << _dictionary.value<std::string>(resolved);
     } else if (_dictionary.hasValue<const char*>(resolved)) {
         ss << _dictionary.value<const char*>(resolved);
+    } else if (_dictionary.hasValue<char*>(resolved)) {
+        ss << _dictionary.value<char*>(resolved);
     } else if (_dictionary.hasValue<long long>(resolved)) {
         ss << _dictionary.value<long long>(resolved);
     } else if (_dictionary.hasValue<unsigned long long>(resolved)) {
@@ -731,7 +731,6 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     return true;
 }
 
-
 bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
     static const std::string endForString = "#endfor";
 
@@ -790,5 +789,4 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
     return false;
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl

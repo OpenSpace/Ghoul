@@ -32,8 +32,7 @@
 struct aiMesh;
 struct aiScene;
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 /**
  * This model reader loads the provided file using the Assimp library. This simple
@@ -91,10 +90,9 @@ public:
     void loadModel(
         const std::string& filename,
         std::vector<Vertex> & vertexArray,
-        std::vector<int> & indexArray ) const;
+        std::vector<int> & indexArray) const;
 };
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___MODELREADERMULTIFORMAT___H__

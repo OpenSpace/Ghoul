@@ -25,8 +25,7 @@
 
 #include <ghoul/opengl/vertexbufferobject.h>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 VertexBufferObject::VertexBufferObject()
     : _vaoID(0)
@@ -158,5 +157,4 @@ void VertexBufferObject::generateGLObjects() {
     glGenBuffers(1, &_iBufferID);
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl

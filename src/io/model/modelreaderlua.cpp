@@ -47,10 +47,9 @@ namespace {
     const char* keyStride = "Stride";
     const char* keyOffset = "Offset";
     const char* keyNormalized = "Normalized";
-}
+} // namespace
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
     
 std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
                                                         const std::string& filename) const
@@ -181,6 +180,5 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     return vbo;
 }
     
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 

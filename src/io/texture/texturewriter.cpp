@@ -35,8 +35,7 @@
 
 using std::string;
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
     
 TextureWriter::MissingWriterException::MissingWriterException(std::string extension)
     : RuntimeError(fmt::format("No writer was found for extension '{}'", extension), "IO")
@@ -91,5 +90,4 @@ TextureWriterBase* TextureWriter::writerForExtension(const std::string& extensio
     throw MissingWriterException(extension);
 }
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io

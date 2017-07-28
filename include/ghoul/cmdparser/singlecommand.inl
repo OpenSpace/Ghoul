@@ -23,8 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-namespace ghoul {
-namespace cmdparser {
+namespace ghoul::cmdparser  {
 
 template<typename T, typename U, typename V, typename W>
 SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, std::string name, std::string shortName,
@@ -115,5 +114,4 @@ void SingleCommand<T, U, V, W>::checkParameters(
     }
 }
 
-} // namespace cmdparser
-} // namespace ghoul
+} // namespace ghoul::cmdparser

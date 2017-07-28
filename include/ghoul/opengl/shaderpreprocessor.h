@@ -37,8 +37,7 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 class ShaderPreprocessor {
 public:
@@ -162,7 +161,6 @@ private:
     ShaderChangedCallback _onChangeCallback;
 };
     
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl
 
 #endif // __GHOUL___SHADERPREPROCESSOR___H__

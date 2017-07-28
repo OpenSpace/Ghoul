@@ -30,8 +30,7 @@
 
 #include <vector>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 /**
  * This class is a wrapper for handling vertex buffer objects. It is only meant for 
@@ -155,8 +154,7 @@ private:
     GLenum _mode;
 };
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl
 
 #include "vertexbufferobject.inl"
 

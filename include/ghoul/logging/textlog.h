@@ -32,8 +32,7 @@
 
 #include <fstream>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 /**
  * A concrete subclass of Log that logs the messages to a plain text file on hard disk.
@@ -112,7 +111,6 @@ private:
     std::fstream _file;
 };
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging
 
 #endif // __GHOUL___TEXTLOG___H__

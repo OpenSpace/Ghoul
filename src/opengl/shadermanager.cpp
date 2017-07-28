@@ -29,8 +29,7 @@
 #include <ghoul/misc/crc32.h>
 #include <ghoul/opengl/shaderobject.h>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
     
 ShaderManager::ShaderManagerError::ShaderManagerError(std::string msg)
     : RuntimeError(std::move(msg), "ShaderManager")
@@ -101,5 +100,4 @@ unsigned int ShaderManager::hashedNameForName(const std::string& name) const {
     return hashCRC32(name);
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl

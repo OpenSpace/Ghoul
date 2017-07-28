@@ -34,8 +34,7 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
-namespace systemcapabilities {
+namespace ghoul::systemcapabilities {
 
 /**
  * The SystemCapabilities class allows access to the functionality the system provides.
@@ -128,8 +127,7 @@ private:
     static bool _isInitialized;
 };
 
-} // namespace systemcapabilities
-} // namespace ghoul
+} // namespace ghoul::systemcapabilities
 
 #define SysCap (ghoul::systemcapabilities::SystemCapabilities::ref())
 

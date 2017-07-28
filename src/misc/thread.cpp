@@ -34,8 +34,7 @@
 #include <pthread.h>
 #endif
 
-namespace ghoul {
-namespace thread {
+namespace ghoul::thread {
 
 namespace {
 
@@ -154,5 +153,4 @@ void setThreadBackground(std::thread& t, Background background) {
 void setThreadBackground(std::thread&, Background) {}
 #endif
 
-} // namespace thread
-} // namespace ghoul
+} // namespace ghoul::thread

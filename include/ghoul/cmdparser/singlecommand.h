@@ -28,8 +28,7 @@
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 
-namespace ghoul {
-namespace cmdparser {
+namespace ghoul::cmdparser {
 
 /**
  * This class represents a command that can occur only once in a given commandline and can
@@ -195,8 +194,7 @@ protected:
     bool* _ptr = nullptr;
 };
 
-} // namespace cmdparser
-} // namespace ghoul
+} // namespace ghoul::cmdparser
 
 #include "singlecommand.inl"
 

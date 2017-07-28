@@ -31,7 +31,7 @@
 #include <functional>
 #include <string>
 
-namespace ghoul {
+namespace ghoul::logging {
     
 /**
  * The BufferLog stores timestamped messages into a provided custom buffer of memory. It
@@ -211,6 +211,6 @@ protected:
     bool _inCallbackStack;
 };
     
-} // namespace ghoul
+} // namespace ghoul::logging
 
 #endif // __GHOUL___BUFFERLOG___H__

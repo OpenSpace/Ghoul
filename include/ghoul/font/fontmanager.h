@@ -36,8 +36,7 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
-namespace fontrendering {
+namespace ghoul::fontrendering {
 
 class Font;
 
@@ -154,7 +153,6 @@ private:
     std::vector<wchar_t> _defaultCharacterSet;
 };
     
-} // namespace fontrendering
-} // namespace ghoul
+} // namespace ghoul::fontrendering
 
 #endif // __GHOUL___FONTMANAGER___H__

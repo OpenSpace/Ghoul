@@ -36,8 +36,7 @@
 #include <IL/il.h>
 #include <IL/ilu.h>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTextureInternal(
     const std::string& source) const
@@ -229,7 +228,6 @@ std::vector<std::string> TextureReaderDevIL::supportedExtensions() const {
     };
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // GHOUL_USE_DEVIL

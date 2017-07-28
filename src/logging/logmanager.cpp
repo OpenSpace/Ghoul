@@ -31,8 +31,7 @@
 #include <map>
 #include <vector>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 LogManager::LogManager(LogLevel level, ImmediateFlush immediateFlush)
     : _level(level)
@@ -93,5 +92,4 @@ void LogManager::resetMessageCounters() {
     _logCounter = { 0, 0, 0, 0, 0, 0, 0 };
 }
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging

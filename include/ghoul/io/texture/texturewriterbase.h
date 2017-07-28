@@ -32,8 +32,7 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 /**
  * This is the base class for all classes that cna be used to write textures to disk. Each
@@ -79,7 +78,6 @@ public:
     virtual std::vector<std::string> supportedExtensions() const = 0;
 };
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___TEXTUREWRITERBASE___H__

@@ -27,17 +27,15 @@
 
 #include <fmt/format.h>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
  
 TextureWriterBase::TextureWriteException::TextureWriteException(std::string n,
-                                                              std::string m,
-                                                              const TextureWriterBase& w)
+                                                                std::string m,
+                                                               const TextureWriterBase& w)
     : RuntimeError(fmt::format("Error writing texture '{}'", n), "TextureWriter")
     , filename(std::move(n))
     , message(std::move(m))
     , writer(w)
 {}
     
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io

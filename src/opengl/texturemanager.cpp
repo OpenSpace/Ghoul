@@ -28,8 +28,7 @@
 #include <ghoul/misc/crc32.h>
 #include <ghoul/opengl/texture.h>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 TextureManager::TextureManagerError::TextureManagerError(std::string msg)
     : RuntimeError(std::move(msg), "TextureManager")
@@ -98,5 +97,4 @@ unsigned int TextureManager::hashedNameForName(const std::string& name) const {
     return hashCRC32(name);
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl

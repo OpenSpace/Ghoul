@@ -32,8 +32,9 @@ bool isConvertible(const Dictionary& dict) {
     using StorageType = internal::StorageTypeConverter<T>;
     
     bool correctSize = dict.size() == StorageType::size;
-    if (!correctSize)
+    if (!correctSize) {
         return false;
+    }
     
     const std::vector<std::string>& keys = dict.keys();
     for (size_t i = 0; i < StorageType::size; ++i) {

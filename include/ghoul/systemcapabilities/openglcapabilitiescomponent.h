@@ -35,8 +35,7 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
-namespace systemcapabilities {
+namespace ghoul::systemcapabilities {
 
 /**
  * This subclass of SystemCapabilitiesComponent detects graphics and OpenGL-related
@@ -217,8 +216,7 @@ protected:
     std::string _adapterName;
 };
 
-} // namespace systemcapabilities
-} // namespace ghoul
+} // namespace ghoul::systemcapabilities
 
 #define OpenGLCap (                                                                      \
     ghoul::systemcapabilities::SystemCapabilities::ref().component<                      \

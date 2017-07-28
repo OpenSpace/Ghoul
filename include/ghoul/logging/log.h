@@ -30,8 +30,7 @@
 #include <ghoul/logging/loglevel.h>
 #include <string>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 /**
  * Abstract base class for all Log%s that can be added to a LogManager. Base classes must
@@ -147,7 +146,6 @@ private:
     LogLevel _logLevel; ///< The minimum allowed log level for this Log
 };
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging
 
 #endif // __GHOUL___LOG___H__

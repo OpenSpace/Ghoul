@@ -28,11 +28,10 @@
 #include <ghoul/logging/logmanager.h>
 
 namespace {
-const std::string _loggerCat = "ghoul.opengl.FramebufferObject";
-}
+    const char* _loggerCat = "ghoul.opengl.FramebufferObject";
+} // namespace
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 std::string FramebufferObject::errorChecking(GLenum status) {
     switch (status) {
@@ -147,5 +146,4 @@ GLuint FramebufferObject::generateId() {
     return _id;
 }
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl

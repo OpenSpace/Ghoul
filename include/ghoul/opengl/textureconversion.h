@@ -30,8 +30,7 @@
 
 #include <memory>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 /**
  * Converts the \p texture into a \p newFormat, replacing the backend storage of the
@@ -41,7 +40,6 @@ namespace opengl {
  */
 void convertTextureFormat(Texture& texture, Texture::Format newFormat);
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl
 
 #endif // __GHOUL___TEXTURECONVERSION___H__

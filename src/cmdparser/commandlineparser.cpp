@@ -38,7 +38,7 @@ using fmt::format;
 
 namespace {
 
-const std::string _loggerCat = "CommandlineParser";
+const char* _loggerCat = "CommandlineParser";
 
 /**
  * Extracts multiple arguments from a single list. <br>
@@ -76,8 +76,7 @@ int extractArguments(const std::vector<std::string>& in, std::vector<std::string
 
 } // namespace
 
-namespace ghoul {
-namespace cmdparser {
+namespace ghoul::cmdparser {
     
 CommandlineParser::CommandlineException::CommandlineException(const std::string& msg)
     : RuntimeError(msg, "CommandlineParser")
@@ -370,5 +369,4 @@ bool CommandlineParser::hasOnlyHelpCommand() const {
     
 }
     
-} // namespace cmdparser
-} // namespace ghoul
+} // namespace ghoul::cmdparser

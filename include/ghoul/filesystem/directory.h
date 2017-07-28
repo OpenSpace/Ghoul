@@ -31,8 +31,7 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
-namespace filesystem {
+namespace ghoul::filesystem {
 
 /**
  * This class represents a directory in the file system. The directory is identified by
@@ -202,7 +201,6 @@ private:
  */
 std::ostream& operator<<(std::ostream& os, const Directory& d);
 
-} // namespace filesystem
-} // namespace ghoul
+} // namespace ghoul::filesystem
 
 #endif // __GHOUL___DIRECTORY___H__

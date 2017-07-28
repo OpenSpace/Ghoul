@@ -58,10 +58,9 @@ using std::vector;
 namespace {
     const char* _loggerCat = "FileSystem";
     const char* TemporaryPathToken = "TEMPORARY";
-}
+} // namespace
 
-namespace ghoul {
-namespace filesystem {
+namespace ghoul::filesystem {
 
 const string FileSystem::TokenOpeningBraces = "${";
 const string FileSystem::TokenClosingBraces = "}";
@@ -844,5 +843,4 @@ string FileSystem::resolveToken(const string& token) const {
     }
 }
 
-} // namespace filesystem
-} // namespace ghoul
+} // namespace ghoul::filesystem

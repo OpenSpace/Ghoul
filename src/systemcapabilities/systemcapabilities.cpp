@@ -31,8 +31,7 @@
 #include <algorithm>
 #include <typeinfo>
 
-namespace ghoul {
-namespace systemcapabilities {
+namespace ghoul::systemcapabilities {
 
 SystemCapabilities SystemCapabilities::_systemCapabilities;
 bool SystemCapabilities::_isInitialized = false;
@@ -100,5 +99,4 @@ void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponen
     _components.push_back(std::move(comp));
 }
 
-} // namespace systemcapabilities
-} // namespace ghoul
+} // namespace ghoul::systemcapabilities

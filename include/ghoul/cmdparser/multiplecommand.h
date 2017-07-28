@@ -30,8 +30,7 @@
 
 #include <vector>
 
-namespace ghoul {
-namespace cmdparser {
+namespace ghoul::cmdparser {
 
 /**
  * This class represents a command that can called multiple times in a given commandline
@@ -200,8 +199,7 @@ protected:
     int* _ptr = nullptr;
 };
 
-} // namespace cmdparser
-} // namespace ghoul
+} // namespace ghoul::cmdparser
 
 #include "multiplecommand.inl"
 

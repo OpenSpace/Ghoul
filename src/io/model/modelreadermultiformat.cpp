@@ -75,8 +75,7 @@ namespace {
     }
 } // namespace
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 std::unique_ptr<opengl::VertexBufferObject> ModelReaderMultiFormat::loadModel(
     const std::string& filename) const
@@ -225,5 +224,4 @@ void ModelReaderMultiFormat::loadModel(
     }
 }
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io

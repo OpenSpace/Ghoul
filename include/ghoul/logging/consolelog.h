@@ -29,8 +29,7 @@
 #include <ghoul/logging/streamlog.h>
 #include <ghoul/misc/boolean.h>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 /**
  * A concrete subclass of Log that logs the messages to the console to the
@@ -107,7 +106,6 @@ protected:
     const bool _colorOutput;
 };
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging
 
 #endif // __GHOUL___CONSOLELOG___H__

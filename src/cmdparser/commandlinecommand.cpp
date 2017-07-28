@@ -27,8 +27,7 @@
 
 #include <fmt/format.h>
 
-namespace ghoul {
-namespace cmdparser {
+namespace ghoul::cmdparser {
     
 CommandlineCommand::CommandExecutionException::CommandExecutionException(
                                                                    const std::string& msg)
@@ -121,5 +120,4 @@ void CommandlineCommand::checkParameters(const std::vector<std::string>& param) 
     }
 }
 
-} // namespace cmdparser
-} // namespace ghoul
+} // namespace ghoul::cmdparser

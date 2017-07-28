@@ -32,8 +32,7 @@
 
 #include <fmt/format.h>
 
-namespace ghoul {
-namespace fontrendering {
+namespace ghoul::fontrendering {
     
 FontManager::FontRegistrationException::FontRegistrationException(const std::string& msg)
     : RuntimeError(msg, "FontManager")
@@ -140,5 +139,4 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     return f;
 }
 
-} // namespace fontrendering
-} // namespace ghoul
+} // namespace ghoul::fontrendering

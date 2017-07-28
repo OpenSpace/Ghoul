@@ -33,8 +33,7 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
-namespace cmdparser {
+namespace ghoul::cmdparser {
 
 /**
  * A command is an operation that can be called via command line arguments on program
@@ -214,8 +213,7 @@ protected:
     MultipleCalls _allowsMultipleCalls;
 };
 
-}  // namespace cmdparser
-}  // namespace ghoul
+}  // namespace ghoul::cmdparser
 
 #include "commandlinecommand.inl"
 

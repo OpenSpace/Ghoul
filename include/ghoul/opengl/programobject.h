@@ -37,8 +37,7 @@
 #include <string>
 #include <vector>
 
-namespace ghoul {
-namespace opengl {
+namespace ghoul::opengl {
 
 /**
  * This class is a wrapper for an OpenGL program object storing an array of OpenGL
@@ -3571,7 +3570,6 @@ private:
     bool _programIsDirty = true;
 };
 
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::opengl
 
 #endif // __GHOUL___PROGRAMOBJECT___H__

@@ -33,8 +33,7 @@
 #include <algorithm>
 #include <SOIL.h>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 void TextureWriterSOIL::saveTexture(const opengl::Texture& texture,
                                                         const std::string& filename) const
@@ -84,7 +83,6 @@ std::vector<std::string> TextureWriterSOIL::supportedExtensions() const {
     };
 }
     
-} // namespace opengl
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // GHOUL_USE_SOIL

@@ -29,8 +29,7 @@
 #include <ghoul/logging/log.h>
 #include <ostream>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 /**
  * A concrete subclass of Log that logs the messages to a given <code>std::ostream</code>.
@@ -82,7 +81,6 @@ protected:
     std::ostream& _stream; ///< The stream to which the log messages will be sent
 };
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging
 
 #endif // __GHOUL___STREAMLOG___H__
