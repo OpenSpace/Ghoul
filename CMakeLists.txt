@@ -139,7 +139,7 @@ if (MSVC)
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(Ghoul PRIVATE "/WX")
     endif ()
-elseif (APPLE)
+elseif (APPLE OR CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     target_compile_options(
         Ghoul
         PRIVATE
@@ -227,24 +227,33 @@ elseif (APPLE)
         "-Wzero-length-array"
         "-Wno-missing-braces"
     )
-    target_compile_definitions(Ghoul PRIVATE "__gl_h_")
+
+    if (APPLE)
+        target_compile_definitions(Ghoul PRIVATE "__gl_h_")
+    endif ()
 
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(Ghoul PRIVATE "-Werror")
     endif ()
 
-    target_include_directories(Ghoul PUBLIC "/Developer/Headers/FlatCarbon")
-    find_library(COREFOUNDATION_LIBRARY CoreFoundation)
-    find_library(CARBON_LIBRARY Carbon)
-    find_library(COCOA_LIBRARY Carbon)
-    find_library(APP_SERVICES_LIBRARY ApplicationServices)
-    mark_as_advanced(CARBON_LIBRARY COCOA_LIBRARY APP_SERVICES_LIBRARY)
-    target_link_libraries(Ghoul
-        ${CARBON_LIBRARY}
-        ${COREFOUNDATION_LIBRARY}
-        ${COCOA_LIBRARY}
-        ${APP_SERVICES_LIBRARY}
-    )
+    if (APPLE)
+        target_include_directories(Ghoul PUBLIC "/Developer/Headers/FlatCarbon")
+        find_library(COREFOUNDATION_LIBRARY CoreFoundation)
+        find_library(CARBON_LIBRARY Carbon)
+        find_library(COCOA_LIBRARY Carbon)
+        find_library(APP_SERVICES_LIBRARY ApplicationServices)
+        mark_as_advanced(CARBON_LIBRARY COCOA_LIBRARY APP_SERVICES_LIBRARY)
+        target_link_libraries(Ghoul
+            ${CARBON_LIBRARY}
+            ${COREFOUNDATION_LIBRARY}
+            ${COCOA_LIBRARY}
+            ${APP_SERVICES_LIBRARY}
+        )
+    elseif (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+       target_include_directories(Ghoul PUBLIC "/usr/local/include")
+       find_library(INOTIFY_LIBRARIES inotify PATHS "/usr/local/lib")
+       target_link_libraries(Ghoul ${INOTIFY_LIBRARIES})
+    endif ()
 elseif (UNIX) # The order is important as UNIX is also true on MacOS
     target_compile_options(
         Ghoul
@@ -498,7 +507,7 @@ if (GHOUL_HAVE_TESTS)
         if (GHOUL_WARNINGS_AS_ERRORS)
             target_compile_options(GhoulTest PRIVATE "/WX")
         endif ()
-    elseif (APPLE)
+    elseif (APPLE OR CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
         target_compile_options(
             GhoulTest
             PRIVATE
