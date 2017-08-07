@@ -199,6 +199,8 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(Ghoul PRIVATE "-Werror")
     endif ()
+else ()
+    message("Compiler not handled in set_ghoul_compile_settings.cmake:203")
 endif ()
 
 if (APPLE)
