@@ -279,7 +279,7 @@ if (GHOUL_HAVE_TESTS)
 
     set_ghoul_compile_settings(GhoulTest)
 
-    if (WIN32)
+    if (MSVC)
         target_compile_options(
             GhoulTest
             PUBLIC
