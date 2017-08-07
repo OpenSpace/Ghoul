@@ -57,6 +57,7 @@ option(GHOUL_MODULE_LUA "Enable Lua" ON)
 option(GHOUL_MODULE_OPENGL "Enable OpenGL" ON)
 option(GHOUL_MODULE_SYSTEMCAPABILITIES "Enable System Capabilities" ON)
 
+option(BUILD_SHARED_LIBS "Build package with shared libraries." OFF)
 
 #############################
 # Including the source files (with source groups already defined)
