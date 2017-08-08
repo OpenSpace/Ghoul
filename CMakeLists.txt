@@ -22,21 +22,10 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
-
-# Remove the RelMinSize configuration option
-set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo CACHE TYPE INTERNAL FORCE)
-mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
-mark_as_advanced(CMAKE_INSTALL_PREFIX)
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
 project(Ghoul)
 message(STATUS "Generating Ghoul project")
-
-if (MSVC)
-    if (MSVC_VERSION LESS 1900)
-        message(FATAL_ERROR "Ghoul requires at least Visual Studio 2015")
-    endif ()
-endif ()
 
 # Setting default paths
 set(GHOUL_ROOT_DIR ${PROJECT_SOURCE_DIR})
@@ -47,6 +36,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
 
 include(${GHOUL_CMAKE_DIR}/handle_external_library.cmake)
+include(${GHOUL_CMAKE_DIR}/set_ghoul_compile_settings.cmake)
+
 
 #############################
 # Options
@@ -73,11 +64,13 @@ option(BUILD_SHARED_LIBS "Build package with shared libraries." OFF)
 #############################
 include(src/CMakeLists.txt)
 
+
 #############################
 # Declare the library
 #############################
 add_library(Ghoul STATIC ${GHOUL_SOURCE} ${GHOUL_HEADER})
 target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
+
 
 #############################
 # Compile settings
@@ -85,204 +78,7 @@ target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
 set_property(TARGET Ghoul PROPERTY CXX_STANDARD 17)
 set_property(TARGET Ghoul PROPERTY CXX_STANDARD_REQUIRED On)
 
-if (WIN32)
-    if (GHOUL_USE_WMI)
-        target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_WMI")
-        target_link_libraries(Ghoul "WbemUuid.lib")
-    endif ()
-    target_link_libraries(Ghoul "shlwapi")
-endif ()
-
-if (MSVC)
-    target_compile_options(
-        Ghoul
-        PRIVATE
-        "/ZI"       # Edit and continue support
-        "/MP"       # Multi-threading support
-        "/W4"       # Highest warning level
-        "/w44062"   # enumerator 'identifier' in a switch of enum 'enumeration' is not handled
-        "/wd4127"   # conditional expression is constant
-        "/wd4201"   # nonstandard extension used : nameless struct/union
-        "/w44255"   # 'function': no function prototype given: converting '()' to '(void)'
-        "/w44263"   # 'function': member function does not override any base class virtual member function
-        "/w44264"   # 'virtual_function': no override available for virtual member function from base 'class'; function is hidden
-        "/w44265"   # 'class': class has virtual functions, but destructor is not virtual
-        "/w44266"   # 'function': no override available for virtual member function from base 'type'; function is hidden
-        "/w44289"   # nonstandard extension used : 'var' : loop control variable declared in the for-loop is used outside the for-loop scope
-        "/w44296"   # 'operator': expression is always false
-        "/w44311"   # 'variable' : pointer truncation from 'type' to 'type'
-        "/w44339"   # 'type' : use of undefined type detected in CLR meta-data - use of this type may lead to a runtime exception
-        "/w44342"   # behavior change: 'function' called, but a member operator was called in previous versions
-        "/w44350"   # behavior change: 'member1' called instead of 'member2'
-        "/w44431"   # missing type specifier - int assumed. Note: C no longer supports default-int
-        "/w44471"   # a forward declaration of an unscoped enumeration must have an underlying type (int assumed)
-        "/w44545"   # expression before comma evaluates to a function which is missing an argument list
-        "/w44546"   # function call before comma missing argument list
-        "/w44547"   # 'operator': operator before comma has no effect; expected operator with side-effect
-        "/w44548"   # expression before comma has no effect; expected expression with side-effect
-        "/w44549"   # 'operator': operator before comma has no effect; did you intend 'operator'?
-        "/w44555"   # expression has no effect; expected expression with side-effect
-        "/w44574"   # 'identifier' is defined to be '0': did you mean to use '#if identifier'?
-        "/w44608"   # 'symbol1' has already been initialized by another union member in the initializer list, 'symbol2'
-        "/w44619"   # #pragma warning: there is no warning number 'number'
-        "/w44628"   # digraphs not supported with -Ze. Character sequence 'digraph' not interpreted as alternate token for 'char'
-        "/w44640"   # 'instance': construction of local static object is not thread-safe
-        "/w44905"   # wide string literal cast to 'LPSTR'
-        "/w44906"   # string literal cast to 'LPWSTR'
-        "/w44946"   # reinterpret_cast used between related classes: 'class1' and 'class2'
-        "/w44986"   # 'symbol': exception specification does not match previous declaration
-        "/w44988"   # 'symbol': variable declared outside class/function scope
-        "/std:c++latest"
-        "/permissive-"
-        "/Zc:strictStrings-"    # Windows header don't adhere to this
-    )
-    if (GHOUL_WARNINGS_AS_ERRORS)
-        target_compile_options(Ghoul PRIVATE "/WX")
-    endif ()
-elseif (APPLE)
-    target_compile_options(
-        Ghoul
-        PRIVATE
-        "-stdlib=libc++"
-        "-Wall"
-        "-Wextra"
-        # "-Wpedantic"
-
-        "-Wabstract-vbase-init"
-        "-Warray-bounds-pointer-arithmetic"
-        "-Wassign-enum"
-        "-Wauto-import"
-        "-Wbad-function-cast"
-        "-Wbitfield-constant-conversion"
-        "-Wcast-calling-convention"
-        "-Wcast-qual"
-        "-Wchar-subscripts"
-        "-Wcomma"
-        "-Wcomment"
-        "-Wcomplex-component-init"
-        "-Wconditional-uninitialized"
-        "-Wdate-time"
-        "-Wdeprecated-implementations"
-        "-Wdollar-in-identifier-extension"
-        "-Wduplicate-enum"
-        "-Wduplicate-method-match"
-        "-Wempty-body"
-        "-Wfloat-equal"
-        "-Wformat-pedantic"
-        "-Wheader-hygiene"
-        "-Widiomatic-parentheses"
-        "-Wimplicit-fallthrough"
-        "-Wimport-preprocessor-directive-pedantic"
-        "-Winconsistent-missing-override"
-        "-Winfinite-recursion"
-        "-Wkeyword-macro"
-        "-Wlanguage-extension-token"
-        "-Wloop-analysis"
-        "-Wmethod-signatures"
-        "-Wmicrosoft-end-of-file"
-        "-Wmicrosoft-enum-forward-reference"
-        "-Wmicrosoft-fixed-enum"
-        "-Wmicrosoft-flexible-array"
-        "-Wmismatched-tags"
-        "-Wmissing-field-initializers"
-        "-Wmissing-noreturn"
-        "-Wmissing-prototypes"
-        "-Wnewline-eof"
-        "-Wnon-virtual-dtor"
-        "-Wold-style-cast"
-        "-Woverloaded-virtual"
-        "-Wpessimizing-move"
-        "-Wpointer-arith"
-        "-Wpragmas"
-        "-Wredundant-move"
-        "-Wreorder"
-        "-Wsemicolon-before-method-body"
-        "-Wshadow-all"
-        "-Wshift-sign-overflow"
-        "-Wshorten-64-to-32"
-        "-Wsign-compare"
-        "-Wstring-conversion"
-        "-Wtautological-compare"
-        "-Wthread-safety"
-        "-Wundef"
-        "-Wundefined-reinterpret-cast"
-        "-Wuninitialized"
-        "-Wunneeded-internal-declaration"
-        "-Wunneeded-member-function"
-        "-Wunreachable-code-break"
-        "-Wunreachable-code-loop-increment"
-        "-Wunreachable-code-return"
-        "-Wunused-exception-parameter"
-        "-Wunused-label"
-        "-Wunused-local-typedef"
-        "-Wunused-macros"
-        "-Wunused-parameter"
-        "-Wunused-private-field"
-        "-Wunused-result"
-        "-Wunused-variable"
-        "-Wused-but-marked-unused"
-        "-Wvariadic-macros"
-        "-Wvla"
-        "-Wweak-template-vtables"
-        "-Wzero-length-array"
-        "-Wno-missing-braces"
-    )
-    target_compile_definitions(Ghoul PRIVATE "__gl_h_")
-
-    if (GHOUL_WARNINGS_AS_ERRORS)
-        target_compile_options(Ghoul PRIVATE "-Werror")
-    endif ()
-
-    target_include_directories(Ghoul PUBLIC "/Developer/Headers/FlatCarbon")
-    find_library(COREFOUNDATION_LIBRARY CoreFoundation)
-    find_library(CARBON_LIBRARY Carbon)
-    find_library(COCOA_LIBRARY Carbon)
-    find_library(APP_SERVICES_LIBRARY ApplicationServices)
-    mark_as_advanced(CARBON_LIBRARY COCOA_LIBRARY APP_SERVICES_LIBRARY)
-    target_link_libraries(Ghoul
-        ${CARBON_LIBRARY}
-        ${COREFOUNDATION_LIBRARY}
-        ${COCOA_LIBRARY}
-        ${APP_SERVICES_LIBRARY}
-    )
-elseif (UNIX) # The order is important as UNIX is also true on MacOS
-    target_compile_options(
-        Ghoul
-        PRIVATE
-        "-ggdb"
-        "-Wall"
-        "-Wextra"
-        "-Wpedantic"
-        "-Wunused-parameter"
-        "-Wuninitialized"
-        "-Wsuggest-attribute=const"
-        "-Wsuggest-final-types"
-        "-Wsuggest-final-methods"
-        "-Wsuggest-override"
-        "-Walloc-zero"
-        "-Wduplicated-cond"
-        "-Wfloat-equal"
-        "-Wshadow"
-        "-Wundef"
-        "-Wcast-qual"
-        "-Wzero-as-null-pointer-constant"
-        "-Wdate-time"
-        "-Wuseless-cast"
-        "-Wlogical-op"
-        "-Wmissing-declarations"
-        "-Wint-in-bool-context"
-
-        "-Wno-write-strings"
-        "-Wnon-virtual-dtor"
-        "-Wold-style-cast"
-        "-Woverloaded-virtual"
-        "-Wno-long-long"
-    )
-
-    if (GHOUL_WARNINGS_AS_ERRORS)
-        target_compile_options(Ghoul PRIVATE "-Werror")
-    endif ()
-endif ()
+set_ghoul_compile_settings(Ghoul)
 
 if (GHOUL_HIGH_DEBUG_MODE)
     target_compile_definitions(Ghoul PUBLIC "GHL_DEBUG")
@@ -299,6 +95,37 @@ endif ()
 #############################
 # Dependencies
 #############################
+
+# System Libraries
+if (WIN32)
+    if (GHOUL_USE_WMI)
+        target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_WMI")
+        target_link_libraries(Ghoul "WbemUuid.lib")
+    endif ()
+    target_link_libraries(Ghoul "shlwapi")
+endif ()
+
+if (APPLE)
+    target_include_directories(Ghoul SYSTEM PUBLIC "/Developer/Headers/FlatCarbon")
+    find_library(COREFOUNDATION_LIBRARY CoreFoundation)
+    find_library(CARBON_LIBRARY Carbon)
+    find_library(COCOA_LIBRARY Carbon)
+    find_library(APP_SERVICES_LIBRARY ApplicationServices)
+    mark_as_advanced(CARBON_LIBRARY COCOA_LIBRARY APP_SERVICES_LIBRARY)
+    target_link_libraries(Ghoul
+        ${CARBON_LIBRARY}
+        ${COREFOUNDATION_LIBRARY}
+        ${COCOA_LIBRARY}
+        ${APP_SERVICES_LIBRARY}
+    )
+endif ()
+
+if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+    target_include_directories(Ghoul SYSTEM PUBLIC "/usr/local/include")
+    find_library(INOTIFY_LIBRARIES inotify PATHS "/usr/local/lib")
+    target_link_libraries(Ghoul ${INOTIFY_LIBRARIES})
+endif ()
+
 # GLM
 set(GLM_ROOT_DIR "${GHOUL_ROOT_DIR}/ext/glm")
 find_package(GLM REQUIRED)
@@ -357,6 +184,7 @@ target_include_directories(Ghoul SYSTEM PUBLIC ${LZ4_INCLUDE_DIR})
 target_link_libraries(Ghoul ${LZ4_LIBRARIES})
 set_property(TARGET lz4 PROPERTY FOLDER "External")
 
+# Lua
 if (GHOUL_MODULE_LUA)
     # Lua
     include_external_library(Ghoul Lua ${GHOUL_ROOT_DIR}/ext/lua)
@@ -372,7 +200,6 @@ set_property(TARGET uninstall PROPERTY FOLDER "External")
 
 if (WIN32)
     set_property(TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "External")
-    #set_property(TARGET zlibstatic PROPERTY FOLDER "External")
 endif ()
 
 # Cppformat
@@ -419,7 +246,6 @@ endif ()
 if (MSVC)
     target_include_directories(Ghoul PUBLIC ${GHOUL_ROOT_DIR}/ext/stackwalker)
     include_external_library(Ghoul StackWalker ${GHOUL_ROOT_DIR}/ext/stackwalker ${GHOUL_ROOT_DIR}/ext/stackwalker)
-    
 endif ()
 
 if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE AND NOT GHOUL_USE_SOIL)
@@ -452,187 +278,9 @@ if (GHOUL_HAVE_TESTS)
         "GHOUL_ROOT_DIR=\"${GHOUL_ROOT_DIR}\""
     )
 
+    set_ghoul_compile_settings(GhoulTest)
+
     if (MSVC)
-        target_compile_options(
-            GhoulTest
-            PRIVATE
-            "/ZI"       # Edit and continue support
-            "/MP"       # Multi-threading support
-            "/W4"       # Highest warning level
-            "/w44062"   # enumerator 'identifier' in a switch of enum 'enumeration' is not handled
-            "/wd4127"   # conditional expression is constant
-            "/wd4201"   # nonstandard extension used : nameless struct/union
-            "/w44255"   # 'function': no function prototype given: converting '()' to '(void)'
-            "/w44263"   # 'function': member function does not override any base class virtual member function
-            "/w44264"   # 'virtual_function': no override available for virtual member function from base 'class'; function is hidden
-            "/w44265"   # 'class': class has virtual functions, but destructor is not virtual
-            "/w44266"   # 'function': no override available for virtual member function from base 'type'; function is hidden
-            "/w44289"   # nonstandard extension used : 'var' : loop control variable declared in the for-loop is used outside the for-loop scope
-            "/w44296"   # 'operator': expression is always false
-            "/w44311"   # 'variable' : pointer truncation from 'type' to 'type'
-            "/w44339"   # 'type' : use of undefined type detected in CLR meta-data - use of this type may lead to a runtime exception
-            "/w44342"   # behavior change: 'function' called, but a member operator was called in previous versions
-            "/w44350"   # behavior change: 'member1' called instead of 'member2'
-            "/w44431"   # missing type specifier - int assumed. Note: C no longer supports default-int
-            "/w44471"   # a forward declaration of an unscoped enumeration must have an underlying type (int assumed)
-            "/w44545"   # expression before comma evaluates to a function which is missing an argument list
-            "/w44546"   # function call before comma missing argument list
-            "/w44547"   # 'operator': operator before comma has no effect; expected operator with side-effect
-            "/w44548"   # expression before comma has no effect; expected expression with side-effect
-            "/w44549"   # 'operator': operator before comma has no effect; did you intend 'operator'?
-            "/w44555"   # expression has no effect; expected expression with side-effect
-            "/w44574"   # 'identifier' is defined to be '0': did you mean to use '#if identifier'?
-            "/w44608"   # 'symbol1' has already been initialized by another union member in the initializer list, 'symbol2'
-            "/w44619"   # #pragma warning: there is no warning number 'number'
-            "/w44628"   # digraphs not supported with -Ze. Character sequence 'digraph' not interpreted as alternate token for 'char'
-            "/w44640"   # 'instance': construction of local static object is not thread-safe
-            "/w44905"   # wide string literal cast to 'LPSTR'
-            "/w44906"   # string literal cast to 'LPWSTR'
-            "/w44946"   # reinterpret_cast used between related classes: 'class1' and 'class2'
-            "/w44986"   # 'symbol': exception specification does not match previous declaration
-            "/w44988"   # 'symbol': variable declared outside class/function scope
-            "/std:c++latest"
-            "/permissive-"
-            "/Zc:strictStrings-"    # Windows header don't adhere to this
-        )
-        if (GHOUL_WARNINGS_AS_ERRORS)
-            target_compile_options(GhoulTest PRIVATE "/WX")
-        endif ()
-    elseif (APPLE)
-        target_compile_options(
-            GhoulTest
-            PRIVATE
-            "-stdlib=libc++"
-            "-Wall"
-            "-Wextra"
-            # "-Wpedantic"
-
-            "-Wabstract-vbase-init"
-            "-Warray-bounds-pointer-arithmetic"
-            "-Wassign-enum"
-            "-Wauto-import"
-            "-Wbad-function-cast"
-            "-Wbitfield-constant-conversion"
-            "-Wcast-calling-convention"
-            "-Wcast-qual"
-            "-Wchar-subscripts"
-            "-Wcomma"
-            "-Wcomment"
-            "-Wcomplex-component-init"
-            "-Wconditional-uninitialized"
-            "-Wdate-time"
-            "-Wdeprecated-implementations"
-            "-Wdollar-in-identifier-extension"
-            "-Wduplicate-enum"
-            "-Wduplicate-method-match"
-            "-Wempty-body"
-            "-Wfloat-equal"
-            "-Wformat-pedantic"
-            "-Wheader-hygiene"
-            "-Widiomatic-parentheses"
-            "-Wimplicit-fallthrough"
-            "-Wimport-preprocessor-directive-pedantic"
-            "-Winconsistent-missing-override"
-            "-Winfinite-recursion"
-            "-Wkeyword-macro"
-            "-Wlanguage-extension-token"
-            "-Wloop-analysis"
-            "-Wmethod-signatures"
-            "-Wmicrosoft-end-of-file"
-            "-Wmicrosoft-enum-forward-reference"
-            "-Wmicrosoft-fixed-enum"
-            "-Wmicrosoft-flexible-array"
-            "-Wmismatched-tags"
-            "-Wmissing-field-initializers"
-            "-Wmissing-noreturn"
-            "-Wmissing-prototypes"
-            "-Wnewline-eof"
-            "-Wnon-virtual-dtor"
-            "-Wold-style-cast"
-            "-Woverloaded-virtual"
-            "-Wpessimizing-move"
-            "-Wpointer-arith"
-            "-Wpragmas"
-            "-Wredundant-move"
-            "-Wreorder"
-            "-Wsemicolon-before-method-body"
-            "-Wshadow-all"
-            "-Wshift-sign-overflow"
-            "-Wshorten-64-to-32"
-            "-Wsign-compare"
-            "-Wstring-conversion"
-            "-Wtautological-compare"
-            "-Wthread-safety"
-            "-Wundef"
-            "-Wundefined-reinterpret-cast"
-            "-Wuninitialized"
-            "-Wunneeded-internal-declaration"
-            "-Wunneeded-member-function"
-            "-Wunreachable-code-break"
-            "-Wunreachable-code-loop-increment"
-            "-Wunreachable-code-return"
-            "-Wunused-exception-parameter"
-            "-Wunused-label"
-            "-Wunused-local-typedef"
-            "-Wunused-macros"
-            "-Wunused-parameter"
-            "-Wunused-private-field"
-            "-Wunused-result"
-            "-Wunused-variable"
-            "-Wused-but-marked-unused"
-            "-Wvariadic-macros"
-            "-Wvla"
-            "-Wweak-template-vtables"
-            "-Wzero-length-array"
-            "-Wno-missing-braces"
-        )
-        target_compile_definitions(GhoulTest PRIVATE "__gl_h_")
-
-        if (GHOUL_WARNINGS_AS_ERRORS)
-            target_compile_options(GhoulTest PRIVATE "-Werror")
-        endif ()
-
-    elseif (UNIX) # The order is important as UNIX is also true on MacOS
-        target_compile_options(
-            GhoulTest
-            PRIVATE
-            "-ggdb"
-            "-Wall"
-            "-Wextra"
-            "-Wpedantic"
-            "-Wunused-parameter"
-            "-Wuninitialized"
-            "-Wsuggest-attribute=const"
-            "-Wsuggest-final-types"
-            "-Wsuggest-final-methods"
-            "-Wsuggest-override"
-            "-Walloc-zero"
-            "-Wduplicated-cond"
-            "-Wfloat-equal"
-            "-Wshadow"
-            "-Wundef"
-            "-Wcast-qual"
-            "-Wzero-as-null-pointer-constant"
-            "-Wdate-time"
-            "-Wuseless-cast"
-            "-Wlogical-op"
-            "-Wmissing-declarations"
-            "-Wint-in-bool-context"
-
-            "-Wno-write-strings"
-            "-Wnon-virtual-dtor"
-            "-Wold-style-cast"
-            "-Woverloaded-virtual"
-            "-Wno-long-long"
-        )
-
-        if (GHOUL_WARNINGS_AS_ERRORS)
-            target_compile_options(GhoulTest PRIVATE "-Werror")
-        endif ()
-    endif ()
-
-
-    if (WIN32)
         target_compile_options(
             GhoulTest
             PUBLIC
