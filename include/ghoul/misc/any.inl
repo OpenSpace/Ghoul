@@ -50,7 +50,7 @@ any& any::operator=(ValueType&& rhs) {
 }
 
 template <typename ValueType>
-any::holder<ValueType>::holder(const ValueType & value)
+any::holder<ValueType>::holder(const ValueType& value)
     : held(value)
 {}
 

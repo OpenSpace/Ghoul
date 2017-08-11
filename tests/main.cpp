@@ -31,7 +31,16 @@
 // When running the unit tests we don't want to be asked what to do in the case of an
 // assertion
 
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable : 4619) // #pragma warning: there is no warning number '4800' 
+#endif // _MSC_VER
+
 #include "gtest/gtest.h"
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif // _MSC_VER
 
 #include <ghoul/cmdparser/cmdparser>
 #include <ghoul/filesystem/filesystem>
