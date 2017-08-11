@@ -51,6 +51,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+
+// Once the GLM version is updated past c834d06c2739f63e28e5665d4569dca9415e3891
+// this can be removed:
+#if defined(__has_feature)
+#undef __has_feature
+#endif // __has_feature
+
 #include <string>
 
 namespace glm {
