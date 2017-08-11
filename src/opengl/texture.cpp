@@ -101,7 +101,7 @@ Texture::~Texture() {
     }
 
     if (_hasOwnershipOfData) {
-        delete[] reinterpret_cast<GLubyte*>(_pixels);
+        destroyMemory();
     }
 }
 
@@ -322,7 +322,7 @@ const void* Texture::pixelData() const {
 
 void Texture::setPixelData(void* pixels, TakeOwnership takeOwnership) {
     if (_hasOwnershipOfData) {
-        delete reinterpret_cast<GLubyte*>(_pixels);
+        destroyMemory();
     }
     _hasOwnershipOfData = takeOwnership;
     _pixels = pixels;
