@@ -76,8 +76,8 @@ public:
      */
     template <typename ValueType>
     any(ValueType&& value,
-        typename std::enable_if_t<!std::is_same<any&, ValueType>::value>* = 0,
-        typename std::enable_if_t<!std::is_const<ValueType>::value>* = 0);
+        typename std::enable_if_t<!std::is_same<any&, ValueType>::value>* = nullptr,
+        typename std::enable_if_t<!std::is_const<ValueType>::value>* = nullptr);
 
     /// Default destructor 
     ~any() noexcept;

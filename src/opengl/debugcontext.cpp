@@ -44,7 +44,7 @@ void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GL
         Source(source),
         Type(type),
         Severity(severity),
-        static_cast<unsigned int>(id),
+        id,
         std::string(message)
     );
 }

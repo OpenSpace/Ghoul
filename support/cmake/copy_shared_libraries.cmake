@@ -2,7 +2,7 @@
 #                                                                                       #
 # GHOUL                                                                                 #
 #                                                                                       #
-# Copyright (c) 2012-2016                                                               #
+# Copyright (c) 2012-2017                                                               #
 #                                                                                       #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this  #
 # software and associated documentation files (the "Software"), to deal in the Software #
@@ -58,7 +58,6 @@ macro (ghl_copy_shared_libraries target ghoul_dir)
         endif ()
 
         ghl_copy_files(${target} $<TARGET_FILE:Lua>)
-
         ghl_copy_files(${target} ${SHARED_LIBS})
     endif (WIN32)
 endmacro ()
