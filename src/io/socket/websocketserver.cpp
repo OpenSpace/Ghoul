@@ -56,7 +56,7 @@ void WebSocketServer::close() {
 
     // flush out pending connections
     _clientConnectionNotifier.notify_all();
-    closesocket(_serverSocket);
+    closeSocket(_serverSocket);
 
     // wait for server thread to exit
     _serverThread->join();
@@ -109,7 +109,7 @@ void WebSocketServer::listen(std::string address, int port) {
     iResult = bind(_serverSocket, result->ai_addr, static_cast<int>(result->ai_addrlen));
     if (iResult == SOCKET_ERROR) {
         freeaddrinfo(result);
-        closesocket(_serverSocket);
+        closeSocket(_serverSocket);
 #if defined(WIN32)
         WSACleanup();
 #endif
@@ -120,7 +120,7 @@ void WebSocketServer::listen(std::string address, int port) {
     freeaddrinfo(result);
 
     if (::listen(_serverSocket, SOMAXCONN) == SOCKET_ERROR) {
-        closesocket(_serverSocket);
+        closeSocket(_serverSocket);
 #if defined(WIN32)
         WSACleanup();
 #endif
