@@ -62,7 +62,7 @@ std::string DictionaryJsonFormatter::formatDouble(double d) const {
     if (std::equal_to<>()(d, 0.0)) {
         return "0";
     }
-    double exponent = std::log10(std::abs(d));
+    int exponent = static_cast<int>(std::log10(std::abs(d)));
     double base = d / std::pow(10, exponent);
     return std::to_string(base) + "E" + std::to_string(exponent);
 }
