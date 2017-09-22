@@ -289,7 +289,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
         size.y += height;
         movingPos.y -= h;
     }
-    size.y = (lines.size() - 1) * font.height();
+    size.y = lines.size() * font.height();
 
     return { size, static_cast<int>(lines.size()) };
 
