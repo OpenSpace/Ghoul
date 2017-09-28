@@ -56,6 +56,8 @@ namespace {
     
     const char* DefaultVertexShaderPath = "${TEMPORARY}/defaultfontrenderer_vs.glsl";
     const char* DefaultFragmentShaderPath = "${TEMPORARY}/defaultfontrenderer_fs.glsl";
+    const char* ProjectionVertexShaderPath = "${TEMPORARY}/projectionfontrenderer_vs.glsl";
+    const char* ProjectionFragmentShaderPath = "${TEMPORARY}/projectionfontrenderer_fs.glsl";
 
     const char* DefaultVertexShaderSource = "\
     #version __CONTEXT__ \n\
@@ -84,6 +86,57 @@ namespace {
     \n\
     out vec4 FragColor; \n\
     \n\
+    uniform sampler2D tex; \n\
+    uniform vec4 baseColor; \n\
+    uniform vec4 outlineColor; \n\
+    uniform bool hasOutline; \n\
+    \n\
+    void main() { \n\
+        if (hasOutline) { \n\
+            float inside = texture(tex, texCoords).r;\n\
+            float outline = texture(tex, outlineTexCoords).r;\n\
+            vec4 blend = mix(outlineColor, baseColor, inside);\n\
+            FragColor = blend * vec4(1.0, 1.0, 1.0, outline);\n\
+        } \n\
+        else { \n\
+            FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r); \n\
+        } \n\
+    }";
+
+    const char* ProjectionVertexShaderSource = "\
+    #version __CONTEXT__ \n\
+    const double PARSEC = 0.308567756e17LF; \n\
+    \n\
+    layout (location = 0) in vec3 in_position; \n\
+    layout (location = 1) in vec2 in_texCoords; \n\
+    layout (location = 2) in vec2 in_outlineTexCoords; \n\
+    \n\
+    layout (location = 0) out vec2 texCoords; \n\
+    layout (location = 1) out vec2 outlineTexCoords; \n\
+    \n\
+    uniform dmat4 projection; \n\
+    uniform float textScale; \n\
+    \n\
+    out float depth; \n\
+    void main() { \n\
+        texCoords = in_texCoords; \n\
+        outlineTexCoords = in_outlineTexCoords; \n\
+        vec4 finalPos = vec4(projection * dvec4(dvec3(in_position) * textScale, 1.0)); \n\
+        float depth = finalPos.w; \n\
+        finalPos.z = 0.0; \n\
+        gl_Position = finalPos; \n\
+    } \n\
+    ";
+
+    const char* ProjectionFragmentShaderSource = "\
+    #version __CONTEXT__ \n\
+    \n\
+    layout (location = 0) in vec2 texCoords; \n\
+    layout (location = 1) in vec2 outlineTexCoords; \n\
+    \n\
+    out vec4 FragColor; \n\
+    \n\
+    in float depth; \n\
     uniform sampler2D tex; \n\
     uniform vec4 baseColor; \n\
     uniform vec4 outlineColor; \n\
@@ -158,6 +211,39 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     program->compileShaderObjects();
     
     LDEBUG("Link default font shader");
+    program->linkProgramObject();
+
+    auto fontRenderer = new FontRenderer;
+    fontRenderer->_program = std::move(program);
+    return std::unique_ptr<FontRenderer>(fontRenderer);
+}
+
+std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
+    std::string vsPath = absPath(ProjectionVertexShaderPath);
+    LDEBUG("Writing default vertex shader to '" << vsPath << "'");
+    std::ofstream file(vsPath);
+    file << ProjectionVertexShaderSource;
+    file.close();
+
+    std::string fsPath = absPath(ProjectionFragmentShaderPath);
+    LDEBUG("Writing default fragment shader to '" << fsPath << "'");
+    file.open(fsPath);
+    file << ProjectionFragmentShaderSource;
+    file.close();
+
+    using namespace opengl;
+    std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>("ProjectionFont");
+    program->attachObject(
+        std::make_unique<ShaderObject>(ShaderObject::ShaderType::Vertex, vsPath)
+    );
+    program->attachObject(
+        std::make_unique<ShaderObject>(ShaderObject::ShaderType::Fragment, fsPath)
+    );
+
+    LDEBUG("Compile projection font shader");
+    program->compileShaderObjects();
+
+    LDEBUG("Link projection font shader");
     program->linkProgramObject();
 
     auto fontRenderer = new FontRenderer;
@@ -304,6 +390,48 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
+
+    va_list args;     // Pointer To List Of Arguments
+    va_start(args, format); // Parses The String For Variables
+
+    int size = 1 + vscprintf(format, args);
+    char* buffer = new char[size];
+
+    memset(buffer, 0, size);
+
+#ifdef _MSC_VER
+    vsprintf_s(buffer, size, format, args);
+#else
+    vsprintf(buffer, format, args);
+#endif
+    va_end(args);
+    
+    auto res = internalRender(
+        font,
+        std::move(glm::vec2(pos)),
+        std::move(color),
+        std::move(outlineColor),
+        buffer
+    );
+    
+    delete[] buffer;
+
+    return res;
+}
+    
+
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
+                                                          glm::vec3 pos,
+                                                          glm::vec4 color,
+                                                          glm::vec4 outlineColor,
+                                                          const float textScale,
+                                                          glm::dmat4 modelViewMatrix,
+                                                          glm::dmat4 projectionMatrix, 
+                                                          glm::vec3 orthonormalRight,
+                                                          glm::vec3 orthonormalUp,
+                                                          const char* format, ...) const
+{
+    ghoul_assert(format != nullptr, "No format is provided");
     
     va_list args;     // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables
@@ -320,42 +448,48 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 #endif
     va_end(args);
     
-    auto res = internalRender(
+    auto res = internalProjectionRender(
         font,
         std::move(pos),
         std::move(color),
         std::move(outlineColor),
-        buffer
+        buffer,
+        textScale,
+        modelViewMatrix,
+        projectionMatrix,
+        orthonormalRight,
+        orthonormalUp
     );
+    
     delete[] buffer;
 
     return res;
 }
-    
+
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec2 pos,
                                                           glm::vec4 color,
                                                           const char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
-    
+
     va_list args;     // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables
-    
+
     int size = 1 + vscprintf(format, args);
     std::vector<char> buffer(size);
     memset(buffer.data(), 0, size);
-    
+
 #ifdef _MSC_VER
     vsprintf_s(buffer.data(), size, format, args);
 #else
     vsprintf(buffer.data(), format, args);
 #endif
     va_end(args);
-    
+
     auto res = internalRender(
         font,
-        std::move(pos),
+        std::move(glm::vec2(pos)),
         color,
         glm::vec4(0.f, 0.f, 0.f, color.a),
         buffer.data()
@@ -364,8 +498,89 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     return res;
 }
 
+
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
+                                                          glm::vec3 pos,
+                                                          glm::vec4 color,
+                                                          const float textScale,
+                                                          glm::dmat4 modelViewMatrix,
+                                                          glm::dmat4 projectionMatrix,
+                                                          glm::vec3 orthonormalRight,
+                                                          glm::vec3 orthonormalUp,
+                                                          const char* format, ...) const
+{
+    ghoul_assert(format != nullptr, "No format is provided");
+    
+    va_list args;     // Pointer To List Of Arguments
+    va_start(args, format); // Parses The String For Variables
+    
+    int size = 1 + vscprintf(format, args);
+    std::vector<char> buffer(size);
+    memset(buffer.data(), 0, size);
+    
+#ifdef _MSC_VER
+    vsprintf_s(buffer.data(), size, format, args);
+#else
+    vsprintf(buffer.data(), format, args);
+#endif
+    va_end(args);
+
+    auto res = internalProjectionRender(
+        font,
+        std::move(pos),
+        color,
+        glm::vec4(0.f, 0.f, 0.f, color.a),
+        buffer.data(),
+        textScale,
+        modelViewMatrix,
+        projectionMatrix,
+        orthonormalRight,
+        orthonormalUp
+    );
+    
+    return res;
+}
+
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec2 pos,
+                                                          const char* format, ...) const
+{
+    ghoul_assert(format != nullptr, "No format is provided");
+
+    va_list args;     // Pointer To List Of Arguments
+    va_start(args, format); // Parses The String For Variables
+
+    int size = 1 + vscprintf(format, args);
+    std::vector<char> buffer(size);
+
+    memset(buffer.data(), 0, size);
+
+#ifdef _MSC_VER
+    vsprintf_s(buffer.data(), size, format, args);
+#else
+    vsprintf(buffer.data(), format, args);
+#endif
+    va_end(args);
+
+    auto res = internalRender(
+        font,
+        std::move(glm::vec2(pos)),
+        glm::vec4(1.f),
+        glm::vec4(0.f, 0.f, 0.f, 1.f),
+        buffer.data()
+    );
+    
+    return res;
+}
+
+
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
+                                                          glm::vec3 pos,
+                                                          const float textScale,
+                                                          glm::dmat4 modelViewMatrix,
+                                                          glm::dmat4 projectionMatrix,
+                                                          glm::vec3 orthonormalRight,
+                                                          glm::vec3 orthonormalUp,
                                                           const char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
@@ -385,12 +600,17 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 #endif
     va_end(args);
     
-    auto res = internalRender(
+    auto res = internalProjectionRender(
         font,
         std::move(pos),
         glm::vec4(1.f),
         glm::vec4(0.f, 0.f, 0.f, 1.f),
-        buffer.data()
+        buffer.data(),
+        textScale,
+        modelViewMatrix,
+        projectionMatrix,
+        orthonormalRight,
+        orthonormalUp
     );
     
     return res;
@@ -441,12 +661,12 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
         movingPos.x = pos.x;
         float width = 0.f;
         float height = 0.f;
-        for (size_t j = 0 ; j < line.size(); ++j) {
+        for (size_t j = 0; j < line.size(); ++j) {
             wchar_t character = line[j];
             if (character == wchar_t('\t'))
                 character = wchar_t(' ');
 
-        const Font::Glyph* glyph;
+            const Font::Glyph* glyph;
             try {
                 glyph = font.glyph(character);
             }
@@ -508,8 +728,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
     _program->setUniform("baseColor", color);
     _program->setUniform("outlineColor", outlineColor);
     _program->setUniform("tex", atlasUnit);
-    _program->setUniform("projection", projection);
     _program->setUniform("hasOutline", font.hasOutline());
+    _program->setUniform("projection", projection);    
     _program->setIgnoreUniformLocationError(opengl::ProgramObject::IgnoreError::No);
     
     glBindVertexArray(_vao);
@@ -559,7 +779,197 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
     
     return { size, static_cast<int>(lines.size()) };
 }
+
+FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font& font,
+    glm::vec3 pos,
+    glm::vec4 color,
+    glm::vec4 outlineColor,
+    const char* buffer,
+    const float textScale,
+    glm::dmat4 modelViewMatrix,
+    glm::dmat4 projectionMatrix,
+    glm::vec3 orthonormalRight,
+    glm::vec3 orthonormalUp)
+    const
+{
+    float h = font.height();
+
+    // Splitting the text into separate lines
+    const char* start_line = buffer;
+    std::vector<std::string> lines;
+    const char* c;
+    for (c = buffer; *c; c++) {
+        if (*c == '\n') {
+            std::string line;
+            for (const char* n = start_line; n < c; ++n)
+                line.append(1, *n);
+            lines.push_back(line);
+            start_line = c + 1;
+        }
+    }
+    if (start_line) {
+        std::string line;
+        for (const char* n = start_line; n < c; ++n)
+            line.append(1, *n);
+        lines.push_back(line);
+    }
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    _program->activate();
+
+    unsigned int vertexIndex = 0;
+    std::vector<GLuint> indices;
+    std::vector<GLfloat> vertices;
+    //glm::vec3 movingPos = pos;
+    // TODO: review y starting position
+    glm::vec2 movingPos(0.f);
+
+    glm::vec2 size = glm::vec2(0.f);
+    for (const std::string& line : lines) {
+        movingPos.x = 0.f;
+        //movingPos.x = pos.x;
+        float width = 0.f;
+        float height = 0.f;
+        for (size_t j = 0; j < line.size(); ++j) {
+            wchar_t character = line[j];
+            if (character == wchar_t('\t'))
+                character = wchar_t(' ');
+
+            const Font::Glyph* glyph;
+            try {
+                glyph = font.glyph(character);
+            }
+            catch (const Font::FontException&) {
+                glyph = font.glyph(wchar_t(' '));
+            }
+
+            if (j > 0) {
+                movingPos.x += glyph->kerning(line[j - 1]);
+            }
+
+            float x0 = movingPos.x + glyph->leftBearing();
+            float y0 = movingPos.y + glyph->topBearing();
+            float s0 = glyph->topLeft().x;
+            float t0 = glyph->topLeft().y;
+            float outlineS0 = glyph->outlineTopLeft().x;
+            float outlineT0 = glyph->outlineTopLeft().y;
+
+            float x1 = x0 + glyph->width();
+            float y1 = y0 - glyph->height();
+            float s1 = glyph->bottomRight().x;
+            float t1 = glyph->bottomRight().y;
+            float outlineS1 = glyph->outlineBottomRight().x;
+            float outlineT1 = glyph->outlineBottomRight().y;
+
+            indices.insert(indices.end(), {
+                vertexIndex, vertexIndex + 1, vertexIndex + 2,
+                vertexIndex, vertexIndex + 2, vertexIndex + 3
+            });
+            vertexIndex += 4;
+            
+            glm::vec3 p0 = x0 * orthonormalRight + y0 * orthonormalUp + pos;
+            glm::vec3 p1 = x0 * orthonormalRight + y1 * orthonormalUp + pos;
+            glm::vec3 p2 = x1 * orthonormalRight + y1 * orthonormalUp + pos;
+            glm::vec3 p3 = x1 * orthonormalRight + y0 * orthonormalUp + pos;
+
+            /*vertices.insert(vertices.end(), {
+                x0, y0, s0, t0, outlineS0, outlineT0,
+                x0, y1, s0, t1, outlineS0, outlineT1,
+                x1, y1, s1, t1, outlineS1, outlineT1,
+                x1, y0, s1, t0, outlineS1, outlineT0
+            });*/
+
+            vertices.insert(vertices.end(), {
+                p0.x, p0.y, p0.z, s0, t0, outlineS0, outlineT0,
+                p1.x, p1.y, p1.z, s0, t1, outlineS0, outlineT1,
+                p2.x, p2.y, p2.z, s1, t1, outlineS1, outlineT1,
+                p3.x, p3.y, p3.z, s1, t0, outlineS1, outlineT0
+            });
+
+            movingPos.x += glyph->horizontalAdvance();
+
+            width += glyph->horizontalAdvance();
+            height = std::max(height, static_cast<float>(glyph->height()));
+        } // end of a line
+        size.x = std::max(size.x, width);
+        size.y += height;
+        movingPos.y -= h;
+    }
+    size.y = (lines.size() - 1) * font.height();
+
+    glm::mat4 projection = glm::ortho(
+        0.f,
+        _framebufferSize.x,
+        0.f,
+        _framebufferSize.y
+    );
+
+    opengl::TextureUnit atlasUnit;
+    atlasUnit.activate();
+    font.atlas().texture().bind();
+
+    _program->setIgnoreUniformLocationError(opengl::ProgramObject::IgnoreError::Yes);
+    _program->setUniform("baseColor", color);
+    _program->setUniform("outlineColor", outlineColor);
+    _program->setUniform("tex", atlasUnit);
+    _program->setUniform("hasOutline", font.hasOutline());
+    _program->setUniform("projection", projectionMatrix * modelViewMatrix);
+    _program->setUniform("textScale", textScale);
     
+    _program->setIgnoreUniformLocationError(opengl::ProgramObject::IgnoreError::No);
+
+    glBindVertexArray(_vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        vertices.size() * sizeof(float),
+        vertices.data(),
+        GL_DYNAMIC_DRAW
+    );
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        indices.size() * sizeof(GLuint),
+        indices.data(),
+        GL_DYNAMIC_DRAW
+    );
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), nullptr);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(
+        1, 2, GL_FLOAT, GL_FALSE,
+        7 * sizeof(float), reinterpret_cast<const void*>(3 * sizeof(float))
+    );
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(
+        2, 2, GL_FLOAT, GL_FALSE,
+        7 * sizeof(float), reinterpret_cast<const void*>(5 * sizeof(float))
+    );
+
+    glDrawElements(
+        GL_TRIANGLES,
+        static_cast<GLsizei>(indices.size()),
+        GL_UNSIGNED_INT,
+        nullptr
+    );
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+
+    return { size, static_cast<int>(lines.size()) };
+}
+
+
 void FontRenderer::setFramebufferSize(glm::vec2 framebufferSize) {
     _framebufferSize = std::move(framebufferSize);
 }

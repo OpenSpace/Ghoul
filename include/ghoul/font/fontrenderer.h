@@ -85,7 +85,7 @@ public:
     ~FontRenderer();
 
     /**
-    * Creates a new instnace of the FontRenderer with a default ProgramObject.
+    * Creates a new instance of the FontRenderer with a default ProgramObject.
     * This method requires the FileSystem to be initialized, as temporary
     * files containing the source code of the ShaderObjects will be created. 
     * This method requires a valid OpenGL state.
@@ -93,6 +93,16 @@ public:
     */
     static std::unique_ptr<FontRenderer> createDefault();
     
+    /**
+    * Creates a new instance of the FontRenderer with a perspective subject 
+    * ProgramObject.
+    * This method requires the FileSystem to be initialized, as temporary
+    * files containing the source code of the ShaderObjects will be created.
+    * This method requires a valid OpenGL state.
+    * \return a raw pointer to the new default instance
+    */
+    static std::unique_ptr<FontRenderer> createProjectionSubjectText();
+
     /**
      * Initializes the singleton variant of the FontRenderer with the default
      * ProgramObject. This method requires the FileSystem to be initialized, as temporary
@@ -156,7 +166,8 @@ public:
      * <code>color</code> and the outline color <code>outlineColor</code>. If the Font
      * does not have an outline, the <code>outlineColor</code> is ignored.
      * \param font The Font that is used to render the provided text
-     * \param pos The screen-space position (in pixel coordinates) that is used to render
+     * \param pos The screen-space position (in pixel coordinates) for 2D text rendering,
+     * or world-space coordinate for projection subject rendering, that is used to render
      * the text
      * \param color The base color that is used to render the text
      * \param outlineColor The outline color that is used to render the text if the Font
@@ -171,6 +182,37 @@ public:
      */
     BoundingBoxInformation render(Font& font, glm::vec2 pos, glm::vec4 color,
         glm::vec4 outlineColor, const char* format, ...) const;
+    
+    /**
+    * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
+    * coordinates <code>pos</code> using the Font <code>font</code> in the base color
+    * <code>color</code> and the outline color <code>outlineColor</code>. If the Font
+    * does not have an outline, the <code>outlineColor</code> is ignored.
+    * \param font The Font that is used to render the provided text
+    * \param pos The world-space coordinate for projection subject rendering that 
+    * is used to render the text
+    * \param color The base color that is used to render the text
+    * \param outlineColor The outline color that is used to render the text if the Font
+    * has an outline
+    * \param textScale Scale applied on the rendered text.
+    * \param modelViewMatrix ModelView matrix transformation.
+    * \param projectionMatrix Projection matrix transformation.
+    * \param orthonormalRight Right vector from the orthonormal basis defining the
+    * text's plane.
+    * \param orthonormalUp Up vector from the orthonormal basis defining the
+    * text's plane.
+    * \param format The format text that is rendered to the screen. This text can contain
+    * symbolic constants (the same as in printf) to refer to later variable arguments,
+    * which are substituted. The <code>text</code> can also contain '\\n' to have a
+    * linebreak, which is of the correct length with regard to the selected font. This
+    * parameter cannot be a <code>nullptr</code>.
+    * \return A tuple containing the bounding box of the text that was printed and the
+    * number of lines that were printed
+    */
+    BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
+        glm::vec4 outlineColor, const float textScale, glm::dmat4 modelViewMatrix,
+        glm::dmat4 projectionMatrix, glm::vec3 orthonormalRight,
+        glm::vec3 orthonormalUp, const char* format, ...) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -192,6 +234,36 @@ public:
     BoundingBoxInformation render(Font& font, glm::vec2 pos, glm::vec4 color,
         const char* format, ...) const;
 
+    
+    /**
+    * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
+    * coordinates <code>pos</code> using the Font <code>font</code> in the base color
+    * <code>color</code>. In case the Font has an outline, the outline is rendered in
+    * black with the same transparency as the provided <code>color</code>.
+    * \param font The Font that is used to render the provided text
+    * \param pos The world-space coordinate for projection subject rendering, 
+    * that is used to render the text
+    * \param color The base color that is used to render the text
+    * \param textScale Scale applied on the rendered text.
+    * \param modelViewMatrix ModelView matrix transformation.
+    * \param projectionMatrix Projection matrix transformation.
+    * \param orthonormalRight Right vector from the orthonormal basis defining the
+    * text's plane.
+    * \param orthonormalUp Up vector from the orthonormal basis defining the
+    * text's plane.
+    * \param format The format text that is rendered to the screen. This text can contain
+    * symbolic constants (the same as in printf) to refer to later variable arguments,
+    * which are substituted. The <code>text</code> can also contain '\\n' to have a
+    * linebreak, which is of the correct length with regard to the selected font. This
+    * parameter cannot be a <code>nullptr</code>.
+    * \return A tuple containing the bounding box of the text that was printed and the
+    * number of lines that were printed
+    */
+    BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
+        const float textScale, glm::dmat4 modelViewMatrix, glm::dmat4 projectionMatrix,
+        glm::vec3 orthonormalRight, glm::vec3 orthonormalUp,
+        const char* format, ...) const;
+
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
      * coordinates <code>pos</code> using the Font <code>font</code> in white color. In
@@ -209,6 +281,32 @@ public:
      */
     BoundingBoxInformation render(Font& font, glm::vec2 pos,
         const char* format, ...) const;
+
+    /**
+    * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
+    * coordinates <code>pos</code> using the Font <code>font</code> in white color. In
+    * case the Font has an outline, the outline is rendered in black.
+    * \param font The Font that is used to render the provided text
+    * \param pos The world-space coordinate for projection subject rendering that is 
+    * used to render the text
+    * \param textScale Scale applied on the rendered text.
+    * \param modelViewMatrix ModelView matrix transformation.
+    * \param projectionMatrix Projection matrix transformation.
+    * \param orthonormalRight Right vector from the orthonormal basis defining the
+    * text's plane.
+    * \param orthonormalUp Up vector from the orthonormal basis defining the
+    * text's plane.
+    * \param format The format text that is rendered to the screen. This text can contain
+    * symbolic constants (the same as in printf) to refer to later variable arguments,
+    * which are substituted. The <code>text</code> can also contain '\\n' to have a
+    * linebreak, which is of the correct length with regard to the selected font. This
+    * parameter cannot be a <code>nullptr</code>.
+    * \return A tuple containing the bounding box of the text that was printed and the
+    * number of lines that were printed
+    */
+    BoundingBoxInformation render(Font& font, glm::vec3 pos, const float textScale, 
+        glm::dmat4 modelViewMatrix, glm::dmat4 projectionMatrix, glm::vec3 orthonormalRight, 
+        glm::vec3 orthonormalUp, const char* format, ...) const;
     
 private:
     /// Private constructor that is used in the #initialize static method
@@ -217,6 +315,11 @@ private:
     BoundingBoxInformation internalRender(Font& font, glm::vec2 pos, glm::vec4 color,
         glm::vec4 outlineColor, const char* buffer) const;
     
+    BoundingBoxInformation internalProjectionRender(Font& font, glm::vec3 pos, glm::vec4 color,
+        glm::vec4 outlineColor, const char* buffer, const float textScale, glm::dmat4 modelViewMatrix,
+        glm::dmat4 projectionMatrix, glm::vec3 orthonormalRight, glm::vec3 orthonormalUp) const;
+
+
     /// The singleton instance of the default FontRenderer
     static std::unique_ptr<FontRenderer> _defaultRenderer;
     
