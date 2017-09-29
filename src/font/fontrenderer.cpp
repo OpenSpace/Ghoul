@@ -115,13 +115,14 @@ namespace {
     layout (location = 1) out vec2 outlineTexCoords; \n\
     \n\
     uniform dmat4 projection; \n\
-    uniform float textScale; \n\
+    //uniform float textScale; \n\
     \n\
     out float depth; \n\
     void main() { \n\
         texCoords = in_texCoords; \n\
         outlineTexCoords = in_outlineTexCoords; \n\
-        vec4 finalPos = vec4(projection * dvec4(dvec3(in_position) * textScale, 1.0)); \n\
+        //vec4 finalPos = vec4(projection * dvec4(dvec3(in_position) * textScale, 1.0)); \n\
+        vec4 finalPos = vec4(projection * dvec4(dvec3(in_position), 1.0)); \n\
         float depth = finalPos.w; \n\
         finalPos.z = 0.0; \n\
         gl_Position = finalPos; \n\
@@ -870,18 +871,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
             });
             vertexIndex += 4;
             
-            glm::vec3 p0 = x0 * orthonormalRight + y0 * orthonormalUp + pos;
-            glm::vec3 p1 = x0 * orthonormalRight + y1 * orthonormalUp + pos;
-            glm::vec3 p2 = x1 * orthonormalRight + y1 * orthonormalUp + pos;
-            glm::vec3 p3 = x1 * orthonormalRight + y0 * orthonormalUp + pos;
-
-            /*vertices.insert(vertices.end(), {
-                x0, y0, s0, t0, outlineS0, outlineT0,
-                x0, y1, s0, t1, outlineS0, outlineT1,
-                x1, y1, s1, t1, outlineS1, outlineT1,
-                x1, y0, s1, t0, outlineS1, outlineT0
-            });*/
-
+            glm::vec3 p0 = (x0 * orthonormalRight + y0 * orthonormalUp) * textScale + pos;
+            glm::vec3 p1 = (x0 * orthonormalRight + y1 * orthonormalUp) * textScale + pos;
+            glm::vec3 p2 = (x1 * orthonormalRight + y1 * orthonormalUp) * textScale + pos;
+            glm::vec3 p3 = (x1 * orthonormalRight + y0 * orthonormalUp) * textScale + pos;
+            
             vertices.insert(vertices.end(), {
                 p0.x, p0.y, p0.z, s0, t0, outlineS0, outlineT0,
                 p1.x, p1.y, p1.z, s0, t1, outlineS0, outlineT1,
@@ -917,7 +911,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
     _program->setUniform("tex", atlasUnit);
     _program->setUniform("hasOutline", font.hasOutline());
     _program->setUniform("projection", projectionMatrix * modelViewMatrix);
-    _program->setUniform("textScale", textScale);
+    //_program->setUniform("textScale", textScale);
     
     _program->setIgnoreUniformLocationError(opengl::ProgramObject::IgnoreError::No);
 
