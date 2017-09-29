@@ -195,6 +195,7 @@ public:
     * \param outlineColor The outline color that is used to render the text if the Font
     * has an outline
     * \param textScale Scale applied on the rendered text.
+    * \param textMinSize Minimal size (in pixels) for a text to be rendered.
     * \param modelViewMatrix ModelView matrix transformation.
     * \param projectionMatrix Projection matrix transformation.
     * \param orthonormalRight Right vector from the orthonormal basis defining the
@@ -210,8 +211,8 @@ public:
     * number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
-        glm::vec4 outlineColor, const float textScale, glm::dmat4 modelViewMatrix,
-        glm::dmat4 projectionMatrix, glm::vec3 orthonormalRight,
+        glm::vec4 outlineColor, const float textScale, const int textMinSize, 
+        glm::dmat4 modelViewMatrix, glm::dmat4 projectionMatrix, glm::vec3 orthonormalRight,
         glm::vec3 orthonormalUp, const char* format, ...) const;
 
     /**
@@ -245,6 +246,7 @@ public:
     * that is used to render the text
     * \param color The base color that is used to render the text
     * \param textScale Scale applied on the rendered text.
+    * \param textMinSize Minimal size (in pixels) for a text to be rendered.
     * \param modelViewMatrix ModelView matrix transformation.
     * \param projectionMatrix Projection matrix transformation.
     * \param orthonormalRight Right vector from the orthonormal basis defining the
@@ -260,8 +262,8 @@ public:
     * number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
-        const float textScale, glm::dmat4 modelViewMatrix, glm::dmat4 projectionMatrix,
-        glm::vec3 orthonormalRight, glm::vec3 orthonormalUp,
+        const float textScale, const int textMinSize, glm::dmat4 modelViewMatrix, 
+        glm::dmat4 projectionMatrix, glm::vec3 orthonormalRight, glm::vec3 orthonormalUp,
         const char* format, ...) const;
 
     /**
@@ -290,6 +292,7 @@ public:
     * \param pos The world-space coordinate for projection subject rendering that is 
     * used to render the text
     * \param textScale Scale applied on the rendered text.
+    * \param textMinSize Minimal size (in pixels) for a text to be rendered.
     * \param modelViewMatrix ModelView matrix transformation.
     * \param projectionMatrix Projection matrix transformation.
     * \param orthonormalRight Right vector from the orthonormal basis defining the
@@ -305,8 +308,8 @@ public:
     * number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, glm::vec3 pos, const float textScale, 
-        glm::dmat4 modelViewMatrix, glm::dmat4 projectionMatrix, glm::vec3 orthonormalRight, 
-        glm::vec3 orthonormalUp, const char* format, ...) const;
+        const int textMinSize, glm::dmat4 modelViewMatrix, glm::dmat4 projectionMatrix, 
+        glm::vec3 orthonormalRight, glm::vec3 orthonormalUp, const char* format, ...) const;
     
 private:
     /// Private constructor that is used in the #initialize static method
@@ -316,8 +319,9 @@ private:
         glm::vec4 outlineColor, const char* buffer) const;
     
     BoundingBoxInformation internalProjectionRender(Font& font, glm::vec3 pos, glm::vec4 color,
-        glm::vec4 outlineColor, const char* buffer, const float textScale, glm::dmat4 modelViewMatrix,
-        glm::dmat4 projectionMatrix, glm::vec3 orthonormalRight, glm::vec3 orthonormalUp) const;
+        glm::vec4 outlineColor, const char* buffer, const float textScale, const int textMinSize, 
+        glm::dmat4 modelViewMatrix, glm::dmat4 projectionMatrix, glm::vec3 orthonormalRight, 
+        glm::vec3 orthonormalUp) const;
 
 
     /// The singleton instance of the default FontRenderer

@@ -34,6 +34,7 @@
 #include <ghoul/opengl/textureunit.h>
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include <cstdarg>
 #include <fstream>
@@ -426,6 +427,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec4 color,
                                                           glm::vec4 outlineColor,
                                                           const float textScale,
+                                                          const int textMinSize,
                                                           glm::dmat4 modelViewMatrix,
                                                           glm::dmat4 projectionMatrix, 
                                                           glm::vec3 orthonormalRight,
@@ -456,6 +458,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         std::move(outlineColor),
         buffer,
         textScale,
+        textMinSize,
         modelViewMatrix,
         projectionMatrix,
         orthonormalRight,
@@ -504,6 +507,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec3 pos,
                                                           glm::vec4 color,
                                                           const float textScale,
+                                                          const int textMinSize,
                                                           glm::dmat4 modelViewMatrix,
                                                           glm::dmat4 projectionMatrix,
                                                           glm::vec3 orthonormalRight,
@@ -533,6 +537,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         glm::vec4(0.f, 0.f, 0.f, color.a),
         buffer.data(),
         textScale,
+        textMinSize,
         modelViewMatrix,
         projectionMatrix,
         orthonormalRight,
@@ -578,6 +583,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec3 pos,
                                                           const float textScale,
+                                                          const int textMinSize,
                                                           glm::dmat4 modelViewMatrix,
                                                           glm::dmat4 projectionMatrix,
                                                           glm::vec3 orthonormalRight,
@@ -608,6 +614,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         glm::vec4(0.f, 0.f, 0.f, 1.f),
         buffer.data(),
         textScale,
+        textMinSize,
         modelViewMatrix,
         projectionMatrix,
         orthonormalRight,
@@ -782,16 +789,17 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font& font,
-    glm::vec3 pos,
-    glm::vec4 color,
-    glm::vec4 outlineColor,
-    const char* buffer,
-    const float textScale,
-    glm::dmat4 modelViewMatrix,
-    glm::dmat4 projectionMatrix,
-    glm::vec3 orthonormalRight,
-    glm::vec3 orthonormalUp)
-    const
+                                                                            glm::vec3 pos,
+                                                                            glm::vec4 color,
+                                                                            glm::vec4 outlineColor,
+                                                                            const char* buffer,
+                                                                            const float textScale,
+                                                                            const int textMinSize,
+                                                                            glm::dmat4 modelViewMatrix,
+                                                                            glm::dmat4 projectionMatrix,
+                                                                            glm::vec3 orthonormalRight,
+                                                                            glm::vec3 orthonormalUp)
+                                                                            const
 {
     float h = font.height();
 
@@ -863,25 +871,43 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
             float s1 = glyph->bottomRight().x;
             float t1 = glyph->bottomRight().y;
             float outlineS1 = glyph->outlineBottomRight().x;
-            float outlineT1 = glyph->outlineBottomRight().y;
-
-            indices.insert(indices.end(), {
-                vertexIndex, vertexIndex + 1, vertexIndex + 2,
-                vertexIndex, vertexIndex + 2, vertexIndex + 3
-            });
-            vertexIndex += 4;
+            float outlineT1 = glyph->outlineBottomRight().y;            
             
             glm::vec3 p0 = (x0 * orthonormalRight + y0 * orthonormalUp) * textScale + pos;
             glm::vec3 p1 = (x0 * orthonormalRight + y1 * orthonormalUp) * textScale + pos;
             glm::vec3 p2 = (x1 * orthonormalRight + y1 * orthonormalUp) * textScale + pos;
             glm::vec3 p3 = (x1 * orthonormalRight + y0 * orthonormalUp) * textScale + pos;
             
+            // Calculate the positions of the lower left and upper right corners of the
+            // billboard in screen-space
+            glm::vec4 projPos[2];
+            glm::dmat4 modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
+            projPos[0] = glm::vec4(modelViewProjectionMatrix * glm::dvec4(p1, 1.0));
+            projPos[1] = glm::vec4(modelViewProjectionMatrix * glm::dvec4(p3, 1.0));
+            glm::vec4 ll = (((projPos[0] / projPos[0].w) + glm::vec4(1.0)) / glm::vec4(2.0)) * glm::vec4(
+            _framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
+            glm::vec4 ur = (((projPos[1] / projPos[1].w) + glm::vec4(1.0)) / glm::vec4(2.0)) * glm::vec4(
+                _framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
+
+            // The billboard is smaller than one pixel, we can discard it
+            float sizeInPixels = length(abs(glm::vec2(ll.x, ll.y) - glm::vec2(ur.x, ur.y)));            
+            if (sizeInPixels < static_cast<float>(textMinSize)) {
+                continue;
+            }
+
+
             vertices.insert(vertices.end(), {
                 p0.x, p0.y, p0.z, s0, t0, outlineS0, outlineT0,
                 p1.x, p1.y, p1.z, s0, t1, outlineS0, outlineT1,
                 p2.x, p2.y, p2.z, s1, t1, outlineS1, outlineT1,
                 p3.x, p3.y, p3.z, s1, t0, outlineS1, outlineT0
             });
+
+            indices.insert(indices.end(), {
+                vertexIndex, vertexIndex + 1, vertexIndex + 2,
+                vertexIndex, vertexIndex + 2, vertexIndex + 3
+            });
+            vertexIndex += 4;
 
             movingPos.x += glyph->horizontalAdvance();
 
@@ -912,6 +938,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
     _program->setUniform("hasOutline", font.hasOutline());
     _program->setUniform("projection", projectionMatrix * modelViewMatrix);
     //_program->setUniform("textScale", textScale);
+    _program->setUniform("textMinSize", textMinSize);
     
     _program->setIgnoreUniformLocationError(opengl::ProgramObject::IgnoreError::No);
 
