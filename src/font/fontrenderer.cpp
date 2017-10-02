@@ -823,12 +823,6 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
         lines.push_back(line);
     }
 
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    _program->activate();
-
     unsigned int vertexIndex = 0;
     std::vector<GLuint> indices;
     std::vector<GLfloat> vertices;
@@ -878,24 +872,27 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
             glm::vec3 p2 = (x1 * orthonormalRight + y1 * orthonormalUp) * textScale + pos;
             glm::vec3 p3 = (x1 * orthonormalRight + y0 * orthonormalUp) * textScale + pos;
             
-            // Calculate the positions of the lower left and upper right corners of the
-            // billboard in screen-space
-            glm::vec4 projPos[2];
-            glm::dmat4 modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
-            projPos[0] = glm::vec4(modelViewProjectionMatrix * glm::dvec4(p1, 1.0));
-            projPos[1] = glm::vec4(modelViewProjectionMatrix * glm::dvec4(p3, 1.0));
-            glm::vec4 ll = (((projPos[0] / projPos[0].w) + glm::vec4(1.0)) / glm::vec4(2.0)) * glm::vec4(
-            _framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
-            glm::vec4 ur = (((projPos[1] / projPos[1].w) + glm::vec4(1.0)) / glm::vec4(2.0)) * glm::vec4(
-                _framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
+            if (character != 32 ) {
+                // Calculate the positions of the lower left and upper right corners of the
+                // billboard in screen-space
+                glm::vec4 projPos[2];
+                glm::dmat4 modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
+                projPos[0] = glm::vec4(modelViewProjectionMatrix * glm::dvec4(p0, 1.0));
+                projPos[1] = glm::vec4(modelViewProjectionMatrix * glm::dvec4(p1, 1.0));
+                glm::vec4 topLeft = (((projPos[0] / projPos[0].w) + glm::vec4(1.0)) / glm::vec4(2.0)) * glm::vec4(
+                    _framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
+                glm::vec4 bottomLeft = (((projPos[1] / projPos[1].w) + glm::vec4(1.0)) / glm::vec4(2.0)) * glm::vec4(
+                    _framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
 
-            // The billboard is smaller than one pixel, we can discard it
-            float sizeInPixels = length(abs(glm::vec2(ll.x, ll.y) - glm::vec2(ur.x, ur.y)));            
-            if (sizeInPixels < static_cast<float>(textMinSize)) {
-                continue;
+                // The billboard is smaller than one pixel, we can discard it
+                float sizeInPixels = length(glm::vec2(topLeft) - glm::vec2(bottomLeft));
+                if (sizeInPixels < static_cast<float>(textMinSize) || 
+                    sizeInPixels > _framebufferSize.x || 
+                    sizeInPixels > _framebufferSize.y) {
+                    return { size, static_cast<int>(lines.size()) };
+                }
             }
-
-
+            
             vertices.insert(vertices.end(), {
                 p0.x, p0.y, p0.z, s0, t0, outlineS0, outlineT0,
                 p1.x, p1.y, p1.z, s0, t1, outlineS0, outlineT1,
@@ -914,18 +911,25 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
             width += glyph->horizontalAdvance();
             height = std::max(height, static_cast<float>(glyph->height()));
         } // end of a line
+            
         size.x = std::max(size.x, width);
         size.y += height;
         movingPos.y -= h;
     }
     size.y = (lines.size() - 1) * font.height();
 
-    glm::mat4 projection = glm::ortho(
+    /*glm::mat4 projection = glm::ortho(
         0.f,
         _framebufferSize.x,
         0.f,
         _framebufferSize.y
-    );
+    );*/
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    _program->activate();
 
     opengl::TextureUnit atlasUnit;
     atlasUnit.activate();
