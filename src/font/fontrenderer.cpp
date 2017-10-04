@@ -116,13 +116,11 @@ namespace {
     layout (location = 1) out vec2 outlineTexCoords; \n\
     \n\
     uniform dmat4 projection; \n\
-    //uniform float textScale; \n\
     \n\
     out float depth; \n\
     void main() { \n\
         texCoords = in_texCoords; \n\
         outlineTexCoords = in_outlineTexCoords; \n\
-        //vec4 finalPos = vec4(projection * dvec4(dvec3(in_position) * textScale, 1.0)); \n\
         vec4 finalPos = vec4(projection * dvec4(dvec3(in_position), 1.0)); \n\
         float depth = finalPos.w; \n\
         finalPos.z = 0.0; \n\
