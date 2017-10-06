@@ -115,13 +115,13 @@ namespace {
     layout (location = 0) out vec2 texCoords; \n\
     layout (location = 1) out vec2 outlineTexCoords; \n\
     \n\
-    uniform dmat4 projection; \n\
+    uniform dmat4 mvpMatrix; \n\
     \n\
     out float depth; \n\
     void main() { \n\
         texCoords = in_texCoords; \n\
         outlineTexCoords = in_outlineTexCoords; \n\
-        vec4 finalPos = vec4(projection * dvec4(dvec3(in_position), 1.0)); \n\
+        vec4 finalPos = vec4(mvpMatrix * dvec4(dvec3(in_position), 1.0)); \n\
         float depth = finalPos.w; \n\
         finalPos.z = 0.0; \n\
         gl_Position = finalPos; \n\
@@ -426,10 +426,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec4 outlineColor,
                                                           const float textScale,
                                                           const int textMinSize,
-                                                          glm::dmat4 modelViewMatrix,
-                                                          glm::dmat4 projectionMatrix, 
-                                                          glm::vec3 orthonormalRight,
-                                                          glm::vec3 orthonormalUp,
+                                                          const glm::dmat4& mvpMatrix,
+                                                          const glm::vec3& orthonormalRight,
+                                                          const glm::vec3& orthonormalUp,
                                                           const char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
@@ -457,8 +456,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         buffer,
         textScale,
         textMinSize,
-        modelViewMatrix,
-        projectionMatrix,
+        mvpMatrix,
         orthonormalRight,
         orthonormalUp
     );
@@ -506,10 +504,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec4 color,
                                                           const float textScale,
                                                           const int textMinSize,
-                                                          glm::dmat4 modelViewMatrix,
-                                                          glm::dmat4 projectionMatrix,
-                                                          glm::vec3 orthonormalRight,
-                                                          glm::vec3 orthonormalUp,
+                                                          const glm::dmat4& mvpMatrix,
+                                                          const glm::vec3& orthonormalRight,
+                                                          const glm::vec3& orthonormalUp,
                                                           const char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
@@ -536,8 +533,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         buffer.data(),
         textScale,
         textMinSize,
-        modelViewMatrix,
-        projectionMatrix,
+        mvpMatrix,
         orthonormalRight,
         orthonormalUp
     );
@@ -582,10 +578,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec3 pos,
                                                           const float textScale,
                                                           const int textMinSize,
-                                                          glm::dmat4 modelViewMatrix,
-                                                          glm::dmat4 projectionMatrix,
-                                                          glm::vec3 orthonormalRight,
-                                                          glm::vec3 orthonormalUp,
+                                                          const glm::dmat4& mvpMatrix,
+                                                          const glm::vec3& orthonormalRight,
+                                                          const glm::vec3& orthonormalUp,
                                                           const char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
@@ -613,8 +608,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         buffer.data(),
         textScale,
         textMinSize,
-        modelViewMatrix,
-        projectionMatrix,
+        mvpMatrix,
         orthonormalRight,
         orthonormalUp
     );
@@ -793,10 +787,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
                                                                             const char* buffer,
                                                                             const float textScale,
                                                                             const int textMinSize,
-                                                                            glm::dmat4 modelViewMatrix,
-                                                                            glm::dmat4 projectionMatrix,
-                                                                            glm::vec3 orthonormalRight,
-                                                                            glm::vec3 orthonormalUp)
+                                                                            const glm::dmat4& mvpMatrix,
+                                                                            const glm::vec3& orthonormalRight,
+                                                                            const glm::vec3& orthonormalUp)
                                                                             const
 {
     float h = font.height();
@@ -874,9 +867,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
                 // Calculate the positions of the lower left and upper right corners of the
                 // billboard in screen-space
                 glm::vec4 projPos[2];
-                glm::dmat4 modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
-                projPos[0] = glm::vec4(modelViewProjectionMatrix * glm::dvec4(p0, 1.0));
-                projPos[1] = glm::vec4(modelViewProjectionMatrix * glm::dvec4(p1, 1.0));
+                projPos[0] = glm::vec4(mvpMatrix * glm::dvec4(p0, 1.0));
+                projPos[1] = glm::vec4(mvpMatrix * glm::dvec4(p1, 1.0));
                 glm::vec4 topLeft = (((projPos[0] / projPos[0].w) + glm::vec4(1.0)) / glm::vec4(2.0)) * glm::vec4(
                     _framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
                 glm::vec4 bottomLeft = (((projPos[1] / projPos[1].w) + glm::vec4(1.0)) / glm::vec4(2.0)) * glm::vec4(
@@ -938,8 +930,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
     _program->setUniform("outlineColor", outlineColor);
     _program->setUniform("tex", atlasUnit);
     _program->setUniform("hasOutline", font.hasOutline());
-    _program->setUniform("projection", projectionMatrix * modelViewMatrix);
-    //_program->setUniform("textScale", textScale);
+    _program->setUniform("mvpMatrix", mvpMatrix);
     _program->setUniform("textMinSize", textMinSize);
     
     _program->setIgnoreUniformLocationError(opengl::ProgramObject::IgnoreError::No);
