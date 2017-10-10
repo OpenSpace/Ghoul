@@ -121,7 +121,7 @@ namespace {
     void main() { \n\
         texCoords = in_texCoords; \n\
         outlineTexCoords = in_outlineTexCoords; \n\
-        vec4 finalPos = vec4(mvpMatrix * dvec4(dvec3(in_position), 1.0)); \n\
+        vec4 finalPos = vec4(mvpMatrix * dvec4(in_position.xyz, 1.0)); \n\
         float depth = finalPos.w; \n\
         finalPos.z = 0.0; \n\
         gl_Position = finalPos; \n\
@@ -420,16 +420,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 }
     
 
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
-                                                          glm::vec3 pos,
-                                                          glm::vec4 color,
-                                                          glm::vec4 outlineColor,
-                                                          const float textScale,
-                                                          const int textMinSize,
-                                                          const glm::dmat4& mvpMatrix,
-                                                          const glm::vec3& orthonormalRight,
-                                                          const glm::vec3& orthonormalUp,
-                                                          const char* format, ...) const
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 pos, glm::vec4 color,
+                                                          glm::vec4 outlineColor, const float textScale, const int textMinSize,
+                                                          const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
+                                                          const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
+                                                          const glm::dvec3& cameraLoopUp, const int renderType, char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
     
@@ -458,7 +453,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         textMinSize,
         mvpMatrix,
         orthonormalRight,
-        orthonormalUp
+        orthonormalUp,
+        cameraPos,
+        cameraLoopUp,
+        renderType
     );
     
     delete[] buffer;
@@ -507,6 +505,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::dmat4& mvpMatrix,
                                                           const glm::vec3& orthonormalRight,
                                                           const glm::vec3& orthonormalUp,
+                                                          const glm::dvec3& cameraPos,
+                                                          const glm::dvec3& cameraLoopUp,
+                                                          const int renderType,
                                                           const char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
@@ -535,7 +536,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         textMinSize,
         mvpMatrix,
         orthonormalRight,
-        orthonormalUp
+        orthonormalUp,
+        cameraPos,
+        cameraLoopUp,
+        renderType
     );
     
     return res;
@@ -581,6 +585,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::dmat4& mvpMatrix,
                                                           const glm::vec3& orthonormalRight,
                                                           const glm::vec3& orthonormalUp,
+                                                          const glm::dvec3& cameraPos,
+                                                          const glm::dvec3& cameraLoopUp,
+                                                          const int renderType,
                                                           const char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
@@ -610,7 +617,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         textMinSize,
         mvpMatrix,
         orthonormalRight,
-        orthonormalUp
+        orthonormalUp,
+        cameraPos,
+        cameraLoopUp,
+        renderType
     );
     
     return res;
@@ -789,7 +799,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
                                                                             const int textMinSize,
                                                                             const glm::dmat4& mvpMatrix,
                                                                             const glm::vec3& orthonormalRight,
-                                                                            const glm::vec3& orthonormalUp)
+                                                                            const glm::vec3& orthonormalUp,
+                                                                            const glm::dvec3& cameraPos,
+                                                                            const glm::dvec3& cameraLoopUp,
+                                                                            const int renderType)
                                                                             const
 {
     float h = font.height();
@@ -856,14 +869,32 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
             float s1 = glyph->bottomRight().x;
             float t1 = glyph->bottomRight().y;
             float outlineS1 = glyph->outlineBottomRight().x;
-            float outlineT1 = glyph->outlineBottomRight().y;            
+            float outlineT1 = glyph->outlineBottomRight().y;    
+
+            glm::vec3 p0 = glm::vec3(0.0);
+            glm::vec3 p1 = glm::vec3(0.0);
+            glm::vec3 p2 = glm::vec3(0.0);
+            glm::vec3 p3 = glm::vec3(0.0);
             
-            glm::vec3 p0 = (x0 * orthonormalRight + y0 * orthonormalUp) * textScale + pos;
-            glm::vec3 p1 = (x0 * orthonormalRight + y1 * orthonormalUp) * textScale + pos;
-            glm::vec3 p2 = (x1 * orthonormalRight + y1 * orthonormalUp) * textScale + pos;
-            glm::vec3 p3 = (x1 * orthonormalRight + y0 * orthonormalUp) * textScale + pos;
-            
-            if (character != 32 ) {
+            if (renderType == 0) {
+                p0 = (x0 * orthonormalRight + y0 * orthonormalUp) * textScale + pos;
+                p1 = (x0 * orthonormalRight + y1 * orthonormalUp) * textScale + pos;
+                p2 = (x1 * orthonormalRight + y1 * orthonormalUp) * textScale + pos;
+                p3 = (x1 * orthonormalRight + y0 * orthonormalUp) * textScale + pos;
+            }
+            else {
+                glm::dvec3 normal = glm::normalize(cameraPos - glm::dvec3(pos));
+                glm::vec3 newRight = glm::vec3(glm::cross(cameraLoopUp, normal));
+                glm::vec3 newUp = glm::vec3(glm::cross(normal, glm::dvec3(newRight)));
+
+                p0 = (x0 * newRight + y0 * newUp) * textScale + pos;
+                p1 = (x0 * newRight + y1 * newUp) * textScale + pos;
+                p2 = (x1 * newRight + y1 * newUp) * textScale + pos;
+                p3 = (x1 * newRight + y0 * newUp) * textScale + pos;
+            }                        
+
+            // Size-based culling
+            if (character != 32 ) { // space can yield erroneous size
                 // Calculate the positions of the lower left and upper right corners of the
                 // billboard in screen-space
                 glm::vec4 projPos[2];

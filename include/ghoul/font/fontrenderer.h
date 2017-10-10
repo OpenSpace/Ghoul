@@ -212,7 +212,8 @@ public:
     BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
         glm::vec4 outlineColor, const float textScale, const int textMinSize, 
         const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
-        const glm::vec3& orthonormalUp, const char* format, ...) const;
+        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
+        const glm::dvec3& cameraLoopUp, const int renderType, char* format, ...) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -262,6 +263,7 @@ public:
     BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
         const float textScale, const int textMinSize, const glm::dmat4& mvpMatrix, 
         const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
+        const glm::dvec3& cameraPos, const glm::dvec3& cameraLoopUp, const int renderType, 
         const char* format, ...) const;
 
     /**
@@ -306,7 +308,8 @@ public:
     */
     BoundingBoxInformation render(Font& font, glm::vec3 pos, const float textScale, 
         const int textMinSize, const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
-        const glm::vec3& orthonormalUp, const char* format, ...) const;
+        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos, const glm::dvec3& cameraLoopUp, 
+        const int renderType, const char* format, ...) const;
     
 private:
     /// Private constructor that is used in the #initialize static method
@@ -318,7 +321,8 @@ private:
     BoundingBoxInformation internalProjectionRender(Font& font, glm::vec3 pos, glm::vec4 color,
         glm::vec4 outlineColor, const char* buffer, const float textScale, const int textMinSize, 
         const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
-        const glm::vec3& orthonormalUp) const;
+        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos, const glm::dvec3& cameraLoopUp,
+        const int renderType) const;
 
 
     /// The singleton instance of the default FontRenderer
