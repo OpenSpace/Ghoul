@@ -424,7 +424,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 
                                                           glm::vec4 outlineColor, const float textScale, const int textMinSize,
                                                           const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
                                                           const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
-                                                          const glm::dvec3& cameraLoopUp, const int renderType, char* format, ...) const
+                                                          const glm::dvec3& cameraLookUp, const int renderType, char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
     
@@ -455,7 +455,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 
         orthonormalRight,
         orthonormalUp,
         cameraPos,
-        cameraLoopUp,
+        cameraLookUp,
         renderType
     );
     
@@ -506,7 +506,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec3& orthonormalRight,
                                                           const glm::vec3& orthonormalUp,
                                                           const glm::dvec3& cameraPos,
-                                                          const glm::dvec3& cameraLoopUp,
+                                                          const glm::dvec3& cameraLookUp,
                                                           const int renderType,
                                                           const char* format, ...) const
 {
@@ -538,7 +538,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         orthonormalRight,
         orthonormalUp,
         cameraPos,
-        cameraLoopUp,
+        cameraLookUp,
         renderType
     );
     
@@ -586,7 +586,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec3& orthonormalRight,
                                                           const glm::vec3& orthonormalUp,
                                                           const glm::dvec3& cameraPos,
-                                                          const glm::dvec3& cameraLoopUp,
+                                                          const glm::dvec3& cameraLookUp,
                                                           const int renderType,
                                                           const char* format, ...) const
 {
@@ -619,7 +619,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         orthonormalRight,
         orthonormalUp,
         cameraPos,
-        cameraLoopUp,
+        cameraLookUp,
         renderType
     );
     
@@ -801,7 +801,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
                                                                             const glm::vec3& orthonormalRight,
                                                                             const glm::vec3& orthonormalUp,
                                                                             const glm::dvec3& cameraPos,
-                                                                            const glm::dvec3& cameraLoopUp,
+                                                                            const glm::dvec3& cameraLookUp,
                                                                             const int renderType)
                                                                             const
 {
@@ -884,7 +884,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
             }
             else {
                 glm::dvec3 normal = glm::normalize(cameraPos - glm::dvec3(pos));
-                glm::vec3 newRight = glm::vec3(glm::cross(cameraLoopUp, normal));
+                glm::vec3 newRight = glm::vec3(glm::cross(cameraLookUp, normal));
                 glm::vec3 newUp = glm::vec3(glm::cross(normal, glm::dvec3(newRight)));
 
                 p0 = (x0 * newRight + y0 * newUp) * textScale + pos;
