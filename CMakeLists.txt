@@ -191,22 +191,32 @@ if (GHOUL_MODULE_LUA)
 endif ()
 
 # Assimp
-set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "We don't build assimp tools because they need DirectX.")
+find_package(Assimp)
+if (Assimp_FOUND)
+    message(STATUS "Using system assimp")
+    target_include_directories(Ghoul SYSTEM PUBLIC ${ASSIMP_INCLUDE_DIRS})
+    target_link_libraries(Ghoul ${ASSIMP_LIBRARIES})
+    link_directories("${ASSIMP_LIBRARY_DIRS}")
+    set(GHOUL_LIBRARY_DIRS "${ASSIMP_LIBRARY_DIRS}" PARENT_SCOPE)
+else ()
+    message(STATUS "Building assimp")
+    set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "We don't build assimp tools because they need DirectX.")
 
-# These two importers produce errors due to missing entries in the config.h right now
-# When they compile, there is no reason to keep them disabled
-set(ASSIM_BUILD_FBX_IMPORTER OFF CACHE BOOL "")
-set(ASSIM_BUILD_IFC_IMPORTER OFF CACHE BOOL "")
+    # These two importers produce errors due to missing entries in the config.h right now
+    # When they compile, there is no reason to keep them disabled
+    set(ASSIMP_BUILD_FBX_IMPORTER OFF CACHE BOOL "")
+    set(ASSIMP_BUILD_IFC_IMPORTER OFF CACHE BOOL "")
 
-set(ASSIM_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
-set(ASSIM_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
-set(ASSIMP_NO_EXPORTER ON CACHE BOOL "Decrease compiling time.")
-set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable GTest.")
-include_external_library(Ghoul assimp ${GHOUL_ROOT_DIR}/ext/assimp ${GHOUL_ROOT_DIR}/ext/assimp/include)
-set_property(TARGET uninstall PROPERTY FOLDER "External")
+    set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
+    set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
+    set(ASSIMP_NO_EXPORTER ON CACHE BOOL "Decrease compiling time.")
+    set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable GTest.")
+    include_external_library(Ghoul assimp ${GHOUL_ROOT_DIR}/ext/assimp ${GHOUL_ROOT_DIR}/ext/assimp/include)
+    set_property(TARGET uninstall PROPERTY FOLDER "External")
 
-if (WIN32)
-    set_property(TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "External")
+    if (WIN32)
+        set_property(TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "External")
+    endif ()
 endif ()
 
 # Cppformat
