@@ -192,6 +192,13 @@ endif ()
 
 # Assimp
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "We don't build assimp tools because they need DirectX.")
+
+# These two importers produce errors due to missing entries in the config.h right now
+# When they compile, there is no reason to keep them disabled
+set(ASSIM_BUILD_FBX_IMPORTER OFF CACHE BOOL "")
+set(ASSIM_BUILD_IFC_IMPORTER OFF CACHE BOOL "")
+
+set(ASSIM_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
 set(ASSIM_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
 set(ASSIMP_NO_EXPORTER ON CACHE BOOL "Decrease compiling time.")
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable GTest.")
