@@ -206,6 +206,7 @@ else ()
     # When they compile, there is no reason to keep them disabled
     set(ASSIMP_BUILD_FBX_IMPORTER OFF CACHE BOOL "" FORCE)
     set(ASSIMP_BUILD_IFC_IMPORTER OFF CACHE BOOL "" FORCE)
+    set(ASSIMP_BUILD_X3D_IMPORTER OFF CACHE BOOL "" FORCE)
 
     set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
     set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
@@ -213,6 +214,9 @@ else ()
     set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable GTest.")
     include_external_library(Ghoul assimp ${GHOUL_ROOT_DIR}/ext/assimp ${GHOUL_ROOT_DIR}/ext/assimp/include)
     set_property(TARGET uninstall PROPERTY FOLDER "External")
+
+    # We need to include this to be able to find the assimp/config.h file
+    target_include_directories(Ghoul PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
 
     if (WIN32)
         if (TARGET IrrXML)
