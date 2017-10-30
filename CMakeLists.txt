@@ -191,7 +191,7 @@ if (GHOUL_MODULE_LUA)
 endif ()
 
 # Assimp
-find_package(Assimp)
+find_package(Assimp QUIET)
 if (Assimp_FOUND)
     message(STATUS "Using system assimp")
     target_include_directories(Ghoul SYSTEM PUBLIC ${ASSIMP_INCLUDE_DIRS})
@@ -204,8 +204,8 @@ else ()
 
     # These two importers produce errors due to missing entries in the config.h right now
     # When they compile, there is no reason to keep them disabled
-    set(ASSIMP_BUILD_FBX_IMPORTER OFF CACHE BOOL "")
-    set(ASSIMP_BUILD_IFC_IMPORTER OFF CACHE BOOL "")
+    set(ASSIMP_BUILD_FBX_IMPORTER OFF CACHE BOOL "" FORCE)
+    set(ASSIMP_BUILD_IFC_IMPORTER OFF CACHE BOOL "" FORCE)
 
     set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
     set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
@@ -215,7 +215,12 @@ else ()
     set_property(TARGET uninstall PROPERTY FOLDER "External")
 
     if (WIN32)
-        set_property(TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "External")
+        if (TARGET IrrXML)
+            set_property(TARGET IrrXML PROPERTY FOLDER "External")
+        endif ()
+        if (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs)
+            set_property(TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "External")
+        endif ()
     endif ()
 endif ()
 
