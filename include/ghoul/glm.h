@@ -48,6 +48,10 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #endif // GLM_ENABLE_EXPERIMENTAL
 
+#ifndef GLM_SWIZZLE
+#define GLM_SWIZZLE
+#endif // GLM_SWIZZLE
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
