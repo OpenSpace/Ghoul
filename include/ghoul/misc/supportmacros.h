@@ -40,16 +40,18 @@
 // We are running the Intel compiler (which also defines _MSC_VER
 #define DISABLE_OPTIMIZATION #warning("OPTIMIZATION macros not implemented")
 #define RESTORE_OPTIMIZATION #warning("OPTIMIZATION macros not implemented")
+
+#elif defined __clang__
+//We are running Clang
+#define DISABLE_OPTIMIZATION #pragma optimize off
+#define RESTORE_OPTIMIZATION #pragma optimize on
+
 #elif defined __GNUC__
 // We are running GCC.  Requires GCC support 4.4 or higher
 #define DISABLE_OPTIMIZATION                                                             \
     #pragma GCC push_options                                                             \
     #pragma GCC optimize("O0")
 #define RESTORE_OPTIMIZATION #pragma GCC pop_options
-#elif defined __clang__
-//We are running Clang
-#define DISABLE_OPTIMIZATION #pragma optimize off
-#define RESTORE_OPTIMIZATION #pragma optimize on
 #endif
 
 #endif // __GHOUL___SUPPORTMACROS___H__

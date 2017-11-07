@@ -36,6 +36,8 @@
 #pragma warning (disable : 4619) // #pragma warning: there is no warning number '4800' 
 #endif // _MSC_VER
 
+#include <ghoul/misc/supportmacros.h>
+
 #include "gtest/gtest.h"
 
 #ifdef _MSC_VER
