@@ -63,25 +63,25 @@ public:
     struct CacheException : public RuntimeError {
         explicit CacheException(const std::string& msg);
     };
-    
+
     /// Exception that gets thrown if the cache has a malformed information file
     struct MalformedCacheException : public CacheException {
         explicit MalformedCacheException(std::string file, std::string msg = "");
         std::string cacheFile;
         std::string message;
     };
-    
+
     /// Exception that gets thrown if there was an error loading the previous cache files
     struct ErrorLoadingCacheException : public CacheException {
         explicit ErrorLoadingCacheException(const std::string& message);
     };
-    
+
     /// Exception that gets thrown if the argument for retrieving a cache file is invalid
     struct IllegalArgumentException : public CacheException {
         explicit IllegalArgumentException(std::string argument);
         std::string argumentName;
     };
-    
+
     /**
      * The constructor will automatically register all persistent cache entries from
      * previous application runs and clean the directory of non-persistent entries that
@@ -96,7 +96,7 @@ public:
      * \pre \p directory must not be empty
      */
     CacheManager(std::string directory, int version = -1);
-    
+
     /**
      * The destructor will save all information on persistent files in a
      * <code>cache</code> file in the cache directory that was passed in the constructor
@@ -286,16 +286,16 @@ public:
      * ) in the \p file
      */
     void removeCacheFile(const std::string& baseName, const std::string& information);
-    
+
 protected:
     /// This struct stores the cache information for a specific hash value.
     struct CacheInformation {
         std::string file; ///< The path to the cached file
         bool isPersistent; ///< if the cached entry should be automatically deleted
     };
-    
+
     using LoadedCacheInfo = std::pair<unsigned int, std::string>;
-    
+
     /**
      * Generates a hash number from the file path and information string
      * \return A hash number

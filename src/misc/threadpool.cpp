@@ -40,7 +40,7 @@ namespace ghoul {
 
 using Func = std::function<void()>;
 using namespace thread;
-    
+
 ThreadPool::ThreadPool(int nThreads, Func workerInit, Func workerDeinit,
                        ThreadPriorityClass tpc, ThreadPriorityLevel tpl, Background bg)
     : _workers(nThreads)
@@ -66,7 +66,7 @@ ThreadPool::ThreadPool(int nThreads, Func workerInit, Func workerDeinit,
 
     ghoul_assert(isRunning(), "ThreadPool is not running");
 }
-    
+
 ThreadPool::~ThreadPool() {
     if (isRunning()) {
         // The stop method cannot guarantee to be noexcept, so we have to catch potential
@@ -86,7 +86,7 @@ ThreadPool::~ThreadPool() {
 
 void ThreadPool::start() {
     ghoul_assert(!isRunning(), "ThreadPool must not be running");
-    
+
     *_isRunning = true;
 
     for (Worker& w : _workers) {
@@ -95,7 +95,7 @@ void ThreadPool::start() {
 
     ghoul_assert(isRunning(), "ThreadPool is not running");
 }
-    
+
 void ThreadPool::stop(RunRemainingTasks runTasks, DetachThreads detachThreads) {
     ghoul_assert(isRunning(), "ThreadPool must be running");
     ghoul_assert(
@@ -124,8 +124,6 @@ void ThreadPool::stop(RunRemainingTasks runTasks, DetachThreads detachThreads) {
             // Block until the thread is finished
             w.thread->join();
         }
-
-
     }
 
     // Delete all the workers. We don't want to actually delete them as we would otherwise
@@ -224,28 +222,28 @@ void ThreadPool::activateWorker(Worker& worker) {
         workerInitialization();
         // And invoke the user-defined deinitialization function when the scope is exited
         OnExit([&]() { workerDeinitialization(); });
-        
+
         std::function<void()> task;
         bool hasTask;
         std::tie(task, hasTask) = taskQueue->pop();
-        
+
         // Infinite look that only gets broken if this thread should terminate or if it
         // gets woken up without there being a task
         while (true) {  // loop #1
             // If there is something in the queue
             while (hasTask) { // loop #2
                 finishedInitializing = true;
-                
+
                 // Do the task
                 task();
-                
+
                 // We cannot check for shouldTerminate earlier as if hasTask is true,
                 // we have already retrieved that value from the stack and if we don't
                 // work on it, it would disappear
                 if (*shouldTerminate) {
                     return;
                 }
-                
+
                 // If we shouldn't terminate, we can check if there is more work
                 // if there is, we stay in this inner loop until there is no more work to
                 // be done
@@ -264,7 +262,7 @@ void ThreadPool::activateWorker(Worker& worker) {
             (*nWaiting)++;
             while (true) { // loop #3
                 finishedInitializing = true;
-                
+
                 // We are doing this in an infinite loop, as we want to check regularly
                 // if there is more work. This shouldn't be necessary in normal cases, but
                 // is more of a last resort protection
@@ -306,7 +304,7 @@ void ThreadPool::activateWorker(Worker& worker) {
     if (_threadBackground == thread::Background::Yes) {
         thread::setThreadBackground(*thread, thread::Background::Yes);
     }
-    
+
     // Overwrite the worker and we are done
     worker = {
         std::move(thread),
@@ -331,17 +329,17 @@ std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
         return std::make_tuple(std::move(t), true);
     }
 }
-    
+
 void ThreadPool::TaskQueue::push(ThreadPool::Task&& task) {
     std::lock_guard<std::mutex> lock(_queueMutex);
     _queue.push(task);
 }
-    
+
 bool ThreadPool::TaskQueue::isEmpty() const {
     std::lock_guard<std::mutex> lock(_queueMutex);
     return _queue.empty();
 }
-    
+
 int ThreadPool::TaskQueue::size() const {
     std::lock_guard<std::mutex> lock(_queueMutex);
     return static_cast<int>(_queue.size());

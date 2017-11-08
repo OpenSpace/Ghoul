@@ -36,12 +36,12 @@ auto ThreadPool::queue(F&& f, Arg&&... arg) -> std::future<decltype(f(arg...))> 
     auto pck = std::make_shared<std::packaged_task<ReturnType ()>>(
         std::bind(std::forward<F>(f), std::forward<Arg>(arg)...)
     );
-    
+
     // Push the packaged packaged_task onto the queue of work items
     _taskQueue->push(
         [pck]() { (*pck)(); }
     );
-    
+
     // Get the future of the result (which might be std::future<void>, but that is not a
     // problem
     auto future = pck->get_future();

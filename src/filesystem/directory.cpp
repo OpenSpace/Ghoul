@@ -87,9 +87,10 @@ Directory Directory::parentDirectory(AbsolutePath absolutePath) const {
     (void)absolutePath; // remove unused argument warning ---abock
     size_t length = _directoryPath.length();
     size_t position = _directoryPath.find_last_of(FileSystem::PathSeparator);
-    if(position == length && length > 1)
+    if (position == length && length > 1) {
         position = _directoryPath.find_last_of(FileSystem::PathSeparator, length-1);
-    
+    }
+
     return Directory(_directoryPath.substr(0, position));
 #endif
 }

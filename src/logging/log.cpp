@@ -80,7 +80,7 @@ LogLevel Log::logLevel() const {
 std::string Log::getTimeString() const {
     auto now = std::chrono::system_clock::now();
     time_t time = std::chrono::system_clock::to_time_t(now);
-    
+
     std::stringstream ss;
 
 #ifdef WIN32
@@ -96,7 +96,7 @@ std::string Log::getTimeString() const {
 std::string Log::getDateString() const {
     auto now = std::chrono::system_clock::now();
     time_t time = std::chrono::system_clock::to_time_t(now);
-    
+
     std::stringstream ss;
 
 #ifdef WIN32

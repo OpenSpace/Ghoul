@@ -89,16 +89,16 @@ public:
 
         std::string token;
     };
-    
+
     /**
      * The token used to separate individual path elements (<code>\\</code> or
      * <code>/</code>)
      */
     static const char PathSeparator;
-    
+
     /// Opening braces that are used for path tokens
     static const std::string TokenOpeningBraces;
-    
+
     /// Closing braces that are used for path tokens
     static const std::string TokenClosingBraces;
 
@@ -115,7 +115,7 @@ public:
      */
     std::string absolutePath(std::string path,
         const std::vector<std::string>& ignoredTokens = std::vector<std::string>()) const;
-    
+
     /**
      * Returns the path of the passed \p path relative to the passed \p baseDirectory. All
      * path tokens present in the \p path are automatically resolved. The \p baseDirectory
@@ -155,7 +155,7 @@ public:
      * \throw FileSystemException If the current directory could not be determined
      */
     Directory currentDirectory() const;
-    
+
     /**
      * Changes the current working directory of this process. Please note that this will
      * have an effect on all relative paths which are used henceforth.
@@ -188,7 +188,7 @@ public:
      * for the \p path
      */
     bool fileExists(std::string path, RawPath isRawPath = RawPath::No) const;
-    
+
     /**
      * Checks if the directory at the \p path exists or not. This method will return
      * <code>false</code> if \p path points to a file.
@@ -199,7 +199,7 @@ public:
      * for the \p path
      */
     bool directoryExists(const Directory& path) const;
-    
+
     /**
      * Deletes the file pointed to by \p path. The method will return <code>true</code> if
      * the file was deleted successfully, <code>false</code> otherwise.
@@ -245,7 +245,7 @@ public:
      * otherwise
      */
     bool emptyDirectory(const Directory& path) const;
-    
+
     /**
      * Registers the path token \p token with this FileSystem. Henceforth, every call to,
      * for example, #absolutePath(), the constructors of File, or Directory, will replace
@@ -282,7 +282,7 @@ public:
      * \return A vector of all registered path tokens
      */
     std::vector<std::string> tokens() const;
-    
+
     /**
      * Checks whether the \p token has been registered to a path before.
      * \param token The token to be checked
@@ -298,7 +298,7 @@ public:
      * \pre \p path must not be empty
      */
     bool containsToken(const std::string& path) const;
-    
+
     /**
      * Creates a CacheManager for this FileSystem. If a CacheManager already exists, this
      * method will fail and log an error. The passed \p cacheDirectory has to be a valid
@@ -313,10 +313,10 @@ public:
      * without destroying it in between (destroyCacheManager)
      * \pre \p cacheDirectory must point to an existing directory
      * \pre \p The CacheManager must not have been created before without destroying it
-     
+
      */
     void createCacheManager(const Directory& cacheDirectory, int version = -1);
-    
+
     /**
      * Destroys the previously created CacheManager. The destruction of the CacheManager
      * will trigger a cleanup of the cache directory via the CacheManager destructor.
@@ -325,7 +325,7 @@ public:
      * \pre CacheManager must have been created before
      */
     void destroyCacheManager();
-    
+
     /**
      * Returns the CacheManager associated with this FileSystem
      * \return The CacheManager or <code>nullptr</code> if it has not been initialized
@@ -341,7 +341,7 @@ public:
      * \pre \p file must not have been added before
      */
     void addFileListener(File* file);
-    
+
     /**
      * Removes the file object from tracking lists. The file on the filesystem may
      * still be tracked and other File objects may still have callbacks registered.
@@ -349,7 +349,7 @@ public:
      * \pre \p file must have been added before (addFileListener)
      */
     void removeFileListener(File* file);
-    
+
     /**
      * Triggers callbacks on filesystem. May not be needed depending on environment.
      */
@@ -378,7 +378,7 @@ private:
      * \pre \p path must not be empty
      */
     std::string cleanupPath(std::string path) const;
-    
+
     /**
      * This method returns the position until both paths \p p1 and \p p2 are equal. After
      * the returned position, the paths are diverging.
@@ -397,7 +397,7 @@ private:
      * \pre \p token must not be empty
      */
     bool hasToken(const std::string& path, const std::string& token) const;
-    
+
     /**
      * Returns the path that was registered for the \p token. If the token has not been
      * registered with any replacement path, the token itself is returned.
@@ -410,7 +410,7 @@ private:
 
     FileSystem(const FileSystem& rhs) = delete;
     FileSystem& operator=(const FileSystem& rhs) = delete;
-    
+
     /// This map stores all the tokens that are used in the FileSystem.
     std::map<std::string, std::string> _tokenMap;
 
@@ -427,7 +427,7 @@ private:
     /// Handles the callback for a directory for the local file path
     static void callbackHandler(DirectoryHandle* directoryHandle,
         const std::string& filepath);
-    
+
     /// External function that calls beginRead
     friend void readStarter(DirectoryHandle* directoryHandle);
 
@@ -437,7 +437,7 @@ private:
 
     /// The list of all tracked files
     std::multimap<std::string, File*> _trackedFiles;
-    
+
     /// The list of tracked directories
     std::map<std::string, DirectoryHandle*> _directories;
 
@@ -447,7 +447,7 @@ private:
 
     /// OS X specific triger filesystem
     void triggerFilesystemEventsInternalApple();
-    
+
     /// OS X callback handler
     static void callbackHandler(const std::string& path);
 
@@ -456,10 +456,10 @@ private:
 
     /// The list of all tracked files
     std::multimap<std::string, File*> _trackedFiles;
-    
+
     /// The list of tracked directories
     std::map<std::string, DirectoryHandle*> _directories;
-    
+
 #else // Linux
     /// Linux specific initialize function
     void initializeInternalLinux();
@@ -473,7 +473,7 @@ private:
     int _inotifyHandle;
     bool _keepGoing;
     std::thread _t;
-    
+
     /// The list of tracked files
     std::multimap<int, File*> _trackedFiles;
 #endif

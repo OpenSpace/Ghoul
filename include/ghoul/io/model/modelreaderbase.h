@@ -35,7 +35,7 @@
 namespace ghoul::opengl { class VertexBufferObject; }
 
 namespace ghoul::io {
-    
+
 /**
  * Concrete instantiations of this abstract base class provide the ability to load
  * geometric models from a file on disk into a VertexBufferObject. The resulting
@@ -59,17 +59,17 @@ public:
      */
     struct ModelReaderException : public RuntimeError {
         explicit ModelReaderException(std::string file, std::string error);
-       
+
         /// The file which caused the exception
         std::string fileName;
-        
+
         /// The error message
         std::string errorMessage;
     };
-    
+
     /// Default virtual destructor
     virtual ~ModelReaderBase() = default;
-    
+
     /**
      * The method loading the specific model from disk. The result is a fully initialized
      * and usable VertexBufferObject
@@ -80,7 +80,7 @@ public:
     virtual std::unique_ptr<opengl::VertexBufferObject> loadModel(
         const std::string& filename) const = 0;
 };
-    
+
 } // namespace ghoul::io
 
 #endif // __GHOUL___MODELREADERBASE___H__

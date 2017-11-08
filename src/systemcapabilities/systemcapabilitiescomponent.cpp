@@ -33,7 +33,7 @@ namespace ghoul::systemcapabilities {
 #ifdef GHOUL_USE_WMI
     IWbemLocator* SystemCapabilitiesComponent::_iwbemLocator = nullptr;
     IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
-    
+
 SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, HRESULT code)
     : RuntimeError(msg + ". Error Code: " + std::to_string(code), "WMI")
     , message(std::move(msg))
@@ -64,7 +64,7 @@ SystemCapabilitiesComponent::~SystemCapabilitiesComponent() {
 void SystemCapabilitiesComponent::initializeWMI() {
     const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
     ghoul_assert(!isWMIInitialized(), "WMI must not have been initialized");
-    
+
     LDEBUG("Begin initializing WMI");
     // This code is based on
     // http://msdn.microsoft.com/en-us/library/aa390423.aspx

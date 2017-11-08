@@ -65,7 +65,7 @@ public:
      */
     virtual void log(LogLevel level, const std::string& category,
         const std::string& message) = 0;
-    
+
     /**
      * Returns the minimum LogLevel that this Log accepts
      */
@@ -120,7 +120,7 @@ protected:
 
     /// Set the log printing of the log level
     void setLogLevelStamping(LogLevelStamping logLevelStamping);
-    
+
     /**
      * Returns the current time as a string. The format for the time is "HH:MM:SS" and the
      * clock is 24h.

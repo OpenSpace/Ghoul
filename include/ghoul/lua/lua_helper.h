@@ -37,25 +37,24 @@ namespace ghoul::lua {
 struct LuaRuntimeException : public RuntimeError {
     explicit LuaRuntimeException(std::string message);
 };
-    
+
 struct LuaFormatException : public LuaRuntimeException {
     explicit LuaFormatException(std::string message, std::string file = "");
     std::string filename;
 };
-    
+
 struct LuaLoadingException : public LuaRuntimeException {
     explicit LuaLoadingException(std::string error, std::string file = "");
     std::string errorMessage;
     std::string filename;
 };
-    
+
 struct LuaExecutionException : public LuaRuntimeException {
     explicit LuaExecutionException(std::string error, std::string file = "");
     std::string errorMessage;
     std::string filename;
 };
 
-    
 /**
  * Returns the location of the calling function using <code>luaL_where</code> and returns
  * that location as a string. This method is just a wrapper around this function and its
@@ -181,7 +180,7 @@ void loadDictionaryFromString(const std::string& script, ghoul::Dictionary& dict
  */
 ghoul::Dictionary loadDictionaryFromString(const std::string& script,
     lua_State* state = nullptr);
-    
+
 /**
  * Uses the Lua \p state to populate the provided ghoul::Dictionary%, extending the passed
  * \p dictionary. This method will overwrite values with the same keys, but will not
@@ -197,7 +196,7 @@ ghoul::Dictionary loadDictionaryFromString(const std::string& script,
  * \post \p state%'s stack is unchanged
  */
 void luaDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary);
-    
+
 /**
  * Converts the Lua type to a human-readable string. The supported types are:
  * \verbatim
@@ -232,7 +231,7 @@ lua_State* createNewLuaState(bool loadStandardLibraries = true);
  * \pre \p state must not be nullptr
  */
 void destroyLuaState(lua_State* state);
-    
+
 /**
  * This function executes the Lua script pointed to by \p filename using the passed
  * <code>lua_State</code> \p state.
@@ -242,7 +241,7 @@ void destroyLuaState(lua_State* state);
  * \pre \p state must not be nullptr
  */
 void runScriptFile(lua_State* state, const std::string& filename);
-    
+
 /**
  * This function executres the Lua script provided as plain text in \p script using the
  * passed <code>lua_State</code> \p state.
@@ -256,7 +255,6 @@ void runScript(lua_State* state, const std::string& script);
 namespace internal {
     void deinitializeGlobalState();
 } // namespace internal
-
 
 } // namespace ghoul::lua
 

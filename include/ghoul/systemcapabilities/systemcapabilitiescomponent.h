@@ -72,10 +72,10 @@ public:
     struct CapabilityInformation {
         /// The user-readable description of this capability
         std::string description;
-        
+
         /// The value of the capability
         std::string value;
-        
+
         /// The SystemCapabilitiesComponent%'s recommendation for Verbosity
         Verbosity verbosity;
     };
@@ -131,7 +131,7 @@ protected:
     /// Management Instrumentation
     struct WMIError : public RuntimeError {
         explicit WMIError(std::string message, HRESULT errorCode);
-        
+
         std::string message;
         HRESULT errorCode;
     };

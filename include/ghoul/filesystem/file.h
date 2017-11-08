@@ -57,7 +57,7 @@ public:
     struct FileException : public RuntimeError {
         explicit FileException(const std::string& msg);
     };
-    
+
     /// The type of the std::function that is used as the prototype for the callback
     using FileChangedCallback = std::function<void (const File&)>;
 
@@ -97,7 +97,7 @@ public:
      * \param callback The new callback function that will be used in this File object
      */
     void setCallback(FileChangedCallback callback);
-    
+
     /**
      * Returns the currently active callback. This object might be uninitialized if no
      * callback has been registered previously.
@@ -125,7 +125,7 @@ public:
      * \return The filename part of the full path
      */
     std::string filename() const;
-    
+
     /**
      * Returns the base name part of the full path. The base name is defined as the part
      * of the path between the last path separator (<code>'/'</code> or
@@ -134,7 +134,7 @@ public:
      * \return The base name part of the full path
      */
     std::string baseName() const;
-    
+
     /**
      * Returns the full base name of the path. The full base name is defined as the part
      * of the path before the extension (if existing). Example (
@@ -142,7 +142,7 @@ public:
      * \return The full base name part of the path
      */
     std::string fullBaseName() const;
-    
+
     /**
      * Returns the directory name of the path. The directory name is defined as the part
      * of the path before the last path separator (<code>'/'</code> or
@@ -151,7 +151,7 @@ public:
      * \return The directory name of the path
      */
     std::string directoryName() const;
-    
+
     /**
      * Returns the extension part of the full path. The extension is defined as the part
      * of the path after the extension separator (<code>'.'</code>). Example (
@@ -173,7 +173,7 @@ private:
      * remove and unregister the old listener in the process
      */
     void installFileChangeListener();
-    
+
     /**
      * Removes the platform-dependent listener. If there is no listener present, this
      * operation is a no-op.

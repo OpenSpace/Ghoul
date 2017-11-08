@@ -63,7 +63,7 @@ public:
         );
         _instance = new T(std::forward<Args>(args)...);
     }
-    
+
     /**
      * Deinitializes and deletes the singleton.
      * \pre The singleton must have been initialized before
@@ -76,7 +76,7 @@ public:
         delete _instance;
         _instance = nullptr;
     }
-    
+
     /**
      * Returns the initialization state of the singleton.
      * \return The initialization state of the singleton
@@ -84,7 +84,7 @@ public:
     static bool isInitialized() {
         return (_instance != nullptr);
     }
-    
+
     /**
      * Returns the reference to the singleton.
      * \return A reference to the singleton
@@ -101,17 +101,17 @@ public:
 protected:
     Singleton() = default;
     ~Singleton() = default;
-    
+
 private:
     // protecting against evil
     Singleton(const Singleton&) = delete;
     Singleton(const Singleton&&) = delete;
     Singleton& operator=(const Singleton& rhs) = delete;
     Singleton& operator=(Singleton&& rhs) = delete;
-    
+
     // instance member
     static T* _instance;
-    
+
 }; // Singleton
 
 template <class T> T* Singleton<T>::_instance = nullptr;

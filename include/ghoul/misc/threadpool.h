@@ -56,7 +56,7 @@
 #include <tuple>
 
 namespace ghoul {
- 
+
 /**
  * The ThreadPool is a class that manages a list of threads (= ThreadPool::Worker%s) that
  * will perform tasks from a list. A ThreadPool is created with a specific number of
@@ -105,7 +105,7 @@ class ThreadPool {
 public:
     using RunRemainingTasks = ghoul::Boolean;
     using DetachThreads = ghoul::Boolean;
-    
+
     /**
      * Constructor that initializes and starts \p nThreads Worker objects.
      * \param nThreads The number of parallel threads of execution managed by the
@@ -133,7 +133,7 @@ public:
         thread::ThreadPriorityLevel priorityLevel = thread::ThreadPriorityLevel::Normal,
         thread::Background background = thread::Background::No
     );
-    
+
     /**
      * Destructor that will block and wait for all remaining Tasks to be finished if the
      * ThreadPool is still running by calling the #stop method. If the ThreadPool has been
@@ -175,7 +175,7 @@ public:
      * otherwise
      */
     bool isRunning() const;
-    
+
     /**
      * Resizes the ThreadPool such that the number of workers in the pool is \p nThreads
      * after this function call. If \p nThreads is bigger than the current number of 
@@ -193,7 +193,7 @@ public:
      * \return The number of workers that are managed by this ThreadPool
      */
     int size() const;
-    
+
     /**
      * Returns the number of currently idle workers in this ThreadPool.
      * \return The number of currently idle workers in this ThreadPool
@@ -211,7 +211,7 @@ public:
      * \post The number of remaining tasks is empty
      */
     void clearRemainingTasks();
-    
+
     /**
      * This function queues a task and returns an <code>std::future</code> object that
      * holds a potential return value of the function. The common use-case is passing a
@@ -277,7 +277,7 @@ ghoul::ThreadPool pool(2);
     template <typename T, typename... Args>
     auto queue(std::packaged_task<T>&& task, Args&&... arguments
         ) -> decltype(task.get_future());
-    
+
 private:
     ThreadPool(const ThreadPool&) = delete;
     ThreadPool(ThreadPool&&) = delete;
@@ -301,7 +301,7 @@ private:
         // ThreadPool as well as the lambda expression that drives the thread.
         std::shared_ptr<std::atomic<bool>> shouldTerminate;
     };
-    
+
     /**
      * This class represents a thin wrapper around <code>std::queue</code> that provides
      * <code>std::mutex</code> protection for the available methods, thus making them
@@ -330,13 +330,13 @@ private:
          * \return <code>true</code> if the queue is empty
          */
         bool isEmpty() const;
-        
+
         /**
          * Returns the size of the queue.
          * \return The size of the queue
          */
         int size() const;
-    
+
     private:
         // The queue of tasks
         std::queue<ThreadPool::Task> _queue;
@@ -344,7 +344,7 @@ private:
         // functions, it is declared 'mutable'
         mutable std::mutex _queueMutex;
     };
-    
+
     /**
      * Activate the \p worker by creating a <code>std::thread</code> with the lambda
      * expression that will do all of the work inside the Worker. This function will
@@ -362,10 +362,10 @@ private:
     /// <code>true</code> if the ThreadPool is currently running, <code>false</code>
     /// otherwise
     std::shared_ptr<std::atomic_bool> _isRunning;
-    
+
     /// The number of Worker%s that are currently waiting for a task
     std::shared_ptr<std::atomic_int> _nWaiting;
-    
+
     /// The mutex used by the <code>condition_variable</code> <code>_cv</code> used to
     /// wait for and wake up Worker%s based on incoming Task%s
     std::shared_ptr<std::mutex> _mutex;
@@ -373,7 +373,7 @@ private:
     /// The condition variable that is used to wake up Worker%s when new Task%s are
     /// incoming. Used in combination with <code>_mutex</code>
     std::shared_ptr<std::condition_variable> _cv;
-    
+
     /// The user-defined function that is called at initialization for each of the Worker
     /// threads
     std::function<void ()> _workerInitialization;

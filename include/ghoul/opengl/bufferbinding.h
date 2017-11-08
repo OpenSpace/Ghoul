@@ -39,7 +39,7 @@ namespace ghoul::opengl::bufferbinding {
 } // namespace ghoul::opengl::bufferbinding 
 
 namespace ghoul::opengl {
-    
+
 /**
  * This class manages buffer bindings for ATOMIC_COUNTER_BUFFER,
  * GL_SHADER_STORAGE_BUFFER, GL_TRANSFORM_FEEDBACK_BUFFER and GL_UNIFORM_BUFFER.
@@ -120,7 +120,7 @@ private:
 
     /// The number in <code>[0, maxBindings]</code> referring to this BufferBinding
     GLint _number = -1;
-    
+
     /// <code>true</code> if the list of busy bindings and the maximum number of bindings
     /// have been initialized
     static bool _initialized;

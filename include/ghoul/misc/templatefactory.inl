@@ -31,7 +31,7 @@
 namespace ghoul {
 
 namespace {
-    
+
 /*
  * The working principle is as follows: There are two methods which can create subclasses,
  * 'create' and 'createWithDictionary'. The first one will create the subclass using the
@@ -130,7 +130,7 @@ std::unique_ptr<BaseClass> TemplateFactory<BaseClass>::create(
                                                        const std::string& className) const
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
-    
+
     auto it = _map.find(className);
     if (it == _map.end()) {
         throw TemplateClassNotFoundError(className);
@@ -176,9 +176,9 @@ void TemplateFactory<BaseClass>::registerClass(std::string className) {
         std::is_constructible<Class, const ghoul::Dictionary&>::value,
         "Class needs a public default or Dictionary constructor"
     );
-    
+
     ghoul_assert(!className.empty(), "Classname must not be empty");
-    
+
     // Use the correct CreateHelper struct to create a function pointer that we can store
     // for later usage. std::is_constructible<>::value returns a boolean that checks at
     // run-time if there is a proper constructor for it)
@@ -196,7 +196,7 @@ void TemplateFactory<BaseClass>::registerClass(std::string className,
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
     ghoul_assert(factoryFunction != nullptr, "Factory function must not be nullptr");
-    
+
     registerClass(std::move(className), FactoryFunction(std::move(factoryFunction)));
 }
 
@@ -218,7 +218,7 @@ void TemplateFactory<BaseClass>::registerClass(std::string className,
 template <typename BaseClass>
 bool TemplateFactory<BaseClass>::hasClass(const std::string& className) const {
     ghoul_assert(!className.empty(), "Classname must not be empty");
-    
+
     return (_map.find(className) != _map.end());
 }
 

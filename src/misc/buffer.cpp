@@ -52,7 +52,7 @@ Buffer::Buffer(const std::string& filename)
     , _offsetRead(0)
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
+
     read(filename);
 }
 
@@ -60,8 +60,7 @@ Buffer::Buffer(const Buffer& other)
     : _data(other._data)
     , _offsetWrite(other._offsetWrite)
     , _offsetRead(other._offsetRead)
-{
-}
+{}
 
 Buffer::Buffer(Buffer&& other) {
     if (this != &other) {
@@ -69,7 +68,7 @@ Buffer::Buffer(Buffer&& other) {
         _data = std::move(other._data);
         _offsetWrite = other._offsetWrite;
         _offsetRead = other._offsetRead;
-        
+
         // invalidate rhs memory
         other._offsetWrite = 0;
         other._offsetRead = 0;
@@ -92,7 +91,7 @@ Buffer& Buffer::operator=(Buffer&& rhs) {
         _data = std::move(rhs._data);
         _offsetWrite = rhs._offsetWrite;
         _offsetRead = rhs._offsetRead;
-        
+
         // invalidate rhs memory
         rhs._offsetWrite = 0;
         rhs._offsetRead = 0;
@@ -104,7 +103,7 @@ void Buffer::reset() {
     _offsetWrite = 0;
     _offsetRead = 0;
 }
-    
+
 const Buffer::value_type* Buffer::data() const {
     return _data.data();
 }
@@ -112,7 +111,7 @@ const Buffer::value_type* Buffer::data() const {
 Buffer::value_type* Buffer::data() {
     return _data.data();
 }
-    
+
 Buffer::size_type Buffer::capacity() const {
     return _data.capacity();
 }
@@ -142,7 +141,7 @@ void Buffer::write(const std::string& filename, Compress compress) {
         std::streamsize size(compressed_size);
         // orginal size
         file.write(reinterpret_cast<const char*>(&_offsetWrite), sizeof(size_t));
-        
+
         // compressed size
         file.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
         file.write(reinterpret_cast<const char*>(buffer.data()), size); // compressed data
@@ -157,11 +156,11 @@ void Buffer::write(const std::string& filename, Compress compress) {
 
 void Buffer::read(const std::string& filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
+
     std::ifstream file;
     file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     file.open(filename, std::ios::binary | std::ios::in);
-    
+
     _offsetRead = 0;
     bool compressed;
     file.read(reinterpret_cast<char*>(&compressed), sizeof(bool));
@@ -170,14 +169,14 @@ void Buffer::read(const std::string& filename) {
         size_t size;
         file.read(reinterpret_cast<char*>(&size), sizeof(size_t));
         _data.resize(size);
-        
+
         // read compressed size
         file.read(reinterpret_cast<char*>(&size), sizeof(size_t));
-        
+
         // allocate and read data
         std::vector<value_type> buffer(size);
         file.read(reinterpret_cast<char*>(buffer.data()),size);
-        
+
         // decompress
         _offsetWrite = LZ4_decompress_safe(
             reinterpret_cast<const char*>(buffer.data()),
@@ -204,7 +203,7 @@ void Buffer::serialize(const char* s) {
 
 void Buffer::serialize(const value_type* data, size_t size) {
     ghoul_assert(data, "Data must not be nullptr");
-    
+
     _data.resize(_data.capacity() + size);
     std::memcpy(_data.data() + _offsetWrite, &data, size);
     _offsetWrite += size;
@@ -212,7 +211,7 @@ void Buffer::serialize(const value_type* data, size_t size) {
 
 void Buffer::deserialize(value_type* data, size_t size) {
     ghoul_assert(data, "Data must not be nullptr");
-    
+
     std::memcpy(data, &_data + _offsetRead, size);
     _offsetRead += size;
 }
@@ -225,7 +224,7 @@ void Buffer::serialize(const std::string& v) {
 
     std::memcpy(_data.data() + _offsetWrite, &length, sizeof(size_t));
     _offsetWrite += sizeof(size_t);
-    
+
     std::memcpy(_data.data() + _offsetWrite, v.c_str(), length);
     _offsetWrite += length;
 }
@@ -235,13 +234,13 @@ void Buffer::deserialize(std::string& v) {
     ghoul_assert(
         _offsetRead + sizeof(size_t) <= _data.size(), "Insufficient buffer size"
     );
-    
+
     size_t size;
     std::memcpy(&size, _data.data() + _offsetRead, sizeof(size_t));
     _offsetRead += sizeof(size_t);
-    
+
     ghoul_assert(_offsetRead + size <= _data.size(), "Insufficient buffer size");
-    
+
     v = std::string(reinterpret_cast<char*>(_data.data()+_offsetRead), size);
     _offsetRead += size;
 }
@@ -251,7 +250,7 @@ void Buffer::serialize(const std::vector<std::string>& v) {
     size_t length = v.size();
     size_t size = sizeof(size_t);
     _data.resize(_data.capacity() + size + length);
-    
+
     std::memcpy(_data.data() + _offsetWrite, &length, sizeof(size_t));
     _offsetWrite += sizeof(size_t);
     for (const auto& e : v) {
@@ -267,7 +266,7 @@ void Buffer::deserialize(std::vector<std::string>& v) {
     size_t n;
     std::memcpy(&n, _data.data() + _offsetRead, sizeof(size_t));
     _offsetRead += sizeof(size_t);
-    
+
     v.reserve(n);
     for (size_t i = 0; i < n; ++i) {
         std::string t;

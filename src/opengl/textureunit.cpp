@@ -32,7 +32,7 @@ namespace ghoul::opengl {
 TextureUnit::TextureUnitError::TextureUnitError(std::string msg)
     : RuntimeError(std::move(msg), "TextureUnit")
 {}
-    
+
 bool TextureUnit::_initialized = false;
 unsigned int TextureUnit::_totalActive = 0;
 unsigned int TextureUnit::_maxTexUnits = 0;

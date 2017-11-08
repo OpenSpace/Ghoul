@@ -33,9 +33,9 @@ namespace ghoul::opengl {
 TextureManager::TextureManagerError::TextureManagerError(std::string msg)
     : RuntimeError(std::move(msg), "TextureManager")
 {}
-    
+
 TextureManager* TextureManager::_manager = nullptr;
-    
+
 TextureManager& TextureManager::ref() {
     static TextureManager manager;
     return manager;
@@ -87,7 +87,7 @@ std::unique_ptr<Texture> TextureManager::unregisterTexture(unsigned int hashedNa
     if (it == _textures.end()) {
         return nullptr;
     }
-        
+
     auto tmp = std::move(it->second);
     _textures.erase(hashedName);
     return tmp;

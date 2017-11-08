@@ -33,7 +33,7 @@
 #include <vector>
 
 namespace ghoul::opengl { class Texture; }
-    
+
 namespace ghoul::io {
 
 /**
@@ -47,20 +47,20 @@ public:
     struct TextureLoadException : public RuntimeError {
         explicit TextureLoadException(std::string name, std::string message,
             const TextureReaderBase* reader);
-        
+
         /// The filename that caused the exception to be thrown
         std::string filename;
-        
+
         /// The error message that occurred
         std::string message;
-        
+
         /// The TextureReaderBase that caused the exception
         const TextureReaderBase* reader;
     };
-    
+
     /// Default virtual destructor
     virtual ~TextureReaderBase();
-    
+
     /**
      * Loads the texture \p filename from disk and returns the loaded Texture.
      * \param filename The texture that should be loaded from the hard disk
@@ -73,7 +73,6 @@ public:
     virtual std::unique_ptr<opengl::Texture> loadTexture(
         const std::string& filename) const = 0;
 
-
     /**
     * Loads a Texture from the memory pointed at by \p memory. The memory block must
     * contain at least \p size number of bytes. 
@@ -85,7 +84,7 @@ public:
     */
     virtual std::unique_ptr<opengl::Texture> loadTexture(void* memory,
         size_t size) const = 0;
-    
+
     /**
      * Returns a list of all extensions that this TextureReaderBase supports.
      * \return A list of all extensions that this TextureReaderBase supports

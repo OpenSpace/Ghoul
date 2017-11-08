@@ -68,19 +68,19 @@ public:
     * is changed.
     */
     using ProgramObjectCallback = std::function<void(ProgramObject*)>;
-    
+
     /// Main exception that is thrown by methods of the ProgramObject class
     struct ProgramObjectError : public RuntimeError {
         explicit ProgramObjectError(std::string message);
     };
-    
+
     /// Exception that is thrown if the linking of a ProgramObject fails
     struct ProgramObjectLinkingError : public ProgramObjectError {
         ProgramObjectLinkingError(std::string linkerError, std::string programName);
 
         /// The linker error that was returned from the GLSL linker
         std::string linkerError;
-        
+
         /// The name of the program that caused the exception to be thrown
         std::string programName;
     };
@@ -258,7 +258,7 @@ public:
     static std::unique_ptr<ProgramObject> Build(const std::string& name,
         const std::string& vertexShaderPath, const std::string& fragmentShaderPath,
         Dictionary dictionary = Dictionary());
-    
+
     /**
      * Constructs and links a ProgramObject built from the provided \p vertexShaderPath
      * vertex shader, \p geometryShaderPath geometry shader, and \p fragmentShaderPath
@@ -321,8 +321,6 @@ public:
         const std::string& tessellationEvaluationShaderPath,
         const std::string& tessellationControlShaderPath,
         Dictionary dictionary = Dictionary());
-    
-
 
     //////////////////////////////////////////////////////////////////////////////////////
     ////// Uniforms
@@ -334,7 +332,7 @@ public:
      * \param ignoreError Should the location error be ignored?
      */
     void setIgnoreUniformLocationError(IgnoreError ignoreError);
-    
+
     /**
      * Returns the state of this ProgramObject if the logging of location errors should be
      * enabled or not.
@@ -1616,7 +1614,7 @@ public:
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLint v1, GLint v2, GLint v3);
-    
+
     /**
      * Sets the uniform located at \p location with the passed values \p v1, \p v2, \p v3,
      * and \p v4. Will call the OpenGL function <code>glProgramUniform4i</code>.
@@ -3423,7 +3421,7 @@ public:
      * \pre \p name must not be empty
      */
     GLuint subroutineIndex(ShaderObject::ShaderType shaderType, const std::string& name);
-    
+
     /**
      * Returns the location of the subroutine uniform with the name \p name inside the
      * attached shader object of type \p shaderType. If the subroutine uniform could not

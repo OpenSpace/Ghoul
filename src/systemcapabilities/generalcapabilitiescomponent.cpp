@@ -54,7 +54,6 @@ namespace std {
     std::string to_string(
         ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem os);
 
-
     std::string to_string(
         ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem os)
     {
@@ -90,25 +89,24 @@ namespace std {
                 return "";
             default:
                 throw ghoul::MissingCaseException();
-
         }
     }
 } // namespace std
 
 namespace ghoul::systemcapabilities {
-    
+
 GeneralCapabilitiesComponent::GeneralCapabilitiesComponentError::
     GeneralCapabilitiesComponentError(std::string msg)
     : RuntimeError(std::move(msg), "GeneralCapabilitiesComponent")
 {}
-    
+
 GeneralCapabilitiesComponent::OperatingSystemError::OperatingSystemError(std::string d,
                                                                          std::string e)
     : GeneralCapabilitiesComponentError(d + ". Error: " + e)
     , description(std::move(d))
     , errorMessage(std::move(e))
 {}
-    
+
 GeneralCapabilitiesComponent::MainMemoryError::MainMemoryError(std::string msg)
     : GeneralCapabilitiesComponentError(std::move(msg))
 {}
@@ -140,7 +138,7 @@ void GeneralCapabilitiesComponent::detectOS() {
     // All rights remain with their original copyright owners
     OSVERSIONINFOEX osVersionInfo;
     SYSTEM_INFO systemInfo;
-    
+
     ZeroMemory(&systemInfo, sizeof(SYSTEM_INFO));
     ZeroMemory(&osVersionInfo, sizeof(OSVERSIONINFOEX));
     osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
@@ -311,7 +309,7 @@ void GeneralCapabilitiesComponent::detectOS() {
         }
 
         resultStream << "(build " << osVersionInfo.dwBuildNumber << ")";
-        
+
         if (osVersionInfo.dwMajorVersion >= 6) {
             if (systemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64) {
                 resultStream << ", 64-bit";
@@ -336,8 +334,7 @@ void GeneralCapabilitiesComponent::detectOS() {
             std::to_string(res)
         );
     }
-    
-    
+
     std::stringstream resultStream;
     resultStream << name.sysname << " " << name.release << " "
         << name.version << " " << name.machine;
@@ -385,7 +382,7 @@ void GeneralCapabilitiesComponent::detectMemory() {
     sysctl(mib, 2, NULL, &len, NULL, 0);
     std::vector<char> p(len);
     sysctl(mib, 2, p.data(), &len, NULL, 0);
-    
+
     int64_t value;
     std::memcpy(&value, p.data(), sizeof(int64_t));
     _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
@@ -443,7 +440,6 @@ void GeneralCapabilitiesComponent::detectCPU() {
     bool    bMONITOR_MWAIT = false;
     bool    bCPLQualifiedDebugStore = false;
     bool    bThermalMonitor2 = false;
-
 
     // __cpuid with an InfoType argument of 0 returns the number of
     // valid Ids in CPUInfo[0] and the CPU identification string in
@@ -503,20 +499,22 @@ void GeneralCapabilitiesComponent::detectCPU() {
         bThermalMonitor2)
     {
 
-        if (bSSE3NewInstructions)
+        if (bSSE3NewInstructions) {
             extensions << "sse3 ";
-        if (bMONITOR_MWAIT)
+        }
+        if (bMONITOR_MWAIT) {
             extensions << "mwait "; // @TODO:  "MONITOR/MWAIT" is this correct? ---jonasstrandstedt
-        if (bCPLQualifiedDebugStore)
+        }
+        if (bCPLQualifiedDebugStore) {
             extensions << "ds_cpl ";
-        if (bThermalMonitor2)
+        }
+        if (bThermalMonitor2) {
             extensions << "tm2 ";
+        }
         unsigned i = 0;
         nIds = 1;
-        while (i < (sizeof(szFeatures) / sizeof(const char*)))
-        {
-            if (nFeatureInfo & nIds)
-            {
+        while (i < (sizeof(szFeatures) / sizeof(const char*))) {
+            if (nFeatureInfo & nIds) {
                 extensions << szFeatures[i] << " ";
             }
 
@@ -542,19 +540,19 @@ void GeneralCapabilitiesComponent::detectCPU() {
     int mib[2];
     size_t len = 512;
     int intValue;
-    
+
 //    mib[0] = CTL_HW;
 //    mib[1] = USER_CS_PATH;
 //    mib[1] = HW_MODEL;
 //    mib[1] = HW_MACHINE_ARCH;
-    
+
 //    sysctl(mib, 2, NULL, &len, NULL, 0);
     char p[512];
 //    p = new char[len];
 //    sysctl(mib, 2, p, &len, NULL, 0);
 //    _cpu = p;
 //    delete[] p;
-    
+
     // CPU name
 //    sysctlbyname( "machdep.cpu.brand_string", NULL, &len, NULL, 0 );
 //    p = new char[len];
@@ -562,7 +560,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     sysctlbyname("machdep.cpu.brand_string", p, &len, NULL, 0 );
     _cpu = p;
 //    delete[] p;
-    
+
     // CPU features/extensions
 //    sysctlbyname( "machdep.cpu.features", NULL, &len, NULL, 0 );
 //    p = new char[len];
@@ -570,12 +568,12 @@ void GeneralCapabilitiesComponent::detectCPU() {
     sysctlbyname( "machdep.cpu.features", p, &len, NULL, 0 );
     _extensions = p;
 //    delete[] p;
-    
+
     // It works using reinterpret_cast<char*>(&intValue) directly
     // since the expected size is an integer. But to avoid risks
     // of memory corruption I have chosen the C-style detection
     // and conversion.
-    
+
     // Number of cores
     mib[0] = CTL_HW;
     mib[1] = HW_AVAILCPU;
@@ -586,7 +584,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     std::memcpy(&intValue, p, sizeof(int));
     _cores = static_cast<unsigned int>(intValue);
 //    delete[] p;
-    
+
     // Cacheline size
     mib[0] = CTL_HW;
     mib[1] = HW_CACHELINE;
@@ -597,7 +595,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     std::memcpy(&intValue, p, sizeof(int));
     _cacheLineSize = static_cast<unsigned int>(intValue);
 //    delete[] p;
-    
+
     // Cache size
     mib[0] = CTL_HW;
     mib[1] = HW_L2CACHESIZE;
@@ -608,7 +606,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     std::memcpy(&intValue, p, sizeof(int));
     _cacheSize = static_cast<unsigned int>(intValue);
 //    delete[] p;
-    
+
     // L2 associativity
 //    sysctlbyname( "machdep.cpu.cache.L2_associativity", NULL, &len, NULL, 0 );
 //    p = new char[len];
@@ -684,11 +682,11 @@ GeneralCapabilitiesComponent::operatingSystem() const
 {
     return _operatingSystem;
 }
-    
+
 std::string GeneralCapabilitiesComponent::operatingSystemString() const {
     return std::to_string(_operatingSystem) + " " + _operatingSystemExtra;
 }
-    
+
 std::string GeneralCapabilitiesComponent::fullOperatingSystem() const {
     return _fullOperatingSystem;
 }

@@ -28,7 +28,7 @@
 #include <fmt/format.h>
 
 namespace ghoul::io {
- 
+
 TextureWriterBase::TextureWriteException::TextureWriteException(std::string n,
                                                                 std::string m,
                                                                const TextureWriterBase& w)
@@ -37,5 +37,5 @@ TextureWriterBase::TextureWriteException::TextureWriteException(std::string n,
     , message(std::move(m))
     , writer(w)
 {}
-    
+
 } // namespace ghoul::io

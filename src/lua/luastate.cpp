@@ -28,17 +28,17 @@
 #include <ghoul/lua/lua_helper.h>
 
 namespace ghoul::lua {
-    
+
 LuaState::LuaState(bool includeStandardLibraries)
     : _state(ghoul::lua::createNewLuaState(includeStandardLibraries))
 {}
-    
+
 LuaState::~LuaState() {
     if (_state) {
         ghoul::lua::destroyLuaState(_state);
     }
 }
-    
+
 LuaState::operator lua_State*() const {
     return _state;
 }

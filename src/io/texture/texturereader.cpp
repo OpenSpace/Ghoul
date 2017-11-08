@@ -34,12 +34,12 @@
 #include <fmt/format.h>
 
 namespace ghoul::io {
-    
+
 TextureReader::MissingReaderException::MissingReaderException(std::string extension)
     : RuntimeError(fmt::format("No reader was found for extension '{}'", extension), "IO")
     , fileExtension(std::move(extension))
 {}
-    
+
 TextureReader& TextureReader::ref() {
     static TextureReader textureReader;
     return textureReader;
@@ -48,10 +48,10 @@ TextureReader& TextureReader::ref() {
 std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& filename) {
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
+
     const std::string& extension = ghoul::filesystem::File(filename).fileExtension();
     ghoul_assert(!extension.empty(), "Filename must have an extension");
-    
+
     TextureReaderBase* reader = readerForExtension(extension);
     return reader->loadTexture(filename);
 }
@@ -88,14 +88,14 @@ void TextureReader::addReader(std::shared_ptr<TextureReaderBase> reader) {
         ),
         "Readers must not be added twice"
     );
-    
+
     _readers.push_back(reader);
 }
 
 std::vector<std::shared_ptr<TextureReaderBase>> TextureReader::readers() const {
     return _readers;
 }
-    
+
 TextureReaderBase* TextureReader::readerForExtension(const std::string& extension) {
     std::string lowerExtension = extension;
     std::transform(

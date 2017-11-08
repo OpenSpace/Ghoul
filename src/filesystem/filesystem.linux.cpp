@@ -36,7 +36,6 @@
 #include <regex>
 #include <cstdio>
 
-
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/param.h>
@@ -113,12 +112,12 @@ void FileSystem::inotifyWatcher() {
         if (select(FD_SETSIZE, &rfds, nullptr, nullptr, &tv) < 1) {
             continue;
         }
-        
+
         ssize_t length = read(fd, buffer, BUF_LEN );
         if (length < 0) {
             continue;
         }
-        
+
         long unsigned int offset = 0;
         while (offset < static_cast<long unsigned int>(length)) {
             struct inotify_event* e = reinterpret_cast<inotify_event*>(buffer + offset);

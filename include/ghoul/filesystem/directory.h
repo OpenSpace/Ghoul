@@ -54,7 +54,7 @@ public:
      * current working directory.
      */
     Directory();
-    
+
     /**
      * This constructor creates a Directory object pointing to the \p path. If
      * \p isRawPath is <code>true</code>, the \p path is used as-is and not modified. If
@@ -116,7 +116,7 @@ public:
      * directory.
      */
     Directory parentDirectory(AbsolutePath absolutePath = AbsolutePath::No) const;
-    
+
     /**
      * This method creates a list of all files and subdirectories in the current directory
      * and returns the paths to each. If \p recursiveSearch is <code>true</code>, each

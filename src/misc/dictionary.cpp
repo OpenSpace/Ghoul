@@ -41,7 +41,7 @@ using namespace ghoul::internal;
  *
  * The calling hierachy for the #ghoul::Dictionary::setValue,
  * #ghoul::Dictionary::getValue, and #ghoul::Dictionary::hasValue methods are as follows:
- 
+
  * #ghoul::Dictionary::value <code>-></code> #ghoul::Dictionary::getValue <code>-></code>
  * #ghoul::Dictionary::getValueInternal <code>-></code> #ghoul::Dictionary::getValueHelper
  *
@@ -53,15 +53,15 @@ using namespace ghoul::internal;
  */
 
 namespace ghoul {
-    
+
 Dictionary::DictionaryError::DictionaryError(std::string msg)
     : RuntimeError(std::move(msg), "Dictionary")
 {}
-    
+
 Dictionary::KeyError::KeyError(std::string msg)
     : DictionaryError(std::move(msg))
 {}
-    
+
 Dictionary::ConversionError::ConversionError(std::string msg)
     : DictionaryError(std::move(msg))
 {}
@@ -122,7 +122,7 @@ EXTERN_TEMPLATE_DEFINITION(glm::dmat3x4);
 EXTERN_TEMPLATE_DEFINITION(glm::dmat4x2);
 EXTERN_TEMPLATE_DEFINITION(glm::dmat4x3);
 EXTERN_TEMPLATE_DEFINITION(glm::dmat4x4);
-    
+
 #undef EXTERN_TEMPLATE_DEFINITION
 #undef EXTERN_TEMPLATE_DEFINITION_SCALAR
 
@@ -155,12 +155,12 @@ bool Dictionary::getValue<std::string>(const std::string& key, std::string& val)
     }
     return false;
 }
-    
+
 template <>
 std::string Dictionary::value<std::string>(const std::string& key) const {
     std::string tmp;
     bool s = getValue(key, tmp);
-    
+
     if (s) {
         return tmp;
     }
@@ -212,7 +212,7 @@ std::vector<string> Dictionary::keys(const string& location) const {
 
 bool Dictionary::hasKey(const string& key) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
-    
+
     auto it = find(key);
     if (it != cend()) {
         return true;
@@ -248,7 +248,7 @@ bool Dictionary::empty() const {
 
 bool Dictionary::removeKey(const std::string& key) {
     ghoul_assert(!key.empty(), "Key must not be empty");
-    
+
     std::map<std::string, ghoul::any>::size_type res = erase(key);
     return (res == 1);
 }

@@ -30,12 +30,12 @@ namespace ghoul {
 template <typename T>
 bool isConvertible(const Dictionary& dict) {
     using StorageType = internal::StorageTypeConverter<T>;
-    
+
     bool correctSize = dict.size() == StorageType::size;
     if (!correctSize) {
         return false;
     }
-    
+
     const std::vector<std::string>& keys = dict.keys();
     for (size_t i = 0; i < StorageType::size; ++i) {
         const std::string& key = keys[i];
@@ -59,7 +59,7 @@ bool isConvertible(const Dictionary& dict) {
 ///////////
 // setValue
 ///////////
-    
+
 template <typename T>
 void Dictionary::setValueHelper(std::string key, T value,
                                 CreateIntermediate createIntermediate)
@@ -72,7 +72,7 @@ void Dictionary::setValueHelper(std::string key, T value,
         (*this)[std::move(key)] = std::move(value);
         return;
     }
-    
+
     // if we get to this point, the 'key' did contain a nested key
     // so we have to find the correct Dictionary (or create it if it doesn't exist)
     auto keyIt = find(first);
@@ -85,7 +85,7 @@ void Dictionary::setValueHelper(std::string key, T value,
         else
             throw KeyError("Intermediate key '{}' was not found in dictionary" + first);
     }
-    
+
     // See if it is actually a Dictionary at this location
     Dictionary* dict = ghoul::any_cast<Dictionary>(&(keyIt->second));
     if (dict == nullptr) {
@@ -97,7 +97,7 @@ void Dictionary::setValueHelper(std::string key, T value,
     // Proper tail-recursion
     dict->setValue(std::move(rest), std::move(value), createIntermediate);
 }
-    
+
 template <typename T>
 void Dictionary::setValueInternal(std::string key, T value,
                                   CreateIntermediate createIntermediate,
@@ -116,7 +116,7 @@ void Dictionary::setValueInternal(std::string key, T value,
                                   IsStandardVectorType<T>*)
 {
     using StorageType = internal::StorageTypeConverter<T>;
-    
+
     std::array<typename StorageType::type, StorageType::size> v;
     auto ptr = glm::value_ptr(value);
     for (size_t i = 0; i < StorageType::size; ++i)
@@ -139,11 +139,11 @@ void Dictionary::setValue(std::string key, T value,
     ghoul_assert(!key.empty(), "Key must not be empty");
     setValueInternal(std::move(key), std::move(value), createIntermediate);
 }
-    
+
 ///////////
 // getValue
 ///////////
-    
+
 template <typename T>
 void ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
     // If we can find the key directly, we can return it immediately
@@ -160,13 +160,13 @@ void ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
         value = *v;
         return;
     }
-    
+
     // if we get to this point, the 'key' did contain a nested key
     // so we have to find the correct Dictionary (or create it if it doesn't exist)
     std::string first;
     std::string rest;
     splitKey(key, first, rest);
-    
+
     auto keyIt = find(first);
     if (keyIt == cend())
         throw KeyError("Could not find key '" + first + "' in Dictionary");
@@ -924,7 +924,7 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
         typename internal::StorageTypeConverter<T>::type,
         internal::StorageTypeConverter<T>::size
     >;
-    
+
     bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
@@ -973,7 +973,7 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
 template <typename T>
 bool Dictionary::getValue(const std::string& key, T& value) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
-    
+
     try {
         bool keyExists = hasKey(key);
         if (!keyExists)
@@ -991,7 +991,7 @@ bool Dictionary::getValue(const std::string& key, T& value) const {
 template <typename T>
 T ghoul::Dictionary::value(const std::string& key) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
-    
+
     T value;
     getValueInternal(key, value);
     return value;
@@ -1009,25 +1009,25 @@ bool ghoul::Dictionary::hasValueHelper(const std::string& key) const {
         bool typeCorrect = (it->second.type() == typeid(T));
         return typeCorrect;
     }
-    
+
     std::string first;
     std::string rest;
     splitKey(key, first, rest);
-    
+
     auto keyIt = find(first);
     if (keyIt == cend())
         // If we can't find the first part of nested key, there is no need to continue
         return false;
-    
+
     const Dictionary* dict = ghoul::any_cast<Dictionary>(&(keyIt->second));
     if (dict == nullptr)
         // If it is not a Dictionary, the value can't be found and no recursion necessary
         return false;
-    
+
     // Proper tail-recursion
     return dict->hasValue<T>(rest);
 }
-    
+
 template <typename T>
 bool Dictionary::hasValueInternal(const std::string& key, IsStandardScalarType<T>*) const
 {
@@ -1077,10 +1077,10 @@ bool Dictionary::hasValueInternal(const std::string& key, IsNonStandardType<T>*)
 template <typename T>
 bool Dictionary::hasValue(const std::string& key) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
-    
+
     return hasValueInternal<T>(key);
 }
-    
+
 template <typename T>
 bool Dictionary::hasKeyAndValue(const std::string& key) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
@@ -1093,7 +1093,7 @@ bool Dictionary::hasKeyAndValue(const std::string& key) const {
 // Extern define template declaration such that the compiler won't try to instantiate each
 // member function individually whenever it is encountered. The definitions are located
 // in the dictionary.cpp compilation unit
-    
+
 #define EXTERN_TEMPLATE_DECLARATION(__TYPE__) \
 extern template void Dictionary::setValue<__TYPE__>(std::string, __TYPE__,               \
     CreateIntermediate);                                                                 \
@@ -1106,7 +1106,7 @@ extern template void Dictionary::setValueHelper<__TYPE__>(std::string, __TYPE__,
 extern template void Dictionary::getValueHelper<__TYPE__>(const std::string&,            \
                                                                        __TYPE__&) const; \
 extern template bool Dictionary::hasValueHelper<__TYPE__>(const std::string&) const;
-    
+
 EXTERN_TEMPLATE_DECLARATION(char);
 EXTERN_TEMPLATE_DECLARATION(signed char);
 EXTERN_TEMPLATE_DECLARATION(unsigned char);
@@ -1157,11 +1157,11 @@ EXTERN_TEMPLATE_DECLARATION(glm::dmat4x4);
 
 template <>
 bool Dictionary::getValue<Dictionary>(const std::string& key, Dictionary& value) const;
-    
+
 template <>
 bool Dictionary::getValue<std::string>(const std::string& key, std::string& value) const;
-    
+
 template <>
 std::string Dictionary::value<std::string>(const std::string& key) const;
-    
+
 } // namespace ghoul

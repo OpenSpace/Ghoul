@@ -67,14 +67,14 @@ public:
 
         /// The compile error as reported by the GLSL compiler
         std::string compileError;
-        
+
         /// File identifiers of included files as reported by ShaderPreprocessor
         std::string fileIdentifiers;
-        
+
         /// The name of the ShaderObject that caused the compile error
         std::string shaderName;
     };
-    
+
     /**
      * An enum of the different types of shaders that can be used in OpenGL. They can be 
      * used interchangeably in native OpenGL calls, too. Compute shaders are only 

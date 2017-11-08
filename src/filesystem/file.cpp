@@ -44,11 +44,11 @@ namespace {
     const string _loggerCat = "File";
 #ifdef WIN32
     const unsigned int changeBufferSize = 16384u;
-    
+
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
-#endif
-#endif
+#endif // _CRT_SECURE_NO_WARNINGS
+#endif // WIN32
 } // namespace
 
 namespace ghoul::filesystem {
@@ -62,7 +62,7 @@ File::File(std::string filename, RawPath isRawPath,
     : _fileChangedCallback(std::move(fileChangedCallback))
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
+
     _filename = isRawPath ?
         std::move(filename) :
         std::move(FileSys.absolutePath(std::move(filename)));
@@ -159,7 +159,7 @@ string File::fileExtension() const {
         return _filename;
     }
 }
-    
+
 std::string File::lastModifiedDate() const {
     if (!FileSys.fileExists(_filename)) {
         throw FileException(fmt::format(

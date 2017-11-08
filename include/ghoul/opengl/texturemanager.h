@@ -51,7 +51,7 @@ public:
     struct TextureManagerError : public RuntimeError {
         explicit TextureManagerError(std::string message);
     };
-    
+
     /**
      * This method returns a reference to the initialized TextureManager.
      * \return An initialized reference to the singleton manager
@@ -125,7 +125,7 @@ public:
 private:
     /// The singleton member
     static TextureManager* _manager;
-    
+
     /// Map containing all the registered Texture%s
     std::map<unsigned int, std::unique_ptr<Texture>> _textures;
 };

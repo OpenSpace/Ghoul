@@ -44,18 +44,18 @@ public:
     struct TemplateFactoryError : public RuntimeError {
         explicit TemplateFactoryError(std::string message);
     };
-    
+
     /// Exception that is thrown if a requested class has not been registered before
     struct TemplateClassNotFoundError : public TemplateFactoryError {
         explicit TemplateClassNotFoundError(std::string className);
         std::string className;
     };
-    
+
     /// Exception that is thrown if a registered class is called with a wrong constructor
     struct TemplateConstructionError : public TemplateFactoryError {
         explicit TemplateConstructionError(std::string message);
     };
-    
+
     virtual const std::type_info& baseClassType() const = 0;
     virtual ~TemplateFactoryBase();
 
@@ -223,7 +223,7 @@ public:
      * \pre \p className must not be empty
      */
     bool hasClass(const std::string& className) const override;
-    
+
     /**
      * Returns the list of all registered classes. All values in this vector can be used
      * to instantiate a new class sing the #create method

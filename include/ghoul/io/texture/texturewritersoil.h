@@ -48,7 +48,7 @@ public:
      */
     void saveTexture(const opengl::Texture& texture,
         const std::string& filename) const override;
-    
+
     /**
      * Returns the supported extensions.
      * \return The supported extensions

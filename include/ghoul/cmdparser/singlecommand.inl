@@ -100,7 +100,7 @@ void SingleCommand<T, U, V, W>::checkParameters(
 {
     CommandlineCommand::checkParameters(parameters);
     is<T>(parameters[0]);
-    
+
     if (_ptr2) {
         is<U>(parameters[1]);
     }

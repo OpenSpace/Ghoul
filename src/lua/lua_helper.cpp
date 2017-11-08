@@ -40,15 +40,15 @@ using std::string;
 static lua_State* _state = nullptr;
 
 namespace {
-    
+
 static const int KeyTableIndex = -2;
 static const int ValueTableIndex = -1;
 
 string luaTableToString(lua_State* state, int tableLocation = KeyTableIndex);
-    
+
 string luaValueToString(lua_State* state, int location) {
     ghoul_assert(state, "State must not be nullptr");
-    
+
     int type = lua_type(state, location);
     switch (type) {
         case LUA_TBOOLEAN:
@@ -63,15 +63,15 @@ string luaValueToString(lua_State* state, int location) {
             return ghoul::lua::luaTypeToString(type);
     }
 }
-    
+
 string luaTableToString(lua_State* state, int tableLocation) {
     ghoul_assert(state, "State must not be nullptr");
     ghoul_assert(lua_istable(state, tableLocation), "Lua object is not a table");
-    
+
     std::stringstream result;
     lua_pushvalue(state, tableLocation);
     lua_pushnil(state);
-    
+
     result << "{ ";
     while (lua_next(state, -2) != 0) {
         result << luaValueToString(state, KeyTableIndex);
@@ -104,13 +104,13 @@ LuaFormatException::LuaFormatException(string msg, string file)
     : LuaRuntimeException(std::move(msg))
     , filename(std::move(file))
 {}
-    
+
 LuaLoadingException::LuaLoadingException(string error, string file)
     : LuaRuntimeException(fmt::format("Error loading script '{}': {}", file, error))
     , errorMessage(std::move(error))
     , filename(std::move(file))
 {}
-    
+
 LuaExecutionException::LuaExecutionException(string error, string file)
     : LuaRuntimeException(fmt::format("Error executing script '{}': {}", file, error))
     , errorMessage(std::move(error))
@@ -119,7 +119,7 @@ LuaExecutionException::LuaExecutionException(string error, string file)
 
 string errorLocation(lua_State* state) {
     ghoul_assert(state, "State must not be empty");
-    
+
     luaL_where(state, 1);
     string result = lua_tostring(state, -1);
     lua_pop(state, 1);
@@ -128,7 +128,7 @@ string errorLocation(lua_State* state) {
 
 string stackInformation(lua_State* state) {
     ghoul_assert(state, "State must not be nullptr");
-    
+
     std::stringstream result;
     int top = lua_gettop(state);
     if (top == 0) {
@@ -179,7 +179,7 @@ void loadDictionaryFromFile(const string& filename, ghoul::Dictionary& dictionar
     if (!FileSys.fileExists(absFilename)) {
         throw ghoul::FileNotFoundError(absFilename);
     }
-    
+
     if (state == nullptr) {
         state = staticLuaState();
     }
@@ -207,7 +207,7 @@ void loadDictionaryFromFile(const string& filename, ghoul::Dictionary& dictionar
     // Clean up after ourselves by cleaning the stack
     lua_settop(state, 0);
 }
-    
+
 ghoul::Dictionary loadDictionaryFromFile(const string& filename, lua_State* state) {
     ghoul::Dictionary result;
     loadDictionaryFromFile(filename, result, state);
@@ -218,7 +218,7 @@ void loadDictionaryFromString(const string& script, Dictionary& dictionary,
                                                                          lua_State* state)
 {
     ghoul_assert(!script.empty(), "Script must not be empty");
-    
+
     if (state == nullptr) {
         state = staticLuaState();
     }
@@ -245,20 +245,20 @@ void loadDictionaryFromString(const string& script, Dictionary& dictionary,
     // Clean up after ourselves by cleaning the stack
     lua_settop(state, 0);
 }
-    
+
 Dictionary loadDictionaryFromString(const string& script, lua_State* state) {
     Dictionary result;
     loadDictionaryFromString(script, result, state);
     return result;
 }
-    
+
 void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
     enum class TableType {
         Undefined = 1,  // 001
         Map = 3,        // 010
         Array = 5       // 101
     };
-    
+
     ghoul_assert(state, "State must not be nullptr");
 
     TableType type = TableType::Undefined;
@@ -285,7 +285,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
                           "Dictionary can only contain a pure map or a pure array"
                     );
                 }
-                
+
                 type = TableType::Map;
                 key = lua_tostring(state, KeyTableIndex);
                 break;
@@ -355,10 +355,10 @@ void destroyLuaState(lua_State* state) {
     ghoul_assert(state, "State must not be nullptr");
     lua_close(state);
 }
-    
+
 void runScriptFile(lua_State* state, const std::string& filename) {
     ghoul_assert(state, "State must not be nullptr");
-    
+
     if (filename.empty()) {
         throw ghoul::FileNotFoundError(filename, "Filename is an empty string");
     }
@@ -372,7 +372,7 @@ void runScriptFile(lua_State* state, const std::string& filename) {
     if (status != LUA_OK) {
         throw LuaLoadingException(lua_tostring(state, -1));
     }
-    
+
     if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
         const std::string error = lua_tostring(state, -1);
         throw LuaExecutionException(error);
@@ -382,12 +382,12 @@ void runScriptFile(lua_State* state, const std::string& filename) {
 void runScript(lua_State* state, const std::string& script) {
     ghoul_assert(state, "State must not be nullptr");
     ghoul_assert(!script.empty(), "Script must not be empty");
-    
+
     int status = luaL_loadstring(state, script.c_str());
     if (status != LUA_OK) {
         throw LuaLoadingException(lua_tostring(state, -1));
     }
-    
+
     if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
         throw LuaExecutionException(lua_tostring(state, -1));
     }

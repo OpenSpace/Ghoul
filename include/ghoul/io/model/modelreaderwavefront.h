@@ -52,7 +52,7 @@ public:
     std::unique_ptr<opengl::VertexBufferObject> loadModel(
         const std::string& filename) const;
 };
-    
+
 } // namespace io
 } // namespace ghoul
 

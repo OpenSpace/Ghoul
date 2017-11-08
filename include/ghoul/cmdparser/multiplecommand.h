@@ -184,11 +184,10 @@ public:
      * \param infoText The info text that will be presented to the user if it is requested
      * by the CommandlineParser
      * \pre \p ptr must not be a <code>nullptr</code>
-     
      */
     MultipleCommandZeroArguments(int* ptr, std::string name, std::string shortName = "",
         std::string infoText = "");
-    
+
     /**
      * Increases the <code>int</code> value passed in the constructor by one per
      * execution.

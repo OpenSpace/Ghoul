@@ -27,7 +27,7 @@
 #include <sstream>
 
 namespace ghoul::logging {
-    
+
 LogLevel LogManager::logLevel() const {
     return _level;
 }
@@ -99,7 +99,7 @@ LOGC(ghoul::logging::LogLevel::Trace, __category__, __message__)
  * _loggerCat needs to be defined and should contain the category.
  */
 #define LTRACE(__message__) LTRACEC(_loggerCat, __message__)
-                
+
 /**
  * Logs the 'message' with a level of LogLevel::Debug. A variable called
  * _loggerCat needs to be defined and should contain the category.

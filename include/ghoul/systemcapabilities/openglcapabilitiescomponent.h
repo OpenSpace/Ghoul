@@ -48,11 +48,11 @@ public:
     struct OpenGLCapabilitiesComponentError : public RuntimeError {
         explicit OpenGLCapabilitiesComponentError(std::string message);
     };
-    
+
     struct GPUVendorError : public OpenGLCapabilitiesComponentError {
         explicit GPUVendorError(std::string message);
     };
-    
+
     /// This enum stores the possible vendors of graphics cards that can be detected
     enum class Vendor {
         Nvidia, ///< Nvidia
@@ -188,7 +188,7 @@ protected:
     std::vector<std::string> _extensions;
     /// GLEW Version
     Version _glewVersion;
-    
+
     /// The maximum supported texture size can have
     int _maxTextureSize = -1;
     /// The maximum supported texture size for 3D textures
@@ -203,7 +203,7 @@ protected:
     int _numUniformBufferBindings = -1;
     /// The maximum number of color attachments for an FBO
     int _maxFramebufferColorAttachments = -1;
-    
+
     // Only used in WMI, but declared nevertheless to prevent a mismatch in compiler flags
     // between the cpp file and an application including this header
     /// Stores the version of the installed driver

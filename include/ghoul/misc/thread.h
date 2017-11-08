@@ -43,7 +43,7 @@ enum class ThreadPriorityClass {
     Normal,
     High
 };
-    
+
 
 /**
  * Determines the priority level of a thread within a ThreadPriorityClass. The available
@@ -60,7 +60,7 @@ enum class ThreadPriorityLevel {
 };
 
 using Background = ghoul::Boolean;
-    
+
 /**
  * This method sets the priorty of the thread \p t to the ThreadPriorityClass
  * \p priorityClass and the ThreadPriorityLevel to \p priorityLevel.

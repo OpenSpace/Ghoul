@@ -27,7 +27,7 @@
 #define __GHOUL___INTERPOLATOR___H__
 
 namespace ghoul {
-    
+
 /**
  * Returns an interpolated value based on the factor supplied in \p t. In addition to the
  * interpolation factor \p t two values which to interpolate between must be supplied.

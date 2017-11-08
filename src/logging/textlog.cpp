@@ -37,7 +37,7 @@ TextLog::TextLog(const std::string& filename, Append writeToAppend,
     , _printFooter(writeToAppend)
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
+
     _file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
 
     if (writeToAppend) {
@@ -68,7 +68,7 @@ void TextLog::log(LogLevel level, const std::string& category,
         if (isTimeStamping()) {
             output += " | " + getTimeString();
         }
-        
+
         if (isDateStamping() || isTimeStamping()) {
             output += "] ";
         }

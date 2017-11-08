@@ -31,7 +31,7 @@
 #include <type_traits>
 
 namespace ghoul::opengl::debug {
-    
+
 namespace {
 void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei,
                         const GLchar* message, const GLvoid* userParam)
@@ -39,7 +39,7 @@ void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GL
     const CallbackFunction& cb = *reinterpret_cast<const CallbackFunction*>(
         userParam
     );
-        
+
     cb(
         Source(source),
         Type(type),
@@ -98,7 +98,6 @@ void setDebugMessageControl(Source source, Type type,
     );
 }
 
-    
 //using Callback = void *(Source source, Type type, Severity severity, unsigned int id
 //  std::string message);
 void setDebugCallback(CallbackFunction callback) {

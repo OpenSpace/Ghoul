@@ -33,15 +33,15 @@
 
 namespace {
     std::vector<std::string> PermanentlyIgnoredAsserts;
-    
+
     std::string hashing(std::string file, int line) {
         return file + "||" + std::to_string(line);
     }
-    
+
     void addPermanentlyIgnoredAssert(std::string file, int line) {
         PermanentlyIgnoredAsserts.emplace_back(hashing(file, line));
     }
-    
+
     bool isPermanentlyIgnored(std::string file, int line) {
         auto it = std::find(
             PermanentlyIgnoredAsserts.begin(),
@@ -64,7 +64,7 @@ AssertionException::AssertionException(std::string exp, std::string msg,
 MissingCaseException::MissingCaseException()
     : std::runtime_error("Missing case label")
 {}
-    
+
 void internal_assert(std::string expression, std::string message, std::string file,
                                                            std::string function, int line)
 {

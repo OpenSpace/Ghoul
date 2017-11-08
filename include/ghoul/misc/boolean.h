@@ -37,7 +37,7 @@ namespace ghoul {
  * For example:
  * \verbatim
 using AllowOverride = ghoul::Boolean;
- 
+
 void foo(std::string value, AllowOverride override = AllowOverride::Yes);
 \endverbatim
  * Though it is more verbal, it elimiates ambiguity regarding parameters. This class is
@@ -49,14 +49,14 @@ struct Boolean {
         Yes = 1,
         No = 0
     };
-   
+
     /// Non-explicit constructor so that we can automatically convert between different
     /// aliases of Boolean
     constexpr Boolean(Value v) : value(v) {}
 
     /// Explicit constructor to convert from \c bool into Boolean
     constexpr explicit Boolean(bool v) : value(v ? Yes : No) {}
-    
+
     /**
      * This operator returns <code>true</code> if the stored value is equal to
      * <code>Yes</code>.
@@ -66,7 +66,7 @@ struct Boolean {
 
     Value value;
 };
-    
+
 } // namespace ghoul
 
 #endif // __GHOUL___BOOLEAN___H__

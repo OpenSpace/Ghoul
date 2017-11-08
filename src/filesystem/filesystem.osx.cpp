@@ -32,7 +32,7 @@
 namespace {
     // the maximum latency allowed before a changed is registered
     const CFAbsoluteTime Latency = 1.0;
-    
+
     enum Events {
         kFSEventStreamEventFlagNone = 0x00000000,
         kFSEventStreamEventFlagMustScanSubDirs = 0x00000001,
@@ -57,7 +57,7 @@ namespace {
         kFSEventStreamEventFlagItemIsDir = 0x00020000,
         kFSEventStreamEventFlagItemIsSymlink = 0x00040000
     };
-    
+
     void completionHandler(ConstFSEventStreamRef, void*, size_t numEvents,
                            void* eventPaths, const FSEventStreamEventFlags eventFlags[],
                            const FSEventStreamEventId[])
@@ -67,7 +67,7 @@ namespace {
             using Events::kFSEventStreamEventFlagItemModified;
             using Events::kFSEventStreamEventFlagItemInodeMetaMod;
             using Events::kFSEventStreamEventFlagItemIsFile;
-            
+
             const bool mod = eventFlags[i] & kFSEventStreamEventFlagItemModified;
             const bool iNode = eventFlags[i] & kFSEventStreamEventFlagItemInodeMetaMod;
             const bool file = eventFlags[i] & kFSEventStreamEventFlagItemIsFile;
@@ -103,7 +103,7 @@ void FileSystem::addFileListener(File* file) {
         ghoul_assert(it->second != file, "File already registered");
     }
 #endif
-    
+
     std::string d = file->directoryName();
     auto f = _directories.find(d);
     if (f == _directories.end()) {
@@ -169,7 +169,7 @@ void FileSystem::removeFileListener(File* file) {
         found |= (it->second == file);
     }
     ghoul_assert(found, "File not previously registered");
-    
+
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
         //LDEBUG("comparing for removal, " << file << "==" << it->second);
         if (it->second == file) {
@@ -190,7 +190,7 @@ void FileSystem::callbackHandler(const std::string& path) {
     if (n == 0) {
         return;
     }
-    
+
     auto eqRange = files.equal_range(path);
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
         File* f = (*it).second;

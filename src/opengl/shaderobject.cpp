@@ -38,7 +38,7 @@ namespace ghoul::opengl {
 ShaderObject::ShaderObjectError::ShaderObjectError(std::string msg)
     : RuntimeError(std::move(msg), "ShaderObject")
 {}
-    
+
 ShaderObject::ShaderCompileError::ShaderCompileError(std::string error,
                                                      std::string ident,
                                                      std::string name)
@@ -285,14 +285,14 @@ void ShaderObject::rebuildFromFile() {
         // filename could not be fetched
         generatedFilename += ".GhoulGenerated.glsl";
     }
-    
+
     std::ofstream os;
     os.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     os.open(generatedFilename);
     os << contents;
     os.close();
 #endif // GHL_DEBUG
-    
+
     const char* contentPtr =  contents.c_str();
     glShaderSource(_id, 1, &contentPtr, nullptr);
 }
@@ -318,7 +318,7 @@ void ShaderObject::compile() {
                 name()
             );
         }
-        
+
         std::vector<GLchar> log(logLength);
         glGetShaderInfoLog(_id, logLength, nullptr, log.data());
         std::string logMessage(log.data());
@@ -343,7 +343,6 @@ std::string ShaderObject::stringForShaderType(ShaderType type) {
         case ShaderType::Fragment:              return "Fragment shader";
         case ShaderType::Compute:               return "Compute shader";
         default:                                throw MissingCaseException();
-
     }
 }
 

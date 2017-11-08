@@ -45,14 +45,14 @@ struct RuntimeError : public std::runtime_error {
      * \pre \p message must not be empty
      */
     explicit RuntimeError(std::string message, std::string component = "");
-    
+
     /// The main message describing the exception
     std::string message;
-    
+
     /// The name of the component that threw the exception
     std::string component;
 };
-    
+
 /**
  * Exception that is thrown if an IO access failed because a file could was not found
  */
@@ -65,11 +65,11 @@ struct FileNotFoundError : public RuntimeError {
      * \pre \p file must not be empty
      */
     explicit FileNotFoundError(std::string file, std::string component = "");
-    
+
     /// The file that was missing
     std::string file;
 };
-    
+
 } // namespace ghoul
 
 #endif // __GHOUL___EXCEPTION___H__

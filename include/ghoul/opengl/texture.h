@@ -183,7 +183,7 @@ public:
 
     /// Returns the OpenGL name of this texture.
     operator GLuint() const;
-    
+
     /**
      * Returns an (optional) name for this Texture. The name is not used internally and is
      * solely for external purposes. One possible use is the filename from which the 

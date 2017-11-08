@@ -46,7 +46,7 @@ namespace {
 } // namespace
 
 namespace ghoul::systemcapabilities {
-    
+
 OpenGLCapabilitiesComponent::OpenGLCapabilitiesComponentError::
     OpenGLCapabilitiesComponentError(std::string msg)
     : RuntimeError(std::move(msg), "OpenGLCapabilitiesComponent")
@@ -128,7 +128,7 @@ void OpenGLCapabilitiesComponent::detectExtensions() {
 void OpenGLCapabilitiesComponent::detectDriverInformation() {
 #ifdef GHOUL_USE_WMI
     queryWMI("Win32_VideoController", "DriverVersion", _driverVersion);
-    
+
     std::string driverDateFull;
     queryWMI("Win32_VideoController", "DriverDate", driverDateFull);
 
@@ -168,7 +168,7 @@ void OpenGLCapabilitiesComponent::clearCapabilities() {
 }
 
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
-    OpenGLCapabilitiesComponent::capabilities() const
+OpenGLCapabilitiesComponent::capabilities() const
 {
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
     result.push_back({ "OpenGL Version", std::to_string(_glVersion), Verbosity::Minimal });
@@ -228,8 +228,7 @@ const std::vector<std::string>& OpenGLCapabilitiesComponent::extensions() const 
 }
 
 bool OpenGLCapabilitiesComponent::isExtensionSupported(const std::string& extension) const {
-    auto result =
-        std::find(_extensions.begin(), _extensions.end(), extension);
+    auto result = std::find(_extensions.begin(), _extensions.end(), extension);
     return (result != _extensions.end());
 }
 

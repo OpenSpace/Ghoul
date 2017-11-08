@@ -33,15 +33,15 @@
 #include <fmt/format.h>
 
 namespace ghoul::fontrendering {
-    
+
 FontManager::FontRegistrationException::FontRegistrationException(const std::string& msg)
     : RuntimeError(msg, "FontManager")
 {}
-    
+
 FontManager::FontAccessException::FontAccessException(const std::string& msg)
     : RuntimeError(msg, "FontManager")
 {}
-    
+
 FontManager::FontManager(glm::ivec3 atlasDimensions)
     : _textureAtlas(std::move(atlasDimensions))
     , _defaultCharacterSet({
@@ -57,13 +57,13 @@ FontManager::FontManager(glm::ivec3 atlasDimensions)
         L'z', L'{', L'|', L'}'
     })
 {}
-    
+
 unsigned int FontManager::registerFontPath(const std::string& fontName,
                                            const std::string& filePath)
 {
     ghoul_assert(!fontName.empty(), "Fontname must not be empty");
     ghoul_assert(!filePath.empty(), "Filepath must not be empty");
-    
+
     unsigned int hash = hashCRC32(fontName);
     auto it = _fontPaths.find(hash);
     if (it != _fontPaths.end()) {
@@ -85,7 +85,7 @@ unsigned int FontManager::registerFontPath(const std::string& fontName,
     _fontPaths[hash] = filePath;
     return hash;
 }
-    
+
 std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
                                         Outline withOutline, LoadGlyphs loadGlyphs)
 {
@@ -101,7 +101,7 @@ std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
         ));
     }
 }
-    
+
 std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
                                         Outline withOutline, LoadGlyphs loadGlyphs)
 {

@@ -96,7 +96,8 @@ void FileSystem::addFileListener(File* file) {
             NULL,
             OPEN_EXISTING,
             FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
-            NULL);
+            NULL
+        );
 
         if (handle->_handle == INVALID_HANDLE_VALUE) {
             LERROR("Directory handle for '" << d << "' could not be obtained");
@@ -176,7 +177,7 @@ void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
         // extract the information which file has changed
         FILE_NOTIFY_INFORMATION& information = 
             reinterpret_cast<FILE_NOTIFY_INFORMATION&>(*buffer);
-        
+
         if (information.Action == FILE_ACTION_MODIFIED) {
             std::vector<char> currentFilenameBuffer(information.FileNameLength);
 
@@ -214,7 +215,7 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
 
     changeBuffer[activeBuffer].resize(changeBufferSize);
     ZeroMemory(&(changeBuffer[activeBuffer][0]), changeBufferSize);
-    
+
     DWORD returnedBytes;
     BOOL success = ReadDirectoryChangesW(
         handle,
@@ -225,7 +226,8 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
         FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_CREATION,
         &returnedBytes,
         overlappedBuffer,
-        &completionHandler);
+        &completionHandler
+    );
 
     if (success == 0) {
         LERROR("Could not begin read directory");

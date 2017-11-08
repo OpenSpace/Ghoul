@@ -56,7 +56,7 @@ public:
      * \return The static variant of the TextureWriter
      */
     static TextureWriter& ref();
-    
+
     /**
      * Saves the provided \p texture into the \p filename on disk. The correct
      * TextureWriterBase is determined by the extension of the \p filename.
@@ -71,7 +71,7 @@ public:
      * before (addWriter)
      */
     void saveTexture(const opengl::Texture& texture, const std::string& filename);
-    
+
     /**
      * Adds the \p writer to this TextureWriter and makes it available through subsequent
      * calls to saveTexture. If an extension is supported by multiple TextureWriterBases,
@@ -80,13 +80,13 @@ public:
      * \pre \p writer must not have been added to this TextureWriter before
      */
     void addWriter(std::shared_ptr<TextureWriterBase> writer);
-    
+
     /**
      * Returns a list of all the previously registered TextureWriterBases.
      * \return A list of all the previously registered TextureWriterBases
      */
     std::vector<std::shared_ptr<TextureWriterBase>> writers() const;
-    
+
 private:
     /**
      * Returns the TextureWriterBase that is responsible for the provided extension.
@@ -94,11 +94,11 @@ private:
      * \throw MissingWriterException If there was no writer for the specified \p extension
      */
     TextureWriterBase* writerForExtension(const std::string& extension);
-    
+
     /// The list of all registered writers
     std::vector<std::shared_ptr<TextureWriterBase>> _writers;
 };
- 
+
 } // namespace ghoul::io
 
 #endif // __GHOUL___TEXTUREWRITER___H__

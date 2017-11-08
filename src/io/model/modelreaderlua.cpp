@@ -50,12 +50,12 @@ namespace {
 } // namespace
 
 namespace ghoul::io {
-    
+
 std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
                                                         const std::string& filename) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
+
     Dictionary dictionary;
     try {
         lua::loadDictionaryFromFile(filename, dictionary);
@@ -63,7 +63,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     catch (const ghoul::lua::LuaRuntimeException& e) {
         throw ModelReaderException(filename, e.what());
     }
-    
+
     if (!dictionary.hasKeyAndValue<Dictionary>(keyVertices)) {
         throw ModelReaderException(
             filename, format("Missing key or wrong format for '{}'", keyVertices)
@@ -96,7 +96,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
         double d = vertices.value<double>(key);
         varray.push_back(static_cast<GLfloat>(d));
     }
-    
+
     // get indices
     Dictionary indices = dictionary.value<Dictionary>(keyIndices);
     std::vector<GLint> iarray;
@@ -108,7 +108,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
         double d = indices.value<double>(key);
         iarray.push_back(static_cast<GLint>(d));
     }
-    
+
     if (varray.empty()) {
         throw ModelReaderException(filename, "No vertices specified");
     }
@@ -119,7 +119,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     // Create the resulting VBO
     auto vbo = std::make_unique<opengl::VertexBufferObject>();
     vbo->initialize(varray, iarray);
-    
+
     Dictionary attribPointers = dictionary.value<Dictionary>(keyAttribPointers);
     auto attribKeys = attribPointers.keys();
     for (const auto& key : attribKeys) {
@@ -127,19 +127,19 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
         if (attribPointers.getValue(key, d)) {
             double position = 0.0;
             attribPointers.getValue(keyPosition, position);
-            
+
             double size = 0.0;
             attribPointers.getValue(keySize, size);
-            
+
             double stride = 0.0;
             attribPointers.getValue(keyStride, stride);
-            
+
             double offset = 0.0;
             attribPointers.getValue(keyOffset, offset);
 
             bool normalized = false;
             attribPointers.getValue(keyNormalized, normalized);
-            
+
             GLenum type = GL_FLOAT;
             vbo->vertexAttribPointer(
                 static_cast<GLuint>(position),
@@ -151,7 +151,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
             );
         }
     }
-    
+
     static const std::map<std::string, GLenum> ModeMap = {
         {"GL_POINTS", GL_POINTS},
         {"GL_LINE_STRIP", GL_LINE_STRIP},
@@ -166,7 +166,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
         {"GL_TRIANGLES_ADJACENCY", GL_TRIANGLES_ADJACENCY},
         {"GL_PATCHES", GL_PATCHES}
     };
-    
+
     std::string modeString = dictionary.value<std::string>(keyMode);
     auto it = ModeMap.find(modeString);
     if (it == ModeMap.end()) {
@@ -179,6 +179,6 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     vbo->setRenderMode(mode);
     return vbo;
 }
-    
+
 } // namespace ghoul::io
 

@@ -30,7 +30,7 @@ namespace ghoul {
 OnScopeExit::OnScopeExit(std::function<void()> function)
     : _function(std::move(function))
 {}
-    
+
 OnScopeExit::~OnScopeExit() {
     if (_function) {
         _function();
@@ -40,5 +40,5 @@ OnScopeExit::~OnScopeExit() {
 void OnScopeExit::clear() {
     _function = nullptr;
 }
-    
+
 } // namespace ghoul

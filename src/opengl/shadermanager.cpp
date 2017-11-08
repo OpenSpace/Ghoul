@@ -30,11 +30,11 @@
 #include <ghoul/opengl/shaderobject.h>
 
 namespace ghoul::opengl {
-    
+
 ShaderManager::ShaderManagerError::ShaderManagerError(std::string msg)
     : RuntimeError(std::move(msg), "ShaderManager")
 {}
-    
+
 ShaderManager& ShaderManager::ref() {
     static ShaderManager manager;
     return manager;
@@ -90,7 +90,7 @@ std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(
     if (it == _objects.end()) {
         return nullptr;
     }
-    
+
     auto tmp = std::move(it->second);
     _objects.erase(hashedName);
     return tmp;

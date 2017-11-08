@@ -106,7 +106,7 @@ public:
      * control sequences.
      */
     void logMessage(LogLevel level, const std::string& message);
-    
+
     /**
      * Returns the LogLevel that this LogManager has been initialized with. This method is
      * inlined as it is used in the LOGC macro and it might lead the compiler to do some
@@ -154,13 +154,13 @@ public:
 private:
     /// The mutex that is protecting the #logMessage calls
     std::mutex _mutex;
-    
+
     /// The LogLevel
     LogLevel _level;
-    
+
     /// Whether all logs should be flushed immediately
     ImmediateFlush _immediateFlush;
-    
+
     /// Stores the Logs which are managed by this LogManager
     std::vector<std::shared_ptr<Log>> _logs;
 

@@ -40,7 +40,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
                                                         const std::string& filename) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
+
     std::ifstream file;
     file.exceptions(std::ifstream::failbit);
     file.open(filename, std::ifstream::in);
@@ -68,7 +68,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
             values = new uint8_t[width * 4];
             continue;
         }
-        
+
         if (!values) {
             throw TextureLoadException(
                 filename,
@@ -82,7 +82,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         s >> color.g;
         s >> color.b;
         s >> color.a;
-        
+
         if (i > (width * 4)) {
             delete[] values;
             throw TextureLoadException(

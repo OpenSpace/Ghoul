@@ -36,5 +36,5 @@ ModelReaderBase::ModelReaderException::ModelReaderException(string file, string 
     , fileName(std::move(file))
     , errorMessage(std::move(error))
 {}
-    
+
 } // namespace ghoul::io

@@ -44,7 +44,7 @@ std::string DictionaryJsonFormatter::format(const Dictionary& dictionary) const 
     };
 
     std::vector<std::string> keys = dictionary.keys();
-    
+
     std::string json = std::accumulate(
         std::next(keys.begin()),
         keys.end(),

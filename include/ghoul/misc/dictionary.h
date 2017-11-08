@@ -39,30 +39,30 @@
 #include <vector>
 
 namespace ghoul {
-    
+
 namespace internal {
     // The storage type for integral values (char, short, int, long long, ...)
     using IntegralType = long long;
-    
+
     // The storage type for unsigned integral values
     using UnsignedIntegralType = unsigned long long;
-    
+
     // The storage type for floating point values
     using FloatingType = double;
-    
+
     // Default struct that defines the type to void
     template <typename InputType>
     struct StorageTypeConverter {
         using type = void;
     };
-    
+
 #define DEF_STORAGE_CONVERTER(T, U, S)                                                   \
     template <>                                                                          \
     struct StorageTypeConverter<T> {                                                     \
         using type = U;                                                                  \
         static const size_t size = S;                                                    \
     };
-    
+
     DEF_STORAGE_CONVERTER(char, IntegralType, 1);
     DEF_STORAGE_CONVERTER(signed char, IntegralType, 1);
     DEF_STORAGE_CONVERTER(unsigned char, UnsignedIntegralType, 1);
@@ -108,13 +108,13 @@ namespace internal {
     DEF_STORAGE_CONVERTER(glm::dmat4x2, FloatingType, 8);
     DEF_STORAGE_CONVERTER(glm::dmat4x3, FloatingType, 12);
     DEF_STORAGE_CONVERTER(glm::dmat4x4, FloatingType, 16);
-    
+
 #undef DEF_STORAGE_CONVERTER
 
 // Boolean not operator for static values
 template <typename T>
 using static_not = std::integral_constant<bool, !T::value>;
-    
+
 // Since we define the basic implementation of StorageTypeConverter's type to void, we can
 // check whether a type T has an assigned StorageTypeConverter class by checking the type
 // against void
@@ -207,17 +207,17 @@ public:
     struct DictionaryError : public RuntimeError {
         explicit DictionaryError(std::string message);
     };
-    
+
     /// Exception that is thrown if one of the messages is called with invalid arguments
     struct KeyError : public DictionaryError {
         explicit KeyError(std::string message);
     };
-    
+
     /// Exception that is thrown if an error converting from one type into another occurs
     struct ConversionError : public DictionaryError {
         explicit ConversionError(std::string message);
     };
-    
+
     /**
      * Creates an empty Dictionary
      */
@@ -342,7 +342,7 @@ public:
      */
     template <typename T>
     bool hasValue(const std::string& key) const;
-    
+
     /**
      * Returns <code>true</code> if the Dictionary contains a value for the specified
      * \p key and the value that is stored is of the type <code>T</code>. This method
@@ -452,7 +452,7 @@ private:
     using IsNonStandardType = std::enable_if_t<
         !internal::has_storage_converter<T>::value
     >;
-    
+
     /**
      * Helper method to add the \p value into the Dictionary at the provided \p key. If
      * \p createIntermediate is <code>true</code>, intermediate keys in the Dictionary are
@@ -467,7 +467,7 @@ private:
      */
     template <typename T>
     void setValueHelper(std::string key, T value, CreateIntermediate createIntermediate);
-    
+
     /**
      * Internal setValue implementation for types that are standard, scalar types. The
      * <code>IsStandardScalarType<T></code> parameter is only used for SFINAE evaluation
@@ -482,7 +482,7 @@ private:
     template <typename T>
     void setValueInternal(std::string key, T value, CreateIntermediate createIntermediate,
         IsStandardScalarType<T>* = nullptr);
-    
+
     /**
      * Internal setValue implementation for types that are standard, non-scalar types. The
      * <code>IsStandardVectorType<T></code> parameter is only used for SFINAE evaluation
@@ -497,7 +497,7 @@ private:
     template <typename T>
     void setValueInternal(std::string key, T value, CreateIntermediate createIntermediate,
         IsStandardVectorType<T>* = nullptr);
-    
+
     /**
      * Internal setValue implementation for types that are non-standard. The
      * <code>IsNonStandardType<T></code> parameter is only used for SFINAE evaluation to
@@ -550,7 +550,7 @@ private:
     template <typename T>
     void getValueInternal(const std::string& key, T& value,
         IsStandardVectorType<T>* = nullptr) const;
-    
+
     template <typename T, glm::precision P>
     void getValueInternal(const std::string& key, glm::tvec2<T, P>& value) const;
 
@@ -611,7 +611,7 @@ private:
      */
     template <typename T>
     bool hasValueHelper(const std::string& key) const;
-    
+
     /**
      * Internal hasValue implementation for types that are standard, scalar types. The
      * <code>IsStandardScalarType<T></code> parameter is only used for SFINAE evaluation
@@ -639,7 +639,7 @@ private:
     template <typename T>
     bool hasValueInternal(const std::string& key,
         IsStandardVectorType<T>* = nullptr) const;
-    
+
     /**
      * Internal hasValue implementation for types that are non-standard. The
      * <code>IsNonStandardType<T></code> parameter is only used for SFINAE evaluation to

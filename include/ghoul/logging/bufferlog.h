@@ -32,7 +32,7 @@
 #include <string>
 
 namespace ghoul::logging {
-    
+
 /**
  * The BufferLog stores timestamped messages into a provided custom buffer of memory. It
  * automatically reserves a part of the block for use as a header in which the version, 
@@ -55,11 +55,11 @@ public:
      */
     struct MemoryExhaustionException : public RuntimeError {
         explicit MemoryExhaustionException(int totalSize, int requestedSize);
-        
+
         int totalSize;
         int requestedSize;
     };
-    
+
     /**
      * A callback of this time will be called when the logging of a message would exhaust
      * the available memory of the buffer. It is the callbacks responsibility to either
@@ -69,7 +69,7 @@ public:
      */
     typedef std::function<void (BufferLog&, unsigned long long int&)>
         MemoryExhaustedCallback;
-    
+
     /**
      * Constructor that registers a MemoryExhausedCallback that will be used. The
      * constructor will take a small piece of the provided buffer to store a necessary
@@ -100,7 +100,7 @@ public:
      * \pre \p bufferSize must be positive
      */
     BufferLog(void* address, size_t bufferSize);
-    
+
     /**
      * Sets the callback that will be used to handle out-of-memory situations. The
      * callback will be called when the memory requirement of the next log message would
@@ -110,7 +110,7 @@ public:
      * \param callback The callback that will be used to handle out-of-memory situations
      */
     void setCallback(MemoryExhaustedCallback callback);
-    
+
     /**
      * Logs a \p message with a particular \p timestamp. The unit of the timestamp is
      * undefined and depends on the specific use case. The \p timestamp and the \p message
@@ -125,21 +125,21 @@ public:
      * \pre \p message must not be empty
      */
     void log(unsigned long long timestamp, std::string message);
- 
+
     /**
      * Returns the buffer that is used by the BufferLog. If this buffer is modified by the
      * caller, especially the Header bytes, the results are undefined.
      * \return The buffer that is used by the BufferLog
      */
     void* buffer();
-    
+
     /**
      * Returns the total size of the buffer that was specified by the user when the
      * BufferLog was constructed or a new buffer was supplied (#setBuffer)
      * \return The total size of the buffer
      */
     size_t totalSize() const;
-    
+
     /**
      * Returns the number of bytes that have been used by this BufferLog, including the
      * information for the header fields. This value is guaranteed to be always less than
@@ -147,7 +147,7 @@ public:
      * \return The number of bytes that have been used by this BufferLog
      */
     size_t usedSize() const;
-    
+
     /**
      * Provides a new buffer that will be used by this BufferLog. This method can be used
      * by the MemoryExhaustCallback to provide a new buffer while taking take of the old
@@ -163,14 +163,14 @@ public:
      * \pre \p bufferSize must be positive
      */
     void setBuffer(void* buffer, size_t bufferSize);
-    
+
     /**
      * Resets the used buffer so that it can hold as many bytes as it did when the
      * BufferLog was first initialized. This method does not actually overwrite anything
      * in the buffer, but marks the buffer as available again. This method is thread-safe.
      */
     void resetBuffer();
-    
+
     /**
      * This method writes the contents of the buffer to disk as a binary file. The full
      * buffer, including the header, will be written out. Only the parts of the buffer 
@@ -181,21 +181,21 @@ public:
      * Any existing file at that location will be overwritten in the process.
      */
     void writeToDisk(const std::string& filename);
-    
+
 protected:
     /**
      * This method will initialize the individual members of the header fields and make
      * the buffer usable.
      */
     void initializeBuffer();
-    
+
     /**
      * This block of memory will store all log messages that are added to this BufferLog
      * it has to be as big as the value provided in <code>_totalSize</code>
      */
     void* _buffer; 
     size_t _totalSize; ///< The total size of the buffer used by this BufferLog
-    
+
     /**
      * This callback will be called when an incoming log message would exhaust the
      * available memory of the buffer. The callback has to either provide a new buffer
@@ -203,14 +203,14 @@ protected:
      * reusable (#resetBuffer)
      */
     MemoryExhaustedCallback _callback;
-    
+
     /** This variable is <code>true</code> if this BufferLog has had its callback trigged
      * in the current callstack. It forces some methods to ignore the
      * <code>atomic_lock</code> to ensure that no deadlock can happen
      */
     bool _inCallbackStack;
 };
-    
+
 } // namespace ghoul::logging
 
 #endif // __GHOUL___BUFFERLOG___H__

@@ -30,7 +30,7 @@
 #include <vector>
 
 namespace ghoul {
-    
+
 /**
  * Returns the stack trace at the calling site of the function. The vector that is
  * returned contains one line for each level of the stack trace. On Windows, the stack
@@ -39,7 +39,7 @@ namespace ghoul {
  * \return A list of the full stack trace at the calling site
  */
 std::vector<std::string> stackTrace();
-    
+
 } // namespace ghoul
 
 #endif // __GHOUL___STACKTRACE___H__

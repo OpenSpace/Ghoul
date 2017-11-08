@@ -36,7 +36,7 @@
 using std::string;
 
 namespace ghoul::io {
-    
+
 TextureWriter::MissingWriterException::MissingWriterException(std::string extension)
     : RuntimeError(fmt::format("No writer was found for extension '{}'", extension), "IO")
     , fileExtension(std::move(extension))
@@ -54,7 +54,7 @@ void TextureWriter::saveTexture(const opengl::Texture& texture, const string& fi
     ghoul::filesystem::File file = ghoul::filesystem::File(filename);
     const std::string& extension = file.fileExtension();
     ghoul_assert(!extension.empty(), "Filename must have an extension");
-    
+
     TextureWriterBase* writer = writerForExtension(extension);
     // Make sure the directory for the file exists
     FileSys.createDirectory(file.directoryName());
@@ -74,7 +74,7 @@ void TextureWriter::addWriter(std::shared_ptr<TextureWriterBase> writer) {
 
     _writers.push_back(writer);
 }
-    
+
 std::vector<std::shared_ptr<TextureWriterBase>> TextureWriter::writers() const {
     return _writers;
 }

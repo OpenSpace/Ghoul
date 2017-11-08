@@ -77,7 +77,7 @@ public:
 
     /// Destructor that closes and finalizes the HTML file
     ~HTMLLog();
-    
+
     /**
      * Method that logs a message with a given <code>level</code> and
      * <code>category</code> to the text file.
@@ -100,7 +100,7 @@ protected:
      * LogLevel::Fatal -> log-level-fatal<br>
      */
     static std::string classForLevel(LogLevel level);
-    
+
     /**
      * Returns a HTML color string for the passed color.
      * LogLevel::Trace -> Grey<br>

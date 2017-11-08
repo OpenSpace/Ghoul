@@ -52,7 +52,7 @@ std::vector<std::string> tokenizeString(
  * \param separator The separator that will be used in the joined string
  */
 std::string join(std::vector<std::string> input, const std::string& separator = ".");
-    
+
 } // namespace ghoul
 
 #endif // __GHOUL___MISC___H__

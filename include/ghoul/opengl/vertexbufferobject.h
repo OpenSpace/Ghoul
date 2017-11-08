@@ -46,13 +46,13 @@ public:
      * cannot be constructed without an OpenGL context.
      */
     VertexBufferObject();
-    
+
     /**
      * Moves the other object in place of the created one. The other object will be in an
      * uninitialized state afterwards.
      */
     VertexBufferObject(VertexBufferObject&& other);
-    
+
     /**
      * Moves the other object in place of the created one. The other object will be in an
      * uninitialized state afterwards.
@@ -63,14 +63,14 @@ public:
      * Default destructor.
      */
     ~VertexBufferObject();
-    
+
     /**
      * A runtime function that checks if initialize has been called.
      * \returns <code>true</code> if any initialize function has been called and
      * <code>false</code> otherwise.
      */
     bool isInitialized() const;
-    
+
     /**
      * Initializes the VertexBufferObject with the provided \p vertexArray and
      * \p indexArray list. The structure of the vertex data can be arbitrary but correct
@@ -140,16 +140,16 @@ private:
 
     /// The vertex array object that stores the created VertexBufferObject
     GLuint _vaoID;
-    
+
     /// The vertex buffer object
     GLuint _vBufferID;
-    
+
     /// The index buffer obejct
     GLuint _iBufferID;
-    
+
     /// The size of the index buffer, determining how many vertices are drawn
     unsigned int _iSize;
-    
+
     /// The rendering mode of this VertexBufferObject
     GLenum _mode;
 };

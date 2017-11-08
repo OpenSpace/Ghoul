@@ -75,16 +75,16 @@ template <bufferbinding::Buffer T>
 int BufferBinding<T>::numberActiveBindings() {
     return _totalActive;
 }
-    
+
 template <bufferbinding::Buffer T>
 void BufferBinding<T>::assignBinding() {
     if (_totalActive >= _maxBufferBindings) {
         //throw MaxBufferBindingsExceeded();
         return;
     }
-    
+
     _assigned = true;
-    
+
     for (size_t i = 0; i < _maxBufferBindings; ++i) {
         if (!_busyBindings[i]) {
             _number = static_cast<GLint>(i);

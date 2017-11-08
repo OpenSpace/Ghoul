@@ -29,7 +29,7 @@
 #include <ghoul/io/model/modelreaderbase.h>
 
 namespace ghoul::io {
-    
+
 /**
  * This model reader reads a model that is specified as a Lua table. The Lua file must
  * return a single top-level table specifying <code>Vertices</code>, <code>Indices</code>,
@@ -65,7 +65,7 @@ public:
     std::unique_ptr<opengl::VertexBufferObject> loadModel(
         const std::string& filename) const;
 };
-    
+
 } // namespace ghoul::io
 
 #endif // __GHOUL___MODELREADERLUA___H__

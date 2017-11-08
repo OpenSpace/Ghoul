@@ -44,7 +44,7 @@ std::string DictionaryLuaFormatter::format(const Dictionary& dictionary) const {
     };
 
     std::vector<std::string> keys = dictionary.keys();
-    
+
     std::string lua = std::accumulate(
         std::next(keys.begin()),
         keys.end(),

@@ -39,7 +39,7 @@
 #include <typeinfo>
 
 namespace ghoul {
-   
+
 /**
  * An object of type !any is able to represent any object. When accessing the stored value
  * using !any_cast%, the correct type must be requested or an exception is thrown.

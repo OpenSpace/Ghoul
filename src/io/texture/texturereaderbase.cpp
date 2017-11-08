@@ -28,7 +28,7 @@
 #include <fmt/format.h>
 
 namespace ghoul::io {
- 
+
 TextureReaderBase::TextureLoadException::TextureLoadException(std::string n,
                                                               std::string m,
                                                               const TextureReaderBase* r)
@@ -37,7 +37,7 @@ TextureReaderBase::TextureLoadException::TextureLoadException(std::string n,
     , message(std::move(m))
     , reader(r)
 {}
-    
+
 TextureReaderBase::~TextureReaderBase() {}
-    
+
 } // namespace ghoul::io

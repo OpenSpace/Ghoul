@@ -88,7 +88,7 @@ namespace {
 namespace ghoul::opengl {
 
 std::vector<std::string> ShaderPreprocessor::_includePaths = std::vector<std::string>();
-    
+
 ShaderPreprocessor::ShaderPreprocessorError::ShaderPreprocessorError(std::string msg)
     : RuntimeError(std::move(msg), "ShaderPreprocessor")
 {}
@@ -100,12 +100,12 @@ ShaderPreprocessor::SubstitutionError::SubstitutionError(std::string msg)
 ShaderPreprocessor::ParserError::ParserError(std::string msg)
     : ShaderPreprocessorError(std::move(msg))
 {}
-    
+
 ShaderPreprocessor::ShaderPreprocessor(std::string shaderPath, Dictionary dictionary)
     : _shaderPath(std::move(shaderPath))
     , _dictionary(std::move(dictionary))
 {}
-    
+
 ShaderPreprocessor::IncludeError::IncludeError(std::string f)
     : ShaderPreprocessorError("Could not resolve file path for include file '" + f + "'")
     , file(std::move(f))
@@ -146,7 +146,7 @@ void ShaderPreprocessor::setFilename(const std::string& shaderPath) {
 std::string ShaderPreprocessor::filename() {
     return _shaderPath;
 }
-    
+
 void ShaderPreprocessor::process(std::string& output) {
     std::stringstream stream;
     ShaderPreprocessor::Env env{stream};
@@ -197,13 +197,14 @@ void ShaderPreprocessor::addIncludePath(std::string folderPath) {
         !FileSys.containsToken(folderPath),
         "Folder path must not contain path tokens"
     );
-    
+
     auto it = std::find(_includePaths.begin(), _includePaths.end(), folderPath);
-    
-    if (it == _includePaths.end())
+
+    if (it == _includePaths.end()) {
         _includePaths.push_back(std::move(folderPath));
+    }
 }
-    
+
 void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges trackChanges,
                                      ShaderPreprocessor::Env& environment)
 {
@@ -280,7 +281,7 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
         "File not in included files"
     );
     size_t fileIdentifier = _includedFiles.at(filename).fileIdentifier;
-    
+
     std::string includeSeparator = "";
     // Sofar, only Nvidia on Windows supports empty statements in the middle of the shader
     using Vendor = ghoul::systemcapabilities::OpenGLCapabilitiesComponent::Vendor;
@@ -312,12 +313,14 @@ bool ShaderPreprocessor::parseLine(ShaderPreprocessor::Env& env) {
 
     bool specialLine = parseEndFor(env); // #endfor
 
-    if (isInsideEmptyForStatement(env))
+    if (isInsideEmptyForStatement(env)) {
         return true;
+    }
 
     // Replace all #{<name>} strings with data from <name> in dictionary.
-    if (!substituteLine(env))
+    if (!substituteLine(env)) {
         return false;
+    }
 
     if (!specialLine) {
         specialLine |=
@@ -355,10 +358,10 @@ bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
 
         std::string in = line.substr(beginOffset + 2, endOffset - 2);
         std::string out = substitute(in, env);
-      
+
         std::string first = line.substr(0, beginOffset);
         std::string last = line.substr(beginOffset + endOffset + 1, line.length() - 1 - (beginOffset + endOffset));
-      
+
         line = first + out + last;
     }
     return true;
@@ -388,8 +391,9 @@ bool ShaderPreprocessor::resolveAlias(const std::string& in, std::string& out, S
 
 std::string ShaderPreprocessor::substitute(const std::string& in, ShaderPreprocessor::Env& env) {
     std::string resolved;
-    if (!resolveAlias(in, resolved, env))
+    if (!resolveAlias(in, resolved, env)) {
         throw SubstitutionError("Could not resolve variable '" + in + "'. " + debugString(env));
+    }
 
     std::stringstream ss;
     if (isString(resolved)) {
@@ -459,7 +463,7 @@ void ShaderPreprocessor::popScope(ShaderPreprocessor::Env& env) {
         ghoul_assert(env.aliases.find(key) != env.aliases.end(), "Key not found");
         ghoul_assert(!env.aliases.at(key).empty(), "No aliases for key");
     }
-    
+
     Env::Scope& scope = env.scopes.back();
     for (const auto& key : scope) {
         env.aliases[key].pop_back();
@@ -482,15 +486,16 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
         size_t p1 = line.find_first_not_of(ws, includeString.length());
         if (p1 == std::string::npos)
             throw ParserError("Expected file path after #include. " + debugString(env));
-        
+
         if ((line[p1] != '\"') && (line[p1] != '<'))
             throw ParserError("Expected \" or <. " + debugString(env));
-        
+
         if (line[p1] == '\"') {
             size_t p2 = line.find_first_of("\"", p1 + 1);
-            if (p2 == std::string::npos)
+            if (p2 == std::string::npos) {
                 throw ParserError("Expected \"" + debugString(env));
-            
+            }
+
             size_t includeLength = p2 - p1 - 1;
             std::string includeFilename = line.substr(p1 + 1, includeLength);
             std::string includeFilepath = FileSys.pathByAppendingComponent(
@@ -533,7 +538,7 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
             size_t p2 = line.find_first_of(">", p1 + 1);
             if (p2 == std::string::npos)
                 throw ParserError("Expected >. " + debugString(env));
-           
+
             size_t includeLength = p2 - p1 - 1;
             std::string includeFilename = absPath(line.substr(p1 + 1, includeLength));
             includeFile(
@@ -673,9 +678,10 @@ bool ShaderPreprocessor::parseRange(const std::string& dictionaryName, Dictionar
 
 bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     std::string keyName, valueName, dictionaryName;
-    if (!tokenizeFor(env.line, keyName, valueName, dictionaryName, env))
+    if (!tokenizeFor(env.line, keyName, valueName, dictionaryName, env)) {
          return false;
-    
+     }
+
     if (keyName.empty()) { 
         // No key means that the for statement could possibly be a range.
         Dictionary rangeDictionary;
@@ -727,7 +733,7 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
         dictionaryRef,
         keyIndex
     });
-                                
+
     return true;
 }
 

@@ -49,7 +49,7 @@ public:
     struct TextureUnitError : public RuntimeError {
         explicit TextureUnitError(std::string message);
     };
-    
+
     /**
      * The constructor will initialize the static variables when the first TextureUnit is
      * created and the non-static variables are initiated.
@@ -137,13 +137,13 @@ private:
 
     /// The number in <code>[0, maxTexUnits]</code> referring to this TextureUnit
     GLint _number;
-    
+
     /**
      * The enum in <code>[GL_TEXTURE0, GL_TEXTURE0 + maxTexUnits]</code> referring to this
      * TextureUnit
      */
     GLenum _glEnum;
-    
+
     /// <code>true</code> if this TextureUnit has been assigned
     bool _assigned;
 

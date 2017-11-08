@@ -40,7 +40,7 @@
 
 namespace ghoul {
 namespace io {
-    
+
 std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
                                                         const std::string& filename) const
 {
@@ -57,15 +57,16 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
         filename.c_str()
     );
 
-    if (!success)
+    if (!success) {
         throw ModelReaderException(filename, errorMessage);
-    
+    }
+
     size_t totalSizeIndex = 0;
     size_t totalSizeVertex = 0;
     for (size_t i = 0; i < shapes.size(); ++i) {
         totalSizeIndex += shapes[i].mesh.indices.size();
         totalSizeVertex += shapes[i].mesh.positions.size();
-        
+
         if (shapes[i].mesh.positions.size() != shapes[i].mesh.normals.size()) {
             throw ModelReaderException(
                 filename,
@@ -77,7 +78,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
             );
         }
     }
-    
+
     /*struct Vertex {
         GLfloat location[3];
         GLfloat tex[2];
@@ -85,7 +86,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
     };*/
     std::vector<Vertex> vertices(totalSizeVertex);
     std::vector<int> indices(totalSizeIndex);
-    
+
     // We add all shapes of the model into the same vertex array, one after the other
     // The _shapeCounts array stores for each shape, how many vertices that shape has
     size_t positionIndex = 0;
@@ -95,19 +96,18 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
             vertices[j + positionIndex].location[0] = shapes[i].mesh.positions[3 * j + 0];
             vertices[j + positionIndex].location[1] = shapes[i].mesh.positions[3 * j + 1];
             vertices[j + positionIndex].location[2] = shapes[i].mesh.positions[3 * j + 2];
-            
+
             vertices[j + positionIndex].normal[0] = shapes[i].mesh.normals[3 * j + 0];
             vertices[j + positionIndex].normal[1] = shapes[i].mesh.normals[3 * j + 1];
             vertices[j + positionIndex].normal[2] = shapes[i].mesh.normals[3 * j + 2];
-            
+
             if (2 * j + 1 < shapes[i].mesh.texcoords.size()) {
                 vertices[j + positionIndex].tex[0] = shapes[i].mesh.texcoords[2 * j + 0];
                 vertices[j + positionIndex].tex[1] = shapes[i].mesh.texcoords[2 * j + 1];
             }
-            
         }
         positionIndex += shapes[i].mesh.positions.size() / 3;
-        
+
         std::copy(
             shapes[i].mesh.indices.begin(),
             shapes[i].mesh.indices.end(),
@@ -115,7 +115,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
         );
         indicesIndex += shapes[i].mesh.indices.size();
     }
-    
+
     auto vbo = std::make_unique<opengl::VertexBufferObject>();
     vbo->initialize(vertices, indices);
     vbo->vertexAttribPointer(0, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, location));
@@ -123,7 +123,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
     vbo->vertexAttribPointer(2, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, normal));
     return vbo;
 }
-    
+
 } // namespace io
 } // namespace ghoul
 

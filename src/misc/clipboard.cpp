@@ -65,7 +65,7 @@ namespace {
 } // namespace
 
 namespace ghoul {
-    
+
 std::string clipboardText() {
 #ifdef WIN32
     // Try opening the clipboard

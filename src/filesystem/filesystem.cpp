@@ -64,7 +64,7 @@ namespace ghoul::filesystem {
 
 const string FileSystem::TokenOpeningBraces = "${";
 const string FileSystem::TokenClosingBraces = "}";
-    
+
 #ifdef WIN32
 const char FileSystem::PathSeparator = '\\';
 #else
@@ -79,7 +79,7 @@ FileSystem::ResolveTokenException::ResolveTokenException(string t)
     : FileSystemException(fmt::format("Token '{}' could not be resolved", t))
     , token(std::move(t))
 {}
-    
+
 FileSystem::FileSystem()
     : _cacheManager(nullptr)
 {
@@ -109,7 +109,7 @@ FileSystem::FileSystem()
         throw FileSystemException(
             "Could not find the path of the system's temporary files");
     }
-    
+
 #if !defined(WIN32) && !defined(__APPLE__)
     _inotifyHandle = inotify_init();
     _keepGoing = true;
@@ -130,7 +130,7 @@ FileSystem::~FileSystem() {
 string FileSystem::absolutePath(string path, const vector<string>& ignoredTokens) const {
     ghoul_assert(!path.empty(), "Path must not be empty");
     expandPathTokens(path, ignoredTokens);
-    
+
     const int PathBufferSize = 4096;
     std::vector<char> buffer(PathBufferSize);
 
@@ -166,11 +166,11 @@ string FileSystem::absolutePath(string path, const vector<string>& ignoredTokens
         }
     }
 #endif
-    
+
     path.assign(buffer.data());
     return path;
 }
-    
+
 string FileSystem::relativePath(string path, const Directory& baseDirectory) const {
     ghoul_assert(!path.empty(), "Path must not be empty");
 
@@ -209,7 +209,7 @@ string FileSystem::relativePath(string path, const Directory& baseDirectory) con
     }
     return relativePath;
 }
-    
+
 string FileSystem::pathByAppendingComponent(string path, string component) const {
     return std::move(path) + PathSeparator + std::move(component);
 }
@@ -262,7 +262,7 @@ Directory FileSystem::currentDirectory() const {
 #endif
     return Directory(currentDir);
 }
-    
+
 void FileSystem::setCurrentDirectory(const Directory& directory) const {
 #ifdef WIN32
     const BOOL success = SetCurrentDirectory(directory.path().c_str());
@@ -383,17 +383,18 @@ bool FileSystem::directoryExists(const Directory& path) const {
     return (isDir != 0);
 #endif
 }
-    
+
 bool FileSystem::deleteFile(const File& path) const {
     bool isFile = fileExists(path);
     if (isFile) {
         int removeResult = remove(path.path().c_str());
         return (removeResult == 0);
     }
-    else
+    else {
         return false;
+    }
 }
-    
+
 void FileSystem::createDirectory(const Directory& path, Recursive recursive) const {
     if (recursive) {
         std::vector<Directory> directories;
@@ -412,7 +413,7 @@ void FileSystem::createDirectory(const Directory& path, Recursive recursive) con
                     createDirectory(d, Recursive::No);
                 }
             });
-        
+
         return;
     }
     else {
@@ -466,7 +467,7 @@ void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) con
 
 #ifdef WIN32
     const string& dirPath = path;
-    
+
     WIN32_FIND_DATA FindFileData;
 
     const std::string dirWildcard = dirPath + PathSeparator + "*";
@@ -511,13 +512,13 @@ void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) con
 
     if (recursive) {
         DIR* directory = opendir(dirPath.c_str());
-        
+
         if (!directory) {
             throw FileSystemException(fmt::format(
                 "Error removing directory '{}': {}", path.path(), strerror(errno)
             ));
         }
-    
+
         while (true) {
             struct dirent* p = readdir(directory);
             if (p == nullptr) {
@@ -619,7 +620,6 @@ void FileSystem::registerPathToken(string token, string path, Override override)
 bool FileSystem::expandPathTokens(string& path,
     const vector<string>& ignoredTokens) const
 {
-
     // TokenInformation = <token, beginning position, length>
     struct TokenInformation {
         string token;
@@ -704,7 +704,7 @@ std::vector<string> FileSystem::tokens() const {
     }
     return tokens;
 }
-    
+
 bool FileSystem::hasRegisteredToken(const string& token) const {
     return _tokenMap.find(token) != _tokenMap.end();
 }
@@ -712,11 +712,11 @@ bool FileSystem::hasRegisteredToken(const string& token) const {
 void FileSystem::createCacheManager(const Directory& cacheDirectory, int version) {
     ghoul_assert(directoryExists(cacheDirectory), "Cache directory did not exist");
     ghoul_assert(!_cacheManager, "CacheManager was already created");
-    
+
     _cacheManager = std::make_unique<CacheManager>(cacheDirectory, version);
     ghoul_assert(_cacheManager, "CacheManager creation failed");
 }
- 
+
 void FileSystem::destroyCacheManager() {
     ghoul_assert(_cacheManager, "CacheManager was not created");
     _cacheManager = nullptr;
@@ -736,10 +736,10 @@ void FileSystem::triggerFilesystemEvents() {
     triggerFilesystemEventsInternalApple();
 #endif
 }
-    
+
 string FileSystem::cleanupPath(string path) const {
     ghoul_assert(!path.empty(), "Path must not be empty");
-    
+
 #ifdef WIN32
     // In Windows, replace all '/' by '\\' for conformity
     std::replace(path.begin(), path.end(), '/', '\\');
@@ -765,15 +765,15 @@ string FileSystem::cleanupPath(string path) const {
             path = path.substr(0, position) + path.substr(position + 1);
         }
     }
-    
+
     // Remove trailing separator
     if (path[path.size() - 1] == PathSeparator) {
         path = path.substr(0, path.size() - 1);
     }
-    
+
     return path;
 }
-    
+
 size_t FileSystem::commonBasePathPosition(const string& p1, const string& p2) const {
     // 'currentPosition' stores the position until which the two paths are the same,
     // 'nextPosition' is a look-ahead. If the look-ahead is equal as well,
@@ -797,10 +797,10 @@ size_t FileSystem::commonBasePathPosition(const string& p1, const string& p2) co
     }
     return currentPosition;
 }
-    
+
 bool FileSystem::containsToken(const string& path) const {
     ghoul_assert(!path.empty(), "Path must not be empty");
-    
+
     bool hasOpeningBrace = path.find(TokenOpeningBraces) != string::npos;
     bool hasClosingBrace = path.find(TokenClosingBraces) != string::npos;
     return hasOpeningBrace && hasClosingBrace;
@@ -809,7 +809,7 @@ bool FileSystem::containsToken(const string& path) const {
 bool FileSystem::hasToken(const string& path, const string& token) const {
     ghoul_assert(!path.empty(), "Path must not be empty");
     ghoul_assert(!token.empty(), "Token must not be empty");
-    
+
     if (!containsToken(path)) {
         return false;
     }
@@ -830,10 +830,10 @@ bool FileSystem::hasToken(const string& path, const string& token) const {
         return false;
     }
 }
-    
+
 string FileSystem::resolveToken(const string& token) const {
     ghoul_assert(!token.empty(), "Token must not be empty");
-    
+
     auto it = _tokenMap.find(token);
     if (it == _tokenMap.end()) {
         throw ResolveTokenException(token);

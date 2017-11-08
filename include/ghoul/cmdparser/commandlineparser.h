@@ -49,7 +49,7 @@ public:
     struct CommandlineException : public RuntimeError {
         explicit CommandlineException(const std::string& msg);
     };
-    
+
     /**
      * Default constructor.
      * \param programName The name of the program. Used in the #displayUsage and
@@ -72,7 +72,7 @@ public:
      * The destructor will also delete all the contained commands within.
      */
     ~CommandlineParser();
-    
+
     /**
      * Sets if this CommandlineParser allows command-line arguments that do not belong to
      * any registered CommandlineCommand. If this is set to <code>true</code>, a receiving
@@ -86,7 +86,7 @@ public:
      * unknown commands are encountered during execution
      */
     void setAllowUnknownCommands(AllowUnknownCommands allowUnknownCommands);
-    
+
     /**
      * Returns if this CommandlineParser allows unknown commands, which do not have a
      * CommandlineCommand associated with them, in the command-line set by
@@ -169,7 +169,7 @@ public:
      * has previously been registered; <code>false</code> otherwise
      */
     bool hasCommandForShortName(const std::string& shortName) const;
-    
+
     /**
      * Returns the first command-line argument containing the path and the executable of
      * the running program.
@@ -211,7 +211,7 @@ protected:
      * <code>nullptr</code> if no such CommandlineCommand exists
      */
     CommandlineCommand* getCommand(const std::string& shortOrLongName);
-    
+
     /**
      * Returns <code>true</code> if the \a _arguments contains only a single help
      * argument.
@@ -227,7 +227,7 @@ protected:
 
     /// All the arguments passed onto this parser
     std::vector<std::string> _arguments;
-    
+
     /// The pointer to the vector that will store all the arguments which have not been
     /// consumed by the CommandlineParser
     std::shared_ptr<std::vector<std::string>> _remainingArguments;
@@ -237,13 +237,13 @@ protected:
 
     /// The name of the program used in the \sa usage method
     std::string _programName;
-    
+
     /// Should the CommandlineParser allow unknown commands or throw an error in that case
     AllowUnknownCommands _allowUnknownCommands;
-    
+
     /// Short version of the command to request help information
     std::string _shortHelpCommand;
-    
+
     /// Long version of the command to request help information
     std::string _longHelpCommand;
 };

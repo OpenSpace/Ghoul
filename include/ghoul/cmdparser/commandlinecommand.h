@@ -65,7 +65,7 @@ public:
     struct CommandExecutionException : public RuntimeError {
         explicit CommandExecutionException(const std::string& msg);
     };
-    
+
     /**
      * Exception that gets thrown if an error occurs in the 
      * ComandlineCommand::checkParameters
@@ -73,7 +73,7 @@ public:
     struct CommandParameterException : public RuntimeError {
         explicit CommandParameterException(const std::string& msg);
     };
-    
+
     /**
      * The constructor which saves the arguments to own member variables.
      * \param name The (long) name of the parameter. For example <code>--command1</code>
@@ -94,7 +94,7 @@ public:
     CommandlineCommand(std::string name, std::string shortName = "",
         std::string infoText = "", std::string parameterList = "", int argumentNum = 1,
         MultipleCalls allowMultipleCalls = MultipleCalls::No);
-    
+
     virtual ~CommandlineCommand() = default;
 
     /**

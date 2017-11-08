@@ -54,7 +54,7 @@ public:
         glm::vec2 boundingBox;
         int numberOfLines;
     };
-    
+
     /**
      * This constructor requires a custom ProgramObject that handles the rendering of any
      * passed text. In addition the initial size of the rendering window has to be passed.
@@ -80,7 +80,7 @@ public:
      */
     FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         glm::vec2 framebufferSize);
-    
+
     /// Default destructor that cleans used OpenGL names and the ProgramObject
     ~FontRenderer();
 
@@ -92,7 +92,7 @@ public:
     * \return a raw pointer to the new default instance
     */
     static std::unique_ptr<FontRenderer> createDefault();
-    
+
     /**
     * Creates a new instance of the FontRenderer with a perspective subject 
     * ProgramObject.
@@ -114,7 +114,7 @@ public:
      * otherwise
      */
     static bool initialize();
-    
+
     /**
      * Deinitializes the singleton variant of the FontRenderer and cleans all used OpenGL
      * objects. Therefore, it requires a valid OpenGL state.
@@ -122,7 +122,7 @@ public:
      * otherwise
      */
     static bool deinitialize();
-    
+
     /**
      * Checks whether the singleton variant of the FontRenderer has already been
      * initialized.
@@ -130,7 +130,7 @@ public:
      * initialized; <code>false</code> otherwise
      */
     static bool isInitialized();
-    
+
     /**
      * Returns the singleton FontRenderer. This method triggers and assertion if the
      * FontRenderer was not initialized before usage.
@@ -159,7 +159,7 @@ public:
      * number of lines that were printed
      */
     BoundingBoxInformation boundingBox(Font& font, const char* format, ...) const;
-    
+
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
      * coordinates <code>pos</code> using the Font <code>font</code> in the base color
@@ -182,7 +182,7 @@ public:
      */
     BoundingBoxInformation render(Font& font, glm::vec2 pos, glm::vec4 color,
         glm::vec4 outlineColor, const char* format, ...) const;
-    
+
     /**
     * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
     * coordinates <code>pos</code> using the Font <code>font</code> in the base color
@@ -235,7 +235,6 @@ public:
     BoundingBoxInformation render(Font& font, glm::vec2 pos, glm::vec4 color,
         const char* format, ...) const;
 
-    
     /**
     * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
     * coordinates <code>pos</code> using the Font <code>font</code> in the base color
@@ -310,14 +309,14 @@ public:
         const int textMinSize, const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
         const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp, 
         const int renderType, const char* format, ...) const;
-    
+
 private:
     /// Private constructor that is used in the #initialize static method
     FontRenderer();
-    
+
     BoundingBoxInformation internalRender(Font& font, glm::vec2 pos, glm::vec4 color,
         glm::vec4 outlineColor, const char* buffer) const;
-    
+
     BoundingBoxInformation internalProjectionRender(Font& font, glm::vec3 pos, glm::vec4 color,
         glm::vec4 outlineColor, const char* buffer, const float textScale, const int textMinSize, 
         const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
@@ -327,20 +326,20 @@ private:
 
     /// The singleton instance of the default FontRenderer
     static std::unique_ptr<FontRenderer> _defaultRenderer;
-    
+
     /// The framebuffer size that is used to compute the transformation from pixel
     /// coordinates to normalized device coordinates
     glm::vec2 _framebufferSize;
-    
+
     /// The ProgramObject that is used to render the text
     std::unique_ptr<opengl::ProgramObject> _program;
-    
+
     /// The vertex array object holding the other OpenGL objects
     unsigned int _vao;
-    
+
     /// The vertex buffer object that contains the vertices for the text to be rendered
     unsigned int _vbo;
-    
+
     /// The index buffer object that allows reusing vertices to form one quad per glyph
     unsigned int _ibo;
 };

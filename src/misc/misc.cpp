@@ -44,7 +44,7 @@ std::vector<std::string> tokenizeString(const std::string& input, char separator
         return result;
     }
 }
-    
+
 std::string join(std::vector<std::string> input, const std::string& separator) {
     std::string result;
     for (std::string& s : input) {

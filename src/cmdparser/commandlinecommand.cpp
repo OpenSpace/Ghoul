@@ -28,12 +28,12 @@
 #include <fmt/format.h>
 
 namespace ghoul::cmdparser {
-    
+
 CommandlineCommand::CommandExecutionException::CommandExecutionException(
                                                                    const std::string& msg)
     : RuntimeError(msg, "Command")
 {}
-    
+
 CommandlineCommand::CommandParameterException::CommandParameterException(
                                                                    const std::string& msg)
     : RuntimeError(msg, "Command")

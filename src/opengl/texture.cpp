@@ -1116,7 +1116,7 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
     if (!_pixels) {
         return vec4(0.f);
     }
-    
+
     vec4 result(0.f);
     switch (_format) {
         case Format::Red:

@@ -39,19 +39,19 @@ void TextureWriterSOIL::saveTexture(const opengl::Texture& texture,
                                                         const std::string& filename) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
+
     auto extensions = supportedExtensions();
     std::string extension = ghoul::filesystem::File(filename).fileExtension();
     ghoul_assert(
         std::find(extensions.begin(), extensions.end(), extension) != extensions.end(),
         "Extension of the filename must be supported"
     );
-    
+
     int width = texture.width();
     int height = texture.height();
-    
+
     int type;
-    
+
     if (extension == "bmp") {
         type = SOIL_SAVE_TYPE_BMP;
     } else if (extension == "tga") {
@@ -59,7 +59,7 @@ void TextureWriterSOIL::saveTexture(const opengl::Texture& texture,
     } else if (extension == "dds") {
         type = SOIL_SAVE_TYPE_DDS;
     }
-    
+
     const unsigned char* data = static_cast<const unsigned char*>(texture.pixelData());
     int result = SOIL_save_image(
         filename.c_str(),
@@ -73,7 +73,7 @@ void TextureWriterSOIL::saveTexture(const opengl::Texture& texture,
         throw TextureWriteException(filename, "Error writing Texture", *this);
     }
 }
-    
+
 std::vector<std::string> TextureWriterSOIL::supportedExtensions() const {
     // taken from http://www.lonesock.net/soil.html
     return {
@@ -82,7 +82,7 @@ std::vector<std::string> TextureWriterSOIL::supportedExtensions() const {
         "dds"
     };
 }
-    
+
 } // namespace ghoul::io
 
 #endif // GHOUL_USE_SOIL

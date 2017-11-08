@@ -48,7 +48,7 @@ public:
      */
     template<class T>
     static std::string name();
-    
+
     /**
      * Returns the name of the type of the provided object. If the class is not
      * registered, the <code>typeid(T).name</code> will be used. This will make the names
@@ -58,7 +58,6 @@ public:
      */
     template<class T>
     static std::string name(const T& obj);
-    
 };
 
 } // namespace ghoul

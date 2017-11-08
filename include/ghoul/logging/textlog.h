@@ -79,7 +79,7 @@ public:
         CategoryStamping categoryStamping = CategoryStamping::Yes,
         LogLevelStamping logLevelStamping = LogLevelStamping::Yes,
         LogLevel minimumLogLevel = LogLevel::AllLogging);
-    
+
     /// Destructor closing and releasing the file handle
     ~TextLog();
 

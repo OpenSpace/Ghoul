@@ -57,11 +57,11 @@ public:
     struct FontRegistrationException : public RuntimeError {
         explicit FontRegistrationException(const std::string& msg);
     };
-    
+
     struct FontAccessException : public RuntimeError {
         explicit FontAccessException(const std::string& msg);
     };
-    
+
     /**
      * The constructor that initializes the TextureAtlas. This means that this constructor
      * requires a valid OpenGL context.
@@ -70,7 +70,7 @@ public:
      * constructor documentation for limitations on the sizes
      */
     FontManager(glm::ivec3 atlasDimensions = glm::ivec3(512, 512, 1));
-    
+
     /**
      * Registers a user-defined \p fontName to an absolute \p filePath. This function does
      * not check whether the file exists, or is accessible. If either of these is the
@@ -133,26 +133,26 @@ public:
     std::shared_ptr<Font> font(unsigned int hashName, float fontSize,
         Outline withOutline = Outline::Yes,
         LoadGlyphs loadGlyphs = LoadGlyphs::Yes);
-    
+
 private:
     FontManager(const FontManager& rhs) = delete;
     FontManager(FontManager&& rhs) = delete;
     FontManager& operator=(const FontManager& rhs) = delete;
     FontManager& operator=(FontManager&& rhs) = delete;
-    
+
     /// The TextureAtlas that is used to store all glyphs for all registered Font objects
     ghoul::opengl::TextureAtlas _textureAtlas;
-    
+
     /// The map that is used to retrieve previously created Font objects.
     std::multimap<unsigned int, std::shared_ptr<Font>> _fonts;
-    
+
     /// The map that correlates the hashed names with the file paths for the fonts
     std::map<unsigned int, std::string> _fontPaths;
-    
+
     /// The default set of glyphs that are loaded when a new Font is initialized
     std::vector<wchar_t> _defaultCharacterSet;
 };
-    
+
 } // namespace ghoul::fontrendering
 
 #endif // __GHOUL___FONTMANAGER___H__

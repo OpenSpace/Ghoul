@@ -38,9 +38,9 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(
                                                         const std::string& filename) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
+
     using opengl::Texture;
- 
+
     int width, height;
     unsigned char* image = SOIL_load_image(
         filename.c_str(),
@@ -67,9 +67,9 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(
 
 std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(void* memory,
                                                                 size_t size) const
-{    
+{
     using opengl::Texture;
- 
+
     int width, height;
     unsigned char* image = SOIL_load_image_from_memory(
         reinterpret_cast<unsigned char*>(memory),
