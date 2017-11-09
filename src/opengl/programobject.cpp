@@ -3376,7 +3376,8 @@ void ProgramObject::setAttribute(GLuint location, GLint v1, GLint v2, GLint v3) 
     glVertexAttribI3i(location, v1, v2, v3);
 }
 
-void ProgramObject::setAttribute(GLuint location, GLint v1, GLint v2, GLint v3, GLint v4) {
+void ProgramObject::setAttribute(GLuint location, GLint v1, GLint v2, GLint v3, GLint v4)
+{
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
     glVertexAttribI4i(location, v1, v2, v3, v4);
@@ -3991,14 +3992,20 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
 
 void ProgramObject::bindFragDataLocation(const std::string& name, GLuint colorNumber) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    ghoul_assert(colorNumber != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
+    ghoul_assert(
+        colorNumber != GL_INVALID_INDEX,
+        "Location must not be GL_INVALID_INDEX"
+    );
 
 #ifdef GHL_DEBUG
     GLint maxBuffers;
     glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxBuffers);
     if (colorNumber >= static_cast<GLuint>(maxBuffers)) {
-        LWARNING("ColorNumber '" << colorNumber <<
-            "' is bigger than the maximum of simultaneous outputs '" << maxBuffers << "'");
+        LWARNING(
+            "ColorNumber '" << colorNumber <<
+            "' is bigger than the maximum of simultaneous outputs '" <<
+            maxBuffers << "'"
+        );
         return;
     }
 #endif

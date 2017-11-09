@@ -55,10 +55,14 @@ static int vscprintf(const char* format, va_list pargs) {
 namespace {
     const char* _loggerCat = "FontRenderer";
 
-    const char* DefaultVertexShaderPath = "${TEMPORARY}/defaultfontrenderer_vs.glsl";
-    const char* DefaultFragmentShaderPath = "${TEMPORARY}/defaultfontrenderer_fs.glsl";
-    const char* ProjectionVertexShaderPath = "${TEMPORARY}/projectionfontrenderer_vs.glsl";
-    const char* ProjectionFragmentShaderPath = "${TEMPORARY}/projectionfontrenderer_fs.glsl";
+    const char* DefaultVertexShaderPath =
+        "${TEMPORARY}/defaultfontrenderer_vs.glsl";
+    const char* DefaultFragmentShaderPath =
+        "${TEMPORARY}/defaultfontrenderer_fs.glsl";
+    const char* ProjectionVertexShaderPath =
+        "${TEMPORARY}/projectionfontrenderer_vs.glsl";
+    const char* ProjectionFragmentShaderPath = 
+        "${TEMPORARY}/projectionfontrenderer_fs.glsl";
 
     const char* DefaultVertexShaderSource = "\
     #version __CONTEXT__ \n\
@@ -232,7 +236,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     file.close();
 
     using namespace opengl;
-    std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>("ProjectionFont");
+    auto program = std::make_unique<ProgramObject>("ProjectionFont");
     program->attachObject(
         std::make_unique<ShaderObject>(ShaderObject::ShaderType::Vertex, vsPath)
     );
@@ -418,11 +422,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     return res;
 }
 
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 pos, glm::vec4 color,
-                                                          glm::vec4 outlineColor, const float textScale, const int textMinSize,
-                                                          const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
-                                                          const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
-                                                          const glm::dvec3& cameraLookUp, const int renderType, char* format, ...) const
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 pos,
+    glm::vec4 color, glm::vec4 outlineColor, const float textScale, const int textMinSize,
+    const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
+    const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
+    const glm::dvec3& cameraLookUp, const int renderType, char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
 
@@ -495,18 +499,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 }
 
 
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
-                                                          glm::vec3 pos,
-                                                          glm::vec4 color,
-                                                          const float textScale,
-                                                          const int textMinSize,
-                                                          const glm::dmat4& mvpMatrix,
-                                                          const glm::vec3& orthonormalRight,
-                                                          const glm::vec3& orthonormalUp,
-                                                          const glm::dvec3& cameraPos,
-                                                          const glm::dvec3& cameraLookUp,
-                                                          const int renderType,
-                                                          const char* format, ...) const
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 pos,
+    glm::vec4 color, const float textScale, const int textMinSize,
+    const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
+    const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
+    const glm::dvec3& cameraLookUp, const int renderType, const char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
 
@@ -576,17 +573,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 }
 
 
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
-                                                          glm::vec3 pos,
-                                                          const float textScale,
-                                                          const int textMinSize,
-                                                          const glm::dmat4& mvpMatrix,
-                                                          const glm::vec3& orthonormalRight,
-                                                          const glm::vec3& orthonormalUp,
-                                                          const glm::dvec3& cameraPos,
-                                                          const glm::dvec3& cameraLookUp,
-                                                          const int renderType,
-                                                          const char* format, ...) const
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 pos,
+    const float textScale, const int textMinSize, const glm::dmat4& mvpMatrix,
+    const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
+    const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
+    const int renderType, const char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
 
@@ -789,19 +780,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font& font,
-                                                                            glm::vec3 pos,
-                                                                            glm::vec4 color,
-                                                                            glm::vec4 outlineColor,
-                                                                            const char* buffer,
-                                                                            const float textScale,
-                                                                            const int textMinSize,
-                                                                            const glm::dmat4& mvpMatrix,
-                                                                            const glm::vec3& orthonormalRight,
-                                                                            const glm::vec3& orthonormalUp,
-                                                                            const glm::dvec3& cameraPos,
-                                                                            const glm::dvec3& cameraLookUp,
-                                                                            const int renderType)
-                                                                            const
+    glm::vec3 pos, glm::vec4 color, glm::vec4 outlineColor, const char* buffer,
+    const float textScale, const int textMinSize, const glm::dmat4& mvpMatrix,
+    const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
+    const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
+    const int renderType) const
 {
     float h = font.height();
 
@@ -893,21 +876,24 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
 
             // Size-based culling
             if (character != 32 ) { // space can yield erroneous size
-                // Calculate the positions of the lower left and upper right corners of the
-                // billboard in screen-space
+                // Calculate the positions of the lower left and upper right corners of
+                // the billboard in screen-space
                 glm::vec4 projPos[2];
                 projPos[0] = glm::vec4(mvpMatrix * glm::dvec4(p0, 1.0));
                 projPos[1] = glm::vec4(mvpMatrix * glm::dvec4(p1, 1.0));
-                glm::vec4 topLeft = (((projPos[0] / projPos[0].w) + glm::vec4(1.0)) / glm::vec4(2.0)) * glm::vec4(
-                    _framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
-                glm::vec4 bottomLeft = (((projPos[1] / projPos[1].w) + glm::vec4(1.0)) / glm::vec4(2.0)) * glm::vec4(
-                    _framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
+                glm::vec4 topLeft =
+                    (((projPos[0] / projPos[0].w) + glm::vec4(1.0)) / glm::vec4(2.0)) *
+                    glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
+                glm::vec4 bottomLeft =
+                    (((projPos[1] / projPos[1].w) + glm::vec4(1.0)) / glm::vec4(2.0)) *
+                    glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
 
                 // The billboard is smaller than one pixel, we can discard it
                 float sizeInPixels = length(glm::vec2(topLeft) - glm::vec2(bottomLeft));
-                if (sizeInPixels < static_cast<float>(textMinSize) || 
-                    sizeInPixels > _framebufferSize.x || 
-                    sizeInPixels > _framebufferSize.y) {
+                if (sizeInPixels < static_cast<float>(textMinSize) ||
+                    sizeInPixels > _framebufferSize.x ||
+                    sizeInPixels > _framebufferSize.y)
+                {
                     return { size, static_cast<int>(lines.size()) };
                 }
             }

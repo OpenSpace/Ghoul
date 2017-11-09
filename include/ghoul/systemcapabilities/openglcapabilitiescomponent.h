@@ -194,13 +194,13 @@ protected:
     /// The maximum supported texture size for 3D textures
     int _maxTextureSize3D = -1;
     /// The maximum number of texture units
-    int _numTextureUnits = -1;
+    int _nTextureUnits = -1;
     /// The maximum number of atomic counter buffer bindings
-    int _numAtomicCounterBufferBindings = -1;
+    int _nAtomicCounterBufferBindings = -1;
     /// The maximum number of shader storage buffer bindings
-    int _numShaderStorageBufferBindings = -1;
+    int _nShaderStorageBufferBindings = -1;
     /// The maximum number of uniform buffer bindings
-    int _numUniformBufferBindings = -1;
+    int _nUniformBufferBindings = -1;
     /// The maximum number of color attachments for an FBO
     int _maxFramebufferColorAttachments = -1;
 

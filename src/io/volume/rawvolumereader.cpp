@@ -59,10 +59,15 @@ opengl::Texture* RawVolumeReader::read(const std::string& filename) {
             fprintf( stderr, "Could not open file '%s'\n", filename.c_str() );
         }
 
-        opengl::Texture* texture = new opengl::Texture(data, glm::size3_t(_hints._dimensions),
-                _hints._format, _hints._internalFormat, GL_UNSIGNED_BYTE,
-                opengl::Texture::FilterMode::Linear, opengl::Texture::WrappingMode::ClampToBorder);
-        //texture->uploadTexture();
+        opengl::Texture* texture = new opengl::Texture(
+            data,
+            glm::size3_t(_hints._dimensions),
+            _hints._format,
+            _hints._internalFormat,
+            GL_UNSIGNED_BYTE,
+            opengl::Texture::FilterMode::Linear,
+            opengl::Texture::WrappingMode::ClampToBorder
+        );
         return texture;
     } else {
         std::cout << "Error. Volume dimensions not set" << std::endl;

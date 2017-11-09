@@ -276,7 +276,10 @@ bool CommandlineParser::addCommand(std::unique_ptr<CommandlineCommand> cmd) {
     ghoul_assert(!getCommand(cmd->name()), "Name was previously registered");
 
     if (!cmd->shortName().empty()) {
-        ghoul_assert(!getCommand(cmd->shortName()), "Shortname was previously registered");
+        ghoul_assert(
+            !getCommand(cmd->shortName()),
+            "Shortname was previously registered"
+        );
     }
 
     _commands.push_back(std::move(cmd));

@@ -109,7 +109,9 @@ void FileSystem::addFileListener(File* file) {
     if (f == _directories.end()) {
         bool alreadyTrackingParent = false;
         for (auto dir : _directories) {
-            if (d.length() > dir.first.length() && d.find(dir.first) != std::string::npos) {
+            if (d.length() > dir.first.length() &&
+                d.find(dir.first) != std::string::npos)
+            {
                 alreadyTrackingParent = true;
                 break;
             }
@@ -117,10 +119,13 @@ void FileSystem::addFileListener(File* file) {
         if (!alreadyTrackingParent) {
             DirectoryHandle* handle = new DirectoryHandle;
 
-            // Create the FSEventStream responsible for this directory (Apple's callback system
-            // only works on the granularity of the directory)
-            CFStringRef path = CFStringCreateWithCString(NULL, d.c_str(),
-                                                         kCFStringEncodingASCII);
+            // Create the FSEventStream responsible for this directory (Apple's callback
+            // system only works on the granularity of the directory)
+            CFStringRef path = CFStringCreateWithCString(
+                NULL,
+                d.c_str(),
+                kCFStringEncodingASCII
+            );
             CFArrayRef pathsToWatch = CFArrayCreate(
                 NULL,
                 reinterpret_cast<const void **>(&path),
@@ -145,7 +150,8 @@ void FileSystem::addFileListener(File* file) {
             );
 
             // Add checking the event stream to the current run loop
-            // If there is a performance bottleneck, this could be done on a separate thread?
+            // If there is a performance bottleneck, this could be done on a separate
+            // thread?
             FSEventStreamScheduleWithRunLoop(handle->_eventStream,
                 CFRunLoopGetCurrent(),
                 kCFRunLoopDefaultMode

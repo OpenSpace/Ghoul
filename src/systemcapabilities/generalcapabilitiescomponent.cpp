@@ -419,7 +419,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
         "clflush",
         "Unknown2",
         "ds",
-        "acpi", //  @TODO: "Thermal Monitor and Clock Ctrl", is this correct? ---jonasstrandstedt
+        "acpi", //  @TODO: "Thermal Monitor and Clock Ctrl", is this correct?
         "mmx",
         "fxsr",
         "sse",
@@ -503,7 +503,8 @@ void GeneralCapabilitiesComponent::detectCPU() {
             extensions << "sse3 ";
         }
         if (bMONITOR_MWAIT) {
-            extensions << "mwait "; // @TODO:  "MONITOR/MWAIT" is this correct? ---jonasstrandstedt
+             // @TODO:  "MONITOR/MWAIT" is this correct? ---jonasstrandstedt
+            extensions << "mwait ";
         }
         if (bCPLQualifiedDebugStore) {
             extensions << "ds_cpl ";

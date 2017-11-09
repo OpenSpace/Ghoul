@@ -640,7 +640,10 @@ bool FileSystem::expandPathTokens(string& path,
                 return { "", string::npos, 0 };
             }
 
-            std::string currentToken = path.substr(beginning, closingLocation - beginning);
+            std::string currentToken = path.substr(
+                beginning,
+                closingLocation - beginning
+            );
 
             auto it = std::find(ignoredTokens.begin(), ignoredTokens.end(), currentToken);
             if (it != ignoredTokens.end()) {
@@ -684,8 +687,8 @@ bool FileSystem::expandPathTokens(string& path,
     //    }
     //    const std::string& replacement = resolveToken(currentToken);
     //    if (replacement == currentToken) {
-    //        // replacement == currentToken will be true if the respective token could not
-    //        // be found;  resolveToken will print an error in that case
+    //        // replacement == currentToken will be true if the respective token could
+    //        // not be found;  resolveToken will print an error in that case
     //        return false;
     //    }
     //    path.replace(

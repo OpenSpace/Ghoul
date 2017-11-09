@@ -51,7 +51,8 @@ using std::string;
 
 namespace {
     const char* _loggerCat = "FileSystem";
-    const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW | IN_UNMOUNT | IN_ISDIR;
+    const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW |
+                          IN_UNMOUNT | IN_ISDIR;
 } // namespace
 
 namespace ghoul::filesystem {
@@ -146,7 +147,11 @@ void FileSystem::inotifyWatcher() {
                     // if there are files tracking
                     if (it != eqRange.second) {
                         // add new tracking
-                        int new_wd = inotify_add_watch( fd, it->second->path().c_str(), mask);
+                        int new_wd = inotify_add_watch(
+                            fd,
+                            it->second->path().c_str(),
+                            mask
+                        );
 
                         // save all files
                         std::vector<File*> v;

@@ -66,7 +66,9 @@ void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous) {
     }
 }
 
-void setDebugMessageControl(Source source, Type type, Severity severity, Enabled enabled) {
+void setDebugMessageControl(Source source, Type type, Severity severity,
+                            Enabled enabled)
+{
     glDebugMessageControl(
         static_cast<GLenum>(source),
         static_cast<GLenum>(type),

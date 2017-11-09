@@ -133,7 +133,9 @@ void FileSystem::removeFileListener(File* file) {
     LWARNING("Could not find tracked '" << file <<"' for path '"<< file->path() << "'");
 }
 
-void FileSystem::callbackHandler(DirectoryHandle* directoryHandle, const std::string& file) {
+void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,
+                                 const std::string& file)
+{
     std::string fullPath;
     for (const auto& d : FileSys._directories) {
         if (d.second == directoryHandle) {
@@ -160,7 +162,9 @@ void readStarter(DirectoryHandle* directoryHandle) {
 }
 
 void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
-    DirectoryHandle* directoryHandle = static_cast<DirectoryHandle*>(lpOverlapped->hEvent);
+    DirectoryHandle* directoryHandle = static_cast<DirectoryHandle*>(
+        lpOverlapped->hEvent
+    );
 
     unsigned char currentBuffer = directoryHandle->_activeBuffer;
 
@@ -170,7 +174,9 @@ void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
     // Restart change listener as soon as possible
     readStarter(directoryHandle);
 
-    char* buffer = reinterpret_cast<char*>(&(directoryHandle->_changeBuffer[currentBuffer][0]));
+    char* buffer = reinterpret_cast<char*>(
+        &(directoryHandle->_changeBuffer[currentBuffer][0])
+    );
 
     // data might have queued up, so we need to check all changes
     while (true) {
