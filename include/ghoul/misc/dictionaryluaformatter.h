@@ -37,7 +37,7 @@ class Dictionary;
 /**
  * This concrete implementation of a DictionaryFormatter converts the passed Dictionary
  * into a Lua format.
- * 
+ *
  * At the moment, the only types that are supported in this conversion are:
  * <code>glm::vec2</code>, <code>glm::vec3</code>, <code>glm::vec4</code>,
  * <code>float</code>, <code>int</code>, and <code>std::string</code>.

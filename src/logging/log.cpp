@@ -31,7 +31,7 @@
 
 namespace ghoul::logging {
 
-Log::Log(TimeStamping timeStamping, DateStamping dateStamping, 
+Log::Log(TimeStamping timeStamping, DateStamping dateStamping,
          CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
          LogLevel minimumLogLevel)
     : _timeStamping(timeStamping)

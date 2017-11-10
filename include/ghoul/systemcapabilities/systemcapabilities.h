@@ -65,7 +65,7 @@ public:
     static SystemCapabilities& ref();
 
     /**
-     * Returns the initialization state of the SystemCapabilities object. 
+     * Returns the initialization state of the SystemCapabilities object.
      * \return The initialization state of the SystemCapabilities object
      */
     static bool isInitialized();

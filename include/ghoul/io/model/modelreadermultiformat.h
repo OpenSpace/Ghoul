@@ -61,8 +61,8 @@ namespace ghoul::io {
 class ModelReaderMultiFormat : public ModelReaderBase {
 public:
     /**
-     * Loads the 3D model (anyone from the previous list) file pointed to by 
-     * \p filename and returns a constructed VertexBufferObject from it. 
+     * Loads the 3D model (anyone from the previous list) file pointed to by
+     * \p filename and returns a constructed VertexBufferObject from it.
      * Provided materials are ignored and all shapes are
      * collapsed into one VertexBufferObject.
      * \param filename The geometric model file to be loaded

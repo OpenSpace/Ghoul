@@ -35,7 +35,7 @@ namespace ghoul::io {
 #ifdef GHOUL_USE_DEVIL
 
 /**
- * Loads the texture using the DevIL library. For a list of supported image formats, see 
+ * Loads the texture using the DevIL library. For a list of supported image formats, see
  * http://openil.sourceforge.net/features.php
  */
 class TextureReaderDevIL : public TextureReaderBase {

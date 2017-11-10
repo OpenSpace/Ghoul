@@ -33,8 +33,8 @@
 namespace ghoul::opengl {
 
 /**
- * This class is a wrapper for handling vertex buffer objects. It is only meant for 
- * simplifying the creation and use of the most standard vertex buffer object with a 
+ * This class is a wrapper for handling vertex buffer objects. It is only meant for
+ * simplifying the creation and use of the most standard vertex buffer object with a
  * vertex list and an index list. It will create an internal vertex array object to store
  * the created VertexBufferObject.
  */
@@ -99,10 +99,11 @@ public:
         const std::vector<GLint>& indexArray);
 
     /**
-     * Sets the render mode for this VertexBufferObject. The render mode is how OpenGL is 
+     * Sets the render mode for this VertexBufferObject. The render mode is how OpenGL is
      * treating the vertices and indices. The default is <code>GL_TRIANGLES</code> but
      * other common render primitives are <code>GL_LINES</code> and
-     * <code>GL_POINTS</code>. See https://www.opengl.org/sdk/docs/man/html/glDrawElements.xhtml
+     * <code>GL_POINTS</code>.
+     * See https://www.opengl.org/sdk/docs/man/html/glDrawElements.xhtml
      * for supported render modes.
      * \param mode The render mode. Default is <code>GL_TRIANGLES</code>
      */

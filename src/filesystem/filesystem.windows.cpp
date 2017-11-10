@@ -181,7 +181,7 @@ void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
     // data might have queued up, so we need to check all changes
     while (true) {
         // extract the information which file has changed
-        FILE_NOTIFY_INFORMATION& information = 
+        FILE_NOTIFY_INFORMATION& information =
             reinterpret_cast<FILE_NOTIFY_INFORMATION&>(*buffer);
 
         if (information.Action == FILE_ACTION_MODIFIED) {
@@ -228,7 +228,7 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
         &changeBuffer[activeBuffer][0],
         static_cast<DWORD>(changeBuffer[activeBuffer].size()),
         false,
-        FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE | 
+        FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE |
         FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_CREATION,
         &returnedBytes,
         overlappedBuffer,

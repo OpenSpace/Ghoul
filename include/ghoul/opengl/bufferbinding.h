@@ -36,7 +36,7 @@ namespace ghoul::opengl::bufferbinding {
         ShaderStorage,
         Uniform
     };
-} // namespace ghoul::opengl::bufferbinding 
+} // namespace ghoul::opengl::bufferbinding
 
 namespace ghoul::opengl {
 

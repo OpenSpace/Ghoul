@@ -52,7 +52,7 @@ public:
     /**
      * Constructor creating an !any object from the \p value.
      * \param value The value that should be stored in the any object
-     */ 
+     */
     template<typename ValueType>
     any(const ValueType& value);
 
@@ -79,7 +79,7 @@ public:
         typename std::enable_if_t<!std::is_same<any&, ValueType>::value>* = nullptr,
         typename std::enable_if_t<!std::is_const<ValueType>::value>* = nullptr);
 
-    /// Default destructor 
+    /// Default destructor
     ~any() noexcept;
 
     /**
@@ -200,7 +200,7 @@ public:
  */
 class bad_any_cast : public std::bad_cast {
 public:
-    const char* what() const noexcept override; 
+    const char* what() const noexcept override;
 };
 
 /**

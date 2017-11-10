@@ -144,7 +144,8 @@ public:
      * parameter. If \p className does not name a registered class, an exception is
      * thrown.  Classes can be registered with the #registerClass method.
      * \param className The class name of the instance that should be created
-     * \param dictionary The dictionary that will be passed to the constructor of the class
+     * \param dictionary The dictionary that will be passed to the constructor of the
+     * class
      * \return A fully initialized instance of the registered class
      * \throw TemplateClassNotFoundError If the \p className did not name a previously
      * registered class
@@ -210,7 +211,7 @@ public:
      * \pre \p className must not be empty
      * \pre \p factoryFunction must not be <code>nullptr</code>
      */
-    void registerClass(std::string className, 
+    void registerClass(std::string className,
         std::function<BaseClass*(bool, const ghoul::Dictionary&)> factoryFunction);
 
     /**

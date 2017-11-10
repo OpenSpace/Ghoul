@@ -116,7 +116,7 @@ void SharedMemory::create(const std::string& name, size_t size) {
             "Error creating shared memory '" + name + "': " + errorMsg
         );
     }
-    else { 
+    else {
         if (error == ERROR_ALREADY_EXISTS) {
             throw SharedMemoryError(
                 "Error creating shared memory '" + name + "': Section exists"

@@ -56,7 +56,7 @@ Buffer::Buffer(const std::string& filename)
     read(filename);
 }
 
-Buffer::Buffer(const Buffer& other) 
+Buffer::Buffer(const Buffer& other)
     : _data(other._data)
     , _offsetWrite(other._offsetWrite)
     , _offsetRead(other._offsetRead)

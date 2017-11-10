@@ -67,7 +67,7 @@ public:
     };
 
     /**
-     * Exception that gets thrown if an error occurs in the 
+     * Exception that gets thrown if an error occurs in the
      * ComandlineCommand::checkParameters
      */
     struct CommandParameterException : public RuntimeError {
@@ -175,7 +175,7 @@ protected:
     /**
      * Casts the string value \p s into the type <code>T</code>. If the conversion fails,
      * an CommandException is thrown. The conversion is done via an
-     * <code>std::stringstream</code> so it can only cast those types supported by the 
+     * <code>std::stringstream</code> so it can only cast those types supported by the
      * stream.
      * \tparam T The type of the value which should be converted
      * \param s The <code>std::string</code> representation of the value

@@ -112,8 +112,8 @@ public:
     std::string operatingSystemString() const;
 
     /**
-     * Returns the full operating system. The exact format of the returned string is 
-     * implementation and operating system-dependent but it should contain the 
+     * Returns the full operating system. The exact format of the returned string is
+     * implementation and operating system-dependent but it should contain the
      * manufacturer and the version.
      * \return The operating system as a parsed string
      */

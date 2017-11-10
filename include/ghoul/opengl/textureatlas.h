@@ -22,13 +22,13 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  *****************************************************************************************
- *
+ *                                                                                       *
  * This code is based on the Freetype GL engine as developed by Nicolas P. Rougier. The  *
  * library is available at http://code.google.com/p/freetype-gl/. His implementation of  *
- * the TextureAtlas is based on the article by Jukka Jylänki: "A Thousand Ways to Pack   *
+ * the TextureAtlas is based on the article by Jukka Jylaanki: "A Thousand Ways to Pack  *
  * the Bin - A Practical Approach to Two-Dimensional Rectangle Bin Packing", 2010.       *
  * More precisely, this is an implementation of the Skyline Bottom-Left algorithm based  *
- * on C++ sources provided by Jukka Jylänki at:                                          *
+ * on C++ sources provided by Jukka Jylaanki at:                                         *
  * http://clb.demon.fi/files/RectangleBinPack/                                           *
  ****************************************************************************************/
 
@@ -66,7 +66,7 @@ public:
     typedef int RegionHandle;
 
     /**
-     * The constructor completely initializes the Texture Atlas. No additional 
+     * The constructor completely initializes the Texture Atlas. No additional
      * initialization step is necessary. Due to the fact that the underlying Texture is
      * initialized here, it requires a valid OpenGL context.
      * \param size The size (<code>width</code>, <code>height</code>, <code>depth</code>)
@@ -144,7 +144,7 @@ public:
      * \param height The height of the requested region
      * \return A handle to the new region that can be passed to the #setRegionData and
      * #textureCoordinates functions
-     * \throws InvalidRegionException If the new requested region does not fit in the 
+     * \throws InvalidRegionException If the new requested region does not fit in the
      * TextureAtlas
      */
     RegionHandle newRegion(int width, int height);

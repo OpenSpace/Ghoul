@@ -108,7 +108,7 @@ public:
     /**
      * Returns the path to a storage location for the cached file. Depending on the
      * persistence (\p isPersistent), the directory and files will automatically be
-     * cleaned on application end or be made available automatically on the next 
+     * cleaned on application end or be made available automatically on the next
      * application run. The method will use the date of last modification as a unique
      * identifier for the file. Subsequent calls (in the same run or different) with the
      * same \p file will consistently produce the same file path until the last-modified
@@ -196,7 +196,7 @@ public:
         const std::string& information, Persistent isPersistent = Persistent::No);
 
     /**
-     * This method checks if a cached \p file has been registered before in this 
+     * This method checks if a cached \p file has been registered before in this
      * application run (persistent and non-persistent files) or in a previous run
      * (persistent cache files only). Note that this only checks if a file has been
      * requested before, not if the cached file has actually been used. The method will
@@ -303,7 +303,7 @@ protected:
     unsigned int generateHash(std::string file, std::string information) const;
 
     /**
-     * Cleans a directory from files not flagged as persistent and removes 
+     * Cleans a directory from files not flagged as persistent and removes
      */
     void cleanDirectory(const Directory& dir) const;
 

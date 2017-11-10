@@ -63,7 +63,7 @@ namespace ghoul {
  * threads but can be #resize%d after the fact, which will change the number of active
  * threads managed by this ThreadPool. Tasks can be queued by the #queue function,
  * which returns a <code>std::future</code> object that contains the possible return value
- * of the passed task. 
+ * of the passed task.
  *
  * Example use-case:
  *\verbatim
@@ -88,10 +88,10 @@ namespace ghoul {
     assert(1 == std::get<2>(val));
  }
 
-\endverbatim 
+\endverbatim
  *
  * Tasks passed to the ThreadPool as started in order a strict FIFO ordering.
- * 
+ *
  * Workers can be initialized with custom functions that are passed to the ThreadPool
  * during construction. These functions are called once for each Worker at the beginning
  * and at the end of its lifetime.
@@ -178,7 +178,7 @@ public:
 
     /**
      * Resizes the ThreadPool such that the number of workers in the pool is \p nThreads
-     * after this function call. If \p nThreads is bigger than the current number of 
+     * after this function call. If \p nThreads is bigger than the current number of
      * workers, additional workers are created and initialized, if \p nThreads is smaller
      * the extra workers detach and finish their work before being terminated. This
      * function can be called whether the ThreadPool is running or stopped.
@@ -216,7 +216,7 @@ public:
      * This function queues a task and returns an <code>std::future</code> object that
      * holds a potential return value of the function. The common use-case is passing a
      * lambda expression to this function that either returns a value or just performs its
-     * task on the referenced values. All tasks passed to this functions are potentially 
+     * task on the referenced values. All tasks passed to this functions are potentially
      * executed in parallel unless this ThreadPool was initialized with only a single
      * worker in the constructor or a subsequent call to #resize. The template parameters
      * of this function are best to be automatically determined. Example use-case:
@@ -242,8 +242,8 @@ ghoul::ThreadPool pool(2);
     assert(1 == std::get<2>(val));
 }
 
-\endverbatim 
-     * \tparam Function The description of the \p function%'s signature that will be 
+\endverbatim
+     * \tparam Function The description of the \p function%'s signature that will be
      * called
      * \tparam Args A variable list of arguments that can be passed to the \p function
      * \param function The function that will be called. This can be any callable object,
@@ -260,7 +260,7 @@ ghoul::ThreadPool pool(2);
     ) -> std::future<decltype(function(arguments...))>;
 
     /**
-    * This function queues a <code>std::packaged_task</code> and returns its 
+    * This function queues a <code>std::packaged_task</code> and returns its
     * <code>std::future</code> object that holds a potential return value. All tasks
     * passed to this functions are potentially executed in parallel unless this ThreadPool
     * was initialized with only a single worker in the constructor or a subsequent call

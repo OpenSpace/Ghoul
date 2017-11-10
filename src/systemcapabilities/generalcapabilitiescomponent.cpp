@@ -33,7 +33,7 @@
 #ifdef WIN32
     #include <Windows.h>
     #include <tchar.h>
-    #include <intrin.h>  
+    #include <intrin.h>
     #pragma comment(lib, "User32.lib")
     #pragma comment(lib, "Kernel32.lib")
     typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
@@ -144,7 +144,7 @@ void GeneralCapabilitiesComponent::detectOS() {
     osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
 #pragma warning (push)
-#pragma warning (disable : 4996) 
+#pragma warning (disable : 4996)
     BOOL osVersionInfoEx = GetVersionEx((OSVERSIONINFO*) &osVersionInfo);
 #pragma warning (pop)
 
@@ -222,7 +222,7 @@ void GeneralCapabilitiesComponent::detectOS() {
         // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
         // For applications that have been manifested for Windows 8.1 or Windows 10.
         // Applications not manifested for Windows 8.1 or Windows 10 will return the
-        // Windows 8 OS version value (6.2). 
+        // Windows 8 OS version value (6.2).
         if (osVersionInfo.dwMajorVersion == 10) {
             if (osVersionInfo.dwMinorVersion == 0) {
                 if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
@@ -444,7 +444,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     // __cpuid with an InfoType argument of 0 returns the number of
     // valid Ids in CPUInfo[0] and the CPU identification string in
     // the other three array elements. The CPU identification string is
-    // not in linear order. The code below arranges the information 
+    // not in linear order. The code below arranges the information
     // in a human readable form.
     __cpuid(CPUInfo, 0);
     nIds = CPUInfo[0];
@@ -665,7 +665,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
 GeneralCapabilitiesComponent::capabilities() const
-{   
+{
     return {
         { "Operating System", operatingSystemString(), Verbosity::Minimal },
         { "CPU", _cpu, Verbosity::Default },

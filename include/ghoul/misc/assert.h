@@ -121,7 +121,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
 
 #endif
 
-#else 
+#else
 
 #define ghoul_assert(__condition__, __message__) {}
 

@@ -167,7 +167,7 @@ private:
      * itself; thus reusing the \p result parameter.
      * \param result The result vector that will contain all files in the directory
      * \param path The path of the directory whose files should be listed
-     * \param recursiveSearch If <code>true</code>, this method will be called recursively 
+     * \param recursiveSearch If <code>true</code>, this method will be called recursively
      * for each directory in the current directory, combining all results in the
      * \p result> vector
      */
@@ -181,7 +181,7 @@ private:
      * itself; thus reusing the \p result parameter.
      * \param result The result vector that will contain all files in the directory
      * \param path The path of the directory whose files should be listed
-     * \param recursiveSearch If <code>true</code>, this method will be called recursively 
+     * \param recursiveSearch If <code>true</code>, this method will be called recursively
      * for each directory in the current directory, combining all results in the
      * \p result vector.
      */

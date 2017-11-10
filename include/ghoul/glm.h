@@ -27,8 +27,8 @@
 #define __GHOUL___GLM___H__
 
 #ifdef __APPLE__
-// The GLM header throw 'anonymous struct' warnings that we do not want. By marking the following
-// files as system headers, all warnings are ignored
+// The GLM header throw 'anonymous struct' warnings that we do not want. By marking the
+// following files as system headers, all warnings are ignored
 #pragma clang diagnostic push
 #pragma clang system_header
 #endif // __APPLE__

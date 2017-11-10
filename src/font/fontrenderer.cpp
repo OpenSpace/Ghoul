@@ -61,7 +61,7 @@ namespace {
         "${TEMPORARY}/defaultfontrenderer_fs.glsl";
     const char* ProjectionVertexShaderPath =
         "${TEMPORARY}/projectionfontrenderer_vs.glsl";
-    const char* ProjectionFragmentShaderPath = 
+    const char* ProjectionFragmentShaderPath =
         "${TEMPORARY}/projectionfontrenderer_fs.glsl";
 
     const char* DefaultVertexShaderSource = "\
@@ -257,8 +257,8 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
 
 bool FontRenderer::initialize() {
     LDEBUG("Creating default FontRenderer");
-    ghoul_assert(!_defaultRenderer, "Default FontRenderer was already initialized");    
-    _defaultRenderer = createDefault(); 
+    ghoul_assert(!_defaultRenderer, "Default FontRenderer was already initialized");
+    _defaultRenderer = createDefault();
     return true;
 }
 
@@ -278,7 +278,7 @@ FontRenderer& FontRenderer::defaultRenderer() {
 
 FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
                                                                const char* format,
-                                                               ...) const 
+                                                               ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
 
@@ -728,7 +728,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
     _program->setUniform("outlineColor", outlineColor);
     _program->setUniform("tex", atlasUnit);
     _program->setUniform("hasOutline", font.hasOutline());
-    _program->setUniform("projection", projection);    
+    _program->setUniform("projection", projection);
     _program->setIgnoreUniformLocationError(opengl::ProgramObject::IgnoreError::No);
 
     glBindVertexArray(_vao);
@@ -850,7 +850,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
             float s1 = glyph->bottomRight().x;
             float t1 = glyph->bottomRight().y;
             float outlineS1 = glyph->outlineBottomRight().x;
-            float outlineT1 = glyph->outlineBottomRight().y;    
+            float outlineT1 = glyph->outlineBottomRight().y;
 
             glm::vec3 p0 = glm::vec3(0.0);
             glm::vec3 p1 = glm::vec3(0.0);

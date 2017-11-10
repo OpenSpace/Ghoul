@@ -37,7 +37,7 @@ namespace io {
 
 /**
  * Loads the texture using the SOIL library. For a list of supported image formats, see
- * http://www.lonesock.net/soil.html 
+ * http://www.lonesock.net/soil.html
  */
 class TextureReaderSOIL : public TextureReaderBase {
 public:

@@ -159,7 +159,7 @@ void ModelReaderMultiFormat::loadModel(
 
     for (const aiMesh* meshPtr : meshArray) {
         // Walk through each of the mesh's vertices
-        for (unsigned int i = 0; i < meshPtr->mNumVertices; i++) {                    
+        for (unsigned int i = 0; i < meshPtr->mNumVertices; i++) {
             Vertex vTmp;
 
             // Positions
@@ -174,7 +174,7 @@ void ModelReaderMultiFormat::loadModel(
 
             // Texture Coordinates
             if (meshPtr->mTextureCoords[0]) {
-                // Each vertex can have at most 8 different texture coordinates. 
+                // Each vertex can have at most 8 different texture coordinates.
                 // We are using only the first one provided.
                 vTmp.tex[0] = meshPtr->mTextureCoords[0][i].x;
                 vTmp.tex[1] = meshPtr->mTextureCoords[0][i].y;
@@ -206,7 +206,7 @@ void ModelReaderMultiFormat::loadModel(
         //    aiMaterial* material = scene->mMaterials[meshPtr->mMaterialIndex];
         //    // We assume a convention for sampler names in the shaders. Each diffuse
         //    // texture should be named as 'texture_diffuseN' where N is a sequential
-        //    // number ranging from 1 to MAX_SAMPLER_NUMBER. 
+        //    // number ranging from 1 to MAX_SAMPLER_NUMBER.
         //    // Same applies to other texture as the following list summarizes:
         //    // Diffuse: texture_diffuseN
         //    // Specular: texture_specularN

@@ -33,8 +33,8 @@ namespace ghoul::io {
 #ifdef GHOUL_USE_SOIL
 
 /**
- * Saves the texture using the Soil library. For a list of supported image formats, see 
- * http://www.lonesock.net/soil.html 
+ * Saves the texture using the Soil library. For a list of supported image formats, see
+ * http://www.lonesock.net/soil.html
  */
 class TextureWriterSOIL : public TextureWriterBase {
 public:

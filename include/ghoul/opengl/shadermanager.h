@@ -64,7 +64,7 @@ public:
      * hash value is equal to \p hashedName. The hashed name that can be used will be
      * returned from the #registerShaderObject method.
      * \param hashedName The hashed name of the ShaderObject that is to be fetched
-     * \return The ShaderObject that has been registered with a string that evaluates 
+     * \return The ShaderObject that has been registered with a string that evaluates
      * to the \p hashedName
      * \throw ShaderManagerError if the ShaderObject for \p hashedName did not exist
      */
@@ -96,7 +96,7 @@ public:
         std::unique_ptr<ShaderObject> shader);
 
     /**
-     * This method will unregister the ShaderObject that was registered under the passed 
+     * This method will unregister the ShaderObject that was registered under the passed
      * name. The ShaderObject will be returned to the caller. If the caller ignores the
      * return value, the ShaderObject will be deleted.
      * \param name The name under which the ShaderObject was registered previously

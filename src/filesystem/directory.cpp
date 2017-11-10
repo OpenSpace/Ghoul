@@ -76,7 +76,7 @@ Directory Directory::parentDirectory(AbsolutePath absolutePath) const {
             _directoryPath + "..",
             absolutePath == AbsolutePath::Yes ? RawPath::No : RawPath::Yes
         );
-    } 
+    }
     else {
         return Directory(
             _directoryPath + FileSystem::PathSeparator + "..",

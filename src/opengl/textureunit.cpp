@@ -63,7 +63,7 @@ void TextureUnit::deactivate() {
     if (_assigned) {
         _assigned = false;
         _busyUnits.at(_number) = false;
-        --_totalActive;        
+        --_totalActive;
     }
 }
 

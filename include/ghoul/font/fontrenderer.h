@@ -87,14 +87,14 @@ public:
     /**
     * Creates a new instance of the FontRenderer with a default ProgramObject.
     * This method requires the FileSystem to be initialized, as temporary
-    * files containing the source code of the ShaderObjects will be created. 
+    * files containing the source code of the ShaderObjects will be created.
     * This method requires a valid OpenGL state.
     * \return a raw pointer to the new default instance
     */
     static std::unique_ptr<FontRenderer> createDefault();
 
     /**
-    * Creates a new instance of the FontRenderer with a perspective subject 
+    * Creates a new instance of the FontRenderer with a perspective subject
     * ProgramObject.
     * This method requires the FileSystem to be initialized, as temporary
     * files containing the source code of the ShaderObjects will be created.
@@ -189,7 +189,7 @@ public:
     * <code>color</code> and the outline color <code>outlineColor</code>. If the Font
     * does not have an outline, the <code>outlineColor</code> is ignored.
     * \param font The Font that is used to render the provided text
-    * \param pos The world-space coordinate for projection subject rendering that 
+    * \param pos The world-space coordinate for projection subject rendering that
     * is used to render the text
     * \param color The base color that is used to render the text
     * \param outlineColor The outline color that is used to render the text if the Font
@@ -210,7 +210,7 @@ public:
     * number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
-        glm::vec4 outlineColor, const float textScale, const int textMinSize, 
+        glm::vec4 outlineColor, const float textScale, const int textMinSize,
         const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
         const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
         const glm::dvec3& cameraLookUp, const int renderType, char* format, ...) const;
@@ -241,7 +241,7 @@ public:
     * <code>color</code>. In case the Font has an outline, the outline is rendered in
     * black with the same transparency as the provided <code>color</code>.
     * \param font The Font that is used to render the provided text
-    * \param pos The world-space coordinate for projection subject rendering, 
+    * \param pos The world-space coordinate for projection subject rendering,
     * that is used to render the text
     * \param color The base color that is used to render the text
     * \param textScale Scale applied on the rendered text.
@@ -260,9 +260,9 @@ public:
     * number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
-        const float textScale, const int textMinSize, const glm::dmat4& mvpMatrix, 
+        const float textScale, const int textMinSize, const glm::dmat4& mvpMatrix,
         const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
-        const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp, const int renderType, 
+        const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp, const int renderType,
         const char* format, ...) const;
 
     /**
@@ -288,7 +288,7 @@ public:
     * coordinates <code>pos</code> using the Font <code>font</code> in white color. In
     * case the Font has an outline, the outline is rendered in black.
     * \param font The Font that is used to render the provided text
-    * \param pos The world-space coordinate for projection subject rendering that is 
+    * \param pos The world-space coordinate for projection subject rendering that is
     * used to render the text
     * \param textScale Scale applied on the rendered text.
     * \param textMinSize Minimal size (in pixels) for a text to be rendered.
@@ -305,9 +305,10 @@ public:
     * \return A tuple containing the bounding box of the text that was printed and the
     * number of lines that were printed
     */
-    BoundingBoxInformation render(Font& font, glm::vec3 pos, const float textScale, 
-        const int textMinSize, const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
-        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp, 
+    BoundingBoxInformation render(Font& font, glm::vec3 pos, const float textScale,
+        const int textMinSize, const glm::dmat4& mvpMatrix,
+        const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
+        const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
         const int renderType, const char* format, ...) const;
 
 private:
@@ -317,10 +318,11 @@ private:
     BoundingBoxInformation internalRender(Font& font, glm::vec2 pos, glm::vec4 color,
         glm::vec4 outlineColor, const char* buffer) const;
 
-    BoundingBoxInformation internalProjectionRender(Font& font, glm::vec3 pos, glm::vec4 color,
-        glm::vec4 outlineColor, const char* buffer, const float textScale, const int textMinSize, 
-        const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
-        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
+    BoundingBoxInformation internalProjectionRender(Font& font, glm::vec3 pos,
+        glm::vec4 color, glm::vec4 outlineColor, const char* buffer,
+        const float textScale, const int textMinSize,  const glm::dmat4& mvpMatrix,
+        const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
+        const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
         const int renderType) const;
 
 

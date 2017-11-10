@@ -184,7 +184,8 @@ void TemplateFactory<BaseClass>::registerClass(std::string className) {
     // run-time if there is a proper constructor for it)
     FactoryFuncPtr&& function = CreateHelper<BaseClass, Class,
         (std::is_default_constructible<Class>::value * DEFAULT_CONSTRUCTOR) |
-        (std::is_constructible<Class, const ghoul::Dictionary&>::value * DICTIONARY_CONSTRUCTOR)
+        (std::is_constructible<Class, const ghoul::Dictionary&>::value *
+        DICTIONARY_CONSTRUCTOR)
     >().createFunction();
 
     registerClass(std::move(className), function);

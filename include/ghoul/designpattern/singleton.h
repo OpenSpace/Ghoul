@@ -51,7 +51,7 @@ template <class T>
 class Singleton {
 public:
     /**
-     * Creates and initializes an empty singleton with the arguments passed to the 
+     * Creates and initializes an empty singleton with the arguments passed to the
      * template class T constructor.
      * \pre The singleton must not have been initialized before
      */

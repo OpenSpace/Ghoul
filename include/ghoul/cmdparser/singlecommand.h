@@ -52,7 +52,7 @@ public:
      * executed
      * \param name The full name for this command. Has to start with a <code>-</code> in
      * order to be valid
-     * \param shortName The (optional) short name for this command. If it is provided, it 
+     * \param shortName The (optional) short name for this command. If it is provided, it
      * has to start with a <code>-</code> in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
      * by the CommandlineParser

@@ -53,9 +53,9 @@ public:
      * messages. If the file does not exist, it will be created.
      * \param filename The path and filename of the file that will receive the log
      * messages
-     * \param writeToAppend If this is <code>true</code>, the log messages will be appended
-     * to the file. If it is <code>false</code> the file will be overwritten without a
-     * warning.
+     * \param writeToAppend If this is <code>true</code>, the log messages will be
+     * appended to the file. If it is <code>false</code> the file will be overwritten
+     * without a warning.
      * \param timeStamping Determines if the log should print the time when a message is
      * logged in the log messages
      * \param dateStamping Determines if the log should print the time when a message is
@@ -112,7 +112,7 @@ protected:
      */
     static std::string colorForLevel(LogLevel level);
 
-private: 
+private:
     bool _customStyling;
 };
 

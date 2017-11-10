@@ -75,7 +75,7 @@ public:
 
     /**
     * Loads a Texture from the memory pointed at by \p memory. The memory block must
-    * contain at least \p size number of bytes. 
+    * contain at least \p size number of bytes.
     * \param memory The memory that contains the bytes of the Texture to be loaded
     * \param size The number of bytes contained in \p memory
     * \throw TextureLoadException If there was an error reading the \p memory

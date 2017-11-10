@@ -86,7 +86,8 @@ public:
 
 private:
     struct Input {
-        Input(std::ifstream& stream, ghoul::filesystem::File& file, std::string indentation);
+        Input(std::ifstream& stream, ghoul::filesystem::File& file,
+            std::string indentation);
 
         std::ifstream& stream;
         ghoul::filesystem::File& file;
@@ -109,7 +110,8 @@ private:
     struct Env {
         using Scope = std::set<std::string>;
 
-        Env(std::stringstream& output, std::string line = "", std::string indentation = "");
+        Env(std::stringstream& output, std::string line = "",
+            std::string indentation = "");
 
         std::stringstream& output;
         std::string line;
@@ -125,7 +127,8 @@ private:
     // pre path not empty
     // pre path must not contain path tokens
     // throws std::ios_base::failure if error opening file
-    void includeFile(const std::string& path, TrackChanges trackChanges, ShaderPreprocessor::Env& environment);
+    void includeFile(const std::string& path, TrackChanges trackChanges,
+        ShaderPreprocessor::Env& environment);
     bool parseLine(ShaderPreprocessor::Env& env);
     bool parseFor(ShaderPreprocessor::Env& env);
     bool parseEndFor(ShaderPreprocessor::Env& env);
@@ -135,14 +138,18 @@ private:
 
     bool substituteLine(ShaderPreprocessor::Env& env);
     std::string substitute(const std::string& in, ShaderPreprocessor::Env& env);
-    bool resolveAlias(const std::string& in, std::string& out, ShaderPreprocessor::Env& env);
+    bool resolveAlias(const std::string& in, std::string& out,
+        ShaderPreprocessor::Env& env);
 
     void pushScope(std::map<std::string, std::string> map, ShaderPreprocessor::Env& env);
 
     void popScope(ShaderPreprocessor::Env& env);
 
-    bool tokenizeFor(const std::string& line, std::string& keyName, std::string& valueName, std::string& dictionaryName, ShaderPreprocessor::Env& env);
-    bool parseRange(const std::string& dictionaryName, Dictionary& dictionary, int& min, int& max);
+    bool tokenizeFor(const std::string& line, std::string& keyName,
+        std::string& valueName, std::string& dictionaryName,
+        ShaderPreprocessor::Env& env);
+    bool parseRange(const std::string& dictionaryName, Dictionary& dictionary, int& min,
+        int& max);
     void addLineNumber(ShaderPreprocessor::Env& env);
     bool isInsideEmptyForStatement(ShaderPreprocessor::Env& env);
 

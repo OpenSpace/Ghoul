@@ -183,10 +183,10 @@ void ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
     dict->getValue<T>(rest, value);
 }
 
-#ifdef _MSC_VER 
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4702)
-#endif // _MSC_VER 
+#endif // _MSC_VER
 template <typename T>
 void Dictionary::getValueInternal(const std::string& key, T& value,
                                                            IsStandardScalarType<T>*) const
@@ -222,9 +222,9 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
         find(key)->second.type().name() + "' to type '" + typeid(T).name() + "'"
     );
 }
-#ifdef _MSC_VER 
+#ifdef _MSC_VER
 #pragma warning(pop)
-#endif // _MSC_VER 
+#endif // _MSC_VER
 
 template <typename T, glm::precision P>
 void Dictionary::getValueInternal(const std::string& key, glm::tvec2<T, P>& value) const {
@@ -448,7 +448,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x2<T, P>& va
 }
 
 template <typename T, glm::precision P>
-void Dictionary::getValueInternal(const std::string& key, glm::tmat2x3<T, P>& value) const {
+void Dictionary::getValueInternal(const std::string& key, glm::tmat2x3<T, P>& value) const
+{
     using Array = std::array<
         typename internal::StorageTypeConverter<glm::tmat2x3<T, P>>::type,
         internal::StorageTypeConverter<glm::tmat2x3<T, P>>::size
@@ -503,7 +504,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x3<T, P>& va
 }
 
 template <typename T, glm::precision P>
-void Dictionary::getValueInternal(const std::string& key, glm::tmat2x4<T, P>& value) const {
+void Dictionary::getValueInternal(const std::string& key, glm::tmat2x4<T, P>& value) const
+{
     using Array = std::array<
         typename internal::StorageTypeConverter<glm::tmat2x4<T, P>>::type,
         internal::StorageTypeConverter<glm::tmat2x4<T, P>>::size
@@ -560,7 +562,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x4<T, P>& va
 }
 
 template <typename T, glm::precision P>
-void Dictionary::getValueInternal(const std::string& key, glm::tmat3x2<T, P>& value) const {
+void Dictionary::getValueInternal(const std::string& key, glm::tmat3x2<T, P>& value) const
+{
     using Array = std::array<
         typename internal::StorageTypeConverter<glm::tmat3x2<T, P>>::type,
         internal::StorageTypeConverter<glm::tmat3x2<T, P>>::size
@@ -615,7 +618,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x2<T, P>& va
 }
 
 template <typename T, glm::precision P>
-void Dictionary::getValueInternal(const std::string& key, glm::tmat3x3<T, P>& value) const {
+void Dictionary::getValueInternal(const std::string& key, glm::tmat3x3<T, P>& value) const
+{
     using Array = std::array<
         typename internal::StorageTypeConverter<glm::tmat3x3<T, P>>::type,
         internal::StorageTypeConverter<glm::tmat3x3<T, P>>::size
@@ -673,7 +677,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x3<T, P>& va
 }
 
 template <typename T, glm::precision P>
-void Dictionary::getValueInternal(const std::string& key, glm::tmat3x4<T, P>& value) const {
+void Dictionary::getValueInternal(const std::string& key, glm::tmat3x4<T, P>& value) const
+{
     using Array = std::array<
         typename internal::StorageTypeConverter<glm::tmat3x4<T, P>>::type,
         internal::StorageTypeConverter<glm::tmat3x4<T, P>>::size
@@ -734,7 +739,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x4<T, P>& va
 }
 
 template <typename T, glm::precision P>
-void Dictionary::getValueInternal(const std::string& key, glm::tmat4x2<T, P>& value) const {
+void Dictionary::getValueInternal(const std::string& key, glm::tmat4x2<T, P>& value) const
+{
     using Array = std::array<
         typename internal::StorageTypeConverter<glm::tmat4x2<T, P>>::type,
         internal::StorageTypeConverter<glm::tmat4x2<T, P>>::size
@@ -791,7 +797,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x2<T, P>& va
 }
 
 template <typename T, glm::precision P>
-void Dictionary::getValueInternal(const std::string& key, glm::tmat4x3<T, P>& value) const {
+void Dictionary::getValueInternal(const std::string& key, glm::tmat4x3<T, P>& value) const
+{
     using Array = std::array<
         typename internal::StorageTypeConverter<glm::tmat4x3<T, P>>::type,
         internal::StorageTypeConverter<glm::tmat4x3<T, P>>::size
@@ -852,7 +859,8 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x3<T, P>& va
 }
 
 template <typename T, glm::precision P>
-void Dictionary::getValueInternal(const std::string& key, glm::tmat4x4<T, P>& value) const {
+void Dictionary::getValueInternal(const std::string& key, glm::tmat4x4<T, P>& value) const
+{
     using Array = std::array<
         typename internal::StorageTypeConverter<glm::tmat4x4<T, P>>::type,
         internal::StorageTypeConverter<glm::tmat4x4<T, P>>::size

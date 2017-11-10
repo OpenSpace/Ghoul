@@ -28,7 +28,7 @@ namespace ghoul::cmdparser  {
 template<typename T, typename U, typename V, typename W>
 SingleCommand<T, U, V, W>::SingleCommand(T* ptr1, std::string name, std::string shortName,
                                          std::string infoText, std::string parameterList)
-    : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), 
+    : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
                          std::move(parameterList), 1, MultipleCalls::No)
     , _ptr1(ptr1)
 {

@@ -37,7 +37,7 @@ namespace ghoul {
  * that threw the exception if it was set.
  */
 struct RuntimeError : public std::runtime_error {
-    /** 
+    /**
      * Main constructor constructing the exception with the provided \p message and
      * \p component.
      * \param message The main message of the exception

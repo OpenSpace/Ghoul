@@ -103,7 +103,7 @@ public:
     std::unique_ptr<Texture> unregisterTexture(const std::string& name);
 
     /**
-     * This method will unregister the Texture that was registered under a name whose hash 
+     * This method will unregister the Texture that was registered under a name whose hash
      * value is equal to the passed \p hashName. The Texture will be returned to the
      * caller. If the caller ignores the return value, the Texture will be deleted.
      * \param hashedName The hash value which is used to refer to a previously stored
@@ -114,8 +114,8 @@ public:
     std::unique_ptr<Texture> unregisterTexture(unsigned int hashedName);
 
     /**
-     * This method returns the hash value for a given string. The hash function is 
-     * implementation detail, but it is guaranteed to be static in an application run and 
+     * This method returns the hash value for a given string. The hash function is
+     * implementation detail, but it is guaranteed to be static in an application run and
      * it will always produce reliable, consistent results.
      * \param name The name which should be converted into a hash value
      * \return The hash value for the passed name

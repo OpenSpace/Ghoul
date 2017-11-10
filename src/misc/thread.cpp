@@ -68,7 +68,7 @@ int convertThreadPriorityLevel(ThreadPriorityClass c, ThreadPriorityLevel p) {
             }
     }
     return 0;
-#endif 
+#endif
 }
 
 [[maybe_unused]] int convertThreadPriorityClass(ThreadPriorityClass c) {
@@ -98,7 +98,7 @@ int convertThreadPriorityLevel(ThreadPriorityClass c, ThreadPriorityLevel p) {
 
 } // namespace
 
-void setPriority(std::thread& t, ThreadPriorityClass priorityClass, 
+void setPriority(std::thread& t, ThreadPriorityClass priorityClass,
                  ThreadPriorityLevel priorityLevel)
 {
 #ifdef WIN32

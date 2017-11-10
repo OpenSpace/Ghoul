@@ -90,7 +90,7 @@ public:
 
     /**
      * Retrieves the Font with the name <code>name</code>, which must have been previously
-     * registered (#registerFontPath). If this is the first call to this function for a 
+     * registered (#registerFontPath). If this is the first call to this function for a
      * specific combination of <code>name</code> and <code>fontSize</code> the Font is
      * initialized. In this case, the <code>loadGlyphs</code> parameter determines whether
      * the Font object will be initialized with a common set of English glyphs. Otherwise,

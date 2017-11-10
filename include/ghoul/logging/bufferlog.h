@@ -35,12 +35,12 @@ namespace ghoul::logging {
 
 /**
  * The BufferLog stores timestamped messages into a provided custom buffer of memory. It
- * automatically reserves a part of the block for use as a header in which the version, 
+ * automatically reserves a part of the block for use as a header in which the version,
  * possible attributes and the amount of stored data is located. The version is always
  * located in the first byte of the buffer and determines the size and the structure of
  * the rest of the header. Each log entry stores an 8 byte timestamp followed by a
  * <code>\0</code> terminated ASCII char array containing the message. Each logging will
- * test if there is enough memory left in the buffer. For memory exhaustion management, a 
+ * test if there is enough memory left in the buffer. For memory exhaustion management, a
  * custom callback can be specified (#setCallback) that will have to reset the buffer
  * (#resetBuffer) or a warning will be logged. The buffer can be written to disk
  * (#writeToDisk), or access directly (#buffer). Most of the methods are thread-safe and
@@ -157,8 +157,8 @@ public:
      * after this function call. This has to be taken care of by the caller or a memory
      * leak will occur. This method is thread-safe.
      * \param buffer The buffer that will be used by the BufferLog from now on
-     * \param bufferSize The size of the buffer that will be used by the BufferLog to store
-     * messages.
+     * \param bufferSize The size of the buffer that will be used by the BufferLog to
+     * store messages.
      * \pre \p buffer must not be <code>nullptr</code>
      * \pre \p bufferSize must be positive
      */
@@ -173,7 +173,7 @@ public:
 
     /**
      * This method writes the contents of the buffer to disk as a binary file. The full
-     * buffer, including the header, will be written out. Only the parts of the buffer 
+     * buffer, including the header, will be written out. Only the parts of the buffer
      * that have been used will be written to disk, as opposed to the whole buffer. This
      * means that the file may contain less bytes than #totalSize. This method is
      * thread-safe.
@@ -193,7 +193,7 @@ protected:
      * This block of memory will store all log messages that are added to this BufferLog
      * it has to be as big as the value provided in <code>_totalSize</code>
      */
-    void* _buffer; 
+    void* _buffer;
     size_t _totalSize; ///< The total size of the buffer used by this BufferLog
 
     /**

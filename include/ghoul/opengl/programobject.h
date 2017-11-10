@@ -42,7 +42,7 @@ namespace ghoul::opengl {
 /**
  * This class is a wrapper for an OpenGL program object storing an array of OpenGL
  * shaders. The usual restrictions for shader objects as described in the OpenGL and GLSL
- * language specifications apply. The ProgramObject can have a <code>name</code> that is 
+ * language specifications apply. The ProgramObject can have a <code>name</code> that is
  * used in the logging feature and as an OpenGL object label, if OpenGL > 4.3 is
  * available. Before the ProgramObject can be used, ShaderObject%s have to be attached,
  * the ShaderObject%s have to be compiled (#compileShaderObjects will compile all attached
@@ -1260,7 +1260,7 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix2x4dv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose Transpose::Yes if the matrix should be set in row major order, 
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
      * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
@@ -1275,7 +1275,7 @@ public:
      * otherwise. Will call the OpenGL function <code>glProgramUniformMatrix3x2dv</code>.
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \param transpose Transpose::Yes if the matrix should be set in row major order, 
+     * \param transpose Transpose::Yes if the matrix should be set in row major order,
      * Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      * <code>false</code> otherwise
@@ -3132,7 +3132,8 @@ public:
      * \param v4 The fourth value the vertex attribute should be set to
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
-    void setAttribute(GLuint location, GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4);
+    void setAttribute(GLuint location, GLdouble v1, GLdouble v2, GLdouble v3,
+        GLdouble v4);
 
     /**
      * Sets the vertex attribute at the \p location to the passed \p value. Will call the
@@ -3404,7 +3405,7 @@ public:
     void setIgnoreSubroutineUniformLocationError(IgnoreError ignoreError);
 
     /**
-     * Returns the state of this ProgramObject if the logging of location errors should be 
+     * Returns the state of this ProgramObject if the logging of location errors should be
      * enabled or not.
      * \return <code>true</code> if location errors will be ignored
      */
@@ -3429,7 +3430,7 @@ public:
      * logged. This will call the OpenGL function
      * <code>glGetSubroutineUniformLocation</code>.
      * \param shaderType The type of the shader object that will be queried
-     * \param name The name of the subroutine uniform for which the location will be 
+     * \param name The name of the subroutine uniform for which the location will be
      * queried
      * \return The location of the subroutine uniform
      * \pre \p name must not be empty
@@ -3438,13 +3439,13 @@ public:
         const std::string& name);
 
     /**
-     * Returns all the names of the active subroutine uniforms in the attached shader 
+     * Returns all the names of the active subroutine uniforms in the attached shader
      * object of type \p shaderType. The returned names can be used in subsequent calls to
-     * #subroutineUniformLocation. This will call the OpenGL function 
+     * #subroutineUniformLocation. This will call the OpenGL function
      * <code>glGetActiveSubroutineUniformName</code>.
      * \param shaderType The type of shader object that will be queried for the active
      * subroutine uniform names
-     * \return The list of all active subroutine uniform names in the attached shader 
+     * \return The list of all active subroutine uniform names in the attached shader
      * object(s)
      */
     std::vector<std::string> activeSubroutineUniformNames(
@@ -3474,9 +3475,9 @@ public:
      * <code>glGetActiveSubroutineUniformiv</code>.
      * \param shaderType The type of shader object that will be queried for the compatible
      * subroutine uniform names
-     * \param subroutineUniformName The name of the subroutine uniform that will be used 
+     * \param subroutineUniformName The name of the subroutine uniform that will be used
      * to determine the compatible subroutines
-     * \return A list of names of all subroutines that are compatible with the subroutine 
+     * \return A list of names of all subroutines that are compatible with the subroutine
      * uniform at \p subroutineUniformLocation
      * \pre \p subroutineUniformName must not be empty
      */
@@ -3484,7 +3485,7 @@ public:
         ShaderObject::ShaderType shaderType, const std::string& subroutineUniformName);
 
     /**
-     * Sets the subroutine indices of all available subroutine uniforms. The vector of 
+     * Sets the subroutine indices of all available subroutine uniforms. The vector of
      * \p indices has to be in the same order as the locations of uniform locations in the
      * attached shader object of type \p shaderType and has to contain as many indices as
      * there are subroutine uniforms in the shader object. I.e., the uniform subroutine at
@@ -3496,7 +3497,7 @@ public:
      * <code>glUniformSubroutinesuiv</code>.
      * \param shaderType The type of shader object that will be queried for the compatible
      * subroutine uniform names
-     * \param indices The list of subroutine indices that will be used to set all of the 
+     * \param indices The list of subroutine indices that will be used to set all of the
      * subroutine uniforms in the attached shader object
      * \return <code>true</code> if all uniform subroutines were set correctly,
      * <code>false</code> otherwise, i.e., if \p indices did not contain the
@@ -3517,7 +3518,7 @@ public:
      * <code>glUniformSubroutinesuiv</code>.
      * \param shaderType The type of shader object that will be queried for the compatible
      * subroutine uniform names
-     * \param values The map of (subroutine uniform name, subroutine name) specifying 
+     * \param values The map of (subroutine uniform name, subroutine name) specifying
      * which subroutine uniform should be set to which subroutine
      * \return <code>true</code> if all uniform subroutines were set correctly,
      * <code>false</code> otherwise, i.e., a subroutine uniform or a subroutine was not

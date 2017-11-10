@@ -98,7 +98,7 @@ public:
     Buffer& operator=(Buffer&& rhs);
 
     /**
-     * Default destructor is sufficient since no objects are 
+     * Default destructor is sufficient since no objects are
      * allocated internally
      */
     ~Buffer() = default;
@@ -146,7 +146,7 @@ public:
     void write(const std::string& filename, Compress compress = Compress::No);
 
     /**
-     * Reads the Buffer from a Buffer file. 
+     * Reads the Buffer from a Buffer file.
      * \param filename The path to the file to read
      * \throw std::ios_base::failure If there was an error reading the file
      * \pre \p filename must not be empty

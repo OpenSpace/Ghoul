@@ -39,7 +39,7 @@ HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend,
                  LogLevel minimumLogLevel)
     : TextLog(std::move(filename), writeToAppend, timeStamping, dateStamping,
                 categoryStamping, logLevelStamping, minimumLogLevel)
-{    
+{
     _customStyling = cssIncludes.size() > 1 || jsIncludes.size() > 1;
 
     std::string output = \
@@ -114,7 +114,7 @@ void HTMLLog::log(LogLevel level, const std::string& category,
 {
     std::string output;
     if (_customStyling) {
-        output = "\t\t\t<tr class=\"" + classForLevel(level) + "\">\n"; 
+        output = "\t\t\t<tr class=\"" + classForLevel(level) + "\">\n";
     } else {
         output = "\t\t\t<tr bgcolor=\"" + colorForLevel(level) + "\">\n";
     }

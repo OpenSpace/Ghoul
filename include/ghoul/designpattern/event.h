@@ -50,7 +50,7 @@ public:
     void subscribe(std::string name, std::string topic, Callback listener);
 
     /**
-     * Given a topic and a message, all subscribers callback functions of this 
+     * Given a topic and a message, all subscribers callback functions of this
      * event topic will be called with message as an argument.
      *
      * \param topic the event topic to publish to

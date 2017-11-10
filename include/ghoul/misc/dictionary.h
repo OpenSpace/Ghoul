@@ -275,7 +275,7 @@ public:
      * \throw KeyError If no intermediate keys should be created and an intermediate key
      * is missing
      * \throw ConversionError If an intermediate key does not name a Dictionary, but any
-     * other type. Example: For <code>a.b.c</code>, this exception is thrown if either 
+     * other type. Example: For <code>a.b.c</code>, this exception is thrown if either
      * <code>a</code> or <code>b</code> exist but are not Dictionary%s
      * \pre \p key must not be empty
      */

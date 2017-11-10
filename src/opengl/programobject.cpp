@@ -1690,7 +1690,7 @@ void ProgramObject::setUniform(GLint location, glm::uvec2* values, int count) {
         glUniform2uiv(location, count, reinterpret_cast<unsigned int*>(values));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
-}   
+}
 
 void ProgramObject::setUniform(GLint location, glm::uvec3* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
@@ -1857,7 +1857,7 @@ void ProgramObject::setUniform(GLint location, glm::ivec2* values, int count) {
         glUniform2iv(location, count, reinterpret_cast<int*>(values));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
-}   
+}
 
 void ProgramObject::setUniform(GLint location, glm::ivec3* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");

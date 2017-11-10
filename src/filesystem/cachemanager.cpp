@@ -124,7 +124,7 @@ CacheManager::CacheManager(std::string directory, int version)
             // remove it
             cacheState.erase(
                 std::remove_if(
-                    cacheState.begin(), cacheState.end(), 
+                    cacheState.begin(), cacheState.end(),
                     [hash, &info](const LoadedCacheInfo& i) {
                         return hash == i.first && info.file == i.second;
                     }
@@ -259,7 +259,7 @@ bool CacheManager::hasCachedFile(const std::string& baseName,
         throw IllegalArgumentException(baseName);
     }
 
-    unsigned int hash = generateHash(baseName, information);    
+    unsigned int hash = generateHash(baseName, information);
     return _files.find(hash) != _files.end();
 }
 
@@ -365,7 +365,7 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
                     ));
                 }
                 else {
-                    // Adding the absPath to normalize all / and \ for Windows 
+                    // Adding the absPath to normalize all / and \ for Windows
                     result.emplace_back(std::stoul(hashName), absPath(files[0]));
                 }
             }

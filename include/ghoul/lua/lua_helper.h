@@ -106,7 +106,7 @@ std::string stackInformation(lua_State* state);
  * \throws FormattingException If the #ghoul::Dictionary contains mixed keys of both type
  * <code>string</code> and type <code>number</code>
  * \throws FormattingException If the script did not return anything else but a table
- * \throws LuaRuntimeException If there was an error initializing a new Lua state if it 
+ * \throws LuaRuntimeException If there was an error initializing a new Lua state if it
  * was necessary
  * \post The \p state%'s stack is empty
  */
@@ -219,7 +219,7 @@ std::string luaTypeToString(int type);
 /**
  * Creates a new Lua state and initializes it with the default Lua libraries.
  * \param loadStandardLibraries If \c true, the Lua standard libraries will be loaded into
- * the newly created state by means of a \c luaL_openlibs call 
+ * the newly created state by means of a \c luaL_openlibs call
  * \return A valid new Lua state initialized with the default Lua libraries
  * \throw LuaRuntimeException If there was an error creating the new Lua state
  */
