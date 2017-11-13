@@ -411,7 +411,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     auto res = internalRender(
         font,
-        std::move(glm::vec2(pos)),
+        std::move(pos),
         std::move(color),
         std::move(outlineColor),
         buffer
@@ -489,7 +489,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     auto res = internalRender(
         font,
-        std::move(glm::vec2(pos)),
+        std::move(pos),
         color,
         glm::vec4(0.f, 0.f, 0.f, color.a),
         buffer.data()
@@ -563,7 +563,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     auto res = internalRender(
         font,
-        std::move(glm::vec2(pos)),
+        std::move(pos),
         glm::vec4(1.f),
         glm::vec4(0.f, 0.f, 0.f, 1.f),
         buffer.data()

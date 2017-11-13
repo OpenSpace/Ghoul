@@ -111,7 +111,7 @@ void FramebufferObject::attachTexture(Texture* texture, GLenum attachment, int m
                 *texture,
                 mipLevel
             );
-
+            break;
         case GL_TEXTURE_3D:
             glFramebufferTexture3D(
                 GL_FRAMEBUFFER,
