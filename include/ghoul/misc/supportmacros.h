@@ -33,6 +33,7 @@
 // undefined
 
 #ifdef _MSC_VER && !defined __INTEL_COMPILER
+
 // We are running Microsoft Visual Studio
 #define DISABLE_OPTIMIZATION #pragma optimize("", off)
 #define RESTORE_OPTIMIZATION #pragma optimize("", on)
