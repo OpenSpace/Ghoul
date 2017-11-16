@@ -111,25 +111,13 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/src/io/texture/texturereader.cpp
         ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderbase.cpp
         ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadercmap.cpp
+        ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderdevil.cpp
         ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderfreeimage.cpp
+        ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadersoil.cpp
         ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriter.cpp
         ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriterbase.cpp
+        ${PROJECT_SOURCE_DIR}/src/io/texture/texturewritersoil.cpp
     )
-
-    if (GHOUL_USE_SOIL)
-        set(GHOUL_SOURCE
-            ${GHOUL_SOURCE}
-            ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadersoil.cpp
-            ${PROJECT_SOURCE_DIR}/src/io/texture/texturewritersoil.cpp
-        )
-    endif ()
-
-    if (GHOUL_USE_DEVIL)
-        set(GHOUL_SOURCE
-            ${GHOUL_SOURCE}
-            ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderdevil.cpp
-        )
-    endif ()
 endif ()
 
 if (GHOUL_MODULE_SYSTEMCAPABILITIES)
@@ -259,27 +247,13 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereader.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderbase.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadercmap.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderdevil.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderfreeimage.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadersoil.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriter.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterbase.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewritersoil.h
     )
-
-    if (GHOUL_USE_SOIL)
-        set(GHOUL_HEADER
-            ${GHOUL_HEADER}
-            ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadersoil.h
-            ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewritersoil.h
-        )
-    endif ()
-
-    if (GHOUL_USE_DEVIL)
-        set(GHOUL_HEADER
-            ${GHOUL_HEADER}
-            ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderdevil.h
-        )
-    endif ()
-
 endif ()
 
 
