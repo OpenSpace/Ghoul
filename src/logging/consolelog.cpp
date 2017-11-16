@@ -24,6 +24,8 @@
  ****************************************************************************************/
 
 #include <ghoul/logging/consolelog.h>
+
+#include <ghoul/misc/assert.h>
 #include <iostream>
 
 #ifdef WIN32
