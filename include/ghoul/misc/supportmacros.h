@@ -32,13 +32,13 @@
 // OBS: Each DISABLE_OPTIMIZATION must have a RESTORE_OPTIMIZATION or the results are
 // undefined
 
-#ifdef _MSC_VER && !defined __INTEL_COMPILER
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 
 // We are running Microsoft Visual Studio
 #define DISABLE_OPTIMIZATION #pragma optimize("", off)
 #define RESTORE_OPTIMIZATION #pragma optimize("", on)
 #elif defined __INTEL_COMPILER
-// We are running the Intel compiler (which also defines _MSC_VER
+// We are running the Intel compiler (which also defines _MSC_VER)
 #define DISABLE_OPTIMIZATION #warning("OPTIMIZATION macros not implemented")
 #define RESTORE_OPTIMIZATION #warning("OPTIMIZATION macros not implemented")
 
