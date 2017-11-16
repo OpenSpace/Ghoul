@@ -72,8 +72,8 @@ namespace ghoul {
 {
     std::future<int> ret = pool.queue([](){ return 1337; });
     auto urn = pool.queue([](){ return "foobar"; });
-    assert(ret.get() == 1337);
-    assert(urn.get() == "foobar");
+    ghoul_assert(ret.get() == 1337);
+    ghoul_assert(urn.get() == "foobar");
  }
 
  {
@@ -83,9 +83,9 @@ namespace ghoul {
 
     std::future<std::tuple<std::string, float, int>> ret = pool.queue(func, 1, 2.f, "3");
     std::tuple<std::string, float, int> val = ret.get();
-    assert("3" == std::get<0>(val));
-    assert(2.f == std::get<1>(val));
-    assert(1 == std::get<2>(val));
+    ghoul_assert("3" == std::get<0>(val));
+    ghoul_assert(2.f == std::get<1>(val));
+    ghoul_assert(1 == std::get<2>(val));
  }
 
 \endverbatim
@@ -226,8 +226,8 @@ ghoul::ThreadPool pool(2);
 {
     std::future<int> ret = pool.queue([](){ return 1337; });
     auto urn = pool.queue([](){ return "foobar"; });
-    assert(ret.get() == 1337);
-    assert(urn.get() == "foobar");
+    ghoul_assert(ret.get() == 1337);
+    ghoul_assert(urn.get() == "foobar");
 }
 
 {
@@ -237,9 +237,9 @@ ghoul::ThreadPool pool(2);
 
     std::future<std::tuple<std::string, float, int>> ret = pool.queue(func, 1, 2.f, "3");
     std::tuple<std::string, float, int> val = ret.get();
-    assert("3" == std::get<0>(val));
-    assert(2.f == std::get<1>(val));
-    assert(1 == std::get<2>(val));
+    ghoul_assert("3" == std::get<0>(val));
+    ghoul_assert(2.f == std::get<1>(val));
+    ghoul_assert(1 == std::get<2>(val));
 }
 
 \endverbatim

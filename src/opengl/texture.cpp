@@ -363,7 +363,7 @@ void Texture::applyWrapping() {
             glTexParameteri(_type, GL_TEXTURE_WRAP_S, wrapping);
             break;
         default:
-            assert(false);
+            throw MissingCaseException();
     }
 }
 
@@ -418,7 +418,7 @@ void Texture::uploadDataToTexture(void* pixelData) {
             );
             break;
         default:
-            assert(false);
+            throw MissingCaseException();
     }
 }
 
@@ -466,7 +466,7 @@ void Texture::reUploadDataToTexture(void* pixelData) {
             );
             break;
         default:
-            assert(false);
+            throw MissingCaseException();
     }
 }
 
