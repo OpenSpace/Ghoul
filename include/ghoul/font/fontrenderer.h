@@ -366,6 +366,25 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos, Args... ar
 
 /**
  * This helper method prints the passed arguments using the Font::render function of the
+ * provided fontrenderer.
+ * \oaram fontRenderer The FontRenderer that is to be used for the rendering of the font
+ * \param font The Font that is used to render the provided text. If this argument is
+ * <code>nullptr</code>, an assertion is thrown
+ * \param pos The screen-space position (in pixel coordinates) that is used to render
+ * the text
+ * \param args The variable arguments that are the format string (the same as in printf)
+ * and optional arguments afterwards.
+ * \return The bounding box of the text that was printed
+ */
+template <typename... Args>
+glm::vec2 RenderFont(ghoul::fontrendering::FontRenderer& renderer, 
+    ghoul::fontrendering::Font& font, glm::vec2 pos, Args... args)
+{
+    return (renderer.render(font, pos, args...)).boundingBox;
+}
+
+/**
+ * This helper method prints the passed arguments using the Font::render function of the
  * default font and moves the pen position downwards after the call. It is equivalent to
  * calling defaultRenderer::render with the same arguments and then subtracting the
  * returned height from the pen position and discarding the second return value
@@ -388,6 +407,30 @@ glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos, Args...
 
 /**
  * This helper method prints the passed arguments using the Font::render function of the
+ * provided fontrenderer and moves the pen position downwards after the call. It is
+ * equivalent to calling the renderer's render with the same arguments and then
+ * subtracting the returned height from the pen position and discarding the second return
+ * value
+ * \oaram fontRenderer The FontRenderer that is to be used for the rendering of the font
+ * \param font The Font that is used to render the provided text. If this argument is
+ * <code>nullptr</code>, an assertion is thrown
+ * \param pos The screen-space position (in pixel coordinates) that is used to render
+ * the text
+ * \param args The variable arguments that are the format string (the same as in printf)
+ * and optional arguments afterwards.
+ * \return The bounding box of the text that was printed
+ */
+template <typename... Args>
+glm::vec2 RenderFontCr(ghoul::fontrendering::FontRenderer& renderer,
+    ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args)
+{
+    auto res = renderer.render(font, pos, args...);
+    pos.y -= res.numberOfLines * font.height();
+    return res.boundingBox;
+}
+
+/**
+ * This helper method prints the passed arguments using the Font::render function of the
  * default font and moves the pen position upwards after the call. It is equivalent to
  * calling defaultRenderer::render with the same arguments and then adding the
  * returned height to the pen position and discarding the second return value
@@ -404,6 +447,29 @@ glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos, Args.
     auto res =
         ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...);
 
+    pos.y += res.numberOfLines * font.height();
+    return res.boundingBox;
+}
+
+/**
+ * This helper method prints the passed arguments using the Font::render function of the
+ * provided fontrenderer and moves the pen position upwards after the call. It is
+ * equivalent to calling the renderer's render with the same arguments and then adding
+ * the returned height to the pen position and discarding the second return value
+ * \oaram fontRenderer The FontRenderer that is to be used for the rendering of the font
+ * \param font The Font that is used to render the provided text. If this argument is
+ * <code>nullptr</code>, an assertion is thrown
+ * \param pos The screen-space position (in pixel coordinates) that is used to render
+ * the text
+ * \param args The variable arguments that are the format string (the same as in printf)
+ * and optional arguments afterwards.
+ * \return The bounding box of the text that was printed
+ */
+template <typename... Args>
+glm::vec2 RenderFontCrUp(ghoul::fontrendering::FontRenderer& renderer,
+    ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args)
+{
+    auto res = renderer.render(font, pos, args...);
     pos.y += res.numberOfLines * font.height();
     return res.boundingBox;
 }

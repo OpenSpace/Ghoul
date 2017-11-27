@@ -321,7 +321,6 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
 
     unsigned int vertexIndex = 0;
     std::vector<GLuint> indices;
-    std::vector<GLfloat> vertices;
     glm::vec2 movingPos = glm::vec2(0.f);
 
     glm::vec2 size = glm::vec2(0.f);
@@ -342,36 +341,30 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
                 glyph = font.glyph(wchar_t(' '));
             }
 
-            if (j > 0) {
-                movingPos.x += glyph->kerning(line[j - 1]);
-            }
+            //if (j > 0) {
+            //    movingPos.x += glyph->kerning(line[j - 1]);
+            //}
 
-            float x0 = movingPos.x + glyph->leftBearing();
-            float y0 = movingPos.y + glyph->topBearing();
-            float s0 = glyph->topLeft().x;
-            float t0 = glyph->topLeft().y;
-            float outlineS0 = glyph->outlineTopLeft().x;
-            float outlineT0 = glyph->outlineTopLeft().y;
+            //float x0 = movingPos.x + glyph->leftBearing();
+            //float y0 = movingPos.y + glyph->topBearing();
+            //float s0 = glyph->topLeft().x;
+            //float t0 = glyph->topLeft().y;
+            //float outlineS0 = glyph->outlineTopLeft().x;
+            //float outlineT0 = glyph->outlineTopLeft().y;
 
-            float x1 = x0 + glyph->width();
-            float y1 = y0 - glyph->height();
-            float s1 = glyph->bottomRight().x;
-            float t1 = glyph->bottomRight().y;
-            float outlineS1 = glyph->outlineBottomRight().x;
-            float outlineT1 = glyph->outlineBottomRight().y;
+            //float x1 = x0 + glyph->width();
+            //float y1 = y0 - glyph->height();
+            //float s1 = glyph->bottomRight().x;
+            //float t1 = glyph->bottomRight().y;
+            //float outlineS1 = glyph->outlineBottomRight().x;
+            //float outlineT1 = glyph->outlineBottomRight().y;
 
-            indices.insert(indices.end(), {
-                vertexIndex, vertexIndex + 1, vertexIndex + 2,
-                vertexIndex, vertexIndex + 2, vertexIndex + 3
-            });
-            vertexIndex += 4;
-            vertices.insert(vertices.end(), {
-                x0, y0, s0, t0, outlineS0, outlineT0,
-                x0, y1, s0, t1, outlineS0, outlineT1,
-                x1, y1, s1, t1, outlineS1, outlineT1,
-                x1, y0, s1, t0, outlineS1, outlineT0
-            });
-            movingPos.x += glyph->horizontalAdvance();
+            //indices.insert(indices.end(), {
+            //    vertexIndex, vertexIndex + 1, vertexIndex + 2,
+            //    vertexIndex, vertexIndex + 2, vertexIndex + 3
+            //});
+            //vertexIndex += 4;
+            //movingPos.x += glyph->horizontalAdvance();
 
             width += glyph->horizontalAdvance();
             height = std::max(height, static_cast<float>(glyph->height()));
