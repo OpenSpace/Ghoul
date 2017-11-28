@@ -25,6 +25,7 @@
 
 #include <ghoul/font/fontmanager.h>
 
+#include <ghoul/filesystem/filesystem.h>
 #include <ghoul/font/font.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
@@ -92,14 +93,22 @@ std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
     ghoul_assert(!name.empty(), "Name must not be empty");
 
     unsigned int hash = hashCRC32(name);
-    try {
-        return font(hash, fontSize, withOutline, loadGlyphs);
+
+    auto itPath = _fontPaths.find(hash);
+    if (itPath == _fontPaths.end()) {
+        // There is no hash registered for the current name, so it might be a local file
+        if (FileSys.fileExists(name)) {
+            hash = registerFontPath(name, name);
+        }
+        else {
+            // The name has not neen previously registered and it is not a valid path
+            throw FontAccessException(fmt::format(
+                "Name '{}' does not name a valid font or file", name
+            ));
+        }
     }
-    catch (const FontAccessException&) {
-        throw FontAccessException(fmt::format(
-            "Error retrieving Font '{}' for size '{}'", name, fontSize
-        ));
-    }
+
+    return font(hash, fontSize, withOutline, loadGlyphs);
 }
 
 std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
@@ -115,7 +124,7 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     auto fonts = _fonts.equal_range(hashName);
     for (auto it = fonts.first; it != fonts.second; ++it) {
         const float delta = 1e-6f; // Font sizes are 1-1000, so a delta of 1/e6 is fine
-        if ((it->second->pointSize() - fontSize < delta) &&
+        if ((glm::abs(it->second->pointSize() - fontSize) < delta) &&
             it->second->hasOutline() == withOutline)
         {
             return it->second;
@@ -123,7 +132,10 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     }
 
     Font::Outline outline =
-        withOutline == Outline::Yes ? Font::Outline::Yes : Font::Outline::No;
+        withOutline == Outline::Yes ?
+        Font::Outline::Yes :
+        Font::Outline::No;
+
     auto f = std::make_shared<Font>(
         _fontPaths[hashName],
         fontSize,
