@@ -630,8 +630,7 @@ void Font::generateKerning() {
             FT_Vector kerning;
             FT_Get_Kerning(face, prevIndex, glyphIndex, FT_KERNING_DEFAULT, &kerning);
             if (kerning.x != 0) {
-                glyph._kerning[prevGlyph._charcode] =
-                    kerning.x / (PointConversionFactor * PointConversionFactor);
+                glyph._kerning[prevGlyph._charcode] = kerning.x / PointConversionFactor;
             }
         }
     }

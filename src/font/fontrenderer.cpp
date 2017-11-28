@@ -101,7 +101,7 @@ namespace {
             float inside = texture(tex, texCoords).r;\n\
             float outline = texture(tex, outlineTexCoords).r;\n\
             vec4 blend = mix(outlineColor, baseColor, inside);\n\
-            FragColor = blend * vec4(1.0, 1.0, 1.0, outline);\n\
+            FragColor = blend * vec4(1.0, 1.0, 1.0, max(inside, outline));\n\
         } \n\
         else { \n\
             FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r); \n\
@@ -110,7 +110,6 @@ namespace {
 
     const char* ProjectionVertexShaderSource = "\
     #version __CONTEXT__ \n\
-    const double PARSEC = 0.308567756e17LF; \n\
     \n\
     layout (location = 0) in vec3 in_position; \n\
     layout (location = 1) in vec2 in_texCoords; \n\
