@@ -25,6 +25,9 @@
 
 #include <ghoul/misc/misc.h>
 
+#include <algorithm>
+#include <cctype>
+
 namespace ghoul {
 
 std::vector<std::string> tokenizeString(const std::string& input, char separator) {
