@@ -53,6 +53,12 @@ std::vector<std::string> tokenizeString(
  */
 std::string join(std::vector<std::string> input, const std::string& separator = ".");
 
+/**
+ * Removes whitespace at the beginning and the end of the string
+ * \param value The string from which to remove the whitespace
+ */
+void trimWhitespace(std::string& value);
+
 } // namespace ghoul
 
 #endif // __GHOUL___MISC___H__

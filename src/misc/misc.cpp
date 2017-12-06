@@ -54,4 +54,22 @@ std::string join(std::vector<std::string> input, const std::string& separator) {
     return result.substr(0, result.size() - 1);
 }
 
+void trimWhitespace(std::string& value) {
+    // Trim from the left until the first non-whitespace character
+    value.erase(
+        value.begin(),
+        std::find_if(value.begin(), value.end(), [](int ch) { return !std::isspace(ch); })
+    );
+
+    // Trim from the right until the first non-whitespace character
+    value.erase(
+        std::find_if(
+            value.rbegin(),
+            value.rend(),
+            [](int ch) { return !std::isspace(ch); }
+        ).base(),
+        value.end()
+    );
+}
+
 } // namespace ghoul
