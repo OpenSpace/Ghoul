@@ -366,6 +366,9 @@ private:
     /// The number of Worker%s that are currently waiting for a task
     std::shared_ptr<std::atomic_int> _nWaiting;
 
+    /// This mutex guards pushing to the queue
+    std::mutex _queueMutex;
+
     /// The mutex used by the <code>condition_variable</code> <code>_cv</code> used to
     /// wait for and wake up Worker%s based on incoming Task%s
     std::shared_ptr<std::mutex> _mutex;
