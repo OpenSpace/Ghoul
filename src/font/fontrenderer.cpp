@@ -150,7 +150,7 @@ namespace {
             float inside = texture(tex, texCoords).r;\n\
             float outline = texture(tex, outlineTexCoords).r;\n\
             vec4 blend = mix(outlineColor, baseColor, inside);\n\
-            FragColor = blend * vec4(1.0, 1.0, 1.0, outline);\n\
+            FragColor = blend * vec4(1.0, 1.0, 1.0, max(inside, outline));\n\
         } \n\
         else { \n\
             FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r); \n\
