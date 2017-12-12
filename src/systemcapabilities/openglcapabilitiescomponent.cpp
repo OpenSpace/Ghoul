@@ -42,7 +42,7 @@
 #endif
 
 namespace {
-    const char* _loggerCat = "OpenGLCapabilities";
+    constexpr const char* _loggerCat = "OpenGLCapabilities";
 } // namespace
 
 namespace ghoul::systemcapabilities {

@@ -53,18 +53,18 @@ static int vscprintf(const char* format, va_list pargs) {
 
 
 namespace {
-    const char* _loggerCat = "FontRenderer";
+    constexpr const char* _loggerCat = "FontRenderer";
 
-    const char* DefaultVertexShaderPath =
+    constexpr const char* DefaultVertexShaderPath =
         "${TEMPORARY}/defaultfontrenderer_vs.glsl";
-    const char* DefaultFragmentShaderPath =
+    constexpr const char* DefaultFragmentShaderPath =
         "${TEMPORARY}/defaultfontrenderer_fs.glsl";
-    const char* ProjectionVertexShaderPath =
+    constexpr const char* ProjectionVertexShaderPath =
         "${TEMPORARY}/projectionfontrenderer_vs.glsl";
-    const char* ProjectionFragmentShaderPath =
+    constexpr const char* ProjectionFragmentShaderPath =
         "${TEMPORARY}/projectionfontrenderer_fs.glsl";
 
-    const char* DefaultVertexShaderSource = "\
+    constexpr const char* DefaultVertexShaderSource = "\
     #version __CONTEXT__ \n\
     \n\
     layout (location = 0) in vec2 in_position; \n\
@@ -83,7 +83,7 @@ namespace {
     } \n\
     ";
 
-    const char* DefaultFragmentShaderSource = "\
+    constexpr const char* DefaultFragmentShaderSource = "\
     #version __CONTEXT__ \n\
     \n\
     layout (location = 0) in vec2 texCoords; \n\
@@ -108,7 +108,7 @@ namespace {
         } \n\
     }";
 
-    const char* ProjectionVertexShaderSource = "\
+    constexpr const char* ProjectionVertexShaderSource = "\
     #version __CONTEXT__ \n\
     \n\
     layout (location = 0) in vec3 in_position; \n\
@@ -131,7 +131,7 @@ namespace {
     } \n\
     ";
 
-    const char* ProjectionFragmentShaderSource = "\
+    constexpr const char* ProjectionFragmentShaderSource = "\
     #version __CONTEXT__ \n\
     \n\
     layout (location = 0) in vec2 texCoords; \n\

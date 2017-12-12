@@ -41,9 +41,10 @@ using std::function;
 using std::string;
 
 namespace {
-    const string _loggerCat = "File";
+    constexpr const char* _loggerCat = "File";
+
 #ifdef WIN32
-    const unsigned int changeBufferSize = 16384u;
+    constexpr unsigned int changeBufferSize = 16384u;
 
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
@@ -57,8 +58,7 @@ File::FileException::FileException(const std::string& msg)
     : RuntimeError(msg, "File")
 {}
 
-File::File(std::string filename, RawPath isRawPath,
-          FileChangedCallback fileChangedCallback)
+File::File(string filename, RawPath isRawPath, FileChangedCallback fileChangedCallback)
     : _fileChangedCallback(std::move(fileChangedCallback))
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");

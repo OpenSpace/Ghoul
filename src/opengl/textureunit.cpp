@@ -94,8 +94,9 @@ int TextureUnit::numberActiveUnits() {
 }
 
 void TextureUnit::assignUnit() {
-    if (_totalActive >= _maxTexUnits)
+    if (_totalActive >= _maxTexUnits) {
         throw TextureUnitError("No more texture units available");
+    }
 
     _assigned = true;
 

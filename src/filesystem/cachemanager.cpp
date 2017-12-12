@@ -36,9 +36,11 @@
 #include <fstream>
 
 namespace {
-    const char* _loggerCat = "CacheManager";
-    const char* _cacheFile = "cache";
-    const char _hashDelimiter = '|'; // something that cannot occur in the filesystem
+    constexpr const char* _loggerCat = "CacheManager";
+    constexpr const char* _cacheFile = "cache";
+
+    // something that cannot occur in the filesystem
+    constexpr const char _hashDelimiter = '|';
 } // namespace
 
 namespace ghoul::filesystem {
@@ -55,7 +57,7 @@ CacheManager::MalformedCacheException::MalformedCacheException(std::string file,
 {}
 
 CacheManager::ErrorLoadingCacheException::ErrorLoadingCacheException(
-                                                             const std::string& msg)
+                                                                   const std::string& msg)
     : CacheException(msg)
 {}
 
@@ -325,7 +327,7 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
 }
 
 std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDirectory(
-    const Directory& dir) const
+                                                               const Directory& dir) const
 {
     std::vector<LoadedCacheInfo> result;
     std::vector<std::string> directories = dir.readDirectories();

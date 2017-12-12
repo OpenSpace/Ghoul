@@ -41,6 +41,7 @@ class CommandlineCommand;
 class CommandlineParser {
 public:
     using AllowUnknownCommands = ghoul::Boolean;
+    using DisplayHelpText = ghoul::Boolean;
 
     /**
      * The exception that is thrown in the CommandlineParser::execute method when an
@@ -126,7 +127,7 @@ public:
      * executions, wrong parameter types, error with unnamed arguments
      * \throws CommandExecutionException If the execution of a CommandlineCommand failed
      */
-    bool execute();
+    DisplayHelpText execute();
 
     /**
      * Add a new command to the parser. This method transfers ownership of the
@@ -134,16 +135,13 @@ public:
      * command upon destruction.
      * \param cmd The command that is to be added. The ownership of the CommandlineCommand
      * will be transferred to the CommandlineParser
-     * \return <code>true</code> if the command was added successfully; <code>false</code>
-     * if it either already existed or the CommandlineCommand::name or
-     * CommandlineCommand::shortName were not unique.
      * \pre \p cmd must not be <code>nullptr</code>
      * \pre The name of \p cmd may not have been used in a previous registered
      * CommandlineCommand's name or short name
      * \pre If \p cmd has a short name, it may not have been used in a previous registered
      * CommandlineCommand's name or short name
      */
-    bool addCommand(std::unique_ptr<CommandlineCommand> cmd);
+    void addCommand(std::unique_ptr<CommandlineCommand> cmd);
 
     /**
      * Add a new command to take care of the nameless arguments. Nameless arguments do not
@@ -171,6 +169,12 @@ public:
     bool hasCommandForShortName(const std::string& shortName) const;
 
     /**
+     * Returns if a nameless command has been previously registered.
+     * \return <code>true</code> if a nameless command has been previously registered
+     */
+    bool hasNamelessCommand() const;
+
+    /**
      * Returns the first command-line argument containing the path and the executable of
      * the running program.
      * \return The full path to the running program
@@ -178,20 +182,30 @@ public:
     const std::string& programPath() const;
 
     /**
-     * Prints usage information to the provided \p stream. If the argument \p command is
-     * empty, the usage information for all registered commands is printed. Otherwise only
-     * the information for the CommandlineCommand with the CommandlineCommand::name or
-     * CommandlineCommand::shortName equal to \p command will be printed.
-     * <code>Nameless</code> is a placeholder name for the nameless command
-     * (#addCommandForNamelessArguments).
-     * \param command Show information for the command with the CommandlineCommand::name
-     * or CommandlineCommand::shortName only. If <code>command</code> is empty, the
-     * usage information for all commands is printed; if <code>command = "Nameless"</code>
-     * the usage information for the nameless argument is logged
-     * \param stream The stream to which the usage information is printed
+     * Returns the usage information for all registered commands.
+     * \return The usage information for all registered commands
      */
-    void displayUsage(const std::string& command = "",
-        std::ostream& stream = std::cout) const;
+    std::string usageInformation() const;
+
+    /**
+     * Returns the usage information for the CommandlineCommand with the
+     * CommandlineCommand::name or CommandlineCommand::shortName equal to \p command.
+     * See #usageInformationForNamelessCommand for accessing the usage information for the
+     * command registered as the nameless command.
+     * \param command Show information for the command with the CommandlineCommand::name
+     * or CommandlineCommand::shortName only. If <code>command = "Nameless"</code>
+     * the usage information for the nameless argument is logged
+     * \return The usage information for the provided CommandlineCommand
+     * \pre command must not be an empty string
+     * \pre command must name a valid command either by full name or short name
+     */
+    std::string usageInformationForCommand(const std::string& command) const;
+
+    /**
+     * Returns the usage information for the nameless command.
+     * \return The usage information for the nameless command
+    */
+    std::string usageInformationForNamelessCommand() const;
 
     /**
      * Print the full help test to the provided \p stream. It consists of the usage

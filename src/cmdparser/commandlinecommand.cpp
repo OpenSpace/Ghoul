@@ -82,15 +82,15 @@ CommandlineCommand::MultipleCalls CommandlineCommand::allowsMultipleCalls() cons
 
 std::string CommandlineCommand::usage() const {
     std::string result = "[";
-    if (shortName() != "") {
+    if (!shortName().empty()) {
         result += "<" + shortName() + "|" + name() + ">";
     }
     else {
         result += name();
     }
 
-    if (parameterList() != "") {
-        result = result + " " + parameterList();
+    if (!parameterList().empty()) {
+        result += " " + parameterList();
     }
 
     result += "]";
@@ -99,15 +99,12 @@ std::string CommandlineCommand::usage() const {
 }
 
 std::string CommandlineCommand::help() const {
-    std::string result;
-    if (shortName() != "") {
-        result = shortName() + "|" + name() + ": \t" + infoText();
+    if (!shortName().empty()) {
+        return shortName() + "|" + name() + ": \t" + infoText();
     }
     else {
-        result = name() + ": \t" + infoText();
+        return name() + ": \t" + infoText();
     }
-
-    return result;
 }
 
 void CommandlineCommand::checkParameters(const std::vector<std::string>& param) const {

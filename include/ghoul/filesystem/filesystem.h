@@ -94,13 +94,17 @@ public:
      * The token used to separate individual path elements (<code>\\</code> or
      * <code>/</code>)
      */
-    static const char PathSeparator;
+#ifdef WIN32
+    static constexpr const char PathSeparator = '\\';
+#else
+    static constexpr const char PathSeparator = '/';
+#endif // WIN32
 
     /// Opening braces that are used for path tokens
-    static const std::string TokenOpeningBraces;
+    static constexpr const char* TokenOpeningBraces = "${";
 
     /// Closing braces that are used for path tokens
-    static const std::string TokenClosingBraces;
+    static constexpr const char* TokenClosingBraces = "}";
 
     /**
      * Returns the absolute path to the passed \p path, resolving any tokens (if present)

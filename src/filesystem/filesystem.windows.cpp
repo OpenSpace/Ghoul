@@ -44,7 +44,7 @@
 using std::string;
 
 namespace {
-    const string _loggerCat = "FileSystem";
+    constexpr const char* _loggerCat = "FileSystem";
 
     void CALLBACK completionHandler(
         DWORD dwErrorCode,

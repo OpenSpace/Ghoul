@@ -27,18 +27,22 @@
 
 namespace ghoul::cmdparser {
 
-SingleCommandZeroArguments::SingleCommandZeroArguments(bool *ptr, std::string name,
+SingleCommandZeroArguments::SingleCommandZeroArguments(bool& ptr, std::string name,
                                                        std::string shortName,
                                                        std::string infoText)
-    : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), "",
-                         0, CommandlineCommand::MultipleCalls::No)
+    : CommandlineCommand(
+        std::move(name),
+        std::move(shortName),
+        std::move(infoText),
+        "",
+        0,
+        CommandlineCommand::MultipleCalls::No
+    )
     , _ptr(ptr)
-{
-    ghoul_assert(ptr, "Pointer must not be a nullptr");
-}
+{}
 
 void SingleCommandZeroArguments::execute(const std::vector<std::string>& /*parameters*/) {
-    *_ptr = true;
+    _ptr = true;
 }
 
 } // namespace ghoul::cmdparser

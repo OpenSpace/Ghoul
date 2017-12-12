@@ -56,20 +56,23 @@ using std::string;
 using std::vector;
 
 namespace {
-    const char* _loggerCat = "FileSystem";
-    const char* TemporaryPathToken = "TEMPORARY";
+    constexpr const char* _loggerCat = "FileSystem";
+    constexpr const char* TemporaryPathToken = "TEMPORARY";
+
+    constexpr size_t constLength(const char* str) {
+        return (*str == '\0') ? 0 : constLength(str + 1) + 1;
+    }
+    
+    constexpr size_t TokenOpeningBracesSize = constLength(
+        ghoul::filesystem::FileSystem::TokenOpeningBraces
+    );
+
+    constexpr size_t TokenClosingBracesSize = constLength(
+        ghoul::filesystem::FileSystem::TokenClosingBraces
+    );
 } // namespace
 
 namespace ghoul::filesystem {
-
-const string FileSystem::TokenOpeningBraces = "${";
-const string FileSystem::TokenClosingBraces = "}";
-
-#ifdef WIN32
-const char FileSystem::PathSeparator = '\\';
-#else
-const char FileSystem::PathSeparator = '/';
-#endif
 
 FileSystem::FileSystemException::FileSystemException(const string& msg)
     : RuntimeError(msg, "FileSystem")
@@ -101,7 +104,7 @@ FileSystem::FileSystem()
     if (!temporaryPath.empty()) {
         LINFO("Set temporary path ${TEMPORARY} to " << temporaryPath);
         registerPathToken(
-            TokenOpeningBraces + TemporaryPathToken + TokenClosingBraces,
+            TokenOpeningBraces + std::string(TemporaryPathToken) + TokenClosingBraces,
             temporaryPath
         );
     }
@@ -631,9 +634,9 @@ bool FileSystem::expandPathTokens(string& path,
         while (true) {
             string::size_type beginning = path.find(TokenOpeningBraces, currentPosition);
             string::size_type closing = path.find(
-                TokenClosingBraces, beginning + TokenOpeningBraces.size()
+                TokenClosingBraces, beginning + std::strlen(TokenOpeningBraces)
             );
-            string::size_type closingLocation = closing + TokenClosingBraces.size();
+            string::size_type closingLocation = closing + TokenClosingBracesSize;
 
             if (beginning == string::npos || closing == string::npos) {
                 // There is no token left
@@ -820,7 +823,7 @@ bool FileSystem::hasToken(const string& path, const string& token) const {
         string::size_type beginning = path.find(TokenOpeningBraces);
         string::size_type closing = path.find(TokenClosingBraces);
         while ((beginning != string::npos) && (closing != string::npos)) {
-            string::size_type closingLocation = closing + TokenClosingBraces.size();
+            string::size_type closingLocation = closing + TokenClosingBracesSize;
             std::string currentToken = path.substr(beginning, closingLocation);
             if (currentToken == token) {
                 return true;

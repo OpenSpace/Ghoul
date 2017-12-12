@@ -67,6 +67,7 @@ public:
     /// Exception that gets thrown if the cache has a malformed information file
     struct MalformedCacheException : public CacheException {
         explicit MalformedCacheException(std::string file, std::string msg = "");
+
         std::string cacheFile;
         std::string message;
     };
@@ -79,6 +80,7 @@ public:
     /// Exception that gets thrown if the argument for retrieving a cache file is invalid
     struct IllegalArgumentException : public CacheException {
         explicit IllegalArgumentException(std::string argument);
+
         std::string argumentName;
     };
 

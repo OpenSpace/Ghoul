@@ -28,7 +28,7 @@
 #include <ghoul/logging/logmanager.h>
 
 namespace {
-    const char* _loggerCat = "ghoul.opengl.FramebufferObject";
+    constexpr const char* _loggerCat = "ghoul.opengl.FramebufferObject";
 } // namespace
 
 namespace ghoul::opengl {

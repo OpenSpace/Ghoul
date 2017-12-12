@@ -59,7 +59,7 @@ public:
     static void initialize(Args... args) {
         ghoul_assert(
             !isInitialized(),
-            std::string(typeid(T).name()) + " is already initialized!"
+            std::string(typeid(T).name()) + " is already initialized"
         );
         _instance = new T(std::forward<Args>(args)...);
     }
@@ -71,7 +71,7 @@ public:
     static void deinitialize() {
         ghoul_assert(
             isInitialized(),
-            std::string(typeid(T).name()) + " is not initialized!"
+            std::string(typeid(T).name()) + " is not initialized"
         );
         delete _instance;
         _instance = nullptr;
@@ -93,7 +93,7 @@ public:
     static T& ref() {
         ghoul_assert(
             isInitialized(),
-            std::string(typeid(T).name()) + " is not initialized!"
+            std::string(typeid(T).name()) + " is not initialized"
         );
         return *_instance;
     }

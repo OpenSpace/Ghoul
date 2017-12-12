@@ -39,37 +39,37 @@ public:
     using Callback = std::function<void(const T&...)>;
 
     /**
-     * Adds a listener callback to the specified topic. When an event is
-     * published with this topic, the callback is called. If this topic does
-     * not already exist, it creates a new key for it in the map of topics.
+     * Adds a listener callback to the specified topic. When an event is published with
+     * this topic, the callback is called. If this topic does not already exist, it
+     * creates a new key for it in the map of topics.
      *
-     * \param name the unique name of the subscriber
-     * \param topic the event topic to subscribe to
-     * \param listener function that should be called when the event is published
+     * \param name The unique name of the subscriber
+     * \param topic The event topic to subscribe to
+     * \param listener Function that should be called when the event is published
      */
     void subscribe(std::string name, std::string topic, Callback listener);
 
     /**
-     * Given a topic and a message, all subscribers callback functions of this
-     * event topic will be called with message as an argument.
+     * Given a topic and a message, all subscribers callback functions of this event topic
+     * will be called with message as an argument.
      *
-     * \param topic the event topic to publish to
-     * \param message to be used as argument for subscriber callbacks
+     * \param topic The event topic to publish to
+     * \param message The message to be used as argument for subscriber callbacks
      */
     void publish(const std::string& topic, T... message);
 
     /**
      * Unsubscribes the object with given name from a specific topic.
      *
-     * \param name the subscribers unique name
-     * \param topic the event to unsubscribe to
+     * \param name The subscriber's unique name
+     * \param topic The event to unsubscribe to
      */
     void unsubscribe(const std::string& name, const std::string& topic);
 
     /**
      * Unsubscribes the object with given name from all topics.
      *
-     * \param name the subscribers unique name
+     * \param name The subscriber's unique name
      */
     void unsubscribe(const std::string& name);
 
@@ -79,11 +79,7 @@ private:
         Callback callback;
     };
 
-    /**
-     * maps event topics to subscriber callbacks.
-     * The std::pair stores the unique name of the subscriber together with the callback
-     * so that it is possible to unsubscribe from the event.
-     */
+    /// Maps event topics to subscriber callbacks.
     std::unordered_map<std::string, std::vector<Subscriber>> _topics;
 };
 
