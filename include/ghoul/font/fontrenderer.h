@@ -196,6 +196,7 @@ public:
     * has an outline
     * \param textScale Scale applied on the rendered text.
     * \param textMinSize Minimal size (in pixels) for a text to be rendered.
+    * \param textMaxSize Maximal size (in pixels) for a text to be rendered.
     * \param mvpMatrix ModelViewProjection matrix transformation.
     * \param orthonormalRight Right vector from the orthonormal basis defining the
     * text's plane.
@@ -211,9 +212,10 @@ public:
     */
     BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
         glm::vec4 outlineColor, const float textScale, const int textMinSize,
-        const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
-        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
-        const glm::dvec3& cameraLookUp, const int renderType, char* format, ...) const;
+        const int textMaxSize, const glm::dmat4& mvpMatrix, 
+        const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp, 
+        const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp, 
+        const int renderType, char* format, ...) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -246,6 +248,7 @@ public:
     * \param color The base color that is used to render the text
     * \param textScale Scale applied on the rendered text.
     * \param textMinSize Minimal size (in pixels) for a text to be rendered.
+    * \param textMaxSize Maximal size (in pixels) for a text to be rendered.
     * \param mvpMatrix ModelViewProjection matrix transformation.
     * \param orthonormalRight Right vector from the orthonormal basis defining the
     * text's plane.
@@ -260,9 +263,10 @@ public:
     * number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
-        const float textScale, const int textMinSize, const glm::dmat4& mvpMatrix,
-        const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
-        const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp, const int renderType,
+        const float textScale, const int textMinSize, const int textMaxSize, 
+        const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
+        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos, 
+        const glm::dvec3& cameraLookUp, const int renderType,
         const char* format, ...) const;
 
     /**
@@ -292,6 +296,7 @@ public:
     * used to render the text
     * \param textScale Scale applied on the rendered text.
     * \param textMinSize Minimal size (in pixels) for a text to be rendered.
+    * \param textMaxSize Maximal size (in pixels) for a text to be rendered.
     * \param mvpMatrix ModelViewProjection matrix transformation.
     * \param orthonormalRight Right vector from the orthonormal basis defining the
     * text's plane.
@@ -306,7 +311,7 @@ public:
     * number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, glm::vec3 pos, const float textScale,
-        const int textMinSize, const glm::dmat4& mvpMatrix,
+        const int textMinSize, const int textMaxSize, const glm::dmat4& mvpMatrix,
         const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
         const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
         const int renderType, const char* format, ...) const;
@@ -320,10 +325,10 @@ private:
 
     BoundingBoxInformation internalProjectionRender(Font& font, glm::vec3 pos,
         glm::vec4 color, glm::vec4 outlineColor, const char* buffer,
-        const float textScale, const int textMinSize,  const glm::dmat4& mvpMatrix,
-        const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
-        const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
-        const int renderType) const;
+        const float textScale, const int textMinSize, const int textMaxSize, 
+        const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
+        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos, 
+        const glm::dvec3& cameraLookUp, const int renderType) const;
 
 
     /// The singleton instance of the default FontRenderer

@@ -125,7 +125,7 @@ namespace {
         texCoords = in_texCoords; \n\
         outlineTexCoords = in_outlineTexCoords; \n\
         vec4 finalPos = vec4(mvpMatrix * dvec4(in_position.xyz, 1.0)); \n\
-        float depth = finalPos.w; \n\
+        depth = finalPos.w; \n\
         finalPos.z = 0.0; \n\
         gl_Position = finalPos; \n\
     } \n\
@@ -150,10 +150,16 @@ namespace {
             float inside = texture(tex, texCoords).r;\n\
             float outline = texture(tex, outlineTexCoords).r;\n\
             vec4 blend = mix(outlineColor, baseColor, inside);\n\
-            FragColor = blend * vec4(1.0, 1.0, 1.0, outline);\n\
+            FragColor = blend * vec4(1.0, 1.0, 1.0, max(inside, outline));\n\
         } \n\
         else { \n\
             FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r); \n\
+        } \n\
+        if (depth > 1.0) { \n\
+            gl_FragDepth = depth / pow(10, 30);\n\
+        } \n\
+        else { \n\
+            gl_FragDepth = depth - 1.0; \n\
         } \n\
     }";
 } // namespace
@@ -318,7 +324,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
         lines.push_back(line);
     }
 
-    unsigned int vertexIndex = 0;
+    //unsigned int vertexIndex = 0;
     std::vector<GLuint> indices;
     glm::vec2 movingPos = glm::vec2(0.f);
 
@@ -416,7 +422,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 pos,
     glm::vec4 color, glm::vec4 outlineColor, const float textScale, const int textMinSize,
-    const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
+    const int textMaxSize, const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
     const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
     const glm::dvec3& cameraLookUp, const int renderType, char* format, ...) const
 {
@@ -445,6 +451,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 
         buffer,
         textScale,
         textMinSize,
+        textMaxSize,
         mvpMatrix,
         orthonormalRight,
         orthonormalUp,
@@ -492,7 +499,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 pos,
-    glm::vec4 color, const float textScale, const int textMinSize,
+    glm::vec4 color, const float textScale, const int textMinSize, const int textMaxSize,
     const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
     const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
     const glm::dvec3& cameraLookUp, const int renderType, const char* format, ...) const
@@ -521,6 +528,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 
         buffer.data(),
         textScale,
         textMinSize,
+        textMaxSize,
         mvpMatrix,
         orthonormalRight,
         orthonormalUp,
@@ -566,10 +574,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 pos,
-    const float textScale, const int textMinSize, const glm::dmat4& mvpMatrix,
-    const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
-    const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
-    const int renderType, const char* format, ...) const
+    const float textScale, const int textMinSize, const int textMaxSize, 
+    const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
+    const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos, 
+    const glm::dvec3& cameraLookUp, const int renderType, 
+    const char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
 
@@ -596,6 +605,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 
         buffer.data(),
         textScale,
         textMinSize,
+        textMaxSize,
         mvpMatrix,
         orthonormalRight,
         orthonormalUp,
@@ -773,10 +783,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
 
 FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font& font,
     glm::vec3 pos, glm::vec4 color, glm::vec4 outlineColor, const char* buffer,
-    const float textScale, const int textMinSize, const glm::dmat4& mvpMatrix,
-    const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
-    const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
-    const int renderType) const
+    const float textScale, const int textMinSize, const int textMaxSize, 
+    const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
+    const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos, 
+    const glm::dvec3& cameraLookUp, const int renderType) const
 {
     float h = font.height();
 
@@ -808,6 +818,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
     glm::vec2 movingPos(0.f);
 
     glm::vec2 size = glm::vec2(0.f);
+    float heightInPixels = 0.0f;
+
     for (const std::string& line : lines) {
         movingPos.x = 0.f;
         //movingPos.x = pos.x;
@@ -866,30 +878,50 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
                 p3 = (x1 * newRight + y0 * newUp) * textScale + pos;
             }
 
-            // Size-based culling
-            if (character != 32 ) { // space can yield erroneous size
-                // Calculate the positions of the lower left and upper right corners of
-                // the billboard in screen-space
-                glm::vec4 projPos[2];
-                projPos[0] = glm::vec4(mvpMatrix * glm::dvec4(p0, 1.0));
-                projPos[1] = glm::vec4(mvpMatrix * glm::dvec4(p1, 1.0));
-                glm::vec4 topLeft =
-                    (((projPos[0] / projPos[0].w) + glm::vec4(1.0)) / glm::vec4(2.0)) *
-                    glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
-                glm::vec4 bottomLeft =
-                    (((projPos[1] / projPos[1].w) + glm::vec4(1.0)) / glm::vec4(2.0)) *
-                    glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
 
-                // The billboard is smaller than one pixel, we can discard it
-                float sizeInPixels = length(glm::vec2(topLeft) - glm::vec2(bottomLeft));
-                if (sizeInPixels < static_cast<float>(textMinSize) ||
-                    sizeInPixels > _framebufferSize.x ||
-                    sizeInPixels > _framebufferSize.y)
-                {
-                    return { size, static_cast<int>(lines.size()) };
-                }
+            glm::vec4 projPos[2];
+            projPos[0] = glm::vec4(mvpMatrix * glm::dvec4(p0, 1.0));
+            projPos[1] = glm::vec4(mvpMatrix * glm::dvec4(p1, 1.0));
+            glm::vec4 topLeft =
+                (((projPos[0] / projPos[0].w) + glm::vec4(1.0)) / glm::vec4(2.0)) *
+                glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
+            glm::vec4 bottomLeft =
+                (((projPos[1] / projPos[1].w) + glm::vec4(1.0)) / glm::vec4(2.0)) *
+                glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
+
+            // The billboard is bigger than the maximum size allowed:
+            heightInPixels = heightInPixels == 0.0f ? glm::length(topLeft - bottomLeft) : heightInPixels;
+            
+            // Size-based culling
+            if (heightInPixels < static_cast<float>(textMinSize) ||
+                heightInPixels > _framebufferSize.x ||
+                heightInPixels > _framebufferSize.y)
+            {
+                return { size, static_cast<int>(lines.size()) };
             }
 
+            if (heightInPixels > textMaxSize) {
+                float scaleFix = static_cast<float>(textMaxSize) / heightInPixels;
+                if (renderType == 0) {
+                    p0 = (x0 * orthonormalRight + y0 * orthonormalUp) * textScale * scaleFix + pos;
+                    p1 = (x0 * orthonormalRight + y1 * orthonormalUp) * textScale * scaleFix + pos;
+                    p2 = (x1 * orthonormalRight + y1 * orthonormalUp) * textScale * scaleFix + pos;
+                    p3 = (x1 * orthonormalRight + y0 * orthonormalUp) * textScale * scaleFix + pos;
+                    //std::cout << "==== textScale: " << textScale << ", scaleFix: " 
+                    //    << scaleFix << ", textScale*scaleFix: " << textScale*scaleFix << " ======" << std::endl;
+                }
+                else {
+                    glm::dvec3 normal = glm::normalize(cameraPos - glm::dvec3(pos));
+                    glm::vec3 newRight = glm::vec3(glm::cross(cameraLookUp, normal));
+                    glm::vec3 newUp = glm::vec3(glm::cross(normal, glm::dvec3(newRight)));
+
+                    p0 = (x0 * newRight + y0 * newUp) * textScale * scaleFix + pos;
+                    p1 = (x0 * newRight + y1 * newUp) * textScale * scaleFix + pos;
+                    p2 = (x1 * newRight + y1 * newUp) * textScale * scaleFix + pos;
+                    p3 = (x1 * newRight + y0 * newUp) * textScale * scaleFix + pos;
+                }
+            }           
+            
             vertices.insert(vertices.end(), {
                 p0.x, p0.y, p0.z, s0, t0, outlineS0, outlineT0,
                 p1.x, p1.y, p1.z, s0, t1, outlineS0, outlineT1,
