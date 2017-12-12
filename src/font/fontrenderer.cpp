@@ -574,10 +574,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 pos,
-    const float textScale, const int textMinSize, const int textMaxSize, 
-    const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
-    const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos, 
-    const glm::dvec3& cameraLookUp, const int renderType, 
+    const float textScale, const int textMinSize, const int textMaxSize,
+    const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
+    const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
+    const glm::dvec3& cameraLookUp, const int renderType,
     const char* format, ...) const
 {
     ghoul_assert(format != nullptr, "No format is provided");
@@ -783,9 +783,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
 
 FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font& font,
     glm::vec3 pos, glm::vec4 color, glm::vec4 outlineColor, const char* buffer,
-    const float textScale, const int textMinSize, const int textMaxSize, 
-    const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
-    const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos, 
+    const float textScale, const int textMinSize, const int textMaxSize,
+    const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
+    const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
     const glm::dvec3& cameraLookUp, const int renderType) const
 {
     float h = font.height();
@@ -890,8 +890,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
                 glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
 
             // The billboard is bigger than the maximum size allowed:
-            heightInPixels = heightInPixels == 0.0f ? glm::length(topLeft - bottomLeft) : heightInPixels;
-            
+            heightInPixels =
+                heightInPixels == 0.0f ?
+                glm::length(topLeft - bottomLeft) :
+                heightInPixels;
+
             // Size-based culling
             if (heightInPixels < static_cast<float>(textMinSize) ||
                 heightInPixels > _framebufferSize.x ||
@@ -903,10 +906,14 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
             if (heightInPixels > textMaxSize) {
                 float scaleFix = static_cast<float>(textMaxSize) / heightInPixels;
                 if (renderType == 0) {
-                    p0 = (x0 * orthonormalRight + y0 * orthonormalUp) * textScale * scaleFix + pos;
-                    p1 = (x0 * orthonormalRight + y1 * orthonormalUp) * textScale * scaleFix + pos;
-                    p2 = (x1 * orthonormalRight + y1 * orthonormalUp) * textScale * scaleFix + pos;
-                    p3 = (x1 * orthonormalRight + y0 * orthonormalUp) * textScale * scaleFix + pos;
+                    p0 = (x0 * orthonormalRight + y0 * orthonormalUp) *
+                          textScale * scaleFix + pos;
+                    p1 = (x0 * orthonormalRight + y1 * orthonormalUp) *
+                          textScale * scaleFix + pos;
+                    p2 = (x1 * orthonormalRight + y1 * orthonormalUp) *
+                          textScale * scaleFix + pos;
+                    p3 = (x1 * orthonormalRight + y0 * orthonormalUp) *
+                          textScale * scaleFix + pos;
                 }
                 else {
                     glm::dvec3 normal = glm::normalize(cameraPos - glm::dvec3(pos));
@@ -918,8 +925,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
                     p2 = (x1 * newRight + y1 * newUp) * textScale * scaleFix + pos;
                     p3 = (x1 * newRight + y0 * newUp) * textScale * scaleFix + pos;
                 }
-            }           
-            
+            }
+
             vertices.insert(vertices.end(), {
                 p0.x, p0.y, p0.z, s0, t0, outlineS0, outlineT0,
                 p1.x, p1.y, p1.z, s0, t1, outlineS0, outlineT1,

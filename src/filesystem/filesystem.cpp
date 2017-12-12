@@ -62,7 +62,7 @@ namespace {
     constexpr size_t constLength(const char* str) {
         return (*str == '\0') ? 0 : constLength(str + 1) + 1;
     }
-    
+
     constexpr size_t TokenOpeningBracesSize = constLength(
         ghoul::filesystem::FileSystem::TokenOpeningBraces
     );

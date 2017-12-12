@@ -24,7 +24,7 @@
  ****************************************************************************************/
 
 namespace ghoul::cmdparser {
-    
+
 template<class T>
 MultipleCommand<T>::MultipleCommand(std::vector<T>& ptr1, std::string name,
                                     std::string shortName, std::string infoText,

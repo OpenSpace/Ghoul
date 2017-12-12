@@ -212,9 +212,9 @@ public:
     */
     BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
         glm::vec4 outlineColor, const float textScale, const int textMinSize,
-        const int textMaxSize, const glm::dmat4& mvpMatrix, 
-        const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp, 
-        const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp, 
+        const int textMaxSize, const glm::dmat4& mvpMatrix,
+        const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
+        const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
         const int renderType, char* format, ...) const;
 
     /**
@@ -263,9 +263,9 @@ public:
     * number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
-        const float textScale, const int textMinSize, const int textMaxSize, 
-        const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
-        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos, 
+        const float textScale, const int textMinSize, const int textMaxSize,
+        const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
+        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
         const glm::dvec3& cameraLookUp, const int renderType,
         const char* format, ...) const;
 
@@ -325,9 +325,9 @@ private:
 
     BoundingBoxInformation internalProjectionRender(Font& font, glm::vec3 pos,
         glm::vec4 color, glm::vec4 outlineColor, const char* buffer,
-        const float textScale, const int textMinSize, const int textMaxSize, 
-        const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight, 
-        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos, 
+        const float textScale, const int textMinSize, const int textMaxSize,
+        const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
+        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
         const glm::dvec3& cameraLookUp, const int renderType) const;
 
 
@@ -382,7 +382,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos, Args... ar
  * \return The bounding box of the text that was printed
  */
 template <typename... Args>
-glm::vec2 RenderFont(ghoul::fontrendering::FontRenderer& renderer, 
+glm::vec2 RenderFont(ghoul::fontrendering::FontRenderer& renderer,
     ghoul::fontrendering::Font& font, glm::vec2 pos, Args... args)
 {
     return (renderer.render(font, pos, args...)).boundingBox;

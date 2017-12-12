@@ -335,7 +335,7 @@ std::string CommandlineParser::usageInformationForCommand(
                                                          const std::string& command) const
 {
     ghoul_assert(!command.empty(), "Command must not be empty");
-    
+
     auto it = std::find_if(
         _commands.begin(),
         _commands.end(),
