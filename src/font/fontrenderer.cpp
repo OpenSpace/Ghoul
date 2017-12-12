@@ -907,8 +907,6 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
                     p1 = (x0 * orthonormalRight + y1 * orthonormalUp) * textScale * scaleFix + pos;
                     p2 = (x1 * orthonormalRight + y1 * orthonormalUp) * textScale * scaleFix + pos;
                     p3 = (x1 * orthonormalRight + y0 * orthonormalUp) * textScale * scaleFix + pos;
-                    //std::cout << "==== textScale: " << textScale << ", scaleFix: " 
-                    //    << scaleFix << ", textScale*scaleFix: " << textScale*scaleFix << " ======" << std::endl;
                 }
                 else {
                     glm::dvec3 normal = glm::normalize(cameraPos - glm::dvec3(pos));
