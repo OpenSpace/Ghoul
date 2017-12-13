@@ -600,8 +600,8 @@ void FileSystem::registerPathToken(string token, string path, Override override)
     ghoul_assert(!token.empty(), "Token must not be empty");
 
     ghoul_assert(
-        (token.substr(0, TokenOpeningBraces.size()) == TokenOpeningBraces) &&
-        (token.substr(token.size() - TokenClosingBraces.size()) == TokenClosingBraces),
+        (token.substr(0, TokenOpeningBracesSize) == TokenOpeningBraces) &&
+        (token.substr(token.size() - TokenClosingBracesSize) == TokenClosingBraces),
         "Token must be enclosed by TokenBraces"
     );
 
