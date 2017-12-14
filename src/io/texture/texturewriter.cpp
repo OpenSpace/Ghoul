@@ -80,8 +80,8 @@ std::vector<std::shared_ptr<TextureWriterBase>> TextureWriter::writers() const {
 }
 
 TextureWriterBase* TextureWriter::writerForExtension(const std::string& extension) {
-    for (const auto& writer : _writers) {
-        auto extensions = writer->supportedExtensions();
+    for (const std::shared_ptr<TextureWriterBase>& writer : _writers) {
+        std::vector<std::string> extensions = writer->supportedExtensions();
         auto it = std::find(extensions.begin(), extensions.end(), extension);
         if (it != extensions.end()) {
             return writer.get();

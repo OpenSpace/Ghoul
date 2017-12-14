@@ -88,11 +88,11 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     // get vertices
     Dictionary vertices = dictionary.value<Dictionary>(keyVertices);
     std::vector<GLfloat> varray;
-    auto vkeys = vertices.keys();
+    std::vector<std::string> vkeys = vertices.keys();
     // Does this need a std::stoi function for the sorting? Otherwise 10 might be sorted
     // before 2 ---abock
     std::sort(vkeys.begin(), vkeys.end());
-    for (const auto& key : vkeys) {
+    for (const std::string& key : vkeys) {
         double d = vertices.value<double>(key);
         varray.push_back(static_cast<GLfloat>(d));
     }
@@ -100,11 +100,11 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     // get indices
     Dictionary indices = dictionary.value<Dictionary>(keyIndices);
     std::vector<GLint> iarray;
-    auto ikeys = vertices.keys();
+    std::vector<std::string> ikeys = vertices.keys();
     // Does this need a std::stoi function for the sorting? Otherwise 10 might be sorted
     // before 2 ---abock
     std::sort(ikeys.begin(), ikeys.end());
-    for (const auto& key : ikeys) {
+    for (const std::string& key : ikeys) {
         double d = indices.value<double>(key);
         iarray.push_back(static_cast<GLint>(d));
     }
@@ -121,8 +121,8 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     vbo->initialize(varray, iarray);
 
     Dictionary attribPointers = dictionary.value<Dictionary>(keyAttribPointers);
-    auto attribKeys = attribPointers.keys();
-    for (const auto& key : attribKeys) {
+    std::vector<std::string> attribKeys = attribPointers.keys();
+    for (const std::string& key : attribKeys) {
         ghoul::Dictionary d;
         if (attribPointers.getValue(key, d)) {
             double position = 0.0;

@@ -222,7 +222,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     LDEBUG("Link default font shader");
     program->linkProgramObject();
 
-    auto fontRenderer = new FontRenderer;
+    FontRenderer* fontRenderer = new FontRenderer;
     fontRenderer->_program = std::move(program);
     return std::unique_ptr<FontRenderer>(fontRenderer);
 }
@@ -241,22 +241,22 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     file.close();
 
     using namespace opengl;
-    auto program = std::make_unique<ProgramObject>("ProjectionFont");
-    program->attachObject(
+    std::unique_ptr<ProgramObject> prog = std::make_unique<ProgramObject>("ProjectionFont");
+    prog->attachObject(
         std::make_unique<ShaderObject>(ShaderObject::ShaderType::Vertex, vsPath)
     );
-    program->attachObject(
+    prog->attachObject(
         std::make_unique<ShaderObject>(ShaderObject::ShaderType::Fragment, fsPath)
     );
 
     LDEBUG("Compile projection font shader");
-    program->compileShaderObjects();
+    prog->compileShaderObjects();
 
     LDEBUG("Link projection font shader");
-    program->linkProgramObject();
+    prog->linkProgramObject();
 
-    auto fontRenderer = new FontRenderer;
-    fontRenderer->_program = std::move(program);
+    FontRenderer* fontRenderer = new FontRenderer;
+    fontRenderer->_program = std::move(prog);
     return std::unique_ptr<FontRenderer>(fontRenderer);
 }
 
@@ -407,7 +407,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 #endif
     va_end(args);
 
-    auto res = internalRender(
+    BoundingBoxInformation res = internalRender(
         font,
         std::move(pos),
         std::move(color),
@@ -443,7 +443,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 
 #endif
     va_end(args);
 
-    auto res = internalProjectionRender(
+    BoundingBoxInformation res = internalProjectionRender(
         font,
         std::move(pos),
         std::move(color),
@@ -486,7 +486,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 #endif
     va_end(args);
 
-    auto res = internalRender(
+    BoundingBoxInformation res = internalRender(
         font,
         std::move(pos),
         color,
@@ -520,7 +520,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 
 #endif
     va_end(args);
 
-    auto res = internalProjectionRender(
+    BoundingBoxInformation res = internalProjectionRender(
         font,
         std::move(pos),
         color,
@@ -561,7 +561,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 #endif
     va_end(args);
 
-    auto res = internalRender(
+    BoundingBoxInformation res = internalRender(
         font,
         std::move(pos),
         glm::vec4(1.f),
@@ -597,7 +597,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 
 #endif
     va_end(args);
 
-    auto res = internalProjectionRender(
+    BoundingBoxInformation res = internalProjectionRender(
         font,
         std::move(pos),
         glm::vec4(1.f),

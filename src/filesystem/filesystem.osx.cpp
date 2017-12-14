@@ -108,7 +108,7 @@ void FileSystem::addFileListener(File* file) {
     auto f = _directories.find(d);
     if (f == _directories.end()) {
         bool alreadyTrackingParent = false;
-        for (auto dir : _directories) {
+        for (const std::pair<std::string, DirectoryHandle*>& dir : _directories) {
             if (d.length() > dir.first.length() &&
                 d.find(dir.first) != std::string::npos)
             {
@@ -191,13 +191,12 @@ void callbackHandler(const std::string& path) {
 }
 
 void FileSystem::callbackHandler(const std::string& path) {
-    auto files = FileSys._trackedFiles;
-    size_t n = files.count(path);
+    size_t n = FileSys._trackedFiles.count(path);
     if (n == 0) {
         return;
     }
 
-    auto eqRange = files.equal_range(path);
+    auto eqRange = FileSys._trackedFiles.equal_range(path);
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
         File* f = (*it).second;
         f->callback()(*f);

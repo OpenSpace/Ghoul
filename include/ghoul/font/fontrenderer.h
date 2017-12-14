@@ -403,7 +403,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::FontRenderer& renderer,
  */
 template <typename... Args>
 glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args) {
-    auto res =
+    ghoul::fontrendering::FontRenderer::BoundingBoxInformation res =
         ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...);
 
     pos.y -= res.numberOfLines * font.height();
@@ -429,7 +429,11 @@ template <typename... Args>
 glm::vec2 RenderFontCr(ghoul::fontrendering::FontRenderer& renderer,
     ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args)
 {
-    auto res = renderer.render(font, pos, args...);
+    ghoul::fontrendering::FontRenderer::BoundingBoxInformation res = renderer.render(
+        font,
+        pos,
+        args...
+    );
     pos.y -= res.numberOfLines * font.height();
     return res.boundingBox;
 }
@@ -449,7 +453,7 @@ glm::vec2 RenderFontCr(ghoul::fontrendering::FontRenderer& renderer,
  */
 template <typename... Args>
 glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args) {
-    auto res =
+    ghoul::fontrendering::FontRenderer::BoundingBoxInformation res =
         ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...);
 
     pos.y += res.numberOfLines * font.height();
@@ -474,7 +478,11 @@ template <typename... Args>
 glm::vec2 RenderFontCrUp(ghoul::fontrendering::FontRenderer& renderer,
     ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args)
 {
-    auto res = renderer.render(font, pos, args...);
+    ghoul::fontrendering::FontRenderer::BoundingBoxInformation res = renderer.render(
+        font,
+        pos,
+        args...
+    );
     pos.y += res.numberOfLines * font.height();
     return res.boundingBox;
 }

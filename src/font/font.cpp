@@ -351,7 +351,8 @@ const Font::Glyph* Font::glyph(wchar_t character) {
         _atlas.setRegionData(handle, data.data());
 
         Glyph glyph(static_cast<wchar_t>(-1));
-        auto coords = _atlas.textureCoordinates(handle);
+        ghoul::opengl::TextureAtlas::TextureCoordinatesResult coords =
+            _atlas.textureCoordinates(handle);
         glyph._topLeft = coords.topLeft;
         glyph._bottomRight = coords.bottomRight;
         _glyphs.push_back(std::move(glyph));
@@ -510,7 +511,8 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             if (outlineBitmap->bitmap.buffer) {
                 _atlas.setRegionData(handle, outlineBitmap->bitmap.buffer);
             }
-            auto res = _atlas.textureCoordinates(handle);
+            ghoul::opengl::TextureAtlas::TextureCoordinatesResult res =
+                _atlas.textureCoordinates(handle);
             outlineTopLeft = res.topLeft;
             outlineBottomRight = res.bottomRight;
         }
@@ -542,7 +544,8 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             if (insideBitmap->bitmap.buffer) {
                 _atlas.setRegionData(handle, insideBitmap->bitmap.buffer);
             }
-            auto res = _atlas.textureCoordinates(handle);
+            ghoul::opengl::TextureAtlas::TextureCoordinatesResult res =
+                _atlas.textureCoordinates(handle);
             topLeft = res.topLeft;
             bottomRight = res.bottomRight;
         }
@@ -575,10 +578,11 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
 
             // We need to offset the texture coordinates by half of the width and height
             // differences
-            auto res = _atlas.textureCoordinates(handle,
-                glm::ivec4(widthOffset / 4.f, heightOffset / 4.f,
+            ghoul::opengl::TextureAtlas::TextureCoordinatesResult res =
+                _atlas.textureCoordinates(handle,
+                    glm::ivec4(widthOffset / 4.f, heightOffset / 4.f,
                            widthOffset / 4.f, heightOffset / 4.f)
-            );
+                );
             topLeft = res.topLeft;
             bottomRight = res.bottomRight;
         }

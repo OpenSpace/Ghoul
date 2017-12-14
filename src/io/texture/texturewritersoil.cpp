@@ -40,7 +40,7 @@ void TextureWriterSOIL::saveTexture(const opengl::Texture& texture,
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-    auto extensions = supportedExtensions();
+    std::vector<std::string> extensions = supportedExtensions();
     std::string extension = ghoul::filesystem::File(filename).fileExtension();
     ghoul_assert(
         std::find(extensions.begin(), extensions.end(), extension) != extensions.end(),

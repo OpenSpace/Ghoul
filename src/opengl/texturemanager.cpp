@@ -88,7 +88,7 @@ std::unique_ptr<Texture> TextureManager::unregisterTexture(unsigned int hashedNa
         return nullptr;
     }
 
-    auto tmp = std::move(it->second);
+    std::unique_ptr<Texture> tmp = std::move(it->second);
     _textures.erase(hashedName);
     return tmp;
 }

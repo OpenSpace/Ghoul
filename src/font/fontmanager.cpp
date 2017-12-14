@@ -136,7 +136,7 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
         Font::Outline::Yes :
         Font::Outline::No;
 
-    auto f = std::make_shared<Font>(
+    std::shared_ptr<Font> f = std::make_shared<Font>(
         _fontPaths[hashName],
         fontSize,
         _textureAtlas,

@@ -195,7 +195,8 @@ void ThreadPool::clearRemainingTasks() {
 
 void ThreadPool::activateWorker(Worker& worker) {
     // a copy of the shared ptr to the flag
-    auto shouldTerminate = std::make_shared<std::atomic_bool>(false);
+    std::shared_ptr<std::atomic_bool> shouldTerminate =
+        std::make_shared<std::atomic_bool>(false);
 
     // We create local copies of the important variables so that we are guaranteed that
     // they continue to exist when we pass them to the 'workerLoop' lamdba. Otherwise,

@@ -105,7 +105,7 @@ TextureReaderBase* TextureReader::readerForExtension(const std::string& extensio
         [](char v) { return static_cast<char>(tolower(v)); }
     );
     for (const std::shared_ptr<TextureReaderBase>& reader : _readers) {
-        auto extensions = reader->supportedExtensions();
+        std::vector<std::string> extensions = reader->supportedExtensions();
         auto it = std::find(extensions.begin(), extensions.end(), lowerExtension);
         if (it != extensions.end()) {
             return reader.get();

@@ -85,7 +85,8 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderMultiFormat::loadModel(
 
     loadModel(filename, vertices, indices);
 
-    auto vbo = std::make_unique<opengl::VertexBufferObject>();
+    std::unique_ptr<opengl::VertexBufferObject> vbo =
+        std::make_unique<opengl::VertexBufferObject>();
     vbo->initialize(vertices, indices);
     vbo->vertexAttribPointer(
         0,

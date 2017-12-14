@@ -119,8 +119,9 @@ void Dictionary::setValueInternal(std::string key, T value,
 
     std::array<typename StorageType::type, StorageType::size> v;
     auto ptr = glm::value_ptr(value);
-    for (size_t i = 0; i < StorageType::size; ++i)
+    for (size_t i = 0; i < StorageType::size; ++i) {
         v[i] = static_cast<typename StorageType::type>(ptr[i]);
+    }
     setValueHelper(std::move(key), std::move(v), createIntermediate);
 }
 

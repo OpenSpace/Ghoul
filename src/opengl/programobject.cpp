@@ -139,8 +139,8 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
         );
     }
 
-    for (const auto& obj : cpy._shaderObjects) {
-        auto shaderCopy = std::make_shared<ShaderObject>(*obj);
+    for (const std::shared_ptr<ShaderObject>& obj : cpy._shaderObjects) {
+        std::shared_ptr<ShaderObject> shaderCopy = std::make_shared<ShaderObject>(*obj);
         glAttachShader(_id, *shaderCopy);
         _shaderObjects.push_back(shaderCopy);
     }
@@ -188,8 +188,9 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
             );
         }
 
-        for (const auto& obj : rhs._shaderObjects) {
-            auto shaderCopy = std::make_shared<ShaderObject>(*obj);
+        for (const std::shared_ptr<ShaderObject>& obj : rhs._shaderObjects) {
+            std::shared_ptr<ShaderObject> shaderCopy =
+                std::make_shared<ShaderObject>(*obj);
             glAttachShader(_id, *shaderCopy);
             _shaderObjects.push_back(shaderCopy);
         }

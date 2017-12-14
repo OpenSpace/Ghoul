@@ -88,7 +88,7 @@ CacheManager::CacheManager(std::string directory, int version)
         if (line != std::to_string(_version)) {
             LINFO("Cache version has changed. Current version " << line <<
                 " new version " << _version);
-            for (const auto& cache : cacheState) {
+            for (const LoadedCacheInfo& cache : cacheState) {
                 LINFO("Deleting file '" << cache.second << "'");
                 FileSys.deleteFile(cache.second);
             }
@@ -141,7 +141,7 @@ CacheManager::CacheManager(std::string directory, int version)
     if (!cacheState.empty()) {
         LINFO("There was a crash in the previous run and it left the cache unclean. "
               "Cleaning it now");
-        for (const auto& cache : cacheState) {
+        for (const LoadedCacheInfo& cache : cacheState) {
             LINFO("Deleting file '" << cache.second << "'");
             FileSys.deleteFile(cache.second);
         }
@@ -162,7 +162,7 @@ CacheManager::~CacheManager() {
     std::ofstream file(path, std::ofstream::out);
     if (file.good()) {
         file << _version << std::endl;
-        for (const auto& p : _files) {
+        for (const std::pair<unsigned int, CacheInformation>& p : _files) {
             if (!p.second.isPersistent) {
                 // Delete all the non-persistent files
                 FileSys.deleteFile(p.second.file);
@@ -304,7 +304,7 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
     LDEBUG("Cleaning directory '" << dir << "'");
     // First search for all subdirectories and call this function recursively on them
     std::vector<std::string> contents = dir.readDirectories();
-    for (const auto& content : contents) {
+    for (const std::string& content : contents) {
         if (FileSys.directoryExists(content)) {
             cleanDirectory(content);
         }
@@ -331,7 +331,7 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
 {
     std::vector<LoadedCacheInfo> result;
     std::vector<std::string> directories = dir.readDirectories();
-    for (const auto& directory : directories) {
+    for (const std::string& directory : directories) {
         Directory d(directory);
 
         // Extract the name of the directory
@@ -339,7 +339,7 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
         std::string directoryName = directory.substr(dir.path().size() + 1);
 
         std::vector<std::string> hashes = d.readDirectories();
-        for (const auto& hash : hashes) {
+        for (const std::string& hash : hashes) {
             // Extract the hash from the directory name
             // +1 as the last path delimiter is missing from the path
             std::string hashName = hash.substr(d.path().size() + 1);
