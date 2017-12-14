@@ -181,19 +181,6 @@ public:
     bool fileExists(const File& path) const;
 
     /**
-     * Checks if the file at the \p path exists or not. This method will also return
-     * <code>false</code> if \p path points to a directory. This method will not expand
-     * any tokens that are passed to it.
-     * \param path The path that should be tested for existence
-     * \param isRawPath A flag if the path is raw or have path tokens
-     * \return <code>true</code> if \p path points to an existing file, <code>false</code>
-     * otherwise
-     * \throw FileSystemException If there is an error retrieving the file attributes
-     * for the \p path
-     */
-    bool fileExists(std::string path, RawPath isRawPath = RawPath::No) const;
-
-    /**
      * Checks if the directory at the \p path exists or not. This method will return
      * <code>false</code> if \p path points to a file.
      * \param path The path that should be tested for existence

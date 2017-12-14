@@ -367,8 +367,7 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
                     ));
                 }
                 else {
-                    // Adding the absPath to normalize all / and \ for Windows
-                    result.emplace_back(std::stoul(hashName), absPath(files[0]));
+                    result.emplace_back(std::stoul(hashName), files[0]);
                 }
             }
         }

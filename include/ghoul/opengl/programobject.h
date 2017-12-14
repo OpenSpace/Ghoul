@@ -253,7 +253,9 @@ public:
      * loaded shaders
      * \throw ProgramObjectLinkingError If there was an error linking the ProgramObject
      * \pre \p vertexShaderPath must not be empty
+     * \pre \p vertexShaderPath must be a file that exists
      * \pre \p fragmentShaderPath must not be empty
+     * \pre \p fragmentShaderPath must be a file that exists
      */
     static std::unique_ptr<ProgramObject> Build(const std::string& name,
         const std::string& vertexShaderPath, const std::string& fragmentShaderPath,
@@ -278,8 +280,11 @@ public:
      * loaded shaders
      * \throw ProgramObjectLinkingError If there was an error linking the ProgramObject
      * \pre \p vertexShaderPath must not be empty
+     * \pre \p vertexShaderPath must be a file that exists
      * \pre \p fragmentShaderPath must not be empty
+     * \pre \p fragmentShaderPath must be a file that exists
      * \pre \p geometryShaderPath must not be empty
+     * \pre \p geometryShaderPath must be a file that exists
      */
     static std::unique_ptr<ProgramObject> Build(const std::string& name,
         const std::string& vertexShaderPath, const std::string& fragmentShaderPath,
@@ -310,10 +315,15 @@ public:
      * loaded shaders
      * \throw ProgramObjectLinkingError If there was an error linking the ProgramObject
      * \pre \p vertexShaderPath must not be empty
+     * \pre \p vertexShaderPath must be a file that exists
      * \pre \p fragmentShaderPath must not be empty
+     * \pre \p fragmentShaderPath must be a file that exists
      * \pre \p geometryShaderPath must not be empty
+     * \pre \p geometryShaderPath must be a file that exists
      * \pre \p tessellationEvaluationShaderPath must not be empty
+     * \pre \p tessellationEvaluationShaderPath must be a file that exists
      * \pre \p tessellationControlShaderPath must not be empty
+     * \pre \p tessellationControlShaderPath must be a file that exists
      */
     static std::unique_ptr<ProgramObject> Build(const std::string& name,
         const std::string& vertexShaderPath, const std::string& fragmentShaderPath,

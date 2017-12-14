@@ -129,6 +129,7 @@ public:
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
      * generated
      * \pre \p filename must not be empty
+     * \pre \p filename must be a file that exists
      */
     ShaderObject(ShaderType shaderType, std::string filename,
         Dictionary dictionary = Dictionary());
@@ -147,6 +148,7 @@ public:
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
      * generated
      * \pre \p filename must not be empty
+     * \pre \p filename must be a file that exists
      */
     ShaderObject(ShaderType shaderType, std::string filename, std::string name,
         Dictionary dictionary = Dictionary());

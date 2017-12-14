@@ -75,7 +75,7 @@ public:
      * \pre \p filename must not be empty
      * \see FileSystem The system to register and use tokens
      */
-    File(std::string filename, RawPath isRawPath = RawPath::No,
+    File(std::string filename, RawPath isRawPath = RawPath::Yes,
          FileChangedCallback fileChangedCallback = FileChangedCallback());
 
     /**

@@ -68,7 +68,7 @@ public:
      * the path is used as-is without changes. This might make the Directory object
      * outdated if the current working directory is subsequently changed.
      */
-    Directory(std::string path, RawPath isRawPath = RawPath::No);
+    Directory(std::string path, RawPath isRawPath = RawPath::Yes);
 
     /**
     * This constructor creates a Directory object pointing to the \p path. If
@@ -83,7 +83,7 @@ public:
     * the path is used as-is without changes. This might make the Directory object
     * outdated if the current working directory is subsequently changed.
     */
-    Directory(const char* path, RawPath isRawPath = RawPath::No);
+    Directory(const char* path, RawPath isRawPath = RawPath::Yes);
 
     /**
      * Operator that returns the path this directory points to. This can, depending on the

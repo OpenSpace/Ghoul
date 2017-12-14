@@ -345,26 +345,20 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                                     Dictionary dictionary)
 {
     ghoul_assert(!vpath.empty(), "VertexShaderPath must not be empty");
+    ghoul_assert(FileSys.fileExists(vpath), "VertexShaderPath file must exist");
     ghoul_assert(!fpath.empty(), "FragmentShaderPath must not be empty");
-
-    if (!FileSys.fileExists(vpath)) {
-        throw FileNotFoundError(vpath, "ProgramObject");
-    }
-
-    if (!FileSys.fileExists(fpath)) {
-        throw FileNotFoundError(fpath, "ProgramObject");
-    }
+    ghoul_assert(FileSys.fileExists(fpath), "FragmentShaderPath file must exist");
 
     std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Vertex,
-        absPath(vpath),
+        vpath,
         name + " Vertex",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Fragment,
-        absPath(fpath),
+        fpath,
         name + " Fragment",
         dictionary
     ));
@@ -381,37 +375,28 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                                     Dictionary dictionary)
 {
     ghoul_assert(!vpath.empty(), "VertexShaderPath must not be empty");
+    ghoul_assert(FileSys.fileExists(vpath), "VertexShaderPath file must exist");
     ghoul_assert(!fpath.empty(), "FragmentShaderPath must not be empty");
+    ghoul_assert(FileSys.fileExists(fpath), "FragmentShaderPath file must exist");
     ghoul_assert(!gpath.empty(), "GeometryShaderPath must not be empty");
-
-    if (!FileSys.fileExists(vpath)) {
-        throw FileNotFoundError(vpath, "ProgramObject");
-    }
-
-    if (!FileSys.fileExists(fpath)) {
-        throw FileNotFoundError(fpath, "ProgramObject");
-    }
-
-    if (!FileSys.fileExists(gpath)) {
-        throw FileNotFoundError(gpath, "ProgramObject");
-    }
+    ghoul_assert(FileSys.fileExists(gpath), "GeometryShaderPath file must exist");
 
     std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Vertex,
-        absPath(vpath),
+        vpath,
         name + " Vertex",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Geometry,
-        absPath(gpath),
+        gpath,
         name + " Geometry",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Fragment,
-        absPath(fpath),
+        fpath,
         name + " Fragment",
         dictionary
     ));
@@ -430,59 +415,50 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                                     Dictionary dictionary)
 {
     ghoul_assert(!vpath.empty(), "VertexShaderPath must not be empty");
+    ghoul_assert(FileSys.fileExists(vpath), "VertexShaderPath file must exist");
     ghoul_assert(!fpath.empty(), "FragmentShaderPath must not be empty");
+    ghoul_assert(FileSys.fileExists(fpath), "FragmentShaderPath file must exist");
     ghoul_assert(!gpath.empty(), "GeometryShaderPath must not be empty");
+    ghoul_assert(FileSys.fileExists(gpath), "GeometryShaderPath file must exist");
     ghoul_assert(!tepath.empty(), "Tessellation evaluation shader must not be empty");
+    ghoul_assert(
+        FileSys.fileExists(tepath),
+        "Tessellation evaluation shader file must exist"
+    );
     ghoul_assert(!tcpath.empty(), "Tessellation control shader must not be empty");
-
-    if (!FileSys.fileExists(vpath)) {
-        throw FileNotFoundError(vpath, "ProgramObject");
-    }
-
-    if (!FileSys.fileExists(fpath)) {
-        throw FileNotFoundError(fpath, "ProgramObject");
-    }
-
-    if (!FileSys.fileExists(gpath)) {
-        throw FileNotFoundError(gpath, "ProgramObject");
-    }
-
-    if (!FileSys.fileExists(tepath)) {
-        throw FileNotFoundError(tepath, "ProgramObject");
-    }
-
-    if (!FileSys.fileExists(tcpath)) {
-        throw FileNotFoundError(tcpath, "ProgramObject");
-    }
+    ghoul_assert(
+        FileSys.fileExists(tcpath),
+        "Tessellation control shader file must exist"
+    );
 
     std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Vertex,
-        absPath(vpath),
+        vpath,
         name + " Vertex",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Geometry,
-        absPath(gpath),
+        gpath,
         name + " Geometry",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::TesselationEvaluation,
-        absPath(tepath),
+        tepath,
         name + " Tessellation Evaluation",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::TesselationControl,
-        absPath(tcpath),
+        tcpath,
         name + " Tessellation Control",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Fragment,
-        absPath(fpath),
+        fpath,
         name + " Fragment",
         dictionary
     ));

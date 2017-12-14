@@ -302,21 +302,14 @@ void FileSystem::setCurrentDirectory(const Directory& directory) const {
 }
 
 bool FileSystem::fileExists(const File& path) const {
-    return fileExists(path.path(), RawPath::Yes);
-}
-
-bool FileSystem::fileExists(std::string path, RawPath isRawPath) const {
-    if (!isRawPath) {
-        path = absolutePath(std::move(path));
-    }
 #ifdef WIN32
-    BOOL exists = PathFileExists(path.c_str());
+    BOOL exists = PathFileExists(path.path().c_str());
     if (exists == FALSE) {
         // The path did not exist, so the file cannot exist
         return false;
     }
     else {
-        const DWORD attributes = GetFileAttributes(path.c_str());
+        const DWORD attributes = GetFileAttributes(path.path().c_str());
         if (attributes == INVALID_FILE_ATTRIBUTES) {
             const DWORD error = GetLastError();
             if ((error != ERROR_FILE_NOT_FOUND) && (error != ERROR_PATH_NOT_FOUND)) {
@@ -346,7 +339,7 @@ bool FileSystem::fileExists(std::string path, RawPath isRawPath) const {
     }
 #else
     struct stat buffer;
-    const int statResult = stat(path.c_str(), &buffer);
+    const int statResult = stat(path.path().c_str(), &buffer);
     if (statResult != 0) {
         if (errno == ENOENT) {
             // The error is that the file didn't exist
