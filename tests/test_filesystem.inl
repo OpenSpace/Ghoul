@@ -104,7 +104,7 @@ TEST_F(FileSystemTest, OnChangeCallback) {
     File* f3 = new File(path, File::RawPath::No, c2);
 
     // Check that the file exists
-    EXPECT_EQ(FileSys.fileExists(cpath, FileSystem::RawPath::No), true);
+    EXPECT_EQ(FileSys.fileExists(absPath(cpath)), true);
     EXPECT_EQ(FileSys.fileExists(path), true);
     EXPECT_EQ(FileSys.fileExists(*f1), true);
 
