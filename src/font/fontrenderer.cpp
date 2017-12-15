@@ -115,8 +115,8 @@ namespace {
     layout (location = 1) in vec2 in_texCoords; \n\
     layout (location = 2) in vec2 in_outlineTexCoords; \n\
     \n\
-    layout (location = 0) out vec2 texCoords; \n\
-    layout (location = 1) out vec2 outlineTexCoords; \n\
+    out vec2 texCoords; \n\
+    out vec2 outlineTexCoords; \n\
     \n\
     uniform dmat4 mvpMatrix; \n\
     \n\
@@ -134,12 +134,12 @@ namespace {
     constexpr const char* ProjectionFragmentShaderSource = "\
     #version __CONTEXT__ \n\
     \n\
-    layout (location = 0) in vec2 texCoords; \n\
-    layout (location = 1) in vec2 outlineTexCoords; \n\
+    in vec2 texCoords; \n\
+    in vec2 outlineTexCoords; \n\
+    in float depth; \n\
     \n\
     out vec4 FragColor; \n\
     \n\
-    in float depth; \n\
     uniform sampler2D tex; \n\
     uniform vec4 baseColor; \n\
     uniform vec4 outlineColor; \n\
