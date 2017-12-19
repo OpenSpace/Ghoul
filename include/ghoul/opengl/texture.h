@@ -76,6 +76,7 @@ public:
     enum class FilterMode {
         Nearest, ///< GL_NEAREST
         Linear, ///< GL_LINEAR
+        LinearMipMap, ///< GL_LINEAR_MIPMAP_LINEAR
         AnisotropicMipMap
     };
 

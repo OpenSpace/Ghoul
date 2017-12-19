@@ -233,6 +233,11 @@ void Texture::applyFilter() {
             glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             break;
+        case FilterMode::LinearMipMap:
+            glGenerateMipmap(_type);
+            glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            break;
         case FilterMode::AnisotropicMipMap:
         {
             glGenerateMipmap(_type);
