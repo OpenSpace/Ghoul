@@ -41,8 +41,6 @@ using std::function;
 using std::string;
 
 namespace {
-    constexpr const char* _loggerCat = "File";
-
 #ifdef WIN32
     constexpr unsigned int changeBufferSize = 16384u;
 
