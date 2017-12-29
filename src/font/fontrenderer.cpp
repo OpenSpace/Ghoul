@@ -241,7 +241,9 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     file.close();
 
     using namespace opengl;
-    std::unique_ptr<ProgramObject> prog = std::make_unique<ProgramObject>("ProjectionFont");
+    std::unique_ptr<ProgramObject> prog = std::make_unique<ProgramObject>(
+        "ProjectionFont"
+    );
     prog->attachObject(
         std::make_unique<ShaderObject>(ShaderObject::ShaderType::Vertex, vsPath)
     );
