@@ -117,7 +117,8 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     }
 
     // Create the resulting VBO
-    auto vbo = std::make_unique<opengl::VertexBufferObject>();
+    std::unique_ptr<opengl::VertexBufferObject> vbo =
+        std::make_unique<opengl::VertexBufferObject>();
     vbo->initialize(varray, iarray);
 
     Dictionary attribPointers = dictionary.value<Dictionary>(keyAttribPointers);

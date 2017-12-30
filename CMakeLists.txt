@@ -334,6 +334,10 @@ if (GHOUL_HAVE_TESTS)
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/googletest)
     target_link_libraries(GhoulTest gtest Ghoul Lua)
 
+    target_compile_definitions(gtest PUBLIC
+        "_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING"
+    )
+
     set_property(TARGET gtest_main PROPERTY FOLDER "External")
     set_property(TARGET gtest PROPERTY FOLDER "External")
 

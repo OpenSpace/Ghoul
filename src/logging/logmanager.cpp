@@ -54,7 +54,7 @@ void LogManager::removeLog(std::shared_ptr<Log> log) {
 }
 
 void LogManager::flushLogs() {
-    for (const auto& log : _logs) {
+    for (const std::shared_ptr<Log>& log : _logs) {
         log->flush();
     }
 }

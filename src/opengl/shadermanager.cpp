@@ -91,7 +91,7 @@ std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(
         return nullptr;
     }
 
-    auto tmp = std::move(it->second);
+    std::unique_ptr<ShaderObject> tmp = std::move(it->second);
     _objects.erase(hashedName);
     return tmp;
 }
