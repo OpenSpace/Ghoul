@@ -28,6 +28,7 @@
 
 #include <ghoul/glm.h>
 #include <ghoul/font/font.h>
+#include <ghoul/opengl/uniformcache.h>
 
 #include <memory>
 
@@ -349,6 +350,9 @@ private:
 
     /// The index buffer object that allows reusing vertices to form one quad per glyph
     unsigned int _ibo;
+
+    UniformCache(baseColor, outlineColor, texture, hasOutline, projection, mvpMatrix
+        /*textMinSize*/) _uniformCache;
 };
 
 /**

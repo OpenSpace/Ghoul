@@ -239,6 +239,7 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.inl
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texturemanager.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureunit.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/uniformcache.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.inl
         ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereader.h

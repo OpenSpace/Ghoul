@@ -184,6 +184,7 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
     : FontRenderer()
 {
     ghoul_assert(program != nullptr, "No program provided");
+
     _program = std::move(program);
     setFramebufferSize(std::move(framebufferSize));
 }
@@ -222,9 +223,16 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     LDEBUG("Link default font shader");
     program->linkProgramObject();
 
-    FontRenderer* fontRenderer = new FontRenderer;
-    fontRenderer->_program = std::move(program);
-    return std::unique_ptr<FontRenderer>(fontRenderer);
+    FontRenderer* fr = new FontRenderer;
+    fr->_program = std::move(program);
+
+    fr->_uniformCache.baseColor = fr->_program->uniformLocation("baseColor");
+    fr->_uniformCache.outlineColor = fr->_program->uniformLocation("outlineColor");
+    fr->_uniformCache.texture = fr->_program->uniformLocation("tex");
+    fr->_uniformCache.hasOutline = fr->_program->uniformLocation("hasOutline");
+    fr->_uniformCache.projection = fr->_program->uniformLocation("projection");
+
+    return std::unique_ptr<FontRenderer>(fr);
 }
 
 std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
@@ -257,9 +265,17 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     LDEBUG("Link projection font shader");
     prog->linkProgramObject();
 
-    FontRenderer* fontRenderer = new FontRenderer;
-    fontRenderer->_program = std::move(prog);
-    return std::unique_ptr<FontRenderer>(fontRenderer);
+    FontRenderer* fr = new FontRenderer;
+    fr->_program = std::move(prog);
+
+    fr->_uniformCache.baseColor = fr->_program->uniformLocation("baseColor");
+    fr->_uniformCache.outlineColor = fr->_program->uniformLocation("outlineColor");
+    fr->_uniformCache.texture = fr->_program->uniformLocation("tex");
+    fr->_uniformCache.hasOutline = fr->_program->uniformLocation("hasOutline");
+    fr->_uniformCache.mvpMatrix = fr->_program->uniformLocation("mvpMatrix");
+    //fr->_uniformCache.textMinSize = fr->_program->uniformLocation("textMinSize");
+
+    return std::unique_ptr<FontRenderer>(fr);
 }
 
 bool FontRenderer::initialize() {
@@ -347,31 +363,6 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
             catch (const Font::FontException&) {
                 glyph = font.glyph(wchar_t(' '));
             }
-
-            //if (j > 0) {
-            //    movingPos.x += glyph->kerning(line[j - 1]);
-            //}
-
-            //float x0 = movingPos.x + glyph->leftBearing();
-            //float y0 = movingPos.y + glyph->topBearing();
-            //float s0 = glyph->topLeft().x;
-            //float t0 = glyph->topLeft().y;
-            //float outlineS0 = glyph->outlineTopLeft().x;
-            //float outlineT0 = glyph->outlineTopLeft().y;
-
-            //float x1 = x0 + glyph->width();
-            //float y1 = y0 - glyph->height();
-            //float s1 = glyph->bottomRight().x;
-            //float t1 = glyph->bottomRight().y;
-            //float outlineS1 = glyph->outlineBottomRight().x;
-            //float outlineT1 = glyph->outlineBottomRight().y;
-
-            //indices.insert(indices.end(), {
-            //    vertexIndex, vertexIndex + 1, vertexIndex + 2,
-            //    vertexIndex, vertexIndex + 2, vertexIndex + 3
-            //});
-            //vertexIndex += 4;
-            //movingPos.x += glyph->horizontalAdvance();
 
             width += glyph->horizontalAdvance();
             height = std::max(height, static_cast<float>(glyph->height()));
@@ -623,8 +614,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
                                                                   glm::vec2 pos,
                                                                   glm::vec4 color,
                                                                   glm::vec4 outlineColor,
-                                                                  const char* buffer)
-                                                                  const
+                                                                 const char* buffer) const
 {
     float h = font.height();
 
@@ -635,16 +625,18 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
     for (c = buffer; *c; c++) {
         if (*c == '\n') {
             std::string line;
-            for (const char* n = start_line; n < c; ++n)
+            for (const char* n = start_line; n < c; ++n) {
                 line.append(1, *n);
+            }
             lines.push_back(line);
             start_line = c+1;
         }
     }
     if (start_line) {
         std::string line;
-        for(const char* n = start_line; n < c; ++n)
+        for (const char* n = start_line; n < c; ++n) {
             line.append(1, *n);
+        }
         lines.push_back(line);
     }
 
@@ -727,13 +719,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
     atlasUnit.activate();
     font.atlas().texture().bind();
 
-    _program->setIgnoreUniformLocationError(opengl::ProgramObject::IgnoreError::Yes);
-    _program->setUniform("baseColor", color);
-    _program->setUniform("outlineColor", outlineColor);
-    _program->setUniform("tex", atlasUnit);
-    _program->setUniform("hasOutline", font.hasOutline());
-    _program->setUniform("projection", projection);
-    _program->setIgnoreUniformLocationError(opengl::ProgramObject::IgnoreError::No);
+    _program->setUniform(_uniformCache.baseColor, color);
+    _program->setUniform(_uniformCache.outlineColor, outlineColor);
+    _program->setUniform(_uniformCache.texture, atlasUnit);
+    _program->setUniform(_uniformCache.hasOutline, font.hasOutline());
+    _program->setUniform(_uniformCache.projection, projection);
 
     glBindVertexArray(_vao);
 
@@ -971,15 +961,12 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
     atlasUnit.activate();
     font.atlas().texture().bind();
 
-    _program->setIgnoreUniformLocationError(opengl::ProgramObject::IgnoreError::Yes);
-    _program->setUniform("baseColor", color);
-    _program->setUniform("outlineColor", outlineColor);
-    _program->setUniform("tex", atlasUnit);
-    _program->setUniform("hasOutline", font.hasOutline());
-    _program->setUniform("mvpMatrix", mvpMatrix);
-    _program->setUniform("textMinSize", textMinSize);
-
-    _program->setIgnoreUniformLocationError(opengl::ProgramObject::IgnoreError::No);
+    _program->setUniform(_uniformCache.baseColor, color);
+    _program->setUniform(_uniformCache.outlineColor, outlineColor);
+    _program->setUniform(_uniformCache.texture, atlasUnit);
+    _program->setUniform(_uniformCache.hasOutline, font.hasOutline());
+    _program->setUniform(_uniformCache.mvpMatrix, mvpMatrix);
+    //_program->setUniform(_uniformCache.textMinSize, textMinSize);
 
     glBindVertexArray(_vao);
 

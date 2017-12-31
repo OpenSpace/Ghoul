@@ -64,9 +64,9 @@ public:
     using Transpose = ghoul::Boolean;
 
     /**
-    * A type definition for a callback function that is called if any of the tracked files
-    * is changed.
-    */
+     * A type definition for a callback function that is called if any of the tracked
+     * files is changed.
+     */
     using ProgramObjectCallback = std::function<void(ProgramObject*)>;
 
     /// Main exception that is thrown by methods of the ProgramObject class
