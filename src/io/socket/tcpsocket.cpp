@@ -36,8 +36,8 @@ namespace io {
 
 std::atomic<bool> TcpSocket::_initializedNetworkApi{false};
 
-TcpSocket::TcpSocketError::TcpSocketError(std::string message, std::string component)
-    : RuntimeError(message, component) {}
+TcpSocket::TcpSocketError::TcpSocketError(std::string message, std::string comp)
+    : RuntimeError(message, comp) {}
 
 TcpSocket::TcpSocket(std::string address, int port)
     : Socket()
@@ -116,7 +116,7 @@ void TcpSocket::connect() {
     _error = false;
 }
 
-void TcpSocket::disconnect(const int reason) {
+void TcpSocket::disconnect(int) {
     if (!_isConnected) return;
 
 #ifdef WIN32

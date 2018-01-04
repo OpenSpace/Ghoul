@@ -80,7 +80,7 @@ void WebSocket::startStreams() {
     );
 }
 
-void WebSocket::disconnect(const int reason) {
+void WebSocket::disconnect(int reason) {
     if (!_isConnected) return;
 
     if (socketHasConnection()) {

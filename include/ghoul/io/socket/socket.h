@@ -39,7 +39,7 @@ public:
     Socket()
         : _socketId(_nextSocketId++)
     {}
-    virtual void disconnect(const int reason = 0) = 0;
+    virtual void disconnect(int reason = 0) = 0;
     virtual bool isConnected() = 0;
     virtual bool isConnecting() = 0;
     virtual void startStreams() = 0;

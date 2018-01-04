@@ -54,22 +54,21 @@ public:
     };
 
     /**
-     * WebSocket close event reason: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
+     * WebSocket close event reason:
+     * https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
      */
-    struct ClosingReason {
-        static const enum CLOSING_REASON {
-            Normal      = 1000,
-            GoingAway   = 1001,
-            // custom app-specific reasons
-            ClosingAll  = 4000
-        };
+    enum class ClosingReason : int {
+        Normal      = 1000,
+        GoingAway   = 1001,
+        // custom app-specific reasons
+        ClosingAll  = 4000
     };
 
     WebSocket(std::string address, int portNumber);
     WebSocket(std::string address, int portNumber, _SOCKET socket);
 
     virtual ~WebSocket();
-    void disconnect(const int reason = WebSocket::ClosingReason::Normal);
+    void disconnect(int reason = static_cast<int>(ClosingReason::Normal)) override;
 
     bool getMessage(std::string& message) override;
     bool putMessage(const std::string& message) override;
@@ -95,7 +94,8 @@ private:
     void onClose(websocketpp::connection_hdl hdl);
 
     std::mutex _connectionHandlesMutex;
-    std::set<websocketpp::connection_hdl,std::owner_less<websocketpp::connection_hdl> > _connectionHandles;
+    std::set<websocketpp::connection_hdl, std::owner_less<websocketpp::connection_hdl>>
+        _connectionHandles;
 
     std::mutex _inputBufferMutex;
     std::mutex _inputQueueMutex;
