@@ -72,10 +72,10 @@ TcpSocket::~TcpSocket() {
 
 void TcpSocket::startStreams() {
     _inputThread = std::thread(
-            [this]() { streamInput(); }
+        [this]() { streamInput(); }
     );
     _outputThread = std::thread(
-            [this]() { streamOutput(); }
+        [this]() { streamOutput(); }
     );
 }
 

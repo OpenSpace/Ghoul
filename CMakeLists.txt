@@ -285,21 +285,22 @@ ExternalProject_Add(websocketpp
     LOG_CONFIGURE 1
     LOG_BUILD 1
     STEP_TARGETS configure build
-    )
-#include_directories(${WEBSOCKETPP_ROOT_DIR})
+)
+
 add_dependencies(Ghoul websocketpp)
 target_include_directories(Ghoul SYSTEM PUBLIC ${WEBSOCKETPP_ROOT_DIR})
 
+# Image library assertion
 if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE AND NOT GHOUL_USE_SOIL)
     message(FATAL_ERROR "Ghoul needs to be built with DevIL, FreeImage, or SoIL")
 endif ()
 
+# Freetype
 if (GHOUL_MODULE_FONTRENDERING)
     set(FREETYPE_DIST OFF CACHE BOOL "Generate the dist target.")
     include_external_library(Ghoul freetype ${GHOUL_ROOT_DIR}/ext/freetype2 ${GHOUL_ROOT_DIR}/ext/freetype2/include)
     set_property(TARGET dist PROPERTY FOLDER "External")
 endif ()
-
 
 #############################
 # Other applications
@@ -318,7 +319,7 @@ if (GHOUL_HAVE_TESTS)
         "GTEST_HAS_TR1_TUPLE=0"
         "GTEST_HAS_GLOBAL_STRING=0"
         "GHOUL_ROOT_DIR=\"${GHOUL_ROOT_DIR}\""
-        )
+    )
 
     set_ghoul_compile_settings(GhoulTest)
 
@@ -363,6 +364,6 @@ if (GHOUL_HAVE_TESTS)
             ${COREFOUNDATION_LIBRARY}
             ${COCOA_LIBRARY}
             ${APP_SERVICES_LIBRARY}
-            )
+        )
     endif ()
 endif ()

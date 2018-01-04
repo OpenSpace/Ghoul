@@ -107,7 +107,7 @@ void TcpSocketServer::listen(std::string address, int port) {
         throw TcpSocket::TcpSocketError("Failed to parse hints for connection!");
     }
 
-    // Create a SOCKET for the server to listen for client connections
+    // Create a socket for the server to listen for client connections
     _serverSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (_serverSocket == INVALID_SOCKET) {
         freeaddrinfo(result);
@@ -117,7 +117,6 @@ void TcpSocketServer::listen(std::string address, int port) {
         throw TcpSocket::TcpSocketError("Failed to init server socket!");
     }
 
-    //set options
     setOptions(_serverSocket);
 
     // Setup the TCP listening socket
@@ -131,7 +130,7 @@ void TcpSocketServer::listen(std::string address, int port) {
         throw TcpSocket::TcpSocketError("Bind failed with error: " + std::to_string(_ERRNO));
     }
 
-    //cleanup
+    // Clean up
     freeaddrinfo(result);
 
     if (::listen(_serverSocket, SOMAXCONN) == SOCKET_ERROR) {
@@ -142,7 +141,6 @@ void TcpSocketServer::listen(std::string address, int port) {
         TcpSocket::TcpSocketError("Listen failed with error: " + std::to_string(_ERRNO));
     }
 
-    //LOG("Waiting for connections on port " << _port);
     _listening = true;
     _serverThread = std::make_unique<std::thread>(
         [this]() { waitForConnections(); }
@@ -184,6 +182,7 @@ std::unique_ptr<TcpSocket> TcpSocketServer::awaitPendingTcpSocket() {
         return nullptr;
     }
     std::unique_lock<std::mutex> lock(_connectionNotificationMutex);
+
     // Block execution until there is a pending connection or until the server stops listening.
     _connectionNotifier.wait(lock, [this]() {
         return hasPendingSockets() || !_listening;
@@ -203,7 +202,6 @@ void TcpSocketServer::waitForConnections() {
 
         _SOCKET socketHandle = accept((int)_serverSocket, (sockaddr*)&clientInfo, &clientInfoSize);
         if (socketHandle == INVALID_SOCKET) {
-            // LERROR("Cannot accept socket connection.");
             continue;
         }
 
@@ -227,41 +225,33 @@ void TcpSocketServer::setOptions(_SOCKET socket) {
     char trueFlag = 1;
     int iResult;
 
-    //set no delay
-    iResult = setsockopt(socket, /* socket affected */
-        IPPROTO_TCP,     /* set option at TCP level */
-        TCP_NODELAY,     /* name of option */
-        &trueFlag,       /* the cast is historical cruft */
-        sizeof(int));    /* length of option value */
+    //Set no delay
+    setsockopt(socket,
+        IPPROTO_TCP,
+        TCP_NODELAY,
+        &trueFlag,
+        sizeof(trueFlag));
 
-    //set send timeout
+    // Set send timeout
     char timeout = 0; //infinite
-    iResult = setsockopt(
+    setsockopt(
         socket,
         SOL_SOCKET,
         SO_SNDTIMEO,
         &timeout,
         sizeof(timeout));
 
-    //set receive timeout
-    iResult = setsockopt(
+    // Set receive timeout
+    setsockopt(
         socket,
         SOL_SOCKET,
         SO_RCVTIMEO,
         &timeout,
         sizeof(timeout));
 
-    iResult = setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &trueFlag, sizeof(int));
-    if (iResult == SOCKET_ERROR) {
-        //LERROR("Failed to set reuse address with error: " << _ERRNO);
-    }
-
-    iResult = setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(int));
-    if (iResult == SOCKET_ERROR) {
-        //LERROR("Failed to set keep alive with error: " << _ERRNO);
-    }
+    setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &trueFlag, sizeof(int));
+    setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(int));
 }
 
 }
 }
-

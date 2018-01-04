@@ -38,7 +38,7 @@ namespace ghoul {
 namespace io {
 
 WebSocket::WebSocketError::WebSocketError(std::string message, std::string component)
-        : RuntimeError(message, component) {}
+    : RuntimeError(message, component) {}
 
 WebSocket::WebSocket(std::string address, int port) : TcpSocket(address, port) {
     LDEBUG(fmt::format("WebSocket started on {}:{}.", address, port));
@@ -69,7 +69,6 @@ WebSocket::WebSocket(std::string address, int port, _SOCKET socket)
 WebSocket::~WebSocket() {
     LDEBUG("Destroying socket connection");
     socketConnection->eof();
-//     socketConnection->terminate();
 }
 
 void WebSocket::startStreams() {
@@ -111,7 +110,7 @@ void WebSocket::disconnect(const int reason) {
         _inputThread.join();
     }
 
-	LDEBUG(fmt::format("Disconnected client {}:{}.", _address, _port));
+    LDEBUG(fmt::format("Disconnected client {}:{}.", _address, _port));
 }
 
 bool WebSocket::socketHasConnection() {
@@ -142,7 +141,6 @@ bool WebSocket::putMessage(const std::string &message) {
 }
 
 void WebSocket::streamInput() {
-    // feed to server somehow
     int nReadBytes = 0;
 
     while (_isConnected && !_shouldDisconnect) {
@@ -156,7 +154,7 @@ void WebSocket::streamInput() {
 
         if (nReadBytes <= 0) {
             _error = true;
-			LDEBUG("Received graceful close request.");
+            LDEBUG("Received graceful close request.");
             _shouldDisconnect = true;
             _inputNotifier.notify_one();
             return;
@@ -164,7 +162,7 @@ void WebSocket::streamInput() {
 
         socketConnection->read_some(_inputBuffer.data(), nReadBytes);
 
-        // Also poke output notifier, as the received message
+        // Poke output notifier, as the received message
         // might trigger something like a handshake or similar.
         _outputNotifier.notify_one();
     }
@@ -189,7 +187,6 @@ void WebSocket::streamOutput() {
                 return;
             }
 
-            // empty outputStream
             _outputStream.clear();
             _outputStream.str(std::string());
         }
@@ -205,9 +202,9 @@ int WebSocket::errorCode() {
 }
 
 int WebSocket::outputStreamSize() {
-	if (!_outputStream) {
-		return 0;
-	}
+    if (!_outputStream) {
+        return 0;
+    }
 
     std::lock_guard<std::mutex> guard(_outputStreamMutex);
     _outputStream.seekg(0, std::ios::end);
@@ -218,8 +215,8 @@ int WebSocket::outputStreamSize() {
 
 /**
  * Callback for incoming messages
- * @param hdl - A handle to uniquely identify a connection.
- * @param msg - the message
+ * \param hdl A handle to uniquely identify a connection.
+ * \param msg The message
  */
 void WebSocket::onMessage(websocketpp::connection_hdl hdl, WsServer::message_ptr msg) {
     std::string msgContent = msg->get_payload();

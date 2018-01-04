@@ -33,8 +33,7 @@ namespace {
 namespace ghoul {
 namespace io {
 
-WebSocketServer::WebSocketServer() {
-}
+WebSocketServer::WebSocketServer() {}
 
 WebSocketServer::~WebSocketServer() {
     if (_listening) {
@@ -54,11 +53,11 @@ void WebSocketServer::close() {
     std::lock_guard<std::mutex> guard(_settingsMutex);
     _listening = false;
 
-    // flush out pending connections
+    // Flush out pending connections
     _clientConnectionNotifier.notify_all();
     closeSocket(_serverSocket);
 
-    // wait for server thread to exit
+    // Wait for server thread to exit
     _serverThread->join();
 }
 
@@ -83,7 +82,7 @@ void WebSocketServer::listen(std::string address, int port) {
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_PASSIVE;
 
-    // find the local address and port to be used by the server
+    // Find the local address and port to be used by the server
     int iResult;
     iResult = getaddrinfo(nullptr, std::to_string(_port).c_str(), &hints, &result);
     if (iResult != 0) {
@@ -93,7 +92,7 @@ void WebSocketServer::listen(std::string address, int port) {
         throw WebSocket::WebSocketError("Failed to parse hints for web socket connection");
     }
 
-    // create a socket for the server to listen for client connections
+    // Create a socket for the server to listen for client connections
     _serverSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (_serverSocket == INVALID_SOCKET) {
         freeaddrinfo(result);
@@ -105,7 +104,7 @@ void WebSocketServer::listen(std::string address, int port) {
 
     setOptions(_serverSocket);
 
-    // setup listening on the TCP socket
+    // Setup listening on the TCP socket
     iResult = bind(_serverSocket, result->ai_addr, static_cast<int>(result->ai_addrlen));
     if (iResult == SOCKET_ERROR) {
         freeaddrinfo(result);
@@ -116,7 +115,7 @@ void WebSocketServer::listen(std::string address, int port) {
         throw WebSocket::WebSocketError("Listen failed with error: " + std::to_string(_ERRNO));
     }
 
-    //cleanup
+    // Cleanup
     freeaddrinfo(result);
 
     if (::listen(_serverSocket, SOMAXCONN) == SOCKET_ERROR) {
@@ -127,10 +126,10 @@ void WebSocketServer::listen(std::string address, int port) {
         WebSocket::WebSocketError("Listen failed with error: " + std::to_string(_ERRNO));
     }
 
-    // mark itself as active and fire up separate thread for incoming connections
+    // Mark as active and start separate thread for incoming connections
     _listening = true;
     _serverThread = std::make_unique<std::thread>(
-            [this]() { waitForConnections(); }
+        [this]() { waitForConnections(); }
     );
 }
 
@@ -143,8 +142,7 @@ bool WebSocketServer::hasPendingSockets() const {
         return false;
     }
 
-    // TODO(klas): Understand why this mutex wont compile
-//    std::lock_guard<std::mutex> guard(_connectionMutex);
+    std::lock_guard<std::mutex> guard(_connectionMutex);
     return !_pendingClientConnections.empty();
 }
 
@@ -172,13 +170,13 @@ std::unique_ptr<WebSocket> WebSocketServer::awaitPendingWebSocket() {
         return nullptr;
     }
 
-    // block execution until we have a pending connection
+    // Block execution until we have a pending connection
     std::unique_lock<std::mutex> lock(_connectionNotificationMutex);
     _clientConnectionNotifier.wait(lock, [this]() {
         return hasPendingSockets() || !_listening;
     });
 
-    // no longer blocked -- there might be a waiting connection for us
+    // No longer blocked: There might be a waiting connection for us
     return nextPendingWebSocket();
 }
 
@@ -195,15 +193,15 @@ void WebSocketServer::waitForConnections() {
         if (socketHandle == INVALID_SOCKET) {
             // no client wanted this socket -- continue loop
 #if defined(WIN32) 
-			LERROR(fmt::format("Could not start socket: ERROR {}", WSAGetLastError()));
-			char val;
-			socklen_t len = sizeof(val);
-			if (getsockopt(_serverSocket, SOL_SOCKET, SO_ACCEPTCONN, &val, &len) == -1)
-				LERROR(fmt::format("_serverSocket {} is not a socket", _serverSocket));
-			else if (val)
-				LERROR(fmt::format("_serverSocket {} is a listening socket", _serverSocket));
-			else
-				LERROR(fmt::format("_serverSocket {} is a non-listening socket", _serverSocket));
+            LERROR(fmt::format("Could not start socket: ERROR {}", WSAGetLastError()));
+            char val;
+            socklen_t len = sizeof(val);
+            if (getsockopt(_serverSocket, SOL_SOCKET, SO_ACCEPTCONN, &val, &len) == -1)
+                LERROR(fmt::format("_serverSocket {} is not a socket", _serverSocket));
+            else if (val)
+                LERROR(fmt::format("_serverSocket {} is a listening socket", _serverSocket));
+            else
+                LERROR(fmt::format("_serverSocket {} is a non-listening socket", _serverSocket));
 #endif
             continue;
         }
@@ -230,15 +228,15 @@ void WebSocketServer::setOptions(_SOCKET socket) {
     char trueFlag = 1;
     int iResult;
 
-    //set no delay
-    iResult = setsockopt(socket, /* socket affected */
-                         IPPROTO_TCP,     /* set option at TCP level */
-                         TCP_NODELAY,     /* name of option */
-                         &trueFlag,       /* the cast is historical cruft */
-                         sizeof(int));    /* length of option value */
+    // Set no delay
+    iResult = setsockopt(socket,
+                         IPPROTO_TCP,
+                         TCP_NODELAY,
+                         &trueFlag,
+                         sizeof(trueFlag));
 
-    //set send timeout
-    char timeout = 0; //infinite
+    // Set send timeout
+    char timeout = 0; // infinite
     iResult = setsockopt(
             socket,
             SOL_SOCKET,
@@ -246,7 +244,7 @@ void WebSocketServer::setOptions(_SOCKET socket) {
             &timeout,
             sizeof(timeout));
 
-    //set receive timeout
+    // Set receive timeout
     iResult = setsockopt(
             socket,
             SOL_SOCKET,
@@ -276,7 +274,6 @@ void WebSocketServer::closeSocket(_SOCKET socket) {
 #endif
     }
 }
-
 
 }
 }

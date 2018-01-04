@@ -48,7 +48,6 @@ public:
     // Get next pending connection. Blocking.
     // Only returns nullptr if the socket server closes.
     virtual std::unique_ptr<Socket> awaitPendingSocket() = 0;
-
 };
 
 } // namespace io

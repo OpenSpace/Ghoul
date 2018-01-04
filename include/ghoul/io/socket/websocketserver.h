@@ -69,9 +69,9 @@ private:
     std::unique_ptr<std::thread> _serverThread;
     _SOCKET _serverSocket;
 
-    std::mutex _settingsMutex;
-    std::mutex _connectionMutex;
-    std::mutex _connectionNotificationMutex;
+    mutable std::mutex _settingsMutex;
+    mutable std::mutex _connectionMutex;
+    mutable std::mutex _connectionNotificationMutex;
 
     std::condition_variable _clientConnectionNotifier;
 
@@ -81,7 +81,6 @@ private:
     void setOptions(_SOCKET);
     void closeSocket(_SOCKET socket);
 };
-
 
 } // namespace io
 } // namespace ghoul

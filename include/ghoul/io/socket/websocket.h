@@ -111,7 +111,6 @@ private:
     std::condition_variable _outputNotifier;
 };
 
-
 } // namespace io
 } // namespace ghoul
 
