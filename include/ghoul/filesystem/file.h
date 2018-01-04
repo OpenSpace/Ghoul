@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -38,15 +38,15 @@ class FileSystem;
 
 /**
  * This class is a handle for a generic file in the file system. The main functionality is
- * to be able to extract parts of the path like the #baseName, the #directoryName, or the 
- * #fileExtension. The second functionality of this class is a platform-independent way of 
+ * to be able to extract parts of the path like the #baseName, the #directoryName, or the
+ * #fileExtension. The second functionality of this class is a platform-independent way of
  * being notified of changes of the file. The constructor or the #setCallback methods
  * expect an <code>std::function</code> object (possibly initialized using a lambda-
  * expression) that will be called whenever the file changes on the hard disk. The
- * callback function has this object passed as a parameter. If many changes of the file 
+ * callback function has this object passed as a parameter. If many changes of the file
  * happen in quick succession, each change will trigger a separate call of the callback.
- * The file system is not polled, but the changes are pushed to the application, so the 
- * changes are registered efficiently and are solely impacted by the overhead of 
+ * The file system is not polled, but the changes are pushed to the application, so the
+ * changes are registered efficiently and are solely impacted by the overhead of
  * <code>std::function</code>.
  */
 class File {
@@ -57,7 +57,7 @@ public:
     struct FileException : public RuntimeError {
         explicit FileException(const std::string& msg);
     };
-    
+
     /// The type of the std::function that is used as the prototype for the callback
     using FileChangedCallback = std::function<void (const File&)>;
 
@@ -75,7 +75,7 @@ public:
      * \pre \p filename must not be empty
      * \see FileSystem The system to register and use tokens
      */
-    File(std::string filename, RawPath isRawPath = RawPath::No,
+    File(std::string filename, RawPath isRawPath = RawPath::Yes,
          FileChangedCallback fileChangedCallback = FileChangedCallback());
 
     /**
@@ -84,7 +84,7 @@ public:
     File(const File& file);
 
     /**
-     * The destructor will automatically stop the notification of future changes in the 
+     * The destructor will automatically stop the notification of future changes in the
      * file system.
      */
     ~File();
@@ -97,7 +97,7 @@ public:
      * \param callback The new callback function that will be used in this File object
      */
     void setCallback(FileChangedCallback callback);
-    
+
     /**
      * Returns the currently active callback. This object might be uninitialized if no
      * callback has been registered previously.
@@ -125,7 +125,7 @@ public:
      * \return The filename part of the full path
      */
     std::string filename() const;
-    
+
     /**
      * Returns the base name part of the full path. The base name is defined as the part
      * of the path between the last path separator (<code>'/'</code> or
@@ -134,7 +134,7 @@ public:
      * \return The base name part of the full path
      */
     std::string baseName() const;
-    
+
     /**
      * Returns the full base name of the path. The full base name is defined as the part
      * of the path before the extension (if existing). Example (
@@ -142,7 +142,7 @@ public:
      * \return The full base name part of the path
      */
     std::string fullBaseName() const;
-    
+
     /**
      * Returns the directory name of the path. The directory name is defined as the part
      * of the path before the last path separator (<code>'/'</code> or
@@ -151,7 +151,7 @@ public:
      * \return The directory name of the path
      */
     std::string directoryName() const;
-    
+
     /**
      * Returns the extension part of the full path. The extension is defined as the part
      * of the path after the extension separator (<code>'.'</code>). Example (
@@ -173,7 +173,7 @@ private:
      * remove and unregister the old listener in the process
      */
     void installFileChangeListener();
-    
+
     /**
      * Removes the platform-dependent listener. If there is no listener present, this
      * operation is a no-op.

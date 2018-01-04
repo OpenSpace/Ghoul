@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -61,8 +61,8 @@ namespace ghoul::io {
 class ModelReaderMultiFormat : public ModelReaderBase {
 public:
     /**
-     * Loads the 3D model (anyone from the previous list) file pointed to by 
-     * \p filename and returns a constructed VertexBufferObject from it. 
+     * Loads the 3D model (anyone from the previous list) file pointed to by
+     * \p filename and returns a constructed VertexBufferObject from it.
      * Provided materials are ignored and all shapes are
      * collapsed into one VertexBufferObject.
      * \param filename The geometric model file to be loaded

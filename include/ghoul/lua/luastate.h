@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -45,24 +45,24 @@ public:
      * \throw LuaRuntimeException If an error occurs during the state creation
      */
     explicit LuaState(bool includeStandardLibraries = true);
-    
+
     /**
      * Destroys the created Lua state and frees all the related memory.
      */
     ~LuaState();
-    
+
     /**
      * Converts this LuaState into a \c lua_State pointer for compatibility with other
      * parts that might still rely on bare \c lua_State pointers
      * \return The contained \c lua_State pointer
      */
     operator lua_State*() const;
-    
+
 private:
     /// The stored \c lua_State
     lua_State* _state;
 };
-    
+
 }  // namespace ghoul::lua
 
 #endif // __GHOUL___LUASTATE___H__

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,6 +25,7 @@
 
 #include <ghoul/font/fontmanager.h>
 
+#include <ghoul/filesystem/filesystem.h>
 #include <ghoul/font/font.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
@@ -33,15 +34,15 @@
 #include <fmt/format.h>
 
 namespace ghoul::fontrendering {
-    
+
 FontManager::FontRegistrationException::FontRegistrationException(const std::string& msg)
     : RuntimeError(msg, "FontManager")
 {}
-    
+
 FontManager::FontAccessException::FontAccessException(const std::string& msg)
     : RuntimeError(msg, "FontManager")
 {}
-    
+
 FontManager::FontManager(glm::ivec3 atlasDimensions)
     : _textureAtlas(std::move(atlasDimensions))
     , _defaultCharacterSet({
@@ -57,13 +58,13 @@ FontManager::FontManager(glm::ivec3 atlasDimensions)
         L'z', L'{', L'|', L'}'
     })
 {}
-    
+
 unsigned int FontManager::registerFontPath(const std::string& fontName,
                                            const std::string& filePath)
 {
     ghoul_assert(!fontName.empty(), "Fontname must not be empty");
     ghoul_assert(!filePath.empty(), "Filepath must not be empty");
-    
+
     unsigned int hash = hashCRC32(fontName);
     auto it = _fontPaths.find(hash);
     if (it != _fontPaths.end()) {
@@ -85,23 +86,31 @@ unsigned int FontManager::registerFontPath(const std::string& fontName,
     _fontPaths[hash] = filePath;
     return hash;
 }
-    
+
 std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
                                         Outline withOutline, LoadGlyphs loadGlyphs)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
 
     unsigned int hash = hashCRC32(name);
-    try {
-        return font(hash, fontSize, withOutline, loadGlyphs);
+
+    auto itPath = _fontPaths.find(hash);
+    if (itPath == _fontPaths.end()) {
+        // There is no hash registered for the current name, so it might be a local file
+        if (FileSys.fileExists(name)) {
+            hash = registerFontPath(name, name);
+        }
+        else {
+            // The name has not neen previously registered and it is not a valid path
+            throw FontAccessException(fmt::format(
+                "Name '{}' does not name a valid font or file", name
+            ));
+        }
     }
-    catch (const FontAccessException&) {
-        throw FontAccessException(fmt::format(
-            "Error retrieving Font '{}' for size '{}'", name, fontSize
-        ));
-    }
+
+    return font(hash, fontSize, withOutline, loadGlyphs);
 }
-    
+
 std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
                                         Outline withOutline, LoadGlyphs loadGlyphs)
 {
@@ -115,7 +124,7 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     auto fonts = _fonts.equal_range(hashName);
     for (auto it = fonts.first; it != fonts.second; ++it) {
         const float delta = 1e-6f; // Font sizes are 1-1000, so a delta of 1/e6 is fine
-        if ((it->second->pointSize() - fontSize < delta) &&
+        if ((glm::abs(it->second->pointSize() - fontSize) < delta) &&
             it->second->hasOutline() == withOutline)
         {
             return it->second;
@@ -123,8 +132,11 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     }
 
     Font::Outline outline =
-        withOutline == Outline::Yes ? Font::Outline::Yes : Font::Outline::No;
-    auto f = std::make_shared<Font>(
+        withOutline == Outline::Yes ?
+        Font::Outline::Yes :
+        Font::Outline::No;
+
+    std::shared_ptr<Font> f = std::make_shared<Font>(
         _fontPaths[hashName],
         fontSize,
         _textureAtlas,

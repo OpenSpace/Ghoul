@@ -2,7 +2,7 @@
  *                                                                                       *
  * OpenSpace                                                                             *
  *                                                                                       *
- * Copyright (c) 2014-2017                                                               *
+ * Copyright (c) 2014-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -62,31 +62,31 @@ void Event<T...>::unsubscribe(const std::string& name, const std::string& topic)
         _topics[topic].erase(
             std::remove_if(
                 _topics[topic].begin(),
-                _topics[topic].end(), 
+                _topics[topic].end(),
                 // predicate function, true if subscriber name is equal to given name
                 [name](const Subscriber& subscriber) {
                     return (subscriber.name == name);
                 }
             ),
-            _topics[topic].end() 
+            _topics[topic].end()
         );
     }
 }
 
 template <class... T>
 void Event<T...>::unsubscribe(const std::string& name) {
-    // Search through all topics to erase all callbacks that belong to the 
+    // Search through all topics to erase all callbacks that belong to the
     // object with given name
     for (auto& topic : _topics) {
         topic.second.erase(
             std::remove_if(
-                topic.second.begin(), topic.second.end(), 
+                topic.second.begin(), topic.second.end(),
                 // predicate function, true if subscriber name is equal to given name
                 [name](const Subscriber& subscriber){
                     return (subscriber.name == name);
                 }
             ),
-            topic.second.end() 
+            topic.second.end()
         );
     }
 }

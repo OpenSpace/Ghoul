@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -44,18 +44,18 @@ public:
     struct TemplateFactoryError : public RuntimeError {
         explicit TemplateFactoryError(std::string message);
     };
-    
+
     /// Exception that is thrown if a requested class has not been registered before
     struct TemplateClassNotFoundError : public TemplateFactoryError {
         explicit TemplateClassNotFoundError(std::string className);
         std::string className;
     };
-    
+
     /// Exception that is thrown if a registered class is called with a wrong constructor
     struct TemplateConstructionError : public TemplateFactoryError {
         explicit TemplateConstructionError(std::string message);
     };
-    
+
     virtual const std::type_info& baseClassType() const = 0;
     virtual ~TemplateFactoryBase();
 
@@ -144,7 +144,8 @@ public:
      * parameter. If \p className does not name a registered class, an exception is
      * thrown.  Classes can be registered with the #registerClass method.
      * \param className The class name of the instance that should be created
-     * \param dictionary The dictionary that will be passed to the constructor of the class
+     * \param dictionary The dictionary that will be passed to the constructor of the
+     * class
      * \return A fully initialized instance of the registered class
      * \throw TemplateClassNotFoundError If the \p className did not name a previously
      * registered class
@@ -210,7 +211,7 @@ public:
      * \pre \p className must not be empty
      * \pre \p factoryFunction must not be <code>nullptr</code>
      */
-    void registerClass(std::string className, 
+    void registerClass(std::string className,
         std::function<BaseClass*(bool, const ghoul::Dictionary&)> factoryFunction);
 
     /**
@@ -223,7 +224,7 @@ public:
      * \pre \p className must not be empty
      */
     bool hasClass(const std::string& className) const override;
-    
+
     /**
      * Returns the list of all registered classes. All values in this vector can be used
      * to instantiate a new class sing the #create method

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -44,7 +44,7 @@ namespace ghoul::systemcapabilities {
 
 /**
  * This class is the base class of all components that can detect a specific set of
- * features. Each subclass should focus on a specific module of features (like 
+ * features. Each subclass should focus on a specific module of features (like
  * GeneralCapabilitiesComponent or OpenGLCapabilitiesComponent). The action flow for a
  * SystemCapabilitiesComponent subclass is as follows: It gets created with the
  * constructor and should provide a descriptive name to this SystemCapabilitiesComponent's
@@ -72,10 +72,10 @@ public:
     struct CapabilityInformation {
         /// The user-readable description of this capability
         std::string description;
-        
+
         /// The value of the capability
         std::string value;
-        
+
         /// The SystemCapabilitiesComponent%'s recommendation for Verbosity
         Verbosity verbosity;
     };
@@ -110,10 +110,10 @@ public:
     virtual void clearCapabilities() = 0;
 
     /**
-     * This method returns pairs CapabilityInformation%s, describing the features and 
+     * This method returns pairs CapabilityInformation%s, describing the features and
      * capabilities the subclass is responsible for. As a best-practice, the subclass
      * should allow individual query for each of the elements as well.
-     * \return All CapabilityInformation%s that this SystemCapabilitiesComponent is 
+     * \return All CapabilityInformation%s that this SystemCapabilitiesComponent is
      * responsible for
      */
     virtual std::vector<CapabilityInformation> capabilities() const = 0;
@@ -131,13 +131,13 @@ protected:
     /// Management Instrumentation
     struct WMIError : public RuntimeError {
         explicit WMIError(std::string message, HRESULT errorCode);
-        
+
         std::string message;
         HRESULT errorCode;
     };
 
     /**
-     * This method initializes the Windows Management Instrumentation. 
+     * This method initializes the Windows Management Instrumentation.
      * \throw WMIError If there was an error initializing the Windows Management
      * Instrumentation
      * \pre The Windows Management Instrumentation must not have been initialized before
@@ -160,7 +160,7 @@ protected:
 
     /**
      * Queries the Windows Management Instrumentation for the \p attribute contained in
-     * the \p wmiClass and returns the value of it. It will execute a query on the Wbem 
+     * the \p wmiClass and returns the value of it. It will execute a query on the Wbem
      * services.
      * \param wmiClass The class in which the required attribute resides
      * \param attribute The attribute which we are interested in
@@ -192,7 +192,7 @@ protected:
 
     /**
      * Helper function that queries the Windows Management Instrumentation for the
-     * \p attribute within the \p wmiClass and it expects the attribute to be of type 
+     * \p attribute within the \p wmiClass and it expects the attribute to be of type
      * <code>int</code>.
      * \param wmiClass The class in which the required attribute resides
      * \param attribute The attribute which we are interested in

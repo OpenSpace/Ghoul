@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -28,17 +28,17 @@
 #include <ghoul/lua/lua_helper.h>
 
 namespace ghoul::lua {
-    
+
 LuaState::LuaState(bool includeStandardLibraries)
     : _state(ghoul::lua::createNewLuaState(includeStandardLibraries))
 {}
-    
+
 LuaState::~LuaState() {
     if (_state) {
         ghoul::lua::destroyLuaState(_state);
     }
 }
-    
+
 LuaState::operator lua_State*() const {
     return _state;
 }

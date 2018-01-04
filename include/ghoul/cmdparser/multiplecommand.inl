@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,91 +25,140 @@
 
 namespace ghoul::cmdparser {
 
-template<class T, class U, class V, class W>
-MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::string name,
-                std::string shortName, std::string infoText, std::string parameterList)
-    : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
-                         std::move(parameterList), 1, MultipleCalls::Yes)
+template<class T>
+MultipleCommand<T>::MultipleCommand(std::vector<T>& ptr1, std::string name,
+                                    std::string shortName, std::string infoText,
+                                    std::string parameterList)
+    : CommandlineCommand(
+        std::move(name),
+        std::move(shortName),
+        std::move(infoText),
+        std::move(parameterList),
+        1,
+        MultipleCalls::Yes
+    )
     , _ptr1(ptr1)
-{
-    ghoul_assert(_ptr1, "Ptr1 must not be nullptr");
+{}
+
+template<class T>
+void MultipleCommand<T>::execute(const std::vector<std::string>& parameters) {
+    _ptr1.push_back(cast<T>(parameters[0]));
 }
 
-template<class T, class U, class V, class W>
-MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2,
-                std::string name, std::string shortName, std::string infoText,
-                std::string parameterList)
-    : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
-                         std::move(parameterList), 2, MultipleCalls::Yes)
-    , _ptr1(ptr1)
-    , _ptr2(ptr2)
-{
-    ghoul_assert(_ptr1, "Ptr1 must not be nullptr");
-    ghoul_assert(_ptr2, "Ptr2 must not be nullptr");
-}
-
-template<class T, class U, class V, class W>
-MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2,
-                std::vector<V>* ptr3, std::string name, std::string shortName,
-                std::string infoText, std::string parameterList)
-    : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
-                         std::move(parameterList), 3, MultipleCalls::Yes)
-    , _ptr1(ptr1)
-    , _ptr2(ptr2)
-    , _ptr3(ptr3)
-{
-    ghoul_assert(_ptr1, "Ptr1 must not be nullptr");
-    ghoul_assert(_ptr2, "Ptr2 must not be nullptr");
-    ghoul_assert(_ptr3, "Ptr3 must not be nullptr");
-}
-
-template<class T, class U, class V, class W>
-MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>* ptr1, std::vector<U>* ptr2,
-                std::vector<V>* ptr3, std::vector<W>* ptr4, std::string name,
-                std::string shortName, std::string infoText, std::string parameterList)
-    : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText),
-                         std::move(parameterList), 4, MultipleCalls::Yes)
-    , _ptr1(ptr1)
-    , _ptr2(ptr2)
-    , _ptr3(ptr3)
-    , _ptr4(ptr4)
-{
-    ghoul_assert(_ptr1, "Ptr1 must not be nullptr");
-    ghoul_assert(_ptr2, "Ptr2 must not be nullptr");
-    ghoul_assert(_ptr3, "Ptr3 must not be nullptr");
-    ghoul_assert(_ptr4, "Ptr4 must not be nullptr");
-}
-
-template<class T, class U, class V, class W>
-void MultipleCommand<T,U,V,W>::execute(const std::vector<std::string>& parameters) {
-    _ptr1->push_back(cast<T>(parameters[0]));
-    if (_ptr2) {
-        _ptr2->push_back(cast<U>(parameters[1]));
-    }
-    if (_ptr3) {
-        _ptr3->push_back(cast<V>(parameters[2]));
-    }
-    if (_ptr4) {
-        _ptr4->push_back(cast<W>(parameters[3]));
-    }
-}
-
-template<class T, class U, class V, class W>
-void MultipleCommand<T,U,V,W>::checkParameters(
-                                       const std::vector<std::string>& parameters) const
+template<class T>
+void MultipleCommand<T>::checkParameters(
+                                         const std::vector<std::string>& parameters) const
 {
     CommandlineCommand::checkParameters(parameters);
 
     is<T>(parameters[0]);
-    if (_ptr2) {
-        is<U>(parameters[1]);
-    }
-    if (_ptr3) {
-        is<V>(parameters[2]);
-    }
-    if (_ptr4) {
-        is<W>(parameters[3]);
-    }
+}
+
+template<class T, class U>
+MultipleCommand<T, U>::MultipleCommand(std::vector<T>& ptr1, std::vector<U>& ptr2,
+                                       std::string name, std::string shortName,
+                                       std::string infoText, std::string parameterList)
+    : CommandlineCommand(
+        std::move(name),
+        std::move(shortName),
+        std::move(infoText),
+        std::move(parameterList),
+        2,
+        MultipleCalls::Yes
+    )
+    , _ptr1(ptr1)
+    , _ptr2(ptr2)
+{}
+
+template<class T, class U>
+void MultipleCommand<T, U>::execute(const std::vector<std::string>& parameters) {
+    _ptr1.push_back(cast<T>(parameters[0]));
+    _ptr2.push_back(cast<U>(parameters[1]));
+}
+
+template<class T, class U>
+void MultipleCommand<T, U>::checkParameters(
+                                         const std::vector<std::string>& parameters) const
+{
+    CommandlineCommand::checkParameters(parameters);
+
+    is<T>(parameters[0]);
+    is<U>(parameters[1]);
+}
+
+template<class T, class U, class V>
+MultipleCommand<T, U, V>::MultipleCommand(std::vector<T>& ptr1, std::vector<U>& ptr2,
+                                          std::vector<V>& ptr3, std::string name,
+                                          std::string shortName, std::string infoText,
+                                          std::string parameterList)
+    : CommandlineCommand(
+        std::move(name),
+        std::move(shortName),
+        std::move(infoText),
+        std::move(parameterList),
+        3,
+        MultipleCalls::Yes
+    )
+    , _ptr1(ptr1)
+    , _ptr2(ptr2)
+    , _ptr3(ptr3)
+{}
+
+template<class T, class U, class V>
+void MultipleCommand<T, U, V>::execute(const std::vector<std::string>& parameters) {
+    _ptr1.push_back(cast<T>(parameters[0]));
+    _ptr2.push_back(cast<U>(parameters[1]));
+    _ptr3.push_back(cast<V>(parameters[2]));
+}
+
+template<class T, class U, class V>
+void MultipleCommand<T, U, V>::checkParameters(
+                                         const std::vector<std::string>& parameters) const
+{
+    CommandlineCommand::checkParameters(parameters);
+
+    is<T>(parameters[0]);
+    is<U>(parameters[1]);
+    is<V>(parameters[2]);
+}
+
+template<class T, class U, class V, class W>
+MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>& ptr1, std::vector<U>& ptr2,
+                                          std::vector<V>& ptr3, std::vector<W>& ptr4,
+                                          std::string name, std::string shortName,
+                                          std::string infoText, std::string parameterList)
+    : CommandlineCommand(
+        std::move(name),
+        std::move(shortName),
+        std::move(infoText),
+        std::move(parameterList),
+        4,
+        MultipleCalls::Yes
+    )
+    , _ptr1(ptr1)
+    , _ptr2(ptr2)
+    , _ptr3(ptr3)
+    , _ptr4(ptr4)
+{}
+
+template<class T, class U, class V, class W>
+void MultipleCommand<T,U,V,W>::execute(const std::vector<std::string>& parameters) {
+    _ptr1.push_back(cast<T>(parameters[0]));
+    _ptr2.push_back(cast<U>(parameters[1]));
+    _ptr3.push_back(cast<V>(parameters[2]));
+    _ptr4.push_back(cast<W>(parameters[3]));
+}
+
+template<class T, class U, class V, class W>
+void MultipleCommand<T,U,V,W>::checkParameters(
+                                         const std::vector<std::string>& parameters) const
+{
+    CommandlineCommand::checkParameters(parameters);
+
+    is<T>(parameters[0]);
+    is<U>(parameters[1]);
+    is<V>(parameters[2]);
+    is<W>(parameters[3]);
 }
 
 } // namespace ghoul::cmdparser

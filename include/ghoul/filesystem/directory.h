@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -54,7 +54,7 @@ public:
      * current working directory.
      */
     Directory();
-    
+
     /**
      * This constructor creates a Directory object pointing to the \p path. If
      * \p isRawPath is <code>true</code>, the \p path is used as-is and not modified. If
@@ -68,7 +68,7 @@ public:
      * the path is used as-is without changes. This might make the Directory object
      * outdated if the current working directory is subsequently changed.
      */
-    Directory(std::string path, RawPath isRawPath = RawPath::No);
+    Directory(std::string path, RawPath isRawPath = RawPath::Yes);
 
     /**
     * This constructor creates a Directory object pointing to the \p path. If
@@ -83,7 +83,7 @@ public:
     * the path is used as-is without changes. This might make the Directory object
     * outdated if the current working directory is subsequently changed.
     */
-    Directory(const char* path, RawPath isRawPath = RawPath::No);
+    Directory(const char* path, RawPath isRawPath = RawPath::Yes);
 
     /**
      * Operator that returns the path this directory points to. This can, depending on the
@@ -116,7 +116,7 @@ public:
      * directory.
      */
     Directory parentDirectory(AbsolutePath absolutePath = AbsolutePath::No) const;
-    
+
     /**
      * This method creates a list of all files and subdirectories in the current directory
      * and returns the paths to each. If \p recursiveSearch is <code>true</code>, each
@@ -167,7 +167,7 @@ private:
      * itself; thus reusing the \p result parameter.
      * \param result The result vector that will contain all files in the directory
      * \param path The path of the directory whose files should be listed
-     * \param recursiveSearch If <code>true</code>, this method will be called recursively 
+     * \param recursiveSearch If <code>true</code>, this method will be called recursively
      * for each directory in the current directory, combining all results in the
      * \p result> vector
      */
@@ -181,7 +181,7 @@ private:
      * itself; thus reusing the \p result parameter.
      * \param result The result vector that will contain all files in the directory
      * \param path The path of the directory whose files should be listed
-     * \param recursiveSearch If <code>true</code>, this method will be called recursively 
+     * \param recursiveSearch If <code>true</code>, this method will be called recursively
      * for each directory in the current directory, combining all results in the
      * \p result vector.
      */

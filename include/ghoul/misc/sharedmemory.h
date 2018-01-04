@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -61,12 +61,12 @@ public:
     struct SharedMemoryError : public RuntimeError {
         explicit SharedMemoryError(std::string message);
     };
-    
+
     /// Exception that is thrown if a specific shared memory did not exist
     struct SharedMemoryNotFoundError : public SharedMemoryError {
         explicit SharedMemoryNotFoundError();
     };
-    
+
     /**
      * Creates a globally visible shared memory block, which is accessible by other
      * processes with the same \p name. A block can only be created once and each attempt
@@ -116,7 +116,7 @@ public:
      * SharedMemory block
      */
     static bool exists(const std::string& name);
-    
+
     /**
      * Creates a SharedMemory object pointing to a previously created shared memory block
      * (#create). If \p name is a valid name for a shared memory block, the constructor
@@ -138,7 +138,7 @@ public:
      * free all previously acquired resources.
      */
     ~SharedMemory();
-    
+
     /**
      * Returns the pointer to the first usable address of the allocated memory. The
      * transparently handled header is automatically skipped and is invisible to the
@@ -154,7 +154,7 @@ public:
      * \return The usable size of the memory block.
      */
     size_t size() const;
-    
+
     /**
      * This method acquires a lock for the calling process to provide exclusive access to
      * the shared memory block. While one process owns the lock, any subsequent call to
@@ -173,28 +173,28 @@ public:
      * the lock of any other process by calling this method.
      */
     void releaseLock();
-    
+
     /**
      * Returns the name for the SharedMemory object that can be used to remove the data
      * that this object depends on.
      * \return The name for this SharedMemory object
      */
     std::string name() const;
-    
+
 private:
     /**
      * This pointer points to the location in local address space where the shared memory
      * block has been attached to
      */
     void* _memory;
-    
+
     /// The name for this SharedMemory block
     std::string _name;
 
     // on Windows it is not possible to query the size of a memory mapped file, so it
     // has to be stored in the block of memory itself. On POSIX systems, we can store
     // the size in this object itself.
-   
+
 #ifdef WIN32
     /**
      * The handle to the memory mapped file that backs this SharedMemory object. Only a
@@ -219,7 +219,7 @@ private:
     int _sharedMemoryHandle;
 #endif
 };
-    
+
 } // namespace ghoul
 
 #endif // __GHOUL___SHAREDMEMORY___H__

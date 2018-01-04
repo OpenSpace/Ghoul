@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -41,6 +41,7 @@ class CommandlineCommand;
 class CommandlineParser {
 public:
     using AllowUnknownCommands = ghoul::Boolean;
+    using DisplayHelpText = ghoul::Boolean;
 
     /**
      * The exception that is thrown in the CommandlineParser::execute method when an
@@ -49,7 +50,7 @@ public:
     struct CommandlineException : public RuntimeError {
         explicit CommandlineException(const std::string& msg);
     };
-    
+
     /**
      * Default constructor.
      * \param programName The name of the program. Used in the #displayUsage and
@@ -72,7 +73,7 @@ public:
      * The destructor will also delete all the contained commands within.
      */
     ~CommandlineParser();
-    
+
     /**
      * Sets if this CommandlineParser allows command-line arguments that do not belong to
      * any registered CommandlineCommand. If this is set to <code>true</code>, a receiving
@@ -86,7 +87,7 @@ public:
      * unknown commands are encountered during execution
      */
     void setAllowUnknownCommands(AllowUnknownCommands allowUnknownCommands);
-    
+
     /**
      * Returns if this CommandlineParser allows unknown commands, which do not have a
      * CommandlineCommand associated with them, in the command-line set by
@@ -126,7 +127,7 @@ public:
      * executions, wrong parameter types, error with unnamed arguments
      * \throws CommandExecutionException If the execution of a CommandlineCommand failed
      */
-    bool execute();
+    DisplayHelpText execute();
 
     /**
      * Add a new command to the parser. This method transfers ownership of the
@@ -134,16 +135,13 @@ public:
      * command upon destruction.
      * \param cmd The command that is to be added. The ownership of the CommandlineCommand
      * will be transferred to the CommandlineParser
-     * \return <code>true</code> if the command was added successfully; <code>false</code>
-     * if it either already existed or the CommandlineCommand::name or
-     * CommandlineCommand::shortName were not unique.
      * \pre \p cmd must not be <code>nullptr</code>
      * \pre The name of \p cmd may not have been used in a previous registered
      * CommandlineCommand's name or short name
      * \pre If \p cmd has a short name, it may not have been used in a previous registered
      * CommandlineCommand's name or short name
      */
-    bool addCommand(std::unique_ptr<CommandlineCommand> cmd);
+    void addCommand(std::unique_ptr<CommandlineCommand> cmd);
 
     /**
      * Add a new command to take care of the nameless arguments. Nameless arguments do not
@@ -169,7 +167,13 @@ public:
      * has previously been registered; <code>false</code> otherwise
      */
     bool hasCommandForShortName(const std::string& shortName) const;
-    
+
+    /**
+     * Returns if a nameless command has been previously registered.
+     * \return <code>true</code> if a nameless command has been previously registered
+     */
+    bool hasNamelessCommand() const;
+
     /**
      * Returns the first command-line argument containing the path and the executable of
      * the running program.
@@ -178,20 +182,30 @@ public:
     const std::string& programPath() const;
 
     /**
-     * Prints usage information to the provided \p stream. If the argument \p command is
-     * empty, the usage information for all registered commands is printed. Otherwise only
-     * the information for the CommandlineCommand with the CommandlineCommand::name or
-     * CommandlineCommand::shortName equal to \p command will be printed.
-     * <code>Nameless</code> is a placeholder name for the nameless command
-     * (#addCommandForNamelessArguments).
-     * \param command Show information for the command with the CommandlineCommand::name
-     * or CommandlineCommand::shortName only. If <code>command</code> is empty, the
-     * usage information for all commands is printed; if <code>command = "Nameless"</code>
-     * the usage information for the nameless argument is logged
-     * \param stream The stream to which the usage information is printed
+     * Returns the usage information for all registered commands.
+     * \return The usage information for all registered commands
      */
-    void displayUsage(const std::string& command = "",
-        std::ostream& stream = std::cout) const;
+    std::string usageInformation() const;
+
+    /**
+     * Returns the usage information for the CommandlineCommand with the
+     * CommandlineCommand::name or CommandlineCommand::shortName equal to \p command.
+     * See #usageInformationForNamelessCommand for accessing the usage information for the
+     * command registered as the nameless command.
+     * \param command Show information for the command with the CommandlineCommand::name
+     * or CommandlineCommand::shortName only. If <code>command = "Nameless"</code>
+     * the usage information for the nameless argument is logged
+     * \return The usage information for the provided CommandlineCommand
+     * \pre command must not be an empty string
+     * \pre command must name a valid command either by full name or short name
+     */
+    std::string usageInformationForCommand(const std::string& command) const;
+
+    /**
+     * Returns the usage information for the nameless command.
+     * \return The usage information for the nameless command
+    */
+    std::string usageInformationForNamelessCommand() const;
 
     /**
      * Print the full help test to the provided \p stream. It consists of the usage
@@ -211,7 +225,7 @@ protected:
      * <code>nullptr</code> if no such CommandlineCommand exists
      */
     CommandlineCommand* getCommand(const std::string& shortOrLongName);
-    
+
     /**
      * Returns <code>true</code> if the \a _arguments contains only a single help
      * argument.
@@ -227,7 +241,7 @@ protected:
 
     /// All the arguments passed onto this parser
     std::vector<std::string> _arguments;
-    
+
     /// The pointer to the vector that will store all the arguments which have not been
     /// consumed by the CommandlineParser
     std::shared_ptr<std::vector<std::string>> _remainingArguments;
@@ -237,13 +251,13 @@ protected:
 
     /// The name of the program used in the \sa usage method
     std::string _programName;
-    
+
     /// Should the CommandlineParser allow unknown commands or throw an error in that case
     AllowUnknownCommands _allowUnknownCommands;
-    
+
     /// Short version of the command to request help information
     std::string _shortHelpCommand;
-    
+
     /// Long version of the command to request help information
     std::string _longHelpCommand;
 };

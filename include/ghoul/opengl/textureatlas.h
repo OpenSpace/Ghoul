@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -22,13 +22,13 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  *****************************************************************************************
- *
+ *                                                                                       *
  * This code is based on the Freetype GL engine as developed by Nicolas P. Rougier. The  *
  * library is available at http://code.google.com/p/freetype-gl/. His implementation of  *
- * the TextureAtlas is based on the article by Jukka Jylänki: "A Thousand Ways to Pack   *
+ * the TextureAtlas is based on the article by Jukka Jylaanki: "A Thousand Ways to Pack  *
  * the Bin - A Practical Approach to Two-Dimensional Rectangle Bin Packing", 2010.       *
  * More precisely, this is an implementation of the Skyline Bottom-Left algorithm based  *
- * on C++ sources provided by Jukka Jylänki at:                                          *
+ * on C++ sources provided by Jukka Jylaanki at:                                         *
  * http://clb.demon.fi/files/RectangleBinPack/                                           *
  ****************************************************************************************/
 
@@ -44,7 +44,7 @@
 #include <vector>
 
 namespace ghoul::opengl {
-    
+
 /**
  * This class represents a texture atlas which automatically organizes smaller textures
  * in a compact representation. The TextureAtlas is useful if many small textures are
@@ -62,11 +62,11 @@ public:
     struct InvalidRegionException : RuntimeError {
         explicit InvalidRegionException(const std::string& msg);
     };
-    
+
     typedef int RegionHandle;
-    
+
     /**
-     * The constructor completely initializes the Texture Atlas. No additional 
+     * The constructor completely initializes the Texture Atlas. No additional
      * initialization step is necessary. Due to the fact that the underlying Texture is
      * initialized here, it requires a valid OpenGL context.
      * \param size The size (<code>width</code>, <code>height</code>, <code>depth</code>)
@@ -76,7 +76,7 @@ public:
      * <code>2</code>, <code>3</code>, or <code>4</code>
      */
     explicit TextureAtlas(glm::ivec3 size);
-    
+
     /**
      * The constructor completely initializes the Texture Atlas. No additional
      * initialization step is necessary. Due to the fact that the underlying Texture is
@@ -92,14 +92,14 @@ public:
      * <code>4</code>
      */
     TextureAtlas(int width, int height, int depth);
-    
+
     /**
      * Copy constructor that performs a deep copy of all the element in the TextureAtlas
      * such that the resulting atlas can be used independently.
      * \param rhs The original TextureAtlas
      */
     TextureAtlas(const TextureAtlas& rhs);
-    
+
     /**
      * Move constructor that leaves the incoming atlas invalid.
      * \param rhs The origin TextureAtlas
@@ -113,7 +113,7 @@ public:
      * \return A copy of the original TextureAtlas
      */
     TextureAtlas& operator=(const TextureAtlas& rhs);
-    
+
     /**
      * Move operator that moves the data into the new atlas without performing any copy
      * operations. This leaves the original atlas invalid.
@@ -121,13 +121,13 @@ public:
      * \return The atlas into which the original values were moved into
      */
     TextureAtlas& operator=(TextureAtlas&& rhs);
-    
+
     /**
      * Uploads the TextureAtlas to the graphics card. This function requires a valid
      * OpenGL context.
      */
     void upload();
-    
+
     /**
      * Clears the TextureAtlas of all data, but leaves the underlying Texture unchanged.
      * A separate call to #upload is required to change the representation on the GPU as
@@ -144,7 +144,7 @@ public:
      * \param height The height of the requested region
      * \return A handle to the new region that can be passed to the #setRegionData and
      * #textureCoordinates functions
-     * \throws InvalidRegionException If the new requested region does not fit in the 
+     * \throws InvalidRegionException If the new requested region does not fit in the
      * TextureAtlas
      */
     RegionHandle newRegion(int width, int height);
@@ -160,13 +160,13 @@ public:
      * \pre \p data must not be a <code>nullptr</code>
      */
     void setRegionData(RegionHandle handle, void* data);
-    
+
     /// Structure that is returned from textureCoordinates function
     struct TextureCoordinatesResult {
         glm::vec2 topLeft;
         glm::vec2 bottomRight;
     };
-    
+
     /**
      * Returns the texture coordinates that define the provided region. If the returned
      * <code>topLeft</code> and <code>bottomRight</code> coordinates are used as texture
@@ -213,7 +213,7 @@ public:
      * and <code>depth</code>.
      */
     glm::ivec3 size() const;
-    
+
     /**
      * Returns the amount of pixels out of the maximum size (<code>width</code> *
      * <code>height</code>) that are currently in use. Please note that this is <b>not</b>
@@ -222,7 +222,7 @@ public:
      * \return The amount of pixels that are currently in use in the atlas.
      */
     int spaceUsed() const;
-    
+
     /**
      * Returns the Texture that is the underlying storage for the TextureAtlas. This
      * Texture can bound to a ProgramObject and subsequently sampled to retrieve the
@@ -234,12 +234,12 @@ public:
 private:
     int atlasFit(size_t index, int width, int height);
     void atlasMerge();
-    
+
     std::vector<glm::ivec3> _nodes;
-    
+
     /// All of the individual elements that are stored in the atlas
     std::vector<glm::ivec4> _handleInformation;
-    
+
     /// Size of the texture
     glm::ivec3 _size;
 

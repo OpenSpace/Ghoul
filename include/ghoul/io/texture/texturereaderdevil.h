@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -35,7 +35,7 @@ namespace ghoul::io {
 #ifdef GHOUL_USE_DEVIL
 
 /**
- * Loads the texture using the DevIL library. For a list of supported image formats, see 
+ * Loads the texture using the DevIL library. For a list of supported image formats, see
  * http://openil.sourceforge.net/features.php
  */
 class TextureReaderDevIL : public TextureReaderBase {

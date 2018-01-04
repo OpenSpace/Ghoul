@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -37,7 +37,7 @@ namespace ghoul::opengl::debug {
 
 /// A boolean value determining whether we want to enable or disable the debug output
 using DebugOutput = ghoul::Boolean;
-/// A boolean value determining whether we want to force synchronous output 
+/// A boolean value determining whether we want to force synchronous output
 using SynchronousOutput = ghoul::Boolean;
 /// A boolean value determining whether to enable individual or groups of messages
 using Enabled = ghoul::Boolean;
@@ -133,7 +133,7 @@ enum class Severity : std::underlying_type_t<GLenum> {
 void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous);
 
 /**
- * Enables or disables debug messages for the provided \p source, \p type, and 
+ * Enables or disables debug messages for the provided \p source, \p type, and
  * \p severity. Any of these values can be their respective \c Dontcare values if any
  * value should be modified.
  * \param source The Source of debug messages that should be modified
@@ -145,7 +145,7 @@ void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous);
 void setDebugMessageControl(Source source, Type type, Severity severity, Enabled enabled);
 
 /**
- * Enables or disables a set of debug messages for the provided \p source, \p type 
+ * Enables or disables a set of debug messages for the provided \p source, \p type
  * identified by a set of \p identifiers.
  * \param source The Source of debug messages that should be modified
  * \param type The Type of debug messages that should be modified

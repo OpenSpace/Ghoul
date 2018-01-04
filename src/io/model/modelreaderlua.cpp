@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -50,12 +50,12 @@ namespace {
 } // namespace
 
 namespace ghoul::io {
-    
+
 std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
                                                         const std::string& filename) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
+
     Dictionary dictionary;
     try {
         lua::loadDictionaryFromFile(filename, dictionary);
@@ -63,7 +63,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     catch (const ghoul::lua::LuaRuntimeException& e) {
         throw ModelReaderException(filename, e.what());
     }
-    
+
     if (!dictionary.hasKeyAndValue<Dictionary>(keyVertices)) {
         throw ModelReaderException(
             filename, format("Missing key or wrong format for '{}'", keyVertices)
@@ -88,27 +88,27 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     // get vertices
     Dictionary vertices = dictionary.value<Dictionary>(keyVertices);
     std::vector<GLfloat> varray;
-    auto vkeys = vertices.keys();
+    std::vector<std::string> vkeys = vertices.keys();
     // Does this need a std::stoi function for the sorting? Otherwise 10 might be sorted
     // before 2 ---abock
     std::sort(vkeys.begin(), vkeys.end());
-    for (const auto& key : vkeys) {
+    for (const std::string& key : vkeys) {
         double d = vertices.value<double>(key);
         varray.push_back(static_cast<GLfloat>(d));
     }
-    
+
     // get indices
     Dictionary indices = dictionary.value<Dictionary>(keyIndices);
     std::vector<GLint> iarray;
-    auto ikeys = vertices.keys();
+    std::vector<std::string> ikeys = vertices.keys();
     // Does this need a std::stoi function for the sorting? Otherwise 10 might be sorted
     // before 2 ---abock
     std::sort(ikeys.begin(), ikeys.end());
-    for (const auto& key : ikeys) {
+    for (const std::string& key : ikeys) {
         double d = indices.value<double>(key);
         iarray.push_back(static_cast<GLint>(d));
     }
-    
+
     if (varray.empty()) {
         throw ModelReaderException(filename, "No vertices specified");
     }
@@ -117,29 +117,30 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     }
 
     // Create the resulting VBO
-    auto vbo = std::make_unique<opengl::VertexBufferObject>();
+    std::unique_ptr<opengl::VertexBufferObject> vbo =
+        std::make_unique<opengl::VertexBufferObject>();
     vbo->initialize(varray, iarray);
-    
+
     Dictionary attribPointers = dictionary.value<Dictionary>(keyAttribPointers);
-    auto attribKeys = attribPointers.keys();
-    for (const auto& key : attribKeys) {
+    std::vector<std::string> attribKeys = attribPointers.keys();
+    for (const std::string& key : attribKeys) {
         ghoul::Dictionary d;
         if (attribPointers.getValue(key, d)) {
             double position = 0.0;
             attribPointers.getValue(keyPosition, position);
-            
+
             double size = 0.0;
             attribPointers.getValue(keySize, size);
-            
+
             double stride = 0.0;
             attribPointers.getValue(keyStride, stride);
-            
+
             double offset = 0.0;
             attribPointers.getValue(keyOffset, offset);
 
             bool normalized = false;
             attribPointers.getValue(keyNormalized, normalized);
-            
+
             GLenum type = GL_FLOAT;
             vbo->vertexAttribPointer(
                 static_cast<GLuint>(position),
@@ -151,7 +152,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
             );
         }
     }
-    
+
     static const std::map<std::string, GLenum> ModeMap = {
         {"GL_POINTS", GL_POINTS},
         {"GL_LINE_STRIP", GL_LINE_STRIP},
@@ -166,7 +167,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
         {"GL_TRIANGLES_ADJACENCY", GL_TRIANGLES_ADJACENCY},
         {"GL_PATCHES", GL_PATCHES}
     };
-    
+
     std::string modeString = dictionary.value<std::string>(keyMode);
     auto it = ModeMap.find(modeString);
     if (it == ModeMap.end()) {
@@ -179,6 +180,6 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     vbo->setRenderMode(mode);
     return vbo;
 }
-    
+
 } // namespace ghoul::io
 

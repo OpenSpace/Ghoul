@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,6 +25,9 @@
 
 #include <ghoul/misc/misc.h>
 
+#include <algorithm>
+#include <cctype>
+
 namespace ghoul {
 
 std::vector<std::string> tokenizeString(const std::string& input, char separator) {
@@ -44,7 +47,7 @@ std::vector<std::string> tokenizeString(const std::string& input, char separator
         return result;
     }
 }
-    
+
 std::string join(std::vector<std::string> input, const std::string& separator) {
     std::string result;
     for (std::string& s : input) {
@@ -52,6 +55,24 @@ std::string join(std::vector<std::string> input, const std::string& separator) {
     }
 
     return result.substr(0, result.size() - 1);
+}
+
+void trimWhitespace(std::string& value) {
+    // Trim from the left until the first non-whitespace character
+    value.erase(
+        value.begin(),
+        std::find_if(value.begin(), value.end(), [](int ch) { return !std::isspace(ch); })
+    );
+
+    // Trim from the right until the first non-whitespace character
+    value.erase(
+        std::find_if(
+            value.rbegin(),
+            value.rend(),
+            [](int ch) { return !std::isspace(ch); }
+        ).base(),
+        value.end()
+    );
 }
 
 } // namespace ghoul

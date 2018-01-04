@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -39,7 +39,7 @@
 #include <typeinfo>
 
 namespace ghoul {
-   
+
 /**
  * An object of type !any is able to represent any object. When accessing the stored value
  * using !any_cast%, the correct type must be requested or an exception is thrown.
@@ -52,7 +52,7 @@ public:
     /**
      * Constructor creating an !any object from the \p value.
      * \param value The value that should be stored in the any object
-     */ 
+     */
     template<typename ValueType>
     any(const ValueType& value);
 
@@ -79,7 +79,7 @@ public:
         typename std::enable_if_t<!std::is_same<any&, ValueType>::value>* = nullptr,
         typename std::enable_if_t<!std::is_const<ValueType>::value>* = nullptr);
 
-    /// Default destructor 
+    /// Default destructor
     ~any() noexcept;
 
     /**
@@ -200,7 +200,7 @@ public:
  */
 class bad_any_cast : public std::bad_cast {
 public:
-    const char* what() const noexcept override; 
+    const char* what() const noexcept override;
 };
 
 /**

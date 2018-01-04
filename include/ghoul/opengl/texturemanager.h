@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -51,7 +51,7 @@ public:
     struct TextureManagerError : public RuntimeError {
         explicit TextureManagerError(std::string message);
     };
-    
+
     /**
      * This method returns a reference to the initialized TextureManager.
      * \return An initialized reference to the singleton manager
@@ -103,7 +103,7 @@ public:
     std::unique_ptr<Texture> unregisterTexture(const std::string& name);
 
     /**
-     * This method will unregister the Texture that was registered under a name whose hash 
+     * This method will unregister the Texture that was registered under a name whose hash
      * value is equal to the passed \p hashName. The Texture will be returned to the
      * caller. If the caller ignores the return value, the Texture will be deleted.
      * \param hashedName The hash value which is used to refer to a previously stored
@@ -114,8 +114,8 @@ public:
     std::unique_ptr<Texture> unregisterTexture(unsigned int hashedName);
 
     /**
-     * This method returns the hash value for a given string. The hash function is 
-     * implementation detail, but it is guaranteed to be static in an application run and 
+     * This method returns the hash value for a given string. The hash function is
+     * implementation detail, but it is guaranteed to be static in an application run and
      * it will always produce reliable, consistent results.
      * \param name The name which should be converted into a hash value
      * \return The hash value for the passed name
@@ -125,7 +125,7 @@ public:
 private:
     /// The singleton member
     static TextureManager* _manager;
-    
+
     /// Map containing all the registered Texture%s
     std::map<unsigned int, std::unique_ptr<Texture>> _textures;
 };

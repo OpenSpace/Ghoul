@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -78,27 +78,27 @@ std::vector<std::string> stackTrace() {
 
 #if defined __unix__ || defined __APPLE__
     const int MaxCallStackDepth = 128;
-    
+
     int callstack[MaxCallStackDepth] = {};
-    
+
     // Get the full stacktrace
     int nFrames = backtrace(reinterpret_cast<void**>(callstack), MaxCallStackDepth);
-    
+
     // Unmangle the stacktrace to get it in a human-readable format
     char** strs = backtrace_symbols(reinterpret_cast<void**>(callstack), nFrames);
-    
+
     stackFrames.reserve(nFrames);
-    
+
     for (int i = 0; i < nFrames; ++i) {
         const int MaxFunctionSymbolLength = 1024;
         const int MaxModuleNameLength = 1024;
         const int MaxAddressLength = 48;
-        
+
         std::vector<char> functionSymbol(MaxFunctionSymbolLength);
         std::vector<char> moduleName(MaxModuleNameLength);
         std::vector<char> addr(MaxAddressLength);
         int  offset = 0;
-        
+
         //
         // Typically this is how the backtrace looks like:
         //
@@ -114,7 +114,7 @@ std::vector<std::string> stackTrace() {
         // 9   <app/lib-name>     0x0000000100001018 main + 56
         // 10  libdyld.dylib      0x00007fff91b647e1 start + 0
         //
-        
+
         // split the string, take out chunks out of stack trace
         // we are primarily interested in module, function and address
         sscanf(
@@ -125,7 +125,7 @@ std::vector<std::string> stackTrace() {
             functionSymbol.data(),
             &offset
         );
-        
+
         int isValidCppName = 0;
         //  if this is a C++ library, symbol will be demangled
         //  on success function returns 0
@@ -136,7 +136,7 @@ std::vector<std::string> stackTrace() {
             nullptr,
             &isValidCppName
         );
-        
+
         const int MaxStackFrameSize = 4096;
         char stackFrame[MaxStackFrameSize] = {};
         if (isValidCppName == 0) {
@@ -163,11 +163,11 @@ std::vector<std::string> stackTrace() {
                 offset
             );
         }
-        
+
         if (functionName) {
             free(functionName);
         }
-        
+
         stackFrames.push_back(std::string(stackFrame));
     }
     free(strs);
@@ -187,7 +187,7 @@ std::vector<std::string> stackTrace() {
 
     sw.ShowCallstack();
 #endif
-    
+
     return stackFrames;
 }
 

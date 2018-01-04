@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -28,6 +28,7 @@
 
 #include <ghoul/glm.h>
 #include <ghoul/font/font.h>
+#include <ghoul/opengl/uniformcache.h>
 
 #include <memory>
 
@@ -54,7 +55,7 @@ public:
         glm::vec2 boundingBox;
         int numberOfLines;
     };
-    
+
     /**
      * This constructor requires a custom ProgramObject that handles the rendering of any
      * passed text. In addition the initial size of the rendering window has to be passed.
@@ -80,19 +81,29 @@ public:
      */
     FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         glm::vec2 framebufferSize);
-    
+
     /// Default destructor that cleans used OpenGL names and the ProgramObject
     ~FontRenderer();
 
     /**
-    * Creates a new instnace of the FontRenderer with a default ProgramObject.
+    * Creates a new instance of the FontRenderer with a default ProgramObject.
     * This method requires the FileSystem to be initialized, as temporary
-    * files containing the source code of the ShaderObjects will be created. 
+    * files containing the source code of the ShaderObjects will be created.
     * This method requires a valid OpenGL state.
     * \return a raw pointer to the new default instance
     */
     static std::unique_ptr<FontRenderer> createDefault();
-    
+
+    /**
+    * Creates a new instance of the FontRenderer with a perspective subject
+    * ProgramObject.
+    * This method requires the FileSystem to be initialized, as temporary
+    * files containing the source code of the ShaderObjects will be created.
+    * This method requires a valid OpenGL state.
+    * \return a raw pointer to the new default instance
+    */
+    static std::unique_ptr<FontRenderer> createProjectionSubjectText();
+
     /**
      * Initializes the singleton variant of the FontRenderer with the default
      * ProgramObject. This method requires the FileSystem to be initialized, as temporary
@@ -104,7 +115,7 @@ public:
      * otherwise
      */
     static bool initialize();
-    
+
     /**
      * Deinitializes the singleton variant of the FontRenderer and cleans all used OpenGL
      * objects. Therefore, it requires a valid OpenGL state.
@@ -112,7 +123,7 @@ public:
      * otherwise
      */
     static bool deinitialize();
-    
+
     /**
      * Checks whether the singleton variant of the FontRenderer has already been
      * initialized.
@@ -120,7 +131,7 @@ public:
      * initialized; <code>false</code> otherwise
      */
     static bool isInitialized();
-    
+
     /**
      * Returns the singleton FontRenderer. This method triggers and assertion if the
      * FontRenderer was not initialized before usage.
@@ -149,14 +160,15 @@ public:
      * number of lines that were printed
      */
     BoundingBoxInformation boundingBox(Font& font, const char* format, ...) const;
-    
+
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
      * coordinates <code>pos</code> using the Font <code>font</code> in the base color
      * <code>color</code> and the outline color <code>outlineColor</code>. If the Font
      * does not have an outline, the <code>outlineColor</code> is ignored.
      * \param font The Font that is used to render the provided text
-     * \param pos The screen-space position (in pixel coordinates) that is used to render
+     * \param pos The screen-space position (in pixel coordinates) for 2D text rendering,
+     * or world-space coordinate for projection subject rendering, that is used to render
      * the text
      * \param color The base color that is used to render the text
      * \param outlineColor The outline color that is used to render the text if the Font
@@ -171,6 +183,40 @@ public:
      */
     BoundingBoxInformation render(Font& font, glm::vec2 pos, glm::vec4 color,
         glm::vec4 outlineColor, const char* format, ...) const;
+
+    /**
+    * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
+    * coordinates <code>pos</code> using the Font <code>font</code> in the base color
+    * <code>color</code> and the outline color <code>outlineColor</code>. If the Font
+    * does not have an outline, the <code>outlineColor</code> is ignored.
+    * \param font The Font that is used to render the provided text
+    * \param pos The world-space coordinate for projection subject rendering that
+    * is used to render the text
+    * \param color The base color that is used to render the text
+    * \param outlineColor The outline color that is used to render the text if the Font
+    * has an outline
+    * \param textScale Scale applied on the rendered text.
+    * \param textMinSize Minimal size (in pixels) for a text to be rendered.
+    * \param textMaxSize Maximal size (in pixels) for a text to be rendered.
+    * \param mvpMatrix ModelViewProjection matrix transformation.
+    * \param orthonormalRight Right vector from the orthonormal basis defining the
+    * text's plane.
+    * \param orthonormalUp Up vector from the orthonormal basis defining the
+    * text's plane.
+    * \param format The format text that is rendered to the screen. This text can contain
+    * symbolic constants (the same as in printf) to refer to later variable arguments,
+    * which are substituted. The <code>text</code> can also contain '\\n' to have a
+    * linebreak, which is of the correct length with regard to the selected font. This
+    * parameter cannot be a <code>nullptr</code>.
+    * \return A tuple containing the bounding box of the text that was printed and the
+    * number of lines that were printed
+    */
+    BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
+        glm::vec4 outlineColor, const float textScale, const int textMinSize,
+        const int textMaxSize, const glm::dmat4& mvpMatrix,
+        const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
+        const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
+        const int renderType, char* format, ...) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -193,6 +239,38 @@ public:
         const char* format, ...) const;
 
     /**
+    * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
+    * coordinates <code>pos</code> using the Font <code>font</code> in the base color
+    * <code>color</code>. In case the Font has an outline, the outline is rendered in
+    * black with the same transparency as the provided <code>color</code>.
+    * \param font The Font that is used to render the provided text
+    * \param pos The world-space coordinate for projection subject rendering,
+    * that is used to render the text
+    * \param color The base color that is used to render the text
+    * \param textScale Scale applied on the rendered text.
+    * \param textMinSize Minimal size (in pixels) for a text to be rendered.
+    * \param textMaxSize Maximal size (in pixels) for a text to be rendered.
+    * \param mvpMatrix ModelViewProjection matrix transformation.
+    * \param orthonormalRight Right vector from the orthonormal basis defining the
+    * text's plane.
+    * \param orthonormalUp Up vector from the orthonormal basis defining the
+    * text's plane.
+    * \param format The format text that is rendered to the screen. This text can contain
+    * symbolic constants (the same as in printf) to refer to later variable arguments,
+    * which are substituted. The <code>text</code> can also contain '\\n' to have a
+    * linebreak, which is of the correct length with regard to the selected font. This
+    * parameter cannot be a <code>nullptr</code>.
+    * \return A tuple containing the bounding box of the text that was printed and the
+    * number of lines that were printed
+    */
+    BoundingBoxInformation render(Font& font, glm::vec3 pos, glm::vec4 color,
+        const float textScale, const int textMinSize, const int textMaxSize,
+        const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
+        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
+        const glm::dvec3& cameraLookUp, const int renderType,
+        const char* format, ...) const;
+
+    /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
      * coordinates <code>pos</code> using the Font <code>font</code> in white color. In
      * case the Font has an outline, the outline is rendered in black.
@@ -209,32 +287,72 @@ public:
      */
     BoundingBoxInformation render(Font& font, glm::vec2 pos,
         const char* format, ...) const;
-    
+
+    /**
+    * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
+    * coordinates <code>pos</code> using the Font <code>font</code> in white color. In
+    * case the Font has an outline, the outline is rendered in black.
+    * \param font The Font that is used to render the provided text
+    * \param pos The world-space coordinate for projection subject rendering that is
+    * used to render the text
+    * \param textScale Scale applied on the rendered text.
+    * \param textMinSize Minimal size (in pixels) for a text to be rendered.
+    * \param textMaxSize Maximal size (in pixels) for a text to be rendered.
+    * \param mvpMatrix ModelViewProjection matrix transformation.
+    * \param orthonormalRight Right vector from the orthonormal basis defining the
+    * text's plane.
+    * \param orthonormalUp Up vector from the orthonormal basis defining the
+    * text's plane.
+    * \param format The format text that is rendered to the screen. This text can contain
+    * symbolic constants (the same as in printf) to refer to later variable arguments,
+    * which are substituted. The <code>text</code> can also contain '\\n' to have a
+    * linebreak, which is of the correct length with regard to the selected font. This
+    * parameter cannot be a <code>nullptr</code>.
+    * \return A tuple containing the bounding box of the text that was printed and the
+    * number of lines that were printed
+    */
+    BoundingBoxInformation render(Font& font, glm::vec3 pos, const float textScale,
+        const int textMinSize, const int textMaxSize, const glm::dmat4& mvpMatrix,
+        const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
+        const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
+        const int renderType, const char* format, ...) const;
+
 private:
     /// Private constructor that is used in the #initialize static method
     FontRenderer();
-    
+
     BoundingBoxInformation internalRender(Font& font, glm::vec2 pos, glm::vec4 color,
         glm::vec4 outlineColor, const char* buffer) const;
-    
+
+    BoundingBoxInformation internalProjectionRender(Font& font, glm::vec3 pos,
+        glm::vec4 color, glm::vec4 outlineColor, const char* buffer,
+        const float textScale, const int textMinSize, const int textMaxSize,
+        const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
+        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
+        const glm::dvec3& cameraLookUp, const int renderType) const;
+
+
     /// The singleton instance of the default FontRenderer
     static std::unique_ptr<FontRenderer> _defaultRenderer;
-    
+
     /// The framebuffer size that is used to compute the transformation from pixel
     /// coordinates to normalized device coordinates
     glm::vec2 _framebufferSize;
-    
+
     /// The ProgramObject that is used to render the text
     std::unique_ptr<opengl::ProgramObject> _program;
-    
+
     /// The vertex array object holding the other OpenGL objects
     unsigned int _vao;
-    
+
     /// The vertex buffer object that contains the vertices for the text to be rendered
     unsigned int _vbo;
-    
+
     /// The index buffer object that allows reusing vertices to form one quad per glyph
     unsigned int _ibo;
+
+    UniformCache(baseColor, outlineColor, texture, hasOutline, projection, mvpMatrix
+        /*textMinSize*/) _uniformCache;
 };
 
 /**
@@ -257,6 +375,25 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos, Args... ar
 
 /**
  * This helper method prints the passed arguments using the Font::render function of the
+ * provided fontrenderer.
+ * \oaram fontRenderer The FontRenderer that is to be used for the rendering of the font
+ * \param font The Font that is used to render the provided text. If this argument is
+ * <code>nullptr</code>, an assertion is thrown
+ * \param pos The screen-space position (in pixel coordinates) that is used to render
+ * the text
+ * \param args The variable arguments that are the format string (the same as in printf)
+ * and optional arguments afterwards.
+ * \return The bounding box of the text that was printed
+ */
+template <typename... Args>
+glm::vec2 RenderFont(ghoul::fontrendering::FontRenderer& renderer,
+    ghoul::fontrendering::Font& font, glm::vec2 pos, Args... args)
+{
+    return (renderer.render(font, pos, args...)).boundingBox;
+}
+
+/**
+ * This helper method prints the passed arguments using the Font::render function of the
  * default font and moves the pen position downwards after the call. It is equivalent to
  * calling defaultRenderer::render with the same arguments and then subtracting the
  * returned height from the pen position and discarding the second return value
@@ -270,9 +407,37 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos, Args... ar
  */
 template <typename... Args>
 glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args) {
-    auto res =
+    ghoul::fontrendering::FontRenderer::BoundingBoxInformation res =
         ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...);
 
+    pos.y -= res.numberOfLines * font.height();
+    return res.boundingBox;
+}
+
+/**
+ * This helper method prints the passed arguments using the Font::render function of the
+ * provided fontrenderer and moves the pen position downwards after the call. It is
+ * equivalent to calling the renderer's render with the same arguments and then
+ * subtracting the returned height from the pen position and discarding the second return
+ * value
+ * \oaram fontRenderer The FontRenderer that is to be used for the rendering of the font
+ * \param font The Font that is used to render the provided text. If this argument is
+ * <code>nullptr</code>, an assertion is thrown
+ * \param pos The screen-space position (in pixel coordinates) that is used to render
+ * the text
+ * \param args The variable arguments that are the format string (the same as in printf)
+ * and optional arguments afterwards.
+ * \return The bounding box of the text that was printed
+ */
+template <typename... Args>
+glm::vec2 RenderFontCr(ghoul::fontrendering::FontRenderer& renderer,
+    ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args)
+{
+    ghoul::fontrendering::FontRenderer::BoundingBoxInformation res = renderer.render(
+        font,
+        pos,
+        args...
+    );
     pos.y -= res.numberOfLines * font.height();
     return res.boundingBox;
 }
@@ -292,9 +457,36 @@ glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos, Args...
  */
 template <typename... Args>
 glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args) {
-    auto res =
+    ghoul::fontrendering::FontRenderer::BoundingBoxInformation res =
         ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...);
 
+    pos.y += res.numberOfLines * font.height();
+    return res.boundingBox;
+}
+
+/**
+ * This helper method prints the passed arguments using the Font::render function of the
+ * provided fontrenderer and moves the pen position upwards after the call. It is
+ * equivalent to calling the renderer's render with the same arguments and then adding
+ * the returned height to the pen position and discarding the second return value
+ * \oaram fontRenderer The FontRenderer that is to be used for the rendering of the font
+ * \param font The Font that is used to render the provided text. If this argument is
+ * <code>nullptr</code>, an assertion is thrown
+ * \param pos The screen-space position (in pixel coordinates) that is used to render
+ * the text
+ * \param args The variable arguments that are the format string (the same as in printf)
+ * and optional arguments afterwards.
+ * \return The bounding box of the text that was printed
+ */
+template <typename... Args>
+glm::vec2 RenderFontCrUp(ghoul::fontrendering::FontRenderer& renderer,
+    ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args)
+{
+    ghoul::fontrendering::FontRenderer::BoundingBoxInformation res = renderer.render(
+        font,
+        pos,
+        args...
+    );
     pos.y += res.numberOfLines * font.height();
     return res.boundingBox;
 }

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -58,39 +58,39 @@ public:
     struct FontException : public RuntimeError {
         explicit FontException(const std::string& msg);
     };
-    
+
     /// The exception that gets thrown if an error occurs in the Font handling
     struct GlyphException : public FontException {
         explicit GlyphException(std::string name, float size, wchar_t character);
-        
+
         /// The name of the font for which the glyph was missing
         std::string fontName;
-        
+
         /// The font size of the font for which the glyph was missing
         float fontSize;
-        
+
         /// The glyph that was missing from the font
         wchar_t glyph;
     };
-    
+
     /// The exception that gets thrown when a FreeType-specific error occurs
     struct FreeTypeException : public FontException {
         explicit FreeTypeException(std::string name, float size, int code,
             std::string message);
-        
+
         /// The name of the font for which the FreeType error occurred
         std::string fontName;
-        
+
         /// The size of the font for which the FreeType error occurred
         float fontSize;
-        
+
         /// The FreeType error code that occurred
         int errorCode;
-        
+
         /// The FreeType error message that occurred
         std::string errorMessage;
     };
-    
+
     /**
      * This class contains the metrics and the texture locations in the TextureAtlas for a
      * single glyph for a specific font. Each glyph supplies two pairs of coordinates:
@@ -118,15 +118,15 @@ public:
               glm::vec2 outlineTexCoordTopLeft = glm::vec2(0.f),
               glm::vec2 outlineTexCoordBottomRight = glm::vec2(0.f)
         );
-        
+
         bool operator==(const Glyph& rhs) const;
-        
+
         /**
          * Returns the horizontal extent of the glyph
          * \return The horizontal extent of the glyph
          */
         int width() const;
-        
+
         /**
          * Returns the vertical extent of the glyph
          * \return The vertical extent of the glyph
@@ -138,7 +138,7 @@ public:
          * \return the left-side bearing of the glyph
          */
         float leftBearing() const;
-        
+
         /**
          * Returns the top-side bearing of the glyph
          * \return The top-side bearing of the glyph
@@ -150,13 +150,13 @@ public:
          * \return The horizontal advance for this glyph
          */
         float horizontalAdvance() const;
-        
+
         /**
          * Returns the vertical advance for this glyph
          * \return The vertical advance for this glyph
          */
         float verticalAdvance() const;
-        
+
         /**
          * Returns the kerning value between this glyph and \p character.
          * \param character The following character for which the kerning value should be
@@ -164,35 +164,35 @@ public:
          * \return The kerning value between this glyph and \p character
          */
         float kerning(wchar_t character) const;
-        
+
         /**
          * Returns the texture coordinate that points to the top left corner of the base
          * representation for this Glyph in the TextureAtlas
          * \return The top left base texture coordinate
          */
         const glm::vec2& topLeft() const;
-        
+
         /**
          * Returns the texture coordinate that points to the bottom right corner of the
          * base representation for this Glyph in the TextureAtlas
          * \return The bottom right base texture coordinates
          */
         const glm::vec2& bottomRight() const;
-        
+
         /**
          * Returns the texture coordinate that points to the top left corner of the
          * outline representation for this Glyph in the TextureAtlas
          * \return The top left outline texture coordinate
          */
         const glm::vec2& outlineTopLeft() const;
-        
+
         /**
          * Returns the texture coordinate that points to the bottom right corner of the
          * outline representation for this Glyph in the TextureAtlas
          * \return The bottom right outline texture coordinate
          */
         const glm::vec2& outlineBottomRight() const;
-        
+
     private:
         /// The wide character that this glyph represents
         wchar_t _charcode;
@@ -212,11 +212,11 @@ public:
         /// This is the distance used when the glyph is drawn as part
         /// of horizontal text
         float _horizontalAdvance;
-        
+
         /// This is the distance used when the glyph is drawn as part
         /// of vertical text
         float _verticalAdvance;
-        
+
         /// Normalized texture coordinate of top-left corner
         glm::vec2 _topLeft;
         /// Normalized texture coordinate of bottom-right corner
@@ -262,26 +262,26 @@ public:
      * \return The name of the Font
      */
     std::string name() const;
-    
+
     /**
      * Returns the font size of this Font
      * \return The font size of this Font
      */
     float pointSize() const;
-    
+
     /**
      * Returns the line seperator for this Font. This is the vertical length that
      * separates two consecutive lines.
      * \return The vertical line separation
      */
     float height() const;
-    
+
     /**
      * Returns whether this Font has an outline or not
      * \return <code>true</code> if this Font has an outline, <code>false</code> otherwise
      */
     bool hasOutline() const;
-    
+
     /**
      * Computes and retures the bounding box for the passed string with the settings of
      * this Font. The value returned is in pixel values and provides the width and the
@@ -295,7 +295,7 @@ public:
      * \pre \p text must not be empty
      */
     glm::vec2 boundingBox(const char* text, ...);
-    
+
     /**
      * Returns the Glyph that representes the passed \p character. The first call to this
      * function for each character creates and caches the Glyph before returning it.
@@ -315,7 +315,7 @@ public:
      * \throw GlyphException If there was an error loading the glyph
      */
     void loadGlyphs(const std::vector<wchar_t>& characters);
-    
+
     /**
      * Returns the TextureAtlas that stores all of the Glyphs for this Font
      * \return The TextureAtlas that stores all of the Glyphs for this Font
@@ -325,32 +325,32 @@ public:
 private:
     /// Generates the Kerning values for all Glyph pairs that have sofar been loaded
     void generateKerning();
-    
+
     /// Computes the left bearing for a glyph with a higher accuracy
     float computeLeftBearing(wchar_t charcode) const;
-    
+
     /// A list of all loaded Glyphs
     std::vector<Glyph> _glyphs;
-    
+
     /// The TextureAtlas backend storage for the loaded Glyphs
     opengl::TextureAtlas& _atlas;
-    
+
     /// The file name of this Font
     std::string _name;
-    
+
     /// The font size in pt
     float _pointSize;
-    
+
     /// The vertical distance between two consecutive lines
     float _height;
-    
+
     /// Whether this Font has an outline or not
     Outline _hasOutline;
-    
+
     /// The thickness of the outline
     float _outlineThickness;
 };
-    
+
 } // namespace ghoul::fontrendering
 
 #endif // __GHOUL___FONT___H__

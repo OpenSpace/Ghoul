@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -36,10 +36,10 @@ namespace ghoul::opengl::bufferbinding {
         ShaderStorage,
         Uniform
     };
-} // namespace ghoul::opengl::bufferbinding 
+} // namespace ghoul::opengl::bufferbinding
 
 namespace ghoul::opengl {
-    
+
 /**
  * This class manages buffer bindings for ATOMIC_COUNTER_BUFFER,
  * GL_SHADER_STORAGE_BUFFER, GL_TRANSFORM_FEEDBACK_BUFFER and GL_UNIFORM_BUFFER.
@@ -120,7 +120,7 @@ private:
 
     /// The number in <code>[0, maxBindings]</code> referring to this BufferBinding
     GLint _number = -1;
-    
+
     /// <code>true</code> if the list of busy bindings and the maximum number of bindings
     /// have been initialized
     static bool _initialized;

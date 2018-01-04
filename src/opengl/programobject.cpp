@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -74,7 +74,7 @@ namespace ghoul::opengl {
 ProgramObject::ProgramObjectError::ProgramObjectError(std::string msg)
     : RuntimeError(std::move(msg), "ProgramObject")
 {}
-    
+
 ProgramObject::ProgramObjectLinkingError::ProgramObjectLinkingError(std::string msg,
                                                                          std::string name)
     : ProgramObjectError(
@@ -85,7 +85,7 @@ ProgramObject::ProgramObjectLinkingError::ProgramObjectLinkingError(std::string 
     , linkerError(std::move(msg))
     , programName(std::move(name))
 {}
-    
+
 ProgramObject::ProgramObject()
     : _id(0)
     , _programName("")
@@ -129,7 +129,7 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
     if (_id == 0) {
         throw ProgramObjectError("glCreateProgram returned 0");
     }
-    
+
     if (glbinding::Binding::ObjectLabel.isResolved()) {
         glObjectLabel(
             GL_PROGRAM,
@@ -139,8 +139,8 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
         );
     }
 
-    for (const auto& obj : cpy._shaderObjects) {
-        auto shaderCopy = std::make_shared<ShaderObject>(*obj);
+    for (const std::shared_ptr<ShaderObject>& obj : cpy._shaderObjects) {
+        std::shared_ptr<ShaderObject> shaderCopy = std::make_shared<ShaderObject>(*obj);
         glAttachShader(_id, *shaderCopy);
         _shaderObjects.push_back(shaderCopy);
     }
@@ -188,8 +188,9 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
             );
         }
 
-        for (const auto& obj : rhs._shaderObjects) {
-            auto shaderCopy = std::make_shared<ShaderObject>(*obj);
+        for (const std::shared_ptr<ShaderObject>& obj : rhs._shaderObjects) {
+            std::shared_ptr<ShaderObject> shaderCopy =
+                std::make_shared<ShaderObject>(*obj);
             glAttachShader(_id, *shaderCopy);
             _shaderObjects.push_back(shaderCopy);
         }
@@ -318,7 +319,7 @@ void ProgramObject::rebuildFromFile() {
     // The copy constructor of ShaderObject (called by the copy constructor of
     // ProgramObject) will take care of the reloading from file
     ProgramObject p(*this);
-    
+
     p.compileShaderObjects();
     p.linkProgramObject();
 
@@ -345,30 +346,24 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                                     Dictionary dictionary)
 {
     ghoul_assert(!vpath.empty(), "VertexShaderPath must not be empty");
+    ghoul_assert(FileSys.fileExists(vpath), "VertexShaderPath file must exist");
     ghoul_assert(!fpath.empty(), "FragmentShaderPath must not be empty");
-    
-    if (!FileSys.fileExists(vpath)) {
-        throw FileNotFoundError(vpath, "ProgramObject");
-    }
+    ghoul_assert(FileSys.fileExists(fpath), "FragmentShaderPath file must exist");
 
-    if (!FileSys.fileExists(fpath)) {
-        throw FileNotFoundError(fpath, "ProgramObject");
-    }
-    
     std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Vertex,
-        absPath(vpath),
+        vpath,
         name + " Vertex",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Fragment,
-        absPath(fpath),
+        fpath,
         name + " Fragment",
         dictionary
     ));
-    
+
     program->compileShaderObjects();
     program->linkProgramObject();
     return program;
@@ -381,41 +376,32 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                                     Dictionary dictionary)
 {
     ghoul_assert(!vpath.empty(), "VertexShaderPath must not be empty");
+    ghoul_assert(FileSys.fileExists(vpath), "VertexShaderPath file must exist");
     ghoul_assert(!fpath.empty(), "FragmentShaderPath must not be empty");
+    ghoul_assert(FileSys.fileExists(fpath), "FragmentShaderPath file must exist");
     ghoul_assert(!gpath.empty(), "GeometryShaderPath must not be empty");
+    ghoul_assert(FileSys.fileExists(gpath), "GeometryShaderPath file must exist");
 
-    if (!FileSys.fileExists(vpath)) {
-        throw FileNotFoundError(vpath, "ProgramObject");
-    }
-    
-    if (!FileSys.fileExists(fpath)) {
-        throw FileNotFoundError(fpath, "ProgramObject");
-    }
-    
-    if (!FileSys.fileExists(gpath)) {
-        throw FileNotFoundError(gpath, "ProgramObject");
-    }
-    
     std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Vertex,
-        absPath(vpath),
+        vpath,
         name + " Vertex",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Geometry,
-        absPath(gpath),
+        gpath,
         name + " Geometry",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Fragment,
-        absPath(fpath),
+        fpath,
         name + " Fragment",
         dictionary
     ));
-    
+
     program->compileShaderObjects();
     program->linkProgramObject();
     return program;
@@ -430,63 +416,54 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                                     Dictionary dictionary)
 {
     ghoul_assert(!vpath.empty(), "VertexShaderPath must not be empty");
+    ghoul_assert(FileSys.fileExists(vpath), "VertexShaderPath file must exist");
     ghoul_assert(!fpath.empty(), "FragmentShaderPath must not be empty");
+    ghoul_assert(FileSys.fileExists(fpath), "FragmentShaderPath file must exist");
     ghoul_assert(!gpath.empty(), "GeometryShaderPath must not be empty");
+    ghoul_assert(FileSys.fileExists(gpath), "GeometryShaderPath file must exist");
     ghoul_assert(!tepath.empty(), "Tessellation evaluation shader must not be empty");
+    ghoul_assert(
+        FileSys.fileExists(tepath),
+        "Tessellation evaluation shader file must exist"
+    );
     ghoul_assert(!tcpath.empty(), "Tessellation control shader must not be empty");
-    
-    if (!FileSys.fileExists(vpath)) {
-        throw FileNotFoundError(vpath, "ProgramObject");
-    }
-    
-    if (!FileSys.fileExists(fpath)) {
-        throw FileNotFoundError(fpath, "ProgramObject");
-    }
-    
-    if (!FileSys.fileExists(gpath)) {
-        throw FileNotFoundError(gpath, "ProgramObject");
-    }
-    
-    if (!FileSys.fileExists(tepath)) {
-        throw FileNotFoundError(tepath, "ProgramObject");
-    }
+    ghoul_assert(
+        FileSys.fileExists(tcpath),
+        "Tessellation control shader file must exist"
+    );
 
-    if (!FileSys.fileExists(tcpath)) {
-        throw FileNotFoundError(tcpath, "ProgramObject");
-    }
-    
     std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Vertex,
-        absPath(vpath),
+        vpath,
         name + " Vertex",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Geometry,
-        absPath(gpath),
+        gpath,
         name + " Geometry",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::TesselationEvaluation,
-        absPath(tepath),
+        tepath,
         name + " Tessellation Evaluation",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::TesselationControl,
-        absPath(tcpath),
+        tcpath,
         name + " Tessellation Control",
         dictionary
     ));
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Fragment,
-        absPath(fpath),
+        fpath,
         name + " Fragment",
         dictionary
     ));
-    
+
     program->compileShaderObjects();
     program->linkProgramObject();
     return program;
@@ -502,7 +479,7 @@ bool ProgramObject::ignoreUniformLocationError() const {
 
 GLint ProgramObject::uniformLocation(const std::string& name) const {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = glGetUniformLocation(_id, name.c_str());
     if (!_ignoreUniformLocationError && location == -1) {
         LWARNING("Failed to locate uniform location for: " + name);
@@ -512,7 +489,7 @@ GLint ProgramObject::uniformLocation(const std::string& name) const {
 
 bool ProgramObject::setUniform(const std::string& name, bool value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-        
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -523,7 +500,7 @@ bool ProgramObject::setUniform(const std::string& name, bool value) {
 
 bool ProgramObject::setUniform(const std::string& name, bool v1, bool v2) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-        
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -534,7 +511,7 @@ bool ProgramObject::setUniform(const std::string& name, bool v1, bool v2) {
 
 bool ProgramObject::setUniform(const std::string& name, bool v1, bool v2, bool v3) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-        
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -547,7 +524,7 @@ bool ProgramObject::setUniform(const std::string& name, bool v1, bool v2, bool v
                                bool v4)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -558,7 +535,7 @@ bool ProgramObject::setUniform(const std::string& name, bool v1, bool v2, bool v
 
 bool ProgramObject::setUniform(const std::string& name, const glm::bvec2& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -569,7 +546,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::bvec2& value)
 
 bool ProgramObject::setUniform(const std::string& name, const glm::bvec3& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -580,7 +557,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::bvec3& value)
 
 bool ProgramObject::setUniform(const std::string& name, const glm::bvec4& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -591,7 +568,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::bvec4& value)
 
 bool ProgramObject::setUniform(const std::string& name, const bool* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -602,7 +579,7 @@ bool ProgramObject::setUniform(const std::string& name, const bool* values, int 
 
 bool ProgramObject::setUniform(const std::string& name, glm::bvec2* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -613,7 +590,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::bvec2* values, int 
 
 bool ProgramObject::setUniform(const std::string& name, glm::bvec3* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -624,7 +601,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::bvec3* values, int 
 
 bool ProgramObject::setUniform(const std::string& name, glm::bvec4* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -635,7 +612,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::bvec4* values, int 
 
 bool ProgramObject::setUniform(const std::string& name, GLuint value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -646,7 +623,7 @@ bool ProgramObject::setUniform(const std::string& name, GLuint value) {
 
 bool ProgramObject::setUniform(const std::string& name, GLuint v1, GLuint v2) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -657,7 +634,7 @@ bool ProgramObject::setUniform(const std::string& name, GLuint v1, GLuint v2) {
 
 bool ProgramObject::setUniform(const std::string& name, GLuint v1, GLuint v2, GLuint v3) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -670,7 +647,7 @@ bool ProgramObject::setUniform(const std::string& name, GLuint v1, GLuint v2, GL
                                GLuint v4)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -681,7 +658,7 @@ bool ProgramObject::setUniform(const std::string& name, GLuint v1, GLuint v2, GL
 
 bool ProgramObject::setUniform(const std::string& name, const glm::uvec2& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -692,7 +669,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::uvec2& value)
 
 bool ProgramObject::setUniform(const std::string& name, const glm::uvec3& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -703,7 +680,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::uvec3& value)
 
 bool ProgramObject::setUniform(const std::string& name, const glm::uvec4& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -714,7 +691,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::uvec4& value)
 
 bool ProgramObject::setUniform(const std::string& name, const GLuint* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -725,7 +702,7 @@ bool ProgramObject::setUniform(const std::string& name, const GLuint* values, in
 
 bool ProgramObject::setUniform(const std::string& name, glm::uvec2* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -736,7 +713,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::uvec2* values, int 
 
 bool ProgramObject::setUniform(const std::string& name, glm::uvec3* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -747,7 +724,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::uvec3* values, int 
 
 bool ProgramObject::setUniform(const std::string& name, glm::uvec4* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -758,7 +735,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::uvec4* values, int 
 
 bool ProgramObject::setUniform(const std::string& name, GLint value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -769,7 +746,7 @@ bool ProgramObject::setUniform(const std::string& name, GLint value) {
 
 bool ProgramObject::setUniform(const std::string& name, GLint v1, GLint v2) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -780,7 +757,7 @@ bool ProgramObject::setUniform(const std::string& name, GLint v1, GLint v2) {
 
 bool ProgramObject::setUniform(const std::string& name, GLint v1, GLint v2, GLint v3) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -793,7 +770,7 @@ bool ProgramObject::setUniform(const std::string& name, GLint v1, GLint v2, GLin
                                GLint v4)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -804,7 +781,7 @@ bool ProgramObject::setUniform(const std::string& name, GLint v1, GLint v2, GLin
 
 bool ProgramObject::setUniform(const std::string& name, const glm::ivec2& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -815,7 +792,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::ivec2& value)
 
 bool ProgramObject::setUniform(const std::string& name, const glm::ivec3& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -826,7 +803,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::ivec3& value)
 
 bool ProgramObject::setUniform(const std::string& name, const glm::ivec4& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -837,7 +814,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::ivec4& value)
 
 bool ProgramObject::setUniform(const std::string& name, const GLint* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -848,7 +825,7 @@ bool ProgramObject::setUniform(const std::string& name, const GLint* values, int
 
 bool ProgramObject::setUniform(const std::string& name, glm::ivec2* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -859,7 +836,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::ivec2* values, int 
 
 bool ProgramObject::setUniform(const std::string& name, glm::ivec3* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -870,7 +847,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::ivec3* values, int 
 
 bool ProgramObject::setUniform(const std::string& name, glm::ivec4* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -881,7 +858,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::ivec4* values, int 
 
 bool ProgramObject::setUniform(const std::string& name, GLfloat value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -892,7 +869,7 @@ bool ProgramObject::setUniform(const std::string& name, GLfloat value) {
 
 bool ProgramObject::setUniform(const std::string& name, GLfloat v1, GLfloat v2) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -905,7 +882,7 @@ bool ProgramObject::setUniform(const std::string& name, GLfloat v1, GLfloat v2,
                                GLfloat v3)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -918,7 +895,7 @@ bool ProgramObject::setUniform(const std::string& name, GLfloat v1, GLfloat v2,
                                GLfloat v3, GLfloat v4)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -929,7 +906,7 @@ bool ProgramObject::setUniform(const std::string& name, GLfloat v1, GLfloat v2,
 
 bool ProgramObject::setUniform(const std::string& name, const glm::vec2& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -940,7 +917,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::vec2& value) 
 
 bool ProgramObject::setUniform(const std::string& name, const glm::vec3& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -951,7 +928,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::vec3& value) 
 
 bool ProgramObject::setUniform(const std::string& name, const glm::vec4& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -964,7 +941,7 @@ bool ProgramObject::setUniform(const std::string& name, const GLfloat* values,
                                int count)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -975,7 +952,7 @@ bool ProgramObject::setUniform(const std::string& name, const GLfloat* values,
 
 bool ProgramObject::setUniform(const std::string& name, glm::vec2* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -986,7 +963,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::vec2* values, int c
 
 bool ProgramObject::setUniform(const std::string& name, glm::vec3* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -997,7 +974,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::vec3* values, int c
 
 bool ProgramObject::setUniform(const std::string& name, glm::vec4* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1008,7 +985,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::vec4* values, int c
 
 bool ProgramObject::setUniform(const std::string& name, GLdouble value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1019,7 +996,7 @@ bool ProgramObject::setUniform(const std::string& name, GLdouble value) {
 
 bool ProgramObject::setUniform(const std::string& name, GLdouble v1, GLdouble v2) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1032,7 +1009,7 @@ bool ProgramObject::setUniform(const std::string& name, GLdouble v1, GLdouble v2
                                GLdouble v3)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1045,7 +1022,7 @@ bool ProgramObject::setUniform(const std::string& name, GLdouble v1, GLdouble v2
                                GLdouble v3, GLdouble v4)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1056,7 +1033,7 @@ bool ProgramObject::setUniform(const std::string& name, GLdouble v1, GLdouble v2
 
 bool ProgramObject::setUniform(const std::string& name, const glm::dvec2& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1067,7 +1044,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dvec2& value)
 
 bool ProgramObject::setUniform(const std::string& name, const glm::dvec3& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1078,7 +1055,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dvec3& value)
 
 bool ProgramObject::setUniform(const std::string& name, const glm::dvec4& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1091,7 +1068,7 @@ bool ProgramObject::setUniform(const std::string& name, const GLdouble* values,
                                int count)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1102,7 +1079,7 @@ bool ProgramObject::setUniform(const std::string& name, const GLdouble* values,
 
 bool ProgramObject::setUniform(const std::string& name, glm::dvec2* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1113,7 +1090,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::dvec2* values, int 
 
 bool ProgramObject::setUniform(const std::string& name, glm::dvec3* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1124,7 +1101,7 @@ bool ProgramObject::setUniform(const std::string& name, glm::dvec3* values, int 
 
 bool ProgramObject::setUniform(const std::string& name, glm::dvec4* values, int count) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1137,7 +1114,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat2x2& value
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1150,7 +1127,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat2x3& value
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1163,7 +1140,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat2x4& value
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1176,7 +1153,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat3x2& value
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1189,7 +1166,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat3x3& value
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1202,7 +1179,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat3x4& value
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1215,7 +1192,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat4x2& value
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1228,7 +1205,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat4x3& value
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1241,7 +1218,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::mat4x4& value
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1254,7 +1231,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat2x2& valu
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1267,7 +1244,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat2x3& valu
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1280,7 +1257,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat2x4& valu
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1293,7 +1270,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat3x2& valu
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1306,7 +1283,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat3x3& valu
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1319,7 +1296,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat3x4& valu
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1332,7 +1309,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat4x2& valu
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1345,7 +1322,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat4x3& valu
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1358,7 +1335,7 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat4x4& valu
                                Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = uniformLocation(name);
     if (location == -1) {
         return false;
@@ -1384,7 +1361,7 @@ void ProgramObject::setUniform(GLint location, bool value) {
 
 void ProgramObject::setUniform(GLint location, bool v1, bool v2) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2i.isResolved()) {
         glProgramUniform2i(_id, location, v1, v2);
     }
@@ -1399,7 +1376,7 @@ void ProgramObject::setUniform(GLint location, bool v1, bool v2) {
 
 void ProgramObject::setUniform(GLint location, bool v1, bool v2, bool v3) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3i.isResolved()) {
         glProgramUniform3i(_id, location, v1, v2, v3);
     }
@@ -1414,7 +1391,7 @@ void ProgramObject::setUniform(GLint location, bool v1, bool v2, bool v3) {
 
 void ProgramObject::setUniform(GLint location, bool v1, bool v2, bool v3, bool v4) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform4i.isResolved()) {
         glProgramUniform4i(_id, location, v1, v2, v3, v4);
     }
@@ -1429,7 +1406,7 @@ void ProgramObject::setUniform(GLint location, bool v1, bool v2, bool v3, bool v
 
 void ProgramObject::setUniform(GLint location, const glm::bvec2& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2iv.isResolved()) {
         glProgramUniform2iv(_id, location, 1, glm::value_ptr(glm::ivec2(value)));
     }
@@ -1444,7 +1421,7 @@ void ProgramObject::setUniform(GLint location, const glm::bvec2& value) {
 
 void ProgramObject::setUniform(GLint location, const glm::bvec3& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3iv.isResolved()) {
         glProgramUniform3iv(_id, location, 1, glm::value_ptr(glm::ivec3(value)));
     }
@@ -1474,7 +1451,7 @@ void ProgramObject::setUniform(GLint location, const glm::bvec4& value) {
 
 void ProgramObject::setUniform(GLint location, const bool* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     std::vector<GLint> castValues(count);
     for (int i = 0; i < count; ++i) {
         castValues[i] = values[i];
@@ -1493,7 +1470,7 @@ void ProgramObject::setUniform(GLint location, const bool* values, int count) {
 
 void ProgramObject::setUniform(GLint location, glm::bvec2* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     std::vector<GLint> castValues(2 * count);
     for (int i = 0; i < count; ++i) {
         castValues[2 * i] = values[i].x;
@@ -1513,7 +1490,7 @@ void ProgramObject::setUniform(GLint location, glm::bvec2* values, int count) {
 
 void ProgramObject::setUniform(GLint location, glm::bvec3* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     std::vector<GLint> castValues(3 * count);
     for (int i = 0; i < count; ++i) {
         castValues[3 * i] = values[i].x;
@@ -1534,7 +1511,7 @@ void ProgramObject::setUniform(GLint location, glm::bvec3* values, int count) {
 
 void ProgramObject::setUniform(GLint location, glm::bvec4* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     std::vector<GLint> castValues(4 * count);
     for (int i = 0; i < count; ++i) {
         castValues[4 * i] = values[i].x;
@@ -1556,7 +1533,7 @@ void ProgramObject::setUniform(GLint location, glm::bvec4* values, int count) {
 
 void ProgramObject::setUniform(GLint location, GLuint value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform1ui.isResolved()) {
         glProgramUniform1ui(_id, location, value);
     }
@@ -1571,7 +1548,7 @@ void ProgramObject::setUniform(GLint location, GLuint value) {
 
 void ProgramObject::setUniform(GLint location, GLuint v1, GLuint v2) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2ui.isResolved()) {
         glProgramUniform2ui(_id, location, v1, v2);
     }
@@ -1586,7 +1563,7 @@ void ProgramObject::setUniform(GLint location, GLuint v1, GLuint v2) {
 
 void ProgramObject::setUniform(GLint location, GLuint v1, GLuint v2, GLuint v3) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3ui.isResolved()) {
         glProgramUniform3ui(_id, location, v1, v2, v3);
     }
@@ -1603,7 +1580,7 @@ void ProgramObject::setUniform(GLint location,
                                GLuint v1, GLuint v2, GLuint v3, GLuint v4)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform4ui.isResolved()) {
         glProgramUniform4ui(_id, location, v1, v2, v3, v4);
     }
@@ -1618,7 +1595,7 @@ void ProgramObject::setUniform(GLint location,
 
 void ProgramObject::setUniform(GLint location, const glm::uvec2& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2uiv.isResolved()) {
         glProgramUniform2uiv(_id, location, 1, value_ptr(value));
     }
@@ -1633,7 +1610,7 @@ void ProgramObject::setUniform(GLint location, const glm::uvec2& value) {
 
 void ProgramObject::setUniform(GLint location, const glm::uvec3& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3uiv.isResolved()) {
         glProgramUniform3uiv(_id, location, 1, value_ptr(value));
     }
@@ -1648,7 +1625,7 @@ void ProgramObject::setUniform(GLint location, const glm::uvec3& value) {
 
 void ProgramObject::setUniform(GLint location, const glm::uvec4& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform4uiv.isResolved()) {
         glProgramUniform4uiv(_id, location, 1, value_ptr(value));
     }
@@ -1663,7 +1640,7 @@ void ProgramObject::setUniform(GLint location, const glm::uvec4& value) {
 
 void ProgramObject::setUniform(GLint location, const GLuint* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform1uiv.isResolved()) {
         glProgramUniform1uiv(_id, location, count, values);
     }
@@ -1678,7 +1655,7 @@ void ProgramObject::setUniform(GLint location, const GLuint* values, int count) 
 
 void ProgramObject::setUniform(GLint location, glm::uvec2* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2uiv.isResolved()) {
         glProgramUniform2uiv(_id, location, count,
                              reinterpret_cast<unsigned int*>(values));
@@ -1690,11 +1667,11 @@ void ProgramObject::setUniform(GLint location, glm::uvec2* values, int count) {
         glUniform2uiv(location, count, reinterpret_cast<unsigned int*>(values));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
-}   
+}
 
 void ProgramObject::setUniform(GLint location, glm::uvec3* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3uiv.isResolved()) {
         glProgramUniform3uiv(_id, location, count,
                              reinterpret_cast<unsigned int*>(values));
@@ -1710,7 +1687,7 @@ void ProgramObject::setUniform(GLint location, glm::uvec3* values, int count) {
 
 void ProgramObject::setUniform(GLint location, glm::uvec4* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform4uiv.isResolved()) {
         glProgramUniform4uiv(_id, location, count,
                              reinterpret_cast<unsigned int*>(values));
@@ -1726,7 +1703,7 @@ void ProgramObject::setUniform(GLint location, glm::uvec4* values, int count) {
 
 void ProgramObject::setUniform(GLint location, GLint value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform1i.isResolved()) {
         glProgramUniform1i(_id, location, value);
     }
@@ -1741,7 +1718,7 @@ void ProgramObject::setUniform(GLint location, GLint value) {
 
 void ProgramObject::setUniform(GLint location, GLint v1, GLint v2) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2i.isResolved()) {
         glProgramUniform2i(_id, location, v1, v2);
     }
@@ -1756,7 +1733,7 @@ void ProgramObject::setUniform(GLint location, GLint v1, GLint v2) {
 
 void ProgramObject::setUniform(GLint location, GLint v1, GLint v2, GLint v3) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3i.isResolved()) {
         glProgramUniform3i(_id, location, v1, v2, v3);
     }
@@ -1771,7 +1748,7 @@ void ProgramObject::setUniform(GLint location, GLint v1, GLint v2, GLint v3) {
 
 void ProgramObject::setUniform(GLint location, GLint v1, GLint v2, GLint v3, GLint v4) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform4i.isResolved()) {
         glProgramUniform4i(_id, location, v1, v2, v3, v4);
     }
@@ -1786,7 +1763,7 @@ void ProgramObject::setUniform(GLint location, GLint v1, GLint v2, GLint v3, GLi
 
 void ProgramObject::setUniform(GLint location, const glm::ivec2& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2iv.isResolved()) {
         glProgramUniform2iv(_id, location, 1, value_ptr(value));
     }
@@ -1801,7 +1778,7 @@ void ProgramObject::setUniform(GLint location, const glm::ivec2& value) {
 
 void ProgramObject::setUniform(GLint location, const glm::ivec3& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3iv.isResolved()) {
         glProgramUniform3iv(_id, location, 1, value_ptr(value));
     }
@@ -1816,7 +1793,7 @@ void ProgramObject::setUniform(GLint location, const glm::ivec3& value) {
 
 void ProgramObject::setUniform(GLint location, const glm::ivec4& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform4iv.isResolved()) {
         glProgramUniform4iv(_id, location, 1, value_ptr(value));
     }
@@ -1831,7 +1808,7 @@ void ProgramObject::setUniform(GLint location, const glm::ivec4& value) {
 
 void ProgramObject::setUniform(GLint location, const GLint* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform1iv.isResolved()) {
         glProgramUniform1iv(_id, location, count, values);
     }
@@ -1846,7 +1823,7 @@ void ProgramObject::setUniform(GLint location, const GLint* values, int count) {
 
 void ProgramObject::setUniform(GLint location, glm::ivec2* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2iv.isResolved()) {
         glProgramUniform2iv(_id, location, count, reinterpret_cast<int*>(values));
     }
@@ -1857,11 +1834,11 @@ void ProgramObject::setUniform(GLint location, glm::ivec2* values, int count) {
         glUniform2iv(location, count, reinterpret_cast<int*>(values));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
-}   
+}
 
 void ProgramObject::setUniform(GLint location, glm::ivec3* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3iv.isResolved()) {
         glProgramUniform3iv(_id, location, count, reinterpret_cast<int*>(values));
     }
@@ -1876,7 +1853,7 @@ void ProgramObject::setUniform(GLint location, glm::ivec3* values, int count) {
 
 void ProgramObject::setUniform(GLint location, glm::ivec4* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform4iv.isResolved()) {
         glProgramUniform4iv(_id, location, count, reinterpret_cast<int*>(values));
     }
@@ -1891,7 +1868,7 @@ void ProgramObject::setUniform(GLint location, glm::ivec4* values, int count) {
 
 void ProgramObject::setUniform(GLint location, GLfloat value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform1f.isResolved()) {
         glProgramUniform1f(_id, location, value);
     }
@@ -1906,7 +1883,7 @@ void ProgramObject::setUniform(GLint location, GLfloat value) {
 
 void ProgramObject::setUniform(GLint location, GLfloat v1, GLfloat v2) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2f.isResolved()) {
         glProgramUniform2f(_id, location, v1, v2);
     }
@@ -1921,7 +1898,7 @@ void ProgramObject::setUniform(GLint location, GLfloat v1, GLfloat v2) {
 
 void ProgramObject::setUniform(GLint location, GLfloat v1, GLfloat v2, GLfloat v3) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3f.isResolved()) {
         glProgramUniform3f(_id, location, v1, v2, v3);
     }
@@ -1938,7 +1915,7 @@ void ProgramObject::setUniform(GLint location,
                                GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform4f.isResolved()) {
         glProgramUniform4f(_id, location, v1, v2, v3, v4);
     }
@@ -1953,7 +1930,7 @@ void ProgramObject::setUniform(GLint location,
 
 void ProgramObject::setUniform(GLint location, const glm::vec2& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2fv.isResolved()) {
         glProgramUniform2fv(_id, location, 1, value_ptr(value));
     }
@@ -1968,7 +1945,7 @@ void ProgramObject::setUniform(GLint location, const glm::vec2& value) {
 
 void ProgramObject::setUniform(GLint location, const glm::vec3& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3fv.isResolved()) {
         glProgramUniform3fv(_id, location, 1, value_ptr(value));
     }
@@ -1983,7 +1960,7 @@ void ProgramObject::setUniform(GLint location, const glm::vec3& value) {
 
 void ProgramObject::setUniform(GLint location, const glm::vec4& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform4fv.isResolved()) {
         glProgramUniform4fv(_id, location, 1, value_ptr(value));
     }
@@ -1998,7 +1975,7 @@ void ProgramObject::setUniform(GLint location, const glm::vec4& value) {
 
 void ProgramObject::setUniform(GLint location, const GLfloat* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform1fv.isResolved()) {
         glProgramUniform1fv(_id, location, count, values);
     }
@@ -2013,7 +1990,7 @@ void ProgramObject::setUniform(GLint location, const GLfloat* values, int count)
 
 void ProgramObject::setUniform(GLint location, glm::vec2* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2fv.isResolved()) {
         glProgramUniform2fv(_id, location, count, reinterpret_cast<float*>(values));
     }
@@ -2028,7 +2005,7 @@ void ProgramObject::setUniform(GLint location, glm::vec2* values, int count) {
 
 void ProgramObject::setUniform(GLint location, glm::vec3* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3fv.isResolved()) {
         glProgramUniform3fv(_id, location, count, reinterpret_cast<float*>(values));
     }
@@ -2043,7 +2020,7 @@ void ProgramObject::setUniform(GLint location, glm::vec3* values, int count) {
 
 void ProgramObject::setUniform(GLint location, glm::vec4* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform4fv.isResolved()) {
         glProgramUniform4fv(_id, location, count, reinterpret_cast<float*>(values));
     }
@@ -2058,7 +2035,7 @@ void ProgramObject::setUniform(GLint location, glm::vec4* values, int count) {
 
 void ProgramObject::setUniform(GLint location, GLdouble value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform1d.isResolved()) {
         glProgramUniform1d(_id, location, value);
     }
@@ -2073,7 +2050,7 @@ void ProgramObject::setUniform(GLint location, GLdouble value) {
 
 void ProgramObject::setUniform(GLint location, GLdouble v1, GLdouble v2) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2d.isResolved()) {
         glProgramUniform2d(_id, location, v1, v2);
     }
@@ -2088,7 +2065,7 @@ void ProgramObject::setUniform(GLint location, GLdouble v1, GLdouble v2) {
 
 void ProgramObject::setUniform(GLint location, GLdouble v1, GLdouble v2, GLdouble v3) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3d.isResolved()) {
         glProgramUniform3d(_id, location, v1, v2, v3);
     }
@@ -2105,7 +2082,7 @@ void ProgramObject::setUniform(GLint location, GLdouble v1, GLdouble v2, GLdoubl
                                GLdouble v4)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform4d.isResolved()) {
         glProgramUniform4d(_id, location, v1, v2, v3, v4);
     }
@@ -2120,7 +2097,7 @@ void ProgramObject::setUniform(GLint location, GLdouble v1, GLdouble v2, GLdoubl
 
 void ProgramObject::setUniform(GLint location, const glm::dvec2& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2dv.isResolved()) {
         glProgramUniform2dv(_id, location, 1, value_ptr(value));
     }
@@ -2135,7 +2112,7 @@ void ProgramObject::setUniform(GLint location, const glm::dvec2& value) {
 
 void ProgramObject::setUniform(GLint location, const glm::dvec3& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3dv.isResolved()) {
         glProgramUniform3dv(_id, location, 1, value_ptr(value));
     }
@@ -2150,7 +2127,7 @@ void ProgramObject::setUniform(GLint location, const glm::dvec3& value) {
 
 void ProgramObject::setUniform(GLint location, const glm::dvec4& value) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform4dv.isResolved()) {
         glProgramUniform4dv(_id, location, 1, value_ptr(value));
     }
@@ -2165,7 +2142,7 @@ void ProgramObject::setUniform(GLint location, const glm::dvec4& value) {
 
 void ProgramObject::setUniform(GLint location, const GLdouble* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform1dv.isResolved()) {
         glProgramUniform1dv(_id, location, count, values);
     }
@@ -2180,7 +2157,7 @@ void ProgramObject::setUniform(GLint location, const GLdouble* values, int count
 
 void ProgramObject::setUniform(GLint location, glm::dvec2* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform2dv.isResolved()) {
         glProgramUniform2dv(_id, location, count, reinterpret_cast<double*>(values));
     }
@@ -2195,7 +2172,7 @@ void ProgramObject::setUniform(GLint location, glm::dvec2* values, int count) {
 
 void ProgramObject::setUniform(GLint location, glm::dvec3* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform3dv.isResolved()) {
         glProgramUniform3dv(_id, location, count, reinterpret_cast<double*>(values));
     }
@@ -2210,7 +2187,7 @@ void ProgramObject::setUniform(GLint location, glm::dvec3* values, int count) {
 
 void ProgramObject::setUniform(GLint location, glm::dvec4* values, int count) {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniform4dv.isResolved()) {
         glProgramUniform4dv(_id, location, count, reinterpret_cast<double*>(values));
     }
@@ -2227,7 +2204,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat2x2& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix2fv.isResolved()) {
         glProgramUniformMatrix2fv(
             _id,
@@ -2256,7 +2233,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat2x3& value,
 {
 
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix2x3fv.isResolved()) {
         glProgramUniformMatrix2x3fv(
             _id,
@@ -2284,7 +2261,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat2x4& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix2x4fv.isResolved()) {
         glProgramUniformMatrix2x4fv(
             _id,
@@ -2312,7 +2289,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat3x2& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix3x2fv.isResolved()) {
         glProgramUniformMatrix3x2fv(
             _id,
@@ -2340,7 +2317,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat3x3& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix3fv.isResolved()) {
         glProgramUniformMatrix3fv(
             _id,
@@ -2368,7 +2345,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat3x4& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix3x4fv.isResolved()) {
         glProgramUniformMatrix3x4fv(
             _id,
@@ -2396,7 +2373,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat4x2& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix4x2fv.isResolved()) {
         glProgramUniformMatrix4x2fv(
             _id,
@@ -2424,7 +2401,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat4x3& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix4x3fv.isResolved()) {
         glProgramUniformMatrix4x3fv(
             _id,
@@ -2452,7 +2429,7 @@ void ProgramObject::setUniform(GLint location, const glm::mat4x4& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix4fv.isResolved()) {
         glProgramUniformMatrix4fv(
             _id,
@@ -2480,7 +2457,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat2x2& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix2dv.isResolved()) {
         glProgramUniformMatrix2dv(
             _id,
@@ -2508,7 +2485,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat2x3& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix2x3dv.isResolved()) {
         glProgramUniformMatrix2x3dv(
             _id,
@@ -2536,7 +2513,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat2x4& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix2x4dv.isResolved()) {
         glProgramUniformMatrix2x4dv(
             _id,
@@ -2564,7 +2541,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat3x2& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix3x2dv.isResolved()) {
         glProgramUniformMatrix3x2dv(
             _id,
@@ -2592,7 +2569,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat3x3& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix3dv.isResolved()) {
         glProgramUniformMatrix3dv(
             _id,
@@ -2620,7 +2597,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat3x4& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix3x4dv.isResolved()) {
         glProgramUniformMatrix3x4dv(
             _id,
@@ -2648,7 +2625,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat4x2& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix4x2dv.isResolved()) {
         glProgramUniformMatrix4x2dv(
             _id,
@@ -2676,7 +2653,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat4x3& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix4x3dv.isResolved()) {
         glProgramUniformMatrix4x3dv(
             _id,
@@ -2704,7 +2681,7 @@ void ProgramObject::setUniform(GLint location, const glm::dmat4x4& value,
                                Transpose transpose)
 {
     ghoul_assert(location != -1, "Location must not be -1");
-    
+
     if (glbinding::Binding::ProgramUniformMatrix4dv.isResolved()) {
         glProgramUniformMatrix4dv(
             _id,
@@ -2764,7 +2741,7 @@ void ProgramObject::setIgnoreAttributeLocationError(IgnoreError ignoreError) {
 
 bool ProgramObject::setAttribute(const std::string& name, bool value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2775,7 +2752,7 @@ bool ProgramObject::setAttribute(const std::string& name, bool value) {
 
 bool ProgramObject::setAttribute(const std::string& name, bool v1, bool v2) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2786,7 +2763,7 @@ bool ProgramObject::setAttribute(const std::string& name, bool v1, bool v2) {
 
 bool ProgramObject::setAttribute(const std::string& name, bool v1, bool v2, bool v3) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2799,7 +2776,7 @@ bool ProgramObject::setAttribute(const std::string& name, bool v1, bool v2, bool
                                  bool v4)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2810,7 +2787,7 @@ bool ProgramObject::setAttribute(const std::string& name, bool v1, bool v2, bool
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::bvec2& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2821,7 +2798,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::bvec2& valu
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::bvec3& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2832,7 +2809,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::bvec3& valu
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::bvec4& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2843,7 +2820,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::bvec4& valu
 
 bool ProgramObject::setAttribute(const std::string& name, GLint value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2854,7 +2831,7 @@ bool ProgramObject::setAttribute(const std::string& name, GLint value) {
 
 bool ProgramObject::setAttribute(const std::string& name, GLint v1, GLint v2) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2865,7 +2842,7 @@ bool ProgramObject::setAttribute(const std::string& name, GLint v1, GLint v2) {
 
 bool ProgramObject::setAttribute(const std::string& name, GLint v1, GLint v2, GLint v3) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2878,7 +2855,7 @@ bool ProgramObject::setAttribute(const std::string& name, GLint v1, GLint v2, GL
                                  GLint v4)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2889,7 +2866,7 @@ bool ProgramObject::setAttribute(const std::string& name, GLint v1, GLint v2, GL
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::ivec2& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2900,7 +2877,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::ivec2& valu
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::ivec3& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2911,7 +2888,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::ivec3& valu
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::ivec4& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2922,7 +2899,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::ivec4& valu
 
 bool ProgramObject::setAttribute(const std::string& name, GLfloat value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2933,7 +2910,7 @@ bool ProgramObject::setAttribute(const std::string& name, GLfloat value) {
 
 bool ProgramObject::setAttribute(const std::string& name, GLfloat v1, GLfloat v2) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2946,7 +2923,7 @@ bool ProgramObject::setAttribute(const std::string& name, GLfloat v1, GLfloat v2
                                  GLfloat v3)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2959,7 +2936,7 @@ bool ProgramObject::setAttribute(const std::string& name, GLfloat v1, GLfloat v2
                                  GLfloat v3, GLfloat v4)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2970,7 +2947,7 @@ bool ProgramObject::setAttribute(const std::string& name, GLfloat v1, GLfloat v2
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::vec2& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2981,7 +2958,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::vec2& value
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::vec3& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -2992,7 +2969,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::vec3& value
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::vec4& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3003,7 +2980,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::vec4& value
 
 bool ProgramObject::setAttribute(const std::string& name, GLdouble value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3014,7 +2991,7 @@ bool ProgramObject::setAttribute(const std::string& name, GLdouble value) {
 
 bool ProgramObject::setAttribute(const std::string& name, GLdouble v1, GLdouble v2) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3027,7 +3004,7 @@ bool ProgramObject::setAttribute(const std::string& name, GLdouble v1, GLdouble 
                                  GLdouble v3)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3040,7 +3017,7 @@ bool ProgramObject::setAttribute(const std::string& name, GLdouble v1, GLdouble 
                                  GLdouble v3, GLdouble v4)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3051,7 +3028,7 @@ bool ProgramObject::setAttribute(const std::string& name, GLdouble v1, GLdouble 
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::dvec2& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3062,7 +3039,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dvec2& valu
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::dvec3& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3073,7 +3050,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dvec3& valu
 
 bool ProgramObject::setAttribute(const std::string& name, const glm::dvec4& value) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3086,7 +3063,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat2x2& val
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3099,7 +3076,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat2x3& val
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3112,7 +3089,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat2x4& val
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3125,7 +3102,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat3x2& val
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3138,7 +3115,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat3x3& val
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3151,7 +3128,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat3x4& val
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3164,7 +3141,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat4x2& val
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3177,7 +3154,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat4x3& val
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3190,7 +3167,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::mat4x4& val
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3203,7 +3180,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat2x2& va
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3216,7 +3193,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat2x3& va
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3229,7 +3206,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat2x4& va
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3242,7 +3219,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat3x2& va
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3255,7 +3232,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat3x3& va
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3268,7 +3245,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat3x4& va
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3281,7 +3258,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat4x2& va
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3294,7 +3271,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat4x3& va
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3307,7 +3284,7 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat4x4& va
                                  Transpose transpose)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint location = attributeLocation(name);
     if (location == GL_INVALID_INDEX) {
         return false;
@@ -3318,103 +3295,104 @@ bool ProgramObject::setAttribute(const std::string& name, const glm::dmat4x4& va
 
 void ProgramObject::setAttribute(GLuint location, bool value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI1i(location, value);
 }
 
 void ProgramObject::setAttribute(GLuint location, bool v1, bool v2) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI2i(location, v1, v2);
 }
 
 void ProgramObject::setAttribute(GLuint location, bool v1, bool v2, bool v3) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI3i(location, v1, v2, v3);
 }
 
 void ProgramObject::setAttribute(GLuint location, bool v1, bool v2, bool v3, bool v4) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI4i(location, v1, v2, v3, v4);
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::bvec2& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI2iv(location, value_ptr(glm::ivec2(value)));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::bvec3& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI3iv(location, value_ptr(glm::ivec3(value)));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::bvec4& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI4iv(location, value_ptr(glm::ivec4(value)));
 }
 
 void ProgramObject::setAttribute(GLuint location, GLint value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI1i(location, value);
 }
 
 void ProgramObject::setAttribute(GLuint location, GLint v1, GLint v2) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI2i(location, v1, v2);
 }
 
 void ProgramObject::setAttribute(GLuint location, GLint v1, GLint v2, GLint v3) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI3i(location, v1, v2, v3);
 }
 
-void ProgramObject::setAttribute(GLuint location, GLint v1, GLint v2, GLint v3, GLint v4) {
+void ProgramObject::setAttribute(GLuint location, GLint v1, GLint v2, GLint v3, GLint v4)
+{
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI4i(location, v1, v2, v3, v4);
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::ivec2& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI2iv(location, value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::ivec3& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI3iv(location, value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::ivec4& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribI4iv(location, value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, GLfloat value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttrib1f(location, value);
 }
 
 void ProgramObject::setAttribute(GLuint location, GLfloat v1, GLfloat v2) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttrib2f(location, v1, v2);
 }
 
 void ProgramObject::setAttribute(GLuint location, GLfloat v1, GLfloat v2, GLfloat v3) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttrib3f(location, v1, v2, v3);
 }
 
@@ -3422,43 +3400,43 @@ void ProgramObject::setAttribute(GLuint location,
                                  GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttrib4f(location, v1, v2, v3, v4);
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::vec2& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttrib2fv(location, value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::vec3& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttrib3fv(location, value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::vec4& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttrib4fv(location, value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, GLdouble value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribL1d(location, value);
 }
 
 void ProgramObject::setAttribute(GLuint location, GLdouble v1, GLdouble v2) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribL2d(location, v1, v2);
 }
 
 void ProgramObject::setAttribute(GLuint location, GLdouble v1, GLdouble v2, GLdouble v3) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribL3d(location, v1, v2, v3);
 }
 
@@ -3466,25 +3444,25 @@ void ProgramObject::setAttribute(GLuint location,
                                  GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribL4d(location, v1, v2, v3, v4);
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dvec2& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribL2dv(location, value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dvec3& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribL3dv(location, value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dvec4& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     glVertexAttribL4dv(location, value_ptr(value));
 }
 
@@ -3492,7 +3470,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat2x2& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3506,7 +3484,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat2x3& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3520,7 +3498,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat2x4& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3534,7 +3512,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat3x2& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3549,7 +3527,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat3x3& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3564,7 +3542,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat3x4& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3579,7 +3557,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat4x2& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3595,7 +3573,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat4x3& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3611,7 +3589,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat4x4& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3627,7 +3605,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat2x2& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3641,7 +3619,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat2x3& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3655,7 +3633,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat2x4& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3669,7 +3647,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat3x2& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3684,7 +3662,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat3x3& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3699,7 +3677,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat3x4& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3714,7 +3692,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat4x2& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3730,7 +3708,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat4x3& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3746,7 +3724,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat4x4& value,
                                  Transpose transpose)
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+
     if (transpose == Transpose::Yes) {
         setAttribute(location, glm::transpose(value));
     }
@@ -3778,7 +3756,7 @@ GLuint ProgramObject::subroutineIndex(ShaderObject::ShaderType shaderType,
                                       const std::string& name)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLuint index = glGetSubroutineIndex(
         _id,
         static_cast<GLenum>(shaderType),
@@ -3794,7 +3772,7 @@ GLint ProgramObject::subroutineUniformLocation(ShaderObject::ShaderType shaderTy
                                                const std::string& name)
 {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    
+
     const GLint location = glGetSubroutineUniformLocation(
         _id,
         static_cast<GLenum>(shaderType),
@@ -3849,7 +3827,7 @@ vector<string> ProgramObject::compatibleSubroutineNames(
         subroutineUniformLocation != GL_INVALID_INDEX,
         "Location must not be GL_INVALID_INDEX"
     );
-    
+
     GLint maximumUniformNameLength;
     glGetProgramStageiv(
         _id,
@@ -3869,7 +3847,7 @@ vector<string> ProgramObject::compatibleSubroutineNames(
     if (numCompatibleSubroutines == 0) {
         return vector<string>();
     }
-    
+
     vector<string> result(static_cast<size_t>(numCompatibleSubroutines));
     std::vector<GLint> indices(numCompatibleSubroutines);
     std::vector<char> buffer(maximumUniformNameLength);
@@ -3899,7 +3877,7 @@ vector<string> ProgramObject::compatibleSubroutineNames(
                                                 const std::string& subroutineUniformName)
 {
     ghoul_assert(!subroutineUniformName.empty(), "Name must not be empty");
-    
+
     const GLint index = subroutineUniformLocation(shaderType, subroutineUniformName);
     if (index == -1) {
         return vector<string>();
@@ -3913,7 +3891,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
                                           const std::vector<GLuint>& values)
 {
     ghoul_assert(!values.empty(), "Values must not be empty");
-    
+
 #ifdef GHL_DEBUG
     int countActiveSubroutineUniforms;
     glGetProgramStageiv(
@@ -3941,7 +3919,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
                                          const std::map<std::string, std::string>& values)
 {
     ghoul_assert(!values.empty(), "Values must not be empty");
-    
+
 #ifdef GHL_DEBUG
     int countActiveSubroutineUniforms;
     glGetProgramStageiv(
@@ -3991,14 +3969,20 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
 
 void ProgramObject::bindFragDataLocation(const std::string& name, GLuint colorNumber) {
     ghoul_assert(!name.empty(), "Name must not be empty");
-    ghoul_assert(colorNumber != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    
+    ghoul_assert(
+        colorNumber != GL_INVALID_INDEX,
+        "Location must not be GL_INVALID_INDEX"
+    );
+
 #ifdef GHL_DEBUG
     GLint maxBuffers;
     glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxBuffers);
     if (colorNumber >= static_cast<GLuint>(maxBuffers)) {
-        LWARNING("ColorNumber '" << colorNumber <<
-            "' is bigger than the maximum of simultaneous outputs '" << maxBuffers << "'");
+        LWARNING(
+            "ColorNumber '" << colorNumber <<
+            "' is bigger than the maximum of simultaneous outputs '" <<
+            maxBuffers << "'"
+        );
         return;
     }
 #endif

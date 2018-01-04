@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -36,7 +36,6 @@
 #include <regex>
 #include <cstdio>
 
-
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/param.h>
@@ -51,8 +50,9 @@
 using std::string;
 
 namespace {
-    const char* _loggerCat = "FileSystem";
-    const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW | IN_UNMOUNT | IN_ISDIR;
+    constexpr const char* _loggerCat = "FileSystem";
+    const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW |
+                          IN_UNMOUNT | IN_ISDIR;
 } // namespace
 
 namespace ghoul::filesystem {
@@ -113,12 +113,12 @@ void FileSystem::inotifyWatcher() {
         if (select(FD_SETSIZE, &rfds, nullptr, nullptr, &tv) < 1) {
             continue;
         }
-        
+
         ssize_t length = read(fd, buffer, BUF_LEN );
         if (length < 0) {
             continue;
         }
-        
+
         long unsigned int offset = 0;
         while (offset < static_cast<long unsigned int>(length)) {
             struct inotify_event* e = reinterpret_cast<inotify_event*>(buffer + offset);
@@ -147,7 +147,11 @@ void FileSystem::inotifyWatcher() {
                     // if there are files tracking
                     if (it != eqRange.second) {
                         // add new tracking
-                        int new_wd = inotify_add_watch( fd, it->second->path().c_str(), mask);
+                        int new_wd = inotify_add_watch(
+                            fd,
+                            it->second->path().c_str(),
+                            mask
+                        );
 
                         // save all files
                         std::vector<File*> v;

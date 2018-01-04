@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -63,7 +63,7 @@ static int vscprintf(const char* format, va_list pargs) {
 namespace {
     const float PointConversionFactor = 64.f;  // Sizes in FT are given in 1/64th of pt
     const int DPI = 96;
-    
+
     // Initializes the passed 'library' and loads the font face specified by the 'name'
     // and 'size' into the provided 'face'
     void loadFace(const std::string& name,
@@ -77,7 +77,7 @@ namespace {
                 name, size, FT_Errors[error].code, FT_Errors[error].message
             );
         }
-        
+
         // Load face
         error = FT_New_Face(library, name.c_str(), 0, &face);
         if (error) {
@@ -86,7 +86,7 @@ namespace {
                 name, size, FT_Errors[error].code, FT_Errors[error].message
             );
         }
-        
+
         // Select charmap
         error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
         if (error) {
@@ -96,7 +96,7 @@ namespace {
                 name, size, FT_Errors[error].code, FT_Errors[error].message
             );
         }
-        
+
         // Set char size
         error = FT_Set_Char_Size(
             face,
@@ -116,11 +116,11 @@ namespace {
 } // namespace
 
 namespace ghoul::fontrendering {
-    
+
 Font::FontException::FontException(const std::string& msg)
     : RuntimeError(msg, "Font")
 {}
-    
+
 Font::GlyphException::GlyphException(std::string name, float size, wchar_t character)
     : FontException(fmt::format(
         "Glyph '{}' was not present in the font '{}' at size '{}'",
@@ -129,7 +129,7 @@ Font::GlyphException::GlyphException(std::string name, float size, wchar_t chara
     , fontSize(size)
     , glyph(character)
 {}
-    
+
 Font::FreeTypeException::FreeTypeException(std::string name, float size, int code,
                                            std::string msg)
     : FontException(fmt::format(
@@ -140,7 +140,7 @@ Font::FreeTypeException::FreeTypeException(std::string name, float size, int cod
     , errorCode(code)
     , errorMessage(std::move(msg))
 {}
-    
+
 Font::Glyph::Glyph(wchar_t character,
                    int width,
                    int height,
@@ -164,11 +164,11 @@ Font::Glyph::Glyph(wchar_t character,
     , _outlineTopLeft(std::move(outlineTexCoordTopLeft))
     , _outlineBottomRight(std::move(outlineTexCoordBottomRight))
 {}
-    
+
 bool Font::Glyph::operator==(const Font::Glyph& rhs) const {
     return _charcode == rhs._charcode;
 }
-    
+
 int Font::Glyph::width() const {
     return _width;
 }
@@ -184,7 +184,7 @@ float Font::Glyph::leftBearing() const {
 float Font::Glyph::topBearing() const {
     return _topBearing;
 }
-    
+
 float Font::Glyph::kerning(wchar_t character) const {
     auto it = _kerning.find(character);
     if (it != _kerning.end()) {
@@ -194,7 +194,7 @@ float Font::Glyph::kerning(wchar_t character) const {
         return 0.f;
     }
 }
-    
+
 float Font::Glyph::horizontalAdvance() const {
     return _horizontalAdvance;
 }
@@ -202,11 +202,11 @@ float Font::Glyph::horizontalAdvance() const {
 float Font::Glyph::verticalAdvance() const {
     return _verticalAdvance;
 }
-    
+
 const glm::vec2& Font::Glyph::topLeft() const {
     return _topLeft;
 }
-    
+
 const glm::vec2& Font::Glyph::bottomRight() const {
     return _bottomRight;
 }
@@ -218,7 +218,7 @@ const glm::vec2& Font::Glyph::outlineTopLeft() const {
 const glm::vec2& Font::Glyph::outlineBottomRight() const {
     return _outlineBottomRight;
 }
-   
+
 Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
            Outline hasOutline, float outlineThickness)
     : _atlas(atlas)
@@ -230,19 +230,19 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
 {
     ghoul_assert(!_name.empty(), "Filename must not be empty");
     ghoul_assert(_pointSize > 0.f, "Need positive point size");
-    
+
     // Get font metrics at higher resolution for increased accuracy
     static const float HighFaceResolutionFactor = 100.f;
-    
+
     FT_Library library;
     FT_Face face;
     loadFace(_name, _pointSize * HighFaceResolutionFactor, library, face);
-    
+
     _height = (face->size->metrics.height >> 6) / HighFaceResolutionFactor;
-    
+
     FT_Done_Face(face);
     FT_Done_FreeType(library);
-    
+
     // -1 is a special glyph
     glyph(static_cast<wchar_t>(-1));
 }
@@ -250,7 +250,7 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
 std::string Font::name() const {
     return _name;
 }
-    
+
 float Font::pointSize() const {
     return _pointSize;
 }
@@ -258,32 +258,32 @@ float Font::pointSize() const {
 float Font::height() const {
     return _height;
 }
-    
+
 opengl::TextureAtlas& Font::atlas() {
     return _atlas;
 }
-    
+
 bool Font::hasOutline() const {
     return _hasOutline;
 }
-    
+
 glm::vec2 Font::boundingBox(const char* format, ...) {
     ghoul_assert(format != nullptr, "No format is provided");
     glm::vec2 result(0.f);
-    
+
     va_list args;     // Pointer To List Of Arguments
     va_start(args, format); // Parses The String For Variables
-    
+
     int size = 1 + vscprintf(format, args);
     std::vector<char> buffer(size, 0);
-    
+
 #ifdef WIN32
     vsprintf_s(buffer.data(), size, format, args);
 #else
     vsprintf(buffer.data(), format, args);
 #endif
     va_end(args);
-    
+
 
     // Splitting the text into separate lines
     const char* start_line = buffer.data();
@@ -306,7 +306,7 @@ glm::vec2 Font::boundingBox(const char* format, ...) {
         }
         lines.push_back(line);
     }
-    
+
     for (const std::string& line : lines) {
         float width = 0.f;
         float height = 0.f;
@@ -323,7 +323,7 @@ glm::vec2 Font::boundingBox(const char* format, ...) {
         result.x = std::max(result.x, width);
         result.y += height;
     }
-    
+
     result.y += (lines.size() - 1) * _height;
 
     return result;
@@ -331,14 +331,14 @@ glm::vec2 Font::boundingBox(const char* format, ...) {
 
 const Font::Glyph* Font::glyph(wchar_t character) {
     using TextureAtlas = opengl::TextureAtlas;
-    
+
     // Check if charcode has been already loaded
     for (const Glyph& g : _glyphs) {
         if (g._charcode == character) {
             return &g;
         }
     }
-    
+
     // charcode -1 is special: it is used for line drawing (overline, underline,
     // strikethrough) and background.
     if (character == static_cast<wchar_t>(-1)) {
@@ -347,38 +347,39 @@ const Font::Glyph* Font::glyph(wchar_t character) {
         // extracts as much data as is needed for the used texture atlas
         std::array<unsigned char, 4*4*4> data;
         data.fill(std::numeric_limits<unsigned char>::max());
-        
+
         _atlas.setRegionData(handle, data.data());
-        
+
         Glyph glyph(static_cast<wchar_t>(-1));
-        auto coords = _atlas.textureCoordinates(handle);
+        ghoul::opengl::TextureAtlas::TextureCoordinatesResult coords =
+            _atlas.textureCoordinates(handle);
         glyph._topLeft = coords.topLeft;
         glyph._bottomRight = coords.bottomRight;
         _glyphs.push_back(std::move(glyph));
-        
+
         return &(_glyphs.back());
     }
-    
+
     // Glyph has not been already loaded
     loadGlyphs({character});
     return &(_glyphs.back());
 }
-    
+
 float Font::computeLeftBearing(wchar_t charcode) const {
     const float HighResolutionFactor = 10.f;
     FT_Library library = nullptr;
     FT_Face face = nullptr;
     loadFace(_name, _pointSize * HighResolutionFactor, library, face);
-    
+
     FT_UInt glyphIndex = FT_Get_Char_Index(face, charcode);
     FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
-    
+
     FT_Glyph outlineGlyph;
     FT_Get_Glyph(face->glyph, &outlineGlyph);
     if (_hasOutline) {
         FT_Stroker stroker;
         FT_Stroker_New(library, &stroker);
-        
+
         float t = _outlineThickness * HighResolutionFactor * PointConversionFactor;
         FT_Stroker_Set(
             stroker,
@@ -387,19 +388,19 @@ float Font::computeLeftBearing(wchar_t charcode) const {
             FT_STROKER_LINEJOIN_ROUND,
             0
         );
-        
+
         FT_Glyph_Stroke(&outlineGlyph, stroker, 1);
         FT_Stroker_Done(stroker);
     }
     FT_Glyph_To_Bitmap(&outlineGlyph, FT_RENDER_MODE_NORMAL, nullptr, 1);
-    
+
     FT_BitmapGlyph outlineBitmap = reinterpret_cast<FT_BitmapGlyph>(outlineGlyph);
 
     FT_Done_Face(face);
     FT_Done_FreeType(library);
     return outlineBitmap->left / HighResolutionFactor;
 }
-    
+
 void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
 #define HandleError(error) \
     if (error) { \
@@ -427,9 +428,9 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
     }
 
     using TextureAtlas = opengl::TextureAtlas;
-    
+
     unsigned int atlasDepth  = _atlas.size().z;
-    
+
     FT_Library library = nullptr;
     FT_Face face = nullptr;
     loadFace(_name, _pointSize, library, face);
@@ -446,7 +447,7 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         if (it != _glyphs.end()) {
             continue;
         }
-        
+
         // First generate the font without outline and store it in the font atlas
         // only if an outline is request, repeat the process for the outline
 
@@ -456,7 +457,7 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         glm::vec2 outlineTopLeft, outlineBottomRight;
         unsigned int width = 0;
         unsigned int height = 0;
-        
+
         FT_UInt glyphIndex = FT_Get_Char_Index(face, charcode);
         if (glyphIndex == 0) {
             FT_Done_Face(face);
@@ -469,7 +470,7 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
 
         FT_Error error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
         HandleError(error);
-        
+
         // In case the font has an outline, we load it first as we need the size of the
         // outline for loading the base layer
         // The reason for this is that the outline is slightly bigger than the base layer
@@ -480,48 +481,49 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             FT_Stroker stroker;
             error = FT_Stroker_New(library, &stroker);
             HandleErrorWithStroker(error);
-            
+
             FT_Stroker_Set(stroker,
                 static_cast<int>(_outlineThickness * PointConversionFactor),
                 FT_STROKER_LINECAP_ROUND,
                 FT_STROKER_LINEJOIN_ROUND,
                 0
             );
-            
+
             FT_Glyph outlineGlyph;
             error = FT_Get_Glyph(face->glyph, &outlineGlyph);
             HandleErrorWithStroker(error);
-          
+
             error = FT_Glyph_Stroke(&outlineGlyph, stroker, 1);
             HandleErrorWithStroker(error);
             FT_Stroker_Done(stroker);
-           
+
             error = FT_Glyph_To_Bitmap(&outlineGlyph, FT_RENDER_MODE_NORMAL, nullptr, 1);
             HandleError(error);
-            
+
             FT_BitmapGlyph outlineBitmap = reinterpret_cast<FT_BitmapGlyph>(outlineGlyph);
             topBearing  = static_cast<float>(outlineBitmap->top);
             leftBearing = computeLeftBearing(charcode);
-            
+
             width = outlineBitmap->bitmap.width / atlasDepth;
             height = outlineBitmap->bitmap.rows;
-            
+
             TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
             if (outlineBitmap->bitmap.buffer) {
                 _atlas.setRegionData(handle, outlineBitmap->bitmap.buffer);
             }
-            auto res = _atlas.textureCoordinates(handle);
+            ghoul::opengl::TextureAtlas::TextureCoordinatesResult res =
+                _atlas.textureCoordinates(handle);
             outlineTopLeft = res.topLeft;
             outlineBottomRight = res.bottomRight;
         }
-        
+
         FT_Glyph insideGlyph;
         error = FT_Get_Glyph(face->glyph, &insideGlyph);
         HandleError(error);
-        
+
         error = FT_Glyph_To_Bitmap(&insideGlyph, FT_RENDER_MODE_NORMAL, nullptr, 1);
         HandleError(error);
-        
+
         FT_BitmapGlyph insideBitmap = reinterpret_cast<FT_BitmapGlyph>(insideGlyph);
         topBearing = std::max(topBearing, static_cast<float>(insideBitmap->top));
         leftBearing = std::max(leftBearing, computeLeftBearing(charcode));
@@ -530,9 +532,9 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         // outline width if there is one) and the height
         width = std::max(width, insideBitmap->bitmap.width / atlasDepth);
         height = std::max(height, insideBitmap->bitmap.rows);
-        
+
         TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
-        
+
         // If we don't have an outline for this font, our current 'width' and 'height'
         // corresponds to the buffer, so we can just use it straight away.
         // If we have an outline, the buffer has a different size from the region in the
@@ -542,7 +544,8 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             if (insideBitmap->bitmap.buffer) {
                 _atlas.setRegionData(handle, insideBitmap->bitmap.buffer);
             }
-            auto res = _atlas.textureCoordinates(handle);
+            ghoul::opengl::TextureAtlas::TextureCoordinatesResult res =
+                _atlas.textureCoordinates(handle);
             topLeft = res.topLeft;
             bottomRight = res.bottomRight;
         }
@@ -550,35 +553,36 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             std::vector<unsigned char> buffer(width * height * sizeof(char), 0);
             int widthOffset = (width - insideBitmap->bitmap.width) / 2;
             int heightOffset = (height - insideBitmap->bitmap.rows) / 2;
-            
+
             for (unsigned int j = 0; j < height; ++j) {
                 for (unsigned int i = 0; i < width; ++i) {
                     int k = i - widthOffset;
                     int l = j - heightOffset;
-                    
+
                     bool inBorder =
                         (k < 0) ||
                         (k >= static_cast<int>(insideBitmap->bitmap.width)) ||
                         (l < 0) ||
                         (l >= static_cast<int>(insideBitmap->bitmap.rows));
-                    
+
                     if (!inBorder) {
                         buffer[(i + j*width)] =
                             insideBitmap->bitmap.buffer[k + insideBitmap->bitmap.width*l];
                     }
                 }
             }
-            
+
             if (!buffer.empty()) {
                 _atlas.setRegionData(handle, buffer.data());
             }
-            
+
             // We need to offset the texture coordinates by half of the width and height
             // differences
-            auto res = _atlas.textureCoordinates(handle,
-                glm::ivec4(widthOffset / 4.f, heightOffset / 4.f,
+            ghoul::opengl::TextureAtlas::TextureCoordinatesResult res =
+                _atlas.textureCoordinates(handle,
+                    glm::ivec4(widthOffset / 4.f, heightOffset / 4.f,
                            widthOffset / 4.f, heightOffset / 4.f)
-            );
+                );
             topLeft = res.topLeft;
             bottomRight = res.bottomRight;
         }
@@ -599,43 +603,42 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             outlineBottomRight
         );
     }
-    
+
     FT_Done_Face(face);
     FT_Done_FreeType(library);
     _atlas.upload();
     generateKerning();
 }
-    
+
 void Font::generateKerning() {
     FT_Library library;
     FT_Face face;
-    
+
     loadFace(_name, _pointSize, library, face);
-    
+
     bool hasKerning = FT_HAS_KERNING(face);
     if (!hasKerning) {
         return;
     }
-    
+
     // For each combination of Glyphs, determine the kerning factors. The index starts at
     // 1 as 0 is reserved for the special background glyph
     for (size_t i = 1; i < _glyphs.size(); ++i) {
         Glyph& glyph = _glyphs[i];
         FT_UInt glyphIndex = FT_Get_Char_Index(face, glyph._charcode);
         glyph._kerning.clear();
-        
+
         for (size_t j = 1; j < _glyphs.size(); ++j) {
             const Glyph& prevGlyph = _glyphs[j];
             FT_UInt prevIndex = FT_Get_Char_Index(face, prevGlyph._charcode);
             FT_Vector kerning;
             FT_Get_Kerning(face, prevIndex, glyphIndex, FT_KERNING_DEFAULT, &kerning);
             if (kerning.x != 0) {
-                glyph._kerning[prevGlyph._charcode] =
-                    kerning.x / (PointConversionFactor * PointConversionFactor);
+                glyph._kerning[prevGlyph._charcode] = kerning.x / PointConversionFactor;
             }
         }
     }
-    
+
     FT_Done_Face(face);
     FT_Done_FreeType(library);
 }

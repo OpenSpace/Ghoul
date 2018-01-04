@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -28,7 +28,7 @@
 #include <ghoul/logging/logmanager.h>
 
 namespace {
-    const char* _loggerCat = "ghoul.opengl.FramebufferObject";
+    constexpr const char* _loggerCat = "ghoul.opengl.FramebufferObject";
 } // namespace
 
 namespace ghoul::opengl {
@@ -89,19 +89,50 @@ bool FramebufferObject::isActive() {
     return ((getActiveObject() == _id) && (_id != 0));
 }
 
-void FramebufferObject::attachTexture(Texture* texture, GLenum attachment, int mipLevel, int zSlice) {
+void FramebufferObject::attachTexture(Texture* texture, GLenum attachment, int mipLevel,
+                                      int zSlice)
+{
     switch (texture->type()) {
         case GL_TEXTURE_1D:
-            glFramebufferTexture1D( GL_FRAMEBUFFER, attachment, GL_TEXTURE_1D, *texture, mipLevel );
+            glFramebufferTexture1D(
+                GL_FRAMEBUFFER,
+                attachment,
+                GL_TEXTURE_1D,
+                *texture,
+                mipLevel
+            );
+            break;
+        case GL_TEXTURE_2D:
+        case GL_TEXTURE_RECTANGLE:
+            glFramebufferTexture2D(
+                GL_FRAMEBUFFER,
+                attachment,
+                texture->type(),
+                *texture,
+                mipLevel
+            );
             break;
         case GL_TEXTURE_3D:
-            glFramebufferTexture3D( GL_FRAMEBUFFER, attachment, GL_TEXTURE_3D, *texture, mipLevel, zSlice );
+            glFramebufferTexture3D(
+                GL_FRAMEBUFFER,
+                attachment,
+                GL_TEXTURE_3D,
+                *texture,
+                mipLevel,
+                zSlice
+            );
             break;
         case GL_TEXTURE_2D_ARRAY:
-            glFramebufferTextureLayer( GL_FRAMEBUFFER, attachment, *texture, mipLevel, zSlice );
+            glFramebufferTextureLayer(
+                GL_FRAMEBUFFER,
+                attachment,
+                *texture,
+                mipLevel,
+                zSlice
+            );
             break;
-        default: //GL_TEXTURE_2D, GL_TEXTURE_RECTANGLE
-            glFramebufferTexture2D( GL_FRAMEBUFFER, attachment, texture->type(), GLuint(*texture), mipLevel );
+        default:
+            LERROR("Unknown texture type");
             break;
     }
     _attachedTextures[attachment] = texture;

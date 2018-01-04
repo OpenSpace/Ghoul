@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -35,6 +35,8 @@
 #pragma warning (push)
 #pragma warning (disable : 4619) // #pragma warning: there is no warning number '4800' 
 #endif // _MSC_VER
+
+#include <ghoul/misc/supportmacros.h>
 
 #include "gtest/gtest.h"
 

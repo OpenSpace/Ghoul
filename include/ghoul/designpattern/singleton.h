@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -51,7 +51,7 @@ template <class T>
 class Singleton {
 public:
     /**
-     * Creates and initializes an empty singleton with the arguments passed to the 
+     * Creates and initializes an empty singleton with the arguments passed to the
      * template class T constructor.
      * \pre The singleton must not have been initialized before
      */
@@ -59,11 +59,11 @@ public:
     static void initialize(Args... args) {
         ghoul_assert(
             !isInitialized(),
-            std::string(typeid(T).name()) + " is already initialized!"
+            std::string(typeid(T).name()) + " is already initialized"
         );
         _instance = new T(std::forward<Args>(args)...);
     }
-    
+
     /**
      * Deinitializes and deletes the singleton.
      * \pre The singleton must have been initialized before
@@ -71,12 +71,12 @@ public:
     static void deinitialize() {
         ghoul_assert(
             isInitialized(),
-            std::string(typeid(T).name()) + " is not initialized!"
+            std::string(typeid(T).name()) + " is not initialized"
         );
         delete _instance;
         _instance = nullptr;
     }
-    
+
     /**
      * Returns the initialization state of the singleton.
      * \return The initialization state of the singleton
@@ -84,7 +84,7 @@ public:
     static bool isInitialized() {
         return (_instance != nullptr);
     }
-    
+
     /**
      * Returns the reference to the singleton.
      * \return A reference to the singleton
@@ -93,7 +93,7 @@ public:
     static T& ref() {
         ghoul_assert(
             isInitialized(),
-            std::string(typeid(T).name()) + " is not initialized!"
+            std::string(typeid(T).name()) + " is not initialized"
         );
         return *_instance;
     }
@@ -101,17 +101,17 @@ public:
 protected:
     Singleton() = default;
     ~Singleton() = default;
-    
+
 private:
     // protecting against evil
     Singleton(const Singleton&) = delete;
     Singleton(const Singleton&&) = delete;
     Singleton& operator=(const Singleton& rhs) = delete;
     Singleton& operator=(Singleton&& rhs) = delete;
-    
+
     // instance member
     static T* _instance;
-    
+
 }; // Singleton
 
 template <class T> T* Singleton<T>::_instance = nullptr;

@@ -2,7 +2,7 @@
 #                                                                                        #
 # GHOUL                                                                                  #
 #                                                                                        #
-# Copyright (c) 2012-2017                                                                #
+# Copyright (c) 2012-2018                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -52,7 +52,8 @@ if (MSVC)
         "/w44548"   # expression before comma has no effect; expected expression with side-effect
         "/w44549"   # 'operator': operator before comma has no effect; did you intend 'operator'?
         "/w44555"   # expression has no effect; expected expression with side-effect
-        "/w44574"   # 'identifier' is defined to be '0': did you mean to use '#if identifier'?
+        # This is disabled until GLM is updated to version 0.9.9 that removes occurrance of this warning
+        # "/w44574"   # 'identifier' is defined to be '0': did you mean to use '#if identifier'?
         "/w44608"   # 'symbol1' has already been initialized by another union member in the initializer list, 'symbol2'
         "/w44619"   # #pragma warning: there is no warning number 'number'
         "/w44628"   # digraphs not supported with -Ze. Character sequence 'digraph' not interpreted as alternate token for 'char'
@@ -72,6 +73,12 @@ if (MSVC)
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(Ghoul PRIVATE "/WX")
     endif ()
+
+    # This definition can be removed when the glbinding submodule is updated
+    target_compile_definitions(Ghoul PUBLIC "_SILENCE_CXX17_ADAPTOR_TYPEDEFS_DEPRECATION_WARNING")
+
+    # This definition can be removed when Cppformat is updated to remove the allocator warning
+    target_compile_definitions(Ghoul PUBLIC "_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(
         Ghoul

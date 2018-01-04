@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -44,7 +44,7 @@
 using std::string;
 
 namespace {
-    const string _loggerCat = "FileSystem";
+    constexpr const char* _loggerCat = "FileSystem";
 
     void CALLBACK completionHandler(
         DWORD dwErrorCode,
@@ -96,7 +96,8 @@ void FileSystem::addFileListener(File* file) {
             NULL,
             OPEN_EXISTING,
             FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
-            NULL);
+            NULL
+        );
 
         if (handle->_handle == INVALID_HANDLE_VALUE) {
             LERROR("Directory handle for '" << d << "' could not be obtained");
@@ -132,7 +133,9 @@ void FileSystem::removeFileListener(File* file) {
     LWARNING("Could not find tracked '" << file <<"' for path '"<< file->path() << "'");
 }
 
-void FileSystem::callbackHandler(DirectoryHandle* directoryHandle, const std::string& file) {
+void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,
+                                 const std::string& file)
+{
     std::string fullPath;
     for (const auto& d : FileSys._directories) {
         if (d.second == directoryHandle) {
@@ -159,7 +162,9 @@ void readStarter(DirectoryHandle* directoryHandle) {
 }
 
 void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
-    DirectoryHandle* directoryHandle = static_cast<DirectoryHandle*>(lpOverlapped->hEvent);
+    DirectoryHandle* directoryHandle = static_cast<DirectoryHandle*>(
+        lpOverlapped->hEvent
+    );
 
     unsigned char currentBuffer = directoryHandle->_activeBuffer;
 
@@ -169,14 +174,16 @@ void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
     // Restart change listener as soon as possible
     readStarter(directoryHandle);
 
-    char* buffer = reinterpret_cast<char*>(&(directoryHandle->_changeBuffer[currentBuffer][0]));
+    char* buffer = reinterpret_cast<char*>(
+        &(directoryHandle->_changeBuffer[currentBuffer][0])
+    );
 
     // data might have queued up, so we need to check all changes
     while (true) {
         // extract the information which file has changed
-        FILE_NOTIFY_INFORMATION& information = 
+        FILE_NOTIFY_INFORMATION& information =
             reinterpret_cast<FILE_NOTIFY_INFORMATION&>(*buffer);
-        
+
         if (information.Action == FILE_ACTION_MODIFIED) {
             std::vector<char> currentFilenameBuffer(information.FileNameLength);
 
@@ -214,18 +221,19 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
 
     changeBuffer[activeBuffer].resize(changeBufferSize);
     ZeroMemory(&(changeBuffer[activeBuffer][0]), changeBufferSize);
-    
+
     DWORD returnedBytes;
     BOOL success = ReadDirectoryChangesW(
         handle,
         &changeBuffer[activeBuffer][0],
         static_cast<DWORD>(changeBuffer[activeBuffer].size()),
         false,
-        FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE | 
+        FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE |
         FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_CREATION,
         &returnedBytes,
         overlappedBuffer,
-        &completionHandler);
+        &completionHandler
+    );
 
     if (success == 0) {
         LERROR("Could not begin read directory");

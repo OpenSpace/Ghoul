@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -45,20 +45,20 @@ public:
     struct TextureWriteException : public RuntimeError {
         explicit TextureWriteException(std::string name, std::string message,
             const TextureWriterBase& writer);
-        
+
         /// The filename that caused the exception to be thrown
         std::string filename;
-        
+
         /// The error message that occurred
         std::string message;
-        
+
         /// The TextureWriterBase that caused the exception
         const TextureWriterBase& writer;
     };
 
     /// Default virtual destructor
     virtual ~TextureWriterBase() {}
-    
+
     /**
      * Saves the \p texture to disk.
      * \param texture The Texture to write to disk
@@ -70,7 +70,7 @@ public:
      */
     virtual void saveTexture(const opengl::Texture& texture,
         const std::string& filename) const = 0;
-    
+
     /**
      * Returns a list of all extensions that this TextureWriteException supports.
      * \return A list of all extensions that this TextureWriteException supports

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -85,7 +85,8 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderMultiFormat::loadModel(
 
     loadModel(filename, vertices, indices);
 
-    auto vbo = std::make_unique<opengl::VertexBufferObject>();
+    std::unique_ptr<opengl::VertexBufferObject> vbo =
+        std::make_unique<opengl::VertexBufferObject>();
     vbo->initialize(vertices, indices);
     vbo->vertexAttribPointer(
         0,
@@ -159,7 +160,7 @@ void ModelReaderMultiFormat::loadModel(
 
     for (const aiMesh* meshPtr : meshArray) {
         // Walk through each of the mesh's vertices
-        for (unsigned int i = 0; i < meshPtr->mNumVertices; i++) {                    
+        for (unsigned int i = 0; i < meshPtr->mNumVertices; i++) {
             Vertex vTmp;
 
             // Positions
@@ -174,7 +175,7 @@ void ModelReaderMultiFormat::loadModel(
 
             // Texture Coordinates
             if (meshPtr->mTextureCoords[0]) {
-                // Each vertex can have at most 8 different texture coordinates. 
+                // Each vertex can have at most 8 different texture coordinates.
                 // We are using only the first one provided.
                 vTmp.tex[0] = meshPtr->mTextureCoords[0][i].x;
                 vTmp.tex[1] = meshPtr->mTextureCoords[0][i].y;
@@ -193,7 +194,9 @@ void ModelReaderMultiFormat::loadModel(
 
             if (face->mNumIndices == 3) {
                 for (unsigned int ii = 0; ii < face->mNumIndices; ii++) {
-                    indexArray.push_back(static_cast<GLint>(face->mIndices[ii] + positionIndex));
+                    indexArray.push_back(
+                        static_cast<GLint>(face->mIndices[ii] + positionIndex)
+                    );
                 }
             }
         }
@@ -202,22 +205,42 @@ void ModelReaderMultiFormat::loadModel(
         //if (meshPtr->mMaterialIndex >= 0)
         //{
         //    aiMaterial* material = scene->mMaterials[meshPtr->mMaterialIndex];
-        //    // We assume a convention for sampler names in the shaders. Each diffuse texture should be named
-        //    // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
+        //    // We assume a convention for sampler names in the shaders. Each diffuse
+        //    // texture should be named as 'texture_diffuseN' where N is a sequential
+        //    // number ranging from 1 to MAX_SAMPLER_NUMBER.
         //    // Same applies to other texture as the following list summarizes:
         //    // Diffuse: texture_diffuseN
         //    // Specular: texture_specularN
         //    // Normal: texture_normalN
 
         //    // 1. Diffuse maps
-        //    vector<Texture> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+        //    vector<Texture> diffuseMaps = this->loadMaterialTextures(
+        //        material,
+        //        aiTextureType_DIFFUSE,
+        //        "texture_diffuse"
+        //    );
         //    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         //    // 2. Specular maps
-        //    vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+        //    vector<Texture> specularMaps = this->loadMaterialTextures(
+        //        material,
+        //        aiTextureType_SPECULAR,
+        //        "texture_specular"
+        //    );
         //    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-        //    // 3. Reflection maps (Note that ASSIMP doesn't load reflection maps properly from wavefront objects, so we'll cheat a little by defining the reflection maps as ambient maps in the .obj file, which ASSIMP is able to load)
-        //    vector<Texture> reflectionMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_reflection");
-        //    textures.insert(textures.end(), reflectionMaps.begin(), reflectionMaps.end());
+        //    // 3. Reflection maps (Note that ASSIMP doesn't load reflection maps
+        //    .. properly from wavefront objects, so we'll cheat a little by defining the
+        //    // reflection maps as ambient maps in the .obj file, which ASSIMP is able to
+        //    // load)
+        //    vector<Texture> reflectionMaps = this->loadMaterialTextures(
+        //        material,
+        //        aiTextureType_AMBIENT,
+        //        "texture_reflection"
+        //    );
+        //    textures.insert(
+        //        textures.end(),
+        //        reflectionMaps.begin(),
+        //        reflectionMaps.end()
+        //    );
         //}
 
         positionIndex += meshPtr->mNumVertices;

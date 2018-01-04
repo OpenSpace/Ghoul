@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -54,7 +54,7 @@ void LogManager::removeLog(std::shared_ptr<Log> log) {
 }
 
 void LogManager::flushLogs() {
-    for (const auto& log : _logs) {
+    for (const std::shared_ptr<Log>& log : _logs) {
         log->flush();
     }
 }
@@ -65,7 +65,7 @@ void LogManager::logMessage(LogLevel level, const std::string& category,
     if (level >= _level) {
         // Acquire lock, automatically released at end of scope
         std::lock_guard<std::mutex> lock(_mutex);
-        
+
         for (const std::shared_ptr<Log>& log : _logs) {
             if (level >= log->logLevel()) {
                 log->log(level, category, message);
@@ -74,7 +74,7 @@ void LogManager::logMessage(LogLevel level, const std::string& category,
                 }
             }
         }
-        
+
         int l = std::underlying_type<LogLevel>::type(level);
         ++(_logCounter[l]);
     }
@@ -83,7 +83,7 @@ void LogManager::logMessage(LogLevel level, const std::string& category,
 void LogManager::logMessage(LogLevel level, const std::string& message) {
     logMessage(level, "", message);
 }
-    
+
 int LogManager::messageCounter(LogLevel level) {
     return _logCounter[std::underlying_type<LogLevel>::type(level)];
 }

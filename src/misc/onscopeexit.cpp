@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -30,7 +30,7 @@ namespace ghoul {
 OnScopeExit::OnScopeExit(std::function<void()> function)
     : _function(std::move(function))
 {}
-    
+
 OnScopeExit::~OnScopeExit() {
     if (_function) {
         _function();
@@ -40,5 +40,5 @@ OnScopeExit::~OnScopeExit() {
 void OnScopeExit::clear() {
     _function = nullptr;
 }
-    
+
 } // namespace ghoul

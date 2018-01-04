@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -84,7 +84,7 @@ void SystemCapabilities::logCapabilities(
 void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponent> comp)
 {
     ghoul_assert(comp != nullptr, "Component must not be nullptr");
-    
+
     auto it = std::find_if(
         _components.begin(),
         _components.end(),
@@ -94,7 +94,7 @@ void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponen
             return typeid(c) == typeid(r);
         }
     );
-    
+
     ghoul_assert(it == _components.end(), "Component must not have been added before");
     _components.push_back(std::move(comp));
 }

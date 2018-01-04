@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -75,16 +75,16 @@ template <bufferbinding::Buffer T>
 int BufferBinding<T>::numberActiveBindings() {
     return _totalActive;
 }
-    
+
 template <bufferbinding::Buffer T>
 void BufferBinding<T>::assignBinding() {
     if (_totalActive >= _maxBufferBindings) {
         //throw MaxBufferBindingsExceeded();
         return;
     }
-    
+
     _assigned = true;
-    
+
     for (size_t i = 0; i < _maxBufferBindings; ++i) {
         if (!_busyBindings[i]) {
             _number = static_cast<GLint>(i);

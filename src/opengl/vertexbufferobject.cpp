@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -40,7 +40,7 @@ VertexBufferObject::VertexBufferObject(VertexBufferObject&& other) {
     _vBufferID = other._vBufferID;
     _iBufferID = other._iBufferID;
     _iSize = other._iSize;
-    
+
     other._vaoID = 0;
     other._vBufferID = 0;
     other._iBufferID = 0;
@@ -53,7 +53,7 @@ VertexBufferObject& VertexBufferObject::operator=(VertexBufferObject&& other) {
         _vBufferID = other._vBufferID;
         _iBufferID = other._iBufferID;
         _iSize = other._iSize;
-        
+
         other._vaoID = 0;
         other._vBufferID = 0;
         other._iBufferID = 0;
@@ -66,7 +66,7 @@ VertexBufferObject::~VertexBufferObject() {
     glDeleteBuffers(1, &_vBufferID);
     glDeleteBuffers(1, &_iBufferID);
     glDeleteVertexArrays(1, &_vaoID);
-    
+
     _vBufferID = 0;
     _iBufferID = 0;
     _vaoID = 0;
@@ -88,13 +88,13 @@ void VertexBufferObject::initialize(const std::vector<GLfloat>& vertexArray,
     ghoul_assert(!isInitialized(), "VertexBufferObject must not have been initialized");
     ghoul_assert(!vertexArray.empty(), "Vertex array must not be empty");
     ghoul_assert(!indexArray.empty(), "Index array must not be empty");
-    
+
     generateGLObjects();
-    
+
     _iSize = static_cast<unsigned int>(indexArray.size());
-    
+
     glBindVertexArray(_vaoID);
-    
+
     glBindBuffer(GL_ARRAY_BUFFER, _vBufferID);
     glBufferData(
         GL_ARRAY_BUFFER,
@@ -102,7 +102,7 @@ void VertexBufferObject::initialize(const std::vector<GLfloat>& vertexArray,
         vertexArray.data(),
         GL_STATIC_DRAW
     );
-    
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
@@ -110,7 +110,7 @@ void VertexBufferObject::initialize(const std::vector<GLfloat>& vertexArray,
         indexArray.data(),
         GL_STATIC_DRAW
     );
-    
+
     glBindVertexArray(0);
 }
 

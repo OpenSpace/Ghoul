@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -48,11 +48,11 @@ public:
     struct OpenGLCapabilitiesComponentError : public RuntimeError {
         explicit OpenGLCapabilitiesComponentError(std::string message);
     };
-    
+
     struct GPUVendorError : public OpenGLCapabilitiesComponentError {
         explicit GPUVendorError(std::string message);
     };
-    
+
     /// This enum stores the possible vendors of graphics cards that can be detected
     enum class Vendor {
         Nvidia, ///< Nvidia
@@ -188,22 +188,22 @@ protected:
     std::vector<std::string> _extensions;
     /// GLEW Version
     Version _glewVersion;
-    
+
     /// The maximum supported texture size can have
     int _maxTextureSize = -1;
     /// The maximum supported texture size for 3D textures
     int _maxTextureSize3D = -1;
     /// The maximum number of texture units
-    int _numTextureUnits = -1;
+    int _nTextureUnits = -1;
     /// The maximum number of atomic counter buffer bindings
-    int _numAtomicCounterBufferBindings = -1;
+    int _nAtomicCounterBufferBindings = -1;
     /// The maximum number of shader storage buffer bindings
-    int _numShaderStorageBufferBindings = -1;
+    int _nShaderStorageBufferBindings = -1;
     /// The maximum number of uniform buffer bindings
-    int _numUniformBufferBindings = -1;
+    int _nUniformBufferBindings = -1;
     /// The maximum number of color attachments for an FBO
     int _maxFramebufferColorAttachments = -1;
-    
+
     // Only used in WMI, but declared nevertheless to prevent a mismatch in compiler flags
     // between the cpp file and an application including this header
     /// Stores the version of the installed driver

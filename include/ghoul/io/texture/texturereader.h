@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -51,13 +51,13 @@ public:
         explicit MissingReaderException(std::string extension);
         std::string fileExtension;
     };
-    
+
     /**
      * Returns the static variant of the TextureReader
      * \return The static variant of the TextureReader
      */
     static TextureReader& ref();
-    
+
     /**
      * Loads the provided \p filename into a Texture and returns it. The correct
      * TextureReaderBase is determined by the extension of the \p filename.
@@ -91,7 +91,7 @@ public:
      */
     std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size,
         const std::string& format = "");
-    
+
     /**
      * Returns a list of all the extensions that are supported by registered readers. If
      * a file with an extension included in this list is passed to the loadTexture file
@@ -108,7 +108,7 @@ public:
      * \pre \p reader must not have been added to this TextureReader before
      */
     void addReader(std::shared_ptr<TextureReaderBase> reader);
-    
+
     /**
      * Returns a list of all the previously registered TextureReaderBases.
      * \return A list of all the previously registered TextureReaderBases
@@ -122,7 +122,7 @@ private:
      * \throw MissingReaderException If there was no reader for the specified \p extension
      */
     TextureReaderBase* readerForExtension(const std::string& extension);
-    
+
     /// The list of all registered readers
     std::vector<std::shared_ptr<TextureReaderBase>> _readers;
 };

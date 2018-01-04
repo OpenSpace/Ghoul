@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -18,7 +18,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,   *
  * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A         *
  * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT    *
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR .OTHER LIABILITY, WHETHER IN AN ACTION OF  *
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR .OTHER LIABILITY, WHETHER IN AN ACTION OF *
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
@@ -233,6 +233,11 @@ void Texture::applyFilter() {
             glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             break;
+        case FilterMode::LinearMipMap:
+            glGenerateMipmap(_type);
+            glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            break;
         case FilterMode::AnisotropicMipMap:
         {
             glGenerateMipmap(_type);
@@ -363,7 +368,7 @@ void Texture::applyWrapping() {
             glTexParameteri(_type, GL_TEXTURE_WRAP_S, wrapping);
             break;
         default:
-            assert(false);
+            throw MissingCaseException();
     }
 }
 
@@ -418,7 +423,7 @@ void Texture::uploadDataToTexture(void* pixelData) {
             );
             break;
         default:
-            assert(false);
+            throw MissingCaseException();
     }
 }
 
@@ -466,7 +471,7 @@ void Texture::reUploadDataToTexture(void* pixelData) {
             );
             break;
         default:
-            assert(false);
+            throw MissingCaseException();
     }
 }
 
@@ -1116,7 +1121,7 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
     if (!_pixels) {
         return vec4(0.f);
     }
-    
+
     vec4 result(0.f);
     switch (_format) {
         case Format::Red:

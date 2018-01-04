@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -121,7 +121,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
 
 #endif
 
-#else 
+#else
 
 #define ghoul_assert(__condition__, __message__) {}
 

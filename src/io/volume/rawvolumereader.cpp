@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -59,10 +59,15 @@ opengl::Texture* RawVolumeReader::read(const std::string& filename) {
             fprintf( stderr, "Could not open file '%s'\n", filename.c_str() );
         }
 
-        opengl::Texture* texture = new opengl::Texture(data, glm::size3_t(_hints._dimensions),
-                _hints._format, _hints._internalFormat, GL_UNSIGNED_BYTE,
-                opengl::Texture::FilterMode::Linear, opengl::Texture::WrappingMode::ClampToBorder);
-        //texture->uploadTexture();
+        opengl::Texture* texture = new opengl::Texture(
+            data,
+            glm::size3_t(_hints._dimensions),
+            _hints._format,
+            _hints._internalFormat,
+            GL_UNSIGNED_BYTE,
+            opengl::Texture::FilterMode::Linear,
+            opengl::Texture::WrappingMode::ClampToBorder
+        );
         return texture;
     } else {
         std::cout << "Error. Volume dimensions not set" << std::endl;

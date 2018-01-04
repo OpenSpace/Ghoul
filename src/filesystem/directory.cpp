@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -69,14 +69,14 @@ const string& Directory::path() const {
     return _directoryPath;
 }
 
-Directory Directory::parentDirectory(AbsolutePath absolutePath) const {
+Directory Directory::parentDirectory([[maybe_unused]] AbsolutePath absolutePath) const {
 #ifdef WIN32
     if (_directoryPath.back() == FileSystem::PathSeparator) {
         return Directory(
             _directoryPath + "..",
             absolutePath == AbsolutePath::Yes ? RawPath::No : RawPath::Yes
         );
-    } 
+    }
     else {
         return Directory(
             _directoryPath + FileSystem::PathSeparator + "..",
@@ -84,12 +84,12 @@ Directory Directory::parentDirectory(AbsolutePath absolutePath) const {
         );
     }
 #else
-    (void)absolutePath; // remove unused argument warning ---abock
     size_t length = _directoryPath.length();
     size_t position = _directoryPath.find_last_of(FileSystem::PathSeparator);
-    if(position == length && length > 1)
+    if (position == length && length > 1) {
         position = _directoryPath.find_last_of(FileSystem::PathSeparator, length-1);
-    
+    }
+
     return Directory(_directoryPath.substr(0, position));
 #endif
 }
@@ -98,7 +98,7 @@ vector<string> Directory::read(Recursive search, Sort sort) const {
     vector<string> result;
     internalReadDirectories(result, _directoryPath, search);
     internalReadFiles(result, _directoryPath, search);
-    if (sort == Sort::Yes) {
+    if (sort) {
         std::sort(result.begin(), result.end());
     }
     return result;

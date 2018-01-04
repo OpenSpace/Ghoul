@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -52,7 +52,13 @@ std::vector<std::string> tokenizeString(
  * \param separator The separator that will be used in the joined string
  */
 std::string join(std::vector<std::string> input, const std::string& separator = ".");
-    
+
+/**
+ * Removes whitespace at the beginning and the end of the string
+ * \param value The string from which to remove the whitespace
+ */
+void trimWhitespace(std::string& value);
+
 } // namespace ghoul
 
 #endif // __GHOUL___MISC___H__

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,7 +27,7 @@
 #define __GHOUL___INTERPOLATOR___H__
 
 namespace ghoul {
-    
+
 /**
  * Returns an interpolated value based on the factor supplied in \p t. In addition to the
  * interpolation factor \p t two values which to interpolate between must be supplied.
@@ -43,7 +43,7 @@ T interpolateLinear(double t, const T& p0, const T& p1);
 
 /**
  * Returns an interpolated value using the Catmull-Rom spline interpolation scheme. Four
- * control points are used in the interpolation; \p p0, \p p1, \p p2, and \p p3. The 
+ * control points are used in the interpolation; \p p0, \p p1, \p p2, and \p p3. The
  * interpolation is calculated based on the interpolation factor \p t.
  * \param t The interpolation factor to use in interpolation
  * \param p0 The first control point of the interpolation

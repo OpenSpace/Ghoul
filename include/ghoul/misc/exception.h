@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -37,7 +37,7 @@ namespace ghoul {
  * that threw the exception if it was set.
  */
 struct RuntimeError : public std::runtime_error {
-    /** 
+    /**
      * Main constructor constructing the exception with the provided \p message and
      * \p component.
      * \param message The main message of the exception
@@ -45,14 +45,14 @@ struct RuntimeError : public std::runtime_error {
      * \pre \p message must not be empty
      */
     explicit RuntimeError(std::string message, std::string component = "");
-    
+
     /// The main message describing the exception
     std::string message;
-    
+
     /// The name of the component that threw the exception
     std::string component;
 };
-    
+
 /**
  * Exception that is thrown if an IO access failed because a file could was not found
  */
@@ -65,11 +65,11 @@ struct FileNotFoundError : public RuntimeError {
      * \pre \p file must not be empty
      */
     explicit FileNotFoundError(std::string file, std::string component = "");
-    
+
     /// The file that was missing
     std::string file;
 };
-    
+
 } // namespace ghoul
 
 #endif // __GHOUL___EXCEPTION___H__

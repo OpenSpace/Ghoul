@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -35,7 +35,7 @@
 namespace ghoul::opengl {
 
 /**
- * This class manages Texture Units and is a wrapper around <code>GL_TEXTURE0</code>, 
+ * This class manages Texture Units and is a wrapper around <code>GL_TEXTURE0</code>,
  * <code>GL_TEXTURE1</code>, ... It manages which texture units are currently active and
  * which units are free to use. To use a TextureUnit, it has to be #activate%d, the
  * Texture has to be bound, and then the #unitNumber can be retrieved so that it can be
@@ -49,7 +49,7 @@ public:
     struct TextureUnitError : public RuntimeError {
         explicit TextureUnitError(std::string message);
     };
-    
+
     /**
      * The constructor will initialize the static variables when the first TextureUnit is
      * created and the non-static variables are initiated.
@@ -62,7 +62,7 @@ public:
     ~TextureUnit();
 
     /**
-     * This method will activate the enum assigned to this TextureUnit. If this is the 
+     * This method will activate the enum assigned to this TextureUnit. If this is the
      * first call to either activate, #glEnum, or #unitNumber, a free unit number will be
      * assigned to this object. This will call the OpenGL function
      * <code>glActiveTexture</code> with the enum as a parameter.
@@ -72,12 +72,12 @@ public:
 
     /**
     * This method will deactivate the enum assigned to this TextureUnit and mark it as
-    * free again. 
+    * free again.
     */
     void deactivate();
 
     /**
-     * This method returns the texture unit enum that was assigned to this TextureUnit. If 
+     * This method returns the texture unit enum that was assigned to this TextureUnit. If
      * this is the first call to either #activate, glEnum, or #unitNumber, a free unit
      * enum will be assigned to this object. The returned enum is equivalent to
      * <code>GL_TEXTURE0 + unitNumber()</code>.
@@ -97,7 +97,7 @@ public:
     /**
      * This operator returns the texture unit number that was assigned to this
      * TextureUnit. If this is the first call to either #activate, #glEnum, or unitNumber,
-     * a free unit number will be assigned to this object. Is guaranteed to give the same 
+     * a free unit number will be assigned to this object. Is guaranteed to give the same
      * result as #unitNumber.
      * \return The texture unit number that was assigned to this TextureUnit
      * \throw TextureUnitError If the new unit number could not be assigned
@@ -105,13 +105,13 @@ public:
     operator GLint();
 
     /**
-     * Sets the zero unit as the active texture unit. This call is equivalent to calling 
+     * Sets the zero unit as the active texture unit. This call is equivalent to calling
      * the OpenGL function <code>glActiveTexture(GL_TEXTURE0)</code>.
      */
     static void setZeroUnit();
 
     /**
-     * This method returns the number texture units that have been marked as used by 
+     * This method returns the number texture units that have been marked as used by
      * calling one of the methods #activate, #glEnum, or #unitNumber. The maximum number
      * of supported texture units can be queried from the
      * #ghoul::systemcapabilities::SystemCapabilities.
@@ -137,13 +137,13 @@ private:
 
     /// The number in <code>[0, maxTexUnits]</code> referring to this TextureUnit
     GLint _number;
-    
+
     /**
      * The enum in <code>[GL_TEXTURE0, GL_TEXTURE0 + maxTexUnits]</code> referring to this
      * TextureUnit
      */
     GLenum _glEnum;
-    
+
     /// <code>true</code> if this TextureUnit has been assigned
     bool _assigned;
 

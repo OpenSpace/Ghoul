@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -28,7 +28,7 @@
 #include <fmt/format.h>
 
 namespace ghoul::io {
- 
+
 TextureReaderBase::TextureLoadException::TextureLoadException(std::string n,
                                                               std::string m,
                                                               const TextureReaderBase* r)
@@ -37,7 +37,7 @@ TextureReaderBase::TextureLoadException::TextureLoadException(std::string n,
     , message(std::move(m))
     , reader(r)
 {}
-    
+
 TextureReaderBase::~TextureReaderBase() {}
-    
+
 } // namespace ghoul::io

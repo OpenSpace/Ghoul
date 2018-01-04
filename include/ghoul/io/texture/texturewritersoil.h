@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -33,8 +33,8 @@ namespace ghoul::io {
 #ifdef GHOUL_USE_SOIL
 
 /**
- * Saves the texture using the Soil library. For a list of supported image formats, see 
- * http://www.lonesock.net/soil.html 
+ * Saves the texture using the Soil library. For a list of supported image formats, see
+ * http://www.lonesock.net/soil.html
  */
 class TextureWriterSOIL : public TextureWriterBase {
 public:
@@ -48,7 +48,7 @@ public:
      */
     void saveTexture(const opengl::Texture& texture,
         const std::string& filename) const override;
-    
+
     /**
      * Returns the supported extensions.
      * \return The supported extensions

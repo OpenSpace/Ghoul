@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -31,7 +31,7 @@
 
 namespace ghoul::logging {
 
-Log::Log(TimeStamping timeStamping, DateStamping dateStamping, 
+Log::Log(TimeStamping timeStamping, DateStamping dateStamping,
          CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
          LogLevel minimumLogLevel)
     : _timeStamping(timeStamping)
@@ -80,7 +80,7 @@ LogLevel Log::logLevel() const {
 std::string Log::getTimeString() const {
     auto now = std::chrono::system_clock::now();
     time_t time = std::chrono::system_clock::to_time_t(now);
-    
+
     std::stringstream ss;
 
 #ifdef WIN32
@@ -96,7 +96,7 @@ std::string Log::getTimeString() const {
 std::string Log::getDateString() const {
     auto now = std::chrono::system_clock::now();
     time_t time = std::chrono::system_clock::to_time_t(now);
-    
+
     std::stringstream ss;
 
 #ifdef WIN32

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -37,7 +37,7 @@ class Dictionary;
 /**
  * This concrete implementation of a DictionaryFormatter converts the passed Dictionary
  * into a Lua format.
- * 
+ *
  * At the moment, the only types that are supported in this conversion are:
  * <code>glm::vec2</code>, <code>glm::vec3</code>, <code>glm::vec4</code>,
  * <code>float</code>, <code>int</code>, and <code>std::string</code>.

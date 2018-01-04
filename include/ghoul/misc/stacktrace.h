@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -30,7 +30,7 @@
 #include <vector>
 
 namespace ghoul {
-    
+
 /**
  * Returns the stack trace at the calling site of the function. The vector that is
  * returned contains one line for each level of the stack trace. On Windows, the stack
@@ -39,7 +39,7 @@ namespace ghoul {
  * \return A list of the full stack trace at the calling site
  */
 std::vector<std::string> stackTrace();
-    
+
 } // namespace ghoul
 
 #endif // __GHOUL___STACKTRACE___H__

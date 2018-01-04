@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -36,7 +36,7 @@
 using std::string;
 
 namespace ghoul::io {
-    
+
 TextureWriter::MissingWriterException::MissingWriterException(std::string extension)
     : RuntimeError(fmt::format("No writer was found for extension '{}'", extension), "IO")
     , fileExtension(std::move(extension))
@@ -54,7 +54,7 @@ void TextureWriter::saveTexture(const opengl::Texture& texture, const string& fi
     ghoul::filesystem::File file = ghoul::filesystem::File(filename);
     const std::string& extension = file.fileExtension();
     ghoul_assert(!extension.empty(), "Filename must have an extension");
-    
+
     TextureWriterBase* writer = writerForExtension(extension);
     // Make sure the directory for the file exists
     FileSys.createDirectory(file.directoryName());
@@ -74,14 +74,14 @@ void TextureWriter::addWriter(std::shared_ptr<TextureWriterBase> writer) {
 
     _writers.push_back(writer);
 }
-    
+
 std::vector<std::shared_ptr<TextureWriterBase>> TextureWriter::writers() const {
     return _writers;
 }
 
 TextureWriterBase* TextureWriter::writerForExtension(const std::string& extension) {
-    for (const auto& writer : _writers) {
-        auto extensions = writer->supportedExtensions();
+    for (const std::shared_ptr<TextureWriterBase>& writer : _writers) {
+        std::vector<std::string> extensions = writer->supportedExtensions();
         auto it = std::find(extensions.begin(), extensions.end(), extension);
         if (it != extensions.end()) {
             return writer.get();

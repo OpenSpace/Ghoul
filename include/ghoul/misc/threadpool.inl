@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -30,18 +30,20 @@ namespace ghoul {
 template <typename F, typename... Arg>
 auto ThreadPool::queue(F&& f, Arg&&... arg) -> std::future<decltype(f(arg...))> {
     using ReturnType = decltype(f(arg...));
+
+    std::lock_guard<std::mutex> guard(_queueMutex);
     // We wrap the packaged_task into a shared pointer so that we can store it in the
     // lambda expression below. The capture of the lambda expression will keep this
     // packaged_task alive
     auto pck = std::make_shared<std::packaged_task<ReturnType ()>>(
         std::bind(std::forward<F>(f), std::forward<Arg>(arg)...)
     );
-    
+
     // Push the packaged packaged_task onto the queue of work items
     _taskQueue->push(
         [pck]() { (*pck)(); }
     );
-    
+
     // Get the future of the result (which might be std::future<void>, but that is not a
     // problem
     auto future = pck->get_future();
@@ -59,6 +61,8 @@ template <typename T, typename... Args>
 auto ThreadPool::queue(std::packaged_task<T>&& task, Args&&... arguments)
     -> decltype(task.get_future())
 {
+    std::lock_guard<std::mutex> guard(_queueMutex);
+
     auto pck = std::make_shared<std::packaged_task<T>>(std::move(task));
     _taskQueue->push(
         [pck]() { (*pck)(); }

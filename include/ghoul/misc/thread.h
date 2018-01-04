@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -43,7 +43,7 @@ enum class ThreadPriorityClass {
     Normal,
     High
 };
-    
+
 
 /**
  * Determines the priority level of a thread within a ThreadPriorityClass. The available
@@ -60,7 +60,7 @@ enum class ThreadPriorityLevel {
 };
 
 using Background = ghoul::Boolean;
-    
+
 /**
  * This method sets the priorty of the thread \p t to the ThreadPriorityClass
  * \p priorityClass and the ThreadPriorityLevel to \p priorityLevel.
@@ -82,7 +82,7 @@ void setPriority(
  * platforms that are not supported. On platforms that are supported, a background state
  * will cause the schedule to reduce the resource allocation for the specific thread.
  * \param t The thread for which to enable the background state
- * \param background Background::Yes if the background state should be enabled or 
+ * \param background Background::Yes if the background state should be enabled or
  * Background::No if the state should be disabled
  */
 void setThreadBackground(std::thread& t, Background background);

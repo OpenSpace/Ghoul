@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -41,7 +41,7 @@ namespace ghoul::opengl {
 /**
  * This class is a wrapper for an OpenGL shader object. It represents a single shader
  * object of the types declared in ShaderObject::ShaderType. All ShaderObject%s must be
- * loaded from a file on disk. The shader will load the contents of the file in the 
+ * loaded from a file on disk. The shader will load the contents of the file in the
  * constructor (if a constructor with a filename was chosen) or in the #setFilename
  * method. If the file changes after it has been loaded, the ShaderObject will not change
  * unless #rebuildFromFile is called, which pulls the changes. Each object can have a name
@@ -67,17 +67,17 @@ public:
 
         /// The compile error as reported by the GLSL compiler
         std::string compileError;
-        
+
         /// File identifiers of included files as reported by ShaderPreprocessor
         std::string fileIdentifiers;
-        
+
         /// The name of the ShaderObject that caused the compile error
         std::string shaderName;
     };
-    
+
     /**
-     * An enum of the different types of shaders that can be used in OpenGL. They can be 
-     * used interchangeably in native OpenGL calls, too. Compute shaders are only 
+     * An enum of the different types of shaders that can be used in OpenGL. They can be
+     * used interchangeably in native OpenGL calls, too. Compute shaders are only
      * available if OpenGL 4.3 is available.
      */
     enum class ShaderType : std::underlying_type_t<GLenum> {
@@ -107,7 +107,7 @@ public:
     using ShaderObjectCallback = std::function<void()>;
 
     /**
-     * This constructor creates a shader of the passed type with an empty source string. 
+     * This constructor creates a shader of the passed type with an empty source string.
      * Before this can be used, a shader must be loaded with #setFilename and it has to be
      * compiled.
      * \param shaderType The type of shader that this ShaderObject will represent
@@ -118,43 +118,45 @@ public:
     ShaderObject(ShaderType shaderType, Dictionary dictionary = Dictionary());
 
     /**
-     * This constructor creates a shader of the passed type and loads the shader source 
-     * from the provided filename. If the filename is an empty string, no source will be 
-     * loaded and the shader remains uninitialized. If the filename is a valid file, its 
+     * This constructor creates a shader of the passed type and loads the shader source
+     * from the provided filename. If the filename is an empty string, no source will be
+     * loaded and the shader remains uninitialized. If the filename is a valid file, its
      * contents will be used to initialize this ShaderObject.
      * \param shaderType The type of shader that this ShaderObject will represent
-     * \param filename The name of the file that will be used to load the source of this 
+     * \param filename The name of the file that will be used to load the source of this
      * shader
      * \param dictionary The dictionary that is used for the !ShaderPreprocessor
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
      * generated
      * \pre \p filename must not be empty
+     * \pre \p filename must be a file that exists
      */
     ShaderObject(ShaderType shaderType, std::string filename,
         Dictionary dictionary = Dictionary());
 
     /**
-     * This constructor creates a shader of the passed type and loads the shader source 
-     * from the provided filename. If the filename is an empty string, no source will be 
-     * loaded and the shader remains uninitialized. If the filename is a valid file, its 
-     * contents will be used to initialize this ShaderObject. The internal name, debug 
+     * This constructor creates a shader of the passed type and loads the shader source
+     * from the provided filename. If the filename is an empty string, no source will be
+     * loaded and the shader remains uninitialized. If the filename is a valid file, its
+     * contents will be used to initialize this ShaderObject. The internal name, debug
      * label and logging category will be set based on the user provided name.
      * \param shaderType The type of shader that this ShaderObject will represent
-     * \param filename The name of the file that will be used to load the source of this 
+     * \param filename The name of the file that will be used to load the source of this
      * shader
      * \param name The human readable name of this ShaderObject
      * \param dictionary The dictionary that is used for the !ShaderPreprocessor
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
      * generated
      * \pre \p filename must not be empty
+     * \pre \p filename must be a file that exists
      */
     ShaderObject(ShaderType shaderType, std::string filename, std::string name,
         Dictionary dictionary = Dictionary());
 
     /**
      * A copy constructor that will copy all of the internal state, and the shader source,
-     * but it will generate a new OpenGL name for the copied object. In addition, if the 
-     * content of the specified file has changed between creating the <code>cpy</code>, 
+     * but it will generate a new OpenGL name for the copied object. In addition, if the
+     * content of the specified file has changed between creating the <code>cpy</code>,
      * the copied Shader will use the changed file. That means a ShaderObject will not
      * cache the contents of the file inside.
      * \param cpy The original object that will be copied
@@ -177,16 +179,16 @@ public:
     ~ShaderObject();
 
     /**
-     * The casting operator that enabled this ShaderObject to be used in native OpenGL 
+     * The casting operator that enabled this ShaderObject to be used in native OpenGL
      * functions and it returns the OpenGL name.
      */
     operator GLuint() const;
 
     /**
      * The assignment operator that will copy all of the internal state, and the shader
-     * source, but it will generate a new OpenGL name for the assigned object. In 
-     * addition, if the content of the specified file has changed between creating the 
-     * <code>rhs</code>, the assigned Shader will use the changed file. I.e., a 
+     * source, but it will generate a new OpenGL name for the assigned object. In
+     * addition, if the content of the specified file has changed between creating the
+     * <code>rhs</code>, the assigned Shader will use the changed file. I.e., a
      * ShaderObject will not cache the contents of the file inside.
      * \param rhs The original right hand side that will be used to set this object
      * \return A reference to <code>this</code>
@@ -259,13 +261,13 @@ public:
 
     /**
      * This method will mark the OpenGL name as unused. Because of the way the OpenGL
-     * functions, the name might still be in use if the ShaderObject is attached to a 
+     * functions, the name might still be in use if the ShaderObject is attached to a
      * ProgramObject prior to deleting.
      */
     void deleteShader();
 
     /**
-     * This method will compile the shader source in this ShaderObject and returns the 
+     * This method will compile the shader source in this ShaderObject and returns the
      * success of this operation.
      * \throw ShaderCompileError If there was an error while compiling the ShaderObject
      */

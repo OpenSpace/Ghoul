@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -32,7 +32,7 @@ namespace ghoul::opengl {
 TextureUnit::TextureUnitError::TextureUnitError(std::string msg)
     : RuntimeError(std::move(msg), "TextureUnit")
 {}
-    
+
 bool TextureUnit::_initialized = false;
 unsigned int TextureUnit::_totalActive = 0;
 unsigned int TextureUnit::_maxTexUnits = 0;
@@ -63,7 +63,7 @@ void TextureUnit::deactivate() {
     if (_assigned) {
         _assigned = false;
         _busyUnits.at(_number) = false;
-        --_totalActive;        
+        --_totalActive;
     }
 }
 
@@ -94,8 +94,9 @@ int TextureUnit::numberActiveUnits() {
 }
 
 void TextureUnit::assignUnit() {
-    if (_totalActive >= _maxTexUnits)
+    if (_totalActive >= _maxTexUnits) {
         throw TextureUnitError("No more texture units available");
+    }
 
     _assigned = true;
 

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -37,7 +37,7 @@ namespace io {
 
 /**
  * Loads the texture using the SOIL library. For a list of supported image formats, see
- * http://www.lonesock.net/soil.html 
+ * http://www.lonesock.net/soil.html
  */
 class TextureReaderSOIL : public TextureReaderBase {
 public:

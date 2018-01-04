@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -41,14 +41,13 @@ using std::function;
 using std::string;
 
 namespace {
-    const string _loggerCat = "File";
 #ifdef WIN32
-    const unsigned int changeBufferSize = 16384u;
-    
+    constexpr unsigned int changeBufferSize = 16384u;
+
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
-#endif
-#endif
+#endif // _CRT_SECURE_NO_WARNINGS
+#endif // WIN32
 } // namespace
 
 namespace ghoul::filesystem {
@@ -57,12 +56,11 @@ File::FileException::FileException(const std::string& msg)
     : RuntimeError(msg, "File")
 {}
 
-File::File(std::string filename, RawPath isRawPath,
-          FileChangedCallback fileChangedCallback)
+File::File(string filename, RawPath isRawPath, FileChangedCallback fileChangedCallback)
     : _fileChangedCallback(std::move(fileChangedCallback))
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
+
     _filename = isRawPath ?
         std::move(filename) :
         std::move(FileSys.absolutePath(std::move(filename)));
@@ -159,7 +157,7 @@ string File::fileExtension() const {
         return _filename;
     }
 }
-    
+
 std::string File::lastModifiedDate() const {
     if (!FileSys.fileExists(_filename)) {
         throw FileException(fmt::format(

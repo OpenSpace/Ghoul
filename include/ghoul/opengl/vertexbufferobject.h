@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -33,8 +33,8 @@
 namespace ghoul::opengl {
 
 /**
- * This class is a wrapper for handling vertex buffer objects. It is only meant for 
- * simplifying the creation and use of the most standard vertex buffer object with a 
+ * This class is a wrapper for handling vertex buffer objects. It is only meant for
+ * simplifying the creation and use of the most standard vertex buffer object with a
  * vertex list and an index list. It will create an internal vertex array object to store
  * the created VertexBufferObject.
  */
@@ -46,13 +46,13 @@ public:
      * cannot be constructed without an OpenGL context.
      */
     VertexBufferObject();
-    
+
     /**
      * Moves the other object in place of the created one. The other object will be in an
      * uninitialized state afterwards.
      */
     VertexBufferObject(VertexBufferObject&& other);
-    
+
     /**
      * Moves the other object in place of the created one. The other object will be in an
      * uninitialized state afterwards.
@@ -63,14 +63,14 @@ public:
      * Default destructor.
      */
     ~VertexBufferObject();
-    
+
     /**
      * A runtime function that checks if initialize has been called.
      * \returns <code>true</code> if any initialize function has been called and
      * <code>false</code> otherwise.
      */
     bool isInitialized() const;
-    
+
     /**
      * Initializes the VertexBufferObject with the provided \p vertexArray and
      * \p indexArray list. The structure of the vertex data can be arbitrary but correct
@@ -99,10 +99,11 @@ public:
         const std::vector<GLint>& indexArray);
 
     /**
-     * Sets the render mode for this VertexBufferObject. The render mode is how OpenGL is 
+     * Sets the render mode for this VertexBufferObject. The render mode is how OpenGL is
      * treating the vertices and indices. The default is <code>GL_TRIANGLES</code> but
      * other common render primitives are <code>GL_LINES</code> and
-     * <code>GL_POINTS</code>. See https://www.opengl.org/sdk/docs/man/html/glDrawElements.xhtml
+     * <code>GL_POINTS</code>.
+     * See https://www.opengl.org/sdk/docs/man/html/glDrawElements.xhtml
      * for supported render modes.
      * \param mode The render mode. Default is <code>GL_TRIANGLES</code>
      */
@@ -140,16 +141,16 @@ private:
 
     /// The vertex array object that stores the created VertexBufferObject
     GLuint _vaoID;
-    
+
     /// The vertex buffer object
     GLuint _vBufferID;
-    
+
     /// The index buffer obejct
     GLuint _iBufferID;
-    
+
     /// The size of the index buffer, determining how many vertices are drawn
     unsigned int _iSize;
-    
+
     /// The rendering mode of this VertexBufferObject
     GLenum _mode;
 };

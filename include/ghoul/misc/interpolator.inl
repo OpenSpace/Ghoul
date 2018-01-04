@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,7 +27,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 namespace ghoul {
-    
+
 template <typename T>
 T interpolateLinear(double t, const T& p0, const T& p1) {
     return t * p1 + (1.0 - t) * p0;
@@ -37,17 +37,17 @@ template <>
 glm::quat interpolateLinear(double t, const glm::quat& p0, const glm::quat& p1) {
     return glm::slerp(p0, p1, static_cast<float>(t));
 }
-    
+
 template <>
 glm::dquat interpolateLinear(double t, const glm::dquat& p0, const glm::dquat& p1) {
     return glm::slerp(p0, p1, t);
 }
-    
+
 template <typename T>
 T interpolateCatmullRom(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
     double t2 = t*t;
     double t3 = t2*t;
-    
+
     return 0.5 * (
         2.0 * p1 +
         t * (p2 - p0) +

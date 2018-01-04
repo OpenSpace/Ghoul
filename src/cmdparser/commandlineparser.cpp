@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -38,7 +38,7 @@ using fmt::format;
 
 namespace {
 
-const char* _loggerCat = "CommandlineParser";
+constexpr const char* _loggerCat = "CommandlineParser";
 
 /**
  * Extracts multiple arguments from a single list. <br>
@@ -77,11 +77,11 @@ int extractArguments(const std::vector<std::string>& in, std::vector<std::string
 } // namespace
 
 namespace ghoul::cmdparser {
-    
+
 CommandlineParser::CommandlineException::CommandlineException(const std::string& msg)
     : RuntimeError(msg, "CommandlineParser")
 {}
-    
+
 CommandlineParser::CommandlineParser(std::string programName,
                                      AllowUnknownCommands unknownCommands,
                                      std::string shortHelpCommand,
@@ -97,7 +97,7 @@ CommandlineParser::CommandlineParser(std::string programName,
 CommandlineParser::~CommandlineParser() {
     _commands.clear();
 }
-    
+
 void CommandlineParser::setAllowUnknownCommands(AllowUnknownCommands unknownCommands) {
     _allowUnknownCommands = unknownCommands;
 }
@@ -121,22 +121,22 @@ std::shared_ptr<const std::vector<std::string>> CommandlineParser::setCommandLin
     // Might be possible that someone calls us multiple times
     _arguments.clear();
     _remainingArguments->clear();
-    
+
     // Just add the arguments to the vector
     _arguments.assign(arguments.begin() + 1, arguments.end());
-    
+
     return _remainingArguments;
 }
 
-bool CommandlineParser::execute() {
+CommandlineParser::DisplayHelpText CommandlineParser::execute() {
     if (_arguments.empty()) {
-        return false;
+        return DisplayHelpText::No;
     }
 
     // There is only one argument and this is either "-h" or "--help"
     // so display the help
     if (hasOnlyHelpCommand()) {
-        return true;
+        return DisplayHelpText::Yes;
     }
 
     std::vector<std::string> argumentsForNameless;
@@ -182,7 +182,7 @@ bool CommandlineParser::execute() {
                 if (_allowUnknownCommands) {
                     // Extract the rest of the arguments
                     std::vector<std::string> arguments;
-                    int number = extractArguments(_arguments, arguments, i, -2);
+                    int number = extractArguments(_arguments, arguments, i + 1, -2);
                     _remainingArguments->push_back(_arguments[i]);
                     for (const std::string& arg : arguments) {
                         _remainingArguments->push_back(arg);
@@ -246,7 +246,7 @@ bool CommandlineParser::execute() {
         s << " " << arg;
     }
     LDEBUG(format("(Nameless argument: {})", s.str()));
-    
+
     for (const auto& it : parameterMap) {
         s.clear();
         for (const std::string& arg : it.second) {
@@ -266,30 +266,32 @@ bool CommandlineParser::execute() {
     for (const auto& it : parameterMap) {
         it.first->execute(it.second);
     }
-    
+
     // If we made it this far it means that all commands have been executed successfully
-    return false;
+    return DisplayHelpText::No;
 }
 
-bool CommandlineParser::addCommand(std::unique_ptr<CommandlineCommand> cmd) {
-    ghoul_assert(cmd, "Command must not be empty");
+void CommandlineParser::addCommand(std::unique_ptr<CommandlineCommand> cmd) {
+    ghoul_assert(cmd, "Command must not be nullptr");
     ghoul_assert(!getCommand(cmd->name()), "Name was previously registered");
-    
+
     if (!cmd->shortName().empty()) {
-        ghoul_assert(!getCommand(cmd->shortName()), "Shortname was previously registered");
+        ghoul_assert(
+            !getCommand(cmd->shortName()),
+            "Shortname was previously registered"
+        );
     }
-    
+
     _commands.push_back(std::move(cmd));
-    return true;
 }
 
 void CommandlineParser::addCommandForNamelessArguments(
-    std::unique_ptr<CommandlineCommand> cmd)
+                                                  std::unique_ptr<CommandlineCommand> cmd)
 {
     ghoul_assert(cmd, "Command must not be empty");
     _commandForNamelessArguments = std::move(cmd);
 }
-    
+
 bool CommandlineParser::hasCommandForName(const std::string& name) const {
     auto it = std::find_if(
         _commands.begin(),
@@ -298,7 +300,7 @@ bool CommandlineParser::hasCommandForName(const std::string& name) const {
     );
     return it != _commands.end();
 }
-    
+
 bool CommandlineParser::hasCommandForShortName(const std::string& shortName) const {
     auto it = std::find_if(
         _commands.begin(),
@@ -308,43 +310,58 @@ bool CommandlineParser::hasCommandForShortName(const std::string& shortName) con
     return it != _commands.end();
 }
 
-void CommandlineParser::displayUsage(const std::string& command,
-                                     std::ostream& stream) const
-{
-    std::string usageString = "Usage: ";
+bool CommandlineParser::hasNamelessCommand() const {
+    return _commandForNamelessArguments != nullptr;
+}
 
-    if (command.empty()) {
-        if (!_programName.empty()) {
-            usageString += _programName + " ";
-        }
-
-        if (_commandForNamelessArguments) {
-            usageString += _commandForNamelessArguments->usage() + " ";
-        }
-
-        for (auto& it : _commands) {
-            if (it) {
-                usageString += "\n" + it->usage() + " ";
-            }
-        }
-    } else {
-        for (auto& it : _commands) {
-            if (it && (it->name() == command || it->shortName() == command)) {
-                usageString += "\n" + it->usage() + " ";
-            }
-        }
+std::string CommandlineParser::usageInformation() const {
+    std::string result;
+    if (!_programName.empty()) {
+        result += _programName + " ";
     }
 
-    // Display via the std-out because no Logger-Prefix is wanted with the output
-    stream << usageString << std::endl;
+    if (_commandForNamelessArguments) {
+        result += _commandForNamelessArguments->usage() + " ";
+    }
+
+    for (const std::unique_ptr<CommandlineCommand>& it : _commands) {
+        result += "\n" + it->usage() + " ";
+    }
+
+    return result;
+}
+
+std::string CommandlineParser::usageInformationForCommand(
+                                                         const std::string& command) const
+{
+    ghoul_assert(!command.empty(), "Command must not be empty");
+
+    auto it = std::find_if(
+        _commands.begin(),
+        _commands.end(),
+        [command](const std::unique_ptr<CommandlineCommand>& i) {
+            return i->name() == command || i->shortName() == command;
+        }
+    );
+    ghoul_assert(it != _commands.end(), "Command must name a valid name or shortname");
+
+    return "Usage: \n" + (*it)->usage();
+}
+
+std::string CommandlineParser::usageInformationForNamelessCommand() const {
+    ghoul_assert(
+        _commandForNamelessArguments,
+        "A nameless commandline argument must be registered"
+    );
+    return "Usage: \n" + _commandForNamelessArguments->usage();
 }
 
 void CommandlineParser::displayHelp(std::ostream& stream) const {
-    displayUsage();
+    stream << usageInformation();
     stream << std::endl << std::endl <<
         "Help:" << std::endl << "-----" << std::endl;
 
-    for (auto& it : _commands) {
+    for (const std::unique_ptr<CommandlineCommand>& it : _commands) {
         stream << it->help() << std::endl;
     }
 }
@@ -353,12 +370,19 @@ CommandlineCommand* CommandlineParser::getCommand(const std::string& shortOrLong
     if (shortOrLongName.empty()) {
         return nullptr;
     }
-    for (auto& it : _commands) {
-        if ((it->name() == shortOrLongName) || (it->shortName() == shortOrLongName)) {
-            return it.get();
+    auto it = std::find_if(
+        _commands.begin(),
+        _commands.end(),
+        [shortOrLongName](const std::unique_ptr<CommandlineCommand>& i) {
+            return i->name() == shortOrLongName || i->name() == shortOrLongName;
         }
+    );
+    if (it != _commands.end()) {
+        return it->get();
     }
-    return nullptr;
+    else {
+        return nullptr;
+    }
 }
 
 bool CommandlineParser::hasOnlyHelpCommand() const {
@@ -366,7 +390,6 @@ bool CommandlineParser::hasOnlyHelpCommand() const {
         (_arguments.size() == 1) &&
         ((_arguments[0] == _shortHelpCommand) || (_arguments[0] == _longHelpCommand))
     );
-    
 }
-    
+
 } // namespace ghoul::cmdparser

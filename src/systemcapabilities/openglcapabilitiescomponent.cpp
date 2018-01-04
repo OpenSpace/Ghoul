@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -42,11 +42,11 @@
 #endif
 
 namespace {
-    const char* _loggerCat = "OpenGLCapabilities";
+    constexpr const char* _loggerCat = "OpenGLCapabilities";
 } // namespace
 
 namespace ghoul::systemcapabilities {
-    
+
 OpenGLCapabilitiesComponent::OpenGLCapabilitiesComponentError::
     OpenGLCapabilitiesComponentError(std::string msg)
     : RuntimeError(std::move(msg), "OpenGLCapabilitiesComponent")
@@ -68,10 +68,10 @@ void OpenGLCapabilitiesComponent::detectCapabilities() {
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_maxTextureSize);
     glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &_maxTextureSize3D);
 
-    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &_numTextureUnits);
-    glGetIntegerv(GL_MAX_ATOMIC_COUNTER_BUFFER_BINDINGS, &_numAtomicCounterBufferBindings);
-    glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &_numShaderStorageBufferBindings);
-    glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &_numUniformBufferBindings);
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &_nTextureUnits);
+    glGetIntegerv(GL_MAX_ATOMIC_COUNTER_BUFFER_BINDINGS, &_nAtomicCounterBufferBindings);
+    glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &_nShaderStorageBufferBindings);
+    glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &_nUniformBufferBindings);
 
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &_maxFramebufferColorAttachments);
 }
@@ -128,7 +128,7 @@ void OpenGLCapabilitiesComponent::detectExtensions() {
 void OpenGLCapabilitiesComponent::detectDriverInformation() {
 #ifdef GHOUL_USE_WMI
     queryWMI("Win32_VideoController", "DriverVersion", _driverVersion);
-    
+
     std::string driverDateFull;
     queryWMI("Win32_VideoController", "DriverDate", driverDateFull);
 
@@ -157,7 +157,7 @@ void OpenGLCapabilitiesComponent::clearCapabilities() {
 
     _maxTextureSize = -1;
     _maxTextureSize3D = -1;
-    _numTextureUnits = -1;
+    _nTextureUnits = -1;
 
 #ifdef GHOUL_USE_WMI
     _driverVersion = "";
@@ -168,14 +168,16 @@ void OpenGLCapabilitiesComponent::clearCapabilities() {
 }
 
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
-    OpenGLCapabilitiesComponent::capabilities() const
+OpenGLCapabilitiesComponent::capabilities() const
 {
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
-    result.push_back({ "OpenGL Version", std::to_string(_glVersion), Verbosity::Minimal });
+    result.push_back(
+        { "OpenGL Version", std::to_string(_glVersion), Verbosity::Minimal }
+    );
     result.push_back({ "OpenGL Compiler", _glslCompiler, Verbosity::Minimal });
     result.push_back({ "OpenGL Renderer", _glRenderer, Verbosity::Minimal });
     result.push_back({"GPU Vendor", gpuVendorString(), Verbosity::Minimal });
-    result.push_back({"GLEW Version", std::to_string(_glewVersion),Verbosity::Minimal });     
+    result.push_back({"GLEW Version", std::to_string(_glewVersion),Verbosity::Minimal });
 #ifdef GHOUL_USE_WMI
     result.push_back({ "GPU Name", _adapterName, Verbosity::Minimal });
     result.push_back({ "GPU Driver Version", _driverVersion, Verbosity::Minimal });
@@ -192,7 +194,7 @@ std::vector<SystemCapabilitiesComponent::CapabilityInformation>
         "Max 3D Texture Size", std::to_string(_maxTextureSize3D), Verbosity::Default }
     );
     result.push_back({
-        "Num of Texture Units", std::to_string(_numTextureUnits), Verbosity::Default }
+        "Num of Texture Units", std::to_string(_nTextureUnits), Verbosity::Default }
     );
     result.push_back({
         "FBO Color Attachments",
@@ -227,14 +229,14 @@ const std::vector<std::string>& OpenGLCapabilitiesComponent::extensions() const 
     return _extensions;
 }
 
-bool OpenGLCapabilitiesComponent::isExtensionSupported(const std::string& extension) const {
-    auto result =
-        std::find(_extensions.begin(), _extensions.end(), extension);
+bool OpenGLCapabilitiesComponent::isExtensionSupported(const std::string& extension) const
+{
+    auto result = std::find(_extensions.begin(), _extensions.end(), extension);
     return (result != _extensions.end());
 }
 
 int OpenGLCapabilitiesComponent::maxTextureUnits() const {
-    return _numTextureUnits;
+    return _nTextureUnits;
 }
 
 int OpenGLCapabilitiesComponent::max2DTextureSize() const {
@@ -246,15 +248,15 @@ int OpenGLCapabilitiesComponent::max3DTextureSize() const {
 }
 
 int OpenGLCapabilitiesComponent::maxAtomicCounterBufferBindings() const {
-    return _numAtomicCounterBufferBindings;
+    return _nAtomicCounterBufferBindings;
 }
 
 int OpenGLCapabilitiesComponent::maxShaderStorageBufferBindings() const {
-    return _numShaderStorageBufferBindings;
+    return _nShaderStorageBufferBindings;
 }
 
 int OpenGLCapabilitiesComponent::maxUniformBufferBindings() const {
-    return _numUniformBufferBindings;
+    return _nUniformBufferBindings;
 }
 
 std::string OpenGLCapabilitiesComponent::gpuVendorString() const {

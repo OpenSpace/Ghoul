@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,18 +27,22 @@
 
 namespace ghoul::cmdparser {
 
-MultipleCommandZeroArguments::MultipleCommandZeroArguments(int* ptr, std::string name,
-                                              std::string shortName, std::string infoText)
-    : CommandlineCommand(std::move(name), std::move(shortName), std::move(infoText), "",
-        0, CommandlineCommand::MultipleCalls::Yes)
+MultipleCommandZeroArguments::MultipleCommandZeroArguments(int& ptr, std::string name,
+                                                           std::string shortName,
+                                                           std::string infoText)
+    : CommandlineCommand(
+        std::move(name),
+        std::move(shortName),
+        std::move(infoText),
+        "",
+        0,
+        CommandlineCommand::MultipleCalls::Yes
+    )
     , _ptr(ptr)
-{
-    ghoul_assert(ptr, "Pointer must not be a nullptr");
-    *_ptr = 0;
-}
+{}
 
-void MultipleCommandZeroArguments::execute(const std::vector<std::string>& /*parameters*/) {
-    ++(*_ptr);
+void MultipleCommandZeroArguments::execute(const std::vector<std::string>&) {
+    ++_ptr;
 }
 
 } // namespace ghoul::cmdparser

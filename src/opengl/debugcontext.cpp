@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -31,7 +31,7 @@
 #include <type_traits>
 
 namespace ghoul::opengl::debug {
-    
+
 namespace {
 void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei,
                         const GLchar* message, const GLvoid* userParam)
@@ -39,7 +39,7 @@ void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GL
     const CallbackFunction& cb = *reinterpret_cast<const CallbackFunction*>(
         userParam
     );
-        
+
     cb(
         Source(source),
         Type(type),
@@ -66,7 +66,9 @@ void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous) {
     }
 }
 
-void setDebugMessageControl(Source source, Type type, Severity severity, Enabled enabled) {
+void setDebugMessageControl(Source source, Type type, Severity severity,
+                            Enabled enabled)
+{
     glDebugMessageControl(
         static_cast<GLenum>(source),
         static_cast<GLenum>(type),
@@ -98,7 +100,6 @@ void setDebugMessageControl(Source source, Type type,
     );
 }
 
-    
 //using Callback = void *(Source source, Type type, Severity severity, unsigned int id
 //  std::string message);
 void setDebugCallback(CallbackFunction callback) {

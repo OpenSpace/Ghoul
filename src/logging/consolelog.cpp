@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -24,6 +24,8 @@
  ****************************************************************************************/
 
 #include <ghoul/logging/consolelog.h>
+
+#include <ghoul/misc/assert.h>
 #include <iostream>
 
 #ifdef WIN32
@@ -43,23 +45,23 @@ static bool runningInDebugger() {
     int mib[4];
     struct kinfo_proc info;
     size_t size;
-    
+
     // Initialize the flags so that, if sysctl fails for some bizarre
     // reason, we get a predictable result.
     info.kp_proc.p_flag = 0;
-    
+
     // Initialize mib, which tells sysctl the info we want, in this case
     // we're looking for information about a specific process ID.
     mib[0] = CTL_KERN;
     mib[1] = KERN_PROC;
     mib[2] = KERN_PROC_PID;
     mib[3] = getpid();
-    
+
     // Call sysctl.
     size = sizeof(info);
     junk = sysctl(mib, sizeof(mib) / sizeof(*mib), &info, &size, NULL, 0);
-    assert(junk == 0);
-    
+    ghoul_assert(junk == 0, "sysctl call failed");
+
     // We're being debugged if the P_TRACED flag is set.
     return ( (info.kp_proc.p_flag & P_TRACED) != 0 );
 }

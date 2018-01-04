@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -51,19 +51,19 @@ public:
     /// Exception that is thrown if there was an error detecting the operating system
     struct OperatingSystemError : public GeneralCapabilitiesComponentError {
         explicit OperatingSystemError(std::string description, std::string errorMessage);
-        
+
         /// The general description of the error
         std::string description;
-        
+
         /// Additional information about the error message
         std::string errorMessage;
     };
-    
+
     /// Exception that is thrown if there was an error detecting the main memory
     struct MainMemoryError : public GeneralCapabilitiesComponentError {
         explicit MainMemoryError(std::string message);
     };
-    
+
     /// This enum stores the possible operating systems that can be detected
     enum class OperatingSystem {
         Windows10,
@@ -90,7 +90,7 @@ public:
         MacOS, // @TODO we need more variety here
         Unknown
     };
-    
+
     /**
      * Returns the list of all capabilities that were detected by this
      * SystemCapabilitiesComponent.
@@ -103,7 +103,7 @@ public:
      * \return The operating system version
      */
     OperatingSystem operatingSystem() const;
-    
+
     /**
      * Returns the operating system as a parsed string. It should contain the
      * manufacturer and the version.
@@ -112,8 +112,8 @@ public:
     std::string operatingSystemString() const;
 
     /**
-     * Returns the full operating system. The exact format of the returned string is 
-     * implementation and operating system-dependent but it should contain the 
+     * Returns the full operating system. The exact format of the returned string is
+     * implementation and operating system-dependent but it should contain the
      * manufacturer and the version.
      * \return The operating system as a parsed string
      */
@@ -177,14 +177,14 @@ protected:
      * \throw OperatingSystemError If the detection of the operating system failed
      */
     void detectOS();
-    
+
     /**
      * Detects the amount of the computer's main memory.
      * \throw MainMemoryError If the detection of the main memory failed
      * \throw WMIError If there was an error accessing the Windows Management
      */
     void detectMemory();
-    
+
     /**
      * Detects detailed information about the CPU on this computer.
      */
@@ -194,28 +194,27 @@ protected:
     OperatingSystem _operatingSystem;
     std::string _operatingSystemExtra;
     std::string _fullOperatingSystem;
-    
+
     /// The amount of RAM that is installed
     unsigned int _installedMainMemory = 0;
-    
+
     /// Information about the CPU
     std::string _cpu = "";
-    
+
     /// Number of CPU cores
     unsigned int _cores = 0;
-    
+
     /// The size of a cache line
     unsigned int _cacheLineSize = 0;
-    
+
     /// The associativity of the L2 cache
     unsigned int _L2Associativity = 0;
-    
+
     /// The size of the cache
     unsigned int _cacheSize = 0;
-    
+
     /// Available CPU extensions
     std::string _extensions = "";
-
 };
 
 } // namespace ghoul::systemcapabilities

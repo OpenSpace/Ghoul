@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -36,9 +36,9 @@ any::any(const ValueType& value)
 template <typename ValueType>
 any::any(ValueType&& value,
     // disable if value has type `any&`
-    typename std::enable_if_t<!std::is_same<any&, ValueType>::value>*, 
+    typename std::enable_if_t<!std::is_same<any&, ValueType>::value>*,
     // disable if value has type `const ValueType&&`
-    typename std::enable_if_t<!std::is_const<ValueType>::value>*)  
+    typename std::enable_if_t<!std::is_const<ValueType>::value>*)
     : content(new holder<
                 typename std::decay_t<ValueType>>(static_cast<ValueType&&>(value)))
 {}
@@ -104,9 +104,9 @@ ValueType any_cast(any& operand) {
         throw bad_any_cast();
     }
 
-    // Attempt to avoid construction of a temporary object in cases when 
+    // Attempt to avoid construction of a temporary object in cases when
     // `ValueType` is not a reference. Example:
-    // `static_cast<std::string>(*result);` 
+    // `static_cast<std::string>(*result);`
     // which is equal to `std::string(*result);`
     //typedef typename boost::mpl::if_<
     //    boost::is_reference<ValueType>,
@@ -126,9 +126,9 @@ inline ValueType any_cast(const any& operand) {
         throw bad_any_cast();
     }
 
-    // Attempt to avoid construction of a temporary object in cases when 
+    // Attempt to avoid construction of a temporary object in cases when
     // `ValueType` is not a reference. Example:
-    // `static_cast<std::string>(*result);` 
+    // `static_cast<std::string>(*result);`
     // which is equal to `std::string(*result);`
     //typedef typename boost::mpl::if_<
     //    boost::is_reference<ValueType>,
@@ -142,9 +142,10 @@ inline ValueType any_cast(const any& operand) {
 template<typename ValueType>
 inline ValueType any_cast(any&& operand) {
     static_assert(
-        std::is_rvalue_reference<ValueType&&>::value /*true if ValueType is rvalue or just a value*/
-        || std::is_const< typename std::remove_reference<ValueType>::type >::value,
-        "ghoul::any_cast shall not be used for getting nonconst references to temporary objects"
+         /*true if ValueType is rvalue or just a value*/
+        std::is_rvalue_reference<ValueType&&>::value ||
+        std::is_const< typename std::remove_reference<ValueType>::type >::value,
+        "ghoul::any_cast cannot be used for nonconst references to temporary objects"
         );
     return any_cast<ValueType>(operand);
 }

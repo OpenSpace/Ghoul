@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -32,24 +32,27 @@
 // OBS: Each DISABLE_OPTIMIZATION must have a RESTORE_OPTIMIZATION or the results are
 // undefined
 
-#ifdef _MSC_VER && !defined __INTEL_COMPILER
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
+
 // We are running Microsoft Visual Studio
 #define DISABLE_OPTIMIZATION #pragma optimize("", off)
 #define RESTORE_OPTIMIZATION #pragma optimize("", on)
 #elif defined __INTEL_COMPILER
-// We are running the Intel compiler (which also defines _MSC_VER
+// We are running the Intel compiler (which also defines _MSC_VER)
 #define DISABLE_OPTIMIZATION #warning("OPTIMIZATION macros not implemented")
 #define RESTORE_OPTIMIZATION #warning("OPTIMIZATION macros not implemented")
+
+#elif defined __clang__
+//We are running Clang
+#define DISABLE_OPTIMIZATION #pragma optimize off
+#define RESTORE_OPTIMIZATION #pragma optimize on
+
 #elif defined __GNUC__
 // We are running GCC.  Requires GCC support 4.4 or higher
 #define DISABLE_OPTIMIZATION                                                             \
     #pragma GCC push_options                                                             \
     #pragma GCC optimize("O0")
 #define RESTORE_OPTIMIZATION #pragma GCC pop_options
-#elif defined __clang__
-//We are running Clang
-#define DISABLE_OPTIMIZATION #pragma optimize off
-#define RESTORE_OPTIMIZATION #pragma optimize on
 #endif
 
 #endif // __GHOUL___SUPPORTMACROS___H__

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -33,7 +33,7 @@ namespace ghoul::systemcapabilities {
 #ifdef GHOUL_USE_WMI
     IWbemLocator* SystemCapabilitiesComponent::_iwbemLocator = nullptr;
     IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
-    
+
 SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, HRESULT code)
     : RuntimeError(msg + ". Error Code: " + std::to_string(code), "WMI")
     , message(std::move(msg))
@@ -64,7 +64,7 @@ SystemCapabilitiesComponent::~SystemCapabilitiesComponent() {
 void SystemCapabilitiesComponent::initializeWMI() {
     const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
     ghoul_assert(!isWMIInitialized(), "WMI must not have been initialized");
-    
+
     LDEBUG("Begin initializing WMI");
     // This code is based on
     // http://msdn.microsoft.com/en-us/library/aa390423.aspx
@@ -99,7 +99,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         0,                       // Locale. NULL indicates current
         NULL,                    // Security flags.
         0,                       // Authority (for example, Kerberos)
-        0,                       // Context object 
+        0,                       // Context object
         &_iwbemServices          // pointer to IWbemServices proxy
     );
     if (FAILED(hRes)) {
@@ -118,11 +118,11 @@ void SystemCapabilitiesComponent::initializeWMI() {
         _iwbemServices,              // Indicates the proxy to set
         RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
         RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
-        NULL,                        // Server principal name 
-        RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx 
+        NULL,                        // Server principal name
+        RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx
         RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
         NULL,                        // client identity
-        EOAC_NONE                    // proxy capabilities 
+        EOAC_NONE                    // proxy capabilities
     );
     if (FAILED(hRes)) {
         _iwbemServices->Release();
@@ -154,7 +154,7 @@ void SystemCapabilitiesComponent::deinitializeWMI() {
 
 std::wstring str2wstr(const std::string& str) {
     int stringLength = static_cast<int>(str.length() + 1);
-    int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), stringLength, 0, 0); 
+    int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), stringLength, 0, 0);
     std::vector<wchar_t> buf(len);
     MultiByteToWideChar(CP_ACP, 0, str.c_str(), stringLength, buf.data(), len);
     return std::wstring(buf.begin(), buf.end());
@@ -162,7 +162,7 @@ std::wstring str2wstr(const std::string& str) {
 
 std::string wstr2str(const std::wstring& wstr) {
     int stringLength = static_cast<int>(wstr.length() + 1);
-    int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), stringLength, 0, 0, 0, 0); 
+    int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), stringLength, 0, 0, 0, 0);
     std::vector<char> buf(len);
     WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), stringLength, buf.data(), len, 0, 0);
     return std::string(buf.begin(), buf.end());

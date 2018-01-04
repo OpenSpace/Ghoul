@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -65,15 +65,15 @@ public:
     struct CommandExecutionException : public RuntimeError {
         explicit CommandExecutionException(const std::string& msg);
     };
-    
+
     /**
-     * Exception that gets thrown if an error occurs in the 
+     * Exception that gets thrown if an error occurs in the
      * ComandlineCommand::checkParameters
      */
     struct CommandParameterException : public RuntimeError {
         explicit CommandParameterException(const std::string& msg);
     };
-    
+
     /**
      * The constructor which saves the arguments to own member variables.
      * \param name The (long) name of the parameter. For example <code>--command1</code>
@@ -94,7 +94,7 @@ public:
     CommandlineCommand(std::string name, std::string shortName = "",
         std::string infoText = "", std::string parameterList = "", int argumentNum = 1,
         MultipleCalls allowMultipleCalls = MultipleCalls::No);
-    
+
     virtual ~CommandlineCommand() = default;
 
     /**
@@ -175,7 +175,7 @@ protected:
     /**
      * Casts the string value \p s into the type <code>T</code>. If the conversion fails,
      * an CommandException is thrown. The conversion is done via an
-     * <code>std::stringstream</code> so it can only cast those types supported by the 
+     * <code>std::stringstream</code> so it can only cast those types supported by the
      * stream.
      * \tparam T The type of the value which should be converted
      * \param s The <code>std::string</code> representation of the value

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,8 +27,8 @@
 #define __GHOUL___GLM___H__
 
 #ifdef __APPLE__
-// The GLM header throw 'anonymous struct' warnings that we do not want. By marking the following
-// files as system headers, all warnings are ignored
+// The GLM header throw 'anonymous struct' warnings that we do not want. By marking the
+// following files as system headers, all warnings are ignored
 #pragma clang diagnostic push
 #pragma clang system_header
 #endif // __APPLE__
@@ -48,8 +48,14 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #endif // GLM_ENABLE_EXPERIMENTAL
 
+// Enabling swizzling breaks binary compatibility between glm::vecX and float* ?
+// #ifndef GLM_SWIZZLE
+// #define GLM_SWIZZLE
+// #endif // GLM_SWIZZLE
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/component_wise.hpp>
 
 #include <string>
 

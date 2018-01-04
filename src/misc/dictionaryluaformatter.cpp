@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -44,7 +44,7 @@ std::string DictionaryLuaFormatter::format(const Dictionary& dictionary) const {
     };
 
     std::vector<std::string> keys = dictionary.keys();
-    
+
     std::string lua = std::accumulate(
         std::next(keys.begin()),
         keys.end(),
@@ -62,7 +62,7 @@ std::string DictionaryLuaFormatter::formatDouble(double d) const {
     if (std::equal_to<>()(d, 0.0)) {
         return "0";
     }
-    double exponent = std::log10(std::abs(d));
+    int exponent = static_cast<int>(std::log10(std::abs(d)));
     double base = d / std::pow(10, exponent);
     return std::to_string(base) + "E" + std::to_string(exponent);
 }

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -57,7 +57,7 @@ namespace {
     Header* header(void* memory) {
         return reinterpret_cast<Header*>(memory);
     }
-    
+
     unsigned int hash(const std::string& name) {
         return hashCRC32(name);
     }
@@ -88,15 +88,15 @@ namespace {
     }
 #endif
 }
-    
+
 SharedMemory::SharedMemoryError::SharedMemoryError(std::string msg)
     : RuntimeError(std::move(msg), "SharedMemory")
 {}
-    
+
 SharedMemory::SharedMemoryNotFoundError::SharedMemoryNotFoundError()
     : SharedMemoryError("Shared memory did not exist")
 {}
-    
+
 void SharedMemory::create(const std::string& name, size_t size) {
     // adjust for the header size
     size += sizeof(Header);
@@ -116,7 +116,7 @@ void SharedMemory::create(const std::string& name, size_t size) {
             "Error creating shared memory '" + name + "': " + errorMsg
         );
     }
-    else { 
+    else {
         if (error == ERROR_ALREADY_EXISTS) {
             throw SharedMemoryError(
                 "Error creating shared memory '" + name + "': Section exists"
@@ -127,7 +127,7 @@ void SharedMemory::create(const std::string& name, size_t size) {
 
             if (memory == nullptr) {
                 std::string errorMsg = lastErrorToString(error);
-                
+
                 throw SharedMemoryError(
                     "Error creating a view on shared memory '" + name + "': " + errorMsg
                 );
@@ -152,18 +152,18 @@ void SharedMemory::create(const std::string& name, size_t size) {
     }
     void* memory = shmat(result, nullptr, SHM_R | SHM_W);
     Header* memoryHeader = header(memory);
-    
+
     memoryHeader->mutex.clear();
     shmdt(memory);
 #endif
 }
- 
+
 void SharedMemory::remove(const std::string& name) {
 #ifdef WIN32
     if (_createdSections.find(name) == _createdSections.end()) {
         throw SharedMemoryNotFoundError();
     }
-    
+
     HANDLE h = _createdSections[name];
     _createdSections.erase(name);
     BOOL result = CloseHandle(h);
@@ -188,7 +188,7 @@ void SharedMemory::remove(const std::string& name) {
     }
 #endif
 }
-    
+
 bool SharedMemory::exists(const std::string& name) {
 #ifdef WIN32
     HANDLE handle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, name.c_str());
@@ -217,7 +217,7 @@ bool SharedMemory::exists(const std::string& name) {
     return result != -1;
 #endif
 }
-    
+
 SharedMemory::SharedMemory(std::string name)
     : _memory(nullptr)
     , _name(std::move(name))
@@ -237,7 +237,7 @@ SharedMemory::SharedMemory(std::string name)
     _memory = MapViewOfFileEx(_sharedMemoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, 0, NULL);
     if (_memory == nullptr) {
         CloseHandle(_sharedMemoryHandle);
-        
+
         std::string errorMsg = lastErrorToString(GetLastError());
         throw SharedMemoryError(
             "Error creating view for shared memory '" + name + "': " + errorMsg
@@ -267,7 +267,7 @@ SharedMemory::SharedMemory(std::string name)
     }
 #endif
 }
-    
+
 SharedMemory::~SharedMemory() {
 #ifdef WIN32
     CloseHandle(_sharedMemoryHandle);
@@ -276,11 +276,11 @@ SharedMemory::~SharedMemory() {
     shmdt(_memory);
 #endif
 }
-    
+
 void* SharedMemory::memory() const {
     return reinterpret_cast<void*>(reinterpret_cast<char*>(_memory) + sizeof(Header));
 }
-    
+
 size_t SharedMemory::size() const {
 #ifdef WIN32
     return header(_memory)->size;
@@ -288,19 +288,19 @@ size_t SharedMemory::size() const {
     return _size;
 #endif
 }
-    
+
 std::string SharedMemory::name() const {
     return _name;
 }
-    
+
 void SharedMemory::acquireLock() {
     Header* h = header(_memory);
     while (h->mutex.test_and_set()) {}
 }
-    
+
 void SharedMemory::releaseLock() {
     Header* h = header(_memory);
     h->mutex.clear();
 }
-    
+
 } // namespace ghoul

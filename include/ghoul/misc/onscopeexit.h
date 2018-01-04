@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -29,7 +29,7 @@
 #include <functional>
 
 namespace ghoul {
-    
+
 #define __MERGE(a,b)  a##b
 #define __LABEL(a) __MERGE(unique_name_, a)
 /**
@@ -38,7 +38,7 @@ namespace ghoul {
  * variable name, this macro cannot be used multiple times in the same row.
  */
 #define OnExit(func) ghoul::OnScopeExit __LABEL(__LINE__)(func)
-    
+
 /**
  * This structure makes it easy to execute a function, for example a lambda, at the end of
  * the scope. The execution order of multiple OnScopeExit objects is determined by the
@@ -55,29 +55,29 @@ struct OnScopeExit {
      * this function is executed in the destructor, it may never throw an exception.
      */
     explicit OnScopeExit(std::function<void()> function);
-    
+
     /**
      * Executes the function passed in the constructor if it is a valid function.
      */
     ~OnScopeExit();
-    
+
     /**
      * Removes the function that would otherwise be called at the end of this objects
      * lifetime.
      */
     void clear();
-    
+
 private:
     OnScopeExit() = delete;
     OnScopeExit(const OnScopeExit&) = delete;
     OnScopeExit(OnScopeExit&& rhs) = delete;
     OnScopeExit& operator=(const OnScopeExit& rhs) = delete;
     OnScopeExit& operator=(OnScopeExit&& rhs) = delete;
-  
+
     /// The function that is passed in the constructor and called in the destructor
     std::function<void()> _function;
 };
-    
+
 } // namespace ghoul
 
 #endif // __GHOUL___ONSCOPEEXIT___H__

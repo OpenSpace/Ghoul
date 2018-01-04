@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -63,25 +63,27 @@ public:
     struct CacheException : public RuntimeError {
         explicit CacheException(const std::string& msg);
     };
-    
+
     /// Exception that gets thrown if the cache has a malformed information file
     struct MalformedCacheException : public CacheException {
         explicit MalformedCacheException(std::string file, std::string msg = "");
+
         std::string cacheFile;
         std::string message;
     };
-    
+
     /// Exception that gets thrown if there was an error loading the previous cache files
     struct ErrorLoadingCacheException : public CacheException {
         explicit ErrorLoadingCacheException(const std::string& message);
     };
-    
+
     /// Exception that gets thrown if the argument for retrieving a cache file is invalid
     struct IllegalArgumentException : public CacheException {
         explicit IllegalArgumentException(std::string argument);
+
         std::string argumentName;
     };
-    
+
     /**
      * The constructor will automatically register all persistent cache entries from
      * previous application runs and clean the directory of non-persistent entries that
@@ -96,7 +98,7 @@ public:
      * \pre \p directory must not be empty
      */
     CacheManager(std::string directory, int version = -1);
-    
+
     /**
      * The destructor will save all information on persistent files in a
      * <code>cache</code> file in the cache directory that was passed in the constructor
@@ -108,7 +110,7 @@ public:
     /**
      * Returns the path to a storage location for the cached file. Depending on the
      * persistence (\p isPersistent), the directory and files will automatically be
-     * cleaned on application end or be made available automatically on the next 
+     * cleaned on application end or be made available automatically on the next
      * application run. The method will use the date of last modification as a unique
      * identifier for the file. Subsequent calls (in the same run or different) with the
      * same \p file will consistently produce the same file path until the last-modified
@@ -196,7 +198,7 @@ public:
         const std::string& information, Persistent isPersistent = Persistent::No);
 
     /**
-     * This method checks if a cached \p file has been registered before in this 
+     * This method checks if a cached \p file has been registered before in this
      * application run (persistent and non-persistent files) or in a previous run
      * (persistent cache files only). Note that this only checks if a file has been
      * requested before, not if the cached file has actually been used. The method will
@@ -286,16 +288,16 @@ public:
      * ) in the \p file
      */
     void removeCacheFile(const std::string& baseName, const std::string& information);
-    
+
 protected:
     /// This struct stores the cache information for a specific hash value.
     struct CacheInformation {
         std::string file; ///< The path to the cached file
         bool isPersistent; ///< if the cached entry should be automatically deleted
     };
-    
+
     using LoadedCacheInfo = std::pair<unsigned int, std::string>;
-    
+
     /**
      * Generates a hash number from the file path and information string
      * \return A hash number
@@ -303,7 +305,7 @@ protected:
     unsigned int generateHash(std::string file, std::string information) const;
 
     /**
-     * Cleans a directory from files not flagged as persistent and removes 
+     * Cleans a directory from files not flagged as persistent and removes
      */
     void cleanDirectory(const Directory& dir) const;
 

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -53,9 +53,9 @@ public:
      * messages. If the file does not exist, it will be created.
      * \param filename The path and filename of the file that will receive the log
      * messages
-     * \param writeToAppend If this is <code>true</code>, the log messages will be appended
-     * to the file. If it is <code>false</code> the file will be overwritten without a
-     * warning.
+     * \param writeToAppend If this is <code>true</code>, the log messages will be
+     * appended to the file. If it is <code>false</code> the file will be overwritten
+     * without a warning.
      * \param timeStamping Determines if the log should print the time when a message is
      * logged in the log messages
      * \param dateStamping Determines if the log should print the time when a message is
@@ -77,7 +77,7 @@ public:
 
     /// Destructor that closes and finalizes the HTML file
     ~HTMLLog();
-    
+
     /**
      * Method that logs a message with a given <code>level</code> and
      * <code>category</code> to the text file.
@@ -100,7 +100,7 @@ protected:
      * LogLevel::Fatal -> log-level-fatal<br>
      */
     static std::string classForLevel(LogLevel level);
-    
+
     /**
      * Returns a HTML color string for the passed color.
      * LogLevel::Trace -> Grey<br>
@@ -112,7 +112,7 @@ protected:
      */
     static std::string colorForLevel(LogLevel level);
 
-private: 
+private:
     bool _customStyling;
 };
 

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -44,24 +44,24 @@ public:
     using TrackChanges = ghoul::Boolean;
 
     using ShaderChangedCallback = std::function<void ()>;
-    
+
     struct ShaderPreprocessorError : public RuntimeError {
         explicit ShaderPreprocessorError(std::string message);
     };
-    
+
     struct SubstitutionError : public ShaderPreprocessorError {
         explicit SubstitutionError(std::string message);
     };
-    
+
     struct ParserError : public ShaderPreprocessorError {
         explicit ParserError(std::string message);
     };
-    
+
     struct IncludeError : public ShaderPreprocessorError {
         explicit IncludeError(std::string file);
         std::string file;
     };
-    
+
     ShaderPreprocessor(std::string shaderPath = "", Dictionary dict = Dictionary());
     std::string filename();
     Dictionary dictionary();
@@ -86,31 +86,33 @@ public:
 
 private:
     struct Input {
-        Input(std::ifstream& stream, ghoul::filesystem::File& file, std::string indentation);
+        Input(std::ifstream& stream, ghoul::filesystem::File& file,
+            std::string indentation);
 
         std::ifstream& stream;
         ghoul::filesystem::File& file;
         std::string indentation;
         unsigned int lineNumber = 1;
     };
-    
+
     struct ForStatement {
         unsigned int inputIndex;
         unsigned int lineNumber;
         unsigned int streamPos;
-        
+
         std::string keyName;
         std::string valueName;
         std::string dictionaryReference;
-        
+
         int keyIndex;
     };
-    
+
     struct Env {
         using Scope = std::set<std::string>;
 
-        Env(std::stringstream& output, std::string line = "", std::string indentation = "");
-        
+        Env(std::stringstream& output, std::string line = "",
+            std::string indentation = "");
+
         std::stringstream& output;
         std::string line;
         std::vector<Input> inputs;
@@ -120,12 +122,13 @@ private:
         std::string indentation;
         bool success = true;
     };
-    
+
     // pre path exists
     // pre path not empty
     // pre path must not contain path tokens
     // throws std::ios_base::failure if error opening file
-    void includeFile(const std::string& path, TrackChanges trackChanges, ShaderPreprocessor::Env& environment);
+    void includeFile(const std::string& path, TrackChanges trackChanges,
+        ShaderPreprocessor::Env& environment);
     bool parseLine(ShaderPreprocessor::Env& env);
     bool parseFor(ShaderPreprocessor::Env& env);
     bool parseEndFor(ShaderPreprocessor::Env& env);
@@ -135,14 +138,18 @@ private:
 
     bool substituteLine(ShaderPreprocessor::Env& env);
     std::string substitute(const std::string& in, ShaderPreprocessor::Env& env);
-    bool resolveAlias(const std::string& in, std::string& out, ShaderPreprocessor::Env& env);
+    bool resolveAlias(const std::string& in, std::string& out,
+        ShaderPreprocessor::Env& env);
 
     void pushScope(std::map<std::string, std::string> map, ShaderPreprocessor::Env& env);
-    
+
     void popScope(ShaderPreprocessor::Env& env);
 
-    bool tokenizeFor(const std::string& line, std::string& keyName, std::string& valueName, std::string& dictionaryName, ShaderPreprocessor::Env& env);
-    bool parseRange(const std::string& dictionaryName, Dictionary& dictionary, int& min, int& max);
+    bool tokenizeFor(const std::string& line, std::string& keyName,
+        std::string& valueName, std::string& dictionaryName,
+        ShaderPreprocessor::Env& env);
+    bool parseRange(const std::string& dictionaryName, Dictionary& dictionary, int& min,
+        int& max);
     void addLineNumber(ShaderPreprocessor::Env& env);
     bool isInsideEmptyForStatement(ShaderPreprocessor::Env& env);
 
@@ -153,14 +160,14 @@ private:
         size_t fileIdentifier;
         bool isTracked;
     };
-    
+
     std::map<std::string, FileStruct> _includedFiles;
     static std::vector<std::string> _includePaths;
     std::string _shaderPath;
     Dictionary _dictionary;
     ShaderChangedCallback _onChangeCallback;
 };
-    
+
 } // namespace ghoul::opengl
 
 #endif // __GHOUL___SHADERPREPROCESSOR___H__

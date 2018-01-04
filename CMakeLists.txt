@@ -2,7 +2,7 @@
 #                                                                                        #
 # GHOUL                                                                                  #
 #                                                                                        #
-# Copyright (c) 2012-2017                                                                #
+# Copyright (c) 2012-2018                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -191,15 +191,41 @@ if (GHOUL_MODULE_LUA)
 endif ()
 
 # Assimp
-set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "We don't build assimp tools because they need DirectX.")
-set(ASSIM_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
-set(ASSIMP_NO_EXPORTER ON CACHE BOOL "Decrease compiling time.")
-set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable GTest.")
-include_external_library(Ghoul assimp ${GHOUL_ROOT_DIR}/ext/assimp ${GHOUL_ROOT_DIR}/ext/assimp/include)
-set_property(TARGET uninstall PROPERTY FOLDER "External")
+find_package(Assimp QUIET)
+if (Assimp_FOUND)
+    message(STATUS "Using system assimp")
+    target_include_directories(Ghoul SYSTEM PUBLIC ${ASSIMP_INCLUDE_DIRS})
+    target_link_libraries(Ghoul ${ASSIMP_LIBRARIES})
+    link_directories("${ASSIMP_LIBRARY_DIRS}")
+    set(GHOUL_LIBRARY_DIRS "${ASSIMP_LIBRARY_DIRS}" PARENT_SCOPE)
+else ()
+    message(STATUS "Building assimp")
+    set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "We don't build assimp tools because they need DirectX.")
 
-if (WIN32)
-    set_property(TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "External")
+    # These two importers produce errors due to missing entries in the config.h right now
+    # When they compile, there is no reason to keep them disabled
+    set(ASSIMP_BUILD_FBX_IMPORTER OFF CACHE BOOL "" FORCE)
+    set(ASSIMP_BUILD_IFC_IMPORTER OFF CACHE BOOL "" FORCE)
+    set(ASSIMP_BUILD_X3D_IMPORTER OFF CACHE BOOL "" FORCE)
+
+    set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
+    set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "Disable DirectX file format.")
+    set(ASSIMP_NO_EXPORTER ON CACHE BOOL "Decrease compiling time.")
+    set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable GTest.")
+    include_external_library(Ghoul assimp ${GHOUL_ROOT_DIR}/ext/assimp ${GHOUL_ROOT_DIR}/ext/assimp/include)
+    set_property(TARGET uninstall PROPERTY FOLDER "External")
+
+    # We need to include this to be able to find the assimp/config.h file
+    target_include_directories(Ghoul PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
+
+    if (WIN32)
+        if (TARGET IrrXML)
+            set_property(TARGET IrrXML PROPERTY FOLDER "External")
+        endif ()
+        if (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs)
+            set_property(TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER "External")
+        endif ()
+    endif ()
 endif ()
 
 # Cppformat
@@ -323,6 +349,10 @@ if (GHOUL_HAVE_TESTS)
     # option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." CACHE ON)
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/googletest)
     target_link_libraries(GhoulTest gtest Ghoul Lua)
+
+    target_compile_definitions(gtest PUBLIC
+        "_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING"
+    )
 
     set_property(TARGET gtest_main PROPERTY FOLDER "External")
     set_property(TARGET gtest PROPERTY FOLDER "External")

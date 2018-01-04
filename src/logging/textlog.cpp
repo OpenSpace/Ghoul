@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -37,7 +37,7 @@ TextLog::TextLog(const std::string& filename, Append writeToAppend,
     , _printFooter(writeToAppend)
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
+
     _file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
 
     if (writeToAppend) {
@@ -68,7 +68,7 @@ void TextLog::log(LogLevel level, const std::string& category,
         if (isTimeStamping()) {
             output += " | " + getTimeString();
         }
-        
+
         if (isDateStamping() || isTimeStamping()) {
             output += "] ";
         }

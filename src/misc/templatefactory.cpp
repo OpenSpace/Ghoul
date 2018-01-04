@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -30,7 +30,7 @@
 namespace ghoul {
 
 TemplateFactoryBase::~TemplateFactoryBase() {}
-    
+
 TemplateFactoryBase::TemplateFactoryError::TemplateFactoryError(std::string msg)
     : RuntimeError(std::move(msg), "TemplateFactory")
 {}
@@ -40,10 +40,10 @@ TemplateFactoryBase::TemplateClassNotFoundError::TemplateClassNotFoundError(
     : TemplateFactoryError("Could not find class '" + name + "'")
     , className(std::move(name))
 {}
- 
+
 TemplateFactoryBase::TemplateConstructionError::TemplateConstructionError(std::string msg)
     : TemplateFactoryError(std::move(msg))
 {}
-    
+
 }
 

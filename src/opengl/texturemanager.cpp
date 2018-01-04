@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -33,9 +33,9 @@ namespace ghoul::opengl {
 TextureManager::TextureManagerError::TextureManagerError(std::string msg)
     : RuntimeError(std::move(msg), "TextureManager")
 {}
-    
+
 TextureManager* TextureManager::_manager = nullptr;
-    
+
 TextureManager& TextureManager::ref() {
     static TextureManager manager;
     return manager;
@@ -87,8 +87,8 @@ std::unique_ptr<Texture> TextureManager::unregisterTexture(unsigned int hashedNa
     if (it == _textures.end()) {
         return nullptr;
     }
-        
-    auto tmp = std::move(it->second);
+
+    std::unique_ptr<Texture> tmp = std::move(it->second);
     _textures.erase(hashedName);
     return tmp;
 }

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -48,7 +48,6 @@ int convertThreadPriorityLevel(ThreadPriorityClass c, ThreadPriorityLevel p) {
         case ThreadPriorityLevel::AboveNormal: return THREAD_PRIORITY_ABOVE_NORMAL;
         case ThreadPriorityLevel::Highest:     return THREAD_PRIORITY_HIGHEST;
         default:                               throw MissingCaseException();
-
     }
 #else
     switch (c) {
@@ -66,11 +65,10 @@ int convertThreadPriorityLevel(ThreadPriorityClass c, ThreadPriorityLevel p) {
                 case ThreadPriorityLevel::AboveNormal: return 66;
                 case ThreadPriorityLevel::Highest:     return 99;
                 default:                               throw MissingCaseException();
-
             }
     }
     return 0;
-#endif 
+#endif
 }
 
 [[maybe_unused]] int convertThreadPriorityClass(ThreadPriorityClass c) {
@@ -80,7 +78,6 @@ int convertThreadPriorityLevel(ThreadPriorityClass c, ThreadPriorityLevel p) {
         case ThreadPriorityClass::Normal: return NORMAL_PRIORITY_CLASS;
         case ThreadPriorityClass::High:   return HIGH_PRIORITY_CLASS;
         default:                          throw MissingCaseException();
-
     }
 #elif defined __APPLE__ || defined __FreeBSD__
     switch (c) {
@@ -88,7 +85,6 @@ int convertThreadPriorityLevel(ThreadPriorityClass c, ThreadPriorityLevel p) {
         case ThreadPriorityClass::Normal: return SCHED_OTHER;
         case ThreadPriorityClass::High:   return SCHED_RR;
         default:                          throw MissingCaseException();
-
     }
 #else
     switch (c) {
@@ -99,15 +95,15 @@ int convertThreadPriorityLevel(ThreadPriorityClass c, ThreadPriorityLevel p) {
 }
 #endif
 }
-    
+
 } // namespace
 
-void setPriority(std::thread& t, ThreadPriorityClass priorityClass, 
+void setPriority(std::thread& t, ThreadPriorityClass priorityClass,
                  ThreadPriorityLevel priorityLevel)
 {
 #ifdef WIN32
     std::thread::native_handle_type h = t.native_handle();
-    
+
     SetPriorityClass(h, convertThreadPriorityClass(priorityClass));
     SetThreadPriority(h, convertThreadPriorityLevel(priorityClass, priorityLevel));
 #else

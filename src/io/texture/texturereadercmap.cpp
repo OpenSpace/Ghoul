@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -40,7 +40,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
                                                         const std::string& filename) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    
+
     std::ifstream file;
     file.exceptions(std::ifstream::failbit);
     file.open(filename, std::ifstream::in);
@@ -68,7 +68,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
             values = new uint8_t[width * 4];
             continue;
         }
-        
+
         if (!values) {
             throw TextureLoadException(
                 filename,
@@ -82,7 +82,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         s >> color.g;
         s >> color.b;
         s >> color.a;
-        
+
         if (i > (width * 4)) {
             delete[] values;
             throw TextureLoadException(

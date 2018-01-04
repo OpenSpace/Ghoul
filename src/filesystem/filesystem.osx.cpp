@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -32,7 +32,7 @@
 namespace {
     // the maximum latency allowed before a changed is registered
     const CFAbsoluteTime Latency = 1.0;
-    
+
     enum Events {
         kFSEventStreamEventFlagNone = 0x00000000,
         kFSEventStreamEventFlagMustScanSubDirs = 0x00000001,
@@ -57,7 +57,7 @@ namespace {
         kFSEventStreamEventFlagItemIsDir = 0x00020000,
         kFSEventStreamEventFlagItemIsSymlink = 0x00040000
     };
-    
+
     void completionHandler(ConstFSEventStreamRef, void*, size_t numEvents,
                            void* eventPaths, const FSEventStreamEventFlags eventFlags[],
                            const FSEventStreamEventId[])
@@ -67,7 +67,7 @@ namespace {
             using Events::kFSEventStreamEventFlagItemModified;
             using Events::kFSEventStreamEventFlagItemInodeMetaMod;
             using Events::kFSEventStreamEventFlagItemIsFile;
-            
+
             const bool mod = eventFlags[i] & kFSEventStreamEventFlagItemModified;
             const bool iNode = eventFlags[i] & kFSEventStreamEventFlagItemInodeMetaMod;
             const bool file = eventFlags[i] & kFSEventStreamEventFlagItemIsFile;
@@ -103,13 +103,15 @@ void FileSystem::addFileListener(File* file) {
         ghoul_assert(it->second != file, "File already registered");
     }
 #endif
-    
+
     std::string d = file->directoryName();
     auto f = _directories.find(d);
     if (f == _directories.end()) {
         bool alreadyTrackingParent = false;
-        for (auto dir : _directories) {
-            if (d.length() > dir.first.length() && d.find(dir.first) != std::string::npos) {
+        for (const std::pair<std::string, DirectoryHandle*>& dir : _directories) {
+            if (d.length() > dir.first.length() &&
+                d.find(dir.first) != std::string::npos)
+            {
                 alreadyTrackingParent = true;
                 break;
             }
@@ -117,10 +119,13 @@ void FileSystem::addFileListener(File* file) {
         if (!alreadyTrackingParent) {
             DirectoryHandle* handle = new DirectoryHandle;
 
-            // Create the FSEventStream responsible for this directory (Apple's callback system
-            // only works on the granularity of the directory)
-            CFStringRef path = CFStringCreateWithCString(NULL, d.c_str(),
-                                                         kCFStringEncodingASCII);
+            // Create the FSEventStream responsible for this directory (Apple's callback
+            // system only works on the granularity of the directory)
+            CFStringRef path = CFStringCreateWithCString(
+                NULL,
+                d.c_str(),
+                kCFStringEncodingASCII
+            );
             CFArrayRef pathsToWatch = CFArrayCreate(
                 NULL,
                 reinterpret_cast<const void **>(&path),
@@ -145,7 +150,8 @@ void FileSystem::addFileListener(File* file) {
             );
 
             // Add checking the event stream to the current run loop
-            // If there is a performance bottleneck, this could be done on a separate thread?
+            // If there is a performance bottleneck, this could be done on a separate
+            // thread?
             FSEventStreamScheduleWithRunLoop(handle->_eventStream,
                 CFRunLoopGetCurrent(),
                 kCFRunLoopDefaultMode
@@ -169,7 +175,7 @@ void FileSystem::removeFileListener(File* file) {
         found |= (it->second == file);
     }
     ghoul_assert(found, "File not previously registered");
-    
+
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
         //LDEBUG("comparing for removal, " << file << "==" << it->second);
         if (it->second == file) {
@@ -185,13 +191,12 @@ void callbackHandler(const std::string& path) {
 }
 
 void FileSystem::callbackHandler(const std::string& path) {
-    auto files = FileSys._trackedFiles;
-    size_t n = files.count(path);
+    size_t n = FileSys._trackedFiles.count(path);
     if (n == 0) {
         return;
     }
-    
-    auto eqRange = files.equal_range(path);
+
+    auto eqRange = FileSys._trackedFiles.equal_range(path);
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
         File* f = (*it).second;
         f->callback()(*f);

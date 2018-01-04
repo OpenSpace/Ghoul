@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -36,9 +36,11 @@
 #include <fstream>
 
 namespace {
-    const char* _loggerCat = "CacheManager";
-    const char* _cacheFile = "cache";
-    const char _hashDelimiter = '|'; // something that cannot occur in the filesystem
+    constexpr const char* _loggerCat = "CacheManager";
+    constexpr const char* _cacheFile = "cache";
+
+    // something that cannot occur in the filesystem
+    constexpr const char _hashDelimiter = '|';
 } // namespace
 
 namespace ghoul::filesystem {
@@ -46,30 +48,30 @@ namespace ghoul::filesystem {
 CacheManager::CacheException::CacheException(const std::string& msg)
     : RuntimeError(msg, "Cache")
 {}
-    
+
 CacheManager::MalformedCacheException::MalformedCacheException(std::string file,
                                                                std::string msg)
     : CacheException(fmt::format("Malformed cache at '{}'", file))
     , cacheFile(std::move(file))
     , message(std::move(msg))
 {}
-  
+
 CacheManager::ErrorLoadingCacheException::ErrorLoadingCacheException(
-                                                             const std::string& msg)
+                                                                   const std::string& msg)
     : CacheException(msg)
 {}
-    
+
 CacheManager::IllegalArgumentException::IllegalArgumentException(std::string argument)
     : CacheException(fmt::format("Argument '{}' contains an illegal character", argument))
     , argumentName(std::move(argument))
 {}
-    
+
 CacheManager::CacheManager(std::string directory, int version)
     : _version(version)
 {
     ghoul_assert(!directory.empty(), "Directory must not be empty");
     _directory = std::move(directory);
-    
+
     // In the cache state, we check our cache directory for all values, in a later step
     // we remove all persistent values, so that only the non-persistent values remain
     // Under normal operation, the resulting vector should be of size == 0, but if the
@@ -86,7 +88,7 @@ CacheManager::CacheManager(std::string directory, int version)
         if (line != std::to_string(_version)) {
             LINFO("Cache version has changed. Current version " << line <<
                 " new version " << _version);
-            for (const auto& cache : cacheState) {
+            for (const LoadedCacheInfo& cache : cacheState) {
                 LINFO("Deleting file '" << cache.second << "'");
                 FileSys.deleteFile(cache.second);
             }
@@ -116,7 +118,7 @@ CacheManager::CacheManager(std::string directory, int version)
             if (!file.good()) {
                 throw MalformedCacheException(path);
             }
-            
+
             info.isPersistent = true;
             _files.emplace(hash, info);
 
@@ -124,7 +126,7 @@ CacheManager::CacheManager(std::string directory, int version)
             // remove it
             cacheState.erase(
                 std::remove_if(
-                    cacheState.begin(), cacheState.end(), 
+                    cacheState.begin(), cacheState.end(),
                     [hash, &info](const LoadedCacheInfo& i) {
                         return hash == i.first && info.file == i.second;
                     }
@@ -133,13 +135,13 @@ CacheManager::CacheManager(std::string directory, int version)
             );
         }
     }
-    
+
     // At this point all values that remain in the cache state vector are left from a
     // previous crash of the application
     if (!cacheState.empty()) {
         LINFO("There was a crash in the previous run and it left the cache unclean. "
               "Cleaning it now");
-        for (const auto& cache : cacheState) {
+        for (const LoadedCacheInfo& cache : cacheState) {
             LINFO("Deleting file '" << cache.second << "'");
             FileSys.deleteFile(cache.second);
         }
@@ -160,7 +162,7 @@ CacheManager::~CacheManager() {
     std::ofstream file(path, std::ofstream::out);
     if (file.good()) {
         file << _version << std::endl;
-        for (const auto& p : _files) {
+        for (const std::pair<unsigned int, CacheInformation>& p : _files) {
             if (!p.second.isPersistent) {
                 // Delete all the non-persistent files
                 FileSys.deleteFile(p.second.file);
@@ -188,7 +190,7 @@ std::string CacheManager::cachedFilename(const File& file, const std::string& in
 {
     return cachedFilename(file.filename(), information, isPersistent);
 }
-    
+
 std::string CacheManager::cachedFilename(const std::string& baseName,
                                          const std::string& information,
                                          Persistent isPersistent)
@@ -197,7 +199,7 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
     }
-    
+
     unsigned int hash = generateHash(baseName, information);
 
     // If we couldn't find the file, we have to generate a directory with the name of the
@@ -207,12 +209,15 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
 
     // If this is the first time anyone requests a cache for the file name, we have to
     // create the base directory under the cache directory
-    if (!FileSys.directoryExists(destinationBase))
+    if (!FileSys.directoryExists(destinationBase)) {
         FileSys.createDirectory(destinationBase);
+    }
 
-    std::string destination = FileSys.pathByAppendingComponent(destinationBase,
-        std::to_string(hash));
-    
+    std::string destination = FileSys.pathByAppendingComponent(
+        destinationBase,
+        std::to_string(hash)
+    );
+
     // The new destination should always not exist, since we checked before if we have the
     // value in the map and only get here if it isn't; persistent cache entries are always
     // in the map and non-persistent entries should have been deleted on application close
@@ -255,8 +260,8 @@ bool CacheManager::hasCachedFile(const std::string& baseName,
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
     }
-    
-    unsigned int hash = generateHash(baseName, information);    
+
+    unsigned int hash = generateHash(baseName, information);
     return _files.find(hash) != _files.end();
 }
 
@@ -270,13 +275,13 @@ void CacheManager::removeCacheFile(const File& file, const std::string& informat
 }
 
 void CacheManager::removeCacheFile(const std::string& baseName,
-                         const std::string& information)
+                                   const std::string& information)
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
     }
-    
+
     unsigned int hash = generateHash(baseName, information);
 
     auto it = _files.find(hash);
@@ -299,7 +304,7 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
     LDEBUG("Cleaning directory '" << dir << "'");
     // First search for all subdirectories and call this function recursively on them
     std::vector<std::string> contents = dir.readDirectories();
-    for (const auto& content : contents) {
+    for (const std::string& content : contents) {
         if (FileSys.directoryExists(content)) {
             cleanDirectory(content);
         }
@@ -320,25 +325,25 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
         FileSys.deleteDirectory(dir);
     }
 }
-    
+
 std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDirectory(
-    const Directory& dir) const
+                                                               const Directory& dir) const
 {
     std::vector<LoadedCacheInfo> result;
     std::vector<std::string> directories = dir.readDirectories();
-    for (const auto& directory : directories) {
+    for (const std::string& directory : directories) {
         Directory d(directory);
 
         // Extract the name of the directory
         // +1 as the last path delimiter is missing from the path
         std::string directoryName = directory.substr(dir.path().size() + 1);
-        
+
         std::vector<std::string> hashes = d.readDirectories();
-        for (const auto& hash : hashes) {
+        for (const std::string& hash : hashes) {
             // Extract the hash from the directory name
             // +1 as the last path delimiter is missing from the path
             std::string hashName = hash.substr(d.path().size() + 1);
-            
+
             std::vector<std::string> files = Directory(hash).readFiles();
             // Cache directories should only contain a single file with the
             // same name as the directory
@@ -362,13 +367,12 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
                     ));
                 }
                 else {
-                    // Adding the absPath to normalize all / and \ for Windows 
-                    result.emplace_back(std::stoul(hashName), absPath(files[0]));
+                    result.emplace_back(std::stoul(hashName), files[0]);
                 }
             }
         }
     }
-    
+
     return result;
 }
 

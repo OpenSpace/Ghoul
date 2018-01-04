@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -30,11 +30,11 @@
 #include <ghoul/opengl/shaderobject.h>
 
 namespace ghoul::opengl {
-    
+
 ShaderManager::ShaderManagerError::ShaderManagerError(std::string msg)
     : RuntimeError(std::move(msg), "ShaderManager")
 {}
-    
+
 ShaderManager& ShaderManager::ref() {
     static ShaderManager manager;
     return manager;
@@ -90,8 +90,8 @@ std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(
     if (it == _objects.end()) {
         return nullptr;
     }
-    
-    auto tmp = std::move(it->second);
+
+    std::unique_ptr<ShaderObject> tmp = std::move(it->second);
     _objects.erase(hashedName);
     return tmp;
 }

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -51,25 +51,25 @@ public:
     struct ShaderManagerError : public RuntimeError {
         explicit ShaderManagerError(std::string message);
     };
-    
+
     /**
      * This method returns a reference to the initialized ShaderManager.
      * \return An initialized reference to the singleton manager
      * \pre The static ShaderManager must have been initialized before
      */
     static ShaderManager& ref();
-    
+
     /**
      * This method will return the ShaderObject that was registered with a string whose
      * hash value is equal to \p hashedName. The hashed name that can be used will be
      * returned from the #registerShaderObject method.
      * \param hashedName The hashed name of the ShaderObject that is to be fetched
-     * \return The ShaderObject that has been registered with a string that evaluates 
+     * \return The ShaderObject that has been registered with a string that evaluates
      * to the \p hashedName
      * \throw ShaderManagerError if the ShaderObject for \p hashedName did not exist
      */
     ShaderObject* shaderObject(unsigned int hashedName);
-    
+
     /**
      * This method will return the ShaderObject that was registered with the passed name.
      * This method will create the hash value from the passed string and will call the
@@ -79,7 +79,7 @@ public:
      * \throw ShaderManagerError If the ShaderObject for \p name did not exist
      */
     ShaderObject* shaderObject(const std::string& name);
-    
+
     /**
      * Register the passed ShaderObject under the passed name so that it can be retrieved
      * either by the given \p name or by the returned hashed value. If the manager already
@@ -94,9 +94,9 @@ public:
      */
     unsigned int registerShaderObject(const std::string& name,
         std::unique_ptr<ShaderObject> shader);
-    
+
     /**
-     * This method will unregister the ShaderObject that was registered under the passed 
+     * This method will unregister the ShaderObject that was registered under the passed
      * name. The ShaderObject will be returned to the caller. If the caller ignores the
      * return value, the ShaderObject will be deleted.
      * \param name The name under which the ShaderObject was registered previously
@@ -104,7 +104,7 @@ public:
      * \p name was not a valid ShaderObject
      */
     std::unique_ptr<ShaderObject> unregisterShaderObject(const std::string& name);
-    
+
     /**
      * This method will unregister the ShaderObject that was registered under a name whose
      * hash value is equal to the passed \p hashName. The ShaderObject will be returned to
@@ -116,7 +116,7 @@ public:
      * a valid ShaderObject
      */
     std::unique_ptr<ShaderObject> unregisterShaderObject(unsigned int hashedName);
-    
+
     /**
      * This method returns the hash value for a given \p name. The hash function is
      * implementation-dependent, but it is guaranteed to be static in an application run
@@ -125,12 +125,12 @@ public:
      * \return The hash value for the passed name
      */
     unsigned int hashedNameForName(const std::string& name) const;
-    
+
 private:
     /// Map containing all the registered ShaderObject%s
     std::map<unsigned int, std::unique_ptr<ShaderObject>> _objects;
 };
-    
+
 #define ShdrMgr (ghoul::opengl::ShaderManager::ref())
 
 } // namespace ghoul::opengl
