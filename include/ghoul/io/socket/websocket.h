@@ -86,9 +86,6 @@ private:
     std::thread _inputThread;
     std::thread _outputThread;
 
-    WsServer server;
-
-    WsServer::connection_ptr socketConnection;
     void onMessage(websocketpp::connection_hdl hdl, WsServer::message_ptr msg);
     void onOpen(websocketpp::connection_hdl hdl);
     void onClose(websocketpp::connection_hdl hdl);
@@ -96,6 +93,9 @@ private:
     std::mutex _connectionHandlesMutex;
     std::set<websocketpp::connection_hdl, std::owner_less<websocketpp::connection_hdl>>
         _connectionHandles;
+
+    WsServer _server;
+    WsServer::connection_ptr _socketConnection;
 
     std::mutex _inputBufferMutex;
     std::mutex _inputQueueMutex;

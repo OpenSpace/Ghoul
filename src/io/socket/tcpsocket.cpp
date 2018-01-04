@@ -249,7 +249,7 @@ void TcpSocket::streamOutput() {
     while (_isConnected && !_shouldDisconnect) {
         waitForOutput(1);
 
-        int nBytesToSend = 0;
+        size_t nBytesToSend = 0;
         std::lock_guard<std::mutex> outputGuard(_outputQueueMutex);
         while ((nBytesToSend = std::min(_outputQueue.size(), _outputBuffer.size())) > 0)
         {
@@ -258,7 +258,7 @@ void TcpSocket::streamOutput() {
                 nBytesToSend,
                 _outputBuffer.begin()
             );
-            int nSentBytes = send(_socket, _outputBuffer.data(), nBytesToSend, 0);
+            size_t nSentBytes = send(_socket, _outputBuffer.data(), nBytesToSend, 0);
             if (nSentBytes <= 0) {
                 _error = true;
                 _shouldDisconnect = true;
@@ -297,7 +297,7 @@ bool TcpSocket::waitForInput(size_t nBytes) {
 
 int TcpSocket::waitForDelimiter() {
     char delimiter = _delimiter;
-    int currentIndex = 0;
+    size_t currentIndex = 0;
     auto receivedRequestedInputOrDisconnected = [this, &currentIndex, delimiter]() {
         if (_shouldDisconnect || (!_isConnected && !_isConnecting)) {
             return true;
@@ -316,7 +316,7 @@ int TcpSocket::waitForDelimiter() {
     if (_error) {
         return -1;
     } else {
-        return currentIndex;
+        return static_cast<int>(currentIndex);
     }
 }
 

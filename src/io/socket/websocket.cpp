@@ -48,19 +48,19 @@ WebSocket::WebSocket(std::string address, int port) : TcpSocket(address, port) {
 WebSocket::WebSocket(std::string address, int port, _SOCKET socket)
         : TcpSocket(address, port, socket)
 {
-    server.set_message_handler(bind(&WebSocket::onMessage, this, ::_1, ::_2));
-    server.set_open_handler(bind(&WebSocket::onOpen,this,::_1));
-    server.set_close_handler(bind(&WebSocket::onClose,this,::_1));
+    _server.set_message_handler(bind(&WebSocket::onMessage, this, ::_1, ::_2));
+    _server.set_open_handler(bind(&WebSocket::onOpen,this,::_1));
+    _server.set_close_handler(bind(&WebSocket::onClose,this,::_1));
 
     // set up WebSocket++ logging
-    server.clear_access_channels(websocketpp::log::alevel::all);
-    server.set_access_channels(websocketpp::log::alevel::connect);
-    server.set_access_channels(websocketpp::log::alevel::disconnect);
-    server.set_access_channels(websocketpp::log::alevel::app);
+    _server.clear_access_channels(websocketpp::log::alevel::all);
+    _server.set_access_channels(websocketpp::log::alevel::connect);
+    _server.set_access_channels(websocketpp::log::alevel::disconnect);
+    _server.set_access_channels(websocketpp::log::alevel::app);
 
-    server.register_ostream(&_outputStream);
-    socketConnection = server.get_connection();
-    socketConnection->start();
+    _server.register_ostream(&_outputStream);
+    _socketConnection = _server.get_connection();
+    _socketConnection->start();
 
     startStreams();
     LDEBUG(fmt::format("WebSocket started. Client: {}:{}.", address, port));
@@ -68,7 +68,7 @@ WebSocket::WebSocket(std::string address, int port, _SOCKET socket)
 
 WebSocket::~WebSocket() {
     LDEBUG("Destroying socket connection");
-    socketConnection->eof();
+    _socketConnection->eof();
 }
 
 void WebSocket::startStreams() {
@@ -84,10 +84,13 @@ void WebSocket::disconnect(int reason) {
     if (!_isConnected) return;
 
     if (socketHasConnection()) {
-        socketConnection->close(reason, "");
+        _socketConnection->close(
+            static_cast<websocketpp::close::status::value>(reason),
+            ""
+        );
     }
 
-    socketConnection->eof();
+    _socketConnection->eof();
     _outputNotifier.notify_all();
     if (_outputThread.joinable()) {
         _outputThread.join();
@@ -114,7 +117,7 @@ void WebSocket::disconnect(int reason) {
 }
 
 bool WebSocket::socketHasConnection() {
-    return socketConnection->get_state() == websocketpp::session::state::open;
+    return _socketConnection->get_state() == websocketpp::session::state::open;
 }
 
 bool WebSocket::getMessage(std::string &message) {
@@ -135,7 +138,7 @@ bool WebSocket::putMessage(const std::string &message) {
         LERROR("Cannot send message when not connected.");
         return false;
     }
-    socketConnection->send(message);
+    _socketConnection->send(message);
     _outputNotifier.notify_one();
     return true;
 }
@@ -160,7 +163,7 @@ void WebSocket::streamInput() {
             return;
         }
 
-        socketConnection->read_some(_inputBuffer.data(), nReadBytes);
+        _socketConnection->read_some(_inputBuffer.data(), nReadBytes);
 
         // Poke output notifier, as the received message
         // might trigger something like a handshake or similar.
