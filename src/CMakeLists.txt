@@ -32,6 +32,11 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.windows.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderbase.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreadermultiformat.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/socket/socket.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/socket/tcpsocket.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/socket/tcpsocketserver.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/socket/websocket.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/socket/websocketserver.cpp
     ${PROJECT_SOURCE_DIR}/src/io/volume/rawvolumereader.cpp
     ${PROJECT_SOURCE_DIR}/src/io/volume/volumereader.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/bufferlog.cpp
@@ -141,6 +146,12 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreadermultiformat.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socket.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socketserver.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/tcpsocket.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/tcpsocketserver.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/websocket.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/websocketserver.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/volume/rawvolumereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/volume/volumereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/bufferlog.h

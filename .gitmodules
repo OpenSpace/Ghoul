@@ -19,3 +19,6 @@ url=http://git.sv.nongnu.org/r/freetype/freetype2.git
 [submodule "ext/glbinding"]
 	path = ext/glbinding
 	url = https://github.com/cginternals/glbinding.git
+[submodule "ext/websocketpp"]
+	path = ext/websocketpp
+	url = https://github.com/zaphoyd/websocketpp.git
