@@ -641,7 +641,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
     }
 
     glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
+    glEnablei(GL_BLEND, 0);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     _program->activate();
@@ -952,7 +952,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
     );*/
 
     glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
+    glEnablei(GL_BLEND, 0);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     _program->activate();
