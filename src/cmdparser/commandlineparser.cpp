@@ -374,7 +374,7 @@ CommandlineCommand* CommandlineParser::getCommand(const std::string& shortOrLong
         _commands.begin(),
         _commands.end(),
         [shortOrLongName](const std::unique_ptr<CommandlineCommand>& i) {
-            return i->name() == shortOrLongName || i->name() == shortOrLongName;
+            return i->name() == shortOrLongName || i->shortName() == shortOrLongName;
         }
     );
     if (it != _commands.end()) {
