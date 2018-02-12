@@ -43,11 +43,7 @@ struct AssertionException : public std::runtime_error {
 /**
  * Exception that gets thrown if switch-case statement is missing a case
  */
-struct MissingCaseException : public std::runtime_error {
-    explicit constexpr MissingCaseException()
-        : std::runtime_error("Missing case label")
-    {}
-};
+struct MissingCaseException {};
 
 /**
  * Ghoul internal assert command. Is called by the ghoul_assert macro.
