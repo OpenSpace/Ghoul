@@ -28,6 +28,7 @@
 #include <fmt/format.h>
 
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
 #include <vector>
 
