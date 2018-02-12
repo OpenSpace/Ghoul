@@ -104,7 +104,9 @@ void internal_assert(std::string expression, std::string message, std::string fi
                 );
             }
             else if (inputLine == "e") {
-                std::quick_exit(EXIT_FAILURE);
+                // We use quick_exit as we don't want other destructors to be called,
+                // which might screw things over further
+                quick_exit(EXIT_FAILURE);
             }
         }
     }
