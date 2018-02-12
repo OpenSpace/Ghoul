@@ -44,7 +44,9 @@ struct AssertionException : public std::runtime_error {
  * Exception that gets thrown if switch-case statement is missing a case
  */
 struct MissingCaseException : public std::runtime_error {
-    explicit MissingCaseException();
+    explicit constexpr MissingCaseException()
+        : std::runtime_error("Missing case label")
+    {}
 };
 
 /**

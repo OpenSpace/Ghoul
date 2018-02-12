@@ -61,10 +61,6 @@ AssertionException::AssertionException(std::string exp, std::string msg,
     ))
 {}
 
-MissingCaseException::MissingCaseException()
-    : std::runtime_error("Missing case label")
-{}
-
 void internal_assert(std::string expression, std::string message, std::string file,
                                                            std::string function, int line)
 {
@@ -107,7 +103,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
                 );
             }
             else if (inputLine == "e") {
-                exit(EXIT_FAILURE);
+                std::quick_exit(EXIT_FAILURE);
             }
         }
     }
