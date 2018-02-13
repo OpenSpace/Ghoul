@@ -28,7 +28,6 @@
 #include <fmt/format.h>
 
 #include <algorithm>
-#include <cstdlib>
 #include <iostream>
 #include <vector>
 
@@ -104,9 +103,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
                 );
             }
             else if (inputLine == "e") {
-                // We use quick_exit as we don't want other destructors to be called,
-                // which might screw things over further
-                quick_exit(EXIT_FAILURE);
+                exit(EXIT_FAILURE);
             }
         }
     }
