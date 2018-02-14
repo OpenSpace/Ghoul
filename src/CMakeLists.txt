@@ -59,7 +59,6 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/misc/dictionaryluaformatter.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/exception.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/misc.cpp
-    ${PROJECT_SOURCE_DIR}/src/misc/onscopeexit.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/sharedmemory.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/stacktrace.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/templatefactory.cpp
@@ -176,6 +175,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/constexpr.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/crc32.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/crc32.inl
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/defer.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionaryformatter.h
@@ -187,7 +187,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/invariants.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/onscopeexit.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/sharedmemory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/stacktrace.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/supportmacros.h
