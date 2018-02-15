@@ -246,7 +246,7 @@ void destroyLuaState(lua_State* state);
 void runScriptFile(lua_State* state, const std::string& filename);
 
 /**
- * This function executres the Lua script provided as plain text in \p script using the
+ * This function executes the Lua script provided as plain text in \p script using the
  * passed <code>lua_State</code> \p state.
  * \throw LuaLoadingException If there was an error loading the script
  * \throw LuaExecutionError If there was an error executing the script
@@ -254,6 +254,56 @@ void runScriptFile(lua_State* state, const std::string& filename);
  * \pre \p script must not be empty
  */
 void runScript(lua_State* state, const std::string& script);
+
+/**
+ * This function calls into the Lua library function <code>luaL_checkstring</code> and,
+ * if successful, pops the string from the stack. If the top argument is not a string,
+ * the stack remains untouched.
+ * \param L The Lua stack to be inspected
+ * \return The string or <code>nullptr</code> if the top element is not a string
+ */
+const char* checkStringAndPop(lua_State* L);
+
+/**
+ * Checks the number of arguments on the Lua stack against the \p expected number of
+ * parameters. If the numbers do not agree, an error is logged and a
+ * ghoul::lua::LuaExecutionException is raised.
+ * \param L The Lua stack from which the arguments are checked
+ * \param expected The number of expected arguments
+ * \param component The name of the component that is used for the error message
+ * \return The number of arguments
+ * \throw ghoul::lua::LuaExecutionException if the number of arguments is wrong
+ */
+int checkArgumentsAndThrow(lua_State* L, int expected, const char* component = nullptr);
+
+/**
+ * Checks if the number of arguments on the Lua stack is equal to \p expected1 or
+ * \p expected2 parameters. If the numbers do not agree, an error is logged and a
+ * ghoul::lua::LuaExecutionException is raised.
+ * \param L The Lua stack from which the arguments are checked
+ * \param expected1 The first allowed number of expected arguments
+ * \param expected2 The second allowed number of expected arguments
+ * \param component The name of the component that is used for the error message
+ * \return The number of arguments
+ * \throw ghoul::lua::LuaExecutionException if the number of arguments is wrong
+ */
+int checkArgumentsAndThrow(lua_State* L, int expected1, int expected2,
+    const char* component = nullptr);
+
+/**
+ * Checks if the number of arguments on the Lua stack is in the \p range of allowed
+ * values. If the numbers do not agree, an error is logged and a
+ * ghoul::lua::LuaExecutionException is raised.
+ * \param L The Lua stack from which the arguments are checked
+ * \param range The inclusive range that the number of arguments are tested against
+ * \param component The name of the component that is used for the error message
+ * \return The number of arguments
+ * \throw ghoul::lua::LuaExecutionException if the number of arguments is wrong
+ */
+int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range,
+    const char* component = nullptr);
+
+
 
 namespace internal {
     void deinitializeGlobalState();

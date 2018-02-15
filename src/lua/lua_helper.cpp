@@ -314,6 +314,11 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
         // get back up one level
         lua_pop(state, 1);
     }
+
+    // @CLEANUP:  This function seems to leak stack space and a lua_settop(state,0)
+    //            crashes --- abock(2018-02-15)
+    //            Affected: navigationhandler_lua.inl::setCameraState
+    //ghoul_assert(lua_gettop(state) == 0, "Incorrect number of items left on stack");
 }
 
 string luaTypeToString(int type) {
@@ -379,6 +384,74 @@ void runScript(lua_State* state, const std::string& script) {
         throw LuaExecutionException(lua_tostring(state, -1));
     }
 }
+
+const char* checkStringAndPop(lua_State* L) {
+    const char* s = luaL_checkstring(L, -1);
+    if (s) {
+        lua_pop(L, 1);
+    }
+    return s;
+}
+
+int checkArgumentsAndThrow(lua_State* L, int expected, const char* component) {
+    int nArguments = lua_gettop(L);
+    if (nArguments != expected) {
+        using namespace fmt::literals;
+        std::string s = "Expected {} arguments, got {}"_format(expected, nArguments);
+        if (component) {
+            LERRORC(component, s);
+        }
+        else {
+            LERRORC("Lua", s);
+        }
+        luaL_error(L, s.c_str());
+    }
+    return nArguments;
+}
+
+int checkArgumentsAndThrow(lua_State* L, int expected1, int expected2,
+                            const char* component)
+{
+    int nArguments = lua_gettop(L);
+    if ((nArguments != expected1) && (nArguments != expected2)) {
+        using namespace fmt::literals;
+        std::string s = "Expected {} or {} arguments, got {}"_format(
+            expected1,
+            expected2,
+            nArguments
+        );
+        if (component) {
+            LERRORC(component, s);
+        }
+        else {
+            LERRORC("Lua", s);
+        }
+        luaL_error(L, s.c_str());
+    }
+    return nArguments;
+}
+
+int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range, const char* component)
+{
+    int nArguments = lua_gettop(L);
+    if ((nArguments < range.first) && (nArguments > range.second)) {
+        using namespace fmt::literals;
+        std::string s = "Expected {}-{} arguments, got {}"_format(
+            range.first,
+            range.second,
+            nArguments
+        );
+        if (component) {
+            LERRORC(component, s);
+        }
+        else {
+            LERRORC("Lua", s);
+        }
+        luaL_error(L, s.c_str());
+    }
+    return nArguments;
+}
+
 
 namespace internal {
 
