@@ -49,8 +49,8 @@ public:
 
 } // namespace ghoul::internal
 
-#define __MERGE(a,b)  a##b
-#define __LABEL(a) __MERGE(scopeExit_, a)
+#define __MERGE_Defer(a,b)  a##b
+#define __LABEL_Defer(a) __MERGE_Defer(scopeExit_, a)
 
 
 // The 'defer' macro can be used to execute a piece of code at the end of a scope, for
@@ -59,6 +59,6 @@ public:
 // int* i = new int;
 // defer { delete i; };
 // *i = 0;
-#define defer auto __LABEL(__LINE__) = ghoul::internal::ScopeExitHelper() << [&]()
+#define defer auto __LABEL_Defer(__LINE__) = ghoul::internal::ScopeExitHelper() << [&]()
 
 #endif // __GHOUL___DEFER___H__
