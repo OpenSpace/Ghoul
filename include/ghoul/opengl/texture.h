@@ -93,6 +93,15 @@ public:
         MirroredRepeat = static_cast<std::underlying_type_t<GLenum>>(GL_MIRRORED_REPEAT)
     };
 
+    // Encapsulating the wrapping mode state for 1D, 2D, and 3D textures.  1D textures
+    // only use <code>s</code>, 2D textures use <code>s</code> and <code>t</code>, where
+    // as 3D textures use all three specified wrapping modes.
+    struct WrappingModes {
+        WrappingMode s;
+        WrappingMode t = s;
+        WrappingMode r = t;
+    };
+
     static int numberOfChannels(Format format);
 
     /**
@@ -384,11 +393,18 @@ public:
      */
     void setWrapping(WrappingMode wrapping);
 
+    /** Sets a new Texture::WrappingModes for this Texture. The new mode is applied
+    * immediately. This function supports setting different wrapping modes for different
+    * dimensions.
+    * \param wrapping The new wrappingmodes for this Texture
+    */
+    void setWrapping(WrappingModes wrapping);
+
     /**
      * Returns the currently used Texture::WrappingMode for this texture.
      * \return The currently used Texture::WrappingMode for this texture
      */
-    WrappingMode wrapping() const;
+    WrappingModes wrapping() const;
 
     /**
      * Sets the maximum number of MipMap levels to use. This is only valid when the
@@ -821,7 +837,7 @@ private:
     std::array<GLenum, 4> _swizzleMask;
     GLenum _dataType;
     FilterMode _filter;
-    WrappingMode _wrapping;
+    WrappingModes _wrapping;
     GLuint _id;
     GLenum _type;
     GLubyte _bpp;

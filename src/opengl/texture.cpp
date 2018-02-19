@@ -58,7 +58,7 @@ Texture::Texture(glm::uvec3 dimensions, Format format, GLenum internalFormat,
     , _internalFormat(internalFormat)
     , _dataType(dataType)
     , _filter(filter)
-    , _wrapping(wrapping)
+    , _wrapping({ wrapping })
     , _mipMapLevel(8)
     , _anisotropyLevel(-1.f)
     , _hasOwnershipOfData(takeOwnership)
@@ -82,7 +82,7 @@ Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLenum intern
     , _internalFormat(internalFormat)
     , _dataType(dataType)
     , _filter(filter)
-    , _wrapping(wrapping)
+    , _wrapping({ wrapping })
     , _mipMapLevel(8)
     , _anisotropyLevel(-1.f)
     , _hasOwnershipOfData(true)
@@ -237,6 +237,7 @@ void Texture::applyFilter() {
             glGenerateMipmap(_type);
             glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(_type, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
             break;
         case FilterMode::AnisotropicMipMap:
         {
@@ -341,11 +342,16 @@ bool Texture::isResident() const {
 }
 
 void Texture::setWrapping(WrappingMode wrapping) {
+    _wrapping = { wrapping, wrapping, wrapping };
+    applyWrapping();
+}
+
+void Texture::setWrapping(WrappingModes wrapping) {
     _wrapping = wrapping;
     applyWrapping();
 }
 
-Texture::WrappingMode Texture::wrapping() const {
+Texture::WrappingModes Texture::wrapping() const {
     return _wrapping;
 }
 
@@ -356,16 +362,15 @@ void Texture::setMipMapLevel(int mipMapLevel) {
 
 void Texture::applyWrapping() {
     bind();
-    GLint wrapping = GLint(_wrapping);
     switch (_type) {
         case GL_TEXTURE_3D:
-            glTexParameteri(_type, GL_TEXTURE_WRAP_R, wrapping);
+            glTexParameteri(_type, GL_TEXTURE_WRAP_R, static_cast<GLint>(_wrapping.r));
             [[fallthrough]];
         case GL_TEXTURE_2D:
-            glTexParameteri(_type, GL_TEXTURE_WRAP_T, wrapping);
+            glTexParameteri(_type, GL_TEXTURE_WRAP_T, static_cast<GLint>(_wrapping.t));
             [[fallthrough]];
         case GL_TEXTURE_1D:
-            glTexParameteri(_type, GL_TEXTURE_WRAP_S, wrapping);
+            glTexParameteri(_type, GL_TEXTURE_WRAP_S, static_cast<GLint>(_wrapping.s));
             break;
         default:
             throw MissingCaseException();
