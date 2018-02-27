@@ -190,7 +190,7 @@ void WebSocketServer::waitForConnections() {
         std::memset(&clientInfo, 0, sizeof(clientInfo));
         _SOCKLEN clientInfoSize = sizeof(clientInfo);
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif // __GNUC__
@@ -199,7 +199,7 @@ void WebSocketServer::waitForConnections() {
             reinterpret_cast<sockaddr*>(&clientInfo),
             &clientInfoSize
         );
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic pop
 #endif // __GNUC__
 
