@@ -214,7 +214,7 @@ int WebSocket::outputStreamSize() {
     _outputStream.seekg(0, std::ios::end);
     std::streampos size = _outputStream.tellg();
     _outputStream.seekg(0, std::ios::beg);
-    return size;
+    return static_cast<int>(size);
 }
 
 /**

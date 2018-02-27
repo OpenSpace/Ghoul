@@ -30,20 +30,9 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/exception.h>
 
-
-#ifdef _MSC_VER
-#pragma warning (push)
-#pragma warning (disable : 4244)
-#pragma warning (disable : 4267)
-#endif // _MSC_VER
-
 #include <websocketpp/config/core.hpp>
 #include <websocketpp/server.hpp>
 #include <websocketpp/common/functional.hpp>
-
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif // _MSC_VER
 
 #include <set>
 

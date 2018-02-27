@@ -262,8 +262,14 @@ void TcpSocket::streamOutput() {
                 nBytesToSend,
                 _outputBuffer.begin()
             );
+
+#ifdef WIN32
             int nSentBytes = send(_socket, _outputBuffer.data(), nBytesToSend, 0);
             if (nSentBytes <= 0) {
+#else
+            size_t nSentBytes = send(_socket, _outputBuffer.data(), nBytesToSend, 0);
+            if (nSentBytes == size_t(-1)) {
+#endif // WIN32
                 _error = true;
                 _shouldDisconnect = true;
                 _inputNotifier.notify_one();
