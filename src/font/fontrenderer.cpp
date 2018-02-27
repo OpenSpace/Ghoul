@@ -167,6 +167,7 @@ namespace {
 namespace ghoul::fontrendering {
 
 std::unique_ptr<FontRenderer> FontRenderer::_defaultRenderer = nullptr;
+std::unique_ptr<FontRenderer> FontRenderer::_defaultProjectionRenderer = nullptr;
 
 FontRenderer::FontRenderer()
     : _program(nullptr)
@@ -282,11 +283,20 @@ bool FontRenderer::initialize() {
     LDEBUG("Creating default FontRenderer");
     ghoul_assert(!_defaultRenderer, "Default FontRenderer was already initialized");
     _defaultRenderer = createDefault();
+
+    LDEBUG("Creating default projection FontRenderer");
+    ghoul_assert(
+        !_defaultProjectionRenderer,
+        "Default projection Fontrenderer was already initialized"
+    );
+    _defaultProjectionRenderer = createProjectionSubjectText();
+
     return true;
 }
 
 bool FontRenderer::deinitialize() {
     _defaultRenderer = nullptr;
+    _defaultProjectionRenderer = nullptr;
     return true;
 }
 
@@ -297,6 +307,14 @@ bool FontRenderer::isInitialized() {
 FontRenderer& FontRenderer::defaultRenderer() {
     ghoul_assert(_defaultRenderer != nullptr, "FontRenderer was not initialized");
     return *_defaultRenderer;
+}
+
+FontRenderer& FontRenderer::defaultProjectionRenderer() {
+    ghoul_assert(
+        _defaultProjectionRenderer != nullptr,
+        "Projection FontRenderer was not initialized"
+    );
+    return *_defaultProjectionRenderer;
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,

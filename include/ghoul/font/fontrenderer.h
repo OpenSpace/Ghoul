@@ -133,11 +133,18 @@ public:
     static bool isInitialized();
 
     /**
-     * Returns the singleton FontRenderer. This method triggers and assertion if the
+     * Returns the singleton FontRenderer. This method triggers an assertion if the
      * FontRenderer was not initialized before usage.
      * \return The singleton FontRenderer
      */
     static FontRenderer& defaultRenderer();
+
+    /**
+     * Returns the singleton FontRenderer that renders projected text. This method
+     * triggers an assertion if the FontRenderer was not initialized before usage.
+     * \return The singleton Fontrenderer rendering projected text.
+     */
+    static FontRenderer& defaultProjectionRenderer();
 
     /**
      * Sets the size of the framebuffer that is used as the target for this FontRenderer.
@@ -334,6 +341,9 @@ private:
 
     /// The singleton instance of the default FontRenderer
     static std::unique_ptr<FontRenderer> _defaultRenderer;
+
+    /// The singleton instance of the default projection FontRenderer
+    static std::unique_ptr<FontRenderer> _defaultProjectionRenderer;
 
     /// The framebuffer size that is used to compute the transformation from pixel
     /// coordinates to normalized device coordinates
