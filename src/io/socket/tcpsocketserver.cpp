@@ -199,11 +199,19 @@ void TcpSocketServer::waitForConnections() {
         std::memset(&clientInfo, 0, sizeof(clientInfo));
         _SOCKLEN clientInfoSize = sizeof(clientInfo);
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif // __GNUC__
         _SOCKET socketHandle = accept(
             static_cast<int>(_serverSocket),
             reinterpret_cast<sockaddr*>(&clientInfo),
             &clientInfoSize
         );
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif // __GNUC__
+
         if (socketHandle == INVALID_SOCKET) {
             continue;
         }

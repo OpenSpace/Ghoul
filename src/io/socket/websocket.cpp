@@ -154,7 +154,8 @@ void WebSocket::streamInput() {
                 _socket,
                 _inputBuffer.data(),
                 static_cast<int>(_inputBuffer.size()),
-                0);
+                0
+        );
 
         if (nReadBytes <= 0) {
             _error = true;
@@ -184,7 +185,9 @@ void WebSocket::streamOutput() {
             int sentBytes = send(_socket, output.c_str(), bytesToSend, 0);
 
             if (sentBytes <= 0) {
-                LERROR(fmt::format("Bad send return code: {}. Disconnecting!", errorCode()));
+                LERROR(
+                    fmt::format("Bad send return code: {}. Disconnecting!", errorCode())
+                );
                 _error = true;
                 _shouldDisconnect = true;
                 _inputNotifier.notify_one();
@@ -222,7 +225,7 @@ int WebSocket::outputStreamSize() {
  * \param hdl A handle to uniquely identify a connection.
  * \param msg The message
  */
-void WebSocket::onMessage(websocketpp::connection_hdl hdl, WsServer::message_ptr msg) {
+void WebSocket::onMessage(websocketpp::connection_hdl, WsServer::message_ptr msg) {
     std::string msgContent = msg->get_payload();
     std::lock_guard<std::mutex> guard(_inputQueueMutex);
     _inputQueue.push_back(msgContent);
