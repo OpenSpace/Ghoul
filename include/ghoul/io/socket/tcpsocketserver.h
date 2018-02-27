@@ -36,13 +36,12 @@
 #include <atomic>
 #include <mutex>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 class TcpSocketServer : public SocketServer {
 public:
     TcpSocketServer();
-    ~TcpSocketServer();
+    virtual ~TcpSocketServer();
     virtual std::string address() const;
     virtual int port() const;
     virtual void close();
@@ -75,7 +74,6 @@ private:
     void setOptions(_SOCKET socket);
 };
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___TCPSOCKETSERVER___H__

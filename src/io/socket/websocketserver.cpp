@@ -186,10 +186,15 @@ std::unique_ptr<Socket> WebSocketServer::awaitPendingSocket() {
 
 void WebSocketServer::waitForConnections() {
     while (_listening) {
-        sockaddr_in clientInfo = { 0 };
+        sockaddr_in clientInfo;
+        std::memset(&clientInfo, 0, sizeof(clientInfo));
         _SOCKLEN clientInfoSize = sizeof(clientInfo);
 
-        _SOCKET socketHandle = accept((int)_serverSocket, (sockaddr*)&clientInfo, &clientInfoSize);
+        _SOCKET socketHandle = accept(
+            static_cast<int>(_serverSocket),
+            reinterpret_cast<sockaddr*>(&clientInfo),
+            &clientInfoSize
+        );
         if (socketHandle == INVALID_SOCKET) {
             // no client wanted this socket -- continue loop
 #if defined(WIN32) 

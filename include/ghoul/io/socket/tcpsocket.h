@@ -148,9 +148,9 @@ protected:
 
     const std::string _address;
     const int _port;
-    std::atomic<bool> _shouldDisconnect;
-    std::atomic<bool> _isConnecting;
     std::atomic<bool> _isConnected;
+    std::atomic<bool> _isConnecting;
+    std::atomic<bool> _shouldDisconnect;
     std::atomic<bool> _error;
 
     _SOCKET _socket;

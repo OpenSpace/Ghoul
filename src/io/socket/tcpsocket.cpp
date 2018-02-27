@@ -36,18 +36,20 @@ namespace io {
 
 std::atomic<bool> TcpSocket::_initializedNetworkApi{false};
 
-TcpSocket::TcpSocketError::TcpSocketError(std::string message, std::string comp)
-    : RuntimeError(message, comp) {}
+TcpSocket::TcpSocketError::TcpSocketError(std::string msg, std::string comp)
+    : RuntimeError(std::move(msg), std::move(comp))
+{}
 
 TcpSocket::TcpSocket(std::string address, int port)
     : Socket()
-    , _address(address)
+    , _address(std::move(address))
     , _port(port)
     , _isConnected(false)
     , _isConnecting(false)
     , _shouldDisconnect(false)
     , _error(false)
     , _socket(INVALID_SOCKET)
+    , _server(nullptr)
     , _inputThread(std::thread())
     , _outputThread(std::thread())
     , _delimiter(DefaultDelimiter)
@@ -55,14 +57,16 @@ TcpSocket::TcpSocket(std::string address, int port)
 
 TcpSocket::TcpSocket(std::string address, int port, _SOCKET socket)
     : Socket()
-    , _address(address)
+    , _address(std::move(address))
     , _port(port)
     , _isConnected(true)
     , _isConnecting(false)
     , _shouldDisconnect(false)
     , _error(false)
     , _socket(socket)
-    , _delimiter(DefaultDelimiter) {}
+    , _server(nullptr)
+    , _delimiter(DefaultDelimiter)
+{}
 
 TcpSocket::~TcpSocket() {
     if (_isConnected) {
@@ -258,7 +262,7 @@ void TcpSocket::streamOutput() {
                 nBytesToSend,
                 _outputBuffer.begin()
             );
-            size_t nSentBytes = send(_socket, _outputBuffer.data(), nBytesToSend, 0);
+            int nSentBytes = send(_socket, _outputBuffer.data(), nBytesToSend, 0);
             if (nSentBytes <= 0) {
                 _error = true;
                 _shouldDisconnect = true;

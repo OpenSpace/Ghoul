@@ -37,8 +37,9 @@ using websocketpp::lib::bind;
 namespace ghoul {
 namespace io {
 
-WebSocket::WebSocketError::WebSocketError(std::string message, std::string component)
-    : RuntimeError(message, component) {}
+WebSocket::WebSocketError::WebSocketError(std::string msg, std::string comp)
+    : RuntimeError(std::move(msg), std::move(comp))
+{}
 
 WebSocket::WebSocket(std::string address, int port) : TcpSocket(address, port) {
     LDEBUG(fmt::format("WebSocket started on {}:{}.", address, port));
@@ -211,7 +212,7 @@ int WebSocket::outputStreamSize() {
 
     std::lock_guard<std::mutex> guard(_outputStreamMutex);
     _outputStream.seekg(0, std::ios::end);
-    int size = _outputStream.tellg();
+    std::streampos size = _outputStream.tellg();
     _outputStream.seekg(0, std::ios::beg);
     return size;
 }
@@ -251,7 +252,7 @@ bool WebSocket::waitForOutput(size_t nBytes) {
         if (_shouldDisconnect || (!_isConnected && !_isConnecting)) {
             return true;
         }
-        return outputStreamSize() >= nBytes;
+        return static_cast<size_t>(outputStreamSize()) >= nBytes;
     };
 
     // Block execution until enough data has come into the output queue.
@@ -263,7 +264,7 @@ bool WebSocket::waitForOutput(size_t nBytes) {
     return !_error;
 }
 
-bool WebSocket::waitForInput(size_t nBytes) {
+bool WebSocket::waitForInput(size_t) {
     auto hasInputOrDisconnected = [this]() {
         if (_shouldDisconnect || (!_isConnected && !_isConnecting)) {
             return true;
