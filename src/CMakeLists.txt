@@ -102,6 +102,7 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/src/opengl/debugcontext.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/framebufferobject.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/programobject.cpp
+        ${PROJECT_SOURCE_DIR}/src/opengl/programobjectmanager.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/shadermanager.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/shaderobject.cpp
         ${PROJECT_SOURCE_DIR}/src/opengl/shaderpreprocessor.cpp
@@ -241,6 +242,7 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/ghoul_gl.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/opengl
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobject.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobjectmanager.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shadermanager.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderobject.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderpreprocessor.h

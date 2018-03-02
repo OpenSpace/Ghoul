@@ -56,15 +56,14 @@ namespace constants {
 #include "tests/test_buffer.inl"
 #include "tests/test_commandlineparser.inl"
 #include "tests/test_common.inl"
-//#include "tests/test_configurationmanager.inl"
+#include "tests/test_crc32.inl"
 #include "tests/test_dictionary.inl"
+#include "tests/test_dictionaryjsonformatter.inl"
+#include "tests/test_dictionaryluaformatter.inl"
 #include "tests/test_filesystem.inl"
 #include "tests/test_luatodictionary.inl"
 #include "tests/test_templatefactory.inl"
 //#include "tests/test_threadpool.inl"
-#include "tests/test_crc32.inl"
-#include "tests/test_dictionaryjsonformatter.inl"
-#include "tests/test_dictionaryluaformatter.inl"
 
 using namespace ghoul::cmdparser;
 using namespace ghoul::filesystem;

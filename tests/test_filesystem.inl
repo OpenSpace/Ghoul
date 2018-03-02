@@ -40,7 +40,7 @@ protected:
 };
 
 TEST_F(FileSystemTest, HasTestDirectory) {
-    EXPECT_EQ(FileSys.directoryExists("${TEMPORARY}"), true);
+    EXPECT_EQ(FileSys.directoryExists(absPath("${TEMPORARY}")), true);
 }
 
 TEST_F(FileSystemTest, CreateRemoveDirectory) {
@@ -64,19 +64,24 @@ TEST_F(FileSystemTest, Path) {
     using ghoul::filesystem::File;
 
     std::string path = "${TEMPORARY}/tmpfil.txt";
-    std::string abspath = absPath(path);
+    std::string absPath = absPath(path);
 
-    File* f1 = new File(path);
-    File* f2 = new File(path, File::RawPath::Yes);
-    File* f3 = new File(abspath, File::RawPath::Yes);
+    File rawPathDef(path);
+    File rawPathYes(path, File::RawPath::Yes);
+    File rawPathNo(path, File::RawPath::No);
+    File absPathDef(absPath);
+    File absPathYes(absPath, File::RawPath::Yes);
+    File absPathNo(absPath, File::RawPath::No);
 
-    EXPECT_NE(f1->path(), f2->path());
-    EXPECT_NE(f2->path(), f3->path());
-    EXPECT_EQ(f1->path(), f3->path());
+    EXPECT_EQ(rawPathDef.path(), rawPathYes.path());
+    EXPECT_NE(rawPathDef.path(), rawPathNo.path());
+    EXPECT_NE(rawPathYes.path(), rawPathNo.path());
 
-    delete f3;
-    delete f2;
-    delete f1;
+    EXPECT_EQ(absPathDef.path(), absPathYes.path());
+    EXPECT_EQ(absPathDef.path(), absPathNo.path());
+    EXPECT_EQ(absPathYes.path(), absPathNo.path());
+
+    EXPECT_EQ(rawPathNo.path(), absPathDef.path());
 }
 
 TEST_F(FileSystemTest, OnChangeCallback) {

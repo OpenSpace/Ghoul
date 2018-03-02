@@ -28,6 +28,7 @@
 
 #include "framebufferobject.h"
 #include "programobject.h"
+#include "programobjectmanager.h"
 #include "shadermanager.h"
 #include "shaderobject.h"
 #include "texture.h"
