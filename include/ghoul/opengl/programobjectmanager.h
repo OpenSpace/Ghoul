@@ -35,16 +35,56 @@ namespace ghoul::opengl {
 
 class ProgramObject;
 
+/**
+ * The ProgramObjectManager can be used to cache multiple ProgramObjects based on a unique
+ * name. A ProgramObject can be requested using #requestProgramObject. If a ProgramObject
+ * with the specified name has already been created, a pointer to it is returned.
+ * Otherwise it will be created using the passed creationFunction and stored internally.
+ * Clients can release a ProgramObject using #releaseProgramObject. The ProgramObject is
+ * only deleted when the last client that requested the object has released it. At the 
+ * time of ProgramObjectManager destruction, all ProgramObject%s have to have been
+ * released or the application will assert. 
+ */
 class ProgramObjectManager {
 public:
+    /**
+     * Checks whether all ProgramObjects have been released
+     */
     ~ProgramObjectManager();
 
+    /*
+     * Requests a new ProgramObject with a unique \p name and, if it has not been created
+     * previously, calls the \p creationFunction whose responsibility it is to return a
+     * newly created ProgramObject, a pointer to which is returned by this function call
+     * and all subsequent function calls with the same \p name. If a ProgramObject existed
+     * at the time of the call, the \p creationFunction is not called. This method only
+     * returns <code>nullptr</code> if \p creationFunction returned a
+     * <code>nullptr</code>, which will cause *all* following calls with the same name to
+     * return a <code>nullptr</code> as well. The \p creationFunction will be called
+     * exactly once for each \p name regardless of its return value.
+     * \param name The name of the ProgramObject that is to be generated
+     * \param creationFunction If this is the first call with the provided \p name, this
+     *        function is executed to create a new ProgramObject. Regardless of its
+     *        return value, this function is only ever going to be called exactly once
+     */
     ProgramObject* requestProgramObject(const std::string& name,
         const std::function<std::unique_ptr<ProgramObject>()>& creationFunction);
 
+    /**
+     * Releases the ProgramName with the provided \p name. If the ProgramObject has been
+     * requested \c i number of times, and this is the \c ith call for this \p name, the
+     * \p destructionFunction is called with the ProgramObject to take care of any
+     * additional destruction. OBS: The regular destructor of the ProgramObject will be
+     * automatically called after the \p destructionFunction returns, so it is **not**
+     * advised for the client to call \c delete on the ProgramObject as well.
+     * \param name The unique name of the ProgramObject that should be released
+     * \param destructionFunction The function that can handle additional destruction
+     *        events required by the client. Please not that the regular destructor will
+     *        be automatically called after this method returns program control back to
+     *        the ProgramObjectManager
+     */
     void releaseProgramObject(const std::string& name,
         const std::function<void(ProgramObject*)>& destructionFunction);
-
 
 private:
     struct Info {
@@ -56,117 +96,4 @@ private:
 
 }  // namespace ghoul::opengl
 
-
 #endif // __GHOUL___PROGRAMOBJECTMANAGER___H__
-
-#if 0
-#include <ghoul/misc/exception.h>
-
-#include <map>
-#include <memory>
-#include <string>
-
-namespace ghoul::opengl {
-
-class ShaderObject;
-
-/**
- * This singleton class provides a central and efficient storage for ShaderObject%s. The
- * shaders stored in this class belong to the ShaderManager and should be deleted using
- * #unregisterShaderObject which returns the stored ShaderObject. If the calling function
- * does not pick up the returned value, it is then destroyed. Shader%s can be registered
- * (#registerShaderObject), unregistered (#unregisterShaderObject), or retrieved
- * (#shaderObject) using either a string name or a generated hash value which is more
- * efficient to retrieve than a string.
- */
-class ShaderManager {
-public:
-    /// Main exception that is thrown in the methods of the ShaderManager
-    struct ShaderManagerError : public RuntimeError {
-        explicit ShaderManagerError(std::string message);
-    };
-
-    /**
-     * This method returns a reference to the initialized ShaderManager.
-     * \return An initialized reference to the singleton manager
-     * \pre The static ShaderManager must have been initialized before
-     */
-    static ShaderManager& ref();
-
-    /**
-     * This method will return the ShaderObject that was registered with a string whose
-     * hash value is equal to \p hashedName. The hashed name that can be used will be
-     * returned from the #registerShaderObject method.
-     * \param hashedName The hashed name of the ShaderObject that is to be fetched
-     * \return The ShaderObject that has been registered with a string that evaluates
-     * to the \p hashedName
-     * \throw ShaderManagerError if the ShaderObject for \p hashedName did not exist
-     */
-    ShaderObject* shaderObject(unsigned int hashedName);
-
-    /**
-     * This method will return the ShaderObject that was registered with the passed name.
-     * This method will create the hash value from the passed string and will call the
-     * #shaderObject method.
-     * \param name The name of the ShaderObject that is to be fetched
-     * \return The ShaderObject that has been registered with the passed name
-     * \throw ShaderManagerError If the ShaderObject for \p name did not exist
-     */
-    ShaderObject* shaderObject(const std::string& name);
-
-    /**
-     * Register the passed ShaderObject under the passed name so that it can be retrieved
-     * either by the given \p name or by the returned hashed value. If the manager already
-     * contains a hashed value equal to the hash value of the name, an exception is
-     * thrown.
-     * \param name The name under which the ShaderObject should be registered
-     * \param shader The ShaderObject that should be registered
-     * \return The hashed value that is generated from the \p name
-     * \throw ShaderManagerError If there already was a ShaderObject for the provided
-     * \p name
-     * \pre \p shader must not be nullptr
-     */
-    unsigned int registerShaderObject(const std::string& name,
-        std::unique_ptr<ShaderObject> shader);
-
-    /**
-     * This method will unregister the ShaderObject that was registered under the passed
-     * name. The ShaderObject will be returned to the caller. If the caller ignores the
-     * return value, the ShaderObject will be deleted.
-     * \param name The name under which the ShaderObject was registered previously
-     * \return The previously registered ShaderObject or <code>nullptr</code> if the
-     * \p name was not a valid ShaderObject
-     */
-    std::unique_ptr<ShaderObject> unregisterShaderObject(const std::string& name);
-
-    /**
-     * This method will unregister the ShaderObject that was registered under a name whose
-     * hash value is equal to the passed \p hashName. The ShaderObject will be returned to
-     * the caller. If the caller ignores the return value, the ShaderObject will be
-     * deleted.
-     * \param hashedName The hash value which is used to refer to a previously stored
-     * ShaderObject
-     * \return The registered ShaderObject or <code>nullptr</code> if the \p name was not
-     * a valid ShaderObject
-     */
-    std::unique_ptr<ShaderObject> unregisterShaderObject(unsigned int hashedName);
-
-    /**
-     * This method returns the hash value for a given \p name. The hash function is
-     * implementation-dependent, but it is guaranteed to be static in an application run
-     * and it will produce reliable, consistent results.
-     * \param name The name which should be converted into a hash value
-     * \return The hash value for the passed name
-     */
-    unsigned int hashedNameForName(const std::string& name) const;
-
-private:
-    /// Map containing all the registered ShaderObject%s
-    std::map<unsigned int, std::unique_ptr<ShaderObject>> _objects;
-};
-
-#define ShdrMgr (ghoul::opengl::ShaderManager::ref())
-
-} // namespace ghoul::opengl
-
-#endif // __GHOUL___SHADERMANAGER___H__
