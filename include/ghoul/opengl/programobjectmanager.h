@@ -26,6 +26,7 @@
 #ifndef __GHOUL___PROGRAMOBJECTMANAGER___H__
 #define __GHOUL___PROGRAMOBJECTMANAGER___H__
 
+#include <ghoul/misc/boolean.h>
 #include <ghoul/opengl/programobject.h>
 #include <functional>
 #include <map>
@@ -46,13 +47,28 @@ namespace ghoul::opengl {
  */
 class ProgramObjectManager {
 public:
+    using Warnings = ghoul::Boolean;
     using CreationCallback = std::function<std::unique_ptr<ProgramObject>()>;
     using DestructionCallback = std::function<void(ProgramObject*)>;
 
     /**
-     * Checks whether all ProgramObjects have been released
+     * Checks whether all ProgramObjects have been released and asserts if the application
+     * was built in Debug mode. If asserts are disabled, this method does nothing except
+     * free all held ProgramObjects (which, to be clear, should not exist at this point
+     * anymore)
      */
     ~ProgramObjectManager();
+
+    /**
+     * This method can be called before the OpenGL context is lost to blanket release all
+     * remaining held ProgramObjects. If \p emitWarnings is \c Yes, each remaining
+     * ProgramObject is logged, also mentioning the remaining reference counter before
+     * destruction. If everything went well in shutdown, this method should not do
+     * anything and should not emit any warnings.
+     * \param emitWarnings If \c Yes each remaining ProgramObject will emit a warning 
+     *        including information about the remaining reference counter at destruction
+     */
+    void releaseAll(Warnings emitWarnings = Warnings::Yes);
 
     /*
      * Requests a new ProgramObject with a unique \p name and, if it has not been created

@@ -45,6 +45,31 @@ ProgramObjectManager::~ProgramObjectManager() {
     }
 }
 
+void ProgramObjectManager::releaseAll(Warnings emitWarnings) {
+    // If we are not interested in the warnings, we can just clear the map and let the
+    // destructors do their job right away.
+    if (!emitWarnings) {
+        _programs.clear();
+        return;
+    }
+
+    if (!_programs.empty()) {
+        LWARNINGC(
+            "ProgramObjectManager",
+            "Remaining ProgramObjects detected. There was probably some error during "
+            "deinitialization that caused this."
+        );
+    }
+    for (std::pair<const std::string, Info>& p : _programs) {
+        LWARNINGC(p.first, "Remaining reference counter: " << p.second.refCount);
+        // We have to destroy the ProgramObject now; otherwise it will destroyed when this
+        // ProgramObjectManager leaves scope, at which point there might not be a valid
+        // OpenGL state left
+        p.second.program = nullptr;
+    }
+
+}
+
 ProgramObject* ProgramObjectManager::requestProgramObject(const std::string& name,
                   const std::function<std::unique_ptr<ProgramObject>()>& creationFunction)
 {
@@ -77,13 +102,15 @@ void ProgramObjectManager::releaseProgramObject(const std::string& name,
 {
     auto it = _programs.find(name);
     ghoul_assert(it != _programs.end(), "Could not find ProgramObject '" + name + "'");
+    ghoul_assert(it->second.refCount >= 0, "Ref count cannot be negative");
 
     --(it->second.refCount);
+    LDEBUGC(name, "Ref count decreased to " << it->second.refCount);
     if (it->second.refCount == 0) {
         // This was the final call, so we will delete the ProgramObject
         destructionFunction(it->second.program.get());
         it->second.program = nullptr;
-        _programs.erase(name);
+        _programs.erase(it);
     }
 }
 
