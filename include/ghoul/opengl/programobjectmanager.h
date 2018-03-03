@@ -26,14 +26,13 @@
 #ifndef __GHOUL___PROGRAMOBJECTMANAGER___H__
 #define __GHOUL___PROGRAMOBJECTMANAGER___H__
 
+#include <ghoul/opengl/programobject.h>
 #include <functional>
 #include <map>
 #include <memory>
 #include <string>
 
 namespace ghoul::opengl {
-
-class ProgramObject;
 
 /**
  * The ProgramObjectManager can be used to cache multiple ProgramObjects based on a unique
@@ -47,6 +46,9 @@ class ProgramObject;
  */
 class ProgramObjectManager {
 public:
+    using CreationCallback = std::function<std::unique_ptr<ProgramObject>()>;
+    using DestructionCallback = std::function<void(ProgramObject*)>;
+
     /**
      * Checks whether all ProgramObjects have been released
      */
@@ -68,7 +70,7 @@ public:
      *        return value, this function is only ever going to be called exactly once
      */
     ProgramObject* requestProgramObject(const std::string& name,
-        const std::function<std::unique_ptr<ProgramObject>()>& creationFunction);
+        const CreationCallback& creationFunction);
 
     /**
      * Releases the ProgramName with the provided \p name. If the ProgramObject has been
@@ -77,6 +79,8 @@ public:
      * additional destruction. OBS: The regular destructor of the ProgramObject will be
      * automatically called after the \p destructionFunction returns, so it is **not**
      * advised for the client to call \c delete on the ProgramObject as well.
+     * The return value can be used to modify a local copy of the ProgramObject to make it
+     * clear which program name is associated with which local variable.
      * \param name The unique name of the ProgramObject that should be released
      * \param destructionFunction The function that can handle additional destruction
      *        events required by the client. Please not that the regular destructor will
@@ -84,7 +88,7 @@ public:
      *        the ProgramObjectManager
      */
     void releaseProgramObject(const std::string& name,
-        const std::function<void(ProgramObject*)>& destructionFunction);
+        const DestructionCallback& destructionFunction = [](ProgramObject*) {});
 
 private:
     struct Info {

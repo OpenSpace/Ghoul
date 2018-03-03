@@ -80,6 +80,7 @@ void ProgramObjectManager::releaseProgramObject(const std::string& name,
 
     --(it->second.refCount);
     if (it->second.refCount == 0) {
+        // This was the final call, so we will delete the ProgramObject
         destructionFunction(it->second.program.get());
         it->second.program = nullptr;
         _programs.erase(name);
