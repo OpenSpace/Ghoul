@@ -29,9 +29,19 @@
 namespace ghoul::opengl {
 
 template <bufferbinding::Buffer T>
-BufferBinding<T>::BufferBinding()
-    : _number(0)
-{
+unsigned int BufferBinding<T>::_totalActive = 0;
+
+template <bufferbinding::Buffer T>
+unsigned int BufferBinding<T>::_maxBufferBindings = 0;
+
+template <bufferbinding::Buffer T>
+std::vector<bool> BufferBinding<T>::_busyBindings = std::vector<bool>();
+
+template <bufferbinding::Buffer T>
+bool BufferBinding<T>::_initialized = false;
+
+template <bufferbinding::Buffer T>
+BufferBinding<T>::BufferBinding() {
     if (!_initialized) {
         initialize();
     }
@@ -106,17 +116,5 @@ void BufferBinding<T>::initialize() {
     _busyBindings = std::vector<bool>(_maxBufferBindings, false);
     _initialized = true;
 }
-
-template <bufferbinding::Buffer T>
-unsigned int BufferBinding<T>::_totalActive = 0;
-
-template <bufferbinding::Buffer T>
-unsigned int BufferBinding<T>::_maxBufferBindings = 0;
-
-template <bufferbinding::Buffer T>
-std::vector<bool> BufferBinding<T>::_busyBindings = std::vector<bool>();
-
-template <bufferbinding::Buffer T>
-bool BufferBinding<T>::_initialized = false;
 
 } // namespace ghoul::opengl

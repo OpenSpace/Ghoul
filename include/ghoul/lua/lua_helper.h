@@ -304,7 +304,6 @@ int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range,
     const char* component = nullptr);
 
 
-
 namespace internal {
     void deinitializeGlobalState();
 } // namespace internal

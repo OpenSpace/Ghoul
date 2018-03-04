@@ -31,7 +31,6 @@
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/shaderobject.h>
 #include <ghoul/glm.h>
-
 #include <map>
 #include <memory>
 #include <string>

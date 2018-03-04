@@ -41,9 +41,7 @@ namespace ghoul {
  * \return The results of the tokenization operation
  * \throws RuntimeError If there was an error tokenizing the string
  */
-std::vector<std::string> tokenizeString(
-    const std::string& input,
-    char separator = '.');
+std::vector<std::string> tokenizeString(const std::string& input, char separator = '.');
 
 /**
  * Joins the strings located in the \p input using the provided \p separator and returns

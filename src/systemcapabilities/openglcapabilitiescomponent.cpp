@@ -27,7 +27,6 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/ghoul_gl.h>
-
 #include <algorithm>
 
 #ifdef WIN32

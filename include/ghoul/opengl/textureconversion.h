@@ -27,7 +27,6 @@
 #define __GHOUL___TEXTURECONVERSION___H__
 
 #include <ghoul/opengl/texture.h>
-
 #include <memory>
 
 namespace ghoul::opengl {

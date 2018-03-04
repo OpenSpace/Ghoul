@@ -26,7 +26,6 @@
 #include <ghoul/opengl/texture.h>
 
 #include <ghoul/misc/assert.h>
-
 #include <cstring>
 
 using glm::detail::int8;
@@ -46,7 +45,7 @@ using std::numeric_limits;
 
 namespace {
     std::array<GLenum, 4> DefaultSwizzleMask = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-}
+} // namespace
 
 namespace ghoul::opengl {
 

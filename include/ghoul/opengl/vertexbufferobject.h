@@ -45,7 +45,7 @@ public:
      * Default constructor. Initializes the internal GL objects to 0. VertexBufferObject%s
      * cannot be constructed without an OpenGL context.
      */
-    VertexBufferObject();
+    VertexBufferObject() = default;
 
     /**
      * Moves the other object in place of the created one. The other object will be in an
@@ -140,19 +140,19 @@ private:
     void generateGLObjects();
 
     /// The vertex array object that stores the created VertexBufferObject
-    GLuint _vaoID;
+    GLuint _vaoID = 0;
 
     /// The vertex buffer object
-    GLuint _vBufferID;
+    GLuint _vBufferID = 0;
 
     /// The index buffer obejct
-    GLuint _iBufferID;
+    GLuint _iBufferID = 0;
 
     /// The size of the index buffer, determining how many vertices are drawn
-    unsigned int _iSize;
+    unsigned int _iSize = 0;
 
     /// The rendering mode of this VertexBufferObject
-    GLenum _mode;
+    GLenum _mode = GL_TRIANGLES;
 };
 
 } // namespace ghoul::opengl

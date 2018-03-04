@@ -27,17 +27,17 @@
 
 namespace ghoul::opengl {
 
-template<>
+template <>
 unsigned int BufferBinding<bufferbinding::Buffer::AtomicCounter>::maxBufferBindings() {
     return OpenGLCap.maxAtomicCounterBufferBindings();
 }
 
-template<>
+template <>
 unsigned int BufferBinding<bufferbinding::Buffer::ShaderStorage>::maxBufferBindings() {
     return OpenGLCap.maxShaderStorageBufferBindings();
 }
 
-template<>
+template <>
 unsigned int BufferBinding<bufferbinding::Buffer::Uniform>::maxBufferBindings() {
     return OpenGLCap.maxUniformBufferBindings();
 }

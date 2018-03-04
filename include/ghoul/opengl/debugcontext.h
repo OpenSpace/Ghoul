@@ -29,7 +29,6 @@
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/fromstring.h>
 #include <ghoul/opengl/ghoul_gl.h>
-
 #include <string>
 #include <vector>
 

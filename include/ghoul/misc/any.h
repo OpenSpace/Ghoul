@@ -26,14 +26,13 @@
  * contibutation from Antony Polukhin, Ed Brey, Mark Rodgers, Peter Dimov, and James     *
  * Curran.                                                                               *
  * Copyright Kevlin Henney, 2000, 2001, 2002. All rights reserved.                       *
- * Original file ddstributed under the Boost Software License, Version 1.0. (See copy at *
+ * Original file distributed under the Boost Software License, Version 1.0. (See copy at *
  * http://www.boost.org/LICENSE_1_0.txt)                                                 *
  ****************************************************************************************/
 
 #ifndef __GHOUL___ANY___H__
 #define __GHOUL___ANY___H__
 
-#include <algorithm>
 #include <memory>
 #include <type_traits>
 #include <typeinfo>
@@ -47,7 +46,7 @@ namespace ghoul {
 class any {
 public:
     /// Constructor creating an empty any object
-    any() noexcept;
+    any() noexcept = default;
 
     /**
      * Constructor creating an !any object from the \p value.
@@ -80,7 +79,7 @@ public:
         typename std::enable_if_t<!std::is_const<ValueType>::value>* = nullptr);
 
     /// Default destructor
-    ~any() noexcept;
+    ~any() noexcept = default;
 
     /**
      * Swaps the contents of \p rhs and <code>this</code> object.
@@ -134,7 +133,7 @@ public:
     class placeholder {
     public:
         /// Default virtual destructor
-        virtual ~placeholder();
+        virtual ~placeholder() = default;
 
         /**
          * This method returns the std::type_info of the stored value

@@ -45,8 +45,8 @@ glm::dquat interpolateLinear(double t, const glm::dquat& p0, const glm::dquat& p
 
 template <typename T>
 T interpolateCatmullRom(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
-    double t2 = t*t;
-    double t3 = t2*t;
+    double t2 = t * t;
+    double t3 = t2 * t;
 
     return 0.5 * (
         2.0 * p1 +

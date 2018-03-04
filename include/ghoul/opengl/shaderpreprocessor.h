@@ -30,7 +30,6 @@
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
-
 #include <functional>
 #include <map>
 #include <set>

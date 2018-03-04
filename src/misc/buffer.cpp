@@ -26,8 +26,8 @@
  ****************************************************************************************/
 
 #include <ghoul/misc/buffer.h>
-#include <ghoul/logging/logmanager.h>
 
+#include <ghoul/logging/logmanager.h>
 #include <algorithm>
 #include <iostream>
 #include <fstream>

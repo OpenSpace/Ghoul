@@ -32,6 +32,7 @@ void VertexBufferObject::initialize(const std::vector<T>& vertexArray,
                                                    const std::vector<GLint>& indexArray)
 {
     static_assert(std::is_pod<T>::value, "T has to be a POD");
+
     ghoul_assert(!isInitialized(), "VertexBufferObject must not have been initialized");
     ghoul_assert(!vertexArray.empty(), "Vertex array must not be empty");
     ghoul_assert(!indexArray.empty(), "Index array must not be empty");

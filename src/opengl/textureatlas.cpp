@@ -27,7 +27,8 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
-
+#include <ghoul/opengl/ghoul_gl.h>
+#include <ghoul/opengl/texture.h>
 #include <fmt/format.h>
 
 namespace {

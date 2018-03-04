@@ -27,7 +27,6 @@
 #define __GHOUL___TEXTUREMANAGER___H__
 
 #include <ghoul/misc/exception.h>
-
 #include <map>
 #include <memory>
 #include <string>

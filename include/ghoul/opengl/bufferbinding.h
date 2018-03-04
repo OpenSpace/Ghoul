@@ -26,8 +26,7 @@
 #ifndef __GHOUL___BUFFERBINDING___H__
 #define __GHOUL___BUFFERBINDING___H__
 
-#include "ghoul/opengl/ghoul_gl.h"
-
+#include <ghoul/opengl/ghoul_gl.h>
 #include <vector>
 
 namespace ghoul::opengl::bufferbinding {
@@ -119,7 +118,7 @@ private:
     static void initialize();
 
     /// The number in <code>[0, maxBindings]</code> referring to this BufferBinding
-    GLint _number = -1;
+    GLint _number = 0;
 
     /// <code>true</code> if the list of busy bindings and the maximum number of bindings
     /// have been initialized

@@ -26,7 +26,6 @@
 #include <ghoul/opengl/debugcontext.h>
 
 #include <ghoul/misc/assert.h>
-
 #include <map>
 #include <type_traits>
 

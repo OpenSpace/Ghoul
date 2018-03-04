@@ -69,8 +69,6 @@ private:
      * \throw LuaFormattingError If the \p key points to a type that cannot be converted
      */
     std::string formatValue(const Dictionary& dictionary, const std::string& key) const;
-
-    std::string formatDouble(double d) const;
 };
 
 }  // namespace ghoul

@@ -29,7 +29,6 @@
 #include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
 
 #include <ghoul/misc/exception.h>
-
 #include <memory>
 #include <string>
 #include <vector>

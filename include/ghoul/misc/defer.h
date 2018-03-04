@@ -28,9 +28,11 @@
 
 namespace ghoul::internal {
 
+// This internal struct is used to host the lambda expression that gets executed when the
+// destructor is called
 template <typename T>
 struct ScopeExit {
-    ScopeExit(T lambda) : _lambda(lambda) {}
+    ScopeExit(T lambda) : _lambda(std::move(lambda)) {}
     ~ScopeExit() {
         _lambda();
     }
@@ -38,7 +40,9 @@ struct ScopeExit {
     T _lambda;
 };
 
-
+// A second helper struct that makes it possible to pass a lambda expression to the
+// ScopeExit without the trailing ) that a constructor call would require. The choce of
+// operator is arbitrary
 class ScopeExitHelper {
 public:
     template <typename T>

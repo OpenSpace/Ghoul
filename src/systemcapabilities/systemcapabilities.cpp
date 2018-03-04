@@ -27,7 +27,6 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
-
 #include <algorithm>
 #include <typeinfo>
 

@@ -36,7 +36,7 @@ T& SystemCapabilities::component() {
         "Template parameter must be a subclass of SystemCapabilitiesComponent"
     );
 
-    for (auto& c : _components) {
+    for (std::unique_ptr<SystemCapabilitiesComponent>& c : _components) {
         T* r = dynamic_cast<T*>(c.get());
         if (r) {
             return *r;

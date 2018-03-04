@@ -22,7 +22,6 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  *****************************************************************************************
- *                                                                                       *
  * This code is based on the Freetype GL engine as developed by Nicolas P. Rougier. The  *
  * library is available at http://code.google.com/p/freetype-gl/. His implementation of  *
  * the TextureAtlas is based on the article by Jukka Jylaanki: "A Thousand Ways to Pack  *
@@ -37,13 +36,12 @@
 
 #include <ghoul/glm.h>
 #include <ghoul/misc/exception.h>
-#include <ghoul/opengl/ghoul_gl.h>
-#include <ghoul/opengl/texture.h>
-
 #include <memory>
 #include <vector>
 
 namespace ghoul::opengl {
+
+    class Texture;
 
 /**
  * This class represents a texture atlas which automatically organizes smaller textures

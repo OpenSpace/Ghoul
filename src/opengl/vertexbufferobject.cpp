@@ -27,14 +27,6 @@
 
 namespace ghoul::opengl {
 
-VertexBufferObject::VertexBufferObject()
-    : _vaoID(0)
-    , _vBufferID(0)
-    , _iBufferID(0)
-    , _iSize(0)
-    , _mode(GL_TRIANGLES)
-{}
-
 VertexBufferObject::VertexBufferObject(VertexBufferObject&& other) {
     _vaoID = other._vaoID;
     _vBufferID = other._vBufferID;
@@ -64,12 +56,14 @@ VertexBufferObject& VertexBufferObject::operator=(VertexBufferObject&& other) {
 
 VertexBufferObject::~VertexBufferObject() {
     glDeleteBuffers(1, &_vBufferID);
-    glDeleteBuffers(1, &_iBufferID);
-    glDeleteVertexArrays(1, &_vaoID);
-
     _vBufferID = 0;
+
+    glDeleteBuffers(1, &_iBufferID);
     _iBufferID = 0;
+    
+    glDeleteVertexArrays(1, &_vaoID);
     _vaoID = 0;
+
     _iSize = 0;
 }
 

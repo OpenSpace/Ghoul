@@ -29,10 +29,8 @@
 #include <ghoul/glm.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/opengl/ghoul_gl.h>
-
-#include <glm/gtx/std_based_type.hpp>
-
 #include <array>
+#include <glm/gtx/std_based_type.hpp>
 #include <string>
 
 namespace ghoul::opengl {

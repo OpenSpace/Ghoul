@@ -28,7 +28,6 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/misc/crc32.h>
-
 #include <algorithm>
 #include <functional>
 #include <fstream>

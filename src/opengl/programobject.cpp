@@ -27,7 +27,6 @@
 
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
-
 #include <glm/gtc/type_ptr.hpp>
 
 using std::map;
@@ -67,7 +66,6 @@ using glm::dmat4x2;
 using glm::dmat4x3;
 using glm::dmat4x4;
 using glm::value_ptr;
-
 
 namespace ghoul::opengl {
 

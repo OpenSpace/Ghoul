@@ -47,7 +47,6 @@
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/thread.h>
-
 #include <future>
 #include <memory>
 #include <mutex>

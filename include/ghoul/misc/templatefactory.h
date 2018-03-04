@@ -27,7 +27,6 @@
 #define __GHOUL___TEMPLATEFACTORY___H__
 
 #include <ghoul/misc/exception.h>
-
 #include <functional>
 #include <map>
 #include <memory>
