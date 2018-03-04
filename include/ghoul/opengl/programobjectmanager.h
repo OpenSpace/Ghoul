@@ -65,6 +65,7 @@ public:
      * ProgramObject is logged, also mentioning the remaining reference counter before
      * destruction. If everything went well in shutdown, this method should not do
      * anything and should not emit any warnings.
+     *
      * \param emitWarnings If \c Yes each remaining ProgramObject will emit a warning 
      *        including information about the remaining reference counter at destruction
      */
@@ -80,6 +81,7 @@ public:
      * <code>nullptr</code>, which will cause *all* following calls with the same name to
      * return a <code>nullptr</code> as well. The \p creationFunction will be called
      * exactly once for each \p name regardless of its return value.
+     *
      * \param name The name of the ProgramObject that is to be generated
      * \param creationFunction If this is the first call with the provided \p name, this
      *        function is executed to create a new ProgramObject. Regardless of its
@@ -97,6 +99,7 @@ public:
      * advised for the client to call \c delete on the ProgramObject as well.
      * The return value can be used to modify a local copy of the ProgramObject to make it
      * clear which program name is associated with which local variable.
+     *
      * \param name The unique name of the ProgramObject that should be released
      * \param destructionFunction The function that can handle additional destruction
      *        events required by the client. Please not that the regular destructor will

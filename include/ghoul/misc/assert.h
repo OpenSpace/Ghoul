@@ -33,7 +33,7 @@ namespace ghoul {
 
 /**
  * Exception that gets thrown if an assertion is triggered and the user selects the
- * <code>AssertionException</code> option
+ * <code>AssertionException</code> option.
  */
 struct AssertionException : public std::runtime_error {
     explicit AssertionException(std::string expression, std::string message,
@@ -41,12 +41,13 @@ struct AssertionException : public std::runtime_error {
 };
 
 /**
- * Exception that gets thrown if switch-case statement is missing a case
+ * Exception that gets thrown if switch-case statement is missing a case.
  */
 struct MissingCaseException {};
 
 /**
  * Ghoul internal assert command. Is called by the ghoul_assert macro.
+ *
  * \param expression The expression that caused the assertion
  * \param message The message that was provided for the assertion
  * \param file The file in which the assertion triggered

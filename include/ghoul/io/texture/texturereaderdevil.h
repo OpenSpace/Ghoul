@@ -41,32 +41,36 @@ public:
     /**
     * Loads the texture \p filename using the DevIL library from disk and returns the
     * loaded Texture.
+     *
     * \param filename The texture that should be loaded from the hard disk
     * \return The loaded Texture object
     * \throw TextureLoadException If there was an error loading the texture
     * \pre \p filename must not be empty
     * \pre The extension of \p filename must be among the supported extensions as
-    * reported by supportedExtensions
+    *      reported by supportedExtensions
     */
     std::unique_ptr<opengl::Texture> loadTexture(
         const std::string& filename) const override;
 
 
     /**
-    * Loads a Texture from the memory pointed at by \p memory using the DevIL library. The
-    * memory block must contain at least \p size number of bytes.
-    * \param memory The memory that contains the bytes of the Texture to be loaded
-    * \param size The number of bytes contained in \p memory
-    * \throw TextureLoadException If there was an error reading the \p memory
-    * \pre \p memory must not be <code>nullptr</code>
-    * \pre \p size must be > 0
-    */
+     * Loads a Texture from the memory pointed at by \p memory using the DevIL library. The
+     * memory block must contain at least \p size number of bytes.
+     *
+     * \param memory The memory that contains the bytes of the Texture to be loaded
+     * \param size The number of bytes contained in \p memory
+     * \throw TextureLoadException If there was an error reading the \p memory
+     * \pre \p memory must not be <code>nullptr</code>
+     * \pre \p size must be > 0
+     */
     std::unique_ptr<opengl::Texture> loadTexture(void* memory,
         size_t size) const override;
 
     /**
-     * Returns the supported file extensions
+     * Returns the supported file extensions.
+     *
      * \return The supported file extensions
+     *
      * \sa http://openil.sourceforge.net/features.php
      */
     std::vector<std::string> supportedExtensions() const override;

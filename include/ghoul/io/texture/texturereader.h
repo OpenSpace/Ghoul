@@ -52,7 +52,8 @@ public:
     };
 
     /**
-     * Returns the static variant of the TextureReader
+     * Returns the static variant of the TextureReader.
+     *
      * \return The static variant of the TextureReader
      */
     static TextureReader& ref();
@@ -60,13 +61,14 @@ public:
     /**
      * Loads the provided \p filename into a Texture and returns it. The correct
      * TextureReaderBase is determined by the extension of the \p filename.
+     *
      * \param filename The name of the file which should be loaded into a texture
      * \throw TextureLoadException If there was an error reading the \p filename
      * \throw MissingReaderException If there was no reader for the specified \p filename
      * \pre \p filename must not be empty
      * \pre \p filename must have an extension
      * \pre At least one TextureReaderBase must have been added to the TextureReader
-     * before (addReader)
+     *      before (addReader)
      */
     std::unique_ptr<opengl::Texture> loadTexture(const std::string& filename);
 
@@ -77,12 +79,13 @@ public:
      * \p format parameter is used to disambiguate the cases where multiple TextureReaders
      * are registered. In this case, the \p format is used in the same way as the file
      * extension for the #loadTexture method.
+     *
      * \param memory The memory that contains the bytes of the Texture to be loaded
      * \param size The number of bytes contained in \p memory
      * \param format The format of the image pointed to by \p memory. This parameter
-     * should be the same as the usual file extension for the image. However, this
-     * parameter is only used to determine which TextureReader is used for this memory, if
-     * multiple readers are registered.
+     *        should be the same as the usual file extension for the image. However, this
+     *        parameter is only used to determine which TextureReader is used for this
+     *        memory, if multiple readers are registered.
      * \throw TextureLoadException If there was an error reading the \p memory
      * \throw MissingReaderException If there was no reader for the specified \p filename
      * \pre \p memory must not be <code>nullptr</code>
@@ -95,6 +98,7 @@ public:
      * Returns a list of all the extensions that are supported by registered readers. If
      * a file with an extension included in this list is passed to the loadTexture file
      * and the file is not corrupted, it will be successfully loaded.
+     *
      * \return A list of all supported extensions
      */
     std::vector<std::string> supportedExtensions();
@@ -103,6 +107,7 @@ public:
      * Adds the \p reader to this TextureReader and makes it available through subsequent
      * calls to loadTexture. If an extension is supported by multiple TextureReaderBases,
      * the TextureReaderBase that was added first will be used.
+     *
      * \param reader The reader that is to be added to this TextureReader
      * \pre \p reader must not have been added to this TextureReader before
      */
@@ -110,6 +115,7 @@ public:
 
     /**
      * Returns a list of all the previously registered TextureReaderBases.
+     *
      * \return A list of all the previously registered TextureReaderBases
      */
     std::vector<std::shared_ptr<TextureReaderBase>> readers() const;
@@ -117,6 +123,7 @@ public:
 private:
     /**
      * Returns the TextureReaderBase that is responsible for the provided extension.
+     *
      * \param extension The extension for which the TextureReaderBase should be returned
      * \throw MissingReaderException If there was no reader for the specified \p extension
      */

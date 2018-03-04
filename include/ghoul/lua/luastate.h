@@ -40,8 +40,9 @@ public:
     /**
      * The constructor will create a new Lua state and optionally fill it with the Lua
      * standard libraries, if \p includeStandardLibraries is \c true.
+     *
      * \param includeStandardLibraries If \c true, the created Lua state will contain the
-     * set of Lua standard libraries.
+     *        set of Lua standard libraries.
      * \throw LuaRuntimeException If an error occurs during the state creation
      */
     explicit LuaState(bool includeStandardLibraries = true);
@@ -53,7 +54,8 @@ public:
 
     /**
      * Converts this LuaState into a \c lua_State pointer for compatibility with other
-     * parts that might still rely on bare \c lua_State pointers
+     * parts that might still rely on bare \c lua_State pointers.
+     *
      * \return The contained \c lua_State pointer
      */
     operator lua_State*() const;

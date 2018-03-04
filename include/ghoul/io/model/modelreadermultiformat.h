@@ -48,7 +48,7 @@ namespace ghoul::io {
  * Industry Foundation Classes (IFC/Step) ( .ifc )
  * XGL ( .xgl,.zgl )
  * Stanford Polygon Library ( .ply )
- * *AutoCAD DXF ( .dxf )
+ * AutoCAD DXF ( .dxf )
  * LightWave ( .lwo )
  * LightWave Scene ( .lws )
  * Modo ( .lxo )
@@ -57,15 +57,16 @@ namespace ghoul::io {
  * AC3D ( .ac )
  * Milkshape 3D ( .ms3d )
  * TrueSpace ( .cob,.scn )
+ *
  * \sa https://github.com/assimp/assimp
  */
 class ModelReaderMultiFormat : public ModelReaderBase {
 public:
     /**
-     * Loads the 3D model (anyone from the previous list) file pointed to by
-     * \p filename and returns a constructed VertexBufferObject from it.
-     * Provided materials are ignored and all shapes are
-     * collapsed into one VertexBufferObject.
+     * Loads the 3D model (anyone from the previous list) file pointed to by \p filename
+     * and returns a constructed VertexBufferObject from it. Provided materials are
+     * ignored and all shapes are collapsed into one VertexBufferObject.
+     *
      * \param filename The geometric model file to be loaded
      * \return The initialized VertexBufferObject containing the model or models
      * \throw ModelReaderException If there was an error reading the model from
@@ -76,10 +77,10 @@ public:
         const std::string& filename) const;
 
     /**
-     * Loads the 3D model (anyone from the previous list) file pointed to by
-     * \p filename and returns populates the vertexArray and indexArray objects.
-     * Provided materials are ignored and all shapes are
-     * collapsed into one VertexBufferObject.
+     * Loads the 3D model (anyone from the previous list) file pointed to by \p filename
+     * and returns populates the vertexArray and indexArray objects. Provided materials
+     * are ignored and all shapes are collapsed into one VertexBufferObject.
+     *
      * \param filename The geometric model file to be loaded
      * \param vertexArray STL vector of ModelReaderBase::Vertex objects
      * \param indexArray STL vector of integers containing the indexes for the vertexes

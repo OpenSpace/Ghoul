@@ -53,6 +53,7 @@ public:
 
     /**
      * This method returns a reference to the initialized ShaderManager.
+     *
      * \return An initialized reference to the singleton manager
      * \pre The static ShaderManager must have been initialized before
      */
@@ -62,9 +63,10 @@ public:
      * This method will return the ShaderObject that was registered with a string whose
      * hash value is equal to \p hashedName. The hashed name that can be used will be
      * returned from the #registerShaderObject method.
+     *
      * \param hashedName The hashed name of the ShaderObject that is to be fetched
      * \return The ShaderObject that has been registered with a string that evaluates
-     * to the \p hashedName
+     *         to the \p hashedName
      * \throw ShaderManagerError if the ShaderObject for \p hashedName did not exist
      */
     ShaderObject* shaderObject(unsigned int hashedName);
@@ -73,6 +75,7 @@ public:
      * This method will return the ShaderObject that was registered with the passed name.
      * This method will create the hash value from the passed string and will call the
      * #shaderObject method.
+     *
      * \param name The name of the ShaderObject that is to be fetched
      * \return The ShaderObject that has been registered with the passed name
      * \throw ShaderManagerError If the ShaderObject for \p name did not exist
@@ -84,11 +87,12 @@ public:
      * either by the given \p name or by the returned hashed value. If the manager already
      * contains a hashed value equal to the hash value of the name, an exception is
      * thrown.
+     *
      * \param name The name under which the ShaderObject should be registered
      * \param shader The ShaderObject that should be registered
      * \return The hashed value that is generated from the \p name
      * \throw ShaderManagerError If there already was a ShaderObject for the provided
-     * \p name
+     *        \p name
      * \pre \p shader must not be nullptr
      */
     unsigned int registerShaderObject(const std::string& name,
@@ -98,9 +102,10 @@ public:
      * This method will unregister the ShaderObject that was registered under the passed
      * name. The ShaderObject will be returned to the caller. If the caller ignores the
      * return value, the ShaderObject will be deleted.
+     *
      * \param name The name under which the ShaderObject was registered previously
      * \return The previously registered ShaderObject or <code>nullptr</code> if the
-     * \p name was not a valid ShaderObject
+     *         \p name was not a valid ShaderObject
      */
     std::unique_ptr<ShaderObject> unregisterShaderObject(const std::string& name);
 
@@ -109,10 +114,11 @@ public:
      * hash value is equal to the passed \p hashName. The ShaderObject will be returned to
      * the caller. If the caller ignores the return value, the ShaderObject will be
      * deleted.
+     *
      * \param hashedName The hash value which is used to refer to a previously stored
-     * ShaderObject
+     *        ShaderObject
      * \return The registered ShaderObject or <code>nullptr</code> if the \p name was not
-     * a valid ShaderObject
+     *         a valid ShaderObject
      */
     std::unique_ptr<ShaderObject> unregisterShaderObject(unsigned int hashedName);
 
@@ -120,6 +126,7 @@ public:
      * This method returns the hash value for a given \p name. The hash function is
      * implementation-dependent, but it is guaranteed to be static in an application run
      * and it will produce reliable, consistent results.
+     *
      * \param name The name which should be converted into a hash value
      * \return The hash value for the passed name
      */

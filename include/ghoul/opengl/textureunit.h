@@ -65,6 +65,7 @@ public:
      * first call to either activate, #glEnum, or #unitNumber, a free unit number will be
      * assigned to this object. This will call the OpenGL function
      * <code>glActiveTexture</code> with the enum as a parameter.
+     *
      * \throw TextureUnitError If the new unit number could not be assigned
      */
     void activate();
@@ -80,6 +81,7 @@ public:
      * this is the first call to either #activate, glEnum, or #unitNumber, a free unit
      * enum will be assigned to this object. The returned enum is equivalent to
      * <code>GL_TEXTURE0 + unitNumber()</code>.
+     *
      * \return The unit enum that was assigned to this TextureUnit
      */
     GLenum glEnum();
@@ -88,6 +90,7 @@ public:
      * This method returns the texture unit number that was assigned to this TextureUnit.
      * If this is the first call to either #activate, #glEnum, or unitNumber, a free unit
      * number will be assigned to this object.
+     *
      * \return The texture unit number that was assigned to this TextureUnit
      * \throw TextureUnitError If the new unit number could not be assigned
      */
@@ -98,6 +101,7 @@ public:
      * TextureUnit. If this is the first call to either #activate, #glEnum, or unitNumber,
      * a free unit number will be assigned to this object. Is guaranteed to give the same
      * result as #unitNumber.
+     *
      * \return The texture unit number that was assigned to this TextureUnit
      * \throw TextureUnitError If the new unit number could not be assigned
      */
@@ -114,6 +118,7 @@ public:
      * calling one of the methods #activate, #glEnum, or #unitNumber. The maximum number
      * of supported texture units can be queried from the
      * #ghoul::systemcapabilities::SystemCapabilities.
+     *
      * \return The number of texture units in use
      */
     static int numberActiveUnits();
@@ -123,6 +128,7 @@ private:
      * This method is called the first time either #activate, #glEnum, or #unitNumber is
      * called. It will assign a new OpenGL texture unit to this TextureUnit and mark this
      * new unit as used until this TextureUnit is destroyed.
+     *
      * \throw TextureUnitError If the new unit number could not be assigned
      */
     void assignUnit();

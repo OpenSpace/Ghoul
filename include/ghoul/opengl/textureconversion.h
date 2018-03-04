@@ -34,6 +34,7 @@ namespace ghoul::opengl {
 /**
  * Converts the \p texture into a \p newFormat, replacing the backend storage of the
  * Texture and converting the individual pixels.
+ *
  * \param texture The texture to convert
  * \param newFormat The new format of the texture
  */

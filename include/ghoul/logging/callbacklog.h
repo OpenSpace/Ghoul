@@ -52,12 +52,13 @@ public:
 
     /**
      * Constructor that calls the Log constructor and initializes this CallbackLog.
+     *
      * \param callbackFunction The callback function that is called for each log
-     * message.
+     *        message.
      * \param timeStamping Determines if the log should print the time when a message
-     * is logged
+     *        is logged
      * \param dateStamping Determines if the log should print the time when a message
-     * is logged
+     *        is logged
      * \param categoryStamping Determines if the log should print the categories
      * \param logLevelStamping Determines if the log should print the log level
      */
@@ -70,9 +71,10 @@ public:
 
     /**
      * Method that logs a message with a given level and category to the console.
+     *
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
-     * individually
+     *        individually
      * \param message The message body of the log message
      */
     void log(LogLevel level, const std::string& category,
@@ -82,12 +84,14 @@ public:
      * Replaces the old callback with this <code>callbackFunction</code>. This function
      * is not checked and it is the caller's responsiblity to assure that the function
      * object is callable.
+     *
      * \param callbackFunction The new callback function that will be called henceforth
      */
     void setCallback(CallbackFunction callbackFunction);
 
     /**
      * Returns the callback function that is used in this CallbackLog.
+     *
      * \return The callback function that is used in this CallbackLog
      */
     const CallbackFunction& callback() const;

@@ -65,13 +65,15 @@ public:
      * controls if the path is used without changes, or if tokens should be converted
      * first. The token conversion is done using the FileSystem. \p fileChangedCallback
      * will be called whenever the pointed file changes on the hard disk.
+     *
      * \param filename The path to the file this File object should point to
      * \param isRawPath If this value is <code>true</code>, the value of \p filename is
-     * used as-is. If it is <code>false</code>, the path is converted into an absolute
-     * path and any tokens, if present, are resolved
+     *        used as-is. If it is <code>false</code>, the path is converted into an
+     *        absolute path and any tokens, if present, are resolved
      * \param fileChangedCallback The callback function that is called once per change of
-     * the file on the filesystem
+     *        the file on the filesystem
      * \pre \p filename must not be empty
+     *
      * \see FileSystem The system to register and use tokens
      */
     File(std::string filename, RawPath isRawPath = RawPath::Yes,
@@ -93,6 +95,7 @@ public:
      * has not been a callback before, there are no race conditions. If there has been a
      * registered callback before and the callback is changed from another thread, a race
      * condition might appear if a file is changed in the file system at the same time.
+     *
      * \param callback The new callback function that will be used in this File object
      */
     void setCallback(FileChangedCallback callback);
@@ -100,18 +103,21 @@ public:
     /**
      * Returns the currently active callback. This object might be uninitialized if no
      * callback has been registered previously.
+     *
      * \return The currently active callback function
      */
     const FileChangedCallback& callback() const;
 
     /**
      * Returns the full path to the file as an <code>std::string</code>.
+     *
      * \return The full path to the file as an <code>std::string</code>
      */
     operator const std::string&() const;
 
     /**
      * Returns the full path to the file as an <code>std::string</code>.
+     *
      * \return The full path to the file as an <code>std::string</code>
      */
     const std::string& path() const;
@@ -121,6 +127,7 @@ public:
      * the path after the last path separator (<code>'/'</code> or <code>'\\\\'</code>)
      * and including the extension. Example (
      * <code>'/home/user/file.txt' -> 'file.txt'</code>)
+     *
      * \return The filename part of the full path
      */
     std::string filename() const;
@@ -130,6 +137,7 @@ public:
      * of the path between the last path separator (<code>'/'</code> or
      * <code>'\\\\'</code>) and the extension (separated by a '.', if existing). Example
      * (<code>'/home/user/file.txt' -> 'file'</code>)
+     *
      * \return The base name part of the full path
      */
     std::string baseName() const;
@@ -138,6 +146,7 @@ public:
      * Returns the full base name of the path. The full base name is defined as the part
      * of the path before the extension (if existing). Example (
      * <code>'/home/user/file.txt' -> '/home/user/file'</code>)
+     *
      * \return The full base name part of the path
      */
     std::string fullBaseName() const;
@@ -147,6 +156,7 @@ public:
      * of the path before the last path separator (<code>'/'</code> or
      * <code>'\\\\'</code>) and does not include the separator itself. Example(
      * <code>'/home/user/file.txt' -> '/home/user'</code>)
+     *
      * \return The directory name of the path
      */
     std::string directoryName() const;
@@ -155,12 +165,14 @@ public:
      * Returns the extension part of the full path. The extension is defined as the part
      * of the path after the extension separator (<code>'.'</code>). Example (
      * <code>'/home/user/file.txt' -> '/home/user/file'</code>).
+     *
      * \return The extension part of the full path
      */
     std::string fileExtension() const;
 
     /**
-     * This method returns the last-modified date of the file as an ISO 8601 string
+     * This method returns the last-modified date of the file as an ISO 8601 string.
+     *
      * \return The last-modified date of the file as an ISO 8601 string
      * \throws FileException If there is an error accessing the file
      */
@@ -191,9 +203,11 @@ private:
 
 /**
  * The stream operator that will stream the File%'s path to the output stream.
+ *
  * \param os The stream that will be inserted into
  * \param f The File which will be inserted into the stream
  * \return The modified stream, used for cascading
+ *
  * \memberof File
  */
 std::ostream& operator<<(std::ostream& os, const File& f);

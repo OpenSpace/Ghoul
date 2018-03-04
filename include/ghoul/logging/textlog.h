@@ -56,19 +56,20 @@ public:
     * Constructor that calls Log constructor and opens the file that will log the
     * messages. If the file does not exist, it will be created. If the path to the file is
     * invalid, an <code>std::ios_base::failure</code> exception will be thrown.
+    *
     * \param filename The path and filename of the file that will receive the log
-    * messages
+    *        messages
     * \param writeToAppend If this is <code>true</code>, the log messages will be appended
-    * to the file. If it is <code>false</code> the file will be overwritten without a
-    * warning.
+    *        to the file. If it is <code>false</code> the file will be overwritten without
+    *        a warning.
     * \param timeStamping Determines if the log should print the time when a message is
-    * logged in the log messages
+    *        logged in the log messages
     * \param dateStamping Determines if the log should print the time when a message is
-    * logged in the log messages
+    *        logged in the log messages
     * \param categoryStamping Determines if the log should print the categories in the
-    * log messages
+    *        log messages
     * \param logLevelStamping Determines if the log should print the log level in the log
-    * messages
+    *        messages
     * \throw std::ios_base::failure If the opening of the file failed
     * \pre \p filename must not be empty
     */
@@ -85,9 +86,10 @@ public:
     /**
      * Method that logs a <code>message</code> with a given <code>level</code> and
      * <code>category</code> to the text file.
+     *
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
-     * individually
+     *        individually
      * \param message The message body of the log message
      */
     virtual void log(LogLevel level, const std::string& category,
@@ -100,6 +102,7 @@ protected:
     /**
      * Writes the passed 'line' to the opened file. The line will be printed 'as-is' and
      * no endline or other control sequence will be added.
+     *
      * \param line The line of text that should be printed to the file
      */
     void writeLine(std::string line);

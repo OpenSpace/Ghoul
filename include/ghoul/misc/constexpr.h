@@ -30,7 +30,8 @@ namespace ghoul {
 
 /**
  * Checks the two passed null-terminated strings for string equality by testing each
- * individual character
+ * individual character.
+ *
  * \param lhs The lefthand side of the equality operator
  * \param rhs The righthand side of the equality operator
  * \return \c true if the two strings are equal

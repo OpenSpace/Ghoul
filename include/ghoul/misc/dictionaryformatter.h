@@ -41,6 +41,7 @@ class DictionaryFormatter {
 public:
     /**
      * Converts the passed \p dictionary into a string representation.
+     *
      * \param dictionary The Dictionary to convert
      * \return A string representing the \p dictionary
      */

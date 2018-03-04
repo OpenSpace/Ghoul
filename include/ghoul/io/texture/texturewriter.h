@@ -51,7 +51,8 @@ public:
     };
 
     /**
-     * Returns the static variant of the TextureWriter
+     * Returns the static variant of the TextureWriter.
+     *
      * \return The static variant of the TextureWriter
      */
     static TextureWriter& ref();
@@ -59,6 +60,7 @@ public:
     /**
      * Saves the provided \p texture into the \p filename on disk. The correct
      * TextureWriterBase is determined by the extension of the \p filename.
+     *
      * \param texture The Texture that is to be written to disk
      * \param filename The target filename for \p filename. The extension of the
      * \p filename determines the TextureWriterBase
@@ -67,7 +69,7 @@ public:
      * \pre \p filename must not be empty
      * \pre \p filename must have an extension
      * \pre At least one TextureWriterBase must have been added to the TextureWriter
-     * before (addWriter)
+     *      before (addWriter)
      */
     void saveTexture(const opengl::Texture& texture, const std::string& filename);
 
@@ -75,6 +77,7 @@ public:
      * Adds the \p writer to this TextureWriter and makes it available through subsequent
      * calls to saveTexture. If an extension is supported by multiple TextureWriterBases,
      * the TextureWriterBase that was added first will be used.
+     *
      * \param writer The writer that is to be added to this TextureWriter
      * \pre \p writer must not have been added to this TextureWriter before
      */
@@ -82,6 +85,7 @@ public:
 
     /**
      * Returns a list of all the previously registered TextureWriterBases.
+     *
      * \return A list of all the previously registered TextureWriterBases
      */
     std::vector<std::shared_ptr<TextureWriterBase>> writers() const;
@@ -89,6 +93,7 @@ public:
 private:
     /**
      * Returns the TextureWriterBase that is responsible for the provided extension.
+     *
      * \param extension The extension for which the TextureWriterBase should be returned
      * \throw MissingWriterException If there was no writer for the specified \p extension
      */

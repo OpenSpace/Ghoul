@@ -33,6 +33,7 @@ namespace ghoul {
  * interpolation factor \p t two values which to interpolate between must be supplied.
  * For <code>t = 0.0</code>, \p p0 is returned, for <code>t = 1.0</code>, \p p1 is
  * returned.
+ *
  * \param t The interpolation factor to use in interpolation
  * \param p0 The first control point of the interpolation
  * \param p1 The second control point of the interpolation
@@ -45,13 +46,14 @@ T interpolateLinear(double t, const T& p0, const T& p1);
  * Returns an interpolated value using the Catmull-Rom spline interpolation scheme. Four
  * control points are used in the interpolation; \p p0, \p p1, \p p2, and \p p3. The
  * interpolation is calculated based on the interpolation factor \p t.
+ *
  * \param t The interpolation factor to use in interpolation
  * \param p0 The first control point of the interpolation
  * \param p1 The second control point of the interpolation
  * \param p2 The third control point of the interpolation
  * \param p3 The fourth control point of the interpolation
  * \return The interpolated value for the given control points calculated using
- * Catmull-Rom spline interpolation based on the interpolation factor \p t
+ *         Catmull-Rom spline interpolation based on the interpolation factor \p t
  */
 template <typename T>
 T interpolateCatmullRom(double t, const T& p0, const T& p1, const T& p2, const T& p3);

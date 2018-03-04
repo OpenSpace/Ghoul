@@ -66,8 +66,9 @@ public:
 
     /**
      * A runtime function that checks if initialize has been called.
+     *
      * \returns <code>true</code> if any initialize function has been called and
-     * <code>false</code> otherwise.
+     *          <code>false</code> otherwise.
      */
     bool isInitialized() const;
 
@@ -75,6 +76,7 @@ public:
      * Initializes the VertexBufferObject with the provided \p vertexArray and
      * \p indexArray list. The structure of the vertex data can be arbitrary but correct
      * offsets must be specified using #vertexAttribPointer.
+     *
      * \param vertexArray The vertex array used for this VertexBufferObject
      * \param indexArray The index list used for this VertexBufferObject
      * \pre VertexBufferObject must not have been initialized
@@ -88,8 +90,9 @@ public:
      * Initializes the VertexBufferObject with the provided \p vertexArray and
      * \p indexArray list. The structure of the vertex data can be arbitrary but correct
      * offsets must be specified using #vertexAttribPointer.
+     *
      * \tparam T The structore holding information for each vertex; must be a
-     * <code>POD</code>
+     *         <code>POD</code>
      * \param vertexArray The vertex array used for this VertexBufferObject
      * \param indexArray The index list used for this VertexBufferObject
      * \pre VertexBufferObject must not have been initialized before
@@ -102,9 +105,9 @@ public:
      * Sets the render mode for this VertexBufferObject. The render mode is how OpenGL is
      * treating the vertices and indices. The default is <code>GL_TRIANGLES</code> but
      * other common render primitives are <code>GL_LINES</code> and
-     * <code>GL_POINTS</code>.
-     * See https://www.opengl.org/sdk/docs/man/html/glDrawElements.xhtml
-     * for supported render modes.
+     * <code>GL_POINTS</code>. See
+     * https://www.opengl.org/sdk/docs/man/html/glDrawElements.xhtml for supported render
+     * modes.
      * \param mode The render mode. Default is <code>GL_TRIANGLES</code>
      */
     void setRenderMode(GLenum mode = GL_TRIANGLES);

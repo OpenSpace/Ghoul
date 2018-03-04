@@ -75,6 +75,7 @@ public:
      * includes a file. The list of include paths is traversed in the order in which they
      * where added to this class. The folder in which the shader is located will always be
      * treated as if being on the top of the list.
+     *
      * \param folderPath The folder that should be added to the list of include paths
      * \pre \p folderPath must not be empty
      * \pre \p folderPath must be an existing directory

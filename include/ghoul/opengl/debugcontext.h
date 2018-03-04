@@ -135,22 +135,24 @@ void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous);
  * Enables or disables debug messages for the provided \p source, \p type, and
  * \p severity. Any of these values can be their respective \c Dontcare values if any
  * value should be modified.
+ *
  * \param source The Source of debug messages that should be modified
  * \param type The Type of debug messages that should be modified
  * \param severity The Severity of debug messages that should be modified
  * \param enabled Whether messages of the specific \p source, \p type, and \p severity
- * should be enabled or disabled
+ *        should be enabled or disabled
  */
 void setDebugMessageControl(Source source, Type type, Severity severity, Enabled enabled);
 
 /**
  * Enables or disables a set of debug messages for the provided \p source, \p type
  * identified by a set of \p identifiers.
+ *
  * \param source The Source of debug messages that should be modified
  * \param type The Type of debug messages that should be modified
  * \param identifiers A list of identifiers that should be modified
  * \param enabled Whether messages of the specific \p source, \p type, and \p severity
- * should be enabled or disabled
+ *        should be enabled or disabled
  * \pre \p source must not be Source::Dontcare
  * \pre \p type must not be Type::Dontcare
   */
@@ -160,6 +162,7 @@ void setDebugMessageControl(Source source, Type type,
 /**
  * The callback function that is passed to the setDebugCallback function and that is
  * called whenever a valid message is reported by the GL.
+ *
  * \param source The source of the debug message
  * \param type The type of the debug message
  * \param severity The severity of the debug message
@@ -172,6 +175,7 @@ using CallbackFunction = void (*)(Source source, Type type, Severity severity,
 /**
  * Sets the debug callback that is called whenever the GL reports a new debug message.
  * Only a C-style function pointer or a state-less lambda can be passed.
+ *
  * \param callback The CallbackFunction that is called
  */
 void setDebugCallback(CallbackFunction callback);
@@ -183,9 +187,10 @@ namespace ghoul {
     * Converts a string with a \p source into a opengl::debug::Source object.
     * The valid values are "API", "Window System", "Shader Compiler", "Third Party",
     * "Application", "Other", and "Don't care".
+    *
     * \param source The string containing the name of a opengl::debug::Source
     * \throw std::out_of_range if the \p source is not a valid name of an
-    * opengl::debug::Source object
+    *        opengl::debug::Source object
     */
     template <>
     opengl::debug::Source from_string(const std::string& source);
@@ -194,9 +199,10 @@ namespace ghoul {
     * Converts a string with a \p type into a opengl::debug::Source object.
     * The valid values are "Error", "Deprecated", "Undefined", "Portability",
     * "Performance", "Marker", "Push group", "Pop group", "Other", and "Don't care".
+    *
     * \param type The string containing the name of a opengl::debug::Type
     * \throw std::out_of_range if the \p type is not a valid name of an
-    * opengl::debug::Type object
+    *        opengl::debug::Type object
     */
     template <>
     opengl::debug::Type from_string(const std::string& type);
@@ -204,9 +210,10 @@ namespace ghoul {
     /**
     * Converts a string with a \p severity into a opengl::debug::Severity object.
     * The valid values are "High", "Medium", "Low", and "Notification".
+    *
     * \param severity The string containing the name of a opengl::debug::Severity
     * \throw std::out_of_range if the \p severity is not a valid name of an
-    * opengl::debug::Severity object
+    *        opengl::debug::Severity object
     */
     template <>
     opengl::debug::Severity from_string(const std::string& severity);
@@ -219,6 +226,7 @@ namespace std {
  * Converts the \p source object into its string representation.
  * The valid return values are: "API", "Window System", "Shader Compiler", "Third Party",
  * "Application", "Other", and "Don't care".
+ *
  * \param source The ghoul::opengl::debug::Source that is converted into a string
  * \return The string representation of the \p source
  */
@@ -228,6 +236,7 @@ std::string to_string(ghoul::opengl::debug::Source source);
  * Converts the \p type object into its string representation.
  * The valid return values are: "Error", "Deprecated", "Undefined", "Portability",
  * "Performance", "Marker", "Push group", "Pop group", "Other", and "Don't care".
+ *
  * \param type The ghoul::opengl::debug::Type that is converted into a string
  * \return The string representation of the \p type
  */
@@ -236,6 +245,7 @@ std::string to_string(ghoul::opengl::debug::Type type);
 /**
  * Converts the \p severity object into its string representation.
  * The valid return values are: "High", "Medium", "Low", and "Notification".
+ *
  * \param severity The ghoul::opengl::debug::Severity that is converted into a string
  * \return The string representation of the \p severity
  */

@@ -109,10 +109,11 @@ public:
      * This constructor creates a shader of the passed type with an empty source string.
      * Before this can be used, a shader must be loaded with #setFilename and it has to be
      * compiled.
+     *
      * \param shaderType The type of shader that this ShaderObject will represent
      * \param dictionary The dictionary that is used for the !ShaderPreprocessor
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
-     * generated
+     *        generated
      */
     ShaderObject(ShaderType shaderType, Dictionary dictionary = Dictionary());
 
@@ -121,12 +122,13 @@ public:
      * from the provided filename. If the filename is an empty string, no source will be
      * loaded and the shader remains uninitialized. If the filename is a valid file, its
      * contents will be used to initialize this ShaderObject.
+     *
      * \param shaderType The type of shader that this ShaderObject will represent
      * \param filename The name of the file that will be used to load the source of this
-     * shader
+     *        shader
      * \param dictionary The dictionary that is used for the !ShaderPreprocessor
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
-     * generated
+     *        generated
      * \pre \p filename must not be empty
      * \pre \p filename must be a file that exists
      */
@@ -139,13 +141,14 @@ public:
      * loaded and the shader remains uninitialized. If the filename is a valid file, its
      * contents will be used to initialize this ShaderObject. The internal name, debug
      * label and logging category will be set based on the user provided name.
+     *
      * \param shaderType The type of shader that this ShaderObject will represent
      * \param filename The name of the file that will be used to load the source of this
-     * shader
+     *        shader
      * \param name The human readable name of this ShaderObject
      * \param dictionary The dictionary that is used for the !ShaderPreprocessor
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
-     * generated
+     *        generated
      * \pre \p filename must not be empty
      * \pre \p filename must be a file that exists
      */
@@ -158,9 +161,10 @@ public:
      * content of the specified file has changed between creating the <code>cpy</code>,
      * the copied Shader will use the changed file. That means a ShaderObject will not
      * cache the contents of the file inside.
+     *
      * \param cpy The original object that will be copied
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
-     * generated
+     *        generated
      */
     ShaderObject(const ShaderObject& cpy);
 
@@ -187,55 +191,61 @@ public:
      * The assignment operator that will copy all of the internal state, and the shader
      * source, but it will generate a new OpenGL name for the assigned object. In
      * addition, if the content of the specified file has changed between creating the
-     * <code>rhs</code>, the assigned Shader will use the changed file. I.e., a
+     * <code>rhs</code>, the assigned Shader will use the changed file. That is, a
      * ShaderObject will not cache the contents of the file inside.
+     *
      * \param rhs The original right hand side that will be used to set this object
      * \return A reference to <code>this</code>
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
-     * generated
+     *        generated
      */
     ShaderObject& operator=(const ShaderObject& rhs);
 
     /**
      * A move assignment that will move all of the internal state, and the shader source,
-     * but it will leave the other object in an invalid state
+     * but it will leave the other object in an invalid state.
      */
     ShaderObject& operator=(ShaderObject&& rhs);
 
     /**
      * Sets the internal name of this ShaderObject that changes the logging category by
      * incorporating the name and (if available) set the object label.
+     *
      * \param name The new internal name that will be used for this ShaderObject
      */
     void setName(std::string name);
 
     /**
-     * Returns the internal name of this ShaderObject
+     * Returns the internal name of this ShaderObject.
+     *
      * \return The internal name of this ShaderObject
      */
     const std::string& name() const;
 
     /**
-    * Returns the dictionary that will be used to compile the shader object
+    * Returns the dictionary that will be used to compile the shader object.
+    *
     * \return The dictionary
     */
     Dictionary dictionary();
 
     /**
-     * Sets the dictionary of the shader object.
-     * Will trigger a rebuild from file.
+     * Sets the dictionary of the shader object. Will trigger a rebuild from file.
+     *
      * \param dictionary object
      */
     void setDictionary(Dictionary dictionary);
 
     /**
      * Sets the shader object callback.
+     *
      * \param changeCallback object
      */
     void setShaderObjectCallback(ShaderObjectCallback changeCallback);
 
     /**
-     * Returns the filepath for the shader object file
+     * Returns the filepath for the shader object file.
+     *
      * \return The filename
      */
     std::string filename();
@@ -245,6 +255,7 @@ public:
      * of the file and uses it as the source text for this ShaderObject. If the file can
      * not be opened or is empty an exception is thrown. The loaded shader will not
      * automatically compiled after loading.
+     *
      * \param filename The name of the file that will be used to load this shader
      * \throw FileNotFoundError If the \p filename did not point to a valid file
      * \throw ShaderObjectError If the file pointed to by \p filename was empty
@@ -268,19 +279,22 @@ public:
     /**
      * This method will compile the shader source in this ShaderObject and returns the
      * success of this operation.
+     *
      * \throw ShaderCompileError If there was an error while compiling the ShaderObject
      */
     void compile();
 
     /**
      * Returns the type of this ShaderObject as a human readable string.
+     *
      * \return The type of this ShaderObject as a human readable string
      */
     std::string typeAsString() const;
 
     /**
      * Returns the ShaderObject <code>type</code> as a human readable string.
-     * \return The ShaderObject <code>type</code> as a human readable string.
+     *
+     * \return The ShaderObject <code>type</code> as a human readable string
      */
     static std::string stringForShaderType(ShaderType type);
 

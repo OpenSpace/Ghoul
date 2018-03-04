@@ -77,6 +77,7 @@ public:
      * different \p filePath or an error is reported. This method returns a hashed version
      * of the \p fontName that can be used in calls to the #font method for a more
      * efficient lookup.
+     *
      * \param fontName The user-defined name under which this font is registered
      * \param filePath The filepath for this registered Font
      * \return The hashed representation of the \p fontName
@@ -96,14 +97,15 @@ public:
      * the function will return immediately with the correct Font object. If the
      * <code>name</code> does not name a registered Font or the registered path does not
      * exist, a <code>nullptr</code> is returned.
+     *
      * \param name User-defined name for the Font that is to be retrieved
      * \param fontSize The font size (in pt) for the Font
      * \param withOutline If this parameter is <code>true</code> the created Font will
-     * contain outlines as well as the base Font
+     *        contain outlines as well as the base Font
      * \param loadGlyphs If <code>true</code>, the first initialization of the Font will
-     * also preload a set of commonly used glyphs
+     *        also preload a set of commonly used glyphs
      * \return Returns a usable and initialized Font object, or <code>nullptr</code> if an
-     * error occurred
+     *         error occurred
      * \pre \p name must not be empty
      */
     std::shared_ptr<Font> font(const std::string& name, float fontSize,
@@ -120,14 +122,15 @@ public:
      * return immediately with the correct Font object. If the <code>name</code> does not
      * name a registered Font or the registered path does not exist, a
      * <code>nullptr</code> is returned.
+     *
      * \param hashName A hashed name of the font that is to be retrieved
      * \param fontSize The font size (in pt) for the Font
      * \param withOutline If this parameter is <code>true</code> the created Font will
-     * contain outlines as well as the base Font
+     *        contain outlines as well as the base Font
      * \param loadGlyphs If <code>true</code>, the first initialization of the Font will
-     * also preload a set of commonly used glyphs
+     *        also preload a set of commonly used glyphs
      * \return Returns a usable and initialized Font object, or <code>nullptr</code> if an
-     * error occurred
+     *         error occurred
      */
     std::shared_ptr<Font> font(unsigned int hashName, float fontSize,
         Outline withOutline = Outline::Yes,

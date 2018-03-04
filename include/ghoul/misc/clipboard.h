@@ -33,13 +33,15 @@ namespace ghoul {
 /**
  * This function retrieves the contents of the system-wide clipboard and returns the
  * textual representation. If the clipboard does not contain anything, or if there was an
- * error accessing the clipboard, an empty string is returned
+ * error accessing the clipboard, an empty string is returned.
+ *
  * \return The contents of the system-wide clipboard
  */
 std::string clipboardText();
 
 /**
  * Writes a passed text into the system-wide clipboard, overwriting its previous content.
+ *
  * \param text The text that is to be written into the clipboard
  * \throws RuntimeError If there was an error writing the text to the clipboard
  */

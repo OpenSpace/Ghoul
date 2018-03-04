@@ -80,14 +80,15 @@ public:
      * failure to call that method will result in a <b>systemwide</b> memory leak. On
      * Windows, the memory mapped file that will be created is only accessible by the same
      * terminal session as the process that has created it.
+     *
      * \param name The name of the SharedMemory block. This name must be unique and
-     * unused in the system. A future constructor call using the same \p name will point
-     * to the memory created in this method call
+     *        unused in the system. A future constructor call using the same \p name will
+     *        point to the memory created in this method call
      * \param size The size (in bytes) of the shared memory block that should be created.
-     * The actual size in memory will be slightly larger due to necessary header
-     * information, which are not accessible by the user
+     *        The actual size in memory will be slightly larger due to necessary header
+     *        information, which are not accessible by the user
      * \return <code>true</code> if the creation of the shared memory block succeeded,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      * \throw SharedMemoryError If there was an error creating the SharedMemory block
      */
     static void create(const std::string& name, size_t size);
@@ -98,22 +99,24 @@ public:
      * when no process has an SharedMemory object pointing to that name anymore as long as
      * one process has its memory attached into its own address space, no memory will be
      * freed.
+     *
      * \param name The name of the shared memory block that should be marked for removal
      * \throw SharedMemoryNotFoundError If the provided \p name is not a valid
-     * SharedMemory block
+     *        SharedMemory block
      * \throw SharedMemoryError If there was an error accessing an existing SharedMemory
-     * block
+     *        block
      */
     static void remove(const std::string& name);
 
     /**
      * Tests if a memory block with the given \p name has been created previously or if
      * the name is available.
+     *
      * \param name The name of the shared memory block that should be tested
      * \return <code>true</code> if a shared memory block exists with the given \p name,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      * \throw SharedMemoryError If there was an error retrieving the information about the
-     * SharedMemory block
+     *        SharedMemory block
      */
     static bool exists(const std::string& name);
 
@@ -126,10 +129,11 @@ public:
      * space, a SharedMemoryError is thrown. It is possible for the same process to attach
      * the same shared memory block multiple times. It is undefined if two SharedMemory
      * objects with the same name will be attached to the same memory location.
+     *
      * \param name The name of the shared memory block to which this process wants to be
-     * attached to
+     *        attached to
      * \throw SharedMemoryError If there was an error either accessing or mapping the
-     * SharedMemory block
+     *        SharedMemory block
      */
     SharedMemory(std::string name);
 
@@ -143,6 +147,7 @@ public:
      * Returns the pointer to the first usable address of the allocated memory. The
      * transparently handled header is automatically skipped and is invisible to the
      * user.
+     *
      * \return A valid pointer into a memory block of the predefined size (#size).
      */
     void* memory() const;
@@ -151,6 +156,7 @@ public:
      * Returns the usable size of the memory block. The value here is the same which was
      * specified in the creation of the shared memory block (#create). The actual size of
      * the memory will be slightly bigger due to header fields.
+     *
      * \return The usable size of the memory block.
      */
     size_t size() const;
@@ -177,6 +183,7 @@ public:
     /**
      * Returns the name for the SharedMemory object that can be used to remove the data
      * that this object depends on.
+     *
      * \return The name for this SharedMemory object
      */
     std::string name() const;

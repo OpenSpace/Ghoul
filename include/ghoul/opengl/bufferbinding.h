@@ -67,6 +67,7 @@ public:
      * This method returns the binding number that was assigned to this BufferBinding.
      * If this is the first call to #bindingNumber, a free binding number
      * will be assigned to this object.
+     *
      * \return The buffer binding number that was assigned to this BufferBinding
      */
     GLint bindingNumber();
@@ -75,6 +76,7 @@ public:
      * This operator returns the binding number that was assigned to this
      * If this is the first call to #bindingNumber, a free binding number
      * will be assigned to this object.
+     *
      * \return The buffer binding number that was assigned to this BufferBinding
      */
     operator GLint();
@@ -87,12 +89,14 @@ public:
 
     /**
      * This method returns the number of bindings that have been marked as used.
+     *
      * \return The number of bindings that have been marked as used
      */
     static int numberActiveBindings();
 
     /**
     * This method returns the maximum number of buffer bindings that is avalable.
+    *
     * \return The number of buffer bindings in use
     */
     static unsigned int maxBufferBindings();

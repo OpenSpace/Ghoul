@@ -86,6 +86,7 @@ public:
      * WMI is disabled in the compilation, no error will occur. If WMI should be used and
      * an error occurs, an error will be logged. This method needs to be called from each
      * derived subclass, even if WMI is not used.
+     *
      * \param initializeWMI If this parameter is <code>true</code>, the Windows Management
      * Instrumentation will be initialized.
      */
@@ -112,6 +113,7 @@ public:
      * This method returns pairs CapabilityInformation%s, describing the features and
      * capabilities the subclass is responsible for. As a best-practice, the subclass
      * should allow individual query for each of the elements as well.
+     *
      * \return All CapabilityInformation%s that this SystemCapabilitiesComponent is
      * responsible for
      */
@@ -120,6 +122,7 @@ public:
     /**
      * The implementation in the subclass should returns a descriptive name of the
      * component.
+     *
      * \return A descriptive name of the component
      */
     virtual std::string name() const = 0;
@@ -137,6 +140,7 @@ protected:
 
     /**
      * This method initializes the Windows Management Instrumentation.
+     *
      * \throw WMIError If there was an error initializing the Windows Management
      * Instrumentation
      * \pre The Windows Management Instrumentation must not have been initialized before
@@ -145,6 +149,7 @@ protected:
 
     /**
      * This method deinitializes the Windows Management Instrumentation.
+     *
      * \pre The Windows Management Instrumentation must have been initialized before
      */
     static void deinitializeWMI();
@@ -153,6 +158,7 @@ protected:
     * Returns if the Windows Management Instrumentation has been initialized before. If
     * the WMI is not enabled, or the application is compiled on a non-Windows
     * architecture, this method is a no-op.
+    *
     * \return <code>true</code> if the WMI has been initialized
     */
     static bool isWMIInitialized();
@@ -161,11 +167,12 @@ protected:
      * Queries the Windows Management Instrumentation for the \p attribute contained in
      * the \p wmiClass and returns the value of it. It will execute a query on the Wbem
      * services.
+     *
      * \param wmiClass The class in which the required attribute resides
      * \param attribute The attribute which we are interested in
      * \return The value of the requested attributes
      * \throw WMIError If there was an error querying the Windows Management
-     * Instrumentation service or there was no query result available
+     *        Instrumentation service or there was no query result available
      * \pre \p wmiClass must not be empty
      * \pre \p attribute must not be empty
      * \pre The Windows Management Instrumentation must have been initialized
@@ -176,12 +183,13 @@ protected:
      * Helper function that queries the Windows Management Instrumentation for the
      * \p attribute within the \p wmiClass and it expects the attribute to be of type
      * <code>std::string</code>.
+     *
      * \param wmiClass The class in which the required attribute resides
      * \param attribute The attribute which we are interested in
      * \param value A reference to the value, where the attribute will be stored in (if
-     * the attribute could be found and it is of type <code>string</code>)
+     *        the attribute could be found and it is of type <code>string</code>)
      * \throw WMIError If there was an error querying the Windows Management
-     * Instrumentation service or there was no query result available
+     *        Instrumentation service or there was no query result available
      * \pre \p wmiClass must not be empty
      * \pre \p attribute must not be empty
      * \pre The Windows Management Instrumentation must have been initialized
@@ -193,12 +201,13 @@ protected:
      * Helper function that queries the Windows Management Instrumentation for the
      * \p attribute within the \p wmiClass and it expects the attribute to be of type
      * <code>int</code>.
+     *
      * \param wmiClass The class in which the required attribute resides
      * \param attribute The attribute which we are interested in
      * \param value A reference to the value, where the attribute will be stored in (if
-     * the attribute could be found and it is of type <code>int</code>)
+     *        the attribute could be found and it is of type <code>int</code>)
      * \throw WMIError If there was an error querying the Windows Management
-     * Instrumentation service or there was no query result available
+     *        Instrumentation service or there was no query result available
      * \pre \p wmiClass must not be empty
      * \pre \p attribute must not be empty
      * \pre The Windows Management Instrumentation must have been initialized
@@ -210,12 +219,13 @@ protected:
      * Helper function that queries the Windows Management Instrumentation for the
      * \p attribute within the \p wmiClass and it expects the attribute to be of type
      * <code>unsigned int</code>.
+     *
      * \param wmiClass The class in which the required attribute resides
      * \param attribute The attribute which we are interested in
      * \param value A reference to the value, where the attribute will be stored in (if
-     * the attribute could be found and it is of type <code>unsigned int</code>)
+     *        the attribute could be found and it is of type <code>unsigned int</code>)
      * \throw WMIError If there was an error querying the Windows Management
-     * Instrumentation service or there was no query result available
+     *        Instrumentation service or there was no query result available
      * \pre \p wmiClass must not be empty
      * \pre \p attribute must not be empty
      * \pre The Windows Management Instrumentation must have been initialized
@@ -227,12 +237,14 @@ protected:
      * Helper function that queries the Windows Management Instrumentation for the
      * \p attribute within the \p wmiClass and it expects the attribute to be of type
      * <code>unsigned long long</code>.
+     *
      * \param wmiClass The class in which the required attribute resides
      * \param attribute The attribute which we are interested in
      * \param value A reference to the value, where the attribute will be stored in (if
-     * the attribute could be found and it is of type <code>unsigned long long</code>)
+     *        the attribute could be found and it is of type
+     *        <code>unsigned long long</code>)
      * \throw WMIError If there was an error querying the Windows Management
-     * Instrumentation service or there was no query result available
+     *        Instrumentation service or there was no query result available
      * \pre \p wmiClass must not be empty
      * \pre \p attribute must not be empty
      * \pre The Windows Management Instrumentation must have been initialized
