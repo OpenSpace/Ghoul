@@ -23,7 +23,9 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/cmdparser/cmdparser>
+#include <ghoul/cmdparser/commandlineparser.h>
+#include <ghoul/cmdparser/singlecommand.h>
+#include <ghoul/cmdparser/multiplecommand.h>
 
 #include <memory>
 

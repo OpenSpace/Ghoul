@@ -29,11 +29,11 @@
 #include <ghoul/glm.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
-#include <ghoul/opengl/textureatlas.h>
-
 #include <map>
 #include <string>
 #include <vector>
+
+namespace ghoul::opengl { class TextureAtlas; }
 
 namespace ghoul::fontrendering {
 

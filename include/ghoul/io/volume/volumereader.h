@@ -26,18 +26,18 @@
 #ifndef __GHOUL___VOLUMEREADER___H__
 #define __GHOUL___VOLUMEREADER___H__
 
-#include <ghoul/opengl/texture.h>
+#include <memory>
+#include <string>
 
-namespace ghoul {
+namespace ghoul::opengl { class Texture; }
 
+namespace ghoul::io {
+    
 class VolumeReader {
 public:
-    VolumeReader();
-    virtual ~VolumeReader();
-
-    virtual opengl::Texture* read(const std::string& filename) = 0;
+    virtual std::unique_ptr<opengl::Texture> read(const std::string& filename) = 0;
 };
 
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___VOLUMEREADER___H__

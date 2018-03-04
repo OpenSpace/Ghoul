@@ -29,7 +29,6 @@
 #include <ghoul/logging/log.h>
 
 #include <ghoul/misc/boolean.h>
-
 #include <fstream>
 
 namespace ghoul::logging {

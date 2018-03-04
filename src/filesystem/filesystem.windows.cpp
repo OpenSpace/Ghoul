@@ -28,27 +28,24 @@
 #include <ghoul/filesystem/filesystem.h>
 
 #include <ghoul/filesystem/cachemanager.h>
+#include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/stacktrace.h>
 
 #include <algorithm>
 #include <cassert>
-#include <regex>
 #include <cstdio>
-
 #include <direct.h>
-#include <windows.h>
+#include <regex>
 #include <Shlobj.h>
-
-#include <ghoul/misc/stacktrace.h>
+#include <windows.h>
 
 using std::string;
 
 namespace {
     constexpr const char* _loggerCat = "FileSystem";
 
-    void CALLBACK completionHandler(
-        DWORD dwErrorCode,
-        DWORD dwNumberOfBytesTransferred,
+    void CALLBACK completionHandler(DWORD dwErrorCode, DWORD dwNumberOfBytesTransferred,
         LPOVERLAPPED lpOverlapped);
 
     const unsigned int changeBufferSize = 16384u;
@@ -68,7 +65,7 @@ struct DirectoryHandle {
 };
 
 void FileSystem::deinitializeInternalWindows() {
-    for (const auto& d : _directories) {
+    for (const std::pair<const std::string, DirectoryHandle*>& d : _directories) {
         DirectoryHandle* dh = d.second;
         if (dh != nullptr && dh->_handle != nullptr) {
             CancelIo(dh->_handle);
@@ -80,7 +77,6 @@ void FileSystem::deinitializeInternalWindows() {
 
 void FileSystem::addFileListener(File* file) {
     ghoul_assert(file != nullptr, "File must not be nullptr");
-    //LDEBUG("Trying to insert  " << file);
     std::string d = file->directoryName();
     auto f = _directories.find(d);
     if (f == _directories.end()) {
@@ -137,7 +133,7 @@ void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,
                                  const std::string& file)
 {
     std::string fullPath;
-    for (const auto& d : FileSys._directories) {
+    for (const std::pair<const std::string, DirectoryHandle*>& d : FileSys._directories) {
         if (d.second == directoryHandle) {
             fullPath = d.first + PathSeparator + file;
         }

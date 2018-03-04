@@ -67,8 +67,8 @@ public:
      * (#setBuffer). The passed parameters are the BufferLog that is exhausted and the
      * timestamp that will be used in the message after the callback has been resolved.
      */
-    typedef std::function<void (BufferLog&, unsigned long long int&)>
-        MemoryExhaustedCallback;
+    using MemoryExhaustedCallback =
+        std::function<void(BufferLog&, unsigned long long int&)>;
 
     /**
      * Constructor that registers a MemoryExhausedCallback that will be used. The

@@ -40,10 +40,10 @@ void CallbackLog::log(LogLevel level, const std::string& category,
 {
     std::string output;
     if (isDateStamping()) {
-        output += "[" + getDateString();
+        output += "[" + dateString();
     }
     if (isTimeStamping()) {
-        output += " | " + getTimeString();
+        output += " | " + timeString();
     }
 
     if (isDateStamping() || isTimeStamping()) {

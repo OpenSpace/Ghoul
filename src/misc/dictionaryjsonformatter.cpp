@@ -25,10 +25,8 @@
 
 #include <ghoul/misc/dictionaryjsonformatter.h>
 
-#include <ghoul/misc/dictionary.h>
-
 #include <ghoul/glm.h>
-
+#include <ghoul/misc/dictionary.h>
 #include <numeric>
 #include <string>
 

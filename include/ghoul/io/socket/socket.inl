@@ -23,11 +23,26 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___SYSTEMCAPABILITIES_COLLECTION___H__
-#define __GHOUL___SYSTEMCAPABILITIES_COLLECTION___H__
+namespace ghoul::io {
 
-#include "systemcapabilities.h"
-#include "generalcapabilitiescomponent.h"
-#include "openglcapabilitiescomponent.h"
+template <typename T>
+bool Socket::get(T* buffer, size_t nItems) {
+    return getBytes(reinterpret_cast<char*>(buffer), nItems * sizeof(T));
+}
 
-#endif // __GHOUL___SYSTEMCAPABILITIES_COLLECTION___H__
+template <typename T>
+bool Socket::peek(T* buffer, size_t nItems) {
+    return peekBytes(reinterpret_cast<char*>(buffer), nItems * sizeof(T));
+}
+
+template <typename T>
+bool Socket::skip(size_t nItems) {
+    return skipBytes(nItems * sizeof(T));
+}
+
+template <typename T>
+bool Socket::put(const T* buffer, size_t nItems) {
+    return putBytes(reinterpret_cast<const char*>(buffer), nItems * sizeof(T));
+}
+
+} // namespace ghoul::io

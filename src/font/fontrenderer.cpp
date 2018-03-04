@@ -25,19 +25,17 @@
 
 #include <ghoul/font/fontrenderer.h>
 
-#include <ghoul/font/font.h>
-
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/font/font.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/programobject.h>
+#include <ghoul/opengl/textureatlas.h>
 #include <ghoul/opengl/textureunit.h>
-
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>
-
 #include <cstdarg>
 #include <fstream>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #ifdef WIN32
 #define vscprintf(f,a) _vscprintf(f,a)
@@ -50,7 +48,6 @@ static int vscprintf(const char* format, va_list pargs) {
     return retval;
 }
 #endif
-
 
 namespace {
     constexpr const char* _loggerCat = "FontRenderer";

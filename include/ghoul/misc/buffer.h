@@ -53,7 +53,7 @@ public:
     /**
      * Default Buffer object constructor. The size of the internal array is 0.
      */
-    Buffer();
+    Buffer() = default;
 
     /**
      * Constructor with requested initial capacity of the internal array.
@@ -239,10 +239,10 @@ private:
     std::vector<value_type> _data;
 
     /// Pointer to the current writing position
-    size_t _offsetWrite;
+    size_t _offsetWrite = 0;
 
     /// Pointer to the current reading position
-    size_t _offsetRead;
+    size_t _offsetRead = 0;
 };
 
 // Specializations for std::string

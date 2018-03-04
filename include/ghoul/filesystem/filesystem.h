@@ -28,10 +28,8 @@
 
 #include <ghoul/designpattern/singleton.h>
 #include <ghoul/filesystem/directory.h>
-#include <ghoul/filesystem/file.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
-
 #include <map>
 #include <memory>
 #include <string>
@@ -51,7 +49,9 @@ void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepa
 struct DirectoryHandle;
 void callbackHandler(const std::string& path);
 #endif
+
 class CacheManager;
+class File;
 
 /**
  * The methods in this class are used to access platform-independent features of the

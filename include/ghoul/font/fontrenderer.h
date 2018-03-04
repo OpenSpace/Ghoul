@@ -27,14 +27,14 @@
 #define __GHOUL___FONTRENDERER___H__
 
 #include <ghoul/glm.h>
-#include <ghoul/font/font.h>
 #include <ghoul/opengl/uniformcache.h>
-
 #include <memory>
 
 namespace ghoul::opengl { class ProgramObject; }
 
 namespace ghoul::fontrendering {
+
+class Font;
 
 /**
  * The FontRenderer is a class that can take a Font object and renderer it at a given

@@ -27,6 +27,7 @@
 #define __GHOUL___MODELREADERMULTIFORMAT___H__
 
 #include <ghoul/io/model/modelreaderbase.h>
+
 #include <vector>
 
 struct aiMesh;
@@ -87,10 +88,8 @@ public:
      * \p filename
      * \pre \p filename must not be empty
      */
-    void loadModel(
-        const std::string& filename,
-        std::vector<Vertex> & vertexArray,
-        std::vector<int> & indexArray) const;
+    void loadModel(const std::string& filename, std::vector<Vertex>& vertexArray,
+        std::vector<int>& indexArray) const;
 };
 
 } // namespace ghoul::io

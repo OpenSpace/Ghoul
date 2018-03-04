@@ -26,14 +26,6 @@
 #include <iostream>
 #include <sstream>
 
-namespace ghoul::logging {
-
-LogLevel LogManager::logLevel() const {
-    return _level;
-}
-
-} // namespace ghoul::logging
-
 /**
  * @defgroup LOGGING_MACRO_GROUP Logging Macros
  *

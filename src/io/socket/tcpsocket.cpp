@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,12 +27,54 @@
 
 #include <cstring>
 
-namespace {
-    const char DefaultDelimiter = '\n';
-}
+#ifdef WIN32
+#define NOMINMAX
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <Windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#ifndef _ERRNO
+#define _ERRNO WSAGetLastError()
+#endif
 
-namespace ghoul {
-namespace io {
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#else //Use BSD sockets
+#ifdef _XCODE
+#include <unistd.h>
+#endif
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <errno.h>
+#ifndef SOCKET_ERROR
+#define SOCKET_ERROR (-1)
+#endif
+
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET (_SOCKET)(~0)
+#endif
+
+#ifndef NO_ERROR
+#define NO_ERROR 0L
+#endif
+
+#ifndef _ERRNO
+#define _ERRNO errno
+#endif
+#endif
+
+namespace {
+    constexpr const char DefaultDelimiter = '\n';
+} // namespace
+
+namespace ghoul::io {
 
 std::atomic<bool> TcpSocket::_initializedNetworkApi{false};
 
@@ -50,8 +92,6 @@ TcpSocket::TcpSocket(std::string address, int port)
     , _error(false)
     , _socket(INVALID_SOCKET)
     , _server(nullptr)
-    , _inputThread(std::thread())
-    , _outputThread(std::thread())
     , _delimiter(DefaultDelimiter)
 {}
 
@@ -94,7 +134,8 @@ void TcpSocket::connect() {
         initializeNetworkApi();
     }
 
-    struct addrinfo *addresult = NULL, hints;
+    struct addrinfo* addresult = nullptr;
+    struct addrinfo hints;
     std::memset(&hints, 0, sizeof(hints));
 
     hints.ai_family = AF_INET;
@@ -102,7 +143,13 @@ void TcpSocket::connect() {
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_PASSIVE;
 
-    int result = getaddrinfo(_address.c_str(), std::to_string(_port).c_str(), &hints, &addresult);
+    int result = getaddrinfo(
+        _address.c_str(),
+        std::to_string(_port).c_str(),
+        &hints,
+        &addresult
+    );
+    
     if (result != 0) {
         return;
     }
@@ -111,9 +158,7 @@ void TcpSocket::connect() {
 
     _outputThread = std::thread([this, addresult]() {
         establishConnection(addresult);
-        _inputThread = std::thread(
-            [this]() { streamInput(); }
-        );
+        _inputThread = std::thread([this]() { streamInput(); });
         streamOutput();
     });
 
@@ -121,7 +166,9 @@ void TcpSocket::connect() {
 }
 
 void TcpSocket::disconnect(int) {
-    if (!_isConnected) return;
+    if (!_isConnected) {
+        return;
+    }
 
 #ifdef WIN32
     shutdown(_socket, SD_BOTH);
@@ -230,7 +277,8 @@ void TcpSocket::streamInput() {
             _socket,
             _inputBuffer.data(),
             static_cast<int>(_inputBuffer.size()),
-            0);
+            0
+        );
 
         if (nReadBytes <= 0) {
             _error = true;
@@ -264,7 +312,13 @@ void TcpSocket::streamOutput() {
             );
 
 #ifdef WIN32
-            int nSentBytes = send(_socket, _outputBuffer.data(), nBytesToSend, 0);
+            int nSentBytes = send(
+                _socket,
+                _outputBuffer.data(),
+                static_cast<int>(nBytesToSend),
+                0
+            );
+
             if (nSentBytes <= 0) {
 #else
             size_t nSentBytes = send(_socket, _outputBuffer.data(), nBytesToSend, 0);
@@ -313,7 +367,11 @@ int TcpSocket::waitForDelimiter() {
             return true;
         }
         std::lock_guard<std::mutex> queueMutex(_inputQueueMutex);
-        auto it = std::find(_inputQueue.begin() + currentIndex, _inputQueue.end(), delimiter);
+        auto it = std::find(
+            _inputQueue.begin() + currentIndex,
+            _inputQueue.end(),
+            delimiter
+        );
         currentIndex = it - _inputQueue.begin();
         return it != _inputQueue.end();
     };
@@ -362,17 +420,14 @@ void TcpSocket::initializeNetworkApi() {
 
     error = WSAStartup(version, &wsaData);
 
-    if (error != 0 ||
-        LOBYTE(wsaData.wVersion) != 2 ||
-        HIBYTE(wsaData.wVersion) != 2)
-    {
-        /* incorrect WinSock version */
+    if (error != 0 || LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
+        // incorrect WinSock version
         WSACleanup();
 
-        throw std::runtime_error("Failed to init WinSock API");
+        throw std::runtime_error("Failed to initialize WinSock API");
     }
 #else
-    //No init needed on unix
+    // No init needed on unix
 #endif
     _initializedNetworkApi = true;
 }
@@ -380,7 +435,6 @@ void TcpSocket::initializeNetworkApi() {
 bool TcpSocket::initializedNetworkApi() {
     return _initializedNetworkApi;
 }
-
 
 bool TcpSocket::getBytes(char* getBuffer, size_t size) {
     waitForInput(size);
@@ -436,6 +490,4 @@ bool TcpSocket::putBytes(const char* buffer, size_t size) {
     return _isConnected || _isConnecting;
 }
 
-
-}
-}
+} // namespace ghoul::io

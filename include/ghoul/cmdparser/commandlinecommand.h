@@ -28,7 +28,6 @@
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
-
 #include <sstream>
 #include <string>
 #include <vector>

@@ -48,7 +48,7 @@ namespace ghoul::logging {
 class CallbackLog : public Log {
 public:
     /// The type of function that is used as a callback in this log
-    typedef std::function<void (std::string)> CallbackFunction;
+    using CallbackFunction = std::function<void (std::string)>;
 
     /**
      * Constructor that calls the Log constructor and initializes this CallbackLog.

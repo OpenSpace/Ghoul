@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/cmdparser/multiplecommand.h"
+#include <ghoul/cmdparser/multiplecommand.h>
 
 namespace ghoul::cmdparser {
 

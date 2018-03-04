@@ -113,7 +113,7 @@ public:
      * optimization for loglevels that are unwanted.
      * \return The LogLevel that this LogManager has been initialized with
      */
-    inline LogLevel logLevel() const;
+    LogLevel logLevel() const;
 
     /**
      * Returns the message counter status for the passed LogLevel \p level.
@@ -165,7 +165,7 @@ private:
     std::vector<std::shared_ptr<Log>> _logs;
 
     /// Stores the number of messages for each log level (7)
-    std::array<int, 7> _logCounter;
+    std::array<int, 7> _logCounters = { 0, 0, 0, 0, 0, 0, 0 };
 };
 
 } // namespace ghoul::logging

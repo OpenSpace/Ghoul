@@ -69,7 +69,7 @@ public:
     * \pre \p size must be > 0
     */
     std::unique_ptr<opengl::Texture> loadTexture(void* memory,
-                                                 size_t size) const override;
+        size_t size) const override;
 
     /**
      * Returns the supported extensions (<code>bmp</code>, <code>cut</code>,
@@ -88,7 +88,7 @@ public:
 
 private:
     std::unique_ptr<opengl::Texture> loadTextureInternal(const std::string& source,
-                                                         FIBITMAP* dib) const;
+        FIBITMAP* dib) const;
 };
 
 #endif // GHOUL_USE_FREEIMAGE

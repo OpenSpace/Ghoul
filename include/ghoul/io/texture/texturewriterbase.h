@@ -28,7 +28,6 @@
 
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/texture.h>
-
 #include <string>
 #include <vector>
 

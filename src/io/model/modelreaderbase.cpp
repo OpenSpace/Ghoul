@@ -27,11 +27,10 @@
 
 #include <fmt/format.h>
 
-using std::string;
-
 namespace ghoul::io {
 
-ModelReaderBase::ModelReaderException::ModelReaderException(string file, string error)
+ModelReaderBase::ModelReaderException::ModelReaderException(std::string file,
+                                                            std::string error)
     : RuntimeError(fmt::format("Error reading model '{}': {}", file, error), "IO")
     , fileName(std::move(file))
     , errorMessage(std::move(error))

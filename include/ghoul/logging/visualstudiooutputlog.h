@@ -28,8 +28,7 @@
 
 #include <ghoul/logging/log.h>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 /**
   * A concrete subclass of Log that logs the messages to the Visual Studio output window
@@ -71,7 +70,6 @@ public:
         const std::string& message) override;
 };
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging
 
 #endif // __GHOUL___VISUALSTUDIOOUTPUTLOG___H__

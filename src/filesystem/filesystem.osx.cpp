@@ -27,6 +27,7 @@
 
 #include <ghoul/filesystem/filesystem.h>
 
+#include <ghoul/filesystem/file.h>
 #include <CoreServices/CoreServices.h>
 
 namespace {

@@ -26,8 +26,8 @@
 #ifndef __GHOUL___LOG___H__
 #define __GHOUL___LOG___H__
 
-#include <ghoul/misc/boolean.h>
 #include <ghoul/logging/loglevel.h>
+#include <ghoul/misc/boolean.h>
 #include <string>
 
 namespace ghoul::logging {
@@ -126,13 +126,13 @@ protected:
      * clock is 24h.
      * \return The current time as a string
      */
-    std::string getTimeString() const;
+    std::string timeString() const;
 
     /**
      * Returns the current date as a string. The date format is "YYYY-MM-DD".
      * \return The current date as a string
      */
-    std::string getDateString() const;
+    std::string dateString() const;
 
     std::string createFullMessageString(LogLevel level,
         const std::string& category, const std::string& message) const;

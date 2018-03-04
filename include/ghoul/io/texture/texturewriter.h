@@ -26,12 +26,11 @@
 #ifndef __GHOUL___TEXTUREWRITER___H__
 #define __GHOUL___TEXTUREWRITER___H__
 
+#include <ghoul/misc/exception.h>
+#include <ghoul/opengl/texture.h>
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <ghoul/misc/exception.h>
-#include <ghoul/opengl/texture.h>
 
 namespace ghoul::io {
 

@@ -29,7 +29,6 @@
 #include <ghoul/filesystem/directory.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
-
 #include <map>
 #include <string>
 

@@ -27,7 +27,6 @@
 #define __GHOUL___DICTIONARYLUAFORMATTER___H__
 
 #include <ghoul/misc/dictionaryformatter.h>
-
 #include <ghoul/misc/exception.h>
 
 namespace ghoul {

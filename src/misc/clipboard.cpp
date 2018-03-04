@@ -32,10 +32,8 @@
 #include <ghoul/misc/clipboard.h>
 
 #include <ghoul/misc/exception.h>
-
-#include <fmt/format.h>
-
 #include <algorithm>
+#include <fmt/format.h>
 #include <sstream>
 
 #ifdef WIN32

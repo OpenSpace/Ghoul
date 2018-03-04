@@ -30,7 +30,6 @@
 #include <ghoul/opengl/textureatlas.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
-
 #include <map>
 #include <memory>
 #include <string>

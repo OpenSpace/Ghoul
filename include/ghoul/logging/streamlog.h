@@ -27,6 +27,7 @@
 #define __GHOUL___STREAMLOG___H__
 
 #include <ghoul/logging/log.h>
+
 #include <ostream>
 
 namespace ghoul::logging {

@@ -29,11 +29,9 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/misc/dictionary.h>
-
 #include <fmt/format.h>
-
-#include <sstream>
 #include <fstream>
+#include <sstream>
 
 using std::string;
 

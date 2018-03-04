@@ -38,7 +38,6 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/io/socket/websocket.cpp
     ${PROJECT_SOURCE_DIR}/src/io/socket/websocketserver.cpp
     ${PROJECT_SOURCE_DIR}/src/io/volume/rawvolumereader.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/volume/volumereader.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/bufferlog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/callbacklog.cpp
     ${PROJECT_SOURCE_DIR}/src/logging/consolelog.cpp
@@ -142,11 +141,11 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/cachemanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/directory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/file.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreadermultiformat.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socket.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socket.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socketserver.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/tcpsocket.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/tcpsocketserver.h
@@ -159,7 +158,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/consolelog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/htmllog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/log.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/logging/logging
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/loglevel.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/logmanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/logmanager.inl
@@ -202,7 +200,6 @@ set(GHOUL_HEADER
 if (GHOUL_MODULE_COMMANDLINEPARSER)
     set(GHOUL_HEADER
         ${GHOUL_HEADER}
-        ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/cmdparser
         ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.inl
         ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlineparser.h
@@ -240,7 +237,6 @@ if (GHOUL_MODULE_OPENGL)
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/debugcontext.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/framebufferobject.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/ghoul_gl.h
-        ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/opengl
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobject.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobjectmanager.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shadermanager.h
@@ -273,7 +269,6 @@ if (GHOUL_MODULE_SYSTEMCAPABILITIES)
         ${GHOUL_HEADER}
         ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/generalcapabilitiescomponent.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/openglcapabilitiescomponent.h
-        ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities
         ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities.inl
         ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilitiescomponent.h

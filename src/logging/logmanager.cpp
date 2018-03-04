@@ -26,7 +26,6 @@
 #include <ghoul/logging/logmanager.h>
 
 #include "ghoul/logging/log.h"
-
 #include <algorithm>
 #include <map>
 #include <vector>
@@ -36,7 +35,6 @@ namespace ghoul::logging {
 LogManager::LogManager(LogLevel level, ImmediateFlush immediateFlush)
     : _level(level)
     , _immediateFlush(immediateFlush)
-    , _logCounter({0, 0, 0, 0, 0, 0, 0})
 {}
 
 void LogManager::addLog(std::shared_ptr<Log> log) {
@@ -76,7 +74,7 @@ void LogManager::logMessage(LogLevel level, const std::string& category,
         }
 
         int l = std::underlying_type<LogLevel>::type(level);
-        ++(_logCounter[l]);
+        ++(_logCounters[l]);
     }
 }
 
@@ -84,12 +82,16 @@ void LogManager::logMessage(LogLevel level, const std::string& message) {
     logMessage(level, "", message);
 }
 
+LogLevel LogManager::logLevel() const {
+    return _level;
+}
+
 int LogManager::messageCounter(LogLevel level) {
-    return _logCounter[std::underlying_type<LogLevel>::type(level)];
+    return _logCounters[std::underlying_type<LogLevel>::type(level)];
 }
 
 void LogManager::resetMessageCounters() {
-    _logCounter = { 0, 0, 0, 0, 0, 0, 0 };
+    _logCounters = { 0, 0, 0, 0, 0, 0, 0 };
 }
 
 } // namespace ghoul::logging

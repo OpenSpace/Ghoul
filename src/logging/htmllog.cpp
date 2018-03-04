@@ -26,7 +26,6 @@
 #include <ghoul/logging/htmllog.h>
 
 #include <ghoul/misc/assert.h>
-
 #include <iterator>
 
 namespace ghoul::logging {
@@ -119,10 +118,10 @@ void HTMLLog::log(LogLevel level, const std::string& category,
         output = "\t\t\t<tr bgcolor=\"" + colorForLevel(level) + "\">\n";
     }
     if (isDateStamping()) {
-        output += "\t\t\t\t<td class=\"log-date\">" + getDateString() + "</td>\n";
+        output += "\t\t\t\t<td class=\"log-date\">" + dateString() + "</td>\n";
     }
     if (isTimeStamping()) {
-        output += "\t\t\t\t<td class=\"log-time\">" + getTimeString() + "</td>\n";
+        output += "\t\t\t\t<td class=\"log-time\">" + timeString() + "</td>\n";
     }
     if (isCategoryStamping()) {
         output += "\t\t\t\t<td class=\"log-category\">" + category + "</td>\n";

@@ -29,9 +29,7 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/crc32.h>
-
 #include <fmt/format.h>
-
 #include <algorithm>
 #include <fstream>
 

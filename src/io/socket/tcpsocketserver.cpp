@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,6 +27,97 @@
 
 #include <cstring>
 
+#ifdef WIN32
+#define NOMINMAX
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <Windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#ifndef _ERRNO
+#define _ERRNO WSAGetLastError()
+#endif
+
+#pragma warning(push)
+#pragma warning (disable : 4996)
+#else //Use BSD sockets
+#ifdef _XCODE
+#include <unistd.h>
+#endif
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <errno.h>
+#ifndef SOCKET_ERROR
+#define SOCKET_ERROR (-1)
+#endif
+
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET (_SOCKET)(~0)
+#endif
+
+#ifndef NO_ERROR
+#define NO_ERROR 0L
+#endif
+
+#ifndef _ERRNO
+#define _ERRNO errno
+#endif
+#endif
+
+namespace {
+    void closeSocket(_SOCKET socket) {
+        if (socket != INVALID_SOCKET) {
+#ifdef WIN32
+            shutdown(socket, SD_BOTH);
+            closesocket(socket);
+#else
+            shutdown(socket, SHUT_RDWR);
+            ::close(socket);
+#endif
+        }
+    }
+
+    void setOptions(_SOCKET socket) {
+        char trueFlag = 1;
+
+        //Set no delay
+        setsockopt(socket,
+            IPPROTO_TCP,
+            TCP_NODELAY,
+            &trueFlag,
+            sizeof(trueFlag)
+        );
+
+        // Set send timeout
+        char timeout = 0; //infinite
+        setsockopt(
+            socket,
+            SOL_SOCKET,
+            SO_SNDTIMEO,
+            &timeout,
+            sizeof(timeout)
+        );
+
+        // Set receive timeout
+        setsockopt(
+            socket,
+            SOL_SOCKET,
+            SO_RCVTIMEO,
+            &timeout,
+            sizeof(timeout)
+        );
+
+        setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &trueFlag, sizeof(int));
+        setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(int));
+    }
+} // namespace
+
 namespace ghoul::io {
 
 TcpSocketServer::TcpSocketServer()
@@ -49,18 +140,6 @@ std::string TcpSocketServer::address() const {
 int TcpSocketServer::port() const {
     std::lock_guard<std::mutex> settingsLock(_settingsMutex);
     return _port;
-}
-
-void TcpSocketServer::closeSocket(_SOCKET socket) {
-    if (socket != INVALID_SOCKET) {
-#ifdef WIN32
-        shutdown(socket, SD_BOTH);
-        closesocket(socket);
-#else
-        shutdown(socket, SHUT_RDWR);
-        ::close(socket);
-#endif
-    }
 }
 
 void TcpSocketServer::close() {
@@ -125,7 +204,9 @@ void TcpSocketServer::listen(std::string address, int port) {
 #if defined(WIN32)
         WSACleanup();
 #endif
-        throw TcpSocket::TcpSocketError("Bind failed with error: " + std::to_string(_ERRNO));
+        throw TcpSocket::TcpSocketError(
+            "Bind failed with error: " + std::to_string(_ERRNO)
+        );
     }
 
     // Clean up
@@ -140,9 +221,7 @@ void TcpSocketServer::listen(std::string address, int port) {
     }
 
     _listening = true;
-    _serverThread = std::make_unique<std::thread>(
-        [this]() { waitForConnections(); }
-    );
+    _serverThread = std::make_unique<std::thread>([this]() { waitForConnections(); });
 }
 
 bool TcpSocketServer::isListening() const {
@@ -155,7 +234,7 @@ bool TcpSocketServer::hasPendingSockets() const {
         return false;
     }
     std::lock_guard<std::mutex> connectionLock(_connectionMutex);
-    return _pendingConnections.size() > 0;
+    return !_pendingConnections.empty();
 }
 
 std::unique_ptr<TcpSocket> TcpSocketServer::nextPendingTcpSocket() {
@@ -163,7 +242,7 @@ std::unique_ptr<TcpSocket> TcpSocketServer::nextPendingTcpSocket() {
         return nullptr;
     }
     std::lock_guard<std::mutex> connectionLock(_connectionMutex);
-    if (_pendingConnections.size() > 0) {
+    if (!_pendingConnections.empty()) {
         std::unique_ptr<TcpSocket> connection = std::move(_pendingConnections.front());
         _pendingConnections.pop_front();
         return connection;
@@ -172,7 +251,7 @@ std::unique_ptr<TcpSocket> TcpSocketServer::nextPendingTcpSocket() {
 }
 
 std::unique_ptr<Socket> TcpSocketServer::nextPendingSocket() {
-    return static_cast<std::unique_ptr<Socket>>(nextPendingTcpSocket());
+    return nextPendingTcpSocket();
 }
 
 std::unique_ptr<TcpSocket> TcpSocketServer::awaitPendingTcpSocket() {
@@ -190,7 +269,7 @@ std::unique_ptr<TcpSocket> TcpSocketServer::awaitPendingTcpSocket() {
 }
 
 std::unique_ptr<Socket> TcpSocketServer::awaitPendingSocket() {
-    return static_cast<std::unique_ptr<Socket>>(awaitPendingTcpSocket());
+    return awaitPendingTcpSocket();
 }
 
 void TcpSocketServer::waitForConnections() {
@@ -220,8 +299,14 @@ void TcpSocketServer::waitForConnections() {
         inet_ntop(AF_INET, &(clientInfo.sin_addr), addressBuffer, INET_ADDRSTRLEN);
         std::string address = addressBuffer;
         int port = static_cast<int>(clientInfo.sin_port);
-
-        std::unique_ptr<TcpSocket> socket = std::make_unique<TcpSocket>(address, port, socketHandle);
+        
+        // @CLEANUP(abock): Can the _pendingConnections be moved to Socket instead of
+        //                  unique_ptr?
+        std::unique_ptr<TcpSocket> socket = std::make_unique<TcpSocket>(
+            address,
+            port,
+            socketHandle
+        );
         socket->startStreams();
         
         std::lock_guard<std::mutex> lock(_connectionMutex);
@@ -230,37 +315,6 @@ void TcpSocketServer::waitForConnections() {
         // Notify `awaitPendingConnection` to return the acquired connection.
         _connectionNotifier.notify_one();
     }
-}
-
-void TcpSocketServer::setOptions(_SOCKET socket) {
-    char trueFlag = 1;
-
-    //Set no delay
-    setsockopt(socket,
-        IPPROTO_TCP,
-        TCP_NODELAY,
-        &trueFlag,
-        sizeof(trueFlag));
-
-    // Set send timeout
-    char timeout = 0; //infinite
-    setsockopt(
-        socket,
-        SOL_SOCKET,
-        SO_SNDTIMEO,
-        &timeout,
-        sizeof(timeout));
-
-    // Set receive timeout
-    setsockopt(
-        socket,
-        SOL_SOCKET,
-        SO_RCVTIMEO,
-        &timeout,
-        sizeof(timeout));
-
-    setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &trueFlag, sizeof(int));
-    setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(int));
 }
 
 } // namespace ghoul::io

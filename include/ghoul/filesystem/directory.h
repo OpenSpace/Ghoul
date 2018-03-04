@@ -27,7 +27,6 @@
 #define __GHOUL___DIRECTORY___H__
 
 #include <ghoul/misc/boolean.h>
-
 #include <string>
 #include <vector>
 

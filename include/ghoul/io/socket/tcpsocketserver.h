@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,14 +26,10 @@
 #ifndef __GHOUL___TCPSOCKETSERVER___H__
 #define __GHOUL___TCPSOCKETSERVER___H__
 
-#include <ghoul/misc/exception.h>
-#include <ghoul/io/socket/tcpsocket.h>
 #include <ghoul/io/socket/socketserver.h>
 
+#include <ghoul/io/socket/tcpsocket.h>
 #include <memory>
-#include <vector>
-#include <thread>
-#include <atomic>
 #include <mutex>
 
 namespace ghoul::io {
@@ -42,20 +38,23 @@ class TcpSocketServer : public SocketServer {
 public:
     TcpSocketServer();
     virtual ~TcpSocketServer();
-    virtual std::string address() const;
-    virtual int port() const;
-    virtual void close();
-    virtual void listen(std::string address, int port);
-    virtual bool isListening() const;
-    virtual bool hasPendingSockets() const;
+
+    std::string address() const override;
+    int port() const override;
+    void close() override;
+    void listen(std::string address, int port) override;
+    bool isListening() const override;
+    
+    bool hasPendingSockets() const override;
     std::unique_ptr<TcpSocket> nextPendingTcpSocket();
-    virtual std::unique_ptr<Socket> nextPendingSocket();
+    std::unique_ptr<Socket> nextPendingSocket() override;
 
     // Blocking methods
     std::unique_ptr<TcpSocket> awaitPendingTcpSocket();
-    virtual std::unique_ptr<Socket> awaitPendingSocket();
+    std::unique_ptr<Socket> awaitPendingSocket() override;
+
 private:
-    void closeSocket(_SOCKET socket);
+    void waitForConnections();
 
     mutable std::mutex _settingsMutex;
     std::string _address;
@@ -70,8 +69,6 @@ private:
 
     std::unique_ptr<std::thread> _serverThread;
     _SOCKET _serverSocket;
-    void waitForConnections();
-    void setOptions(_SOCKET socket);
 };
 
 } // namespace ghoul::io

@@ -77,7 +77,7 @@ LogLevel Log::logLevel() const {
     return _logLevel;
 }
 
-std::string Log::getTimeString() const {
+std::string Log::timeString() const {
     auto now = std::chrono::system_clock::now();
     time_t time = std::chrono::system_clock::to_time_t(now);
 
@@ -93,7 +93,7 @@ std::string Log::getTimeString() const {
     return ss.str();
 }
 
-std::string Log::getDateString() const {
+std::string Log::dateString() const {
     auto now = std::chrono::system_clock::now();
     time_t time = std::chrono::system_clock::to_time_t(now);
 
@@ -114,10 +114,10 @@ std::string Log::createFullMessageString(LogLevel level, const std::string& cate
 {
     std::string output;
     if (isDateStamping()) {
-        output += "[" + getDateString();
+        output += "[" + dateString();
     }
     if (isTimeStamping()) {
-        output += " | " + getTimeString();
+        output += " | " + timeString();
     }
 
     if (isDateStamping() || isTimeStamping()) {

@@ -27,7 +27,6 @@
 #define __GHOUL___TEXTUREREADERBASE___H__
 
 #include <ghoul/misc/exception.h>
-
 #include <memory>
 #include <string>
 #include <vector>

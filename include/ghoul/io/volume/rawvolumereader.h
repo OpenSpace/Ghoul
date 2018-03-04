@@ -28,30 +28,34 @@
 
 #include <ghoul/io/volume/volumereader.h>
 
-namespace ghoul {
+#include <ghoul/glm.h>
+#include <ghoul/opengl/texture.h>
+
+namespace ghoul::io {
 
 class RawVolumeReader : public VolumeReader {
 public:
     struct ReadHints {
         ReadHints(glm::ivec3 dimensions = glm::ivec3(0));
+
         glm::ivec3 _dimensions;
         opengl::Texture::Format _format;
         GLenum _internalFormat;
     };
 
-    RawVolumeReader();
-    RawVolumeReader(const ReadHints& hints);
-    ~RawVolumeReader();
+    RawVolumeReader() = default;
+    RawVolumeReader(ReadHints hints);
+    ~RawVolumeReader() = default;
 
     void setReadHints(glm::ivec3 dimension);
-    void setReadHints(const ReadHints& hints);
+    void setReadHints(ReadHints hints);
 
-    opengl::Texture* read(const std::string& filename) override;
+    std::unique_ptr<opengl::Texture> read(const std::string& filename) override;
 
 private:
-    ReadHints _hints;
+    ReadHints _hints = ReadHints();
 };
 
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___RAWVOLUMEREADER___H__

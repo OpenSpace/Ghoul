@@ -28,8 +28,6 @@
 
 #include <ghoul/io/texture/texturereaderbase.h>
 
-#include <memory>
-
 namespace ghoul::io {
 
 #ifdef GHOUL_USE_DEVIL

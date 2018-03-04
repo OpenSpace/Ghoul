@@ -27,11 +27,10 @@
 
 #include <ghoul/misc/assert.h>
 #include <ghoul/logging/logmanager.h>
-
-#include <fmt/format.h>
-
+#include <ghoul/opengl/textureatlas.h>
 #include <algorithm>
 #include <array>
+#include <fmt/format.h>
 #include <tuple>
 
 #include <ft2build.h>
@@ -42,6 +41,7 @@
 #define FT_ERRORDEF( e, v, s )  { e, s },
 #define FT_ERROR_START_LIST     {
 #define FT_ERROR_END_LIST       { 0, nullptr } };
+
 const struct {
     int          code;
     const char*  message;

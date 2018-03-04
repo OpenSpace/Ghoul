@@ -26,7 +26,6 @@
 #include <ghoul/misc/dictionary.h>
 
 #include <ghoul/misc/assert.h>
-
 #include <algorithm>
 #include <array>
 

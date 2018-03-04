@@ -62,7 +62,7 @@ public:
     * \pre \p size must be > 0
     */
     std::unique_ptr<opengl::Texture> loadTexture(void* memory,
-                                                 size_t size) const override;
+        size_t size) const override;
 
     /*
      * Returns the supported extension (<code>cmap</code>)

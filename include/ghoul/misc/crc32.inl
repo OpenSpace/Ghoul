@@ -83,7 +83,7 @@ constexpr unsigned int crc32Internal(unsigned int crc, const char* str) {
                   ^ (crc >> 8), str + 1);
 }
 
-}
+} // namespace
 
 constexpr unsigned int hashCRC32(const char* s) {
     return crc32Internal(0xFFFFFFFF, s);

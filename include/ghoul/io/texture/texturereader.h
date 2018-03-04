@@ -26,11 +26,10 @@
 #ifndef __GHOUL___TEXTUREREADER___H__
 #define __GHOUL___TEXTUREREADER___H__
 
+#include <ghoul/misc/exception.h>
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <ghoul/misc/exception.h>
 
 namespace ghoul::opengl { class Texture; }
 

@@ -27,6 +27,7 @@
 #define __GHOUL___CONSOLELOG___H__
 
 #include <ghoul/logging/streamlog.h>
+
 #include <ghoul/misc/boolean.h>
 
 namespace ghoul::logging {

@@ -27,12 +27,10 @@
 #define __GHOUL___DICTIONARY___H__
 
 #include <ghoul/glm.h>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/misc/any.h>
-
+#include <glm/gtc/type_ptr.hpp>
 #include <map>
 #include <string>
 #include <type_traits>

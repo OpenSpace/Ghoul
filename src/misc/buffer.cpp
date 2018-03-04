@@ -28,29 +28,18 @@
 #include <ghoul/misc/buffer.h>
 #include <ghoul/logging/logmanager.h>
 
-#include <lz4/lz4.h>
-
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <lz4/lz4.h>
 
 namespace ghoul {
 
-Buffer::Buffer()
-    : _offsetWrite(0)
-    , _offsetRead(0)
-{}
-
 Buffer::Buffer(size_t capacity)
     : _data(capacity)
-    , _offsetWrite(0)
-    , _offsetRead(0)
 {}
 
-Buffer::Buffer(const std::string& filename)
-    : _offsetWrite(0)
-    , _offsetRead(0)
-{
+Buffer::Buffer(const std::string& filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
     read(filename);
