@@ -30,6 +30,7 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/programobject.h>
+#include <ghoul/opengl/texture.h>
 #include <ghoul/opengl/textureatlas.h>
 #include <ghoul/opengl/textureunit.h>
 #include <cstdarg>

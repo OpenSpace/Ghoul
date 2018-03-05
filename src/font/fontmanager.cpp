@@ -31,6 +31,7 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
+#include <ghoul/opengl/texture.h>
 #include <fmt/format.h>
 
 namespace ghoul::fontrendering {
