@@ -25,11 +25,12 @@
 
 #include <ghoul/lua/lua_helper.h>
 
+#include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/misc/dictionary.h>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 #include <fstream>
 #include <sstream>
 

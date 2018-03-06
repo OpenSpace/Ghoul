@@ -25,6 +25,7 @@
 
 #include <ghoul/font/fontrenderer.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/font/font.h>
 #include <ghoul/logging/logmanager.h>
@@ -196,13 +197,13 @@ FontRenderer::~FontRenderer() {
 
 std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     std::string vsPath = absPath(DefaultVertexShaderPath);
-    LDEBUG("Writing default vertex shader to '" << vsPath << "'");
+    LDEBUG(fmt::format("Writing default vertex shader to '{}'", vsPath));
     std::ofstream file(vsPath);
     file << DefaultVertexShaderSource;
     file.close();
 
     std::string fsPath = absPath(DefaultFragmentShaderPath);
-    LDEBUG("Writing default fragment shader to '" << fsPath << "'");
+    LDEBUG(fmt::format("Writing default fragment shader to '{}'", fsPath));
     file.open(fsPath);
     file << DefaultFragmentShaderSource;
     file.close();
@@ -236,13 +237,13 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
 
 std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     std::string vsPath = absPath(ProjectionVertexShaderPath);
-    LDEBUG("Writing default vertex shader to '" << vsPath << "'");
+    LDEBUG(fmt::format("Writing default vertex shader to '{}'", vsPath));
     std::ofstream file(vsPath);
     file << ProjectionVertexShaderSource;
     file.close();
 
     std::string fsPath = absPath(ProjectionFragmentShaderPath);
-    LDEBUG("Writing default fragment shader to '" << fsPath << "'");
+    LDEBUG(fmt::format("Writing default fragment shader to '{}'", fsPath));
     file.open(fsPath);
     file << ProjectionFragmentShaderSource;
     file.close();

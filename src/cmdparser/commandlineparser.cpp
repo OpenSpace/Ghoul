@@ -29,7 +29,7 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <algorithm>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 #include <map>
 
 using fmt::format;

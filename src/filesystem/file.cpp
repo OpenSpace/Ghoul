@@ -26,7 +26,7 @@
 #include <ghoul/filesystem/file.h>
 
 #include <ghoul/filesystem/filesystem.h>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 
 #ifdef WIN32
 #include <windows.h>

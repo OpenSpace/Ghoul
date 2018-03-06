@@ -26,106 +26,142 @@
 #include <iostream>
 #include <sstream>
 
+inline void log(ghoul::logging::LogLevel level, const std::string& category,
+                const std::string& message)
+{
+    if (ghoul::logging::LogManager::isInitialized()) {
+        LogMgr.logMessage(level, category, message);
+    }
+    else {
+        std::cout << category << " (" <<
+            ghoul::logging::stringFromLevel(level) << ") : " << message << std::endl;
+    }
+}
+
+inline void LTRACEC(const std::string& category, const std::string& message) {
+    log(ghoul::logging::LogLevel::Trace, category, message);
+}
+
+inline void LDEBUGC(const std::string& category, const std::string& message) {
+    log(ghoul::logging::LogLevel::Debug, category, message);
+}
+
+inline void LINFOC(const std::string& category, const std::string& message) {
+    log(ghoul::logging::LogLevel::Info, category, message);
+}
+
+inline void LWARNINGC(const std::string& category, const std::string& message) {
+    log(ghoul::logging::LogLevel::Warning, category, message);
+}
+
+inline void LERRORC(const std::string& category, const std::string& message) {
+    log(ghoul::logging::LogLevel::Error, category, message);
+}
+
+inline void LFATALC(const std::string& category, const std::string& message) {
+    log(ghoul::logging::LogLevel::Fatal, category, message);
+}
+
 /**
  * @defgroup LOGGING_MACRO_GROUP Logging Macros
  *
  * @{
  */
 
-/// Logs the 'message' with the 'category' at a level of 'logLevel'
-#define LOGC(__loglevel__, __category__, __message__) \
-    do { \
-        if (ghoul::logging::LogManager::isInitialized()) { \
-            if (__loglevel__ >= LogMgr.logLevel()) { \
-                std::ostringstream __tmp__; \
-                __tmp__ << __message__; \
-                LogMgr.logMessage( \
-                    (__loglevel__), \
-                    (__category__), \
-                    __tmp__.str() \
-                ); \
-            } \
-        } else { \
-            std::ostringstream __tmp__; \
-            __tmp__ << __message__; \
-            std::cout << (__category__) << " (" << \
-            ghoul::logging::stringFromLevel(__loglevel__) << \
-            ") : " << __tmp__.str() << std::endl; \
-        } \
-    } while (false)
-
-
-#ifdef GHOUL_LOGGING_ENABLE_TRACE
-/// Logs the 'message' with the 'category' at a level of LogLevel::Trace
-#define LTRACEC(__category__, __message__) \
-LOGC(ghoul::logging::LogLevel::Trace, __category__, __message__)
-#else
-// If we compile without trace, we remove all trace code
-#define LTRACEC(__category, __message)
-#endif
-
-/// Logs the 'message' with the 'category' at a level of LogLevel::Debug
-#define LDEBUGC(__category__, __message__) \
-    LOGC(ghoul::logging::LogLevel::Debug, __category__, __message__)
-
-/// Logs the 'message' with the 'category' at a level of LogLevel::Info
-#define LINFOC(__category__, __message__) \
-    LOGC(ghoul::logging::LogLevel::Info, __category__, __message__)
-
-/// Logs the 'message' with the 'category' at a level of LogLevel::Warning
-#define LWARNINGC(__category__, __message__) \
-    LOGC(ghoul::logging::LogLevel::Warning, __category__, __message__)
-
-/// Logs the 'message' with the 'category' at a level of LogLevelError
-#define LERRORC(__category__, __message__) \
-    LOGC(ghoul::logging::LogLevel::Error, __category__, __message__)
-
-/// Logs the 'message' with the 'category' at a level of LogLevelFatal
-#define LFATALC(__category__, __message__) \
-    LOGC(ghoul::logging::LogLevel::Fatal, __category__, __message__)
-
-#define LOG(__loglevel__, __message__) LOGC(__loglevel__, _loggerCat, __message__)
-
-/**
- * Logs the 'message' with a level of LogLevel::Trace. A variable called
- * _loggerCat needs to be defined and should contain the category.
- */
-#define LTRACE(__message__) LTRACEC(_loggerCat, __message__)
-
-/**
- * Logs the 'message' with a level of LogLevel::Debug. A variable called
- * _loggerCat needs to be defined and should contain the category.
- */
-#define LDEBUG(__message__) LDEBUGC(_loggerCat, __message__)
-
-/**
- * Logs the 'message' with a level of LogLevel::Info. A variable called
- * _loggerCat needs to be defined and should contain the category.
- */
-#define LINFO(__message__) LINFOC(_loggerCat, __message__)
-
-/**
- * Logs the 'message' with a level of LogLevel::Info. A variable called
- * _loggerCat needs to be defined and should contain the category.
- */
-#define LINFO(__message__) LINFOC(_loggerCat, __message__)
-
-/**
- * Logs the 'message' with a level of LogLevel::Warning. A variable called
- * _loggerCat needs to be defined and should contain the category.
- */
-#define LWARNING(__message__) LWARNINGC(_loggerCat, __message__)
-
-/**
- * Logs the 'message' with a level of LogLevel::Error. A variable called
- * _loggerCat needs to be defined and should contain the category.
- */
-#define LERROR(__message__) LERRORC(_loggerCat, __message__)
-
-/**
- * Logs the 'message' with a level of LogLevel::Fatal. A variable called
- * _loggerCat needs to be defined and should contain the category.
- */
-#define LFATAL(__message__) LFATALC(_loggerCat, __message__)
+///// Logs the 'message' with the 'category' at a level of 'logLevel'
+//#define LOGC(__loglevel__, __category__, __message__) \
+//    do { \
+//        if (ghoul::logging::LogManager::isInitialized()) { \
+//            if (__loglevel__ >= LogMgr.logLevel()) { \
+//                std::ostringstream __tmp__; \
+//                __tmp__ << __message__; \
+//                LogMgr.logMessage( \
+//                    (__loglevel__), \
+//                    (__category__), \
+//                    __tmp__.str() \
+//                ); \
+//            } \
+//        } else { \
+//            std::ostringstream __tmp__; \
+//            __tmp__ << __message__; \
+//            std::cout << (__category__) << " (" << \
+//            ghoul::logging::stringFromLevel(__loglevel__) << \
+//            ") : " << __tmp__.str() << std::endl; \
+//        } \
+//    } while (false)
+//
+//
+//#ifdef GHOUL_LOGGING_ENABLE_TRACE
+///// Logs the 'message' with the 'category' at a level of LogLevel::Trace
+//#define LTRACEC(__category__, __message__) \
+//LOGC(ghoul::logging::LogLevel::Trace, __category__, __message__)
+//#else
+//// If we compile without trace, we remove all trace code
+//#define LTRACEC(__category, __message)
+//#endif
+//
+///// Logs the 'message' with the 'category' at a level of LogLevel::Debug
+//#define LDEBUGC(__category__, __message__) \
+//    LOGC(ghoul::logging::LogLevel::Debug, __category__, __message__)
+//
+///// Logs the 'message' with the 'category' at a level of LogLevel::Info
+//#define LINFOC(__category__, __message__) \
+//    LOGC(ghoul::logging::LogLevel::Info, __category__, __message__)
+//
+///// Logs the 'message' with the 'category' at a level of LogLevel::Warning
+//#define LWARNINGC(__category__, __message__) \
+//    LOGC(ghoul::logging::LogLevel::Warning, __category__, __message__)
+//
+///// Logs the 'message' with the 'category' at a level of LogLevelError
+//#define LERRORC(__category__, __message__) \
+//    LOGC(ghoul::logging::LogLevel::Error, __category__, __message__)
+//
+///// Logs the 'message' with the 'category' at a level of LogLevelFatal
+//#define LFATALC(__category__, __message__) \
+//    LOGC(ghoul::logging::LogLevel::Fatal, __category__, __message__)
+//
+//#define LOG(__loglevel__, __message__) LOGC(__loglevel__, _loggerCat, __message__)
+//
+///**
+// * Logs the 'message' with a level of LogLevel::Trace. A variable called
+// * _loggerCat needs to be defined and should contain the category.
+// */
+//#define LTRACE(__message__) LTRACEC(_loggerCat, __message__)
+//
+///**
+// * Logs the 'message' with a level of LogLevel::Debug. A variable called
+// * _loggerCat needs to be defined and should contain the category.
+// */
+//#define LDEBUG(__message__) LDEBUGC(_loggerCat, __message__)
+//
+///**
+// * Logs the 'message' with a level of LogLevel::Info. A variable called
+// * _loggerCat needs to be defined and should contain the category.
+// */
+//#define LINFO(__message__) LINFOC(_loggerCat, __message__)
+//
+///**
+// * Logs the 'message' with a level of LogLevel::Info. A variable called
+// * _loggerCat needs to be defined and should contain the category.
+// */
+//#define LINFO(__message__) LINFOC(_loggerCat, __message__)
+//
+///**
+// * Logs the 'message' with a level of LogLevel::Warning. A variable called
+// * _loggerCat needs to be defined and should contain the category.
+// */
+//#define LWARNING(__message__) LWARNINGC(_loggerCat, __message__)
+//
+///**
+// * Logs the 'message' with a level of LogLevel::Error. A variable called
+// * _loggerCat needs to be defined and should contain the category.
+// */
+//#define LERROR(__message__) LERRORC(_loggerCat, __message__)
+//
+///**
+// * Logs the 'message' with a level of LogLevel::Fatal. A variable called
+// * _loggerCat needs to be defined and should contain the category.
+// */
+//#define LFATAL(__message__) LFATALC(_loggerCat, __message__)
 
 /** @} */

@@ -175,10 +175,30 @@ private:
     /// Stores the number of messages for each log level (7)
     std::array<int, 7> _logCounters = { 0, 0, 0, 0, 0, 0, 0 };
 };
-
 } // namespace ghoul::logging
 
 #define LogMgr (ghoul::logging::LogManager::ref())
+
+inline void log(ghoul::logging::LogLevel level, const std::string& category,
+    const std::string& message);
+
+#define LTRACE(__msg__) LTRACEC(_loggerCat, __msg__)
+inline void LTRACEC(const std::string& category, const std::string& message);
+
+#define LDEBUG(__msg__) LDEBUGC(_loggerCat, __msg__)
+inline void LDEBUGC(const std::string& category, const std::string& message);
+
+#define LINFO(__msg__) LINFOC(_loggerCat, __msg__)
+inline void LINFOC(const std::string& category, const std::string& message);
+
+#define LWARNING(__msg__) LWARNINGC(_loggerCat, __msg__)
+inline void LWARNINGC(const std::string& category, const std::string& message);
+
+#define LERROR(__msg__) LERRORC(_loggerCat, __msg__)
+inline void LERRORC(const std::string& category, const std::string& message);
+
+#define LFATAL(__msg__) LFATALC(_loggerCat, __msg__)
+inline void LFATALC(const std::string& category, const std::string& message);
 
 #include "logmanager.inl"
 

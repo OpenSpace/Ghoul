@@ -25,6 +25,7 @@
 
 #include <ghoul/systemcapabilities/systemcapabilities.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <algorithm>
@@ -73,7 +74,7 @@ void SystemCapabilities::logCapabilities(
             if (verbosity >= cap.verbosity) {
                 LINFOC(
                     "SystemCapabilitiesComponent." + c->name(),
-                    cap.description << ": " << cap.value
+                    fmt::format("{}: {}", cap.description, cap.value)
                 );
             }
         }

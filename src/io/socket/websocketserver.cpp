@@ -107,12 +107,12 @@ namespace {
 
         iResult = setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &trueFlag, sizeof(int));
         if (iResult == SOCKET_ERROR) {
-            LERROR("Failed to set reuse address with error: " << _ERRNO);
+            LERROR(fmt::format("Failed to set reuse address with error: {}", _ERRNO));
         }
 
         iResult = setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(int));
         if (iResult == SOCKET_ERROR) {
-            LERROR("Failed to set keep alive with error: " << _ERRNO);
+            LERROR(fmt::format("Failed to set keep alive with error: {}", _ERRNO));
         }
     }
 

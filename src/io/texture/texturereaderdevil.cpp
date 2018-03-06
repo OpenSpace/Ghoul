@@ -30,7 +30,7 @@
 #include <ghoul/opengl/texture.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/glm.h>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 #include <IL/il.h>
 #include <IL/ilu.h>
 

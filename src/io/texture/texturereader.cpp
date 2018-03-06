@@ -30,7 +30,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 
 namespace ghoul::io {
 

@@ -25,7 +25,7 @@
 
 #include <ghoul/io/model/modelreaderbase.h>
 
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 
 namespace ghoul::io {
 

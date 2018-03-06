@@ -28,7 +28,7 @@
 #include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
 #include <atomic>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 #include <fstream>
 
 namespace {

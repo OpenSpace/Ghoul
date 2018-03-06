@@ -26,7 +26,7 @@
 #include <ghoul/misc/assert.h>
 
 #include <algorithm>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 #include <iostream>
 #include <vector>
 

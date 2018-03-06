@@ -29,7 +29,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/texture.h>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 
 namespace {
     const glm::ivec4 InvalidRegionLocation = glm::ivec4(-1, -1, 0, 0);

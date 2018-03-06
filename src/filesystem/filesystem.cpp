@@ -29,7 +29,7 @@
 #include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
 #include <algorithm>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 #include <regex>
 
 #ifdef WIN32
@@ -101,7 +101,7 @@ FileSystem::FileSystem()
 #endif // WIN32
 
     if (!temporaryPath.empty()) {
-        LINFO("Set temporary path ${TEMPORARY} to " << temporaryPath);
+        LINFO(fmt::format("Set temporary path ${{TEMPORARY}} to {}", temporaryPath));
         registerPathToken(
             TokenOpeningBraces + std::string(TemporaryPathToken) + TokenClosingBraces,
             temporaryPath

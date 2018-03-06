@@ -34,7 +34,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <cstdio>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 #include <fstream>
 #include <iostream>
 #include <memory>

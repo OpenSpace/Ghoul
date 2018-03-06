@@ -27,6 +27,7 @@
 
 #include <ghoul/filesystem/filesystem.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
@@ -80,7 +81,7 @@ void FileSystem::addFileListener(File* file) {
     std::string d = file->directoryName();
     auto f = _directories.find(d);
     if (f == _directories.end()) {
-        LDEBUG("Started watching: " << d);
+        LDEBUG(fmt::format("Started watching: {}", d));
         DirectoryHandle* handle = new DirectoryHandle;
         handle->_activeBuffer = 0;
         handle->_handle = nullptr;
@@ -96,7 +97,7 @@ void FileSystem::addFileListener(File* file) {
         );
 
         if (handle->_handle == INVALID_HANDLE_VALUE) {
-            LERROR("Directory handle for '" << d << "' could not be obtained");
+            LERROR(fmt::format("Directory handle for '{}' could not be obtained", d));
             delete handle;
             return;
         }
@@ -126,7 +127,11 @@ void FileSystem::removeFileListener(File* file) {
             return;
         }
     }
-    LWARNING("Could not find tracked '" << file <<"' for path '"<< file->path() << "'");
+    LWARNING(fmt::format(
+        "Could not find tracked '{0:x}' for path '{}'",
+        reinterpret_cast<void*>(file),
+        file->path()
+    ));
 }
 
 void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,
@@ -257,10 +262,10 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
         if (errorBuffer != nullptr) {
             std::string errorString(errorBuffer);
             LocalFree(errorBuffer);
-            LERROR("Error reading directory changes: " << errorString);
+            LERROR(fmt::format("Error reading directory changes: {}", errorString));
         }
         else {
-            LERROR("Error reading directory changes: " << error);
+            LERROR(fmt::format("Error reading directory changes: {}", error));
         }
     }
 }

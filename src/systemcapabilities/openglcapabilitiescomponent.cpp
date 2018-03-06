@@ -25,6 +25,7 @@
 
 #include "ghoul/systemcapabilities/openglcapabilitiescomponent.h"
 
+#include <ghoul/fmt.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <algorithm>
@@ -102,8 +103,10 @@ void OpenGLCapabilitiesComponent::detectGPUVendor() {
         _vendor = Vendor::Intel;
     }
     else {
-        LINFO("Vendor of graphics card is not in the enum 'Vendor'. Vendor information: "
-            << _glslCompiler);
+        LINFO(fmt::format(
+            "Vendor of graphics card is not in the enum 'Vendor'. Vendor information: {}",
+            _glslCompiler
+        ));
         _vendor = Vendor::Other;
     }
 }

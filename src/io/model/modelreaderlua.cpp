@@ -30,7 +30,7 @@
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/vertexbufferobject.h>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 #include <map>
 #include <vector>
 

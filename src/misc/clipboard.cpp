@@ -33,7 +33,7 @@
 
 #include <ghoul/misc/exception.h>
 #include <algorithm>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 #include <sstream>
 
 #ifdef WIN32

@@ -25,6 +25,7 @@
 
 #include <ghoul/font/fontmanager.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/font/font.h>
@@ -32,7 +33,6 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
 #include <ghoul/opengl/texture.h>
-#include <fmt/format.h>
 
 namespace ghoul::fontrendering {
 

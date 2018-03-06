@@ -30,7 +30,7 @@
 #include <ghoul/opengl/textureatlas.h>
 #include <algorithm>
 #include <array>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 #include <tuple>
 
 #include <ft2build.h>
