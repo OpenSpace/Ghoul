@@ -29,6 +29,11 @@
 #include <ghoul/fmt.h>
 #include <websocketpp/common/functional.hpp>
 
+#ifndef WIN32
+#include <unistd.h>
+#include <sys/socket.h>
+#endif // WIN32
+
 namespace {
     constexpr const char* _loggerCat = "WebSocket";
 } // namespace

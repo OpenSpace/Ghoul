@@ -41,9 +41,18 @@
 using _SOCKET = size_t;
 using _SOCKLEN = int;
 #else //linux & macOS
-typedef int _SOCKET;
-typedef socklen_t _SOCKLEN;
-#endif
+
+#include <sys/socket.h>
+#include <sys/types.h>
+
+using _SOCKET = int;
+using _SOCKLEN = socklen_t;
+
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET (_SOCKET)(~0)
+#endif // INVALID_SOCKET
+
+#endif // WIN32
 
 struct addrinfo;
 
