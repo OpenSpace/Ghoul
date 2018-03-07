@@ -67,21 +67,22 @@ public:
      * (#setBuffer). The passed parameters are the BufferLog that is exhausted and the
      * timestamp that will be used in the message after the callback has been resolved.
      */
-    typedef std::function<void (BufferLog&, unsigned long long int&)>
-        MemoryExhaustedCallback;
+    using MemoryExhaustedCallback =
+        std::function<void(BufferLog&, unsigned long long int&)>;
 
     /**
      * Constructor that registers a MemoryExhausedCallback that will be used. The
      * constructor will take a small piece of the provided buffer to store a necessary
      * header. The size of the header is version-dependent.
+     *
      * \param address The address to the buffer that will be used by this log. The
-     * ownership of the memory is <b>not</b> passed to the BufferLog by this
+     *        ownership of the memory is <b>not</b> passed to the BufferLog by this
      * \param bufferSize The total size of the buffer. It is the callers responsibility to
-     * assure that the provided buffer is at least as big as \p totalSize
+     *        assure that the provided buffer is at least as big as \p totalSize
      * \param callback The MemoryExhaustedCallback that will be used when a potential
-     * log entry would exhaust the available memory in the buffer. It is the callback's
-     * responsibility to either clear the buffer (#resetBuffer) or provide a new buffer
-     * that is used instead (#setBuffer)
+     *        log entry would exhaust the available memory in the buffer. It is the
+     *        callback's responsibility to either clear the buffer (#resetBuffer) or
+     *        provide a new buffer that is used instead (#setBuffer)
      * \pre \p address must not be <code>nullptr</code>
      * \pre \p bufferSize must be positive
      */
@@ -92,10 +93,11 @@ public:
      * header. The size of the header is version-dependent. If no MemoryExhaustedCallback
      * is registered and a subsequent call to #log would exceed the remainder of the
      * buffer, an exception will be thrown.
+     *
      * \param address The address to the buffer that will be used by this log. The
-     * ownership of the memory is <b>not</b> passed to the BufferLog by this
+     *        ownership of the memory is <b>not</b> passed to the BufferLog by this
      * \param bufferSize The total size of the buffer. It is the callers responsibility to
-     * assure that the provided buffer is at least as big as \p bufferSize
+     *        assure that the provided buffer is at least as big as \p bufferSize
      * \pre \p address must not be <code>nullptr</code>
      * \pre \p bufferSize must be positive
      */
@@ -107,6 +109,7 @@ public:
      * exhaust the available memory in the buffer. It is the callback's responsibility to
      * either clear the used memory (#resetBuffer) or provide a replacement buffer
      * (#setBuffer) that is used instead.
+     *
      * \param callback The callback that will be used to handle out-of-memory situations
      */
     void setCallback(MemoryExhaustedCallback callback);
@@ -117,11 +120,12 @@ public:
      * will be copied into the buffer. This method will acquire a lock before calling the
      * callback function (if provided). Calling this function from the callback results in
      * undefined behavior. This method is thread-safe.
+     *
      * \param timestamp The timestamp of the message
      * \param message The message to store in the buffer
      * \throw MemoryExhaustionException If there was not enough memory left in the buffer
-     * and there either was no MemoryExhaustCallback or the callback failed to provide new
-     * memory
+     *        and there either was no MemoryExhaustCallback or the callback failed to
+     *        provide new memory
      * \pre \p message must not be empty
      */
     void log(unsigned long long timestamp, std::string message);
@@ -129,13 +133,15 @@ public:
     /**
      * Returns the buffer that is used by the BufferLog. If this buffer is modified by the
      * caller, especially the Header bytes, the results are undefined.
+     *
      * \return The buffer that is used by the BufferLog
      */
     void* buffer();
 
     /**
      * Returns the total size of the buffer that was specified by the user when the
-     * BufferLog was constructed or a new buffer was supplied (#setBuffer)
+     * BufferLog was constructed or a new buffer was supplied (#setBuffer).
+     *
      * \return The total size of the buffer
      */
     size_t totalSize() const;
@@ -143,7 +149,8 @@ public:
     /**
      * Returns the number of bytes that have been used by this BufferLog, including the
      * information for the header fields. This value is guaranteed to be always less than
-     * the value returned by #totalSize
+     * the value returned by #totalSize.
+     *
      * \return The number of bytes that have been used by this BufferLog
      */
     size_t usedSize() const;
@@ -156,9 +163,10 @@ public:
      * not take ownership of the provided buffer, the old buffer might become unavailable
      * after this function call. This has to be taken care of by the caller or a memory
      * leak will occur. This method is thread-safe.
+     *
      * \param buffer The buffer that will be used by the BufferLog from now on
      * \param bufferSize The size of the buffer that will be used by the BufferLog to
-     * store messages.
+     *        store messages.
      * \pre \p buffer must not be <code>nullptr</code>
      * \pre \p bufferSize must be positive
      */
@@ -177,8 +185,9 @@ public:
      * that have been used will be written to disk, as opposed to the whole buffer. This
      * means that the file may contain less bytes than #totalSize. This method is
      * thread-safe.
+     *
      * \param filename The path to the file which will hold the contents of the buffer.
-     * Any existing file at that location will be overwritten in the process.
+     *        Any existing file at that location will be overwritten in the process.
      */
     void writeToDisk(const std::string& filename);
 
@@ -200,13 +209,13 @@ protected:
      * This callback will be called when an incoming log message would exhaust the
      * available memory of the buffer. The callback has to either provide a new buffer
      * which will be used henceforth (#setBuffer) or mark the current buffer as
-     * reusable (#resetBuffer)
+     * reusable (#resetBuffer).
      */
     MemoryExhaustedCallback _callback;
 
     /** This variable is <code>true</code> if this BufferLog has had its callback trigged
      * in the current callstack. It forces some methods to ignore the
-     * <code>atomic_lock</code> to ensure that no deadlock can happen
+     * <code>atomic_lock</code> to ensure that no deadlock can happen.
      */
     bool _inCallbackStack;
 };

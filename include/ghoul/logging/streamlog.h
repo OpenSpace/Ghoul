@@ -27,6 +27,7 @@
 #define __GHOUL___STREAMLOG___H__
 
 #include <ghoul/logging/log.h>
+
 #include <ostream>
 
 namespace ghoul::logging {
@@ -47,15 +48,16 @@ class StreamLog : public Log {
 public:
     /**
      * Constructor that calls Log constructor.
+     *
      * \param stream The initialized stream this Log should use
      * \param timeStamping Determines if the log should print the time when a message is
-     * logged in the log messages
+     *        logged in the log messages
      * \param dateStamping Determines if the log should print the time when a message is
-     * logged in the log messages
+     *        logged in the log messages
      * \param categoryStamping Determines if the log should print the categories in the
-     * log messages
+     *        log messages
      * \param logLevelStamping Determines if the log should print the log level in the
-     * log messages
+     *        log messages
      */
     StreamLog(std::ostream& stream, TimeStamping timeStamping = TimeStamping::No,
         DateStamping dateStamping = DateStamping::No,
@@ -66,9 +68,10 @@ public:
     /**
      * Method that logs a <code>message</code> with a given <code>level</code> and
      * <code>category</code> to the stream.
+     *
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
-     * individually
+     *        individually
      * \param message The message body of the log message
      */
     virtual void log(LogLevel level, const std::string& category,

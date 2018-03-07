@@ -40,6 +40,7 @@ class TextureWriterSOIL : public TextureWriterBase {
 public:
     /**
      * Writes the \p texture into the \p filename.
+     *
      * \param texture The Texture that is to be saved
      * \param filename The target file on disk into which to save the Texture
      * \pre \p filename must not be empty
@@ -51,7 +52,9 @@ public:
 
     /**
      * Returns the supported extensions.
+     *
      * \return The supported extensions
+     *
      * \sa http://lonesock.net/soil.html
      */
     std::vector<std::string> supportedExtensions() const override;

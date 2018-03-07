@@ -71,13 +71,15 @@ public:
 
     /**
      * Creates and initializes an empty LogManager with the passed LogLevel.
+     *
      * \param level The lowest LogLevel that will be passed to the containing
-     * Log%s.
+     *        Log%s.
      * \param immediateFlush Determines if all Log%s will be flushed out immediately
-     * after a message was received. In the case of file-backed logs, the files will be
-     * written out to disk and in case of a console log, the console will be updated.
-     * Passing <code>true</code> will slow down the execution but guarantees that a crash
-     * immediately after a log message won't lead to data loss.
+     *        after a message was received. In the case of file-backed logs, the files
+     *        will be written out to disk and in case of a console log, the console will
+     *        be updated. Passing <code>true</code> will slow down the execution but
+     *        guarantees that a crash immediately after a log message won't lead to data
+     *        loss.
      */
     LogManager(LogLevel level = LogLevel::Info,
         ImmediateFlush immediateFlush = ImmediateFlush::No);
@@ -87,11 +89,12 @@ public:
      * LogManager was created with, the <code>message</code> will be passed to the stored
      * Log%s. The <code>category</code> will be used in different ways depending on the
      * Log in question, but examples are grouping or prepending to the message.
+     *
      * \param level The level of the message that should be passed to the Log%s
      * \param category The category of the message, which will be used depending on
-     * the Log%s
+     *        the Log%s
      * \param message The message that will be passed to the Log%s. May contain
-     * control sequences.
+     *        control sequences.
      */
     void logMessage(LogLevel level, const std::string& category,
         const std::string& message);
@@ -101,9 +104,10 @@ public:
      * LogManager was created with, the <code>message</code> will be passed to the stored
      * Log%s. The <code>category</code> of the message will be an empty string, which
      * causes it to be ignored by most Log%s.
+     *
      * \param level The level of the message that should be passed to the Log%s
      * \param message The message that will be passed to the Log%s. May contain
-     * control sequences.
+     *        control sequences.
      */
     void logMessage(LogLevel level, const std::string& message);
 
@@ -111,15 +115,17 @@ public:
      * Returns the LogLevel that this LogManager has been initialized with. This method is
      * inlined as it is used in the LOGC macro and it might lead the compiler to do some
      * optimization for loglevels that are unwanted.
+     *
      * \return The LogLevel that this LogManager has been initialized with
      */
-    inline LogLevel logLevel() const;
+    LogLevel logLevel() const;
 
     /**
      * Returns the message counter status for the passed LogLevel \p level.
+     *
      * \param level The LogLevel for which the counter is returned
      * \return The number of messages that have been logged for the passed \p level since
-     * creation of the LogManager or the last call to resetCounter
+     *         creation of the LogManager or the last call to resetCounter
      */
     int messageCounter(LogLevel level);
 
@@ -132,6 +138,7 @@ public:
      * Adds the passed log to the list of managed Log%s. The ownership of the Log is
      * passed to the LogManager. The Log will be deleted when the LogManager is
      * #deinitialize%d. Adding the same Log twice has no effect and is permitted.
+     *
      * \param log The Log that should be added to this LogManager
      */
     void addLog(std::shared_ptr<Log> log);
@@ -140,6 +147,7 @@ public:
      * Removes the passed log from the list of managed Log%s. This transfers the ownership
      * of the Log back to the caller and he is responsible for deleting the Log. Trying to
      * remove a Log that is not part of this LogManager has no effect and is permitted.
+     *
      * \param log The Log that should be removed from this LogManager
      */
     void removeLog(std::shared_ptr<Log> log);
@@ -165,12 +173,32 @@ private:
     std::vector<std::shared_ptr<Log>> _logs;
 
     /// Stores the number of messages for each log level (7)
-    std::array<int, 7> _logCounter;
+    std::array<int, 7> _logCounters = { 0, 0, 0, 0, 0, 0, 0 };
 };
-
 } // namespace ghoul::logging
 
 #define LogMgr (ghoul::logging::LogManager::ref())
+
+inline void log(ghoul::logging::LogLevel level, const std::string& category,
+    const std::string& message);
+
+#define LTRACE(__msg__) LTRACEC(_loggerCat, __msg__)
+inline void LTRACEC(const std::string& category, const std::string& message);
+
+#define LDEBUG(__msg__) LDEBUGC(_loggerCat, __msg__)
+inline void LDEBUGC(const std::string& category, const std::string& message);
+
+#define LINFO(__msg__) LINFOC(_loggerCat, __msg__)
+inline void LINFOC(const std::string& category, const std::string& message);
+
+#define LWARNING(__msg__) LWARNINGC(_loggerCat, __msg__)
+inline void LWARNINGC(const std::string& category, const std::string& message);
+
+#define LERROR(__msg__) LERRORC(_loggerCat, __msg__)
+inline void LERRORC(const std::string& category, const std::string& message);
+
+#define LFATAL(__msg__) LFATALC(_loggerCat, __msg__)
+inline void LFATALC(const std::string& category, const std::string& message);
 
 #include "logmanager.inl"
 

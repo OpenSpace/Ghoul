@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,19 +27,13 @@
 #define __GHOUL___WEBSOCKET___H__
 
 #include <ghoul/io/socket/tcpsocket.h>
-#include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/exception.h>
 
+#include <ghoul/misc/exception.h>
+#include <set>
 #include <websocketpp/config/core.hpp>
 #include <websocketpp/server.hpp>
-#include <websocketpp/common/functional.hpp>
 
-#include <set>
-
-namespace ghoul {
-namespace io {
-
-typedef websocketpp::server<websocketpp::config::core> WsServer;
+namespace ghoul::io {
 
 /**
  * WebSockets are essentially a wrapper around regular TCP sockets.
@@ -51,6 +45,8 @@ typedef websocketpp::server<websocketpp::config::core> WsServer;
  */
 class WebSocket : public TcpSocket {
 public:
+    using WsServer = websocketpp::server<websocketpp::config::core>;
+
     struct WebSocketError : public ghoul::RuntimeError {
         explicit WebSocketError(std::string message, std::string component = "");
     };
@@ -113,7 +109,6 @@ private:
     std::condition_variable _outputNotifier;
 };
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___WEBSOCKET___H__

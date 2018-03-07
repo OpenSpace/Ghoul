@@ -29,7 +29,6 @@
 
 #include <ghoul/opengl/texture.h>
 #include <ghoul/glm.h>
-
 #include <SOIL.h>
 
 namespace ghoul::io {
@@ -68,8 +67,6 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(
 std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(void* memory,
                                                                 size_t size) const
 {
-    using opengl::Texture;
-
     int width, height;
     unsigned char* image = SOIL_load_image_from_memory(
         reinterpret_cast<unsigned char*>(memory),
@@ -81,38 +78,32 @@ std::unique_ptr<opengl::Texture> TextureReaderSOIL::loadTexture(void* memory,
     );
 
     glm::size3_t imageSize(width, height, 1);
-    Texture::Format format;
-    format = Texture::Format::RGBA;
+    opengl::Texture::Format format;
+    format = opengl::Texture::Format::RGBA;
     GLenum type = GL_UNSIGNED_BYTE;
 
-    return std::make_unique<Texture>(
+    return std::make_unique<opengl::Texture>(
         reinterpret_cast<void*>(image),
         imageSize,
         format,
         static_cast<GLenum>(format),
         type,
-        Texture::FilterMode::Linear
+        opengl::Texture::FilterMode::Linear
     );
 }
 
 std::vector<std::string> TextureReaderSOIL::supportedExtensions() const {
     // taken from http://www.lonesock.net/soil.html
     return {
-        // BMP - non-1bpp, non-RLE (from stb_image documentation)
-        "bmp",
-        // PNG - non-interlaced (from stb_image documentation)
-        "png",
-        // JPG - JPEG baseline (from stb_image documentation)
+        "bmp",  // BMP - non-1bpp, non-RLE (from stb_image documentation)
+        "png",  // PNG - non-interlaced (from stb_image documentation)
         "jpg",
-        "jpeg",
-        // TGA - greyscale or RGB or RGBA or indexed, uncompressed or RLE
-        "tga",
-        // DDS - DXT1/2/3/4/5, uncompressed, cubemaps (can't read 3D DDS files yet)
-        "dds",
-        // PSD - (from stb_image documentation)
-        "psd",
-        // HDR - converted to LDR
-        "hdr",
+        "jpeg", // JPG - JPEG baseline (from stb_image documentation)
+        "jpeg", 
+        "tga",  // TGA - greyscale or RGB or RGBA or indexed, uncompressed or RLE
+        "dds",  // DDS - DXT1/2/3/4/5, uncompressed, cubemaps(can't read 3D DDS files yet)
+        "psd",  // PSD - (from stb_image documentation)
+        "hdr"   // HDR - converted to LDR
     };
 }
 

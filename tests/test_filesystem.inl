@@ -23,7 +23,9 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/filesystem/filesystem>
+#include <ghoul/filesystem/filesystem.h>
+#include <ghoul/filesystem/file.h>
+
 #include <iostream>
 #include <fstream>
 

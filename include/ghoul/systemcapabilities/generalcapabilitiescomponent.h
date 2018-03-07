@@ -33,12 +33,13 @@
 
 namespace ghoul::systemcapabilities {
 
+// @TODO: Implement CPU detection
+// @TODO: Implement feature detection
+
 /**
  * This subclass of SystemCapabilitiesComponent detects CPU-related capabilities, like CPU
  * information, main memory availability and other local, general hardware features. At
  * the current time, only the Operating System and the main memory are implemented.
- * \todo Implement CPU detection, feature detection
- * \todo More features
  */
 class GeneralCapabilitiesComponent : public SystemCapabilitiesComponent {
 public:
@@ -94,12 +95,14 @@ public:
     /**
      * Returns the list of all capabilities that were detected by this
      * SystemCapabilitiesComponent.
+     *
      * \return The list of all detected capabilities
      */
     std::vector<CapabilityInformation> capabilities() const override;
 
     /**
      * Returns the operating system version.
+     *
      * \return The operating system version
      */
     OperatingSystem operatingSystem() const;
@@ -107,6 +110,7 @@ public:
     /**
      * Returns the operating system as a parsed string. It should contain the
      * manufacturer and the version.
+     *
      * \return The operating system
      */
     std::string operatingSystemString() const;
@@ -115,6 +119,7 @@ public:
      * Returns the full operating system. The exact format of the returned string is
      * implementation and operating system-dependent but it should contain the
      * manufacturer and the version.
+     *
      * \return The operating system as a parsed string
      */
     std::string fullOperatingSystem() const;
@@ -123,42 +128,49 @@ public:
      * Returns the amount of available, installed main memory (RAM) on the system in MB.
      * This value is retrieved using the Windows Management Instrumentation (if
      * available). The default value is <code>-1</code>.
+     *
      * \return The amount of available main memory
      */
     unsigned int installedMainMemory() const;
 
     /**
-     * Returns the number of cores
+     * Returns the number of cores.
+     *
      * \return The number of cores
      */
     unsigned int cores() const;
 
     /**
-     * Returns the cache line size
+     * Returns the cache line size.
+     *
      * \return The cache line size
      */
     unsigned int cacheLineSize() const;
 
     /**
-     * Returns the L2 associativity
+     * Returns the L2 associativity.
+     *
      * \return The L2 associativity
      */
     unsigned int L2Associativity() const;
 
     /**
-     * Returns the cache size
+     * Returns the cache size.
+     *
      * \return The cache size
      */
     unsigned int cacheSize() const;
 
     /**
-     * Returns all supported exteions as commaseparated string
+     * Returns all supported exteions as commaseparated string.
+     *
      * \return The extension
      */
     std::string extensions() const;
 
     /**
      * Returns the <code>CPU</code> string.
+     *
      * \return The <code>CPU</code> string
      */
     std::string name() const override;
@@ -166,6 +178,7 @@ public:
 protected:
     /**
      * Method that detects all of the capabilities.
+     *
      * \throw OperatingSystemError If the detection of the operating system failed
      * \throw MainMemoryError If the detection of the main memory failed
      */
@@ -174,12 +187,14 @@ protected:
 
     /**
      * Detects the operating system.
+     *
      * \throw OperatingSystemError If the detection of the operating system failed
      */
     void detectOS();
 
     /**
      * Detects the amount of the computer's main memory.
+     *
      * \throw MainMemoryError If the detection of the main memory failed
      * \throw WMIError If there was an error accessing the Windows Management
      */

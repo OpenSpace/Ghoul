@@ -24,28 +24,33 @@
  ****************************************************************************************/
 
 #include <ghoul/io/volume/rawvolumereader.h>
+
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/fmt.h>
 #include <iostream>
 #include <fstream>
 
-namespace ghoul {
+namespace {
+    constexpr const char* _loggerCat = "RawVolumeReader";
+} // namespace
+
+namespace ghoul::io {
 
 RawVolumeReader::ReadHints::ReadHints(glm::ivec3 dimensions) : _dimensions(dimensions) {}
 
-RawVolumeReader::RawVolumeReader() : _hints(ReadHints()) {}
-
-RawVolumeReader::RawVolumeReader(const ReadHints& hints)  : _hints(hints) {}
-
-RawVolumeReader::~RawVolumeReader() {}
+RawVolumeReader::RawVolumeReader(ReadHints hints)
+    : _hints(std::move(hints))
+{}
 
 void RawVolumeReader::setReadHints(glm::ivec3 dimension) {
-    _hints._dimensions = dimension;
+    _hints._dimensions = std::move(dimension);
 }
 
-void RawVolumeReader::setReadHints(const ReadHints& hints) {
-    _hints = hints;
+void RawVolumeReader::setReadHints(ReadHints hints) {
+    _hints = std::move(hints);
 }
 
-opengl::Texture* RawVolumeReader::read(const std::string& filename) {
+std::unique_ptr<opengl::Texture> RawVolumeReader::read(const std::string& filename) {
     if (_hints._dimensions != glm::ivec3(0)) {
         unsigned int size =
             _hints._dimensions.x * _hints._dimensions.y * _hints._dimensions.z;
@@ -56,10 +61,10 @@ opengl::Texture* RawVolumeReader::read(const std::string& filename) {
             fin.read(reinterpret_cast<char*>(data), sizeof(unsigned char) * size);
             fin.close();
         } else {
-            fprintf( stderr, "Could not open file '%s'\n", filename.c_str() );
+            LERROR(fmt::format("Could not open file {}", filename));
         }
 
-        opengl::Texture* texture = new opengl::Texture(
+        return std::make_unique<opengl::Texture>(
             data,
             glm::size3_t(_hints._dimensions),
             _hints._format,
@@ -68,11 +73,10 @@ opengl::Texture* RawVolumeReader::read(const std::string& filename) {
             opengl::Texture::FilterMode::Linear,
             opengl::Texture::WrappingMode::ClampToBorder
         );
-        return texture;
     } else {
-        std::cout << "Error. Volume dimensions not set" << std::endl;
+        LERROR(fmt::format("Volume dimensions not set for file {}", filename));
         return nullptr;
     }
 }
 
-} // namespace ghoul
+} // namespace ghoul::io

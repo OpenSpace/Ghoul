@@ -29,9 +29,8 @@
 #include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/directory.h>
 #include <ghoul/io/texture/texturewriterbase.h>
-
 #include <algorithm>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 
 using std::string;
 

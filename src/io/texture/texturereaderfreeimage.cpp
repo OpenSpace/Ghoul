@@ -50,12 +50,11 @@
 #pragma warning (pop)
 #endif // _MSC_VER
 
-#include <iostream>
-
 namespace ghoul::io {
 
 std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
-    const std::string& source, FIBITMAP* dib) const
+                                                                const std::string& source,
+                                                                      FIBITMAP* dib) const
 {
     //retrieve the image data
     BYTE* bits = FreeImage_GetBits(dib);
@@ -72,7 +71,6 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
             this
         );
     }
-
 
     FREE_IMAGE_TYPE            imageType = FreeImage_GetImageType(dib);
     FREE_IMAGE_COLOR_TYPE    colorType = FreeImage_GetColorType(dib);
@@ -220,8 +218,6 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
 std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(void* memory,
                                                                      size_t size) const
 {
-    using opengl::Texture;
-
     // Pointer to the image, once loaded
     FIBITMAP* dib = nullptr;
 

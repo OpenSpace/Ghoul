@@ -40,6 +40,7 @@ struct RuntimeError : public std::runtime_error {
     /**
      * Main constructor constructing the exception with the provided \p message and
      * \p component.
+     *
      * \param message The main message of the exception
      * \param component The optional component
      * \pre \p message must not be empty
@@ -59,7 +60,8 @@ struct RuntimeError : public std::runtime_error {
 struct FileNotFoundError : public RuntimeError {
     /**
      * Main constructor constructing the exception with the provided missing \p file and
-     * the \p component that threw the exception
+     * the \p component that threw the exception.
+     *
      * \param file The file that was missing which caused this exception to be thrown
      * \param component The optional compoment that caused this exception to be thrown
      * \pre \p file must not be empty

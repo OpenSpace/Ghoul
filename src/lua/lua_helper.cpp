@@ -25,28 +25,25 @@
 
 #include <ghoul/lua/lua_helper.h>
 
+#include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/misc/dictionary.h>
-
-#include <fmt/format.h>
-
-#include <sstream>
+#include <ghoul/fmt.h>
 #include <fstream>
-
-using std::string;
+#include <sstream>
 
 static lua_State* _state = nullptr;
 
 namespace {
 
-static const int KeyTableIndex = -2;
-static const int ValueTableIndex = -1;
+constexpr const int KeyTableIndex = -2;
+constexpr const int ValueTableIndex = -1;
 
-string luaTableToString(lua_State* state, int tableLocation = KeyTableIndex);
+std::string luaTableToString(lua_State* state, int tableLocation = KeyTableIndex);
 
-string luaValueToString(lua_State* state, int location) {
+std::string luaValueToString(lua_State* state, int location) {
     ghoul_assert(state, "State must not be nullptr");
 
     int type = lua_type(state, location);
@@ -64,7 +61,7 @@ string luaValueToString(lua_State* state, int location) {
     }
 }
 
-string luaTableToString(lua_State* state, int tableLocation) {
+std::string luaTableToString(lua_State* state, int tableLocation) {
     ghoul_assert(state, "State must not be nullptr");
     ghoul_assert(lua_istable(state, tableLocation), "Lua object is not a table");
 
@@ -96,37 +93,37 @@ lua_State* staticLuaState() {
 
 namespace ghoul::lua {
 
-LuaRuntimeException::LuaRuntimeException(string msg)
+LuaRuntimeException::LuaRuntimeException(std::string msg)
     : RuntimeError(std::move(msg), "Lua")
 {}
 
-LuaFormatException::LuaFormatException(string msg, string file)
+LuaFormatException::LuaFormatException(std::string msg, std::string file)
     : LuaRuntimeException(std::move(msg))
     , filename(std::move(file))
 {}
 
-LuaLoadingException::LuaLoadingException(string error, string file)
+LuaLoadingException::LuaLoadingException(std::string error, std::string file)
     : LuaRuntimeException(fmt::format("Error loading script '{}': {}", file, error))
     , errorMessage(std::move(error))
     , filename(std::move(file))
 {}
 
-LuaExecutionException::LuaExecutionException(string error, string file)
+LuaExecutionException::LuaExecutionException(std::string error, std::string file)
     : LuaRuntimeException(fmt::format("Error executing script '{}': {}", file, error))
     , errorMessage(std::move(error))
     , filename(std::move(file))
 {}
 
-string errorLocation(lua_State* state) {
+std::string errorLocation(lua_State* state) {
     ghoul_assert(state, "State must not be empty");
 
     luaL_where(state, 1);
-    string result = lua_tostring(state, -1);
+    std::string result = lua_tostring(state, -1);
     lua_pop(state, 1);
     return result;
 }
 
-string stackInformation(lua_State* state) {
+std::string stackInformation(lua_State* state) {
     ghoul_assert(state, "State must not be nullptr");
 
     std::stringstream result;
@@ -168,7 +165,7 @@ string stackInformation(lua_State* state) {
     return result.str();
 }
 
-void loadDictionaryFromFile(const string& filename, ghoul::Dictionary& dictionary,
+void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dictionary,
                                                                          lua_State* state)
 {
     ghoul_assert(!filename.empty(), "filename must not be empty");
@@ -202,13 +199,13 @@ void loadDictionaryFromFile(const string& filename, ghoul::Dictionary& dictionar
     lua_settop(state, 0);
 }
 
-ghoul::Dictionary loadDictionaryFromFile(const string& filename, lua_State* state) {
+ghoul::Dictionary loadDictionaryFromFile(const std::string& filename, lua_State* state) {
     ghoul::Dictionary result;
     loadDictionaryFromFile(filename, result, state);
     return result;
 }
 
-void loadDictionaryFromString(const string& script, Dictionary& dictionary,
+void loadDictionaryFromString(const std::string& script, Dictionary& dictionary,
                                                                          lua_State* state)
 {
     ghoul_assert(!script.empty(), "Script must not be empty");
@@ -240,7 +237,7 @@ void loadDictionaryFromString(const string& script, Dictionary& dictionary,
     lua_settop(state, 0);
 }
 
-Dictionary loadDictionaryFromString(const string& script, lua_State* state) {
+Dictionary loadDictionaryFromString(const std::string& script, lua_State* state) {
     Dictionary result;
     loadDictionaryFromString(script, result, state);
     return result;
@@ -260,7 +257,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
     lua_pushnil(state);
     while (lua_next(state, KeyTableIndex) != 0) {
         // get the key
-        string key;
+        std::string key;
         int keyType = lua_type(state, KeyTableIndex);
         switch (keyType) {
             case LUA_TNUMBER:
@@ -321,7 +318,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
     //ghoul_assert(lua_gettop(state) == 0, "Incorrect number of items left on stack");
 }
 
-string luaTypeToString(int type) {
+std::string luaTypeToString(int type) {
     switch (type) {
         case LUA_TNONE:          return "None";
         case LUA_TNIL:           return "Nil";

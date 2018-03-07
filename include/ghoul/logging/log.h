@@ -26,8 +26,8 @@
 #ifndef __GHOUL___LOG___H__
 #define __GHOUL___LOG___H__
 
-#include <ghoul/misc/boolean.h>
 #include <ghoul/logging/loglevel.h>
+#include <ghoul/misc/boolean.h>
 #include <string>
 
 namespace ghoul::logging {
@@ -58,16 +58,17 @@ public:
     /**
      * Method that logs a message with a given <code>level</code> and
      * <code>category</code>. The method of logging is dependent on the explicit subclass.
+     * 
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
-     * individually
+     *        individually
      * \param message The message body of the log message
      */
     virtual void log(LogLevel level, const std::string& category,
         const std::string& message) = 0;
 
     /**
-     * Returns the minimum LogLevel that this Log accepts
+     * Returns the minimum LogLevel that this Log accepts.
      */
     LogLevel logLevel() const;
 
@@ -80,16 +81,17 @@ public:
 protected:
     /**
      * Base constructor, which initializes the passed parameters.
+     *
      * \param timeStamping Determines if the log should print the time when a message
-     * is logged in the log messages
+     *        is logged in the log messages
      * \param dateStamping Determines if the log should print the time when a message
-     * is logged in the log messages
+     *        is logged in the log messages
      * \param categoryStamping Determines if the log should print the categories in
-     * the log messages
+     *        the log messages
      * \param logLevelStamping Determines if the log should print the log level in
-     * the log messages
+     *        the log messages
      * \param minimumLogLevel The minimum level for Log messages that are processed by
-     * this Log
+     *        this Log
      */
     Log(TimeStamping timeStamping = TimeStamping::Yes,
         DateStamping dateStamping = DateStamping::Yes,
@@ -124,15 +126,17 @@ protected:
     /**
      * Returns the current time as a string. The format for the time is "HH:MM:SS" and the
      * clock is 24h.
+     *
      * \return The current time as a string
      */
-    std::string getTimeString() const;
+    std::string timeString() const;
 
     /**
      * Returns the current date as a string. The date format is "YYYY-MM-DD".
+     *
      * \return The current date as a string
      */
-    std::string getDateString() const;
+    std::string dateString() const;
 
     std::string createFullMessageString(LogLevel level,
         const std::string& category, const std::string& message) const;

@@ -29,11 +29,11 @@
 #include <ghoul/glm.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
-#include <ghoul/opengl/textureatlas.h>
-
 #include <map>
 #include <string>
 #include <vector>
+
+namespace ghoul::opengl { class TextureAtlas; }
 
 namespace ghoul::fontrendering {
 
@@ -122,73 +122,84 @@ public:
         bool operator==(const Glyph& rhs) const;
 
         /**
-         * Returns the horizontal extent of the glyph
+         * Returns the horizontal extent of the glyph.
+         *
          * \return The horizontal extent of the glyph
          */
         int width() const;
 
         /**
-         * Returns the vertical extent of the glyph
+         * Returns the vertical extent of the glyph.
+         *
          * \return The vertical extent of the glyph
          */
         int height() const;
 
         /**
-         * Returns the left-side bearing of the glyph
+         * Returns the left-side bearing of the glyph.
+         *
          * \return the left-side bearing of the glyph
          */
         float leftBearing() const;
 
         /**
-         * Returns the top-side bearing of the glyph
+         * Returns the top-side bearing of the glyph.
+         *
          * \return The top-side bearing of the glyph
          */
         float topBearing() const;
 
         /**
          * Returns the horizontal advance for this glyph
+         *
          * \return The horizontal advance for this glyph
          */
         float horizontalAdvance() const;
 
         /**
-         * Returns the vertical advance for this glyph
+         * Returns the vertical advance for this glyph.
+         *
          * \return The vertical advance for this glyph
          */
         float verticalAdvance() const;
 
         /**
          * Returns the kerning value between this glyph and \p character.
+         *
          * \param character The following character for which the kerning value should be
-         * returned.
+         *        returned.
          * \return The kerning value between this glyph and \p character
          */
         float kerning(wchar_t character) const;
 
         /**
          * Returns the texture coordinate that points to the top left corner of the base
-         * representation for this Glyph in the TextureAtlas
+         * representation for this Glyph in the TextureAtlas.
+         *
          * \return The top left base texture coordinate
          */
         const glm::vec2& topLeft() const;
 
         /**
          * Returns the texture coordinate that points to the bottom right corner of the
-         * base representation for this Glyph in the TextureAtlas
+         * base representation for this Glyph in the TextureAtlas.
+         *
          * \return The bottom right base texture coordinates
          */
         const glm::vec2& bottomRight() const;
 
         /**
          * Returns the texture coordinate that points to the top left corner of the
-         * outline representation for this Glyph in the TextureAtlas
+         * outline representation for this Glyph in the TextureAtlas.
+         *
          * \return The top left outline texture coordinate
          */
         const glm::vec2& outlineTopLeft() const;
 
         /**
          * Returns the texture coordinate that points to the bottom right corner of the
-         * outline representation for this Glyph in the TextureAtlas
+         * outline representation for this Glyph in the TextureAtlas.
+         *
          * \return The bottom right outline texture coordinate
          */
         const glm::vec2& outlineBottomRight() const;
@@ -240,12 +251,13 @@ public:
      * if there is enough free space. If \p outline is <code>true</code> two sets of
      * Glyphs are created which are combined to provide an outline of thickness
      * \p outlineThickness to the glyphs.
+     *
      * \param filename The full path to the font file
      * \param pointSize The font size in pt
      * \param atlas The TextureAtlas which holds the created Glyphs
      * \param hasOutline A flag whether Glyphs of this Font should have an outline or not
      * \param outlineThickness The thickness of the outline. This setting is ignored if
-     * the Font does not have an outline
+     *        the Font does not have an outline
      * \throws FreeTypeException If there was an error loading the basic font information
      * \pre \p filename must not be empty
      * \pre \p pointSize must be positive and bigger than 0
@@ -258,13 +270,15 @@ public:
     );
 
     /**
-     * Returns the name of the Font
+     * Returns the name of the Font.
+     *
      * \return The name of the Font
      */
     std::string name() const;
 
     /**
-     * Returns the font size of this Font
+     * Returns the font size of this Font.
+     *
      * \return The font size of this Font
      */
     float pointSize() const;
@@ -272,12 +286,14 @@ public:
     /**
      * Returns the line seperator for this Font. This is the vertical length that
      * separates two consecutive lines.
+     *
      * \return The vertical line separation
      */
     float height() const;
 
     /**
-     * Returns whether this Font has an outline or not
+     * Returns whether this Font has an outline or not.
+     *
      * \return <code>true</code> if this Font has an outline, <code>false</code> otherwise
      */
     bool hasOutline() const;
@@ -286,11 +302,12 @@ public:
      * Computes and retures the bounding box for the passed string with the settings of
      * this Font. The value returned is in pixel values and provides the width and the
      * height of the text if it were to be rendered.
+     *
      * \param text The format text that is rendered to the screen. This text can contain
-     * symbolic constants (the same as in printf) to refer to later variable arguments,
-     * which are substituted. The <code>text</code> can also contain '\\n' to have a
-     * linebreak, which is of the correct length with regard to the selected font. This
-     * parameter cannot be a <code>nullptr</code>.
+     *        symbolic constants (the same as in printf) to refer to later variable
+     *        arguments, which are substituted. The <code>text</code> can also contain
+     *        '\\n' to have a linebreak, which is of the correct length with regard to the
+     *        selected font. This parameter cannot be a <code>nullptr</code>.
      * \return The pixel coordinates of the bounding box of the passed text
      * \pre \p text must not be empty
      */
@@ -299,6 +316,7 @@ public:
     /**
      * Returns the Glyph that representes the passed \p character. The first call to this
      * function for each character creates and caches the Glyph before returning it.
+     *
      * \param character The character for which the Glyph should be returned
      * \return A pointer to the Glyph
      * \throw FreeTypeException If a FreeType exception occurred while loading the glyph
@@ -309,8 +327,9 @@ public:
     /**
      * Preloads a list of Glyphs. Glyphs that are passed as part of  \p characters that
      * have been loaded previously are ignored and not loaded multiple times.
+     *
      * \param characters A list of characters for which Glyphs should be created and
-     * cached
+     *        cached
      * \throw FreeTypeException If a FreeType exception occurred while loading the glyphs
      * \throw GlyphException If there was an error loading the glyph
      */
@@ -318,6 +337,7 @@ public:
 
     /**
      * Returns the TextureAtlas that stores all of the Glyphs for this Font
+     *
      * \return The TextureAtlas that stores all of the Glyphs for this Font
      */
     opengl::TextureAtlas& atlas();

@@ -25,13 +25,14 @@
 
 #include <ghoul/font/fontmanager.h>
 
+#include <ghoul/fmt.h>
+#include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/font/font.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
-
-#include <fmt/format.h>
+#include <ghoul/opengl/texture.h>
 
 namespace ghoul::fontrendering {
 

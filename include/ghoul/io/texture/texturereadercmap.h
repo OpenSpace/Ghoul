@@ -41,12 +41,13 @@ public:
     /**
     * Loads the texture \p filename in CMAP format from disk and returns the loaded
     * Texture.
+     *
     * \param filename The texture that should be loaded from the hard disk
     * \return The loaded Texture object
     * \throw TextureLoadException If there was an error loading the texture
     * \pre \p filename must not be empty
     * \pre The extension of \p filename must be among the supported extensions as
-    * reported by supportedExtensions
+    *      reported by supportedExtensions
     */
     std::unique_ptr<opengl::Texture> loadTexture(
         const std::string& filename) const override;
@@ -55,6 +56,7 @@ public:
     /**
     * Loads a Texture from the memory pointed at by \p memory in CMAP format. The memory
     * block must contain at least \p size number of bytes.
+     *
     * \param memory The memory that contains the bytes of the Texture to be loaded
     * \param size The number of bytes contained in \p memory
     * \throw TextureLoadException If there was an error reading the \p memory
@@ -62,10 +64,11 @@ public:
     * \pre \p size must be > 0
     */
     std::unique_ptr<opengl::Texture> loadTexture(void* memory,
-                                                 size_t size) const override;
+        size_t size) const override;
 
     /*
-     * Returns the supported extension (<code>cmap</code>)
+     * Returns the supported extension (<code>cmap</code>).
+     *
      * \return The supported extension
      */
     std::vector<std::string> supportedExtensions() const override;

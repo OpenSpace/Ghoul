@@ -27,8 +27,6 @@
 
 namespace ghoul {
 
-any::any() noexcept {}
-
 any::any(const any& other)
     : content(other.content ? other.content->clone() : nullptr)
 {}
@@ -38,8 +36,6 @@ any::any(any&& other) noexcept
 {
     other.content = nullptr;
 }
-
-any::~any() noexcept {}
 
 any& any::swap(any& rhs) noexcept {
     std::swap(content, rhs.content);
@@ -68,8 +64,6 @@ void any::clear() noexcept {
 const std::type_info& any::type() const noexcept {
     return content ? content->type() : typeid(void);
 }
-
-any::placeholder::~placeholder() {}
 
 inline void swap(any& lhs, any& rhs) noexcept {
     lhs.swap(rhs);

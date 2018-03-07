@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,72 +26,37 @@
 #ifndef __GHOUL___TCPSOCKET___H__
 #define __GHOUL___TCPSOCKET___H__
 
-#include <ghoul/misc/exception.h>
 #include <ghoul/io/socket/socket.h>
 
-#include <thread>
-#include <deque>
+#include <ghoul/misc/exception.h>
 #include <array>
-#include <mutex>
-#include <condition_variable>
 #include <atomic>
-#include <algorithm>
+#include <condition_variable>
+#include <deque>
+#include <mutex>
+#include <thread>
 
  // OS specific socket implementation normalization.
-
 #ifdef WIN32
-#define NOMINMAX
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <Windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#ifndef _ERRNO
-#define _ERRNO WSAGetLastError()
-#endif
+using _SOCKET = size_t;
+using _SOCKLEN = int;
+#else //linux & macOS
 
-#pragma warning(push)
-#pragma warning (disable : 4996)
-#else //Use BSD sockets
-#ifdef _XCODE
-#include <unistd.h>
-#endif
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <unistd.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <errno.h>
-#ifndef SOCKET_ERROR
-#define SOCKET_ERROR (-1)
-#endif
+#include <sys/types.h>
+
+using _SOCKET = int;
+using _SOCKLEN = socklen_t;
 
 #ifndef INVALID_SOCKET
 #define INVALID_SOCKET (_SOCKET)(~0)
-#endif
+#endif // INVALID_SOCKET
 
-#ifndef NO_ERROR
-#define NO_ERROR 0L
-#endif
+#endif // WIN32
 
-#ifndef _ERRNO
-#define _ERRNO errno
-#endif
-#endif
+struct addrinfo;
 
-#ifdef WIN32
-typedef size_t _SOCKET;
-typedef int _SOCKLEN;
-#else //linux & macOS
-typedef int _SOCKET;
-typedef socklen_t _SOCKLEN;
-#endif
-
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 class TcpSocketServer;
 
@@ -159,7 +124,7 @@ protected:
     std::thread _outputThread;
 
 private:
-    void establishConnection(addrinfo *info);
+    void establishConnection(addrinfo* info);
     void streamInput();
     void streamOutput();
     int waitForDelimiter();
@@ -183,7 +148,6 @@ private:
     static std::atomic<bool> _initializedNetworkApi;
 };
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___TCPSOCKET___H__

@@ -25,9 +25,9 @@
 
 #include <ghoul/opengl/programobject.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
-
 #include <glm/gtc/type_ptr.hpp>
 
 using std::map;
@@ -67,7 +67,6 @@ using glm::dmat4x2;
 using glm::dmat4x3;
 using glm::dmat4x4;
 using glm::value_ptr;
-
 
 namespace ghoul::opengl {
 
@@ -3901,10 +3900,12 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
         &countActiveSubroutineUniforms
     );
     if (static_cast<size_t>(countActiveSubroutineUniforms) != values.size()) {
-        LWARNING("Number of active subroutine uniform (" <<
-            countActiveSubroutineUniforms <<
-            ") is different from passed uniform subroutine indices (" << values.size() <<
-            ")");
+        LWARNING(fmt::format(
+            "Number of active subroutine uniforms ({}) is different from passed uniform "
+            "subroutine indices ({})",
+            countActiveSubroutineUniforms,
+            values.size()
+        ));
         return false;
     }
 #endif
@@ -3929,10 +3930,12 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
         &countActiveSubroutineUniforms
     );
     if (static_cast<size_t>(countActiveSubroutineUniforms) != values.size()) {
-        LWARNING("Number of active subroutine uniform (" <<
-            countActiveSubroutineUniforms <<
-            ") is different from passed uniform subroutine indices (" << values.size()
-            << ")");
+        LWARNING(fmt::format(
+            "Number of active subroutine uniforms ({}) is different from passed uniform "
+            "subroutine indices ({})",
+            countActiveSubroutineUniforms,
+            values.size()
+        ));
         return false;
     }
 #endif
@@ -3944,8 +3947,9 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
         map<string,string>::const_iterator subroutine = values.find(uniformSubroutine);
 #ifdef GHL_DEBUG
         if (subroutine == values.end()) {
-            LWARNING("Uniform subroutine name '" + uniformSubroutine +
-                "' was not present in map");
+            LWARNING(fmt::format(
+                "Uniform subroutine name '{}' was not present in map", uniformSubroutine
+            ));
             return false;
         }
 #endif
@@ -3953,8 +3957,9 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
         GLuint idxSubroutine = subroutineIndex(shaderType, nameSubroutine);
 #ifdef GHL_DEBUG
         if (idxSubroutine == GL_INVALID_INDEX) {
-            LWARNING("Subroutine name '" + nameSubroutine +
-                "' was not found in shader object.");
+            LWARNING(fmt::format(
+                "Subroutine name '{}' was not found in shader object", nameSubroutine
+            ));
             return false;
         }
 #endif
@@ -3978,11 +3983,10 @@ void ProgramObject::bindFragDataLocation(const std::string& name, GLuint colorNu
     GLint maxBuffers;
     glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxBuffers);
     if (colorNumber >= static_cast<GLuint>(maxBuffers)) {
-        LWARNING(
-            "ColorNumber '" << colorNumber <<
-            "' is bigger than the maximum of simultaneous outputs '" <<
-            maxBuffers << "'"
-        );
+        LWARNING(fmt::format(
+            "ColorNumber '{}' is bigger than the maximum of simultaneous outputs '{}'",
+            colorNumber, maxBuffers
+        ));
         return;
     }
 #endif

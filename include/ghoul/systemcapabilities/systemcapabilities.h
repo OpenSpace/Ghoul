@@ -29,7 +29,6 @@
 #include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
 
 #include <ghoul/misc/exception.h>
-
 #include <memory>
 #include <string>
 #include <vector>
@@ -59,6 +58,7 @@ public:
 
     /**
      * Returns a reference to the global SystemCapabilities object.
+     *
      * \return A reference to the global SystemCapabilities object
      * \pre The static SystemCapabilities must have been initialized
      */
@@ -66,6 +66,7 @@ public:
 
     /**
      * Returns the initialization state of the SystemCapabilities object.
+     *
      * \return The initialization state of the SystemCapabilities object
      */
     static bool isInitialized();
@@ -86,6 +87,7 @@ public:
      * \p verbosity. This method will, in turn, call the
      * #ghoul::systemcapabilities::SystemCapabilitiesComponent::capabilities of all the
      * registered SystemCapabilitiesComponent%s.
+     *
      * \param verbosity The verbosity of the resulting log entries
      */
     void logCapabilities(SystemCapabilitiesComponent::Verbosity verbosity =
@@ -97,9 +99,10 @@ public:
      * capabilities in this component; this has to be done using the
      * #ghoul::systemcapabilities::SystemCapabilitiesComponent::detectCapabilities
      * method. A specific subclass of SystemCapabilitiesComponent can only be added once
-     * to the SystemCapabilities
+     * to the SystemCapabilities.
+     *
      * \param component The component that will be added to this SystemCapabilities
-     * object.
+     *        object.
      * \pre \p component must not be nullptr
      * \pre \p A component of the same type must not have been added before
      */
@@ -107,6 +110,7 @@ public:
 
     /**
      * Returns the component of type <code>T</code>.
+     *
      * \tparam T The subclass of SystemCapabilitiesComponent that should be retrieved
      * \throws CapabilitiesComponentNotFoundError If no component of type T could be found
      * \return The SystemCapabilitiesComponent that should be retrieved or

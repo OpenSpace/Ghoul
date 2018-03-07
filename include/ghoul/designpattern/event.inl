@@ -1,6 +1,7 @@
 /*****************************************************************************************
  *                                                                                       *
- * OpenSpace                                                                             *
+ * GHOUL                                                                                 *
+ * General Helpful Open Utility Library                                                  *
  *                                                                                       *
  * Copyright (c) 2014-2018                                                               *
  *                                                                                       *
@@ -77,7 +78,7 @@ template <class... T>
 void Event<T...>::unsubscribe(const std::string& name) {
     // Search through all topics to erase all callbacks that belong to the
     // object with given name
-    for (auto& topic : _topics) {
+    for (std::pair<const std::string, std::vector<Subscriber>>& topic : _topics) {
         topic.second.erase(
             std::remove_if(
                 topic.second.begin(), topic.second.end(),

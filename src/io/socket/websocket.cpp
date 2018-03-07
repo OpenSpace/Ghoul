@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -24,18 +24,25 @@
  ****************************************************************************************/
 
 #include <ghoul/io/socket/websocket.h>
-#include <fmt/format.h>
+
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/fmt.h>
+#include <websocketpp/common/functional.hpp>
+
+#ifndef WIN32
+#include <unistd.h>
+#include <sys/socket.h>
+#endif // WIN32
 
 namespace {
-    const std::string _loggerCat = "WebSocket";
-}
+    constexpr const char* _loggerCat = "WebSocket";
+} // namespace
 
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 WebSocket::WebSocketError::WebSocketError(std::string msg, std::string comp)
     : RuntimeError(std::move(msg), std::move(comp))
@@ -47,7 +54,7 @@ WebSocket::WebSocket(std::string address, int port) : TcpSocket(address, port) {
 }
 
 WebSocket::WebSocket(std::string address, int port, _SOCKET socket)
-        : TcpSocket(address, port, socket)
+    : TcpSocket(address, port, socket)
 {
     _server.set_message_handler(bind(&WebSocket::onMessage, this, ::_1, ::_2));
     _server.set_open_handler(bind(&WebSocket::onOpen,this,::_1));
@@ -73,12 +80,8 @@ WebSocket::~WebSocket() {
 }
 
 void WebSocket::startStreams() {
-    _inputThread = std::thread(
-            [this]() { streamInput(); }
-    );
-    _outputThread = std::thread(
-            [this]() { streamOutput(); }
-    );
+    _inputThread = std::thread([this]() { streamInput(); } );
+    _outputThread = std::thread([this]() { streamOutput(); });
 }
 
 void WebSocket::disconnect(int reason) {
@@ -121,11 +124,11 @@ bool WebSocket::socketHasConnection() {
     return _socketConnection->get_state() == websocketpp::session::state::open;
 }
 
-bool WebSocket::getMessage(std::string &message) {
+bool WebSocket::getMessage(std::string& message) {
     waitForInput();
     std::lock_guard<std::mutex> guard(_inputQueueMutex);
 
-    if (_inputQueue.size() == 0) {
+    if (_inputQueue.empty()) {
         return false;
     }
 
@@ -151,10 +154,10 @@ void WebSocket::streamInput() {
         std::lock_guard<std::mutex> inputBufferGuard(_inputBufferMutex);
 
         nReadBytes = recv(
-                _socket,
-                _inputBuffer.data(),
-                static_cast<int>(_inputBuffer.size()),
-                0
+            _socket,
+            _inputBuffer.data(),
+            static_cast<int>(_inputBuffer.size()),
+            0
         );
 
         if (nReadBytes <= 0) {
@@ -283,5 +286,4 @@ bool WebSocket::waitForInput(size_t) {
     return !_error;
 }
 
-}
-}
+}  // namespace ghoul::io

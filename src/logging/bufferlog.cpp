@@ -27,15 +27,12 @@
 
 #include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
-
 #include <atomic>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 #include <fstream>
 
 namespace {
-    const uint8_t CURRENT_VERSION = 1;
-
-    const std::string _loggerCat = "BufferLog";
+    constexpr const uint8_t CURRENT_VERSION = 1;
 
     struct Header {
         /**
@@ -93,7 +90,9 @@ namespace ghoul::logging {
 
 BufferLog::MemoryExhaustionException::MemoryExhaustionException(int total, int requested)
     : RuntimeError(
-        fmt::format("Exhausted BufferLog ({} of {} byte)", requested, total), "BufferLog")
+        fmt::format("Exhausted BufferLog ({} of {} byte)", requested, total),
+        "BufferLog"
+    )
     , totalSize(total)
     , requestedSize(requested)
 {}

@@ -25,7 +25,7 @@
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 
 namespace ghoul::cmdparser {
 

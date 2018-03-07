@@ -28,7 +28,6 @@
 
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/texture.h>
-
 #include <string>
 #include <vector>
 
@@ -61,11 +60,12 @@ public:
 
     /**
      * Saves the \p texture to disk.
+     *
      * \param texture The Texture to write to disk
      * \param filename The target file for the Texture
      * \pre \p filename must not be empty
      * \pre The extension of \p filename must be among the supported extensions as
-     * reported by supportedExtensions
+     *      reported by supportedExtensions
      * \throw TextureWriteException If there was an error writing the \p texture
      */
     virtual void saveTexture(const opengl::Texture& texture,
@@ -73,6 +73,7 @@ public:
 
     /**
      * Returns a list of all extensions that this TextureWriteException supports.
+     *
      * \return A list of all extensions that this TextureWriteException supports
      */
     virtual std::vector<std::string> supportedExtensions() const = 0;

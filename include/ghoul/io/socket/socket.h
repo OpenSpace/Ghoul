@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,49 +26,35 @@
 #ifndef __GHOUL___SOCKET___H__
 #define __GHOUL___SOCKET___H__
 
-#include <string>
 #include <atomic>
 #include <memory>
+#include <string>
 
-namespace ghoul {
-namespace io {
-
-
+namespace ghoul::io {
+    
 class Socket {
 public:
-    Socket()
-        : _socketId(_nextSocketId++)
-    {}
+    Socket();
     virtual void disconnect(int reason = 0) = 0;
     virtual bool isConnected() = 0;
     virtual bool isConnecting() = 0;
     virtual void startStreams() = 0;
-    int socketId() const {
-        return _socketId;
-    }
+    int socketId() const;
 
     /**
      * Methods for binary communication
      */
     template <typename T = char>
-    bool get(T* buffer, size_t nItems = 1) {
-        return getBytes(reinterpret_cast<char*>(buffer), nItems * sizeof(T));
-    }
+    bool get(T* buffer, size_t nItems = 1);
 
     template <typename T = char>
-    bool peek(T* buffer, size_t nItems = 1) {
-        return peekBytes(reinterpret_cast<char*>(buffer), nItems * sizeof(T));
-    }
+    bool peek(T* buffer, size_t nItems = 1);
 
     template <typename T = char>
-    bool skip(size_t nItems = 1) {
-        return skipBytes(nItems * sizeof(T));
-    }
+    bool skip(size_t nItems = 1);
 
     template <typename T = char>
-    bool put(const T* buffer, size_t nItems = 1) {
-        return putBytes(reinterpret_cast<const char*>(buffer), nItems * sizeof(T));
-    }
+    bool put(const T* buffer, size_t nItems = 1);
 
     /**
      * Methods for text based communication.
@@ -90,8 +76,8 @@ private:
     static std::atomic<int> _nextSocketId;
 };
 
-}
-}
+} // namespace ghoul::io
 
+#include <ghoul/io/socket/socket.inl>
 
 #endif //  __GHOUL___SOCKET___H__

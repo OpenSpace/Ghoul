@@ -25,6 +25,7 @@
 
 #include <ghoul/opengl/programobjectmanager.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/programobject.h>
@@ -61,7 +62,10 @@ void ProgramObjectManager::releaseAll(Warnings emitWarnings) {
         );
     }
     for (std::pair<const std::string, Info>& p : _programs) {
-        LWARNINGC(p.first, "Remaining reference counter: " << p.second.refCount);
+        LWARNINGC(
+            p.first,
+            fmt::format("Remaining reference counter: {}", p.second.refCount)
+        );
         // We have to destroy the ProgramObject now; otherwise it will destroyed when this
         // ProgramObjectManager leaves scope, at which point there might not be a valid
         // OpenGL state left
@@ -91,7 +95,7 @@ ProgramObject* ProgramObjectManager::requestProgramObject(const std::string& nam
         ++(it->second.refCount);
         LDEBUGC(
             name,
-            "Reusing shader program (new ref count " << it->second.refCount << ")"
+            fmt::format("Reusing shader program (new ref count {})", it->second.refCount)
         );
         return it->second.program.get();
     }
@@ -105,7 +109,7 @@ void ProgramObjectManager::releaseProgramObject(const std::string& name,
     ghoul_assert(it->second.refCount >= 0, "Ref count cannot be negative");
 
     --(it->second.refCount);
-    LDEBUGC(name, "Ref count decreased to " << it->second.refCount);
+    LDEBUGC(name, fmt::format("Ref count decreased to {}", it->second.refCount));
     if (it->second.refCount == 0) {
         // This was the final call, so we will delete the ProgramObject
         destructionFunction(it->second.program.get());

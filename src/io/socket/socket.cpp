@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,10 +25,14 @@
 
 #include <ghoul/io/socket/socket.h>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 std::atomic<int> Socket::_nextSocketId{ 0 };
 
-} // namespace io
-} // namespace ghoul
+Socket::Socket() : _socketId(_nextSocketId++) {}
+
+int Socket::socketId() const {
+    return _socketId;
+}
+
+} // namespace ghoul::io

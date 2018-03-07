@@ -33,7 +33,6 @@
 #if defined __unix__ || defined __APPLE__
 #include <execinfo.h>
 #include <cxxabi.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #elif defined _MSC_VER

@@ -29,10 +29,8 @@
 #include <ghoul/glm.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/opengl/ghoul_gl.h>
-
-#include <glm/gtx/std_based_type.hpp>
-
 #include <array>
+#include <glm/gtx/std_based_type.hpp>
 #include <string>
 
 namespace ghoul::opengl {
@@ -109,29 +107,30 @@ public:
      * necessary for the \p dimensions <code>* bytesPerPixel</code> (which is in turn
      * dependent on the \p dataType). The Texture can be 1D, 2D, or 3D depending on how
      * many components are equal to <code>1</code>.
+     *
      * \param dimensions The dimensions of the texture. A 3D texture will be created
-     * if all components are bigger than <code>1</code>, a 2D texture will be created if
-     * the <code>z</code> component is equal to <code>1</code>, while a 1D texture is
-     * created if the <code>y</code> and <code>z</code> component is equal to
-     * <code>1</code>
+     *        if all components are bigger than <code>1</code>, a 2D texture will be
+     *        created if the <code>z</code> component is equal to <code>1</code>, while a
+     *        1D texture is created if the <code>y</code> and <code>z</code> component is
+     *        equal to <code>1</code>
      * \param format Specifies the format of the data
      * \param internalFormat The internal format for the texture. See
-     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1, 2, and 3 for
-     * concrete values. In addition, the S3TC_DXT formats can be used to support
-     * hardware compression. See http://www.opengl.org/wiki/Image_Format#S3TC.2FDXT for
-     * more information
+     *        http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1, 2, and 3
+     *        for concrete values. In addition, the S3TC_DXT formats can be used to
+     *        support hardware compression. See
+     *        http://www.opengl.org/wiki/Image_Format#S3TC.2FDXT for more information
      * \param dataType The data type of the pixel data. See
-     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for a list of possible
-     * values
+     *        http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for a list of
+     *        possible values
      * \param filter The Texture::FilterMode that will be used to interpolate between
-     * texels
+     *        texels
      * \param wrapping The Texture::WrappingMode that will be used to generate values on
-     * the border of the texture
+     *        the border of the texture
      * \param allocate Sets whether or not the texture object should allocate texture
-     * data itself
+     *        data itself
      * \param takeOwnership Sets whether or not the Texture object should take ownership
-     * of the data allocated. In case there is no data allocated, the Texture will
-     * automatically not take ownership
+     *        of the data allocated. In case there is no data allocated, the Texture will
+     *        automatically not take ownership
      * \pre Element of \p dimensions must be bigger or equal <code>1</code>
      */
     Texture(glm::uvec3 dimensions, Format format = Format::RGBA,
@@ -151,27 +150,28 @@ public:
      * following equations: <code>(y * dimensions.x) + x</code> in the 2D case and
      * <code>(z * dimensions.x * dimensions.y) + (y * dimensions.x) + x</code> in the 3D
      * case. This Texture will take ownership of the data array and will delete it once
-     * this object is destroyed
+     * this object is destroyed.
+     *
      * \param dimensions The dimensions of the texture. A 3D texture will be created
-     * if all components are bigger than <code>1</code>, a 2D texture will be created if
-     * the <code>z</code> component is equal to <code>1</code>, while a 1D texture is
-     * created if the <code>y</code> and <code>z</code> component is equal to
-     * <code>1</code>
+     *        if all components are bigger than <code>1</code>, a 2D texture will be
+     *        created if the <code>z</code> component is equal to <code>1</code>, while a
+     *        1D texture is created if the <code>y</code> and <code>z</code> component is
+     *        equal to <code>1</code>
      * \param format Specifies the format of the data
      * \param internalFormat The internal format for the texture. See
-     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1,2, and 3 for
-     * concrete values. In addition, the S3TC_DXT formats can be used to support
-     * hardware compression. See http://www.opengl.org/wiki/Image_Format#S3TC.2FDXT for
-     * more information
+     *        http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1,2, and 3
+     *        for concrete values. In addition, the S3TC_DXT formats can be used to
+     *        support hardware compression.
+     *        See http://www.opengl.org/wiki/Image_Format#S3TC.2FDXT for more information
      * \param dataType The data type of the pixel data. See
-     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for a list of possible
-     * values
+     *        http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for a list of
+     *        possible values
      * \param filter The Texture::FilterMode that will be used to interpolate between
-     * texels
+     *        texels
      * \param wrapping The Texture::WrappingMode that will be used to generate values on
-     * the border of the texture
+     *        the border of the texture
      * \param takeOwnership Sets whether or not the Texture object should take ownership
-     * of the data.
+     *        of the data.
      */
     Texture(void* data, glm::uvec3 dimensions, Format format = Format::RGBA,
             GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
@@ -199,6 +199,7 @@ public:
      * Returns an (optional) name for this Texture. The name is not used internally and is
      * solely for external purposes. One possible use is the filename from which the
      * texture was loaded.
+     *
      * \return The name for this texture
      */
     const std::string& getName() const;
@@ -207,23 +208,27 @@ public:
      * Sets an (optional) name for this texture. The name is not used internally and is
      * solely for external purposes. One possible use is the filename from which the
      * texture was loaded.
+     *
      * \param name The name for this texture
      */
     void setName(std::string name);
 
     /**
      * Returns the type for this texture.
-     * \returns The type for this texture. This value can either be
-     * <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code> or
-     * <code>GL_TEXTURE_3D</code> depending on the dimension of the stored texture.
+     *
+     * \return The type for this texture. This value can either be
+     *         <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code> or
+     *         <code>GL_TEXTURE_3D</code> depending on the dimension of the stored
+     *         texture.
      */
     GLenum type() const;
 
     /**
      * Overrides the type of the texture that was automatically determined.
+     *
      * \param type The new type for the texture.
      * \pre \p type must be <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code> or
-     * <code>GL_TEXTURE_3D</code>
+     *      <code>GL_TEXTURE_3D</code>
      */
     void setType(GLenum type);
 
@@ -232,6 +237,7 @@ public:
      * <code>z</code> component will be equal to <code>1</code> and if the texture is a 1D
      * texture, the <code>y</code> and <code>z</code> components will be equal to
      * <code>1</code>.
+     *
      * \return The dimensions of this texture.
      */
     const glm::uvec3& dimensions() const;
@@ -239,6 +245,7 @@ public:
     /**
      * Sets new dimensions for this texture. The texture is not automatically updated or
      * uploaded to the graphics card. Solely the stored dimensions are changed.
+     *
      * \param dimensions The new dimensions for this texture
      */
     void setDimensions(glm::uvec3 dimensions);
@@ -254,7 +261,8 @@ public:
 
     /**
      * Returns the format for this texture.
-     * \returns The format for this texture.
+     *
+     * \returns The format for this texture
      */
     Format format() const;
 
@@ -262,7 +270,8 @@ public:
      * Sets the format for this texture. This only updates the internal state and doesn't
      * affect the texture on the graphics card. Call <code>uploadTexture</code> to apply
      * changes.
-     * \param format The new format for this texture.
+     *
+     * \param format The new format for this texture
      */
     void setFormat(Format format);
 
@@ -278,14 +287,16 @@ public:
      * and doesn't affect the texture on the graphics card. Call #uploadTexture to apply
      * changes. See http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for more
      * information and possible parameter values.
+     *
      * \param internalFormat The new internal format. See
-     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1, 2, and 3 for
-     * possible values.
+     *        http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1, 2, and 3
+     *        for possible values.
      */
     void setInternalFormat(GLenum internalFormat);
 
     /**
      * Returns the Texture::FilterMode used by this texture.
+     *
      * \return The Texture::FilterMode used by this texture
      */
     FilterMode filter() const;
@@ -294,6 +305,7 @@ public:
      * Sets a new Texture::FilterMode for this Texture. The new Texture::FilterMode is
      * applied immediately. If the filter is FilterMode::AnisotropicMipMap, the texture
      * has to be uploaded before calling this method. Otherwise, the result is undefined.
+     *
      * \param filter The new Texture::FilterMode for this Texture
      */
     void setFilter(FilterMode filter);
@@ -306,6 +318,7 @@ public:
      * <code>GL_BLUE</code>, <code>GL_ALPHA</code>, <code>GL_ONE</code>, and
      * <code>GL_ZERO</code>. See
      * https://www.opengl.org/sdk/docs/man/html/glTexParameter.xhtml for more information.
+     *
      * \param swizzleMask The swizzle mask that is applied to this Texture
      */
     void setSwizzleMask(std::array<GLenum, 4> swizzleMask);
@@ -318,6 +331,7 @@ public:
 
     /**
      * Returns the currently used swizzle mask for this Texture.
+     *
      * \return The currently used swizzle mask for this Texture
      */
     std::array<GLenum, 4> swizzleMask() const;
@@ -326,6 +340,7 @@ public:
      * Returns the storage data type for this Texture. For a complete list of available
      * return values see http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for
      * more information.
+     *
      * \return The storage data type
      */
     GLenum dataType() const;
@@ -335,6 +350,7 @@ public:
      * parameters see http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml. The new
      * data type is only stored internally and not updated immediately, although it will
      * update the number of* bytes per pixel (see bytesPerPixel method).
+     *
      * \param dataType The new storage data type
      */
     void setDataType(GLenum dataType);
@@ -344,12 +360,14 @@ public:
      * the Texture is not in the list of formats found at
      * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml, an assertion will be
      * triggered.
+     *
      * \return The number of channels that are stored in this texture
      */
     int numberOfChannels() const;
 
     /*
      * Returns the number of bytes each pixel stores.
+     *
      * \return The number of bytes each pixel stores
      */
     GLubyte bytesPerPixel() const;
@@ -358,6 +376,7 @@ public:
      * Returns the stored data of the texture. If the memory is deleted, a new
      * (sufficiently) large memory block have been created or a segmentation fault might
      * occur.
+     *
      * \return The stored data of the texture
      */
     const void* pixelData() const;
@@ -366,8 +385,9 @@ public:
      * Returns the size the pixel data should have according to the dimensionality and the
      * bytes per pixel. <code>dimensions.x * dimensions.y * dimensions.z * bpp</code>. The
      * real size of the data can be different if it was set manually.
+     *
      * \return The size of the pixel data according to the dimensionality and the bytes
-     * per pixel
+     *         per pixel
      */
     int expectedPixelDataSize() const;
 
@@ -375,20 +395,24 @@ public:
      * Sets new data for the texture to use. If the dimensions are not updated and the new
      * data has a different size, undefined behavior will occur. This Texture will take
      * ownership of the data array.
+     *
      * \param pixels The pointer to the new data array that should be used.
      * \param takeOwnership Should this Texture take ownership of the data and delete
-     * it?
+     *        it?
      */
     void setPixelData(void* pixels, TakeOwnership takeOwnership = TakeOwnership::Yes);
 
     /**
      * Returns <code>true</code> if the OpenGL texture is resident in the GPU memory.
+     *
      * \return <code>true</code> if the OpenGL texture is resident
      */
     bool isResident() const;
 
-    /** Sets a new Texture::WrappingMode for this Texture. The new mode is applied
+    /** 
+     * Sets a new Texture::WrappingMode for this Texture. The new mode is applied
      * immediately.
+     *
      * \param wrapping The new Texture::WrappingMode for this Texture
      */
     void setWrapping(WrappingMode wrapping);
@@ -396,12 +420,14 @@ public:
     /** Sets a new Texture::WrappingModes for this Texture. The new mode is applied
     * immediately. This function supports setting different wrapping modes for different
     * dimensions.
+    *
     * \param wrapping The new wrappingmodes for this Texture
     */
     void setWrapping(WrappingModes wrapping);
 
     /**
      * Returns the currently used Texture::WrappingMode for this texture.
+     *
      * \return The currently used Texture::WrappingMode for this texture
      */
     WrappingModes wrapping() const;
@@ -409,6 +435,7 @@ public:
     /**
      * Sets the maximum number of MipMap levels to use. This is only valid when the
      * FilterMode::AnisotropicMipMap is selected. Defaults to 8 levels.
+     *
      * \param mipMapLevel The MipMap level that should be used in this texture.
      */
     void setMipMapLevel(int mipMapLevel);
@@ -417,6 +444,7 @@ public:
      * Sets the maximum anisotropy level that should be used. This is only valid when the
      * FilterMode::AnisotropicMipMap is selected. On default, the maximum anisotropy
      * supported by the graphics card is used.
+     *
      * \param anisotropyLevel The anisotropy level that should be used
      */
     void setAnisotropyLevel(float anisotropyLevel);
@@ -425,7 +453,7 @@ public:
      * Binds and uploads the texture to graphics memory. The Texture has to be of type
      * <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code>, or
      * <code>GL_TEXTURE_3D</code>. The type will be determined automatically based on the
-     * provided dimensions
+     * provided dimensions.
      */
     void uploadTexture();
 
@@ -433,9 +461,8 @@ public:
      * Binds and uploads the texture to graphics memory. The Texture has to be of type
      * <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code>, or
      * <code>GL_TEXTURE_3D</code>. The type will be determined automatically based on the
-     * provided dimensions.
-     * The function calls glTexSubImage which means that the texture will already have
-     * to be existing in graphics memory.
+     * provided dimensions. The function calls glTexSubImage which means that the texture
+     * will already have to be existing in graphics memory.
      */
     void reUploadTexture();
 
@@ -444,9 +471,8 @@ public:
      * The Texture has to be of type
      * <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code>, or
      * <code>GL_TEXTURE_3D</code>. The type will be determined automatically based on the
-     * provided dimensions.
-     * The data pointer will not be used. Intead it is assumed that the provided pixel
-     * buffer object contains the data of the right size and format.
+     * provided dimensions. The data pointer will not be used. Intead it is assumed that
+     * the provided pixel buffer object contains the data of the right size and format.
      */
     void uploadTextureFromPBO(GLuint pbo);
 
@@ -455,9 +481,8 @@ public:
      * The Texture has to be of type
      * <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code>, or
      * <code>GL_TEXTURE_3D</code>. The type will be determined automatically based on the
-     * provided dimensions.
-     * The data pointer will not be used. Intead it is assumed that the provided pixel
-     * buffer object contains the data of the right size and format.
+     * provided dimensions. The data pointer will not be used. Intead it is assumed that
+     * the provided pixel buffer object contains the data of the right size and format.
      * The function calls glTexSubImage which means that the texture will already have
      * to be existing in graphics memory.
      */
@@ -472,6 +497,7 @@ public:
     /**
      * Changes (=grants/revokes) ownership of the stored data. Changing this will not
      * change the underlying data.
+     *
      * \param hasOwnership <code>true</code> if this Texture should own the data in
      * <code>_pixels</code>
      */
@@ -479,6 +505,7 @@ public:
 
     /**
      * Returns if this Texture owns its contained data.
+     *
      * \return <code>true</code> if this Texture owns its contained data
      */
     bool dataOwnership() const;
@@ -491,6 +518,7 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \tparam T The type of the data that is returned
      * \param x The position of the texel that should be fetched
      * \return The texel at the specified position casted to the requested type T
@@ -509,6 +537,7 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \tparam T The type of the data that is returned
      * \param x The position of the texel that should be fetched
      * \return The texel at the specified position casted to the requested type T
@@ -527,6 +556,7 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \tparam T The type of the data that is returned
      * \param x The coordinate on the <code>width</code> axis
      * \param y The coordinate on the <code>height</code> axis
@@ -547,6 +577,7 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \tparam T The type of the data that is returned
      * \param x The coordinate on the <code>width</code> axis
      * \param y The coordinate on the <code>height</code> axis
@@ -568,6 +599,7 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \tparam T The type of the data that is returned
      * \param position The coordinate of the texel
      * \return The texel at the specified position casted to the requested type T
@@ -587,6 +619,7 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \tparam T The type of the data that is returned
      * \param position The coordinate of the texel
      * \return The texel at the specified position casted to the requested type T
@@ -606,6 +639,7 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \tparam T The type of the data that is returned
      * \param x The coordinate on the <code>width</code> axis
      * \param y The coordinate on the <code>height</code> axis
@@ -628,6 +662,7 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \tparam T The type of the data that is returned
      * \param x The coordinate on the <code>width</code> axis
      * \param y The coordinate on the <code>height</code> axis
@@ -651,6 +686,7 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \tparam T The type of the data that is returned
      * \param position The coordinate of the texel
      * \return The texel at the specified position casted to the requested type T
@@ -692,9 +728,10 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code> . Trying
      * to use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \param x The coordinate on the <code>width</code> axis
      * \return The texel at the specified position as a vector with each component in
-     * <code>[0,1]</code>
+     *         <code>[0,1]</code>
      * \pre The Texture must be a one dimensional Texture
      * \pre \p x must be smaller than the width of the Texture
      */
@@ -709,10 +746,11 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \param x The coordinate on the <code>width</code> axis
      * \param y The coordinate on the <code>height</code> axis
      * \return The texel at the specified position as a vector with each component in
-     * <code>[0,1]</code>
+     *         <code>[0,1]</code>
      * \pre The Texture must be a two dimensional Texture
      * \pre \p x must be smaller than the width of the Texture
      * \pre \p y must be smaller than the height of the Texture
@@ -728,9 +766,10 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \param pos The coordinate of the texel
      * \return The texel at the specified position as a vector with each component in
-     * <code>[0,1]</code>
+     *         <code>[0,1]</code>
      * \pre The Texture must be a two dimensional Texture
      * \pre <code>pos.x</code> must be smaller than the width of the Texture
      * \pre <code>pos.y</code> must be smaller than the height of the Texture
@@ -746,11 +785,12 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \param x The coordinate on the <code>width</code> axis
      * \param y The coordinate on the <code>height</code> axis
      * \param z The coordinate on the <code>depth</code> axis
      * \return The texel at the specified position as a vector with each component in
-     * <code>[0,1]</code>
+     *         <code>[0,1]</code>
      * \pre The Texture must be a three dimensional Texture
      * \pre \p x must be smaller than the width of the Texture
      * \pre \p y must be smaller than the height of the Texture
@@ -767,9 +807,10 @@ public:
      * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
+     *
      * \param pos The coordinate of the texel
      * \return The texel at the specified position as a vector with each component in
-     * <code>[0,1]</code>
+     *         <code>[0,1]</code>
      * \pre The Texture must be a three dimensional Texture
      * \pre <code>pos.x</code> must be smaller than the width of the Texture
      * \pre <code>pos.y</code> must be smaller than the height of the Texture

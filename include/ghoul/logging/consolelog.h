@@ -27,6 +27,7 @@
 #define __GHOUL___CONSOLELOG___H__
 
 #include <ghoul/logging/streamlog.h>
+
 #include <ghoul/misc/boolean.h>
 
 namespace ghoul::logging {
@@ -56,15 +57,16 @@ public:
 
     /**
      * Constructor that calls Log constructor.
+     *
      * \param colorOutput Determines if the log should printed in color
      * \param timeStamping Determines if the log should print the time when a message
-     * is logged in the log messages
+     *        is logged in the log messages
      * \param dateStamping Determines if the log should print the time when a message
-     * is logged in the log messages
+     *        is logged in the log messages
      * \param categoryStamping Determines if the log should print the categories in
-     * the log messages
+     *        the log messages
      * \param logLevelStamping Determines if the log should print the log level in the
-     * log messages
+     *        log messages
      */
     ConsoleLog(ColorOutput colorOutput = ColorOutput::Yes,
         TimeStamping timeStamping = TimeStamping::No,
@@ -75,9 +77,10 @@ public:
 
     /**
      * Method that logs a message with a given level and category to the console.
+     *
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
-     * individually
+     *        individually
      * \param message The message body of the log message
      */
     void log(LogLevel level, const std::string& category,
@@ -92,13 +95,14 @@ protected:
      * LogLevel::Warning -> Yellow<br>
      * LogLevel::Error -> Red<br>
      * LogLevel::Fatal -> Cyan<br>
+     *
      * \param level The level that determines the color scheme for the console
      */
     void setColorForLevel(LogLevel level);
 
     /**
      * Resets the console to the default color scheme (*nix) or the color scheme it had
-     * when the program stared (Windows)
+     * when the program stared (Windows).
      */
     void resetColor();
 

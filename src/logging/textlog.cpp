@@ -63,10 +63,10 @@ void TextLog::log(LogLevel level, const std::string& category,
     else {
         std::string output;
         if (isDateStamping()) {
-            output += "[" + getDateString();
+            output += "[" + dateString();
         }
         if (isTimeStamping()) {
-            output += " | " + getTimeString();
+            output += " | " + timeString();
         }
 
         if (isDateStamping() || isTimeStamping()) {

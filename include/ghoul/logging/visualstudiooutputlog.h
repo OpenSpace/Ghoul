@@ -28,8 +28,7 @@
 
 #include <ghoul/logging/log.h>
 
-namespace ghoul {
-namespace logging {
+namespace ghoul::logging {
 
 /**
   * A concrete subclass of Log that logs the messages to the Visual Studio output window
@@ -45,14 +44,15 @@ class VisualStudioOutputLog : public Log {
 public:
     /**
      * Constructor that calls Log constructor.
+     *
      * \param timeStamping Determines if the log should print the time when a message
-     * is logged in the log messages
+     *        is logged in the log messages
      * \param dateStamping Determines if the log should print the time when a message
-     * is logged in the log messages
+     *        is logged in the log messages
      * \param categoryStamping Determines if the log should print the categories in
-     * the log messages
+     *        the log messages
      * \param logLevelStamping Determines if the log should print the log level in the
-     * log messages
+     *        log messages
      */
     VisualStudioOutputLog(TimeStamping timeStamping = TimeStamping::No,
         DateStamping dateStamping = DateStamping::No,
@@ -62,16 +62,16 @@ public:
 
     /**
      * Method that logs a message with a given level and category to the console.
+     *
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
-     * individually
+     *        individually
      * \param message The message body of the log message
      */
     void log(LogLevel level, const std::string& category,
         const std::string& message) override;
 };
 
-} // namespace logging
-} // namespace ghoul
+} // namespace ghoul::logging
 
 #endif // __GHOUL___VISUALSTUDIOOUTPUTLOG___H__

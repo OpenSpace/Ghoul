@@ -29,7 +29,6 @@
 
 #include <ghoul/filesystem/file.h>
 #include <ghoul/opengl/texture.h>
-
 #include <algorithm>
 #include <SOIL.h>
 

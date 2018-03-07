@@ -31,7 +31,6 @@
 #include <ghoul/misc/exception.h>
 #include <ghoul/systemcapabilities/systemcapabilities.h>
 #include <ghoul/systemcapabilities/version.h>
-
 #include <string>
 #include <vector>
 
@@ -65,7 +64,8 @@ public:
 
     /**
      * Returns the maximum OpenGL version that is supported on this platform. This means
-     * that all the lower version will be supported as well,
+     * that all the lower version will be supported as well.
+     *
      * \return The maximum OpenGL version
      */
     Version openGLVersion() const;
@@ -73,25 +73,29 @@ public:
     /**
      * Returns the value of a call to <code>glGetString(GL_VENDOR)</code>. This will give
      * detailed information about the vendor of the main graphics card. This string can be
-     * used if the automatic Vendor detection failed
+     * used if the automatic Vendor detection failed.
+     *
      * \return The value of a call to <code>glGetString(GL_VENDOR)</code>
      */
     const std::string& glslCompiler() const;
 
     /**
      * Returns the vendor of the main graphics card.
+     *
      * \return The vendor of the main graphics card
      */
     Vendor gpuVendor() const;
 
     /**
      * Returns the vendor of the main graphics card converted into a string.
+     *
      * \return The vendor of the main graphics card converted into a string
      */
     std::string gpuVendorString() const;
 
     /**
      * Returns all available extensions as a list of names.
+     *
      * \return All available extensions as a list of names
      */
     const std::vector<std::string>& extensions() const;
@@ -105,46 +109,53 @@ public:
 
     /**
      * Returns the maximum number of texture units that are available on the main
-     * graphics card
+     * graphics card.
+     *
      * \return The maximum number of texture units
      */
     int maxTextureUnits() const;
 
     /**
      * Returns the largest dimension for a 2D texture on this graphics card.
+     *
      * \return The largest dimension for a 2D texture on this graphics card
      */
     int max2DTextureSize() const;
 
     /**
     * Returns the largest dimension for a 3D texture on this graphics card.
+    *
     * \return The largest dimension for a 3D texture on this graphics card
     */
     int max3DTextureSize() const;
 
     /**
      * Returns the maximum number of atomic counter buffer bindings
-     * that are available on the main graphics card
+     * that are available on the main graphics card.
+     *
      * \return The maximum number of bindings
      */
     int maxAtomicCounterBufferBindings() const;
 
     /**
      * Returns the maximum number of shader storage bindings
-     * that are available on the main graphics card
+     * that are available on the main graphics card.
+     *
      * \return The maximum number of bindings
      */
     int maxShaderStorageBufferBindings() const;
 
     /**
      * Returns the maximum number of uniform buffer bindings
-     * that are available on the main graphics card
+     * that are available on the main graphics card.
+     *
      * \return The maximum number of bindings
      */
     int maxUniformBufferBindings() const;
 
     /**
      * Returns the <code>OpenGL</code> string.
+     *
      * \return The <code>OpenGL</code> string
      */
     std::string name() const override;
@@ -152,9 +163,10 @@ public:
 protected:
     /**
      * Method that detects all of the capabilities.
+     *
      * \throw GPUVendorError If the detection of the GPU vendor failed
      * \throw WMIError If the Windows Management Instrumentation was requested and access
-     * to it failed
+     *        to it failed
      */
     void detectCapabilities() override;
     void clearCapabilities() override;
@@ -170,9 +182,10 @@ protected:
     void detectExtensions();
 
     /**
-     * Use WMI (on Windows) to retrieve information about the installed driver
+     * Use WMI (on Windows) to retrieve information about the installed driver.
+     *
      * \throws WMIError If there was an error accessing the Windows Management
-     * Instrumentation
+     *         Instrumentation
      */
     void detectDriverInformation();
 

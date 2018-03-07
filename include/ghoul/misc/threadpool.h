@@ -47,7 +47,6 @@
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/thread.h>
-
 #include <future>
 #include <memory>
 #include <mutex>
@@ -108,18 +107,19 @@ public:
 
     /**
      * Constructor that initializes and starts \p nThreads Worker objects.
+     *
      * \param nThreads The number of parallel threads of execution managed by the
-     * ThreadPool
+     *        ThreadPool
      * \param workerInitialization The additional initialize function for each Worker that
-     * gets called once for each Worker when it is created
+     *        gets called once for each Worker when it is created
      * \param workerDeinitialization The additional deinitialize function for each Worker
-     * that gets called once for each Worken when it is destroyed
+     *        that gets called once for each Worken when it is destroyed
      * \param priorityClass The ghoul::thread::ThreadPriorityClass of the worker threads
-     * managed by the ThreadPool
+     *        managed by the ThreadPool
      * \param priorityLevel The ghoul::thread::ThreadPriorityLevel of the worker threads
-     * managed by the ThreadPool
+     *        managed by the ThreadPool
      * \param background Whether the worker threads managed by this thread pool are run in
-     * a background mode (depending on the support of the operating system)
+     *        a background mode (depending on the support of the operating system)
      * \pre \p nThreads must be bigger than 0
      * \pre \p workerInitialization must not be empty
      * \pre \p workerDeinitialization must not be empty
@@ -143,6 +143,7 @@ public:
 
     /**
      * Starts the previously #stop%ped ThreadPool and activates its Worker%s.
+     *
      * \pre The ThreadPool must not be running
      * \post The ThreadPool is running
      */
@@ -151,16 +152,18 @@ public:
     /**
      * Stops the previously running ThreadPool. Depending on the passed parameters, this
      * function might block until all remaining tasks have been processed.
+     *
      * \param runTasks If RunRemainingTasks::Yes, all remaining tasks in the queue will be
-     * finished; if RunRemainingTasks::No, they will be discarded
+     *        finished; if RunRemainingTasks::No, they will be discarded
      * \param detachThreads If DetachThreads::Yes, the worker threads will be detached and
-     * finish their job independently from the current thread and, thus, this function
-     * will return immediately. if DetachThreads::No, this function will block until all
-     * workers have finished. Potential exceptions that occur during detaching or joining
-     * will be caught and an error message will be logged.
+     *        finish their job independently from the current thread and, thus, this
+     *        function will return immediately. if DetachThreads::No, this function will
+     *        block until all workers have finished. Potential exceptions that occur
+     *        during detaching or joining will be caught and an error message will be
+     *        logged.
      * \pre The ThreadPool must be running
      * \pre Cannot run remaining tasks and detach threads
-     * <code>!(runTasks == Yes && detachThreads == Yes)</code>
+     *      <code>!(runTasks == Yes && detachThreads == Yes)</code>
      * \post The ThreadPool is stopped
      */
     void stop(
@@ -171,6 +174,7 @@ public:
     /**
      * Returns <code>true</code> if the ThreadPool is running, <code>false</code>
      * otherwise.
+     *
      * \return <code>true</code> if the ThreadPool is running, <code>false</code>
      * otherwise
      */
@@ -182,6 +186,7 @@ public:
      * workers, additional workers are created and initialized, if \p nThreads is smaller
      * the extra workers detach and finish their work before being terminated. This
      * function can be called whether the ThreadPool is running or stopped.
+     *
      * \param nThreads The new number of worker threads in this ThreadPool
      * \pre nThreads must be bigger than 0
      * \post The ThreadPool contains \p nThreads workers
@@ -190,24 +195,28 @@ public:
 
     /**
      * Returns the number of workers that are managed by this ThreadPool.
+     *
      * \return The number of workers that are managed by this ThreadPool
      */
     int size() const;
 
     /**
      * Returns the number of currently idle workers in this ThreadPool.
+     *
      * \return The number of currently idle workers in this ThreadPool
      */
     int idleThreads() const;
 
     /**
      * Returns the number of remaining tasks waiting to be processed by this ThreadPool.
+     *
      * \return The number of remaining tasks waiting to be processed by this ThreadPool
      */
     int remainingTasks() const;
 
     /**
      * Removes the remaining tasks from the waiting list, discarding them.
+     *
      * \post The number of remaining tasks is empty
      */
     void clearRemainingTasks();
@@ -243,15 +252,16 @@ ghoul::ThreadPool pool(2);
 }
 
 \endverbatim
+     *
      * \tparam Function The description of the \p function%'s signature that will be
-     * called
+     *         called
      * \tparam Args A variable list of arguments that can be passed to the \p function
      * \param function The function that will be called. This can be any callable object,
-     * such as <code>std::function</code>, a <code>lamdba</code> expression, a
-     * <code>struct</code> with overloaded <code>operator()</code> or others
+     *        such as <code>std::function</code>, a <code>lamdba</code> expression, a
+     *        <code>struct</code> with overloaded <code>operator()</code> or others
      * \param arguments The potential list of arguments passed to the \p function
      * \return A future containing the result of the evaluation of \p function with the
-     * passed \p arguments. If the function does not return anything, an
+     *         passed \p arguments. If the function does not return anything, an
      * <code>std::future<void></code> is returned
      */
     template <typename Function, typename... Args>
@@ -266,8 +276,9 @@ ghoul::ThreadPool pool(2);
     * was initialized with only a single worker in the constructor or a subsequent call
     * to #resize. The template parameters of this function are best to be automatically
     * determined.
+    *
     * \tparam T The type information of the <code>std::packaged_task</code> that is to be
-    * executed
+    *         executed
     * \tparam Args A variable list of arguments that can be passed to the \p task
     * \param task The task that will be executed.
     * \param arguments The potential list of arguments passed to the \p task
@@ -314,25 +325,29 @@ private:
          * Returns the top element of the queue and whether this item existed. If the
          * queue was empty, <code>{ Task(), false}</code> is returned, otherwise the
          * second argument to the <code>tuple</code> is <code>true</code>.
+         * 
          * \return A tuple containing either the top element of the queue and
-         * <code>true</code>, or a default constructed Task and <code>false</code>
+         *         <code>true</code>, or a default constructed Task and <code>false</code>
          */
         std::tuple<Task, bool> pop();
 
         /**
          * Pushes the \p task to the bottom of the <code>std::queue</code>.
+         *
          * \param task The task to be pushed onto the queue
          */
         void push(Task&& task);
 
         /**
          * Returns whether the queue is empty.
+         *
          * \return <code>true</code> if the queue is empty
          */
         bool isEmpty() const;
 
         /**
          * Returns the size of the queue.
+         *
          * \return The size of the queue
          */
         int size() const;
@@ -348,7 +363,8 @@ private:
     /**
      * Activate the \p worker by creating a <code>std::thread</code> with the lambda
      * expression that will do all of the work inside the Worker. This function will
-     * overwrite the values of the passed \p worker
+     * overwrite the values of the passed \p worker.
+     *
      * \param worker The worker to be set by this function
      */
     void activateWorker(Worker& worker);

@@ -27,28 +27,26 @@
 
 #include <ghoul/filesystem/filesystem.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/filesystem/cachemanager.h>
+#include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/stacktrace.h>
 
 #include <algorithm>
 #include <cassert>
-#include <regex>
 #include <cstdio>
-
 #include <direct.h>
-#include <windows.h>
+#include <regex>
 #include <Shlobj.h>
-
-#include <ghoul/misc/stacktrace.h>
+#include <windows.h>
 
 using std::string;
 
 namespace {
     constexpr const char* _loggerCat = "FileSystem";
 
-    void CALLBACK completionHandler(
-        DWORD dwErrorCode,
-        DWORD dwNumberOfBytesTransferred,
+    void CALLBACK completionHandler(DWORD dwErrorCode, DWORD dwNumberOfBytesTransferred,
         LPOVERLAPPED lpOverlapped);
 
     const unsigned int changeBufferSize = 16384u;
@@ -68,7 +66,7 @@ struct DirectoryHandle {
 };
 
 void FileSystem::deinitializeInternalWindows() {
-    for (const auto& d : _directories) {
+    for (const std::pair<const std::string, DirectoryHandle*>& d : _directories) {
         DirectoryHandle* dh = d.second;
         if (dh != nullptr && dh->_handle != nullptr) {
             CancelIo(dh->_handle);
@@ -80,11 +78,10 @@ void FileSystem::deinitializeInternalWindows() {
 
 void FileSystem::addFileListener(File* file) {
     ghoul_assert(file != nullptr, "File must not be nullptr");
-    //LDEBUG("Trying to insert  " << file);
     std::string d = file->directoryName();
     auto f = _directories.find(d);
     if (f == _directories.end()) {
-        LDEBUG("Started watching: " << d);
+        LDEBUG(fmt::format("Started watching: {}", d));
         DirectoryHandle* handle = new DirectoryHandle;
         handle->_activeBuffer = 0;
         handle->_handle = nullptr;
@@ -100,7 +97,7 @@ void FileSystem::addFileListener(File* file) {
         );
 
         if (handle->_handle == INVALID_HANDLE_VALUE) {
-            LERROR("Directory handle for '" << d << "' could not be obtained");
+            LERROR(fmt::format("Directory handle for '{}' could not be obtained", d));
             delete handle;
             return;
         }
@@ -130,14 +127,18 @@ void FileSystem::removeFileListener(File* file) {
             return;
         }
     }
-    LWARNING("Could not find tracked '" << file <<"' for path '"<< file->path() << "'");
+    LWARNING(fmt::format(
+        "Could not find tracked '{0:x}' for path '{}'",
+        reinterpret_cast<void*>(file),
+        file->path()
+    ));
 }
 
 void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,
                                  const std::string& file)
 {
     std::string fullPath;
-    for (const auto& d : FileSys._directories) {
+    for (const std::pair<const std::string, DirectoryHandle*>& d : FileSys._directories) {
         if (d.second == directoryHandle) {
             fullPath = d.first + PathSeparator + file;
         }
@@ -261,10 +262,10 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
         if (errorBuffer != nullptr) {
             std::string errorString(errorBuffer);
             LocalFree(errorBuffer);
-            LERROR("Error reading directory changes: " << errorString);
+            LERROR(fmt::format("Error reading directory changes: {}", errorString));
         }
         else {
-            LERROR("Error reading directory changes: " << error);
+            LERROR(fmt::format("Error reading directory changes: {}", error));
         }
     }
 }

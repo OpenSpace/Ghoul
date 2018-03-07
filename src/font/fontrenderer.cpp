@@ -25,19 +25,19 @@
 
 #include <ghoul/font/fontrenderer.h>
 
-#include <ghoul/font/font.h>
-
+#include <ghoul/fmt.h>
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/font/font.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/programobject.h>
+#include <ghoul/opengl/texture.h>
+#include <ghoul/opengl/textureatlas.h>
 #include <ghoul/opengl/textureunit.h>
-
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>
-
 #include <cstdarg>
 #include <fstream>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #ifdef WIN32
 #define vscprintf(f,a) _vscprintf(f,a)
@@ -50,7 +50,6 @@ static int vscprintf(const char* format, va_list pargs) {
     return retval;
 }
 #endif
-
 
 namespace {
     constexpr const char* _loggerCat = "FontRenderer";
@@ -198,13 +197,13 @@ FontRenderer::~FontRenderer() {
 
 std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     std::string vsPath = absPath(DefaultVertexShaderPath);
-    LDEBUG("Writing default vertex shader to '" << vsPath << "'");
+    LDEBUG(fmt::format("Writing default vertex shader to '{}'", vsPath));
     std::ofstream file(vsPath);
     file << DefaultVertexShaderSource;
     file.close();
 
     std::string fsPath = absPath(DefaultFragmentShaderPath);
-    LDEBUG("Writing default fragment shader to '" << fsPath << "'");
+    LDEBUG(fmt::format("Writing default fragment shader to '{}'", fsPath));
     file.open(fsPath);
     file << DefaultFragmentShaderSource;
     file.close();
@@ -238,13 +237,13 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
 
 std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     std::string vsPath = absPath(ProjectionVertexShaderPath);
-    LDEBUG("Writing default vertex shader to '" << vsPath << "'");
+    LDEBUG(fmt::format("Writing default vertex shader to '{}'", vsPath));
     std::ofstream file(vsPath);
     file << ProjectionVertexShaderSource;
     file.close();
 
     std::string fsPath = absPath(ProjectionFragmentShaderPath);
-    LDEBUG("Writing default fragment shader to '" << fsPath << "'");
+    LDEBUG(fmt::format("Writing default fragment shader to '{}'", fsPath));
     file.open(fsPath);
     file << ProjectionFragmentShaderSource;
     file.close();

@@ -27,7 +27,6 @@
 #define __GHOUL___TEMPLATEFACTORY___H__
 
 #include <ghoul/misc/exception.h>
-
 #include <functional>
 #include <map>
 #include <memory>
@@ -100,6 +99,7 @@ i = factory.create("D"); // creates an instance of D with the default constructo
 i = factory.create("D", { }); // creates an instance of D with the Dictionary constructor
 i = factory.create("B", { }); // throws an exception as B does not have a Dictionary ctor
 \endverbatim
+ *
  * \tparam BaseClass The base class of all classes that can be registered and created
  * using this factory
  */
@@ -110,14 +110,15 @@ public:
      * This is a function pointer that is called when a new subclass is to be created and
      * must return the new-allocated class. The function pointer is stored in the
      * TemplateFactory.
+     *
      * \param useDictionary <code>true</code> if the class was called with a provided
-     * Dictionary and the Dictionary should be used.
+     *        Dictionary and the Dictionary should be used.
      * \param dict The Dictionary that should be used to initialize the subclass. If
-     * \p useDictionary is <code>false</code>, this is the empty Dictionary.
+     *        \p useDictionary is <code>false</code>, this is the empty Dictionary.
      * \return The initialized subclass of type <code>BaseClass</code>
      * \throw TemplateConstructionError If the class was initialized using the wrong
-     * constructor, for example a class that does not have a Dictionary constructor, but
-     * a Dictionary was used.
+     *        constructor, for example a class that does not have a Dictionary
+     *        constructor, but a Dictionary was used.
      */
     using FactoryFuncPtr = BaseClass* (*)(bool useDictionary, const Dictionary& dict);
 
@@ -126,12 +127,13 @@ public:
      * \p className. This creation uses the parameterless default constructor of the
      * class. If \p className does not name a registered class, an exception is thrown.
      * Classes can be registered with the #registerClass method.
+     *
      * \param className The class name of the instance that should be created
      * \return A fully initialized instance of the registered class
      * \throw TemplateClassNotFoundError If the \p className did not name a previously
-     * registered class
+     *        registered class
      * \throw TemplateConstructionError If the class registered under \p className does
-     * not have a default constructor
+     *        not have a default constructor
      * \pre \p className must not be empty
      */
     std::unique_ptr<BaseClass> create(const std::string& className) const;
@@ -142,15 +144,16 @@ public:
      * \p dictionary to the constructor. For this method to work, the class which was
      * registered with \p className has to have a constructor with a single Dictionary as
      * parameter. If \p className does not name a registered class, an exception is
-     * thrown.  Classes can be registered with the #registerClass method.
+     * thrown. Classes can be registered with the #registerClass method.
+     *
      * \param className The class name of the instance that should be created
      * \param dictionary The dictionary that will be passed to the constructor of the
-     * class
+     *        class
      * \return A fully initialized instance of the registered class
      * \throw TemplateClassNotFoundError If the \p className did not name a previously
-     * registered class
+     *        registered class
      * \throw TemplateConstructionError If the class registered under \p className does
-     * not have a constructor using a Dictionary object
+     *        not have a constructor using a Dictionary object
      * \pre \p className must not be empty
      */
     std::unique_ptr<BaseClass> create(const std::string& className,
@@ -161,13 +164,14 @@ public:
      * be #create%d using the same \p className. <code>Class</code> has to be a subclass
      * of <code>BaseClass</code> or a compile-error will occur. If a class already has
      * been registered under the \p className, an exception will be thrown.
+     *
      * \tparam Class The class that should be registered under the provided
-     * \p className
+     *         \p className
      * \param className The class name under which the <code>Class</code> is registered.
      * \throw TemplateFactoryError If the \p className has been registered before
      * \pre <code>Class</code> must be derived from <code>BaseClass</code>
      * \pre <code>Class</code> must have a default constructor or a constructor that takes
-     * a Dictionary
+     *      a Dictionary
      * \pre \p className must not be empty
      */
     template <typename Class>
@@ -180,14 +184,15 @@ public:
      * The function pointer is stored inside and <b>no</b> closure will be constructed.
      * This means that it is the callers responsibility that the factory function returns
      * a valid type for each call of #create.
+     *
      * \param className The class name, which will be registered with the provided
-     * factory function
+     *        factory function
      * \param factoryFunction The function pointer that will be called if the
-     * TemplateFactory is asked to create a class of type \p className. The first argument
-     * of the function pointer is <code>true</code> if the #create method was called with
-     * a Dictionary as an additional parameter, implying that the subclass should be
-     * constructed using the Dictionary provided as the second argument. The factory
-     * function is free to ignore this request.
+     *        TemplateFactory is asked to create a class of type \p className. The first
+     *        argument of the function pointer is <code>true</code> if the #create method
+     *        was called with a Dictionary as an additional parameter, implying that the
+     *        subclass should be constructed using the Dictionary provided as the second
+     *        argument. The factory function is free to ignore this request.
      * \throw TemplateFactoryError If the \p className has been registered before
      * \pre \p className must not be empty
      * \pre \p factoryFunction must not be <code>nullptr</code>
@@ -199,14 +204,15 @@ public:
      * #FactoryFuncPtr. The \p factoryFunction must return a valid subclass of
      * <code>BaseClass</code> when is it called in the #create methods of TemplateFactory.
      * The <code>std::function</code> object is stored inside.
+     *
      * \param className The class name, which will be registered with the provided
-     * factory function
+     *        factory function
      * \param factoryFunction The <code>std::function</code> that will be called if the
-     * TemplateFactory is asked to create a class of type \p className. The first argument
-     * of the function pointer is <code>true</code> if the #create method was called with
-     * a Dictionary as an additional parameter, implying that the subclass should be
-     * constructed using the Dictionary provided as the second argument. The factory
-     * function is free to ignore this request.
+     *        TemplateFactory is asked to create a class of type \p className. The first
+     *        argument of the function pointer is <code>true</code> if the #create method
+     *        was called with a Dictionary as an additional parameter, implying that the
+     *        subclass should be constructed using the Dictionary provided as the second
+     *        argument. The factory function is free to ignore this request.
      * \throw TemplateFactoryError If the \p className has been registered before
      * \pre \p className must not be empty
      * \pre \p factoryFunction must not be <code>nullptr</code>
@@ -218,16 +224,18 @@ public:
      * Checks if any class has been registered under the provided \p className As any
      * invalid class will create a compile-time error, if a class has been registered,
      * it is guaranteed that the \p className can be used to generate a valid instance.
+     *
      * \param className The class name that is to be tested
      * \return <code>true</code> if the \p className was used in #registerClass
-     * before; <code>false</code> otherwise
+     *         before; <code>false</code> otherwise
      * \pre \p className must not be empty
      */
     bool hasClass(const std::string& className) const override;
 
     /**
      * Returns the list of all registered classes. All values in this vector can be used
-     * to instantiate a new class sing the #create method
+     * to instantiate a new class sing the #create method.
+     *
      * \return The list of all registered classes
      */
     std::vector<std::string> registeredClasses() const override;
@@ -235,7 +243,8 @@ public:
     /**
      * Returns the <code>type_info</code> of the baseclass for this factory, i.e., the
      * base class which is the super class for all actual instances that can be created
-     * using the #create method
+     * using the #create method.
+     *
      * \return The <code>type_info</code> of the baseclass for this factory
      */
     const std::type_info& baseClassType() const override;

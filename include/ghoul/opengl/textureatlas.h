@@ -22,7 +22,6 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  *****************************************************************************************
- *                                                                                       *
  * This code is based on the Freetype GL engine as developed by Nicolas P. Rougier. The  *
  * library is available at http://code.google.com/p/freetype-gl/. His implementation of  *
  * the TextureAtlas is based on the article by Jukka Jylaanki: "A Thousand Ways to Pack  *
@@ -37,13 +36,12 @@
 
 #include <ghoul/glm.h>
 #include <ghoul/misc/exception.h>
-#include <ghoul/opengl/ghoul_gl.h>
-#include <ghoul/opengl/texture.h>
-
 #include <memory>
 #include <vector>
 
 namespace ghoul::opengl {
+
+    class Texture;
 
 /**
  * This class represents a texture atlas which automatically organizes smaller textures
@@ -69,11 +67,12 @@ public:
      * The constructor completely initializes the Texture Atlas. No additional
      * initialization step is necessary. Due to the fact that the underlying Texture is
      * initialized here, it requires a valid OpenGL context.
+     *
      * \param size The size (<code>width</code>, <code>height</code>, <code>depth</code>)
-     * of the TextureAtlas.
+     *        of the TextureAtlas.
      * \pre \p size's width and height has to be bigger than <code>4</code> and smaller
-     * thank the GPU limit for 2D textures. The \p size's depth has to be <code>1</code>,
-     * <code>2</code>, <code>3</code>, or <code>4</code>
+     *      than the GPU limit for 2D textures. The \p size's depth has to be
+     *      <code>1</code>, <code>2</code>, <code>3</code>, or <code>4</code>
      */
     explicit TextureAtlas(glm::ivec3 size);
 
@@ -81,27 +80,30 @@ public:
      * The constructor completely initializes the Texture Atlas. No additional
      * initialization step is necessary. Due to the fact that the underlying Texture is
      * initialized here, it requires a valid OpenGL context.
+     *
      * \param width The width of the TextureAtlas
      * \param height The height of the TextureAtlas
      * \param depth The depth of the TetureAtlas
      * \pre \p width must be bigger than <code>4</code> and smaller than the GPU limit for
-     * 2D tetxures
+     *      2D tetxures
      * \pre \p height must be bigger than <code>4</code> and smaller than the GPU limit
-     * for 2D tetxures
+     *      for 2D tetxures
      * \pre \p depth must be <code>1</code>, <code>2</code>, <code>3</code>, or
-     * <code>4</code>
+     *      <code>4</code>
      */
     TextureAtlas(int width, int height, int depth);
 
     /**
      * Copy constructor that performs a deep copy of all the element in the TextureAtlas
      * such that the resulting atlas can be used independently.
+     *
      * \param rhs The original TextureAtlas
      */
     TextureAtlas(const TextureAtlas& rhs);
 
     /**
      * Move constructor that leaves the incoming atlas invalid.
+     *
      * \param rhs The origin TextureAtlas
      */
     TextureAtlas(TextureAtlas&& rhs);
@@ -109,6 +111,7 @@ public:
     /**
      * Assignment operator that performs a deep copy of all the elements in the
      * TextureAtlas such that the resulting atlas can be used independently.
+     *
      * \param rhs The original TextureAtlas
      * \return A copy of the original TextureAtlas
      */
@@ -117,6 +120,7 @@ public:
     /**
      * Move operator that moves the data into the new atlas without performing any copy
      * operations. This leaves the original atlas invalid.
+     *
      * \param rhs The original TextureAtlas
      * \return The atlas into which the original values were moved into
      */
@@ -131,7 +135,7 @@ public:
     /**
      * Clears the TextureAtlas of all data, but leaves the underlying Texture unchanged.
      * A separate call to #upload is required to change the representation on the GPU as
-     * well
+     * well.
      */
     void clear();
 
@@ -140,12 +144,13 @@ public:
      * Please note that the internal width and height of the region will be increased by 1
      * pixel to account for a margin and prevent interpolation issues. The only
      * implication for the usage is the increase storage requirement.
+     *
      * \param width The width of the requested region
      * \param height The height of the requested region
      * \return A handle to the new region that can be passed to the #setRegionData and
-     * #textureCoordinates functions
+     *         #textureCoordinates functions
      * \throws InvalidRegionException If the new requested region does not fit in the
-     * TextureAtlas
+     *         TextureAtlas
      */
     RegionHandle newRegion(int width, int height);
 
@@ -155,6 +160,7 @@ public:
      * or underflows. In all cases,
      * <code>width(region) * height(region) * depth(atlas)</code> number of bytes are read
      * from the <code>data</code> block.
+     *
      * \param handle The handle of the region for which the data is provided
      * \param data The data that should be set for the specified region
      * \pre \p data must not be a <code>nullptr</code>
@@ -193,15 +199,16 @@ public:
      * \param handle The handle of the region for which the texture coordinates shall be
      * retrieved
      * \param windowing Determines whether a subset of the region should be retrieved. If
-     * this parameter is equal to <code>glm::ivec4(0)</code>, the full region is returned.
-     * The first two parameters <code>x</code> and <code>y</code> determine an offset for
-     * the top left corner, while the third and fourth parameters are subtracted from the
-     * bottom right corner. That means thati f <code>windowing</code> is equal to
-     * <code>glm::ivec4(width / 4, height / 4, width / 4, height / 4</code>, a subset in
-     * the center of the region is returned.
+     *        this parameter is equal to <code>glm::ivec4(0)</code>, the full region is
+     *        returned. The first two parameters <code>x</code> and <code>y</code>
+     *        determine an offset for the top left corner, while the third and fourth
+     *        parameters are subtracted from the bottom right corner. That means that if
+     *        <code>windowing</code> is equal to
+     *        <code>glm::ivec4(width / 4, height / 4, width / 4, height / 4</code>, a
+     *        subset in the center of the region is returned.
      * \return A TextureCoordinatesResult structure containing the <code>topLeft</code>
-     * corner of the region in texture coordinates and that <code>bottomRight</code>
-     * corner of the region in texture coordinates
+     *         corner of the region in texture coordinates and that
+     *        <code>bottomRight</code> corner of the region in texture coordinates
      */
     TextureCoordinatesResult textureCoordinates(
         RegionHandle handle, const glm::ivec4& windowing = glm::ivec4(0)) const;
@@ -209,8 +216,9 @@ public:
     /**
      * Returns the size of the TextureAtlas in <code>width</code>, <code>height</code>,
      * and <code>depth</code>.
+     *
      * \return The size of the TextureAtlas in <code>width</code>, <code>height</code>,
-     * and <code>depth</code>.
+     *         and <code>depth</code>.
      */
     glm::ivec3 size() const;
 
@@ -219,6 +227,7 @@ public:
      * <code>height</code>) that are currently in use. Please note that this is <b>not</b>
      * equal to the amount of pixels that can possiblity be used due to fragmentation in
      * the atlas.
+     *
      * \return The amount of pixels that are currently in use in the atlas.
      */
     int spaceUsed() const;
@@ -227,6 +236,7 @@ public:
      * Returns the Texture that is the underlying storage for the TextureAtlas. This
      * Texture can bound to a ProgramObject and subsequently sampled to retrieve the
      * stored textures.
+     *
      * \return The Texture that is the underlying storage for this TextureAtlas.
      */
     const Texture& texture() const;

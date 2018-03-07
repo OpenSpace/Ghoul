@@ -30,16 +30,14 @@
 #include <ghoul/opengl/texture.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/glm.h>
-
-#include <fmt/format.h>
-
+#include <ghoul/fmt.h>
 #include <IL/il.h>
 #include <IL/ilu.h>
 
 namespace ghoul::io {
 
 std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTextureInternal(
-    const std::string& source) const
+                                                          const std::string& source) const
 {
     ILint imageFormat = ilGetInteger(IL_IMAGE_FORMAT);
 
@@ -130,7 +128,6 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTextureInternal(
 std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(
                                                         const std::string& filename) const
 {
-    using opengl::Texture;
     ilInit();
     iluInit();
 
@@ -154,7 +151,6 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(
 std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(void* memory,
                                                                  size_t size) const
 {
-    using opengl::Texture;
     ilInit();
     iluInit();
 
@@ -182,22 +178,22 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(void* memory,
 
 std::vector<std::string> TextureReaderDevIL::supportedExtensions() const {
     // Taken from http://openil.sourceforge.net/features.php
-    return{
+    return {
         "bmp",                        // Windows Bitmap
         "cut",                        // Dr. Halo
         "dcx",                        // Multi-PCX
-        "dicom", "dcm",                // Dicom
+        "dicom", "dcm",               // Dicom
         "dds",                        // DirectDraw Surface
         "exr",                        // OpenEXR
         "fits", "fit",                // Flexible Image Transport System
         "ftx",                        // Heavy Metal: FAKK 2
         "hdr",                        // Radiance High Dynamic
-        "icns",                        // Macintosh icon
-        "ico", "cur",                // Windows icon/cursor
+        "icns",                       // Macintosh icon
+        "ico", "cur",                 // Windows icon/cursor
         "iff",                        // Interchange File Format
         "iwi",                        // Infinity Ward Image
         "gif",                        // Graphics Interchange Format
-        "jpg", "jpe", "jpeg",        // Jpeg
+        "jpg", "jpe", "jpeg",         // Jpeg
         "jp2",                        // Jpeg 2000
         "lbm",                        // Interlaced Bitmap
         "lif",                        // Homeworld texture
@@ -208,7 +204,7 @@ std::vector<std::string> TextureReaderDevIL::supportedExtensions() const {
         "pcx",                        // ZSoft PCX
         "pic",                        // Softimage PIC
         "png",                        // Portable Network Graphics
-        "pbm", "pgm", "pnm",        // Portable Anymap
+        "pbm", "pgm", "pnm",          // Portable Anymap
         "pix",                        // Alias | Wavefront
         "psd",                        // Adobe PhotoShop
         "psp",                        // PaintShop Pro
@@ -223,8 +219,8 @@ std::vector<std::string> TextureReaderDevIL::supportedExtensions() const {
         "utx",                        // Unreal Texture
         "wal",                        // Quake 2 Texture
         "vtf",                        // Valve Texture Format
-        "wdp", "hdp",                // HD Photo
-        "xpm"                        // X Pixel Map
+        "wdp", "hdp",                 // HD Photo
+        "xpm"                         // X Pixel Map
     };
 }
 

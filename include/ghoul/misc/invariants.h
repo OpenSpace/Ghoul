@@ -26,16 +26,16 @@
 #ifndef __GHOUL___INVARIANTS___H__
 #define __GHOUL___INVARIANTS___H__
 
-#include <ghoul/misc/assert.h>
-#include <ghoul/misc/onscopeexit.h>
-
 #if !(defined(NDEBUG) || defined(DEBUG))
+
+#include <ghoul/misc/assert.h>
+#include <ghoul/misc/defer.h>
 
 #define ghoul_precondition(__condition__, __message__) \
     ghoul_assert(__condition__, "Precondition failed: " __message__)
 
 #define ghoul_postcondition(__condition__, __message__) \
-    OnExit([&](){ ghoul_assert(__condition__, "Postcondition failed: " __message__); })
+    defer { ghoul_assert(__condition__, "Postcondition failed: " __message__); };
 
 #else
 

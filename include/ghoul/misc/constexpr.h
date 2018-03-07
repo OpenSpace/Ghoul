@@ -28,6 +28,14 @@
 
 namespace ghoul {
 
+/**
+ * Checks the two passed null-terminated strings for string equality by testing each
+ * individual character.
+ *
+ * \param lhs The lefthand side of the equality operator
+ * \param rhs The righthand side of the equality operator
+ * \return \c true if the two strings are equal
+ */
 constexpr bool equal(char const* lhs, char const* rhs) {
     while (*lhs || *rhs) {
         if (*lhs++ != *rhs++) {

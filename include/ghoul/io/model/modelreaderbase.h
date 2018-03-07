@@ -73,6 +73,7 @@ public:
     /**
      * The method loading the specific model from disk. The result is a fully initialized
      * and usable VertexBufferObject
+     *
      * \param filename The file on disk that is to be loaded
      * \return The intialized VertexBufferObject
      * \throw ModelReaderException If there was an error loading the model from disk

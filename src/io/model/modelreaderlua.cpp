@@ -30,23 +30,22 @@
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/vertexbufferobject.h>
-
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 #include <map>
 #include <vector>
 
 using fmt::format;
 
 namespace {
-    const char* keyMode = "Mode";
-    const char* keyVertices = "Vertices";
-    const char* keyIndices = "Indices";
-    const char* keyAttribPointers = "VertexAttribPointers";
-    const char* keyPosition = "Position";
-    const char* keySize = "Size";
-    const char* keyStride = "Stride";
-    const char* keyOffset = "Offset";
-    const char* keyNormalized = "Normalized";
+    constexpr const char* keyMode = "Mode";
+    constexpr const char* keyVertices = "Vertices";
+    constexpr const char* keyIndices = "Indices";
+    constexpr const char* keyAttribPointers = "VertexAttribPointers";
+    constexpr const char* keyPosition = "Position";
+    constexpr const char* keySize = "Size";
+    constexpr const char* keyStride = "Stride";
+    constexpr const char* keyOffset = "Offset";
+    constexpr const char* keyNormalized = "Normalized";
 } // namespace
 
 namespace ghoul::io {

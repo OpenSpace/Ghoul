@@ -29,9 +29,7 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/crc32.h>
-
-#include <fmt/format.h>
-
+#include <ghoul/fmt.h>
 #include <algorithm>
 #include <fstream>
 
@@ -86,10 +84,13 @@ CacheManager::CacheManager(std::string directory, int version)
         // The first line of the file contains the version number
         std::getline(file, line);
         if (line != std::to_string(_version)) {
-            LINFO("Cache version has changed. Current version " << line <<
-                " new version " << _version);
+            LINFO(fmt::format(
+                "Cache version has changed. Current version {}; new version {}",
+                line,
+                _version
+            ));
             for (const LoadedCacheInfo& cache : cacheState) {
-                LINFO("Deleting file '" << cache.second << "'");
+                LINFO(fmt::format("Deleting file '{}'", cache.second));
                 FileSys.deleteFile(cache.second);
             }
             cleanDirectory(_directory);
@@ -142,7 +143,7 @@ CacheManager::CacheManager(std::string directory, int version)
         LINFO("There was a crash in the previous run and it left the cache unclean. "
               "Cleaning it now");
         for (const LoadedCacheInfo& cache : cacheState) {
-            LINFO("Deleting file '" << cache.second << "'");
+            LINFO(fmt::format("Deleting file '{}'", cache.second));
             FileSys.deleteFile(cache.second);
         }
         // First clean the cache directory with all contents
@@ -175,7 +176,10 @@ CacheManager::~CacheManager() {
         file.close();
     }
     else {
-        LERROR("Could not open file '" << path << "' for writing permanent cache files");
+        LERROR(fmt::format(
+            "Could not open file '{}' for writing parmanent cache files",
+            path
+        ));
     }
     cleanDirectory(_directory);
 }
@@ -301,7 +305,7 @@ unsigned int CacheManager::generateHash(std::string file, std::string informatio
 }
 
 void CacheManager::cleanDirectory(const Directory& dir) const {
-    LDEBUG("Cleaning directory '" << dir << "'");
+    LDEBUG(fmt::format("Cleaning directory '{}'", dir));
     // First search for all subdirectories and call this function recursively on them
     std::vector<std::string> contents = dir.readDirectories();
     for (const std::string& content : contents) {
@@ -321,7 +325,7 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
 #endif
     // If this directory is empty, we can delete it
     if (isEmpty) {
-        LDEBUG("Deleting directory '" << dir << "'");
+        LDEBUG(fmt::format("Deleting directory '{}'", dir));
         FileSys.deleteDirectory(dir);
     }
 }

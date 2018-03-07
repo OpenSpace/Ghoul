@@ -26,7 +26,6 @@
 #include <ghoul/systemcapabilities/generalcapabilitiescomponent.h>
 
 #include <ghoul/misc/assert.h>
-
 #include <algorithm>
 #include <sstream>
 

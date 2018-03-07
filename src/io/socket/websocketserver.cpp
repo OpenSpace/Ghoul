@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -24,16 +24,112 @@
  ****************************************************************************************/
 
 #include <ghoul/io/socket/websocketserver.h>
+
+#include <ghoul/logging/logmanager.h>
 #include <cstring>
 
+#ifdef WIN32
+#define NOMINMAX
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <Windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#ifndef _ERRNO
+#define _ERRNO WSAGetLastError()
+#endif
+
+#pragma warning(push)
+#pragma warning (disable : 4996)
+#else //Use BSD sockets
+#ifdef _XCODE
+#include <unistd.h>
+#endif
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <errno.h>
+#ifndef SOCKET_ERROR
+#define SOCKET_ERROR (-1)
+#endif
+
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET (_SOCKET)(~0)
+#endif
+
+#ifndef NO_ERROR
+#define NO_ERROR 0L
+#endif
+
+#ifndef _ERRNO
+#define _ERRNO errno
+#endif
+#endif
+
 namespace {
-    std::string _loggerCat = "WebSocketServer";
-}
+    constexpr const char* _loggerCat = "WebSocketServer";
 
-namespace ghoul {
-namespace io {
+    void setOptions(_SOCKET socket) {
+        char trueFlag = 1;
+        int iResult;
 
-WebSocketServer::WebSocketServer() {}
+        // Set no delay
+        iResult = setsockopt(socket,
+            IPPROTO_TCP,
+            TCP_NODELAY,
+            &trueFlag,
+            sizeof(trueFlag)
+        );
+
+        // Set send timeout
+        char timeout = 0; // infinite
+        iResult = setsockopt(
+            socket,
+            SOL_SOCKET,
+            SO_SNDTIMEO,
+            &timeout,
+            sizeof(timeout)
+        );
+
+        // Set receive timeout
+        iResult = setsockopt(
+            socket,
+            SOL_SOCKET,
+            SO_RCVTIMEO,
+            &timeout,
+            sizeof(timeout)
+        );
+
+        iResult = setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &trueFlag, sizeof(int));
+        if (iResult == SOCKET_ERROR) {
+            LERROR(fmt::format("Failed to set reuse address with error: {}", _ERRNO));
+        }
+
+        iResult = setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(int));
+        if (iResult == SOCKET_ERROR) {
+            LERROR(fmt::format("Failed to set keep alive with error: {}", _ERRNO));
+        }
+    }
+
+    void closeSocket(_SOCKET socket) {
+        if (socket != INVALID_SOCKET) {
+#ifdef WIN32
+            shutdown(socket, SD_BOTH);
+            closesocket(socket);
+#else
+            shutdown(socket, SHUT_RDWR);
+            ::close(socket);
+#endif
+        }
+    }
+} // namespace
+
+namespace ghoul::io {
 
 WebSocketServer::~WebSocketServer() {
     if (_listening) {
@@ -237,56 +333,4 @@ void WebSocketServer::waitForConnections() {
     }
 }
 
-void WebSocketServer::setOptions(_SOCKET socket) {
-    char trueFlag = 1;
-    int iResult;
-
-    // Set no delay
-    iResult = setsockopt(socket,
-                         IPPROTO_TCP,
-                         TCP_NODELAY,
-                         &trueFlag,
-                         sizeof(trueFlag));
-
-    // Set send timeout
-    char timeout = 0; // infinite
-    iResult = setsockopt(
-            socket,
-            SOL_SOCKET,
-            SO_SNDTIMEO,
-            &timeout,
-            sizeof(timeout));
-
-    // Set receive timeout
-    iResult = setsockopt(
-            socket,
-            SOL_SOCKET,
-            SO_RCVTIMEO,
-            &timeout,
-            sizeof(timeout));
-
-    iResult = setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &trueFlag, sizeof(int));
-    if (iResult == SOCKET_ERROR) {
-        LERROR("Failed to set reuse address with error: " << _ERRNO);
-    }
-
-    iResult = setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(int));
-    if (iResult == SOCKET_ERROR) {
-        LERROR("Failed to set keep alive with error: " << _ERRNO);
-    }
-}
-
-void WebSocketServer::closeSocket(_SOCKET socket) {
-    if (socket != INVALID_SOCKET) {
-#ifdef WIN32
-        shutdown(socket, SD_BOTH);
-        closesocket(socket);
-#else
-        shutdown(socket, SHUT_RDWR);
-        ::close(socket);
-#endif
-    }
-}
-
-}
-}
+} // namespace ghoul::io

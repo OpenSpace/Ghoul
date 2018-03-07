@@ -35,26 +35,27 @@ namespace ghoul {
  * Separates the provided \p input URI into separate parts. If \p input is
  * <code>a.b.c.d 1.e</code>, the returned vector will contain one entry for
  * <code>a</code>, <code>b</code>, <code>c</code>, <code>d 1</code>, and <code>e</code>.
- * If an error occurred, an exception will be thrown
+ * If an error occurred, an exception will be thrown.
+ *
  * \param input The input URI that is to be tokenized using the \p separator
  * \param separator The separator that is used for tokenize the string
  * \return The results of the tokenization operation
  * \throws RuntimeError If there was an error tokenizing the string
  */
-std::vector<std::string> tokenizeString(
-    const std::string& input,
-    char separator = '.');
+std::vector<std::string> tokenizeString(const std::string& input, char separator = '.');
 
 /**
  * Joins the strings located in the \p input using the provided \p separator and returns
  * the joined list.
+ *
  * \param input The list of strings that will be joined
  * \param separator The separator that will be used in the joined string
  */
 std::string join(std::vector<std::string> input, const std::string& separator = ".");
 
 /**
- * Removes whitespace at the beginning and the end of the string
+ * Removes whitespace at the beginning and the end of the string.
+ *
  * \param value The string from which to remove the whitespace
  */
 void trimWhitespace(std::string& value);

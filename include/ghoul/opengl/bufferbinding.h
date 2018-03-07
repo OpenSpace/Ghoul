@@ -26,8 +26,7 @@
 #ifndef __GHOUL___BUFFERBINDING___H__
 #define __GHOUL___BUFFERBINDING___H__
 
-#include "ghoul/opengl/ghoul_gl.h"
-
+#include <ghoul/opengl/ghoul_gl.h>
 #include <vector>
 
 namespace ghoul::opengl::bufferbinding {
@@ -68,6 +67,7 @@ public:
      * This method returns the binding number that was assigned to this BufferBinding.
      * If this is the first call to #bindingNumber, a free binding number
      * will be assigned to this object.
+     *
      * \return The buffer binding number that was assigned to this BufferBinding
      */
     GLint bindingNumber();
@@ -76,6 +76,7 @@ public:
      * This operator returns the binding number that was assigned to this
      * If this is the first call to #bindingNumber, a free binding number
      * will be assigned to this object.
+     *
      * \return The buffer binding number that was assigned to this BufferBinding
      */
     operator GLint();
@@ -88,12 +89,14 @@ public:
 
     /**
      * This method returns the number of bindings that have been marked as used.
+     *
      * \return The number of bindings that have been marked as used
      */
     static int numberActiveBindings();
 
     /**
     * This method returns the maximum number of buffer bindings that is avalable.
+    *
     * \return The number of buffer bindings in use
     */
     static unsigned int maxBufferBindings();
@@ -119,7 +122,7 @@ private:
     static void initialize();
 
     /// The number in <code>[0, maxBindings]</code> referring to this BufferBinding
-    GLint _number = -1;
+    GLint _number = 0;
 
     /// <code>true</code> if the list of busy bindings and the maximum number of bindings
     /// have been initialized

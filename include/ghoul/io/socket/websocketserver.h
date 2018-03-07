@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -29,39 +29,39 @@
 #include <ghoul/misc/exception.h>
 #include <ghoul/io/socket/socketserver.h>
 #include <ghoul/io/socket/websocket.h>
-
-#include <string>
-#include <memory>
-#include <thread>
 #include <atomic>
+#include <ghoul/fmt.h>
+#include <memory>
 #include <mutex>
+#include <string>
+#include <thread>
 #include <vector>
 
-#include <fmt/format.h>
-
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 class WebSocketServer : public SocketServer {
 public:
-    WebSocketServer();
     virtual ~WebSocketServer();
-    virtual std::string address() const;
-    virtual int port() const;
-    virtual void close();
-    virtual void listen(std::string address, int port);
-    virtual bool isListening() const;
-    virtual bool hasPendingSockets() const;
+
+    std::string address() const override;
+    int port() const override;
+    void close() override;
+    void listen(std::string address, int port) override;
+    bool isListening() const override;
+    bool hasPendingSockets() const override;
+
     // Get next pending connection. Non-blocking. Can return nullptr.
     std::unique_ptr<WebSocket> nextPendingWebSocket();
-    virtual std::unique_ptr<Socket> nextPendingSocket();
+    std::unique_ptr<Socket> nextPendingSocket() override;
 
     // Get next pending connection. Blocking.
     // Only returns nullptr if the socket server closes.
     std::unique_ptr<WebSocket> awaitPendingWebSocket();
-    virtual std::unique_ptr<Socket> awaitPendingSocket();
+    std::unique_ptr<Socket> awaitPendingSocket() override;
 
 private:
+    void waitForConnections();
+
     std::string _address;
     int _port;
     bool _listening = false;
@@ -76,13 +76,8 @@ private:
     std::condition_variable _clientConnectionNotifier;
 
     std::deque<std::unique_ptr<WebSocket>> _pendingClientConnections;
-
-    void waitForConnections();
-    void setOptions(_SOCKET);
-    void closeSocket(_SOCKET socket);
 };
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___WEBSOCKETSERVER___H__

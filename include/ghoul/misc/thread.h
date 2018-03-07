@@ -27,7 +27,6 @@
 #define __GHOUL___THREAD___H__
 
 #include <ghoul/misc/boolean.h>
-
 #include <thread>
 
 namespace ghoul::thread {
@@ -64,15 +63,14 @@ using Background = ghoul::Boolean;
 /**
  * This method sets the priorty of the thread \p t to the ThreadPriorityClass
  * \p priorityClass and the ThreadPriorityLevel to \p priorityLevel.
+ *
  * \param t The thread for which to set the priority class and level
  * \param priorityClass The ThreadPriorityClass that is to be set for \p t
  * \param priorityLevel The ThreadPriorityLevel that is to be set for \p t
  * \throws ghoul::RuntimeError If a non-recoverable error occurs while setting the thread
- * class or level
+ *         class or level
  */
-void setPriority(
-    std::thread& t,
-    ThreadPriorityClass priorityClass,
+void setPriority(std::thread& t, ThreadPriorityClass priorityClass,
     ThreadPriorityLevel priorityLevel
 );
 
@@ -81,9 +79,10 @@ void setPriority(
  * This function might not be supported on all platforms and reverts to a no-op on
  * platforms that are not supported. On platforms that are supported, a background state
  * will cause the schedule to reduce the resource allocation for the specific thread.
+ *
  * \param t The thread for which to enable the background state
- * \param background Background::Yes if the background state should be enabled or
- * Background::No if the state should be disabled
+ * \param background BackgroundThread::Yes if the background state should be enabled or
+ *        BackgroundThread::No if the state should be disabled
  */
 void setThreadBackground(std::thread& t, Background background);
 

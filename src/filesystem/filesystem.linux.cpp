@@ -28,22 +28,21 @@
 #include <ghoul/filesystem/filesystem.h>
 
 #include <ghoul/filesystem/cachemanager.h>
+#include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
-
 #include <algorithm>
 #include <cassert>
-#include <regex>
 #include <cstdio>
-
 #include <dirent.h>
+#include <pwd.h>
+#include <regex>
 #include <unistd.h>
+#include <sys/inotify.h>
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <pwd.h>
 
-#include <sys/inotify.h>
 #define EVENT_SIZE  ( sizeof (struct inotify_event) )
 #define BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
 
@@ -97,7 +96,10 @@ void FileSystem::removeFileListener(File* file) {
             return;
         }
     }
-    LWARNING("Could not find tracked '" << file <<"' for path '"<< file->path() << "'");
+    LWARNING(fmt::format(
+        "Could not find tracked '{}' for path '{}'",
+        reinterpret_cast<void*>(file), file->path()
+    ));
 }
 
 void FileSystem::inotifyWatcher() {

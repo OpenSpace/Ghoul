@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2017                                                               *
+ * Copyright (c) 2012-2018                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -29,8 +29,7 @@
 #include <memory>
 #include <string>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 class Socket;
 
@@ -50,8 +49,7 @@ public:
     virtual std::unique_ptr<Socket> awaitPendingSocket() = 0;
 };
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif //  __GHOUL___SOCKETSERVER___H__
 

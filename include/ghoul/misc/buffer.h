@@ -53,16 +53,18 @@ public:
     /**
      * Default Buffer object constructor. The size of the internal array is 0.
      */
-    Buffer();
+    Buffer() = default;
 
     /**
      * Constructor with requested initial capacity of the internal array.
+     *
      * \param capacity The initial capacity for the internal array
      */
     Buffer(size_t capacity);
 
     /**
      * Constructs a Buffer object from file.
+     *
      * \param filename The filename of the binary Buffer file.
      * \pre \p filename must not be empty
      * \throw std::ios_base::failure If the buffer could not be read from \p filename
@@ -71,6 +73,7 @@ public:
 
     /**
      * Constructs a Buffer by copying another Buffer object.
+     *
      * \param other The Buffer to copy the data from
      */
     Buffer(const Buffer& other);
@@ -78,12 +81,14 @@ public:
     /**
      * Moves the original object into this one. The original object must not be used after
      * the move since it is in an undefined state.
+     *
      * \param other The Buffer from which the data is moved out of
      */
     Buffer(Buffer&& other);
 
     /**
      * Constructs a Buffer by copying another Buffer object.
+     *
      * \param rhs The Buffer from which the data is copied
      * \return The object this operator was called on
      */
@@ -92,36 +97,39 @@ public:
     /**
      * Moves the original object into this one. The original object must not be used after
      * the move since it is in an undefined state.
+     *
      * \param rhs The Buffer out of which the data is moved
      * \return The object this operator was called on
      */
     Buffer& operator=(Buffer&& rhs);
 
     /**
-     * Default destructor is sufficient since no objects are
-     * allocated internally
+     * Default destructor is sufficient since no objects are allocated internally.
      */
     ~Buffer() = default;
 
     /**
-     * Sets the read and write offsets to 0
+     * Sets the read and write offsets to 0.
      */
     void reset();
 
     /**
-     * Pointer to the const raw data pointer
-     *  \return Const pointer to the raw data
+     * Pointer to the const raw data pointer.
+     *
+     * \return Const pointer to the raw data
      */
     const value_type* data() const;
 
     /**
-     * Pointer to the raw data pointer
+     * Pointer to the raw data pointer.
+     *
      * \return Pointer to the raw data
      */
     value_type* data();
 
     /**
-     * Returns the capacity of the internal array
+     * Returns the capacity of the internal array.
+     *
      * \return The current capacity of the internal array
      */
     size_type capacity() const;
@@ -129,6 +137,7 @@ public:
     /**
      * Returns the size of the internal array. This is the same as the amount of bytes
      * currently serialized.
+     *
      * \return The current size of the internal array
      */
     size_type size() const;
@@ -136,9 +145,10 @@ public:
     /**
      * Writes the current Buffer to a file. This file will be bigger than the current
      * Buffer size because it also writes metadata to the file.
+     *
      * \param filename The filename to be written to
      * \param compress Flag that specifies if the current Buffer should be compressed when
-     * written to file
+     *        written to file
      * \pre \p filename must not be empty
      * \throw std::ios_base::failure If there was an error writing the file
      * \throw RuntimeError if there was an error compressing the data
@@ -147,6 +157,7 @@ public:
 
     /**
      * Reads the Buffer from a Buffer file.
+     *
      * \param filename The path to the file to read
      * \throw std::ios_base::failure If there was an error reading the file
      * \pre \p filename must not be empty
@@ -154,7 +165,8 @@ public:
     void read(const std::string& filename);
 
     /**
-     * Serializes a const char* string to a std::string
+     * Serializes a const char* string to a std::string.
+     *
      * \param s The string to be serialized
      * \pre \p s must not be <code>nullptr</code>
      */
@@ -162,6 +174,7 @@ public:
 
     /**
      * Serializes raw data.
+     *
      * \param data Pointer to the raw data to serialize
      * \param size The size of the data to serialize in bytes
      * \pre \p data must not be <code>nullptr</code>
@@ -170,8 +183,9 @@ public:
 
     /**
      * Seralizes a general object.
-     * \param v The object to be serialized
+     *
      * \tparam T The type of the object
+     * \param v The object to be serialized
      * \pre \p T must be a POD type
      */
     template <class T>
@@ -179,8 +193,9 @@ public:
 
     /**
      * Serializes a vector of general objects.
-     * \param v The vector of objects to serialize
+     *
      * \tparam T The type of each object
+     * \param v The vector of objects to serialize
      * \pre \p T must be a POD type
      */
     template <typename T>
@@ -188,16 +203,18 @@ public:
 
     /**
      * Serializes the elements [begin, end) to the Buffer.
+     *
+     * \tparam Iter Forward-iterator
      * \param begin Inclusive iterator to the front of the set of serialized elements
      * \param end Exclusive iterator to the end of the set of serialized elements
-     * \tparam Iter Forward-iterator
      * \pre The type pointed to by \p Iter must be a POD
      */
     template <typename Iter>
     void serialize(Iter begin, Iter end);
 
     /**
-     * Deserialize raw data
+     * Deserialize raw data.
+     *
      * \param data Pointer to a datablock to copy data into
      * \param size The size number of bytes of data to copy
      * \pre \p data must not be <code>nullptr</code>
@@ -206,8 +223,9 @@ public:
 
     /**
      * Deserializes a general object.
-     * \param value The object to deserialize
+     *
      * \tparam T The type of the object to deserialize
+     * \param value The object to deserialize
      * \pre \p T must be a POD type
      */
     template <class T>
@@ -215,8 +233,9 @@ public:
 
     /**
      * Deserializes a vector of general objects.
-     * \param v The vector of objects to deserialize
+     *
      * \tparam T The type of each object
+     * \param v The vector of objects to deserialize
      * \pre \p T must be a POD type
      */
     template <typename T>
@@ -224,9 +243,10 @@ public:
 
     /**
      * Deserializes the Buffer into the elements [begin, end).
+     *
+     * \tparam Iter Forward-iterator
      * \param begin Inclusive iterator to the front of the set of deserialized elements
      * \param end Exclusive iterator to the end of the set of deserialized elements
-     * \tparam Iter Forward-iterator
      * \pre The type pointed to by \p Iter must be a POD
      * \pre The number of elements deserialized must be equal to the distance between
      * \p begin and \p end
@@ -239,10 +259,10 @@ private:
     std::vector<value_type> _data;
 
     /// Pointer to the current writing position
-    size_t _offsetWrite;
+    size_t _offsetWrite = 0;
 
     /// Pointer to the current reading position
-    size_t _offsetRead;
+    size_t _offsetRead = 0;
 };
 
 // Specializations for std::string

@@ -23,14 +23,10 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/io/volume/volumereader.h>
+#ifndef __GHOUL___FMT___H__
+#define __GHOUL___FMT___H__
 
-namespace ghoul {
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 
-VolumeReader::VolumeReader() {
-}
-
-VolumeReader::~VolumeReader() {
-}
-
-} // namespace ghoul
+#endif // __GHOUL___FMT___H__

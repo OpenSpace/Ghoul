@@ -26,7 +26,6 @@
 #include <ghoul/opengl/textureconversion.h>
 
 #include <ghoul/misc/assert.h>
-
 #include <cstring>
 #include <vector>
 

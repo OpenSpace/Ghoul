@@ -49,6 +49,7 @@ namespace ghoul::io {
  * <code>GL_TRIANGLE_FAN</code>, <code>GL_TRIANGLES</code>,
  * <code>GL_TRIANGLE_STRIP_ADJACENCY</code>, <code>GL_TRIANGLES_ADJACENCY</code>, or
  * <code>GL_PATCHES</code>.
+ *
  * \sa https://www.opengl.org/sdk/docs/man/html/glVertexAttribPointer.xhtml
  */
 class ModelReaderLua: public ModelReaderBase {
@@ -56,8 +57,9 @@ public:
     /**
      * Loads the model described as a Lua table and returns the initialized
      * VertexBufferObject.
+     *
      * \param filename The Lua file that is to be read. The file must return a single Lua
-     * table
+     *        table
      * \return The initialized VertexBufferObject of the specified model
      * \throw ModelReaderException If there was an exception loading the model
      * \pre \p filename must not be empty

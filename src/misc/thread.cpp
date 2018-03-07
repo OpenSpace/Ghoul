@@ -134,14 +134,7 @@ void setPriority(std::thread& t, ThreadPriorityClass priorityClass,
 
 #ifdef WIN32
 void setThreadBackground(std::thread& t, Background background) {
-    int m;
-    if (background) {
-        m = THREAD_MODE_BACKGROUND_BEGIN;
-    }
-    else {
-        m = THREAD_MODE_BACKGROUND_END;
-    }
-
+    int m = background ? THREAD_MODE_BACKGROUND_BEGIN : THREAD_MODE_BACKGROUND_END;
     std::thread::native_handle_type h = t.native_handle();
     SetThreadPriority(h, m);
 }

@@ -26,7 +26,6 @@
 #include <ghoul/filesystem/directory.h>
 
 #include <ghoul/filesystem/filesystem.h>
-
 #include <algorithm>
 #include <stack>
 

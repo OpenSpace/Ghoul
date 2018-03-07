@@ -53,6 +53,7 @@ public:
     /**
      * Creates and initializes an empty singleton with the arguments passed to the
      * template class T constructor.
+     *
      * \pre The singleton must not have been initialized before
      */
     template <typename... Args>
@@ -66,6 +67,7 @@ public:
 
     /**
      * Deinitializes and deletes the singleton.
+     *
      * \pre The singleton must have been initialized before
      */
     static void deinitialize() {
@@ -79,6 +81,7 @@ public:
 
     /**
      * Returns the initialization state of the singleton.
+     *
      * \return The initialization state of the singleton
      */
     static bool isInitialized() {
@@ -87,6 +90,7 @@ public:
 
     /**
      * Returns the reference to the singleton.
+     *
      * \return A reference to the singleton
      * \pre The singleton must have been initialized before
      */

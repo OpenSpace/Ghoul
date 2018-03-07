@@ -51,19 +51,20 @@ public:
     /**
      * Constructor that calls TextLog constructor and opens the file that will log the
      * messages. If the file does not exist, it will be created.
+     *
      * \param filename The path and filename of the file that will receive the log
-     * messages
+     *        messages
      * \param writeToAppend If this is <code>true</code>, the log messages will be
-     * appended to the file. If it is <code>false</code> the file will be overwritten
-     * without a warning.
+     *        appended to the file. If it is <code>false</code> the file will be
+     *        overwritten without a warning.
      * \param timeStamping Determines if the log should print the time when a message is
-     * logged in the log messages
+     *        logged in the log messages
      * \param dateStamping Determines if the log should print the time when a message is
-     * logged in the log messages
+     *        logged in the log messages
      * \param categoryStamping Determines if the log should print the categories in the
-     * log messages
+     *        log messages
      * \param logLevelStamping Determines if the log should print the log level in the log
-     * messages
+     *        messages
      * \pre \p filename must not be empty
      */
     HTMLLog(const std::string& filename, Append writeToAppend = Append::Yes,
@@ -81,9 +82,10 @@ public:
     /**
      * Method that logs a message with a given <code>level</code> and
      * <code>category</code> to the text file.
+     *
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
-     * individually
+     *        individually
      * \param message The message body of the log message
      */
     void log(LogLevel level, const std::string& category,

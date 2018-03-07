@@ -27,14 +27,13 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
-
-#include <ghoul/misc/onscopeexit.h>
+#include <ghoul/misc/defer.h>
 #include <chrono>
 
 namespace {
     // The wait-out time for the condition_variable inside the worker threads
-    const std::chrono::seconds WaitTime(1);
-}
+    constexpr const std::chrono::seconds WaitTime(1);
+}  // namespace
 
 namespace ghoul {
 
@@ -42,7 +41,8 @@ using Func = std::function<void()>;
 using namespace thread;
 
 ThreadPool::ThreadPool(int nThreads, Func workerInit, Func workerDeinit,
-                       ThreadPriorityClass tpc, ThreadPriorityLevel tpl, Background bg)
+                       ThreadPriorityClass tpc, ThreadPriorityLevel tpl,
+                       Background bg)
     : _workers(nThreads)
     , _taskQueue(std::make_shared<TaskQueue>())
     , _isRunning(std::make_shared<std::atomic_bool>(true))
@@ -222,7 +222,7 @@ void ThreadPool::activateWorker(Worker& worker) {
         // Invoke the user-defined initialization function
         workerInitialization();
         // And invoke the user-defined deinitialization function when the scope is exited
-        OnExit([&]() { workerDeinitialization(); });
+        defer { workerDeinitialization(); };
 
         std::function<void()> task;
         bool hasTask;

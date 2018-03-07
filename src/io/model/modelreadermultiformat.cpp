@@ -29,17 +29,15 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/vertexbufferobject.h>
-
-#include <fmt/format.h>
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-
 #include <cstdio>
+#include <ghoul/fmt.h>
+#include <fstream>
 #include <iostream>
 #include <memory>
-#include <fstream>
 #include <vector>
 
 namespace {
@@ -111,7 +109,6 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderMultiFormat::loadModel(
     );
     return vbo;
 }
-
 
 void ModelReaderMultiFormat::loadModel(
     const std::string& filename,

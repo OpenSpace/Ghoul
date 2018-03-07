@@ -23,10 +23,9 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <type_traits>
-
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/dictionary.h>
+#include <type_traits>
 
 namespace ghoul {
 
@@ -49,8 +48,8 @@ namespace {
  * std::has_default_constructor and DICTIONARY_CONSTRUCTOR with std::is_convertible
  */
 
-const int DEFAULT_CONSTRUCTOR = 1;
-const int DICTIONARY_CONSTRUCTOR = 2;
+constexpr const int DEFAULT_CONSTRUCTOR = 1;
+constexpr const int DICTIONARY_CONSTRUCTOR = 2;
 
 /// Create Class using only the default constructor
 template <typename BaseClass, typename Class>
@@ -95,13 +94,13 @@ BaseClass* createDictionary(bool useDictionary, const Dictionary& dict) {
 
 template <typename BaseClass, typename Class, int Constructor>
 struct CreateHelper {
-    typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
+    using FactoryFuncPtr = BaseClass* (*)(bool useDictionary, const Dictionary& dict);
     FactoryFuncPtr createFunction();
 };
 
 template <typename BaseClass, typename Class>
 struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR | DICTIONARY_CONSTRUCTOR> {
-    typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
+    using FactoryFuncPtr = BaseClass * (*)(bool useDictionary, const Dictionary& dict);
     FactoryFuncPtr createFunction() {
         return &createDefaultAndDictionary<BaseClass, Class>;
     }
@@ -109,7 +108,7 @@ struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR | DICTIONARY_CONSTRUCT
 
 template <typename BaseClass, typename Class>
 struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR> {
-    typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
+    using FactoryFuncPtr = BaseClass * (*)(bool useDictionary, const Dictionary& dict);
     FactoryFuncPtr createFunction() {
         return &createDefault<BaseClass, Class>;
     }
@@ -117,7 +116,7 @@ struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR> {
 
 template <typename BaseClass, typename Class>
 struct CreateHelper<BaseClass, Class, DICTIONARY_CONSTRUCTOR> {
-    typedef BaseClass* (*FactoryFuncPtr)(bool, const Dictionary&);
+    using FactoryFuncPtr = BaseClass * (*)(bool useDictionary, const Dictionary& dict);
     FactoryFuncPtr createFunction() {
         return &createDictionary<BaseClass, Class>;
     }
@@ -227,15 +226,14 @@ template <typename BaseClass>
 std::vector<std::string> TemplateFactory<BaseClass>::registeredClasses() const {
     std::vector<std::string> result;
     result.reserve(_map.size());
-    for (const auto& it : _map) {
+    for (const std::pair<const std::string, FactoryFunction>& it : _map) {
         result.push_back(it.first);
     }
     return result;
 }
 
 template <typename BaseClass>
-const std::type_info& TemplateFactory<BaseClass>::baseClassType() const
-{
+const std::type_info& TemplateFactory<BaseClass>::baseClassType() const {
     return typeid(BaseClass);
 }
 

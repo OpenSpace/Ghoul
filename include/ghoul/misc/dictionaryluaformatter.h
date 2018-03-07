@@ -27,7 +27,6 @@
 #define __GHOUL___DICTIONARYLUAFORMATTER___H__
 
 #include <ghoul/misc/dictionaryformatter.h>
-
 #include <ghoul/misc/exception.h>
 
 namespace ghoul {
@@ -53,6 +52,7 @@ public:
 
     /**
      * Converts the passed \p dictionary into a Lua string representation.
+     *
      * \param dictionary The Dictionary that should be converted
      * \return A Lua string representing the Dictionary
      * \throw LuaFormattingError If the \p key points to a type that cannot be converted
@@ -63,15 +63,14 @@ private:
     /**
      * Converts a single value \p key out of the \p dictionary by manually iterating all
      * the types and trying to access them.
+     *
      * \param dictionary The Dictionary from which the \p key should be extracted and
-     * converted
+     *        converted
      * \param key The key in the Dictionary that should be converted
      * \return A Lua representation of the \p key's value
      * \throw LuaFormattingError If the \p key points to a type that cannot be converted
      */
     std::string formatValue(const Dictionary& dictionary, const std::string& key) const;
-
-    std::string formatDouble(double d) const;
 };
 
 }  // namespace ghoul

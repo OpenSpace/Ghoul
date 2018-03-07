@@ -45,7 +45,7 @@ public:
      * Default constructor. Initializes the internal GL objects to 0. VertexBufferObject%s
      * cannot be constructed without an OpenGL context.
      */
-    VertexBufferObject();
+    VertexBufferObject() = default;
 
     /**
      * Moves the other object in place of the created one. The other object will be in an
@@ -66,8 +66,9 @@ public:
 
     /**
      * A runtime function that checks if initialize has been called.
+     *
      * \returns <code>true</code> if any initialize function has been called and
-     * <code>false</code> otherwise.
+     *          <code>false</code> otherwise.
      */
     bool isInitialized() const;
 
@@ -75,6 +76,7 @@ public:
      * Initializes the VertexBufferObject with the provided \p vertexArray and
      * \p indexArray list. The structure of the vertex data can be arbitrary but correct
      * offsets must be specified using #vertexAttribPointer.
+     *
      * \param vertexArray The vertex array used for this VertexBufferObject
      * \param indexArray The index list used for this VertexBufferObject
      * \pre VertexBufferObject must not have been initialized
@@ -88,8 +90,9 @@ public:
      * Initializes the VertexBufferObject with the provided \p vertexArray and
      * \p indexArray list. The structure of the vertex data can be arbitrary but correct
      * offsets must be specified using #vertexAttribPointer.
+     *
      * \tparam T The structore holding information for each vertex; must be a
-     * <code>POD</code>
+     *         <code>POD</code>
      * \param vertexArray The vertex array used for this VertexBufferObject
      * \param indexArray The index list used for this VertexBufferObject
      * \pre VertexBufferObject must not have been initialized before
@@ -102,9 +105,9 @@ public:
      * Sets the render mode for this VertexBufferObject. The render mode is how OpenGL is
      * treating the vertices and indices. The default is <code>GL_TRIANGLES</code> but
      * other common render primitives are <code>GL_LINES</code> and
-     * <code>GL_POINTS</code>.
-     * See https://www.opengl.org/sdk/docs/man/html/glDrawElements.xhtml
-     * for supported render modes.
+     * <code>GL_POINTS</code>. See
+     * https://www.opengl.org/sdk/docs/man/html/glDrawElements.xhtml for supported render
+     * modes.
      * \param mode The render mode. Default is <code>GL_TRIANGLES</code>
      */
     void setRenderMode(GLenum mode = GL_TRIANGLES);
@@ -140,19 +143,19 @@ private:
     void generateGLObjects();
 
     /// The vertex array object that stores the created VertexBufferObject
-    GLuint _vaoID;
+    GLuint _vaoID = 0;
 
     /// The vertex buffer object
-    GLuint _vBufferID;
+    GLuint _vBufferID = 0;
 
     /// The index buffer obejct
-    GLuint _iBufferID;
+    GLuint _iBufferID = 0;
 
     /// The size of the index buffer, determining how many vertices are drawn
-    unsigned int _iSize;
+    unsigned int _iSize = 0;
 
     /// The rendering mode of this VertexBufferObject
-    GLenum _mode;
+    GLenum _mode = GL_TRIANGLES;
 };
 
 } // namespace ghoul::opengl

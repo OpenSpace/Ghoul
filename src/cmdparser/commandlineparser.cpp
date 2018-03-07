@@ -27,11 +27,9 @@
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 #include <ghoul/logging/logmanager.h>
-
 #include <ghoul/misc/assert.h>
-#include <fmt/format.h>
-
 #include <algorithm>
+#include <ghoul/fmt.h>
 #include <map>
 
 using fmt::format;

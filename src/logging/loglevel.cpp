@@ -26,7 +26,6 @@
 #include <ghoul/logging/loglevel.h>
 
 #include <ghoul/misc/assert.h>
-
 #include <map>
 
 namespace ghoul::logging {
@@ -42,7 +41,6 @@ std::string stringFromLevel(LogLevel level) {
         case LogLevel::Fatal:      return "Fatal";
         case LogLevel::NoLogging:  return "None";
         default:                   throw MissingCaseException();
-
     }
 }
 

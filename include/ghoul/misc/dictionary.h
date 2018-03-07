@@ -27,12 +27,10 @@
 #define __GHOUL___DICTIONARY___H__
 
 #include <ghoul/glm.h>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/misc/any.h>
-
+#include <glm/gtc/type_ptr.hpp>
 #include <map>
 #include <string>
 #include <type_traits>
@@ -228,26 +226,29 @@ public:
      * initializer list can be, for example, of the format
      * <code>{ { "a", 1 }, { "b", 2 } }</code> and it will add all of the
      * <code>std::pair</code>s provided to the Dictionary.
+     *
      * \param l The <code>std::initializer_list</code> that contains all of the values
-     * that should be added to the Dictionary
+     *        that should be added to the Dictionary
      */
     Dictionary(std::initializer_list<std::pair<std::string, ghoul::any>> l);
 
     /**
      * Returns all of the keys that are stored in the dictionary at a given \p location.
      * This location specifier can be nested to inspect the keys at deeper levels.
+     *
      * \param location The location for which all keys should be returned
      * \return A list of all keys that are stored in the Dictionary for the provided
-     * location
+     *         location
      * \throw KeyError If the provided \p location did not exist in the Dictionary
      * \throw ConversionError if the provided \p location was nested, but one of the
-     * nested levels did exist but was not a Dictionary
+     *        nested levels did exist but was not a Dictionary
      */
     std::vector<std::string> keys(const std::string& location = "") const;
 
     /**
      * Returns <code>true</code> if there is a specific key in the Dictionary, regardless
      * of its type. \p key can be a nested location to search for keys at deeper levels.
+     *
      * \param key The key that should be checked for existence
      * \return <code>true</code> if the provided key exists, <code>false</code> otherwise
      * \pre \p key must not be empty
@@ -261,22 +262,23 @@ public:
      * to deeper levels of the Dictionary. If \p createIntermediate is <code>true</code>
      * all intermediate levels in the Dictionary are created automatically; if it is
      * <code>false</code>, this function will fail if a non-existing level is encountered.
+     *
      * \tparam T The type of the \p value to set
      * \param key The key at which the \p value will be entered. This can be a nested
-     * location to insert value are deeper levels. Depending on the value of the
-     * \p createIntermediate parameter, all intermediate levels already have to exist in
-     * the Dictionary or will be created on-the-fly.
+     *        location to insert value are deeper levels. Depending on the value of the
+     *        \p createIntermediate parameter, all intermediate levels already have to
+     *        exist in the Dictionary or will be created on-the-fly.
      * \param value The value that will be added into the Dictionary. If the type supports
-     * it, the value will only be moved rather than copied.
+     *        it, the value will only be moved rather than copied.
      * \param createIntermediate If <code>true</code> all intermediate levels in the
-     * Dictionary will be automatically created along the way, if the provided \p key
-     * contains a nested location. If <code>false</code> the method will fail if a missing
-     * intermediate level is encountered.
+     *        Dictionary will be automatically created along the way, if the provided
+     *        \p key contains a nested location. If <code>false</code> the method will
+     *        fail if a missing intermediate level is encountered.
      * \throw KeyError If no intermediate keys should be created and an intermediate key
-     * is missing
+     *        is missing
      * \throw ConversionError If an intermediate key does not name a Dictionary, but any
-     * other type. Example: For <code>a.b.c</code>, this exception is thrown if either
-     * <code>a</code> or <code>b</code> exist but are not Dictionary%s
+     *        other type. Example: For <code>a.b.c</code>, this exception is thrown if
+     *        either <code>a</code> or <code>b</code> exist but are not Dictionary%s
      * \pre \p key must not be empty
      */
     template <typename T>
@@ -293,14 +295,16 @@ public:
      * <code>value</code> is unchanged. If the key does not exist in the dictionary, the
      * error is silently ignored. See the #value method for a variant of this method that
      * does not ignore errors.
+     *
      * \tparam T The type of the value that should be retrieved. The <code>typeid</code>
-     * of this type has to be equal to the typeid of the value that is to be retrieved
+     *         of this type has to be equal to the typeid of the value that is to be
+     *        retrieved
      * \param key The, potentially nested, key for which the stored value should be
-     * returned
+     *        returned
      * \param value A reference to the value where the value will be copied to, if it
-     * could be found and the types agree
+     *        could be found and the types agree
      * \return <code>true</code> if the value was retrieved successfully,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      * \pre \p key must not be empty
      * \pre \p value must not be the Dictionary this method is called on
      * \post If the value could not be retrieved, the \p value is unchanged
@@ -314,14 +318,16 @@ public:
      * the Dictionary. If the Dictionary has a value at the provided key and the type
      * agrees with the template parameter, the value will be returned. If either the key
      * does not exist or the type does not agree, an exception is thrown.
+     *
      * \tparam T The type of the value that should be tested. The <code>typeid</code> of
-     * this type has to be equal to the typeid of the value that is to be retrieved
+     *         this type has to be equal to the typeid of the value that is to be
+     *         retrieved
      * \param key The, potentially nested, key for which the stored value should be
-     * returned
+     *         returned
      * \return value The value stored at the <code>key</code>
      * \throw KeyError If the \p key does not exist in the Dictionary
      * \throw ConversionError If the stored value's type for \p does not agree with
-     * <code>T</code>
+     *        <code>T</code>
      * \pre \p key must not be empty
      */
     template <typename T>
@@ -332,12 +338,13 @@ public:
      * \p key and the stored type agrees with the provided template parameter. The key can
      * be nested and refer to deeper levels of the Dictionary. If any of the intermediate
      * levels does not exists, <code>false</code> is returned.
+     *
      * \tparam T The type of the value that should be tested. The <code>typeid</code> of
-     * this type has to be equal to the typeid of the value that is to be checked
+     *         this type has to be equal to the typeid of the value that is to be checked
      * \param key The, potentially nested, key which should be checked for existence
      * \return <code>true</code> if the Dictionary contains a value at the specified
-     * \p key with the correct type <code>T</code>. Will return <code>false</code>
-     * otherwise
+     *         \p key with the correct type <code>T</code>. Will return <code>false</code>
+     *         otherwise
      * \pre \p key must not be empty
      */
     template <typename T>
@@ -347,10 +354,11 @@ public:
      * Returns <code>true</code> if the Dictionary contains a value for the specified
      * \p key and the value that is stored is of the type <code>T</code>. This method
      * calls the Dictionary::hasKey and Dictionary::hasValue methods.
+     *
      * \tparam T The type of the value that should be tested
      * \param key The key that should be tested
      * \return <code>true</code> if the Dictionary contains a value for the \p key and the
-     * value is of type <code>T</code>
+     *         value is of type <code>T</code>
      * \pre \p key must not be empty
      */
     template <typename T>
@@ -361,6 +369,7 @@ public:
      * recurse into sub-Dictionaries, but will only return the top-level keys for the
      * Dictionary it is called on. This value will always be equal to the size of the
      * <code>std::vector</code> returned by #keys.
+     *
      * \return The number of keys stored in this Dictionary
      */
     size_t size() const;
@@ -372,7 +381,9 @@ public:
     void clear();
 
     /**
-     * Returns <code>true</code> if this Dictionary is empty; <code>false</code> otherwise
+     * Returns <code>true</code> if this Dictionary is empty; <code>false</code>
+     * otherwise.
+     *
      * \return <code>true</code> if this Dictionary is empty; <code>false</code> otherwise
      */
     bool empty() const;
@@ -382,9 +393,10 @@ public:
      * \p key was found and successfully removed, <code>true</code> is returned, otherwise
      * the method returns <code>false</code>. Under no circumstances an error is logged.
      * \param key The, potentially nested, key pointing to the object that should be
-     * deleted
+     * deleted.
+     *
      * \return Returns <code>true</code> if the key was successfully found and removed,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      * \pre \p key must not be empty
      */
     bool removeKey(const std::string& key);
@@ -394,11 +406,12 @@ private:
      * Splits the provided \p key into a \p first part and the \p rest. Provided a key
      * <code>a.b.c</code>, \p first will be assigned <code>a</code> and \p rest will be
      * assigned <code>b.c</code> after calling this method.
+     *
      * \param key The key that should be split
      * \param first The first part of the key
      * \param rest The rest of the key
      * \return <code>true</code> if there was a rest of the key, <code>false</code> if no
-     * separator could be found
+     *         separator could be found
      */
     bool splitKey(const std::string& key, std::string& first, std::string& rest) const;
 
@@ -408,6 +421,7 @@ private:
      * correct version of #setValue%, which will do the conversion to the unified storage
      * format. Any type that is not explicitly handled here, is just passed on to the
      * #setValue function unchanged.
+     *
      * \param key The key under which the \p value is stored
      * \param value The value that should be stored under the provided key
      */
@@ -419,6 +433,7 @@ private:
      * <code>T</code> is a standard type (i.e., one of the types for which an automatic
      * conversion is defined) and if it is a scalar value (i.e., it only uses one storage
      * value).
+     *
      * \tparam T The type to test
      */
     template <typename T>
@@ -433,6 +448,7 @@ private:
      * <code>T</code> is a standard type (i.e., one of the types for which an automatic
      * conversion is defined) and if it is not a scalar value (i.e., it uses more than one
      * storage value).
+     *
      * \tparam T The type to test
      */
     template <typename T>
@@ -446,6 +462,7 @@ private:
      * #getValueInternal, and #hasValueInternal) and determines whether the type
      * <code>T</code> is a non-standard type (i.e., it is not one of the types for which
      * an automatic conversion is defined).
+     *
      * \tparam T The type to test
      */
     template <typename T>
@@ -458,11 +475,13 @@ private:
      * \p createIntermediate is <code>true</code>, intermediate keys in the Dictionary are
      * automatically created, otherwise an exception is thrown if a missing key is
      * encountered.
+     *
      * \tparam T The type of the \p value that is to be stored
      * \param key The, possibly nested, location at which the \p value is stored
      * \param value The value to be stored in the Dictionary
      * \param createIntermediate If <code>true</code> intermediate levels in the
-     * Dictionary are created, otherwise, they already have to exist
+     *        Dictionary are created, otherwise, they already have to exist
+     *
      * \sa setValue
      */
     template <typename T>
@@ -472,11 +491,13 @@ private:
      * Internal setValue implementation for types that are standard, scalar types. The
      * <code>IsStandardScalarType<T></code> parameter is only used for SFINAE evaluation
      * to remove this method from the overload set of unwanted <code>T</code>s.
+     *
      * \tparam T The type of the \p value that is to be stored
      * \param key The, possibly nested, location at which the \p value is stored
      * \param value The value to be stored in the Dictionary
      * \param createIntermediate If <code>true</code> intermediate levels in the
-     * Dictionary are created, otherwise, they already have to exist
+     *        Dictionary are created, otherwise, they already have to exist
+     *
      * \sa setValue
      */
     template <typename T>
@@ -487,11 +508,13 @@ private:
      * Internal setValue implementation for types that are standard, non-scalar types. The
      * <code>IsStandardVectorType<T></code> parameter is only used for SFINAE evaluation
      * to remove this method from the overload set of unwanted <code>T</code>s.
+     *
      * \tparam T The type of the \p value that is to be stored
      * \param key The, possibly nested, location at which the \p value is stored
      * \param value The value to be stored in the Dictionary
      * \param createIntermediate If <code>true</code> intermediate levels in the
-     * Dictionary are created, otherwise, they already have to exist
+     *        Dictionary are created, otherwise, they already have to exist
+     *
      * \sa setValue
      */
     template <typename T>
@@ -502,11 +525,13 @@ private:
      * Internal setValue implementation for types that are non-standard. The
      * <code>IsNonStandardType<T></code> parameter is only used for SFINAE evaluation to
      * remove this method from the overload set of unwanted <code>T</code>s.
+     *
      * \tparam T The type of the \p value that is to be stored
      * \param key The, possibly nested, location at which the \p value is stored
      * \param value The value to be stored in the Dictionary
      * \param createIntermediate If <code>true</code> intermediate levels in the
-     * Dictionary are created, otherwise, they already have to exist
+     *        Dictionary are created, otherwise, they already have to exist
+     *
      * \sa setValue
      */
     template <typename T>
@@ -515,10 +540,11 @@ private:
 
     /**
      * Helper method to retrieve the \p value from the provided \p key in the Dictionary.
+     *
      * \tparam T The type of the \p value that is to be retrieved
      * \param key The location from which the \p value should be retrived
      * \param value The storage into which the value is written. If an error occurs, this
-     * value is unchanged
+     *        value is unchanged
      */
     template <typename T>
     void getValueHelper(const std::string& key, T& value) const;
@@ -527,10 +553,12 @@ private:
      * Internal getValue implementation for types that are standard, scalar types. The
      * <code>IsStandardScalarType<T></code> parameter is only used for SFINAE evaluation
      * to remove this method from the overload set of unwanted <code>T</code>s.
+     *
      * \tparam T The type of the \p value that is to be retrieved
      * \param key The location from which the \p value should be retrived
      * \param value The storage into which the value is written. If an error occurs, this
-     * value is unchanged
+     *        value is unchanged
+     *
      * \sa getValue
      */
     template <typename T>
@@ -541,10 +569,12 @@ private:
      * Internal getValue implementation for types that are standard, non-scalar types. The
      * <code>IsStandardVectorType<T></code> parameter is only used for SFINAE evaluation
      * to remove this method from the overload set of unwanted <code>T</code>s.
+     *
      * \tparam T The type of the \p value that is to be retrieved
      * \param key The location from which the \p value should be retrived
      * \param value The storage into which the value is written. If an error occurs, this
-     * value is unchanged
+     *        value is unchanged
+     *
      * \sa getValue
      */
     template <typename T>
@@ -591,10 +621,12 @@ private:
      * Internal getValue implementation for types that are non-standard. The
      * <code>IsNonStandardType<T></code> parameter is only used for SFINAE evaluation to
      * remove this method from the overload set of unwanted <code>T</code>s.
+     *
      * \tparam T The type of the \p value that is to be retrieved
      * \param key The location from which the \p value should be retrived
      * \param value The storage into which the value is written. If an error occurs, this
-     * value is unchanged
+     *        value is unchanged
+     *
      * \sa getValue
      */
     template <typename T>
@@ -604,10 +636,11 @@ private:
     /**
      * Helper method to check whether this Dictionary has a value of a specific type
      * <code>T</code> at the, possibly nested, location \p key.
+     *
      * \tparam T The type to be tested
      * \param key The key to be tested
      * \return <code>true</code> if the \p key exists and the stored value has the type
-     * <code>T</code>
+     *         <code>T</code>
      */
     template <typename T>
     bool hasValueHelper(const std::string& key) const;
@@ -616,10 +649,12 @@ private:
      * Internal hasValue implementation for types that are standard, scalar types. The
      * <code>IsStandardScalarType<T></code> parameter is only used for SFINAE evaluation
      * to remove this method from the overload set of unwanted <code>T</code>s.
+     *
      * \tparam T The type to be tested
      * \param key The key to be tested
      * \return <code>true</code> if the \p key exists and the stored value has the type
-     * <code>T</code>
+     *         <code>T</code>
+     *
      * \sa hasValue
      */
     template <typename T>
@@ -630,10 +665,12 @@ private:
      * Internal hasValue implementation for types that are standard, non-scalar types. The
      * <code>IsStandardVectorType<T></code> parameter is only used for SFINAE evaluation
      * to remove this method from the overload set of unwanted <code>T</code>s.
+     *
      * \tparam T The type to be tested
      * \param key The key to be tested
      * \return <code>true</code> if the \p key exists and the stored value has the type
-     * <code>T</code>
+     *         <code>T</code>
+     *
      * \sa hasValue
      */
     template <typename T>
@@ -644,10 +681,12 @@ private:
      * Internal hasValue implementation for types that are non-standard. The
      * <code>IsNonStandardType<T></code> parameter is only used for SFINAE evaluation to
      * remove this method from the overload set of unwanted <code>T</code>s.
+     *
      * \tparam T The type to be tested
      * \param key The key to be tested
      * \return <code>true</code> if the \p key exists and the stored value has the type
-     * <code>T</code>
+     *         <code>T</code>
+     *
      * \sa hasValue
      */
     template <typename T>

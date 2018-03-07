@@ -44,9 +44,9 @@
 #pragma warning (pop)
 #endif // _MSC_VER
 
-#include <ghoul/cmdparser/cmdparser>
-#include <ghoul/filesystem/filesystem>
-#include <ghoul/logging/logging>
+#include <ghoul/filesystem/filesystem.h>
+#include <ghoul/logging/consolelog.h>
+#include <ghoul/logging/logmanager.h>
 
 namespace constants {
     static std::string TestDirectory;
@@ -63,9 +63,7 @@ namespace constants {
 #include "tests/test_filesystem.inl"
 #include "tests/test_luatodictionary.inl"
 #include "tests/test_templatefactory.inl"
-//#include "tests/test_threadpool.inl"
 
-using namespace ghoul::cmdparser;
 using namespace ghoul::filesystem;
 using namespace ghoul::logging;
 
@@ -74,7 +72,6 @@ using namespace ghoul::logging;
 #endif
 
 // #define PRINT_OUTPUT
-
 
 int main(int argc, char** argv) {
     LogManager::initialize(LogLevel::Fatal);

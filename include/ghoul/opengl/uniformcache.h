@@ -46,6 +46,9 @@
 // https://stackoverflow.com/questions/11761703/overloading-macro-on-number-of-arguments
 // The mutable was added to the struct to make them usable in `const` methods
 
+
+
+
 // HOW TO ADD MORE PARAMETERS:
 // 1. Add a new macro UniformCacheX, copying from X-1
 // 2. Add vX variable to argument list
