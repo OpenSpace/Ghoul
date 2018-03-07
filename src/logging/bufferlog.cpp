@@ -34,8 +34,6 @@
 namespace {
     constexpr const uint8_t CURRENT_VERSION = 1;
 
-    constexpr const char* _loggerCat = "BufferLog";
-
     struct Header {
         /**
         * The version header contains in increasing unsigned integer, which specifies the
