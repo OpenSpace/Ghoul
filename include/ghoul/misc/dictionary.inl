@@ -24,6 +24,7 @@
  ****************************************************************************************/
 
 #include <ghoul/misc/assert.h>
+#include <algorithm>
 
 namespace ghoul {
 

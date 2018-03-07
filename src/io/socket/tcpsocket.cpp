@@ -25,6 +25,7 @@
 
 #include <ghoul/io/socket/tcpsocket.h>
 
+#include <algorithm>
 #include <cstring>
 
 #ifdef WIN32
