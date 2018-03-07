@@ -27,6 +27,7 @@
 
 #include <ghoul/filesystem/filesystem.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
