@@ -96,7 +96,10 @@ void FileSystem::removeFileListener(File* file) {
             return;
         }
     }
-    LWARNING("Could not find tracked '" << file <<"' for path '"<< file->path() << "'");
+    LWARNING(fmt::format(
+        "Could not find tracked '{}' for path '{}'",
+        reinterpret_cast<void*>(file), file->path()
+    ));
 }
 
 void FileSystem::inotifyWatcher() {
