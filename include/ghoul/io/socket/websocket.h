@@ -66,6 +66,10 @@ public:
     WebSocket(std::string address, int portNumber, _SOCKET socket);
 
     virtual ~WebSocket();
+
+    virtual std::string address() const;
+    virtual int port() const;
+
     void disconnect(int reason = static_cast<int>(ClosingReason::Normal)) override;
 
     bool getMessage(std::string& message) override;
