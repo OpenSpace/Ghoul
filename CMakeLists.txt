@@ -54,6 +54,7 @@ option(GHOUL_THROW_ON_ASSERT "Disables the feedback on asserts; for use in unit 
 option(GHOUL_MODULE_COMMANDLINEPARSER "Enable Commandlineparser" ON)
 option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
 option(GHOUL_MODULE_LUA "Enable Lua" ON)
+option(GHOUL_MODULE_STB_IMAGE "Enable stb_image" ON)
 option(GHOUL_MODULE_OPENGL "Enable OpenGL" ON)
 option(GHOUL_MODULE_SYSTEMCAPABILITIES "Enable System Capabilities" ON)
 
@@ -186,7 +187,6 @@ set_property(TARGET lz4 PROPERTY FOLDER "External")
 
 # Lua
 if (GHOUL_MODULE_LUA)
-    # Lua
     include_external_library(Ghoul Lua ${GHOUL_ROOT_DIR}/ext/lua)
 endif ()
 
@@ -266,6 +266,12 @@ if (SOIL_FOUND)
         target_include_directories(Ghoul PUBLIC ${SOIL_INCLUDE_DIRS})
         target_link_libraries(Ghoul ${SOIL_LIBRARIES})
     endif ()
+endif ()
+
+# stb_image
+if (GHOUL_MODULE_STB_IMAGE)
+    target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_STB")
+    include_external_library(Ghoul stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
 endif ()
 
 # Stackwalker
