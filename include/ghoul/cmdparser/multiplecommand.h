@@ -100,7 +100,7 @@ protected:
  * The template classes \p T, \p U, \p V, and \p U must be convertable using an
  * <code>std::stringstream</code>.
  *
- * \tparam T The typename of the first argument type 
+ * \tparam T The typename of the first argument type
  * \tparam U The typename of the second argument type
  *
  * \sa MultipleCommandZeroArguments

@@ -150,7 +150,7 @@ void TcpSocket::connect() {
         &hints,
         &addresult
     );
-    
+
     if (result != 0) {
         return;
     }
@@ -224,7 +224,7 @@ bool TcpSocket::putMessage(const std::string& message) {
         return false;
     }
     char delimiter = _delimiter;
-    return putBytes(&delimiter);   
+    return putBytes(&delimiter);
 }
 
 void TcpSocket::setDelimiter(char delimiter) {

@@ -60,7 +60,7 @@ VertexBufferObject::~VertexBufferObject() {
 
     glDeleteBuffers(1, &_iBufferID);
     _iBufferID = 0;
-    
+
     glDeleteVertexArrays(1, &_vaoID);
     _vaoID = 0;
 

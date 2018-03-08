@@ -185,7 +185,9 @@ void WebSocketServer::listen(std::string address, int port) {
 #if defined(WIN32)
         WSACleanup();
 #endif
-        throw WebSocket::WebSocketError("Failed to parse hints for web socket connection");
+        throw WebSocket::WebSocketError(
+            "Failed to parse hints for web socket connection"
+        );
     }
 
     // Create a socket for the server to listen for client connections
@@ -208,7 +210,9 @@ void WebSocketServer::listen(std::string address, int port) {
 #if defined(WIN32)
         WSACleanup();
 #endif
-        throw WebSocket::WebSocketError("Listen failed with error: " + std::to_string(_ERRNO));
+        throw WebSocket::WebSocketError(
+            "Listen failed with error: " + std::to_string(_ERRNO)
+        );
     }
 
     // Cleanup
@@ -249,7 +253,9 @@ std::unique_ptr<WebSocket> WebSocketServer::nextPendingWebSocket() {
 
     std::lock_guard<std::mutex> guard(_connectionMutex);
     if (!_pendingClientConnections.empty()) {
-        std::unique_ptr<WebSocket> connection = std::move(_pendingClientConnections.front());
+        std::unique_ptr<WebSocket> connection = std::move(
+            _pendingClientConnections.front()
+        );
         _pendingClientConnections.pop_front();
         return connection;
     }
@@ -301,16 +307,20 @@ void WebSocketServer::waitForConnections() {
 
         if (socketHandle == INVALID_SOCKET) {
             // no client wanted this socket -- continue loop
-#if defined(WIN32) 
+#if defined(WIN32)
             LERROR(fmt::format("Could not start socket: ERROR {}", WSAGetLastError()));
             char val;
             socklen_t len = sizeof(val);
             if (getsockopt(_serverSocket, SOL_SOCKET, SO_ACCEPTCONN, &val, &len) == -1)
                 LERROR(fmt::format("_serverSocket {} is not a socket", _serverSocket));
             else if (val)
-                LERROR(fmt::format("_serverSocket {} is a listening socket", _serverSocket));
+                LERROR(fmt::format(
+                    "_serverSocket {} is a listening socket", _serverSocket
+                ));
             else
-                LERROR(fmt::format("_serverSocket {} is a non-listening socket", _serverSocket));
+                LERROR(fmt::format(
+                    "_serverSocket {} is a non-listening socket", _serverSocket
+                ));
 #endif
             continue;
         }
@@ -322,7 +332,11 @@ void WebSocketServer::waitForConnections() {
         auto port = static_cast<int>(clientInfo.sin_port);
 
         // create client socket
-        std::unique_ptr<WebSocket> socket = std::make_unique<WebSocket>(address, port, socketHandle);
+        std::unique_ptr<WebSocket> socket = std::make_unique<WebSocket>(
+            address,
+            port,
+            socketHandle
+        );
 
         // store client
         std::lock_guard<std::mutex> guard(_connectionMutex);

@@ -58,7 +58,7 @@ public:
     /**
      * Method that logs a message with a given <code>level</code> and
      * <code>category</code>. The method of logging is dependent on the explicit subclass.
-     * 
+     *
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
      *        individually

@@ -145,7 +145,7 @@ int TcpSocketServer::port() const {
 void TcpSocketServer::close() {
     std::lock_guard<std::mutex> settingsLock(_settingsMutex);
     _listening = false;
-    
+
     // Notify all threads waiting for connections.
     _connectionNotifier.notify_all();
     closeSocket(_serverSocket);
@@ -260,7 +260,8 @@ std::unique_ptr<TcpSocket> TcpSocketServer::awaitPendingTcpSocket() {
     }
     std::unique_lock<std::mutex> lock(_connectionNotificationMutex);
 
-    // Block execution until there is a pending connection or until the server stops listening.
+    // Block execution until there is a pending connection or until the server stops
+    // listening.
     _connectionNotifier.wait(lock, [this]() {
         return hasPendingSockets() || !_listening;
     });
@@ -299,7 +300,7 @@ void TcpSocketServer::waitForConnections() {
         inet_ntop(AF_INET, &(clientInfo.sin_addr), addressBuffer, INET_ADDRSTRLEN);
         std::string address = addressBuffer;
         int port = static_cast<int>(clientInfo.sin_port);
-        
+
         // @CLEANUP(abock): Can the _pendingConnections be moved to Socket instead of
         //                  unique_ptr?
         std::unique_ptr<TcpSocket> socket = std::make_unique<TcpSocket>(
@@ -308,7 +309,7 @@ void TcpSocketServer::waitForConnections() {
             socketHandle
         );
         socket->startStreams();
-        
+
         std::lock_guard<std::mutex> lock(_connectionMutex);
         _pendingConnections.push_back(std::move(socket));
 

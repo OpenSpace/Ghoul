@@ -99,7 +99,7 @@ std::vector<std::string> TextureReaderSOIL::supportedExtensions() const {
         "png",  // PNG - non-interlaced (from stb_image documentation)
         "jpg",
         "jpeg", // JPG - JPEG baseline (from stb_image documentation)
-        "jpeg", 
+        "jpeg",
         "tga",  // TGA - greyscale or RGB or RGBA or indexed, uncompressed or RLE
         "dds",  // DDS - DXT1/2/3/4/5, uncompressed, cubemaps(can't read 3D DDS files yet)
         "psd",  // PSD - (from stb_image documentation)

@@ -325,7 +325,7 @@ private:
          * Returns the top element of the queue and whether this item existed. If the
          * queue was empty, <code>{ Task(), false}</code> is returned, otherwise the
          * second argument to the <code>tuple</code> is <code>true</code>.
-         * 
+         *
          * \return A tuple containing either the top element of the queue and
          *         <code>true</code>, or a default constructed Task and <code>false</code>
          */

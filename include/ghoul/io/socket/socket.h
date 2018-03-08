@@ -31,7 +31,7 @@
 #include <string>
 
 namespace ghoul::io {
-    
+
 class Socket {
 public:
     Socket();
@@ -80,4 +80,4 @@ private:
 
 #include <ghoul/io/socket/socket.inl>
 
-#endif //  __GHOUL___SOCKET___H__
+#endif // __GHOUL___SOCKET___H__

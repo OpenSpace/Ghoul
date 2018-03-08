@@ -409,7 +409,7 @@ public:
      */
     bool isResident() const;
 
-    /** 
+    /**
      * Sets a new Texture::WrappingMode for this Texture. The new mode is applied
      * immediately.
      *

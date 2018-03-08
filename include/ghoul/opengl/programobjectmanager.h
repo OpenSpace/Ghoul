@@ -41,9 +41,9 @@ namespace ghoul::opengl {
  * with the specified name has already been created, a pointer to it is returned.
  * Otherwise it will be created using the passed creationFunction and stored internally.
  * Clients can release a ProgramObject using #releaseProgramObject. The ProgramObject is
- * only deleted when the last client that requested the object has released it. At the 
+ * only deleted when the last client that requested the object has released it. At the
  * time of ProgramObjectManager destruction, all ProgramObject%s have to have been
- * released or the application will assert. 
+ * released or the application will assert.
  */
 class ProgramObjectManager {
 public:
@@ -66,7 +66,7 @@ public:
      * destruction. If everything went well in shutdown, this method should not do
      * anything and should not emit any warnings.
      *
-     * \param emitWarnings If \c Yes each remaining ProgramObject will emit a warning 
+     * \param emitWarnings If \c Yes each remaining ProgramObject will emit a warning
      *        including information about the remaining reference counter at destruction
      */
     void releaseAll(Warnings emitWarnings = Warnings::Yes);

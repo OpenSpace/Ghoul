@@ -62,8 +62,8 @@ public:
 
 
     /**
-     * Loads a Texture from the memory pointed at by \p memory using the FreeImage library.
-     * The memory block must contain at least \p size number of bytes.
+     * Loads a Texture from the memory pointed at by \p memory using the FreeImage
+     * library. The memory block must contain at least \p size number of bytes.
      *
      * \param memory The memory that contains the bytes of the Texture to be loaded
      * \param size The number of bytes contained in \p memory

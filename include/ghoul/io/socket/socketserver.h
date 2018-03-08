@@ -51,6 +51,4 @@ public:
 
 } // namespace ghoul::io
 
-#endif //  __GHOUL___SOCKETSERVER___H__
-
-
+#endif // __GHOUL___SOCKETSERVER___H__

@@ -44,7 +44,7 @@ public:
     void close() override;
     void listen(std::string address, int port) override;
     bool isListening() const override;
-    
+
     bool hasPendingSockets() const override;
     std::unique_ptr<TcpSocket> nextPendingTcpSocket();
     std::unique_ptr<Socket> nextPendingSocket() override;

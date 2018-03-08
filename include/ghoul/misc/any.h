@@ -220,7 +220,7 @@ public:
 /**
  * This method casts an !any object \p operand into a type <code>ValueType</code> and
  * returns it.
- * 
+ *
  * \param operand The !any object that is to be converted into the type
  *        <code>ValueType</code>
  * \return The converted \p operand
