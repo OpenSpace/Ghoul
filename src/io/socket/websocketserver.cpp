@@ -62,14 +62,14 @@
 #define INVALID_SOCKET (_SOCKET)(~0)
 #endif
 
-#ifndef NO_ERROR
-#define NO_ERROR 0L
-#endif
+// #ifndef NO_ERROR
+// #define NO_ERROR 0L
+// #endif
 
 #ifndef _ERRNO
 #define _ERRNO errno
 #endif
-#endif
+#endif // !WIN32
 
 namespace {
     constexpr const char* _loggerCat = "WebSocketServer";

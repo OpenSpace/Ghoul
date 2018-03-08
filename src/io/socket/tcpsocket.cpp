@@ -30,12 +30,15 @@
 
 #ifdef WIN32
 #define NOMINMAX
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif
+#endif // WIN32_LEAN_AND_MEAN
+
 #include <Windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+
 #ifndef _ERRNO
 #define _ERRNO WSAGetLastError()
 #endif
@@ -46,6 +49,7 @@
 #ifdef _XCODE
 #include <unistd.h>
 #endif
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -54,6 +58,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <errno.h>
+
 #ifndef SOCKET_ERROR
 #define SOCKET_ERROR (-1)
 #endif
@@ -62,14 +67,14 @@
 #define INVALID_SOCKET (_SOCKET)(~0)
 #endif
 
-#ifndef NO_ERROR
-#define NO_ERROR 0L
-#endif
+// #ifndef NO_ERROR
+// #define NO_ERROR 0L
+// #endif
 
-#ifndef _ERRNO
-#define _ERRNO errno
-#endif
-#endif
+// #ifndef _ERRNO
+// #define _ERRNO errno
+// #endif
+#endif // !WIN32
 
 namespace {
     constexpr const char DefaultDelimiter = '\n';
@@ -279,7 +284,15 @@ void TcpSocket::establishConnection(addrinfo *info) {
 }
 
 void TcpSocket::streamInput() {
+#ifdef WIN32
     int nReadBytes = 0;
+
+    auto failed = [](int nBytes) { return nBytes <= 0; };
+#else
+    ssize_t nReadBytes = 0;
+
+    auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
+#endif // WIN32
 
     while (_isConnected && !_shouldDisconnect) {
         nReadBytes = recv(
@@ -289,7 +302,7 @@ void TcpSocket::streamInput() {
             0
         );
 
-        if (nReadBytes <= 0) {
+        if (failed(nReadBytes)) {
             _error = true;
             _shouldDisconnect = true;
             _inputNotifier.notify_one();
@@ -328,11 +341,13 @@ void TcpSocket::streamOutput() {
                 0
             );
 
-            if (nSentBytes <= 0) {
+            auto failed = [](int nBytes) { return nBytes <= 0; };
 #else
-            size_t nSentBytes = send(_socket, _outputBuffer.data(), nBytesToSend, 0);
-            if (nSentBytes == size_t(-1)) {
-#endif // WIN32
+            ssize_t nSentBytes = send(_socket, _outputBuffer.data(), nBytesToSend, 0);
+            auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
+#endif //WIN32
+
+            if (failed(nSentBytes)) {
                 _error = true;
                 _shouldDisconnect = true;
                 _inputNotifier.notify_one();

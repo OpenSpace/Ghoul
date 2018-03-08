@@ -156,7 +156,15 @@ bool WebSocket::putMessage(const std::string &message) {
 }
 
 void WebSocket::streamInput() {
+#ifdef WIN32
     int nReadBytes = 0;
+
+    auto failed = [](int nBytes) { return nBytes <= 0; };
+#else
+    ssize_t nReadBytes = 0;
+
+    auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
+#endif // WIN32
 
     while (_isConnected && !_shouldDisconnect) {
         std::lock_guard<std::mutex> inputBufferGuard(_inputBufferMutex);
@@ -168,7 +176,7 @@ void WebSocket::streamInput() {
             0
         );
 
-        if (nReadBytes <= 0) {
+        if (failed(nReadBytes)) {
             _error = true;
             LDEBUG("Received graceful close request.");
             _shouldDisconnect = true;
@@ -193,9 +201,15 @@ void WebSocket::streamOutput() {
         while ((bytesToSend = outputStreamSize()) > 0) {
             std::lock_guard<std::mutex> streamGuard(_outputStreamMutex);
             std::string output = _outputStream.str();
-            int sentBytes = send(_socket, output.c_str(), bytesToSend, 0);
+            #ifdef WIN32
+                int sentBytes = send(_socket, output.c_str(), bytesToSend, 0);
+                auto failed = [](int nBytes) { return nBytes <= 0; };
+            #else
+                ssize_t sentBytes = send(_socket, output.c_str(), bytesToSend, 0);
+                auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
+            #endif // WIN32
 
-            if (sentBytes <= 0) {
+            if (failed(sentBytes)) {
                 LERROR(
                     fmt::format("Bad send return code: {}. Disconnecting!", errorCode())
                 );
