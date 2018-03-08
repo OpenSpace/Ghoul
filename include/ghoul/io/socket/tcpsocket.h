@@ -75,6 +75,9 @@ public:
     bool isConnected() override;
     bool isConnecting() override;
 
+    virtual std::string address() const;
+    virtual int port() const;
+
     bool getMessage(std::string& message) override;
     bool putMessage(const std::string& message) override;
     void setDelimiter(char delim);

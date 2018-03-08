@@ -35,6 +35,9 @@ namespace ghoul::io {
 class Socket {
 public:
     Socket();
+    virtual std::string address() const = 0;
+    virtual int port() const = 0;
+
     virtual void disconnect(int reason = 0) = 0;
     virtual bool isConnected() = 0;
     virtual bool isConnecting() = 0;
