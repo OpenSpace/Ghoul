@@ -115,6 +115,14 @@ TcpSocket::~TcpSocket() {
     }
 }
 
+std::string TcpSocket::address() const {
+    return _address;
+}
+
+int TcpSocket::port() const {
+    return _port;
+}
+
 void TcpSocket::startStreams() {
     _inputThread = std::thread(
         [this]() { streamInput(); }

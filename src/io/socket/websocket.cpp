@@ -79,6 +79,14 @@ WebSocket::~WebSocket() {
     _socketConnection->eof();
 }
 
+std::string WebSocket::address() const {
+    return _address;
+}
+
+int WebSocket::port() const {
+    return _port;
+}
+
 void WebSocket::startStreams() {
     _inputThread = std::thread([this]() { streamInput(); } );
     _outputThread = std::thread([this]() { streamOutput(); });
