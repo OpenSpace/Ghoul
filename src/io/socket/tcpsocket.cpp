@@ -24,6 +24,8 @@
  ****************************************************************************************/
 
 #include <ghoul/io/socket/tcpsocket.h>
+#include <ghoul/logging/logmanager.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <cstring>
@@ -77,6 +79,7 @@
 #endif // !WIN32
 
 namespace {
+    constexpr const char* _loggerCat = "TcpSocket";
     constexpr const char DefaultDelimiter = '\n';
 } // namespace
 
@@ -117,6 +120,12 @@ TcpSocket::TcpSocket(std::string address, int port, _SOCKET socket)
 TcpSocket::~TcpSocket() {
     if (_isConnected) {
         disconnect();
+    }
+    if (_inputThread.joinable()) {
+        _inputThread.join();
+    }
+    if (_outputThread.joinable()) {
+        _outputThread.join();
     }
 }
 
@@ -180,7 +189,7 @@ void TcpSocket::connect() {
 }
 
 void TcpSocket::disconnect(int) {
-    if (!_isConnected) {
+    if (!_isConnected && !_isConnecting) {
         return;
     }
 
@@ -193,7 +202,7 @@ void TcpSocket::disconnect(int) {
 #endif
     _socket = INVALID_SOCKET;
 
-    _shouldDisconnect = false;
+    _shouldDisconnect = true;
     _isConnected = false;
     _isConnecting = false;
     _inputNotifier.notify_all();
@@ -205,19 +214,14 @@ void TcpSocket::disconnect(int) {
     if (_outputThread.joinable()) {
         _outputThread.join();
     }
+    _shouldDisconnect = false;
 }
 
 bool TcpSocket::isConnected() {
-    if (_shouldDisconnect) {
-        disconnect();
-    }
     return _isConnected;
 }
 
 bool TcpSocket::isConnecting() {
-    if (_shouldDisconnect) {
-        disconnect();
-    }
     return _isConnecting;
 }
 
@@ -250,30 +254,53 @@ void TcpSocket::establishConnection(addrinfo *info) {
     if (_socket == INVALID_SOCKET) {
         freeaddrinfo(info);
         _error = true;
+        _isConnected = false;
+        _isConnecting = false;
         _shouldDisconnect = true;
         return;
     }
 
-    char trueFlag = 1;
-    char falseFlag = 0;
+    int trueFlag = 1;
+    int falseFlag = 0;
     int result;
 
     // Disable Nagle's algorithm.
     result = setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, &trueFlag, sizeof(trueFlag));
-
+    if (result == SOCKET_ERROR) {
+        LWARNING(fmt::format("Socket error: {}", _ERRNO));
+    }
     // Set send timeout
     char timeout = 0;
     result = setsockopt(_socket, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+    if (result == SOCKET_ERROR) {
+        LWARNING(fmt::format("Socket error: {}", _ERRNO));
+    }
     // Set receive timeout
     result = setsockopt(_socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+    if (result == SOCKET_ERROR) {
+        LWARNING(fmt::format("Socket error: {}", _ERRNO));
+    }
     // Disable address reuse
     result = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &falseFlag, sizeof(falseFlag));
     if (result == SOCKET_ERROR) {
+        LWARNING(fmt::format("Socket error: {}", _ERRNO));
+    }
+    if (result == SOCKET_ERROR) {
+        freeaddrinfo(info);
+        _error = true;
+        _isConnecting = false;
+        _isConnected = false;
+        _shouldDisconnect = true;
         return;
     }
     // Keep alive
     result = setsockopt(_socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(trueFlag));
     if (result == SOCKET_ERROR) {
+        freeaddrinfo(info);
+        _error = true;
+        _isConnecting = false;
+        _isConnected = false;
+        _shouldDisconnect = true;
         return;
     }
 
@@ -305,6 +332,8 @@ void TcpSocket::streamInput() {
         if (failed(nReadBytes)) {
             _error = true;
             _shouldDisconnect = true;
+            _isConnecting = false;
+            _isConnected = false;
             _inputNotifier.notify_one();
             return;
         }
@@ -350,6 +379,8 @@ void TcpSocket::streamOutput() {
             if (failed(nSentBytes)) {
                 _error = true;
                 _shouldDisconnect = true;
+                _isConnecting = false;
+                _isConnected = false;
                 _inputNotifier.notify_one();
                 return;
             }
@@ -463,7 +494,7 @@ bool TcpSocket::initializedNetworkApi() {
 bool TcpSocket::getBytes(char* getBuffer, size_t size) {
     waitForInput(size);
     if (_shouldDisconnect) {
-        disconnect();
+        return false;
     }
     if (!_isConnected && !_isConnecting) {
         return false;
@@ -477,7 +508,7 @@ bool TcpSocket::getBytes(char* getBuffer, size_t size) {
 bool TcpSocket::peekBytes(char* peekBuffer, size_t size) {
     waitForInput(size);
     if (_shouldDisconnect) {
-        disconnect();
+        return false;
     }
     if (!_isConnected && !_isConnecting) {
         return false;
@@ -490,7 +521,7 @@ bool TcpSocket::peekBytes(char* peekBuffer, size_t size) {
 bool TcpSocket::skipBytes(size_t size) {
     waitForInput(size);
     if (_shouldDisconnect) {
-        disconnect();
+        return false;
     }
     if (!_isConnected && !_isConnecting) {
         return false;
@@ -502,7 +533,7 @@ bool TcpSocket::skipBytes(size_t size) {
 
 bool TcpSocket::putBytes(const char* buffer, size_t size) {
     if (_shouldDisconnect) {
-        disconnect();
+        return false;
     }
     std::lock_guard<std::mutex> outputLock(_outputQueueMutex);
     _outputQueue.insert(
