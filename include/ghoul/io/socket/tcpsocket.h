@@ -114,12 +114,14 @@ protected:
     */
     virtual bool putBytes(const char* buffer, size_t size = 1);
 
+    void closeSocket();
+
     const std::string _address;
     const int _port;
-    std::atomic<bool> _isConnected;
-    std::atomic<bool> _isConnecting;
-    std::atomic<bool> _shouldDisconnect;
-    std::atomic<bool> _error;
+    std::atomic<bool> _isConnected = false;
+    std::atomic<bool> _isConnecting = false;
+    std::atomic<bool> _shouldStopThreads = false;
+    std::atomic<bool> _shouldCloseSocket = false;
 
     _SOCKET _socket;
     TcpSocketServer* _server;
@@ -131,8 +133,8 @@ private:
     void streamInput();
     void streamOutput();
     int waitForDelimiter();
-    bool waitForInput(size_t nBytes);
-    bool waitForOutput(size_t nBytes);
+    void waitForInput(size_t nBytes);
+    void waitForOutput(size_t nBytes);
 
     std::mutex _inputBufferMutex;
     std::mutex _inputQueueMutex;

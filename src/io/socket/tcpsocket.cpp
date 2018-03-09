@@ -97,8 +97,7 @@ TcpSocket::TcpSocket(std::string address, int port)
     , _port(port)
     , _isConnected(false)
     , _isConnecting(false)
-    , _shouldDisconnect(false)
-    , _error(false)
+    , _shouldStopThreads(false)
     , _socket(INVALID_SOCKET)
     , _server(nullptr)
     , _delimiter(DefaultDelimiter)
@@ -110,8 +109,7 @@ TcpSocket::TcpSocket(std::string address, int port, _SOCKET socket)
     , _port(port)
     , _isConnected(true)
     , _isConnecting(false)
-    , _shouldDisconnect(false)
-    , _error(false)
+    , _shouldStopThreads(false)
     , _socket(socket)
     , _server(nullptr)
     , _delimiter(DefaultDelimiter)
@@ -121,6 +119,7 @@ TcpSocket::~TcpSocket() {
     if (_isConnected) {
         disconnect();
     }
+    _shouldStopThreads = true;
     if (_inputThread.joinable()) {
         _inputThread.join();
     }
@@ -184,11 +183,9 @@ void TcpSocket::connect() {
         _inputThread = std::thread([this]() { streamInput(); });
         streamOutput();
     });
-
-    _error = false;
 }
 
-void TcpSocket::disconnect(int) {
+void TcpSocket::closeSocket() {
     if (!_isConnected && !_isConnecting) {
         return;
     }
@@ -202,9 +199,18 @@ void TcpSocket::disconnect(int) {
 #endif
     _socket = INVALID_SOCKET;
 
-    _shouldDisconnect = true;
     _isConnected = false;
     _isConnecting = false;
+}
+
+void TcpSocket::disconnect(int) {
+    if (!_isConnected && !_isConnecting) {
+        return;
+    }
+
+    _shouldStopThreads = true;
+    closeSocket();
+
     _inputNotifier.notify_all();
     _outputNotifier.notify_all();
 
@@ -214,7 +220,7 @@ void TcpSocket::disconnect(int) {
     if (_outputThread.joinable()) {
         _outputThread.join();
     }
-    _shouldDisconnect = false;
+    _shouldStopThreads = false;
 }
 
 bool TcpSocket::isConnected() {
@@ -253,10 +259,11 @@ void TcpSocket::establishConnection(addrinfo *info) {
 
     if (_socket == INVALID_SOCKET) {
         freeaddrinfo(info);
-        _error = true;
         _isConnected = false;
         _isConnecting = false;
-        _shouldDisconnect = true;
+        _shouldStopThreads = true;
+        _inputNotifier.notify_all();
+        _outputNotifier.notify_all();
         return;
     }
 
@@ -287,20 +294,22 @@ void TcpSocket::establishConnection(addrinfo *info) {
     }
     if (result == SOCKET_ERROR) {
         freeaddrinfo(info);
-        _error = true;
         _isConnecting = false;
         _isConnected = false;
-        _shouldDisconnect = true;
+        _shouldStopThreads = true;
+        _inputNotifier.notify_all();
+        _outputNotifier.notify_all();
         return;
     }
     // Keep alive
     result = setsockopt(_socket, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char*>(&trueFlag), sizeof(trueFlag));
     if (result == SOCKET_ERROR) {
         freeaddrinfo(info);
-        _error = true;
         _isConnecting = false;
         _isConnected = false;
-        _shouldDisconnect = true;
+        _shouldStopThreads = true;
+        _inputNotifier.notify_all();
+        _outputNotifier.notify_all();
         return;
     }
 
@@ -321,7 +330,7 @@ void TcpSocket::streamInput() {
     auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
 #endif // WIN32
 
-    while (_isConnected && !_shouldDisconnect) {
+    while (_isConnected && !_shouldStopThreads) {
         nReadBytes = recv(
             _socket,
             _inputBuffer.data(),
@@ -330,11 +339,10 @@ void TcpSocket::streamInput() {
         );
 
         if (failed(nReadBytes)) {
-            _error = true;
-            _shouldDisconnect = true;
-            _isConnecting = false;
-            _isConnected = false;
-            _inputNotifier.notify_one();
+            _shouldStopThreads = true;
+            _inputNotifier.notify_all();
+            _outputNotifier.notify_all();
+            closeSocket();
             return;
         }
 
@@ -349,7 +357,7 @@ void TcpSocket::streamInput() {
 }
 
 void TcpSocket::streamOutput() {
-    while (_isConnected && !_shouldDisconnect) {
+    while (_isConnected && !_shouldStopThreads) {
         waitForOutput(1);
 
         size_t nBytesToSend = 0;
@@ -377,11 +385,10 @@ void TcpSocket::streamOutput() {
 #endif //WIN32
 
             if (failed(nSentBytes)) {
-                _error = true;
-                _shouldDisconnect = true;
-                _isConnecting = false;
-                _isConnected = false;
-                _inputNotifier.notify_one();
+                closeSocket();
+                _shouldStopThreads = true;
+                _inputNotifier.notify_all();
+                _outputNotifier.notify_all();
                 return;
             }
             _outputQueue.erase(
@@ -392,13 +399,13 @@ void TcpSocket::streamOutput() {
     }
 }
 
-bool TcpSocket::waitForInput(size_t nBytes) {
+void TcpSocket::waitForInput(size_t nBytes) {
     if (nBytes == 0) {
-        return true;
+        return;
     }
 
     auto receivedRequestedInputOrDisconnected = [this, nBytes]() {
-        if (_shouldDisconnect || (!_isConnected && !_isConnecting)) {
+        if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
         }
         std::lock_guard<std::mutex> queueMutex(_inputQueueMutex);
@@ -410,15 +417,13 @@ bool TcpSocket::waitForInput(size_t nBytes) {
         std::unique_lock<std::mutex> lock(_inputBufferMutex);
         _inputNotifier.wait(lock, receivedRequestedInputOrDisconnected);
     }
-
-    return !_error;
 }
 
 int TcpSocket::waitForDelimiter() {
     char delimiter = _delimiter;
     size_t currentIndex = 0;
     auto receivedRequestedInputOrDisconnected = [this, &currentIndex, delimiter]() {
-        if (_shouldDisconnect || (!_isConnected && !_isConnecting)) {
+        if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
         }
         std::lock_guard<std::mutex> queueMutex(_inputQueueMutex);
@@ -436,20 +441,16 @@ int TcpSocket::waitForDelimiter() {
         std::unique_lock<std::mutex> lock(_inputBufferMutex);
         _inputNotifier.wait(lock, receivedRequestedInputOrDisconnected);
     }
-    if (_error) {
-        return -1;
-    } else {
-        return static_cast<int>(currentIndex);
-    }
+    return static_cast<int>(currentIndex);
 }
 
-bool TcpSocket::waitForOutput(size_t nBytes) {
+void TcpSocket::waitForOutput(size_t nBytes) {
     if (nBytes == 0) {
-        return true;
+        return;
     }
 
     auto receivedRequestedOutputOrDisconnected = [this, nBytes]() {
-        if (_shouldDisconnect || (!_isConnected && !_isConnecting)) {
+        if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
         }
         std::lock_guard<std::mutex> queueMutex(_outputQueueMutex);
@@ -461,8 +462,6 @@ bool TcpSocket::waitForOutput(size_t nBytes) {
         std::unique_lock<std::mutex> lock(_outputBufferMutex);
         _outputNotifier.wait(lock, receivedRequestedOutputOrDisconnected);
     }
-
-    return !_error;
 }
 
 void TcpSocket::initializeNetworkApi() {
@@ -493,7 +492,7 @@ bool TcpSocket::initializedNetworkApi() {
 
 bool TcpSocket::getBytes(char* getBuffer, size_t size) {
     waitForInput(size);
-    if (_shouldDisconnect) {
+    if (_shouldStopThreads) {
         return false;
     }
     if (!_isConnected && !_isConnecting) {
@@ -507,7 +506,7 @@ bool TcpSocket::getBytes(char* getBuffer, size_t size) {
 
 bool TcpSocket::peekBytes(char* peekBuffer, size_t size) {
     waitForInput(size);
-    if (_shouldDisconnect) {
+    if (_shouldStopThreads) {
         return false;
     }
     if (!_isConnected && !_isConnecting) {
@@ -520,7 +519,7 @@ bool TcpSocket::peekBytes(char* peekBuffer, size_t size) {
 
 bool TcpSocket::skipBytes(size_t size) {
     waitForInput(size);
-    if (_shouldDisconnect) {
+    if (_shouldStopThreads) {
         return false;
     }
     if (!_isConnected && !_isConnecting) {
@@ -532,7 +531,7 @@ bool TcpSocket::skipBytes(size_t size) {
 }
 
 bool TcpSocket::putBytes(const char* buffer, size_t size) {
-    if (_shouldDisconnect) {
+    if (_shouldStopThreads) {
         return false;
     }
     std::lock_guard<std::mutex> outputLock(_outputQueueMutex);

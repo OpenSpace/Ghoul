@@ -79,9 +79,11 @@ public:
 private:
     void streamInput();
     void streamOutput();
-    bool waitForOutput(size_t nBytes);
-    bool waitForInput(size_t nBytes = 0);
+    void waitForOutput(size_t nBytes);
+    void waitForInput(size_t nBytes = 0);
     int errorCode();
+
+    void closeSocket();
 
     bool socketHasConnection();
 

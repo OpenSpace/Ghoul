@@ -102,11 +102,28 @@ void WebSocket::disconnect(int reason) {
         );
     }
 
+    _shouldStopThreads = true;
+    
     _socketConnection->eof();
+    closeSocket();
+
     _outputNotifier.notify_all();
     if (_outputThread.joinable()) {
         _outputThread.join();
     }
+
+    _shouldStopThreads = false;
+    _isConnected = false;
+    _isConnecting = false;
+    _inputNotifier.notify_all();
+    if (_inputThread.joinable()) {
+        _inputThread.join();
+    }
+
+    LDEBUG(fmt::format("Disconnected client {}:{}.", _address, _port));
+}
+
+void WebSocket::closeSocket() {
 
 #ifdef WIN32
     shutdown(_socket, SD_BOTH);
@@ -117,15 +134,9 @@ void WebSocket::disconnect(int reason) {
 #endif
     _socket = INVALID_SOCKET;
 
-    _shouldDisconnect = false;
     _isConnected = false;
     _isConnecting = false;
-    _inputNotifier.notify_all();
-    if (_inputThread.joinable()) {
-        _inputThread.join();
-    }
 
-    LDEBUG(fmt::format("Disconnected client {}:{}.", _address, _port));
 }
 
 bool WebSocket::socketHasConnection() {
@@ -166,7 +177,7 @@ void WebSocket::streamInput() {
     auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
 #endif // WIN32
 
-    while (_isConnected && !_shouldDisconnect) {
+    while (_isConnected && !_shouldStopThreads) {
         std::lock_guard<std::mutex> inputBufferGuard(_inputBufferMutex);
 
         nReadBytes = recv(
@@ -177,9 +188,8 @@ void WebSocket::streamInput() {
         );
 
         if (failed(nReadBytes)) {
-            _error = true;
             LDEBUG("Received graceful close request.");
-            _shouldDisconnect = true;
+            _shouldStopThreads = true;
             _inputNotifier.notify_one();
             return;
         }
@@ -193,7 +203,7 @@ void WebSocket::streamInput() {
 }
 
 void WebSocket::streamOutput() {
-    while (_isConnected && !_shouldDisconnect) {
+    while (_isConnected && !_shouldStopThreads) {
         waitForOutput(1);
 
         int bytesToSend = 0;
@@ -213,8 +223,7 @@ void WebSocket::streamOutput() {
                 LERROR(
                     fmt::format("Bad send return code: {}. Disconnecting!", errorCode())
                 );
-                _error = true;
-                _shouldDisconnect = true;
+                _shouldStopThreads = true;
                 _inputNotifier.notify_one();
                 return;
             }
@@ -265,19 +274,19 @@ void WebSocket::onOpen(websocketpp::connection_hdl hdl) {
 
 void WebSocket::onClose(websocketpp::connection_hdl hdl) {
     LDEBUG(fmt::format("onClose: WebSocket closing. Client: {}:{}.", _address, _port));
-    _shouldDisconnect = true;
+    _shouldStopThreads = true;
 
     std::lock_guard<std::mutex> guard(_connectionHandlesMutex);
     _connectionHandles.erase(hdl);
 }
 
-bool WebSocket::waitForOutput(size_t nBytes) {
+void WebSocket::waitForOutput(size_t nBytes) {
     if (nBytes == 0) {
-        return false;
+        return;
     }
 
     auto receivedRequestedOutputOrDisconnected = [this, nBytes]() {
-        if (_shouldDisconnect || (!_isConnected && !_isConnecting)) {
+        if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
         }
         return static_cast<size_t>(outputStreamSize()) >= nBytes;
@@ -288,13 +297,11 @@ bool WebSocket::waitForOutput(size_t nBytes) {
         std::unique_lock<std::mutex> lock(_outputBufferMutex);
         _outputNotifier.wait(lock, receivedRequestedOutputOrDisconnected);
     }
-
-    return !_error;
 }
 
-bool WebSocket::waitForInput(size_t) {
+void WebSocket::waitForInput(size_t) {
     auto hasInputOrDisconnected = [this]() {
-        if (_shouldDisconnect || (!_isConnected && !_isConnecting)) {
+        if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
         }
         return _inputQueue.size() > 0;
@@ -304,8 +311,6 @@ bool WebSocket::waitForInput(size_t) {
         std::unique_lock<std::mutex> lock(_inputQueueMutex);
         _inputNotifier.wait(lock, hasInputOrDisconnected);
     }
-
-    return !_error;
 }
 
 }  // namespace ghoul::io
