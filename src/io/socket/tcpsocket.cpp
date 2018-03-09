@@ -265,23 +265,23 @@ void TcpSocket::establishConnection(addrinfo *info) {
     int result;
 
     // Disable Nagle's algorithm.
-    result = setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, &trueFlag, sizeof(trueFlag));
+    result = setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<char*>(&trueFlag), sizeof(trueFlag));
     if (result == SOCKET_ERROR) {
         LWARNING(fmt::format("Socket error: {}", _ERRNO));
     }
     // Set send timeout
     char timeout = 0;
-    result = setsockopt(_socket, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+    result = setsockopt(_socket, SOL_SOCKET, SO_SNDTIMEO, reinterpret_cast<char*>(&timeout), sizeof(timeout));
     if (result == SOCKET_ERROR) {
         LWARNING(fmt::format("Socket error: {}", _ERRNO));
     }
     // Set receive timeout
-    result = setsockopt(_socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+    result = setsockopt(_socket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char*>(&timeout), sizeof(timeout));
     if (result == SOCKET_ERROR) {
         LWARNING(fmt::format("Socket error: {}", _ERRNO));
     }
     // Disable address reuse
-    result = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &falseFlag, sizeof(falseFlag));
+    result = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&falseFlag), sizeof(falseFlag));
     if (result == SOCKET_ERROR) {
         LWARNING(fmt::format("Socket error: {}", _ERRNO));
     }
@@ -294,7 +294,7 @@ void TcpSocket::establishConnection(addrinfo *info) {
         return;
     }
     // Keep alive
-    result = setsockopt(_socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(trueFlag));
+    result = setsockopt(_socket, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char*>(&trueFlag), sizeof(trueFlag));
     if (result == SOCKET_ERROR) {
         freeaddrinfo(info);
         _error = true;
