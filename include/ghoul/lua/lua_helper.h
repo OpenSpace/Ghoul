@@ -321,6 +321,30 @@ int checkArgumentsAndThrow(lua_State* L, int expected1, int expected2,
 int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range,
     const char* component = nullptr);
 
+/**
+ * Checks if the number of arguments on the Lua stack is in either equal to \p
+ * expected o inside the \p range of allowed values. If the numbers do not agree, an "
+ * error is logged and a ghoul::lua::LuaExecutionException is raised.
+ *
+ * \param L The Lua stack from which the arguments are checked
+ * \param expected The expected value
+ * \param range The inclusive range that the number of arguments are tested against
+ * \param component The name of the component that is used for the error message
+ * \return The number of arguments
+ * \throw ghoul::lua::LuaExecutionException if the number of arguments is wrong
+ */
+int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range,
+    const char* component = nullptr);
+
+/**
+ * Checks whether the passed state \p L has the correct size. If it is not equal to
+ * \p expected this function asserts in debug configuration and will print the stack
+ * information, but is a noop in other configurations
+ * \param L The state that is to be tested
+ * \param expected The expected number of items on the stack
+ */
+void verifyStackSize(lua_State* L, int expected = 0);
+
 
 namespace internal {
     void deinitializeGlobalState();
