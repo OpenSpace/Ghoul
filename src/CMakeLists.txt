@@ -56,6 +56,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/misc/dictionary.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/dictionaryjsonformatter.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/dictionaryluaformatter.cpp
+    ${PROJECT_SOURCE_DIR}/src/misc/easing.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/exception.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/misc.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/sharedmemory.cpp
@@ -181,6 +182,8 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionaryformatter.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionaryjsonformatter.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionaryluaformatter.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/easing.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/easing.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/exception.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/fromstring.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
