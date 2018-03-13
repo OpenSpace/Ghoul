@@ -93,6 +93,10 @@ void internal_assert(std::string expression, std::string message, std::string fi
                 break;
             }
             else if (inputLine == "a") {
+#ifdef _MSC_VER
+                __debugbreak();
+#endif // _MSC_VER
+
                 throw AssertionException(
                     std::move(expression),
                     std::move(message),
