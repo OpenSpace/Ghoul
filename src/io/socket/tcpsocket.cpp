@@ -233,12 +233,14 @@ bool TcpSocket::isConnecting() {
 
 bool TcpSocket::getMessage(std::string& message) {
     int delimiterIndex = waitForDelimiter();
-    if (delimiterIndex == -1) {
+    if (delimiterIndex == 0) {
         return false;
     }
     std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
     message = std::string(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex);
-    _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex + 1);
+    if (_inputQueue.size() >= delimiterIndex + 1) {
+        _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex + 1);
+    }
     return true;
 }
 
