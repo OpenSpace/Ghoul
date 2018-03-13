@@ -278,17 +278,7 @@ void TcpSocket::establishConnection(addrinfo *info) {
     if (result == SOCKET_ERROR) {
         LWARNING(fmt::format("Socket error: {}", _ERRNO));
     }
-    // Set send timeout
-    char timeout = 0;
-    result = setsockopt(_socket, SOL_SOCKET, SO_SNDTIMEO, reinterpret_cast<char*>(&timeout), sizeof(timeout));
-    if (result == SOCKET_ERROR) {
-        LWARNING(fmt::format("Socket error: {}", _ERRNO));
-    }
-    // Set receive timeout
-    result = setsockopt(_socket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char*>(&timeout), sizeof(timeout));
-    if (result == SOCKET_ERROR) {
-        LWARNING(fmt::format("Socket error: {}", _ERRNO));
-    }
+
     // Disable address reuse
     result = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&falseFlag), sizeof(falseFlag));
     if (result == SOCKET_ERROR) {
