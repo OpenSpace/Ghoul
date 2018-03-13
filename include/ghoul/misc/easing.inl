@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  *****************************************************************************************
  * File based on 'easing.c' by Auerhaus Development, LLC and used under the Do What The  *
- * Fuck You Want ToPublic License, Version 2 as published by Sam Hocevar. See            *
+ * Fuck You Want To Public License, Version 2 as published by Sam Hocevar. See           *
  * http://sam.zoy.org/wtfpl/COPYING for more details.                                    *
  ****************************************************************************************/
 
