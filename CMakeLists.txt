@@ -54,7 +54,6 @@ option(GHOUL_THROW_ON_ASSERT "Disables the feedback on asserts; for use in unit 
 option(GHOUL_MODULE_COMMANDLINEPARSER "Enable Commandlineparser" ON)
 option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
 option(GHOUL_MODULE_LUA "Enable Lua" ON)
-option(GHOUL_MODULE_STB_IMAGE "Enable stb_image" ON)
 option(GHOUL_MODULE_OPENGL "Enable OpenGL" ON)
 option(GHOUL_MODULE_SYSTEMCAPABILITIES "Enable System Capabilities" ON)
 
@@ -269,8 +268,9 @@ if (SOIL_FOUND)
 endif ()
 
 # stb_image
-if (GHOUL_MODULE_STB_IMAGE)
-    target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_STB")
+option(GHOUL_USE_STB_IMAGE "Use the stb_image library" ON)
+if (GHOUL_USE_STB_IMAGE)
+    target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_STB_IMAGE")
     include_external_library(Ghoul stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
 endif ()
 
@@ -297,8 +297,8 @@ add_dependencies(Ghoul websocketpp)
 target_include_directories(Ghoul SYSTEM PUBLIC ${WEBSOCKETPP_ROOT_DIR})
 
 # Image library assertion
-if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE AND NOT GHOUL_USE_SOIL)
-    message(FATAL_ERROR "Ghoul needs to be built with DevIL, FreeImage, or SoIL")
+if (NOT GHOUL_USE_DEVIL AND NOT GHOUL_USE_FREEIMAGE AND NOT GHOUL_USE_SOIL AND NOT GHOUL_USE_STB_IMAGE)
+    message(FATAL_ERROR "Ghoul needs to be built with DevIL, FreeImage, SoIL or stb_image")
 endif ()
 
 # Freetype

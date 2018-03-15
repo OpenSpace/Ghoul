@@ -25,6 +25,8 @@
 
 #include <ghoul/io/texture/texturereaderstb.h>
 
+#ifdef GHOUL_USE_STB_IMAGE
+
 #include <ghoul/fmt.h>
 #include <ghoul/glm.h>
 #include <ghoul/opengl/texture.h>
@@ -149,3 +151,5 @@ std::vector<std::string> TextureReaderSTB::supportedExtensions() const {
 }
 
 } // namespace ghoul::io
+
+#endif // GHOUL_USE_STB_IMAGE
