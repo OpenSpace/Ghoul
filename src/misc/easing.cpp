@@ -70,72 +70,71 @@ bool isValidEasingFunctionName(const char* name) {
     return false;
 }
 
-// template linear<float>;
-// template quadraticEaseIn<float>;
-// template quadraticEaseOut<float>;
-// template quadraticEaseInOut<float>;
-// template cubicEaseIn<float>;
-// template cubicEaseOut<float>;
-// template cubicEaseInOut<float>;
-// template quarticEaseIn<float>;
-// template quarticEaseOut<float>;
-// template quarticEaseInOut<float>;
-// template quinticEaseIn<float>;
-// template quinticEaseOut<float>;
-// template quinticEaseInOut<float>;
-// template quinticEaseIn<float>;
-// template quinticEaseOut<float>;
-// template quinticEaseInOut<float>;
-// template sineEaseIn<float>;
-// template sineEaseOut<float>;
-// template sineEaseInOut<float>;
-// template circularEaseIn<float>;
-// template circularEaseOut<float>;
-// template circularEaseInOut<float>;
-// template exponentialEaseIn<float>;
-// template exponentialEaseOut<float>;
-// template exponentialEaseInOut<float>;
-// template elasticEaseIn<float>;
-// template elasticEaseInOut<float>;
-// template elasticEaseOut<float>;
-// template bounceEaseIn<float>;
-// template bounceEaseOut<float>;
-// template bounceEaseInOut<float>;
+namespace {
+    // Just instantiate them once to see that they compile and don't throw warnings
+    [[maybe_unused]] float _f = linear(0.f);
+    [[maybe_unused]] float _f1 = quadraticEaseIn(0.f);
+    [[maybe_unused]] float _f2 = quadraticEaseOut(0.f);
+    [[maybe_unused]] float _f3 = quadraticEaseInOut(0.f);
+    [[maybe_unused]] float _f4 = cubicEaseIn(0.f);
+    [[maybe_unused]] float _f5 = cubicEaseOut(0.f);
+    [[maybe_unused]] float _f6 = cubicEaseInOut(0.f);
+    [[maybe_unused]] float _f7 = quarticEaseIn(0.f);
+    [[maybe_unused]] float _f8 = quarticEaseOut(0.f);
+    [[maybe_unused]] float _f9 = quarticEaseInOut(0.f);
+    [[maybe_unused]] float _f10 = quinticEaseIn(0.f);
+    [[maybe_unused]] float _f11 = quinticEaseOut(0.f);
+    [[maybe_unused]] float _f12 = quinticEaseInOut(0.f);
+    [[maybe_unused]] float _f13 = quinticEaseIn(0.f);
+    [[maybe_unused]] float _f14 = quinticEaseOut(0.f);
+    [[maybe_unused]] float _f15 = quinticEaseInOut(0.f);
+    [[maybe_unused]] float _f16 = sineEaseIn(0.f);
+    [[maybe_unused]] float _f17 = sineEaseOut(0.f);
+    [[maybe_unused]] float _f18 = sineEaseInOut(0.f);
+    [[maybe_unused]] float _f19 = circularEaseIn(0.f);
+    [[maybe_unused]] float _f20 = circularEaseOut(0.f);
+    [[maybe_unused]] float _f21 = circularEaseInOut(0.f);
+    [[maybe_unused]] float _f22 = exponentialEaseIn(0.f);
+    [[maybe_unused]] float _f23 = exponentialEaseOut(0.f);
+    [[maybe_unused]] float _f24 = exponentialEaseInOut(0.f);
+    [[maybe_unused]] float _f25 = elasticEaseIn(0.f);
+    [[maybe_unused]] float _f26 = elasticEaseInOut(0.f);
+    [[maybe_unused]] float _f27 = elasticEaseOut(0.f);
+    [[maybe_unused]] float _f28 = bounceEaseIn(0.f);
+    [[maybe_unused]] float _f29 = bounceEaseOut(0.f);
+    [[maybe_unused]] float _f30 = bounceEaseInOut(0.f);
 
-// template linear<double>;
-// template quadraticEaseIn<double>;
-// template quadraticEaseOut<double>;
-// template quadraticEaseInOut<double>;
-// template cubicEaseIn<double>;
-// template cubicEaseOut<double>;
-// template cubicEaseInOut<double>;
-// template quarticEaseIn<double>;
-// template quarticEaseOut<double>;
-// template quarticEaseInOut<double>;
-// template quinticEaseIn<double>;
-// template quinticEaseOut<double>;
-// template quinticEaseInOut<double>;
-// template quinticEaseIn<double>;
-// template quinticEaseOut<double>;
-// template quinticEaseInOut<double>;
-// template sineEaseIn<double>;
-// template sineEaseOut<double>;
-// template sineEaseInOut<double>;
-// template circularEaseIn<double>;
-// template circularEaseOut<double>;
-// template circularEaseInOut<double>;
-// template exponentialEaseIn<double>;
-// template exponentialEaseOut<double>;
-// template exponentialEaseInOut<double>;
-// template elasticEaseIn<double>;
-// template elasticEaseInOut<double>;
-// template elasticEaseOut<double>;
-// template bounceEaseIn<double>;
-// template bounceEaseOut<double>;
-// template bounceEaseInOut<double>;
-
-
-
-
+    [[maybe_unused]] double _d = linear(0.0);
+    [[maybe_unused]] double _d1 = quadraticEaseIn(0.0);
+    [[maybe_unused]] double _d2 = quadraticEaseOut(0.0);
+    [[maybe_unused]] double _d3 = quadraticEaseInOut(0.0);
+    [[maybe_unused]] double _d4 = cubicEaseIn(0.0);
+    [[maybe_unused]] double _d5 = cubicEaseOut(0.0);
+    [[maybe_unused]] double _d6 = cubicEaseInOut(0.0);
+    [[maybe_unused]] double _d7 = quarticEaseIn(0.0);
+    [[maybe_unused]] double _d8 = quarticEaseOut(0.0);
+    [[maybe_unused]] double _d9 = quarticEaseInOut(0.0);
+    [[maybe_unused]] double _d10 = quinticEaseIn(0.0);
+    [[maybe_unused]] double _d11 = quinticEaseOut(0.0);
+    [[maybe_unused]] double _d12 = quinticEaseInOut(0.0);
+    [[maybe_unused]] double _d13 = quinticEaseIn(0.0);
+    [[maybe_unused]] double _d14 = quinticEaseOut(0.0);
+    [[maybe_unused]] double _d15 = quinticEaseInOut(0.0);
+    [[maybe_unused]] double _d16 = sineEaseIn(0.0);
+    [[maybe_unused]] double _d17 = sineEaseOut(0.0);
+    [[maybe_unused]] double _d18 = sineEaseInOut(0.0);
+    [[maybe_unused]] double _d19 = circularEaseIn(0.0);
+    [[maybe_unused]] double _d20 = circularEaseOut(0.0);
+    [[maybe_unused]] double _d21 = circularEaseInOut(0.0);
+    [[maybe_unused]] double _d22 = exponentialEaseIn(0.0);
+    [[maybe_unused]] double _d23 = exponentialEaseOut(0.0);
+    [[maybe_unused]] double _d24 = exponentialEaseInOut(0.0);
+    [[maybe_unused]] double _d25 = elasticEaseIn(0.0);
+    [[maybe_unused]] double _d26 = elasticEaseInOut(0.0);
+    [[maybe_unused]] double _d27 = elasticEaseOut(0.0);
+    [[maybe_unused]] double _d28 = bounceEaseIn(0.0);
+    [[maybe_unused]] double _d29 = bounceEaseOut(0.0);
+    [[maybe_unused]] double _d30 = bounceEaseInOut(0.0);
+} // namespace
 
 } // namespace ghoul

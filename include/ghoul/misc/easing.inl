@@ -142,7 +142,7 @@ T cubicEaseInOut(T p) {
     }
     else {
         T f = ((2 * p) - 2);
-        return 0.5 * f * f * f + 1;
+        return 0.5f * f * f * f + 1;
     }
 }
 
@@ -198,7 +198,7 @@ T quinticEaseInOut(T p)  {
     }
     else {
         T f = ((2 * p) - 2);
-        return  0.5 * f * f * f * f * f + 1;
+        return 0.5f * f * f * f * f * f + 1;
     }
 }
 
@@ -220,7 +220,7 @@ template <typename T>
 T sineEaseInOut(T p) {
     ghoul_assert(p >= 0 && p <= 1, "Interpolation variable p out of range [0,1]");
 
-    return 0.5 * (1 - cos(p * glm::pi<T>()));
+    return 0.5f * (1 - cos(p * glm::pi<T>()));
 }
 
 template <typename T>
@@ -242,10 +242,10 @@ T circularEaseInOut(T p) {
     ghoul_assert(p >= 0 && p <= 1, "Interpolation variable p out of range [0,1]");
 
     if (p < 0.5) {
-        return 0.5 * (1 - sqrt(1 - 4 * (p * p)));
+        return 0.5f * (1 - sqrt(1 - 4 * (p * p)));
     }
     else {
-        return 0.5 * (sqrt(-((2 * p) - 3) * ((2 * p) - 1)) + 1);
+        return 0.5f * (sqrt(-((2 * p) - 3) * ((2 * p) - 1)) + 1);
     }
 }
 
@@ -253,14 +253,14 @@ template <typename T>
 T exponentialEaseIn(T p) {
     ghoul_assert(p >= 0 && p <= 1, "Interpolation variable p out of range [0,1]");
 
-    return (p == 0.0) ? p : pow(2, 10 * (p - 1));
+    return (p == 0.0) ? p : static_cast<T>(pow(2, 10 * (p - 1)));
 }
 
 template <typename T>
 T exponentialEaseOut(T p) {
     ghoul_assert(p >= 0 && p <= 1, "Interpolation variable p out of range [0,1]");
 
-    return (p == 1.0) ? p : 1 - pow(2, -10 * p);
+    return (p == 1.0) ? p : static_cast<T>(1 - pow(2, -10 * p));
 }
 
 template <typename T>
@@ -272,10 +272,10 @@ T exponentialEaseInOut(T p) {
     }
     
     if (p < 0.5) {
-        return 0.5 * pow(2, (20 * p) - 10);
+        return static_cast<T>(0.5f * pow(2, (20 * p) - 10));
     }
     else {
-        return -0.5 * pow(2, (-20 * p) + 10) + 1;
+        return static_cast<T>(-0.5f * pow(2, (-20 * p) + 10) + 1);
     }
 }
 
@@ -283,26 +283,30 @@ template <typename T>
 T elasticEaseIn(T p) {
     ghoul_assert(p >= 0 && p <= 1, "Interpolation variable p out of range [0,1]");
 
-    return sin(13 * glm::half_pi<T>() * p) * pow(2, 10 * (p - 1));
+    return static_cast<T>(sin(13 * glm::half_pi<T>() * p) * pow(2, 10 * (p - 1)));
 }
 
 template <typename T>
 T elasticEaseOut(T p) {
     ghoul_assert(p >= 0 && p <= 1, "Interpolation variable p out of range [0,1]");
 
-    return sin(-13 * glm::half_pi<T>() * (p + 1)) * pow(2, -10 * p) + 1;
+    return static_cast<T>(sin(-13 * glm::half_pi<T>() * (p + 1)) * pow(2, -10 * p) + 1);
 }
 
 template <typename T>
 T elasticEaseInOut(T p) {
     ghoul_assert(p >= 0 && p <= 1, "Interpolation variable p out of range [0,1]");
 
-    if (p < 0.5) {
-        return 0.5 * sin(13 * glm::half_pi<T>() * (2 * p)) * pow(2, 10 * ((2 * p) - 1));
+    if (p < 0.5f) {
+        return static_cast<T>(
+            0.5f * sin(13 * glm::half_pi<T>() * (2 * p)) * pow(2, 10 * ((2 * p) - 1))
+        );
     }
     else {
-        return 0.5 * (sin(-13 * glm::half_pi<T>() * ((2 * p - 1) + 1)) *
-               pow(2, -10 * (2 * p - 1)) + 2);
+        return static_cast<T>(
+            0.5f * (sin(-13 * glm::half_pi<T>() * ((2 * p - 1) + 1)) *
+                pow(2, -10 * (2 * p - 1)) + 2)
+        );
     }
 }
 
@@ -347,16 +351,16 @@ T bounceEaseOut(T p) {
     ghoul_assert(p >= 0 && p <= 1, "Interpolation variable p out of range [0,1]");
 
     if (p < 4 / 11.0) {
-        return (121 * p * p)/16.0;
+        return static_cast<T>((121 * p * p) / 16.0);
     }
     else if (p < 8 / 11.0) {
-        return (363/40.0 * p * p) - (99/10.0 * p) + 17/5.0;
+        return static_cast<T>((363/40.0 * p * p) - (99/10.0 * p) + 17/5.0);
     }
     else if (p < 9 / 10.0) {
-        return (4356/361.0 * p * p) - (35442/1805.0 * p) + 16061/1805.0;
+        return static_cast<T>((4356/361.0 * p * p) - (35442/1805.0 * p) + 16061/1805.0);
     }
     else {
-        return (54/5.0 * p * p) - (513/25.0 * p) + 268/25.0;
+        return static_cast<T>((54/5.0 * p * p) - (513/25.0 * p) + 268/25.0);
     }
 }
 
@@ -365,10 +369,10 @@ T bounceEaseInOut(T p) {
     ghoul_assert(p >= 0 && p <= 1, "Interpolation variable p out of range [0,1]");
 
     if (p < 0.5) {
-        return 0.5 * bounceEaseIn(p * 2);
+        return 0.5f * bounceEaseIn(p * 2);
     }
     else {
-        return 0.5 * bounceEaseOut(p * 2 - 1) + 0.5;
+        return 0.5f * bounceEaseOut(p * 2 - 1) + 0.5f;
     }
 }
 
