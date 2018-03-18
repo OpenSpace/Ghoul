@@ -99,7 +99,6 @@ TcpSocket::TcpSocket(std::string address, int port)
     , _isConnecting(false)
     , _shouldStopThreads(false)
     , _socket(INVALID_SOCKET)
-    , _server(nullptr)
     , _delimiter(DefaultDelimiter)
 {}
 
@@ -111,7 +110,6 @@ TcpSocket::TcpSocket(std::string address, int port, _SOCKET socket)
     , _isConnecting(false)
     , _shouldStopThreads(false)
     , _socket(socket)
-    , _server(nullptr)
     , _delimiter(DefaultDelimiter)
 {}
 
@@ -223,11 +221,11 @@ void TcpSocket::disconnect(int) {
     _shouldStopThreads = false;
 }
 
-bool TcpSocket::isConnected() {
+bool TcpSocket::isConnected() const {
     return _isConnected;
 }
 
-bool TcpSocket::isConnecting() {
+bool TcpSocket::isConnecting() const {
     return _isConnecting;
 }
 
@@ -338,12 +336,18 @@ void TcpSocket::streamInput() {
             return;
         }
 
-        std::lock_guard<std::mutex> inputGuard(_inputQueueMutex);
-        _inputQueue.insert(
-            _inputQueue.end(),
-            _inputBuffer.begin(),
-            _inputBuffer.begin() + nReadBytes
-        );
+        std::lock_guard<std::mutex> lock(_inputInterceptionMutex);
+
+        if (_inputInterceptor) {
+            _inputInterceptor(_inputBuffer.data(), nReadBytes);
+        } else {
+            std::lock_guard<std::mutex> inputGuard(_inputQueueMutex);
+            _inputQueue.insert(
+                _inputQueue.end(),
+                _inputBuffer.begin(),
+                _inputBuffer.begin() + nReadBytes
+            );
+        }
         _inputNotifier.notify_one();
     }
 }
@@ -480,6 +484,16 @@ void TcpSocket::initializeNetworkApi() {
 
 bool TcpSocket::initializedNetworkApi() {
     return _initializedNetworkApi;
+}
+
+void TcpSocket::interceptInput(InputInterceptor interceptor) {
+    std::lock_guard<std::mutex> lock(_inputInterceptionMutex);
+    _inputInterceptor = interceptor;
+}
+
+void TcpSocket::uninterceptInput() {
+    std::lock_guard<std::mutex> lock(_inputInterceptionMutex);
+    _inputInterceptor = nullptr;
 }
 
 bool TcpSocket::getBytes(char* getBuffer, size_t size) {

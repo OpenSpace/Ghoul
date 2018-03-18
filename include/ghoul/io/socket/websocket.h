@@ -30,10 +30,18 @@
 
 #include <ghoul/misc/exception.h>
 #include <set>
+#include <deque>
 #include <websocketpp/config/core.hpp>
 #include <websocketpp/server.hpp>
 
+#include <websocketpp/config/core.hpp>
+#include <websocketpp/server.hpp>
+#include <websocketpp/common/functional.hpp>
+
+
 namespace ghoul::io {
+
+class WebSocketServerInternal;
 
 /**
  * WebSockets are essentially a wrapper around regular TCP sockets.
@@ -43,10 +51,8 @@ namespace ghoul::io {
  * In WebSockets however, the message delimiting is handled by a
  * message header.
  */
-class WebSocket : public TcpSocket {
+class WebSocket : public Socket {
 public:
-    using WsServer = websocketpp::server<websocketpp::config::core>;
-
     struct WebSocketError : public ghoul::RuntimeError {
         explicit WebSocketError(std::string message, std::string component = "");
     };
@@ -62,35 +68,29 @@ public:
         ClosingAll  = 4000
     };
 
-    WebSocket(std::string address, int portNumber);
-    WebSocket(std::string address, int portNumber, _SOCKET socket);
+    WebSocket(std::unique_ptr<TcpSocket> socket,
+              websocketpp::server<websocketpp::config::core>& server);
 
     virtual ~WebSocket();
 
-    virtual std::string address() const;
-    virtual int port() const;
+    std::string address() const override;
+    int port() const override;
 
     void disconnect(int reason = static_cast<int>(ClosingReason::Normal)) override;
 
     bool getMessage(std::string& message) override;
     bool putMessage(const std::string& message) override;
-    void startStreams();
+
+    bool isConnected() const override;
+    bool isConnecting() const override;
+
+    void startStreams() override;
 
 private:
-    void streamInput();
-    void streamOutput();
-    void waitForOutput(size_t nBytes);
-    void waitForInput(size_t nBytes = 0);
-    int errorCode();
 
-    void closeSocket();
+    void onMessage(websocketpp::connection_hdl hdl,
+        websocketpp::server<websocketpp::config::core>::message_ptr msg);
 
-    bool socketHasConnection();
-
-    std::thread _inputThread;
-    std::thread _outputThread;
-
-    void onMessage(websocketpp::connection_hdl hdl, WsServer::message_ptr msg);
     void onOpen(websocketpp::connection_hdl hdl);
     void onClose(websocketpp::connection_hdl hdl);
 
@@ -98,21 +98,16 @@ private:
     std::set<websocketpp::connection_hdl, std::owner_less<websocketpp::connection_hdl>>
         _connectionHandles;
 
-    WsServer _server;
-    WsServer::connection_ptr _socketConnection;
-
-    std::mutex _inputBufferMutex;
-    std::mutex _inputQueueMutex;
-    std::condition_variable _inputNotifier;
-    std::deque<std::string> _inputQueue;
-    std::array<char, 4096> _inputBuffer;
+    websocketpp::server<websocketpp::config::core>::connection_ptr _socketConnection;
 
     std::stringstream _outputStream;
     std::mutex _outputStreamMutex;
-    std::mutex _outputBufferMutex;
-    int outputStreamSize();
-    std::mutex _outputQueueMutex;
-    std::condition_variable _outputNotifier;
+
+    std::deque<std::string> _inputMessageQueue;
+    std::mutex _inputMessageQueueMutex;
+    std::condition_variable _inputNotifier;
+
+    std::unique_ptr<ghoul::io::TcpSocket> _tcpSocket;
 };
 
 } // namespace ghoul::io

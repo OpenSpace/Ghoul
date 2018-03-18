@@ -146,9 +146,9 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreadermultiformat.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socket.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socket.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socketserver.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/tcpsocket.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/tcpsocket.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/tcpsocketserver.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/websocket.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/websocketserver.h

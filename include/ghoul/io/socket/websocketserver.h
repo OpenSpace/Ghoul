@@ -26,21 +26,19 @@
 #ifndef __GHOUL___WEBSOCKETSERVER___H__
 #define __GHOUL___WEBSOCKETSERVER___H__
 
-#include <ghoul/misc/exception.h>
 #include <ghoul/io/socket/socketserver.h>
 #include <ghoul/io/socket/websocket.h>
-#include <atomic>
-#include <ghoul/fmt.h>
-#include <memory>
-#include <mutex>
-#include <string>
-#include <thread>
-#include <vector>
+
+#include <ghoul/io/socket/tcpsocketserver.h>
+
+#include <websocketpp/config/core.hpp>
+#include <websocketpp/server.hpp>
 
 namespace ghoul::io {
 
 class WebSocketServer : public SocketServer {
 public:
+    WebSocketServer();
     virtual ~WebSocketServer();
 
     std::string address() const override;
@@ -60,22 +58,8 @@ public:
     std::unique_ptr<Socket> awaitPendingSocket() override;
 
 private:
-    void waitForConnections();
-
-    std::string _address;
-    int _port;
-    bool _listening = false;
-
-    std::unique_ptr<std::thread> _serverThread;
-    _SOCKET _serverSocket;
-
-    mutable std::mutex _settingsMutex;
-    mutable std::mutex _connectionMutex;
-    mutable std::mutex _connectionNotificationMutex;
-
-    std::condition_variable _clientConnectionNotifier;
-
-    std::deque<std::unique_ptr<WebSocket>> _pendingClientConnections;
+    websocketpp::server<websocketpp::config::core> _server;
+    TcpSocketServer _tcpSocketServer;
 };
 
 } // namespace ghoul::io

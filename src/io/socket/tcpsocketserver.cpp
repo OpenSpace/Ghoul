@@ -308,7 +308,6 @@ void TcpSocketServer::waitForConnections() {
             port,
             socketHandle
         );
-        socket->startStreams();
 
         std::lock_guard<std::mutex> lock(_connectionMutex);
         _pendingConnections.push_back(std::move(socket));
