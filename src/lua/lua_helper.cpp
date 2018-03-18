@@ -359,7 +359,8 @@ void runScriptFile(lua_State* state, const std::string& filename) {
 
     int status = luaL_loadfile(state, filename.c_str());
     if (status != LUA_OK) {
-        throw LuaLoadingException(lua_tostring(state, -1));
+        std::string error = lua_tostring(state, -1);
+        throw LuaLoadingException(std::move(error));
     }
 
     if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
@@ -447,6 +448,53 @@ int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range, const char* 
         luaL_error(L, s.c_str());
     }
     return nArguments;
+}
+
+int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range,
+                           const char* component)
+{
+    int nArguments = lua_gettop(L);
+
+    if (nArguments != expected &&
+       (nArguments < range.first) && (nArguments > range.second))
+    {
+        using namespace fmt::literals;
+        std::string s = "Expected {} or {}-{} arguments, got {}"_format(
+            expected,
+            range.first,
+            range.second,
+            nArguments
+        );
+
+        if (component) {
+            LERRORC(component, s);
+        }
+        else {
+            LERRORC("Lua", s);
+        }
+        luaL_error(L, s.c_str());
+    }
+    return nArguments;
+}
+
+void verifyStackSize(lua_State* L, int expected) {
+#if !(defined(NDEBUG) || defined(DEBUG))
+    int size = lua_gettop(L);
+
+    if (size != expected) {
+        LINFOC("Stack", stackInformation(L));
+    }
+
+    ghoul_assert(
+        size == expected,
+        fmt::format("Incorrect number of items left on stack. Expected {} got {}",
+            expected,
+            size
+        )
+    );
+#else
+    (void)L; // Remove unused variable warning in release mode
+#endif 
 }
 
 

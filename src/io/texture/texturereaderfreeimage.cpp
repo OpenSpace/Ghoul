@@ -286,4 +286,4 @@ std::vector<std::string> TextureReaderFreeImage::supportedExtensions() const {
 
 } // namespace ghoul::io
 
-#endif // GHOUL_USE_DEVIL
+#endif // GHOUL_USE_FREEIMAGE

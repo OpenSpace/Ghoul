@@ -305,7 +305,6 @@ unsigned int CacheManager::generateHash(std::string file, std::string informatio
 }
 
 void CacheManager::cleanDirectory(const Directory& dir) const {
-    LDEBUG(fmt::format("Cleaning directory '{}'", dir));
     // First search for all subdirectories and call this function recursively on them
     std::vector<std::string> contents = dir.readDirectories();
     for (const std::string& content : contents) {
@@ -325,7 +324,6 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
 #endif
     // If this directory is empty, we can delete it
     if (isEmpty) {
-        LDEBUG(fmt::format("Deleting directory '{}'", dir));
         FileSys.deleteDirectory(dir);
     }
 }
