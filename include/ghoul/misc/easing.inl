@@ -27,6 +27,7 @@
  * http://sam.zoy.org/wtfpl/COPYING for more details.                                    *
  ****************************************************************************************/
 
+#include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
 #include <glm/gtc/constants.hpp>
 
