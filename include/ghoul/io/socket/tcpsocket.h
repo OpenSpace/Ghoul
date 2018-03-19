@@ -36,6 +36,7 @@
 #include <mutex>
 #include <thread>
 #include <unordered_map>
+#include <functional>
 
  // OS specific socket implementation normalization.
 #ifdef WIN32

@@ -73,9 +73,9 @@
 // #define NO_ERROR 0L
 // #endif
 
-// #ifndef _ERRNO
-// #define _ERRNO errno
-// #endif
+#ifndef _ERRNO
+#define _ERRNO errno
+#endif
 #endif // !WIN32
 
 namespace {
