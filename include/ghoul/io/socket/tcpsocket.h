@@ -35,6 +35,8 @@
 #include <deque>
 #include <mutex>
 #include <thread>
+#include <unordered_map>
+#include <functional>
 
  // OS specific socket implementation normalization.
 #ifdef WIN32
@@ -62,7 +64,9 @@ class TcpSocketServer;
 
 class TcpSocket : public Socket {
 public:
-    struct TcpSocketError : public ghoul::RuntimeError {
+    using InputInterceptor = std::function<void(const char* data, size_t nBytes)>;
+
+    struct TcpSocketError : public RuntimeError {
         explicit TcpSocketError(std::string message, std::string component = "");
     };
 
@@ -70,10 +74,10 @@ public:
     TcpSocket(std::string address, int port, _SOCKET socket);
     virtual ~TcpSocket();
     void connect();
-    void startStreams();
+    void startStreams() override;
     void disconnect(int reason = 0) override;
-    bool isConnected() override;
-    bool isConnecting() override;
+    bool isConnected() const override;
+    bool isConnecting() const override;
 
     virtual std::string address() const;
     virtual int port() const;
@@ -85,13 +89,31 @@ public:
     static void initializeNetworkApi();
     static bool initializedNetworkApi();
 
-protected:
+    void interceptInput(InputInterceptor interceptor);
+    void uninterceptInput();
+
+    /**
+    * Methods for binary communication
+    */
+    template <typename T = char>
+    bool get(T* buffer, size_t nItems = 1);
+
+    template <typename T = char>
+    bool peek(T* buffer, size_t nItems = 1);
+
+    template <typename T = char>
+    bool skip(size_t nItems = 1);
+
+    template <typename T = char>
+    bool put(const T* buffer, size_t nItems = 1);
+
+private:
     /*
     * Read size bytes from the socket, store them in buffer and dequeue them from input.
     * Block until size bytes have been read.
     * Return false if this fails. Use error() to get the socket error code.
     */
-    virtual bool getBytes(char* buffer, size_t nItems = 1);
+    bool getBytes(char* buffer, size_t nItems = 1);
 
     /*
     * Read size bytes from the socket, store them in buffer.
@@ -99,40 +121,39 @@ protected:
     * Block until size bytes have been read.
     * Return false if this fails. Use error() to get the socket error code.
     */
-    virtual bool peekBytes(char* buffer, size_t nItems);
+    bool peekBytes(char* buffer, size_t nItems);
 
     /*
     * Skip size bytes from the socket.
     * Block until size bytes have been read.
     * Return false if this fails. Use error() to get the socket error code.
     */
-    virtual bool skipBytes(size_t nItems);
+    bool skipBytes(size_t nItems);
 
     /**
     * Write size bytes from buffer into the socket.
     * Return false if this fails. Use error() to get the socket error code.
     */
-    virtual bool putBytes(const char* buffer, size_t size = 1);
+    bool putBytes(const char* buffer, size_t size = 1);
 
-    const std::string _address;
-    const int _port;
-    std::atomic<bool> _isConnected;
-    std::atomic<bool> _isConnecting;
-    std::atomic<bool> _shouldDisconnect;
-    std::atomic<bool> _error;
-
-    _SOCKET _socket;
-    TcpSocketServer* _server;
-    std::thread _inputThread;
-    std::thread _outputThread;
-
-private:
+    void closeSocket();
     void establishConnection(addrinfo* info);
     void streamInput();
     void streamOutput();
     int waitForDelimiter();
-    bool waitForInput(size_t nBytes);
-    bool waitForOutput(size_t nBytes);
+    void waitForInput(size_t nBytes);
+    void waitForOutput(size_t nBytes);
+
+    const std::string _address;
+    const int _port;
+    std::atomic<bool> _isConnected = false;
+    std::atomic<bool> _isConnecting = false;
+    std::atomic<bool> _shouldStopThreads = false;
+    std::atomic<bool> _shouldCloseSocket = false;
+
+    _SOCKET _socket;
+    std::thread _inputThread;
+    std::thread _outputThread;
 
     std::mutex _inputBufferMutex;
     std::mutex _inputQueueMutex;
@@ -148,9 +169,14 @@ private:
 
     std::atomic<char> _delimiter;
 
+    std::mutex _inputInterceptionMutex;
+    InputInterceptor _inputInterceptor;
+
     static std::atomic<bool> _initializedNetworkApi;
 };
 
 } // namespace ghoul::io
+
+#include <ghoul/io/socket/tcpsocket.inl>
 
 #endif // __GHOUL___TCPSOCKET___H__

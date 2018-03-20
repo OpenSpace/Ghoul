@@ -26,22 +26,22 @@
 namespace ghoul::io {
 
 template <typename T>
-bool Socket::get(T* buffer, size_t nItems) {
+bool TcpSocket::get(T* buffer, size_t nItems) {
     return getBytes(reinterpret_cast<char*>(buffer), nItems * sizeof(T));
 }
 
 template <typename T>
-bool Socket::peek(T* buffer, size_t nItems) {
+bool TcpSocket::peek(T* buffer, size_t nItems) {
     return peekBytes(reinterpret_cast<char*>(buffer), nItems * sizeof(T));
 }
 
 template <typename T>
-bool Socket::skip(size_t nItems) {
+bool TcpSocket::skip(size_t nItems) {
     return skipBytes(nItems * sizeof(T));
 }
 
 template <typename T>
-bool Socket::put(const T* buffer, size_t nItems) {
+bool TcpSocket::put(const T* buffer, size_t nItems) {
     return putBytes(reinterpret_cast<const char*>(buffer), nItems * sizeof(T));
 }
 
