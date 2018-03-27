@@ -77,7 +77,6 @@ HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend,
         \t</head>\n\
         \t<body>\n\
         \n\
-        \t\t<h1>Log File</h1>\n\
         \t<table>\n\
         \n\
         \t\t<thead>\n\
@@ -130,8 +129,30 @@ void HTMLLog::log(LogLevel level, const std::string& category,
         output += "\t\t\t\t<td class=\"log-level\">" +
             stringFromLevel(level) + "</td>\n";
     }
-    output += "\t\t\t\t<td class=\"log-message\">" + message + "</td>\n\t\t\t</tr>\n";
 
+    output += "\t\t\t\t<td class=\"log-message\">";
+
+    for (const char& c : message) {
+        switch (c) {
+        case '<':
+            output += "&lt;";
+            break;
+        case '>':
+            output += "&gt;";
+            break;
+        case '&':
+            output += "&amp;";
+            break;
+        case '\n':
+            output += "<br>";
+            break;
+        default:
+            output += c;
+            break;
+        }
+    }
+
+    output += "</td>\n\t\t\t</tr>\n";
     writeLine(std::move(output));
 }
 
