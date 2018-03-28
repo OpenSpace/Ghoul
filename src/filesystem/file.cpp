@@ -256,8 +256,4 @@ void File::removeFileChangeListener() {
     FileSys.removeFileListener(this);
 }
 
-std::ostream& operator<<(std::ostream& os, const File& f) {
-    return os << f.path();
-}
-
 } // namespace ghoul::filesystem

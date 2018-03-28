@@ -201,17 +201,6 @@ private:
     FileChangedCallback _fileChangedCallback;
 };
 
-/**
- * The stream operator that will stream the File%'s path to the output stream.
- *
- * \param os The stream that will be inserted into
- * \param f The File which will be inserted into the stream
- * \return The modified stream, used for cascading
- *
- * \memberof File
- */
-std::ostream& operator<<(std::ostream& os, const File& f);
-
 } // namespace ghoul::filesystem
 
 #endif // __GHOUL___FILE___H__
