@@ -216,8 +216,4 @@ void Directory::internalReadDirectories(vector<string>& result, const string& pa
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const Directory& d) {
-    return os << d.path();
-}
-
 } // namespace ghoul::filesystem

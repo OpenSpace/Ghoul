@@ -202,17 +202,6 @@ private:
     std::string _directoryPath;
 };
 
-/**
- * The stream operator that will stream the Directory%'s path to the output stream.
- *
- * \param os The stream that will be inserted into
- * \param d The Directory which will be inserted into the stream
- * \return The modified stream, used for cascading
- *
- * \memberof Directory
- */
-std::ostream& operator<<(std::ostream& os, const Directory& d);
-
 } // namespace ghoul::filesystem
 
 #endif // __GHOUL___DIRECTORY___H__
