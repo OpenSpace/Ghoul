@@ -39,8 +39,8 @@ class CommandlineCommand;
 
 class CommandlineParser {
 public:
-    using AllowUnknownCommands = ghoul::Boolean;
-    using DisplayHelpText = ghoul::Boolean;
+    BooleanType(AllowUnknownCommands);
+    BooleanType(DisplayHelpText);
 
     /**
      * The exception that is thrown in the CommandlineParser::execute method when an

@@ -72,9 +72,9 @@ class File;
  */
 class FileSystem : public Singleton<FileSystem> {
 public:
-    using RawPath = ghoul::Boolean;
-    using Recursive = ghoul::Boolean;
-    using Override = ghoul::Boolean;
+    BooleanType(RawPath);
+    BooleanType(Recursive);
+    BooleanType(Override);
 
     friend class Singleton<FileSystem>;
 

@@ -102,8 +102,8 @@ namespace ghoul {
  */
 class ThreadPool {
 public:
-    using RunRemainingTasks = ghoul::Boolean;
-    using DetachThreads = ghoul::Boolean;
+    BooleanType(RunRemainingTasks);
+    BooleanType(DetachThreads);
 
     /**
      * Constructor that initializes and starts \p nThreads Worker objects.

@@ -56,7 +56,7 @@ class File;
  */
 class CacheManager {
 public:
-    using Persistent = ghoul::Boolean;
+    BooleanType(Persistent);
 
     /// Superclass for all cache-related exceptions
     struct CacheException : public RuntimeError {

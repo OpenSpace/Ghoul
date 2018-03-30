@@ -50,7 +50,7 @@ namespace ghoul::logging {
  */
 class TextLog : public Log {
 public:
-    using Append = ghoul::Boolean;
+    BooleanType(Append);
 
     /**
     * Constructor that calls Log constructor and opens the file that will log the

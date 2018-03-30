@@ -35,11 +35,11 @@
 namespace ghoul::opengl::debug {
 
 /// A boolean value determining whether we want to enable or disable the debug output
-using DebugOutput = ghoul::Boolean;
+BooleanType(DebugOutput);
 /// A boolean value determining whether we want to force synchronous output
-using SynchronousOutput = ghoul::Boolean;
+BooleanType(SynchronousOutput);
 /// A boolean value determining whether to enable individual or groups of messages
-using Enabled = ghoul::Boolean;
+BooleanType(Enabled);
 
 /**
  * The different sources from which a debug message in OpenGL can originate.

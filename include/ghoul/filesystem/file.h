@@ -50,7 +50,7 @@ class FileSystem;
  */
 class File {
 public:
-    using RawPath = ghoul::Boolean;
+    BooleanType(RawPath);
 
      /// Exception that gets thrown if there is a file-related error in any of the methods
     struct FileException : public RuntimeError {

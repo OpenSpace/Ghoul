@@ -67,7 +67,7 @@ class Log;
  */
 class LogManager : public Singleton<LogManager> {
 public:
-    using ImmediateFlush = ghoul::Boolean;
+    BooleanType(ImmediateFlush);
 
     /**
      * Creates and initializes an empty LogManager with the passed LogLevel.

@@ -48,8 +48,8 @@ namespace ghoul::opengl {
  */
 class Texture {
 public:
-    using AllocateData = ghoul::Boolean;
-    using TakeOwnership = ghoul::Boolean;
+    BooleanType(AllocateData);
+    BooleanType(TakeOwnership);
 
     /**
      * This enum specifies the allowed formats for the Texture%s. These are directly

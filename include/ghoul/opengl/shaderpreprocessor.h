@@ -40,7 +40,7 @@ namespace ghoul::opengl {
 
 class ShaderPreprocessor {
 public:
-    using TrackChanges = ghoul::Boolean;
+    BooleanType(TrackChanges);
 
     using ShaderChangedCallback = std::function<void ()>;
 

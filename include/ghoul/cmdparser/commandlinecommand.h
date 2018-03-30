@@ -55,7 +55,7 @@ namespace ghoul::cmdparser {
  */
 class CommandlineCommand {
 public:
-    using MultipleCalls = ghoul::Boolean;
+    BooleanType(MultipleCalls);
 
     /**
      * Exception that gets thrown if an error occurs in the CommandlineCommand::execute

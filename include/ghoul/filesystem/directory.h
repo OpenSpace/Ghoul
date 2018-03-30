@@ -43,10 +43,10 @@ namespace ghoul::filesystem {
  */
 class Directory {
 public:
-    using RawPath = ghoul::Boolean;
-    using AbsolutePath = ghoul::Boolean;
-    using Recursive = ghoul::Boolean;
-    using Sort = ghoul::Boolean;
+    BooleanType(RawPath);
+    BooleanType(AbsolutePath);
+    BooleanType(Recursive);
+    BooleanType(Sort);
 
     /**
      * This constructor creates a Directory object pointing to the absolute path of the

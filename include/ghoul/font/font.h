@@ -52,7 +52,7 @@ namespace ghoul::fontrendering {
  */
 class Font {
 public:
-    using Outline = ghoul::Boolean;
+    BooleanType(Outline);
 
     /// Superclass for all font-related exceptions that this class throws
     struct FontException : public RuntimeError {

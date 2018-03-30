@@ -57,7 +57,7 @@ namespace ghoul::systemcapabilities {
  */
 class SystemCapabilitiesComponent {
 public:
-    using InitializeWMI = ghoul::Boolean;
+    BooleanType(InitializeWMI);
 
     /// The verbosity that is used in the #capabilities method
     enum class Verbosity {

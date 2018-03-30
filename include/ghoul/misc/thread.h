@@ -58,7 +58,7 @@ enum class ThreadPriorityLevel {
     Highest
 };
 
-using Background = ghoul::Boolean;
+BooleanType(Background);
 
 /**
  * This method sets the priorty of the thread \p t to the ThreadPriorityClass

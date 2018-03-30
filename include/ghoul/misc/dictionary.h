@@ -199,7 +199,7 @@ using has_storage_converter = static_not<
  */
 class Dictionary : private std::map<std::string, ghoul::any> {
 public:
-    using CreateIntermediate = ghoul::Boolean;
+    BooleanType(CreateIntermediate);
 
     /// Base class for all Dictionary%-based exceptions
     struct DictionaryError : public RuntimeError {

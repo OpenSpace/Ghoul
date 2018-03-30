@@ -43,12 +43,12 @@ void foo(std::string value, AllowOverride override = AllowOverride::Yes);
  * Though it is more verbal, it elimiates ambiguity regarding parameters. This class is
  * implicitly convertible to <code>bool</code>, but not the other way around. Furthermore,
  * it supports the <code>==</code>, <code>!=</code>, and <code>!</code> operators.
+ *
+ * When using the Boolean class, also consider the BooleanType defintion to create a
+ * typesafe version of the usage describe above.
  */
 struct Boolean {
-    enum Value {
-        Yes = 1,
-        No = 0
-    };
+    enum Value { Yes = 1, No = 0 };
 
     /// Non-explicit constructor so that we can automatically convert between different
     /// aliases of Boolean
@@ -65,6 +65,21 @@ struct Boolean {
     constexpr operator bool() const { return value == Yes; }
 
     Value value;
+};
+
+// This define can be used as a drop-in for the Boolean type to make it type-safe
+#define BooleanType(__name__)                                                            \
+struct __name__ {                                                                        \
+    enum Value { Yes = 1, No = 0 };                                                      \
+                                                                                         \
+    constexpr __name__(Value v) : value(v) {}                                            \
+                                                                                         \
+    constexpr explicit __name__(bool v) : value(v ? Yes : No) {}                         \
+                                                                                         \
+    operator bool() { return value == Yes; }                                             \
+    constexpr operator bool() const { return value == Yes; }                             \
+                                                                                         \
+    Value value;                                                                         \
 };
 
 } // namespace ghoul

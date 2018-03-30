@@ -49,8 +49,8 @@ class Font;
  */
 class FontManager {
 public:
-    using Outline = ghoul::Boolean;
-    using LoadGlyphs = ghoul::Boolean;
+    BooleanType(Outline);
+    BooleanType(LoadGlyphs);
 
     /// This exception is thrown if registering a Font fails
     struct FontRegistrationException : public RuntimeError {

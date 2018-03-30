@@ -48,10 +48,10 @@ namespace ghoul::logging {
  */
 class Log {
 public:
-    using TimeStamping = ghoul::Boolean;
-    using DateStamping = ghoul::Boolean;
-    using CategoryStamping = ghoul::Boolean;
-    using LogLevelStamping = ghoul::Boolean;
+    BooleanType(TimeStamping);
+    BooleanType(DateStamping);
+    BooleanType(CategoryStamping);
+    BooleanType(LogLevelStamping);
 
     virtual ~Log() = default;
 

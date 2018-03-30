@@ -53,7 +53,7 @@ namespace ghoul::logging {
 
 class ConsoleLog : public StreamLog {
 public:
-    using ColorOutput = ghoul::Boolean;
+    BooleanType(ColorOutput);
 
     /**
      * Constructor that calls Log constructor.

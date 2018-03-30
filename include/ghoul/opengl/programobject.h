@@ -59,8 +59,8 @@ namespace ghoul::opengl {
  */
 class ProgramObject {
 public:
-    using IgnoreError = ghoul::Boolean;
-    using Transpose = ghoul::Boolean;
+    BooleanType(IgnoreError);
+    BooleanType(Transpose);
 
     /**
      * A type definition for a callback function that is called if any of the tracked

@@ -47,7 +47,7 @@ namespace ghoul::opengl {
  */
 class ProgramObjectManager {
 public:
-    using Warnings = ghoul::Boolean;
+    BooleanType(Warnings);
     using CreationCallback = std::function<std::unique_ptr<ProgramObject>()>;
     using DestructionCallback = std::function<void(ProgramObject*)>;
 
