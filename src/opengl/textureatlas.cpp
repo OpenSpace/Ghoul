@@ -268,7 +268,9 @@ void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
         void* src = reinterpret_cast<unsigned char*>(data) + (i * width) * sizeof(char);
         size_t nBytes = width * sizeof(char) * _size.z;
 
-        memcpy(dst, src, nBytes);
+        if (src && dst) {
+            memcpy(dst, src, nBytes);
+        }
     }
 }
 

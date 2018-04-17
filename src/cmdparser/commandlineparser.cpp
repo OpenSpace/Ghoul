@@ -25,11 +25,11 @@
 
 #include <ghoul/cmdparser/commandlineparser.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/cmdparser/commandlinecommand.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <algorithm>
-#include <ghoul/fmt.h>
 #include <map>
 
 using fmt::format;
@@ -84,9 +84,7 @@ CommandlineParser::CommandlineParser(std::string programName,
                                      AllowUnknownCommands unknownCommands,
                                      std::string shortHelpCommand,
                                      std::string longHelpCommand)
-    : _commandForNamelessArguments(nullptr)
-    , _remainingArguments(std::make_shared<std::vector<std::string>>())
-    , _programName(std::move(programName))
+    : _programName(std::move(programName))
     , _allowUnknownCommands(unknownCommands)
     , _shortHelpCommand(std::move(shortHelpCommand))
     , _longHelpCommand(std::move(longHelpCommand))
@@ -108,8 +106,8 @@ const std::string& CommandlineParser::programPath() const {
     return _programPath;
 }
 
-std::shared_ptr<const std::vector<std::string>> CommandlineParser::setCommandLine(
-    std::vector<std::string> arguments)
+const std::vector<std::string>& CommandlineParser::setCommandLine(
+                                                       std::vector<std::string> arguments)
 {
     // arguments[0] = program name
     // arguments[i] = i-th argument
@@ -118,7 +116,7 @@ std::shared_ptr<const std::vector<std::string>> CommandlineParser::setCommandLin
 
     // Might be possible that someone calls us multiple times
     _arguments.clear();
-    _remainingArguments->clear();
+    _remainingArguments.clear();
 
     // Just add the arguments to the vector
     _arguments.assign(arguments.begin() + 1, arguments.end());
@@ -164,7 +162,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                     std::vector<std::string> arguments;
                     int number = extractArguments(_arguments, arguments, i, -2);
                     for (const std::string& arg : arguments) {
-                        _remainingArguments->push_back(arg);
+                        _remainingArguments.push_back(arg);
                     }
                     i += (number - 1);
                 }
@@ -181,9 +179,9 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                     // Extract the rest of the arguments
                     std::vector<std::string> arguments;
                     int number = extractArguments(_arguments, arguments, i + 1, -2);
-                    _remainingArguments->push_back(_arguments[i]);
+                    _remainingArguments.push_back(_arguments[i]);
                     for (const std::string& arg : arguments) {
-                        _remainingArguments->push_back(arg);
+                        _remainingArguments.push_back(arg);
                     }
                     i += number;
                     continue;
@@ -223,7 +221,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
     if (!argumentsForNameless.empty() && (!_commandForNamelessArguments)) {
         if (_allowUnknownCommands) {
             for (std::string arg : argumentsForNameless) {
-                _remainingArguments->push_back(arg);
+                _remainingArguments.push_back(arg);
             }
         }
         else {

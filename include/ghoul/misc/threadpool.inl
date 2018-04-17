@@ -35,9 +35,10 @@ auto ThreadPool::queue(F&& f, Arg&&... arg) -> std::future<decltype(f(arg...))> 
     // We wrap the packaged_task into a shared pointer so that we can store it in the
     // lambda expression below. The capture of the lambda expression will keep this
     // packaged_task alive
-    auto pck = std::make_shared<std::packaged_task<ReturnType ()>>(
-        std::bind(std::forward<F>(f), std::forward<Arg>(arg)...)
-    );
+    std::shared_ptr<std::packaged_task<ReturnType ()>> pck =
+        std::make_shared<std::packaged_task<ReturnType ()>>(
+            std::bind(std::forward<F>(f), std::forward<Arg>(arg)...)
+        );
 
     // Push the packaged packaged_task onto the queue of work items
     _taskQueue->push(
@@ -46,7 +47,7 @@ auto ThreadPool::queue(F&& f, Arg&&... arg) -> std::future<decltype(f(arg...))> 
 
     // Get the future of the result (which might be std::future<void>, but that is not a
     // problem
-    auto future = pck->get_future();
+    std::future<ReturnType> future = pck->get_future();
 
     // Notify a potentially waiting thread that a new task is available
     _cv->notify_one();
@@ -63,12 +64,11 @@ auto ThreadPool::queue(std::packaged_task<T>&& task, Args&&... arguments)
 {
     std::lock_guard<std::mutex> guard(_queueMutex);
 
-    auto pck = std::make_shared<std::packaged_task<T>>(std::move(task));
-    _taskQueue->push(
-        [pck]() { (*pck)(); }
-    );
+    std::shared_ptr<std::packaged_task<T>> pck =
+        std::make_shared<std::packaged_task<T>>(std::move(task));
+    _taskQueue->push([pck]() { (*pck)(); });
 
-    auto future = pck->get_future();
+    std::future<T> future = pck->get_future();
 
     _cv->notify_one();
 

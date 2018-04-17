@@ -326,7 +326,7 @@ void GeneralCapabilitiesComponent::detectOS() {
     _fullOperatingSystem = std::to_string(_operatingSystem) + " " + _operatingSystemExtra;
 #else
     utsname name;
-    auto res = uname(&name);
+    int res = uname(&name);
     if (res != 0) {
         throw OperatingSystemError(
             "OS detection failed. 'uname' returned non-null value",

@@ -107,12 +107,10 @@ public:
      * application
      * \return The storage for the commands that have not been consumed by the
      *         CommandlineParser. The <code>vector</code> will be cleared by this function
-     *         and will be filled by the execute method
+     *         and will be filled by the #execute method
      * \pre \p arguments must not be empty
      */
-    std::shared_ptr<const std::vector<std::string>> setCommandLine(
-        std::vector<std::string> arguments
-    );
+    const std::vector<std::string>& setCommandLine(std::vector<std::string> arguments);
 
     /**
      * Parses the command-line (setCommandLine), evaluates all the commands
@@ -254,14 +252,14 @@ protected:
     std::vector<std::unique_ptr<CommandlineCommand>> _commands;
 
     /// The command we want to use for nameless arguments
-    std::unique_ptr<CommandlineCommand> _commandForNamelessArguments;
+    std::unique_ptr<CommandlineCommand> _commandForNamelessArguments = nullptr;
 
     /// All the arguments passed onto this parser
     std::vector<std::string> _arguments;
 
     /// The pointer to the vector that will store all the arguments which have not been
     /// consumed by the CommandlineParser
-    std::shared_ptr<std::vector<std::string>> _remainingArguments;
+    std::vector<std::string> _remainingArguments;
 
     /// The path to the program + filename
     std::string _programPath;

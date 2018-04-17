@@ -112,15 +112,15 @@ TEST_F(CommandlineParserTest, UnknownCommandsInterspersed) {
 
     using ghoul::cmdparser::CommandlineParser;
     _p->setAllowUnknownCommands(CommandlineParser::AllowUnknownCommands::Yes);
-    auto arguments = _p->setCommandLine(argv);
+    const std::vector<std::string>& arguments = _p->setCommandLine(argv);
     
     ASSERT_NO_THROW(_p->execute());
 
-    EXPECT_EQ(4, arguments->size());
-    EXPECT_EQ("-cmd1", arguments->at(0));
-    EXPECT_EQ("arg", arguments->at(1));
-    EXPECT_EQ("-cmd3", arguments->at(2));
-    EXPECT_EQ("arg4", arguments->at(3));
+    EXPECT_EQ(4, arguments.size());
+    EXPECT_EQ("-cmd1", arguments.at(0));
+    EXPECT_EQ("arg", arguments.at(1));
+    EXPECT_EQ("-cmd3", arguments.at(2));
+    EXPECT_EQ("arg4", arguments.at(3));
     EXPECT_EQ("arg2", v1);
     EXPECT_EQ("arg3", v2);
 }

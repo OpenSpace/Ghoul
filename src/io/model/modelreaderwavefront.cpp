@@ -116,7 +116,9 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
         indicesIndex += shapes[i].mesh.indices.size();
     }
 
-    auto vbo = std::make_unique<opengl::VertexBufferObject>();
+    std::unique_ptr<opengl::VertexBufferObject> vbo =
+        std::make_unique<opengl::VertexBufferObject>();
+
     vbo->initialize(vertices, indices);
     vbo->vertexAttribPointer(0, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, location));
     vbo->vertexAttribPointer(1, 2, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, tex));
