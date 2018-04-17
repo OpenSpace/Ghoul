@@ -621,7 +621,7 @@ bool FileSystem::expandPathTokens(string& path,
         string::size_type beginning;
         string::size_type length;
     };
-    auto nextToken = [this, ignoredTokens, &path]() -> TokenInformation {
+    auto nextToken = [ignoredTokens, &path]() -> TokenInformation {
         string::size_type currentPosition = 0;
         while (true) {
             string::size_type beginning = path.find(TokenOpeningBraces, currentPosition);

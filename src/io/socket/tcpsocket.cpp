@@ -272,13 +272,25 @@ void TcpSocket::establishConnection(addrinfo *info) {
     int result;
 
     // Disable Nagle's algorithm.
-    result = setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<char*>(&trueFlag), sizeof(trueFlag));
+    result = setsockopt(
+        _socket,
+        IPPROTO_TCP,
+        TCP_NODELAY,
+        reinterpret_cast<char*>(&trueFlag),
+        sizeof(trueFlag)
+    );
     if (result == SOCKET_ERROR) {
         LWARNING(fmt::format("Socket error: {}", _ERRNO));
     }
 
     // Disable address reuse
-    result = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&falseFlag), sizeof(falseFlag));
+    result = setsockopt(
+        _socket,
+        SOL_SOCKET,
+        SO_REUSEADDR,
+        reinterpret_cast<char*>(&falseFlag),
+        sizeof(falseFlag)
+    );
     if (result == SOCKET_ERROR) {
         LWARNING(fmt::format("Socket error: {}", _ERRNO));
     }
@@ -292,7 +304,13 @@ void TcpSocket::establishConnection(addrinfo *info) {
         return;
     }
     // Keep alive
-    result = setsockopt(_socket, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char*>(&trueFlag), sizeof(trueFlag));
+    result = setsockopt(
+        _socket,
+        SOL_SOCKET,
+        SO_KEEPALIVE,
+        reinterpret_cast<char*>(&trueFlag),
+        sizeof(trueFlag)
+    );
     if (result == SOCKET_ERROR) {
         freeaddrinfo(info);
         _isConnecting = false;

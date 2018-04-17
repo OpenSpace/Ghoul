@@ -29,7 +29,6 @@
 
 #include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
-#include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
 namespace ghoul {
@@ -272,7 +271,7 @@ T exponentialEaseInOut(T p) {
     if (p == 0.0 || p == 1.0) {
         return p;
     }
-    
+
     if (p < 0.5) {
         return static_cast<T>(0.5f * glm::pow(2, (20 * p) - 10));
     }
@@ -285,7 +284,9 @@ template <typename T>
 T elasticEaseIn(T p) {
     ghoul_assert(p >= 0 && p <= 1, "Interpolation variable p out of range [0,1]");
 
-    return static_cast<T>(glm::sin(13 * glm::half_pi<T>() * p) * glm::pow(2, 10 * (p - 1)));
+    return static_cast<T>(
+        glm::sin(13 * glm::half_pi<T>() * p) * glm::pow(2, 10 * (p - 1))
+    );
 }
 
 template <typename T>

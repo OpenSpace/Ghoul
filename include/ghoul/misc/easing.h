@@ -64,7 +64,7 @@ EasingFunc<T> easingFunction(EasingFunction func);
 /**
  * Converts the passed \p func enum into a textual representation, which can be used for
  * the #easingFunctionFromName to recreate the same enum.
- * 
+ *
  * \param func The easing function for which the name should be retrieved
  * \return The name of the easing function
  */
@@ -73,7 +73,7 @@ const char* nameForEasingFunction(EasingFunction func);
 /**
  * Returns the enum for the passed \p name of an easing function. If \p name is not a
  * valid easing function name, a ghoul::MissingCaseException is raised.
- * 
+ *
  * \param name The name for which the easing function enum should be returned
  * \return The enum value for the easing function named \p name
  *
@@ -86,7 +86,7 @@ EasingFunction easingFunctionFromName(const char* name);
  * Returns whether \p name is naming a valid easing function. If this function returns
  * \c true and \p name is passed to #easingFunctionFromName, the function is guaranteed to
  * not throw.
- * 
+ *
  * \param name The name for which should be tested whether it is a valid easing function
  *        name
  * \return \c true if \p name is a valid name for an easing function, \c false otherwise
@@ -96,7 +96,7 @@ EasingFunction easingFunctionFromName(const char* name);
 bool isValidEasingFunctionName(const char* name);
 
 /**
- * Interpolates the parameter \p p, which has to be in [0,1] using the easing function 
+ * Interpolates the parameter \p p, which has to be in [0,1] using the easing function
  * named by \p func, which is used to a call for #easingFunction to determine which easing
  * function is used.
  *
@@ -328,7 +328,7 @@ template <typename T>
 T sineEaseInOut(T p);
 
 /**
- * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the shifted 
+ * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the shifted
  * quadrant IV of unit circle.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
@@ -341,7 +341,7 @@ template <typename T>
 T circularEaseIn(T p);
 
 /**
- * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the shifted 
+ * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the shifted
  * quadrant II of unit circle.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type

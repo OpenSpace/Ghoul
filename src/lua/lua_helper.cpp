@@ -492,9 +492,9 @@ void verifyStackSize(lua_State* L, int expected) {
             size
         )
     );
-#else
+#else // NDBEUG
     (void)L; // Remove unused variable warning in release mode
-#endif 
+#endif // NDEBUG
 }
 
 
