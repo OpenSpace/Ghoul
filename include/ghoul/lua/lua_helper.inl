@@ -23,38 +23,72 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/lua/luastate.h>
-
-#include <ghoul/lua/lua_helper.h>
+#include <ghoul/fmt.h>
+#include <ghoul/lua/ghoul_lua.h>
+#include <ghoul/misc/invariants.h>
 
 namespace ghoul::lua {
 
-LuaState::LuaState(bool includeStandardLibraries)
-    : _state(ghoul::lua::createNewLuaState(includeStandardLibraries))
-{}
+template <typename T>
+T value(lua_State* L) {
+    ghoul_precondition(lua_gettop(L) > 0, "Stack of L must not be empty");
 
-LuaState::LuaState(LuaState&& other) noexcept
-    : _state(other._state)
-{
-    other._state = nullptr;
-}
-
-LuaState::~LuaState() {
-    if (_state) {
-        ghoul::lua::destroyLuaState(_state);
+    if constexpr (std::is_same_v<T, bool>) {
+        if (lua_isboolean(L, -1)) {
+            return lua_toboolean(L, -1) == 1;
+        }
     }
-}
-
-LuaState& LuaState::operator=(LuaState&& other) noexcept {
-    if (this == &other) {
-        return *this;
+    else if constexpr (std::is_same_v<T, lua_Number>) {
+        if (lua_isnumber(L, -1)) {
+            return lua_tonumber(L, -1);
+        }
     }
-    _state = other._state;
-    other._state = nullptr;
+    else if constexpr (std::is_same_v<T, lua_Integer>) {
+        if (lua_isinteger(L, -1)) {
+            return lua_tointeger(L, -1);
+        }
+    }
+    else if constexpr (std::is_integral_v<T>) {
+        if (lua_isinteger(L, -1)) {
+            return static_cast<T>(lua_tointeger(L, -1));
+        }
+    }
+    else if constexpr (std::is_floating_point_v<T>) {
+        if (lua_isnumber(L, -1)) {
+            return static_cast<T>(lua_tonumber(L, -1));
+        }
+    }
+    else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, std::string>) {
+        if (lua_isstring(L, -1)) {
+            return lua_tostring(L, -1);
+        }
+    }
+    else if constexpr (std::is_same_v<T, ghoul::Dictionary>) {
+        if (lua_istable(L, -1)) {
+            ghoul::Dictionary d;
+            ghoul::lua::luaDictionaryFromState(L, d);
+            return d;
+        }
+    }
+    else {
+        static_assert(false, "Unrecognized type T");
+    }
+
+    // If we get this far, none of the previous return statements were hit
+    throw LuaFormatException(fmt::format(
+        "Requested type {} was not the expected type {}",
+        typeid(T).name(),
+        luaTypeToString(lua_type(L, -1))
+    ));
 }
 
-LuaState::operator lua_State*() const {
-    return _state;
+template <typename T>
+T value(lua_State* L, const char* name) {
+    ghoul_precondition(name != nullptr, "name must not be nullptr");
+    ghoul_precondition(strlen(name) > 0, "name must not be empty");
+
+    lua_getglobal(L, name);
+    return value<T>(L);
 }
 
-}  // namespace ghoul::lua
+} // namespace ghoul::lua

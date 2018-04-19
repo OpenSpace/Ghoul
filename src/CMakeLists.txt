@@ -229,6 +229,7 @@ if (GHOUL_MODULE_LUA)
         ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderlua.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/lua/ghoul_lua.h
         ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.h
+        ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.inl
         ${PROJECT_SOURCE_DIR}/include/ghoul/lua/luastate.h
     )
 endif ()

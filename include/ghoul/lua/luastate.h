@@ -52,6 +52,12 @@ public:
      */
     ~LuaState();
 
+    LuaState(LuaState&& other) noexcept;
+
+    LuaState& operator=(const LuaState& other) = delete;
+
+    LuaState& operator=(LuaState&& other) noexcept;
+
     /**
      * Converts this LuaState into a \c lua_State pointer for compatibility with other
      * parts that might still rely on bare \c lua_State pointers.

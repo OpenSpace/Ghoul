@@ -345,11 +345,42 @@ int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range
  */
 void verifyStackSize(lua_State* L, int expected = 0);
 
+/**
+ * Extracts a value from the top of the provided stack and returns it.
+ *
+ * \tparam T The type of the return value. If the value at the top of the stack is not T
+ *         a LuaFormatException is thrown
+ * \param L The stack from from which the top value is extracted
+ *
+ * \throw LuaFormatException If the top value of the stack is not T
+ * \pre The stack of \p L must not be empty
+ */
+template <typename T>
+T value(lua_State* L);
+
+
+/**
+ * Extracts a named value from the global variables of the provided stack and returns it.
+ * 
+ * \tparam T The type of the return value. If the value of the variable \p name is not T
+ *         a LuaFormatException is thrown
+ * \param L The stack from from which the top value is extracted
+ * \param name The name of the global variable that is to be extracted
+ *
+ * \throw LuaFormatException If the value of \p name is not T
+ * \pre The stack of \p L must not be empty
+ * \pre \p name must not be nullptr
+ * \pre \p name must not be empty
+ */
+template <typename T>
+T value(lua_State* L, const char* name);
 
 namespace internal {
     void deinitializeGlobalState();
 } // namespace internal
 
 } // namespace ghoul::lua
+
+#include "lua_helper.inl"
 
 #endif // __GHOUL___LUA_HELPER___H__
