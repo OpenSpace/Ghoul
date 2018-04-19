@@ -72,6 +72,7 @@ public:
      *        absolute path and any tokens, if present, are resolved
      * \param fileChangedCallback The callback function that is called once per change of
      *        the file on the filesystem
+     *
      * \pre \p filename must not be empty
      *
      * \see FileSystem The system to register and use tokens
@@ -174,7 +175,8 @@ public:
      * This method returns the last-modified date of the file as an ISO 8601 string.
      *
      * \return The last-modified date of the file as an ISO 8601 string
-     * \throws FileException If there is an error accessing the file
+     *
+     * \throw FileException If there is an error accessing the file
      */
     std::string lastModifiedDate() const;
 

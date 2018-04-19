@@ -63,7 +63,8 @@ public:
      *
      * \param texture The Texture that is to be written to disk
      * \param filename The target filename for \p filename. The extension of the
-     * \p filename determines the TextureWriterBase
+     *        \p filename determines the TextureWriterBase
+     * 
      * \throw TextureWriteException If there was an error writing the \p filename
      * \throw MissingWriterException If there was no writer for the specified \p filename
      * \pre \p filename must not be empty
@@ -79,6 +80,7 @@ public:
      * the TextureWriterBase that was added first will be used.
      *
      * \param writer The writer that is to be added to this TextureWriter
+     * 
      * \pre \p writer must not have been added to this TextureWriter before
      */
     void addWriter(std::shared_ptr<TextureWriterBase> writer);
@@ -95,6 +97,7 @@ private:
      * Returns the TextureWriterBase that is responsible for the provided extension.
      *
      * \param extension The extension for which the TextureWriterBase should be returned
+     * 
      * \throw MissingWriterException If there was no writer for the specified \p extension
      */
     TextureWriterBase* writerForExtension(const std::string& extension);

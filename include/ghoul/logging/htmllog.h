@@ -65,6 +65,7 @@ public:
      *        log messages
      * \param logLevelStamping Determines if the log should print the log level in the log
      *        messages
+     *
      * \pre \p filename must not be empty
      */
     HTMLLog(const std::string& filename, Append writeToAppend = Append::Yes,

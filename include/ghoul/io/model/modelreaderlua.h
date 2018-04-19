@@ -61,6 +61,7 @@ public:
      * \param filename The Lua file that is to be read. The file must return a single Lua
      *        table
      * \return The initialized VertexBufferObject of the specified model
+     *
      * \throw ModelReaderException If there was an exception loading the model
      * \pre \p filename must not be empty
      */

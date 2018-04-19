@@ -93,6 +93,7 @@ public:
      * \param directory The directory that is used for the CacheManager
      * \param version The version of the cache. If a major change happens that shouldn't
      *        be dealt on an individual level, this invalidates previous caches
+     *
      * \throw MalformedCacheException If the cache file could is malformed
      * \throw ErrorLoadingCacheException If the previous cache could not be loaded
      * \pre \p directory must not be empty
@@ -125,10 +126,11 @@ public:
      *        next application run (<code>true</code>). If the cached file has been
      *        created before, this parameter is silently ignored.
      * \return The cached file that can be used by the caller to store the results
-     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *         <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *         <code>\></code>, or <code>.</code>) in the \p file
+     *
+     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
+     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
+     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
+     *        <code>\></code>, or <code>.</code>) in the \p file
      */
     std::string cachedFilename(const File& file,
         Persistent isPersistent = Persistent::No);
@@ -155,10 +157,11 @@ public:
      *        next application run (<code>true</code>). If the cached file has been
      *        created before, this parameter is silently ignored.
      * \return The cached file that can be used by the caller to store the results
-     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *         <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *         <code>\></code>, or <code>.</code>) in the \p file
+     *
+     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
+     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
+     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
+     *        <code>\></code>, or <code>.</code>) in the \p file
      */
     std::string cachedFilename(const File& file, const std::string& information,
         Persistent isPersistent = Persistent::No);
@@ -194,10 +197,11 @@ public:
      *        next application run (<code>true</code>). If the cached file has been
      *        created before, this parameter is silently ignored.
      * \return The cached file that can be used by the caller to store the results
-     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *         <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *         <code>\></code>, or <code>.</code>) in the \p file
+     *
+     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
+     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
+     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
+     *        <code>\></code>, or <code>.</code>) in the \p file
      */
     std::string cachedFilename(const std::string& baseName,
         const std::string& information, Persistent isPersistent = Persistent::No);
@@ -212,10 +216,11 @@ public:
      * \param file The file for which the cached file should be searched
      * \return <code>true</code> if a cached file was requested before; <code>false</code>
      *         otherwise
-     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *         <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *         <code>\></code>, or <code>.</code>) in the \p file
+     *
+     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
+     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
+     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
+     *        <code>\></code>, or <code>.</code>) in the \p file
      */
     bool hasCachedFile(const File& file) const;
 
@@ -230,7 +235,8 @@ public:
      * \param information The identifying information for the file
      * \return <code>true</code> if a cached file was requested before; <code>false</code>
      *         otherwise
-     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
+     *
+     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
      *         <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
      *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *         <code>\></code>, or <code>.</code>) in the \p file
@@ -248,10 +254,11 @@ public:
      * \param information The identifying information for the file
      * \return <code>true</code> if a cached file was requested before; <code>false</code>
      *         otherwise
-     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *         <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *         <code>\></code>, or <code>.</code>) in the \p baseName
+     *
+     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
+     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
+     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
+     *        <code>\></code>, or <code>.</code>) in the \p baseName
      */
     bool hasCachedFile(const std::string& baseName, const std::string& information) const;
 
@@ -262,10 +269,11 @@ public:
      * identifier for the file.
      *
      * \param file The file for which the cache file should be deleted
-     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *         <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *         <code>\></code>, or <code>.</code>) in the \p file
+     *
+     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
+     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
+     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
+     *        <code>\></code>, or <code>.</code>) in the \p file
      */
     void removeCacheFile(const File& file);
 
@@ -277,10 +285,11 @@ public:
      * \param file The file for which the cache file should be deleted
      * \param information The detailed information for the cached file which should be
      *        deleted
-     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *         <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *         <code>\></code>, or <code>.</code>) in the \p file
+     *
+     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
+     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
+     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
+     *        <code>\></code>, or <code>.</code>) in the \p file
      */
     void removeCacheFile(const File& file, const std::string& information);
 
@@ -293,10 +302,11 @@ public:
      * \param baseName The base name for which the cache file should be deleted
      * \param information The detailed information identifying the cached file that
      *        should be deleted
-     * \throws IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *         <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *         <code>\></code>, or <code>.</code>) in the \p baseName
+     *
+     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
+     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
+     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
+     *        <code>\></code>, or <code>.</code>) in the \p baseName
      */
     void removeCacheFile(const std::string& baseName, const std::string& information);
 

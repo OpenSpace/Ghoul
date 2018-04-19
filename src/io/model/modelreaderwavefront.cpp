@@ -25,21 +25,18 @@
 
 #include <ghoul/io/model/modelreaderwavefront.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/vertexbufferobject.h>
-
-#include <format.h>
-#include <tiny_obj_loader.h>
-
 #include <cstdio>
+#include <fstream>
 #include <iostream>
 #include <memory>
-#include <fstream>
+#include <tiny_obj_loader.h>
 #include <vector>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
                                                         const std::string& filename) const
@@ -126,6 +123,5 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderWavefront::loadModel(
     return vbo;
 }
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 

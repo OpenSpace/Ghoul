@@ -27,13 +27,13 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/fmt.h>
-#include <websocketpp/common/functional.hpp>
-#include <functional>
 #include <chrono>
+#include <functional>
+#include <websocketpp/common/functional.hpp>
 
 namespace {
     constexpr const char* _loggerCat = "WebSocket";
-    std::chrono::milliseconds MaxWaitDuration(1000);
+    constexpr const std::chrono::milliseconds MaxWaitDuration(1000);
 } // namespace
 
 using websocketpp::lib::placeholders::_1;

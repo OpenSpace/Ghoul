@@ -43,6 +43,7 @@ public:
      *
      * \param includeStandardLibraries If \c true, the created Lua state will contain the
      *        set of Lua standard libraries.
+     *
      * \throw LuaRuntimeException If an error occurs during the state creation
      */
     explicit LuaState(bool includeStandardLibraries = true);

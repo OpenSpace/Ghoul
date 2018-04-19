@@ -63,6 +63,7 @@ public:
      * TextureReaderBase is determined by the extension of the \p filename.
      *
      * \param filename The name of the file which should be loaded into a texture
+     *
      * \throw TextureLoadException If there was an error reading the \p filename
      * \throw MissingReaderException If there was no reader for the specified \p filename
      * \pre \p filename must not be empty
@@ -86,6 +87,7 @@ public:
      *        should be the same as the usual file extension for the image. However, this
      *        parameter is only used to determine which TextureReader is used for this
      *        memory, if multiple readers are registered.
+     *
      * \throw TextureLoadException If there was an error reading the \p memory
      * \throw MissingReaderException If there was no reader for the specified \p filename
      * \pre \p memory must not be <code>nullptr</code>
@@ -109,6 +111,7 @@ public:
      * the TextureReaderBase that was added first will be used.
      *
      * \param reader The reader that is to be added to this TextureReader
+     *
      * \pre \p reader must not have been added to this TextureReader before
      */
     void addReader(std::shared_ptr<TextureReaderBase> reader);
@@ -118,13 +121,14 @@ public:
      *
      * \return A list of all the previously registered TextureReaderBases
      */
-    std::vector<std::shared_ptr<TextureReaderBase>> readers() const;
+    const std::vector<std::shared_ptr<TextureReaderBase>>& readers() const;
 
 private:
     /**
      * Returns the TextureReaderBase that is responsible for the provided extension.
      *
      * \param extension The extension for which the TextureReaderBase should be returned
+     *
      * \throw MissingReaderException If there was no reader for the specified \p extension
      */
     TextureReaderBase* readerForExtension(const std::string& extension);

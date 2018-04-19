@@ -116,6 +116,7 @@ public:
      * \param ignoredTokens All tokens contained in this list are ignored during the
      *        resolving of path tokens
      * \return The absolute path to the passed \p path
+     *
      * \pre \p path must not be empty
      */
     std::string absolutePath(std::string path,
@@ -131,6 +132,7 @@ public:
      * \param path The path that should be converted into a relative path
      * \param baseDirectory The base directory the path is relative to
      * \return The relative path leading from the \p baseDirectory to the \p path
+     *
      * \pre \p path must not be empty
      */
     std::string relativePath(std::string path,
@@ -161,6 +163,7 @@ public:
      * Returns the current working directory of this process.
      *
      * \return The current working directory of this process
+     *
      * \throw FileSystemException If the current directory could not be determined
      */
     Directory currentDirectory() const;
@@ -170,6 +173,7 @@ public:
      * have an effect on all relative paths which are used henceforth.
      *
      * \param directory The path that will be used as the new working directory
+     *
      * \throw FileSystemException If the current directory could not be set
      */
     void setCurrentDirectory(const Directory& directory) const;
@@ -182,8 +186,9 @@ public:
      * \param path The path that should be tested for existence
      * \return <code>true</code> if \p path points to an existing file, <code>false</code>
      *         otherwise
+     *
      * \throw FileSystemException If there is an error retrieving the file attribtues
-     * for the \p path
+     *        for the \p path
      */
     bool fileExists(const File& path) const;
 
@@ -194,6 +199,7 @@ public:
      * \param path The path that should be tested for existence
      * \return <code>true</code> if \p path points to an existing directory,
      *         <code>false</code> otherwise
+     *
      * \throw FileSystemException If there is an error retrieving the directory attributes
      *        for the \p path
      */
@@ -218,6 +224,7 @@ public:
      * \param recursive If <code>true</code> all directories leading to the
      *        \p path will be created; if <code>false</code> and the leading directories
      *        do not exist, the method will fail and return <code>false</code>
+     *
      * \throw FileSystemException If there was an error creating the directory
      */
     void createDirectory(const Directory& path,
@@ -231,6 +238,7 @@ public:
      *
      * \param path The directory that should be deleted
      * \param recursive True if content should be removed as well, default is false
+     *
      * \throw FileSystemException If there was an error deleting the directory
      * \throw FileSystemException If \p path is not an empty directory and \p recursive
      *        is <code>false</code>
@@ -259,6 +267,7 @@ public:
      * \param token The token in the form <code>${...}</code>
      * \param path The path the token should point to
      * \param override If <code>true</code> an existing token will be silently overriden
+     *
      * \pre \p token must not be empty
      * \pre \p token must start with FileSystem::TokenOpeningBrace and end with
      *      FileSystem::TokenClosingBraces
@@ -303,6 +312,7 @@ public:
      *
      * \param path The path that is checked for tokens
      * \return <code>true</code> if the \p path contains any tokens
+     *
      * \pre \p path must not be empty
      */
     bool containsToken(const std::string& path) const;
@@ -321,6 +331,7 @@ public:
      *         non-existing directory, missing read/write rights, or if the CacheManager
      *         was created previously without destroying it in between
      *         (destroyCacheManager)
+     *
      * \pre \p cacheDirectory must point to an existing directory
      * \pre \p The CacheManager must not have been created before without destroying it
      */
@@ -340,6 +351,7 @@ public:
      * Returns the CacheManager associated with this FileSystem
      *
      * \return The CacheManager or <code>nullptr</code> if it has not been initialized
+     *
      * \pre CacheManager must have been created before
      */
     CacheManager* cacheManager();
@@ -349,6 +361,7 @@ public:
      * called.
      *
      * \param file The file object to be tracked
+     *
      * \pre \p file must not be a <code>nullptr</code>
      * \pre \p file must not have been added before
      */
@@ -390,6 +403,7 @@ private:
      *
      * \param path The path that should be cleaned up
      * \return The cleaned path with correct separators
+     *
      * \pre \p path must not be empty
      */
     std::string cleanupPath(std::string path) const;
@@ -421,6 +435,7 @@ private:
      *
      * \param token The token whose replacement is looked up
      * \return The replacement string for the token
+     *
      * \throw FileSystemException If the token could not be resolved
      * \pre \p token must not be empty
      */

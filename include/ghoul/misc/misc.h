@@ -40,7 +40,8 @@ namespace ghoul {
  * \param input The input URI that is to be tokenized using the \p separator
  * \param separator The separator that is used for tokenize the string
  * \return The results of the tokenization operation
- * \throws RuntimeError If there was an error tokenizing the string
+ *
+ * \throw RuntimeError If there was an error tokenizing the string
  */
 std::vector<std::string> tokenizeString(const std::string& input, char separator = '.');
 

@@ -239,6 +239,7 @@ public:
      * \param location The location for which all keys should be returned
      * \return A list of all keys that are stored in the Dictionary for the provided
      *         location
+     *
      * \throw KeyError If the provided \p location did not exist in the Dictionary
      * \throw ConversionError if the provided \p location was nested, but one of the
      *        nested levels did exist but was not a Dictionary
@@ -251,6 +252,7 @@ public:
      *
      * \param key The key that should be checked for existence
      * \return <code>true</code> if the provided key exists, <code>false</code> otherwise
+     *
      * \pre \p key must not be empty
      */
     bool hasKey(const std::string& key) const;
@@ -274,6 +276,7 @@ public:
      *        Dictionary will be automatically created along the way, if the provided
      *        \p key contains a nested location. If <code>false</code> the method will
      *        fail if a missing intermediate level is encountered.
+     *
      * \throw KeyError If no intermediate keys should be created and an intermediate key
      *        is missing
      * \throw ConversionError If an intermediate key does not name a Dictionary, but any
@@ -305,6 +308,7 @@ public:
      *        could be found and the types agree
      * \return <code>true</code> if the value was retrieved successfully,
      *         <code>false</code> otherwise
+     *
      * \pre \p key must not be empty
      * \pre \p value must not be the Dictionary this method is called on
      * \post If the value could not be retrieved, the \p value is unchanged
@@ -325,6 +329,7 @@ public:
      * \param key The, potentially nested, key for which the stored value should be
      *         returned
      * \return value The value stored at the <code>key</code>
+     *
      * \throw KeyError If the \p key does not exist in the Dictionary
      * \throw ConversionError If the stored value's type for \p does not agree with
      *        <code>T</code>
@@ -345,6 +350,7 @@ public:
      * \return <code>true</code> if the Dictionary contains a value at the specified
      *         \p key with the correct type <code>T</code>. Will return <code>false</code>
      *         otherwise
+     *
      * \pre \p key must not be empty
      */
     template <typename T>
@@ -359,6 +365,7 @@ public:
      * \param key The key that should be tested
      * \return <code>true</code> if the Dictionary contains a value for the \p key and the
      *         value is of type <code>T</code>
+     *
      * \pre \p key must not be empty
      */
     template <typename T>
@@ -397,6 +404,7 @@ public:
      *
      * \return Returns <code>true</code> if the key was successfully found and removed,
      *         <code>false</code> otherwise
+     *
      * \pre \p key must not be empty
      */
     bool removeKey(const std::string& key);

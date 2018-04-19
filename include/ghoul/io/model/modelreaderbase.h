@@ -76,6 +76,7 @@ public:
      *
      * \param filename The file on disk that is to be loaded
      * \return The intialized VertexBufferObject
+     *
      * \throw ModelReaderException If there was an error loading the model from disk
      */
     virtual std::unique_ptr<opengl::VertexBufferObject> loadModel(

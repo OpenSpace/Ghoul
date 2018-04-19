@@ -70,6 +70,7 @@ public:
     *        log messages
     * \param logLevelStamping Determines if the log should print the log level in the log
     *        messages
+    *
     * \throw std::ios_base::failure If the opening of the file failed
     * \pre \p filename must not be empty
     */

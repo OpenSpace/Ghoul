@@ -43,7 +43,8 @@ std::string clipboardText();
  * Writes a passed text into the system-wide clipboard, overwriting its previous content.
  *
  * \param text The text that is to be written into the clipboard
- * \throws RuntimeError If there was an error writing the text to the clipboard
+ *
+ * \throw RuntimeError If there was an error writing the text to the clipboard
  */
 void setClipboardText(std::string text);
 

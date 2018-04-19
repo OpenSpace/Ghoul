@@ -62,6 +62,7 @@ struct LuaExecutionException : public LuaRuntimeException {
  *
  * \param state The Lua state that is to be exermined
  * \return The location of the function whose stack is being tested
+ *
  * \pre \p state must not be nullptr
  */
 std::string errorLocation(lua_State* state);
@@ -84,6 +85,7 @@ std::string errorLocation(lua_State* state);
  *
  * \param state The Lua state that will have its stack printed
  * \return The description of the current \p state's stack
+ *
  * \pre \p state must not be nullptr
  */
 std::string stackInformation(lua_State* state);
@@ -104,11 +106,12 @@ std::string stackInformation(lua_State* state);
  *        creating a new state. It is the callers responsibility to ensure that the passed
  *        state is valid if this parameter is not <code>nullptr</code>. After calling this
  *        method, the stack of the passed state will be empty after this function returns.
- * \throws FormattingException If the #ghoul::Dictionary contains mixed keys of both type
- *         <code>string</code> and type <code>number</code>
- * \throws FormattingException If the script did not return anything else but a table
- * \throws LuaRuntimeException If there was an error initializing a new Lua state if it
- *         was necessary
+ *
+ * \throw FormattingException If the #ghoul::Dictionary contains mixed keys of both type
+ *        <code>string</code> and type <code>number</code>
+ * \throw FormattingException If the script did not return anything else but a table
+ * \throw LuaRuntimeException If there was an error initializing a new Lua state if it
+ *        was necessary
  * \pre \p filename must not be empty
  * \pre \p filename must be a path to an existing file
  * \post The \p state%'s stack is empty
@@ -131,11 +134,12 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
  *        state is valid if this parameter is not <code>nullptr</code>. After calling this
  *        method, the stack of the passed state will be empty after this function returns.
  * \return The ghoul::Dictionary described by the Lua script
- * \throws FormattingException If the #ghoul::Dictionary contains mixed keys of both type
- *         <code>string</code> and type <code>number</code>
- * \throws FormattingException If the script did not return anything else but a table
- * \throws LuaRuntimeException If there was an error initializing a new Lua state if it
- *         was necessary
+ *
+ * \throw FormattingException If the #ghoul::Dictionary contains mixed keys of both type
+ *        <code>string</code> and type <code>number</code>
+ * \throw FormattingException If the script did not return anything else but a table
+ * \throw LuaRuntimeException If there was an error initializing a new Lua state if it
+ *        was necessary
  * \pre \p filename must not be empty
  * \pre \p filename must be a path to an existing file
  * \post The \p state%'s stack is empty
@@ -158,9 +162,10 @@ ghoul::Dictionary loadDictionaryFromFile(const std::string& filename,
  *        creating a new state. It is the callers responsibility to ensure that the passed
  *        state is valid. After calling this method, the stack of the passed state will be
  *        empty.
- * \throws ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
- *         keys of both type <code>string</code> and type <code>number</code>
- * \throws FormattingException If the script did not return anything else but a table
+ *
+ * \throw ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
+ *        keys of both type <code>string</code> and type <code>number</code>
+ * \throw FormattingException If the script did not return anything else but a table
  * \pre \p script must not be empty
  * \post \p state%'s stack is empty
  */
@@ -179,9 +184,10 @@ void loadDictionaryFromString(const std::string& script, ghoul::Dictionary& dict
  *        state is valid. After calling this method, the stack of the passed state will be
  *        empty.
  * \return The ghoul::Dictionary described by the Lua script
- * \throws ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
- *         keys of both type <code>string</code> and type <code>number</code>
- * \throws FormattingException If the script did not return anything else but a table
+ *
+ * \throw ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
+ *        keys of both type <code>string</code> and type <code>number</code>
+ * \throw FormattingException If the script did not return anything else but a table
  * \pre \p script must not be empty
  * \post \p state%'s stack is empty
  */
@@ -198,8 +204,9 @@ ghoul::Dictionary loadDictionaryFromString(const std::string& script,
  * \param state The Lua state that is used to populate the \p dictionary
  * \param dictionary The #ghoul::Dictionary into which the values from the stack are
  *        added
- * \throws LuaFormatException If the \p dictionary contains mixed keys of both type
- *         <code>string</code> and type <code>number</code>
+ *
+ * \throw LuaFormatException If the \p dictionary contains mixed keys of both type
+ *        <code>string</code> and type <code>number</code>
  * \pre \p state must not be nullptr
  * \post \p state%'s stack is unchanged
  */
@@ -231,6 +238,7 @@ std::string luaTypeToString(int type);
  * \param loadStandardLibraries If \c true, the Lua standard libraries will be loaded into
  *        the newly created state by means of a \c luaL_openlibs call
  * \return A valid new Lua state initialized with the default Lua libraries
+ *
  * \throw LuaRuntimeException If there was an error creating the new Lua state
  */
 lua_State* createNewLuaState(bool loadStandardLibraries = true);
@@ -239,6 +247,7 @@ lua_State* createNewLuaState(bool loadStandardLibraries = true);
  * Destroys the passed lua state and frees all memory that is associated with it.
  *
  * \param state The Lua state that is to be deleted
+ *
  * \pre \p state must not be nullptr
  */
 void destroyLuaState(lua_State* state);
@@ -249,6 +258,7 @@ void destroyLuaState(lua_State* state);
  *
  * \param state The Lua state that is used to execute the script
  * \param filename The file path that contains the Lua script that is executed
+ *
  * \throw LuaLoadingException If there was an error loading the script
  * \throw LuaExecutionError If there was an error executing the script
  * \throw FileNotFoundError If the file does not exist
@@ -264,6 +274,7 @@ void runScriptFile(lua_State* state, const std::string& filename);
  *
  * \throw LuaLoadingException If there was an error loading the script
  * \throw LuaExecutionError If there was an error executing the script
+ *
  * \pre \p state must not be nullptr
  * \pre \p script must not be empty
  */
@@ -288,6 +299,7 @@ const char* checkStringAndPop(lua_State* L);
  * \param expected The number of expected arguments
  * \param component The name of the component that is used for the error message
  * \return The number of arguments
+ *
  * \throw ghoul::lua::LuaExecutionException if the number of arguments is wrong
  */
 int checkArgumentsAndThrow(lua_State* L, int expected, const char* component = nullptr);
@@ -302,6 +314,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected, const char* component = n
  * \param expected2 The second allowed number of expected arguments
  * \param component The name of the component that is used for the error message
  * \return The number of arguments
+ *
  * \throw ghoul::lua::LuaExecutionException if the number of arguments is wrong
  */
 int checkArgumentsAndThrow(lua_State* L, int expected1, int expected2,
@@ -316,6 +329,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected1, int expected2,
  * \param range The inclusive range that the number of arguments are tested against
  * \param component The name of the component that is used for the error message
  * \return The number of arguments
+ *
  * \throw ghoul::lua::LuaExecutionException if the number of arguments is wrong
  */
 int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range,
@@ -331,6 +345,7 @@ int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range,
  * \param range The inclusive range that the number of arguments are tested against
  * \param component The name of the component that is used for the error message
  * \return The number of arguments
+ *
  * \throw ghoul::lua::LuaExecutionException if the number of arguments is wrong
  */
 int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range,

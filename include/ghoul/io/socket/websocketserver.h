@@ -27,10 +27,9 @@
 #define __GHOUL___WEBSOCKETSERVER___H__
 
 #include <ghoul/io/socket/socketserver.h>
-#include <ghoul/io/socket/websocket.h>
 
 #include <ghoul/io/socket/tcpsocketserver.h>
-
+#include <ghoul/io/socket/websocket.h>
 #include <websocketpp/config/core.hpp>
 #include <websocketpp/server.hpp>
 
@@ -39,7 +38,7 @@ namespace ghoul::io {
 class WebSocketServer : public SocketServer {
 public:
     WebSocketServer();
-    virtual ~WebSocketServer();
+    virtual ~WebSocketServer() = default;
 
     std::string address() const override;
     int port() const override;

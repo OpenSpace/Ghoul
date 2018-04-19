@@ -1,7 +1,0 @@
-diff a/src/io/texture/texturereaderfreeimage.cpp b/src/io/texture/texturereaderfreeimage.cpp	(rejected hunks)
-@@ -1,4 +0,4 @@
--/*****************************************************************************************
-+﻿/*****************************************************************************************
-  *                                                                                       *
-  * GHOUL                                                                                 *
-  * General Helpful Open Utility Library                                                  *

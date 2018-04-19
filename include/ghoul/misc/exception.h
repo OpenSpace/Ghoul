@@ -64,6 +64,7 @@ struct FileNotFoundError : public RuntimeError {
      *
      * \param file The file that was missing which caused this exception to be thrown
      * \param component The optional compoment that caused this exception to be thrown
+     *
      * \pre \p file must not be empty
      */
     explicit FileNotFoundError(std::string file, std::string component = "");

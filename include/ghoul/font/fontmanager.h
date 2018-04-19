@@ -81,6 +81,7 @@ public:
      * \param fontName The user-defined name under which this font is registered
      * \param filePath The filepath for this registered Font
      * \return The hashed representation of the \p fontName
+     *
      * \throw FontManagerException If there was an error registering the Font
      * \pre \p fontName must not be empty
      * \pre \p filePath must not be empty
@@ -106,6 +107,7 @@ public:
      *        also preload a set of commonly used glyphs
      * \return Returns a usable and initialized Font object, or <code>nullptr</code> if an
      *         error occurred
+     *
      * \pre \p name must not be empty
      */
     std::shared_ptr<Font> font(const std::string& name, float fontSize,

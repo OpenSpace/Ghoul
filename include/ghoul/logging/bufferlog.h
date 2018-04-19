@@ -83,6 +83,7 @@ public:
      *        log entry would exhaust the available memory in the buffer. It is the
      *        callback's responsibility to either clear the buffer (#resetBuffer) or
      *        provide a new buffer that is used instead (#setBuffer)
+     * 
      * \pre \p address must not be <code>nullptr</code>
      * \pre \p bufferSize must be positive
      */
@@ -98,6 +99,7 @@ public:
      *        ownership of the memory is <b>not</b> passed to the BufferLog by this
      * \param bufferSize The total size of the buffer. It is the callers responsibility to
      *        assure that the provided buffer is at least as big as \p bufferSize
+     * 
      * \pre \p address must not be <code>nullptr</code>
      * \pre \p bufferSize must be positive
      */
@@ -123,6 +125,7 @@ public:
      *
      * \param timestamp The timestamp of the message
      * \param message The message to store in the buffer
+     * 
      * \throw MemoryExhaustionException If there was not enough memory left in the buffer
      *        and there either was no MemoryExhaustCallback or the callback failed to
      *        provide new memory
@@ -167,6 +170,7 @@ public:
      * \param buffer The buffer that will be used by the BufferLog from now on
      * \param bufferSize The size of the buffer that will be used by the BufferLog to
      *        store messages.
+     * 
      * \pre \p buffer must not be <code>nullptr</code>
      * \pre \p bufferSize must be positive
      */

@@ -147,7 +147,7 @@ public:
      *        the current directory.
      * \param sort If <code>true</code> the final result will be sorted by name
      * \return The paths to all files in the current directory (and subdirectories if
-     * \p recursiveSearch is <code>true</code>)
+     *         \p recursiveSearch is <code>true</code>)
      */
     std::vector<std::string> readFiles(Recursive recursiveSearch = Recursive::No,
         Sort sort = Sort::No) const;

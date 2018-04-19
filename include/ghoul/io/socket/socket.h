@@ -27,7 +27,6 @@
 #define __GHOUL___SOCKET___H__
 
 #include <atomic>
-#include <memory>
 #include <string>
 
 namespace ghoul::io {

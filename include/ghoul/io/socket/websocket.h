@@ -29,11 +29,10 @@
 #include <ghoul/io/socket/tcpsocket.h>
 
 #include <ghoul/misc/exception.h>
-#include <set>
 #include <deque>
+#include <set>
 #include <websocketpp/config/core.hpp>
 #include <websocketpp/server.hpp>
-
 #include <websocketpp/config/core.hpp>
 #include <websocketpp/server.hpp>
 #include <websocketpp/common/functional.hpp>

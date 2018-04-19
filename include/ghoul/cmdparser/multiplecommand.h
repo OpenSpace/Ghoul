@@ -76,6 +76,7 @@ public:
      * the pointers passed through the constructor.
      *
      * \param parameters The parameters for this MultipleCommand
+     *
      * \throws CommandExecutionException If one parameter has the wrong type that was not
      *         detected in the checkParameters method
      */
@@ -138,8 +139,9 @@ public:
      * the pointers passed through the constructor.
      *
      * \param parameters The parameters for this MultipleCommand
-     * \throws CommandExecutionException If one parameter has the wrong type that was not
-     *         detected in the checkParameters method
+     *
+     * \throw CommandExecutionException If one parameter has the wrong type that was not
+     *        detected in the checkParameters method
      */
     void execute(const std::vector<std::string>& parameters) override;
 
@@ -147,6 +149,7 @@ public:
      * Checks whether all of the \p parameters have the correct types.
      *
      * \param parameters The list of parameters that are to be checked
+     *
      * \throw CommandParameterException If any of the parameters have the wrong type
      */
     void checkParameters(const std::vector<std::string>& parameters) const override;
@@ -202,8 +205,9 @@ public:
      * the pointers passed through the constructor.
      *
      * \param parameters The parameters for this MultipleCommand
-     * \throws CommandExecutionException If one parameter has the wrong type that was not
-     *         detected in the checkParameters method
+     *
+     * \throw CommandExecutionException If one parameter has the wrong type that was not
+     *        detected in the checkParameters method
      */
     void execute(const std::vector<std::string>& parameters) override;
 
@@ -211,6 +215,7 @@ public:
      * Checks whether all of the \p parameters have the correct types.
      *
      * \param parameters The list of parameters that are to be checked
+     *
      * \throw CommandParameterException If any of the parameters have the wrong type
      */
     void checkParameters(const std::vector<std::string>& parameters) const override;
@@ -268,8 +273,9 @@ public:
      * the pointers passed through the constructor.
      *
      * \param parameters The parameters for this MultipleCommand
-     * \throws CommandExecutionException If one parameter has the wrong type that was not
-     *         detected in the checkParameters method
+     *
+     * \throw CommandExecutionException If one parameter has the wrong type that was not
+     *        detected in the checkParameters method
      */
     void execute(const std::vector<std::string>& parameters) override;
 
@@ -277,6 +283,7 @@ public:
      * Checks whether all of the \p parameters have the correct types.
      *
      * \param parameters The list of parameters that are to be checked
+     *
      * \throw CommandParameterException If any of the parameters have the wrong type
      */
     void checkParameters(const std::vector<std::string>& parameters) const override;

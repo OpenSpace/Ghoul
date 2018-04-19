@@ -56,6 +56,7 @@ public:
      *
      * \param dictionary The Dictionary that should be converted
      * \return A JSON string representing the Dictionary
+     *
      * \throw JsonFormattingError If the \p key points to a type that cannot be converted
      */
     std::string format(const Dictionary& dictionary) const override;
@@ -69,6 +70,7 @@ private:
      *        converted
      * \param key The key in the Dictionary that should be converted
      * \return A JSON representation of the \p key's value
+     *
      * \throw JsonFormattingError If the \p key points to a type that cannot be converted
      */
     std::string formatValue(const Dictionary& dictionary, const std::string& key) const;

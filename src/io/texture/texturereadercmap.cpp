@@ -25,10 +25,10 @@
 
 #include <ghoul/io/texture/texturereadercmap.h>
 
+#include <ghoul/fmt.h>
+#include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/texture.h>
-#include <ghoul/glm.h>
-#include <ghoul/fmt.h>
 #include <fstream>
 #include <sstream>
 
@@ -107,9 +107,9 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
 
     using opengl::Texture;
     std::unique_ptr<Texture> texture = std::make_unique<Texture>(
-        values,                         // data
-        glm::size3_t(width, 1, 1),        // dimensions
-        Texture::Format::RGBA            // Format
+        values,                    // data
+        glm::size3_t(width, 1, 1), // dimensions
+        Texture::Format::RGBA      // Format
     );
 
     return texture;

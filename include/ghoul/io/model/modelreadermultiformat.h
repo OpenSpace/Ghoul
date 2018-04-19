@@ -69,8 +69,9 @@ public:
      *
      * \param filename The geometric model file to be loaded
      * \return The initialized VertexBufferObject containing the model or models
+     *
      * \throw ModelReaderException If there was an error reading the model from
-     * \p filename
+     *        \p filename
      * \pre \p filename must not be empty
      */
     std::unique_ptr<opengl::VertexBufferObject> loadModel(
@@ -85,8 +86,9 @@ public:
      * \param vertexArray STL vector of ModelReaderBase::Vertex objects
      * \param indexArray STL vector of integers containing the indexes for the vertexes
      * \return The initialized VertexBufferObject containing the model or models
+     *
      * \throw ModelReaderException If there was an error reading the model from
-     * \p filename
+     *        \p filename
      * \pre \p filename must not be empty
      */
     void loadModel(const std::string& filename, std::vector<Vertex>& vertexArray,

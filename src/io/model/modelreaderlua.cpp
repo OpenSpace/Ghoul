@@ -87,24 +87,16 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     // get vertices
     Dictionary vertices = dictionary.value<Dictionary>(keyVertices);
     std::vector<GLfloat> varray;
-    std::vector<std::string> vkeys = vertices.keys();
-    // Does this need a std::stoi function for the sorting? Otherwise 10 might be sorted
-    // before 2 ---abock
-    std::sort(vkeys.begin(), vkeys.end());
-    for (const std::string& key : vkeys) {
-        double d = vertices.value<double>(key);
+    for (size_t i = 1; i <= vertices.size(); ++i) {
+        double d = vertices.value<double>(std::to_string(i));
         varray.push_back(static_cast<GLfloat>(d));
     }
 
     // get indices
     Dictionary indices = dictionary.value<Dictionary>(keyIndices);
     std::vector<GLint> iarray;
-    std::vector<std::string> ikeys = vertices.keys();
-    // Does this need a std::stoi function for the sorting? Otherwise 10 might be sorted
-    // before 2 ---abock
-    std::sort(ikeys.begin(), ikeys.end());
-    for (const std::string& key : ikeys) {
-        double d = indices.value<double>(key);
+    for (size_t i = 1; i <= indices.size(); ++i) {
+        double d = indices.value<double>(std::to_string(i));
         iarray.push_back(static_cast<GLint>(d));
     }
 

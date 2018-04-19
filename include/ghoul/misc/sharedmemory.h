@@ -89,6 +89,7 @@ public:
      *        information, which are not accessible by the user
      * \return <code>true</code> if the creation of the shared memory block succeeded,
      *         <code>false</code> otherwise
+     *
      * \throw SharedMemoryError If there was an error creating the SharedMemory block
      */
     static void create(const std::string& name, size_t size);
@@ -101,6 +102,7 @@ public:
      * freed.
      *
      * \param name The name of the shared memory block that should be marked for removal
+     *
      * \throw SharedMemoryNotFoundError If the provided \p name is not a valid
      *        SharedMemory block
      * \throw SharedMemoryError If there was an error accessing an existing SharedMemory
@@ -115,6 +117,7 @@ public:
      * \param name The name of the shared memory block that should be tested
      * \return <code>true</code> if a shared memory block exists with the given \p name,
      *         <code>false</code> otherwise
+     *
      * \throw SharedMemoryError If there was an error retrieving the information about the
      *        SharedMemory block
      */
@@ -132,6 +135,7 @@ public:
      *
      * \param name The name of the shared memory block to which this process wants to be
      *        attached to
+     *
      * \throw SharedMemoryError If there was an error either accessing or mapping the
      *        SharedMemory block
      */

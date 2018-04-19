@@ -30,8 +30,7 @@
 
 #include <memory>
 
-namespace ghoul {
-namespace io {
+namespace ghoul::io {
 
 #ifdef GHOUL_USE_SOIL
 
@@ -47,6 +46,7 @@ public:
      *
      * \param filename The texture that should be loaded from the hard disk
      * \return The loaded Texture object
+     * 
      * \throw TextureLoadException If there was an error loading the texture
      * \pre \p filename must not be empty
      * \pre The extension of \p filename must be among the supported extensions as
@@ -62,6 +62,7 @@ public:
      *
      * \param memory The memory that contains the bytes of the Texture to be loaded
      * \param size The number of bytes contained in \p memory
+     * 
      * \throw TextureLoadException If there was an error reading the \p memory
      * \pre \p memory must not be <code>nullptr</code>
      * \pre \p size must be > 0
@@ -81,7 +82,6 @@ public:
 
 #endif // GHOUL_USE_SOIL
 
-} // namespace io
-} // namespace ghoul
+} // namespace ghoul::io
 
 #endif // __GHOUL___TEXTUREREADERSOIL___H__

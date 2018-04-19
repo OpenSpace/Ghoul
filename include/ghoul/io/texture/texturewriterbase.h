@@ -63,6 +63,7 @@ public:
      *
      * \param texture The Texture to write to disk
      * \param filename The target file for the Texture
+     * 
      * \pre \p filename must not be empty
      * \pre The extension of \p filename must be among the supported extensions as
      *      reported by supportedExtensions

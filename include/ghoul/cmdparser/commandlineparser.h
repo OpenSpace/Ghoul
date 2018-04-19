@@ -108,6 +108,7 @@ public:
      * \return The storage for the commands that have not been consumed by the
      *         CommandlineParser. The <code>vector</code> will be cleared by this function
      *         and will be filled by the #execute method
+     *
      * \pre \p arguments must not be empty
      */
     const std::vector<std::string>& setCommandLine(std::vector<std::string> arguments);
@@ -124,6 +125,7 @@ public:
      *
      * \return <code>true</code> if the help message should be displayed by the caller
      *         using the displayHelp method.
+     *
      * \throws CommandlineException If there are malformed commandline parameters that
      *         were passed in the setCommandLine method. Malformed parameters may be due
      *         to invalid commands, multiple commands for commands that do not allow for
@@ -139,6 +141,7 @@ public:
      *
      * \param cmd The command that is to be added. The ownership of the CommandlineCommand
      *        will be transferred to the CommandlineParser
+     *
      * \pre \p cmd must not be <code>nullptr</code>
      * \pre The name of \p cmd may not have been used in a previous registered
      *      CommandlineCommand's name or short name
@@ -155,6 +158,7 @@ public:
      * nameless argument, it will be replaced by <code>cmd</code>.
      *
      * \param cmd The command responsible for those arguments
+     *
      * \pre \p cmd must not be <code>nullptr</code>
      */
     void addCommandForNamelessArguments(std::unique_ptr<CommandlineCommand> cmd);
@@ -207,6 +211,7 @@ public:
      *        or CommandlineCommand::shortName only. If <code>command = "Nameless"</code>
      *        the usage information for the nameless argument is logged
      * \return The usage information for the provided CommandlineCommand
+     *
      * \pre command must not be an empty string
      * \pre command must name a valid command either by full name or short name
      */
@@ -216,7 +221,7 @@ public:
      * Returns the usage information for the nameless command.
      *
      * \return The usage information for the nameless command
-    */
+     */
     std::string usageInformationForNamelessCommand() const;
 
     /**

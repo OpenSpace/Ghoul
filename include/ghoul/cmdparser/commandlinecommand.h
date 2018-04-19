@@ -87,6 +87,7 @@ public:
      * \param allowMultipleCalls If this argument is <code>true</code> it signals the
      *        CommandlineParser that it should allow multiple instances of this
      *        CommandlineCommand in a single command line
+     *
      * \pre \p name must not be empty
      * \pre \p name must start with a '-'
      * \pre If the \p shortName is not empty, it must start with a '-'
@@ -113,28 +114,29 @@ public:
 
     /**
      *
-     * Returns the parameter list necessary for the #usage method
+     * Returns the parameter list necessary for the #usage method.
+     *
      * \return The parameter list this command expects
      */
     const std::string& parameterList() const;
 
     /**
      * Returns a short description used in the CommandlineParser::displayHelp and
-     * CommandlineParser::displayUsage methods
+     * CommandlineParser::displayUsage methods.
      *
      * \return A short description of this command
      */
     const std::string& infoText() const;
 
     /**
-     * Returns the number of accepted arguments for this command
+     * Returns the number of accepted arguments for this command.
      *
      * \return The number of accepted arguments for this command
      */
     int argumentNumber() const;
 
     /**
-     * Returns if the command can be called more than once in a single command line
+     * Returns if the command can be called more than once in a single command line.
      *
      * \return If the command can be called more than once in a single command line
      */
@@ -149,8 +151,9 @@ public:
      *        #checkParameters method
      * \return This method should return <code>true</code>, if the execution was
      *         successful, <code>false</code> otherwise and log possible errors
-     * \throws CommandExecutionException If one parameter has the wrong type that was not
-     *         detected in the checkParameters method
+     *
+     * \throw CommandExecutionException If one parameter has the wrong type that was not
+     *        detected in the checkParameters method
      */
     virtual void execute(const std::vector<std::string>& parameters) = 0;
 
@@ -162,6 +165,7 @@ public:
      * \param parameters The parameters which should be tested
      * \return <code>true</code>, if the parameters are correct, <code>false</code>
      *         otherwise
+     *
      * \throw CommandParameterException If any of the parameters have the wrong type
      */
     virtual void checkParameters(const std::vector<std::string>& parameters) const;
@@ -190,6 +194,7 @@ protected:
      *
      * \tparam T The type of the value which should be converted
      * \param s The <code>std::string</code> representation of the value
+     *
      * \throws CommandException If the conversion failed
      * \pre \p s must not be empty
      */
@@ -199,7 +204,7 @@ protected:
     /**
      * Checks if the string value \p s can be cast into the type <code>T</code>. It only
      * returns <code>true</code> for those values that can be converted using an
-     * <code>std::stringstream</code>
+     * <code>std::stringstream</code>.
      *
      * \tparam T The type of the value which should be converted
      * \param s The <code>std::string</code> representation of the value

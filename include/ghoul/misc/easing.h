@@ -77,8 +77,8 @@ const char* nameForEasingFunction(EasingFunction func);
  * \param name The name for which the easing function enum should be returned
  * \return The enum value for the easing function named \p name
  *
- * \pre \p name must not be nullptr
  * \throw std::invalid_argument If \p name is not a valid name for an easing function
+ * \pre \p name must not be nullptr
  */
 EasingFunction easingFunctionFromName(const char* name);
 

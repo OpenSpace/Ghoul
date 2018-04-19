@@ -92,6 +92,7 @@ public:
      * Returns the reference to the singleton.
      *
      * \return A reference to the singleton
+     *
      * \pre The singleton must have been initialized before
      */
     static T& ref() {

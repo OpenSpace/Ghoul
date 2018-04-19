@@ -25,12 +25,12 @@
 
 #include <ghoul/io/texture/texturereader.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/filesystem/file.h>
 #include <ghoul/io/texture/texturereaderbase.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
-#include <ghoul/fmt.h>
 
 namespace ghoul::io {
 
@@ -91,7 +91,7 @@ void TextureReader::addReader(std::shared_ptr<TextureReaderBase> reader) {
     _readers.push_back(reader);
 }
 
-std::vector<std::shared_ptr<TextureReaderBase>> TextureReader::readers() const {
+const std::vector<std::shared_ptr<TextureReaderBase>>& TextureReader::readers() const {
     return _readers;
 }
 

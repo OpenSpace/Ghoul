@@ -28,10 +28,6 @@
 #include <ghoul/logging/logmanager.h>
 #include <cstring>
 
-namespace {
-
-} // namespace
-
 namespace ghoul::io {
 
 WebSocketServer::WebSocketServer() {
@@ -40,10 +36,6 @@ WebSocketServer::WebSocketServer() {
     _server.set_access_channels(websocketpp::log::alevel::connect);
     _server.set_access_channels(websocketpp::log::alevel::disconnect);
     _server.set_access_channels(websocketpp::log::alevel::app);
-}
-
-WebSocketServer::~WebSocketServer() {
-
 }
 
 std::string WebSocketServer::address() const {

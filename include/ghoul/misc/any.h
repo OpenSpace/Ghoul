@@ -224,6 +224,7 @@ public:
  * \param operand The !any object that is to be converted into the type
  *        <code>ValueType</code>
  * \return The converted \p operand
+ *
  * \throw bad_any_cast If the \p operand does not contain a value of type
  *        <code>ValueType</code>
  * \pre \p operand must not be <code>nullptr</code>
@@ -239,6 +240,7 @@ ValueType* any_cast(any* operand);
  * \param operand The !any object that is to be converted into the type
  *        <code>ValueType</code>
  * \return The converted \p operand
+ *
  * \throw bad_any_cast If the \p operand does not contain a value of type
  *        <code>ValueType</code>
  * \pre \p operand must not be <code>nullptr</code>
@@ -254,6 +256,7 @@ inline const ValueType* any_cast(const any* operand);
  * \param operand The !any object that is to be converted into the type
  *        <code>ValueType</code>
  * \return The converted \p operand
+ *
  * \throw bad_any_cast If the \p operand does not contain a value of type
  *        <code>ValueType</code>
  */
@@ -267,6 +270,7 @@ ValueType any_cast(any& operand);
  * \param operand The !any object that is to be converted into the type
  *        <code>ValueType</code>
  * \return The converted \p operand
+ *
  * \throw bad_any_cast If the \p operand does not contain a value of type
  *        <code>ValueType</code>
  */
@@ -280,6 +284,7 @@ inline ValueType any_cast(const any& operand);
 * \param operand The !any object that is to be converted into the type
 *        <code>ValueType</code>
 * \return The converted \p operand
+*
 * \throw bad_any_cast If the \p operand does not contain a value of type
 *        <code>ValueType</code>
 */

@@ -46,7 +46,7 @@ template<typename T>
 class SingleCommand<T> : public CommandlineCommand {
 public:
     /**
-     * This constructor uses a singleparameters.
+     * This constructor uses a single parameter.
      *
      * \param ptr1 The reference to the parameter that will be set when this command is
      *        executed
@@ -58,6 +58,7 @@ public:
      *        by the CommandlineParser
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
+     *
      * \pre \p ptr1 must not be a nullptr
      * \pre \p ptr2 must not be a nullptr
      */
@@ -69,8 +70,9 @@ public:
      * pointers passed through the constructor.
      *
      * \param parameters The parameters for this SingleCommand
-     * \throws CommandExecutionException If one parameter has the wrong type that was not
-     *         detected in the checkParameters method
+     *
+     * \throw CommandExecutionException If one parameter has the wrong type that was not
+     *        detected in the checkParameters method
      */
     void execute(const std::vector<std::string>& parameters) override;
 
@@ -78,6 +80,7 @@ public:
      * Checks whether all of the \p parameters have the correct types.
      *
      * \param parameters The list of parameters that are to be checked
+     *
      * \throw CommandParameterException If any of the parameters have the wrong type
      */
     void checkParameters(const std::vector<std::string>& parameters) const override;
@@ -114,6 +117,7 @@ public:
      *        by the CommandlineParser
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
+     *
      * \pre \p ptr1 must not be a nullptr
      * \pre \p ptr2 must not be a nullptr
      */
@@ -125,8 +129,9 @@ public:
      * pointers passed through the constructor.
      *
      * \param parameters The parameters for this SingleCommand
-     * \throws CommandExecutionException If one parameter has the wrong type that was not
-     *         detected in the checkParameters method
+     *
+     * \throw CommandExecutionException If one parameter has the wrong type that was not
+     *        detected in the checkParameters method
      */
     void execute(const std::vector<std::string>& parameters) override;
 
@@ -134,6 +139,7 @@ public:
      * Checks whether all of the \p parameters have the correct types.
      *
      * \param parameters The list of parameters that are to be checked
+     *
      * \throw CommandParameterException If any of the parameters have the wrong type
      */
     void checkParameters(const std::vector<std::string>& parameters) const override;
@@ -174,6 +180,7 @@ public:
      *        by the CommandlineParser
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
+     *
      * \pre \p ptr1 must not be a nullptr
      * \pre \p ptr2 must not be a nullptr
      * \pre \p ptr3 must not be a nullptr
@@ -186,8 +193,9 @@ public:
      * pointers passed through the constructor.
      *
      * \param parameters The parameters for this SingleCommand
-     * \throws CommandExecutionException If one parameter has the wrong type that was not
-     *         detected in the checkParameters method
+     *
+     * \throw CommandExecutionException If one parameter has the wrong type that was not
+     *        detected in the checkParameters method
      */
     void execute(const std::vector<std::string>& parameters) override;
 
@@ -195,6 +203,7 @@ public:
      * Checks whether all of the \p parameters have the correct types.
      *
      * \param parameters The list of parameters that are to be checked
+     *
      * \throw CommandParameterException If any of the parameters have the wrong type
      */
     void checkParameters(const std::vector<std::string>& parameters) const override;
@@ -240,6 +249,7 @@ public:
      *        by the CommandlineParser
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
+     *
      * \pre \p ptr1 must not be a nullptr
      * \pre \p ptr2 must not be a nullptr
      * \pre \p ptr3 must not be a nullptr
@@ -254,8 +264,9 @@ public:
      * pointers passed through the constructor.
      *
      * \param parameters The parameters for this SingleCommand
-     * \throws CommandExecutionException If one parameter has the wrong type that was not
-     *         detected in the checkParameters method
+     *
+     * \throw CommandExecutionException If one parameter has the wrong type that was not
+     *        detected in the checkParameters method
      */
     void execute(const std::vector<std::string>& parameters) override;
 
@@ -263,6 +274,7 @@ public:
      * Checks whether all of the \p parameters have the correct types.
      *
      * \param parameters The list of parameters that are to be checked
+     *
      * \throw CommandParameterException If any of the parameters have the wrong type
      */
     void checkParameters(const std::vector<std::string>& parameters) const override;
@@ -278,7 +290,7 @@ protected:
 /**
  * This class represents a command with zero arguments that can only occur once in a given
  * commandline. The bool pointer will be set to <code>true</code>, if the command is
- * executed
+ * executed.
  */
 class SingleCommandZeroArguments : public CommandlineCommand {
 public:

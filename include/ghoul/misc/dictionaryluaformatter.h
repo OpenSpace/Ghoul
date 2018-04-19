@@ -55,6 +55,7 @@ public:
      *
      * \param dictionary The Dictionary that should be converted
      * \return A Lua string representing the Dictionary
+     *
      * \throw LuaFormattingError If the \p key points to a type that cannot be converted
      */
     std::string format(const Dictionary& dictionary) const override;
@@ -68,6 +69,7 @@ private:
      *        converted
      * \param key The key in the Dictionary that should be converted
      * \return A Lua representation of the \p key's value
+     *
      * \throw LuaFormattingError If the \p key points to a type that cannot be converted
      */
     std::string formatValue(const Dictionary& dictionary, const std::string& key) const;

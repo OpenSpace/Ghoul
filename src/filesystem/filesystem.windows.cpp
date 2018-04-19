@@ -32,7 +32,6 @@
 #include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/stacktrace.h>
-
 #include <algorithm>
 #include <cassert>
 #include <cstdio>

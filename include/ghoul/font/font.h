@@ -258,7 +258,8 @@ public:
      * \param hasOutline A flag whether Glyphs of this Font should have an outline or not
      * \param outlineThickness The thickness of the outline. This setting is ignored if
      *        the Font does not have an outline
-     * \throws FreeTypeException If there was an error loading the basic font information
+     *
+     * \throw FreeTypeException If there was an error loading the basic font information
      * \pre \p filename must not be empty
      * \pre \p pointSize must be positive and bigger than 0
      */
@@ -309,6 +310,7 @@ public:
      *        '\\n' to have a linebreak, which is of the correct length with regard to the
      *        selected font. This parameter cannot be a <code>nullptr</code>.
      * \return The pixel coordinates of the bounding box of the passed text
+     *
      * \pre \p text must not be empty
      */
     glm::vec2 boundingBox(const char* text, ...);
@@ -319,6 +321,7 @@ public:
      *
      * \param character The character for which the Glyph should be returned
      * \return A pointer to the Glyph
+     *
      * \throw FreeTypeException If a FreeType exception occurred while loading the glyph
      * \throw GlyphException If there was an error loading the glyph
      */
@@ -330,6 +333,7 @@ public:
      *
      * \param characters A list of characters for which Glyphs should be created and
      *        cached
+     *
      * \throw FreeTypeException If a FreeType exception occurred while loading the glyphs
      * \throw GlyphException If there was an error loading the glyph
      */

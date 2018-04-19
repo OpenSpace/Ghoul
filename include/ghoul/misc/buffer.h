@@ -66,8 +66,9 @@ public:
      * Constructs a Buffer object from file.
      *
      * \param filename The filename of the binary Buffer file.
-     * \pre \p filename must not be empty
+     *
      * \throw std::ios_base::failure If the buffer could not be read from \p filename
+     * \pre \p filename must not be empty
      */
     Buffer(const std::string& filename);
 
@@ -149,9 +150,10 @@ public:
      * \param filename The filename to be written to
      * \param compress Flag that specifies if the current Buffer should be compressed when
      *        written to file
-     * \pre \p filename must not be empty
+     *
      * \throw std::ios_base::failure If there was an error writing the file
      * \throw RuntimeError if there was an error compressing the data
+     * \pre \p filename must not be empty
      */
     void write(const std::string& filename, Compress compress = Compress::No);
 
@@ -159,6 +161,7 @@ public:
      * Reads the Buffer from a Buffer file.
      *
      * \param filename The path to the file to read
+     *
      * \throw std::ios_base::failure If there was an error reading the file
      * \pre \p filename must not be empty
      */
@@ -168,6 +171,7 @@ public:
      * Serializes a const char* string to a std::string.
      *
      * \param s The string to be serialized
+     *
      * \pre \p s must not be <code>nullptr</code>
      */
     void serialize(const char* s);
@@ -177,6 +181,7 @@ public:
      *
      * \param data Pointer to the raw data to serialize
      * \param size The size of the data to serialize in bytes
+     *
      * \pre \p data must not be <code>nullptr</code>
      */
     void serialize(const value_type* data, size_t size);
@@ -186,6 +191,7 @@ public:
      *
      * \tparam T The type of the object
      * \param v The object to be serialized
+     *
      * \pre \p T must be a POD type
      */
     template <class T>
@@ -196,6 +202,7 @@ public:
      *
      * \tparam T The type of each object
      * \param v The vector of objects to serialize
+     *
      * \pre \p T must be a POD type
      */
     template <typename T>
@@ -207,6 +214,7 @@ public:
      * \tparam Iter Forward-iterator
      * \param begin Inclusive iterator to the front of the set of serialized elements
      * \param end Exclusive iterator to the end of the set of serialized elements
+     *
      * \pre The type pointed to by \p Iter must be a POD
      */
     template <typename Iter>
@@ -217,6 +225,7 @@ public:
      *
      * \param data Pointer to a datablock to copy data into
      * \param size The size number of bytes of data to copy
+     *
      * \pre \p data must not be <code>nullptr</code>
      */
     void deserialize(value_type* data, size_t size);
@@ -226,6 +235,7 @@ public:
      *
      * \tparam T The type of the object to deserialize
      * \param value The object to deserialize
+     *
      * \pre \p T must be a POD type
      */
     template <class T>
@@ -236,6 +246,7 @@ public:
      *
      * \tparam T The type of each object
      * \param v The vector of objects to deserialize
+     *
      * \pre \p T must be a POD type
      */
     template <typename T>
@@ -247,9 +258,10 @@ public:
      * \tparam Iter Forward-iterator
      * \param begin Inclusive iterator to the front of the set of deserialized elements
      * \param end Exclusive iterator to the end of the set of deserialized elements
+     *
      * \pre The type pointed to by \p Iter must be a POD
      * \pre The number of elements deserialized must be equal to the distance between
-     * \p begin and \p end
+     *      \p begin and \p end
      */
     template <typename Iter>
     void deserialize(Iter begin, Iter end);
