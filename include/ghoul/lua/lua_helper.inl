@@ -71,7 +71,7 @@ T value(lua_State* L) {
         }
     }
     else {
-        static_assert(false, "Unrecognized type T");
+        static_assert(false, "Unhandled type T");
     }
 
     // If we get this far, none of the previous return statements were hit

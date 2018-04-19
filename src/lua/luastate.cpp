@@ -51,6 +51,7 @@ LuaState& LuaState::operator=(LuaState&& other) noexcept {
     }
     _state = other._state;
     other._state = nullptr;
+    return *this;
 }
 
 LuaState::operator lua_State*() const {
