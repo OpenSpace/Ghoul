@@ -130,7 +130,7 @@ public:
      * This operator will reveal the OpenGL name of this ProgramObject so that it can be
      * directly used in native OpenGL functions.
      *
-     * \returns The OpenGL name of this ProgramObject
+     * \return The OpenGL name of this ProgramObject
      */
     operator GLuint() const;
 
@@ -173,6 +173,8 @@ public:
 
     /**
      * Returns the current dictionary.
+     *
+     * \return The current dictionary
      */
     Dictionary dictionary();
 
@@ -187,6 +189,7 @@ public:
      * Attaches the specified ShaderObject to this ProgramObject.
      *
      * \param shaderObject The ShaderObject that will be attached to this ProgramObject.
+     *
      * \pre \p shaderObject must not be nullptr
      * \pre \p shaderObject must not have been registered before
      */
@@ -196,6 +199,7 @@ public:
      * Detaches the specified ShaderObject from this ProgramObject.
      *
      * \param shaderObject The ShaderObject that should be detached.
+     *
      * \pre \p shaderObject must not be nullptr
      * \pre \p shaderObject must have been registered before
      */
@@ -211,6 +215,7 @@ public:
 
     /**
      * Links all attached ShaderObject%s into a program object.
+     *
      * \throw ProgramObjectLinkingError If there was an error linking the ProgramObject
      */
     void linkProgramObject();
@@ -261,6 +266,7 @@ public:
      * \param dictionary The dictionary that is used for the created ShaderObject%s and
      *        ultimately for the ShaderPreprocessor
      * \return The constructed ProgramObject if successful
+     *
      * \throw FileNotFoundError If any of the shader files could not be found
      * \throw ShaderCompileError If there was an error compiling at least one of the
      *        loaded shaders
@@ -289,6 +295,7 @@ public:
      * \param dictionary The dictionary that is used for the created ShaderObject%s and
      *        ultimately for the ShaderPreprocessor
      * \return The constructed ProgramObject if successful
+     *
      * \throw FileNotFoundError If any of the shader files could not be found
      * \throw ShaderCompileError If there was an error compiling at least one of the
      *        loaded shaders
@@ -325,6 +332,7 @@ public:
      * \param dictionary The dictionary that is used for the created ShaderObject%s and
      *        ultimately for the ShaderPreprocessor
      * \return The constructed ProgramObject if successful
+     *
      * \throw FileNotFoundError If any of the shader files could not be found
      * \throw ShaderCompileError If there was an error compiling at least one of the
      *        loaded shaders
@@ -376,6 +384,7 @@ public:
      * \param name The name of the uniform for which the location should be fetched
      * \return The location of the uniform, or <code>-1</code> if the uniform could not be
      *         found
+     *
      * \pre \p name must not be empty
      */
     GLint uniformLocation(const std::string& name) const;
@@ -389,6 +398,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, bool value);
@@ -403,6 +413,7 @@ public:
      * \param v2 The second value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, bool v1, bool v2);
@@ -418,6 +429,7 @@ public:
      * \param v3 The third value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, bool v1, bool v2, bool v3);
@@ -435,6 +447,7 @@ public:
      * \param v4 The fourth value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, bool v1, bool v2, bool v3, bool v4);
@@ -448,6 +461,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::bvec2& value);
@@ -461,6 +475,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::bvec3& value);
@@ -474,6 +489,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::bvec4& value);
@@ -489,6 +505,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const bool* values, int count = 1);
@@ -504,6 +521,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::bvec2* values, int count = 1);
@@ -519,6 +537,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code>otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::bvec3* values, int count = 1);
@@ -534,6 +553,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::bvec4* values, int count = 1);
@@ -547,6 +567,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code>otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLuint value);
@@ -561,6 +582,7 @@ public:
      * \param v2 The second value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLuint v1, GLuint v2);
@@ -576,6 +598,7 @@ public:
      * \param v3 The third value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLuint v1, GLuint v2, GLuint v3);
@@ -593,6 +616,7 @@ public:
      * \param v4 The fourth value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLuint v1, GLuint v2, GLuint v3, GLuint v4);
@@ -606,6 +630,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::uvec2& value);
@@ -619,6 +644,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::uvec3& value);
@@ -632,6 +658,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::uvec4& value);
@@ -647,6 +674,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const GLuint* values, int count = 1);
@@ -662,6 +690,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::uvec2* values, int count = 1);
@@ -677,6 +706,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::uvec3* values, int count = 1);
@@ -692,6 +722,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::uvec4* values, int count = 1);
@@ -705,6 +736,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLint value);
@@ -719,6 +751,7 @@ public:
      * \param v2 The second value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLint v1, GLint v2);
@@ -734,6 +767,7 @@ public:
      * \param v3 The third value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLint v1, GLint v2, GLint v3);
@@ -751,6 +785,7 @@ public:
      * \param v4 The fourth value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLint v1, GLint v2, GLint v3, GLint v4);
@@ -764,6 +799,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::ivec2& value);
@@ -777,6 +813,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::ivec3& value);
@@ -790,6 +827,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::ivec4& value);
@@ -805,6 +843,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const GLint* values, int count = 1);
@@ -820,6 +859,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::ivec2* values, int count = 1);
@@ -835,6 +875,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::ivec3* values, int count = 1);
@@ -850,6 +891,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::ivec4* values, int count = 1);
@@ -863,6 +905,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLfloat value);
@@ -877,6 +920,7 @@ public:
      * \param v2 The second value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLfloat v1, GLfloat v2);
@@ -892,6 +936,7 @@ public:
      * \param v3 The third value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLfloat v1, GLfloat v2, GLfloat v3);
@@ -909,6 +954,7 @@ public:
      * \param v4 The fourth value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name,
@@ -923,6 +969,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::vec2& value);
@@ -936,6 +983,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::vec3& value);
@@ -949,6 +997,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::vec4& value);
@@ -964,6 +1013,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const GLfloat* values, int count = 1);
@@ -979,6 +1029,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::vec2* values, int count = 1);
@@ -994,6 +1045,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::vec3* values, int count = 1);
@@ -1009,6 +1061,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::vec4* values, int count = 1);
@@ -1020,8 +1073,9 @@ public:
      *
      * \param name The name of the uniform in the ShaderObject%s
      * \param value The value the uniform should be set to
-     * \return <code>true</code> if the uniform was successfully located, <code>false
-     *         </code> otherwise
+     * \return <code>true</code> if the uniform was successfully located,
+     *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLdouble value);
@@ -1036,6 +1090,7 @@ public:
      * \param v2 The second value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLdouble v1, GLdouble v2);
@@ -1051,6 +1106,7 @@ public:
      * \param v3 The third value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, GLdouble v1, GLdouble v2, GLdouble v3);
@@ -1068,6 +1124,7 @@ public:
      * \param v4 The fourth value that should be used to set the uniform
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name,
@@ -1082,6 +1139,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dvec2& value);
@@ -1095,6 +1153,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dvec3& value);
@@ -1108,6 +1167,7 @@ public:
      * \param value The value the uniform should be set to
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dvec4& value);
@@ -1123,6 +1183,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const GLdouble* values, int count = 1);
@@ -1138,6 +1199,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::dvec2* values, int count = 1);
@@ -1153,6 +1215,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::dvec3* values, int count = 1);
@@ -1168,6 +1231,7 @@ public:
      * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, glm::dvec4* values, int count = 1);
@@ -1183,6 +1247,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat2x2& value,
@@ -1199,6 +1264,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat2x3& value,
@@ -1215,6 +1281,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat2x4& value,
@@ -1231,6 +1298,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat3x2& value,
@@ -1247,6 +1315,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat3x3& value,
@@ -1263,6 +1332,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat3x4& value,
@@ -1279,6 +1349,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat4x2& value,
@@ -1295,6 +1366,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat4x3& value,
@@ -1311,6 +1383,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::mat4x4& value,
@@ -1327,6 +1400,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat2x2& value,
@@ -1343,6 +1417,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat2x3& value,
@@ -1359,6 +1434,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat2x4& value,
@@ -1375,6 +1451,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat3x2& value,
@@ -1391,6 +1468,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat3x3& value,
@@ -1407,6 +1485,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat3x4& value,
@@ -1423,6 +1502,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat4x2& value,
@@ -1439,6 +1519,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat4x3& value,
@@ -1455,6 +1536,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the initial uniform was successfully located,
      *         <code>false</code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setUniform(const std::string& name, const glm::dmat4x4& value,
@@ -1477,6 +1559,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, bool v1, bool v2);
@@ -1489,6 +1572,7 @@ public:
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, bool v1, bool v2, bool v3);
@@ -1502,6 +1586,7 @@ public:
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
      * \param v4 The fourth value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, bool v1, bool v2, bool v3, bool v4);
@@ -1512,6 +1597,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::bvec2& value);
@@ -1522,6 +1608,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::bvec3& value);
@@ -1532,6 +1619,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::bvec4& value);
@@ -1544,6 +1632,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const bool* values, int count = 1);
@@ -1556,6 +1645,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::bvec2* values, int count = 1);
@@ -1568,6 +1658,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::bvec3* values, int count = 1);
@@ -1580,6 +1671,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::bvec4* values, int count = 1);
@@ -1590,6 +1682,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLuint value);
@@ -1601,6 +1694,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLuint v1, GLuint v2);
@@ -1613,6 +1707,7 @@ public:
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLuint v1, GLuint v2, GLuint v3);
@@ -1626,6 +1721,7 @@ public:
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
      * \param v4 The fourth value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLuint v1, GLuint v2, GLuint v3, GLuint v4);
@@ -1636,6 +1732,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::uvec2& value);
@@ -1646,6 +1743,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::uvec3& value);
@@ -1656,6 +1754,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::uvec4& value);
@@ -1668,6 +1767,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const GLuint* values, int count = 1);
@@ -1680,6 +1780,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::uvec2* values, int count = 1);
@@ -1692,6 +1793,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::uvec3* values, int count = 1);
@@ -1704,6 +1806,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::uvec4* values, int count = 1);
@@ -1714,6 +1817,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLint value);
@@ -1725,6 +1829,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLint v1, GLint v2);
@@ -1737,6 +1842,7 @@ public:
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLint v1, GLint v2, GLint v3);
@@ -1750,6 +1856,7 @@ public:
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
      * \param v4 The fourth value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLint v1, GLint v2, GLint v3, GLint v4);
@@ -1760,6 +1867,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::ivec2& value);
@@ -1770,6 +1878,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::ivec3& value);
@@ -1780,6 +1889,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::ivec4& value);
@@ -1792,6 +1902,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const GLint* values, int count = 1);
@@ -1804,6 +1915,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::ivec2* values, int count = 1);
@@ -1816,6 +1928,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::ivec3* values, int count = 1);
@@ -1828,6 +1941,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::ivec4* values, int count = 1);
@@ -1838,6 +1952,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLfloat value);
@@ -1849,6 +1964,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLfloat v1, GLfloat v2);
@@ -1861,6 +1977,7 @@ public:
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLfloat v1, GLfloat v2, GLfloat v3);
@@ -1874,6 +1991,7 @@ public:
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
      * \param v4 The fourth value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4);
@@ -1884,6 +2002,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::vec2& value);
@@ -1894,6 +2013,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::vec3& value);
@@ -1904,6 +2024,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::vec4& value);
@@ -1916,6 +2037,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const GLfloat* values, int count = 1);
@@ -1928,6 +2050,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::vec2* values, int count = 1);
@@ -1940,6 +2063,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::vec3* values, int count = 1);
@@ -1952,6 +2076,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::vec4* values, int count = 1);
@@ -1962,6 +2087,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLdouble value);
@@ -1973,6 +2099,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLdouble v1, GLdouble v2);
@@ -1985,6 +2112,7 @@ public:
      * \param v1 The first value that should be used to set the uniform
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLdouble v1, GLdouble v2, GLdouble v3);
@@ -1998,6 +2126,7 @@ public:
      * \param v2 The second value that should be used to set the uniform
      * \param v3 The third value that should be used to set the uniform
      * \param v4 The fourth value that should be used to set the uniform
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4);
@@ -2008,6 +2137,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::dvec2& value);
@@ -2018,6 +2148,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::dvec3& value);
@@ -2028,6 +2159,7 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param value The value the uniform should be set to
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::dvec4& value);
@@ -2040,6 +2172,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const GLdouble* values, int count = 1);
@@ -2052,6 +2185,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::dvec2* values, int count = 1);
@@ -2064,6 +2198,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::dvec3* values, int count = 1);
@@ -2076,6 +2211,7 @@ public:
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
      * \param count The number of values that are stored in values
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, glm::dvec4* values, int count = 1);
@@ -2089,6 +2225,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::mat2x2& value,
@@ -2103,6 +2240,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::mat2x3& value,
@@ -2117,6 +2255,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::mat2x4& value,
@@ -2131,6 +2270,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::mat3x2& value,
@@ -2145,6 +2285,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::mat3x3& value,
@@ -2159,6 +2300,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::mat3x4& value,
@@ -2173,6 +2315,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::mat4x2& value,
@@ -2187,6 +2330,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::mat4x3& value,
@@ -2201,6 +2345,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::mat4x4& value,
@@ -2215,6 +2360,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::dmat2x2& value,
@@ -2229,6 +2375,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::dmat2x3& value,
@@ -2243,6 +2390,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::dmat2x4& value,
@@ -2257,6 +2405,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::dmat3x2& value,
@@ -2271,6 +2420,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::dmat3x3& value,
@@ -2285,6 +2435,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::dmat3x4& value,
@@ -2299,6 +2450,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::dmat4x2& value,
@@ -2313,6 +2465,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::dmat4x3& value,
@@ -2327,6 +2480,7 @@ public:
      * \param value The value the uniform should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const glm::dmat4x4& value,
@@ -2346,6 +2500,7 @@ public:
      * \param binding The binding the block should be bound to
      * \return <code>true</code> if the block was successfully located, <code>false
      *         </code> otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setSsboBinding(const std::string& name, GLuint binding);
@@ -2356,6 +2511,7 @@ public:
      *
      * \param index The index of the block retrieved from
      *        <code>glGetUniformBlockIndex</code>
+     *
      * \param binding The binding the block should be bound to
      */
     void setSsboBinding(GLuint index, GLuint binding);
@@ -2389,6 +2545,7 @@ public:
      *
      * \param name The name of the attribute for which the location should be fetched
      * \return The location of the attribute, or <code>-1</code> if it could not be found
+     *
      * \pre \p name must not be empty
      */
     GLuint attributeLocation(const std::string& name) const;
@@ -2399,6 +2556,7 @@ public:
      *
      * \param name The name of the attribute variable
      * \param index The location of the generic vertex attribute that should be bound
+     *
      * \pre \p name must not be empty
      */
     void bindAttributeLocation(const std::string& name, GLuint index);
@@ -2412,6 +2570,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, bool value);
@@ -2427,6 +2586,7 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, bool v1, bool v2);
@@ -2443,6 +2603,7 @@ public:
      * \param v3 The third value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, bool v1, bool v2, bool v3);
@@ -2460,6 +2621,7 @@ public:
      * \param v4 The fourth value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, bool v1, bool v2, bool v3, bool v4);
@@ -2473,6 +2635,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::bvec2& value);
@@ -2486,6 +2649,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::bvec3& value);
@@ -2499,6 +2663,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::bvec4& value);
@@ -2512,6 +2677,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, GLint value);
@@ -2527,6 +2693,7 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, GLint v1, GLint v2);
@@ -2543,6 +2710,7 @@ public:
      * \param v3 The third value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, GLint v1, GLint v2, GLint v3);
@@ -2560,6 +2728,7 @@ public:
      * \param v4 The fourth value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, GLint v1, GLint v2, GLint v3, GLint v4);
@@ -2573,6 +2742,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::ivec2& value);
@@ -2586,6 +2756,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::ivec3& value);
@@ -2599,6 +2770,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::ivec4& value);
@@ -2612,6 +2784,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, GLfloat value);
@@ -2627,6 +2800,7 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, GLfloat v1, GLfloat v2);
@@ -2643,6 +2817,7 @@ public:
      * \param v3 The third value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, GLfloat v1, GLfloat v2, GLfloat v3);
@@ -2660,6 +2835,7 @@ public:
      * \param v4 The fourth value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name,
@@ -2674,6 +2850,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::vec2& value);
@@ -2687,6 +2864,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::vec3& value);
@@ -2700,6 +2878,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::vec4& value);
@@ -2713,6 +2892,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, GLdouble value);
@@ -2728,6 +2908,7 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, GLdouble v1, GLdouble v2);
@@ -2744,6 +2925,7 @@ public:
      * \param v3 The third value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, GLdouble v1, GLdouble v2, GLdouble v3);
@@ -2761,6 +2943,7 @@ public:
      * \param v4 The fourth value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name,
@@ -2775,6 +2958,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dvec2& value);
@@ -2788,6 +2972,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dvec3& value);
@@ -2801,6 +2986,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dvec4& value);
@@ -2817,6 +3003,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat2x2& value,
@@ -2834,6 +3021,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat2x3& value,
@@ -2851,6 +3039,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat2x4& value,
@@ -2868,6 +3057,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat3x2& value,
@@ -2885,6 +3075,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat3x3& value,
@@ -2902,6 +3093,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat3x4& value,
@@ -2919,6 +3111,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat4x2& value,
@@ -2936,6 +3129,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat4x3& value,
@@ -2953,6 +3147,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::mat4x4& value,
@@ -2970,6 +3165,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat2x2& value,
@@ -2987,6 +3183,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat2x3& value,
@@ -3004,6 +3201,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat2x4& value,
@@ -3021,6 +3219,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat3x2& value,
@@ -3038,6 +3237,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat3x3& value,
@@ -3055,6 +3255,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat3x4& value,
@@ -3089,6 +3290,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat4x3& value,
@@ -3106,6 +3308,7 @@ public:
      *        Transpose::No if the matrix is in column major order
      * \return <code>true</code> if the attribute was successfully set, <code>false</code>
      *         otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat4x4& value,
@@ -3117,6 +3320,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, bool value);
@@ -3128,6 +3332,7 @@ public:
      * \param location The location of the vertex attribute
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, bool v1, bool v2);
@@ -3140,6 +3345,7 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, bool v1, bool v2, bool v3);
@@ -3153,6 +3359,7 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, bool v1, bool v2, bool v3, bool v4);
@@ -3163,6 +3370,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::bvec2& value);
@@ -3173,6 +3381,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::bvec3& value);
@@ -3183,6 +3392,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::bvec4& value);
@@ -3193,6 +3403,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, GLint value);
@@ -3204,6 +3415,7 @@ public:
      * \param location The location of the vertex attribute
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, GLint v1, GLint v2);
@@ -3216,6 +3428,7 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, GLint v1, GLint v2, GLint v3);
@@ -3229,6 +3442,7 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, GLint v1, GLint v2, GLint v3, GLint v4);
@@ -3239,6 +3453,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::ivec2& value);
@@ -3249,6 +3464,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::ivec3& value);
@@ -3259,6 +3475,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::ivec4& value);
@@ -3269,6 +3486,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, GLfloat value);
@@ -3280,6 +3498,7 @@ public:
      * \param location The location of the vertex attribute
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, GLfloat v1, GLfloat v2);
@@ -3292,6 +3511,7 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, GLfloat v1, GLfloat v2, GLfloat v3);
@@ -3305,6 +3525,7 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4);
@@ -3315,6 +3536,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::vec2& value);
@@ -3325,6 +3547,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::vec3& value);
@@ -3335,6 +3558,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::vec4& value);
@@ -3345,6 +3569,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, GLdouble value);
@@ -3356,6 +3581,7 @@ public:
      * \param location The location of the vertex attribute
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, GLdouble v1, GLdouble v2);
@@ -3368,6 +3594,7 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, GLdouble v1, GLdouble v2, GLdouble v3);
@@ -3381,6 +3608,7 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, GLdouble v1, GLdouble v2, GLdouble v3,
@@ -3392,6 +3620,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::dvec2& value);
@@ -3403,6 +3632,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::dvec3& value);
@@ -3413,6 +3643,7 @@ public:
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::dvec4& value);
@@ -3425,6 +3656,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::mat2x2& value,
@@ -3438,6 +3670,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::mat2x3& value,
@@ -3451,6 +3684,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::mat2x4& value,
@@ -3464,6 +3698,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::mat3x2& value,
@@ -3477,6 +3712,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::mat3x3& value,
@@ -3490,6 +3726,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::mat3x4& value,
@@ -3503,6 +3740,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::mat4x2& value,
@@ -3516,6 +3754,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::mat4x3& value,
@@ -3529,6 +3768,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::mat4x4& value,
@@ -3542,6 +3782,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::dmat2x2& value,
@@ -3555,6 +3796,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::dmat2x3& value,
@@ -3568,6 +3810,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::dmat2x4& value,
@@ -3581,6 +3824,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::dmat3x2& value,
@@ -3594,6 +3838,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::dmat3x3& value,
@@ -3607,6 +3852,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::dmat3x4& value,
@@ -3620,6 +3866,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::dmat4x2& value,
@@ -3633,6 +3880,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::dmat4x3& value,
@@ -3646,6 +3894,7 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
+     *
      * \pre \p location must not be <code>GL_INVALID_INDEX</code>
      */
     void setAttribute(GLuint location, const glm::dmat4x4& value,
@@ -3696,6 +3945,7 @@ public:
      * \param shaderType The type of the shader object that will be queried
      * \param name The name of the subroutine for which the index will be queried
      * \return The index of the subroutine
+     *
      * \pre \p name must not be empty
      */
     GLuint subroutineIndex(ShaderObject::ShaderType shaderType, const std::string& name);
@@ -3711,6 +3961,7 @@ public:
      * \param name The name of the subroutine uniform for which the location will be
      *        queried
      * \return The location of the subroutine uniform
+     *
      * \pre \p name must not be empty
      */
     GLint subroutineUniformLocation(ShaderObject::ShaderType shaderType,
@@ -3743,6 +3994,7 @@ public:
      *        that will be used to determine the compatible subroutines
      * \return A list of names of all subroutines that are compatible with the subroutine
      *         uniform at \p subroutineUniformLocation
+     *
      * \pre \p subroutineUniformLocation must not be <code>GL_INVALID_INDEX</code>
      */
     std::vector<std::string> compatibleSubroutineNames(
@@ -3760,6 +4012,7 @@ public:
      *        to determine the compatible subroutines
      * \return A list of names of all subroutines that are compatible with the subroutine
      *         uniform at \p subroutineUniformLocation
+     *
      * \pre \p subroutineUniformName must not be empty
      */
     std::vector<std::string> compatibleSubroutineNames(
@@ -3784,6 +4037,7 @@ public:
      * \return <code>true</code> if all uniform subroutines were set correctly,
      *         <code>false</code> otherwise, i.e., if \p indices did not contain the
      *         correct number of indices.
+     *
      * \pre \p indices must not be empty
      */
     bool setUniformSubroutines(ShaderObject::ShaderType shaderType,
@@ -3806,6 +4060,7 @@ public:
      * \return <code>true</code> if all uniform subroutines were set correctly,
      *         <code>false</code> otherwise, i.e., a subroutine uniform or a subroutine
      *         was not found
+     *
      * \pre \p indices must not be empty
      */
     bool setUniformSubroutines(ShaderObject::ShaderType shaderType,
@@ -3818,6 +4073,7 @@ public:
      *
      * \param name The name of the output variable that is to be bound
      * \param colorNumber The color number that will be bound
+     *
      * \pre \p name must not be empty
      * \pre \p colorNumber must not be <code>GL_INVALID_INDEX</code>
      */

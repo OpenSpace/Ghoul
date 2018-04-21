@@ -92,6 +92,7 @@ public:
      * number will be assigned to this object.
      *
      * \return The texture unit number that was assigned to this TextureUnit
+     *
      * \throw TextureUnitError If the new unit number could not be assigned
      */
     GLint unitNumber();
@@ -103,6 +104,7 @@ public:
      * result as #unitNumber.
      *
      * \return The texture unit number that was assigned to this TextureUnit
+     *
      * \throw TextureUnitError If the new unit number could not be assigned
      */
     operator GLint();

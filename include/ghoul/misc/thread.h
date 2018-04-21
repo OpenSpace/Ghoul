@@ -67,8 +67,9 @@ BooleanType(Background);
  * \param t The thread for which to set the priority class and level
  * \param priorityClass The ThreadPriorityClass that is to be set for \p t
  * \param priorityLevel The ThreadPriorityLevel that is to be set for \p t
- * \throws ghoul::RuntimeError If a non-recoverable error occurs while setting the thread
- *         class or level
+ *
+ * \throw ghoul::RuntimeError If a non-recoverable error occurs while setting the thread
+ *        class or level
  */
 void setPriority(std::thread& t, ThreadPriorityClass priorityClass,
     ThreadPriorityLevel priorityLevel

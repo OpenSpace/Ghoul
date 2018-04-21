@@ -79,6 +79,7 @@ public:
      *
      * \param vertexArray The vertex array used for this VertexBufferObject
      * \param indexArray The index list used for this VertexBufferObject
+     *
      * \pre VertexBufferObject must not have been initialized
      * \pre \p vertexArray must not be empty
      * \pre \p indexArray must not be empty
@@ -95,6 +96,7 @@ public:
      *         <code>POD</code>
      * \param vertexArray The vertex array used for this VertexBufferObject
      * \param indexArray The index list used for this VertexBufferObject
+     *
      * \pre VertexBufferObject must not have been initialized before
      */
     template<typename T>

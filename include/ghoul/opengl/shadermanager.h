@@ -67,6 +67,7 @@ public:
      * \param hashedName The hashed name of the ShaderObject that is to be fetched
      * \return The ShaderObject that has been registered with a string that evaluates
      *         to the \p hashedName
+     *
      * \throw ShaderManagerError if the ShaderObject for \p hashedName did not exist
      */
     ShaderObject* shaderObject(unsigned int hashedName);
@@ -78,6 +79,7 @@ public:
      *
      * \param name The name of the ShaderObject that is to be fetched
      * \return The ShaderObject that has been registered with the passed name
+     *
      * \throw ShaderManagerError If the ShaderObject for \p name did not exist
      */
     ShaderObject* shaderObject(const std::string& name);
@@ -91,6 +93,7 @@ public:
      * \param name The name under which the ShaderObject should be registered
      * \param shader The ShaderObject that should be registered
      * \return The hashed value that is generated from the \p name
+     *
      * \throw ShaderManagerError If there already was a ShaderObject for the provided
      *        \p name
      * \pre \p shader must not be nullptr

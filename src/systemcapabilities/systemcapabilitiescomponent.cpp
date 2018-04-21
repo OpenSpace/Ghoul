@@ -27,6 +27,43 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
+#include <map>
+
+namespace std {
+
+string to_string(ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity v) {
+    using Verbosity = ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity;
+    switch (v) {
+        case Verbosity::None:    return "None";
+        case Verbosity::Minimal: return "Minimal";
+        case Verbosity::Default: return "Default";
+        case Verbosity::Full:    return "Full";
+        default:                 throw ghoul::MissingCaseException();
+    }
+}
+
+} // namespace std
+
+namespace ghoul {
+
+template <>
+ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity
+from_string(const std::string& str)
+{
+    using Verbosity = ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity;
+
+    static const std::map<std::string, Verbosity> VerbosityMap = {
+        { "None", Verbosity::None },
+        { "Minimal", Verbosity::Minimal },
+        { "Default", Verbosity::Default },
+        { "Full", Verbosity::Full }
+    };
+
+    // Throws a std::out_of_range exception if the type could not be found
+    return VerbosityMap.at(str);
+}
+
+} // namespace ghoul
 
 namespace ghoul::systemcapabilities {
 

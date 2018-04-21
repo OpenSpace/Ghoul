@@ -77,6 +77,7 @@ public:
      * treated as if being on the top of the list.
      *
      * \param folderPath The folder that should be added to the list of include paths
+     *
      * \pre \p folderPath must not be empty
      * \pre \p folderPath must be an existing directory
      * \pre \p folderPath must be a path without FileSystem tokens

@@ -112,6 +112,7 @@ public:
      *
      * \param shaderType The type of shader that this ShaderObject will represent
      * \param dictionary The dictionary that is used for the !ShaderPreprocessor
+     *
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
      *        generated
      */
@@ -127,6 +128,7 @@ public:
      * \param filename The name of the file that will be used to load the source of this
      *        shader
      * \param dictionary The dictionary that is used for the !ShaderPreprocessor
+     *
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
      *        generated
      * \pre \p filename must not be empty
@@ -147,6 +149,7 @@ public:
      *        shader
      * \param name The human readable name of this ShaderObject
      * \param dictionary The dictionary that is used for the !ShaderPreprocessor
+     *
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
      *        generated
      * \pre \p filename must not be empty
@@ -163,6 +166,7 @@ public:
      * cache the contents of the file inside.
      *
      * \param cpy The original object that will be copied
+     *
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
      *        generated
      */
@@ -196,6 +200,7 @@ public:
      *
      * \param rhs The original right hand side that will be used to set this object
      * \return A reference to <code>this</code>
+     *
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
      *        generated
      */
@@ -257,6 +262,7 @@ public:
      * automatically compiled after loading.
      *
      * \param filename The name of the file that will be used to load this shader
+     *
      * \throw FileNotFoundError If the \p filename did not point to a valid file
      * \throw ShaderObjectError If the file pointed to by \p filename was empty
      * \pre \p filename must not be empty

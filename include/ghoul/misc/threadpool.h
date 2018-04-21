@@ -188,6 +188,7 @@ public:
      * function can be called whether the ThreadPool is running or stopped.
      *
      * \param nThreads The new number of worker threads in this ThreadPool
+     *
      * \pre nThreads must be bigger than 0
      * \post The ThreadPool contains \p nThreads workers
      */

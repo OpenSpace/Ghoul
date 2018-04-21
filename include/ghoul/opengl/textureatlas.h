@@ -70,6 +70,7 @@ public:
      *
      * \param size The size (<code>width</code>, <code>height</code>, <code>depth</code>)
      *        of the TextureAtlas.
+     *
      * \pre \p size's width and height has to be bigger than <code>4</code> and smaller
      *      than the GPU limit for 2D textures. The \p size's depth has to be
      *      <code>1</code>, <code>2</code>, <code>3</code>, or <code>4</code>
@@ -84,6 +85,7 @@ public:
      * \param width The width of the TextureAtlas
      * \param height The height of the TextureAtlas
      * \param depth The depth of the TetureAtlas
+     *
      * \pre \p width must be bigger than <code>4</code> and smaller than the GPU limit for
      *      2D tetxures
      * \pre \p height must be bigger than <code>4</code> and smaller than the GPU limit
@@ -149,8 +151,9 @@ public:
      * \param height The height of the requested region
      * \return A handle to the new region that can be passed to the #setRegionData and
      *         #textureCoordinates functions
-     * \throws InvalidRegionException If the new requested region does not fit in the
-     *         TextureAtlas
+     *
+     * \throw InvalidRegionException If the new requested region does not fit in the
+     *        TextureAtlas
      */
     RegionHandle newRegion(int width, int height);
 
@@ -163,6 +166,7 @@ public:
      *
      * \param handle The handle of the region for which the data is provided
      * \param data The data that should be set for the specified region
+     *
      * \pre \p data must not be a <code>nullptr</code>
      */
     void setRegionData(RegionHandle handle, void* data);

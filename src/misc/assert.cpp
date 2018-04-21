@@ -25,8 +25,9 @@
 
 #include <ghoul/misc/assert.h>
 
-#include <algorithm>
 #include <ghoul/fmt.h>
+#include <ghoul/misc/stacktrace.h>
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -73,7 +74,8 @@ void internal_assert(std::string expression, std::string message, std::string fi
             << padding << message << std::endl;
 
         while (true) {
-            std::cerr << "(I)gnore / Ignore (P)ermanently / (A)ssertion / (E)xit: ";
+            std::cerr << "(I)gnore / Ignore (P)ermanently / (A)ssertion / (S)tacktrack "
+                         "/ (E)xit: ";
             std::string inputLine;
             std::getline(std::cin, inputLine);
 
@@ -104,6 +106,17 @@ void internal_assert(std::string expression, std::string message, std::string fi
                     std::move(function),
                     line
                 );
+            }
+            else if (inputLine == "s") {
+                std::vector<std::string> stackTrace = ghoul::stackTrace();
+
+                std::cerr << '\n';
+                for (size_t i = 0; i < stackTrace.size(); ++i) {
+                    std::cerr << i << ": " << stackTrace[i] << '\n';
+                }
+                std::cerr << '\n';
+
+                continue;
             }
             else if (inputLine == "e") {
                 exit(EXIT_FAILURE);

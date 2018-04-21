@@ -131,6 +131,7 @@ public:
      * \param takeOwnership Sets whether or not the Texture object should take ownership
      *        of the data allocated. In case there is no data allocated, the Texture will
      *        automatically not take ownership
+     *
      * \pre Element of \p dimensions must be bigger or equal <code>1</code>
      */
     Texture(glm::uvec3 dimensions, Format format = Format::RGBA,
@@ -227,6 +228,7 @@ public:
      * Overrides the type of the texture that was automatically determined.
      *
      * \param type The new type for the texture.
+     *
      * \pre \p type must be <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code> or
      *      <code>GL_TEXTURE_3D</code>
      */
@@ -522,6 +524,7 @@ public:
      * \tparam T The type of the data that is returned
      * \param x The position of the texel that should be fetched
      * \return The texel at the specified position casted to the requested type T
+     *
      * \pre The Texture must be a one dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
      * \pre \p x must be within the width of the Texture
@@ -541,6 +544,7 @@ public:
      * \tparam T The type of the data that is returned
      * \param x The position of the texel that should be fetched
      * \return The texel at the specified position casted to the requested type T
+     *
      * \pre The Texture must be a one dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
      * \pre \p x must be smaller than the width of the Texture
@@ -561,6 +565,7 @@ public:
      * \param x The coordinate on the <code>width</code> axis
      * \param y The coordinate on the <code>height</code> axis
      * \return The texel at the specified position casted to the requested type T
+     *
      * \pre The Texture must be a two dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
      * \pre \p x must be smaller than the width of the Texture
@@ -582,6 +587,7 @@ public:
      * \param x The coordinate on the <code>width</code> axis
      * \param y The coordinate on the <code>height</code> axis
      * \return The texel at the specified position casted to the requested type T
+     *
      * \pre The Texture must be a two dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
      * \pre \p x must be smaller than the width of the Texture
@@ -603,6 +609,7 @@ public:
      * \tparam T The type of the data that is returned
      * \param position The coordinate of the texel
      * \return The texel at the specified position casted to the requested type T
+     *
      * \pre The Texture must be a two dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
      * \pre <code>position.x</code> must be smaller than the width of the Texture
@@ -623,6 +630,7 @@ public:
      * \tparam T The type of the data that is returned
      * \param position The coordinate of the texel
      * \return The texel at the specified position casted to the requested type T
+     *
      * \pre The Texture must be a two dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
      * \pre <code>position.x</code> must be smaller than the width of the Texture
@@ -645,6 +653,7 @@ public:
      * \param y The coordinate on the <code>height</code> axis
      * \param z The coordinate on the <code>depth</code> axis
      * \return The texel at the specified position casted to the requested type T
+     *
      * \pre The Texture must be a three dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
      * \pre \p x must be smaller than the width of the Texture
@@ -668,6 +677,7 @@ public:
      * \param y The coordinate on the <code>height</code> axis
      * \param z The coordinate on the <code>depth</code> axis
      * \return The texel at the specified position casted to the requested type T
+     *
      * \pre The Texture must be a three dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
      * \pre \p x must be smaller than the width of the Texture
@@ -690,6 +700,7 @@ public:
      * \tparam T The type of the data that is returned
      * \param position The coordinate of the texel
      * \return The texel at the specified position casted to the requested type T
+     *
      * \pre The Texture must be a three dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
      * \pre <code>position.x</code> must be smaller than the width of the Texture
@@ -710,6 +721,7 @@ public:
      * \tparam T The type of the data that is returned
      * \param position The coordinate of the texel
      * \return The texel at the specified position casted to the requested type T
+     *
      * \pre The Texture must be a three dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
      * \pre <code>position.x</code> must be smaller than the width of the Texture
@@ -732,6 +744,7 @@ public:
      * \param x The coordinate on the <code>width</code> axis
      * \return The texel at the specified position as a vector with each component in
      *         <code>[0,1]</code>
+     *
      * \pre The Texture must be a one dimensional Texture
      * \pre \p x must be smaller than the width of the Texture
      */
@@ -751,6 +764,7 @@ public:
      * \param y The coordinate on the <code>height</code> axis
      * \return The texel at the specified position as a vector with each component in
      *         <code>[0,1]</code>
+     *
      * \pre The Texture must be a two dimensional Texture
      * \pre \p x must be smaller than the width of the Texture
      * \pre \p y must be smaller than the height of the Texture
@@ -770,6 +784,7 @@ public:
      * \param pos The coordinate of the texel
      * \return The texel at the specified position as a vector with each component in
      *         <code>[0,1]</code>
+     *
      * \pre The Texture must be a two dimensional Texture
      * \pre <code>pos.x</code> must be smaller than the width of the Texture
      * \pre <code>pos.y</code> must be smaller than the height of the Texture
@@ -791,6 +806,7 @@ public:
      * \param z The coordinate on the <code>depth</code> axis
      * \return The texel at the specified position as a vector with each component in
      *         <code>[0,1]</code>
+     *
      * \pre The Texture must be a three dimensional Texture
      * \pre \p x must be smaller than the width of the Texture
      * \pre \p y must be smaller than the height of the Texture
@@ -811,6 +827,7 @@ public:
      * \param pos The coordinate of the texel
      * \return The texel at the specified position as a vector with each component in
      *         <code>[0,1]</code>
+     *
      * \pre The Texture must be a three dimensional Texture
      * \pre <code>pos.x</code> must be smaller than the width of the Texture
      * \pre <code>pos.y</code> must be smaller than the height of the Texture

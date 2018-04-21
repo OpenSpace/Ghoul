@@ -103,6 +103,7 @@ public:
      *
      * \param component The component that will be added to this SystemCapabilities
      *        object.
+     *
      * \pre \p component must not be nullptr
      * \pre \p A component of the same type must not have been added before
      */
@@ -112,9 +113,10 @@ public:
      * Returns the component of type <code>T</code>.
      *
      * \tparam T The subclass of SystemCapabilitiesComponent that should be retrieved
-     * \throws CapabilitiesComponentNotFoundError If no component of type T could be found
      * \return The SystemCapabilitiesComponent that should be retrieved or
-     * <code>nullptr</code> if no such type exists
+     *         <code>nullptr</code> if no such type exists
+     *
+     * \throws CapabilitiesComponentNotFoundError If no component of type T could be found
      */
     template <typename T>
     T& component();

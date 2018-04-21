@@ -41,7 +41,8 @@ namespace ghoul {
  */
 template <typename T>
 T from_string(const std::string& string) {
-    // Unfortunately, we can't write 'false' here, as the optimizer is a bit too eager
+    // Unfortunately, we can't write 'false' here, as the compiler is a bit too eager to
+    // evaluate that
     static_assert(sizeof(T) == -1, "Missing from_string implementation");
 }
 

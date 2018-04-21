@@ -116,6 +116,7 @@ public:
      * \param dict The Dictionary that should be used to initialize the subclass. If
      *        \p useDictionary is <code>false</code>, this is the empty Dictionary.
      * \return The initialized subclass of type <code>BaseClass</code>
+     *
      * \throw TemplateConstructionError If the class was initialized using the wrong
      *        constructor, for example a class that does not have a Dictionary
      *        constructor, but a Dictionary was used.
@@ -130,6 +131,7 @@ public:
      *
      * \param className The class name of the instance that should be created
      * \return A fully initialized instance of the registered class
+     *
      * \throw TemplateClassNotFoundError If the \p className did not name a previously
      *        registered class
      * \throw TemplateConstructionError If the class registered under \p className does
@@ -150,6 +152,7 @@ public:
      * \param dictionary The dictionary that will be passed to the constructor of the
      *        class
      * \return A fully initialized instance of the registered class
+     *
      * \throw TemplateClassNotFoundError If the \p className did not name a previously
      *        registered class
      * \throw TemplateConstructionError If the class registered under \p className does
@@ -168,6 +171,7 @@ public:
      * \tparam Class The class that should be registered under the provided
      *         \p className
      * \param className The class name under which the <code>Class</code> is registered.
+     *
      * \throw TemplateFactoryError If the \p className has been registered before
      * \pre <code>Class</code> must be derived from <code>BaseClass</code>
      * \pre <code>Class</code> must have a default constructor or a constructor that takes
@@ -193,6 +197,7 @@ public:
      *        was called with a Dictionary as an additional parameter, implying that the
      *        subclass should be constructed using the Dictionary provided as the second
      *        argument. The factory function is free to ignore this request.
+     *
      * \throw TemplateFactoryError If the \p className has been registered before
      * \pre \p className must not be empty
      * \pre \p factoryFunction must not be <code>nullptr</code>
@@ -213,6 +218,7 @@ public:
      *        was called with a Dictionary as an additional parameter, implying that the
      *        subclass should be constructed using the Dictionary provided as the second
      *        argument. The factory function is free to ignore this request.
+     *
      * \throw TemplateFactoryError If the \p className has been registered before
      * \pre \p className must not be empty
      * \pre \p factoryFunction must not be <code>nullptr</code>
@@ -228,6 +234,7 @@ public:
      * \param className The class name that is to be tested
      * \return <code>true</code> if the \p className was used in #registerClass
      *         before; <code>false</code> otherwise
+     *
      * \pre \p className must not be empty
      */
     bool hasClass(const std::string& className) const override;

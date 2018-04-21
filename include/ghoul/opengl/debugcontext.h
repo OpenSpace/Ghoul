@@ -153,6 +153,7 @@ void setDebugMessageControl(Source source, Type type, Severity severity, Enabled
  * \param identifiers A list of identifiers that should be modified
  * \param enabled Whether messages of the specific \p source, \p type, and \p severity
  *        should be enabled or disabled
+ *
  * \pre \p source must not be Source::Dontcare
  * \pre \p type must not be Type::Dontcare
   */
@@ -189,6 +190,7 @@ namespace ghoul {
     * "Application", "Other", and "Don't care".
     *
     * \param source The string containing the name of a opengl::debug::Source
+    *
     * \throw std::out_of_range if the \p source is not a valid name of an
     *        opengl::debug::Source object
     */
@@ -201,6 +203,7 @@ namespace ghoul {
     * "Performance", "Marker", "Push group", "Pop group", "Other", and "Don't care".
     *
     * \param type The string containing the name of a opengl::debug::Type
+    *
     * \throw std::out_of_range if the \p type is not a valid name of an
     *        opengl::debug::Type object
     */
@@ -212,6 +215,7 @@ namespace ghoul {
     * The valid values are "High", "Medium", "Low", and "Notification".
     *
     * \param severity The string containing the name of a opengl::debug::Severity
+    *
     * \throw std::out_of_range if the \p severity is not a valid name of an
     *        opengl::debug::Severity object
     */

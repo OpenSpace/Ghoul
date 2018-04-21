@@ -55,6 +55,7 @@ public:
      * This method returns a reference to the initialized TextureManager.
      *
      * \return An initialized reference to the singleton manager
+     *
      * \pre The static TextureManager must have been initialized before
      */
     static TextureManager& ref();
@@ -66,6 +67,7 @@ public:
      *
      * \param hashedName The hash of the Texture that is to be fetched
      * \return The Texture that has been registered with the passed name
+     *
      * \throw TextureManagerError If the ShaderObject for \p name did not exist
      */
     Texture* texture(unsigned int hashedName);
@@ -77,6 +79,7 @@ public:
      *
      * \param name The name of the Texture that is to be fetched
      * \return The Texture that has been registered with the passed name
+     *
      * \throw TextureManagerError If the ShaderObject for \p name did not exist
      */
     Texture* texture(const std::string& name);
@@ -90,6 +93,7 @@ public:
      * \param name The name under which the Texture should be registered
      * \param texture The Texture that should be registered
      * \return The hashed value that is generated from the \p name
+     *
      * \pre \p texture must not be nullptr
      */
     unsigned int registerTexture(const std::string& name,

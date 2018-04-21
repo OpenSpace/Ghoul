@@ -28,6 +28,7 @@
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
+#include <ghoul/misc/fromstring.h>
 #include <string>
 #include <vector>
 
@@ -88,7 +89,7 @@ public:
      * derived subclass, even if WMI is not used.
      *
      * \param initializeWMI If this parameter is <code>true</code>, the Windows Management
-     * Instrumentation will be initialized.
+     *        Instrumentation will be initialized.
      */
     SystemCapabilitiesComponent(InitializeWMI initializeWMI = InitializeWMI::Yes);
 
@@ -115,7 +116,7 @@ public:
      * should allow individual query for each of the elements as well.
      *
      * \return All CapabilityInformation%s that this SystemCapabilitiesComponent is
-     * responsible for
+     *         responsible for
      */
     virtual std::vector<CapabilityInformation> capabilities() const = 0;
 
@@ -142,7 +143,7 @@ protected:
      * This method initializes the Windows Management Instrumentation.
      *
      * \throw WMIError If there was an error initializing the Windows Management
-     * Instrumentation
+     *        Instrumentation
      * \pre The Windows Management Instrumentation must not have been initialized before
      */
     static void initializeWMI();
@@ -171,6 +172,7 @@ protected:
      * \param wmiClass The class in which the required attribute resides
      * \param attribute The attribute which we are interested in
      * \return The value of the requested attributes
+     *
      * \throw WMIError If there was an error querying the Windows Management
      *        Instrumentation service or there was no query result available
      * \pre \p wmiClass must not be empty
@@ -188,6 +190,7 @@ protected:
      * \param attribute The attribute which we are interested in
      * \param value A reference to the value, where the attribute will be stored in (if
      *        the attribute could be found and it is of type <code>string</code>)
+     *
      * \throw WMIError If there was an error querying the Windows Management
      *        Instrumentation service or there was no query result available
      * \pre \p wmiClass must not be empty
@@ -206,6 +209,7 @@ protected:
      * \param attribute The attribute which we are interested in
      * \param value A reference to the value, where the attribute will be stored in (if
      *        the attribute could be found and it is of type <code>int</code>)
+     *
      * \throw WMIError If there was an error querying the Windows Management
      *        Instrumentation service or there was no query result available
      * \pre \p wmiClass must not be empty
@@ -224,6 +228,7 @@ protected:
      * \param attribute The attribute which we are interested in
      * \param value A reference to the value, where the attribute will be stored in (if
      *        the attribute could be found and it is of type <code>unsigned int</code>)
+     *
      * \throw WMIError If there was an error querying the Windows Management
      *        Instrumentation service or there was no query result available
      * \pre \p wmiClass must not be empty
@@ -243,6 +248,7 @@ protected:
      * \param value A reference to the value, where the attribute will be stored in (if
      *        the attribute could be found and it is of type
      *        <code>unsigned long long</code>)
+     *
      * \throw WMIError If there was an error querying the Windows Management
      *        Instrumentation service or there was no query result available
      * \pre \p wmiClass must not be empty
@@ -267,5 +273,19 @@ protected:
 };
 
 } // namespace ghoul::systemcapabilities
+
+namespace std {
+
+string to_string(ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity v);
+
+} // namespace std
+
+namespace ghoul {
+
+template <>
+ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity
+from_string(const std::string& str);
+
+} // namespace ghoul
 
 #endif // __GHOUL___SYSTEMCAPABILITIESCOMPONENT___H__

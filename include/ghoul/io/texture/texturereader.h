@@ -114,27 +114,20 @@ public:
      *
      * \pre \p reader must not have been added to this TextureReader before
      */
-    void addReader(std::shared_ptr<TextureReaderBase> reader);
-
-    /**
-     * Returns a list of all the previously registered TextureReaderBases.
-     *
-     * \return A list of all the previously registered TextureReaderBases
-     */
-    const std::vector<std::shared_ptr<TextureReaderBase>>& readers() const;
+    void addReader(std::unique_ptr<TextureReaderBase> reader);
 
 private:
     /**
      * Returns the TextureReaderBase that is responsible for the provided extension.
      *
      * \param extension The extension for which the TextureReaderBase should be returned
-     *
-     * \throw MissingReaderException If there was no reader for the specified \p extension
+     * \return The first match of a reader that can read the provided \p extension, or
+     *         \c nullptr if no such reader exists
      */
     TextureReaderBase* readerForExtension(const std::string& extension);
 
     /// The list of all registered readers
-    std::vector<std::shared_ptr<TextureReaderBase>> _readers;
+    std::vector<std::unique_ptr<TextureReaderBase>> _readers;
 };
 
 } // namespace ghoul::io

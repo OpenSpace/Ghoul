@@ -55,38 +55,30 @@ void TextureWriter::saveTexture(const opengl::Texture& texture, const string& fi
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
     TextureWriterBase* writer = writerForExtension(extension);
-    // Make sure the directory for the file exists
-    FileSys.createDirectory(file.directoryName());
-    writer->saveTexture(texture, filename);
+
+    if (writer) {
+        // Make sure the directory for the file exists
+        FileSys.createDirectory(file.directoryName());
+        writer->saveTexture(texture, filename);
+    }
+    else {
+        throw MissingWriterException(extension);
+    }
 }
 
-void TextureWriter::addWriter(std::shared_ptr<TextureWriterBase> writer) {
-    ghoul_assert(
-        std::none_of(
-            _writers.begin(),
-            _writers.end(), [writer](std::shared_ptr<TextureWriterBase>& rhs) {
-                return rhs.get() == writer.get();
-            }
-        ),
-        "Writers must not be added twice"
-    );
-
-    _writers.push_back(writer);
-}
-
-std::vector<std::shared_ptr<TextureWriterBase>> TextureWriter::writers() const {
-    return _writers;
+void TextureWriter::addWriter(std::unique_ptr<TextureWriterBase> writer) {
+    _writers.push_back(std::move(writer));
 }
 
 TextureWriterBase* TextureWriter::writerForExtension(const std::string& extension) {
-    for (const std::shared_ptr<TextureWriterBase>& writer : _writers) {
+    for (const std::unique_ptr<TextureWriterBase>& writer : _writers) {
         std::vector<std::string> extensions = writer->supportedExtensions();
         auto it = std::find(extensions.begin(), extensions.end(), extension);
         if (it != extensions.end()) {
             return writer.get();
         }
     }
-    throw MissingWriterException(extension);
+    return nullptr;
 }
 
 } // namespace ghoul::io

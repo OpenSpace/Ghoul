@@ -83,27 +83,20 @@ public:
      * 
      * \pre \p writer must not have been added to this TextureWriter before
      */
-    void addWriter(std::shared_ptr<TextureWriterBase> writer);
-
-    /**
-     * Returns a list of all the previously registered TextureWriterBases.
-     *
-     * \return A list of all the previously registered TextureWriterBases
-     */
-    std::vector<std::shared_ptr<TextureWriterBase>> writers() const;
+    void addWriter(std::unique_ptr<TextureWriterBase> writer);
 
 private:
     /**
      * Returns the TextureWriterBase that is responsible for the provided extension.
      *
      * \param extension The extension for which the TextureWriterBase should be returned
-     * 
-     * \throw MissingWriterException If there was no writer for the specified \p extension
+     * \return The first TextureWriterBase that can write the provided \p extension, or
+     *         \c nullptr if no such file exists
      */
     TextureWriterBase* writerForExtension(const std::string& extension);
 
     /// The list of all registered writers
-    std::vector<std::shared_ptr<TextureWriterBase>> _writers;
+    std::vector<std::unique_ptr<TextureWriterBase>> _writers;
 };
 
 } // namespace ghoul::io

@@ -52,7 +52,12 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& f
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
     TextureReaderBase* reader = readerForExtension(extension);
-    return reader->loadTexture(filename);
+    if (reader) {
+        return reader->loadTexture(filename);
+    }
+    else {
+        throw MissingReaderException(extension);
+    }
 }
 
 std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory,
@@ -69,30 +74,15 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory,
 
 std::vector<std::string> TextureReader::supportedExtensions() {
     std::vector<std::string> result;
-    for (const std::shared_ptr<TextureReaderBase>& i : _readers) {
+    for (const std::unique_ptr<TextureReaderBase>& i : _readers) {
         std::vector<std::string> extensions = i->supportedExtensions();
         result.insert(result.end(), extensions.begin(), extensions.end());
     }
     return result;
 }
 
-void TextureReader::addReader(std::shared_ptr<TextureReaderBase> reader) {
-    ghoul_assert(
-        std::none_of(
-            _readers.begin(),
-            _readers.end(),
-            [&reader](std::shared_ptr<TextureReaderBase>& rhs) {
-                return rhs.get() == reader.get();
-            }
-        ),
-        "Readers must not be added twice"
-    );
-
-    _readers.push_back(reader);
-}
-
-const std::vector<std::shared_ptr<TextureReaderBase>>& TextureReader::readers() const {
-    return _readers;
+void TextureReader::addReader(std::unique_ptr<TextureReaderBase> reader) {
+    _readers.push_back(std::move(reader));
 }
 
 TextureReaderBase* TextureReader::readerForExtension(const std::string& extension) {
@@ -103,14 +93,15 @@ TextureReaderBase* TextureReader::readerForExtension(const std::string& extensio
         lowerExtension.begin(),
         [](char v) { return static_cast<char>(tolower(v)); }
     );
-    for (const std::shared_ptr<TextureReaderBase>& reader : _readers) {
+    for (const std::unique_ptr<TextureReaderBase>& reader : _readers) {
         std::vector<std::string> extensions = reader->supportedExtensions();
         auto it = std::find(extensions.begin(), extensions.end(), lowerExtension);
         if (it != extensions.end()) {
             return reader.get();
         }
     }
-    throw MissingReaderException(extension);
+
+    return nullptr;
 }
 
 } // namespace ghoul::io
