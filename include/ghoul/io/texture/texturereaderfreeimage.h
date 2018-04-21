@@ -67,7 +67,7 @@ public:
      *
      * \param memory The memory that contains the bytes of the Texture to be loaded
      * \param size The number of bytes contained in \p memory
-     * 
+     *
      * \throw TextureLoadException If there was an error reading the \p memory
      * \pre \p memory must not be <code>nullptr</code>
      * \pre \p size must be > 0

@@ -376,7 +376,7 @@ T value(lua_State* L);
 
 /**
  * Extracts a named value from the global variables of the provided stack and returns it.
- * 
+ *
  * \tparam T The type of the return value. If the value of the variable \p name is not T
  *         a LuaFormatException is thrown
  * \param L The stack from from which the top value is extracted

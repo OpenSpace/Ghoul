@@ -43,7 +43,7 @@ public:
      *
      * \param texture The Texture that is to be saved
      * \param filename The target file on disk into which to save the Texture
-     * 
+     *
      * \pre \p filename must not be empty
      * \pre The \p filename's file extension has to be supported
      * \throw TextureWriteException If there was an error writing the Texture file
