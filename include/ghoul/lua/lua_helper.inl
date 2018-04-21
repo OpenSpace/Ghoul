@@ -25,6 +25,7 @@
 
 #include <ghoul/fmt.h>
 #include <ghoul/lua/ghoul_lua.h>
+#include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/invariants.h>
 
 namespace ghoul::lua {
@@ -71,7 +72,7 @@ T value(lua_State* L) {
         }
     }
     else {
-        static_assert(false, "Unhandled type T");
+        static_assert(sizeof(T) == 0, "Unhandled type T");
     }
 
     // If we get this far, none of the previous return statements were hit
