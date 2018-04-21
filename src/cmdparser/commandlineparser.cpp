@@ -56,14 +56,23 @@ int extractArguments(const std::vector<std::string>& in, std::vector<std::string
             out.push_back(in[begin + 1 + i]);
         }
     }
-    else
-        if (count == -2) {
-            // Extract arguments until a new command is found
-            // The '-' restriction is enforced in the #addCommand method
-            for (size_t i = begin; (i < in.size()) && (in[i][0] != '-'); ++i, ++num) {
-                out.push_back(in[i]);
-            }
+    else if (count == -2) {
+        // Extract arguments until a new command is found
+        // The '-' restriction is enforced in the #addCommand method
+        for (size_t i = begin; (i < in.size()) && (in[i][0] != '-'); ++i, ++num) {
+            out.push_back(in[i]);
         }
+    }
+    else if (count == -3) {
+        // Add the -command and then read till the end
+        out.push_back(in[begin]);
+        ++num;
+        // Extract arguments until a new command is found
+        // The '-' restriction is enforced in the #addCommand method
+        for (size_t i = begin + 1; (i < in.size()) && (in[i][0] != '-'); ++i, ++num) {
+            out.push_back(in[i]);
+        }
+    }
     else {
         for (int i = 0; (i < count) && ((begin + 1 + i) < in.size()); ++i, ++num) {
             out.push_back(in[begin + 1 + i]);
@@ -170,6 +179,8 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
         }
         else {
             // We have found a command
+
+
             CommandlineCommand* currentCommand = getCommand(_arguments[i]);
 
             // currentCommand = nullptr, if there wasn't a command with that specific

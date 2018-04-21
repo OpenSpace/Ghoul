@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <ghoul/misc/misc.h>
+
 namespace ghoul::cmdparser {
 
 template <typename T>
@@ -37,11 +39,28 @@ SingleCommand<T>::SingleCommand(T& ptr1, std::string name, std::string shortName
         MultipleCalls::No
     )
     , _ptr1(ptr1)
-{}
+{
+    if constexpr (std::is_same_v<T, std::string>) {
+        _nArguments = -3;
+    }
+}
 
 template<typename T>
 void SingleCommand<T>::execute(const std::vector<std::string>& parameters) {
-    _ptr1 = cast<T>(parameters[0]);
+    if constexpr (std::is_same_v<T, std::string>) {
+        // If we have a string the parameter set might contain an arbitrary number of
+        // parameters that we have to concatenate first
+        
+        // The parameter list contains the command-name as the first argument and we don't
+        // want that
+        _ptr1 = ghoul::join(
+            std::vector<std::string>(parameters.begin() + 1, parameters.end()),
+            " "
+        );
+    }
+    else {
+        _ptr1 = cast<T>(parameters[0]);
+    }
 }
 
 template<typename T>

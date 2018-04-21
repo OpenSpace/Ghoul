@@ -225,7 +225,7 @@ protected:
     /// Name used as a prefix for logging
     std::string _loggerCat;
     /// Stores the number of arguments this command accepts
-    int _argumentNum;
+    int _nArguments;
     /// Stores, if the command can be called multiple times in a single command line
     MultipleCalls _allowsMultipleCalls;
 };

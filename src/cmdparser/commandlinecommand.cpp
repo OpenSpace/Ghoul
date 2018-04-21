@@ -46,7 +46,7 @@ CommandlineCommand::CommandlineCommand(std::string name, std::string shortName,
     , _shortName(std::move(shortName))
     , _infoText(std::move(infoText))
     , _parameterList(std::move(parameterList))
-    , _argumentNum(argumentNum)
+    , _nArguments(argumentNum)
     , _allowsMultipleCalls(allowMultipleCalls)
 {
     ghoul_assert(!_name.empty(), "Name must not be empty");
@@ -73,7 +73,7 @@ const std::string& CommandlineCommand::infoText() const {
 }
 
 int CommandlineCommand::argumentNumber() const {
-    return _argumentNum;
+    return _nArguments;
 }
 
 CommandlineCommand::MultipleCalls CommandlineCommand::allowsMultipleCalls() const {
@@ -108,7 +108,7 @@ std::string CommandlineCommand::help() const {
 }
 
 void CommandlineCommand::checkParameters(const std::vector<std::string>& param) const {
-    if (param.size() != static_cast<size_t>(argumentNumber())) {
+    if (param.size() != static_cast<size_t>(_nArguments) && _nArguments != -3) {
         throw CommandParameterException(fmt::format(
             "Wrong number of arguments. Expected {} got {}",
             argumentNumber(),

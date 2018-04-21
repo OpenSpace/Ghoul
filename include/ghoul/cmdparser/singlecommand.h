@@ -100,7 +100,7 @@ protected:
  * \sa SingleCommandZeroArguments
  */
 template<typename T, typename U>
-class SingleCommand<T,U> : public CommandlineCommand {
+class SingleCommand<T, U> : public CommandlineCommand {
 public:
     /**
      * This constructor uses two parameters.
