@@ -55,6 +55,11 @@ struct LuaExecutionException : public LuaRuntimeException {
     std::string filename;
 };
 
+/// If an instance of this struct is passed to the #push method, it will cause a nil value
+/// to be pushed onto the stack
+struct nil_t {};
+
+
 /**
  * Returns the location of the calling function using <code>luaL_where</code> and returns
  * that location as a string. This method is just a wrapper around this function and its
@@ -361,7 +366,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range
 void verifyStackSize(lua_State* L, int expected = 0);
 
 /**
- * Extracts a value from the top of the provided stack and returns it.
+ * Extract a value from the top of the provided stack and returns it. 
  *
  * \tparam T The type of the return value. If the value at the top of the stack is not T
  *         a LuaFormatException is thrown
@@ -374,6 +379,30 @@ void verifyStackSize(lua_State* L, int expected = 0);
 template <typename T>
 T value(lua_State* L);
 
+/**
+ * Extract an arbitrary number of values from the top of the provided stack and returns
+ * them.
+ *
+ * \tparam T1 The type of the first value that is popped from the stack. If the value at
+ *         the top of the stack is not T1 a LuaFormatException is thrown
+ * \tparam T2 The type of the second value that is popped from the stack. If the value at
+ *         the second position of the stack is not T2 a LuaFormatException is thrown
+ * \tparam Ts The types of the other values that are popped from the stack. If one of the
+ *         value on the stack is not Ts a LuaFormatException is thrown
+ * \param L The stack from from which the values is extracted
+ *
+ * \throw LuaFormatException If the type of any value on the stack is not correct
+ * \pre \L must not be nullptr
+ * \pre The stack of \p L must not be empty
+ *
+ * \note This method is an overload of #pop that supports multiple types. Due to the way
+ *       the overload resolution with template parameter packs works, we have to
+ *       explicitly mention the first two parameter types in the template declaration as
+ *       the parameter pack might be empty and could thus otherwise result in a ambigious
+ *       function call
+ */
+// template <typename T1, typename T2, typename... Ts>
+// std::tuple<T1, T2, Ts...> pop(lua_State* L);
 
 /**
  * Extracts a named value from the global variables of the provided stack and returns it.
@@ -391,10 +420,6 @@ T value(lua_State* L);
  */
 template <typename T>
 T value(lua_State* L, const char* name);
-
-/// If an instance of this struct is passed to the #push method, it will cause a nil value
-/// to be pushed onto the stack
-struct nil_t {};
 
 /**
  * Pushes the passed parameters \p args onto the provided stack \p L in the order that

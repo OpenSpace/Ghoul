@@ -38,26 +38,20 @@ void push(lua_State* L, T value) {
     // converted to ints, which would remove their fractional part
     // Same goes for the const char* check before the std::is_pointer, since we want to
     // handle the specialized case first
-    if constexpr (std::is_convertible_v<T, lua_Number>) {
-        // The extra check is to remove compiler warnings about unnecessary conversions
-        if constexpr (std::is_same_v<T, lua_Number>) {
-            lua_pushnumber(L, std::move(value));
-        }
-        else {
-            lua_pushnumber(L, static_cast<lua_Number&&>(std::move(value)));
-        }
-    }
-    else if constexpr (std::is_convertible_v<T, lua_Integer>) {
-        // The extra check is to remove compiler warnings about unnecessary conversions
-        if constexpr (std::is_same_v<T, lua_Integer>) {
-            lua_pushinteger(L, std::move(value));
-        }
-        else {
-            lua_pushinteger(L, static_cast<lua_Integer&&>(std::move(value)));
-        }
-    }
-    else if constexpr (std::is_same_v<T, bool>) {
+    if constexpr (std::is_same_v<T, bool>) {
         lua_pushboolean(L, value);
+    }
+    else if constexpr (std::is_same_v<T, lua_Number>) {
+        lua_pushnumber(L, std::move(value));
+    }
+    else if constexpr (std::is_same_v<T, lua_Integer>) {
+        lua_pushinteger(L, std::move(value));
+    }
+    else if constexpr (std::is_floating_point_v<T>) {
+        lua_pushnumber(L, static_cast<lua_Number&&>(std::move(value)));
+    }
+    else if constexpr (std::is_integral_v<T>) {
+        lua_pushinteger(L, static_cast<lua_Integer&&>(std::move(value)));
     }
     else if constexpr (std::is_same_v<T, nil_t>) {
         lua_pushnil(L);
@@ -76,47 +70,58 @@ void push(lua_State* L, T value) {
     }
 }
 
-} // namespace internal
-
 template <typename T>
-T value(lua_State* L) {
-    ghoul_precondition(L != nullptr, "L must not be nullptr");
-    ghoul_precondition(lua_gettop(L) > 0, "Stack of L must not be empty");
-
+T value(lua_State* L, int location) {
     if constexpr (std::is_same_v<T, bool>) {
-        if (lua_isboolean(L, -1)) {
-            return lua_toboolean(L, -1) == 1;
+        if (lua_isboolean(L, location)) {
+            return lua_toboolean(L, location) == 1;
         }
     }
     else if constexpr (std::is_same_v<T, lua_Number>) {
-        if (lua_isnumber(L, -1)) {
-            return lua_tonumber(L, -1);
+        if (lua_isnumber(L, location)) {
+            return lua_tonumber(L, location);
         }
     }
     else if constexpr (std::is_same_v<T, lua_Integer>) {
-        if (lua_isinteger(L, -1)) {
-            return lua_tointeger(L, -1);
+        if (lua_isinteger(L, location)) {
+            return lua_tointeger(L, location);
         }
     }
     else if constexpr (std::is_integral_v<T>) {
-        if (lua_isinteger(L, -1)) {
-            return static_cast<T>(lua_tointeger(L, -1));
+        if (lua_isinteger(L, location)) {
+            return static_cast<T>(lua_tointeger(L, location));
         }
     }
     else if constexpr (std::is_floating_point_v<T>) {
-        if (lua_isnumber(L, -1)) {
-            return static_cast<T>(lua_tonumber(L, -1));
+        if (lua_isnumber(L, location)) {
+            return static_cast<T>(lua_tonumber(L, location));
         }
     }
     else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, std::string>) {
-        if (lua_isstring(L, -1)) {
-            return lua_tostring(L, -1);
+        if (lua_isstring(L, location)) {
+            return lua_tostring(L, location);
         }
     }
     else if constexpr (std::is_same_v<T, ghoul::Dictionary>) {
-        if (lua_istable(L, -1)) {
+        if (lua_istable(L, location)) {
+            if (location != -1) {
+                lua_pushvalue(L, location);
+            }
+
             ghoul::Dictionary d;
-            ghoul::lua::luaDictionaryFromState(L, d);
+            try {
+                ghoul::lua::luaDictionaryFromState(L, d);
+            }
+            catch (const LuaFormatException& e) {
+                if (location != -1) {
+                    lua_pop(L, 1);
+                }
+                throw;
+            }
+
+            if (location != -1) {
+                lua_pop(L, 1);
+            }
             return d;
         }
     }
@@ -131,6 +136,27 @@ T value(lua_State* L) {
         luaTypeToString(lua_type(L, -1))
     ));
 }
+
+} // namespace internal
+
+template <typename T>
+T value(lua_State* L) {
+    ghoul_precondition(L != nullptr, "L must not be nullptr");
+    ghoul_precondition(lua_gettop(L) > 0, "Stack of L must not be empty");
+
+    return internal::value<T>(L, -1);
+}
+
+// template <typename T1, typename T2, typename... Ts>
+// std::tuple<T1, T2, Ts...> pop(lua_State* L) {
+//     std::tuple<T1, T2, Ts...> res = std::apply(
+//         [](auto... x) -> std::tuple<T1, T2, Ts...> {
+//             return std::make_tuple(do_something(x)...);
+//         },
+//         std::tuple<T1, T2, Ts...>()
+//     );
+//     return res;
+// }
 
 template <typename T>
 T value(lua_State* L, const char* name) {
