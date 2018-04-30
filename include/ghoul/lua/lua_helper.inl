@@ -25,6 +25,7 @@
 
 #include <ghoul/fmt.h>
 #include <ghoul/lua/ghoul_lua.h>
+#include <ghoul/misc/defer.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/invariants.h>
 #include <type_traits>
@@ -39,7 +40,7 @@ void push(lua_State* L, T value) {
     // Same goes for the const char* check before the std::is_pointer, since we want to
     // handle the specialized case first
     if constexpr (std::is_same_v<T, bool>) {
-        lua_pushboolean(L, value);
+        lua_pushboolean(L, value ? 1 : 0);
     }
     else if constexpr (std::is_same_v<T, lua_Number>) {
         lua_pushnumber(L, std::move(value));
@@ -104,24 +105,12 @@ T value(lua_State* L, int location) {
     }
     else if constexpr (std::is_same_v<T, ghoul::Dictionary>) {
         if (lua_istable(L, location)) {
-            if (location != -1) {
-                lua_pushvalue(L, location);
-            }
+            lua_pushvalue(L, location);
+            defer { lua_pop(L, 1); };
 
             ghoul::Dictionary d;
-            try {
-                ghoul::lua::luaDictionaryFromState(L, d);
-            }
-            catch (const LuaFormatException& e) {
-                if (location != -1) {
-                    lua_pop(L, 1);
-                }
-                throw;
-            }
+            ghoul::lua::luaDictionaryFromState(L, d);
 
-            if (location != -1) {
-                lua_pop(L, 1);
-            }
             return d;
         }
     }
@@ -129,22 +118,28 @@ T value(lua_State* L, int location) {
         static_assert(sizeof(T) == 0, "Unhandled type T");
     }
 
-    // If we get this far, none of the previous return statements were hit
-    throw LuaFormatException(fmt::format(
+    std::string error = fmt::format(
         "Requested type {} was not the expected type {}",
         typeid(T).name(),
         luaTypeToString(lua_type(L, -1))
-    ));
+    );
+
+    ghoul_assert(false, error);
+    // If we get this far, none of the previous return statements were hit
+    throw LuaFormatException(std::move(error));
 }
 
 } // namespace internal
 
 template <typename T>
-T value(lua_State* L) {
+T value(lua_State* L, int location, PopValue shouldPopValue) {
     ghoul_precondition(L != nullptr, "L must not be nullptr");
-    ghoul_precondition(lua_gettop(L) > 0, "Stack of L must not be empty");
 
-    return internal::value<T>(L, -1);
+    T res = internal::value<T>(L, location);
+    if (shouldPopValue) {
+        lua_pop(L, 1);
+    }
+    return res;
 }
 
 // template <typename T1, typename T2, typename... Ts>
@@ -159,13 +154,20 @@ T value(lua_State* L) {
 // }
 
 template <typename T>
-T value(lua_State* L, const char* name) {
+T value(lua_State* L, const char* name, PopValue shouldPopValue) {
     ghoul_precondition(L != nullptr, "L must not be nullptr");
     ghoul_precondition(name != nullptr, "name must not be nullptr");
     ghoul_precondition(strlen(name) > 0, "name must not be empty");
 
     lua_getglobal(L, name);
-    return value<T>(L);
+
+    T res = value<T>(L);
+
+    if (shouldPopValue) {
+        lua_pop(L, 1);
+    }
+
+    return res;
 }
 
 template <typename... Ts>

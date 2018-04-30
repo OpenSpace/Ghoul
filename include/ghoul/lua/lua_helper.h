@@ -26,6 +26,7 @@
 #ifndef __GHOUL___LUA_HELPER___H__
 #define __GHOUL___LUA_HELPER___H__
 
+#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 
 struct lua_State;
@@ -59,6 +60,8 @@ struct LuaExecutionException : public LuaRuntimeException {
 /// to be pushed onto the stack
 struct nil_t {};
 
+BooleanType(PopValue);
+
 
 /**
  * Returns the location of the calling function using <code>luaL_where</code> and returns
@@ -70,7 +73,7 @@ struct nil_t {};
  *
  * \pre \p state must not be nullptr
  */
-std::string errorLocation(lua_State* state);
+const char* errorLocation(lua_State* state);
 
 
 /**
@@ -286,16 +289,6 @@ void runScriptFile(lua_State* state, const std::string& filename);
 void runScript(lua_State* state, const std::string& script);
 
 /**
- * This function calls into the Lua library function <code>luaL_checkstring</code> and,
- * if successful, pops the string from the stack. If the top argument is not a string,
- * the stack remains untouched.
- *
- * \param L The Lua stack to be inspected
- * \return The string or <code>nullptr</code> if the top element is not a string
- */
-const char* checkStringAndPop(lua_State* L);
-
-/**
  * Checks the number of arguments on the Lua stack against the \p expected number of
  * parameters. If the numbers do not agree, an error is logged and a
  * ghoul::lua::LuaExecutionException is raised.
@@ -366,18 +359,20 @@ int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range
 void verifyStackSize(lua_State* L, int expected = 0);
 
 /**
- * Extract a value from the top of the provided stack and returns it. 
+ * Extracts a value from the provided location of the provided stack and returns it.
  *
- * \tparam T The type of the return value. If the value at the top of the stack is not T
- *         a LuaFormatException is thrown
+ * \tparam T The type of the return value. If the value at the provided location of the
+ *           stack is not T a LuaFormatException is thrown
  * \param L The stack from from which the top value is extracted
+ * \param location The location from which the value should be extracted
+ * \param shouldPopValue If the value was successfully retrieved, should it be popped from
+ *        the stack
  *
- * \throw LuaFormatException If the top value of the stack is not T
+ * \throw LuaFormatException If the value at the provided stack location is not T
  * \pre \L must not be nullptr
- * \pre The stack of \p L must not be empty
  */
 template <typename T>
-T value(lua_State* L);
+T value(lua_State* L, int location = -1, PopValue shouldPopValue = PopValue::No);
 
 /**
  * Extract an arbitrary number of values from the top of the provided stack and returns
@@ -411,6 +406,8 @@ T value(lua_State* L);
  *         a LuaFormatException is thrown
  * \param L The stack from from which the top value is extracted
  * \param name The name of the global variable that is to be extracted
+ * \param shouldPopValue If the value was successfully retrieved, should it be popped from
+ *        the stack
  *
  * \throw LuaFormatException If the value of \p name is not T
  * \pre \L must not be nullptr
@@ -419,7 +416,7 @@ T value(lua_State* L);
  * \pre \p name must not be empty
  */
 template <typename T>
-T value(lua_State* L, const char* name);
+T value(lua_State* L, const char* name, PopValue shouldPopValue = PopValue::No);
 
 /**
  * Pushes the passed parameters \p args onto the provided stack \p L in the order that

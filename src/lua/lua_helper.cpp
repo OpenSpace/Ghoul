@@ -46,7 +46,7 @@ std::string luaTableToString(lua_State* state, int tableLocation = KeyTableIndex
 std::string luaValueToString(lua_State* state, int location) {
     ghoul_assert(state, "State must not be nullptr");
 
-    int type = lua_type(state, location);
+    const int type = lua_type(state, location);
     switch (type) {
         case LUA_TBOOLEAN:
             return std::to_string(lua_toboolean(state, location));
@@ -83,7 +83,7 @@ std::string luaTableToString(lua_State* state, int tableLocation) {
 }
 
 lua_State* staticLuaState() {
-    if (_state == nullptr) {
+    if (!_state) {
         _state = ghoul::lua::createNewLuaState();
     }
     return _state;
@@ -114,11 +114,11 @@ LuaExecutionException::LuaExecutionException(std::string error, std::string file
     , filename(std::move(file))
 {}
 
-std::string errorLocation(lua_State* state) {
+const char* errorLocation(lua_State* state) {
     ghoul_assert(state, "State must not be empty");
 
     luaL_where(state, 1);
-    std::string result = lua_tostring(state, -1);
+    const char* result = lua_tostring(state, -1);
     lua_pop(state, 1);
     return result;
 }
@@ -127,7 +127,7 @@ std::string stackInformation(lua_State* state) {
     ghoul_assert(state, "State must not be nullptr");
 
     std::stringstream result;
-    int top = lua_gettop(state);
+    const int top = lua_gettop(state);
     if (top == 0) {
         result << "Lua Stack (empty)";
     }
@@ -171,7 +171,7 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
     ghoul_assert(!filename.empty(), "filename must not be empty");
     ghoul_assert(FileSys.fileExists(filename), "filename must be an existing file");
 
-    if (state == nullptr) {
+    if (state) {
         state = staticLuaState();
     }
 
@@ -210,7 +210,7 @@ void loadDictionaryFromString(const std::string& script, Dictionary& dictionary,
 {
     ghoul_assert(!script.empty(), "Script must not be empty");
 
-    if (state == nullptr) {
+    if (!state) {
         state = staticLuaState();
     }
 
@@ -219,7 +219,8 @@ void loadDictionaryFromString(const std::string& script, Dictionary& dictionary,
         throw LuaLoadingException(lua_tostring(state, -1));
     }
 
-    if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
+    status = lua_pcall(state, 0, LUA_MULTRET, 0);
+    if (status != LUA_OK) {
         throw LuaExecutionException(lua_tostring(state, -1));
     }
 
@@ -258,12 +259,12 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
     while (lua_next(state, KeyTableIndex) != 0) {
         // get the key
         std::string key;
-        int keyType = lua_type(state, KeyTableIndex);
+        const int keyType = lua_type(state, KeyTableIndex);
         switch (keyType) {
             case LUA_TNUMBER:
                 if (type == TableType::Map) {
                     throw LuaFormatException(
-                          "Dictionary can only contain a pure map or a pure array"
+                        "Dictionary can only contain a pure map or a pure array"
                     );
                 }
 
@@ -273,7 +274,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
             case LUA_TSTRING:
                 if (type == TableType::Array) {
                     throw LuaFormatException(
-                          "Dictionary can only contain a pure map or a pure array"
+                        "Dictionary can only contain a pure map or a pure array"
                     );
                 }
 
@@ -304,8 +305,9 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
                 dict.setValue(key, d);
             } break;
             default:
-                throw LuaFormatException("Unknown type: "
-                                      + std::to_string(lua_type(state, ValueTableIndex)));
+                throw LuaFormatException(
+                    "Unknown type: " + std::to_string(lua_type(state, ValueTableIndex))
+                );
         }
 
         // get back up one level
@@ -337,7 +339,7 @@ std::string luaTypeToString(int type) {
 lua_State* createNewLuaState(bool loadStandardLibraries) {
     LDEBUGC("Lua", "Creating Lua state");
     lua_State* s = luaL_newstate();
-    if (s == nullptr) {
+    if (!s) {
         throw LuaRuntimeException("Error creating Lua state: Memory allocation");
     }
     if (loadStandardLibraries) {
@@ -359,13 +361,12 @@ void runScriptFile(lua_State* state, const std::string& filename) {
 
     int status = luaL_loadfile(state, filename.c_str());
     if (status != LUA_OK) {
-        std::string error = lua_tostring(state, -1);
-        throw LuaLoadingException(std::move(error));
+        throw LuaLoadingException(lua_tostring(state, -1));
     }
 
-    if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
-        const std::string error = lua_tostring(state, -1);
-        throw LuaExecutionException(error);
+    status = lua_pcall(state, 0, LUA_MULTRET, 0);
+    if (status != LUA_OK) {
+        throw LuaExecutionException(lua_tostring(state, -1));
     }
 }
 
@@ -378,52 +379,39 @@ void runScript(lua_State* state, const std::string& script) {
         throw LuaLoadingException(lua_tostring(state, -1));
     }
 
-    if (lua_pcall(state, 0, LUA_MULTRET, 0)) {
+    status = lua_pcall(state, 0, LUA_MULTRET, 0);
+    if (status != LUA_OK) {
         throw LuaExecutionException(lua_tostring(state, -1));
     }
 }
 
-const char* checkStringAndPop(lua_State* L) {
-    const char* s = luaL_checkstring(L, -1);
-    if (s) {
-        lua_pop(L, 1);
-    }
-    return s;
-}
-
 int checkArgumentsAndThrow(lua_State* L, int expected, const char* component) {
-    int nArguments = lua_gettop(L);
+    const int nArguments = lua_gettop(L);
     if (nArguments != expected) {
-        using namespace fmt::literals;
-        std::string s = "Expected {} arguments, got {}"_format(expected, nArguments);
-        if (component) {
-            LERRORC(component, s);
-        }
-        else {
-            LERRORC("Lua", s);
-        }
+        std::string s = fmt::format(
+            "Expected {} arguments, got {}", expected, nArguments
+        );
+        LERRORC(
+            component ? component : "Lua",
+            s
+        );
         luaL_error(L, s.c_str());
     }
     return nArguments;
 }
 
 int checkArgumentsAndThrow(lua_State* L, int expected1, int expected2,
-                            const char* component)
+                           const char* component)
 {
-    int nArguments = lua_gettop(L);
+    const int nArguments = lua_gettop(L);
     if ((nArguments != expected1) && (nArguments != expected2)) {
-        using namespace fmt::literals;
-        std::string s = "Expected {} or {} arguments, got {}"_format(
-            expected1,
-            expected2,
-            nArguments
+        std::string s = fmt::format(
+            "Expected {} or {} arguments, got {}", expected1, expected2, nArguments
         );
-        if (component) {
-            LERRORC(component, s);
-        }
-        else {
-            LERRORC("Lua", s);
-        }
+        LERRORC(
+            component ? component : "Lua",
+            s
+        );
         luaL_error(L, s.c_str());
     }
     return nArguments;
@@ -431,20 +419,15 @@ int checkArgumentsAndThrow(lua_State* L, int expected1, int expected2,
 
 int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range, const char* component)
 {
-    int nArguments = lua_gettop(L);
+    const int nArguments = lua_gettop(L);
     if ((nArguments < range.first) && (nArguments > range.second)) {
-        using namespace fmt::literals;
-        std::string s = "Expected {}-{} arguments, got {}"_format(
-            range.first,
-            range.second,
-            nArguments
+        std::string s = fmt::format(
+            "Expected {}-{} arguments, got {}", range.first, range.second, nArguments
         );
-        if (component) {
-            LERRORC(component, s);
-        }
-        else {
-            LERRORC("Lua", s);
-        }
+        LERRORC(
+            component ? component : "Lua",
+            s
+        );
         luaL_error(L, s.c_str());
     }
     return nArguments;
@@ -453,25 +436,24 @@ int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range, const char* 
 int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range,
                            const char* component)
 {
-    int nArguments = lua_gettop(L);
+    const int nArguments = lua_gettop(L);
 
     if (nArguments != expected &&
        (nArguments < range.first) && (nArguments > range.second))
     {
-        using namespace fmt::literals;
-        std::string s = "Expected {} or {}-{} arguments, got {}"_format(
+        std::string s = fmt::format(
+            "Expected {} or {}-{} arguments, got {}",
             expected,
             range.first,
             range.second,
             nArguments
         );
 
-        if (component) {
-            LERRORC(component, s);
-        }
-        else {
-            LERRORC("Lua", s);
-        }
+        LERRORC(
+            component ? component : "Lua",
+            s
+        );
+
         luaL_error(L, s.c_str());
     }
     return nArguments;
@@ -479,7 +461,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range
 
 void verifyStackSize(lua_State* L, int expected) {
 #if !(defined(NDEBUG) || defined(DEBUG))
-    int size = lua_gettop(L);
+    const int size = lua_gettop(L);
 
     if (size != expected) {
         LINFOC("Stack", stackInformation(L));
