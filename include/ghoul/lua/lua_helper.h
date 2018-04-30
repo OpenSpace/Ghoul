@@ -368,6 +368,7 @@ void verifyStackSize(lua_State* L, int expected = 0);
  * \param L The stack from from which the top value is extracted
  *
  * \throw LuaFormatException If the top value of the stack is not T
+ * \pre \L must not be nullptr
  * \pre The stack of \p L must not be empty
  */
 template <typename T>
@@ -383,12 +384,42 @@ T value(lua_State* L);
  * \param name The name of the global variable that is to be extracted
  *
  * \throw LuaFormatException If the value of \p name is not T
+ * \pre \L must not be nullptr
  * \pre The stack of \p L must not be empty
  * \pre \p name must not be nullptr
  * \pre \p name must not be empty
  */
 template <typename T>
 T value(lua_State* L, const char* name);
+
+/// If an instance of this struct is passed to the #push method, it will cause a nil value
+/// to be pushed onto the stack
+struct nil_t {};
+
+/**
+ * Pushes the passed parameters \p args onto the provided stack \p L in the order that
+ * they are specified in this function call. All passed parameters must be of a type that
+ * can be converted to a type that can be pushed to the stack, otherwise the function call
+ * will generate a compile error at the calling location. If no arguments are passed to
+ * this function, it will be a no-op. If one of the parameters is an instance of the
+ * nil_t tag struct, it will cause a nil value to be pushed to the stack.
+ *
+ * The allowed types for T are:
+ *  - integer number types)
+ *  - floating point types
+ *  - bool
+ *  - nil_t for pushing a nil value
+ *  - pointers which are pushed as light user data
+ *
+ * \tparam Ts the list of types of passed arguments
+ * \param L The lua_State onto which the \p arguments are pushed
+ * \param arguments The variable arguments that are pushed to the stack in the order in
+ *        which they appear in this function call
+ *
+ * \pre \L must not be nullptr
+ */
+template <typename... Ts>
+void push(lua_State* L, Ts... arguments);
 
 namespace internal {
     void deinitializeGlobalState();

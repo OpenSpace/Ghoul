@@ -27,11 +27,60 @@
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/invariants.h>
+#include <type_traits>
 
 namespace ghoul::lua {
 
+namespace internal {
+template <typename T>
+void push(lua_State* L, T value) {
+    // We have to handle the floating point types first in this as floats are able to be
+    // converted to ints, which would remove their fractional part
+    // Same goes for the const char* check before the std::is_pointer, since we want to
+    // handle the specialized case first
+    if constexpr (std::is_convertible_v<T, lua_Number>) {
+        // The extra check is to remove compiler warnings about unnecessary conversions
+        if constexpr (std::is_same_v<T, lua_Number>) {
+            lua_pushnumber(L, std::move(value));
+        }
+        else {
+            lua_pushnumber(L, static_cast<lua_Number&&>(std::move(value)));
+        }
+    }
+    else if constexpr (std::is_convertible_v<T, lua_Integer>) {
+        // The extra check is to remove compiler warnings about unnecessary conversions
+        if constexpr (std::is_same_v<T, lua_Integer>) {
+            lua_pushinteger(L, std::move(value));
+        }
+        else {
+            lua_pushinteger(L, static_cast<lua_Integer&&>(std::move(value)));
+        }
+    }
+    else if constexpr (std::is_same_v<T, bool>) {
+        lua_pushboolean(L, value);
+    }
+    else if constexpr (std::is_same_v<T, nil_t>) {
+        lua_pushnil(L);
+    }
+    else if constexpr (std::is_same_v<T, const char*>) {
+        lua_pushstring(L, value);
+    }
+    else if constexpr (std::is_same_v<T, std::string>) {
+        lua_pushstring(L, value.c_str());
+    }
+    else if constexpr (std::is_pointer_v<T>) {
+        lua_pushlightuserdata(L, reinterpret_cast<void*>(value));
+    }
+    else {
+        static_assert(sizeof(T) == 0, "Unable to push type T onto the Lua stack");
+    }
+}
+
+} // namespace internal
+
 template <typename T>
 T value(lua_State* L) {
+    ghoul_precondition(L != nullptr, "L must not be nullptr");
     ghoul_precondition(lua_gettop(L) > 0, "Stack of L must not be empty");
 
     if constexpr (std::is_same_v<T, bool>) {
@@ -85,11 +134,20 @@ T value(lua_State* L) {
 
 template <typename T>
 T value(lua_State* L, const char* name) {
+    ghoul_precondition(L != nullptr, "L must not be nullptr");
     ghoul_precondition(name != nullptr, "name must not be nullptr");
     ghoul_precondition(strlen(name) > 0, "name must not be empty");
 
     lua_getglobal(L, name);
     return value<T>(L);
 }
+
+template <typename... Ts>
+void push(lua_State* L, Ts... arguments) {
+    ghoul_precondition(L != nullptr, "L must not be nullptr");
+
+    (internal::push(L, arguments), ...);
+}
+
 
 } // namespace ghoul::lua
