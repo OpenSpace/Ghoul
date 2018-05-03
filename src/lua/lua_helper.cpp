@@ -171,7 +171,7 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
     ghoul_assert(!filename.empty(), "filename must not be empty");
     ghoul_assert(FileSys.fileExists(filename), "filename must be an existing file");
 
-    if (state) {
+    if (!state) {
         state = staticLuaState();
     }
 

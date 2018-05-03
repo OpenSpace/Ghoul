@@ -381,14 +381,14 @@ private:
  *        and optional arguments afterwards.
  * \return The bounding box of the text that was printed
  */
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos, glm::vec4 color,
+inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos, glm::vec4 color,
     const std::string& text)
 {
     return (ghoul::fontrendering::FontRenderer::defaultRenderer().render(
         font, pos, color, text)).boundingBox;
 }
 
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos,
+inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos,
     const std::string& text)
 {
     return (ghoul::fontrendering::FontRenderer::defaultRenderer().render(
@@ -408,14 +408,14 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos,
  *        and optional arguments afterwards.
  * \return The bounding box of the text that was printed
  */
-glm::vec2 RenderFont(ghoul::fontrendering::FontRenderer& renderer,
+inline glm::vec2 RenderFont(ghoul::fontrendering::FontRenderer& renderer,
     ghoul::fontrendering::Font& font, glm::vec2 pos, glm::vec4 color,
     const std::string& text)
 {
     return (renderer.render(font, pos, color, text)).boundingBox;
 }
 
-glm::vec2 RenderFont(ghoul::fontrendering::FontRenderer& renderer,
+inline glm::vec2 RenderFont(ghoul::fontrendering::FontRenderer& renderer,
     ghoul::fontrendering::Font& font, glm::vec2 pos,
     const std::string& text)
 {
@@ -436,7 +436,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::FontRenderer& renderer,
  *        and optional arguments afterwards.
  * \return The bounding box of the text that was printed
  */
-glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos, glm::vec4 color,
+inline glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos, glm::vec4 color,
     const std::string& text)
 {
     ghoul::fontrendering::FontRenderer::BoundingBoxInformation res =
@@ -446,7 +446,7 @@ glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos, glm::ve
     return res.boundingBox;
 }
 
-glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos,
+inline glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos,
     const std::string& text)
 {
     ghoul::fontrendering::FontRenderer::BoundingBoxInformation res =
@@ -472,7 +472,7 @@ glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos,
  *        and optional arguments afterwards.
  * \return The bounding box of the text that was printed
  */
-glm::vec2 RenderFontCr(ghoul::fontrendering::FontRenderer& renderer,
+inline glm::vec2 RenderFontCr(ghoul::fontrendering::FontRenderer& renderer,
     ghoul::fontrendering::Font& font, glm::vec2& pos, glm::vec4 color, const std::string& text)
 {
     ghoul::fontrendering::FontRenderer::BoundingBoxInformation res = renderer.render(
@@ -485,7 +485,7 @@ glm::vec2 RenderFontCr(ghoul::fontrendering::FontRenderer& renderer,
     return res.boundingBox;
 }
 
-glm::vec2 RenderFontCr(ghoul::fontrendering::FontRenderer& renderer,
+inline glm::vec2 RenderFontCr(ghoul::fontrendering::FontRenderer& renderer,
     ghoul::fontrendering::Font& font, glm::vec2& pos, const std::string& text)
 {
     ghoul::fontrendering::FontRenderer::BoundingBoxInformation res = renderer.render(
@@ -511,7 +511,7 @@ glm::vec2 RenderFontCr(ghoul::fontrendering::FontRenderer& renderer,
  *        and optional arguments afterwards.
  * \return The bounding box of the text that was printed
  */
-glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos, glm::vec4 color,
+inline glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos, glm::vec4 color,
     const std::string& text)
 {
     ghoul::fontrendering::FontRenderer::BoundingBoxInformation res =
@@ -521,7 +521,7 @@ glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos, glm::
     return res.boundingBox;
 }
 
-glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos,
+inline glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos,
     const std::string& text)
 {
     ghoul::fontrendering::FontRenderer::BoundingBoxInformation res =
@@ -546,7 +546,7 @@ glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos,
  *        and optional arguments afterwards.
  * \return The bounding box of the text that was printed
  */
-glm::vec2 RenderFontCrUp(ghoul::fontrendering::FontRenderer& renderer,
+inline glm::vec2 RenderFontCrUp(ghoul::fontrendering::FontRenderer& renderer,
     ghoul::fontrendering::Font& font, glm::vec2& pos, glm::vec4 color, const std::string& text)
 {
     ghoul::fontrendering::FontRenderer::BoundingBoxInformation res = renderer.render(
@@ -559,7 +559,7 @@ glm::vec2 RenderFontCrUp(ghoul::fontrendering::FontRenderer& renderer,
     return res.boundingBox;
 }
 
-glm::vec2 RenderFontCrUp(ghoul::fontrendering::FontRenderer& renderer,
+inline glm::vec2 RenderFontCrUp(ghoul::fontrendering::FontRenderer& renderer,
     ghoul::fontrendering::Font& font, glm::vec2& pos, const std::string& text)
 {
     ghoul::fontrendering::FontRenderer::BoundingBoxInformation res = renderer.render(
