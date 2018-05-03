@@ -30,6 +30,7 @@
 #include <ghoul/font/font.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/misc.h>
 #include <ghoul/opengl/programobject.h>
 #include <ghoul/opengl/texture.h>
 #include <ghoul/opengl/textureatlas.h>
@@ -317,47 +318,11 @@ FontRenderer& FontRenderer::defaultProjectionRenderer() {
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
-                                                               const char* format,
-                                                               ...) const
+                                                            const std::string& text) const
 {
-    ghoul_assert(format != nullptr, "No format is provided");
-
-    va_list args;     // Pointer To List Of Arguments
-    va_start(args, format); // Parses The String For Variables
-
-    int s = 1 + vscprintf(format, args);
-    std::vector<char> buffer(s);
-
-    memset(buffer.data(), 0, s);
-
-#ifdef _MSC_VER
-    vsprintf_s(buffer.data(), s, format, args);
-#else
-    vsprintf(buffer.data(), format, args);
-#endif
-    va_end(args);
+    const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
 
     float h = font.height();
-
-    // Splitting the text into separate lines
-    const char* start_line = buffer.data();
-    std::vector<std::string> lines;
-    const char* c;
-    for (c = buffer.data(); *c; c++) {
-        if (*c == '\n') {
-            std::string line;
-            for (const char* n = start_line; n < c; ++n)
-                line.append(1, *n);
-            lines.push_back(line);
-            start_line = c + 1;
-        }
-    }
-    if (start_line) {
-        std::string line;
-        for (const char* n = start_line; n < c; ++n)
-            line.append(1, *n);
-        lines.push_back(line);
-    }
 
     //unsigned int vertexIndex = 0;
     std::vector<GLuint> indices;
@@ -398,34 +363,15 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec2 pos,
                                                           glm::vec4 color,
                                                           glm::vec4 outlineColor,
-                                                          const char* format, ...) const
+                                                          const std::string& text) const
 {
-    ghoul_assert(format != nullptr, "No format is provided");
-
-    va_list args;     // Pointer To List Of Arguments
-    va_start(args, format); // Parses The String For Variables
-
-    int size = 1 + vscprintf(format, args);
-    char* buffer = new char[size];
-
-    memset(buffer, 0, size);
-
-#ifdef _MSC_VER
-    vsprintf_s(buffer, size, format, args);
-#else
-    vsprintf(buffer, format, args);
-#endif
-    va_end(args);
-
     BoundingBoxInformation res = internalRender(
         font,
         std::move(pos),
         std::move(color),
         std::move(outlineColor),
-        buffer
+        text
     );
-
-    delete[] buffer;
 
     return res;
 }
@@ -434,31 +380,14 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 
     glm::vec4 color, glm::vec4 outlineColor, const float textScale, const int textMinSize,
     const int textMaxSize, const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
     const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
-    const glm::dvec3& cameraLookUp, const int renderType, char* format, ...) const
+    const glm::dvec3& cameraLookUp, const int renderType, const std::string& text) const
 {
-    ghoul_assert(format != nullptr, "No format is provided");
-
-    va_list args;     // Pointer To List Of Arguments
-    va_start(args, format); // Parses The String For Variables
-
-    int size = 1 + vscprintf(format, args);
-    char* buffer = new char[size];
-
-    memset(buffer, 0, size);
-
-#ifdef _MSC_VER
-    vsprintf_s(buffer, size, format, args);
-#else
-    vsprintf(buffer, format, args);
-#endif
-    va_end(args);
-
     BoundingBoxInformation res = internalProjectionRender(
         font,
         std::move(pos),
         std::move(color),
         std::move(outlineColor),
-        buffer,
+        text,
         textScale,
         textMinSize,
         textMaxSize,
@@ -470,38 +399,20 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 
         renderType
     );
 
-    delete[] buffer;
-
     return res;
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec2 pos,
                                                           glm::vec4 color,
-                                                          const char* format, ...) const
+                                                          const std::string& text) const
 {
-    ghoul_assert(format != nullptr, "No format is provided");
-
-    va_list args;     // Pointer To List Of Arguments
-    va_start(args, format); // Parses The String For Variables
-
-    int size = 1 + vscprintf(format, args);
-    std::vector<char> buffer(size);
-    memset(buffer.data(), 0, size);
-
-#ifdef _MSC_VER
-    vsprintf_s(buffer.data(), size, format, args);
-#else
-    vsprintf(buffer.data(), format, args);
-#endif
-    va_end(args);
-
     BoundingBoxInformation res = internalRender(
         font,
         std::move(pos),
         color,
         glm::vec4(0.f, 0.f, 0.f, color.a),
-        buffer.data()
+        text
     );
 
     return res;
@@ -512,30 +423,14 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 
     glm::vec4 color, const float textScale, const int textMinSize, const int textMaxSize,
     const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
     const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
-    const glm::dvec3& cameraLookUp, const int renderType, const char* format, ...) const
+    const glm::dvec3& cameraLookUp, const int renderType, const std::string& text) const
 {
-    ghoul_assert(format != nullptr, "No format is provided");
-
-    va_list args;     // Pointer To List Of Arguments
-    va_start(args, format); // Parses The String For Variables
-
-    int size = 1 + vscprintf(format, args);
-    std::vector<char> buffer(size);
-    memset(buffer.data(), 0, size);
-
-#ifdef _MSC_VER
-    vsprintf_s(buffer.data(), size, format, args);
-#else
-    vsprintf(buffer.data(), format, args);
-#endif
-    va_end(args);
-
     BoundingBoxInformation res = internalProjectionRender(
         font,
         std::move(pos),
         color,
         glm::vec4(0.f, 0.f, 0.f, color.a),
-        buffer.data(),
+        text,
         textScale,
         textMinSize,
         textMaxSize,
@@ -552,31 +447,14 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           glm::vec2 pos,
-                                                          const char* format, ...) const
+                                                          const std::string& text) const
 {
-    ghoul_assert(format != nullptr, "No format is provided");
-
-    va_list args;     // Pointer To List Of Arguments
-    va_start(args, format); // Parses The String For Variables
-
-    int size = 1 + vscprintf(format, args);
-    std::vector<char> buffer(size);
-
-    memset(buffer.data(), 0, size);
-
-#ifdef _MSC_VER
-    vsprintf_s(buffer.data(), size, format, args);
-#else
-    vsprintf(buffer.data(), format, args);
-#endif
-    va_end(args);
-
     BoundingBoxInformation res = internalRender(
         font,
         std::move(pos),
         glm::vec4(1.f),
         glm::vec4(0.f, 0.f, 0.f, 1.f),
-        buffer.data()
+        text
     );
 
     return res;
@@ -588,31 +466,14 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 
     const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
     const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
     const glm::dvec3& cameraLookUp, const int renderType,
-    const char* format, ...) const
+    const std::string& text) const
 {
-    ghoul_assert(format != nullptr, "No format is provided");
-
-    va_list args;     // Pointer To List Of Arguments
-    va_start(args, format); // Parses The String For Variables
-
-    int size = 1 + vscprintf(format, args);
-    std::vector<char> buffer(size);
-
-    memset(buffer.data(), 0, size);
-
-#ifdef _MSC_VER
-    vsprintf_s(buffer.data(), size, format, args);
-#else
-    vsprintf(buffer.data(), format, args);
-#endif
-    va_end(args);
-
     BoundingBoxInformation res = internalProjectionRender(
         font,
         std::move(pos),
         glm::vec4(1.f),
         glm::vec4(0.f, 0.f, 0.f, 1.f),
-        buffer.data(),
+        text,
         textScale,
         textMinSize,
         textMaxSize,
@@ -631,31 +492,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
                                                                   glm::vec2 pos,
                                                                   glm::vec4 color,
                                                                   glm::vec4 outlineColor,
-                                                                 const char* buffer) const
+                                                            const std::string& text) const
 {
     float h = font.height();
 
-    // Splitting the text into separate lines
-    const char* start_line = buffer;
-    std::vector<std::string> lines;
-    const char* c;
-    for (c = buffer; *c; c++) {
-        if (*c == '\n') {
-            std::string line;
-            for (const char* n = start_line; n < c; ++n) {
-                line.append(1, *n);
-            }
-            lines.push_back(line);
-            start_line = c+1;
-        }
-    }
-    if (start_line) {
-        std::string line;
-        for (const char* n = start_line; n < c; ++n) {
-            line.append(1, *n);
-        }
-        lines.push_back(line);
-    }
+    const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
 
     glDisable(GL_DEPTH_TEST);
     glEnablei(GL_BLEND, 0);
@@ -791,7 +632,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font& font,
-    glm::vec3 pos, glm::vec4 color, glm::vec4 outlineColor, const char* buffer,
+    glm::vec3 pos, glm::vec4 color, glm::vec4 outlineColor, const std::string& text,
     const float textScale, const int textMinSize, const int textMaxSize,
     const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
     const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
@@ -799,25 +640,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
 {
     float h = font.height();
 
-    // Splitting the text into separate lines
-    const char* start_line = buffer;
-    std::vector<std::string> lines;
-    const char* c;
-    for (c = buffer; *c; c++) {
-        if (*c == '\n') {
-            std::string line;
-            for (const char* n = start_line; n < c; ++n)
-                line.append(1, *n);
-            lines.push_back(line);
-            start_line = c + 1;
-        }
-    }
-    if (start_line) {
-        std::string line;
-        for (const char* n = start_line; n < c; ++n)
-            line.append(1, *n);
-        lines.push_back(line);
-    }
+    std::vector<std::string> lines = ghoul::tokenizeString(text, '\n');
 
     unsigned int vertexIndex = 0;
     std::vector<GLuint> indices;

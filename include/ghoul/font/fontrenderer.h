@@ -169,15 +169,13 @@ public:
      * screen.
      *
      * \param font The Font that is used to render the provided text
-     * \param format The format text that is rendered to the screen. This text can contain
-     *        symbolic constants (the same as in printf) to refer to later variable
-     *        arguments, which are substituted. The <code>text</code> can also contain
+     * \param text The text that is rendered to the screen. The \p text can also contain
      *        '\\n' to have a linebreak, which is of the correct length with regard to the
-     *        selected font. This parameter cannot be a <code>nullptr</code>.
+     *        selected font.
      * \return A tuple containing the bounding box of the text that was printed and the
      *         number of lines that were printed
      */
-    BoundingBoxInformation boundingBox(Font& font, const char* format, ...) const;
+    BoundingBoxInformation boundingBox(Font& font, const std::string& text) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -192,16 +190,14 @@ public:
      * \param color The base color that is used to render the text
      * \param outlineColor The outline color that is used to render the text if the Font
      *        has an outline
-     * \param format The format text that is rendered to the screen. This text can contain
-     *        symbolic constants (the same as in printf) to refer to later variable
-     *        arguments, which are substituted. The <code>text</code> can also contain
+     * \param text The text that is rendered to the screen. The \p text can also contain
      *        '\\n' to have a linebreak, which is of the correct length with regard to the
-     *        selected font. This parameter cannot be a <code>nullptr</code>.
+     *        selected font.
      * \return A tuple containing the bounding box of the text that was printed and the
      *         number of lines that were printed
      */
     BoundingBoxInformation render(Font& font, glm::vec2 pos, glm::vec4 color,
-        glm::vec4 outlineColor, const char* format, ...) const;
+        glm::vec4 outlineColor, const std::string& text) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -223,11 +219,9 @@ public:
      *        text's plane.
      * \param orthonormalUp Up vector from the orthonormal basis defining the
      *        text's plane.
-     * \param format The format text that is rendered to the screen. This text can contain
-     *        symbolic constants (the same as in printf) to refer to later variable
-     *        arguments, which are substituted. The <code>text</code> can also contain
+     * \param text The text that is rendered to the screen.The \p text can also contain
      *        '\\n' to have a linebreak, which is of the correct length with regard to the
-     *        selected font. This parameter cannot be a <code>nullptr</code>.
+     *        selected font.
      * \return A tuple containing the bounding box of the text that was printed and the
      *         number of lines that were printed
      */
@@ -236,7 +230,7 @@ public:
         const int textMaxSize, const glm::dmat4& mvpMatrix,
         const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
         const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
-        const int renderType, char* format, ...) const;
+        const int renderType, const std::string& text) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -248,16 +242,14 @@ public:
      * \param pos The screen-space position (in pixel coordinates) that is used to render
      *        the text
      * \param color The base color that is used to render the text
-     * \param format The format text that is rendered to the screen. This text can contain
-     *        symbolic constants (the same as in printf) to refer to later variable
-     *        arguments, which are substituted. The <code>text</code> can also contain
+     * \param text The text that is rendered to the screen.The \p text can also contain
      *        '\\n' to have a linebreak, which is of the correct length with regard to the
-     *        selected font. This parameter cannot be a <code>nullptr</code>.
+     *        selected font.
      * \return A tuple containing the bounding box of the text that was printed and the
      *         number of lines that were printed
      */
     BoundingBoxInformation render(Font& font, glm::vec2 pos, glm::vec4 color,
-        const char* format, ...) const;
+        const std::string& text) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -277,11 +269,9 @@ public:
      *        text's plane.
      * \param orthonormalUp Up vector from the orthonormal basis defining the
      *        text's plane.
-     * \param format The format text that is rendered to the screen. This text can contain
-     *        symbolic constants (the same as in printf) to refer to later variable
-     *        arguments, which are substituted. The <code>text</code> can also contain
+     * \param text The text that is rendered to the screen. The \p text can also contain
      *        '\\n' to have a linebreak, which is of the correct length with regard to the
-     *        selected font. This parameter cannot be a <code>nullptr</code>.
+     *        selected font.
      * \return A tuple containing the bounding box of the text that was printed and the
      *         number of lines that were printed
      */
@@ -290,7 +280,7 @@ public:
         const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
         const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
         const glm::dvec3& cameraLookUp, const int renderType,
-        const char* format, ...) const;
+        const std::string& text) const;
 
     /**
      * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -300,16 +290,14 @@ public:
      * \param font The Font that is used to render the provided text
      * \param pos The screen-space position (in pixel coordinates) that is used to render
      *        the text
-     * \param format The format text that is rendered to the screen. This text can contain
-     *        symbolic constants (the same as in printf) to refer to later variable
-     *        arguments, which are substituted. The <code>text</code> can also contain
+     * \param text The text that is rendered to the screen. The \p text can also contain
      *        '\\n' to have a linebreak, which is of the correct length with regard to the
-     *        selected font. This parameter cannot be a <code>nullptr</code>.
+     *        selected font.
      * \return A tuple containing the bounding box of the text that was printed and the
      *         number of lines that were printed
      */
     BoundingBoxInformation render(Font& font, glm::vec2 pos,
-        const char* format, ...) const;
+        const std::string& text) const;
 
     /**
     * Renders the provided texts (<code>format</code> + variable arguments) to the pixel
@@ -327,11 +315,9 @@ public:
     *        text's plane.
     * \param orthonormalUp Up vector from the orthonormal basis defining the
     *        text's plane.
-    * \param format The format text that is rendered to the screen. This text can contain
-    *        symbolic constants (the same as in printf) to refer to later variable
-    *        arguments, which are substituted. The <code>text</code> can also contain
+    * \param text The text that is rendered to the screen. The \p text can also contain
     *        '\\n' to have a linebreak, which is of the correct length with regard to the
-    *        selected font. This parameter cannot be a <code>nullptr</code>.
+    *        selected font.
     * \return A tuple containing the bounding box of the text that was printed and the
     *         number of lines that were printed
     */
@@ -339,17 +325,17 @@ public:
         const int textMinSize, const int textMaxSize, const glm::dmat4& mvpMatrix,
         const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
         const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
-        const int renderType, const char* format, ...) const;
+        const int renderType, const std::string& text) const;
 
 private:
     /// Private constructor that is used in the #initialize static method
     FontRenderer();
 
     BoundingBoxInformation internalRender(Font& font, glm::vec2 pos, glm::vec4 color,
-        glm::vec4 outlineColor, const char* buffer) const;
+        glm::vec4 outlineColor, const std::string& text) const;
 
     BoundingBoxInformation internalProjectionRender(Font& font, glm::vec3 pos,
-        glm::vec4 color, glm::vec4 outlineColor, const char* buffer,
+        glm::vec4 color, glm::vec4 outlineColor, const std::string& text,
         const float textScale, const int textMinSize, const int textMaxSize,
         const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
         const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
@@ -395,10 +381,18 @@ private:
  *        and optional arguments afterwards.
  * \return The bounding box of the text that was printed
  */
-template <typename... Args>
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos, Args... args) {
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos, glm::vec4 color,
+    const std::string& text)
+{
     return (ghoul::fontrendering::FontRenderer::defaultRenderer().render(
-        font, pos, args...)).boundingBox;
+        font, pos, color, text)).boundingBox;
+}
+
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos,
+    const std::string& text)
+{
+    return (ghoul::fontrendering::FontRenderer::defaultRenderer().render(
+        font, pos, { 1.f, 1.f, 1.f, 1.f }, text)).boundingBox;
 }
 
 /**
@@ -414,11 +408,18 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2 pos, Args... ar
  *        and optional arguments afterwards.
  * \return The bounding box of the text that was printed
  */
-template <typename... Args>
 glm::vec2 RenderFont(ghoul::fontrendering::FontRenderer& renderer,
-    ghoul::fontrendering::Font& font, glm::vec2 pos, Args... args)
+    ghoul::fontrendering::Font& font, glm::vec2 pos, glm::vec4 color,
+    const std::string& text)
 {
-    return (renderer.render(font, pos, args...)).boundingBox;
+    return (renderer.render(font, pos, color, text)).boundingBox;
+}
+
+glm::vec2 RenderFont(ghoul::fontrendering::FontRenderer& renderer,
+    ghoul::fontrendering::Font& font, glm::vec2 pos,
+    const std::string& text)
+{
+    return (renderer.render(font, pos, { 1.f, 1.f, 1.f, 1.f }, text)).boundingBox;
 }
 
 /**
@@ -435,10 +436,21 @@ glm::vec2 RenderFont(ghoul::fontrendering::FontRenderer& renderer,
  *        and optional arguments afterwards.
  * \return The bounding box of the text that was printed
  */
-template <typename... Args>
-glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args) {
+glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos, glm::vec4 color,
+    const std::string& text)
+{
     ghoul::fontrendering::FontRenderer::BoundingBoxInformation res =
-        ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...);
+        ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, color, text);
+
+    pos.y -= res.numberOfLines * font.height();
+    return res.boundingBox;
+}
+
+glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos,
+    const std::string& text)
+{
+    ghoul::fontrendering::FontRenderer::BoundingBoxInformation res =
+        ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, { 1.f, 1.f, 1.f, 1.f }, text);
 
     pos.y -= res.numberOfLines * font.height();
     return res.boundingBox;
@@ -460,19 +472,31 @@ glm::vec2 RenderFontCr(ghoul::fontrendering::Font& font, glm::vec2& pos, Args...
  *        and optional arguments afterwards.
  * \return The bounding box of the text that was printed
  */
-template <typename... Args>
 glm::vec2 RenderFontCr(ghoul::fontrendering::FontRenderer& renderer,
-    ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args)
+    ghoul::fontrendering::Font& font, glm::vec2& pos, glm::vec4 color, const std::string& text)
 {
     ghoul::fontrendering::FontRenderer::BoundingBoxInformation res = renderer.render(
         font,
         pos,
-        args...
+        color,
+        text
     );
     pos.y -= res.numberOfLines * font.height();
     return res.boundingBox;
 }
 
+glm::vec2 RenderFontCr(ghoul::fontrendering::FontRenderer& renderer,
+    ghoul::fontrendering::Font& font, glm::vec2& pos, const std::string& text)
+{
+    ghoul::fontrendering::FontRenderer::BoundingBoxInformation res = renderer.render(
+        font,
+        pos,
+        { 1.f, 1.f, 1.f, 1.f },
+        text
+    );
+    pos.y -= res.numberOfLines * font.height();
+    return res.boundingBox;
+}
 /**
  * This helper method prints the passed arguments using the Font::render function of the
  * default font and moves the pen position upwards after the call. It is equivalent to
@@ -487,10 +511,21 @@ glm::vec2 RenderFontCr(ghoul::fontrendering::FontRenderer& renderer,
  *        and optional arguments afterwards.
  * \return The bounding box of the text that was printed
  */
-template <typename... Args>
-glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args) {
+glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos, glm::vec4 color,
+    const std::string& text)
+{
     ghoul::fontrendering::FontRenderer::BoundingBoxInformation res =
-        ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, args...);
+        ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, color, text);
+
+    pos.y += res.numberOfLines * font.height();
+    return res.boundingBox;
+}
+
+glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos,
+    const std::string& text)
+{
+    ghoul::fontrendering::FontRenderer::BoundingBoxInformation res =
+        ghoul::fontrendering::FontRenderer::defaultRenderer().render(font, pos, { 1.f, 1.f, 1.f, 1.f }, text);
 
     pos.y += res.numberOfLines * font.height();
     return res.boundingBox;
@@ -511,14 +546,27 @@ glm::vec2 RenderFontCrUp(ghoul::fontrendering::Font& font, glm::vec2& pos, Args.
  *        and optional arguments afterwards.
  * \return The bounding box of the text that was printed
  */
-template <typename... Args>
 glm::vec2 RenderFontCrUp(ghoul::fontrendering::FontRenderer& renderer,
-    ghoul::fontrendering::Font& font, glm::vec2& pos, Args... args)
+    ghoul::fontrendering::Font& font, glm::vec2& pos, glm::vec4 color, const std::string& text)
 {
     ghoul::fontrendering::FontRenderer::BoundingBoxInformation res = renderer.render(
         font,
         pos,
-        args...
+        color,
+        text
+    );
+    pos.y += res.numberOfLines * font.height();
+    return res.boundingBox;
+}
+
+glm::vec2 RenderFontCrUp(ghoul::fontrendering::FontRenderer& renderer,
+    ghoul::fontrendering::Font& font, glm::vec2& pos, const std::string& text)
+{
+    ghoul::fontrendering::FontRenderer::BoundingBoxInformation res = renderer.render(
+        font,
+        pos,
+        { 1.f, 1.f, 1.f, 1.f },
+        text
     );
     pos.y += res.numberOfLines * font.height();
     return res.boundingBox;

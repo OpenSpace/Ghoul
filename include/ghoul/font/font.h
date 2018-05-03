@@ -263,11 +263,8 @@ public:
      * \pre \p filename must not be empty
      * \pre \p pointSize must be positive and bigger than 0
      */
-    Font(std::string filename,
-         float pointSize,
-         opengl::TextureAtlas& atlas,
-         Outline hasOutline = Outline::Yes,
-         float outlineThickness = 1.f
+    Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
+         Outline hasOutline = Outline::Yes, float outlineThickness = 1.f
     );
 
     /**
@@ -304,16 +301,12 @@ public:
      * this Font. The value returned is in pixel values and provides the width and the
      * height of the text if it were to be rendered.
      *
-     * \param text The format text that is rendered to the screen. This text can contain
-     *        symbolic constants (the same as in printf) to refer to later variable
-     *        arguments, which are substituted. The <code>text</code> can also contain
-     *        '\\n' to have a linebreak, which is of the correct length with regard to the
-     *        selected font. This parameter cannot be a <code>nullptr</code>.
+     * \param text The text that is rendered to the screen. The <code>text</code> can also
+     *        contain '\\n' to have a linebreak, which is of the correct length for the 
+     *        selected font.
      * \return The pixel coordinates of the bounding box of the passed text
-     *
-     * \pre \p text must not be empty
      */
-    glm::vec2 boundingBox(const char* text, ...);
+    glm::vec2 boundingBox(const std::string& text);
 
     /**
      * Returns the Glyph that representes the passed \p character. The first call to this

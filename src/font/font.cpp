@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <array>
 #include <ghoul/fmt.h>
+#include <ghoul/misc/misc.h>
 #include <tuple>
 
 #include <ft2build.h>
@@ -267,45 +268,10 @@ bool Font::hasOutline() const {
     return _hasOutline;
 }
 
-glm::vec2 Font::boundingBox(const char* format, ...) {
-    ghoul_assert(format != nullptr, "No format is provided");
+glm::vec2 Font::boundingBox(const std::string& text) {
     glm::vec2 result(0.f);
 
-    va_list args;     // Pointer To List Of Arguments
-    va_start(args, format); // Parses The String For Variables
-
-    int size = 1 + vscprintf(format, args);
-    std::vector<char> buffer(size, 0);
-
-#ifdef WIN32
-    vsprintf_s(buffer.data(), size, format, args);
-#else
-    vsprintf(buffer.data(), format, args);
-#endif
-    va_end(args);
-
-
-    // Splitting the text into separate lines
-    const char* start_line = buffer.data();
-    std::vector<std::string> lines;
-    const char* c;
-    for (c = buffer.data(); *c; c++) {
-        if (*c == '\n') {
-            std::string line;
-            for (const char* n = start_line; n < c; ++n) {
-                line.append(1, *n);
-            }
-            lines.push_back(line);
-            start_line = c+1;
-        }
-    }
-    if (start_line) {
-        std::string line;
-        for (const char* n = start_line; n < c; ++n) {
-            line.append(1, *n);
-        }
-        lines.push_back(line);
-    }
+    const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
 
     for (const std::string& line : lines) {
         float width = 0.f;
