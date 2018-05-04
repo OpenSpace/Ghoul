@@ -358,141 +358,19 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
     return { size, static_cast<int>(lines.size()) };
 }
 
-// I wish I didn't have to copy-n-paste the render function, but *sigh* ---abock
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
-                                                          glm::vec2 pos,
-                                                          glm::vec4 color,
-                                                          glm::vec4 outlineColor,
-                                                          const std::string& text) const
+                                                          const glm::vec2& pos,
+                                                          const std::string& text,
+                                                          const glm::vec4& color) const
 {
-    BoundingBoxInformation res = internalRender(
-        font,
-        std::move(pos),
-        std::move(color),
-        std::move(outlineColor),
-        text
-    );
-
-    return res;
-}
-
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 pos,
-    glm::vec4 color, glm::vec4 outlineColor, const float textScale, const int textMinSize,
-    const int textMaxSize, const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
-    const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
-    const glm::dvec3& cameraLookUp, const int renderType, const std::string& text) const
-{
-    BoundingBoxInformation res = internalProjectionRender(
-        font,
-        std::move(pos),
-        std::move(color),
-        std::move(outlineColor),
-        text,
-        textScale,
-        textMinSize,
-        textMaxSize,
-        mvpMatrix,
-        orthonormalRight,
-        orthonormalUp,
-        cameraPos,
-        cameraLookUp,
-        renderType
-    );
-
-    return res;
+    return render(font, pos, text, color, { 0.f, 0.f, 0.f, color.a });
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
-                                                          glm::vec2 pos,
-                                                          glm::vec4 color,
-                                                          const std::string& text) const
-{
-    BoundingBoxInformation res = internalRender(
-        font,
-        std::move(pos),
-        color,
-        glm::vec4(0.f, 0.f, 0.f, color.a),
-        text
-    );
-
-    return res;
-}
-
-
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 pos,
-    glm::vec4 color, const float textScale, const int textMinSize, const int textMaxSize,
-    const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
-    const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
-    const glm::dvec3& cameraLookUp, const int renderType, const std::string& text) const
-{
-    BoundingBoxInformation res = internalProjectionRender(
-        font,
-        std::move(pos),
-        color,
-        glm::vec4(0.f, 0.f, 0.f, color.a),
-        text,
-        textScale,
-        textMinSize,
-        textMaxSize,
-        mvpMatrix,
-        orthonormalRight,
-        orthonormalUp,
-        cameraPos,
-        cameraLookUp,
-        renderType
-    );
-
-    return res;
-}
-
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
-                                                          glm::vec2 pos,
-                                                          const std::string& text) const
-{
-    BoundingBoxInformation res = internalRender(
-        font,
-        std::move(pos),
-        glm::vec4(1.f),
-        glm::vec4(0.f, 0.f, 0.f, 1.f),
-        text
-    );
-
-    return res;
-}
-
-
-FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font, glm::vec3 pos,
-    const float textScale, const int textMinSize, const int textMaxSize,
-    const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
-    const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
-    const glm::dvec3& cameraLookUp, const int renderType,
-    const std::string& text) const
-{
-    BoundingBoxInformation res = internalProjectionRender(
-        font,
-        std::move(pos),
-        glm::vec4(1.f),
-        glm::vec4(0.f, 0.f, 0.f, 1.f),
-        text,
-        textScale,
-        textMinSize,
-        textMaxSize,
-        mvpMatrix,
-        orthonormalRight,
-        orthonormalUp,
-        cameraPos,
-        cameraLookUp,
-        renderType
-    );
-
-    return res;
-}
-
-FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
-                                                                  glm::vec2 pos,
-                                                                  glm::vec4 color,
-                                                                  glm::vec4 outlineColor,
-                                                            const std::string& text) const
+                                                          const glm::vec2& pos,
+                                                          const std::string& text,
+                                                          const glm::vec4& color,
+                                                      const glm::vec4& outlineColor) const
 {
     float h = font.height();
 
@@ -528,7 +406,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
             }
 
             if (j > 0)
-                movingPos.x += glyph->kerning(line[j-1]);
+                movingPos.x += glyph->kerning(line[j - 1]);
 
             float x0 = movingPos.x + glyph->leftBearing();
             float y0 = movingPos.y + glyph->topBearing();
@@ -547,14 +425,14 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
             indices.insert(indices.end(), {
                 vertexIndex, vertexIndex + 1, vertexIndex + 2,
                 vertexIndex, vertexIndex + 2, vertexIndex + 3
-            });
+                });
             vertexIndex += 4;
             vertices.insert(vertices.end(), {
                 x0, y0, s0, t0, outlineS0, outlineT0,
                 x0, y1, s0, t1, outlineS0, outlineT1,
                 x1, y1, s1, t1, outlineS1, outlineT1,
                 x1, y0, s1, t0, outlineS1, outlineT0
-            });
+                });
             movingPos.x += glyph->horizontalAdvance();
 
             width += glyph->horizontalAdvance();
@@ -564,7 +442,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
         size.y += height;
         movingPos.y -= h;
     }
-    size.y = (lines.size() -  1) * font.height();
+    size.y = (lines.size() - 1) * font.height();
 
     glm::mat4 projection = glm::ortho(
         0.f,
@@ -631,12 +509,20 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalRender(Font& font,
     return { size, static_cast<int>(lines.size()) };
 }
 
-FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font& font,
-    glm::vec3 pos, glm::vec4 color, glm::vec4 outlineColor, const std::string& text,
-    const float textScale, const int textMinSize, const int textMaxSize,
-    const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
-    const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
-    const glm::dvec3& cameraLookUp, const int renderType) const
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
+                                                          const glm::vec3& pos,
+                                                          const std::string& text,
+                                                          const glm::vec4& color,
+                                                          const glm::vec4& outlineColor,
+                                                          float textScale,
+                                                          int textMinSize,
+                                                          int textMaxSize,
+                                                          const glm::dmat4& mvpMatrix,
+                                                        const glm::vec3& orthonormalRight,
+                                                         const glm::vec3& orthonormalUp,
+                                                         const glm::dvec3& cameraPos,
+                                                         const glm::dvec3& cameraLookUp,
+                                                         int renderType) const
 {
     float h = font.height();
 
@@ -739,13 +625,13 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
                 float scaleFix = static_cast<float>(textMaxSize) / heightInPixels;
                 if (renderType == 0) {
                     p0 = (x0 * orthonormalRight + y0 * orthonormalUp) *
-                          textScale * scaleFix + pos;
+                        textScale * scaleFix + pos;
                     p1 = (x0 * orthonormalRight + y1 * orthonormalUp) *
-                          textScale * scaleFix + pos;
+                        textScale * scaleFix + pos;
                     p2 = (x1 * orthonormalRight + y1 * orthonormalUp) *
-                          textScale * scaleFix + pos;
+                        textScale * scaleFix + pos;
                     p3 = (x1 * orthonormalRight + y0 * orthonormalUp) *
-                          textScale * scaleFix + pos;
+                        textScale * scaleFix + pos;
                 }
                 else {
                     glm::dvec3 normal = glm::normalize(cameraPos - glm::dvec3(pos));
@@ -764,12 +650,12 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
                 p1.x, p1.y, p1.z, s0, t1, outlineS0, outlineT1,
                 p2.x, p2.y, p2.z, s1, t1, outlineS1, outlineT1,
                 p3.x, p3.y, p3.z, s1, t0, outlineS1, outlineT0
-            });
+                });
 
             indices.insert(indices.end(), {
                 vertexIndex, vertexIndex + 1, vertexIndex + 2,
                 vertexIndex, vertexIndex + 2, vertexIndex + 3
-            });
+                });
             vertexIndex += 4;
 
             movingPos.x += glyph->horizontalAdvance();
@@ -785,10 +671,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
     size.y = (lines.size() - 1) * font.height();
 
     /*glm::mat4 projection = glm::ortho(
-        0.f,
-        _framebufferSize.x,
-        0.f,
-        _framebufferSize.y
+    0.f,
+    _framebufferSize.x,
+    0.f,
+    _framebufferSize.y
     );*/
 
     glDisable(GL_DEPTH_TEST);
@@ -854,6 +740,69 @@ FontRenderer::BoundingBoxInformation FontRenderer::internalProjectionRender(Font
     glEnable(GL_DEPTH_TEST);
 
     return { size, static_cast<int>(lines.size()) };
+}
+
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
+                                                          const glm::vec3& pos,
+                                                          const std::string& text,
+                                                          const glm::vec4& color,
+                                                          float textScale,
+                                                          int textMinSize,
+                                                          int textMaxSize,
+                                                          const glm::dmat4& mvpMatrix,
+                                                        const glm::vec3& orthonormalRight,
+                                                          const glm::vec3& orthonormalUp,
+                                                          const glm::dvec3& cameraPos,
+                                                          const glm::dvec3& cameraLookUp,
+                                                          int renderType) const
+{
+    return render(
+        font,
+        pos,
+        text,
+        color,
+        { 0.f, 0.f, 0.f, color.a },
+        textScale,
+        textMinSize,
+        textMaxSize,
+        mvpMatrix,
+        orthonormalRight,
+        orthonormalUp,
+        cameraPos,
+        cameraLookUp,
+        renderType
+    );
+}
+
+FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
+                                                          const glm::vec3& pos,
+                                                          const std::string& text,
+                                                          float textScale,
+                                                          int textMinSize,
+                                                          int textMaxSize,
+                                                          const glm::dmat4& mvpMatrix,
+                                                        const glm::vec3& orthonormalRight,
+                                                          const glm::vec3& orthonormalUp,
+                                                          const glm::dvec3& cameraPos,
+                                                          const glm::dvec3& cameraLookUp,
+                                                          int renderType) const
+{
+    return render(
+        font,
+        pos,
+        text,
+        { 1.f, 1.f, 1.f, 1.f },
+        { 0.f, 0.f, 0.f, 1.f },
+        textScale,
+        textMinSize,
+        textMaxSize,
+        mvpMatrix,
+        orthonormalRight,
+        orthonormalUp,
+        cameraPos,
+        cameraLookUp,
+        renderType
+    );
 }
 
 void FontRenderer::setFramebufferSize(glm::vec2 framebufferSize) {
