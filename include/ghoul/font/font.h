@@ -106,17 +106,12 @@ public:
         friend class Font;
 
         /// The default constructor for a Glyph
-        Glyph(wchar_t character,
-              int width = 0,
-              int height = 0,
-              float leftBearing = 0.f,
-              float topBearing = 0.f,
-              float advanceX = 0.f,
-              float advanceY = 0.f,
-              glm::vec2 texCoordTopLeft = glm::vec2(0.f),
-              glm::vec2 texCoordBottomRight = glm::vec2(0.f),
-              glm::vec2 outlineTexCoordTopLeft = glm::vec2(0.f),
-              glm::vec2 outlineTexCoordBottomRight = glm::vec2(0.f)
+        Glyph(wchar_t character, int width = 0, int height = 0, float leftBearing = 0.f,
+            float topBearing = 0.f, float advanceX = 0.f, float advanceY = 0.f,
+            glm::vec2 texCoordTopLeft = glm::vec2(0.f),
+            glm::vec2 texCoordBottomRight = glm::vec2(0.f),
+            glm::vec2 outlineTexCoordTopLeft = glm::vec2(0.f),
+            glm::vec2 outlineTexCoordBottomRight = glm::vec2(0.f)
         );
 
         bool operator==(const Glyph& rhs) const;
@@ -230,6 +225,7 @@ public:
 
         /// Normalized texture coordinate of top-left corner
         glm::vec2 _topLeft;
+
         /// Normalized texture coordinate of bottom-right corner
         glm::vec2 _bottomRight;
 
@@ -272,7 +268,7 @@ public:
      *
      * \return The name of the Font
      */
-    std::string name() const;
+    const std::string& name() const;
 
     /**
      * Returns the font size of this Font.

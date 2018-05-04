@@ -73,13 +73,13 @@ Directory Directory::parentDirectory([[maybe_unused]] AbsolutePath absolutePath)
     if (_directoryPath.back() == FileSystem::PathSeparator) {
         return Directory(
             _directoryPath + "..",
-            absolutePath == AbsolutePath::Yes ? RawPath::No : RawPath::Yes
+            absolutePath ? RawPath::No : RawPath::Yes
         );
     }
     else {
         return Directory(
             _directoryPath + FileSystem::PathSeparator + "..",
-            absolutePath == AbsolutePath::Yes ? RawPath::No : RawPath::Yes
+            absolutePath ? RawPath::No : RawPath::Yes
         );
     }
 #else

@@ -62,8 +62,9 @@ static int vscprintf(const char* format, va_list pargs) {
 #endif
 
 namespace {
-    const float PointConversionFactor = 64.f;  // Sizes in FT are given in 1/64th of pt
-    const int DPI = 96;
+    // Sizes in FT are given in 1/64th of pt
+    constexpr const float PointConversionFactor = 64.f;
+    constexpr const int DPI = 96;
 
     // Initializes the passed 'library' and loads the font face specified by the 'name'
     // and 'size' into the provided 'face'
@@ -142,17 +143,10 @@ Font::FreeTypeException::FreeTypeException(std::string name, float size, int cod
     , errorMessage(std::move(msg))
 {}
 
-Font::Glyph::Glyph(wchar_t character,
-                   int width,
-                   int height,
-                   float leftBearing,
-                   float topBearing,
-                   float advanceX,
-                   float advanceY,
-                   glm::vec2 texCoordTopLeft,
-                   glm::vec2 texCoordBottomRight,
-                   glm::vec2 outlineTexCoordTopLeft,
-                   glm::vec2 outlineTexCoordBottomRight)
+Font::Glyph::Glyph(wchar_t character, int width, int height, float leftBearing,
+                   float topBearing, float advanceX, float advanceY,
+                   glm::vec2 texCoordTopLeft, glm::vec2 texCoordBottomRight,
+                   glm::vec2 outlineTexCoordTopLeft, glm::vec2 outlineTexCoordBottomRight)
     : _charcode(std::move(character))
     , _width(width)
     , _height(height)
@@ -233,7 +227,7 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
     ghoul_assert(_pointSize > 0.f, "Need positive point size");
 
     // Get font metrics at higher resolution for increased accuracy
-    static const float HighFaceResolutionFactor = 100.f;
+    constexpr const float HighFaceResolutionFactor = 100.f;
 
     FT_Library library;
     FT_Face face;
@@ -248,7 +242,7 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
     glyph(static_cast<wchar_t>(-1));
 }
 
-std::string Font::name() const {
+const std::string& Font::name() const {
     return _name;
 }
 
@@ -277,8 +271,8 @@ glm::vec2 Font::boundingBox(const std::string& text) {
         float width = 0.f;
         float height = 0.f;
         for (size_t j = 0 ; j < line.size(); ++j) {
-            const Font::Glyph* g = glyph(line[j]);
-            if (g != nullptr) {
+            const Font::Glyph* const g = glyph(line[j]);
+            if (g) {
                 if (j > 0) {
                     width += g->kerning(line[j - 1]);
                 }
@@ -296,8 +290,6 @@ glm::vec2 Font::boundingBox(const std::string& text) {
 }
 
 const Font::Glyph* Font::glyph(wchar_t character) {
-    using TextureAtlas = opengl::TextureAtlas;
-
     // Check if charcode has been already loaded
     for (const Glyph& g : _glyphs) {
         if (g._charcode == character) {
@@ -308,7 +300,7 @@ const Font::Glyph* Font::glyph(wchar_t character) {
     // charcode -1 is special: it is used for line drawing (overline, underline,
     // strikethrough) and background.
     if (character == static_cast<wchar_t>(-1)) {
-        TextureAtlas::RegionHandle handle = _atlas.newRegion(4, 4);
+        opengl::TextureAtlas::RegionHandle handle = _atlas.newRegion(4, 4);
         // The last *4 for the depth is not a danger here as _atlas.setRegion only
         // extracts as much data as is needed for the used texture atlas
         std::array<unsigned char, 4*4*4> data;
@@ -327,12 +319,12 @@ const Font::Glyph* Font::glyph(wchar_t character) {
     }
 
     // Glyph has not been already loaded
-    loadGlyphs({character});
+    loadGlyphs({ character });
     return &(_glyphs.back());
 }
 
 float Font::computeLeftBearing(wchar_t charcode) const {
-    const float HighResolutionFactor = 10.f;
+    constexpr const float HighResolutionFactor = 10.f;
     FT_Library library = nullptr;
     FT_Face face = nullptr;
     loadFace(_name, _pointSize * HighResolutionFactor, library, face);
@@ -473,11 +465,11 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             width = outlineBitmap->bitmap.width / atlasDepth;
             height = outlineBitmap->bitmap.rows;
 
-            TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
+            opengl::TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
             if (outlineBitmap->bitmap.buffer) {
                 _atlas.setRegionData(handle, outlineBitmap->bitmap.buffer);
             }
-            ghoul::opengl::TextureAtlas::TextureCoordinatesResult res =
+            opengl::TextureAtlas::TextureCoordinatesResult res =
                 _atlas.textureCoordinates(handle);
             outlineTopLeft = res.topLeft;
             outlineBottomRight = res.bottomRight;
@@ -499,7 +491,7 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         width = std::max(width, insideBitmap->bitmap.width / atlasDepth);
         height = std::max(height, insideBitmap->bitmap.rows);
 
-        TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
+        opengl::TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
 
         // If we don't have an outline for this font, our current 'width' and 'height'
         // corresponds to the buffer, so we can just use it straight away.
@@ -544,10 +536,13 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
 
             // We need to offset the texture coordinates by half of the width and height
             // differences
-            ghoul::opengl::TextureAtlas::TextureCoordinatesResult res =
-                _atlas.textureCoordinates(handle,
-                    glm::ivec4(widthOffset / 4.f, heightOffset / 4.f,
-                           widthOffset / 4.f, heightOffset / 4.f)
+            opengl::TextureAtlas::TextureCoordinatesResult res =
+                _atlas.textureCoordinates(
+                    handle,
+                    glm::ivec4(
+                        widthOffset / 4.f, heightOffset / 4.f, 
+                        widthOffset / 4.f, heightOffset / 4.f
+                    )
                 );
             topLeft = res.topLeft;
             bottomRight = res.bottomRight;

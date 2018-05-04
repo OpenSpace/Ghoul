@@ -132,16 +132,11 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
         }
     }
 
-    Font::Outline outline =
-        withOutline == Outline::Yes ?
-        Font::Outline::Yes :
-        Font::Outline::No;
-
     std::shared_ptr<Font> f = std::make_shared<Font>(
         _fontPaths[hashName],
         fontSize,
         _textureAtlas,
-        outline
+        withOutline ? Font::Outline::Yes : Font::Outline::No
     );
 
     if (loadGlyphs) {

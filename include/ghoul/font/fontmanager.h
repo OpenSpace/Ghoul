@@ -111,8 +111,7 @@ public:
      * \pre \p name must not be empty
      */
     std::shared_ptr<Font> font(const std::string& name, float fontSize,
-        Outline withOutline = Outline::Yes,
-        LoadGlyphs loadGlyphs = LoadGlyphs::Yes);
+        Outline withOutline = Outline::Yes, LoadGlyphs loadGlyphs = LoadGlyphs::Yes);
 
     /**
      * Retrieves the Font with the hashed name <code>hashName</code>, which must have been
@@ -135,8 +134,7 @@ public:
      *         error occurred
      */
     std::shared_ptr<Font> font(unsigned int hashName, float fontSize,
-        Outline withOutline = Outline::Yes,
-        LoadGlyphs loadGlyphs = LoadGlyphs::Yes);
+        Outline withOutline = Outline::Yes, LoadGlyphs loadGlyphs = LoadGlyphs::Yes);
 
 private:
     FontManager(const FontManager& rhs) = delete;
