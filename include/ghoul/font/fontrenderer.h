@@ -316,16 +316,16 @@ private:
     glm::vec2 _framebufferSize;
 
     /// The ProgramObject that is used to render the text
-    std::unique_ptr<opengl::ProgramObject> _program;
+    std::unique_ptr<opengl::ProgramObject> _program = nullptr;
 
     /// The vertex array object holding the other OpenGL objects
-    unsigned int _vao;
+    unsigned int _vao = 0;
 
     /// The vertex buffer object that contains the vertices for the text to be rendered
-    unsigned int _vbo;
+    unsigned int _vbo = 0;
 
     /// The index buffer object that allows reusing vertices to form one quad per glyph
-    unsigned int _ibo;
+    unsigned int _ibo = 0;
 
     UniformCache(baseColor, outlineColor, texture, hasOutline, projection, mvpMatrix
         /*textMinSize*/) _uniformCache;

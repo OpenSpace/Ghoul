@@ -35,22 +35,9 @@
 #include <ghoul/opengl/texture.h>
 #include <ghoul/opengl/textureatlas.h>
 #include <ghoul/opengl/textureunit.h>
-#include <cstdarg>
 #include <fstream>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>
-
-#ifdef WIN32
-#define vscprintf(f,a) _vscprintf(f,a)
-#else
-static int vscprintf(const char* format, va_list pargs) {
-    va_list argcopy;
-    va_copy(argcopy, pargs);
-    int retval = vsnprintf(nullptr, 0, format, argcopy);
-    va_end(argcopy);
-    return retval;
-}
-#endif
+#include <numeric>
 
 namespace {
     constexpr const char* _loggerCat = "FontRenderer";
@@ -169,12 +156,7 @@ namespace ghoul::fontrendering {
 std::unique_ptr<FontRenderer> FontRenderer::_defaultRenderer = nullptr;
 std::unique_ptr<FontRenderer> FontRenderer::_defaultProjectionRenderer = nullptr;
 
-FontRenderer::FontRenderer()
-    : _program(nullptr)
-    , _vao(0)
-    , _vbo(0)
-    , _ibo(0)
-{
+FontRenderer::FontRenderer() {
     glGenVertexArrays(1, &_vao);
     glGenBuffers(1, &_vbo);
     glGenBuffers(1, &_ibo);
@@ -372,30 +354,48 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec4& color,
                                                       const glm::vec4& outlineColor) const
 {
-    float h = font.height();
-
     const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
 
     glDisable(GL_DEPTH_TEST);
-    glEnablei(GL_BLEND, 0);
+    glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     _program->activate();
 
-    unsigned int vertexIndex = 0;
-    std::vector<GLuint> indices;
-    std::vector<GLfloat> vertices;
-    glm::vec2 movingPos = pos;
+    struct Vertex {
+        float x;
+        float y;
+        float s;
+        float t;
+        float outlineS;
+        float outlineT;
+    };
 
+    int nCharacters = std::accumulate(
+        lines.begin(),
+        lines.end(),
+        0,
+        [](int lhs, const std::string& rhs) { return static_cast<int>(rhs.size()) + lhs; }
+    );
+    std::vector<Vertex> vertices;
+    vertices.reserve(nCharacters * 4); // each character is four vertices
+
+    std::vector<GLushort> indices;
+    indices.reserve(nCharacters * 3); // each character is two triangles
+
+
+    GLushort vertexIndex = 0;
     glm::vec2 size = glm::vec2(0.f);
+    glm::vec2 movingPos = pos;
     for (const std::string& line : lines) {
         movingPos.x = pos.x;
         float width = 0.f;
         float height = 0.f;
         for (size_t j = 0; j < line.size(); ++j) {
             wchar_t character = line[j];
-            if (character == wchar_t('\t'))
+            if (character == wchar_t('\t')) {
                 character = wchar_t(' ');
+            }
 
             const Font::Glyph* glyph;
             try {
@@ -405,51 +405,45 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 glyph = font.glyph(wchar_t(' '));
             }
 
-            if (j > 0)
+            if (j > 0) {
                 movingPos.x += glyph->kerning(line[j - 1]);
+            }
 
-            float x0 = movingPos.x + glyph->leftBearing();
-            float y0 = movingPos.y + glyph->topBearing();
-            float s0 = glyph->topLeft().x;
-            float t0 = glyph->topLeft().y;
-            float outlineS0 = glyph->outlineTopLeft().x;
-            float outlineT0 = glyph->outlineTopLeft().y;
+            const float x0 = movingPos.x + glyph->leftBearing();
+            const float y0 = movingPos.y + glyph->topBearing();
+            const float s0 = glyph->topLeft().x;
+            const float t0 = glyph->topLeft().y;
+            const float outlineS0 = glyph->outlineTopLeft().x;
+            const float outlineT0 = glyph->outlineTopLeft().y;
 
-            float x1 = x0 + glyph->width();
-            float y1 = y0 - glyph->height();
-            float s1 = glyph->bottomRight().x;
-            float t1 = glyph->bottomRight().y;
-            float outlineS1 = glyph->outlineBottomRight().x;
-            float outlineT1 = glyph->outlineBottomRight().y;
+            const float x1 = x0 + glyph->width();
+            const float y1 = y0 - glyph->height();
+            const float s1 = glyph->bottomRight().x;
+            const float t1 = glyph->bottomRight().y;
+            const float outlineS1 = glyph->outlineBottomRight().x;
+            const float outlineT1 = glyph->outlineBottomRight().y;
 
             indices.insert(indices.end(), {
-                vertexIndex, vertexIndex + 1, vertexIndex + 2,
-                vertexIndex, vertexIndex + 2, vertexIndex + 3
-                });
+                vertexIndex, vertexIndex + 1u, vertexIndex + 2u,
+                vertexIndex, vertexIndex + 2u, vertexIndex + 3u
+            });
             vertexIndex += 4;
             vertices.insert(vertices.end(), {
-                x0, y0, s0, t0, outlineS0, outlineT0,
-                x0, y1, s0, t1, outlineS0, outlineT1,
-                x1, y1, s1, t1, outlineS1, outlineT1,
-                x1, y0, s1, t0, outlineS1, outlineT0
-                });
+                { x0, y0, s0, t0, outlineS0, outlineT0 },
+                { x0, y1, s0, t1, outlineS0, outlineT1 },
+                { x1, y1, s1, t1, outlineS1, outlineT1 },
+                { x1, y0, s1, t0, outlineS1, outlineT0 }
+            });
             movingPos.x += glyph->horizontalAdvance();
 
             width += glyph->horizontalAdvance();
             height = std::max(height, static_cast<float>(glyph->height()));
         }
         size.x = std::max(size.x, width);
-        size.y += height;
-        movingPos.y -= h;
+        //size.y += height;
+        movingPos.y -= font.height();
     }
     size.y = (lines.size() - 1) * font.height();
-
-    glm::mat4 projection = glm::ortho(
-        0.f,
-        _framebufferSize.x,
-        0.f,
-        _framebufferSize.y
-    );
 
     opengl::TextureUnit atlasUnit;
     atlasUnit.activate();
@@ -459,14 +453,17 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     _program->setUniform(_uniformCache.outlineColor, outlineColor);
     _program->setUniform(_uniformCache.texture, atlasUnit);
     _program->setUniform(_uniformCache.hasOutline, font.hasOutline());
-    _program->setUniform(_uniformCache.projection, projection);
+    _program->setUniform(
+        _uniformCache.projection,
+        glm::ortho(0.f, _framebufferSize.x, 0.f, _framebufferSize.y)
+    );
 
     glBindVertexArray(_vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBufferData(
         GL_ARRAY_BUFFER,
-        vertices.size() * sizeof(float),
+        vertices.size() * sizeof(Vertex),
         vertices.data(),
         GL_DYNAMIC_DRAW
     );
@@ -474,36 +471,42 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
-        indices.size() * sizeof(GLuint),
+        indices.size() * sizeof(GLushort),
         indices.data(),
         GL_DYNAMIC_DRAW
     );
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
 
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(
-        1, 2, GL_FLOAT, GL_FALSE,
-        6 * sizeof(float), reinterpret_cast<const void*>(2 * sizeof(float))
+        1,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(Vertex),
+        reinterpret_cast<const void*>(offsetof(Vertex, s))
     );
 
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(
-        2, 2, GL_FLOAT, GL_FALSE,
-        6 * sizeof(float), reinterpret_cast<const void*>(4 * sizeof(float))
+        2,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(Vertex),
+        reinterpret_cast<const void*>(offsetof(Vertex, outlineS))
     );
 
     glDrawElements(
         GL_TRIANGLES,
         static_cast<GLsizei>(indices.size()),
-        GL_UNSIGNED_INT,
+        GL_UNSIGNED_SHORT,
         nullptr
     );
 
     glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glEnable(GL_DEPTH_TEST);
 
     return { size, static_cast<int>(lines.size()) };
@@ -526,7 +529,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 {
     float h = font.height();
 
-    std::vector<std::string> lines = ghoul::tokenizeString(text, '\n');
+    const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
 
     unsigned int vertexIndex = 0;
     std::vector<GLuint> indices;
@@ -545,8 +548,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         float height = 0.f;
         for (size_t j = 0; j < line.size(); ++j) {
             wchar_t character = line[j];
-            if (character == wchar_t('\t'))
+            if (character == wchar_t('\t')) {
                 character = wchar_t(' ');
+            }
 
             const Font::Glyph* glyph;
             try {
@@ -650,12 +654,12 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 p1.x, p1.y, p1.z, s0, t1, outlineS0, outlineT1,
                 p2.x, p2.y, p2.z, s1, t1, outlineS1, outlineT1,
                 p3.x, p3.y, p3.z, s1, t0, outlineS1, outlineT0
-                });
+            });
 
             indices.insert(indices.end(), {
                 vertexIndex, vertexIndex + 1, vertexIndex + 2,
                 vertexIndex, vertexIndex + 2, vertexIndex + 3
-                });
+            });
             vertexIndex += 4;
 
             movingPos.x += glyph->horizontalAdvance();
