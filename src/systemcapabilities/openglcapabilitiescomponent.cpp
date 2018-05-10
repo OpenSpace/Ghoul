@@ -82,14 +82,7 @@ void OpenGLCapabilitiesComponent::detectGLSLVersion() {
 }
 
 void OpenGLCapabilitiesComponent::detectGPUVendor() {
-    const char* vendor =
-        reinterpret_cast<const char*>(glGetString(GL_VENDOR));
-    if (vendor) {
-        _glslCompiler = std::string(vendor);
-    }
-    else {
-        throw GPUVendorError("Detection the GPU Vendor failed");
-    }
+    _glslCompiler = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
 
     if (_glslCompiler.find("NVIDIA") != std::string::npos) {
         _vendor = Vendor::Nvidia;
@@ -97,8 +90,8 @@ void OpenGLCapabilitiesComponent::detectGPUVendor() {
     else if (_glslCompiler.find("ATI") != std::string::npos) {
         _vendor = Vendor::ATI;
     }
-    else if ((_glslCompiler.find("INTEL") != std::string::npos)
-        || (_glslCompiler.find("Intel") != std::string::npos))
+    else if ((_glslCompiler.find("INTEL") != std::string::npos) ||
+             (_glslCompiler.find("Intel") != std::string::npos))
     {
         _vendor = Vendor::Intel;
     }
@@ -112,7 +105,7 @@ void OpenGLCapabilitiesComponent::detectGPUVendor() {
 }
 
 void OpenGLCapabilitiesComponent::detectGLRenderer() {
-    _glRenderer = std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
+    _glRenderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
 }
 
 void OpenGLCapabilitiesComponent::detectExtensions() {
@@ -121,7 +114,7 @@ void OpenGLCapabilitiesComponent::detectExtensions() {
     for (GLint i = 0; i < nExtensions; ++i) {
         const GLubyte* ext = glGetStringi(GL_EXTENSIONS, i);
         if (ext) {
-            const std::string extension = std::string(reinterpret_cast<const char*>(ext));
+            std::string extension = std::string(reinterpret_cast<const char*>(ext));
             _extensions.push_back(extension);
         }
     }
@@ -134,12 +127,8 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
     std::string driverDateFull;
     queryWMI("Win32_VideoController", "DriverDate", driverDateFull);
 
-    std::stringstream dateStream;
-    dateStream << driverDateFull.substr(0,4) << "-"
-        << driverDateFull.substr(4,2) << "-"
-        << driverDateFull.substr(6,2);
-    _driverDate = dateStream.str();
-
+    _driverDate = driverDateFull.substr(0, 4) + '-' + driverDateFull.substr(4, 2) + '-' +
+        driverDateFull.substr(6, 2);
 
     queryWMI("Win32_VideoController", "AdapterRAM", _adapterRAM);
     // adapterRAM is in bytes

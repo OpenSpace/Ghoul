@@ -51,9 +51,6 @@
 
 namespace std {
     std::string to_string(
-        ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem os);
-
-    std::string to_string(
         ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem os)
     {
         using OS =
@@ -477,14 +474,16 @@ void GeneralCapabilitiesComponent::detectCPU() {
         __cpuid(CPUInfo, i);
 
         // Interpret CPU brand string and cache information.
-        if (i == 0x80000002)
+        if (i == 0x80000002) {
             memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-        else if (i == 0x80000003)
+        }
+        else if (i == 0x80000003) {
             memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-        else if (i == 0x80000004)
+        }
+        else if (i == 0x80000004) {
             memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
-        else if (i == 0x80000006)
-        {
+        }
+        else if (i == 0x80000006) {
             _cacheLineSize = CPUInfo[2] & 0xff;
             _L2Associativity = (CPUInfo[2] >> 12) & 0xf;
             _cacheSize = (CPUInfo[2] >> 16) & 0xffff;
@@ -493,9 +492,8 @@ void GeneralCapabilitiesComponent::detectCPU() {
 
     // Get extensions list
     std::stringstream extensions;
-    if (nFeatureInfo || bSSE3NewInstructions ||
-        bMONITOR_MWAIT || bCPLQualifiedDebugStore ||
-        bThermalMonitor2)
+    if (nFeatureInfo || bSSE3NewInstructions || bMONITOR_MWAIT ||
+        bCPLQualifiedDebugStore || bThermalMonitor2)
     {
 
         if (bSSE3NewInstructions) {
@@ -687,7 +685,7 @@ std::string GeneralCapabilitiesComponent::operatingSystemString() const {
     return std::to_string(_operatingSystem) + " " + _operatingSystemExtra;
 }
 
-std::string GeneralCapabilitiesComponent::fullOperatingSystem() const {
+const std::string& GeneralCapabilitiesComponent::fullOperatingSystem() const {
     return _fullOperatingSystem;
 }
 
@@ -711,7 +709,7 @@ unsigned int GeneralCapabilitiesComponent::cacheSize() const {
     return _cacheSize;
 }
 
-std::string GeneralCapabilitiesComponent::extensions() const {
+const std::string& GeneralCapabilitiesComponent::extensions() const {
     return _extensions;
 }
 

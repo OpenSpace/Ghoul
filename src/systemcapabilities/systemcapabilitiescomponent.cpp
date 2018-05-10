@@ -68,8 +68,8 @@ from_string(const std::string& str)
 namespace ghoul::systemcapabilities {
 
 #ifdef GHOUL_USE_WMI
-    IWbemLocator* SystemCapabilitiesComponent::_iwbemLocator = nullptr;
-    IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
+IWbemLocator* SystemCapabilitiesComponent::_iwbemLocator = nullptr;
+IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
 
 SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, HRESULT code)
     : RuntimeError(msg + ". Error Code: " + std::to_string(code), "WMI")
@@ -99,7 +99,8 @@ SystemCapabilitiesComponent::~SystemCapabilitiesComponent() {
 
 #ifdef GHOUL_USE_WMI
 void SystemCapabilitiesComponent::initializeWMI() {
-    const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
+    constexpr const char* _loggerCat = "SystemCapabilitiesComponent.WMI";
+
     ghoul_assert(!isWMIInitialized(), "WMI must not have been initialized");
 
     LDEBUG("Begin initializing WMI");
@@ -173,7 +174,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
 }
 
 void SystemCapabilitiesComponent::deinitializeWMI() {
-    const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
+    constexpr const char* _loggerCat = "SystemCapabilitiesComponent.WMI";
     ghoul_assert(isWMIInitialized(), "WMI must have been initialized");
 
     LDEBUG("Deinitializing WMI.");
@@ -210,8 +211,9 @@ bool SystemCapabilitiesComponent::isWMIInitialized() {
 }
 
 VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
-                                               const std::string& attribute) {
-    const std::string _loggerCat = "SystemCapabilitiesComponent.WMI";
+                                               const std::string& attribute)
+{
+    constexpr const char* _loggerCat = "SystemCapabilitiesComponent.WMI";
     ghoul_assert(isWMIInitialized(), "WMI must have been initialized");
     ghoul_assert(!wmiClass.empty(), "wmiClass must not be empty");
     ghoul_assert(!attribute.empty(), "Attribute must not be empty");
@@ -234,21 +236,10 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
     ULONG returnValue = 0;
     HRESULT hr = S_OK;
     if (enumerator) {
-        hr = enumerator->Next(
-            WBEM_INFINITE,
-            1,
-            &pclsObject,
-            &returnValue
-        );
+        hr = enumerator->Next(WBEM_INFINITE, 1, &pclsObject, &returnValue );
         if (!FAILED(hRes) && returnValue) {
             result = new VARIANT;
-            hr = pclsObject->Get(
-                LPCWSTR(str2wstr(attribute).c_str()),
-                0,
-                result,
-                0,
-                0
-            );
+            hr = pclsObject->Get(LPCWSTR(str2wstr(attribute).c_str()), 0, result, 0, 0);
         }
     }
 

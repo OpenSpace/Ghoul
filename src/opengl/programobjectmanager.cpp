@@ -75,7 +75,7 @@ void ProgramObjectManager::releaseAll(Warnings emitWarnings) {
 }
 
 ProgramObject* ProgramObjectManager::requestProgramObject(const std::string& name,
-                  const std::function<std::unique_ptr<ProgramObject>()>& creationFunction)
+                                                 const CreationCallback& creationFunction)
 {
     auto it = _programs.find(name);
     if (it == _programs.end()) {
@@ -102,7 +102,7 @@ ProgramObject* ProgramObjectManager::requestProgramObject(const std::string& nam
 }
 
 void ProgramObjectManager::releaseProgramObject(const std::string& name,
-                           const std::function<void(ProgramObject*)>& destructionFunction)
+                                           const DestructionCallback& destructionFunction)
 {
     auto it = _programs.find(name);
     ghoul_assert(it != _programs.end(), "Could not find ProgramObject '" + name + "'");

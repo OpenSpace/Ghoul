@@ -67,10 +67,10 @@ void SystemCapabilities::clearCapabilities() {
 void SystemCapabilities::logCapabilities(
                                   SystemCapabilitiesComponent::Verbosity verbosity) const
 {
-    for (const std::unique_ptr<SystemCapabilitiesComponent>& c : _components) {
-        std::vector<SystemCapabilitiesComponent::CapabilityInformation> caps =
-            c->capabilities();
-        for (const SystemCapabilitiesComponent::CapabilityInformation& cap : caps) {
+    using SCC = SystemCapabilitiesComponent;
+    for (const std::unique_ptr<SCC>& c : _components) {
+        const std::vector<SCC::CapabilityInformation>& caps = c->capabilities();
+        for (const SCC::CapabilityInformation& cap : caps) {
             if (verbosity >= cap.verbosity) {
                 LINFOC(
                     "SystemCapabilitiesComponent." + c->name(),
@@ -89,9 +89,7 @@ void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponen
         _components.begin(),
         _components.end(),
         [&comp](const std::unique_ptr<SystemCapabilitiesComponent>& rhs) {
-            auto& c = *comp;
-            auto& r = *rhs;
-            return typeid(c) == typeid(r);
+            return typeid(*comp) == typeid(*rhs);
         }
     );
 

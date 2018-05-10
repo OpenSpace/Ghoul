@@ -260,7 +260,7 @@ void ProgramObject::setProgramObjectCallback(ProgramObjectCallback changeCallbac
         _programIsDirty = true;
         changeCallback(this);
     };
-    for (const auto& shaderObject : _shaderObjects) {
+    for (const std::shared_ptr<ShaderObject>& shaderObject : _shaderObjects) {
         shaderObject->setShaderObjectCallback(c);
     }
 }

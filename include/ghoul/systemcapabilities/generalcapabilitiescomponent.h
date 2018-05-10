@@ -122,7 +122,7 @@ public:
      *
      * \return The operating system as a parsed string
      */
-    std::string fullOperatingSystem() const;
+    const std::string& fullOperatingSystem() const;
 
     /**
      * Returns the amount of available, installed main memory (RAM) on the system in MB.
@@ -166,7 +166,7 @@ public:
      *
      * \return The extension
      */
-    std::string extensions() const;
+    const std::string& extensions() const;
 
     /**
      * Returns the <code>CPU</code> string.

@@ -28,8 +28,8 @@
 #ifndef __GHOUL___BUFFER___H__
 #define __GHOUL___BUFFER___H__
 
+#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
-
 #include <string>
 #include <vector>
 
@@ -45,7 +45,7 @@ namespace ghoul {
  */
 class Buffer {
 public:
-    enum class Compress { Yes, No };
+    BooleanType(Compress);
 
     using value_type = unsigned char;
     using size_type = std::vector<value_type>::size_type;
