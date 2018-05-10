@@ -534,7 +534,7 @@ if (statResult == 0) {
     }
     else {
         int removeSuccess = remove(fullName.c_str());
-        if (removeSuccess != -1) {
+        if (removeSuccess != 0) {
             throw FileSystemException(fmt::format(
                 "Error deleting file '{}' in directory '{}': {}",
                 fullName, path.path(), strerror(errno)

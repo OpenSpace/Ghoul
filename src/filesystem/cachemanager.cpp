@@ -324,7 +324,7 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
 #endif
     // If this directory is empty, we can delete it
     if (isEmpty) {
-        FileSys.deleteDirectory(dir);
+        FileSys.deleteDirectory(dir, FileSystem::Recursive::Yes);
     }
 }
 
