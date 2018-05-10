@@ -30,9 +30,9 @@
 namespace ghoul::logging {
 
 TextLog::TextLog(const std::string& filename, Append writeToAppend,
-        TimeStamping timeStamping, DateStamping dateStamping,
-        CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
-        LogLevel minimumLogLevel)
+                 TimeStamping timeStamping, DateStamping dateStamping,
+                 CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
+                 LogLevel minimumLogLevel)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, minimumLogLevel)
     , _printFooter(writeToAppend)
 {
@@ -61,28 +61,7 @@ void TextLog::log(LogLevel level, const std::string& category,
         writeLine("\n");
     }
     else {
-        std::string output;
-        if (isDateStamping()) {
-            output += "[" + dateString();
-        }
-        if (isTimeStamping()) {
-            output += " | " + timeString();
-        }
-
-        if (isDateStamping() || isTimeStamping()) {
-            output += "] ";
-        }
-        if (isCategoryStamping() && !category.empty()) {
-            output += category + " ";
-        }
-        if (isLogLevelStamping()) {
-            output += "(" + stringFromLevel(level) + ") ";
-        }
-        if (output != "") {
-            output += ":\t";
-        }
-        output += message + '\n';
-        writeLine(std::move(output));
+        writeLine(createFullMessageString(level, category, message) + '\n');
     }
 }
 

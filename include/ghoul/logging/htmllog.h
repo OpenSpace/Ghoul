@@ -116,7 +116,7 @@ protected:
     static std::string colorForLevel(LogLevel level);
 
 private:
-    bool _customStyling;
+    bool _useCustomStyling;
 };
 
 } // namespace ghoul::logging

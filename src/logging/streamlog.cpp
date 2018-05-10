@@ -28,8 +28,8 @@
 namespace ghoul::logging {
 
 StreamLog::StreamLog(std::ostream& stream, TimeStamping timeStamping,
-        DateStamping dateStamping, CategoryStamping categoryStamping,
-        LogLevelStamping logLevelStamping, LogLevel logLevel)
+                     DateStamping dateStamping, CategoryStamping categoryStamping,
+                     LogLevelStamping logLevelStamping, LogLevel logLevel)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, logLevel)
     , _stream(stream)
 {}

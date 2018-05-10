@@ -66,7 +66,7 @@ public:
      * A type definition for a callback function that is called if any of the tracked
      * files is changed.
      */
-    using ProgramObjectCallback = std::function<void(ProgramObject*)>;
+    using ProgramObjectCallback = void(*)(ProgramObject*);
 
     /// Main exception that is thrown by methods of the ProgramObject class
     struct ProgramObjectError : public RuntimeError {

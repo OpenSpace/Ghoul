@@ -243,7 +243,7 @@ const string& ProgramObject::name() const{
 }
 
 void ProgramObject::setDictionary(const Dictionary& dict) {
-    for (const auto& shaderObject : _shaderObjects) {
+    for (const std::shared_ptr<ShaderObject>& shaderObject : _shaderObjects) {
         shaderObject->setDictionary(dict);
     }
 }
@@ -270,9 +270,7 @@ void ProgramObject::attachObject(std::shared_ptr<ShaderObject> shaderObject) {
     auto it = std::find(_shaderObjects.begin(), _shaderObjects.end(), shaderObject);
     ghoul_assert(it == _shaderObjects.end(), "ShaderObject was already registered");
 
-    shaderObject->setShaderObjectCallback([this]() {
-        _programIsDirty = true;
-    });
+    shaderObject->setShaderObjectCallback([this]() { _programIsDirty = true; });
 
     glAttachShader(_id, *shaderObject);
     _shaderObjects.push_back(shaderObject);
@@ -288,7 +286,7 @@ void ProgramObject::detachObject(std::shared_ptr<ShaderObject> shaderObject) {
 }
 
 void ProgramObject::compileShaderObjects() {
-    for (const auto& obj : _shaderObjects) {
+    for (const std::shared_ptr<ShaderObject>& obj : _shaderObjects) {
         obj->compile();
     }
 }
@@ -3784,7 +3782,7 @@ GLint ProgramObject::subroutineUniformLocation(ShaderObject::ShaderType shaderTy
 }
 
 vector<string> ProgramObject::activeSubroutineUniformNames(
-                                                    ShaderObject::ShaderType shaderType)
+                                                      ShaderObject::ShaderType shaderType)
 {
     GLint maximumUniformNameLength;
     glGetProgramStageiv(
@@ -3872,8 +3870,8 @@ vector<string> ProgramObject::compatibleSubroutineNames(
 }
 
 vector<string> ProgramObject::compatibleSubroutineNames(
-                                                ShaderObject::ShaderType shaderType,
-                                                const std::string& subroutineUniformName)
+                                                      ShaderObject::ShaderType shaderType,
+                                                 const std::string& subroutineUniformName)
 {
     ghoul_assert(!subroutineUniformName.empty(), "Name must not be empty");
 

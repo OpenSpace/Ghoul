@@ -540,7 +540,7 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
                 _atlas.textureCoordinates(
                     handle,
                     glm::ivec4(
-                        widthOffset / 4.f, heightOffset / 4.f, 
+                        widthOffset / 4.f, heightOffset / 4.f,
                         widthOffset / 4.f, heightOffset / 4.f
                     )
                 );

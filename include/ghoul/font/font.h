@@ -298,7 +298,7 @@ public:
      * height of the text if it were to be rendered.
      *
      * \param text The text that is rendered to the screen. The <code>text</code> can also
-     *        contain '\\n' to have a linebreak, which is of the correct length for the 
+     *        contain '\\n' to have a linebreak, which is of the correct length for the
      *        selected font.
      * \return The pixel coordinates of the bounding box of the passed text
      */

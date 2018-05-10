@@ -34,12 +34,18 @@ HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend,
                  TimeStamping timeStamping, DateStamping dateStamping,
                  CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
                  const std::vector<std::string>& cssIncludes,
-                 const std::vector<std::string>& jsIncludes,
-                 LogLevel minimumLogLevel)
-    : TextLog(std::move(filename), writeToAppend, timeStamping, dateStamping,
-                categoryStamping, logLevelStamping, minimumLogLevel)
+                 const std::vector<std::string>& jsIncludes, LogLevel minimumLogLevel)
+    : TextLog(
+        std::move(filename),
+        writeToAppend,
+        timeStamping,
+        dateStamping,
+        categoryStamping,
+        logLevelStamping,
+        minimumLogLevel
+    )
 {
-    _customStyling = cssIncludes.size() > 1 || jsIncludes.size() > 1;
+    _useCustomStyling = cssIncludes.size() > 1 || jsIncludes.size() > 1;
 
     std::string output = \
         "<html>\n\
@@ -111,7 +117,7 @@ void HTMLLog::log(LogLevel level, const std::string& category,
                   const std::string& message)
 {
     std::string output;
-    if (_customStyling) {
+    if (_useCustomStyling) {
         output = "\t\t\t<tr class=\"" + classForLevel(level) + "\">\n";
     } else {
         output = "\t\t\t<tr bgcolor=\"" + colorForLevel(level) + "\">\n";
@@ -131,24 +137,23 @@ void HTMLLog::log(LogLevel level, const std::string& category,
     }
 
     output += "\t\t\t\t<td class=\"log-message\">";
-
-    for (const char& c : message) {
+    for (char c : message) {
         switch (c) {
-        case '<':
-            output += "&lt;";
-            break;
-        case '>':
-            output += "&gt;";
-            break;
-        case '&':
-            output += "&amp;";
-            break;
-        case '\n':
-            output += "<br>";
-            break;
-        default:
-            output += c;
-            break;
+            case '<':
+                output += "&lt;";
+                break;
+            case '>':
+                output += "&gt;";
+                break;
+            case '&':
+                output += "&amp;";
+                break;
+            case '\n':
+                output += "<br>";
+                break;
+            default:
+                output += c;
+                break;
         }
     }
 

@@ -45,5 +45,5 @@ TemplateFactoryBase::TemplateConstructionError::TemplateConstructionError(std::s
     : TemplateFactoryError(std::move(msg))
 {}
 
-}
+} // namespace ghoul
 

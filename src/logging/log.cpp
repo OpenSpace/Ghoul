@@ -123,7 +123,7 @@ std::string Log::createFullMessageString(LogLevel level, const std::string& cate
     if (isDateStamping() || isTimeStamping()) {
         output += "] ";
     }
-    if (isCategoryStamping() && (category != "")) {
+    if (isCategoryStamping() && (!category.empty())) {
         output += category + " ";
     }
     if (isLogLevelStamping()) {

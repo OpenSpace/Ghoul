@@ -50,7 +50,7 @@ void SingleCommand<T>::execute(const std::vector<std::string>& parameters) {
     if constexpr (std::is_same_v<T, std::string>) {
         // If we have a string the parameter set might contain an arbitrary number of
         // parameters that we have to concatenate first
-        
+
         // The parameter list contains the command-name as the first argument and we don't
         // want that
         _ptr1 = ghoul::join(
