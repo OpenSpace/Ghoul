@@ -26,6 +26,8 @@
 #ifndef __GHOUL___LUASTATE___H__
 #define __GHOUL___LUASTATE___H__
 
+#include <ghoul/misc/boolean.h>
+
 struct lua_State;
 
 namespace ghoul::lua {
@@ -37,6 +39,8 @@ namespace ghoul::lua {
  */
 class LuaState {
 public:
+    BooleanType(IncludeStandardLibrary);
+
     /**
      * The constructor will create a new Lua state and optionally fill it with the Lua
      * standard libraries, if \p includeStandardLibraries is \c true.
@@ -46,7 +50,7 @@ public:
      *
      * \throw LuaRuntimeException If an error occurs during the state creation
      */
-    explicit LuaState(bool includeStandardLibraries = true);
+    explicit LuaState(IncludeStandardLibrary include = IncludeStandardLibrary::Yes);
 
     /**
      * Destroys the created Lua state and frees all the related memory.

@@ -29,8 +29,8 @@
 
 namespace ghoul::lua {
 
-LuaState::LuaState(bool includeStandardLibraries)
-    : _state(ghoul::lua::createNewLuaState(includeStandardLibraries))
+LuaState::LuaState(IncludeStandardLibrary include)
+    : _state(ghoul::lua::createNewLuaState(include))
 {}
 
 LuaState::LuaState(LuaState&& other) noexcept
