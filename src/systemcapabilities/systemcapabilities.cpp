@@ -89,7 +89,10 @@ void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponen
         _components.begin(),
         _components.end(),
         [&comp](const std::unique_ptr<SystemCapabilitiesComponent>& rhs) {
-            return typeid(*comp) == typeid(*rhs);
+            SystemCapabilitiesComponent* l = comp.get();
+            SystemCapabilitiesComponent* r = rhs.get();
+
+            return typeid(*l) == typeid(*r);
         }
     );
 

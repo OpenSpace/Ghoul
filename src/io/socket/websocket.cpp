@@ -81,7 +81,7 @@ int WebSocket::port() const {
     return _tcpSocket->port();
 }
 
-void WebSocket::disconnect(int reason) {
+void WebSocket::disconnect(int) {
     _tcpSocket->disconnect();
 }
 

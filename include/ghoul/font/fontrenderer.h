@@ -316,7 +316,7 @@ private:
     glm::vec2 _framebufferSize;
 
     /// The ProgramObject that is used to render the text
-    std::unique_ptr<opengl::ProgramObject> _program = nullptr;
+    std::unique_ptr<opengl::ProgramObject> _program;
 
     /// The vertex array object holding the other OpenGL objects
     unsigned int _vao = 0;

@@ -28,6 +28,7 @@
 #include <ghoul/misc/assert.h>
 #include <algorithm>
 #include <sstream>
+#include <string>
 
 #ifdef WIN32
     #include <Windows.h>

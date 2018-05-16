@@ -49,18 +49,6 @@ const struct {
 } FT_Errors[] =
 #include FT_ERRORS_H
 
-#ifdef WIN32
-#define vscprintf(f,a) _vscprintf(f,a)
-#else
-static int vscprintf(const char* format, va_list pargs) {
-    va_list argcopy;
-    va_copy(argcopy, pargs);
-    int retval = vsnprintf(nullptr, 0, format, argcopy);
-    va_end(argcopy);
-    return retval;
-}
-#endif
-
 namespace {
     // Sizes in FT are given in 1/64th of pt
     constexpr const float PointConversionFactor = 64.f;
@@ -384,8 +372,6 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             FT_Errors[error].message \
         ); \
     }
-
-    using TextureAtlas = opengl::TextureAtlas;
 
     unsigned int atlasDepth  = _atlas.size().z;
 

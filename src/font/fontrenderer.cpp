@@ -423,10 +423,13 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             const float outlineS1 = glyph->outlineBottomRight().x;
             const float outlineT1 = glyph->outlineBottomRight().y;
 
-            indices.insert(indices.end(), {
-                vertexIndex, vertexIndex + 1u, vertexIndex + 2u,
-                vertexIndex, vertexIndex + 2u, vertexIndex + 3u
-            });
+            // These variables are necessary as the insertion would otherwise produce a
+            // narrowing error on clang
+            const GLushort idx = vertexIndex;
+            const GLushort idx1 = vertexIndex + 1;
+            const GLushort idx2 = vertexIndex + 2;
+            const GLushort idx3 = vertexIndex + 3;
+            indices.insert(indices.end(), { idx, idx1, idx2, idx, idx2, idx3 });
             vertexIndex += 4;
             vertices.insert(vertices.end(), {
                 { x0, y0, s0, t0, outlineS0, outlineT0 },
