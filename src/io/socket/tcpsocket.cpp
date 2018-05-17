@@ -322,7 +322,7 @@ void TcpSocket::establishConnection(addrinfo *info) {
     }
 
     // Try to connect
-    result = ::connect(_socket, info->ai_addr, static_cast<int>(info->ai_addrlen));
+    ::connect(_socket, info->ai_addr, static_cast<int>(info->ai_addrlen));
     _isConnected = true;
     _isConnecting = false;
 }
