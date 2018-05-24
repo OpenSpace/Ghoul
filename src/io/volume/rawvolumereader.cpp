@@ -36,7 +36,9 @@ namespace {
 
 namespace ghoul::io {
 
-RawVolumeReader::ReadHints::ReadHints(glm::ivec3 dimensions) : _dimensions(dimensions) {}
+RawVolumeReader::ReadHints::ReadHints(glm::ivec3 dimensions)
+    : _dimensions(std::move(dimensions))
+{}
 
 RawVolumeReader::RawVolumeReader(ReadHints hints)
     : _hints(std::move(hints))
@@ -51,32 +53,31 @@ void RawVolumeReader::setReadHints(ReadHints hints) {
 }
 
 std::unique_ptr<opengl::Texture> RawVolumeReader::read(const std::string& filename) {
-    if (_hints._dimensions != glm::ivec3(0)) {
-        unsigned int size =
-            _hints._dimensions.x * _hints._dimensions.y * _hints._dimensions.z;
-        GLubyte* data = new GLubyte[size];
-
-        std::ifstream fin(filename, std::ios::in | std::ios::binary);
-        if( fin.good() ){
-            fin.read(reinterpret_cast<char*>(data), sizeof(unsigned char) * size);
-            fin.close();
-        } else {
-            LERROR(fmt::format("Could not open file {}", filename));
-        }
-
-        return std::make_unique<opengl::Texture>(
-            data,
-            glm::size3_t(_hints._dimensions),
-            _hints._format,
-            _hints._internalFormat,
-            GL_UNSIGNED_BYTE,
-            opengl::Texture::FilterMode::Linear,
-            opengl::Texture::WrappingMode::ClampToBorder
-        );
-    } else {
+    if (_hints._dimensions == glm::ivec3(0)) {
         LERROR(fmt::format("Volume dimensions not set for file {}", filename));
         return nullptr;
     }
+
+    unsigned int s = _hints._dimensions.x * _hints._dimensions.y * _hints._dimensions.z;
+    GLubyte* data = new GLubyte[s];
+
+    std::ifstream fin(filename, std::ios::in | std::ios::binary);
+    if (fin.good()) {
+        fin.read(reinterpret_cast<char*>(data), sizeof(unsigned char) * s);
+        fin.close();
+    } else {
+        LERROR(fmt::format("Could not open file {}", filename));
+    }
+
+    return std::make_unique<opengl::Texture>(
+        data,
+        glm::size3_t(_hints._dimensions),
+        _hints._format,
+        _hints._internalFormat,
+        GL_UNSIGNED_BYTE,
+        opengl::Texture::FilterMode::Linear,
+        opengl::Texture::WrappingMode::ClampToBorder
+    );
 }
 
 } // namespace ghoul::io
