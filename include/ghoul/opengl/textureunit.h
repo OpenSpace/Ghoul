@@ -156,7 +156,7 @@ private:
 
     /// <code>true</code> if the list of busy units and the maximum number of units have
     /// been initialized
-    static bool _initialized;
+    static bool _isInitialized;
 
     /// The total number of active texture unit
     static unsigned int _totalActive;

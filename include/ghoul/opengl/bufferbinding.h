@@ -126,7 +126,7 @@ private:
 
     /// <code>true</code> if the list of busy bindings and the maximum number of bindings
     /// have been initialized
-    static bool _initialized;
+    static bool _isInitialized;
 
     // assigned
     bool _assigned = false;

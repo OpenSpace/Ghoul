@@ -33,7 +33,7 @@ TextureUnit::TextureUnitError::TextureUnitError(std::string msg)
     : RuntimeError(std::move(msg), "TextureUnit")
 {}
 
-bool TextureUnit::_initialized = false;
+bool TextureUnit::_isInitialized = false;
 unsigned int TextureUnit::_totalActive = 0;
 unsigned int TextureUnit::_maxTexUnits = 0;
 std::vector<bool> TextureUnit::_busyUnits = std::vector<bool>();
@@ -43,7 +43,7 @@ TextureUnit::TextureUnit()
     , _glEnum(GLenum(0))
     , _assigned(false)
 {
-    if (!_initialized) {
+    if (!_isInitialized) {
         initialize();
     }
 }
@@ -119,7 +119,7 @@ void TextureUnit::initialize() {
         _maxTexUnits = 8; // Reasonable default setting for OpenGL
     }
     _busyUnits = std::vector<bool>(_maxTexUnits, false);
-    _initialized = true;
+    _isInitialized = true;
 }
 
 } // namespace ghoul::opengl

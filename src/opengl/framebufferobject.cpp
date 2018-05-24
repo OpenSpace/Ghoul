@@ -156,7 +156,7 @@ void FramebufferObject::detachAll() {
     }
 }
 
-Texture* FramebufferObject::getTexture(GLenum attachment) {
+Texture* FramebufferObject::texture(GLenum attachment) {
     auto iterator = _attachedTextures.find(attachment);
     if (iterator != _attachedTextures.end()) {
         return _attachedTextures[attachment];

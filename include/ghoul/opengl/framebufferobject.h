@@ -50,7 +50,7 @@ public:
     void detachTexture(GLenum attachment);
     void detachAll();
 
-    Texture* getTexture(GLenum attachment = GL_COLOR_ATTACHMENT0);
+    Texture* texture(GLenum attachment = GL_COLOR_ATTACHMENT0);
     static GLuint getActiveObject();
 
 private:

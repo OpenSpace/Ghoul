@@ -38,11 +38,11 @@ template <bufferbinding::Buffer T>
 std::vector<bool> BufferBinding<T>::_busyBindings = std::vector<bool>();
 
 template <bufferbinding::Buffer T>
-bool BufferBinding<T>::_initialized = false;
+bool BufferBinding<T>::_isInitialized = false;
 
 template <bufferbinding::Buffer T>
 BufferBinding<T>::BufferBinding() {
-    if (!_initialized) {
+    if (!_isInitialized) {
         initialize();
     }
 }
@@ -114,7 +114,7 @@ void BufferBinding<T>::initialize() {
         _maxBufferBindings = 8; // Reasonable default setting for OpenGL
     }
     _busyBindings = std::vector<bool>(_maxBufferBindings, false);
-    _initialized = true;
+    _isInitialized = true;
 }
 
 } // namespace ghoul::opengl
