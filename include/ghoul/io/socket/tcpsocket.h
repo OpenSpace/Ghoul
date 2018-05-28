@@ -62,8 +62,8 @@ public:
     bool isConnected() const override;
     bool isConnecting() const override;
 
-    virtual std::string address() const;
-    virtual int port() const;
+    virtual std::string address() const override;
+    virtual int port() const override;
 
     bool getMessage(std::string& message) override;
     bool putMessage(const std::string& message) override;
