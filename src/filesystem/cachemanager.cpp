@@ -121,7 +121,7 @@ CacheManager::CacheManager(std::string directory, int version)
             }
 
             info.isPersistent = true;
-            _files.emplace(hash, info);
+            _files[hash] = info;
 
             // If the current hash + file is contained in the cache state, we have to
             // remove it
@@ -244,7 +244,7 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
         cachedFileName,
         isPersistent
     };
-    _files.emplace(hash, info);
+    _files[hash] = info;
     return cachedFileName;
 }
 

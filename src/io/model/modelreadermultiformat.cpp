@@ -25,6 +25,7 @@
 
 #include <ghoul/io/model/modelreadermultiformat.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/ghoul_gl.h>
@@ -33,10 +34,6 @@
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-#include <cstdio>
-#include <ghoul/fmt.h>
-#include <fstream>
-#include <iostream>
 #include <memory>
 #include <vector>
 

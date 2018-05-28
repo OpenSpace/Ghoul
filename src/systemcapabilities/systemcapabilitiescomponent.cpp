@@ -213,7 +213,6 @@ bool SystemCapabilitiesComponent::isWMIInitialized() {
 VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
                                                const std::string& attribute)
 {
-    constexpr const char* _loggerCat = "SystemCapabilitiesComponent.WMI";
     ghoul_assert(isWMIInitialized(), "WMI must have been initialized");
     ghoul_assert(!wmiClass.empty(), "wmiClass must not be empty");
     ghoul_assert(!attribute.empty(), "Attribute must not be empty");

@@ -29,11 +29,12 @@
 #include <ghoul/io/socket/socketserver.h>
 
 #include <ghoul/io/socket/tcpsocketserver.h>
-#include <ghoul/io/socket/websocket.h>
 #include <websocketpp/config/core.hpp>
 #include <websocketpp/server.hpp>
 
 namespace ghoul::io {
+
+class WebSocket;
 
 class WebSocketServer : public SocketServer {
 public:

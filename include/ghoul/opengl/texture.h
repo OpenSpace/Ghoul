@@ -899,12 +899,12 @@ private:
     GLuint _id;
     GLenum _type;
     GLubyte _bpp;
-    int _mipMapLevel;
-    float _anisotropyLevel;
+    int _mipMapLevel = 8;
+    float _anisotropyLevel = -1.f;
     std::string _name;
 
-    bool _hasOwnershipOfData;
-    void* _pixels;
+    bool _hasOwnershipOfData = false;
+    void* _pixels = nullptr;
 };
 
 } // namespace ghoul::opengl

@@ -25,11 +25,11 @@
 
 #include <ghoul/filesystem/filesystem.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
 #include <algorithm>
-#include <ghoul/fmt.h>
 #include <regex>
 
 #ifdef WIN32
@@ -82,9 +82,7 @@ FileSystem::ResolveTokenException::ResolveTokenException(string t)
     , token(std::move(t))
 {}
 
-FileSystem::FileSystem()
-    : _cacheManager(nullptr)
-{
+FileSystem::FileSystem() {
     std::string temporaryPath;
 #ifdef WIN32
     std::vector<char> ptr;
@@ -609,7 +607,7 @@ void FileSystem::registerPathToken(string token, string path, Override override)
             _tokenMap.erase(it);
         }
     }
-    _tokenMap.emplace(token, path);
+    _tokenMap[token] = path;
 }
 
 bool FileSystem::expandPathTokens(string& path,

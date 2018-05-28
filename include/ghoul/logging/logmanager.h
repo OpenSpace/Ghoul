@@ -28,10 +28,8 @@
 
 #include <ghoul/designpattern/singleton.h>
 
-#include <ghoul/logging/log.h>
 #include <ghoul/logging/loglevel.h>
 #include <ghoul/misc/boolean.h>
-
 #include <array>
 #include <memory>
 #include <mutex>

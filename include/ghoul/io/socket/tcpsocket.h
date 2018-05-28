@@ -28,6 +28,7 @@
 
 #include <ghoul/io/socket/socket.h>
 
+#include <ghoul/io/socket/sockettype.h>
 #include <ghoul/misc/exception.h>
 #include <array>
 #include <atomic>
@@ -37,24 +38,6 @@
 #include <thread>
 #include <unordered_map>
 #include <functional>
-
- // OS specific socket implementation normalization.
-#ifdef WIN32
-using _SOCKET = size_t;
-using _SOCKLEN = int;
-#else //linux & macOS
-
-#include <sys/socket.h>
-#include <sys/types.h>
-
-using _SOCKET = int;
-using _SOCKLEN = socklen_t;
-
-#ifndef INVALID_SOCKET
-#define INVALID_SOCKET (_SOCKET)(~0)
-#endif // INVALID_SOCKET
-
-#endif // WIN32
 
 struct addrinfo;
 
@@ -159,7 +142,7 @@ private:
     std::mutex _inputQueueMutex;
     std::condition_variable _inputNotifier;
     std::deque<char> _inputQueue;
-    std::array<char, 4096> _inputBuffer;
+    std::array<char, 4096> _inputBuffer = { 0 };
 
     std::mutex _outputBufferMutex;
     std::mutex _outputQueueMutex;

@@ -28,7 +28,6 @@
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -231,7 +230,7 @@ public:
      *
      * \param stream The stream to which the help information is printed
      */
-    void displayHelp(std::ostream& stream = std::cout) const;
+    void displayHelp(std::ostream& stream) const;
 
 protected:
     /** Returns the CommandlineCommand with a specific CommandlineCommand::shortName or

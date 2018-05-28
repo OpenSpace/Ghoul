@@ -28,15 +28,18 @@
 
 #include <ghoul/io/socket/socketserver.h>
 
-#include <ghoul/io/socket/tcpsocket.h>
+#include <ghoul/io/socket/sockettype.h>
+#include <deque>
 #include <memory>
 #include <mutex>
 
 namespace ghoul::io {
 
+class TcpSocket;
+
 class TcpSocketServer : public SocketServer {
 public:
-    TcpSocketServer();
+    TcpSocketServer() = default;
     virtual ~TcpSocketServer();
 
     std::string address() const override;
@@ -57,9 +60,9 @@ private:
     void waitForConnections();
 
     mutable std::mutex _settingsMutex;
-    std::string _address;
-    int _port;
-    bool _listening;
+    std::string _address = "localhost";
+    int _port = 0;
+    bool _listening = false;
 
     mutable std::mutex _connectionMutex;
     std::deque<std::unique_ptr<TcpSocket>> _pendingConnections;
@@ -68,7 +71,7 @@ private:
     std::condition_variable _connectionNotifier;
 
     std::unique_ptr<std::thread> _serverThread;
-    _SOCKET _serverSocket;
+    _SOCKET _serverSocket = _SOCKET(0);
 };
 
 } // namespace ghoul::io

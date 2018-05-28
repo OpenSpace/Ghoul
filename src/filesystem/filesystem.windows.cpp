@@ -33,12 +33,8 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/stacktrace.h>
 #include <algorithm>
-#include <cassert>
-#include <cstdio>
-#include <direct.h>
 #include <regex>
 #include <Shlobj.h>
-#include <windows.h>
 
 using std::string;
 
@@ -58,7 +54,7 @@ namespace {
 namespace ghoul::filesystem {
 
 struct DirectoryHandle {
-    HANDLE _handle;
+    HANDLE _handle = nullptr;
     unsigned char _activeBuffer;
     std::vector<BYTE> _changeBuffer[2];
     OVERLAPPED _overlappedBuffer;

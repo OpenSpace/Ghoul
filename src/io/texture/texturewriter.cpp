@@ -25,12 +25,12 @@
 
 #include <ghoul/io/texture/texturewriter.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/filesystem/file.h>
-#include <ghoul/filesystem/directory.h>
 #include <ghoul/io/texture/texturewriterbase.h>
+#include <ghoul/opengl/texture.h>
 #include <algorithm>
-#include <ghoul/fmt.h>
 
 using std::string;
 

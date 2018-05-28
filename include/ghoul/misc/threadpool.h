@@ -131,8 +131,7 @@ public:
         std::function<void ()> workerDeinitialization = [](){},
         thread::ThreadPriorityClass priorityClass = thread::ThreadPriorityClass::Normal,
         thread::ThreadPriorityLevel priorityLevel = thread::ThreadPriorityLevel::Normal,
-        thread::Background background = thread::Background::No
-    );
+        thread::Background background = thread::Background::No);
 
     /**
      * Destructor that will block and wait for all remaining Tasks to be finished if the

@@ -25,12 +25,12 @@
 
 #include <ghoul/io/model/modelreaderlua.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/lua/lua_helper.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/vertexbufferobject.h>
-#include <ghoul/fmt.h>
 #include <map>
 #include <vector>
 

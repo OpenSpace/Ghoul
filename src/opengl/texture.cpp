@@ -58,10 +58,7 @@ Texture::Texture(glm::uvec3 dimensions, Format format, GLenum internalFormat,
     , _dataType(dataType)
     , _filter(filter)
     , _wrapping({ wrapping })
-    , _mipMapLevel(8)
-    , _anisotropyLevel(-1.f)
     , _hasOwnershipOfData(takeOwnership)
-    , _pixels(nullptr)
 {
     ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
@@ -82,10 +79,8 @@ Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLenum intern
     , _dataType(dataType)
     , _filter(filter)
     , _wrapping({ wrapping })
-    , _mipMapLevel(8)
-    , _anisotropyLevel(-1.f)
     , _hasOwnershipOfData(true)
-    , _pixels(data)
+    , _pixels(data) 
 {
     ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");

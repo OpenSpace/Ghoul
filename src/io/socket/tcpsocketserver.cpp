@@ -25,6 +25,8 @@
 
 #include <ghoul/io/socket/tcpsocketserver.h>
 
+#include <ghoul/io/socket/tcpsocket.h>
+
 #include <cstring>
 
 #ifdef WIN32
@@ -119,12 +121,6 @@ namespace {
 } // namespace
 
 namespace ghoul::io {
-
-TcpSocketServer::TcpSocketServer()
-    : _address("localhost")
-    , _port(0)
-    , _listening(false)
-{}
 
 TcpSocketServer::~TcpSocketServer() {
     if (_listening) {

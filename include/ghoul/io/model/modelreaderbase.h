@@ -28,7 +28,6 @@
 
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/ghoul_gl.h>
-
 #include <memory>
 #include <string>
 

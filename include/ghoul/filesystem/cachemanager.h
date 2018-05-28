@@ -314,7 +314,7 @@ protected:
     /// This struct stores the cache information for a specific hash value.
     struct CacheInformation {
         std::string file; ///< The path to the cached file
-        bool isPersistent; ///< if the cached entry should be automatically deleted
+        bool isPersistent = false; ///< if the cached file should be automatically deleted
     };
 
     using LoadedCacheInfo = std::pair<unsigned int, std::string>;

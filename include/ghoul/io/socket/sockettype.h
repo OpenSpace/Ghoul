@@ -23,67 +23,25 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/io/socket/websocketserver.h>
+#ifndef __GHOUL___SOCKETTYPE___H__
+#define __GHOUL___SOCKETTYPE___H__
 
-#include <ghoul/io/socket/websocket.h>
-#include <ghoul/logging/logmanager.h>
+ // OS specific socket implementation normalization.
+#ifdef WIN32
+using _SOCKET = size_t;
+using _SOCKLEN = int;
+#else //linux & macOS
 
-namespace ghoul::io {
+#include <sys/socket.h>
+#include <sys/types.h>
 
-WebSocketServer::WebSocketServer() {
-    // set up WebSocket++ logging
-    _server.clear_access_channels(websocketpp::log::alevel::all);
-    _server.set_access_channels(websocketpp::log::alevel::connect);
-    _server.set_access_channels(websocketpp::log::alevel::disconnect);
-    _server.set_access_channels(websocketpp::log::alevel::app);
-}
+using _SOCKET = int;
+using _SOCKLEN = socklen_t;
 
-std::string WebSocketServer::address() const {
-    return _tcpSocketServer.address();
-}
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET (_SOCKET)(~0)
+#endif // INVALID_SOCKET
 
-int WebSocketServer::port() const {
-    return _tcpSocketServer.port();
-}
+#endif // WIN32
 
-void WebSocketServer::close() {
-    return _tcpSocketServer.close();
-}
-
-void WebSocketServer::listen(std::string address, int port) {
-    return _tcpSocketServer.listen(address, port);
-}
-
-bool WebSocketServer::isListening() const {
-    return _tcpSocketServer.isListening();
-}
-
-bool WebSocketServer::hasPendingSockets() const {
-    return _tcpSocketServer.hasPendingSockets();
-}
-
-std::unique_ptr<WebSocket> WebSocketServer::nextPendingWebSocket() {
-    std::unique_ptr<TcpSocket> tcpSocket = _tcpSocketServer.nextPendingTcpSocket();
-    if (!tcpSocket) {
-        return nullptr;
-    }
-    return std::make_unique<WebSocket>(std::move(tcpSocket), _server);
-}
-
-std::unique_ptr<Socket> WebSocketServer::nextPendingSocket() {
-    return std::unique_ptr<Socket>(nextPendingWebSocket());
-}
-
-std::unique_ptr<WebSocket> WebSocketServer::awaitPendingWebSocket() {
-    std::unique_ptr<TcpSocket> tcpSocket = _tcpSocketServer.awaitPendingTcpSocket();
-    if (!tcpSocket) {
-        return nullptr;
-    }
-    return std::make_unique<WebSocket>(std::move(tcpSocket), _server);
-}
-
-std::unique_ptr<Socket> WebSocketServer::awaitPendingSocket() {
-    return std::unique_ptr<Socket>(awaitPendingWebSocket());
-}
-
-} // namespace ghoul::io
+#endif // __GHOUL___SOCKETTYPE___H__

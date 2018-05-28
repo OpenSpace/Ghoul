@@ -25,10 +25,10 @@
 
 #include <ghoul/logging/bufferlog.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
 #include <atomic>
-#include <ghoul/fmt.h>
 #include <fstream>
 
 namespace {
