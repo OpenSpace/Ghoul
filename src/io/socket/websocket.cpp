@@ -47,15 +47,15 @@ WebSocket::WebSocketError::WebSocketError(std::string msg, std::string comp)
 {}
 
 WebSocket::WebSocket(std::unique_ptr<TcpSocket> socket,
-    websocketpp::server<websocketpp::config::core>& webSocketServer
+    websocketpp::server<websocketpp::config::core>& server
 ) {
     _tcpSocket = std::move(socket);
 
-    webSocketServer.set_message_handler(bind(&WebSocket::onMessage, this, ::_1, ::_2));
-    webSocketServer.set_open_handler(bind(&WebSocket::onOpen, this, ::_1));
-    webSocketServer.set_close_handler(bind(&WebSocket::onClose, this, ::_1));
+    server.set_message_handler(bind(&WebSocket::onMessage, this, ::_1, ::_2));
+    server.set_open_handler(bind(&WebSocket::onOpen, this, ::_1));
+    server.set_close_handler(bind(&WebSocket::onClose, this, ::_1));
 
-    _socketConnection = webSocketServer.get_connection();
+    _socketConnection = server.get_connection();
     _socketConnection->register_ostream(&_outputStream);
     _socketConnection->start();
 
@@ -129,8 +129,8 @@ void WebSocket::startStreams() {
  * \param hdl A handle to uniquely identify a connection.
  * \param msg The message
  */
-void WebSocket::onMessage(websocketpp::connection_hdl,
-    websocketpp::server<websocketpp::config::core>::message_ptr msg)
+void WebSocket::onMessage(const websocketpp::connection_hdl&,
+                   const websocketpp::server<websocketpp::config::core>::message_ptr& msg)
 {
     std::string msgContent = msg->get_payload();
     std::lock_guard<std::mutex> guard(_inputMessageQueueMutex);
@@ -138,7 +138,7 @@ void WebSocket::onMessage(websocketpp::connection_hdl,
     _inputNotifier.notify_one();
 }
 
-void WebSocket::onOpen(websocketpp::connection_hdl hdl) {
+void WebSocket::onOpen(const websocketpp::connection_hdl& hdl) {
     LDEBUG(fmt::format("onOpen: WebSocket opened. Client: {}:{}.",
         _tcpSocket->address(),
         _tcpSocket->port()
@@ -149,7 +149,7 @@ void WebSocket::onOpen(websocketpp::connection_hdl hdl) {
     _outputStream.str("");
 }
 
-void WebSocket::onClose(websocketpp::connection_hdl hdl) {
+void WebSocket::onClose(const websocketpp::connection_hdl& hdl) {
     LDEBUG(fmt::format(
         "onClose: WebSocket closing. Client: {}:{}.",
         _tcpSocket->address(),

@@ -119,7 +119,7 @@ void setDebugCallback(CallbackFunction callback) {
 namespace ghoul {
 
 template <>
-opengl::debug::Source from_string(const std::string& source) {
+opengl::debug::Source from_string(const std::string& string) {
     static const std::map<std::string, opengl::debug::Source> Map = {
         { "API",             opengl::debug::Source::API },
         { "Window System",   opengl::debug::Source::WindowSystem },
@@ -131,11 +131,11 @@ opengl::debug::Source from_string(const std::string& source) {
     };
 
     // Throws a std::out_of_range exception if the source could not be found
-    return Map.at(source);
+    return Map.at(string);
 }
 
 template <>
-opengl::debug::Type from_string(const std::string& type) {
+opengl::debug::Type from_string(const std::string& string) {
     static const std::map<std::string, opengl::debug::Type> Map = {
         { "Error",          opengl::debug::Type::Error },
         { "Deprecated",     opengl::debug::Type::Deprecated },
@@ -150,11 +150,11 @@ opengl::debug::Type from_string(const std::string& type) {
     };
 
     // Throws a std::out_of_range exception if the type could not be found
-    return Map.at(type);
+    return Map.at(string);
 }
 
 template <>
-opengl::debug::Severity from_string(const std::string& severity) {
+opengl::debug::Severity from_string(const std::string& string) {
     static const std::map<std::string, opengl::debug::Severity> Map = {
         { "High",           opengl::debug::Severity::High },
         { "Medium",         opengl::debug::Severity::Medium },
@@ -163,7 +163,7 @@ opengl::debug::Severity from_string(const std::string& severity) {
     };
 
     // Throws a std::out_of_range exception if the severity could not be found
-    return Map.at(severity);
+    return Map.at(string);
 }
 
 } // namespace ghoul

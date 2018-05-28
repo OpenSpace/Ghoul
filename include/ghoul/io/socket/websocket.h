@@ -53,7 +53,7 @@ class WebSocketServerInternal;
 class WebSocket : public Socket {
 public:
     struct WebSocketError : public ghoul::RuntimeError {
-        explicit WebSocketError(std::string message, std::string component = "");
+        explicit WebSocketError(std::string msg, std::string comp = "");
     };
 
     /**
@@ -87,11 +87,11 @@ public:
 
 private:
 
-    void onMessage(websocketpp::connection_hdl hdl,
-        websocketpp::server<websocketpp::config::core>::message_ptr msg);
+    void onMessage(const websocketpp::connection_hdl& hdl,
+        const websocketpp::server<websocketpp::config::core>::message_ptr& msg);
 
-    void onOpen(websocketpp::connection_hdl hdl);
-    void onClose(websocketpp::connection_hdl hdl);
+    void onOpen(const websocketpp::connection_hdl& hdl);
+    void onClose(const websocketpp::connection_hdl& hdl);
 
     std::mutex _connectionHandlesMutex;
     std::set<websocketpp::connection_hdl, std::owner_less<websocketpp::connection_hdl>>

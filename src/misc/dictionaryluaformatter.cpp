@@ -47,6 +47,10 @@ std::string formatDouble(double d) {
 
 namespace ghoul {
 
+DictionaryLuaFormatter::LuaFormattingError::LuaFormattingError(const std::string& msg)
+    : RuntimeError(msg, "Dictionary")
+{}
+
 std::string DictionaryLuaFormatter::format(const Dictionary& dictionary) const {
     if (dictionary.empty()) {
         return "{}";
@@ -112,7 +116,7 @@ std::string DictionaryLuaFormatter::formatValue(const Dictionary& dictionary,
     if (dictionary.hasValue<std::string>(key)) {
         std::string value = dictionary.value<std::string>(key);
 
-        std::string luaString = "";
+        std::string luaString;
         for (const char& c : value) {
             switch (c) {
             case '"':
@@ -148,9 +152,5 @@ std::string DictionaryLuaFormatter::formatValue(const Dictionary& dictionary,
         "Key '" + key + "' has invalid type for formatting dictionary as lua"
     );
 }
-
-DictionaryLuaFormatter::LuaFormattingError::LuaFormattingError(const std::string& msg)
-    : RuntimeError(msg, "Dictionary")
-{}
 
 }  // namespace ghoul

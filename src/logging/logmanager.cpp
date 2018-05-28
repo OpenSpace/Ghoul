@@ -44,8 +44,12 @@ void LogManager::addLog(std::shared_ptr<Log> log) {
     }
 }
 
-void LogManager::removeLog(std::shared_ptr<Log> log) {
-    auto it = std::find(_logs.begin(), _logs.end(), log);
+void LogManager::removeLog(Log* log) {
+    auto it = std::find_if(
+        _logs.begin(),
+        _logs.end(),
+        [log](const std::shared_ptr<Log>& l) { return l.get() == log; }
+    );
     if (it != _logs.end()) {
         _logs.erase(it);
     }

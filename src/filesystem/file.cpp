@@ -36,7 +36,6 @@
 #include <sys/stat.h>
 #endif
 
-using std::function;
 using std::string;
 
 namespace {
@@ -67,9 +66,9 @@ File::File(string filename, RawPath isRawPath, FileChangedCallback fileChangedCa
     }
 }
 
-File::File(const File& cpy)
-    : _filename(cpy._filename)
-    , _fileChangedCallback(cpy._fileChangedCallback)
+File::File(const File& file)
+    : _filename(file._filename)
+    , _fileChangedCallback(file._fileChangedCallback)
 {
     if (_fileChangedCallback) {
         installFileChangeListener();
@@ -116,7 +115,7 @@ std::string File::filename() const {
 
 string File::baseName() const {
     string fileName = filename();
-    string::size_type dot = fileName.rfind(".");
+    string::size_type dot = fileName.rfind('.');
     if (dot != string::npos) {
         return fileName.substr(0, dot);
     }
@@ -126,7 +125,7 @@ string File::baseName() const {
 }
 
 string File::fullBaseName() const {
-    string::size_type dot = _filename.rfind(".");
+    string::size_type dot = _filename.rfind('.');
     if (dot != string::npos) {
         return _filename.substr(0, dot);
     }
@@ -146,7 +145,7 @@ string File::directoryName() const {
 }
 
 string File::fileExtension() const {
-    string::size_type dot = _filename.rfind(".");
+    string::size_type dot = _filename.rfind('.');
     if (dot != string::npos) {
         return _filename.substr(dot + 1);
     }
@@ -175,12 +174,12 @@ std::string File::lastModifiedDate() const {
         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
             FORMAT_MESSAGE_ALLOCATE_BUFFER |
             FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
+            nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer,
+            (LPTSTR)&errorBuffer, // NOLINT
             0,
-            NULL
+            nullptr
         );
         if (errorBuffer != nullptr) {
             std::string msg(errorBuffer);
@@ -207,12 +206,12 @@ std::string File::lastModifiedDate() const {
             DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
                 FORMAT_MESSAGE_ALLOCATE_BUFFER |
                 FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL,
+                nullptr,
                 error,
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                (LPTSTR)&errorBuffer,
+                (LPTSTR)&errorBuffer, // NOLINT
                 0,
-                NULL
+                nullptr
             );
             if ((nValues > 0) && (errorBuffer != nullptr)) {
                 std::string msg(errorBuffer);

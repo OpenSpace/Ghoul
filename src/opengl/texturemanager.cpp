@@ -48,8 +48,9 @@ Texture* TextureManager::texture(unsigned int hashedName) {
             "Could not find Texture for hash '" + std::to_string(hashedName) + "'"
         );
     }
-    else
+    else {
         return it->second.get();
+    }
 }
 
 Texture* TextureManager::texture(const std::string& name) {

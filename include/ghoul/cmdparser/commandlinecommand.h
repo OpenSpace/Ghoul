@@ -158,17 +158,17 @@ public:
     virtual void execute(const std::vector<std::string>& parameters) = 0;
 
     /**
-     * Checks the parameters for consistency and correct amount. The basic implementation
-     * only checks for the correct number of parameters. If you want to test for other
-     * conditions (for example type), overwrite this method in the derived class.
+     * Checks the param for consistency and correct amount. The basic implementation only
+     * checks for the correct number of param. If you want to test for other conditions
+     * (for example type), overwrite this method in the derived class.
      *
-     * \param parameters The parameters which should be tested
-     * \return <code>true</code>, if the parameters are correct, <code>false</code>
+     * \param param The param which should be tested
+     * \return <code>true</code>, if the param are correct, <code>false</code>
      *         otherwise
      *
      * \throw CommandParameterException If any of the parameters have the wrong type
      */
-    virtual void checkParameters(const std::vector<std::string>& parameters) const;
+    virtual void checkParameters(const std::vector<std::string>& param) const;
 
     /**
      * Returns the usage part for the help of this CommandlineCommand. Used in the

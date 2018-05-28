@@ -71,9 +71,9 @@ namespace ghoul::logging {
 
 ConsoleLog::ConsoleLog(ColorOutput colorOutput, TimeStamping timeStamping,
             DateStamping dateStamping, CategoryStamping categoryStamping,
-            LogLevelStamping logLevelStamping, LogLevel logLevel)
+            LogLevelStamping logLevelStamping, LogLevel minimumLogLevel)
     : StreamLog(std::cout, timeStamping, dateStamping, categoryStamping, logLevelStamping,
-                logLevel)
+                minimumLogLevel)
     , _colorOutput(colorOutput)
 {}
 

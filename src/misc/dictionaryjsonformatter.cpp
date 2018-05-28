@@ -31,19 +31,23 @@
 #include <string>
 
 namespace {
-std::string formatDouble(double d) {
-    // This check is to silence -Wfloat-equal on GCC due to floating point comparison
-    if (std::equal_to<>()(d, 0.0)) {
-        return "0";
+    std::string formatDouble(double d) {
+        // This check is to silence -Wfloat-equal on GCC due to floating point comparison
+        if (std::equal_to<>()(d, 0.0)) {
+            return "0";
+        }
+        int exponent = static_cast<int>(std::log10(std::abs(d)));
+        double base = d / std::pow(10, exponent);
+        return std::to_string(base) + "E" + std::to_string(exponent);
     }
-    int exponent = static_cast<int>(std::log10(std::abs(d)));
-    double base = d / std::pow(10, exponent);
-    return std::to_string(base) + "E" + std::to_string(exponent);
-}
-
 } // namespace
 
 namespace ghoul {
+
+DictionaryJsonFormatter::JsonFormattingError::JsonFormattingError(const std::string& msg)
+    : RuntimeError(msg, "Dictionary")
+{}
+
 
 std::string DictionaryJsonFormatter::format(const Dictionary& dictionary) const {
     if (dictionary.empty()) {
@@ -119,7 +123,7 @@ std::string DictionaryJsonFormatter::formatValue(const Dictionary& dictionary,
     if (dictionary.hasValue<std::string>(key)) {
         std::string value = dictionary.value<std::string>(key);
 
-        std::string jsonString = "";
+        std::string jsonString;
         for (const char& c : value) {
             switch (c) {
             case '"':
@@ -155,9 +159,5 @@ std::string DictionaryJsonFormatter::formatValue(const Dictionary& dictionary,
         "Key '" + key + "' has invalid type for formatting dictionary as json"
     );
 }
-
-DictionaryJsonFormatter::JsonFormattingError::JsonFormattingError(const std::string& msg)
-    : RuntimeError(msg, "Dictionary")
-{}
 
 }  // namespace ghoul

@@ -39,8 +39,8 @@ public:
         ReadHints(glm::ivec3 dimensions = glm::ivec3(0));
 
         glm::ivec3 _dimensions;
-        opengl::Texture::Format _format;
-        GLenum _internalFormat;
+        opengl::Texture::Format _format = opengl::Texture::Format::Red;
+        GLenum _internalFormat = GLenum::GL_RED;
     };
 
     RawVolumeReader() = default;

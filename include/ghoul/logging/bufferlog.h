@@ -54,7 +54,7 @@ public:
      * failed to free enough memory.
      */
     struct MemoryExhaustionException : public RuntimeError {
-        explicit MemoryExhaustionException(int totalSize, int requestedSize);
+        explicit MemoryExhaustionException(int sizeTotal, int sizeRequested);
 
         int totalSize;
         int requestedSize;
@@ -131,7 +131,7 @@ public:
      *        provide new memory
      * \pre \p message must not be empty
      */
-    void log(unsigned long long timestamp, std::string message);
+    void log(unsigned long long timestamp, const std::string& message);
 
     /**
      * Returns the buffer that is used by the BufferLog. If this buffer is modified by the

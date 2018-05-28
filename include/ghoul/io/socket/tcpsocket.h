@@ -50,7 +50,7 @@ public:
     using InputInterceptor = std::function<void(const char* data, size_t nBytes)>;
 
     struct TcpSocketError : public RuntimeError {
-        explicit TcpSocketError(std::string message, std::string component = "");
+        explicit TcpSocketError(std::string msg, std::string comp = "");
     };
 
     TcpSocket(std::string address, int port);
@@ -62,12 +62,12 @@ public:
     bool isConnected() const override;
     bool isConnecting() const override;
 
-    virtual std::string address() const override;
-    virtual int port() const override;
+    std::string address() const override;
+    int port() const override;
 
     bool getMessage(std::string& message) override;
     bool putMessage(const std::string& message) override;
-    void setDelimiter(char delim);
+    void setDelimiter(char delimiter);
 
     static void initializeNetworkApi();
     static bool initializedNetworkApi();
@@ -148,7 +148,7 @@ private:
     std::mutex _outputQueueMutex;
     std::condition_variable _outputNotifier;
     std::deque<char> _outputQueue;
-    std::array<char, 4096> _outputBuffer;
+    std::array<char, 4096> _outputBuffer = { 0 };
 
     std::atomic<char> _delimiter;
 

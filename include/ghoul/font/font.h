@@ -76,7 +76,7 @@ public:
     /// The exception that gets thrown when a FreeType-specific error occurs
     struct FreeTypeException : public FontException {
         explicit FreeTypeException(std::string name, float size, int code,
-            std::string message);
+            std::string msg);
 
         /// The name of the font for which the FreeType error occurred
         std::string fontName;

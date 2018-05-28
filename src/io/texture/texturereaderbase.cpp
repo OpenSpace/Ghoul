@@ -29,15 +29,13 @@
 
 namespace ghoul::io {
 
-TextureReaderBase::TextureLoadException::TextureLoadException(std::string n,
-                                                              std::string m,
+TextureReaderBase::TextureLoadException::TextureLoadException(std::string name,
+                                                              std::string msg,
                                                               const TextureReaderBase* r)
-    : RuntimeError(fmt::format("Error loading texture '{}'", n), "TextureLoader")
-    , filename(std::move(n))
-    , message(std::move(m))
+    : RuntimeError(fmt::format("Error loading texture '{}'", name), "TextureLoader")
+    , filename(std::move(name))
+    , message(std::move(msg))
     , reader(r)
 {}
-
-TextureReaderBase::~TextureReaderBase() {}
 
 } // namespace ghoul::io

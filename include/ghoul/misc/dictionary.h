@@ -203,17 +203,17 @@ public:
 
     /// Base class for all Dictionary%-based exceptions
     struct DictionaryError : public RuntimeError {
-        explicit DictionaryError(std::string message);
+        explicit DictionaryError(std::string msg);
     };
 
     /// Exception that is thrown if one of the messages is called with invalid arguments
     struct KeyError : public DictionaryError {
-        explicit KeyError(std::string message);
+        explicit KeyError(std::string msg);
     };
 
     /// Exception that is thrown if an error converting from one type into another occurs
     struct ConversionError : public DictionaryError {
-        explicit ConversionError(std::string message);
+        explicit ConversionError(std::string msg);
     };
 
     /**

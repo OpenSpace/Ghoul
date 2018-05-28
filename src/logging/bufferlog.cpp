@@ -88,13 +88,14 @@ namespace {
 
 namespace ghoul::logging {
 
-BufferLog::MemoryExhaustionException::MemoryExhaustionException(int total, int requested)
+BufferLog::MemoryExhaustionException::MemoryExhaustionException(int sizeTotal,
+                                                                int sizeRequested)
     : RuntimeError(
-        fmt::format("Exhausted BufferLog ({} of {} byte)", requested, total),
+        fmt::format("Exhausted BufferLog ({} of {} byte)", sizeRequested, sizeTotal),
         "BufferLog"
     )
-    , totalSize(total)
-    , requestedSize(requested)
+    , totalSize(sizeTotal)
+    , requestedSize(sizeRequested)
 {}
 
 BufferLog::BufferLog(void* address, size_t bufferSize)
@@ -152,7 +153,7 @@ void BufferLog::resetBuffer() {
     }
 }
 
-void BufferLog::log(unsigned long long timestamp, std::string message) {
+void BufferLog::log(unsigned long long timestamp, const std::string& message) {
     ghoul_assert(!message.empty(), "Message must not be empty");
 
     Header* h = header(_buffer);

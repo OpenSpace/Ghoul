@@ -161,7 +161,7 @@ void TcpSocketServer::listen(std::string address, int port) {
     _port = port;
 
     struct addrinfo* result = nullptr;
-    struct addrinfo hints;
+    struct addrinfo hints {};
 
     std::memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
@@ -271,7 +271,7 @@ std::unique_ptr<Socket> TcpSocketServer::awaitPendingSocket() {
 
 void TcpSocketServer::waitForConnections() {
     while (_listening) {
-        sockaddr_in clientInfo;
+        sockaddr_in clientInfo {};
         std::memset(&clientInfo, 0, sizeof(clientInfo));
         _SOCKLEN clientInfoSize = sizeof(clientInfo);
 

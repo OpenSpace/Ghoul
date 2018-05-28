@@ -45,11 +45,11 @@ public:
     /// The main exception that is thrown if there is an error detecting an OpenGL
     /// capability
     struct OpenGLCapabilitiesComponentError : public RuntimeError {
-        explicit OpenGLCapabilitiesComponentError(std::string message);
+        explicit OpenGLCapabilitiesComponentError(std::string msg);
     };
 
     struct GPUVendorError : public OpenGLCapabilitiesComponentError {
-        explicit GPUVendorError(std::string message);
+        explicit GPUVendorError(std::string msg);
     };
 
     /// This enum stores the possible vendors of graphics cards that can be detected

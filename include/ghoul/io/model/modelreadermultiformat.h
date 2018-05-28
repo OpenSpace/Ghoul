@@ -75,7 +75,7 @@ public:
      * \pre \p filename must not be empty
      */
     std::unique_ptr<opengl::VertexBufferObject> loadModel(
-        const std::string& filename) const;
+        const std::string& filename) const override;
 
     /**
      * Loads the 3D model (anyone from the previous list) file pointed to by \p filename

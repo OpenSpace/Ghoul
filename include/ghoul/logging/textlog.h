@@ -93,11 +93,11 @@ public:
      *        individually
      * \param message The message body of the log message
      */
-    virtual void log(LogLevel level, const std::string& category,
-                     const std::string& message);
+    void log(LogLevel level, const std::string& category,
+        const std::string& message) override;
 
     /// Flushes the text file and, thereby, all messages that are in the associated buffer
-    virtual void flush();
+    void flush() override;
 
 protected:
     /**

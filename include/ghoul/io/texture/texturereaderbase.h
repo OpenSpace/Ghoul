@@ -44,8 +44,8 @@ class TextureReaderBase {
 public:
     /// The exception that gets thrown if there was an error loading the Texture
     struct TextureLoadException : public RuntimeError {
-        explicit TextureLoadException(std::string name, std::string message,
-            const TextureReaderBase* reader);
+        explicit TextureLoadException(std::string name, std::string msg,
+            const TextureReaderBase* r);
 
         /// The filename that caused the exception to be thrown
         std::string filename;
@@ -58,7 +58,7 @@ public:
     };
 
     /// Default virtual destructor
-    virtual ~TextureReaderBase();
+    virtual ~TextureReaderBase() = default;
 
     /**
      * Loads the texture \p filename from disk and returns the loaded Texture.

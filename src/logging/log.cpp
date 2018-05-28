@@ -84,7 +84,7 @@ std::string Log::timeString() const {
     std::stringstream ss;
 
 #ifdef WIN32
-    tm t;
+    tm t {};
     localtime_s(&t, &time);
     ss << std::put_time(&t, "%T");
 #else
@@ -100,7 +100,7 @@ std::string Log::dateString() const {
     std::stringstream ss;
 
 #ifdef WIN32
-    tm t;
+    tm t {};
     localtime_s(&t, &time);
     ss << std::put_time(&t, "%F");
 #else
@@ -129,7 +129,7 @@ std::string Log::createFullMessageString(LogLevel level, const std::string& cate
     if (isLogLevelStamping()) {
         output += "(" + stringFromLevel(level) + ")";
     }
-    if (output != "") {
+    if (!output.empty()) {
         output += "\t";
     }
     output += message;

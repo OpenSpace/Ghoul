@@ -93,19 +93,19 @@ Directory Directory::parentDirectory([[maybe_unused]] AbsolutePath absolutePath)
 #endif
 }
 
-vector<string> Directory::read(Recursive search, Sort sort) const {
+vector<string> Directory::read(Recursive recursiveSearch, Sort sort) const {
     vector<string> result;
-    internalReadDirectories(result, _directoryPath, search);
-    internalReadFiles(result, _directoryPath, search);
+    internalReadDirectories(result, _directoryPath, recursiveSearch);
+    internalReadFiles(result, _directoryPath, recursiveSearch);
     if (sort) {
         std::sort(result.begin(), result.end());
     }
     return result;
 }
 
-vector<string> Directory::readFiles(Recursive search, Sort sort) const {
+vector<string> Directory::readFiles(Recursive recursiveSearch, Sort sort) const {
     vector<string> result;
-    internalReadFiles(result, _directoryPath, search);
+    internalReadFiles(result, _directoryPath, recursiveSearch);
     if (sort) {
         std::sort(result.begin(), result.end());
     }
@@ -121,7 +121,7 @@ void Directory::internalReadFiles(vector<string>& result, const string& path,
     const string& directory = path + "\\*";
 
     HANDLE findHandle = FindFirstFile(directory.c_str(), &findFileData);
-    if (findHandle != INVALID_HANDLE_VALUE) {
+    if (findHandle != INVALID_HANDLE_VALUE) { // NOLINT
         do {
             string file(findFileData.cFileName);
             const DWORD isDir = findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
@@ -160,9 +160,9 @@ void Directory::internalReadFiles(vector<string>& result, const string& path,
     }
 }
 
-vector<string> Directory::readDirectories(Recursive search, Sort sort) const {
+vector<string> Directory::readDirectories(Recursive recursiveSearch, Sort sort) const {
     std::vector<std::string> result;
-    internalReadDirectories(result, _directoryPath, search);
+    internalReadDirectories(result, _directoryPath, recursiveSearch);
     if (sort) {
         std::sort(result.begin(), result.end());
     }
@@ -179,7 +179,7 @@ void Directory::internalReadDirectories(vector<string>& result, const string& pa
     std::string directory = path + "\\*";
 
     HANDLE findHandle = FindFirstFile(directory.c_str(), &findFileData);
-    if (findHandle != INVALID_HANDLE_VALUE) {
+    if (findHandle != INVALID_HANDLE_VALUE) { // NOLINT
         do {
             string file(findFileData.cFileName);
             const DWORD isDir = findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;

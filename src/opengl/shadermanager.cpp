@@ -47,8 +47,9 @@ ShaderObject* ShaderManager::shaderObject(unsigned int hashedName) {
             "Could not find ShaderObject for hash '" + std::to_string(hashedName) + "'"
         );
     }
-    else
+    else {
         return it->second.get();
+    }
 }
 
 ShaderObject* ShaderManager::shaderObject(const std::string& name) {

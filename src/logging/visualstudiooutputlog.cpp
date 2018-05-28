@@ -35,8 +35,8 @@ VisualStudioOutputLog::VisualStudioOutputLog(TimeStamping timeStamping,
                                              DateStamping dateStamping,
                                              CategoryStamping categoryStamping,
                                              LogLevelStamping logLevelStamping,
-                                             LogLevel logLevel)
-    : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, logLevel)
+                                             LogLevel minimumLogLevel)
+    : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, minimumLogLevel)
 {}
 
 #ifdef WIN32

@@ -123,8 +123,8 @@ Font::GlyphException::GlyphException(std::string name, float size, wchar_t chara
 Font::FreeTypeException::FreeTypeException(std::string name, float size, int code,
                                            std::string msg)
     : FontException(fmt::format(
-        "Error loading font '{}' for size '{}': ({}) {}",
-        name, size, code, message))
+        "Error loading font '{}' for size '{}': ({}) {}", name, size, code, msg
+    ))
     , fontName(std::move(name))
     , fontSize(size)
     , errorCode(code)
@@ -291,7 +291,7 @@ const Font::Glyph* Font::glyph(wchar_t character) {
         opengl::TextureAtlas::RegionHandle handle = _atlas.newRegion(4, 4);
         // The last *4 for the depth is not a danger here as _atlas.setRegion only
         // extracts as much data as is needed for the used texture atlas
-        std::array<unsigned char, 4*4*4> data;
+        std::array<unsigned char, 4 * 4 * 4> data {};
         data.fill(std::numeric_limits<unsigned char>::max());
 
         _atlas.setRegionData(handle, data.data());

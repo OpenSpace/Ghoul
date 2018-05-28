@@ -110,28 +110,28 @@ public:
      *
      * \param nThreads The number of parallel threads of execution managed by the
      *        ThreadPool
-     * \param workerInitialization The additional initialize function for each Worker that
-     *        gets called once for each Worker when it is created
-     * \param workerDeinitialization The additional deinitialize function for each Worker
-     *        that gets called once for each Worken when it is destroyed
-     * \param priorityClass The ghoul::thread::ThreadPriorityClass of the worker threads
-     *        managed by the ThreadPool
-     * \param priorityLevel The ghoul::thread::ThreadPriorityLevel of the worker threads
-     *        managed by the ThreadPool
-     * \param background Whether the worker threads managed by this thread pool are run in
-     *        a background mode (depending on the support of the operating system)
+     * \param workerInit The additional initialize function for each Worker that gets
+     *        called once for each Worker when it is created
+     * \param workerDeinit The additional deinitialize function for each Worker that gets
+     *        called once for each Worken when it is destroyed
+     * \param tpc The ghoul::thread::ThreadPriorityClass of the worker threads managed by
+     *        the ThreadPool
+     * \param tpl The ghoul::thread::ThreadPriorityLevel of the worker threads managed by
+     *        the ThreadPool
+     * \param bg Whether the worker threads managed by this thread pool are run in a
+     *        background mode (depending on the support of the operating system)
      * \pre \p nThreads must be bigger than 0
-     * \pre \p workerInitialization must not be empty
-     * \pre \p workerDeinitialization must not be empty
+     * \pre \p workerInit must not be empty
+     * \pre \p workerDeinit must not be empty
      * \post The ThreadPool is running
      */
     ThreadPool(
         int nThreads = 1,
-        std::function<void ()> workerInitialization = [](){},
-        std::function<void ()> workerDeinitialization = [](){},
-        thread::ThreadPriorityClass priorityClass = thread::ThreadPriorityClass::Normal,
-        thread::ThreadPriorityLevel priorityLevel = thread::ThreadPriorityLevel::Normal,
-        thread::Background background = thread::Background::No);
+        std::function<void ()> workerInit = [](){},
+        std::function<void ()> workerDeinit = [](){},
+        thread::ThreadPriorityClass tpc = thread::ThreadPriorityClass::Normal,
+        thread::ThreadPriorityLevel tpl = thread::ThreadPriorityLevel::Normal,
+        thread::Background bg = thread::Background::No);
 
     /**
      * Destructor that will block and wait for all remaining Tasks to be finished if the

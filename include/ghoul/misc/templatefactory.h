@@ -41,22 +41,22 @@ class TemplateFactoryBase {
 public:
     /// Main exception that is thrown by the TemplateFactory in the case of errors
     struct TemplateFactoryError : public RuntimeError {
-        explicit TemplateFactoryError(std::string message);
+        explicit TemplateFactoryError(std::string msg);
     };
 
     /// Exception that is thrown if a requested class has not been registered before
     struct TemplateClassNotFoundError : public TemplateFactoryError {
-        explicit TemplateClassNotFoundError(std::string className);
+        explicit TemplateClassNotFoundError(std::string name);
         std::string className;
     };
 
     /// Exception that is thrown if a registered class is called with a wrong constructor
     struct TemplateConstructionError : public TemplateFactoryError {
-        explicit TemplateConstructionError(std::string message);
+        explicit TemplateConstructionError(std::string msg);
     };
 
     virtual const std::type_info& baseClassType() const = 0;
-    virtual ~TemplateFactoryBase();
+    virtual ~TemplateFactoryBase() = default;
 
     virtual bool hasClass(const std::string& className) const = 0;
     virtual std::vector<std::string> registeredClasses() const = 0;

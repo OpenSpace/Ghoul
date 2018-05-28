@@ -48,7 +48,7 @@ public:
      * This exception is thrown if an unknown type is being converted.
      */
     struct JsonFormattingError : public RuntimeError {
-        explicit JsonFormattingError(const std::string& message);
+        explicit JsonFormattingError(const std::string& msg);
     };
 
     /**

@@ -52,17 +52,17 @@ class ShaderObject {
 public:
     /// Main exception that is thrown by methods of the ShaderObject class
     struct ShaderObjectError : public RuntimeError {
-        explicit ShaderObjectError(std::string message);
+        explicit ShaderObjectError(std::string msg);
     };
 
     /// The exception that is thrown if the compilation of a ShaderObject failed
     struct ShaderCompileError : public ShaderObjectError {
         /**
          * The constructor constructing a ShaderCompileError containing the cause for the
-         * error (\p compileError) as well as the, optional, \p shaderName
+         * error (\p error) as well as the, optional, \p ident and \p name
          */
-        explicit ShaderCompileError(std::string compileError, std::string fileIdentifiers,
-            std::string shaderName);
+        explicit ShaderCompileError(std::string error, std::string ident,
+            std::string name);
 
         /// The compile error as reported by the GLSL compiler
         std::string compileError;

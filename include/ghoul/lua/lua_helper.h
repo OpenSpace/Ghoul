@@ -36,11 +36,11 @@ namespace ghoul { class Dictionary; }
 namespace ghoul::lua {
 
 struct LuaRuntimeException : public RuntimeError {
-    explicit LuaRuntimeException(std::string message);
+    explicit LuaRuntimeException(std::string msg);
 };
 
 struct LuaFormatException : public LuaRuntimeException {
-    explicit LuaFormatException(std::string message, std::string file = "");
+    explicit LuaFormatException(std::string msg, std::string file = "");
     std::string filename;
 };
 

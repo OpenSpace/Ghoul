@@ -77,7 +77,7 @@ public:
      *
      * \param other The Buffer to copy the data from
      */
-    Buffer(const Buffer& other);
+    Buffer(const Buffer& other) = default;
 
     /**
      * Moves the original object into this one. The original object must not be used after

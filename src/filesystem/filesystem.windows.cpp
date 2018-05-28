@@ -55,9 +55,9 @@ namespace ghoul::filesystem {
 
 struct DirectoryHandle {
     HANDLE _handle = nullptr;
-    unsigned char _activeBuffer;
+    unsigned char _activeBuffer = 0;
     std::vector<BYTE> _changeBuffer[2];
-    OVERLAPPED _overlappedBuffer;
+    OVERLAPPED _overlappedBuffer = { 0 };
 };
 
 void FileSystem::deinitializeInternalWindows() {
@@ -85,13 +85,13 @@ void FileSystem::addFileListener(File* file) {
             d.c_str(),
             FILE_LIST_DIRECTORY,
             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-            NULL,
+            nullptr,
             OPEN_EXISTING,
             FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
-            NULL
+            nullptr
         );
 
-        if (handle->_handle == INVALID_HANDLE_VALUE) {
+        if (handle->_handle == INVALID_HANDLE_VALUE) {  // NOLINT
             LERROR(fmt::format("Directory handle for '{}' could not be obtained", d));
             delete handle;
             return;
@@ -130,12 +130,12 @@ void FileSystem::removeFileListener(File* file) {
 }
 
 void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,
-                                 const std::string& file)
+                                 const std::string& filePath)
 {
     std::string fullPath;
     for (const std::pair<const std::string, DirectoryHandle*>& d : FileSys._directories) {
         if (d.second == directoryHandle) {
-            fullPath = d.first + PathSeparator + file;
+            fullPath = d.first + PathSeparator + filePath;
         }
     }
 
@@ -149,8 +149,8 @@ void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,
     }
 }
 
-void callbackHandler(DirectoryHandle* directoryHandle, const std::string& file) {
-    FileSys.callbackHandler(directoryHandle, file);
+void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filePath) {
+    FileSys.callbackHandler(directoryHandle, filePath);
 }
 
 void readStarter(DirectoryHandle* directoryHandle) {
@@ -238,12 +238,12 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
             FORMAT_MESSAGE_ALLOCATE_BUFFER |
             FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
+            nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer,
+            (LPTSTR)&errorBuffer, // NOLINT 
             0,
-            NULL
+            nullptr
         );
 
         // For some reason, there is a potential race condition here at the end of the

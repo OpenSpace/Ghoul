@@ -36,6 +36,8 @@
 #include <string>
 #include <vector>
 
+// @TODO(abock): This class needs cleanup
+
 namespace ghoul::opengl {
 
 class ShaderPreprocessor {
@@ -45,28 +47,30 @@ public:
     using ShaderChangedCallback = std::function<void ()>;
 
     struct ShaderPreprocessorError : public RuntimeError {
-        explicit ShaderPreprocessorError(std::string message);
+        explicit ShaderPreprocessorError(std::string msg);
     };
 
     struct SubstitutionError : public ShaderPreprocessorError {
-        explicit SubstitutionError(std::string message);
+        explicit SubstitutionError(std::string msg);
     };
 
     struct ParserError : public ShaderPreprocessorError {
-        explicit ParserError(std::string message);
+        explicit ParserError(std::string msg);
     };
 
     struct IncludeError : public ShaderPreprocessorError {
-        explicit IncludeError(std::string file);
+        explicit IncludeError(std::string f);
         std::string file;
     };
 
-    ShaderPreprocessor(std::string shaderPath = "", Dictionary dict = Dictionary());
+    ShaderPreprocessor(std::string shaderPath = "",
+        Dictionary dictionary = Dictionary());
+
     std::string filename();
     Dictionary dictionary();
-    void setDictionary(Dictionary dict);
-    void setFilename(const std::string& filename);
-    void setCallback(ShaderChangedCallback cb);
+    void setDictionary(Dictionary dictionary);
+    void setFilename(const std::string& shaderPath);
+    void setCallback(ShaderChangedCallback changeCallback);
     void process(std::string& output);
     std::string getFileIdentifiersString();
 
@@ -87,8 +91,7 @@ public:
 
 private:
     struct Input {
-        Input(std::ifstream& stream, ghoul::filesystem::File& file,
-            std::string indentation);
+        Input(std::ifstream& str, ghoul::filesystem::File& f, std::string indent);
 
         std::ifstream& stream;
         ghoul::filesystem::File& file;
@@ -111,8 +114,8 @@ private:
     struct Env {
         using Scope = std::set<std::string>;
 
-        Env(std::stringstream& output, std::string line = "",
-            std::string indentation = "");
+        Env(std::stringstream& out, std::string l = "",
+            std::string indent = "");
 
         std::stringstream& output;
         std::string line;

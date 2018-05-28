@@ -44,7 +44,7 @@ namespace ghoul::filesystem {
 #ifdef WIN32
 struct DirectoryHandle;
 void readStarter(DirectoryHandle* directoryHandle);
-void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filepath);
+void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filePath);
 #elif defined(__APPLE__)
 struct DirectoryHandle;
 void callbackHandler(const std::string& path);
@@ -85,7 +85,7 @@ public:
 
     /// Exception that gets thrown if a file system token could not be resolved
     struct ResolveTokenException : FileSystemException {
-        explicit ResolveTokenException(std::string token);
+        explicit ResolveTokenException(std::string t);
 
         std::string token;
     };
@@ -105,6 +105,9 @@ public:
 
     /// Closing braces that are used for path tokens
     static constexpr const char* TokenClosingBraces = "}";
+
+    FileSystem(const FileSystem& rhs) = delete;
+    FileSystem& operator=(const FileSystem& rhs) = delete;
 
     /**
      * Returns the absolute path to the passed \p path, resolving any tokens (if present)
@@ -441,9 +444,6 @@ private:
      */
     std::string resolveToken(const std::string& token) const;
 
-    FileSystem(const FileSystem& rhs) = delete;
-    FileSystem& operator=(const FileSystem& rhs) = delete;
-
     /// This map stores all the tokens that are used in the FileSystem.
     std::map<std::string, std::string> _tokenMap;
 
@@ -459,14 +459,14 @@ private:
 
     /// Handles the callback for a directory for the local file path
     static void callbackHandler(DirectoryHandle* directoryHandle,
-        const std::string& filepath);
+        const std::string& filePath);
 
     /// External function that calls beginRead
     friend void readStarter(DirectoryHandle* directoryHandle);
 
     /// External function that calls callbackHandler
     friend void callbackHandler(DirectoryHandle* directoryHandle,
-        const std::string& filepath);
+        const std::string& filePath);
 
     /// The list of all tracked files
     std::multimap<std::string, File*> _trackedFiles;

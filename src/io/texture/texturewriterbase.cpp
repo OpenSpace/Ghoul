@@ -29,12 +29,12 @@
 
 namespace ghoul::io {
 
-TextureWriterBase::TextureWriteException::TextureWriteException(std::string n,
-                                                                std::string m,
+TextureWriterBase::TextureWriteException::TextureWriteException(std::string name,
+                                                                std::string msg,
                                                                const TextureWriterBase& w)
-    : RuntimeError(fmt::format("Error writing texture '{}'", n), "TextureWriter")
-    , filename(std::move(n))
-    , message(std::move(m))
+    : RuntimeError(fmt::format("Error writing texture '{}'", name), "TextureWriter")
+    , filename(std::move(name))
+    , message(std::move(msg))
     , writer(w)
 {}
 

@@ -42,8 +42,8 @@ class TextureWriterBase {
 public:
     /// The exception that gets thrown if there was an error writing the Texture
     struct TextureWriteException : public RuntimeError {
-        explicit TextureWriteException(std::string name, std::string message,
-            const TextureWriterBase& writer);
+        explicit TextureWriteException(std::string name, std::string msg,
+            const TextureWriterBase& w);
 
         /// The filename that caused the exception to be thrown
         std::string filename;

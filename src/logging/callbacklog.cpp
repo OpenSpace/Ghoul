@@ -30,8 +30,8 @@ namespace ghoul::logging {
 CallbackLog::CallbackLog(CallbackFunction callbackFunction, TimeStamping timeStamping,
             DateStamping dateStamping, CategoryStamping categoryStamping,
             LogLevelStamping logLevelStamping,
-            LogLevel logLevel)
-    : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, logLevel)
+            LogLevel minimumLogLevel)
+    : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, minimumLogLevel)
     , _callbackFunction(std::move(callbackFunction))
 {}
 
@@ -49,13 +49,13 @@ void CallbackLog::log(LogLevel level, const std::string& category,
     if (isDateStamping() || isTimeStamping()) {
         output += "] ";
     }
-    if (isCategoryStamping() && (category != "")) {
+    if (isCategoryStamping() && (!category.empty())) {
         output += category + " ";
     }
     if (isLogLevelStamping()) {
         output += "(" + stringFromLevel(level) + ")";
     }
-    if (output != "") {
+    if (!output.empty()) {
         output += "\t";
     }
     output += message;

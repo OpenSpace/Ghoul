@@ -46,7 +46,7 @@ std::string clipboardText();
  *
  * \throw RuntimeError If there was an error writing the text to the clipboard
  */
-void setClipboardText(std::string text);
+void setClipboardText(const std::string& text);
 
 } // namespace ghoul
 

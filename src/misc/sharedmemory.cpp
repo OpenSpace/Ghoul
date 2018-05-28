@@ -69,12 +69,12 @@ namespace {
             FORMAT_MESSAGE_FROM_SYSTEM |
             FORMAT_MESSAGE_ALLOCATE_BUFFER |
             FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
+            nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer,
+            (LPTSTR)&errorBuffer, // NOLINT
             0,
-            NULL
+            nullptr
         );
         if ((nValues > 0) && (errorBuffer != nullptr)) {
             std::string errorMsg(errorBuffer);
@@ -83,7 +83,7 @@ namespace {
         }
         else {
             return std::string("Error constructing format message for error: ") +
-                std::to_string(error);
+                   std::to_string(error);
         }
     }
 #endif
@@ -102,15 +102,15 @@ void SharedMemory::create(const std::string& name, size_t size) {
     size += sizeof(Header);
 #ifdef WIN32
     HANDLE handle = CreateFileMapping(
-        INVALID_HANDLE_VALUE,
-        NULL,
+        INVALID_HANDLE_VALUE, // NOLINT
+        nullptr,
         PAGE_READWRITE,
         0,
         static_cast<DWORD>(size),
         name.c_str()
     );
     const DWORD error = GetLastError();
-    if (handle == NULL) {
+    if (handle == nullptr) {
         std::string errorMsg = lastErrorToString(error);
         throw SharedMemoryError(
             "Error creating shared memory '" + name + "': " + errorMsg
@@ -123,7 +123,7 @@ void SharedMemory::create(const std::string& name, size_t size) {
             );
         }
         else {
-            void* memory = MapViewOfFileEx(handle, FILE_MAP_ALL_ACCESS, 0, 0, 0, NULL);
+            void* memory = MapViewOfFileEx(handle, FILE_MAP_ALL_ACCESS, 0, 0, 0, nullptr);
 
             if (memory == nullptr) {
                 std::string errorMsg = lastErrorToString(error);
@@ -192,7 +192,7 @@ void SharedMemory::remove(const std::string& name) {
 bool SharedMemory::exists(const std::string& name) {
 #ifdef WIN32
     HANDLE handle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, name.c_str());
-    if (handle != NULL) {
+    if (handle != nullptr) {
         // the file exists, so we have to close it immediately to not leak the handle
         CloseHandle(handle);
         return true;
@@ -234,7 +234,7 @@ SharedMemory::SharedMemory(std::string name)
         );
     }
 
-    _memory = MapViewOfFileEx(_sharedMemoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, 0, NULL);
+    _memory = MapViewOfFileEx(_sharedMemoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, 0, nullptr);
     if (_memory == nullptr) {
         CloseHandle(_sharedMemoryHandle);
 

@@ -59,7 +59,7 @@ class SharedMemory {
 public:
     /// Superclass for all exceptions that are thrown by this class
     struct SharedMemoryError : public RuntimeError {
-        explicit SharedMemoryError(std::string message);
+        explicit SharedMemoryError(std::string msg);
     };
 
     /// Exception that is thrown if a specific shared memory did not exist

@@ -90,11 +90,11 @@ CommandlineParser::CommandlineException::CommandlineException(const std::string&
 {}
 
 CommandlineParser::CommandlineParser(std::string programName,
-                                     AllowUnknownCommands unknownCommands,
+                                     AllowUnknownCommands allowUnknownCommands,
                                      std::string shortHelpCommand,
                                      std::string longHelpCommand)
     : _programName(std::move(programName))
-    , _allowUnknownCommands(unknownCommands)
+    , _allowUnknownCommands(allowUnknownCommands)
     , _shortHelpCommand(std::move(shortHelpCommand))
     , _longHelpCommand(std::move(longHelpCommand))
 {}
@@ -103,8 +103,9 @@ CommandlineParser::~CommandlineParser() {
     _commands.clear();
 }
 
-void CommandlineParser::setAllowUnknownCommands(AllowUnknownCommands unknownCommands) {
-    _allowUnknownCommands = unknownCommands;
+void CommandlineParser::setAllowUnknownCommands(AllowUnknownCommands allowUnknownCommands)
+{
+    _allowUnknownCommands = allowUnknownCommands;
 }
 
 CommandlineParser::AllowUnknownCommands CommandlineParser::allowsUnknownCommands() const {
@@ -231,7 +232,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
     // command. If so, bail out
     if (!argumentsForNameless.empty() && (!_commandForNamelessArguments)) {
         if (_allowUnknownCommands) {
-            for (std::string arg : argumentsForNameless) {
+            for (const std::string& arg : argumentsForNameless) {
                 _remainingArguments.push_back(arg);
             }
         }

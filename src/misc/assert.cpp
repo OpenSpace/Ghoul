@@ -34,15 +34,15 @@
 namespace {
     std::vector<std::string> PermanentlyIgnoredAsserts;
 
-    std::string hashing(std::string file, int line) {
+    std::string hashing(const std::string& file, int line) {
         return file + "||" + std::to_string(line);
     }
 
-    void addPermanentlyIgnoredAssert(std::string file, int line) {
+    void addPermanentlyIgnoredAssert(const std::string& file, int line) {
         PermanentlyIgnoredAsserts.emplace_back(hashing(file, line));
     }
 
-    bool isPermanentlyIgnored(std::string file, int line) {
+    bool isPermanentlyIgnored(const std::string& file, int line) {
         auto it = std::find(
             PermanentlyIgnoredAsserts.begin(),
             PermanentlyIgnoredAsserts.end(),

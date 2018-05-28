@@ -48,7 +48,7 @@ class ShaderManager {
 public:
     /// Main exception that is thrown in the methods of the ShaderManager
     struct ShaderManagerError : public RuntimeError {
-        explicit ShaderManagerError(std::string message);
+        explicit ShaderManagerError(std::string msg);
     };
 
     /**

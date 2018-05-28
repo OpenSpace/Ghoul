@@ -70,12 +70,12 @@ public:
 
     /// Main exception that is thrown by methods of the ProgramObject class
     struct ProgramObjectError : public RuntimeError {
-        explicit ProgramObjectError(std::string message);
+        explicit ProgramObjectError(std::string msg);
     };
 
     /// Exception that is thrown if the linking of a ProgramObject fails
     struct ProgramObjectLinkingError : public ProgramObjectError {
-        ProgramObjectLinkingError(std::string linkerError, std::string programName);
+        ProgramObjectLinkingError(std::string msg, std::string name);
 
         /// The linker error that was returned from the GLSL linker
         std::string linkerError;

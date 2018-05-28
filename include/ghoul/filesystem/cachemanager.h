@@ -60,7 +60,7 @@ public:
 
     /// Superclass for all cache-related exceptions
     struct CacheException : public RuntimeError {
-        explicit CacheException(const std::string& msg);
+        explicit CacheException(std::string msg);
     };
 
     /// Exception that gets thrown if the cache has a malformed information file
@@ -73,7 +73,7 @@ public:
 
     /// Exception that gets thrown if there was an error loading the previous cache files
     struct ErrorLoadingCacheException : public CacheException {
-        explicit ErrorLoadingCacheException(const std::string& message);
+        explicit ErrorLoadingCacheException(std::string msg);
     };
 
     /// Exception that gets thrown if the argument for retrieving a cache file is invalid
@@ -107,6 +107,11 @@ public:
      * non-persistent files are automatically deleted in the destructor.
      */
     ~CacheManager();
+
+    CacheManager(const CacheManager& c) = delete;
+    CacheManager(CacheManager&& m) = delete;
+    CacheManager& operator=(const CacheManager& rhs) = delete;
+    CacheManager& operator=(CacheManager&& rhs) = delete;
 
     /**
      * Returns the path to a storage location for the cached file. Depending on the
@@ -320,13 +325,6 @@ protected:
     using LoadedCacheInfo = std::pair<unsigned int, std::string>;
 
     /**
-     * Generates a hash number from the file path and information string
-     *
-     * \return A hash number
-     */
-    unsigned int generateHash(std::string file, std::string information) const;
-
-    /**
      * Cleans a directory from files not flagged as persistent and removes
      */
     void cleanDirectory(const Directory& dir) const;
@@ -338,10 +336,6 @@ protected:
      */
     std::vector<LoadedCacheInfo> cacheInformationFromDirectory(
         const Directory& dir) const;
-
-    CacheManager(const CacheManager& c) = delete;
-    CacheManager(CacheManager&& m) = delete;
-    CacheManager& operator=(const CacheManager& rhs) = delete;
 
     /// The cache directory
     Directory _directory;

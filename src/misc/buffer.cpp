@@ -45,12 +45,6 @@ Buffer::Buffer(const std::string& filename) {
     read(filename);
 }
 
-Buffer::Buffer(const Buffer& other)
-    : _data(other._data)
-    , _offsetWrite(other._offsetWrite)
-    , _offsetRead(other._offsetRead)
-{}
-
 Buffer::Buffer(Buffer&& other) {
     if (this != &other) {
         // move memory
@@ -219,7 +213,7 @@ void Buffer::serialize(const std::string& v) {
 }
 
 template <>
-void Buffer::deserialize(std::string& v) {
+void Buffer::deserialize(std::string& value) {
     ghoul_assert(
         _offsetRead + sizeof(size_t) <= _data.size(), "Insufficient buffer size"
     );
@@ -230,7 +224,7 @@ void Buffer::deserialize(std::string& v) {
 
     ghoul_assert(_offsetRead + size <= _data.size(), "Insufficient buffer size");
 
-    v = std::string(reinterpret_cast<char*>(_data.data()+_offsetRead), size);
+    value = std::string(reinterpret_cast<char*>(_data.data()+_offsetRead), size);
     _offsetRead += size;
 }
 

@@ -50,6 +50,11 @@ namespace ghoul {
 template <class T>
 class Singleton {
 public:
+    Singleton(const Singleton&) = delete;
+    Singleton(const Singleton&&) = delete;
+    Singleton& operator=(const Singleton& rhs) = delete;
+    Singleton& operator=(Singleton&& rhs) = delete;
+
     /**
      * Creates and initializes an empty singleton with the arguments passed to the
      * template class T constructor.
@@ -108,13 +113,6 @@ protected:
     ~Singleton() = default;
 
 private:
-    // protecting against evil
-    Singleton(const Singleton&) = delete;
-    Singleton(const Singleton&&) = delete;
-    Singleton& operator=(const Singleton& rhs) = delete;
-    Singleton& operator=(Singleton&& rhs) = delete;
-
-    // instance member
     static T* _instance;
 
 }; // Singleton

@@ -48,7 +48,7 @@ class TextureManager {
 public:
     /// Main exception that is thrown in the methods of the TextureManager
     struct TextureManagerError : public RuntimeError {
-        explicit TextureManagerError(std::string message);
+        explicit TextureManagerError(std::string msg);
     };
 
     /**

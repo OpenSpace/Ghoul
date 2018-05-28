@@ -133,7 +133,7 @@ protected:
     /// Exception that will be thrown if there was an error regarding Windows'
     /// Management Instrumentation
     struct WMIError : public RuntimeError {
-        explicit WMIError(std::string message, HRESULT errorCode);
+        explicit WMIError(std::string msg, HRESULT code);
 
         std::string message;
         HRESULT errorCode;

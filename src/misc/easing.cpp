@@ -62,8 +62,8 @@ EasingFunction easingFunctionFromName(const char* name) {
 }
 
 bool isValidEasingFunctionName(const char* name) {
-    for (size_t i = 0; i < EaseFuncNames.size(); ++i) {
-        if (std::string(EaseFuncNames[i]) == std::string(name)) {
+    for (const char* n : EaseFuncNames) {
+        if (std::string(n) == std::string(name)) {
             return true;
         }
     }

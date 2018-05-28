@@ -244,7 +244,7 @@ Dictionary loadDictionaryFromString(const std::string& script, lua_State* state)
     return result;
 }
 
-void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
+void luaDictionaryFromState(lua_State* state, Dictionary& dictionary) {
     enum class TableType {
         Undefined = 1,  // 001
         Map = 3,        // 010
@@ -289,20 +289,20 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dict) {
         switch (lua_type(state, ValueTableIndex)) {
             case LUA_TNUMBER: {
                 double value = lua_tonumber(state, ValueTableIndex);
-                dict.setValue(key, value);
+                dictionary.setValue(key, value);
             } break;
             case LUA_TBOOLEAN: {
                 bool value = (lua_toboolean(state, ValueTableIndex) == 1);
-                dict.setValue(key, value);
+                dictionary.setValue(key, value);
             } break;
             case LUA_TSTRING: {
                 std::string value = lua_tostring(state, ValueTableIndex);
-                dict.setValue(key, value);
+                dictionary.setValue(key, value);
             } break;
             case LUA_TTABLE: {
                 Dictionary d;
                 luaDictionaryFromState(state, d);
-                dict.setValue(key, d);
+                dictionary.setValue(key, d);
             } break;
             default:
                 throw LuaFormatException(
@@ -395,7 +395,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected, const char* component) {
             component ? component : "Lua",
             s
         );
-        luaL_error(L, s.c_str());
+        luaL_error(L, s.c_str()); // NOLINT
     }
     return nArguments;
 }
@@ -412,7 +412,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected1, int expected2,
             component ? component : "Lua",
             s
         );
-        luaL_error(L, s.c_str());
+        luaL_error(L, s.c_str()); // NOLINT
     }
     return nArguments;
 }
@@ -428,7 +428,7 @@ int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range, const char* 
             component ? component : "Lua",
             s
         );
-        luaL_error(L, s.c_str());
+        luaL_error(L, s.c_str()); // NOLINT
     }
     return nArguments;
 }
@@ -454,7 +454,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range
             s
         );
 
-        luaL_error(L, s.c_str());
+        luaL_error(L, s.c_str()); // NOLINT
     }
     return nArguments;
 }

@@ -35,8 +35,8 @@
     #include <tchar.h>
     #pragma comment(lib, "User32.lib")
     #pragma comment(lib, "Kernel32.lib")
-    typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
-    typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD);
+    typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO); // NOLINT
+    typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD); // NOLINT
 #else
     #include <sys/utsname.h>
 #endif

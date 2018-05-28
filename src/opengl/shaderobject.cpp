@@ -249,7 +249,7 @@ std::string ShaderObject::filename() {
 }
 
 void ShaderObject::setDictionary(Dictionary dictionary) {
-    _preprocessor.setDictionary(dictionary);
+    _preprocessor.setDictionary(std::move(dictionary));
 }
 
 Dictionary ShaderObject::dictionary() {
@@ -265,7 +265,7 @@ void ShaderObject::rebuildFromFile() {
     std::string generatedFilename;
 
     std::string baseName;
-    if (_shaderName == "") {
+    if (_shaderName.empty()) {
         filesystem::File ghlFile(filename());
         baseName = ghlFile.baseName();
     } else {

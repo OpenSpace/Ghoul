@@ -148,7 +148,7 @@ public:
      *
      * \param log The Log that should be removed from this LogManager
      */
-    void removeLog(std::shared_ptr<Log> log);
+    void removeLog(Log* log);
 
     /**
      * Flushes all of the registered Log%s. This can be useful in cases when an

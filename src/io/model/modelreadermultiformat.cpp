@@ -88,21 +88,21 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderMultiFormat::loadModel(
         3,
         GL_FLOAT,
         sizeof(Vertex),
-        offsetof(Vertex, location)
+        offsetof(Vertex, location) // NOLINT 
     );
     vbo->vertexAttribPointer(
         1,
         2,
         GL_FLOAT,
         sizeof(Vertex),
-        offsetof(Vertex, tex)
+        offsetof(Vertex, tex) // NOLINT 
     );
     vbo->vertexAttribPointer(
         2,
         3,
         GL_FLOAT,
         sizeof(Vertex),
-        offsetof(Vertex, normal)
+        offsetof(Vertex, normal) // NOLINT 
     );
     return vbo;
 }
@@ -155,7 +155,7 @@ void ModelReaderMultiFormat::loadModel(
     for (const aiMesh* meshPtr : meshArray) {
         // Walk through each of the mesh's vertices
         for (unsigned int i = 0; i < meshPtr->mNumVertices; i++) {
-            Vertex vTmp;
+            Vertex vTmp {};
 
             // Positions
             vTmp.location[0] = meshPtr->mVertices[i].x;

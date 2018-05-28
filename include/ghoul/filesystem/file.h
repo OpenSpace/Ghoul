@@ -85,11 +85,17 @@ public:
      */
     File(const File& file);
 
+    File(File&& file) = default;
+
     /**
      * The destructor will automatically stop the notification of future changes in the
      * file system.
      */
     ~File();
+
+    File& operator=(const File& rhs) = default;
+    File& operator=(File&& rhs) = default;
+
 
     /**
      * Sets a new callback function that will be used for this File object. If there

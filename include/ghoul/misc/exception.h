@@ -38,14 +38,14 @@ namespace ghoul {
  */
 struct RuntimeError : public std::runtime_error {
     /**
-     * Main constructor constructing the exception with the provided \p message and
-     * \p component.
+     * Main constructor constructing the exception with the provided message \p msg and
+     * component \p comp.
      *
-     * \param message The main message of the exception
-     * \param component The optional component
-     * \pre \p message must not be empty
+     * \param msg The main message of the exception
+     * \param comp The optional component
+     * \pre \p msg must not be empty
      */
-    explicit RuntimeError(std::string message, std::string component = "");
+    explicit RuntimeError(std::string msg, std::string comp = "");
 
     /// The main message describing the exception
     std::string message;
@@ -59,15 +59,15 @@ struct RuntimeError : public std::runtime_error {
  */
 struct FileNotFoundError : public RuntimeError {
     /**
-     * Main constructor constructing the exception with the provided missing \p file and
-     * the \p component that threw the exception.
+     * Main constructor constructing the exception with the provided missing file \p f and
+     * the component \p comp that threw the exception.
      *
-     * \param file The file that was missing which caused this exception to be thrown
-     * \param component The optional compoment that caused this exception to be thrown
+     * \param f The file that was missing which caused this exception to be thrown
+     * \param comp The optional compoment that caused this exception to be thrown
      *
-     * \pre \p file must not be empty
+     * \pre \p f must not be empty
      */
-    explicit FileNotFoundError(std::string file, std::string component = "");
+    explicit FileNotFoundError(std::string f, std::string comp = "");
 
     /// The file that was missing
     std::string file;

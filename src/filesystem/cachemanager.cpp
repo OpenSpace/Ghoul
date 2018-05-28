@@ -39,12 +39,19 @@ namespace {
 
     // something that cannot occur in the filesystem
     constexpr const char _hashDelimiter = '|';
+
+    unsigned int generateHash(const std::string& file, const std::string& information) {
+        std::string hashString = file + _hashDelimiter + information;
+        unsigned int hash = ghoul::hashCRC32(hashString);
+        return hash;
+    }
+
 } // namespace
 
 namespace ghoul::filesystem {
 
-CacheManager::CacheException::CacheException(const std::string& msg)
-    : RuntimeError(msg, "Cache")
+CacheManager::CacheException::CacheException(std::string msg)
+    : RuntimeError(std::move(msg), "Cache")
 {}
 
 CacheManager::MalformedCacheException::MalformedCacheException(std::string file,
@@ -54,9 +61,8 @@ CacheManager::MalformedCacheException::MalformedCacheException(std::string file,
     , message(std::move(msg))
 {}
 
-CacheManager::ErrorLoadingCacheException::ErrorLoadingCacheException(
-                                                                   const std::string& msg)
-    : CacheException(msg)
+CacheManager::ErrorLoadingCacheException::ErrorLoadingCacheException(std::string msg)
+    : CacheException(std::move(msg))
 {}
 
 CacheManager::IllegalArgumentException::IllegalArgumentException(std::string argument)
@@ -298,12 +304,6 @@ void CacheManager::removeCacheFile(const std::string& baseName,
     }
 }
 
-unsigned int CacheManager::generateHash(std::string file, std::string information) const {
-    std::string hashString = file + _hashDelimiter + information;
-    unsigned int hash = hashCRC32(hashString);
-    return hash;
-}
-
 void CacheManager::cleanDirectory(const Directory& dir) const {
     // First search for all subdirectories and call this function recursively on them
     std::vector<std::string> contents = dir.readDirectories();
@@ -368,9 +368,8 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
                         directoryName
                     ));
                 }
-                else {
-                    result.emplace_back(std::stoul(hashName), files[0]);
-                }
+
+                result.emplace_back(std::stoul(hashName), files[0]);
             }
         }
     }

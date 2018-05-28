@@ -92,16 +92,14 @@ TcpSocket::TcpSocketError::TcpSocketError(std::string msg, std::string comp)
 {}
 
 TcpSocket::TcpSocket(std::string address, int port)
-    : Socket()
-    , _address(std::move(address))
+    : _address(std::move(address))
     , _port(port)
     , _socket(INVALID_SOCKET)
     , _delimiter(DefaultDelimiter)
 {}
 
 TcpSocket::TcpSocket(std::string address, int port, _SOCKET socket)
-    : Socket()
-    , _address(std::move(address))
+    : _address(std::move(address))
     , _port(port)
     , _isConnected(true)
     , _socket(socket)
@@ -150,7 +148,7 @@ void TcpSocket::connect() {
     }
 
     struct addrinfo* addresult = nullptr;
-    struct addrinfo hints;
+    struct addrinfo hints {};
     std::memset(&hints, 0, sizeof(hints));
 
     hints.ai_family = AF_INET;
@@ -501,7 +499,7 @@ bool TcpSocket::initializedNetworkApi() {
 
 void TcpSocket::interceptInput(InputInterceptor interceptor) {
     std::lock_guard<std::mutex> lock(_inputInterceptionMutex);
-    _inputInterceptor = interceptor;
+    _inputInterceptor = std::move(interceptor);
 }
 
 void TcpSocket::uninterceptInput() {
@@ -509,8 +507,8 @@ void TcpSocket::uninterceptInput() {
     _inputInterceptor = nullptr;
 }
 
-bool TcpSocket::getBytes(char* getBuffer, size_t size) {
-    waitForInput(size);
+bool TcpSocket::getBytes(char* buffer, size_t nItems) {
+    waitForInput(nItems);
     if (_shouldStopThreads) {
         return false;
     }
@@ -518,13 +516,13 @@ bool TcpSocket::getBytes(char* getBuffer, size_t size) {
         return false;
     }
     std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
-    std::copy_n(_inputQueue.begin(), size, getBuffer);
-    _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + size);
+    std::copy_n(_inputQueue.begin(), nItems, buffer);
+    _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + nItems);
     return true;
 }
 
-bool TcpSocket::peekBytes(char* peekBuffer, size_t size) {
-    waitForInput(size);
+bool TcpSocket::peekBytes(char* buffer, size_t nItems) {
+    waitForInput(nItems);
     if (_shouldStopThreads) {
         return false;
     }
@@ -532,12 +530,12 @@ bool TcpSocket::peekBytes(char* peekBuffer, size_t size) {
         return false;
     }
     std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
-    std::copy_n(_inputQueue.begin(), size, peekBuffer);
+    std::copy_n(_inputQueue.begin(), nItems, buffer);
     return true;
 }
 
-bool TcpSocket::skipBytes(size_t size) {
-    waitForInput(size);
+bool TcpSocket::skipBytes(size_t nItems) {
+    waitForInput(nItems);
     if (_shouldStopThreads) {
         return false;
     }
@@ -545,7 +543,7 @@ bool TcpSocket::skipBytes(size_t size) {
         return false;
     }
     std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
-    _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + size);
+    _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + nItems);
     return true;
 }
 

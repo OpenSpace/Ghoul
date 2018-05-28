@@ -44,13 +44,16 @@ namespace {
     {
         static const std::string ws = " \n\r\t";
         size_t startPos = str.find_first_not_of(ws);
-        if (startPos == std::string::npos)
+        if (startPos == std::string::npos) {
             startPos = 0;
+        }
         size_t endPos = str.find_last_not_of(ws);
-        if (endPos == std::string::npos)
+        if (endPos == std::string::npos) {
             endPos = str.length();
-        else
+        }
+        else {
             endPos += 1;
+        }
 
         size_t length = endPos - startPos;
         if (before != nullptr) {
@@ -113,17 +116,17 @@ ShaderPreprocessor::IncludeError::IncludeError(std::string f)
     , file(std::move(f))
 {}
 
-ShaderPreprocessor::Input::Input(std::ifstream& s, ghoul::filesystem::File& f,
-                                 std::string i)
-    : stream(s)
+ShaderPreprocessor::Input::Input(std::ifstream& str, ghoul::filesystem::File& f,
+                                 std::string indent)
+    : stream(str)
     , file(f)
-    , indentation(std::move(i))
+    , indentation(std::move(indent))
 {}
 
-ShaderPreprocessor::Env::Env(std::stringstream& o, std::string l, std::string i)
-    : output(o)
+ShaderPreprocessor::Env::Env(std::stringstream& out, std::string l, std::string indent)
+    : output(out)
     , line(std::move(l))
-    , indentation(std::move(i))
+    , indentation(std::move(indent))
 {}
 
 void ShaderPreprocessor::setDictionary(Dictionary dictionary) {
@@ -156,14 +159,14 @@ void ShaderPreprocessor::process(std::string& output) {
 
     includeFile(absPath(_shaderPath), TrackChanges::Yes, env);
 
-    if (env.forStatements.size() > 0) {
+    if (!env.forStatements.empty()) {
         throw ParserError(
             "Unexpected end of file in the middle of expanding #for statement. " +
             debugString(env)
         );
     }
 
-    if (env.scopes.size() > 0) {
+    if (!env.scopes.empty()) {
         throw ParserError(
             "Unexpected end of file. " + debugString(env)
         );
@@ -173,19 +176,19 @@ void ShaderPreprocessor::process(std::string& output) {
 }
 
 void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
-    _onChangeCallback = changeCallback;
-    for (auto& files : _includedFiles) {
-        if (files.second.isTracked)
-            files.second.file.setCallback([this](const filesystem::File& file) {
-            (void) file; // Suppress compiler warning about unused parameter
-            _onChangeCallback();
-        });
+    _onChangeCallback = std::move(changeCallback);
+    for (std::pair<const std::string, FileStruct>& files : _includedFiles) {
+        if (files.second.isTracked) {
+            files.second.file.setCallback([this](const filesystem::File&) {
+                _onChangeCallback();
+            });
+        }
     }
 }
 
 std::string ShaderPreprocessor::getFileIdentifiersString() {
     std::stringstream identifiers;
-    for (const auto& f : _includedFiles) {
+    for (const std::pair<const std::string, FileStruct>& f : _includedFiles) {
         identifiers << f.second.fileIdentifier << ": " << f.first << std::endl;
     }
     return identifiers.str();
@@ -217,7 +220,7 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
     ghoul_assert(!FileSys.containsToken(path), "Path must not contain path tokens");
 
     if (_includedFiles.find(path) == _includedFiles.end()) {
-        auto it = _includedFiles.emplace(
+        const auto it = _includedFiles.emplace(
             path,
             FileStruct {
                 filesystem::File(path),
@@ -225,28 +228,30 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
                 trackChanges
             }
         ).first;
-        if (trackChanges)
-            it->second.file.setCallback([this](const filesystem::File& file) {
-            (void) file; // Suppress compiler warning about unused parameter
-            _onChangeCallback();
-        });
+        if (trackChanges) {
+            it->second.file.setCallback([this](const filesystem::File&) {
+                _onChangeCallback();
+            });
+        }
     }
 
     std::ifstream stream(path);
-    if (!stream.good())
+    if (!stream.good()) {
         perror(path.c_str());
+    }
     ghoul_assert(stream.good() , "Input stream '" + path + "' is not good");
 
     ghoul::filesystem::File file(path);
 
     std::string prevIndentation =
-        environment.inputs.size() > 0 ? environment.inputs.back().indentation : "";
+        !environment.inputs.empty() ? environment.inputs.back().indentation : "";
 
     environment.inputs.emplace_back(
         stream, file, prevIndentation + environment.indentation
     );
-    if (environment.inputs.size() > 1)
+    if (environment.inputs.size() > 1) {
         addLineNumber(environment);
+    }
 
     while (parseLine(environment)) {
         if (!environment.success) {
@@ -257,7 +262,7 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
         }
     }
 
-    if (environment.forStatements.size() > 0) {
+    if (!environment.forStatements.empty()) {
         ShaderPreprocessor::ForStatement& forStatement = environment.forStatements.back();
         if (forStatement.inputIndex + 1 >= environment.inputs.size()) {
             int inputIndex = forStatement.inputIndex;
@@ -274,8 +279,9 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
 
     environment.inputs.pop_back();
 
-    if (environment.inputs.size() > 0)
-      addLineNumber(environment);
+    if (!environment.inputs.empty()) {
+        addLineNumber(environment);
+    }
 }
 
 void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
@@ -286,7 +292,7 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
     );
     size_t fileIdentifier = _includedFiles.at(filename).fileIdentifier;
 
-    std::string includeSeparator = "";
+    std::string includeSeparator;
     // Sofar, only Nvidia on Windows supports empty statements in the middle of the shader
     using Vendor = ghoul::systemcapabilities::OpenGLCapabilitiesComponent::Vendor;
     if (OpenGLCap.gpuVendor() == Vendor::Nvidia) {
@@ -303,13 +309,14 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
 }
 
 bool ShaderPreprocessor::isInsideEmptyForStatement(ShaderPreprocessor::Env& env) {
-    return env.forStatements.size() > 0 && env.forStatements.back().keyIndex == -1;
+    return !env.forStatements.empty() && (env.forStatements.back().keyIndex == -1);
 }
 
 bool ShaderPreprocessor::parseLine(ShaderPreprocessor::Env& env) {
     Input& input = env.inputs.back();
-    if (!std::getline(input.stream, env.line))
+    if (!std::getline(input.stream, env.line)) {
         return false;
+    }
     input.lineNumber++;
 
     // Trim away any whitespaces in the start and end of the line.
@@ -343,11 +350,13 @@ bool ShaderPreprocessor::parseLine(ShaderPreprocessor::Env& env) {
 }
 
 std::string ShaderPreprocessor::debugString(ShaderPreprocessor::Env& env) {
-    if (env.inputs.size() > 0) {
+    if (!env.inputs.empty()) {
         ShaderPreprocessor::Input& input = env.inputs.back();
         return input.file.path() + ": " + std::to_string(input.lineNumber);
-    } else
+    }
+    else {
         return "";
+    }
 }
 
 bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
@@ -355,7 +364,7 @@ bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
     size_t beginOffset;
 
     while ((beginOffset = line.rfind("#{")) != std::string::npos) {
-        size_t endOffset = line.substr(beginOffset).find("}");
+        size_t endOffset = line.substr(beginOffset).find('}');
         if (endOffset == std::string::npos) {
             throw ParserError("Could not parse line. " + debugString(env));
         }
@@ -369,7 +378,7 @@ bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
             line.length() - 1 - (beginOffset + endOffset)
         );
 
-        line = first + out + last;
+        line = first + out + last; // NOLINT
     }
     return true;
 }
@@ -379,7 +388,7 @@ bool ShaderPreprocessor::resolveAlias(const std::string& in, std::string& out,
 {
     size_t firstDotPos;
     std::string beforeDot, afterDot;
-    if ((firstDotPos = in.find(".")) != std::string::npos) {
+    if ((firstDotPos = in.find('.')) != std::string::npos) {
         beforeDot = in.substr(0, firstDotPos);
         afterDot = in.substr(firstDotPos);
     } else {
@@ -389,13 +398,13 @@ bool ShaderPreprocessor::resolveAlias(const std::string& in, std::string& out,
 
     // Resolve only part before dot
     if (env.aliases.find(beforeDot) != env.aliases.end()) {
-        if (env.aliases[beforeDot].size() > 0) {
+        if (!env.aliases[beforeDot].empty()) {
             beforeDot = env.aliases[beforeDot].back();
         }
     }
 
     out = beforeDot + afterDot;
-    return ((afterDot == "" && isString(beforeDot)) || _dictionary.hasKey(out));
+    return ((afterDot.empty() && isString(beforeDot)) || _dictionary.hasKey(out));
 }
 
 std::string ShaderPreprocessor::substitute(const std::string& in,
@@ -482,8 +491,9 @@ void ShaderPreprocessor::popScope(ShaderPreprocessor::Env& env) {
     Env::Scope& scope = env.scopes.back();
     for (const auto& key : scope) {
         env.aliases[key].pop_back();
-        if (env.aliases[key].size() == 0)
+        if (env.aliases[key].empty()) {
             env.aliases.erase(key);
+        }
     }
     env.scopes.pop_back();
 }
@@ -495,18 +505,20 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
 
     std::string& line = env.line;
 
-    bool mustTrackInclude = (line.find(noTrackString) == std::string::npos);
+    bool tracksInclude = (line.find(noTrackString) == std::string::npos);
 
     if (line.substr(0, includeString.length()) == includeString) {
         size_t p1 = line.find_first_not_of(ws, includeString.length());
-        if (p1 == std::string::npos)
+        if (p1 == std::string::npos) {
             throw ParserError("Expected file path after #include. " + debugString(env));
+        }
 
-        if ((line[p1] != '\"') && (line[p1] != '<'))
+        if ((line[p1] != '\"') && (line[p1] != '<')) {
             throw ParserError("Expected \" or <. " + debugString(env));
+        }
 
         if (line[p1] == '\"') {
-            size_t p2 = line.find_first_of("\"", p1 + 1);
+            size_t p2 = line.find_first_of('\"', p1 + 1);
             if (p2 == std::string::npos) {
                 throw ParserError("Expected \"" + debugString(env));
             }
@@ -544,26 +556,21 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
                 }
             }
 
-            if (includeFileWasFound)
-                includeFile(
-                    absPath(includeFilepath),
-                    mustTrackInclude ? TrackChanges::Yes : TrackChanges::No,
-                    env
-                );
-            else
+            if (includeFileWasFound) {
+                includeFile(absPath(includeFilepath), TrackChanges(tracksInclude), env);
+            }
+            else {
                 throw IncludeError(includeFilename);
+            }
         } else if (line.at(p1) == '<') {
-            size_t p2 = line.find_first_of(">", p1 + 1);
-            if (p2 == std::string::npos)
+            size_t p2 = line.find_first_of('>', p1 + 1);
+            if (p2 == std::string::npos) {
                 throw ParserError("Expected >. " + debugString(env));
+            }
 
             size_t includeLength = p2 - p1 - 1;
             std::string includeFilename = absPath(line.substr(p1 + 1, includeLength));
-            includeFile(
-                includeFilename,
-                mustTrackInclude ? TrackChanges::Yes : TrackChanges::No,
-                env
-            );
+            includeFile(includeFilename, TrackChanges(tracksInclude), env);
         }
         return true;
     }
@@ -743,7 +750,7 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     int keyIndex;
 
     std::map<std::string, std::string> table;
-    if (keys.size() > 0) {
+    if (!keys.empty()) {
         table[keyName] = "\"" + keys[0] + "\"";
         table[valueName] = dictionaryRef + "." + keys[0];
         keyIndex = 0;
@@ -777,7 +784,7 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
     size_t length = line.length();
 
     if (length > 6 && line.substr(0, endForString.length()) == endForString) {
-        if (env.forStatements.size() == 0) {
+        if (env.forStatements.empty()) {
             throw ParserError(
                 "Unexpected #endfor. No corresponing #for was found." + debugString(env)
             );

@@ -315,12 +315,14 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
         movingPos.x = 0.f;
         float width = 0.f;
         float height = 0.f;
-        for (size_t j = 0; j < line.size(); ++j) {
-            wchar_t character = line[j];
-            if (character == wchar_t('\t'))
+        for (char c : line) {
+            wchar_t character = c;
+            if (character == wchar_t('\t')) {
                 character = wchar_t(' ');
+            }
             const Font::Glyph* glyph;
 
+            // @TODO: Replace with an explicit lookup to not eat the cost of the throw
             try {
                 glyph = font.glyph(character);
             }
@@ -489,7 +491,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         GL_FLOAT,
         GL_FALSE,
         sizeof(Vertex),
-        reinterpret_cast<const void*>(offsetof(Vertex, s))
+        reinterpret_cast<const void*>(offsetof(Vertex, s)) // NOLINT
     );
 
     glEnableVertexAttribArray(2);
@@ -499,7 +501,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         GL_FLOAT,
         GL_FALSE,
         sizeof(Vertex),
-        reinterpret_cast<const void*>(offsetof(Vertex, outlineS))
+        reinterpret_cast<const void*>(offsetof(Vertex, outlineS)) // NOLINT
     );
 
     glDrawElements(
@@ -538,7 +540,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     std::vector<GLuint> indices;
     std::vector<GLfloat> vertices;
     //glm::vec3 movingPos = pos;
-    // TODO: review y starting position
+    // TODO(abock): review y starting position
     glm::vec2 movingPos(0.f);
 
     glm::vec2 size = glm::vec2(0.f);

@@ -109,7 +109,7 @@ std::string clipboardText() {
 #endif
 }
 
-void setClipboardText(std::string text) {
+void setClipboardText(const std::string& text) {
 #ifdef WIN32
     HANDLE hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, text.length() + 1);
     if (hData == nullptr) {

@@ -107,7 +107,7 @@ TextureAtlas::TextureAtlas(const TextureAtlas& rhs)
     , _handleInformation(rhs._handleInformation)
     , _size(rhs._size)
     , _nUsed(rhs._nUsed)
-    , _texture(new Texture(*rhs._texture.get()))
+    , _texture(new Texture(*rhs._texture))
     , _data(rhs._data)
 {}
 
@@ -126,7 +126,7 @@ TextureAtlas& TextureAtlas::operator=(const TextureAtlas& rhs) {
         _handleInformation = rhs._handleInformation;
         _size = rhs._size;
         _nUsed = rhs._nUsed;
-        _texture = std::make_unique<Texture>(*rhs._texture.get());
+        _texture = std::make_unique<Texture>(*rhs._texture);
         _data = rhs._data;
     }
     return *this;
