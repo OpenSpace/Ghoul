@@ -35,6 +35,8 @@ class Socket;
 
 class SocketServer {
 public:
+    virtual ~SocketServer() = default;
+
     virtual std::string address() const = 0;
     virtual int port() const = 0;
     virtual void close() = 0;

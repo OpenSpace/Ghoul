@@ -34,6 +34,8 @@ namespace ghoul::io {
 class Socket {
 public:
     Socket();
+    virtual ~Socket() = default;
+
     virtual std::string address() const = 0;
     virtual int port() const = 0;
 
