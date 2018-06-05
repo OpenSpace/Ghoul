@@ -36,6 +36,8 @@ namespace {
     std::vector<std::vector<std::string>> internalLoadCSV(std::ifstream& file,
                                      const std::vector<int>& indices = std::vector<int>())
     {
+        ghoul_assert(file.good(), "File handle should be good");
+
         std::vector<std::vector<std::string>> result;
 
         std::string line;
@@ -58,6 +60,25 @@ namespace {
 } // namespace
 
 namespace ghoul {
+
+
+std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
+                                                  bool includeFirstLine)
+{
+    ghoul_assert(!fileName.empty(), "fileName must not be empty");
+
+    std::ifstream file;
+    file.exceptions(std::ifstream::badbit);
+    file.open(fileName);
+
+    // Just skip over the first line if we don't want to include it
+    if (!includeFirstLine) {
+        std::string line;
+        std::getline(file, line);
+    }
+
+    return internalLoadCSV(file);
+}
 
 std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
                                                   const std::vector<std::string>& columns,
@@ -99,6 +120,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
         }
     );
 
+    // Reset the file stream if we want to include the first line
     if (includeFirstLine) {
         file.seekg(0);
     }
@@ -117,29 +139,13 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     file.exceptions(std::ifstream::badbit);
     file.open(fileName);
 
+    // Just skip over the first line if we don't want to include it
     if (!includeFirstLine) {
         std::string line;
         std::getline(file, line);
     }
 
     return internalLoadCSV(file, columns);
-}
-
-std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
-                                                  bool includeFirstLine)
-{
-    ghoul_assert(!fileName.empty(), "fileName must not be empty");
-
-    std::ifstream file;
-    file.exceptions(std::ifstream::badbit);
-    file.open(fileName);
-
-    if (!includeFirstLine) {
-        std::string line;
-        std::getline(file, line);
-    }
-
-    return internalLoadCSV(file);
 }
 
 } // namespace ghoul
