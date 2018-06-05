@@ -53,6 +53,7 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/misc/buffer.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/clipboard.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/crc32.cpp
+    ${PROJECT_SOURCE_DIR}/src/misc/csvreader.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/dictionary.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/dictionaryjsonformatter.cpp
     ${PROJECT_SOURCE_DIR}/src/misc/dictionaryluaformatter.cpp
@@ -177,6 +178,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/constexpr.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/crc32.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/crc32.inl
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/csvreader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/defer.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.inl

@@ -63,6 +63,7 @@ namespace constants {
 #include "tests/test_filesystem.inl"
 #include "tests/test_luatodictionary.inl"
 #include "tests/test_templatefactory.inl"
+#include "tests/test_csvreader.inl"
 
 using namespace ghoul::filesystem;
 using namespace ghoul::logging;
