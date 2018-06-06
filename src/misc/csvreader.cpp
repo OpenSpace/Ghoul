@@ -108,11 +108,11 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
         columns.begin(),
         columns.end(),
         indices.begin(),
-        [elements](const std::string& column) {
+        [elements, &fileName](const std::string& column) {
             auto it = std::find(elements.begin(), elements.end(), column);
             if (it == elements.end()) {
                 throw ghoul::RuntimeError(fmt::format(
-                    "CSV file {} did not contain the requested key {}"
+                    "CSV file {} did not contain the requested key {}", fileName, column
                 ));
             }
 
