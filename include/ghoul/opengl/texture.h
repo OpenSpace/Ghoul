@@ -33,6 +33,8 @@
 #include <glm/gtx/std_based_type.hpp>
 #include <string>
 
+//#define Debugging_Ghoul_Textures
+
 namespace ghoul::opengl {
 
 /**
@@ -905,6 +907,11 @@ private:
 
     bool _hasOwnershipOfData = false;
     void* _pixels = nullptr;
+
+#ifdef Debugging_Ghoul_Textures
+    int index = 0;
+    static int nextIndex;
+#endif // Debugging_Ghoul_Textures
 };
 
 } // namespace ghoul::opengl
