@@ -92,7 +92,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     file.open(fileName);
 
     std::string line;
-    
+
     // Get the file line that contains the column names
     std::getline(file, line);
     std::vector<std::string> elements = ghoul::tokenizeString(line, ',');

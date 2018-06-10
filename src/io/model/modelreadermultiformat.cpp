@@ -88,21 +88,21 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderMultiFormat::loadModel(
         3,
         GL_FLOAT,
         sizeof(Vertex),
-        offsetof(Vertex, location) // NOLINT 
+        offsetof(Vertex, location) // NOLINT
     );
     vbo->vertexAttribPointer(
         1,
         2,
         GL_FLOAT,
         sizeof(Vertex),
-        offsetof(Vertex, tex) // NOLINT 
+        offsetof(Vertex, tex) // NOLINT
     );
     vbo->vertexAttribPointer(
         2,
         3,
         GL_FLOAT,
         sizeof(Vertex),
-        offsetof(Vertex, normal) // NOLINT 
+        offsetof(Vertex, normal) // NOLINT
     );
     return vbo;
 }

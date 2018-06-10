@@ -88,7 +88,7 @@ Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLenum intern
     , _filter(filter)
     , _wrapping({ wrapping })
     , _hasOwnershipOfData(true)
-    , _pixels(data) 
+    , _pixels(data)
 {
 #ifdef Debugging_Ghoul_Textures
     index = nextIndex++;

@@ -241,7 +241,7 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
             nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer, // NOLINT 
+            (LPTSTR)&errorBuffer, // NOLINT
             0,
             nullptr
         );
