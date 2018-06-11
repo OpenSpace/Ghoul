@@ -133,13 +133,11 @@ public:
     void resetMessageCounters();
 
     /**
-     * Adds the passed log to the list of managed Log%s. The ownership of the Log is
-     * passed to the LogManager. The Log will be deleted when the LogManager is
-     * #deinitialize%d. Adding the same Log twice has no effect and is permitted.
+     * Adds the passed log to the list of managed Log%s.
      *
      * \param log The Log that should be added to this LogManager
      */
-    void addLog(std::shared_ptr<Log> log);
+    void addLog(std::unique_ptr<Log> log);
 
     /**
      * Removes the passed log from the list of managed Log%s. This transfers the ownership
@@ -168,7 +166,7 @@ private:
     ImmediateFlush _immediateFlush;
 
     /// Stores the Logs which are managed by this LogManager
-    std::vector<std::shared_ptr<Log>> _logs;
+    std::vector<std::unique_ptr<Log>> _logs;
 
     /// Stores the number of messages for each log level (7)
     std::array<int, 7> _logCounters = { 0, 0, 0, 0, 0, 0, 0 };

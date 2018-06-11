@@ -76,7 +76,7 @@ using namespace ghoul::logging;
 
 int main(int argc, char** argv) {
     LogManager::initialize(LogLevel::Fatal);
-    LogMgr.addLog(std::make_shared<ConsoleLog>());
+    LogMgr.addLog(std::make_unique<ConsoleLog>());
 
     FileSystem::initialize();
     

@@ -37,7 +37,7 @@ LogManager::LogManager(LogLevel level, ImmediateFlush immediateFlush)
     , _immediateFlush(immediateFlush)
 {}
 
-void LogManager::addLog(std::shared_ptr<Log> log) {
+void LogManager::addLog(std::unique_ptr<Log> log) {
     auto it = std::find(_logs.begin(), _logs.end(), log);
     if (it == _logs.end()) {
         _logs.push_back(std::move(log));
@@ -48,7 +48,7 @@ void LogManager::removeLog(Log* log) {
     auto it = std::find_if(
         _logs.begin(),
         _logs.end(),
-        [log](const std::shared_ptr<Log>& l) { return l.get() == log; }
+        [log](const std::unique_ptr<Log>& l) { return l.get() == log; }
     );
     if (it != _logs.end()) {
         _logs.erase(it);
@@ -56,7 +56,7 @@ void LogManager::removeLog(Log* log) {
 }
 
 void LogManager::flushLogs() {
-    for (const std::shared_ptr<Log>& log : _logs) {
+    for (const std::unique_ptr<Log>& log : _logs) {
         log->flush();
     }
 }
@@ -68,7 +68,7 @@ void LogManager::logMessage(LogLevel level, const std::string& category,
         // Acquire lock, automatically released at end of scope
         std::lock_guard<std::mutex> lock(_mutex);
 
-        for (const std::shared_ptr<Log>& log : _logs) {
+        for (const std::unique_ptr<Log>& log : _logs) {
             if (level >= log->logLevel()) {
                 log->log(level, category, message);
                 if (_immediateFlush) {
