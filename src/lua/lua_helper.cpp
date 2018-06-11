@@ -123,6 +123,12 @@ const char* errorLocation(lua_State* state) {
     return result;
 }
 
+int luaError(lua_State* state, std::string message) {
+    ghoul_assert(state, "State must not be empty");
+
+    return luaL_error(state, message.c_str());
+}
+
 std::string stackInformation(lua_State* state) {
     ghoul_assert(state, "State must not be nullptr");
 
@@ -395,7 +401,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected, const char* component) {
             component ? component : "Lua",
             s
         );
-        luaL_error(L, s.c_str()); // NOLINT
+        return luaError(L, std::move(s));
     }
     return nArguments;
 }
@@ -412,7 +418,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected1, int expected2,
             component ? component : "Lua",
             s
         );
-        luaL_error(L, s.c_str()); // NOLINT
+        return luaError(L, std::move(s));
     }
     return nArguments;
 }
@@ -428,7 +434,7 @@ int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range, const char* 
             component ? component : "Lua",
             s
         );
-        luaL_error(L, s.c_str()); // NOLINT
+        return luaError(L, std::move(s));
     }
     return nArguments;
 }
@@ -454,7 +460,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range
             s
         );
 
-        luaL_error(L, s.c_str()); // NOLINT
+        return luaError(L, std::move(s));
     }
     return nArguments;
 }

@@ -68,12 +68,26 @@ BooleanType(PopValue);
  * that location as a string. This method is just a wrapper around this function and its
  * use is for non-fatal error handling.
  *
- * \param state The Lua state that is to be exermined
+ * \param state The Lua state that is to be examined
  * \return The location of the function whose stack is being tested
  *
  * \pre \p state must not be nullptr
  */
-const char* errorLocation(lua_State* state);
+[[nodiscard]] const char* errorLocation(lua_State* state);
+
+/**
+ * Raises a fatal Lua error by calling the \c luaL_error function with the passed
+ * parameters.
+ *
+ * \param state The Lua state in which the error is raised
+ * \param message The error message that will be printed to the Lua console alongside the
+ *        file name and line number
+ * \return The symbolic value that is returned by the \c luaL_error function to signal the
+ *         Lua interpreter that an error has occurred
+ *
+ * \pre \p state must not be nullptr
+ */
+[[nodiscard]] int luaError(lua_State* state, std::string message);
 
 
 /**
@@ -96,7 +110,7 @@ const char* errorLocation(lua_State* state);
  *
  * \pre \p state must not be nullptr
  */
-std::string stackInformation(lua_State* state);
+[[nodiscard]] std::string stackInformation(lua_State* state);
 
 
 /**
