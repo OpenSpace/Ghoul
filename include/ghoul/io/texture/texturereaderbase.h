@@ -58,7 +58,7 @@ public:
     };
 
     /// Default virtual destructor
-    virtual ~TextureReaderBase() = default;
+    virtual ~TextureReaderBase();
 
     /**
      * Loads the texture \p filename from disk and returns the loaded Texture.
