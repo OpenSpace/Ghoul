@@ -80,7 +80,7 @@ struct __name__ {                                                               
     constexpr operator bool() const { return value == Yes; }                             \
                                                                                          \
     Value value;                                                                         \
-};
+}
 
 } // namespace ghoul
 
