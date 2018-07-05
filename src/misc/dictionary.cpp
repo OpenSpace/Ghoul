@@ -126,11 +126,11 @@ EXTERN_TEMPLATE_DEFINITION(glm::dmat4x4);
 #undef EXTERN_TEMPLATE_DEFINITION_SCALAR
 
 template <>
-bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& value) const {
-    ghoul_assert(&value != this, "Value argument must not be 'this' object");
+bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& val) const {
+    ghoul_assert(&val != this, "Value argument must not be 'this' object");
     bool dict = hasKeyAndValue<Dictionary>(key);
     if (dict) {
-        getValueHelper(key, value);
+        getValueHelper(key, val);
         return true;
     }
     else {
@@ -139,17 +139,17 @@ bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& value) cons
 }
 
 template <>
-bool Dictionary::getValue<std::string>(const std::string& key, std::string& value) const {
+bool Dictionary::getValue<std::string>(const std::string& key, std::string& val) const {
     bool str = hasValue<std::string>(key);
     if (str) {
-        getValueHelper(key, value);
+        getValueHelper(key, val);
         return true;
     }
     bool c = hasValue<const char*>(key);
     if (c) {
         const char* data;
         getValueHelper<const char*>(key, data);
-        value = std::string(data);
+        val = std::string(data);
         return true;
     }
     return false;

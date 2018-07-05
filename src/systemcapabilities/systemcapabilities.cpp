@@ -81,16 +81,15 @@ void SystemCapabilities::logCapabilities(
     }
 }
 
-void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponent>
-                                                                                component)
+void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponent> comp)
 {
-    ghoul_assert(component != nullptr, "Component must not be nullptr");
+    ghoul_assert(comp != nullptr, "Component must not be nullptr");
 
     auto it = std::find_if(
         _components.begin(),
         _components.end(),
-        [&component](const std::unique_ptr<SystemCapabilitiesComponent>& rhs) {
-            SystemCapabilitiesComponent* l = component.get();
+        [&comp](const std::unique_ptr<SystemCapabilitiesComponent>& rhs) {
+            SystemCapabilitiesComponent* l = comp.get();
             SystemCapabilitiesComponent* r = rhs.get();
 
             return typeid(*l) == typeid(*r);
@@ -98,7 +97,7 @@ void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponen
     );
 
     ghoul_assert(it == _components.end(), "Component must not have been added before");
-    _components.push_back(std::move(component));
+    _components.push_back(std::move(comp));
 }
 
 } // namespace ghoul::systemcapabilities

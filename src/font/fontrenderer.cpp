@@ -544,7 +544,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glm::vec2 movingPos(0.f);
 
     glm::vec2 size = glm::vec2(0.f);
-    float heightInPixels = 0.0f;
+    float heightInPixels = 0.f;
 
     for (const std::string& line : lines) {
         movingPos.x = 0.f;
@@ -618,7 +618,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
             // The billboard is bigger than the maximum size allowed:
             heightInPixels =
-                heightInPixels == 0.0f ?
+                std::equal_to<>()(heightInPixels, 0.0) ?
                 glm::length(topLeft - bottomLeft) :
                 heightInPixels;
 
