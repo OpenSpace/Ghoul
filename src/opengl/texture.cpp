@@ -49,9 +49,9 @@ namespace {
 
 namespace ghoul::opengl {
 
-#ifdef Debugging_Ghoul_Textures
+#ifdef Debugging_Ghoul_Textures_Indices
 int Texture::nextIndex = 0;
-#endif // Debugging_Ghoul_Textures
+#endif // Debugging_Ghoul_Textures_Indices
 
 Texture::Texture(glm::uvec3 dimensions, Format format, GLenum internalFormat,
                  GLenum dataType, FilterMode filter, WrappingMode wrapping,
@@ -64,9 +64,9 @@ Texture::Texture(glm::uvec3 dimensions, Format format, GLenum internalFormat,
     , _wrapping({ wrapping })
     , _hasOwnershipOfData(takeOwnership)
 {
-#ifdef Debugging_Ghoul_Textures
+#ifdef Debugging_Ghoul_Textures_Indices
     index = nextIndex++;
-#endif // Debugging_Ghoul_Textures
+#endif // Debugging_Ghoul_Textures_Indices
 
     ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
@@ -90,9 +90,9 @@ Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLenum intern
     , _hasOwnershipOfData(true)
     , _pixels(data)
 {
-#ifdef Debugging_Ghoul_Textures
+#ifdef Debugging_Ghoul_Textures_Indices
     index = nextIndex++;
-#endif // Debugging_Ghoul_Textures
+#endif // Debugging_Ghoul_Textures_Indices
 
     ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
