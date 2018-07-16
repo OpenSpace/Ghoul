@@ -95,11 +95,10 @@ std::string Log::timeString() const {
 #else
     struct timeval t;
     gettimeofday(&t, NULL);
-
     tm* m = gmtime(&t.tv_sec);
 
     return fmt::format(
-        "{:0>2}:{:0>2}:{:0>2}.{:0<3}", m->tm_hour, m->tm_min, m->tm_sec, t.tv_usec
+        "{:0>2}:{:0>2}:{:0>2}.{:0<3}", m->tm_hour, m->tm_min, m->tm_sec, t.tv_usec / 1000
     );
 #endif
 }
