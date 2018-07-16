@@ -26,8 +26,15 @@
 #include <ghoul/logging/log.h>
 
 #include <chrono>
+#include <fmt/format.h>
+
+#ifdef WIN32
+#include <Windows.h>
+#else // WIN32
 #include <iomanip>
 #include <sstream>
+#include <sys/time.h>
+#endif // WIN32
 
 namespace ghoul::logging {
 
@@ -78,35 +85,39 @@ LogLevel Log::logLevel() const {
 }
 
 std::string Log::timeString() const {
-    auto now = std::chrono::system_clock::now();
-    time_t time = std::chrono::system_clock::to_time_t(now);
-
-    std::stringstream ss;
-
 #ifdef WIN32
-    tm t {};
-    localtime_s(&t, &time);
-    ss << std::put_time(&t, "%T");
+    SYSTEMTIME t = {};
+    GetLocalTime(&t);
+
+    return fmt::format(
+        "{:0>2}:{:0>2}:{:0>2}.{:0<3}", t.wHour, t.wMinute, t.wSecond, t.wMilliseconds
+    );
 #else
-    ss << std::put_time(std::localtime(&time), "%T");
+    struct timeval t;
+    gettimeofday(&t, NULL);
+    tm* m = gmtime(&t.tv_sec);
+
+    return fmt::format(
+        "{:0>2}:{:0>2}:{:0>2}.{:0<3}", m->tm_hour, m->tm_min, m->tm_sec, t.tv_usec / 1000
+    );
 #endif
-    return ss.str();
 }
 
 std::string Log::dateString() const {
+#ifdef WIN32
+    SYSTEMTIME t = {};
+    GetLocalTime(&t);
+
+    return fmt::format("{}-{:0>2}-{:0>2}", t.wYear, t.wMonth, t.wDay);
+#else
     auto now = std::chrono::system_clock::now();
     time_t time = std::chrono::system_clock::to_time_t(now);
 
     std::stringstream ss;
 
-#ifdef WIN32
-    tm t {};
-    localtime_s(&t, &time);
-    ss << std::put_time(&t, "%F");
-#else
     ss << std::put_time(std::localtime(&time), "%F");
-#endif
     return ss.str();
+#endif
 }
 
 std::string Log::createFullMessageString(LogLevel level, const std::string& category,
