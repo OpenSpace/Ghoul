@@ -54,7 +54,7 @@ std::string join(std::vector<std::string> input, const std::string& separator) {
         result += std::move(s) + separator;
     }
 
-    return result.substr(0, result.size() - 1);
+    return result.substr(0, result.size() - separator.size());
 }
 
 void trimWhitespace(std::string& value) {
