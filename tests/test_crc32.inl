@@ -212,7 +212,9 @@ TEST(CRC32Test, HashFixedEquality) {
     for (const Data& d : TestStrings) {
         unsigned int stringHash = ghoul::hashCRC32(std::string(d.string));
         unsigned int charHash = ghoul::hashCRC32(d.string);
+        unsigned int bufferHash = ghoul::hashCRC32(d.string, strlen(d.string));
         EXPECT_EQ(stringHash, charHash) << d.string;
+        EXPECT_EQ(stringHash, bufferHash) << d.string;
         EXPECT_EQ(stringHash, d.hash) << d.string;
     }
 }
@@ -228,14 +230,18 @@ TEST(CRC32Test, StaticTest) {
 }
 
 TEST(CRC32Test, HashRandomEquality) {
-    static const std::string alphanum =
-        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    static const std::vector<char> alphanum = {
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+        'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+        'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+        'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+    };
 
     static const int nTests = 100;
 
     std::random_device r;
     std::default_random_engine e(r());
-    std::uniform_int_distribution<int> dist(0, static_cast<int>(alphanum.length()));
+    std::uniform_int_distribution<int> dist(0, static_cast<int>(alphanum.size() - 1));
 
     // Create nTests number of random strings to test
     for (int i = 0; i < nTests; ++i) {
@@ -249,7 +255,9 @@ TEST(CRC32Test, HashRandomEquality) {
             std::string string(data.begin(), data.end());
             unsigned int stringHash = ghoul::hashCRC32(string);
             unsigned int charHash = ghoul::hashCRC32(string.data());
+            unsigned int bufferHash = ghoul::hashCRC32(data.data(), j);
             EXPECT_EQ(stringHash, charHash) << string;
+            EXPECT_EQ(stringHash, bufferHash) << string;
         }
     }
 }

@@ -25,77 +25,10 @@
 
 #include <ghoul/opengl/texturemanager.h>
 
-#include <ghoul/misc/crc32.h>
-#include <ghoul/opengl/texture.h>
-
 namespace ghoul::opengl {
 
-TextureManager::TextureManagerError::TextureManagerError(std::string msg)
-    : RuntimeError(std::move(msg), "TextureManager")
+TextureManager::TextureManager()
+    : ObjectManager("TextureManager")
 {}
-
-TextureManager* TextureManager::_manager = nullptr;
-
-TextureManager& TextureManager::ref() {
-    static TextureManager manager;
-    return manager;
-}
-
-Texture* TextureManager::texture(unsigned int hashedName) {
-    auto it = _textures.find(hashedName);
-    if (it == _textures.end()) {
-        throw TextureManagerError(
-            "Could not find Texture for hash '" + std::to_string(hashedName) + "'"
-        );
-    }
-    else {
-        return it->second.get();
-    }
-}
-
-Texture* TextureManager::texture(const std::string& name) {
-    unsigned int hash = hashCRC32(name);
-    try {
-        return texture(hash);
-    }
-    catch (const TextureManagerError&) {
-        // Repackage the exception as otherwise only the hash value would get returned
-        throw TextureManagerError("Could not find Texture for '" + name + "'");
-    }
-}
-
-unsigned int TextureManager::registerTexture(const std::string& name,
-                                             std::unique_ptr<Texture> texture)
-{
-    unsigned int hashedName = hashCRC32(name);
-    auto it = _textures.find(hashedName);
-    if (it == _textures.end()) {
-        _textures[hashedName] = std::move(texture);
-        return hashedName;
-    }
-    else {
-        throw TextureManagerError("Name '" + name + "' was already registered");
-    }
-}
-
-std::unique_ptr<Texture> TextureManager::unregisterTexture(const std::string& name) {
-    unsigned int hashedName = hashCRC32(name);
-    return unregisterTexture(hashedName);
-}
-
-std::unique_ptr<Texture> TextureManager::unregisterTexture(unsigned int hashedName) {
-    auto it = _textures.find(hashedName);
-    if (it == _textures.end()) {
-        return nullptr;
-    }
-
-    std::unique_ptr<Texture> tmp = std::move(it->second);
-    _textures.erase(hashedName);
-    return tmp;
-}
-
-unsigned int TextureManager::hashedNameForName(const std::string& name) const {
-    return hashCRC32(name);
-}
 
 } // namespace ghoul::opengl

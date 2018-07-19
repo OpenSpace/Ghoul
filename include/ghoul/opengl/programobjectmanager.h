@@ -26,96 +26,17 @@
 #ifndef __GHOUL___PROGRAMOBJECTMANAGER___H__
 #define __GHOUL___PROGRAMOBJECTMANAGER___H__
 
-#include <ghoul/misc/boolean.h>
+#include <ghoul/misc/objectmanager.h>
+
 #include <ghoul/opengl/programobject.h>
-#include <functional>
-#include <map>
-#include <memory>
-#include <string>
 
 namespace ghoul::opengl {
 
-/**
- * The ProgramObjectManager can be used to cache multiple ProgramObjects based on a unique
- * name. A ProgramObject can be requested using #requestProgramObject. If a ProgramObject
- * with the specified name has already been created, a pointer to it is returned.
- * Otherwise it will be created using the passed creationFunction and stored internally.
- * Clients can release a ProgramObject using #releaseProgramObject. The ProgramObject is
- * only deleted when the last client that requested the object has released it. At the
- * time of ProgramObjectManager destruction, all ProgramObject%s have to have been
- * released or the application will assert.
- */
-class ProgramObjectManager {
+class ProgramObjectManager : public ghoul::ObjectManager<ProgramObject> {
 public:
-    BooleanType(Warnings);
-    using CreationCallback = std::function<std::unique_ptr<ProgramObject>()>;
-    using DestructionCallback = std::function<void(ProgramObject*)>;
-
-    /**
-     * Checks whether all ProgramObjects have been released and asserts if the application
-     * was built in Debug mode. If asserts are disabled, this method does nothing except
-     * free all held ProgramObjects (which, to be clear, should not exist at this point
-     * anymore)
-     */
-    ~ProgramObjectManager();
-
-    /**
-     * This method can be called before the OpenGL context is lost to blanket release all
-     * remaining held ProgramObjects. If \p emitWarnings is \c Yes, each remaining
-     * ProgramObject is logged, also mentioning the remaining reference counter before
-     * destruction. If everything went well in shutdown, this method should not do
-     * anything and should not emit any warnings.
-     *
-     * \param emitWarnings If \c Yes each remaining ProgramObject will emit a warning
-     *        including information about the remaining reference counter at destruction
-     */
-    void releaseAll(Warnings emitWarnings = Warnings::Yes);
-
-    /*
-     * Requests a new ProgramObject with a unique \p name and, if it has not been created
-     * previously, calls the \p creationFunction whose responsibility it is to return a
-     * newly created ProgramObject, a pointer to which is returned by this function call
-     * and all subsequent function calls with the same \p name. If a ProgramObject existed
-     * at the time of the call, the \p creationFunction is not called. This method only
-     * returns <code>nullptr</code> if \p creationFunction returned a
-     * <code>nullptr</code>, which will cause *all* following calls with the same name to
-     * return a <code>nullptr</code> as well. The \p creationFunction will be called
-     * exactly once for each \p name regardless of its return value.
-     *
-     * \param name The name of the ProgramObject that is to be generated
-     * \param creationFunction If this is the first call with the provided \p name, this
-     *        function is executed to create a new ProgramObject. Regardless of its
-     *        return value, this function is only ever going to be called exactly once
-     */
-    ProgramObject* requestProgramObject(const std::string& name,
-        const CreationCallback& creationFunction);
-
-    /**
-     * Releases the ProgramName with the provided \p name. If the ProgramObject has been
-     * requested \c i number of times, and this is the \c ith call for this \p name, the
-     * \p destructionFunction is called with the ProgramObject to take care of any
-     * additional destruction. OBS: The regular destructor of the ProgramObject will be
-     * automatically called after the \p destructionFunction returns, so it is **not**
-     * advised for the client to call \c delete on the ProgramObject as well.
-     * The return value can be used to modify a local copy of the ProgramObject to make it
-     * clear which program name is associated with which local variable.
-     *
-     * \param name The unique name of the ProgramObject that should be released
-     * \param destructionFunction The function that can handle additional destruction
-     *        events required by the client. Please not that the regular destructor will
-     *        be automatically called after this method returns program control back to
-     *        the ProgramObjectManager
-     */
-    void releaseProgramObject(const std::string& name,
-        const DestructionCallback& destructionFunction = [](ProgramObject*) {});
-
-private:
-    struct Info {
-        std::unique_ptr<ProgramObject> program = nullptr;
-        int refCount = 0;
-    };
-    std::map<std::string, Info> _programs;
+    ProgramObjectManager();
 };
+
 
 }  // namespace ghoul::opengl
 

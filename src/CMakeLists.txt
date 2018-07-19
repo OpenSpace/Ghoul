@@ -193,6 +193,8 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/invariants.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/objectmanager.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/objectmanager.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/sharedmemory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/stacktrace.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/supportmacros.h
