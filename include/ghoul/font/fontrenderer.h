@@ -327,8 +327,8 @@ private:
     /// The index buffer object that allows reusing vertices to form one quad per glyph
     unsigned int _ibo = 0;
 
-    UniformCache(baseColor, outlineColor, texture, hasOutline, projection, mvpMatrix
-        /*textMinSize*/) _uniformCache;
+    UniformCache(baseColor, outlineColor, texture, hasOutline, projection) _uniformCache;
+    int _uniformMvp = -1;
 };
 
 enum class CrDirection {

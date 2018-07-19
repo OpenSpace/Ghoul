@@ -256,7 +256,10 @@ void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& unif
 
     int* uniformLocations = reinterpret_cast<int*>(&uniformCache);
     for (int i = 0; i < nValues; ++i) {
-        uniformLocations[i] = program.uniformLocation(uniformNames[i]);
+        // We skip empty uniform names
+        if (uniformNames[i]) {
+            uniformLocations[i] = program.uniformLocation(uniformNames[i]);
+        }
     }
 }
 
