@@ -25,6 +25,7 @@
 
 #include <ghoul/misc/assert.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/fmt.h>
 
 namespace ghoul {
 
