@@ -94,7 +94,7 @@ std::string Log::timeString() const {
     );
 #else
     struct timeval t;
-    gettimeofday(&t, NULL);
+    gettimeofday(&t, nullptr);
     tm* m = gmtime(&t.tv_sec);
 
     return fmt::format(

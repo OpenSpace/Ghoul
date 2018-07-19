@@ -344,7 +344,7 @@ protected:
     int _version;
 
     /// A map containing file hashes and file information
-    std::map<unsigned int, CacheInformation> _files;
+    std::map<unsigned long, CacheInformation> _files;
 };
 
 } // namespace ghoul::filesystem

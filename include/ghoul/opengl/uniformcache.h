@@ -47,8 +47,6 @@
 // The mutable was added to the struct to make them usable in `const` methods
 
 
-
-
 // HOW TO ADD MORE PARAMETERS:
 // 1. Add a new macro UniformCacheX, copying from X-1
 // 2. Add vX variable to argument list
@@ -56,9 +54,19 @@
 // 4. Add _X before NAME in the GET_MACRO macro
 // 5. Add UniformCacheX after __VA_ARGS__ in the UniformCache macro
 
+#include <ghoul/opengl/programobject.h>
+#include <array>
+
 #define UniformCache1(v1)                                                                \
     struct {                                                                             \
         int v1 = -1;                                                                     \
+                                                                                         \
+        void updateLocations(ghoul::opengl::ProgramObject& p,                            \
+                          const std::array<const char*, 1>& uniformNames)                \
+        {                                                                                \
+            v1 = p.uniformLocation(uniformNames[0]);                                     \
+        }                                                                                \
+                                                                                         \
         void reset() { v1 = -1; }                                                        \
     }
 
@@ -77,6 +85,16 @@
 #define UniformCache4(v1, v2, v3, v4)                                                    \
     struct {                                                                             \
         int v1 = -1, v2 = -1, v3 = -1, v4 = -1;                                          \
+                                                                                         \
+        void updateLocations(ghoul::opengl::ProgramObject& p,                            \
+                          const std::array<const char*, 4>& uniformNames)                \
+        {                                                                                \
+            v1 = p.uniformLocation(uniformNames[0]);                                     \
+            v2 = p.uniformLocation(uniformNames[1]);                                     \
+            v3 = p.uniformLocation(uniformNames[2]);                                     \
+            v4 = p.uniformLocation(uniformNames[3]);                                     \
+        }                                                                                \
+                                                                                         \
         void reset() { v1 = v2 = v3 = v4 = -1; }                                         \
     }
 
