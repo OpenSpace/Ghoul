@@ -54,258 +54,214 @@
 // 4. Add _X before NAME in the GET_MACRO macro
 // 5. Add UniformCacheX after __VA_ARGS__ in the UniformCache macro
 
+// OBS: Refrain from adding new values to the struct, or at the very least, update the
+//      updateUniformLocations method as it depends on the UniformCache's struct size
+
 #include <ghoul/opengl/programobject.h>
 #include <array>
 
+/// This is just an empty tag that can be used to provide better error messages for the
+/// updateUniformLocations method
+struct UniformCacheBase {};
+
 #define UniformCache1(v1)                                                                \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1;                                                                     \
-                                                                                         \
-        void updateLocations(ghoul::opengl::ProgramObject& p,                            \
-                          const std::array<const char*, 1>& uniformNames)                \
-        {                                                                                \
-            v1 = p.uniformLocation(uniformNames[0]);                                     \
-        }                                                                                \
-                                                                                         \
-        void reset() { v1 = -1; }                                                        \
     }
 
 #define UniformCache2(v1, v2)                                                            \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1;                                                            \
-        void reset() { v1 = v2 = -1; }                                                   \
     }
 
 #define UniformCache3(v1, v2, v3)                                                        \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1;                                                   \
-        void reset() { v1 = v2 = v3 = -1; }                                              \
     }
 
 #define UniformCache4(v1, v2, v3, v4)                                                    \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1, v4 = -1;                                          \
-                                                                                         \
-        void updateLocations(ghoul::opengl::ProgramObject& p,                            \
-                          const std::array<const char*, 4>& uniformNames)                \
-        {                                                                                \
-            v1 = p.uniformLocation(uniformNames[0]);                                     \
-            v2 = p.uniformLocation(uniformNames[1]);                                     \
-            v3 = p.uniformLocation(uniformNames[2]);                                     \
-            v4 = p.uniformLocation(uniformNames[3]);                                     \
-        }                                                                                \
-                                                                                         \
-        void reset() { v1 = v2 = v3 = v4 = -1; }                                         \
     }
 
 #define UniformCache5(v1, v2, v3, v4, v5)                                                \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1, v4 = -1, v5 = -1;                                 \
-        void reset() { v1 = v2 = v3 = v4 = v5 = -1; }                                    \
 }
 
 #define UniformCache6(v1, v2, v3, v4, v5, v6)                                            \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1, v4 = -1, v5 = -1, v6 = -1;                        \
-        void reset() { v1 = v2 = v3 = v4 = v5 = v6 = -1; }                               \
     }
 
 #define UniformCache7(v1, v2, v3, v4, v5, v6, v7)                                        \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1, v4 = -1, v5 = -1, v6 = -1, v7 = -1;               \
-        void reset() { v1 = v2 = v3 = v4 = v5 = v6 = v7 = -1; }                          \
     }
 
 #define UniformCache8(v1, v2, v3, v4, v5, v6, v7, v8)                                    \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1, v4 = -1, v5 = -1, v6 = -1, v7 = -1, v8 = -1;      \
-        void reset() { v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = -1; }                     \
     }
 
 #define UniformCache9(v1, v2, v3, v4, v5, v6, v7, v8, v9)                                \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1, v4 = -1, v5 = -1, v6 = -1, v7 = -1, v8 = -1,      \
             v9 = -1;                                                                     \
-        void reset() { v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = -1; }                \
     }
 
 #define UniformCache10(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10)                          \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1,  v2 = -1, v3 = -1, v4 = -1, v5 = -1, v6 = -1, v7 = -1, v8 = -1,     \
             v9 = -1, v10 = -1;                                                           \
-        void reset() { v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = -1; }          \
     }
 
 #define UniformCache11(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11)                     \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1,  v2 = -1,  v3 = -1, v4 = -1, v5 = -1, v6 = -1, v7 = -1, v8 = -1,    \
             v9 = -1, v10 = -1, v11 = -1;                                                 \
-        void reset() { v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = -1; }    \
     }
 
 #define UniformCache12(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12)                \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1, v5 = -1, v6 = -1, v7 = -1, v8 = -1,   \
             v9 = -1, v10 = -1, v11 = -1, v12 = -1;                                       \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = -1;           \
-        }                                                                                \
     }
 
 #define UniformCache13(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13)           \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1, v6 = -1, v7 = -1, v8 = -1,  \
             v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1;                             \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = v13 = -1;     \
-        }                                                                                \
     }
 
 #define UniformCache14(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14)      \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1, v7 = -1, v8 = -1, \
             v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1;                   \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = v13 =         \
-                v14 = -1;                                                                \
-        }                                                                                \
     }
 
 #define UniformCache15(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15) \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int  v1 = -1, v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,         \
              v8 = -1, v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,         \
             v15 = -1;                                                                    \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = v13 =         \
-                v14 = v15 = -1;                                                          \
-        }                                                                                \
     }
 
 #define UniformCache16(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16)                                                              \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1;                                                          \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = v13 =         \
-                v14 = v15 = v16 = -1;                                                    \
-        }                                                                                \
     }
 
 #define UniformCache17(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17)                                                         \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1;                                                \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = v13 =         \
-                v14 = v15 = v16 = v17 = -1;                                              \
-        }                                                                                \
     }
 
 #define UniformCache18(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18)                                                    \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1;                                      \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = v13 =         \
-                v14 = v15 = v16 = v17 = v18 = -1;                                        \
-        }                                                                                \
     }
 
 #define UniformCache19(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19)                                               \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1;                            \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = v13 =         \
-                v14 = v15 = v16 = v17 = v18 = v19 = -1;                                  \
-        }                                                                                \
     }
 
 #define UniformCache20(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20)                                          \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1;                  \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = v13 =         \
-                v14 = v15 = v16 = v17 = v18 = v19 = v20 = -1;                            \
-        }                                                                                \
     }
 
 #define UniformCache21(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21)                                     \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1;        \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = v13 =         \
-                v14 = v15 = v16 = v17 = v18 = v19 = v20 = v21 = -1;                      \
-        }                                                                                \
     }
 
 #define UniformCache22(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22)                                \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1;                                                                    \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = v13 =         \
-                v14 = v15 = v16 = v17 = v18 = v19 = v20 = v21 = v22 = -1;                \
-        }                                                                                \
     }
 
 #define UniformCache23(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23)                           \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1;                                                          \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = v13 =         \
-                v14 = v15 = v16 = v17 = v18 = v19 = v20 = v21 = v22 = v23 = -1;          \
-        }                                                                                \
     }
 
 #define UniformCache24(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24)                      \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1;                                                \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = v13 =         \
-                v14 = v15 = v16 = v17 = v18 = v19 = v20 = v21 = v22 = v23 = v24 = -1;    \
-        }                                                                                \
     }
 
 #define UniformCache25(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24, v25)                 \
-    struct {                                                                             \
+    struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1, v25 = -1;                                      \
-        void reset() {                                                                   \
-            v1 = v2 = v3 = v4 = v5 = v6 = v7 = v8 = v9 = v10 = v11 = v12 = v13 =         \
-                v14 = v15 = v16 = v17 = v18 = v19 = v20 = v21 = v22 = v23 = v24 =        \
-                v25 = -1;                                                                \
-        }                                                                                \
     }
+
+namespace ghoul::opengl {
+
+/**
+ * Function that will update the uniform locations of the \p uniformCache based on
+ * querying the \p uniformNames in the \p program. This method will essentially call
+ * ProgramObject::uniformLocation on the passed parameters. The order of arguments in the
+ * \p uniformNames has to be the same as the location definitions.
+ *
+ * \tparam
+ */
+template <typename T> // @CONCEPTS
+void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& uniformCache,
+                     const std::array<const char*, sizeof(T) / sizeof(int)>& uniformNames)
+{
+    // The UniformCaches must only contain data for the uniform locations, so they must be
+    // divisible by 4 as each is an integer number
+    static_assert(sizeof(T) % sizeof(int) == 0);
+
+    // Make the error message a bit nicer if the 
+    static_assert(std::is_base_of_v<UniformCacheBase, T>);
+
+    constexpr const int nValues = sizeof(T) / sizeof(int);
+
+    int* uniformLocations = reinterpret_cast<int*>(&uniformCache);
+    for (int i = 0; i < nValues; ++i) {
+        uniformLocations[i] = program.uniformLocation(uniformNames[i]);
+    }
+}
+
+} // namespace ghoul::opengl
+
 
 // The EXPAND macro is a fix for MSVC's interpretation of the C++11 standard of VA_ARGS
 #define EXPAND(x) x
