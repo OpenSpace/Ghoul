@@ -41,7 +41,7 @@
 
 namespace ghoul::opengl {
 
-    class Texture;
+class Texture;
 
 /**
  * This class represents a texture atlas which automatically organizes smaller textures
