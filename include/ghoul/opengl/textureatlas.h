@@ -129,6 +129,18 @@ public:
     TextureAtlas& operator=(TextureAtlas&& rhs);
 
     /**
+     * Initializes the TextureAtlas and creates its backend storage. This method
+     * requires a valid OpenGL context.
+     */
+    void initialize();
+
+    /**
+    * Deinitializes the TextureAtlas and cleans its backend storage. This method
+    * requires a valid OpenGL context.
+    */
+    void deinitialize();
+
+    /**
      * Uploads the TextureAtlas to the graphics card. This function requires a valid
      * OpenGL context.
      */

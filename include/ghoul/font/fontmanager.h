@@ -71,6 +71,19 @@ public:
     FontManager(glm::ivec3 atlasDimensions = glm::ivec3(512, 512, 1));
 
     /**
+     * Initializes the TextureAtlas backend and requires a valid OpenGL state.
+     */
+    void initialize();
+
+    /**
+     * Deinitializes the TextureAtlas backend and requires a valid OpenGL state.
+     */
+    void deinitialize();
+
+    /// Accessor to the backend TextureAtlas
+    opengl::TextureAtlas& textureAtlas();
+
+    /**
      * Registers a user-defined \p fontName to an absolute \p filePath. This function does
      * not check whether the file exists, or is accessible. If either of these is the
      * case, subsequent #font calls fail. The \p fontName cannot have been assigned to a
