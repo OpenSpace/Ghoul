@@ -188,7 +188,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/easing.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/easing.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/exception.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/fromstring.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/invariants.h
@@ -197,6 +196,7 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/objectmanager.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/sharedmemory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/stacktrace.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/stringconversion.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/supportmacros.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.inl

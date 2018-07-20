@@ -163,33 +163,36 @@ OpenGLCapabilitiesComponent::capabilities() const
 {
     std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
     result.push_back(
-        { "OpenGL Version", std::to_string(_glVersion), Verbosity::Minimal }
+        { "OpenGL Version", ghoul::to_string(_glVersion), Verbosity::Minimal }
     );
     result.push_back({ "OpenGL Compiler", _glslCompiler, Verbosity::Minimal });
     result.push_back({ "OpenGL Renderer", _glRenderer, Verbosity::Minimal });
-    result.push_back({"GPU Vendor", gpuVendorString(), Verbosity::Minimal });
-    result.push_back({"GLEW Version", std::to_string(_glewVersion),Verbosity::Minimal });
+    result.push_back({ "GPU Vendor", gpuVendorString(), Verbosity::Minimal });
+    result.push_back({
+        "GLEW Version",
+        ghoul::to_string(_glewVersion),Verbosity::Minimal
+    });
 #ifdef GHOUL_USE_WMI
     result.push_back({ "GPU Name", _adapterName, Verbosity::Minimal });
     result.push_back({ "GPU Driver Version", _driverVersion, Verbosity::Minimal });
     result.push_back({ "GPU Driver Date", _driverDate, Verbosity::Minimal });
     result.push_back({
-        "GPU RAM", std::to_string(_adapterRAM) + " MB",Verbosity::Minimal }
+        "GPU RAM", ghoul::to_string(_adapterRAM) + " MB",Verbosity::Minimal }
     );
 #endif
 
     result.push_back({
-        "Max Texture Size", std::to_string(_maxTextureSize), Verbosity::Default }
+        "Max Texture Size", ghoul::to_string(_maxTextureSize), Verbosity::Default }
     );
     result.push_back({
-        "Max 3D Texture Size", std::to_string(_maxTextureSize3D), Verbosity::Default }
+        "Max 3D Texture Size", ghoul::to_string(_maxTextureSize3D), Verbosity::Default }
     );
     result.push_back({
-        "Num of Texture Units", std::to_string(_nTextureUnits), Verbosity::Default }
+        "Num of Texture Units", ghoul::to_string(_nTextureUnits), Verbosity::Default }
     );
     result.push_back({
         "FBO Color Attachments",
-        std::to_string(_maxFramebufferColorAttachments),
+        ghoul::to_string(_maxFramebufferColorAttachments),
         Verbosity::Default
     });
 

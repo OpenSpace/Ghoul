@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___FROMSTRING___H__
-#define __GHOUL___FROMSTRING___H__
+#ifndef __GHOUL___STRINGCONVERSION___H__
+#define __GHOUL___STRINGCONVERSION___H__
 
 #include <string>
 
@@ -35,15 +35,31 @@ namespace ghoul {
  * conversion, a template specialization has to be created. This function is meant to be
  * analogous to the <code>std::to_string</code> function and should behave as such:
  *
- * <code>std::to_string(ghoul::from_string(s)) == s</code>
+ * <code>ghoul::to_string(ghoul::from_string(s)) == s</code>
  *
- * <code>ghoul::from_string(std::to_string(v)) == v</code>
+ * <code>ghoul::from_string(ghoul::to_string(v)) == v</code>
  */
 template <typename T>
 T from_string(const std::string& string) {
     // Unfortunately, we can't write 'false' here, as the compiler is a bit too eager to
     // evaluate that
     static_assert(sizeof(T) == -1, "Missing from_string implementation");
+}
+
+/**
+ * Converts the passed \p value to its string representation. The default implementation
+ * calls the <code>std::to_string</code> function. User-defined types are supported by
+ * creating a specialization of this function.
+ */
+template <typename T>
+std::string to_string(const T& value) {
+    // std::string does not define the identity transformation so we have to handle that
+    if constexpr (std::is_same_v<T, std::string>) {
+        return value;
+    }
+    else {
+        return std::to_string(value);
+    }
 }
 
 } // namespace ghoul

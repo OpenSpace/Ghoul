@@ -28,7 +28,7 @@
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
-#include <ghoul/misc/fromstring.h>
+#include <ghoul/misc/stringconversion.h>
 #include <string>
 #include <vector>
 
@@ -274,13 +274,11 @@ protected:
 
 } // namespace ghoul::systemcapabilities
 
-namespace std {
-
-string to_string(ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity v);
-
-} // namespace std
-
 namespace ghoul {
+
+template <>
+std::string to_string(
+    const ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity& v);
 
 template <>
 ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity

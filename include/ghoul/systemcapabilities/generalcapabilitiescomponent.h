@@ -234,10 +234,12 @@ protected:
 
 } // namespace ghoul::systemcapabilities
 
-namespace std {
-    std::string to_string(
-        ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem os);
-} // namespace std
+namespace ghoul {
+
+template <>
+std::string to_string(
+    const systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem& os);
+} // namespace ghoul
 
 #define CpuCap (                                                                         \
     ghoul::systemcapabilities::SystemCapabilities::ref().component<                      \

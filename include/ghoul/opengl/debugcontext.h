@@ -27,7 +27,7 @@
 #define __GHOUL___DEBUGCONTEXT___H__
 
 #include <ghoul/misc/boolean.h>
-#include <ghoul/misc/fromstring.h>
+#include <ghoul/misc/stringconversion.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <string>
 #include <vector>
@@ -184,47 +184,44 @@ void setDebugCallback(CallbackFunction callback);
 } // namespace ghoul::opengl::debug
 
 namespace ghoul {
-    /**
-    * Converts a string with a \p source into a opengl::debug::Source object.
-    * The valid values are "API", "Window System", "Shader Compiler", "Third Party",
-    * "Application", "Other", and "Don't care".
-    *
-    * \param source The string containing the name of a opengl::debug::Source
-    *
-    * \throw std::out_of_range if the \p source is not a valid name of an
-    *        opengl::debug::Source object
-    */
-    template <>
-    opengl::debug::Source from_string(const std::string& source);
 
-    /**
-    * Converts a string with a \p type into a opengl::debug::Source object.
-    * The valid values are "Error", "Deprecated", "Undefined", "Portability",
-    * "Performance", "Marker", "Push group", "Pop group", "Other", and "Don't care".
-    *
-    * \param type The string containing the name of a opengl::debug::Type
-    *
-    * \throw std::out_of_range if the \p type is not a valid name of an
-    *        opengl::debug::Type object
-    */
-    template <>
-    opengl::debug::Type from_string(const std::string& type);
+/**
+* Converts a string with a \p source into a opengl::debug::Source object.
+* The valid values are "API", "Window System", "Shader Compiler", "Third Party",
+* "Application", "Other", and "Don't care".
+*
+* \param source The string containing the name of a opengl::debug::Source
+*
+* \throw std::out_of_range if the \p source is not a valid name of an
+*        opengl::debug::Source object
+*/
+template <>
+opengl::debug::Source from_string(const std::string& source);
 
-    /**
-    * Converts a string with a \p severity into a opengl::debug::Severity object.
-    * The valid values are "High", "Medium", "Low", and "Notification".
-    *
-    * \param severity The string containing the name of a opengl::debug::Severity
-    *
-    * \throw std::out_of_range if the \p severity is not a valid name of an
-    *        opengl::debug::Severity object
-    */
-    template <>
-    opengl::debug::Severity from_string(const std::string& severity);
+/**
+* Converts a string with a \p type into a opengl::debug::Source object.
+* The valid values are "Error", "Deprecated", "Undefined", "Portability",
+* "Performance", "Marker", "Push group", "Pop group", "Other", and "Don't care".
+*
+* \param type The string containing the name of a opengl::debug::Type
+*
+* \throw std::out_of_range if the \p type is not a valid name of an
+*        opengl::debug::Type object
+*/
+template <>
+opengl::debug::Type from_string(const std::string& type);
 
-} // namespace ghoul
-
-namespace std {
+/**
+* Converts a string with a \p severity into a opengl::debug::Severity object.
+* The valid values are "High", "Medium", "Low", and "Notification".
+*
+* \param severity The string containing the name of a opengl::debug::Severity
+*
+* \throw std::out_of_range if the \p severity is not a valid name of an
+*        opengl::debug::Severity object
+*/
+template <>
+opengl::debug::Severity from_string(const std::string& severity);
 
 /**
  * Converts the \p source object into its string representation.
@@ -234,7 +231,8 @@ namespace std {
  * \param source The ghoul::opengl::debug::Source that is converted into a string
  * \return The string representation of the \p source
  */
-std::string to_string(ghoul::opengl::debug::Source source);
+template <>
+std::string to_string(const ghoul::opengl::debug::Source& source);
 
 /**
  * Converts the \p type object into its string representation.
@@ -244,7 +242,8 @@ std::string to_string(ghoul::opengl::debug::Source source);
  * \param type The ghoul::opengl::debug::Type that is converted into a string
  * \return The string representation of the \p type
  */
-std::string to_string(ghoul::opengl::debug::Type type);
+template <>
+std::string to_string(const ghoul::opengl::debug::Type& type);
 
 /**
  * Converts the \p severity object into its string representation.
@@ -253,8 +252,9 @@ std::string to_string(ghoul::opengl::debug::Type type);
  * \param severity The ghoul::opengl::debug::Severity that is converted into a string
  * \return The string representation of the \p severity
  */
-std::string to_string(ghoul::opengl::debug::Severity severity);
+template <>
+std::string to_string(const ghoul::opengl::debug::Severity& severity);
 
-} // namespace std
+} // namespace ghoul
 
 #endif // __GHOUL___DEBUGCONTEXT___H__

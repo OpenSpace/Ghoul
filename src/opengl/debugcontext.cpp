@@ -166,10 +166,8 @@ opengl::debug::Severity from_string(const std::string& string) {
     return Map.at(string);
 }
 
-} // namespace ghoul
-
-namespace std {
-std::string to_string(ghoul::opengl::debug::Source source) {
+template <>
+std::string to_string(const ghoul::opengl::debug::Source& source) {
     switch (source) {
         case ghoul::opengl::debug::Source::API:             return "API";
         case ghoul::opengl::debug::Source::WindowSystem:    return "Window System";
@@ -182,7 +180,8 @@ std::string to_string(ghoul::opengl::debug::Source source) {
     }
 }
 
-std::string to_string(ghoul::opengl::debug::Type type) {
+template <>
+std::string to_string(const ghoul::opengl::debug::Type& type) {
     switch (type) {
         case ghoul::opengl::debug::Type::Error:         return "Error";
         case ghoul::opengl::debug::Type::Deprecated:    return "Deprecated";
@@ -198,7 +197,8 @@ std::string to_string(ghoul::opengl::debug::Type type) {
     }
 }
 
-std::string to_string(ghoul::opengl::debug::Severity severity) {
+template <>
+std::string to_string(const ghoul::opengl::debug::Severity& severity) {
     switch (severity) {
         case ghoul::opengl::debug::Severity::High:          return "High";
         case ghoul::opengl::debug::Severity::Medium:        return "Medium";
@@ -208,4 +208,4 @@ std::string to_string(ghoul::opengl::debug::Severity severity) {
     }
 }
 
-} // namespace std
+} // namespace ghoul
