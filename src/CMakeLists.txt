@@ -31,7 +31,6 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.osx.cpp
     ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.windows.cpp
     ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderbase.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/model/modelreadermultiformat.cpp
     ${PROJECT_SOURCE_DIR}/src/io/socket/socket.cpp
     ${PROJECT_SOURCE_DIR}/src/io/socket/tcpsocket.cpp
     ${PROJECT_SOURCE_DIR}/src/io/socket/tcpsocketserver.cpp
@@ -67,6 +66,13 @@ set(GHOUL_SOURCE
     ${PROJECT_SOURCE_DIR}/src/misc/threadpool.cpp
     ${PROJECT_SOURCE_DIR}/src/ghoul.cpp
 )
+
+if (GHOUL_MODULE_ASSIMP)
+    set(GHOUL_SOURCE
+        ${GHOUL_SOURCE}
+        ${PROJECT_SOURCE_DIR}/src/io/model/modelreadermultiformat.cpp
+    )
+endif ()
 
 if (GHOUL_MODULE_COMMANDLINEPARSER)
     set(GHOUL_SOURCE
@@ -146,7 +152,6 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/file.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreadermultiformat.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socket.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socketserver.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/sockettype.h
@@ -205,6 +210,13 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/threadpool.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/ghoul.h
 )
+
+if (GHOUL_MODULE_ASSIMP)
+    set(GHOUL_HEADER
+        ${GHOUL_HEADER}
+        ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreadermultiformat.h
+    )
+endif ()
 
 if (GHOUL_MODULE_COMMANDLINEPARSER)
     set(GHOUL_HEADER
