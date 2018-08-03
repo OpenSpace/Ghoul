@@ -280,7 +280,8 @@ void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& unif
             UniformCache17, UniformCache16, UniformCache15, UniformCache14,              \
             UniformCache13, UniformCache12, UniformCache11, UniformCache10,              \
              UniformCache9,  UniformCache8,  UniformCache7,  UniformCache6,              \
-             UniformCache5,  UniformCache4,  UniformCache3,  UniformCache2               \
+             UniformCache5,  UniformCache4,  UniformCache3,  UniformCache2,              \
+             UniformCache1                                                               \
         )(__VA_ARGS__)                                                                   \
     )
 
