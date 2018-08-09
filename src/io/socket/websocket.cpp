@@ -91,8 +91,8 @@ bool WebSocket::getMessage(std::string& message) {
             !_inputMessageQueue.empty();
     };
 
+    std::unique_lock<std::mutex> lock(_inputMessageQueueMutex);
     while (!messageOrDisconnected()) {
-        std::unique_lock<std::mutex> lock(_inputMessageQueueMutex);
         _inputNotifier.wait_for(lock, MaxWaitDuration, messageOrDisconnected);
     }
 
