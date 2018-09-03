@@ -249,7 +249,7 @@ void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& unif
     // divisible by 4 as each is an integer number
     static_assert(sizeof(T) % sizeof(int) == 0);
 
-    // Make the error message a bit nicer if the 
+    // Make the error message a bit nicer if the
     static_assert(std::is_base_of_v<UniformCacheBase, T>);
 
     constexpr const int nValues = sizeof(T) / sizeof(int);

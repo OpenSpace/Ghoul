@@ -64,4 +64,4 @@ std::string to_string(const T& value) {
 
 } // namespace ghoul
 
-#endif // __GHOUL___FROMSTRING___H__
+#endif // __GHOUL___STRINGCONVERSION___H__
