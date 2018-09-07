@@ -142,4 +142,4 @@ private:
 
 #include "objectmanager.inl"
 
-#endif // __GHOUL___PROGRAMOBJECTMANAGER___H__
+#endif // __GHOUL___OBJECTMANAGER___H__
