@@ -144,7 +144,9 @@ void TcpSocketServer::close() {
 
     // Notify all threads waiting for connections.
     _connectionNotifier.notify_all();
-    closeSocket(_serverSocket);
+    const _SOCKET serverSocket = _serverSocket;
+    _serverSocket = INVALID_SOCKET;
+    closeSocket(serverSocket);
     _serverThread->join();
 }
 

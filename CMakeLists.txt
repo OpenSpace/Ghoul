@@ -322,6 +322,8 @@ if (GHOUL_MODULE_FONTRENDERING)
     endif ()
 endif ()
 
+include_external_library(Ghoul tiny-process-library ${GHOUL_ROOT_DIR}/ext/tiny-process-library)
+
 #############################
 # Other applications
 #############################
