@@ -35,13 +35,10 @@ namespace ghoul {
 
 class Process {
 public:
-	Process(
-        const std::string& command,
-        const std::string& path,
-        std::function<void(const char *bytes, size_t n)> readStdout = nullptr,
-        std::function<void(const char *bytes, size_t n)> readStderr = nullptr,
-        bool openStdin = false,
-        size_t bufferSize = 131072);
+    Process(const std::string& command, const std::string& path,
+        std::function<void(const char* bytes, size_t n)> readStdout = nullptr,
+        std::function<void(const char* bytes, size_t n)> readStderr = nullptr,
+        bool openStdin = false, size_t bufferSize = 131072);
     ~Process();
 
     void kill();
@@ -50,6 +47,6 @@ private:
     std::unique_ptr<TinyProcessLib::Process> _process;
 };
 
-}
+} // namespace ghoul
 
 #endif // __GHOUL___PROCESS___H__

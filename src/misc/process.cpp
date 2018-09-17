@@ -24,27 +24,23 @@
  ****************************************************************************************/
 
 #include <ghoul/misc/process.h>
-#include <ghoul/logging/logmanager.h>
-
-
-namespace {
-    const constexpr char* _loggerCat = "Process";
-}
 
 namespace ghoul {
 
-Process::Process(
-    const std::string& command,
-    const std::string& path,
-    std::function<void(const char *bytes, size_t n)> readStdout,
-    std::function<void(const char *bytes, size_t n)> readStderr,
-    bool openStdin,
-    size_t bufferSize)
+Process::Process(const std::string& command, const std::string& path,
+                 std::function<void(const char *bytes, size_t n)> readStdout,
+                 std::function<void(const char *bytes, size_t n)> readStderr,
+                 bool openStdin, size_t bufferSize)
 {
     _process = std::make_unique<TinyProcessLib::Process>(
-        command, path, readStdout, readStderr, openStdin, bufferSize);
+        command,
+        path,
+        readStdout,
+        readStderr,
+        openStdin,
+        bufferSize
+        );
 }
-
 
 void Process::kill() {
     if (!_process) {
@@ -53,7 +49,6 @@ void Process::kill() {
     _process->kill();
     _process = nullptr;
 }
-
 
 Process::~Process() {
     kill();
