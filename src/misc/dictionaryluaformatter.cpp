@@ -47,35 +47,44 @@ std::string formatDouble(double d) {
 
 namespace ghoul {
 
-DictionaryLuaFormatter::DictionaryLuaFormatter(bool prettyPrint)
-{
-    _prettyPrint = prettyPrint;
-}
+DictionaryLuaFormatter::DictionaryLuaFormatter(PrettyPrint prettyPrint,
+    std::string indentation)
+    : _prettyPrint(prettyPrint)
+    , _indentation(indentation)
+{}
+
 
 DictionaryLuaFormatter::LuaFormattingError::LuaFormattingError(const std::string& msg)
     : RuntimeError(msg, "Dictionary")
 {}
 
-std::string DictionaryLuaFormatter::format(const Dictionary& dictionary, int indentationSteps) const {
+std::string DictionaryLuaFormatter::format(const Dictionary& dictionary) const {
+    return format(dictionary, 0);
+}
+
+std::string DictionaryLuaFormatter::format(const Dictionary& dictionary,
+                                           int indentationSteps) const
+{
     if (dictionary.empty()) {
         return "{}";
     }
 
-    std::string indentationString = "";
-    std::string decrementedIntentationString = "";
-    if (_prettyPrint) {
-        for (int i = 0; i <= indentationSteps; i++) {
-            indentationString += "  ";
-        }
+    const std::string whitespace = _prettyPrint ? " " : "";
 
-        decrementedIntentationString = indentationString;
-        decrementedIntentationString.erase(0, 2);
+    std::string indentationString = "";
+    if (_prettyPrint) {
+        for (int i = 0; i < indentationSteps; i++) {
+            indentationString += _indentation;
+        }
     }
 
     std::string newLine = _prettyPrint ? "\n" : "";
 
-    auto convert = [this, dictionary, indentationSteps](const std::string& key) -> std::string {
-        return key + "=" + formatValue(dictionary, key, indentationSteps);
+    auto convert = [this, dictionary, whitespace, indentationSteps]
+        (const std::string& key)
+    {
+        return _indentation + key + whitespace + "=" + whitespace +
+            formatValue(dictionary, key, indentationSteps + 1);
     };
 
     std::vector<std::string> keys = dictionary.keys();
@@ -88,37 +97,40 @@ std::string DictionaryLuaFormatter::format(const Dictionary& dictionary, int ind
             return a + "," + newLine + indentationString + convert(key);
         });
 
-    return "{" + newLine + indentationString + lua + newLine + decrementedIntentationString + "}";
+    return "{" + newLine +
+        indentationString + lua + newLine +
+        indentationString + "}";
 }
 
 std::string DictionaryLuaFormatter::formatValue(const Dictionary& dictionary,
                                                  const std::string& key, 
                                                  int indentationSteps) const
 {
+    const std::string whitespace = _prettyPrint ? " " : "";
+
     if (dictionary.hasValue<Dictionary>(key)) {
-        int incremented = indentationSteps + 1;
         Dictionary subDictionary = dictionary.value<Dictionary>(key);
-        return format(subDictionary, incremented);
+        return format(subDictionary, indentationSteps);
     }
 
     if (dictionary.hasValue<glm::dvec4>(key)) {
         glm::dvec4 vec = dictionary.value<glm::dvec4>(key);
         return "{" + formatDouble(vec.x) + "," +
-            formatDouble(vec.y) + "," +
-            formatDouble(vec.z) + "," +
+            formatDouble(vec.y) + "," + whitespace +
+            formatDouble(vec.z) + "," + whitespace +
             formatDouble(vec.w) + "}";
     }
 
     if (dictionary.hasValue<glm::dvec3>(key)) {
         glm::dvec3 vec = dictionary.value<glm::dvec3>(key);
-        return "{" + formatDouble(vec.x) + "," +
-            formatDouble(vec.y) + "," +
+        return "{" + formatDouble(vec.x) + "," + whitespace +
+            formatDouble(vec.y) + "," + whitespace +
             formatDouble(vec.z) + "}";
     }
 
     if (dictionary.hasValue<glm::dvec2>(key)) {
         glm::dvec2 vec = dictionary.value<glm::dvec2>(key);
-        return "{" + formatDouble(vec.x) + "," +
+        return "{" + formatDouble(vec.x) + "," + whitespace +
             formatDouble(vec.y) + "}";
     }
 
