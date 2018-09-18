@@ -49,7 +49,7 @@ DictionaryJsonFormatter::JsonFormattingError::JsonFormattingError(const std::str
 {}
 
 
-std::string DictionaryJsonFormatter::format(const Dictionary& dictionary) const {
+std::string DictionaryJsonFormatter::format(const Dictionary& dictionary, int counter) const {
     if (dictionary.empty()) {
         return "{}";
     }
@@ -82,7 +82,8 @@ std::string DictionaryJsonFormatter::format(const Dictionary& dictionary) const 
 * \throw JsonFormattingError If the \p key points to a type that cannot be converted
 */
 std::string DictionaryJsonFormatter::formatValue(const Dictionary& dictionary,
-                                                 const std::string& key) const
+                                                 const std::string& key,
+                                                 int indentationSteps) const
 {
     if (dictionary.hasValue<Dictionary>(key)) {
         Dictionary subDictionary = dictionary.value<Dictionary>(key);

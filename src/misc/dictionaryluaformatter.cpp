@@ -47,17 +47,35 @@ std::string formatDouble(double d) {
 
 namespace ghoul {
 
+DictionaryLuaFormatter::DictionaryLuaFormatter(bool prettyPrint)
+{
+    _prettyPrint = prettyPrint;
+}
+
 DictionaryLuaFormatter::LuaFormattingError::LuaFormattingError(const std::string& msg)
     : RuntimeError(msg, "Dictionary")
 {}
 
-std::string DictionaryLuaFormatter::format(const Dictionary& dictionary) const {
+std::string DictionaryLuaFormatter::format(const Dictionary& dictionary, int indentationSteps) const {
     if (dictionary.empty()) {
         return "{}";
     }
 
-    auto convert = [this, dictionary](const std::string& key) -> std::string {
-        return key + "=" + formatValue(dictionary, key);
+    std::string indentationString = "";
+    std::string decrementedIntentationString = "";
+    if (_prettyPrint) {
+        for (int i = 0; i <= indentationSteps; i++) {
+            indentationString += "  ";
+        }
+
+        decrementedIntentationString = indentationString;
+        decrementedIntentationString.erase(0, 2);
+    }
+
+    std::string newLine = _prettyPrint ? "\n" : "";
+
+    auto convert = [this, dictionary, indentationSteps](const std::string& key) -> std::string {
+        return key + "=" + formatValue(dictionary, key, indentationSteps);
     };
 
     std::vector<std::string> keys = dictionary.keys();
@@ -66,20 +84,21 @@ std::string DictionaryLuaFormatter::format(const Dictionary& dictionary) const {
         std::next(keys.begin()),
         keys.end(),
         convert(*keys.begin()),
-        [convert](std::string a, std::string key) {
-            return a + "," + convert(key);
-        }
-    );
+        [convert, indentationString, newLine](std::string a, std::string key) {
+            return a + "," + newLine + indentationString + convert(key);
+        });
 
-    return "{" + lua + "}";
+    return "{" + newLine + indentationString + lua + newLine + decrementedIntentationString + "}";
 }
 
 std::string DictionaryLuaFormatter::formatValue(const Dictionary& dictionary,
-                                                 const std::string& key) const
+                                                 const std::string& key, 
+                                                 int indentationSteps) const
 {
     if (dictionary.hasValue<Dictionary>(key)) {
+        int incremented = indentationSteps + 1;
         Dictionary subDictionary = dictionary.value<Dictionary>(key);
-        return format(subDictionary);
+        return format(subDictionary, incremented);
     }
 
     if (dictionary.hasValue<glm::dvec4>(key)) {

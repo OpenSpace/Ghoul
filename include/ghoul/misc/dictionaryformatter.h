@@ -45,7 +45,7 @@ public:
      * \param dictionary The Dictionary to convert
      * \return A string representing the \p dictionary
      */
-    virtual std::string format(const Dictionary& dictionary) const = 0;
+    virtual std::string format(const Dictionary& dictionary, int indentationSteps) const = 0;
 };
 
 }  // namespace ghoul

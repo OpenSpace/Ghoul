@@ -59,7 +59,7 @@ public:
      *
      * \throw JsonFormattingError If the \p key points to a type that cannot be converted
      */
-    std::string format(const Dictionary& dictionary) const override;
+    std::string format(const Dictionary& dictionary, int indentationSteps = 0) const override;
 
 private:
     /**
@@ -73,7 +73,7 @@ private:
      *
      * \throw JsonFormattingError If the \p key points to a type that cannot be converted
      */
-    std::string formatValue(const Dictionary& dictionary, const std::string& key) const;
+    std::string formatValue(const Dictionary& dictionary, const std::string& key, int indentationSteps = 0) const;
 };
 
 }  // namespace ghoul
