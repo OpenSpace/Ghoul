@@ -47,7 +47,7 @@ public:
     BooleanType(PrettyPrint);
 
     DictionaryLuaFormatter(PrettyPrint prettyPrint = PrettyPrint::No,
-        std::string indentation = "  ");
+        std::string indentation = "    ");
 
     /**
      * This exception is thrown if an unknown type is being converted.
