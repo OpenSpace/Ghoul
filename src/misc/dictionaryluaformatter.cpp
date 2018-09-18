@@ -83,7 +83,7 @@ std::string DictionaryLuaFormatter::format(const Dictionary& dictionary,
     auto convert = [this, dictionary, whitespace, indentationSteps]
         (const std::string& key)
     {
-        return _indentation + key + whitespace + "=" + whitespace +
+        return (_prettyPrint ? _indentation : "") + key + whitespace + "=" + whitespace +
             formatValue(dictionary, key, indentationSteps + 1);
     };
 
