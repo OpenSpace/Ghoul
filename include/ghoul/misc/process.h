@@ -23,56 +23,30 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/misc/misc.h>
+#ifndef __GHOUL___PROCESS___H__
+#define __GHOUL___PROCESS___H__
 
-#include <algorithm>
-#include <cctype>
+#include <string>
+#include <functional>
+
+#include <process.hpp>
 
 namespace ghoul {
 
-std::vector<std::string> tokenizeString(const std::string& input, char separator) {
-    size_t separatorPos = input.find(separator);
-    if (separatorPos == std::string::npos) {
-        return { input };
-    }
-    else {
-        std::vector<std::string> result;
-        size_t prevSeparator = 0;
-        while (separatorPos != std::string::npos) {
-            result.push_back(input.substr(prevSeparator, separatorPos - prevSeparator));
-            prevSeparator = separatorPos + 1;
-            separatorPos = input.find(separator, separatorPos + 1);
-        }
-        result.push_back(input.substr(prevSeparator));
-        return result;
-    }
-}
+class Process {
+public:
+    Process(const std::string& command, const std::string& path,
+        std::function<void(const char* bytes, size_t n)> readStdout = nullptr,
+        std::function<void(const char* bytes, size_t n)> readStderr = nullptr,
+        bool openStdin = false, size_t bufferSize = 131072);
+    ~Process();
 
-std::string join(std::vector<std::string> input, const std::string& separator) {
-    std::string result;
-    for (std::string& s : input) {
-        result += std::move(s) + separator;
-    }
+    void kill();
 
-    return result.substr(0, result.size() - separator.size());
-}
-
-void trimWhitespace(std::string& value) {
-    // Trim from the left until the first non-whitespace character
-    value.erase(
-        value.begin(),
-        std::find_if(value.begin(), value.end(), [](int ch) { return !std::isspace(ch); })
-    );
-
-    // Trim from the right until the first non-whitespace character
-    value.erase(
-        std::find_if(
-            value.rbegin(),
-            value.rend(),
-            [](int ch) { return !std::isspace(ch); }
-        ).base(),
-        value.end()
-    );
-}
+private:
+    std::unique_ptr<TinyProcessLib::Process> _process;
+};
 
 } // namespace ghoul
+
+#endif // __GHOUL___PROCESS___H__

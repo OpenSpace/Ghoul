@@ -725,7 +725,6 @@ void FileSystem::destroyCacheManager() {
 }
 
 CacheManager* FileSystem::cacheManager() {
-    ghoul_assert(_cacheManager, "CacheManager was not created");
     return _cacheManager.get();
 }
 

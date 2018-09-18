@@ -25,6 +25,7 @@
 #ifndef __GHOUL___VERSION___H__
 #define __GHOUL___VERSION___H__
 
+#include <ghoul/misc/stringconversion.h>
 #include <string>
 
 namespace ghoul::systemcapabilities {
@@ -96,10 +97,11 @@ struct Version {
 
 } // namespace ghoul::systemcapabilities
 
-namespace std {
+namespace ghoul {
 
-string to_string(const ghoul::systemcapabilities::Version& v);
+template <>
+std::string to_string(const ghoul::systemcapabilities::Version& v);
 
-} // namespace std
+} // namespace ghoul
 
 #endif // __GHOUL___VERSION___H__

@@ -29,9 +29,11 @@
 #include <ghoul/misc/assert.h>
 #include <map>
 
-namespace std {
+namespace ghoul {
 
-string to_string(ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity v) {
+std::string to_string
+              (const ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity& v)
+{
     using Verbosity = ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity;
     switch (v) {
         case Verbosity::None:    return "None";
@@ -41,10 +43,6 @@ string to_string(ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosi
         default:                 throw ghoul::MissingCaseException();
     }
 }
-
-} // namespace std
-
-namespace ghoul {
 
 template <>
 ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity

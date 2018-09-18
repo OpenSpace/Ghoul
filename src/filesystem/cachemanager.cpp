@@ -169,7 +169,7 @@ CacheManager::~CacheManager() {
     std::ofstream file(path, std::ofstream::out);
     if (file.good()) {
         file << _version << std::endl;
-        for (const std::pair<unsigned int, CacheInformation>& p : _files) {
+        for (const std::pair<unsigned long, CacheInformation>& p : _files) {
             if (!p.second.isPersistent) {
                 // Delete all the non-persistent files
                 FileSys.deleteFile(p.second.file);
@@ -271,7 +271,7 @@ bool CacheManager::hasCachedFile(const std::string& baseName,
         throw IllegalArgumentException(baseName);
     }
 
-    unsigned int hash = generateHash(baseName, information);
+    unsigned long hash = generateHash(baseName, information);
     return _files.find(hash) != _files.end();
 }
 

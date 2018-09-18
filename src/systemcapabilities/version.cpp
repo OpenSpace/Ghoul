@@ -36,10 +36,10 @@ unsigned int packVersion(int major, int minor, int release) {
 
 } // namespace
 
-namespace std {
+namespace ghoul {
 
-string to_string(const ghoul::systemcapabilities::Version& v) {
-    using std::to_string;
+template <>
+std::string to_string(const ghoul::systemcapabilities::Version& v) {
     if (v.release != 0) {
         return to_string(v.major) + "." + to_string(v.minor) + "." + to_string(v.release);
     } else {
@@ -47,7 +47,7 @@ string to_string(const ghoul::systemcapabilities::Version& v) {
     }
 }
 
-} // namespace std
+} // namespace ghoul
 
 namespace ghoul::systemcapabilities {
 

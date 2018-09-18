@@ -75,18 +75,29 @@ constexpr unsigned int CRC32Table[] = {
     0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
 };
 
-constexpr unsigned int crc32Internal(unsigned int crc, const char* str) {
-    return (*str == 0)
-        ? crc ^ 0xFFFFFFFF
-        : crc32Internal(
-            CRC32Table[static_cast<unsigned char>(crc) ^ static_cast<unsigned char>(*str)]
-                  ^ (crc >> 8), str + 1);
-}
-
 } // namespace
 
 constexpr unsigned int hashCRC32(const char* s) {
-    return crc32Internal(0xFFFFFFFF, s);
+    unsigned int res = 0xFFFFFFFF;
+    while (*s != 0) {
+        res = CRC32Table[
+            static_cast<unsigned char>(res) ^ static_cast<unsigned char>(*s)
+        ] ^ (res >> 8);
+        ++s;
+    }
+
+    return res ^ 0xFFFFFFFF;
+}
+
+constexpr unsigned int hashCRC32(const char* buffer, unsigned int size) {
+    unsigned int res = 0xFFFFFFFF;
+    for (unsigned int i = 0; i < size; ++i) {
+        res = CRC32Table[
+            static_cast<unsigned char>(res) ^ static_cast<unsigned char>(buffer[i])
+        ] ^ (res >> 8);
+    }
+
+    return res ^ 0xFFFFFFFF;
 }
 
 constexpr unsigned int operator "" _crc32(const char* s, size_t) {

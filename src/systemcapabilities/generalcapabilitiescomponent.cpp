@@ -50,45 +50,47 @@
     #include <sys/utsname.h>
 #endif
 
-namespace std {
-    std::string to_string(
-        ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem os)
-    {
-        using OS =
-            ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem;
-        switch (os) {
-            case OS::Windows10:                   return "Windows 10";
-            case OS::WindowsServer2016:           return "Windows Server 2016";
-            case OS::WindowsVista:                return "Windows Vista";
-            case OS::WindowsServer2008:           return "Windows Server 2008";
-            case OS::Windows7:                    return "Windows 7";
-            case OS::WindowsServer2008R2:         return "Windows Server 2008 R2";
-            case OS::Windows8:                    return "Windows 8";
-            case OS::WindowsServer2012:           return "Windows Server 2012";
-            case OS::Windows81:                   return "Windows 8.1";
-            case OS::WindowsServer2012R2:         return "Windows Server 2012 R2";
-            case OS::WindowsServer2003R2:         return "Windows Server 2003 R2";
-            case OS::WindowsStorageServer2003:    return "Windows Storage Server 2003";
-            case OS::WindowsXPProfx64:            return "Windows XP Professional x64";
-            case OS::WindowsServer2003:           return "Windows Server 2003";
-            case OS::WindowsXPHome:               return "Windows XP Home Edition";
-            case OS::WindowsXPProf:              return "Windows XP Professional Edition";
-            case OS::Windows2000Prof:             return "Windows 2000 Professional";
-            case OS::Windows2000DatacenterServer: return "Windows 2000 Datacenter Server";
-            case OS::Windows2000AdvancedServer:   return "Windows 2000 Advanced Server";
-            case OS::Windows2000Server:           return "Windows 2000 Server";
-            case OS::Linux: // @TODO we need more variety here
-                return "Linux";
-            case OS::MacOS:
-                // @TODO we need more variety here
-                return "MacOS";
-            case OS::Unknown:
-                return "";
-            default:
-                throw ghoul::MissingCaseException();
-        }
+namespace ghoul {
+
+template <>
+std::string to_string(
+              const systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem& os)
+{
+    using OS =
+        ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem;
+    switch (os) {
+        case OS::Windows10:                   return "Windows 10";
+        case OS::WindowsServer2016:           return "Windows Server 2016";
+        case OS::WindowsVista:                return "Windows Vista";
+        case OS::WindowsServer2008:           return "Windows Server 2008";
+        case OS::Windows7:                    return "Windows 7";
+        case OS::WindowsServer2008R2:         return "Windows Server 2008 R2";
+        case OS::Windows8:                    return "Windows 8";
+        case OS::WindowsServer2012:           return "Windows Server 2012";
+        case OS::Windows81:                   return "Windows 8.1";
+        case OS::WindowsServer2012R2:         return "Windows Server 2012 R2";
+        case OS::WindowsServer2003R2:         return "Windows Server 2003 R2";
+        case OS::WindowsStorageServer2003:    return "Windows Storage Server 2003";
+        case OS::WindowsXPProfx64:            return "Windows XP Professional x64";
+        case OS::WindowsServer2003:           return "Windows Server 2003";
+        case OS::WindowsXPHome:               return "Windows XP Home Edition";
+        case OS::WindowsXPProf:              return "Windows XP Professional Edition";
+        case OS::Windows2000Prof:             return "Windows 2000 Professional";
+        case OS::Windows2000DatacenterServer: return "Windows 2000 Datacenter Server";
+        case OS::Windows2000AdvancedServer:   return "Windows 2000 Advanced Server";
+        case OS::Windows2000Server:           return "Windows 2000 Server";
+        case OS::Linux: // @TODO we need more variety here
+            return "Linux";
+        case OS::MacOS:
+            // @TODO we need more variety here
+            return "MacOS";
+        case OS::Unknown:
+            return "";
+        default:
+            throw ghoul::MissingCaseException();
     }
-} // namespace std
+}
+} // namespace ghoul
 
 namespace ghoul::systemcapabilities {
 
@@ -321,7 +323,8 @@ void GeneralCapabilitiesComponent::detectOS() {
     }
 
     _operatingSystemExtra = resultStream.str();
-    _fullOperatingSystem = std::to_string(_operatingSystem) + " " + _operatingSystemExtra;
+    _fullOperatingSystem = ghoul::to_string(_operatingSystem) +
+                           " " + _operatingSystemExtra;
 #else
     utsname name;
     int res = uname(&name);
@@ -679,7 +682,7 @@ GeneralCapabilitiesComponent::operatingSystem() const
 }
 
 std::string GeneralCapabilitiesComponent::operatingSystemString() const {
-    return std::to_string(_operatingSystem) + " " + _operatingSystemExtra;
+    return ghoul::to_string(_operatingSystem) + " " + _operatingSystemExtra;
 }
 
 const std::string& GeneralCapabilitiesComponent::fullOperatingSystem() const {

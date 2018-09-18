@@ -87,6 +87,7 @@ void WebSocket::disconnect(int) {
 
 bool WebSocket::getMessage(std::string& message) {
     auto messageOrDisconnected = [this]() {
+        // `_inputMessageQueueMutex` must be locked when calling this function.
         return (!_tcpSocket->isConnected() && !_tcpSocket->isConnecting()) ||
             !_inputMessageQueue.empty();
     };
@@ -96,6 +97,7 @@ bool WebSocket::getMessage(std::string& message) {
         _inputNotifier.wait_for(lock, MaxWaitDuration, messageOrDisconnected);
     }
 
+    std::lock_guard<std::mutex> guard(_inputMessageQueueMutex);
     if (_inputMessageQueue.empty()) {
         return false;
     }

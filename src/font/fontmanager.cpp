@@ -60,6 +60,18 @@ FontManager::FontManager(glm::ivec3 atlasDimensions)
     })
 {}
 
+void FontManager::initialize() {
+    _textureAtlas.initialize();
+}
+
+void FontManager::deinitialize() {
+    _textureAtlas.deinitialize();
+}
+
+opengl::TextureAtlas& FontManager::textureAtlas() {
+    return _textureAtlas;
+}
+
 unsigned int FontManager::registerFontPath(const std::string& fontName,
                                            const std::string& filePath)
 {

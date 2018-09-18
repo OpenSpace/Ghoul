@@ -23,29 +23,35 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___FROMSTRING___H__
-#define __GHOUL___FROMSTRING___H__
-
-#include <string>
+#include <ghoul/misc/process.h>
 
 namespace ghoul {
 
-/**
- * Converts the passed \p string into a \c T value and returns it. For each valid
- * conversion, a template specialization has to be created. This function is meant to be
- * analogous to the <code>std::to_string</code> function and should behave as such:
- *
- * <code>std::to_string(ghoul::from_string(s)) == s</code>
- *
- * <code>ghoul::from_string(std::to_string(v)) == v</code>
- */
-template <typename T>
-T from_string(const std::string& string) {
-    // Unfortunately, we can't write 'false' here, as the compiler is a bit too eager to
-    // evaluate that
-    static_assert(sizeof(T) == -1, "Missing from_string implementation");
+Process::Process(const std::string& command, const std::string& path,
+                 std::function<void(const char *bytes, size_t n)> readStdout,
+                 std::function<void(const char *bytes, size_t n)> readStderr,
+                 bool openStdin, size_t bufferSize)
+{
+    _process = std::make_unique<TinyProcessLib::Process>(
+        command,
+        path,
+        readStdout,
+        readStderr,
+        openStdin,
+        bufferSize
+        );
+}
+
+void Process::kill() {
+    if (!_process) {
+        return;
+    }
+    _process->kill();
+    _process = nullptr;
+}
+
+Process::~Process() {
+    kill();
 }
 
 } // namespace ghoul
-
-#endif // __GHOUL___FROMSTRING___H__

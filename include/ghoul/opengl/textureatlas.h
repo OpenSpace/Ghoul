@@ -41,7 +41,7 @@
 
 namespace ghoul::opengl {
 
-    class Texture;
+class Texture;
 
 /**
  * This class represents a texture atlas which automatically organizes smaller textures
@@ -127,6 +127,18 @@ public:
      * \return The atlas into which the original values were moved into
      */
     TextureAtlas& operator=(TextureAtlas&& rhs);
+
+    /**
+     * Initializes the TextureAtlas and creates its backend storage. This method
+     * requires a valid OpenGL context.
+     */
+    void initialize();
+
+    /**
+    * Deinitializes the TextureAtlas and cleans its backend storage. This method
+    * requires a valid OpenGL context.
+    */
+    void deinitialize();
 
     /**
      * Uploads the TextureAtlas to the graphics card. This function requires a valid

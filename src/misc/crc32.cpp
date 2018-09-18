@@ -32,11 +32,25 @@
 #include <ghoul/misc/crc32.h>
 
 #include <ghoul/misc/assert.h>
+#include <fstream>
+#include <vector>
 
 namespace ghoul {
 
 unsigned int hashCRC32(const std::string& s) {
-    return crc32Internal(0xFFFFFFFF, s.c_str());
+    return hashCRC32(s.c_str());
+}
+
+unsigned int hashCRC32File(const std::string& file) {
+    std::fstream f(file);
+    f.seekg(0, std::ios::end);
+    unsigned int length = static_cast<int>(f.tellg());
+    f.seekg(0, std::ios::beg);
+    std::vector<char> buffer(length);
+    f.read(buffer.data(), length);
+    f.close();
+
+    return hashCRC32(buffer.data(), length);
 }
 
 } // namespace ghoul

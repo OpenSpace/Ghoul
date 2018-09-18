@@ -55,47 +55,6 @@ TextureAtlas::TextureAtlas(glm::ivec3 size)
     _nodes.emplace_back(1, 1, _size.x - 2);
     _data.resize(_size.x * _size.y * _size.z);
     std::fill(_data.begin(), _data.end(), static_cast<unsigned char>(0));
-
-    // Create texture
-    Texture::Format format;
-    // Choose the correct texture format based on the textureatlas depth
-    switch (_size.z) {
-        case 1:
-            format = Texture::Format::Red;
-            break;
-        case 2:
-            format = Texture::Format::RG;
-            break;
-        case 3:
-            format = Texture::Format::RGB;
-            break;
-        case 4:
-            format = Texture::Format::RGBA;
-            break;
-        default:
-            throw ghoul::RuntimeError("Wrong texture depth", "TextureAtlas");
-    }
-    GLenum internalFormat = GLenum(format);
-
-    // Normally, we want to store data as single bytes, but if the reversed format is
-    // supported, we can use that for depth==4 atlasses
-    GLenum dataType = GL_UNSIGNED_BYTE;
-
-#ifdef GL_UNSIGNED_INT_8_8_8_8_REV
-    if (_size.z == 4) {
-        internalFormat = GL_BGRA;
-        dataType = GL_UNSIGNED_INT_8_8_8_8_REV;
-    }
-#endif
-
-    _texture = std::make_unique<Texture>(
-        _size,
-        format,
-        internalFormat,
-        dataType,
-        Texture::FilterMode::Nearest
-    );
-    ghoul_assert(_texture != nullptr, "Error creating Texture");
 }
 
 TextureAtlas::TextureAtlas(int width, int height, int depth)
@@ -144,6 +103,53 @@ TextureAtlas& TextureAtlas::operator=(TextureAtlas&& rhs) {
     return *this;
 }
 
+void TextureAtlas::initialize() {
+    // Create texture
+    Texture::Format format;
+    // Choose the correct texture format based on the textureatlas depth
+    switch (_size.z) {
+        case 1:
+            format = Texture::Format::Red;
+            break;
+        case 2:
+            format = Texture::Format::RG;
+            break;
+        case 3:
+            format = Texture::Format::RGB;
+            break;
+        case 4:
+            format = Texture::Format::RGBA;
+            break;
+        default:
+            throw ghoul::RuntimeError("Wrong texture depth", "TextureAtlas");
+    }
+    GLenum internalFormat = GLenum(format);
+
+    // Normally, we want to store data as single bytes, but if the reversed format is
+    // supported, we can use that for depth==4 atlasses
+    GLenum dataType = GL_UNSIGNED_BYTE;
+
+#ifdef GL_UNSIGNED_INT_8_8_8_8_REV
+    if (_size.z == 4) {
+        internalFormat = GL_BGRA;
+        dataType = GL_UNSIGNED_INT_8_8_8_8_REV;
+    }
+#endif
+
+    _texture = std::make_unique<Texture>(
+        _size,
+        format,
+        internalFormat,
+        dataType,
+        Texture::FilterMode::Nearest
+    );
+    ghoul_assert(_texture != nullptr, "Error creating Texture");
+}
+
+void TextureAtlas::deinitialize() {
+    _texture = nullptr;
+}
+
 glm::ivec3 TextureAtlas::size() const {
     return _size;
 }
@@ -172,6 +178,8 @@ void TextureAtlas::clear() {
 }
 
 TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
+    ghoul_assert(_texture, "TextureAtlas has not been initialized");
+
     // We assign an area that is one pixel bigger to allow for a margin around each region
     width += 1;
     height += 1;
@@ -244,6 +252,7 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
 
 void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
     ghoul_assert(data, "Data must not be a nullptr");
+    ghoul_assert(_texture, "TextureAtlas has not been initialized");
 
     glm::ivec4 region = _handleInformation[handle];
 
@@ -277,6 +286,8 @@ void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
 TextureAtlas::TextureCoordinatesResult TextureAtlas::textureCoordinates(
                                    RegionHandle handle, const glm::ivec4& windowing) const
 {
+    ghoul_assert(_texture, "TextureAtlas has not been initialized");
+
     glm::ivec4 region = _handleInformation[handle];
 
     // Offset the location to the pixel center

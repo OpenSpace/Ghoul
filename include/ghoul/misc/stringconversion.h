@@ -23,56 +23,45 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/misc/misc.h>
+#ifndef __GHOUL___STRINGCONVERSION___H__
+#define __GHOUL___STRINGCONVERSION___H__
 
-#include <algorithm>
-#include <cctype>
+#include <string>
 
 namespace ghoul {
 
-std::vector<std::string> tokenizeString(const std::string& input, char separator) {
-    size_t separatorPos = input.find(separator);
-    if (separatorPos == std::string::npos) {
-        return { input };
+/**
+ * Converts the passed \p string into a \c T value and returns it. For each valid
+ * conversion, a template specialization has to be created. This function is meant to be
+ * analogous to the <code>std::to_string</code> function and should behave as such:
+ *
+ * <code>ghoul::to_string(ghoul::from_string(s)) == s</code>
+ *
+ * <code>ghoul::from_string(ghoul::to_string(v)) == v</code>
+ */
+template <typename T>
+T from_string(const std::string& string) {
+    // Unfortunately, we can't write 'false' here, as the compiler is a bit too eager to
+    // evaluate that
+    static_assert(sizeof(T) == -1, "Missing from_string implementation");
+}
+
+/**
+ * Converts the passed \p value to its string representation. The default implementation
+ * calls the <code>std::to_string</code> function. User-defined types are supported by
+ * creating a specialization of this function.
+ */
+template <typename T>
+std::string to_string(const T& value) {
+    // std::string does not define the identity transformation so we have to handle that
+    if constexpr (std::is_same_v<T, std::string>) {
+        return value;
     }
     else {
-        std::vector<std::string> result;
-        size_t prevSeparator = 0;
-        while (separatorPos != std::string::npos) {
-            result.push_back(input.substr(prevSeparator, separatorPos - prevSeparator));
-            prevSeparator = separatorPos + 1;
-            separatorPos = input.find(separator, separatorPos + 1);
-        }
-        result.push_back(input.substr(prevSeparator));
-        return result;
+        return std::to_string(value);
     }
-}
-
-std::string join(std::vector<std::string> input, const std::string& separator) {
-    std::string result;
-    for (std::string& s : input) {
-        result += std::move(s) + separator;
-    }
-
-    return result.substr(0, result.size() - separator.size());
-}
-
-void trimWhitespace(std::string& value) {
-    // Trim from the left until the first non-whitespace character
-    value.erase(
-        value.begin(),
-        std::find_if(value.begin(), value.end(), [](int ch) { return !std::isspace(ch); })
-    );
-
-    // Trim from the right until the first non-whitespace character
-    value.erase(
-        std::find_if(
-            value.rbegin(),
-            value.rend(),
-            [](int ch) { return !std::isspace(ch); }
-        ).base(),
-        value.end()
-    );
 }
 
 } // namespace ghoul
+
+#endif // __GHOUL___STRINGCONVERSION___H__
