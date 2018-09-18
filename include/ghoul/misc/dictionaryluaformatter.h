@@ -28,6 +28,7 @@
 
 #include <ghoul/misc/dictionaryformatter.h>
 #include <ghoul/misc/exception.h>
+#include <ghoul/misc/boolean.h>
 
 namespace ghoul {
 
@@ -43,6 +44,11 @@ class Dictionary;
  */
 class DictionaryLuaFormatter : public DictionaryFormatter {
 public:
+    BooleanType(PrettyPrint);
+
+    DictionaryLuaFormatter(PrettyPrint prettyPrint = PrettyPrint::No,
+        std::string indentation = "    ");
+
     /**
      * This exception is thrown if an unknown type is being converted.
      */
@@ -72,7 +78,22 @@ private:
      *
      * \throw LuaFormattingError If the \p key points to a type that cannot be converted
      */
-    std::string formatValue(const Dictionary& dictionary, const std::string& key) const;
+    std::string formatValue(const Dictionary& dictionary, const std::string& key,
+        int indentationSteps) const;
+
+    /**
+     * Converts the passed \p dictionary into a Lua string representation.
+     *
+     * \param dictionary The Dictionary that should be converted
+     * \param indentationSteps The number of indentation steps to begin with
+     * \return A Lua string representing the Dictionary
+     *
+     * \throw LuaFormattingError If the \p key points to a type that cannot be converted
+     */
+    std::string format(const Dictionary& dictionary, int indentationSteps) const;
+
+    bool _prettyPrint = false;
+    std::string _indentation;
 };
 
 }  // namespace ghoul
