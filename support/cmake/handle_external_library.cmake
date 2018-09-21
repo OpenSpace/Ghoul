@@ -51,6 +51,12 @@ function(disable_external_warnings_for_file file_name)
     endif ()
 endfunction ()
 
+function (set_folder_location target folder)
+    if (TARGET ${target})
+        set_property(TARGET ${target} PROPERTY FOLDER ${folder})
+    endif ()
+endfunction ()
+
 # Includes an external library by adding its subdirectory using 'add_subdirectory'
 # target_name: Target to which the library is added
 # library_name: The library that is added by including 'path'
@@ -62,7 +68,7 @@ function (include_external_library target_name library_name path)
         get_property(INCLUDE_DIR TARGET ${target_name} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
         target_link_libraries(${target_name} ${library_name})
         target_include_directories(${target_name} SYSTEM PUBLIC ${INCLUDE_DIR} ${extra_macro_args})
-        set_property(TARGET ${library_name} PROPERTY FOLDER "External")
+        set_folder_location(${library_name} "External")
         if (MSVC)
             target_compile_options(
                 ${library_name}
