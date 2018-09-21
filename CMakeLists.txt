@@ -341,7 +341,8 @@ endif ()
 if (MSVC)
     begin_dependency("Stackwalker")
     target_include_directories(Ghoul PUBLIC ${GHOUL_ROOT_DIR}/ext/stackwalker)
-    include_external_library(Ghoul StackWalker ${GHOUL_ROOT_DIR}/ext/stackwalker ${GHOUL_ROOT_DIR}/ext/stackwalker)
+    include_external_library(Ghoul StackWalker
+        ${GHOUL_ROOT_DIR}/ext/stackwalker ${GHOUL_ROOT_DIR}/ext/stackwalker)
     end_dependency()
 endif ()
 
@@ -366,7 +367,8 @@ end_dependency()
 if (GHOUL_MODULE_FONTRENDERING)
     begin_module("FontRendering")
     set(FREETYPE_DIST OFF CACHE BOOL "")
-    include_external_library(Ghoul freetype ${GHOUL_ROOT_DIR}/ext/freetype2 ${GHOUL_ROOT_DIR}/ext/freetype2/include)
+    include_external_library(Ghoul freetype
+        ${GHOUL_ROOT_DIR}/ext/freetype2 ${GHOUL_ROOT_DIR}/ext/freetype2/include)
 
     mark_as_advanced(FT_WITH_BZIP2 FT_WITH_HARFBUZZ FT_WITH_PNG FT_WITH_ZLIB)
     set_folder_location(dist "External")
@@ -374,7 +376,8 @@ if (GHOUL_MODULE_FONTRENDERING)
 endif ()
 
 begin_dependency("tiny-process-library")
-include_external_library(Ghoul tiny-process-library ${GHOUL_ROOT_DIR}/ext/tiny-process-library)
+include_external_library(Ghoul tiny-process-library
+    ${GHOUL_ROOT_DIR}/ext/tiny-process-library)
 end_dependency()
 
 
@@ -384,7 +387,7 @@ end_dependency()
 #############################
 option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
 if (GHOUL_HAVE_TESTS)
-    begin_header("Building tests")
+    begin_header("Generating tests")
     file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
     add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})
 
@@ -392,7 +395,8 @@ if (GHOUL_HAVE_TESTS)
     set_property(TARGET GhoulTest PROPERTY CXX_STANDARD_REQUIRED On)
 
     target_compile_definitions(GhoulTest PRIVATE
-        "GHL_THROW_ON_ASSERT" # Jenkins shouldn't ask for asserts when they happen, but just throw
+        # Jenkins shouldn't ask for asserts when they happen, but just throw
+        "GHL_THROW_ON_ASSERT"
         "GHOUL_HAVE_TESTS"
         "GTEST_HAS_TR1_TUPLE=0"
         "GTEST_HAS_GLOBAL_STRING=0"
@@ -402,21 +406,13 @@ if (GHOUL_HAVE_TESTS)
     set_ghoul_compile_settings(GhoulTest)
 
     if (MSVC)
-        target_compile_options(
-            GhoulTest
-            PUBLIC
-            "-Od"
-            "/bigobj"
-        )
+        target_compile_options(GhoulTest PUBLIC "-Od" "/bigobj")
     else ()
-        target_compile_options(
-            GhoulTest
-            PUBLIC
-            "-O0"
-        )
+        target_compile_options(GhoulTest PUBLIC "-O0" )
     endif ()
 
-    target_include_directories(GhoulTest PUBLIC "${GHOUL_ROOT_DIR}/ext/googletest/googletest/include" "${GHOUL_ROOT_DIR}")
+    target_include_directories(GhoulTest PUBLIC
+        "${GHOUL_ROOT_DIR}/ext/googletest/googletest/include" "${GHOUL_ROOT_DIR}")
 
     set(BUILD_GTEST ON CACHE BOOL "")
     set(BUILD_GMOCK OFF CACHE BOOL "")
