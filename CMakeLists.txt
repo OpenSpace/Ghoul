@@ -29,16 +29,14 @@ project(Ghoul)
 # Setting default paths
 set(GHOUL_ROOT_DIR ${PROJECT_SOURCE_DIR})
 set(GHOUL_CMAKE_DIR ${GHOUL_ROOT_DIR}/support/cmake)
-set(GHOUL_CMAKE_DIR ${GHOUL_ROOT_DIR}/support/cmake PARENT_SCOPE)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_CMAKE_DIR} ${GHOUL_ROOT_DIR}/ext)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${GHOUL_ROOT_DIR}/bin")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_CMAKE_DIR})
 
 include(${GHOUL_CMAKE_DIR}/handle_external_library.cmake)
 include(${GHOUL_CMAKE_DIR}/set_ghoul_compile_settings.cmake)
 include(${GHOUL_CMAKE_DIR}/message_macros.cmake)
+include(${GHOUL_CMAKE_DIR}/include_gtest.cmake)
 
-begin_header("Generating Ghoul Project")
+begin_header("Configuring Ghoul Project")
 
 #############################
 # Options
@@ -137,7 +135,7 @@ begin_dependency("GLM")
 set(GLM_ROOT_DIR "${GHOUL_ROOT_DIR}/ext/glm")
 find_package(GLM REQUIRED)
 message(STATUS "Including GLM found at ${GLM_INCLUDE_DIRS}")
-mark_as_advanced(GLM_INCLUDE_DIRS)
+mark_as_advanced(GLM_INCLUDE_DIR GLM_INCLUDE_DIRS)
 target_include_directories(Ghoul SYSTEM PUBLIC ${GLM_INCLUDE_DIRS})
 end_dependency("GLM")
 
@@ -165,7 +163,7 @@ if (GHOUL_MODULE_OPENGL)
     set(OPTION_BUILD_EXAMPLES OFF CACHE BOOL "")
     mark_as_advanced(OPTION_BUILD_GPU_TESTS OPTION_BUILD_TESTS OPTION_BUILD_TOOLS
         OPTION_BUILD_EXAMPLES OPTION_BUILD_CHECK OPTION_BUILD_DOCS
-        OPTION_BUILD_WITH_BOOST_THREAD)
+        OPTION_BUILD_WITH_BOOST_THREAD INSTALL_MSVC_REDIST_FILEPATH)
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/glbinding)
     target_include_directories(Ghoul SYSTEM PUBLIC
         ${GHOUL_ROOT_DIR}/ext/glbinding/source/glbinding/include)
@@ -232,16 +230,17 @@ if (GHOUL_MODULE_ASSIMP)
         set(ASSIMP_NO_EXPORTER ON CACHE BOOL "")
         set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
 
-        mark_as_advanced(ASSIMP_ANDROID_JNIIOSYSTEM ASSIMP_ASAN ASSIMP_BIN_INSTALL_DIR
-            ASSIMP_BUILD_3DS_IMPORTER ASSIMP_BUILD_3D_IMPORTER ASSIMP_BUILD_3MF_IMPORTER
-            ASSIMP_BUILD_AC_IMPORTER ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT
-            ASSIMP_BUILD_AMF_IMPORTER ASSIMP_BUILD_ASE_IMPORTER
-            ASSIMP_BUILD_ASSBIN_IMPORTER ASSIMP_BUILD_ASSIMP_TOOLS
-            ASSIMP_BUILD_ASSXML_IMPORTER ASSIMP_BUILD_B3D_IMPORTER
-            ASSIMP_BUILD_BLEND_IMPORTER ASSIMP_BUILD_BVH_IMPORTER
-            ASSIMP_BUILD_COB_IMPORTER ASSIMP_BUILD_COLLADA_IMPORTER
-            ASSIMP_BUILD_CSM_IMPORTER ASSIMP_BUILD_DXF_IMPORTER ASSIMP_BUILD_FBX_IMPORTER
-            ASSIMP_BUILD_GLTF_IMPORTER ASSIMP_BUILD_HMP_IMPORTER ASSIMP_BUILD_IFC_IMPORTER
+        mark_as_advanced(Assimp_DIR ASSIMP_ANDROID_JNIIOSYSTEM ASSIMP_ASAN
+            ASSIMP_BIN_INSTALL_DIR ASSIMP_BUILD_3DS_IMPORTER ASSIMP_BUILD_3D_IMPORTER
+            ASSIMP_BUILD_3MF_IMPORTER ASSIMP_BUILD_AC_IMPORTER
+            ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT ASSIMP_BUILD_AMF_IMPORTER
+            ASSIMP_BUILD_ASE_IMPORTER ASSIMP_BUILD_ASSBIN_IMPORTER
+            ASSIMP_BUILD_ASSIMP_TOOLS ASSIMP_BUILD_ASSXML_IMPORTER
+            ASSIMP_BUILD_B3D_IMPORTER ASSIMP_BUILD_BLEND_IMPORTER
+            ASSIMP_BUILD_BVH_IMPORTER ASSIMP_BUILD_COB_IMPORTER
+            ASSIMP_BUILD_COLLADA_IMPORTER ASSIMP_BUILD_CSM_IMPORTER
+            ASSIMP_BUILD_DXF_IMPORTER ASSIMP_BUILD_FBX_IMPORTER ASSIMP_BUILD_GLTF_IMPORTER
+            ASSIMP_BUILD_HMP_IMPORTER ASSIMP_BUILD_IFC_IMPORTER
             ASSIMP_BUILD_IRRMESH_IMPORTER ASSIMP_BUILD_IRR_IMPORTER
             ASSIMP_BUILD_LWO_IMPORTER ASSIMP_BUILD_LWS_IMPORTER ASSIMP_BUILD_MD2_IMPORTER
             ASSIMP_BUILD_MD3_IMPORTER ASSIMP_BUILD_MD5_IMPORTER ASSIMP_BUILD_MDC_IMPORTER
@@ -256,9 +255,10 @@ if (GHOUL_MODULE_ASSIMP)
             ASSIMP_BUILD_TERRAGEN_IMPORTER ASSIMP_BUILD_TESTS ASSIMP_BUILD_X_IMPORTER
             ASSIMP_BUILD_X3D_IMPORTER ASSIMP_BUILD_XGL_IMPORTER ASSIMP_BUILD_ZLIB
             ASSIMP_COVERALLS ASSIMP_DOUBLE_PRECISION ASSIMP_INCLUDE_INSTALL_DIR
-            ASSIMP_LIBRARY_SUFFIX ASSIMP_LIB_INSTALL_DIR ASSIMP_NO_EXPORT
-            ASSIMP_NO_EXPORTER ASSIMP_OPT_BUILD_PACKAGES ASSIMP_PACKAGE_VERSION
-            ASSIMP_UBSAN ASSIMP_WERROR)
+            ASSIMP_INSTALL_PDB ASSIMP_LIBRARY_SUFFIX ASSIMP_LIB_INSTALL_DIR
+            ASSIMP_NO_EXPORT ASSIMP_NO_EXPORTER ASSIMP_OPT_BUILD_PACKAGES
+            ASSIMP_PACKAGE_VERSION ASSIMP_UBSAN ASSIMP_WERROR BUILD_DOCS BUILD_FRAMEWORK
+            SYSTEM_IRRXML LIBRARY_SUFFIX)
 
         include_external_library(Ghoul
             assimp
@@ -294,13 +294,13 @@ if (IL_FOUND)
     option(GHOUL_USE_DEVIL "Use the DevIL library" ON)
     if (GHOUL_USE_DEVIL)
         target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_DEVIL")
-        # set(DevIL_USE_STATIC_LIBS OFF)
+
         target_include_directories(Ghoul SYSTEM PUBLIC ${IL_INCLUDE_DIR})
         target_link_libraries(Ghoul ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
     endif ()
     end_dependency()
 endif ()
-mark_as_advanced(IL_INCLUDE_DIR IL_LIBRARIES)
+mark_as_advanced(IL_INCLUDE_DIR IL_LIBRARIES ILU_LIBRARIES ILUT_LIBRARIES)
 
 # FreeImage
 find_package(FreeImage QUIET)
@@ -361,6 +361,9 @@ ExternalProject_Add(websocketpp
 )
 add_dependencies(Ghoul websocketpp)
 target_include_directories(Ghoul SYSTEM PUBLIC ${WEBSOCKETPP_ROOT_DIR})
+set_folder_location(websocketpp "External")
+set_folder_location(websocketpp-build "External")
+set_folder_location(websocketpp-configure "External")
 end_dependency()
 
 # Freetype
@@ -370,7 +373,8 @@ if (GHOUL_MODULE_FONTRENDERING)
     include_external_library(Ghoul freetype
         ${GHOUL_ROOT_DIR}/ext/freetype2 ${GHOUL_ROOT_DIR}/ext/freetype2/include)
 
-    mark_as_advanced(FT_WITH_BZIP2 FT_WITH_HARFBUZZ FT_WITH_PNG FT_WITH_ZLIB)
+    mark_as_advanced(FT_WITH_BZIP2 FT_WITH_HARFBUZZ FT_WITH_PNG FT_WITH_ZLIB
+        FREETYPE_DIST)
     set_folder_location(dist "External")
     end_module("FontRendering")
 endif ()
@@ -378,6 +382,7 @@ endif ()
 begin_dependency("tiny-process-library")
 include_external_library(Ghoul tiny-process-library
     ${GHOUL_ROOT_DIR}/ext/tiny-process-library)
+mark_as_advanced(BUILD_TESTING)
 end_dependency()
 
 
@@ -390,9 +395,6 @@ if (GHOUL_HAVE_TESTS)
     begin_header("Generating tests")
     file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
     add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})
-
-    set_property(TARGET GhoulTest PROPERTY CXX_STANDARD 17)
-    set_property(TARGET GhoulTest PROPERTY CXX_STANDARD_REQUIRED On)
 
     target_compile_definitions(GhoulTest PRIVATE
         # Jenkins shouldn't ask for asserts when they happen, but just throw
@@ -414,23 +416,9 @@ if (GHOUL_HAVE_TESTS)
     target_include_directories(GhoulTest PUBLIC
         "${GHOUL_ROOT_DIR}/ext/googletest/googletest/include" "${GHOUL_ROOT_DIR}")
 
-    set(BUILD_GTEST ON CACHE BOOL "")
-    set(BUILD_GMOCK OFF CACHE BOOL "")
-    set(gtest_force_shared_crt ON CACHE BOOL "")
-    # set(BUILD_SHARED_LIBS ON CACHE BOOL "")
+    include_gtest("${GHOUL_ROOT_DIR}/ext/googletest")
 
-    # option(BUILD_GTEST "Builds the googletest subproject" CACHE ON)
-    # option(BUILD_GMOCK "Builds the googlemock subproject" CACHE OFF)
-    # option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." CACHE ON)
-    add_subdirectory(${GHOUL_ROOT_DIR}/ext/googletest)
     target_link_libraries(GhoulTest gtest Ghoul Lua)
-
-    target_compile_definitions(gtest PUBLIC
-        "_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING"
-    )
-
-    set_property(TARGET gtest_main PROPERTY FOLDER "External")
-    set_property(TARGET gtest PROPERTY FOLDER "External")
 
     if (APPLE)
         target_link_libraries(GhoulTest
@@ -443,5 +431,5 @@ if (GHOUL_HAVE_TESTS)
     end_header()
 endif ()
 
-end_header("End: Generating Ghoul Project")
+end_header("End: Configuring Ghoul Project")
 message(STATUS "\n\n")
