@@ -198,7 +198,7 @@ target_link_libraries(Ghoul ${LZ4_LIBRARIES})
 
 mark_as_advanced(LZ4_INCLUDE_DIR)
 set_folder_location(lz4 "External")
-end_dependency()
+end_dependency("LZ4")
 
 # Lua
 if (GHOUL_MODULE_LUA)
@@ -383,7 +383,7 @@ begin_dependency("tiny-process-library")
 include_external_library(Ghoul tiny-process-library
     ${GHOUL_ROOT_DIR}/ext/tiny-process-library)
 mark_as_advanced(BUILD_TESTING)
-end_dependency()
+end_dependency("tiny-process-library")
 
 
 

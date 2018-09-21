@@ -23,8 +23,8 @@
 ##########################################################################################
 
 function (set_ghoul_compile_settings target)
-    set_property(TARGET ${project} PROPERTY CXX_STANDARD 17)
-    set_property(TARGET ${project} PROPERTY CXX_STANDARD_REQUIRED ON)
+    set_property(TARGET ${target} PROPERTY CXX_STANDARD 17)
+    set_property(TARGET ${target} PROPERTY CXX_STANDARD_REQUIRED ON)
 
     if (MSVC)
         target_compile_options(
