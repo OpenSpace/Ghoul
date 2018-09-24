@@ -62,6 +62,7 @@ namespace constants {
 #include "tests/test_dictionaryluaformatter.inl"
 #include "tests/test_filesystem.inl"
 #include "tests/test_luatodictionary.inl"
+#include "tests/test_memorypool.inl"
 #include "tests/test_templatefactory.inl"
 #include "tests/test_csvreader.inl"
 

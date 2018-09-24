@@ -197,6 +197,8 @@ set(GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/invariants.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/objectmanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/objectmanager.inl
