@@ -27,10 +27,12 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/stringconversion.h>
 #include <map>
 
 namespace ghoul {
 
+template <>
 std::string to_string
               (const ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity& v)
 {

@@ -286,4 +286,6 @@ std::vector<std::string> TextureReaderFreeImage::supportedExtensions() const {
 
 } // namespace ghoul::io
 
+#else
+int _StubToPreventLinkerWarningAboutMissingExportSymbols;
 #endif // GHOUL_USE_FREEIMAGE

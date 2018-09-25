@@ -267,4 +267,6 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
 
 } // namespace ghoul::filesystem
 
+#else
+int _StubToPreventLinkerWarningAboutMissingExportSymbols;
 #endif
