@@ -55,7 +55,7 @@ void MemoryPool<BucketSize>::reset() {
     for (Bucket* b : _buckets) {
         delete b;
     }
-    _buckets.resize(_originalNBuckets);
+    _buckets.resize(_originalBucketSize);
 }
 
 template <int BucketSize>

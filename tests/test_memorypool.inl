@@ -26,7 +26,7 @@
 #include <ghoul/misc/memorypool.h>
 
 TEST(MemoryPoolTest, MemoryPool) {
-    ghoul::MemoryPool pool1;
+    ghoul::MemoryPool<> pool1;
     void* p1 = pool1.alloc(1024);
     EXPECT_NE(p1, nullptr);
 
