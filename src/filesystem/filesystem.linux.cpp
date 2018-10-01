@@ -180,6 +180,4 @@ void FileSystem::inotifyWatcher() {
 
 } // namespace ghoul::filesystem
 
-#else
-int _StubToPreventLinkerWarningAboutMissingExportSymbols;
 #endif

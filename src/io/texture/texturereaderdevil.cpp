@@ -226,6 +226,4 @@ std::vector<std::string> TextureReaderDevIL::supportedExtensions() const {
 
 } // namespace ghoul::io
 
-#else
-int _StubToPreventLinkerWarningAboutMissingExportSymbols;
 #endif // GHOUL_USE_DEVIL

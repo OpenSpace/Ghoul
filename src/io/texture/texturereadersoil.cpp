@@ -109,6 +109,4 @@ std::vector<std::string> TextureReaderSOIL::supportedExtensions() const {
 
 } // namespace ghoul::io
 
-#else
-int _StubToPreventLinkerWarningAboutMissingExportSymbols;
 #endif // GHOUL_USE_SOIL

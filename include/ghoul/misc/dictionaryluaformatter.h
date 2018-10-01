@@ -48,6 +48,7 @@ public:
 
     DictionaryLuaFormatter(PrettyPrint prettyPrint = PrettyPrint::No,
         std::string indentation = "    ");
+    virtual ~DictionaryLuaFormatter() = default;
 
     /**
      * This exception is thrown if an unknown type is being converted.
