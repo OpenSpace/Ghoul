@@ -26,6 +26,8 @@
 #ifndef __GHOUL___GLM___H__
 #define __GHOUL___GLM___H__
 
+#include <ghoul/misc/stringconversion.h>
+
 #ifdef __APPLE__
 // The GLM header throw 'anonymous struct' warnings that we do not want. By marking the
 // following files as system headers, all warnings are ignored
@@ -154,10 +156,6 @@ struct glm_cols<glm::tmat4x3<T, P>> : public std::integral_constant<glm::length_
 template <typename T, glm::precision P>
 struct glm_cols<glm::tmat4x4<T, P>> : public std::integral_constant<glm::length_t, 4> {};
 
-} // ghoul
-
-namespace std {
-
 inline std::string to_string(const glm::bvec2& _Val) {
     return "{" + std::to_string(_Val.x) + "," + std::to_string(_Val.y) + "}";
 }
@@ -196,6 +194,14 @@ inline std::string to_string(const glm::vec4& _Val) {
         std::to_string(_Val.w) + "}";
 }
 
+inline std::string to_string(const glm::quat& _Val) {
+    return "{" +
+        std::to_string(_Val.x) + "," +
+        std::to_string(_Val.y) + "," +
+        std::to_string(_Val.z) + "," +
+        std::to_string(_Val.w) + "}";
+}
+
 inline std::string to_string(const glm::dvec2& _Val) {
     return "{" + std::to_string(_Val.x) + "," + std::to_string(_Val.y) + "}";
 }
@@ -208,6 +214,14 @@ inline std::string to_string(const glm::dvec3& _Val) {
 }
 
 inline std::string to_string(const glm::dvec4& _Val) {
+    return "{" +
+        std::to_string(_Val.x) + "," +
+        std::to_string(_Val.y) + "," +
+        std::to_string(_Val.z) + "," +
+        std::to_string(_Val.w) + "}";
+}
+
+inline std::string to_string(const glm::dquat& _Val) {
     return "{" +
         std::to_string(_Val.x) + "," +
         std::to_string(_Val.y) + "," +
@@ -487,66 +501,71 @@ inline std::string to_string(const glm::dmat4& _Val) {
         std::to_string(_Val[3].w) + "}";
 }
 
-} // namespace std
+} // namespace ghoul
 
 template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tvec2<T,P>& val) {
-    return out << std::to_string(val);
+std::ostream& operator<<(std::ostream& out, const glm::tvec2<T, P>& val) {
+    return out << ghoul::to_string(val);
 }
 
 template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tvec3<T,P>& val) {
-    return out << std::to_string(val);
+std::ostream& operator<<(std::ostream& out, const glm::tvec3<T, P>& val) {
+    return out << ghoul::to_string(val);
 }
 
 template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tvec4<T,P>& val) {
-    return out << std::to_string(val);
+std::ostream& operator<<(std::ostream& out, const glm::tvec4<T, P>& val) {
+    return out << ghoul::to_string(val);
 }
 
 template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat2x2<T,P>& val) {
-    return out << std::to_string(val);
+std::ostream& operator<<(std::ostream& out, const glm::tmat2x2<T, P>& val) {
+    return out << ghoul::to_string(val);
 }
 
 template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat2x3<T,P>& val) {
-    return out << std::to_string(val);
+std::ostream& operator<<(std::ostream& out, const glm::tmat2x3<T, P>& val) {
+    return out << ghoul::to_string(val);
 }
 
 template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat2x4<T,P>& val) {
-    return out << std::to_string(val);
+std::ostream& operator<<(std::ostream& out, const glm::tmat2x4<T, P>& val) {
+    return out << ghoul::to_string(val);
 }
 
 template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat3x2<T,P>& val) {
-    return out << std::to_string(val);
+std::ostream& operator<<(std::ostream& out, const glm::tmat3x2<T, P>& val) {
+    return out << ghoul::to_string(val);
 }
 
 template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat3x3<T,P>& val) {
-    return out << std::to_string(val);
+std::ostream& operator<<(std::ostream& out, const glm::tmat3x3<T, P>& val) {
+    return out << ghoul::to_string(val);
 }
 
 template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat3x4<T,P>& val) {
-    return out << std::to_string(val);
+std::ostream& operator<<(std::ostream& out, const glm::tmat3x4<T, P>& val) {
+    return out << ghoul::to_string(val);
 }
 
 template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat4x2<T,P>& val) {
-    return out << std::to_string(val);
+std::ostream& operator<<(std::ostream& out, const glm::tmat4x2<T, P>& val) {
+    return out << ghoul::to_string(val);
 }
 
 template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat4x3<T,P>& val) {
-    return out << std::to_string(val);
+std::ostream& operator<<(std::ostream& out, const glm::tmat4x3<T, P>& val) {
+    return out << ghoul::to_string(val);
 }
 
 template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat4x4<T,P>& val) {
-    return out << std::to_string(val);
+std::ostream& operator<<(std::ostream& out, const glm::tmat4x4<T, P>& val) {
+    return out << ghoul::to_string(val);
+}
+
+template <typename T, glm::precision P>
+std::ostream& operator<<(std::ostream& out, const glm::tquat<T, P>& val) {
+    return out << ghoul::to_string(val);
 }
 
 
