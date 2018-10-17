@@ -127,7 +127,7 @@ public:
  *
  * \tparam T The type for which the MemoryPool should operate
  * \tparam BucketSizeItems The number of Ts that should be stored in a single Bucket
- * 
+ *
  */
 template <typename T, int BucketSizeItems = 128>
 class ReusableTypedMemoryPool {
@@ -169,7 +169,7 @@ public:
      * pointer will be returned in a future allocate call.
      *
      * \param ptr The pointer that should be returned and marked for reuse. This pointer
-     *            must be a pointer that has previously been returned by the allocate 
+     *            must be a pointer that has previously been returned by the allocate
      *            method.
      */
     void free(T* ptr);

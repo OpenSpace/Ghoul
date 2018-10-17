@@ -103,7 +103,7 @@ std::string DictionaryLuaFormatter::format(const Dictionary& dictionary,
 }
 
 std::string DictionaryLuaFormatter::formatValue(const Dictionary& dictionary,
-                                                 const std::string& key, 
+                                                 const std::string& key,
                                                  int indentationSteps) const
 {
     const std::string whitespace = _prettyPrint ? " " : "";

@@ -207,7 +207,4 @@ void ReusableTypedMemoryPool<T, BucketSizeItems>::free(T* ptr) {
     }
 }
 
-
-
-
 } // namespace ghoul

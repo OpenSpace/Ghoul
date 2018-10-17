@@ -118,12 +118,12 @@ T value(lua_State* L, int location) {
         static_assert(sizeof(T) == 0, "Unhandled type T");
     }
 
-	std::string error = fmt::format(
-		"Requested type {} for parameter {} was not the expected type {}",
-		typeid(T).name(),
-		location,
-		luaTypeToString(lua_type(L, location))
-	);
+    std::string error = fmt::format(
+        "Requested type {} for parameter {} was not the expected type {}",
+        typeid(T).name(),
+        location,
+        luaTypeToString(lua_type(L, location))
+    );
 
     ghoul_assert(false, error);
     // If we get this far, none of the previous return statements were hit
