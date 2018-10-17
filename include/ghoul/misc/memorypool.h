@@ -29,6 +29,7 @@
 #include <ghoul/misc/assert.h>
 #include <array>
 #include <cstddef>
+#include <memory>
 #include <vector>
 
 namespace ghoul {
@@ -142,7 +143,7 @@ public:
      * Frees the memory that was allocated during the existence of this MemoryPool or the
      * last call of reset.
      */
-    ~ReusableTypedMemoryPool();
+    ~ReusableTypedMemoryPool() = default;
 
     /**
      * Frees the memory that was allocated during the existence of this MemoryPool or the
@@ -181,7 +182,7 @@ private:
     };
 
     std::vector<T*> _freeList; ///< The list of pointers that have been returned
-    std::vector<Bucket*> _buckets;  ///< The number of allocated buckets
+    std::vector<std::unique_ptr<Bucket>> _buckets;  ///< The number of allocated buckets
     int _originalNBuckets;  ///< The original desired number of buckets
 };
 

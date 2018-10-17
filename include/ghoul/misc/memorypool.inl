@@ -124,21 +124,9 @@ template <typename T, int BucketSizeItems>
 ReusableTypedMemoryPool<T, BucketSizeItems>::ReusableTypedMemoryPool(int nBuckets)
     : _originalNBuckets(nBuckets)
 {
-    // Try to allocate as contiguous memory as possible
-    constexpr int BucketSizeBytes = BucketSizeItems * sizeof(T);
-    void* memory = malloc(nBuckets * BucketSizeBytes);
     _buckets.reserve(nBuckets);
     for (int i = 0; i < nBuckets; ++i) {
-        void* memPtr = reinterpret_cast<std::byte*>(memory) + (BucketSizeBytes * i);
-        Bucket* b = new (memPtr) Bucket;
-        _buckets.push_back(b);
-    }
-}
-
-template <typename T, int BucketSizeItems>
-ReusableTypedMemoryPool<T, BucketSizeItems>::~ReusableTypedMemoryPool() {
-    for (Bucket* b : _buckets) {
-        delete b;
+        _buckets.push_back(std::make_unique<Bucket>());
     }
 }
 
@@ -182,19 +170,19 @@ std::vector<void*> ReusableTypedMemoryPool<T, BucketSizeItems>::allocate(int n) 
     auto it = std::find_if(
         _buckets.begin(),
         _buckets.end(),
-        [n](Bucket* i) {
-        return i->usage + n * sizeof(T) <= BucketSizeItems * sizeof(T);
-    }
+        [n](const std::unique_ptr<Bucket>& i) {
+            return i->usage + n * sizeof(T) <= BucketSizeItems * sizeof(T);
+        }
     );
 
     // No bucket had enough space, so we have to create a new one
     if (it == _buckets.end()) {
-        _buckets.push_back(new Bucket);
+        _buckets.push_back(std::make_unique<Bucket>());
         it = _buckets.end() - 1;
     }
 
 
-    Bucket* b = *it;
+    Bucket* b = it->get();
     void* ptr = reinterpret_cast<std::byte*>(b->payload.data()) + b->usage;
     b->usage += n * sizeof(T);
 
