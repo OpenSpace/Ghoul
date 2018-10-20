@@ -32,6 +32,8 @@
 #include <vector>
 
 namespace {
+    constexpr const bool AlwaysAssert = false;
+    
     std::vector<std::string> PermanentlyIgnoredAsserts;
 
     std::string hashing(const std::string& file, int line) {
@@ -72,6 +74,20 @@ void internal_assert(std::string expression, std::string message, std::string fi
             << padding << "Function:   " << function << std::endl
             << padding << "Assertion:  " << expression
             << padding << message << std::endl;
+
+        if (AlwaysAssert) {
+#ifdef _MSC_VER
+            __debugbreak();
+#endif // _MSC_VER
+
+            throw AssertionException(
+                std::move(expression),
+                std::move(message),
+                std::move(file),
+                std::move(function),
+                line
+            );
+        }
 
         while (true) {
             std::cerr << "(I)gnore / Ignore (P)ermanently / (A)ssertion / (S)tacktrace "
