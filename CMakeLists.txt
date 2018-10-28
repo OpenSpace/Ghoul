@@ -374,7 +374,7 @@ if (GHOUL_MODULE_FONTRENDERING)
         ${GHOUL_ROOT_DIR}/ext/freetype2 ${GHOUL_ROOT_DIR}/ext/freetype2/include)
 
     mark_as_advanced(FT_WITH_BZIP2 FT_WITH_HARFBUZZ FT_WITH_PNG FT_WITH_ZLIB
-        FREETYPE_DIST)
+        FREETYPE_DIST pkgcfg_lib_PC_HARFBUZZ_harfbuzz)
     set_folder_location(dist "External")
     end_module("FontRendering")
 endif ()
