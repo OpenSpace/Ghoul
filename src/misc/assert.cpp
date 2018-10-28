@@ -33,7 +33,7 @@
 
 namespace {
     constexpr const bool AlwaysAssert = false;
-    
+
     std::vector<std::string> PermanentlyIgnoredAsserts;
 
     std::string hashing(const std::string& file, int line) {
