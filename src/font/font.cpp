@@ -25,13 +25,13 @@
 
 #include <ghoul/font/font.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/misc.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/textureatlas.h>
 #include <algorithm>
 #include <array>
-#include <ghoul/fmt.h>
-#include <ghoul/misc/misc.h>
 #include <tuple>
 
 #include <ft2build.h>
@@ -56,15 +56,15 @@ namespace {
 
     // Initializes the passed 'library' and loads the font face specified by the 'name'
     // and 'size' into the provided 'face'
-    void loadFace(const std::string& name,
-                  float size,
-                  FT_Library& library,
-                  FT_Face& face)
+    void loadFace(const std::string& name, float size, FT_Library& library, FT_Face& face)
     {
         FT_Error error = FT_Init_FreeType(&library);
         if (error) {
             throw ghoul::fontrendering::Font::FreeTypeException(
-                name, size, FT_Errors[error].code, FT_Errors[error].message
+                name,
+                size,
+                FT_Errors[error].code,
+                FT_Errors[error].message
             );
         }
 
@@ -73,7 +73,10 @@ namespace {
         if (error) {
             FT_Done_FreeType(library);
             throw ghoul::fontrendering::Font::FreeTypeException(
-                name, size, FT_Errors[error].code, FT_Errors[error].message
+                name,
+                size,
+                FT_Errors[error].code,
+                FT_Errors[error].message
             );
         }
 
@@ -83,7 +86,10 @@ namespace {
             FT_Done_Face(face);
             FT_Done_FreeType(library);
             throw ghoul::fontrendering::Font::FreeTypeException(
-                name, size, FT_Errors[error].code, FT_Errors[error].message
+                name,
+                size,
+                FT_Errors[error].code,
+                FT_Errors[error].message
             );
         }
 
@@ -99,7 +105,10 @@ namespace {
             FT_Done_Face(face);
             FT_Done_FreeType(library);
             throw ghoul::fontrendering::Font::FreeTypeException(
-                name, size, FT_Errors[error].code, FT_Errors[error].message
+                name,
+                size,
+                FT_Errors[error].code,
+                FT_Errors[error].message
             );
         }
     }
@@ -107,17 +116,8 @@ namespace {
 
 namespace ghoul::fontrendering {
 
-Font::FontException::FontException(const std::string& msg)
-    : RuntimeError(msg, "Font")
-{}
-
-Font::GlyphException::GlyphException(std::string name, float size, wchar_t character)
-    : FontException(fmt::format(
-        "Glyph '{}' was not present in the font '{}' at size '{}'",
-        name, size, char(character)))
-    , fontName(std::move(name))
-    , fontSize(size)
-    , glyph(character)
+Font::FontException::FontException(std::string msg)
+    : RuntimeError(std::move(msg), "Font")
 {}
 
 Font::FreeTypeException::FreeTypeException(std::string name, float size, int code,
@@ -396,9 +396,11 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         // only if an outline is request, repeat the process for the outline
 
         float leftBearing = 0.f;
-        float topBearing = 0.f;;
-        glm::vec2 topLeft, bottomRight;
-        glm::vec2 outlineTopLeft, outlineBottomRight;
+        float topBearing = 0.f;
+        glm::vec2 topLeft;
+        glm::vec2 bottomRight;
+        glm::vec2 outlineTopLeft;
+        glm::vec2 outlineBottomRight;
         unsigned int width = 0;
         unsigned int height = 0;
 

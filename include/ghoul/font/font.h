@@ -56,21 +56,7 @@ public:
 
     /// Superclass for all font-related exceptions that this class throws
     struct FontException : public RuntimeError {
-        explicit FontException(const std::string& msg);
-    };
-
-    /// The exception that gets thrown if an error occurs in the Font handling
-    struct GlyphException : public FontException {
-        explicit GlyphException(std::string name, float size, wchar_t character);
-
-        /// The name of the font for which the glyph was missing
-        std::string fontName;
-
-        /// The font size of the font for which the glyph was missing
-        float fontSize;
-
-        /// The glyph that was missing from the font
-        wchar_t glyph;
+        explicit FontException(std::string msg);
     };
 
     /// The exception that gets thrown when a FreeType-specific error occurs
