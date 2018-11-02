@@ -63,14 +63,14 @@ namespace {
     }
 
 #ifdef WIN32
-    std::string lastErrorToString(DWORD error) {
+    std::string lastErrorToString(DWORD err) {
         LPTSTR errorBuffer = nullptr;
         DWORD nValues = FormatMessage(
             FORMAT_MESSAGE_FROM_SYSTEM |
             FORMAT_MESSAGE_ALLOCATE_BUFFER |
             FORMAT_MESSAGE_IGNORE_INSERTS,
             nullptr,
-            error,
+            err,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
             (LPTSTR)&errorBuffer, // NOLINT
             0,
@@ -82,8 +82,7 @@ namespace {
             return errorMsg;
         }
         else {
-            return std::string("Error constructing format message for error: ") +
-                   std::to_string(error);
+            return "Error constructing format message for error: " + std::to_string(err);
         }
     }
 #endif
@@ -110,7 +109,7 @@ void SharedMemory::create(const std::string& name, size_t size) {
         name.c_str()
     );
     const DWORD error = GetLastError();
-    if (handle == nullptr) {
+    if (!handle) {
         std::string errorMsg = lastErrorToString(error);
         throw SharedMemoryError(
             "Error creating shared memory '" + name + "': " + errorMsg
@@ -125,7 +124,7 @@ void SharedMemory::create(const std::string& name, size_t size) {
         else {
             void* memory = MapViewOfFileEx(handle, FILE_MAP_ALL_ACCESS, 0, 0, 0, nullptr);
 
-            if (memory == nullptr) {
+            if (!memory) {
                 std::string errorMsg = lastErrorToString(error);
 
                 throw SharedMemoryError(
@@ -192,7 +191,7 @@ void SharedMemory::remove(const std::string& name) {
 bool SharedMemory::exists(const std::string& name) {
 #ifdef WIN32
     HANDLE handle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, name.c_str());
-    if (handle != nullptr) {
+    if (handle) {
         // the file exists, so we have to close it immediately to not leak the handle
         CloseHandle(handle);
         return true;
@@ -219,15 +218,14 @@ bool SharedMemory::exists(const std::string& name) {
 }
 
 SharedMemory::SharedMemory(std::string name)
-    : _memory(nullptr)
-    , _name(std::move(name))
+    : _name(std::move(name))
 #ifndef WIN32
     , _size(0)
 #endif
 {
 #ifdef WIN32
     _sharedMemoryHandle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, _name.c_str());
-    if (_sharedMemoryHandle == nullptr) {
+    if (!_sharedMemoryHandle) {
         std::string errorMsg = lastErrorToString(GetLastError());
         throw SharedMemoryError(
             "Error accessing shared memory '" + name + "': " + errorMsg
@@ -235,7 +233,7 @@ SharedMemory::SharedMemory(std::string name)
     }
 
     _memory = MapViewOfFileEx(_sharedMemoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, 0, nullptr);
-    if (_memory == nullptr) {
+    if (!_memory) {
         CloseHandle(_sharedMemoryHandle);
 
         std::string errorMsg = lastErrorToString(GetLastError());

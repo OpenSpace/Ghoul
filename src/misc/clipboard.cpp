@@ -73,13 +73,13 @@ std::string clipboardText() {
 
     // Get handle of clipboard object for ANSI text
     HANDLE hData = GetClipboardData(CF_TEXT);
-    if (hData == nullptr) {
+    if (!hData) {
         return "";
     }
 
     // Lock the handle to get the actual text pointer
     char* pszText = static_cast<char*>(GlobalLock(hData));
-    if (pszText == nullptr) {
+    if (!pszText) {
         return "";
     }
 
@@ -112,12 +112,12 @@ std::string clipboardText() {
 void setClipboardText(const std::string& text) {
 #ifdef WIN32
     HANDLE hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, text.length() + 1);
-    if (hData == nullptr) {
+    if (!hData) {
         throw RuntimeError("Error allocating memory", "Clipboard");
     }
 
     char* ptrData = static_cast<char*>(GlobalLock(hData));
-    if (ptrData == nullptr) {
+    if (!ptrData) {
         GlobalFree(hData);
         throw RuntimeError("Error acquiring lock", "Clipboard");
     }

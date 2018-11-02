@@ -306,7 +306,7 @@ public:
 
 private:
     /// The OpenGL name of this ShaderObject
-    GLuint _id;
+    GLuint _id = 0;
 
     /// The type of this ShaderObject
     ShaderType _type;
@@ -318,7 +318,7 @@ private:
     std::string _loggerCat;
 
     /// The callback function if any of the tracked files are changed
-    ShaderObjectCallback _onChangeCallback;
+    ShaderObjectCallback _onChangeCallback = nullptr;
 
     /// The preprocessor to process the shader file and track changes
     ShaderPreprocessor _preprocessor;

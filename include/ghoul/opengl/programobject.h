@@ -4081,7 +4081,7 @@ public:
 
 private:
     /// The OpenGL name of this program object.
-    GLuint _id;
+    GLuint _id = 0;
 
     /// The internal name of this program name, used for the object label and logging.
     std::string _programName;

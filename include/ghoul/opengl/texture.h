@@ -876,9 +876,6 @@ protected:
      */
     void calculateBytesPerPixel();
 
-    /// Determines from the dimensions whether this is a 1D, 2D, or 3D texture
-    void determineTextureType();
-
     /// Upload the passed data pointer to graphics memory by calling glTexImage.
     void uploadDataToTexture(void* pixelData);
 

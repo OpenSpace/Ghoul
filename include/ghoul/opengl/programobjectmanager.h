@@ -37,7 +37,6 @@ public:
     ProgramObjectManager();
 };
 
-
 }  // namespace ghoul::opengl
 
 #endif // __GHOUL___PROGRAMOBJECTMANAGER___H__

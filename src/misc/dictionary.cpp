@@ -128,7 +128,7 @@ EXTERN_TEMPLATE_DEFINITION(glm::dmat4x4);
 template <>
 bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& val) const {
     ghoul_assert(&val != this, "Value argument must not be 'this' object");
-    bool dict = hasKeyAndValue<Dictionary>(key);
+    const bool dict = hasKeyAndValue<Dictionary>(key);
     if (dict) {
         getValueHelper(key, val);
         return true;
@@ -140,12 +140,12 @@ bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& val) const 
 
 template <>
 bool Dictionary::getValue<std::string>(const std::string& key, std::string& val) const {
-    bool str = hasValue<std::string>(key);
+    const bool str = hasValue<std::string>(key);
     if (str) {
         getValueHelper(key, val);
         return true;
     }
-    bool c = hasValue<const char*>(key);
+    const bool c = hasValue<const char*>(key);
     if (c) {
         const char* data;
         getValueHelper<const char*>(key, data);
@@ -158,7 +158,7 @@ bool Dictionary::getValue<std::string>(const std::string& key, std::string& val)
 template <>
 std::string Dictionary::value<std::string>(const std::string& key) const {
     std::string tmp;
-    bool s = getValue(key, tmp);
+    const bool s = getValue(key, tmp);
 
     if (s) {
         return tmp;
@@ -173,7 +173,7 @@ std::string Dictionary::value<std::string>(const std::string& key) const {
 }
 
 Dictionary::Dictionary(std::initializer_list<std::pair<std::string, ghoul::any>> l) {
-    for (auto& p : l) {
+    for (const std::pair<std::string, ghoul::any>& p : l) {
         if (!p.first.empty()) {
             setValueAnyHelper(std::move(p.first), std::move(p.second));
         }
@@ -184,7 +184,7 @@ std::vector<string> Dictionary::keys(const string& location) const {
     if (location.empty()) {
         std::vector<string> result;
         result.reserve(size());
-        for (const auto& it : *this) {
+        for (const std::pair<std::string, ghoul::any>& it : *this) {
             result.push_back(it.first);
         }
         return result;

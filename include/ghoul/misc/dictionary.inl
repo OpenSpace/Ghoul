@@ -23,6 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <ghoul/fmt.h>
 #include <ghoul/misc/assert.h>
 #include <algorithm>
 
@@ -32,7 +33,7 @@ template <typename T>
 bool isConvertible(const Dictionary& dict) {
     using StorageType = internal::StorageTypeConverter<T>;
 
-    bool correctSize = dict.size() == StorageType::size;
+    const bool correctSize = dict.size() == StorageType::size;
     if (!correctSize) {
         return false;
     }
@@ -46,13 +47,14 @@ bool isConvertible(const Dictionary& dict) {
         // StorageTypeConverter<TargetType>::type == TargetType
         #pragma warning(suppress: 6287)
         #endif // WIN32
-        bool correctType =
-            dict.hasValue<typename StorageType::type>(key) || dict.hasValue<T>(key);
+        const bool correctType = dict.hasValue<typename StorageType::type>(key) ||
+                                 dict.hasValue<T>(key);
         #ifdef WIN32
         #pragma warning(pop)
         #endif // WIN32
-        if (!correctType)
+        if (!correctType) {
             return false;
+        }
     }
     return true;
 }
@@ -67,7 +69,7 @@ void Dictionary::setValueHelper(std::string key, T value,
 {
     std::string first;
     std::string rest;
-    bool hasRestPath = splitKey(key, first, rest);
+    const bool hasRestPath = splitKey(key, first, rest);
     if (!hasRestPath) {
         // if no rest exists, key == first and we can just insert the value
         (*this)[std::move(key)] = std::move(value);
@@ -83,17 +85,21 @@ void Dictionary::setValueHelper(std::string key, T value,
             (*this)[first] = ghoul::Dictionary();
             keyIt = find(first);
         }
-        else
-            throw KeyError("Intermediate key '{}' was not found in dictionary" + first);
+        else {
+            throw KeyError(fmt::format(
+                "Intermediate key '{}' was not found in dictionary", first
+            ));
+        }
     }
 
     // See if it is actually a Dictionary at this location
     Dictionary* dict = ghoul::any_cast<Dictionary>(&(keyIt->second));
     if (dict == nullptr) {
-        throw ConversionError(
-            "Error converting key '" + first + "' from type '" +
-            keyIt->second.type().name() + "' to type 'Dictionary'"
-        );
+        throw ConversionError(fmt::format(
+            "error converting key '{}' from type '{}' to type 'Dictionary'",
+            first,
+            keyIt->second.type().name()
+        ));
     }
     // Proper tail-recursion
     dict->setValue(std::move(rest), std::move(value), createIntermediate);
@@ -106,7 +112,7 @@ void Dictionary::setValueInternal(std::string key, T value,
 {
     setValueHelper(
         std::move(key),
-        static_cast<typename internal::StorageTypeConverter<T>::type>(value),
+        static_cast<typename internal::StorageTypeConverter<T>::type&&>(std::move(value)),
         createIntermediate
     );
 }
@@ -153,11 +159,13 @@ void ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
     if (it != cend()) {
         const T* v = ghoul::any_cast<T>(&(it->second));
         // See if it has the correct type
-        if (v == nullptr) {
-            throw ConversionError(
-                "Wrong type for key '" + key + "': Expected '" + typeid(T).name() +
-                "' got '" + it->second.type().name() + "'"
-            );
+        if (!v) {
+            throw ConversionError(fmt::format(
+                "Wrong type for key '{}': Expected '{}' got '{}'",
+                key,
+                typeid(T).name(),
+                it->second.type().name()
+            ));
         }
         value = *v;
         return;
@@ -170,16 +178,18 @@ void ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
     splitKey(key, first, rest);
 
     auto keyIt = find(first);
-    if (keyIt == cend())
-        throw KeyError("Could not find key '" + first + "' in Dictionary");
+    if (keyIt == cend()) {
+        throw KeyError(fmt::format("Could not find key '{}' in Dictionary", first));
+    }
 
     const Dictionary* dict = ghoul::any_cast<Dictionary>(&(keyIt->second));
     // See if it is actually a Dictionary at this location
-    if (dict == nullptr) {
-        throw ConversionError(
-            "Error converting key '" + first + "' from type '" +
-            keyIt->second.type().name() + "' to type 'Dictionary'"
-        );
+    if (!dict) {
+        throw ConversionError(fmt::format(
+            "Error converting key '{}' from type '{}' to type 'Dictionary'",
+            first,
+            keyIt->second.type().name()
+        ));
     }
     // Proper tail-recursion
     dict->getValue<T>(rest, value);
@@ -193,9 +203,10 @@ template <typename T>
 void Dictionary::getValueInternal(const std::string& key, T& value,
                                                            IsStandardScalarType<T>*) const
 {
-    bool keyExists = hasKey(key);
-    if (!keyExists)
-        throw KeyError("Key '" + key + "' did not exist in Dictionary");
+    const bool keyExists = hasKey(key);
+    if (!keyExists) {
+        throw KeyError(fmt::format("Key '{}' did not exist in Dictionary", key));
+    }
     bool success = hasValueHelper<typename internal::StorageTypeConverter<T>::type>(key);
     if (success) {
         typename internal::StorageTypeConverter<T>::type v;
@@ -208,7 +219,7 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            bool canConvert = isConvertible<T>(dict);
+            const bool canConvert = isConvertible<T>(dict);
             if (canConvert) {
                 const std::vector<std::string>& keys = dict.keys();
                 for (size_t i = 0; i < internal::StorageTypeConverter<T>::size; ++i) {
@@ -219,10 +230,12 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" + typeid(T).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(T).name()
+    ));
 }
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -235,7 +248,7 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec2<T, P>& valu
         internal::StorageTypeConverter<glm::tvec2<T, P>>::size
     >;
 
-    bool success = hasValueHelper<Array>(key);
+    const bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
         getValueHelper(key, v);
@@ -246,11 +259,11 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec2<T, P>& valu
         return;
     }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            bool canConvert = isConvertible<glm::tvec2<T, P>>(dict);
+            const bool canConvert = isConvertible<glm::tvec2<T, P>>(dict);
             if (canConvert) {
                 std::vector<std::string> keys = dict.keys();
                 // sort numerically rather than by ASCII value
@@ -276,11 +289,12 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec2<T, P>& valu
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" +
-        typeid(glm::tvec2<T, P>).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(glm::tvec2<T, P>).name()
+    ));
 }
 
 template <typename T, glm::precision P>
@@ -290,7 +304,7 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec3<T, P>& valu
         internal::StorageTypeConverter<glm::tvec3<T, P>>::size
     >;
 
-    bool success = hasValueHelper<Array>(key);
+    const bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
         getValueHelper(key, v);
@@ -302,11 +316,11 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec3<T, P>& valu
         return;
     }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            bool canConvert = isConvertible<glm::tvec3<T, P>>(dict);
+            const bool canConvert = isConvertible<glm::tvec3<T, P>>(dict);
             if (canConvert) {
                 std::vector<std::string> keys = dict.keys();
                 // sort numerically rather than by ASCII value
@@ -332,11 +346,12 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec3<T, P>& valu
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" +
-        typeid(glm::tvec3<T, P>).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(glm::tvec3<T, P>).name()
+    ));
 }
 
 template <typename T, glm::precision P>
@@ -346,7 +361,7 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec4<T, P>& valu
         internal::StorageTypeConverter<glm::tvec4<T, P>>::size
     >;
 
-    bool success = hasValueHelper<Array>(key);
+    const bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
         getValueHelper(key, v);
@@ -359,11 +374,11 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec4<T, P>& valu
         return;
     }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            bool canConvert = isConvertible<glm::tvec4<T, P>>(dict);
+            const bool canConvert = isConvertible<glm::tvec4<T, P>>(dict);
             if (canConvert) {
                 std::vector<std::string> keys = dict.keys();
                 // sort numerically rather than by ASCII value
@@ -388,11 +403,12 @@ void Dictionary::getValueInternal(const std::string& key, glm::tvec4<T, P>& valu
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" +
-        typeid(glm::tvec4<T, P>).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(glm::tvec4<T, P>).name()
+    ));
 }
 
 template <typename T, glm::precision P>
@@ -403,7 +419,7 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x2<T, P>& va
         internal::StorageTypeConverter<glm::tmat2x2<T, P>>::size
     >;
 
-    bool success = hasValueHelper<Array>(key);
+    const bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
         getValueHelper(key, v);
@@ -416,11 +432,11 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x2<T, P>& va
         return;
     }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            bool canConvert = isConvertible<glm::tmat2x2<T, P>>(dict);
+            const bool canConvert = isConvertible<glm::tmat2x2<T, P>>(dict);
             if (canConvert) {
                 std::vector<std::string> keys = dict.keys();
                 // sort numerically rather than by ASCII value
@@ -442,11 +458,12 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x2<T, P>& va
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" +
-        typeid(glm::tmat2x2<T, P>).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(glm::tmat2x2<T, P>).name()
+    ));
 }
 
 template <typename T, glm::precision P>
@@ -457,7 +474,7 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x3<T, P>& va
         internal::StorageTypeConverter<glm::tmat2x3<T, P>>::size
     >;
 
-    bool success = hasValueHelper<Array>(key);
+    const bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
         getValueHelper(key, v);
@@ -472,11 +489,11 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x3<T, P>& va
         return;
     }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            bool canConvert = isConvertible<glm::tmat2x3<T, P>>(dict);
+            const bool canConvert = isConvertible<glm::tmat2x3<T, P>>(dict);
             if (canConvert) {
                 std::vector<std::string> keys = dict.keys();
                 // sort numerically rather than by ASCII value
@@ -498,11 +515,12 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x3<T, P>& va
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" +
-        typeid(glm::tmat2x3<T, P>).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(glm::tmat2x3<T, P>).name()
+    ));
 }
 
 template <typename T, glm::precision P>
@@ -513,7 +531,7 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x4<T, P>& va
         internal::StorageTypeConverter<glm::tmat2x4<T, P>>::size
     >;
 
-    bool success = hasValueHelper<Array>(key);
+    const bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
         getValueHelper(key, v);
@@ -530,11 +548,11 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x4<T, P>& va
         return;
     }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            bool canConvert = isConvertible<glm::tmat2x4<T, P>>(dict);
+            const bool canConvert = isConvertible<glm::tmat2x4<T, P>>(dict);
             if (canConvert) {
                 std::vector<std::string> keys = dict.keys();
                 // sort numerically rather than by ASCII value
@@ -556,11 +574,12 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat2x4<T, P>& va
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" +
-        typeid(glm::tmat2x4<T, P>).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(glm::tmat2x4<T, P>).name()
+    ));
 }
 
 template <typename T, glm::precision P>
@@ -571,7 +590,7 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x2<T, P>& va
         internal::StorageTypeConverter<glm::tmat3x2<T, P>>::size
     >;
 
-    bool success = hasValueHelper<Array>(key);
+    const bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
         getValueHelper(key, v);
@@ -586,11 +605,11 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x2<T, P>& va
         return;
     }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            bool canConvert = isConvertible<glm::tmat3x2<T, P>>(dict);
+            const bool canConvert = isConvertible<glm::tmat3x2<T, P>>(dict);
             if (canConvert) {
                 std::vector<std::string> keys = dict.keys();
                 // sort numerically rather than by ASCII value
@@ -612,11 +631,12 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x2<T, P>& va
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" +
-        typeid(glm::tmat3x2<T, P>).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(glm::tmat3x2<T, P>).name()
+    ));
 }
 
 template <typename T, glm::precision P>
@@ -627,7 +647,7 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x3<T, P>& va
         internal::StorageTypeConverter<glm::tmat3x3<T, P>>::size
     >;
 
-    bool success = hasValueHelper<Array>(key);
+    const bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
         getValueHelper(key, v);
@@ -645,11 +665,11 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x3<T, P>& va
         return;
     }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            bool canConvert = isConvertible<glm::tmat3x3<T, P>>(dict);
+            const bool canConvert = isConvertible<glm::tmat3x3<T, P>>(dict);
             if (canConvert) {
                 std::vector<std::string> keys = dict.keys();
                 // sort numerically rather than by ASCII value
@@ -671,11 +691,12 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x3<T, P>& va
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" +
-        typeid(glm::tmat3x3<T, P>).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(glm::tmat3x3<T, P>).name()
+    ));
 }
 
 template <typename T, glm::precision P>
@@ -686,7 +707,7 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x4<T, P>& va
         internal::StorageTypeConverter<glm::tmat3x4<T, P>>::size
     >;
 
-    bool success = hasValueHelper<Array>(key);
+    const bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
         getValueHelper(key, v);
@@ -707,11 +728,11 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x4<T, P>& va
         return;
     }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            bool canConvert = isConvertible<glm::tmat3x4<T, P>>(dict);
+            const bool canConvert = isConvertible<glm::tmat3x4<T, P>>(dict);
             if (canConvert) {
                 std::vector<std::string> keys = dict.keys();
                 // sort numerically rather than by ASCII value
@@ -733,11 +754,12 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat3x4<T, P>& va
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" +
-        typeid(glm::tmat3x4<T, P>).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(glm::tmat3x4<T, P>).name()
+    ));
 }
 
 template <typename T, glm::precision P>
@@ -748,7 +770,7 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x2<T, P>& va
         internal::StorageTypeConverter<glm::tmat4x2<T, P>>::size
     >;
 
-    bool success = hasValueHelper<Array>(key);
+    const bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
         getValueHelper(key, v);
@@ -765,11 +787,11 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x2<T, P>& va
         return;
     }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            bool canConvert = isConvertible<glm::tmat4x2<T, P>>(dict);
+            const bool canConvert = isConvertible<glm::tmat4x2<T, P>>(dict);
             if (canConvert) {
                 std::vector<std::string> keys = dict.keys();
                 // sort numerically rather than by ASCII value
@@ -791,11 +813,12 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x2<T, P>& va
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" +
-        typeid(glm::tmat4x2<T, P>).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(glm::tmat4x2<T, P>).name()
+    ));
 }
 
 template <typename T, glm::precision P>
@@ -806,7 +829,7 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x3<T, P>& va
         internal::StorageTypeConverter<glm::tmat4x3<T, P>>::size
     >;
 
-    bool success = hasValueHelper<Array>(key);
+    const bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
         getValueHelper(key, v);
@@ -827,11 +850,11 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x3<T, P>& va
         return;
     }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            bool canConvert = isConvertible<glm::tmat4x3<T, P>>(dict);
+            const bool canConvert = isConvertible<glm::tmat4x3<T, P>>(dict);
             if (canConvert) {
                 std::vector<std::string> keys = dict.keys();
                 // sort numerically rather than by ASCII value
@@ -853,11 +876,12 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x3<T, P>& va
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" +
-        typeid(glm::tmat3x3<T, P>).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(glm::tmat4x3<T, P>).name()
+    ));
 }
 
 template <typename T, glm::precision P>
@@ -868,7 +892,7 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x4<T, P>& va
         internal::StorageTypeConverter<glm::tmat4x4<T, P>>::size
     >;
 
-    bool success = hasValueHelper<Array>(key);
+    const bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
         getValueHelper(key, v);
@@ -893,11 +917,11 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x4<T, P>& va
         return;
     }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            bool canConvert = isConvertible<glm::tmat4x4<T, P>>(dict);
+            const bool canConvert = isConvertible<glm::tmat4x4<T, P>>(dict);
             if (canConvert) {
                 std::vector<std::string> keys = dict.keys();
                 // sort numerically rather than by ASCII value
@@ -919,11 +943,12 @@ void Dictionary::getValueInternal(const std::string& key, glm::tmat4x4<T, P>& va
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" +
-        typeid(glm::tmat4x4<T, P>).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(glm::tmat4x4<T, P>).name()
+    ));
 }
 
 template <typename T>
@@ -935,7 +960,7 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
         internal::StorageTypeConverter<T>::size
     >;
 
-    bool success = hasValueHelper<Array>(key);
+    const bool success = hasValueHelper<Array>(key);
     if (success) {
         Array v;
         getValueHelper(key, v);
@@ -944,11 +969,11 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
         return;
     }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper<Dictionary>(key, dict);
-            bool canConvert = isConvertible<T>(dict);
+            const bool canConvert = isConvertible<T>(dict);
             if (canConvert) {
                 std::vector<std::string> keys = dict.keys();
                 // sort numerically rather than by ASCII value
@@ -967,10 +992,12 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
             }
         }
     }
-    throw ConversionError(
-        "Error converting key '" + key + "' from type '" +
-        find(key)->second.type().name() + "' to type '" + typeid(T).name() + "'"
-    );
+    throw ConversionError(fmt::format(
+        "Error converting key '{}' from type '{}' to type '{}'",
+        key,
+        find(key)->second.type().name(),
+        typeid(T).name()
+    ));
 }
 
 template <typename T>
@@ -985,9 +1012,10 @@ bool Dictionary::getValue(const std::string& key, T& value) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
 
     try {
-        bool keyExists = hasKey(key);
-        if (!keyExists)
+        const bool keyExists = hasKey(key);
+        if (!keyExists) {
             return false;
+        }
         else {
             getValueInternal(key, value);
             return true;
@@ -1025,14 +1053,16 @@ bool ghoul::Dictionary::hasValueHelper(const std::string& key) const {
     splitKey(key, first, rest);
 
     auto keyIt = find(first);
-    if (keyIt == cend())
+    if (keyIt == cend()) {
         // If we can't find the first part of nested key, there is no need to continue
         return false;
+    }
 
     const Dictionary* dict = ghoul::any_cast<Dictionary>(&(keyIt->second));
-    if (dict == nullptr)
+    if (!dict) {
         // If it is not a Dictionary, the value can't be found and no recursion necessary
         return false;
+    }
 
     // Proper tail-recursion
     return dict->hasValue<T>(rest);
@@ -1042,16 +1072,18 @@ template <typename T>
 bool Dictionary::hasValueInternal(const std::string& key, IsStandardScalarType<T>*) const
 {
     bool val = hasValueHelper<typename internal::StorageTypeConverter<T>::type>(key);
-    if (val)
+    if (val) {
         return true;
+    }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            bool canConvert = isConvertible<T>(dict);
-            if (canConvert)
+            const bool canConvert = isConvertible<T>(dict);
+            if (canConvert) {
                 return true;
+            }
         }
         return false;
     }
@@ -1060,20 +1092,22 @@ bool Dictionary::hasValueInternal(const std::string& key, IsStandardScalarType<T
 template <typename T>
 bool Dictionary::hasValueInternal(const std::string& key, IsStandardVectorType<T>*) const
 {
-    bool val = hasValueHelper<std::array<
+    const bool val = hasValueHelper<std::array<
         typename internal::StorageTypeConverter<T>::type,
         internal::StorageTypeConverter<T>::size
     >>(key);
-    if (val)
+    if (val) {
         return true;
+    }
     else {
-        bool hasDictionary = hasValueHelper<Dictionary>(key);
+        const bool hasDictionary = hasValueHelper<Dictionary>(key);
         if (hasDictionary) {
             Dictionary dict;
             getValueHelper(key, dict);
-            bool canConvert = isConvertible<T>(dict);
-            if (canConvert)
+            const bool canConvert = isConvertible<T>(dict);
+            if (canConvert) {
                 return true;
+            }
         }
         return false;
     }

@@ -56,7 +56,7 @@ public:
 private:
     GLuint generateId();
 
-    GLuint _id;
+    GLuint _id = 0;
     std::map<GLenum, Texture*> _attachedTextures;
 };
 

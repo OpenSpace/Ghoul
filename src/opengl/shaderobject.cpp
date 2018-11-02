@@ -52,11 +52,8 @@ ShaderObject::ShaderCompileError::ShaderCompileError(std::string error,
 {}
 
 ShaderObject::ShaderObject(ShaderType shaderType, Dictionary dictionary)
-    : _id(0)
-    , _type(shaderType)
-    , _shaderName("")
+    : _type(shaderType)
     , _loggerCat("ShaderObject")
-    , _onChangeCallback(nullptr)
 {
     _id = glCreateShader(static_cast<GLenum>(_type));
     _preprocessor.setDictionary(std::move(dictionary));
@@ -69,11 +66,8 @@ ShaderObject::ShaderObject(ShaderType shaderType, Dictionary dictionary)
 
 ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
                            Dictionary dictionary)
-    : _id(0)
-    , _type(shaderType)
-    , _shaderName("")
+    : _type(shaderType)
     , _loggerCat("ShaderObject")
-    , _onChangeCallback(nullptr)
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
@@ -89,11 +83,9 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
 
 ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
                            std::string name, Dictionary dictionary)
-    : _id(0)
-    , _type(shaderType)
+    : _type(shaderType)
     , _shaderName(std::move(name))
     , _loggerCat("ShaderObject('" + _shaderName + "')")
-    , _onChangeCallback(nullptr)
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
@@ -101,8 +93,9 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
     if (_id == 0) {
         throw ShaderObjectError("glCreateShader returned 0");
     }
+
 #ifdef GL_VERSION_4_3
-    if (glObjectLabel) {
+    if (glbinding::Binding::ObjectLabel.isResolved()) {
         glObjectLabel(
             GL_SHADER,
             _id,
@@ -130,7 +123,7 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
         throw ShaderObjectError("glCreateShader returned 0");
     }
 #ifdef GL_VERSION_4_3
-    if (glObjectLabel) {
+    if (glbinding::Binding::ObjectLabel.isResolved()) {
         glObjectLabel(
             GL_SHADER,
             _id,
@@ -180,7 +173,7 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
             throw ShaderObjectError("glCreateShader returned 0");
         }
 #ifdef GL_VERSION_4_3
-        if (glObjectLabel) {
+        if (glbinding::Binding::ObjectLabel.isResolved()) {
             glObjectLabel(
                 GL_SHADER,
                 _id,
@@ -213,7 +206,7 @@ void ShaderObject::setName(std::string name) {
     _shaderName = std::move(name);
     _loggerCat = "ShaderObject['" + _shaderName + "']";
 #ifdef GL_VERSION_4_3
-    if (glObjectLabel) {
+    if (glbinding::Binding::ObjectLabel.isResolved()) {
         glObjectLabel(
             GL_SHADER,
             _id,
@@ -276,7 +269,9 @@ void ShaderObject::rebuildFromFile() {
         // we use the .baseName() version because otherwise we get a new file
         // every time we reload the shader
         generatedFilename = FileSys.cacheManager()->cachedFilename(
-            baseName, "", filesystem::CacheManager::Persistent::Yes
+            baseName,
+            "",
+            filesystem::CacheManager::Persistent::Yes
         );
     }
     else {

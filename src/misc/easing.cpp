@@ -31,15 +31,15 @@ namespace {
 
 const std::array<const char*, 28> EaseFuncNames = {
     "Linear",
-    "QuadraticEaseIn", "QuadraticEaseOut", "QuadraticEaseInOut",
-    "CubicEaseIn", "CubicEaseOut", "CubicEaseInOut",
-    "QuarticEaseIn", "QuarticEaseOut", "QuarticEaseInOut",
-    "QuinticEaseIn", "QuinticEaseOut", "QuinticEaseInOut",
-    "SineEaseIn", "SineEaseOut", "SineEaseInOut",
-    "CircularEaseIn", "CircularEaseOut", "CircularEaseInOut",
+    "QuadraticEaseIn",   "QuadraticEaseOut",   "QuadraticEaseInOut",
+    "CubicEaseIn",       "CubicEaseOut",       "CubicEaseInOut",
+    "QuarticEaseIn",     "QuarticEaseOut",     "QuarticEaseInOut",
+    "QuinticEaseIn",     "QuinticEaseOut",     "QuinticEaseInOut",
+    "SineEaseIn",        "SineEaseOut",        "SineEaseInOut",
+    "CircularEaseIn",    "CircularEaseOut",    "CircularEaseInOut",
     "ExponentialEaseIn", "ExponentialEaseOut", "ExponentialEaseInOut",
-    "ElasticEaseIn", "ElasticEaseOut", "ElasticEaseInOut",
-    "BounceEaseIn", "BounceEaseOut", "BounceEaseInOut"
+    "ElasticEaseIn",     "ElasticEaseOut",     "ElasticEaseInOut",
+    "BounceEaseIn",      "BounceEaseOut",      "BounceEaseInOut"
 };
 
 } // namespace

@@ -86,8 +86,7 @@ ProgramObject::ProgramObjectLinkingError::ProgramObjectLinkingError(std::string 
 {}
 
 ProgramObject::ProgramObject()
-    : _id(0)
-    , _programName("")
+    : _programName("")
     , _loggerCat("ProgramObject")
 {
     _id = glCreateProgram();
@@ -97,8 +96,7 @@ ProgramObject::ProgramObject()
 }
 
 ProgramObject::ProgramObject(std::string name)
-    : _id(0)
-    , _programName(std::move(name))
+    : _programName(std::move(name))
     , _loggerCat("ProgramObject('" + _programName + "')")
 {
     _id = glCreateProgram();
@@ -116,8 +114,7 @@ ProgramObject::ProgramObject(std::string name)
 }
 
 ProgramObject::ProgramObject(const ProgramObject& cpy)
-    : _id(0)
-    , _programName(cpy._programName)
+    : _programName(cpy._programName)
     , _loggerCat(cpy._loggerCat)
     , _ignoreUniformLocationError(cpy._ignoreUniformLocationError)
     , _ignoreAttributeLocationError(cpy._ignoreAttributeLocationError)
@@ -3498,7 +3495,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat2x2& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3512,7 +3509,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat2x3& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3526,7 +3523,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat2x4& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3540,7 +3537,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat3x2& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3555,7 +3552,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat3x3& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3570,7 +3567,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat3x4& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3585,7 +3582,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat4x2& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3601,7 +3598,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat4x3& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3617,7 +3614,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat4x4& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3633,7 +3630,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat2x2& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3647,7 +3644,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat2x3& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3661,7 +3658,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat2x4& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3675,7 +3672,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat3x2& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3690,7 +3687,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat3x3& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3705,7 +3702,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat3x4& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3720,7 +3717,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat4x2& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3736,7 +3733,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat4x3& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {
@@ -3752,7 +3749,7 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat4x4& value,
 {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
 
-    if (transpose == Transpose::Yes) {
+    if (transpose) {
         setAttribute(location, glm::transpose(value));
     }
     else {

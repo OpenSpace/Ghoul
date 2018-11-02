@@ -36,16 +36,16 @@ namespace {
         if (std::equal_to<>()(d, 0.0)) {
             return "0";
         }
-        int exponent = static_cast<int>(std::log10(std::abs(d)));
-        double base = d / std::pow(10, exponent);
+        const int exponent = static_cast<int>(std::log10(std::abs(d)));
+        const double base = d / std::pow(10, exponent);
         return std::to_string(base) + "E" + std::to_string(exponent);
     }
 } // namespace
 
 namespace ghoul {
 
-DictionaryJsonFormatter::JsonFormattingError::JsonFormattingError(const std::string& msg)
-    : RuntimeError(msg, "Dictionary")
+DictionaryJsonFormatter::JsonFormattingError::JsonFormattingError(std::string msg)
+    : RuntimeError(std::move(msg), "Dictionary")
 {}
 
 
@@ -64,9 +64,7 @@ std::string DictionaryJsonFormatter::format(const Dictionary& dictionary) const 
         std::next(keys.begin()),
         keys.end(),
         convert(*keys.begin()),
-        [convert](std::string a, std::string key) {
-            return a + "," + convert(key);
-        }
+        [convert](std::string a, std::string key) { return a + "," + convert(key); }
     );
 
     return "{" + json + "}";
@@ -126,29 +124,29 @@ std::string DictionaryJsonFormatter::formatValue(const Dictionary& dictionary,
         std::string jsonString;
         for (const char& c : value) {
             switch (c) {
-            case '"':
-                jsonString += "\\\"";
-                break;
-            case '\\':
-                jsonString += "\\\\";
-                break;
-            case '\b':
-                jsonString += "\\b";
-                break;
-            case '\f':
-                jsonString += "\\f";
-                break;
-            case '\n':
-                jsonString += "\\n";
-                break;
-            case '\r':
-                jsonString += "\\r";
-                break;
-            case '\t':
-                jsonString += "\\t";
-                break;
-            default:
-                jsonString += c;
+                case '"':
+                    jsonString += "\\\"";
+                    break;
+                case '\\':
+                    jsonString += "\\\\";
+                    break;
+                case '\b':
+                    jsonString += "\\b";
+                    break;
+                case '\f':
+                    jsonString += "\\f";
+                    break;
+                case '\n':
+                    jsonString += "\\n";
+                    break;
+                case '\r':
+                    jsonString += "\\r";
+                    break;
+                case '\t':
+                    jsonString += "\\t";
+                    break;
+                default:
+                    jsonString += c;
             }
         }
 

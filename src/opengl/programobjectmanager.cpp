@@ -27,8 +27,6 @@
 
 namespace ghoul::opengl {
 
-ProgramObjectManager::ProgramObjectManager() :
-    ObjectManager("ProgramObjectManager")
-{}
+ProgramObjectManager::ProgramObjectManager() : ObjectManager("ProgramObjectManager") {}
 
 } // namespace ghoul::opengl

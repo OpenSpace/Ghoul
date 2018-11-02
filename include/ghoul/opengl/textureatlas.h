@@ -270,7 +270,7 @@ private:
     glm::ivec3 _size;
 
     /// Allocated surface size
-    int _nUsed;
+    int _nUsed = 0;
 
     /// Pointer to the texture that is used as the atlas
     std::unique_ptr<Texture> _texture;

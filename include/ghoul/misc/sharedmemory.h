@@ -197,7 +197,7 @@ private:
      * This pointer points to the location in local address space where the shared memory
      * block has been attached to
      */
-    void* _memory;
+    void* _memory = nullptr;
 
     /// The name for this SharedMemory block
     std::string _name;

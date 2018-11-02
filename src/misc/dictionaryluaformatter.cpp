@@ -33,24 +33,24 @@
 
 namespace {
 
-std::string formatDouble(double d) {
-    // This check is to silence -Wfloat-equal on GCC due to floating point comparison
-    if (std::equal_to<>()(d, 0.0)) {
-        return "0";
+    std::string formatDouble(double d) {
+        // This check is to silence -Wfloat-equal on GCC due to floating point comparison
+        if (std::equal_to<>()(d, 0.0)) {
+            return "0";
+        }
+        const int exponent = static_cast<int>(std::log10(std::abs(d)));
+        const double base = d / std::pow(10, exponent);
+        return std::to_string(base) + "E" + std::to_string(exponent);
     }
-    int exponent = static_cast<int>(std::log10(std::abs(d)));
-    double base = d / std::pow(10, exponent);
-    return std::to_string(base) + "E" + std::to_string(exponent);
-}
 
 }  // namespace
 
 namespace ghoul {
 
 DictionaryLuaFormatter::DictionaryLuaFormatter(PrettyPrint prettyPrint,
-    std::string indentation)
+                                               std::string indentation)
     : _prettyPrint(prettyPrint)
-    , _indentation(indentation)
+    , _indentation(std::move(indentation))
 {}
 
 
@@ -69,21 +69,21 @@ std::string DictionaryLuaFormatter::format(const Dictionary& dictionary,
         return "{}";
     }
 
-    const std::string whitespace = _prettyPrint ? " " : "";
-
-    std::string indentationString = "";
+    std::string indent;
     if (_prettyPrint) {
         for (int i = 0; i < indentationSteps; i++) {
-            indentationString += _indentation;
+            indent += _indentation;
         }
     }
 
     std::string newLine = _prettyPrint ? "\n" : "";
 
-    auto convert = [this, dictionary, whitespace, indentationSteps]
+    auto convert = [this, dictionary, indentationSteps]
         (const std::string& key)
     {
-        return (_prettyPrint ? _indentation : "") + key + whitespace + "=" + whitespace +
+        return
+            (_prettyPrint ? _indentation : "") + key +
+            (_prettyPrint ? " " : "") + "=" + (_prettyPrint ? " " : "") +
             formatValue(dictionary, key, indentationSteps + 1);
     };
 
@@ -93,20 +93,21 @@ std::string DictionaryLuaFormatter::format(const Dictionary& dictionary,
         std::next(keys.begin()),
         keys.end(),
         convert(*keys.begin()),
-        [convert, indentationString, newLine](std::string a, std::string key) {
-            return a + "," + newLine + indentationString + convert(key);
-        });
+        [convert, indent, this](std::string a, std::string key) {
+            return a + "," + (_prettyPrint ? "\n" : "") + indent + convert(key);
+        }
+    );
 
-    return "{" + newLine +
-        indentationString + lua + newLine +
-        indentationString + "}";
+    return std::string("{") + (_prettyPrint ? "\n" : "") +
+        indent + lua + (_prettyPrint ? "\n" : "") +
+        indent + "}";
 }
 
 std::string DictionaryLuaFormatter::formatValue(const Dictionary& dictionary,
                                                  const std::string& key,
                                                  int indentationSteps) const
 {
-    const std::string whitespace = _prettyPrint ? " " : "";
+    const char* whitespace = _prettyPrint ? " " : "";
 
     if (dictionary.hasValue<Dictionary>(key)) {
         Dictionary subDictionary = dictionary.value<Dictionary>(key);
@@ -150,29 +151,29 @@ std::string DictionaryLuaFormatter::formatValue(const Dictionary& dictionary,
         std::string luaString;
         for (const char& c : value) {
             switch (c) {
-            case '"':
-                luaString += "\\\"";
-                break;
-            case '\\':
-                luaString += "\\\\";
-                break;
-            case '\b':
-                luaString += "\\b";
-                break;
-            case '\f':
-                luaString += "\\f";
-                break;
-            case '\n':
-                luaString += "\\n";
-                break;
-            case '\r':
-                luaString += "\\r";
-                break;
-            case '\t':
-                luaString += "\\t";
-                break;
-            default:
-                luaString += c;
+                case '"':
+                    luaString += "\\\"";
+                    break;
+                case '\\':
+                    luaString += "\\\\";
+                    break;
+                case '\b':
+                    luaString += "\\b";
+                    break;
+                case '\f':
+                    luaString += "\\f";
+                    break;
+                case '\n':
+                    luaString += "\\n";
+                    break;
+                case '\r':
+                    luaString += "\\r";
+                    break;
+                case '\t':
+                    luaString += "\\t";
+                    break;
+                default:
+                    luaString += c;
             }
         }
 

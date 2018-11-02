@@ -39,7 +39,7 @@ Process::Process(const std::string& command, const std::string& path,
         readStderr,
         openStdin,
         bufferSize
-        );
+    );
 }
 
 void Process::kill() {

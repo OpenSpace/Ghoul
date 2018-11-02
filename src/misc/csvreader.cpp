@@ -61,7 +61,6 @@ namespace {
 
 namespace ghoul {
 
-
 std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
                                                   bool includeFirstLine)
 {
@@ -91,15 +90,14 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     file.exceptions(std::ifstream::badbit);
     file.open(fileName);
 
-    std::string line;
-
     // Get the file line that contains the column names
+    std::string line;
     std::getline(file, line);
     std::vector<std::string> elements = ghoul::tokenizeString(line, ',');
     if (elements.empty()) {
-        throw ghoul::RuntimeError(fmt::format(
-            "CSV file {} did not contain any lines", fileName
-        ));
+        throw ghoul::RuntimeError(
+            fmt::format("CSV file {} did not contain any lines", fileName)
+        );
     }
 
     std::vector<int> indices(columns.size());

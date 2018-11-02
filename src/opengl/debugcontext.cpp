@@ -33,19 +33,10 @@ namespace ghoul::opengl::debug {
 
 namespace {
 void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei,
-                        const GLchar* message, const GLvoid* userParam)
+                      const GLchar* message, const GLvoid* userParam)
 {
-    const CallbackFunction& cb = *reinterpret_cast<const CallbackFunction*>(
-        userParam
-    );
-
-    cb(
-        Source(source),
-        Type(type),
-        Severity(severity),
-        id,
-        std::string(message)
-    );
+    const CallbackFunction& cb = *reinterpret_cast<const CallbackFunction*>(userParam);
+    cb(Source(source), Type(type), Severity(severity), id, std::string(message));
 }
 } // namespace
 
@@ -65,8 +56,7 @@ void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous) {
     }
 }
 
-void setDebugMessageControl(Source source, Type type, Severity severity,
-                            Enabled enabled)
+void setDebugMessageControl(Source source, Type type, Severity severity, Enabled enabled)
 {
     glDebugMessageControl(
         static_cast<GLenum>(source),
@@ -108,10 +98,7 @@ void setDebugCallback(CallbackFunction callback) {
     // callback only allows pure C functions
     static CallbackFunction storage;
     storage = callback;
-    glDebugMessageCallback(
-        internalCallback,
-        &storage
-    );
+    glDebugMessageCallback(internalCallback, &storage);
 }
 
 } // namespace ghoul::opengl::debug

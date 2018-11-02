@@ -56,7 +56,7 @@ std::string FramebufferObject::errorChecking(GLenum status) {
     }
 }
 
-FramebufferObject::FramebufferObject() : _id(0) {
+FramebufferObject::FramebufferObject() {
     generateId();
 }
 

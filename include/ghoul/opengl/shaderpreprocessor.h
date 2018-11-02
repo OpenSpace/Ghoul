@@ -66,8 +66,8 @@ public:
     ShaderPreprocessor(std::string shaderPath = "",
         Dictionary dictionary = Dictionary());
 
-    std::string filename();
-    Dictionary dictionary();
+    const std::string& filename() const;
+    const Dictionary& dictionary() const;
     void setDictionary(Dictionary dictionary);
     void setFilename(const std::string& shaderPath);
     void setCallback(ShaderChangedCallback changeCallback);

@@ -136,7 +136,7 @@ void ShaderPreprocessor::setDictionary(Dictionary dictionary) {
     }
 }
 
-Dictionary ShaderPreprocessor::dictionary() {
+const Dictionary& ShaderPreprocessor::dictionary() const {
     return _dictionary;
 }
 
@@ -149,7 +149,7 @@ void ShaderPreprocessor::setFilename(const std::string& shaderPath) {
     }
 }
 
-std::string ShaderPreprocessor::filename() {
+const std::string& ShaderPreprocessor::filename() const {
     return _shaderPath;
 }
 
@@ -167,9 +167,7 @@ void ShaderPreprocessor::process(std::string& output) {
     }
 
     if (!env.scopes.empty()) {
-        throw ParserError(
-            "Unexpected end of file. " + debugString(env)
-        );
+        throw ParserError("Unexpected end of file. " + debugString(env));
     }
 
     output = stream.str();
@@ -300,6 +298,7 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
             "; // semicolon separator added by preprocessor to isolate error messages";
     }
 #ifdef __APPLE__
+    // The Apple OpenGL compiler doesn't like empty semicolor statements
     includeSeparator = "";
 #endif
 
@@ -467,13 +466,12 @@ void ShaderPreprocessor::pushScope(std::map<std::string, std::string> map,
                                    ShaderPreprocessor::Env& env)
 {
     Env::Scope scope;
-    for (const auto& pair : map) {
-        std::string key = pair.first;
-        std::string value = pair.second;
+    for (const std::pair<const std::string, std::string>& pair : map) {
+        const std::string& key = pair.first;
+        const std::string& value = pair.second;
         scope.insert(key);
         if (env.aliases.find(key) == env.aliases.end()) {
-           std::vector<std::string> vec;
-           env.aliases[key] = vec;
+           env.aliases[key] = std::vector<std::string>();
         }
         env.aliases[key].push_back(value);
     }
@@ -482,14 +480,14 @@ void ShaderPreprocessor::pushScope(std::map<std::string, std::string> map,
 
 void ShaderPreprocessor::popScope(ShaderPreprocessor::Env& env) {
     ghoul_assert(!env.scopes.empty(), "Environment must have open scope");
-    for (const auto& key : env.scopes.back()) {
-        (void)key; // unused variable in Release build
+    for (const std::string& key : env.scopes.back()) {
+        (void)key; // [[maybe_unused]] causes a compiler error in VS 15.8.8 --abock
         ghoul_assert(env.aliases.find(key) != env.aliases.end(), "Key not found");
         ghoul_assert(!env.aliases.at(key).empty(), "No aliases for key");
     }
 
     Env::Scope& scope = env.scopes.back();
-    for (const auto& key : scope) {
+    for (const std::string& key : scope) {
         env.aliases[key].pop_back();
         if (env.aliases[key].empty()) {
             env.aliases.erase(key);
@@ -590,8 +588,9 @@ bool ShaderPreprocessor::parseVersion(ShaderPreprocessor::Env& env) {
 bool ShaderPreprocessor::parseOs(ShaderPreprocessor::Env& env) {
     static const std::string osString = "#define __OS__";
     std::string& line = env.line;
-    if  (line.length() >= osString.length() &&
-         line.substr(0, osString.length()) == osString) {
+    if (line.length() >= osString.length() &&
+        line.substr(0, osString.length()) == osString)
+    {
         std::string os;
 
 #ifdef WIN32
@@ -679,28 +678,18 @@ bool ShaderPreprocessor::parseRange(const std::string& dictionaryName,
                                     Dictionary& dictionary, int& min, int& max)
 {
     static const std::string twoDots = "..";
-    size_t minimumStart = 0;
-    size_t minimumEnd = dictionaryName.find(twoDots);
+    size_t minStart = 0;
+    size_t minEnd = dictionaryName.find(twoDots);
 
-    if (minimumEnd == std::string::npos) {
+    if (minEnd == std::string::npos) {
         throw ParserError("Expected '..' in range. " + dictionaryName);
     }
-    int minimum = std::stoi(
-        dictionaryName.substr(minimumStart, minimumEnd - minimumStart)
-    );
+    int minimum = std::stoi(dictionaryName.substr(minStart, minEnd - minStart));
 
-    size_t maximumStart = minimumEnd + 2;
-    size_t maximumEnd = dictionaryName.length();
+    size_t maxStart = minEnd + 2;
+    size_t maxEnd = dictionaryName.length();
 
-    int maximum = std::stoi(
-        dictionaryName.substr(maximumStart, maximumEnd - maximumStart)
-    );
-
-    //if (minimum > maximum) {
-    //    throw ParserError(
-    //        "Minimum value must be smaller than maximum value. " + dictionaryName
-    //    );
-    //}
+    int maximum = std::stoi(dictionaryName.substr(maxStart, maxEnd - maxStart));
 
     // Create all the elements in the dictionary
     for (int i = 0; i <= maximum - minimum; i++) {
@@ -723,7 +712,8 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     if (keyName.empty()) {
         // No key means that the for statement could possibly be a range.
         Dictionary rangeDictionary;
-        int min, max;
+        int min;
+        int max;
         if (!parseRange(dictionaryName, rangeDictionary, min, max)) {
             return false;
         }
@@ -740,7 +730,7 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     if (!resolveAlias(dictionaryName, dictionaryRef, env)) {
         throw SubstitutionError(
             "Could not resolve variable '" + dictionaryName + "'. " + debugString(env)
-            );
+        );
     }
     // Fetch the dictionary to iterate over.
     Dictionary innerDictionary = _dictionary.value<Dictionary>(dictionaryRef);

@@ -43,7 +43,6 @@ TextureAtlas::InvalidRegionException::InvalidRegionException(const std::string& 
 
 TextureAtlas::TextureAtlas(glm::ivec3 size)
     : _size(std::move(size))
-    , _nUsed(0)
 {
     // Limitations to the depth are due to the fact that the atlas is represented by
     // a single texture on the GPU (which only allows up to four channels)
