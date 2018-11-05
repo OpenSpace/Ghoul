@@ -80,7 +80,7 @@ public:
 
     /// Exception that gets thrown if the FileSystem encounters a nonrecoverable error
     struct FileSystemException : RuntimeError {
-        explicit FileSystemException(const std::string& msg);
+        explicit FileSystemException(std::string msg);
     };
 
     /// Exception that gets thrown if a file system token could not be resolved

@@ -128,7 +128,7 @@ void Directory::internalReadFiles(vector<string>& result, const string& path,
             if (!isDir) {
                 result.push_back(path + "\\" + file);
             }
-            if (recursiveSearch && isDir && file != "." && file != "..") {
+            if (recursiveSearch && isDir && (file != ".") && (file != "..")) {
                 directories.push(path + "\\" + file);
             }
         } while (FindNextFile(findHandle, &findFileData) != 0);

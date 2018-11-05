@@ -25,8 +25,8 @@
 
 #include <ghoul/filesystem/file.h>
 
-#include <ghoul/filesystem/filesystem.h>
 #include <ghoul/fmt.h>
+#include <ghoul/filesystem/filesystem.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -48,8 +48,8 @@ namespace {
 
 namespace ghoul::filesystem {
 
-File::FileException::FileException(const std::string& msg)
-    : RuntimeError(msg, "File")
+File::FileException::FileException(std::string msg)
+    : RuntimeError(std::move(msg), "File")
 {}
 
 File::File(string filename, RawPath isRawPath, FileChangedCallback fileChangedCallback)
@@ -185,14 +185,11 @@ std::string File::lastModifiedDate() const {
             std::string msg(errorBuffer);
             LocalFree(errorBuffer);
             throw FileException(fmt::format(
-                "Could not retrieve last-modified date for file '{}': {}",
-                _filename,
-                msg
+                "Could not retrieve last-modified date for file '{}': {}", _filename, msg
             ));
         }
         throw FileException(fmt::format(
-            "Could not retrieve last-modified date for file '{}'",
-            _filename
+            "Could not retrieve last-modified date for file '{}'", _filename
         ));
     }
     else {
@@ -217,21 +214,18 @@ std::string File::lastModifiedDate() const {
                 std::string msg(errorBuffer);
                 LocalFree(errorBuffer);
                 throw FileException(fmt::format(
-                    "'FileTimeToSystemTime' failed for file '{}': {}",
-                    _filename,
-                    msg
+                    "'FileTimeToSystemTime' failed for file '{}': {}", _filename, msg
                 ));
             }
             throw FileException(fmt::format(
-                "'FileTimeToSystemTime' failed for file '{}'",
-                _filename
+                "'FileTimeToSystemTime' failed for file '{}'", _filename
             ));
         }
         else {
-            return std::to_string(time.wYear) + "-" + std::to_string(time.wMonth) + "-" +
-                std::to_string(time.wDay) + "T" + std::to_string(time.wHour) + ":" +
-                std::to_string(time.wMinute) + ":" + std::to_string(time.wSecond) + "." +
-                std::to_string(time.wMilliseconds);
+            return fmt::format(
+                "{}-{}-{}T{}:{}:{}.{}", time.wYear, time.wMonth, time.wDay, time.wHour,
+                time.wMinute, time.wSecond, time.wMilliseconds
+            );
         }
     }
 #else

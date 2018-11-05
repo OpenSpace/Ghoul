@@ -73,8 +73,8 @@ namespace {
 
 namespace ghoul::filesystem {
 
-FileSystem::FileSystemException::FileSystemException(const string& msg)
-    : RuntimeError(msg, "FileSystem")
+FileSystem::FileSystemException::FileSystemException(string msg)
+    : RuntimeError(std::move(msg), "FileSystem")
 {}
 
 FileSystem::ResolveTokenException::ResolveTokenException(string t)
@@ -143,8 +143,7 @@ string FileSystem::absolutePath(string path, const vector<string>& ignoredTokens
     );
     if (success == 0) {
         throw FileSystemException(fmt::format(
-            "Error retrieving absolute path '{}'",
-            path
+            "Error retrieving absolute path '{}'", path
         ));
     }
 #else
@@ -172,7 +171,7 @@ string FileSystem::absolutePath(string path, const vector<string>& ignoredTokens
     }
 #endif
 
-    path.assign(buffer.data());
+    path = buffer.data();
     return path;
 }
 
@@ -248,8 +247,7 @@ Directory FileSystem::currentDirectory() const {
             string msg(errorBuffer);
             LocalFree(errorBuffer);
             throw FileSystemException(fmt::format(
-                "Error retrieving current directory: {}",
-                msg
+                "Error retrieving current directory: {}", msg
             ));
         }
         throw FileSystemException("Error retrieving current directory");
@@ -258,7 +256,7 @@ Directory FileSystem::currentDirectory() const {
 #else
     std::vector<char> buffer(MAXPATHLEN);
     char* result = getcwd(buffer.data(), MAXPATHLEN);
-    if (result == nullptr) {
+    if (!result) {
         throw FileSystemException(fmt::format(
             "Error retrieving current directory: {}", strerror(errno)
         ));
@@ -531,28 +529,28 @@ void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) con
             }
 
             struct stat statbuf;
-string fullName = dirPath + "/" + name;
-int statResult = stat(fullName.c_str(), &statbuf);
-if (statResult == 0) {
-    if (S_ISDIR(statbuf.st_mode)) {
-        deleteDirectory(fullName);
-    }
-    else {
-        int removeSuccess = remove(fullName.c_str());
-        if (removeSuccess != 0) {
-            throw FileSystemException(fmt::format(
-                "Error deleting file '{}' in directory '{}': {}",
-                fullName, path.path(), strerror(errno)
-            ));
-        }
-    }
-}
-else {
-    throw FileSystemException(fmt::format(
-        "Error getting information about file '{}' in directory '{}': {}",
-        fullName, path.path(), strerror(errno)
-    ));
-}
+            string fullName = dirPath + "/" + name;
+            int statResult = stat(fullName.c_str(), &statbuf);
+            if (statResult == 0) {
+                if (S_ISDIR(statbuf.st_mode)) {
+                    deleteDirectory(fullName);
+                }
+                else {
+                    int removeSuccess = remove(fullName.c_str());
+                    if (removeSuccess != 0) {
+                        throw FileSystemException(fmt::format(
+                            "Error deleting file '{}' in directory '{}': {}",
+                            fullName, path.path(), strerror(errno)
+                        ));
+                    }
+                }
+            }
+            else {
+                throw FileSystemException(fmt::format(
+                    "Error getting information about file '{}' in directory '{}': {}",
+                    fullName, path.path(), strerror(errno)
+                ));
+            }
         }
         closedir(directory);
     }
@@ -572,8 +570,8 @@ bool FileSystem::emptyDirectory(const Directory& path) const {
 #else
     int n = 0;
     DIR* dir = opendir(dirPath.c_str());
-    if (dir == NULL) {
-        //Not a directory or doesn't exist
+    if (!dir) {
+        // Not a directory or doesn't exist
         return false;
     }
     while (readdir(dir) != nullptr) {

@@ -54,7 +54,7 @@ public:
 
      /// Exception that gets thrown if there is a file-related error in any of the methods
     struct FileException : public RuntimeError {
-        explicit FileException(const std::string& msg);
+        explicit FileException(std::string msg);
     };
 
     /// The type of the std::function that is used as the prototype for the callback
