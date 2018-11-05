@@ -26,22 +26,43 @@
 #include <ghoul/logging/logmanager.h>
 
 #include <ghoul/logging/log.h>
+#include <ghoul/misc/assert.h>
 #include <algorithm>
 #include <map>
 #include <vector>
 
 namespace ghoul::logging {
 
+LogManager* LogManager::_instance = nullptr;
+
 LogManager::LogManager(LogLevel level, ImmediateFlush immediateFlush)
     : _level(level)
     , _immediateFlush(immediateFlush)
 {}
 
+void LogManager::initialize(LogLevel level, ImmediateFlush immediateFlush) {
+    ghoul_assert(!isInitialized(), "LogManager is already initialized");
+    _instance = new LogManager(level, immediateFlush);
+}
+
+void LogManager::deinitialize() {
+    ghoul_assert(isInitialized(), "LogManager is not initialized");
+    delete _instance;
+    _instance = nullptr;
+}
+
+bool LogManager::isInitialized() {
+    return _instance != nullptr;
+}
+
+LogManager& LogManager::ref() {
+    ghoul_assert(isInitialized(), "LogManager is not initialized");
+    return *_instance;
+}
+
+
 void LogManager::addLog(std::unique_ptr<Log> log) {
-    auto it = std::find(_logs.begin(), _logs.end(), log);
-    if (it == _logs.end()) {
-        _logs.push_back(std::move(log));
-    }
+    _logs.push_back(std::move(log));
 }
 
 void LogManager::removeLog(Log* log) {
@@ -65,8 +86,7 @@ void LogManager::logMessage(LogLevel level, const std::string& category,
                             const std::string& message)
 {
     if (level >= _level) {
-        // Acquire lock, automatically released at end of scope
-        std::lock_guard<std::mutex> lock(_mutex);
+        std::lock_guard lock(_mutex);
 
         for (const std::unique_ptr<Log>& log : _logs) {
             if (level >= log->logLevel()) {
@@ -95,7 +115,7 @@ int LogManager::messageCounter(LogLevel level) {
 }
 
 void LogManager::resetMessageCounters() {
-    _logCounters = { 0, 0, 0, 0, 0, 0, 0 };
+    std::fill(_logCounters.begin(), _logCounters.end(), 0);
 }
 
 } // namespace ghoul::logging

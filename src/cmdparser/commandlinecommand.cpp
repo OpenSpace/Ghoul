@@ -29,14 +29,12 @@
 
 namespace ghoul::cmdparser {
 
-CommandlineCommand::CommandExecutionException::CommandExecutionException(
-                                                                   const std::string& msg)
-    : RuntimeError(msg, "Command")
+CommandlineCommand::CommandExecutionException::CommandExecutionException(std::string msg)
+    : RuntimeError(std::move(msg), "Command")
 {}
 
-CommandlineCommand::CommandParameterException::CommandParameterException(
-                                                                   const std::string& msg)
-    : RuntimeError(msg, "Command")
+CommandlineCommand::CommandParameterException::CommandParameterException(std::string msg)
+    : RuntimeError(std::move(msg), "Command")
 {}
 
 CommandlineCommand::CommandlineCommand(std::string name, std::string shortName,
@@ -111,8 +109,7 @@ void CommandlineCommand::checkParameters(const std::vector<std::string>& param) 
     if (param.size() != static_cast<size_t>(_nArguments) && _nArguments != -3) {
         throw CommandParameterException(fmt::format(
             "Wrong number of arguments. Expected {} got {}",
-            argumentNumber(),
-            param.size()
+            argumentNumber(), param.size()
         ));
     }
 }

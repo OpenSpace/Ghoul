@@ -145,7 +145,6 @@ if (GHOUL_MODULE_SYSTEMCAPABILITIES)
 endif ()
 
 set(GHOUL_HEADER 
-    ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/singleton.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/event.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/event.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/cachemanager.h

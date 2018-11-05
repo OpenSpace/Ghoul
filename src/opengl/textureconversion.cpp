@@ -167,10 +167,7 @@ void convertTextureFormat(Texture& texture, Texture::Format newFormat) {
     int nChannelsOld = texture.numberOfChannels();
     int nChannelsNew = Texture::numberOfChannels(newFormat);
 
-    ConversionFunc convFunc = conversionFunctionSelector(
-        texture.format(),
-        newFormat
-    );
+    ConversionFunc convFunc = conversionFunctionSelector(texture.format(), newFormat);
 
     const char* oldData = reinterpret_cast<const char*>(texture.pixelData());
     char* newData = new char[nChannelsNew * bytesPerChannel * nPixels];

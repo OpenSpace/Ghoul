@@ -51,7 +51,7 @@ void WebSocketServer::close() {
 }
 
 void WebSocketServer::listen(std::string address, int port) {
-    return _tcpSocketServer.listen(address, port);
+    return _tcpSocketServer.listen(std::move(address), port);
 }
 
 bool WebSocketServer::isListening() const {

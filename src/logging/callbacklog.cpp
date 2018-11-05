@@ -53,7 +53,7 @@ void CallbackLog::log(LogLevel level, const std::string& category,
         output += category + " ";
     }
     if (isLogLevelStamping()) {
-        output += "(" + stringFromLevel(level) + ")";
+        output += "(" + to_string(level) + ")";
     }
     if (!output.empty()) {
         output += "\t";

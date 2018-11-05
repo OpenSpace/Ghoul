@@ -37,8 +37,8 @@ namespace {
 
 namespace ghoul::opengl {
 
-TextureAtlas::InvalidRegionException::InvalidRegionException(const std::string& msg)
-    : RuntimeError(msg, "TextureAtlas")
+TextureAtlas::InvalidRegionException::InvalidRegionException(std::string msg)
+    : RuntimeError(std::move(msg), "TextureAtlas")
 {}
 
 TextureAtlas::TextureAtlas(glm::ivec3 size)
@@ -55,10 +55,6 @@ TextureAtlas::TextureAtlas(glm::ivec3 size)
     _data.resize(_size.x * _size.y * _size.z);
     std::fill(_data.begin(), _data.end(), static_cast<unsigned char>(0));
 }
-
-TextureAtlas::TextureAtlas(int width, int height, int depth)
-    : TextureAtlas(glm::ivec3(width, height, depth))
-{}
 
 TextureAtlas::TextureAtlas(const TextureAtlas& rhs)
     : _nodes(rhs._nodes)
@@ -283,11 +279,12 @@ void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
 }
 
 TextureAtlas::TextureCoordinatesResult TextureAtlas::textureCoordinates(
-                                   RegionHandle handle, const glm::ivec4& windowing) const
+                                                                      RegionHandle handle,
+                                                        const glm::ivec4& windowing) const
 {
     ghoul_assert(_texture, "TextureAtlas has not been initialized");
 
-    glm::ivec4 region = _handleInformation[handle];
+    const glm::ivec4& region = _handleInformation[handle];
 
     // Offset the location to the pixel center
     int topLeftX = region.x + windowing.x;

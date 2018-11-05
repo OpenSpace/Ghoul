@@ -32,8 +32,6 @@
 #include <algorithm>
 #include <map>
 
-using fmt::format;
-
 namespace {
 
 constexpr const char* _loggerCat = "CommandlineParser";
@@ -103,9 +101,8 @@ CommandlineParser::~CommandlineParser() {
     _commands.clear();
 }
 
-void CommandlineParser::setAllowUnknownCommands(AllowUnknownCommands allowUnknownCommands)
-{
-    _allowUnknownCommands = allowUnknownCommands;
+void CommandlineParser::setAllowUnknownCommands(AllowUnknownCommands allowUnknownCmds) {
+    _allowUnknownCommands = allowUnknownCmds;
 }
 
 CommandlineParser::AllowUnknownCommands CommandlineParser::allowsUnknownCommands() const {
@@ -180,13 +177,11 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
         }
         else {
             // We have found a command
-
-
-            CommandlineCommand* currentCommand = getCommand(_arguments[i]);
+            CommandlineCommand* currentCmd = getCommand(_arguments[i]);
 
             // currentCommand = nullptr, if there wasn't a command with that specific
             // name or shortName
-            if (!currentCommand) {
+            if (!currentCmd) {
                 if (_allowUnknownCommands) {
                     // Extract the rest of the arguments
                     std::vector<std::string> arguments;
@@ -199,30 +194,28 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                     continue;
                 }
                 else {
-                    throw CommandlineException(format(
+                    throw CommandlineException(fmt::format(
                         "{} is not a valid command", _arguments[i]
                     ));
                 }
             }
 
-            std::vector<std::string> parameters;
-            int number = extractArguments(
-                _arguments, parameters, i, currentCommand->argumentNumber()
-            );
-            i += number;
+            std::vector<std::string> params;
+            int n = extractArguments(_arguments, params, i, currentCmd->argumentNumber());
+            i += n;
 
             // don't insert if the command doesn't allow multiple calls and already is in
             // the map
-            if (!currentCommand->allowsMultipleCalls() &&
-                parameterMap.find(currentCommand) != parameterMap.end())
+            if (!currentCmd->allowsMultipleCalls() &&
+                parameterMap.find(currentCmd) != parameterMap.end())
             {
-                throw CommandlineException(format(
+                throw CommandlineException(fmt::format(
                     "{} does not allow multiple calls in a single line",
-                    currentCommand->name()
+                    currentCmd->name()
                 ));
             }
 
-            parameterMap.emplace(currentCommand, parameters);
+            parameterMap.emplace(currentCmd, params);
         }
     }
     // We now have all the commands with the respective parameters stored in the map and
@@ -232,35 +225,41 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
     // command. If so, bail out
     if (!argumentsForNameless.empty() && (!_commandForNamelessArguments)) {
         if (_allowUnknownCommands) {
-            for (const std::string& arg : argumentsForNameless) {
-                _remainingArguments.push_back(arg);
-            }
+            _remainingArguments.insert(
+                _remainingArguments.end(),
+                argumentsForNameless.begin(),
+                argumentsForNameless.end()
+            );
         }
         else {
-            throw CommandlineException(
-                "No appropriate command available for nameless parameters"
-            );
+            throw CommandlineException("No command available for nameless parameters");
         }
     }
 
     // Second step: Check if every command is happy with the parameters assigned to it
-    for (const auto& it : parameterMap) {
-        it.first->checkParameters(it.second);
-    }
+    using K = CommandlineCommand*;
+    using V = std::vector<std::string>;
+    std::for_each(
+        parameterMap.begin(),
+        parameterMap.end(),
+        [](const std::pair<const K, V>& it) {
+            it.first->checkParameters(it.second);
+        }
+    );
 
     // Second-and-a-half step: Display pairs for (command,argument) in debug level
     std::stringstream s;
     for (const std::string& arg : argumentsForNameless) {
         s << " " << arg;
     }
-    LDEBUG(format("(Nameless argument: {})", s.str()));
+    LDEBUG(fmt::format("(Nameless argument: {})", s.str()));
 
-    for (const auto& it : parameterMap) {
+    for (const std::pair<const K, V>& it : parameterMap) {
         s.clear();
         for (const std::string& arg : it.second) {
             s << " " << arg;
         }
-        LDEBUG(format("({}: {})", it.first->name(), s.str()));
+        LDEBUG(fmt::format("({}: {})", it.first->name(), s.str()));
     }
 
     // Third step: Execute the nameless command if there are any arguments available
@@ -271,7 +270,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
 
     // Fourth step: Execute the commands (this step is only done if everyone is happy up
     // until now)
-    for (const auto& it : parameterMap) {
+    for (const std::pair<const K, V>& it : parameterMap) {
         it.first->execute(it.second);
     }
 
@@ -304,7 +303,9 @@ bool CommandlineParser::hasCommandForName(const std::string& name) const {
     auto it = std::find_if(
         _commands.begin(),
         _commands.end(),
-        [&name](auto& command) { return command->name() == name; }
+        [&name](const std::unique_ptr<CommandlineCommand>& c) {
+            return c->name() == name;
+        }
     );
     return it != _commands.end();
 }
@@ -313,7 +314,9 @@ bool CommandlineParser::hasCommandForShortName(const std::string& shortName) con
     auto it = std::find_if(
         _commands.begin(),
         _commands.end(),
-        [&shortName](auto& command) { return command->shortName() == shortName; }
+        [&shortName](const std::unique_ptr<CommandlineCommand>& command) {
+            return command->shortName() == shortName;
+        }
     );
     return it != _commands.end();
 }
@@ -366,8 +369,7 @@ std::string CommandlineParser::usageInformationForNamelessCommand() const {
 
 void CommandlineParser::displayHelp(std::ostream& stream) const {
     stream << usageInformation();
-    stream << std::endl << std::endl <<
-        "Help:" << std::endl << "-----" << std::endl;
+    stream << std::endl << std::endl << "Help:" << std::endl << "-----" << std::endl;
 
     for (const std::unique_ptr<CommandlineCommand>& it : _commands) {
         stream << it->help() << std::endl;

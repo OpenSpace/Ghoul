@@ -27,6 +27,7 @@
 
 #include <ghoul/fmt.h>
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/misc/assert.h>
 
 #ifdef WIN32
 #include <windows.h>

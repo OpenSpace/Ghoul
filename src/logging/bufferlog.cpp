@@ -82,7 +82,7 @@ namespace {
 
         return reinterpret_cast<void*>(
             reinterpret_cast<char*>(buffer) + sizeof(Header) + h->firstEmptyByte
-            );
+        );
     }
 } // namespace
 
@@ -101,7 +101,6 @@ BufferLog::MemoryExhaustionException::MemoryExhaustionException(int sizeTotal,
 BufferLog::BufferLog(void* address, size_t bufferSize)
     : _buffer(address)
     , _totalSize(bufferSize)
-    , _inCallbackStack(false)
 {
     ghoul_assert(address, "Address must not be nullptr");
     ghoul_assert(bufferSize > 0, "Total size must be positive");
@@ -115,7 +114,6 @@ BufferLog::BufferLog(void* address, size_t bufferSize, MemoryExhaustedCallback c
     : _buffer(address)
     , _totalSize(bufferSize)
     , _callback(std::move(callback))
-    , _inCallbackStack(false)
 {
     ghoul_assert(address, "Address must not be nullptr");
     ghoul_assert(bufferSize > 0, "Total size must be positive");

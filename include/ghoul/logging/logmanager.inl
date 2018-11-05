@@ -34,7 +34,7 @@ inline void log(ghoul::logging::LogLevel level, const std::string& category,
     }
     else {
         std::cout << category << " (" <<
-            ghoul::logging::stringFromLevel(level) << ") : " << message << std::endl;
+            ghoul::to_string(level) << ") : " << message << std::endl;
     }
 }
 

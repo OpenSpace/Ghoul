@@ -105,14 +105,11 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         );
     }
 
-    using opengl::Texture;
-    std::unique_ptr<Texture> texture = std::make_unique<Texture>(
-        values,                    // data
-        glm::size3_t(width, 1, 1), // dimensions
-        Texture::Format::RGBA      // Format
+    return std::make_unique<opengl::Texture>(
+        values,
+        glm::size3_t(width, 1, 1),
+        opengl::Texture::Format::RGBA
     );
-
-    return texture;
 }
 
 std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(void* /*memory*/,

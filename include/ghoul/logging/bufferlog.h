@@ -221,7 +221,7 @@ protected:
      * in the current callstack. It forces some methods to ignore the
      * <code>atomic_lock</code> to ensure that no deadlock can happen.
      */
-    bool _inCallbackStack;
+    bool _inCallbackStack = false;
 };
 
 } // namespace ghoul::logging

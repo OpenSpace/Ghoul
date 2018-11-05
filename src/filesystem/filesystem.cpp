@@ -29,6 +29,7 @@
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
 #include <algorithm>
 #include <regex>
 
@@ -72,6 +73,8 @@ namespace {
 } // namespace
 
 namespace ghoul::filesystem {
+
+FileSystem* FileSystem::_instance = nullptr;
 
 FileSystem::FileSystemException::FileSystemException(string msg)
     : RuntimeError(std::move(msg), "FileSystem")
@@ -125,6 +128,26 @@ FileSystem::~FileSystem() {
 #else
     deinitializeInternalLinux();
 #endif
+}
+
+void FileSystem::initialize() {
+    ghoul_assert(!isInitialized(), "FileSystem is already initialized");
+    _instance = new FileSystem;
+}
+
+void FileSystem::deinitialize() {
+    ghoul_assert(isInitialized(), "FileSystem is not initialized");
+    delete _instance;
+    _instance = nullptr;
+}
+
+bool FileSystem::isInitialized() {
+    return _instance != nullptr;
+}
+
+FileSystem& FileSystem::ref() {
+    ghoul_assert(isInitialized(), "FileSystem is not initialized");
+    return *_instance;
 }
 
 string FileSystem::absolutePath(string path, const vector<string>& ignoredTokens) const {

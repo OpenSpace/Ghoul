@@ -126,7 +126,7 @@ void ConsoleLog::setColorForLevel(LogLevel level) {
 
     // Or-ing the new foreground color with the old values for the background
     const WORD Background = BACKGROUND_BLUE | BACKGROUND_GREEN |
-        BACKGROUND_RED | BACKGROUND_INTENSITY;
+                            BACKGROUND_RED | BACKGROUND_INTENSITY;
     SetConsoleTextAttribute(hConsole, colorIndex | (csbiInfo.wAttributes & Background));
 #elif defined __unix__
     switch (level) {

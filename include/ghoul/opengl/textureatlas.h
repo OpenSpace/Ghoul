@@ -58,7 +58,7 @@ class TextureAtlas {
 public:
     /// Exception that gets thrown if an invalid region would be returned or is used
     struct InvalidRegionException : RuntimeError {
-        explicit InvalidRegionException(const std::string& msg);
+        explicit InvalidRegionException(std::string msg);
     };
 
     typedef int RegionHandle;
@@ -66,7 +66,8 @@ public:
     /**
      * The constructor completely initializes the Texture Atlas. No additional
      * initialization step is necessary. Due to the fact that the underlying Texture is
-     * initialized here, it requires a valid OpenGL context.
+     * initialized here, it requires a valid OpenGL context. The size is defined as
+     * \c width, \c height, and \c depth.
      *
      * \param size The size (<code>width</code>, <code>height</code>, <code>depth</code>)
      *        of the TextureAtlas.
@@ -74,26 +75,14 @@ public:
      * \pre \p size's width and height has to be bigger than <code>4</code> and smaller
      *      than the GPU limit for 2D textures. The \p size's depth has to be
      *      <code>1</code>, <code>2</code>, <code>3</code>, or <code>4</code>
-     */
-    explicit TextureAtlas(glm::ivec3 size);
-
-    /**
-     * The constructor completely initializes the Texture Atlas. No additional
-     * initialization step is necessary. Due to the fact that the underlying Texture is
-     * initialized here, it requires a valid OpenGL context.
-     *
-     * \param width The width of the TextureAtlas
-     * \param height The height of the TextureAtlas
-     * \param depth The depth of the TetureAtlas
-     *
-     * \pre \p width must be bigger than <code>4</code> and smaller than the GPU limit for
-     *      2D tetxures
-     * \pre \p height must be bigger than <code>4</code> and smaller than the GPU limit
-     *      for 2D tetxures
-     * \pre \p depth must be <code>1</code>, <code>2</code>, <code>3</code>, or
+     * \pre \c width component must be bigger than <code>4</code> and smaller than the GPU
+     *      limit for 2D tetxures
+     * \pre \c height component must be bigger than <code>4</code> and smaller than the
+     *      GPU limit for 2D tetxures
+     * \pre \c depth component must be <code>1</code>, <code>2</code>, <code>3</code>, or
      *      <code>4</code>
      */
-    TextureAtlas(int width, int height, int depth);
+    explicit TextureAtlas(glm::ivec3 size);
 
     /**
      * Copy constructor that performs a deep copy of all the element in the TextureAtlas

@@ -62,7 +62,7 @@ public:
      * that could not be checked in the CommandlineCommand::checkParameters method
      */
     struct CommandExecutionException : public RuntimeError {
-        explicit CommandExecutionException(const std::string& msg);
+        explicit CommandExecutionException(std::string msg);
     };
 
     /**
@@ -70,7 +70,7 @@ public:
      * ComandlineCommand::checkParameters
      */
     struct CommandParameterException : public RuntimeError {
-        explicit CommandParameterException(const std::string& msg);
+        explicit CommandParameterException(std::string msg);
     };
 
     /**

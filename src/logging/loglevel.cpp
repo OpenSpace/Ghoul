@@ -28,32 +28,33 @@
 #include <ghoul/misc/assert.h>
 #include <map>
 
-namespace ghoul::logging {
+namespace ghoul {
 
-std::string stringFromLevel(LogLevel level) {
+std::string to_string(logging::LogLevel level) {
     switch (level) {
-        case LogLevel::AllLogging: return "All";
-        case LogLevel::Trace:      return "Trace";
-        case LogLevel::Debug:      return "Debug";
-        case LogLevel::Info:       return "Info";
-        case LogLevel::Warning:    return "Warning";
-        case LogLevel::Error:      return "Error";
-        case LogLevel::Fatal:      return "Fatal";
-        case LogLevel::NoLogging:  return "None";
+        case logging::LogLevel::AllLogging: return "All";
+        case logging::LogLevel::Trace:      return "Trace";
+        case logging::LogLevel::Debug:      return "Debug";
+        case logging::LogLevel::Info:       return "Info";
+        case logging::LogLevel::Warning:    return "Warning";
+        case logging::LogLevel::Error:      return "Error";
+        case logging::LogLevel::Fatal:      return "Fatal";
+        case logging::LogLevel::NoLogging:  return "None";
         default:                   throw MissingCaseException();
     }
 }
 
-LogLevel levelFromString(const std::string& level) {
-    static const std::map<std::string, LogLevel> levels = {
-        { "All"    , LogLevel::AllLogging },
-        { "Trace"  , LogLevel::Trace },
-        { "Debug"  , LogLevel::Debug },
-        { "Info"   , LogLevel::Info },
-        { "Warning", LogLevel::Warning },
-        { "Error"  , LogLevel::Error },
-        { "Fatal"  , LogLevel::Fatal },
-        { "None"   , LogLevel::NoLogging }
+template <>
+logging::LogLevel from_string(const std::string& level) {
+    static const std::map<std::string, logging::LogLevel> levels = {
+        { "All"    , logging::LogLevel::AllLogging },
+        { "Trace"  , logging::LogLevel::Trace },
+        { "Debug"  , logging::LogLevel::Debug },
+        { "Info"   , logging::LogLevel::Info },
+        { "Warning", logging::LogLevel::Warning },
+        { "Error"  , logging::LogLevel::Error },
+        { "Fatal"  , logging::LogLevel::Fatal },
+        { "None"   , logging::LogLevel::NoLogging }
     };
 
     auto it = levels.find(level);

@@ -25,11 +25,12 @@
 
 #include <ghoul/filesystem/cachemanager.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
-#include <ghoul/fmt.h>
 #include <algorithm>
 #include <fstream>
 
@@ -92,8 +93,7 @@ CacheManager::CacheManager(std::string directory, int version)
         if (line != std::to_string(_version)) {
             LINFO(fmt::format(
                 "Cache version has changed. Current version {}; new version {}",
-                line,
-                _version
+                line, _version
             ));
             for (const LoadedCacheInfo& cache : cacheState) {
                 LINFO(fmt::format("Deleting file '{}'", cache.second));

@@ -26,7 +26,6 @@
 #include <ghoul/io/socket/tcpsocketserver.h>
 
 #include <ghoul/io/socket/tcpsocket.h>
-
 #include <cstring>
 
 #ifdef WIN32
@@ -89,31 +88,14 @@ namespace {
         char trueFlag = 1;
 
         //Set no delay
-        setsockopt(socket,
-            IPPROTO_TCP,
-            TCP_NODELAY,
-            &trueFlag,
-            sizeof(trueFlag)
-        );
+        setsockopt(socket,IPPROTO_TCP, TCP_NODELAY, &trueFlag, sizeof(trueFlag));
 
         // Set send timeout
         char timeout = 0; //infinite
-        setsockopt(
-            socket,
-            SOL_SOCKET,
-            SO_SNDTIMEO,
-            &timeout,
-            sizeof(timeout)
-        );
+        setsockopt(socket, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
 
         // Set receive timeout
-        setsockopt(
-            socket,
-            SOL_SOCKET,
-            SO_RCVTIMEO,
-            &timeout,
-            sizeof(timeout)
-        );
+        setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
         setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &trueFlag, sizeof(int));
         setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(int));
@@ -129,17 +111,17 @@ TcpSocketServer::~TcpSocketServer() {
 }
 
 std::string TcpSocketServer::address() const {
-    std::lock_guard<std::mutex> settingsLock(_settingsMutex);
+    std::lock_guard settingsLock(_settingsMutex);
     return _address;
 }
 
 int TcpSocketServer::port() const {
-    std::lock_guard<std::mutex> settingsLock(_settingsMutex);
+    std::lock_guard settingsLock(_settingsMutex);
     return _port;
 }
 
 void TcpSocketServer::close() {
-    std::lock_guard<std::mutex> settingsLock(_settingsMutex);
+    std::lock_guard settingsLock(_settingsMutex);
     _listening = false;
 
     // Notify all threads waiting for connections.
@@ -158,8 +140,8 @@ void TcpSocketServer::listen(std::string address, int port) {
         TcpSocket::initializeNetworkApi();
     }
 
-    std::lock_guard<std::mutex> settingsLock(_settingsMutex);
-    _address = address;
+    std::lock_guard settingsLock(_settingsMutex);
+    _address = std::move(address);
     _port = port;
 
     struct addrinfo* result = nullptr;
@@ -223,7 +205,7 @@ void TcpSocketServer::listen(std::string address, int port) {
 }
 
 bool TcpSocketServer::isListening() const {
-    std::lock_guard<std::mutex> settingsLock(_settingsMutex);
+    std::lock_guard settingsLock(_settingsMutex);
     return _listening;
 }
 
@@ -239,7 +221,7 @@ std::unique_ptr<TcpSocket> TcpSocketServer::nextPendingTcpSocket() {
     if (!_listening) {
         return nullptr;
     }
-    std::lock_guard<std::mutex> connectionLock(_connectionMutex);
+    std::lock_guard connectionLock(_connectionMutex);
     if (!_pendingConnections.empty()) {
         std::unique_ptr<TcpSocket> connection = std::move(_pendingConnections.front());
         _pendingConnections.pop_front();
@@ -256,7 +238,7 @@ std::unique_ptr<TcpSocket> TcpSocketServer::awaitPendingTcpSocket() {
     if (!_listening) {
         return nullptr;
     }
-    std::unique_lock<std::mutex> lock(_connectionNotificationMutex);
+    std::unique_lock lock(_connectionNotificationMutex);
 
     // Block execution until there is a pending connection or until the server stops
     // listening.
@@ -301,13 +283,9 @@ void TcpSocketServer::waitForConnections() {
 
         // @CLEANUP(abock): Can the _pendingConnections be moved to Socket instead of
         //                  unique_ptr?
-        std::unique_ptr<TcpSocket> socket = std::make_unique<TcpSocket>(
-            address,
-            port,
-            socketHandle
-        );
+        auto socket = std::make_unique<TcpSocket>(address, port, socketHandle);
 
-        std::lock_guard<std::mutex> lock(_connectionMutex);
+        std::lock_guard lock(_connectionMutex);
         _pendingConnections.push_back(std::move(socket));
 
         // Notify `awaitPendingConnection` to return the acquired connection.

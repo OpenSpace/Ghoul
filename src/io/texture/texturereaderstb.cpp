@@ -29,6 +29,7 @@
 
 #include <ghoul/fmt.h>
 #include <ghoul/glm.h>
+#include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
 #include <stb_image.h>
@@ -39,7 +40,7 @@ namespace {
                                                  int n, const std::string& message,
                                                  const ghoul::io::TextureReaderBase* r)
     {
-        if (data == nullptr) {
+        if (!data) {
             throw ghoul::io::TextureReaderBase::TextureLoadException(
                 message,
                 fmt::format("Error reading image data: {}", stbi_failure_reason()),
@@ -48,7 +49,7 @@ namespace {
         }
 
 
-        std::cout << fmt::format("{}: {} {} {}\n", message, x, y, n);
+        LDEBUGC("TextureReaderSTB", fmt::format("{}: {} {} {}\n", message, x, y, n));
 
         // This is weird.  stb_image.h says that the first pixel loaded is the one in the
         // upper left.  However, if we load the data and just use it, the images are

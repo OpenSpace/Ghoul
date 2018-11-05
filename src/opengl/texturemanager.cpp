@@ -27,8 +27,6 @@
 
 namespace ghoul::opengl {
 
-TextureManager::TextureManager()
-    : ObjectManager("TextureManager")
-{}
+TextureManager::TextureManager() : ObjectManager("TextureManager") {}
 
 } // namespace ghoul::opengl

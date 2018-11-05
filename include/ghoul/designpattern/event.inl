@@ -31,16 +31,10 @@ template <class... T>
 void Event<T...>::subscribe(std::string name, std::string topic, Callback callback) {
     auto it = _topics.find(topic);
     if (it == _topics.end()) {
-        _topics.insert({
-            std::move(topic),
-            { { std::move(name), std::move(callback) } }
-        });
+        _topics.insert({ std::move(topic), { { std::move(name), std::move(callback) } }});
     }
     else {
-        it->second.push_back({
-            std::move(name),
-            std::move(callback)
-        });
+        it->second.push_back({ std::move(name), std::move(callback) });
     }
 }
 

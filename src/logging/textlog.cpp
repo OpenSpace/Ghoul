@@ -54,8 +54,7 @@ TextLog::~TextLog() {
     }
 }
 
-void TextLog::log(LogLevel level, const std::string& category,
-                                                               const std::string& message)
+void TextLog::log(LogLevel level, const std::string& category, const std::string& message)
 {
     if (category.empty() && message.empty()) {
         writeLine("\n");

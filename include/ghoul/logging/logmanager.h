@@ -26,8 +26,6 @@
 #ifndef __GHOUL___LOGMANAGER___H__
 #define __GHOUL___LOGMANAGER___H__
 
-#include <ghoul/designpattern/singleton.h>
-
 #include <ghoul/logging/loglevel.h>
 #include <ghoul/misc/boolean.h>
 #include <array>
@@ -63,9 +61,15 @@ class Log;
  * versions without the C require an <code>std::string</code> variable named
  * <code>_loggerCat</code> to be defined in the scope of the macro "call".
  */
-class LogManager : public Singleton<LogManager> {
+class LogManager {
 public:
     BooleanType(ImmediateFlush);
+
+    static void initialize(LogLevel level = LogLevel::Info,
+        ImmediateFlush immediateFlush = ImmediateFlush::No);
+    static void deinitialize();
+    static bool isInitialized();
+    static LogManager& ref();
 
     /**
      * Creates and initializes an empty LogManager with the passed LogLevel.
@@ -156,6 +160,8 @@ public:
     void flushLogs();
 
 private:
+    static LogManager* _instance;
+
     /// The mutex that is protecting the #logMessage calls
     std::mutex _mutex;
 

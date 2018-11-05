@@ -26,6 +26,7 @@
 #ifndef __GHOUL___LOGLEVEL___H__
 #define __GHOUL___LOGLEVEL___H__
 
+#include <ghoul/misc/stringconversion.h>
 #include <string>
 
 namespace ghoul::logging {
@@ -71,13 +72,17 @@ enum class LogLevel {
     NoLogging = 7
 };
 
+} // namespace ghoul::logging
+
+namespace ghoul {
+
 /**
 * Returns the string representation of the passed LogLevel. The name of
 * each level is equal to its enum value.
 *
 * \return The string representation of the passed LogLevel
 */
-std::string stringFromLevel(LogLevel level);
+std::string to_string(logging::LogLevel level);
 
 /**
 * Returns the LogLevel for the passed string representation. The name of
@@ -85,8 +90,10 @@ std::string stringFromLevel(LogLevel level);
 *
 * \return The the LogLevel for the passed string representation
 */
-LogLevel levelFromString(const std::string& level);
+template <>
+logging::LogLevel from_string(const std::string& level);
 
-} // namespace ghoul::logging
+
+} // namespace
 
 #endif // __GHOUL___LOGLEVEL___H__

@@ -26,7 +26,6 @@
 #ifndef __GHOUL___FILESYSTEM___H__
 #define __GHOUL___FILESYSTEM___H__
 
-#include <ghoul/designpattern/singleton.h>
 #include <ghoul/filesystem/directory.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
@@ -70,13 +69,11 @@ class File;
  * tokens. Every FileSystem contains one token <code>${TEMPORARY}</code> that points to
  * the location of the system's temporary files.
  */
-class FileSystem : public Singleton<FileSystem> {
+class FileSystem {
 public:
     BooleanType(RawPath);
     BooleanType(Recursive);
     BooleanType(Override);
-
-    friend class Singleton<FileSystem>;
 
     /// Exception that gets thrown if the FileSystem encounters a nonrecoverable error
     struct FileSystemException : RuntimeError {
@@ -107,7 +104,14 @@ public:
     static constexpr const char* TokenClosingBraces = "}";
 
     FileSystem(const FileSystem& rhs) = delete;
+    FileSystem(const FileSystem&&) = delete;
     FileSystem& operator=(const FileSystem& rhs) = delete;
+    FileSystem& operator=(FileSystem&& rhs) = delete;
+
+    static void initialize();
+    static void deinitialize();
+    static bool isInitialized();
+    static FileSystem& ref();
 
     /**
      * Returns the absolute path to the passed \p path, resolving any tokens (if present)
@@ -510,6 +514,8 @@ private:
     /// The list of tracked files
     std::multimap<int, File*> _trackedFiles;
 #endif
+
+    static FileSystem* _instance;
 };
 
 #define FileSys (ghoul::filesystem::FileSystem::ref())

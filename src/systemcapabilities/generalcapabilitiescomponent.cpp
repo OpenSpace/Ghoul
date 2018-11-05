@@ -119,15 +119,15 @@ void GeneralCapabilitiesComponent::detectCapabilities() {
 
 void GeneralCapabilitiesComponent::clearCapabilities() {
     _operatingSystem = OperatingSystem::Unknown;
-    _operatingSystemExtra = "";
-    _fullOperatingSystem = "";
+    _operatingSystemExtra.clear();
+    _fullOperatingSystem.clear();
     _installedMainMemory = 0;
-    _cpu = "";
+    _cpu.clear();
     _cores = 0;
     _cacheLineSize = 0;
     _L2Associativity = 0;
     _cacheSize = 0;
-    _extensions = "";
+    _extensions.clear();
 }
 
 void GeneralCapabilitiesComponent::detectOS() {
@@ -355,7 +355,7 @@ void GeneralCapabilitiesComponent::detectMemory() {
     catch (const WMIError& e) {
         throw MainMemoryError(
             "Error reading physical memory from WMI. " +
-            e.message + " (" + std::to_string(e.errorCode)
+            e.message + " (" + std::to_string(e.errorCode) + ")"
         );
     }
     std::stringstream convert;
@@ -397,63 +397,32 @@ void GeneralCapabilitiesComponent::detectCPU() {
     // @TODO This function needs cleanup ---abock
 #ifdef WIN32
     static const std::vector<std::string> szFeatures = {
-        "fpu",
-        "vme",
-        "de",
-        "pse",
-        "tsc",
-        "msr",
-        "pae",
-        "mce",
-        "cx8",
-        "apic",
-        "Unknown1",
-        "sep",
-        "mtrr",
-        "pge",
-        "mca",
-        "cmov",
-        "pat",
-        "pse36",
-        "psn",
-        "clflush",
-        "Unknown2",
-        "ds",
-        "acpi", //  @TODO: "Thermal Monitor and Clock Ctrl", is this correct?
-        "mmx",
-        "fxsr",
-        "sse",
-        "sse2",
-        "ss",
-        "ht",
-        "tm",
-        "Unknown4",
-        "pbe"
+        "fpu", "vme", "de", "pse", "tsc", "msr", "pae", "mce", "cx8", "apic", "Unknown1",
+        "sep", "mtrr", "pge", "mca", "cmov", "pat", "pse36", "psn", "clflush", "Unknown2",
+        "ds", "acpi", "mmx", "fxsr", "sse", "sse2", "ss", "ht", "tm", "Unknown4", "pbe"
     };
-
-    char CPUString[0x20];
-    char CPUBrandString[0x40];
-    int CPUInfo[4] = { -1 };
-    int nFeatureInfo = 0;
-    unsigned    nIds, nExIds;
-    bool    bSSE3NewInstructions = false;
-    bool    bMONITOR_MWAIT = false;
-    bool    bCPLQualifiedDebugStore = false;
-    bool    bThermalMonitor2 = false;
 
     // __cpuid with an InfoType argument of 0 returns the number of
     // valid Ids in CPUInfo[0] and the CPU identification string in
     // the other three array elements. The CPU identification string is
     // not in linear order. The code below arranges the information
     // in a human readable form.
+    int CPUInfo[4] = { -1 };
     __cpuid(CPUInfo, 0);
-    nIds = CPUInfo[0];
+    unsigned nIds = CPUInfo[0];
+
+    char CPUString[0x20];
     memset(CPUString, 0, sizeof(CPUString));
     *((int*)CPUString) = CPUInfo[1]; // NOLINT
     *((int*)(CPUString + 4)) = CPUInfo[3]; // NOLINT
     *((int*)(CPUString + 8)) = CPUInfo[2]; // NOLINT
 
     // Get the information associated with each valid Id
+    int nFeatureInfo = 0;
+    bool bSSE3NewInstructions = false;
+    bool bMONITOR_MWAIT = false;
+    bool bCPLQualifiedDebugStore = false;
+    bool bThermalMonitor2 = false;
     for (unsigned i = 0; i <= nIds; ++i) {
         __cpuid(CPUInfo, i);
 
@@ -470,7 +439,9 @@ void GeneralCapabilitiesComponent::detectCPU() {
     // Calling __cpuid with 0x80000000 as the InfoType argument
     // gets the number of valid extended IDs.
     __cpuid(CPUInfo, 0x80000000);
-    nExIds = CPUInfo[0];
+    unsigned nExIds = CPUInfo[0];
+
+    char CPUBrandString[0x40];
     memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
     // Get the information associated with each extended ID.
@@ -496,28 +467,23 @@ void GeneralCapabilitiesComponent::detectCPU() {
 
     // Get extensions list
     std::stringstream extensions;
-    if (nFeatureInfo || bSSE3NewInstructions || bMONITOR_MWAIT ||
-        bCPLQualifiedDebugStore || bThermalMonitor2)
-    {
+    if (bSSE3NewInstructions) {
+        extensions << "sse3 ";
+    }
+    if (bMONITOR_MWAIT) {
+        // @TODO:  "MONITOR/MWAIT" is this correct? ---jonasstrandstedt
+        extensions << "mwait ";
+    }
+    if (bCPLQualifiedDebugStore) {
+        extensions << "ds_cpl ";
+    }
+    if (bThermalMonitor2) {
+        extensions << "tm2 ";
+    }
 
-        if (bSSE3NewInstructions) {
-            extensions << "sse3 ";
-        }
-        if (bMONITOR_MWAIT) {
-             // @TODO:  "MONITOR/MWAIT" is this correct? ---jonasstrandstedt
-            extensions << "mwait ";
-        }
-        if (bCPLQualifiedDebugStore) {
-            extensions << "ds_cpl ";
-        }
-        if (bThermalMonitor2) {
-            extensions << "tm2 ";
-        }
-
-        for (size_t i = 0; i < szFeatures.size(); ++i, nIds <<= 1) {
-            if (nFeatureInfo & nIds) {
-                extensions << szFeatures[i] << " ";
-            }
+    for (size_t i = 0; i < szFeatures.size(); ++i, nIds <<= 1) {
+        if (nFeatureInfo & nIds) {
+            extensions << szFeatures[i] << " ";
         }
     }
 

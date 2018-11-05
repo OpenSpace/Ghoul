@@ -142,7 +142,7 @@ void OpenGLCapabilitiesComponent::clearCapabilities() {
     _glVersion = { 0, 0, 0 };
     _glslCompiler.clear();
     _vendor = Vendor::Other;
-    _glRenderer = "";
+    _glRenderer.clear();
     _extensions.clear();
     _glewVersion = { 0, 0, 0 };
 
@@ -151,10 +151,10 @@ void OpenGLCapabilitiesComponent::clearCapabilities() {
     _nTextureUnits = -1;
 
 #ifdef GHOUL_USE_WMI
-    _driverVersion = "";
-    _driverDate = "";
+    _driverVersion.clear();
+    _driverDate.clear();
     _adapterRAM = 0;
-    _adapterName = "";
+    _adapterName.clear();
 #endif
 }
 

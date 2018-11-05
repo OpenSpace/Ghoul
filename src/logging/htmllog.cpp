@@ -64,7 +64,7 @@ HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend,
         );
     }
 
-    output += \
+    output += 
         "\t\t</style>\n\
         \t\t<script>\n\
         " ;
@@ -132,8 +132,7 @@ void HTMLLog::log(LogLevel level, const std::string& category,
         output += "\t\t\t\t<td class=\"log-category\">" + category + "</td>\n";
     }
     if (isLogLevelStamping()) {
-        output += "\t\t\t\t<td class=\"log-level\">" +
-            stringFromLevel(level) + "</td>\n";
+        output += "\t\t\t\t<td class=\"log-level\">" + to_string(level) + "</td>\n";
     }
 
     output += "\t\t\t\t<td class=\"log-message\">";
