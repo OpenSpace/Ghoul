@@ -64,7 +64,7 @@ HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend,
         );
     }
 
-    output += 
+    output +=
         "\t\t</style>\n\
         \t\t<script>\n\
         " ;
