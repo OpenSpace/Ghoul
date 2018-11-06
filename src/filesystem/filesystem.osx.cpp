@@ -28,6 +28,7 @@
 #include <ghoul/filesystem/filesystem.h>
 
 #include <ghoul/filesystem/file.h>
+#include <ghoul/misc/assert.h>
 #include <CoreServices/CoreServices.h>
 
 namespace {
