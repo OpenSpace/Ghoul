@@ -602,7 +602,6 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     ghoul_assert(false, "Missing case label");
                     throw MissingCaseException();
             }
-            break;
         case Format::RG:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:
@@ -674,7 +673,6 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     ghoul_assert(false, "Missing case label");
                     throw MissingCaseException();
             }
-            break;
         case Format::RGB:
             [[fallthrough]];
         case Format::BGR:
@@ -748,7 +746,6 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     ghoul_assert(false, "Missing case label");
                     throw MissingCaseException();
             }
-            break;
         case Format::RGBA:
             [[fallthrough]];
         case Format::BGRA:
@@ -819,7 +816,6 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     ghoul_assert(false, "Missing case label");
                     throw MissingCaseException();
             }
-            break;
         case Format::DepthComponent:
             return vec4(0.f);
         default:
@@ -911,7 +907,6 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                     ghoul_assert(false, "Missing case label");
                     throw MissingCaseException();
             }
-            break;
         case Format::RG:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:
@@ -983,7 +978,6 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                     ghoul_assert(false, "Missing case label");
                     throw MissingCaseException();
             }
-            break;
         case Format::RGB: // Intentional fallthrough
         case Format::BGR:
             switch (_dataType) {
@@ -1056,7 +1050,6 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                     ghoul_assert(false, "Missing case label");
                     throw MissingCaseException();
             }
-            break;
         case Format::RGBA:
             [[fallthrough]];
         case Format::BGRA:
@@ -1127,7 +1120,6 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                     ghoul_assert(false, "Missing case label");
                     throw MissingCaseException();
             }
-            break;
         case Format::DepthComponent:
             return vec4(0.f);
         default:
@@ -1220,7 +1212,6 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                     ghoul_assert(false, "Missing case label");
                     throw MissingCaseException();
             }
-            break;
         case Format::RG:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:
@@ -1292,7 +1283,6 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                     ghoul_assert(false, "Missing case label");
                     throw MissingCaseException();
             }
-            break;
         case Format::RGB:
             [[fallthrough]];
         case Format::BGR:
@@ -1366,7 +1356,6 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                     ghoul_assert(false, "Missing case label");
                     throw MissingCaseException();
             }
-            break;
         case Format::RGBA:
             [[fallthrough]];
         case Format::BGRA:
@@ -1437,7 +1426,6 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                     ghoul_assert(false, "Missing case label");
                     throw MissingCaseException();
             }
-            break;
         case Format::DepthComponent:
             return vec4(0.f);
         default:
