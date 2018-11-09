@@ -151,10 +151,17 @@ void ModelReaderMultiFormat::loadModel(const std::string& filename,
             vTmp.location[1] = meshPtr->mVertices[i].y;
             vTmp.location[2] = meshPtr->mVertices[i].z;
 
-            // Normals
-            vTmp.normal[0] = meshPtr->mNormals[i].x;
-            vTmp.normal[1] = meshPtr->mNormals[i].y;
-            vTmp.normal[2] = meshPtr->mNormals[i].z;
+
+            if (meshPtr->mNormals) {
+                // Normals
+                vTmp.normal[0] = meshPtr->mNormals[i].x;
+                vTmp.normal[1] = meshPtr->mNormals[i].y;
+                vTmp.normal[2] = meshPtr->mNormals[i].z;
+            } else {
+                vTmp.normal[0] = 0;
+                vTmp.normal[1] = 0;
+                vTmp.normal[2] = 0;
+            }
 
             // Texture Coordinates
             if (meshPtr->mTextureCoords[0]) {
