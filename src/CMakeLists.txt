@@ -144,7 +144,10 @@ if (GHOUL_MODULE_SYSTEMCAPABILITIES)
     )
 endif ()
 
-set(GHOUL_HEADER 
+set(GHOUL_HEADER
+    ${PROJECT_SOURCE_DIR}/include/ghoul/fmt.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/ghoul.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/glm.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/event.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/event.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/cachemanager.h

@@ -111,8 +111,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
 }
 
 ShaderObject::ShaderObject(const ShaderObject& cpy)
-    : _id(0)
-    , _type(cpy._type)
+    : _type(cpy._type)
     , _shaderName(cpy._shaderName)
     , _loggerCat(cpy._loggerCat)
     , _onChangeCallback(cpy._onChangeCallback)

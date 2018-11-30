@@ -270,10 +270,10 @@ void ProgramObject::attachObject(std::shared_ptr<ShaderObject> shaderObject) {
     shaderObject->setShaderObjectCallback([this]() { _programIsDirty = true; });
 
     glAttachShader(_id, *shaderObject);
-    _shaderObjects.push_back(shaderObject);
+    _shaderObjects.push_back(std::move(shaderObject));
 }
 
-void ProgramObject::detachObject(std::shared_ptr<ShaderObject> shaderObject) {
+void ProgramObject::detachObject(const std::shared_ptr<ShaderObject>& shaderObject) {
     ghoul_assert(shaderObject, "ShaderObject must not be nullptr");
     auto it = std::find(_shaderObjects.begin(), _shaderObjects.end(), shaderObject);
     ghoul_assert(it != _shaderObjects.end(), "ShaderObject must have been registered");

@@ -238,7 +238,7 @@ namespace ghoul {
 
 template <>
 std::string to_string(
-    const systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem& os);
+    const systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem& value);
 } // namespace ghoul
 
 #define CpuCap (                                                                         \

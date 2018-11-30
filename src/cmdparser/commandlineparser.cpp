@@ -101,8 +101,9 @@ CommandlineParser::~CommandlineParser() {
     _commands.clear();
 }
 
-void CommandlineParser::setAllowUnknownCommands(AllowUnknownCommands allowUnknownCmds) {
-    _allowUnknownCommands = allowUnknownCmds;
+void CommandlineParser::setAllowUnknownCommands(AllowUnknownCommands allowUnknownCommands)
+{
+    _allowUnknownCommands = allowUnknownCommands;
 }
 
 CommandlineParser::AllowUnknownCommands CommandlineParser::allowsUnknownCommands() const {

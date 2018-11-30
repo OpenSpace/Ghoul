@@ -43,10 +43,6 @@ using glm::vec4;
 using glm::compMul;
 using std::numeric_limits;
 
-namespace {
-    std::array<GLenum, 4> DefaultSwizzleMask = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-} // namespace
-
 namespace ghoul::opengl {
 
 #ifdef Debugging_Ghoul_Textures_Indices

@@ -883,6 +883,13 @@ protected:
     void reUploadDataToTexture(void* pixelData);
 
 private:
+    const std::array<GLenum, 4> DefaultSwizzleMask = {
+        GL_RED,
+        GL_GREEN,
+        GL_BLUE,
+        GL_ALPHA
+    };
+
     /**
      * Stores the dimensions of the texture, <code>y</code> and <code>z</code> may be
      * <code>1</code> if the Texture is 1D or 2D
@@ -890,12 +897,12 @@ private:
     glm::uvec3 _dimensions;
     Format _format;
     GLenum _internalFormat;
-    bool _swizzleMaskChanged;
-    std::array<GLenum, 4> _swizzleMask;
+    bool _swizzleMaskChanged = false;
+    std::array<GLenum, 4> _swizzleMask = DefaultSwizzleMask;
     GLenum _dataType;
     FilterMode _filter;
     WrappingModes _wrapping;
-    GLuint _id;
+    GLuint _id = 0;
     GLenum _type;
     GLubyte _bpp;
     int _mipMapLevel = 8;

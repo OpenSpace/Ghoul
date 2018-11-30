@@ -196,7 +196,7 @@ namespace ghoul {
 *        opengl::debug::Source object
 */
 template <>
-opengl::debug::Source from_string(const std::string& source);
+opengl::debug::Source from_string(const std::string& string);
 
 /**
 * Converts a string with a \p type into a opengl::debug::Source object.
@@ -209,7 +209,7 @@ opengl::debug::Source from_string(const std::string& source);
 *        opengl::debug::Type object
 */
 template <>
-opengl::debug::Type from_string(const std::string& type);
+opengl::debug::Type from_string(const std::string& string);
 
 /**
 * Converts a string with a \p severity into a opengl::debug::Severity object.
@@ -221,7 +221,7 @@ opengl::debug::Type from_string(const std::string& type);
 *        opengl::debug::Severity object
 */
 template <>
-opengl::debug::Severity from_string(const std::string& severity);
+opengl::debug::Severity from_string(const std::string& string);
 
 /**
  * Converts the \p source object into its string representation.
@@ -232,7 +232,7 @@ opengl::debug::Severity from_string(const std::string& severity);
  * \return The string representation of the \p source
  */
 template <>
-std::string to_string(const ghoul::opengl::debug::Source& source);
+std::string to_string(const ghoul::opengl::debug::Source& value);
 
 /**
  * Converts the \p type object into its string representation.
@@ -243,7 +243,7 @@ std::string to_string(const ghoul::opengl::debug::Source& source);
  * \return The string representation of the \p type
  */
 template <>
-std::string to_string(const ghoul::opengl::debug::Type& type);
+std::string to_string(const ghoul::opengl::debug::Type& value);
 
 /**
  * Converts the \p severity object into its string representation.
@@ -253,7 +253,7 @@ std::string to_string(const ghoul::opengl::debug::Type& type);
  * \return The string representation of the \p severity
  */
 template <>
-std::string to_string(const ghoul::opengl::debug::Severity& severity);
+std::string to_string(const ghoul::opengl::debug::Severity& value);
 
 } // namespace ghoul
 

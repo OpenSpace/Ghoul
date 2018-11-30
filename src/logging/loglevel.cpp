@@ -30,8 +30,8 @@
 
 namespace ghoul {
 
-std::string to_string(logging::LogLevel level) {
-    switch (level) {
+std::string to_string(logging::LogLevel string) {
+    switch (string) {
         case logging::LogLevel::AllLogging: return "All";
         case logging::LogLevel::Trace:      return "Trace";
         case logging::LogLevel::Debug:      return "Debug";
@@ -45,7 +45,7 @@ std::string to_string(logging::LogLevel level) {
 }
 
 template <>
-logging::LogLevel from_string(const std::string& level) {
+logging::LogLevel from_string(const std::string& string) {
     static const std::map<std::string, logging::LogLevel> levels = {
         { "All"    , logging::LogLevel::AllLogging },
         { "Trace"  , logging::LogLevel::Trace },
@@ -57,7 +57,7 @@ logging::LogLevel from_string(const std::string& level) {
         { "None"   , logging::LogLevel::NoLogging }
     };
 
-    auto it = levels.find(level);
+    auto it = levels.find(string);
     ghoul_assert(it != levels.end(), "Missing entry in 'levels' map");
     return it->second;
 }

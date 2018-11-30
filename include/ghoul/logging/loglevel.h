@@ -82,7 +82,7 @@ namespace ghoul {
 *
 * \return The string representation of the passed LogLevel
 */
-std::string to_string(logging::LogLevel level);
+std::string to_string(logging::LogLevel string);
 
 /**
 * Returns the LogLevel for the passed string representation. The name of
@@ -91,7 +91,7 @@ std::string to_string(logging::LogLevel level);
 * \return The the LogLevel for the passed string representation
 */
 template <>
-logging::LogLevel from_string(const std::string& level);
+logging::LogLevel from_string(const std::string& string);
 
 
 } // namespace

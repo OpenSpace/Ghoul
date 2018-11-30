@@ -154,8 +154,8 @@ opengl::debug::Severity from_string(const std::string& string) {
 }
 
 template <>
-std::string to_string(const ghoul::opengl::debug::Source& source) {
-    switch (source) {
+std::string to_string(const ghoul::opengl::debug::Source& value) {
+    switch (value) {
         case ghoul::opengl::debug::Source::API:             return "API";
         case ghoul::opengl::debug::Source::WindowSystem:    return "Window System";
         case ghoul::opengl::debug::Source::ShaderCompiler:  return "Shader Compiler";
@@ -168,8 +168,8 @@ std::string to_string(const ghoul::opengl::debug::Source& source) {
 }
 
 template <>
-std::string to_string(const ghoul::opengl::debug::Type& type) {
-    switch (type) {
+std::string to_string(const ghoul::opengl::debug::Type& value) {
+    switch (value) {
         case ghoul::opengl::debug::Type::Error:         return "Error";
         case ghoul::opengl::debug::Type::Deprecated:    return "Deprecated";
         case ghoul::opengl::debug::Type::Undefined:     return "Undefined";
@@ -185,8 +185,8 @@ std::string to_string(const ghoul::opengl::debug::Type& type) {
 }
 
 template <>
-std::string to_string(const ghoul::opengl::debug::Severity& severity) {
-    switch (severity) {
+std::string to_string(const ghoul::opengl::debug::Severity& value) {
+    switch (value) {
         case ghoul::opengl::debug::Severity::High:          return "High";
         case ghoul::opengl::debug::Severity::Medium:        return "Medium";
         case ghoul::opengl::debug::Severity::Low:           return "Low";

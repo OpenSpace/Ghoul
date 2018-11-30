@@ -123,7 +123,7 @@ const char* errorLocation(lua_State* state) {
     return result;
 }
 
-int luaError(lua_State* state, std::string message) {
+int luaError(lua_State* state, const std::string& message) {
     ghoul_assert(state, "State must not be empty");
     return luaL_error(state, message.c_str());
 }
@@ -400,7 +400,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected, const char* component) {
             "Expected {} arguments, got {}", expected, nArguments
         );
         LERRORC(component ? component : "Lua", s);
-        return luaError(L, std::move(s));
+        return luaError(L, s);
     }
     return nArguments;
 }

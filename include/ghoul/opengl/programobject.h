@@ -203,7 +203,7 @@ public:
      * \pre \p shaderObject must not be nullptr
      * \pre \p shaderObject must have been registered before
      */
-    void detachObject(std::shared_ptr<ShaderObject> shaderObject);
+    void detachObject(const std::shared_ptr<ShaderObject>& shaderObject);
 
     /**
      * Compiles all the ShaderObject%s that are attached to this ProgramObject.

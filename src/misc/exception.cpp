@@ -37,8 +37,13 @@ RuntimeError::RuntimeError(std::string msg, std::string comp)
     ghoul_assert(!message.empty(), "Message must not be empty");
 }
 
-RuntimeError::~RuntimeError() {}
-
+RuntimeError::~RuntimeError() {
+    // I don't really understand why doing this manually is necessary;  but if the dtor is
+    // not specified explicitly, the automatic cleanup of the two stored strings fails
+    // catastrophically --abock  2018-11-30
+    message.clear();
+    component.clear();
+}
 
 FileNotFoundError::FileNotFoundError(std::string f, std::string comp)
     : RuntimeError("Could not find file '" + f + "'", std::move(comp))

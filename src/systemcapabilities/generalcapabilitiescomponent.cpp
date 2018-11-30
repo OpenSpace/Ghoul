@@ -54,11 +54,11 @@ namespace ghoul {
 
 template <>
 std::string to_string(
-              const systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem& os)
+           const systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem& value)
 {
     using OS =
         ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem;
-    switch (os) {
+    switch (value) {
         case OS::Windows10:                   return "Windows 10";
         case OS::WindowsServer2016:           return "Windows Server 2016";
         case OS::WindowsVista:                return "Windows Vista";

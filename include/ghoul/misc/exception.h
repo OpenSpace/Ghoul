@@ -47,7 +47,7 @@ struct RuntimeError : public std::runtime_error {
      */
     explicit RuntimeError(std::string msg, std::string comp = "");
 
-    ~RuntimeError();
+    virtual ~RuntimeError();
 
     /// The main message describing the exception
     std::string message;

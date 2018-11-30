@@ -87,7 +87,7 @@ BooleanType(PopValue);
  *
  * \pre \p state must not be nullptr
  */
-[[nodiscard]] int luaError(lua_State* state, std::string message);
+[[nodiscard]] int luaError(lua_State* state, const std::string& message);
 
 
 /**
