@@ -104,15 +104,12 @@ namespace {
 
 namespace ghoul::io {
 
+TcpSocketServer::TcpSocketServer() {}
+
 TcpSocketServer::~TcpSocketServer() {
     if (_listening) {
         close();
     }
-}
-
-std::string TcpSocketServer::address() const {
-    std::lock_guard settingsLock(_settingsMutex);
-    return _address;
 }
 
 int TcpSocketServer::port() const {
@@ -132,7 +129,7 @@ void TcpSocketServer::close() {
     _serverThread->join();
 }
 
-void TcpSocketServer::listen(std::string address, int port) {
+void TcpSocketServer::listen(int port) {
     if (_listening) {
         throw TcpSocket::TcpSocketError("Socket is already listening.");
     }
@@ -141,7 +138,6 @@ void TcpSocketServer::listen(std::string address, int port) {
     }
 
     std::lock_guard settingsLock(_settingsMutex);
-    _address = std::move(address);
     _port = port;
 
     struct addrinfo* result = nullptr;

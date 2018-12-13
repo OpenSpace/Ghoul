@@ -41,10 +41,9 @@ public:
     WebSocketServer();
     virtual ~WebSocketServer() = default;
 
-    std::string address() const override;
     int port() const override;
     void close() override;
-    void listen(std::string address, int port) override;
+    void listen(int port) override;
     bool isListening() const override;
     bool hasPendingSockets() const override;
 
