@@ -41,13 +41,12 @@ class TcpSocket;
 
 class TcpSocketServer : public SocketServer {
 public:
-    TcpSocketServer() = default;
+    TcpSocketServer();
     virtual ~TcpSocketServer();
 
-    std::string address() const override;
     int port() const override;
     void close() override;
-    void listen(std::string address, int port) override;
+    void listen(int port) override;
     bool isListening() const override;
 
     bool hasPendingSockets() const override;
@@ -62,7 +61,6 @@ private:
     void waitForConnections();
 
     mutable std::mutex _settingsMutex;
-    std::string _address = "localhost";
     int _port = 0;
     bool _listening = false;
 

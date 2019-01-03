@@ -37,10 +37,9 @@ class SocketServer {
 public:
     virtual ~SocketServer() = default;
 
-    virtual std::string address() const = 0;
     virtual int port() const = 0;
     virtual void close() = 0;
-    virtual void listen(std::string address, int port) = 0;
+    virtual void listen(int port) = 0;
     virtual bool isListening() const = 0;
     virtual bool hasPendingSockets() const = 0;
     // Get next pending connection. Non-blocking. Can return nullptr.

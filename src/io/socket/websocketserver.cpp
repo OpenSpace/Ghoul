@@ -38,10 +38,6 @@ WebSocketServer::WebSocketServer() {
     _server.set_access_channels(websocketpp::log::alevel::app);
 }
 
-std::string WebSocketServer::address() const {
-    return _tcpSocketServer.address();
-}
-
 int WebSocketServer::port() const {
     return _tcpSocketServer.port();
 }
@@ -50,8 +46,8 @@ void WebSocketServer::close() {
     return _tcpSocketServer.close();
 }
 
-void WebSocketServer::listen(std::string address, int port) {
-    return _tcpSocketServer.listen(std::move(address), port);
+void WebSocketServer::listen(int port) {
+    return _tcpSocketServer.listen(port);
 }
 
 bool WebSocketServer::isListening() const {
