@@ -526,7 +526,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                          const glm::vec3& orthonormalUp,
                                                          const glm::dvec3& cameraPos,
                                                          const glm::dvec3& cameraLookUp,
-                                                         int renderType) const
+                                                         int renderType,
+                                                         const glm::vec2 &offset) const
 {
     float h = font.height();
 
@@ -537,13 +538,13 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     std::vector<GLfloat> vertices;
     //glm::vec3 movingPos = pos;
     // TODO(abock): review y starting position
-    glm::vec2 movingPos(0.f);
+    glm::vec2 movingPos(offset);
 
     glm::vec2 size = glm::vec2(0.f);
     float heightInPixels = 0.f;
 
     for (const std::string& line : lines) {
-        movingPos.x = 0.f;
+        //movingPos.x = 0.f;
         //movingPos.x = pos.x;
         float width = 0.f;
         float height = 0.f;
@@ -759,7 +760,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec3& orthonormalUp,
                                                           const glm::dvec3& cameraPos,
                                                           const glm::dvec3& cameraLookUp,
-                                                          int renderType) const
+                                                          int renderType,
+                                                          const glm::vec2 &offset) const
 {
     return render(
         font,
@@ -775,7 +777,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         orthonormalUp,
         cameraPos,
         cameraLookUp,
-        renderType
+        renderType,
+        offset
     );
 }
 

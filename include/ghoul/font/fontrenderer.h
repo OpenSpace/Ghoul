@@ -238,6 +238,7 @@ public:
      *        text's plane.
      * \param orthonormalUp Up vector from the orthonormal basis defining the
      *        text's plane.
+     * \param offset Moves the label in xy position of the text's plane
      * \return The bounding box of the text and the number of lines that were printed
      */
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
@@ -245,7 +246,7 @@ public:
         float textScale, int textMinSize, int textMaxSize, const glm::dmat4& mvpMatrix,
         const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
         const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
-        int renderType) const;
+        int renderType, const glm::vec2 &offset = glm::vec2(0.0f, 0.0f)) const;
 
     /**
     * Renders the provided \p text to the coordinates \p pos using the \p font in the
@@ -267,13 +268,14 @@ public:
     *        text's plane.
     * \param orthonormalUp Up vector from the orthonormal basis defining the
     *        text's plane.
+    * \param offset Moves the label in xy position of the text's plane
     * \return The bounding box of the text and the number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
         const std::string& text, const glm::vec4& color, float textScale, int textMinSize,
         int textMaxSize, const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
         const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
-        const glm::dvec3& cameraLookUp, int renderType) const;
+        const glm::dvec3& cameraLookUp, int renderType, const glm::vec2 &offset = glm::vec2(0.0f, 0.0f)) const;
 
     /**
     * Renders the provided \p text to the coordinates \p pos using the \p font in white
