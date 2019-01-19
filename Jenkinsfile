@@ -18,7 +18,7 @@ stage('Build') {
         node('windows') {
             timeout(time: 45, unit: 'MINUTES') {
                 // We specify the workspace directory manually to reduce the path length and thus try to avoid MSB3491 on Visual Studio
-                ws("C:/J/G/${env.BRANCH_NAME}") {
+                ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}") {
                     deleteDir()
                     checkout scm
                     bat '''
