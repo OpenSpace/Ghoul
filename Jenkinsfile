@@ -47,7 +47,6 @@ stage('Build') {
                       mkdir ${srcDir}/build
                     fi
                 '''
-                dir()
                 dir("build") {
                     sh '/Applications/CMake.app/Contents/bin/cmake -G "Xcode" ..'
                     sh 'xcodebuild -quiet'
