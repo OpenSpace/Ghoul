@@ -5,7 +5,7 @@ stage('Build') {
                 deleteDir()
                 checkout scm
                 sh 'git submodule update --init --recursive'
-                sh 'mkdir -p build; ch build'
+                sh 'mkdir -p build; cd build'
                 sh 'cmake ..'
                 sh 'make -j4'
             }
@@ -19,7 +19,8 @@ stage('Build') {
                     deleteDir()
                     checkout scm
                     bat 'git submodule update --init --recursive'
-                    bat 'if not exist "build" mkdir "build"; cd build'
+                    bat 'mkdir build 2> NUL & cd build'
+                    // bat 'if not exist "build" mkdir "build" cd build'
                     bat 'cmake -G "Visual Studio 15 2017 Win64" .. '
                     bat 'msbuild.exe Ghoul.sln /nologo /verbosity:minimal /m:2 /p:Configuration=Debug'
                 }
