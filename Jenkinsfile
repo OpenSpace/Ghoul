@@ -36,20 +36,10 @@ stage('Build') {
                 deleteDir()
                 checkout scm
                 sh 'git submodule update --init --recursive'
-                sh '''
-                    mkdir -p build
-                    export PATH=${PATH}:/usr/local/bin:/Applications/CMake.app/Contents/bin
-                    srcDir=$PWD
-                    if [ ! -d ${srcDir} ]; then
-                      mkdir ${srcDir}
-                    fi
-                    if [ ! -d ${srcDir}/build ]; then
-                      mkdir ${srcDir}/build
-                    fi
-                '''
+                sh 'mkdir -p build'
                 dir("build") {
                     sh '/Applications/CMake.app/Contents/bin/cmake -G "Xcode" ..'
-                    sh 'xcodebuild -quiet'
+                    sh 'xcodebuild'
                 }
             }
         }
