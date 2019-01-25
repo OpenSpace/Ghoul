@@ -6,7 +6,10 @@ stage('Build') {
                 checkout scm
                 sh 'git submodule update --init --recursive'
                 sh 'mkdir -p build'
-                cmakeBuild buildDir: 'build', generator: 'Unix Makefiles', installation: 'InSearchPath', steps: [[withCmake: true]]
+                dir("build") {
+                    cmake arguments: '.. -G Unix Makefiles'
+                    sh 'make -j4'
+                }
             }
         }
     },
@@ -19,11 +22,10 @@ stage('Build') {
                     checkout scm
                     bat 'git submodule update --init --recursive'
                     bat 'mkdir build 2> NUL'
-                    cmakeBuild buildDir: 'build', buildType: 'Debug', generator: 'Visual Studio 15 2017 Win64', installation: 'InSearchPath', steps: [[args: '/nologo /verbosity:minimal /m:2', withCmake: true]]
-                    // dir("build") {
-                    //     bat 'cmake -G "" .. '
-                    //     bat 'msbuild.exe Ghoul.sln /nologo /verbosity:minimal /m:2 /p:Configuration=Debug'
-                    // }
+                    dir ('build') {
+                        cmake arguments: '.. -G Visual Studio 15 2017 Win64'
+                        bat 'msbuild.exe Ghoul.sln /nologo /verbosity:minimal /m:2 /p:Configuration=Debug'
+                    }
                 }
             }
         }
@@ -45,11 +47,10 @@ stage('Build') {
                       mkdir ${srcDir}/build
                     fi
                 '''
-                cmakeBuild buildDir: 'build', generator: 'Xcode', installation: 'InSearchPath', steps: [[args: '-quiet', withCmake: true]]
-                // dir("build") {
-                //     sh '/Applications/CMake.app/Contents/bin/cmake -G Xcode ..'
-                //     sh 'xcodebuild -quiet'
-                // }
+                dir("build") {
+                    cmake arguments: '.. -G Xcode'
+                    sh 'xcodebuild -quiet'
+                }
             }
         }
     }
