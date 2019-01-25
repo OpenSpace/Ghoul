@@ -6,7 +6,7 @@ stage('Build') {
                 checkout scm
                 sh 'git submodule update --init --recursive'
                 sh 'mkdir -p build'
-                dir(build) {
+                dir("build") {
                     cmake(arguments: '..')
                     cmakeBuild()
                     // sh 'cmake ..'
@@ -24,7 +24,7 @@ stage('Build') {
                     checkout scm
                     bat 'git submodule update --init --recursive'
                     bat 'mkdir build 2> NUL'
-                    dir(build) {
+                    dir("build") {
                         bat 'cmake -G "Visual Studio 15 2017 Win64" .. '
                         bat 'msbuild.exe Ghoul.sln /nologo /verbosity:minimal /m:2 /p:Configuration=Debug'
                     }
@@ -49,7 +49,7 @@ stage('Build') {
                       mkdir ${srcDir}/build
                     fi
                 '''
-                dir(build) {
+                dir("build") {
                     sh '/Applications/CMake.app/Contents/bin/cmake -G Xcode ..'
                     sh 'xcodebuild -quiet'
                 }
