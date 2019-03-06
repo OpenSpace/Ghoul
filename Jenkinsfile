@@ -11,7 +11,7 @@ parallel linux: {
                 sh 'cmake .. -G "Unix Makefiles"'
             }
             stage('Build') {
-                timeout(30) {
+                timeout(time: 30, unit: 'MINUTES') {
                     sh 'make -j4'
                 }
             }
@@ -33,7 +33,7 @@ windows: {
                     bat 'cmake .. -G "Visual Studio 15 2017 Win64"'
                 }
                 stage('Build') {
-                    timeout(30) {
+                    timeout(time: 30, unit: 'MINUTES') {
                         bat 'msbuild.exe Ghoul.sln /nologo /verbosity:minimal /m:2 /p:Configuration=Debug'
                     }
                 }
@@ -52,10 +52,9 @@ osx: {
         dir("build") {
             stage('CMake') {
                 sh '/Applications/CMake.app/Contents/bin/cmake -G "Xcode" ..'
-
             }
             stage('Build') {
-                timeout(30) {
+                timeout(time: 30, unit: 'MINUTES') {
                     sh 'xcodebuild -quiet'
                 }
             }
