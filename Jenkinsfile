@@ -60,6 +60,10 @@ windows: {
 },
 osx: {
   node('osx') {
+    environment {
+      PATH = '/Applications/CMake.app/Contents/bin:$PATH'
+    }
+
     stage('SCM') {
       deleteDir()
       checkout scm
@@ -70,7 +74,7 @@ osx: {
         cmakeBuild([
           generator: 'Xcode',
           buildDir: 'build',
-          installation: '/Applications/CMake.app/Contents/bin/cmake'
+          installation: 'InSearchPath'
         ])
 
         // cmakeBuild(generator: "Xcode", buildDir: "build", withCMake: true)
