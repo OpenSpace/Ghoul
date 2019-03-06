@@ -12,9 +12,9 @@ parallel linux: {
       // }
       stage('Build') {
         cmakeBuild([
-          generator: "Unix Makefiles",
-          buildDir: "build",
-          installation: 'cmake'
+          generator: 'Unix Makefiles',
+          buildDir: 'build',
+          installation: 'InSearchPath'
         ])
       }
 
@@ -37,9 +37,9 @@ windows: {
       }
       stage('Build') {
         cmakeBuild([
-          generator: "Visual Studio 15 2017 Win64",
-          buildDir: "build",
-          installation: 'cmake'
+          generator: 'Visual Studio 15 2017 Win64',
+          buildDir: 'build',
+          installation: 'InSearchPath'
         ])
         // cmakeBuild(generator: "Visual Studio 15 2017 Win64", buildDir: "build", withCMake: true)
       }
@@ -68,9 +68,9 @@ osx: {
 
       stage('Build') {
         cmakeBuild([
-          generator: "Xcode",
-          buildDir: "build",
-          installation: 'cmake'
+          generator: 'Xcode',
+          buildDir: 'build',
+          installation: 'InSearchPath'
         ])
 
         // cmakeBuild(generator: "Xcode", buildDir: "build", withCMake: true)
