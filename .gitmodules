@@ -24,4 +24,4 @@ url=http://git.sv.nongnu.org/r/freetype/freetype2.git
 	url = https://github.com/zaphoyd/websocketpp.git
 [submodule "ext/tiny-process-library"]
 	path = ext/tiny-process-library
-	url = https://gitlab.com/eidheim/tiny-process-library.git
+	url = https://github.com/OpenSpace/tiny-process-library.git
