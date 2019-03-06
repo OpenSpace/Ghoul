@@ -14,12 +14,12 @@ parallel linux: {
         cmakeBuild(generator: "Unix Makefiles", buildDir: "build", withCMake: true)
       }
 
-/*      stage('Build') {
-        timeout(time: 30, unit: 'MINUTES') {
-          sh 'make -j4'
-        }
-      }
-// */    }
+    //   stage('Build') {
+    //     timeout(time: 30, unit: 'MINUTES') {
+    //       sh 'make -j4'
+    //     }
+    //   }
+    // }
   }
 },
 windows: {
@@ -60,7 +60,7 @@ osx: {
       stage('Build') {
         cmakeBuild(generator: "Xcode", buildDir: "build", withCMake: true)
       }
-    
+
     // sh 'mkdir -p build'
     // dir("build") {
       // stage('CMake') {
