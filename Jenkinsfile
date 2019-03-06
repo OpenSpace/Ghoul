@@ -70,7 +70,7 @@ osx: {
         cmakeBuild([
           generator: 'Xcode',
           buildDir: 'build',
-          installation: 'InSearchPath'
+          installation: '/Applications/CMake.app/Contents/bin/cmake'
         ])
 
         // cmakeBuild(generator: "Xcode", buildDir: "build", withCMake: true)
