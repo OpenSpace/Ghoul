@@ -11,7 +11,11 @@ parallel linux: {
       //   sh 'cmake .. -G "Unix Makefiles"'
       // }
       stage('Build') {
-        cmakeBuild(generator: "Unix Makefiles", buildDir: "build", withCMake: true)
+        cmakeBuild([
+          generator: "Unix Makefiles",
+          buildDir: "build",
+          installation: 'cmake'
+        ])
       }
 
     //   stage('Build') {
@@ -32,7 +36,12 @@ windows: {
         bat 'git submodule update --init --recursive'
       }
       stage('Build') {
-        cmakeBuild(generator: "Visual Studio 15 2017 Win64", buildDir: "build", withCMake: true)
+        cmakeBuild([
+          generator: "Visual Studio 15 2017 Win64",
+          buildDir: "build",
+          installation: 'cmake'
+        ])
+        // cmakeBuild(generator: "Visual Studio 15 2017 Win64", buildDir: "build", withCMake: true)
       }
       // bat 'mkdir build 2> NUL'
       // dir ('build') {
@@ -58,7 +67,13 @@ osx: {
     }
 
       stage('Build') {
-        cmakeBuild(generator: "Xcode", buildDir: "build", withCMake: true)
+        cmakeBuild([
+          generator: "Xcode",
+          buildDir: "build",
+          installation: 'cmake'
+        ])
+
+        // cmakeBuild(generator: "Xcode", buildDir: "build", withCMake: true)
       }
 
     // sh 'mkdir -p build'
