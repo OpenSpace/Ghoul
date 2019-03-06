@@ -60,10 +60,6 @@ windows: {
 },
 osx: {
   node('osx') {
-    environment {
-      PATH = '/Applications/CMake.app/Contents/bin:$PATH'
-    }
-
     stage('SCM') {
       deleteDir()
       checkout scm
