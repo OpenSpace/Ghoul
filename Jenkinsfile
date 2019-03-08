@@ -33,7 +33,7 @@ windows: {
           buildDir: 'build',
           installation: 'InSearchPath',
           steps: [
-            [ args: '-- /nologo /verbosity:minimal /m:2', withCmake: true ]
+            [ args: '-- /nologo /verbosity:minimal /m:4', withCmake: true ]
           ]
         ])
       }
