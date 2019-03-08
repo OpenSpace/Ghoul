@@ -11,8 +11,8 @@ parallel linux: {
         buildDir: 'build',
         installation: 'InSearchPath',
         steps: [
-          [ args: '--target Ghoul -- -j4', withCmake: true, ]
-          // [ args: '-j4 --target GhoulTest', withCmake: true, ]
+          [ args: '--target Ghoul -- -j4', withCmake: true ]
+          // [ args: '-j4 --target GhoulTest', withCmake: true ]
         ]
       ])
     }
@@ -21,7 +21,7 @@ parallel linux: {
 windows: {
   node('windows') {
     // We specify the workspace directory manually to reduce the path length and thus try to avoid MSB3491 on Visual Studio
-    ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}") {
+    ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}/${env.BUILD_ID}") {
       stage('windows/SCM') {
         deleteDir()
         checkout scm
@@ -33,7 +33,7 @@ windows: {
           buildDir: 'build',
           installation: 'InSearchPath',
           steps: [
-            [ args: '-- /nologo /verbosity:minimal /m:2', withCmake: true, ]
+            [ args: '-- /nologo /verbosity:minimal /m:2', withCmake: true ]
           ]
         ])
       }
@@ -54,7 +54,7 @@ osx: {
         buildDir: 'build',
         installation: 'InSearchPath',
         steps: [
-          [ args: '-- -quiet', withCmake: true, ]
+          [ args: '-- -quiet', withCmake: true ]
         ]
       ])
     }
