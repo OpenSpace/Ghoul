@@ -11,8 +11,8 @@ parallel linux: {
         buildDir: 'build',
         installation: 'InSearchPath',
         steps: [
-          [ args: '--target Ghoul', withCmake: true, ],
-          [ args: '--target GhoulTest', withCmake: true, ]
+          [ args: '-j4 --target Ghoul', withCmake: true, ],
+          [ args: '-j4 --target GhoulTest', withCmake: true, ]
         ]
       ])
     }
@@ -33,8 +33,7 @@ windows: {
           buildDir: 'build',
           installation: 'InSearchPath',
           steps: [
-            [ args: '--target Ghoul', withCmake: true, ],
-            [ args: '--target GhoulTest', withCmake: true, ]
+            [ args: 'Ghoul.sln /nologo /verbosity:minimal /m:2', withCmake: true, ]
           ]
         ])
       }
@@ -55,8 +54,7 @@ osx: {
         buildDir: 'build',
         installation: 'InSearchPath',
         steps: [
-          [ args: '--target Ghoul', withCmake: true, ],
-          [ args: '--target GhoulTest', withCmake: true, ]
+          [ args: '-quiet', withCmake: true, ]
         ]
       ])
     }
