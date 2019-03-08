@@ -12,7 +12,7 @@ parallel linux: {
         installation: 'InSearchPath',
         steps: [
           [ args: '--target Ghoul -- -j4', withCmake: true ]
-          // [ args: '-j4 --target GhoulTest', withCmake: true ]
+          // [ args: '--target Ghoul --target GhoulTest -- -j4', withCmake: true ]
         ]
       ])
     }
@@ -54,8 +54,7 @@ osx: {
         buildDir: 'build',
         installation: 'InSearchPath',
         steps: [
-          [ args: '-- -quiet -parallelizeTargets -jobs 4 -target Ghoul', withCmake: true ],
-          [ args: '-- -quiet -parallelizeTargets -jobs 4 -target GhoulTest', withCmake: true ]
+          [ args: '-- -parallelizeTargets -jobs 4 -target Ghoul -target GhoulTest', withCmake: true ],
         ]
       ])
     }
