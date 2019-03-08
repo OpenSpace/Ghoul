@@ -33,8 +33,8 @@ windows: {
           buildDir: 'build',
           installation: 'InSearchPath',
           steps: [
-            [ args: '-- /nologo /verbosity:minimal /m:2 /target:Ghoul', withCmake: true ],
-            [ args: '-- /nologo /verbosity:minimal /m:2 /target:"Unit Tests"\\GhoulTest', withCmake: true ]
+            [ args: 'Ghoul.sln -- /nologo /verbosity:minimal /m:2 /target:Ghoul', withCmake: true ],
+            [ args: 'Ghoul.sln -- /nologo /verbosity:minimal /m:2 /target:"Unit Tests"\\GhoulTest', withCmake: true ]
           ]
         ])
       }
