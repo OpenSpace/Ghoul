@@ -5,21 +5,10 @@ parallel linux: {
       checkout scm
       sh 'git submodule update --init --recursive'
     }
-    stage('linux/build/native') {
+    stage('linux/Build') {
       cmakeBuild([
         generator: 'Unix Makefiles',
-        buildDir: 'build-make',
-        installation: 'InSearchPath',
-        steps: [
-          [ args: '--target Ghoul -- -j4', withCmake: true, ]
-          // [ args: '-j4 --target GhoulTest', withCmake: true, ]
-        ]
-      ])
-    }
-    stage('linux/build/ninja') {
-      cmakeBuild([
-        generator: 'Ninja',
-        buildDir: 'build-ninja',
+        buildDir: 'build',
         installation: 'InSearchPath',
         steps: [
           [ args: '--target Ghoul -- -j4', withCmake: true, ]
@@ -38,27 +27,16 @@ windows: {
         checkout scm
         bat 'git submodule update --init --recursive'
       }
-      stage('windows/build/native') {
+      stage('windows/Build') {
         cmakeBuild([
           generator: 'Visual Studio 15 2017 Win64',
-          buildDir: 'build-vs',
+          buildDir: 'build',
           installation: 'InSearchPath',
           steps: [
             [ args: '-- /nologo /verbosity:minimal /m:2', withCmake: true, ]
           ]
         ])
       }
-    stage('windows/build/ninja') {
-      cmakeBuild([
-        generator: 'Ninja',
-        buildDir: 'build-ninja',
-        installation: 'InSearchPath',
-        steps: [
-          [ args: '--target Ghoul -- -j4', withCmake: true, ]
-          // [ args: '-j4 --target GhoulTest', withCmake: true, ]
-        ]
-      ])
-    }
     }
   } // node('windows')
 },
@@ -70,10 +48,10 @@ osx: {
       sh 'git submodule update --init --recursive'
     }
 
-    stage('osx/build/native') {
+    stage('osx/Build') {
       cmakeBuild([
         generator: 'Xcode',
-        buildDir: 'build-xcode',
+        buildDir: 'build',
         installation: 'InSearchPath',
         steps: [
           [ args: '-- -quiet', withCmake: true, ]
