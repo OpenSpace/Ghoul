@@ -9,7 +9,11 @@ parallel linux: {
       cmakeBuild([
         generator: 'Unix Makefiles',
         buildDir: 'build',
-        installation: 'InSearchPath'
+        installation: 'InSearchPath',
+        steps: [
+          [ args: '--target Ghoul', withCmake: true, ]
+          [ args: '--target GhoulTest', withCmake: true, ]
+        ]
       ])
     }
   } // node('linux')
@@ -27,7 +31,11 @@ windows: {
         cmakeBuild([
           generator: 'Visual Studio 15 2017 Win64',
           buildDir: 'build',
-          installation: 'InSearchPath'
+          installation: 'InSearchPath',
+          steps: [
+            [ args: '--target Ghoul', withCmake: true, ]
+            [ args: '--target GhoulTest', withCmake: true, ]
+          ]
         ])
       }
     }
@@ -45,7 +53,11 @@ osx: {
       cmakeBuild([
         generator: 'Xcode',
         buildDir: 'build',
-        installation: 'InSearchPath'
+        installation: 'InSearchPath',
+        steps: [
+          [ args: '--target Ghoul', withCmake: true, ]
+          [ args: '--target GhoulTest', withCmake: true, ]
+        ]
       ])
     }
   } // node('osx')
