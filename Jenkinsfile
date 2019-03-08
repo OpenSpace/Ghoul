@@ -33,7 +33,8 @@ windows: {
           buildDir: 'build',
           installation: 'InSearchPath',
           steps: [
-            [ args: '-- /nologo /verbosity:minimal /m:2', withCmake: true ]
+            [ args: '-- /nologo /verbosity:minimal /m:2 /target:Ghoul', withCmake: true ],
+            [ args: '-- /nologo /verbosity:minimal /m:2 /target:"Unit Tests"\\GhoulTest', withCmake: true ]
           ]
         ])
       }
@@ -54,7 +55,8 @@ osx: {
         buildDir: 'build',
         installation: 'InSearchPath',
         steps: [
-          [ args: '-- -quiet', withCmake: true ]
+          [ args: '-- -quiet -parallelizeTargets -jobs 4 -target Ghoul', withCmake: true ],
+          [ args: '-- -quiet -parallelizeTargets -jobs 4 -target GhoulTest', withCmake: true ]
         ]
       ])
     }
