@@ -11,8 +11,8 @@ parallel linux: {
         buildDir: 'build',
         installation: 'InSearchPath',
         steps: [
-          [ args: '--target Ghoul -- -j4', withCmake: true ]
-          // [ args: '--target Ghoul --target GhoulTest -- -j4', withCmake: true ]
+          [ args: '--target Ghoul -- -j4', withCmake: true ],
+          [ args: '--target GhoulTest -- -j4', withCmake: true ]
         ]
       ])
     }
