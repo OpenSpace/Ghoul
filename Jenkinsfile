@@ -41,7 +41,7 @@ windows: {
         ])
       }
       stage('windows/test') {
-        bat 'build/GhoulTest --gtest_output=xml:test_results.xml'
+        bat 'build\\Debug\\GhoulTest --gtest_output=xml:test_results.xml'
         junit([testResults: 'test_results.xml'])
       }
     }
@@ -65,7 +65,7 @@ osx: {
       ])
     }
     stage('osx/test') {
-      sh 'build/GhoulTest --gtest_output=xml:test_results.xml'
+      sh 'build/Debug/GhoulTest --gtest_output=xml:test_results.xml'
       junit([testResults: 'test_results.xml'])
     }
   } // node('osx')
