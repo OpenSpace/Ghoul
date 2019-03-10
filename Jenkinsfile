@@ -11,7 +11,6 @@ parallel linux: {
         buildDir: 'build',
         installation: 'InSearchPath',
         steps: [
-          [ args: '--target Ghoul -- -j4', withCmake: true ],
           [ args: '--target GhoulTest -- -j4', withCmake: true ]
         ]
       ])
@@ -41,6 +40,10 @@ windows: {
           ]
         ])
       }
+      stage('windows/test') {
+        bat 'build/GhoulTest --gtest_output=xml:test_results.xml'
+        junit([testResults: 'test_results.xml'])
+      }
     }
   } // node('windows')
 },
@@ -51,7 +54,6 @@ osx: {
       checkout scm
       sh 'git submodule update --init --recursive'
     }
-
     stage('osx/Build') {
       cmakeBuild([
         generator: 'Xcode',
@@ -61,6 +63,10 @@ osx: {
           [ args: '-- -parallelizeTargets -jobs 4 -target Ghoul -target GhoulTest', withCmake: true ],
         ]
       ])
+    }
+    stage('osx/test') {
+      sh 'build/GhoulTest --gtest_output=xml:test_results.xml'
+      junit([testResults: 'test_results.xml'])
     }
   } // node('osx')
 }
