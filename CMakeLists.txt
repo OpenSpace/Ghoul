@@ -420,6 +420,8 @@ if (GHOUL_HAVE_TESTS)
 
     target_link_libraries(GhoulTest gtest Ghoul Lua)
 
+    ghl_copy_shared_libraries(GhoulTest ${GHOUL_ROOT_DIR})
+
     if (APPLE)
         target_link_libraries(GhoulTest
             ${CARBON_LIBRARY}
