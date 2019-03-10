@@ -17,7 +17,7 @@ parallel linux: {
       ])
     }
     stage('linux/test') {
-      sh './GhoulTest > test_results.xml'
+      sh 'build/GhoulTest > test_results.xml'
       junit 'test_results.xml'
     }
   } // node('linux')
