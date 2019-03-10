@@ -11,10 +11,13 @@ parallel linux: {
         buildDir: 'build',
         installation: 'InSearchPath',
         steps: [
-          [ args: '--target Ghoul -- -j4', withCmake: true ]
-          // [ args: '--target Ghoul --target GhoulTest -- -j4', withCmake: true ]
+          [ args: '--target GhoulTest -- -j4', withCmake: true ]
         ]
       ])
+    }
+    stage('linux/test') {
+      sh 'build/GhoulTest --gtest_output=xml:test_results.xml'
+      junit([testResults: 'test_results.xml'])
     }
   } // node('linux')
 },
@@ -37,6 +40,11 @@ windows: {
           ]
         ])
       }
+      // Currently, the unit tests are failing on Windows
+      // stage('windows/test') {
+      //   bat 'build\\Debug\\GhoulTest --gtest_output=xml:test_results.xml'
+      //   junit([testResults: 'test_results.xml'])
+      // }
     }
   } // node('windows')
 },
@@ -47,7 +55,6 @@ osx: {
       checkout scm
       sh 'git submodule update --init --recursive'
     }
-
     stage('osx/Build') {
       cmakeBuild([
         generator: 'Xcode',
@@ -58,5 +65,10 @@ osx: {
         ]
       ])
     }
+    // Currently, the unit tests are crashing on OS X
+    // stage('osx/test') {
+    //   sh 'build/Debug/GhoulTest --gtest_output=xml:test_results.xml'
+    //   junit([testResults: 'test_results.xml'])
+    // }
   } // node('osx')
 }

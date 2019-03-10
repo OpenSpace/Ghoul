@@ -33,6 +33,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_CMAKE_DIR})
 
 include(${GHOUL_CMAKE_DIR}/handle_external_library.cmake)
 include(${GHOUL_CMAKE_DIR}/set_ghoul_compile_settings.cmake)
+include(${GHOUL_CMAKE_DIR}/copy_shared_libraries.cmake)
 include(${GHOUL_CMAKE_DIR}/message_macros.cmake)
 include(${GHOUL_CMAKE_DIR}/include_gtest.cmake)
 
@@ -419,6 +420,8 @@ if (GHOUL_HAVE_TESTS)
     include_gtest("${GHOUL_ROOT_DIR}/ext/googletest")
 
     target_link_libraries(GhoulTest gtest Ghoul Lua)
+
+    ghl_copy_shared_libraries(GhoulTest ${GHOUL_ROOT_DIR})
 
     if (APPLE)
         target_link_libraries(GhoulTest
