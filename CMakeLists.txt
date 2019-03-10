@@ -33,6 +33,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_CMAKE_DIR})
 
 include(${GHOUL_CMAKE_DIR}/handle_external_library.cmake)
 include(${GHOUL_CMAKE_DIR}/set_ghoul_compile_settings.cmake)
+include(${GHOUL_CMAKE_DIR}/ghl_copy_shared_libraries.cmake)
 include(${GHOUL_CMAKE_DIR}/message_macros.cmake)
 include(${GHOUL_CMAKE_DIR}/include_gtest.cmake)
 
