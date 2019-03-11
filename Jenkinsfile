@@ -8,7 +8,7 @@ parallel linux: {
     stage('linux/Build') {
       cmake([
         installation: 'InSearchPath',
-        arguments: '-G Unix Makefiles',
+        arguments: '-G "Unix Makefiles"',
         workingDir: 'build'
       ])
       cmakeBuild([
@@ -37,7 +37,7 @@ windows: {
       stage('windows/Build') {
         cmake([
           installation: 'InSearchPath',
-          arguments: '-G Visual Studio 15 2017 Win64',
+          arguments: '-G "Visual Studio 15 2017 Win64"',
           workingDir: 'build'
         ])
         cmakeBuild([
