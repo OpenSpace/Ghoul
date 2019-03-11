@@ -6,10 +6,14 @@ parallel linux: {
       sh 'git submodule update --init --recursive'
     }
     stage('linux/Build') {
-      cmakeBuild([
-        generator: 'Unix Makefiles',
-        buildDir: 'build',
+      cmake([
         installation: 'InSearchPath',
+        arguments: '-G Unix Makefiles',
+        workingDir: 'build'
+      ])
+      cmakeBuild([
+        installation: 'InSearchPath',
+        buildDir: 'build',
         steps: [
           [ args: '--target GhoulTest -- -j4', withCmake: true ]
         ]
@@ -31,10 +35,14 @@ windows: {
         bat 'git submodule update --init --recursive'
       }
       stage('windows/Build') {
-        cmakeBuild([
-          generator: 'Visual Studio 15 2017 Win64',
-          buildDir: 'build',
+        cmake([
           installation: 'InSearchPath',
+          arguments: '-G Visual Studio 15 2017 Win64',
+          workingDir: 'build'
+        ])
+        cmakeBuild([
+          installation: 'InSearchPath',
+          buildDir: 'build',
           steps: [
             [ args: '-- /nologo /verbosity:minimal /m:4', withCmake: true ]
           ]
@@ -56,10 +64,14 @@ osx: {
       sh 'git submodule update --init --recursive'
     }
     stage('osx/Build') {
-      cmakeBuild([
-        generator: 'Xcode',
-        buildDir: 'build',
+      cmake([
         installation: 'InSearchPath',
+        arguments: '-G Xcode',
+        workingDir: 'build'
+      ])
+      cmakeBuild([
+        installation: 'InSearchPath',
+        buildDir: 'build',
         steps: [
           [ args: '-- -parallelizeTargets -jobs 4 -target Ghoul -target GhoulTest', withCmake: true ],
         ]
