@@ -141,7 +141,6 @@ osx: {
   } // node('osx')
 }
 
-currentBuild.result = 'UNSTABLE';
 
 //
 // Post-build actions
