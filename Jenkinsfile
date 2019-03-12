@@ -35,15 +35,15 @@ def runTests(bin) {
 }
 
 def recordCompileIssues(compiler) {
-  if (compiler.toLowerCase() == 'msvc') {
-    recordIssues(tools: [msBuild()])
-  }
-  else if (compiler.toLowerCase() == 'clang') {
-    recordIssues(tools: [clang()])
-  }
-  else if (compiler.toLowerCase() == 'gcc') {
-    recordIssues(tools: [gcc4()])
-  }
+  // if (compiler.toLowerCase() == 'msvc') {
+  //   recordIssues(tools: [msBuild()])
+  // }
+  // else if (compiler.toLowerCase() == 'clang') {
+  //   recordIssues(tools: [clang()])
+  // }
+  // else if (compiler.toLowerCase() == 'gcc') {
+  //   recordIssues(tools: [gcc4()])
+  // }
 }
 
 // Returns a list of the commit messages that led to this build being triggered
@@ -166,6 +166,10 @@ osx: {
 //
 // Post-build actions
 //
+stage('PostBuild/ReportIssues') {
+  recordIssues aggregatingResults: true, tools: [clang(), gcc4(), msBuild()]
+}
+
 stage('Notifications/Slack') {
   def colors = [ 'SUCCESS': 'good', 'UNSTABLE': 'warning', 'FAILURE': 'danger' ];
   def humanReadable = [ 'SUCCESS': 'Success', 'UNSTABLE': 'Unstable', 'FAILURE': 'Failure' ];
