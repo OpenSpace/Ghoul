@@ -110,6 +110,8 @@ currentBuild.result = 'UNSTABLE';
 def changeString() {
   def res = ""
 
+  res += "1: ${currentBuild.changeSets.size()}";
+
   for (int i = 0; i < currentBuild.changeSets.size(); i++) {
     def entries = currentBuild.changeSets[i].items;
     for (int j = 0; j < entries.length; j++) {
@@ -143,7 +145,7 @@ stage('Notifications/Slack') {
     slackSend(
       color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
-      message: "Status improved\n\nProject: ${currentBuild.projectName}\nBranch: ${job}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}\nChanges:\n${changes}"
+      message: "Status improved\n\nBranch: ${job}/${env.BRANCH_NAME}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}\nChanges:\n${changes}"
     )
   // }
 
