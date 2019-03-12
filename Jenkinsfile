@@ -101,6 +101,8 @@ def runTests(bin) {
 //   } // node('osx')
 // }
 
+checkoutGit()
+
 currentBuild.result = 'UNSTABLE';
 
 //
