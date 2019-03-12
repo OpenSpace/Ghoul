@@ -18,14 +18,14 @@ parallel linux: {
           arguments: '-G "Unix Makefiles"',
           workingDir: '..'
         ])
+        cmakeBuild([
+          installation: 'InSearchPath',
+          buildDir: 'build',
+          steps: [
+            [ args: '--target GhoulTest -- -j4', withCmake: true ]
+          ]
+        ])
       }
-      cmakeBuild([
-        installation: 'InSearchPath',
-        buildDir: 'build',
-        steps: [
-          [ args: '--target GhoulTest -- -j4', withCmake: true ]
-        ]
-      ])
     }
     stage('linux/test') {
       sh 'build/GhoulTest --gtest_output=xml:test_results.xml'
@@ -49,14 +49,14 @@ windows: {
             arguments: '-G "Visual Studio 15 2017 Win64"',
             workingDir: '..'
           ])
+          cmakeBuild([
+            installation: 'InSearchPath',
+            // buildDir: 'build',
+            steps: [
+              [ args: '-- /nologo /verbosity:minimal /m:4', withCmake: true ]
+            ]
+          ])
         }
-        cmakeBuild([
-          installation: 'InSearchPath',
-          buildDir: 'build',
-          steps: [
-            [ args: '-- /nologo /verbosity:minimal /m:4', withCmake: true ]
-          ]
-        ])
       }
       // Currently, the unit tests are failing on Windows
       // stage('windows/test') {
@@ -81,14 +81,14 @@ osx: {
           workingDir: '..',
 
         ])
+        cmakeBuild([
+          installation: 'InSearchPath',
+          // buildDir: 'build',
+          steps: [
+            [ args: '-- -parallelizeTargets -jobs 4 -target Ghoul -target GhoulTest', withCmake: true ],
+          ]
+        ])
       }
-      cmakeBuild([
-        installation: 'InSearchPath',
-        buildDir: 'build',
-        steps: [
-          [ args: '-- -parallelizeTargets -jobs 4 -target Ghoul -target GhoulTest', withCmake: true ],
-        ]
-      ])
     }
     // Currently, the unit tests are crashing on OS X
     // stage('osx/test') {
