@@ -1,3 +1,9 @@
+// Map defaultCMakeOptions() {
+//   return [
+
+//   ]
+// }
+
 parallel linux: {
   node('linux') {
     stage('linux/SCM') {
@@ -6,18 +12,20 @@ parallel linux: {
       sh 'git submodule update --init --recursive'
     }
     stage('linux/Build') {
-      cmake([
-        installation: 'InSearchPath',
-        arguments: '-G "Unix Makefiles"',
-        workingDir: 'build'
-      ])
-      cmakeBuild([
-        installation: 'InSearchPath',
-        buildDir: 'build',
-        steps: [
-          [ args: '--target GhoulTest -- -j4', withCmake: true ]
-        ]
-      ])
+      dir('build') {
+        cmake([
+          installation: 'InSearchPath',
+          arguments: '-G "Unix Makefiles"',
+          workingDir: '..'
+        ])
+        cmakeBuild([
+          installation: 'InSearchPath',
+          // buildDir: 'build',
+          steps: [
+            [ args: '--target GhoulTest -- -j4', withCmake: true ]
+          ]
+        ])
+      }
     }
     stage('linux/test') {
       sh 'build/GhoulTest --gtest_output=xml:test_results.xml'
@@ -35,18 +43,20 @@ windows: {
         bat 'git submodule update --init --recursive'
       }
       stage('windows/Build') {
-        cmake([
-          installation: 'InSearchPath',
-          arguments: '-G "Visual Studio 15 2017 Win64"',
-          workingDir: 'build'
-        ])
-        cmakeBuild([
-          installation: 'InSearchPath',
-          buildDir: 'build',
-          steps: [
-            [ args: '-- /nologo /verbosity:minimal /m:4', withCmake: true ]
-          ]
-        ])
+        dir('build') {
+          cmake([
+            installation: 'InSearchPath',
+            arguments: '-G "Visual Studio 15 2017 Win64"',
+            workingDir: '..'
+          ])
+          cmakeBuild([
+            installation: 'InSearchPath',
+            // buildDir: 'build',
+            steps: [
+              [ args: '-- /nologo /verbosity:minimal /m:4', withCmake: true ]
+            ]
+          ])
+        }
       }
       // Currently, the unit tests are failing on Windows
       // stage('windows/test') {
@@ -64,18 +74,21 @@ osx: {
       sh 'git submodule update --init --recursive'
     }
     stage('osx/Build') {
-      cmake([
-        installation: 'InSearchPath',
-        arguments: '-G Xcode',
-        workingDir: 'build'
-      ])
-      cmakeBuild([
-        installation: 'InSearchPath',
-        buildDir: 'build',
-        steps: [
-          [ args: '-- -parallelizeTargets -jobs 4 -target Ghoul -target GhoulTest', withCmake: true ],
-        ]
-      ])
+      dir('build') {
+        cmake([
+          installation: 'InSearchPath',
+          arguments: '-G Xcode',
+          workingDir: '..',
+
+        ])
+        cmakeBuild([
+          installation: 'InSearchPath',
+          // buildDir: 'build',
+          steps: [
+            [ args: '-- -parallelizeTargets -jobs 4 -target Ghoul -target GhoulTest', withCmake: true ],
+          ]
+        ])
+      }
     }
     // Currently, the unit tests are crashing on OS X
     // stage('osx/test') {
