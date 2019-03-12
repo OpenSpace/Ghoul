@@ -114,7 +114,7 @@ def changeString() {
     def entries = currentBuild.changeSets[i].items;
     for (int j = 0; j < entries.length; j++) {
       def entry = entries[j];
-      res += "${new Date(entry.timestamp)} [${entry.author}] (${entry.commitId}): ${entry.msg};
+      res += "${new Date(entry.timestamp)} [${entry.author}] (${entry.commitId}): ${entry.msg}"
     }
   }
 
