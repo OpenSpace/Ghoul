@@ -115,7 +115,7 @@ currentBuild.result = 'UNSTABLE';
 @NonCPS
 def changeString() {
   def authors = [
-    'Alexander Bock': 'alex',
+    'Alexanvder Bock': 'alex',
     'Emil Axelsson': 'emil',
     'Gene Payne': 'gpayne',
     'Jonathas Costa': 'jccosta',
@@ -161,27 +161,41 @@ stage('Notifications/Slack') {
   def better = !currentBuild.resultIsWorseOrEqualTo(currentBuild.previousBuild.currentResult)
 
   def (discard, job) = env.JOB_NAME.tokenize('/');
-
   def changes = changeString();
 
-  // if (better) {
+  def msgBranch = "Branch: ${job}/${env.BRANCH_NAME}";
+  def msgUrl = "URL: ${env.BUILD_URL}";
+  def msgChanges = "Changes: ${changes}";
+
+  if (better) {
+    def msgStatus = "Build status improved (${currentBuild.previousBuild.currentResult} -> ${currentBuild.currentResult})";
+
     slackSend(
       color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
-      message: "Status improved\n\nBranch: ${job}/${env.BRANCH_NAME}\nStatus: ${currentBuild.currentResult}\nURL: ${env.BUILD_URL}\nChanges:\n${changes}"
+      message: "${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
     )
-  // }
+  }
+  else if (worse) {
+    def msgStatus = "Build status worsened (${currentBuild.previousBuild.currentResult} -> ${currentBuild.currentResult})";
+    def msgBuildTime = "Build time: ${currentBuild.duration / 1000}";
 
+    slackSend(
+      color: colors[currentBuild.currentResult],
+      channel: 'Jenkins',
+      message: "${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
+    )
+  }
+  else if (currentBuild.currentResult == 'UNSTABLE' && currentBuild.previousBuild.currentResult == 'UNSTABLE') {
+    def msgStatus = "Build still unstable";
+    def msgBuildTime = "Build time: ${currentBuild.duration / 1000}";
 
-  // if (worse) {
-  //   slackSend(
-  //     color: colors[currentBuild.currentResult],
-  //     channel: 'Jenkins',
-  //     message: "New compile error\n\nProject: ${currentBuild.projectName}\nBranch: ${job}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}\nChanges:\n${changes}"
-  //   )
-  // }
-
-
+    slackSend(
+      color: colors[currentBuild.currentResult],
+      channel: 'Jenkins',
+      message: "${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
+    )
+  }
 }
 // if (!currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult)) {
 //   mail([
