@@ -140,7 +140,7 @@ def changeString() {
       // def author = authors.containsKey(entry.author) ? "${entry.author} (@${authors[entry.author]})" : "${entry.author}";
       def author = "${entry.author}";
       def authorHandle = authors[author];
-      def fullAuthor = authorHandle ? "${author} (@${authorHandle})" : "${author}"';;'
+      def fullAuthor = authorHandle ? "${author} (@${authorHandle})" : "${author}";
       def commit = "${entry.commitId.take(8)}";
       def message = "${entry.msg}";
       res += "${date} [${fullAuthor}] (${commit}): ${message}\n"
