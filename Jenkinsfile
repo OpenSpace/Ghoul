@@ -15,18 +15,13 @@ def build(String compileOptions) {
   ])
 }
 
-// Map defaultCMakeOptions() {
-//   return [
-
-//   ]
-// }
-
 parallel linux: {
   node('linux') {
     stage('linux/SCM') {
       deleteDir()
-      checkout scm
-      sh 'git submodule update --init --recursive'
+      checkout([$class: 'GitSCM', branches: [[name: '${env.BRANCH_NAME}']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: false, recursiveSubmodules: true, reference: '', trackingSubmodules: false]], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/OpenSpace/Ghoul']]])
+      // checkout scm
+      // sh 'git submodule update --init --recursive'
     }
     stage('linux/Build') {
       createDirectory('build')
@@ -47,8 +42,9 @@ windows: {
     ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}/${env.BUILD_ID}") {
       stage('windows/SCM') {
         deleteDir()
-        checkout scm
-        bat 'git submodule update --init --recursive'
+        checkout([$class: 'GitSCM', branches: [[name: '${env.BRANCH_NAME}']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: false, recursiveSubmodules: true, reference: '', trackingSubmodules: false]], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/OpenSpace/Ghoul']]])
+        // checkout scm
+        // bat 'git submodule update --init --recursive'
       }
       stage('windows/Build') {
         createDirectory('build')
@@ -69,8 +65,9 @@ osx: {
   node('osx') {
     stage('osx/SCM') {
       deleteDir()
-      checkout scm
-      sh 'git submodule update --init --recursive'
+      checkout([$class: 'GitSCM', branches: [[name: '${env.BRANCH_NAME}']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: false, recursiveSubmodules: true, reference: '', trackingSubmodules: false]], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/OpenSpace/Ghoul']]])
+      // checkout scm
+      // sh 'git submodule update --init --recursive'
     }
     stage('osx/Build') {
       createDirectory('build')
