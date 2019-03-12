@@ -169,7 +169,7 @@ stage('Notifications/Slack') {
   def (discard, job) = env.JOB_NAME.tokenize('/');
   def changes = changeString();
 
-  def msgHeader = "<h3>${job}</h3>";
+  def msgHeader = "<b>${job}</b>";
   def msgBranch = "Branch: ${job}/${env.BRANCH_NAME}";
   def msgUrl = "URL: ${env.BUILD_URL}";
   def msgChanges = "Changes: ${changes}";
@@ -182,7 +182,7 @@ stage('Notifications/Slack') {
     slackSend(
       color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
-      message: "${msgHeader}\n${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
+      message: "${msgHeader}\n\n${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
     )
   }
   else if (worse) {
@@ -194,7 +194,7 @@ stage('Notifications/Slack') {
     slackSend(
       color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
-      message: "${msgHeader}\n${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
+      message: "${msgHeader}\n\n${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
     )
   }
   else if (currentBuild.currentResult == 'UNSTABLE' && currentBuild.previousBuild.currentResult == 'UNSTABLE') {
@@ -204,7 +204,7 @@ stage('Notifications/Slack') {
     slackSend(
       color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
-      message: "${msgHeader}\n${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
+      message: "${msgHeader}\n\n${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
     )
   }
 }
