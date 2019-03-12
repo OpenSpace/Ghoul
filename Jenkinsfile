@@ -1,5 +1,5 @@
 def createDirectory(String dir) {
-  cmake([installation: 'InSearchPath', arguments: '-E make_directory ${dir}'])
+  cmake([installation: 'InSearchPath', arguments: "-E make_directory ${dir}"])
 }
 
 // Map defaultCMakeOptions() {
