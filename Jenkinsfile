@@ -31,15 +31,19 @@ def runTests(bin) {
   else {
     bat "${bin} --gtest_output=xml:test_results.xml"
   }
-  xunit([
-    JUnit(
-      deleteOutputFiles: true,
-      failIfNotNew: true,
-      pattern: 'test_results.xml',
-      skipNoTestFiles: false,
-      stopProcessingIfError: true
-    )
-  ])
+  junit([testResults: 'test_results.xml'])
+}
+
+def recordIssues(compiler) {
+  if (compiler.toLowerCase() == 'msvc') {
+    recordIssues(tools: [msBuild()])
+  }
+  else if (compiler.toLowerCase() == 'clang') {
+    recordIssues(tools: [clang()])
+  }
+  else if (compiler.toLowerCase() == 'gcc') {
+    recordIssues(tools: [gcc4()])
+  }
 }
 
 // Returns a list of the commit messages that led to this build being triggered
@@ -89,8 +93,8 @@ def changeString() {
 parallel linux: {
   node('linux') {
     stage('linux/SCM') {
-      deleteDir()
-      checkoutGit()
+      deleteDir();
+      checkoutGit();
     }
     stage('linux/Build') {
       cmakeBuild([
@@ -98,10 +102,13 @@ parallel linux: {
         generator: 'Unix Makefiles',
         buildDir: 'build',
         steps: [[args: '-- -j4', withCmake: true]]
-      ])
+      ]);
+    }
+    stage('linux/warnings') {
+      recordIssues('GCC');
     }
     stage('linux/test') {
-      runTests('build/GhoulTest')
+      runTests('build/GhoulTest');
     }
   } // node('linux')
 },
@@ -110,8 +117,8 @@ windows: {
     // We specify the workspace directory manually to reduce the path length and thus try to avoid MSB3491 on Visual Studio
     ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}/${env.BUILD_ID}") {
       stage('windows/SCM') {
-        deleteDir()
-        checkoutGit()
+        deleteDir();
+        checkoutGit();
       }
       stage('windows/Build') {
         cmakeBuild([
@@ -119,7 +126,10 @@ windows: {
           generator: 'Visual Studio 15 2017 Win64',
           buildDir: 'build',
           steps: [[args: '-- /nologo /verbosity:minimal /m:4', withCmake: true]]
-        ])
+        ]);
+      }
+      stage('windows/warnings') {
+        recordIssues('MSVC');
       }
       stage('windows/test') {
         // Currently, the unit tests are failing on Windows
@@ -131,8 +141,8 @@ windows: {
 osx: {
   node('osx') {
     stage('osx/SCM') {
-      deleteDir()
-      checkoutGit()
+      deleteDir();
+      checkoutGit();
     }
     stage('osx/Build') {
       cmakeBuild([
@@ -140,7 +150,10 @@ osx: {
         generator: 'Xcode',
         buildDir: 'build',
         steps: [[args: '-- -parallelizeTargets -jobs 4', withCmake: true]]
-      ])
+      ]);
+    }
+    stage('osx/warnings') {
+      recordIssues('Clang');
     }
     stage('osx/test') {
       // Currently, the unit tests are crashing on OS X
