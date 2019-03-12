@@ -130,7 +130,8 @@ def changeString() {
       def entry = entries[j];
 
       def date = "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")}";
-      def author = authors.containsKey(entry.author) ? "${entry.author} (@${authors[entry.author]})" : "${entry.author}";
+      // def author = authors.containsKey(entry.author) ? "${entry.author} (@${authors[entry.author]})" : "${entry.author}";
+      def author = "${entry.author} (@${authors[entry.author]})";
       def commit = "${entry.commitId.take(8)}";
       def message = "${entry.msg}";
       res += "${date} [${author}] (${commit}): ${message}\n"
