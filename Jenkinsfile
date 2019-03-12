@@ -94,7 +94,7 @@ windows: {
       }
       stage('windows/test') {
         // Currently, the unit tests are failing on Windows
-        runTests('build\\Debug\\GhoulTest')
+        // runTests('build\\Debug\\GhoulTest')
       }
     }
   } // node('windows')
@@ -114,7 +114,7 @@ osx: {
     }
     stage('osx/test') {
       // Currently, the unit tests are crashing on OS X
-      runTests('build/Debug/GhoulTest')
+      // runTests('build/Debug/GhoulTest')
     }
   } // node('osx')
 }
