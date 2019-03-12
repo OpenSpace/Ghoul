@@ -23,26 +23,6 @@ def checkoutGit() {
   ])
 }
 
-// Create the specified directory
-def createDirectory(String dir) {
-  cmake([installation: 'InSearchPath', arguments: "-E make_directory ${dir}"])
-}
-
-// Run the initial CMake for the specified generator
-def runCMake(String generator) {
-  cmake([ installation: 'InSearchPath', arguments: "-G \"${generator}\" .." ])
-}
-
-// Build all targets by calling through the cmakeBuild tool
-def build(String compileOptions) {
-  cmakeBuild([
-    installation: 'InSearchPath',
-    steps: [
-      [ args: "-- ${compileOptions}", withCmake: true ]
-    ]
-  ])
-}
-
 // Runs the provided binary path (GhoulTest) and analyses the results using junit
 def runTests(bin) {
   if (isUnix()) {
@@ -55,13 +35,13 @@ def runTests(bin) {
 }
 
 
-
 mail([
   to: 'alexander.bock@liu.se',
   from: 'jenkins@dev.openspaceproject.com',
-  subject: "Hello there: ${env.JOB_NAME}",
-  body:  "BRANCH_NAME:${env.BRANCH_NAME}\nCHANGE_ID:${env.CHANGE_ID}\nCHANGE_URL:${env.CHANGE_URL}\nCHANGE_TITLE:${env.CHANGE_TITLE}\nCHANGE_AUTHOR:${env.CHANGE_AUTHOR}\nCHANGE_AUTHOR_DISPLAY_NAME:${env.CHANGE_AUTHOR_DISPLAY_NAME}\nCHANGE_AUTHOR_EMAIL:${env.CHANGE_AUTHOR_EMAIL}\nCHANGE_TARGET:${env.CHANGE_TARGET}\nBUILD_NUMBER:${env.BUILD_NUMBER}\nBUILD_ID:${env.BUILD_ID}\nBUILD_DISPLAY_NAME:${env.BUILD_DISPLAY_NAME}\nJOB_NAME:${env.JOB_NAME}\nJOB_BASE_NAME:${env.JOB_BASE_NAME}\nBUILD_TAG:${env.BUILD_TAG}\nEXECUTOR_NUMBER:${env.EXECUTOR_NUMBER}\nNODE_NAME:${env.NODE_NAME}\nNODE_LABELS:${env.NODE_LABELS}\nWORKSPACE:${env.WORKSPACE}\nJENKINS_HOME:${env.JENKINS_HOME}\nJENKINS_URL:${env.JENKINS_URL}\nBUILD_URL:${env.BUILD_URL}\nJOB_URL:${env.JOB_URL}"
+  subject: "Hello there (before): ${env.JOB_NAME}",
+  body:  "BRANCH_NAME:${env.BRANCH_NAME}\nCHANGE_ID:${env.CHANGE_ID}\nCHANGE_URL:${env.CHANGE_URL}\nCHANGE_TITLE:${env.CHANGE_TITLE}\nCHANGE_AUTHOR:${env.CHANGE_AUTHOR}\nCHANGE_AUTHOR_DISPLAY_NAME:${env.CHANGE_AUTHOR_DISPLAY_NAME}\nCHANGE_AUTHOR_EMAIL:${env.CHANGE_AUTHOR_EMAIL}\nCHANGE_TARGET:${env.CHANGE_TARGET}\nBUILD_NUMBER:${env.BUILD_NUMBER}\nBUILD_ID:${env.BUILD_ID}\nBUILD_DISPLAY_NAME:${env.BUILD_DISPLAY_NAME}\nJOB_NAME:${env.JOB_NAME}\nJOB_BASE_NAME:${env.JOB_BASE_NAME}\nBUILD_TAG:${env.BUILD_TAG}\nEXECUTOR_NUMBER:${env.EXECUTOR_NUMBER}\nNODE_NAME:${env.NODE_NAME}\nNODE_LABELS:${env.NODE_LABELS}\nWORKSPACE:${env.WORKSPACE}\nJENKINS_HOME:${env.JENKINS_HOME}\nJENKINS_URL:${env.JENKINS_URL}\nBUILD_URL:${env.BUILD_URL}\nJOB_URL:${env.JOB_URL}GIT_COMMIT:${GIT_COMMIT}\nGIT_PREVIOUS_COMMIT:${GIT_PREVIOUS_COMMIT}\nGIT_PREVIOUS_SUCCESSFUL_COMMIT:${GIT_PREVIOUS_SUCCESSFUL_COMMIT}\nGIT_BRANCH:${GIT_BRANCH}\nGIT_LOCAL_BRANCH:${GIT_LOCAL_BRANCH}\nGIT_URL:${GIT_URL}\nGIT_COMMITTER_NAME:${GIT_COMMITTER_NAME}\nGIT_AUTHOR_NAME:${GIT_AUTHOR_NAME}\nGIT_COMMITTER_EMAIL:${GIT_COMMITTER_EMAIL}\nGIT_AUTHOR_EMAIL:${GIT_AUTHOR_EMAIL}"
 ])
+
 
 //
 // Pipeline start
@@ -79,11 +59,6 @@ parallel linux: {
         buildDir: 'build',
         steps: [[args: '-- -j4', withCmake: true]]
       ])
-      // createDirectory('build')
-      // dir('build') {
-      //   runCMake('Unix Makefiles')
-      //   build('-j4')
-      // }
     }
     stage('linux/test') {
       runTests('build/GhoulTest')
@@ -105,12 +80,6 @@ windows: {
           buildDir: 'build',
           steps: [[args: '-- /nologo /verbosity:minimal /m:4', withCmake: true]]
         ])
-
-        // createDirectory('build')
-        // dir('build') {
-        //   runCMake('Visual Studio 15 2017 Win64')
-        //   build('/nologo /verbosity:minimal /m:4')
-        // }
       }
       stage('windows/test') {
         // Currently, the unit tests are failing on Windows
@@ -132,12 +101,6 @@ osx: {
         buildDir: 'build',
         steps: [[args: '-- -parallelizeTargets -jobs 4', withCmake: true]]
       ])
-
-      // createDirectory('build')
-      // dir('build') {
-      //   runCMake('Xcode')
-      //   build('-parallelizeTargets -jobs 4')
-      // }
     }
     stage('osx/test') {
       // Currently, the unit tests are crashing on OS X
@@ -145,3 +108,10 @@ osx: {
     }
   } // node('osx')
 }
+
+mail([
+  to: 'alexander.bock@liu.se',
+  from: 'jenkins@dev.openspaceproject.com',
+  subject: "Hello there (after): ${env.JOB_NAME}",
+  body:  "BRANCH_NAME:${env.BRANCH_NAME}\nCHANGE_ID:${env.CHANGE_ID}\nCHANGE_URL:${env.CHANGE_URL}\nCHANGE_TITLE:${env.CHANGE_TITLE}\nCHANGE_AUTHOR:${env.CHANGE_AUTHOR}\nCHANGE_AUTHOR_DISPLAY_NAME:${env.CHANGE_AUTHOR_DISPLAY_NAME}\nCHANGE_AUTHOR_EMAIL:${env.CHANGE_AUTHOR_EMAIL}\nCHANGE_TARGET:${env.CHANGE_TARGET}\nBUILD_NUMBER:${env.BUILD_NUMBER}\nBUILD_ID:${env.BUILD_ID}\nBUILD_DISPLAY_NAME:${env.BUILD_DISPLAY_NAME}\nJOB_NAME:${env.JOB_NAME}\nJOB_BASE_NAME:${env.JOB_BASE_NAME}\nBUILD_TAG:${env.BUILD_TAG}\nEXECUTOR_NUMBER:${env.EXECUTOR_NUMBER}\nNODE_NAME:${env.NODE_NAME}\nNODE_LABELS:${env.NODE_LABELS}\nWORKSPACE:${env.WORKSPACE}\nJENKINS_HOME:${env.JENKINS_HOME}\nJENKINS_URL:${env.JENKINS_URL}\nBUILD_URL:${env.BUILD_URL}\nJOB_URL:${env.JOB_URL}GIT_COMMIT:${GIT_COMMIT}\nGIT_PREVIOUS_COMMIT:${GIT_PREVIOUS_COMMIT}\nGIT_PREVIOUS_SUCCESSFUL_COMMIT:${GIT_PREVIOUS_SUCCESSFUL_COMMIT}\nGIT_BRANCH:${GIT_BRANCH}\nGIT_LOCAL_BRANCH:${GIT_LOCAL_BRANCH}\nGIT_URL:${GIT_URL}\nGIT_COMMITTER_NAME:${GIT_COMMITTER_NAME}\nGIT_AUTHOR_NAME:${GIT_AUTHOR_NAME}\nGIT_COMMITTER_EMAIL:${GIT_COMMITTER_EMAIL}\nGIT_AUTHOR_EMAIL:${GIT_AUTHOR_EMAIL}"
+])
