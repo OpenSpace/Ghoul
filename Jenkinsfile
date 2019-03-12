@@ -52,7 +52,7 @@ windows: {
         }
         cmakeBuild([
           installation: 'InSearchPath',
-          // buildDir: 'build',
+          buildDir: 'build',
           steps: [
             [ args: '-- /nologo /verbosity:minimal /m:4', withCmake: true ]
           ]
@@ -84,7 +84,7 @@ osx: {
       }
       cmakeBuild([
         installation: 'InSearchPath',
-        // buildDir: 'build',
+        buildDir: 'build',
         steps: [
           [ args: '-- -parallelizeTargets -jobs 4 -target Ghoul -target GhoulTest', withCmake: true ],
         ]
