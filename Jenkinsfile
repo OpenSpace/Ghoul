@@ -108,16 +108,16 @@ parallel linux: {
       recordCompileIssues('gcc');
     }
     stage('linux/cppcheck') {
-      sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include modules src tests 2> build/cppcheck.xml'
+      sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> cppcheck.xml'
       publishCppcheck(
-        pattern: 'build/cppcheck.xml'
+        pattern: 'cppcheck.xml'
       )
     }
     stage('linux/sloc') {
-      sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=build/cloc.xml --force-lang-def=support/cloc/langDef --quiet .'
+      sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=cloc.xml --force-lang-def=support/cloc/langDef --quiet .'
       sloccountPublish(
         encoding: '',
-        pattern: 'build/cloc.xml'
+        pattern: 'cloc.xml'
       )
     }
     stage('linux/test') {
