@@ -105,22 +105,45 @@ currentBuild.result = 'UNSTABLE';
 
 //
 // Post-build options
-if (!currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult)) {
-  mail([
-    to: 'alexander.bock@liu.se',
-    from: 'jenkins@dev.openspaceproject.com',
-    subject: "Hello there (after): ${env.JOB_NAME}",
-    body:  "not better or equal"
-  ])
+stage('Notifications/Slack') {
+  def colors = ['SUCCESS' : 'good', 'UNSTABLE' : 'warning' , 'FAILURE' : 'danger' ]
+
+  def worse = !currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult)
+  def better = !currentBuild.resultIsWorseOrEqualTo(currentBuild.previousBuild.currentResult)
+
+  if (worse) {
+    slackSend(
+      color: colors[rescurrentBuild.result],
+      channel: 'Jenkins',
+      message: "New compile error\n\nBranch: ${env.BRANCH_NAME}\nStatus: ${build.result}\nJob: ${env.BUILD_URL}"
+    )
+  }
+
+  if (better) {
+    slackSend(
+      color: colors[rescurrentBuild.result],
+      channel: 'Jenkins',
+      message: "Status improved\n\nBranch: ${env.BRANCH_NAME}\nStatus: ${build.result}\nJob: ${env.BUILD_URL}"
+    )
+  }
+
 }
-else {
-  mail([
-    to: 'alexander.bock@liu.se',
-    from: 'jenkins@dev.openspaceproject.com',
-    subject: "Hello there (after): ${env.JOB_NAME}",
-    body:  "better or equal"
-  ])
-}
+// if (!currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult)) {
+//   mail([
+//     to: 'alexander.bock@liu.se',
+//     from: 'jenkins@dev.openspaceproject.com',
+//     subject: "Hello there (after): ${env.JOB_NAME}",
+//     body:  "not better or equal"
+//   ])
+// }
+// else {
+//   mail([
+//     to: 'alexander.bock@liu.se',
+//     from: 'jenkins@dev.openspaceproject.com',
+//     subject: "Hello there (after): ${env.JOB_NAME}",
+//     body:  "better or equal"
+//   ])
+// }
 
 
 
