@@ -108,11 +108,14 @@ def runTests(bin) {
 @NonCPS
 def changeString(build) {
   def res = ""
-  build.changeSets.each { entries ->
-    // entries.each { entry -> res += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} [${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n" }
-    entries.each { entry -> res += "${entry.timestamp} [${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n" }
-  }
-  return res
+  build.changeSets.each { changeSet -> changeSet.each { commit ->  res += "a: ${commit.commitId}" } }
+  return res;
+
+  // build.changeSets.each { entries ->
+  //   // entries.each { entry -> res += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} [${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n" }
+  //   entries.each { entry -> res += "${entry.timestamp} [${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n" }
+  // }
+  // return res
 }
 
 mail([
