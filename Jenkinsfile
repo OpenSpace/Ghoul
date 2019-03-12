@@ -104,36 +104,40 @@ def runTests(bin) {
 
 //
 // Post-build options
-
-@NonCPS
-def changeString(build) {
-  def res = "a"
-  build.changeSets.each { changeSet -> changeSet.each { commit ->  res += "a: ${commit.commitId}" } }
-  return res;
-
-  // build.changeSets.each { entries ->
-  //   // entries.each { entry -> res += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} [${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n" }
-  //   entries.each { entry -> res += "${entry.timestamp} [${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n" }
-  // }
-  // return res
+if (!currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult)) {
+  mail([
+    to: 'alexander.bock@liu.se',
+    from: 'jenkins@dev.openspaceproject.com',
+    subject: "Hello there (after): ${env.JOB_NAME}",
+    body:  "not better or equal"
+  ])
+}
+else {
+  mail([
+    to: 'alexander.bock@liu.se',
+    from: 'jenkins@dev.openspaceproject.com',
+    subject: "Hello there (after): ${env.JOB_NAME}",
+    body:  "better or equal"
+  ])
 }
 
-@NonCPS
-def getChangeString(build) {
-    def MAX_MSG_LEN = 100
-    def changeString = ""
-    build.changeSets.each {entries -> 
-        entries.each { entry -> 
-            changeString += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} "
-            changeString += "[${entry.commitId.take(8)}] ${entry.author}: ${entry.msg.take(MAX_MSG_LEN)}\n"
-        }
-    }
-    return changeString ?: " - No new changes"
-}
 
-mail([
-  to: 'alexander.bock@liu.se',
-  from: 'jenkins@dev.openspaceproject.com',
-  subject: "Hello there (after): ${env.JOB_NAME}",
-  body:  getChangeString(currentBuild)
-])
+
+// @NonCPS
+// def changeString(build) {
+//     def changeString = ""
+//     build.changeSets.each {entries -> 
+//         entries.each { entry -> 
+//             changeString += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} "
+//             changeString += "[${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n"
+//         }
+//     }
+//     return changeString ?: " - No new changes"
+// }
+
+// mail([
+//   to: 'alexander.bock@liu.se',
+//   from: 'jenkins@dev.openspaceproject.com',
+//   subject: "Hello there (after): ${env.JOB_NAME}",
+//   body:  changeString(currentBuild)
+// ])
