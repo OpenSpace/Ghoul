@@ -70,7 +70,7 @@ parallel linux: {
         installation: 'InSearchPath',
         generator: 'Unix Makefiles',
         buildDir: 'build',
-        steps: [[args: '-j4', withCmake: true]]
+        steps: [[args: '-- -j4', withCmake: true]]
       ])
       // createDirectory('build')
       // dir('build') {
@@ -96,7 +96,7 @@ windows: {
           installation: 'InSearchPath',
           generator: 'Visual Studio 15 2017 Win64',
           buildDir: 'build',
-          steps: [[args: '/nologo /verbosity:minimal /m:4', withCmake: true]]
+          steps: [[args: '-- /nologo /verbosity:minimal /m:4', withCmake: true]]
         ])
 
         // createDirectory('build')
@@ -123,7 +123,7 @@ osx: {
         installation: 'InSearchPath',
         generator: 'Xcode',
         buildDir: 'build',
-        steps: [[args: '-parallelizeTargets -jobs 4', withCmake: true]]
+        steps: [[args: '-- -parallelizeTargets -jobs 4', withCmake: true]]
       ])
 
       // createDirectory('build')
