@@ -31,7 +31,15 @@ def runTests(bin) {
   else {
     bat "${bin} --gtest_output=xml:test_results.xml"
   }
-  junit([testResults: 'test_results.xml'])
+  xunit([
+    JUnit(
+      deleteOutputFiles: true,
+      failIfNotNew: true,
+      pattern: 'test_results.xml',
+      skipNoTestFiles: false,
+      stopProcessingIfError: true
+    )
+  ])
 }
 
 // Returns a list of the commit messages that led to this build being triggered
