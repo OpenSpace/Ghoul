@@ -101,7 +101,7 @@ def runTests(bin) {
 //   } // node('osx')
 // }
 
-currentBuild.result = 'FAILURE';
+currentBuild.result = 'UNSTABLE';
 
 //
 // Post-build options
