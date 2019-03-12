@@ -116,13 +116,11 @@ currentBuild.result = 'UNSTABLE';
 def changeString() {
   def res = ""
 
-  res += "1: ${currentBuild.changeSets.size()}";
-
   for (int i = 0; i < currentBuild.changeSets.size(); i++) {
     def entries = currentBuild.changeSets[i].items;
     for (int j = 0; j < entries.length; j++) {
       def entry = entries[j];
-      res += "${new Date(entry.timestamp)} [${entry.author}] (${entry.commitId}): ${entry.msg}"
+      res += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} [${entry.author}] (${entry.commitId.take(8)}): ${entry.msg}"
     }
   }
 
