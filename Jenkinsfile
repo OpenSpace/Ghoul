@@ -45,7 +45,12 @@ def build(String compileOptions) {
 
 // Runs the provided binary path (GhoulTest) and analyses the results using junit
 def runTests(bin) {
-  sh "${bin} --gtest_output=xml:test_results.xml"
+  if (isUnix()) {
+    sh "${bin} --gtest_output=xml:test_results.xml"
+  }
+  else {
+    bat "${bin} --gtest_output=xml:test_results.xml"
+  }
   junit([testResults: 'test_results.xml'])
 }
 
