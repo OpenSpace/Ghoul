@@ -1,3 +1,8 @@
+// Header
+
+// Checks out Ghoul from Git with recursive submodules
+// unfortunately, as of now (2019-03-12), there is no good way of specifying recursive
+// submodules directly to the git Jenkins plugin
 def checkoutGit() {
   checkout([
     $class: 'GitSCM',
@@ -18,14 +23,17 @@ def checkoutGit() {
   ])
 }
 
+// Create the specified directory
 def createDirectory(String dir) {
   cmake([installation: 'InSearchPath', arguments: "-E make_directory ${dir}"])
 }
 
+// Run the initial CMake for the specified generator
 def runCMake(String generator) {
   cmake([ installation: 'InSearchPath', arguments: "-G \"${generator}\" .." ])
 }
 
+// Build all targets by calling through the cmakeBuild tool
 def build(String compileOptions) {
   cmakeBuild([
     installation: 'InSearchPath',
@@ -35,6 +43,17 @@ def build(String compileOptions) {
   ])
 }
 
+// Runs the provided binary path (GhoulTest) and analyses the results using junit
+def runTests(bin) {
+  sh "${bin} --gtest_output=xml:test_results.xml"
+  junit([testResults: 'test_results.xml'])
+}
+
+
+
+//
+// Pipeline start
+//
 parallel linux: {
   node('linux') {
     stage('linux/SCM') {
@@ -49,8 +68,7 @@ parallel linux: {
       }
     }
     stage('linux/test') {
-      sh 'build/GhoulTest --gtest_output=xml:test_results.xml'
-      junit([testResults: 'test_results.xml'])
+      runTests('build/GhoulTest')
     }
   } // node('linux')
 },
@@ -69,11 +87,10 @@ windows: {
           build('/nologo /verbosity:minimal /m:4')
         }
       }
-      // Currently, the unit tests are failing on Windows
-      // stage('windows/test') {
-      //   bat 'build\\Debug\\GhoulTest --gtest_output=xml:test_results.xml'
-      //   junit([testResults: 'test_results.xml'])
-      // }
+      stage('windows/test') {
+        // Currently, the unit tests are failing on Windows
+        runTests('build\\Debug\\GhoulTest')
+      }
     }
   } // node('windows')
 },
@@ -90,10 +107,9 @@ osx: {
         build('-parallelizeTargets -jobs 4')
       }
     }
-    // Currently, the unit tests are crashing on OS X
-    // stage('osx/test') {
-    //   sh 'build/Debug/GhoulTest --gtest_output=xml:test_results.xml'
-    //   junit([testResults: 'test_results.xml'])
-    // }
+    stage('osx/test') {
+      // Currently, the unit tests are crashing on OS X
+      runTests('build/Debug/GhoulTest')
+    }
   } // node('osx')
 }
