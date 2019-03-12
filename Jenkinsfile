@@ -107,7 +107,7 @@ node('linux') {
     checkoutGit()
   }
 }
-currentBuild.result = 'UNSTABLE';
+currentBuild.result = 'SUCCESS';
 
 //
 // Post-build options
