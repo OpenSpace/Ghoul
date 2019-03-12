@@ -107,7 +107,7 @@ node('linux') {
     checkoutGit()
   }
 }
-currentBuild.result = 'UNSTABLE';
+currentBuild.result = 'FAILURE';
 
 //
 // Post-build options
@@ -155,7 +155,13 @@ stage('Notifications/Slack') {
     'SUCCESS': 'good',
     'UNSTABLE': 'warning',
     'FAILURE': 'danger'
-  ]
+  ];
+
+  def humanReadable = [
+    'SUCCESS': 'Success',
+    'UNSTABLE': 'Unstable',
+    'FAILURE': 'Failure'
+  ];
 
   def worse = !currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult)
   def better = !currentBuild.resultIsWorseOrEqualTo(currentBuild.previousBuild.currentResult)
@@ -168,7 +174,9 @@ stage('Notifications/Slack') {
   def msgChanges = "Changes: ${changes}";
 
   if (better) {
-    def msgStatus = "Build status improved (${currentBuild.previousBuild.currentResult} -> ${currentBuild.currentResult})";
+    def msgStatusPrev = humanReadable[currentBuild.previousBuild.currentResult];
+    def msgStatusCurr = humanReadable[currentBuild.currentResult];
+    def msgStatus = "Build status improved (${msgStatusPrev} -> ${msgStatusCurr})";
 
     slackSend(
       color: colors[currentBuild.currentResult],
@@ -177,7 +185,9 @@ stage('Notifications/Slack') {
     )
   }
   else if (worse) {
-    def msgStatus = "Build status worsened (${currentBuild.previousBuild.currentResult} -> ${currentBuild.currentResult})";
+    def msgStatusPrev = humanReadable[currentBuild.previousBuild.currentResult];
+    def msgStatusCurr = humanReadable[currentBuild.currentResult];
+    def msgStatus = "Build status worsened (${msgStatusPrev} -> ${msgStatusCurr})";
     def msgBuildTime = "Build time: ${currentBuild.duration / 1000}";
 
     slackSend(
