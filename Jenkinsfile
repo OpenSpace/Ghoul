@@ -122,7 +122,7 @@ def changeString(build) {
 def getChangeString(build) {
     def MAX_MSG_LEN = 100
     def changeString = ""
-    build.rawBuild.changeSets.each {entries -> 
+    build.changeSets.each {entries -> 
         entries.each { entry -> 
             changeString += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} "
             changeString += "[${entry.commitId.take(8)}] ${entry.author}: ${entry.msg.take(MAX_MSG_LEN)}\n"
