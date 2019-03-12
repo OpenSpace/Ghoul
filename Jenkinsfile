@@ -101,31 +101,50 @@ def runTests(bin) {
 //   } // node('osx')
 // }
 
-// currentBuild.result = 'UNSTABLE';
+currentBuild.result = 'UNSTABLE';
 
 //
 // Post-build options
+
+@NonCPS
+def changeString() {
+  def res = ""
+  currentBuild.changeSets.each {entries -> 
+    entries.each { entry -> 
+      res += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} "
+      res += "[${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n"
+    }
+  }
+  return res ?: " - No new changes"
+}
+
 stage('Notifications/Slack') {
   def colors = ['SUCCESS' : 'good', 'UNSTABLE' : 'warning' , 'FAILURE' : 'danger' ]
 
   def worse = !currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult)
   def better = !currentBuild.resultIsWorseOrEqualTo(currentBuild.previousBuild.currentResult)
 
-  if (worse) {
-    slackSend(
-      color: colors[currentBuild.currentResult],
-      channel: 'Jenkins',
-      message: "New compile error\n\nBranch: ${env.BRANCH_NAME}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}"
-    )
-  }
+  def (discard, job) = env.JOB_NAME.tokenize('/');
+
+  def changes = changeString();
 
   if (better) {
     slackSend(
       color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
-      message: "Status improved\n\nBranch: ${env.BRANCH_NAME}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}"
+      message: "Status improved\n\nBranch: ${job}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}\nChanges:\n${changes}"
     )
   }
+
+
+  if (worse) {
+    slackSend(
+      color: colors[currentBuild.currentResult],
+      channel: 'Jenkins',
+      message: "New compile error\n\nBranch: ${job}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}\nChanges:\n${changes}"
+    )
+  }
+
 
 }
 // if (!currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult)) {
@@ -147,17 +166,7 @@ stage('Notifications/Slack') {
 
 
 
-// @NonCPS
-// def changeString(build) {
-//     def changeString = ""
-//     build.changeSets.each {entries -> 
-//         entries.each { entry -> 
-//             changeString += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} "
-//             changeString += "[${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n"
-//         }
-//     }
-//     return changeString ?: " - No new changes"
-// }
+
 
 // mail([
 //   to: 'alexander.bock@liu.se',
