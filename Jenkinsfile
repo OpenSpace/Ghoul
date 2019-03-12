@@ -107,7 +107,7 @@ def runTests(bin) {
 
 @NonCPS
 def changeString(build) {
-  def res = ""
+  def res = "a"
   build.changeSets.each { changeSet -> changeSet.each { commit ->  res += "a: ${commit.commitId}" } }
   return res;
 
