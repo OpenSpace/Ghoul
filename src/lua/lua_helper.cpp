@@ -43,6 +43,16 @@ constexpr const int ValueTableIndex = -1;
 
 std::string luaTableToString(lua_State* state, int tableLocation);
 
+int luaAbsoluteLocation(lua_State* state, int relativeLocation) {
+    if (relativeLocation >= 0) {
+        return relativeLocation;
+    }
+    // Negative indices implies indexing the stack from top.
+    // -1 is the topmost item. +1 is the first item.
+    int nItems = lua_gettop(state);
+    return nItems + relativeLocation + 1;
+}
+
 std::string luaValueToString(lua_State* state, int location) {
     ghoul_assert(state, "State must not be nullptr");
 
@@ -243,13 +253,51 @@ void loadDictionaryFromString(const std::string& script, Dictionary& dictionary,
     lua_settop(state, 0);
 }
 
+void loadArrayDictionaryFromString(const std::string& script, Dictionary& dictionary,
+                                                                         lua_State* state)
+{
+    ghoul_assert(!script.empty(), "Script must not be empty");
+
+    if (!state) {
+        state = staticLuaState();
+    }
+
+    // Clear the stack. This should not be necessary, but if the stack was left unclean,
+    // we want to avoid previous values to leak into the dictionary.
+    lua_settop(state, 0);
+
+    const int loadStatus = luaL_loadstring(state, script.c_str());
+    if (loadStatus != LUA_OK) {
+        throw LuaLoadingException(lua_tostring(state, -1));
+    }
+
+    const int callStatus = lua_pcall(state, 0, LUA_MULTRET, 0);
+    if (callStatus != LUA_OK) {
+        throw LuaExecutionException(lua_tostring(state, -1));
+    }
+
+    luaArrayDictionaryFromState(state, dictionary);
+
+    // Clean up after ourselves by cleaning the stack
+    lua_settop(state, 0);
+}
+
+
 Dictionary loadDictionaryFromString(const std::string& script, lua_State* state) {
     Dictionary result;
     loadDictionaryFromString(script, result, state);
     return result;
 }
 
-void luaDictionaryFromState(lua_State* state, Dictionary& dictionary) {
+Dictionary loadArrayDictionaryFromString(const std::string& script, lua_State* state) {
+    Dictionary result;
+    loadArrayDictionaryFromString(script, result, state);
+    return result;
+}
+
+void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
+                                                                     int relativeLocation)
+{
     enum class TableType {
         Undefined = 1,  // 001
         Map = 3,        // 010
@@ -260,8 +308,10 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary) {
 
     TableType type = TableType::Undefined;
 
+    int location = luaAbsoluteLocation(state, relativeLocation);
+
     lua_pushnil(state);
-    while (lua_next(state, KeyTableIndex) != 0) {
+    while (lua_next(state, location) != 0) {
         // get the key
         std::string key;
         const int keyType = lua_type(state, KeyTableIndex);
@@ -323,6 +373,36 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary) {
     //            crashes --- abock(2018-02-15)
     //            Affected: navigationhandler_lua.inl::setCameraState
     //ghoul_assert(lua_gettop(state) == 0, "Incorrect number of items left on stack");
+}
+
+void luaArrayDictionaryFromState(lua_State* state, Dictionary& dictionary) {
+    const int nValues = lua_gettop(state);
+
+    for (int i = 1; i <= nValues; ++i) {
+        switch (lua_type(state, i)) {
+        case LUA_TNUMBER: {
+            double value = lua_tonumber(state, i);
+            dictionary.setValue(std::to_string(i), value);
+        } break;
+        case LUA_TBOOLEAN: {
+            bool value = (lua_toboolean(state, i) == 1);
+            dictionary.setValue(std::to_string(i), value);
+        } break;
+        case LUA_TSTRING: {
+            std::string value = lua_tostring(state, i);
+            dictionary.setValue(std::to_string(i), value);
+        } break;
+        case LUA_TTABLE: {
+            Dictionary d;
+            luaDictionaryFromState(state, d, i);
+            dictionary.setValue(std::to_string(i), d);
+        } break;
+        default:
+            throw LuaFormatException(
+                "Unknown type: " + std::to_string(lua_type(state, i))
+            );
+        }
+    }
 }
 
 std::string luaTypeToString(int type) {

@@ -195,6 +195,29 @@ void loadDictionaryFromString(const std::string& script, ghoul::Dictionary& dict
     lua_State* state = nullptr);
 
 /**
+ * Loads a Lua state into the given #ghoul::Dictionary%, extending the passed in
+ * dictionary with numeric keys based on the stack indices. This method will overwrite
+ * values with the same keys, but will not remove any other keys from the dictionary.
+ * The script contained in the string may return mulitple values which will be included
+ * into the #ghoul::Dictionary.
+ *
+ * \param script The source code of the script that is executed
+ * \param dictionary The #ghoul::Dictionary into which the values from the script are
+ *        added
+ * \param state If this is set to a valid lua_State, this state is used instead of
+ *        creating a new state. It is the callers responsibility to ensure that the passed
+ *        state is valid. After calling this method, the stack of the passed state will be
+ *        empty.
+ *
+ * \throw FormattingException If the script did not return something that could not be
+ * turned into a dictionary, such as a function or userdata.
+ * \pre \p script must not be empty
+ * \post \p state%'s stack is empty
+ */
+void loadArrayDictionaryFromString(const std::string& script,
+    ghoul::Dictionary& dictionary, lua_State* state = nullptr);
+
+/**
  * Loads a Lua script and returns it as a #ghoul::Dictionary%. The script contained in the
  * string must return a single table, which is then parsed. The single restriction on the
  * script is that it can only contain a pure array-style table (= onl indexed by numbers)
@@ -217,6 +240,27 @@ ghoul::Dictionary loadDictionaryFromString(const std::string& script,
     lua_State* state = nullptr);
 
 /**
+ * Loads a Lua state and returns it as a #ghoul::Dictionary%, extending the passed in
+ * dictionary with numeric keys based on the stack indices. The script contained in the
+ * string may return mulitple values which will be included into the #ghoul::Dictionary.
+ *
+ * \param script The source code of the script that is executed
+ * \param dictionary The #ghoul::Dictionary into which the values from the script are
+ *        added
+ * \param state If this is set to a valid lua_State, this state is used instead of
+ *        creating a new state. It is the callers responsibility to ensure that the passed
+ *        state is valid. After calling this method, the stack of the passed state will be
+ *        empty.
+ *
+ * \throw FormattingException If the script did not return something that could not be
+ * turned into a dictionary, such as a function or userdata.
+ * \pre \p script must not be empty
+ * \post \p state%'s stack is empty
+ */
+ghoul::Dictionary loadArrayDictionaryFromString(const std::string& script,
+    lua_State* state = nullptr);
+
+/**
  * Uses the Lua \p state to populate the provided ghoul::Dictionary%, extending the passed
  * \p dictionary. This method will overwrite values with the same keys, but will not
  * remove any other keys from the dictionary. The \p state must have a single table object
@@ -226,13 +270,31 @@ ghoul::Dictionary loadDictionaryFromString(const std::string& script,
  * \param state The Lua state that is used to populate the \p dictionary
  * \param dictionary The #ghoul::Dictionary into which the values from the stack are
  *        added
+ * \param location The stack index of the item to extract. Defaults to -1 (topmost item).
  *
  * \throw LuaFormatException If the \p dictionary contains mixed keys of both type
  *        <code>string</code> and type <code>number</code>
  * \pre \p state must not be nullptr
  * \post \p state%'s stack is unchanged
  */
-void luaDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary);
+void luaDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary,
+    int location = -1);
+
+/**
+ * Uses the Lua \p state to populate the provided ghoul::Dictionary%, extending the passed
+ * \p dictionary with numeric keys based on the values indices on the stack. This method
+ * will overwrite values with the same keys, but will not remove any other keys from the
+ * dictionary. The \p state may have multiple items on the stack.
+  *
+ * \param state The Lua state that is used to populate the \p dictionary
+ * \param dictionary The #ghoul::Dictionary into which the values from the stack are
+ *        added
+ *
+ * \pre \p state must not be nullptr
+ * \post \p state%'s stack is unchanged
+ */
+void luaArrayDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary);
+
 
 /**
  * Converts the Lua type to a human-readable string. The supported types are:
