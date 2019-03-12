@@ -104,20 +104,20 @@ osx: {
 
 @NonCPS
 def getChangeString(build) {
-    def MAX_MSG_LEN = 100
-    def changeString = ""
-    build.rawBuild.changeSets.each {entries -> 
-        entries.each { entry -> 
-            changeString += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} "
-            changeString += "[${entry.commitId.take(8)}] ${entry.author}: ${entry.msg.take(MAX_MSG_LEN)}\n"
-        }
-    }
-    return changeString ?: " - No new changes"
+  def MAX_MSG_LEN = 100
+  def changeString = ""
+  build.rawBuild.changeSets.each {entries -> 
+      entries.each { entry -> 
+          changeString += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} "
+          changeString += "[${entry.commitId.take(8)}] ${entry.author}: ${entry.msg.take(MAX_MSG_LEN)}\n"
+      }
+  }
+  return changeString ?: " - No new changes"
 }
 
 mail([
   to: 'alexander.bock@liu.se',
   from: 'jenkins@dev.openspaceproject.com',
   subject: "Hello there (after): ${env.JOB_NAME}",
-  body:  "BRANCH_NAME:${env.BRANCH_NAME}\nCHANGE_ID:${env.CHANGE_ID}\nCHANGE_URL:${env.CHANGE_URL}\nCHANGE_TITLE:${env.CHANGE_TITLE}\nCHANGE_AUTHOR:${env.CHANGE_AUTHOR}\nCHANGE_AUTHOR_DISPLAY_NAME:${env.CHANGE_AUTHOR_DISPLAY_NAME}\nCHANGE_AUTHOR_EMAIL:${env.CHANGE_AUTHOR_EMAIL}\nCHANGE_TARGET:${env.CHANGE_TARGET}\nBUILD_NUMBER:${env.BUILD_NUMBER}\nBUILD_ID:${env.BUILD_ID}\nBUILD_DISPLAY_NAME:${env.BUILD_DISPLAY_NAME}\nJOB_NAME:${env.JOB_NAME}\nJOB_BASE_NAME:${env.JOB_BASE_NAME}\nBUILD_TAG:${env.BUILD_TAG}\nEXECUTOR_NUMBER:${env.EXECUTOR_NUMBER}\nNODE_NAME:${env.NODE_NAME}\nNODE_LABELS:${env.NODE_LABELS}\nWORKSPACE:${env.WORKSPACE}\nJENKINS_HOME:${env.JENKINS_HOME}\nJENKINS_URL:${env.JENKINS_URL}\nBUILD_URL:${env.BUILD_URL}\nJOB_URL:${env.JOB_URL}GIT_COMMIT:${env.GIT_COMMIT}\nGIT_PREVIOUS_COMMIT:${env.GIT_PREVIOUS_COMMIT}\nGIT_PREVIOUS_SUCCESSFUL_COMMIT:${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}\nGIT_BRANCH:${env.GIT_BRANCH}\nGIT_LOCAL_BRANCH:${env.GIT_LOCAL_BRANCH}\nGIT_URL:${env.GIT_URL}\nGIT_COMMITTER_NAME:${env.GIT_COMMITTER_NAME}\nGIT_AUTHOR_NAME:${env.GIT_AUTHOR_NAME}\nGIT_COMMITTER_EMAIL:${env.GIT_COMMITTER_EMAIL}\nGIT_AUTHOR_EMAIL:${env.GIT_AUTHOR_EMAIL}\n\n" + getChangeString(build)
+  body:  "BRANCH_NAME:${env.BRANCH_NAME}\nCHANGE_ID:${env.CHANGE_ID}\nCHANGE_URL:${env.CHANGE_URL}\nCHANGE_TITLE:${env.CHANGE_TITLE}\nCHANGE_AUTHOR:${env.CHANGE_AUTHOR}\nCHANGE_AUTHOR_DISPLAY_NAME:${env.CHANGE_AUTHOR_DISPLAY_NAME}\nCHANGE_AUTHOR_EMAIL:${env.CHANGE_AUTHOR_EMAIL}\nCHANGE_TARGET:${env.CHANGE_TARGET}\nBUILD_NUMBER:${env.BUILD_NUMBER}\nBUILD_ID:${env.BUILD_ID}\nBUILD_DISPLAY_NAME:${env.BUILD_DISPLAY_NAME}\nJOB_NAME:${env.JOB_NAME}\nJOB_BASE_NAME:${env.JOB_BASE_NAME}\nBUILD_TAG:${env.BUILD_TAG}\nEXECUTOR_NUMBER:${env.EXECUTOR_NUMBER}\nNODE_NAME:${env.NODE_NAME}\nNODE_LABELS:${env.NODE_LABELS}\nWORKSPACE:${env.WORKSPACE}\nJENKINS_HOME:${env.JENKINS_HOME}\nJENKINS_URL:${env.JENKINS_URL}\nBUILD_URL:${env.BUILD_URL}\nJOB_URL:${env.JOB_URL}GIT_COMMIT:${env.GIT_COMMIT}\nGIT_PREVIOUS_COMMIT:${env.GIT_PREVIOUS_COMMIT}\nGIT_PREVIOUS_SUCCESSFUL_COMMIT:${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}\nGIT_BRANCH:${env.GIT_BRANCH}\nGIT_LOCAL_BRANCH:${env.GIT_LOCAL_BRANCH}\nGIT_URL:${env.GIT_URL}\nGIT_COMMITTER_NAME:${env.GIT_COMMITTER_NAME}\nGIT_AUTHOR_NAME:${env.GIT_AUTHOR_NAME}\nGIT_COMMITTER_EMAIL:${env.GIT_COMMITTER_EMAIL}\nGIT_AUTHOR_EMAIL:${env.GIT_AUTHOR_EMAIL}\n\n" + getChangeString(currentBuild)
 ])
