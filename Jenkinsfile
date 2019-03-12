@@ -107,7 +107,7 @@ node('linux') {
     checkoutGit()
   }
 }
-currentBuild.result = 'SUCCESS';
+currentBuild.result = 'UNSTABLE';
 
 //
 // Post-build options
@@ -115,7 +115,7 @@ currentBuild.result = 'SUCCESS';
 @NonCPS
 def changeString() {
   def authors = [
-    'Alexanvder Bock': 'alex',
+    'Alexander Bock': 'alex',
     'Emil Axelsson': 'emil',
     'Gene Payne': 'gpayne',
     'Jonathas Costa': 'jccosta',
