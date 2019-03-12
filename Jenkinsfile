@@ -35,15 +35,15 @@ def runTests(bin) {
 }
 
 def recordCompileIssues(compiler) {
-  // if (compiler.toLowerCase() == 'msvc') {
-  //   recordIssues(tools: [msBuild()])
-  // }
-  // else if (compiler.toLowerCase() == 'clang') {
-  //   recordIssues(tools: [clang()])
-  // }
-  // else if (compiler.toLowerCase() == 'gcc') {
-  //   recordIssues(tools: [gcc4()])
-  // }
+  if (compiler.toLowerCase() == 'msvc') {
+    recordIssues(tools: [msBuild()])
+  }
+  else if (compiler.toLowerCase() == 'clang') {
+    recordIssues(tools: [clang()])
+  }
+  else if (compiler.toLowerCase() == 'gcc') {
+    recordIssues(tools: [gcc4()])
+  }
 }
 
 // Returns a list of the commit messages that led to this build being triggered
@@ -107,6 +107,19 @@ parallel linux: {
     stage('linux/warnings') {
       recordCompileIssues('gcc');
     }
+    stage('linux/cppcheck') {
+      sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include modules src tests 2> build/cppcheck.xml'
+      publishCppcheck(
+        pattern: 'build/cppcheck.xml'
+      )
+    }
+    stage('linux/sloc') {
+      sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=build/cloc.xml --force-lang-def=support/cloc/langDef --quiet .'
+      sloccountPublish(
+        encoding: '',
+        pattern: 'build/cloc.xml'
+      )
+    }
     stage('linux/test') {
       runTests('build/GhoulTest');
     }
@@ -166,18 +179,18 @@ osx: {
 //
 // Post-build actions
 //
-node('master') {
-  stage('PostBuild/ReportIssues') {
-    recordIssues(
-      aggregatingResults: true,
-      tools: [
-        clang(),
-        gcc4(),
-        msBuild()
-      ]
-    )
-  }
-}
+// node('master') {
+//   stage('PostBuild/ReportIssues') {
+//     recordIssues(
+//       aggregatingResults: true,
+//       tools: [
+//         clang(),
+//         gcc4(),
+//         msBuild()
+//       ]
+//     )
+//   }
+// }
 
 stage('Notifications/Slack') {
   def colors = [ 'SUCCESS': 'good', 'UNSTABLE': 'warning', 'FAILURE': 'danger' ];
