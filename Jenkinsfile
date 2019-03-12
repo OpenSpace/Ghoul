@@ -48,7 +48,7 @@ def changeString() {
     'Micah Acinapura': 'Micah'
   ];
 
-  def res = "";
+  def res = [];
 
   for (int i = 0; i < currentBuild.changeSets.size(); i++) {
     def entries = currentBuild.changeSets[i].items;
@@ -61,17 +61,22 @@ def changeString() {
       def fullAuthor = authorHandle ? "${author} (@${authorHandle})" : "${author}";
       def commit = "${entry.commitId.take(8)}";
       def message = "${entry.msg}";
-      res += "${date} [${fullAuthor}] (${commit}): ${message}\n"
+
+      def fullMessage = "${date} [${fullAuthor}] (${commit}): ${message}";
+      if (!fullMessage in res) {
+        // Having multiple parallel builds will cause messages to appear multiple times
+        res += fullMessage;
+      }
     }
   }
 
-  return res;
+  return res.join('\n');
 }
 
 
-// 
+//
 // Pipeline start
-// 
+//
 parallel linux: {
   node('linux') {
     stage('linux/SCM') {
@@ -135,7 +140,7 @@ osx: {
   } // node('osx')
 }
 
-
+currentBuild.result = 'UNSTABLE';
 
 //
 // Post-build actions
