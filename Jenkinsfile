@@ -107,7 +107,7 @@ node('linux') {
     checkoutGit()
   }
 }
-currentBuild.result = 'FAILURE';
+currentBuild.result = 'UNSTABLE';
 
 //
 // Post-build options
@@ -156,13 +156,13 @@ stage('Notifications/Slack') {
     'FAILURE': 'Failure'
   ];
 
-  def worse = !currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult)
-  def better = !currentBuild.resultIsWorseOrEqualTo(currentBuild.previousBuild.currentResult)
+  def worse = !currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult);
+  def better = !currentBuild.resultIsWorseOrEqualTo(currentBuild.previousBuild.currentResult);
 
   def (discard, job) = env.JOB_NAME.tokenize('/');
   def changes = changeString();
 
-  def msgHeader = "<b>${job}</b>";
+  def msgHeader = "*${job}*";
   def msgBranch = "Branch: ${job}/${env.BRANCH_NAME}";
   def msgUrl = "URL: ${env.BUILD_URL}";
   def msgChanges = "Changes: ${changes}";
@@ -176,7 +176,7 @@ stage('Notifications/Slack') {
       color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
       message: "${msgHeader}\n\n${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
-    )
+    );
   }
   else if (worse) {
     def msgStatusPrev = humanReadable[currentBuild.previousBuild.currentResult];
@@ -188,7 +188,7 @@ stage('Notifications/Slack') {
       color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
       message: "${msgHeader}\n\n${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
-    )
+    );
   }
   else if (currentBuild.currentResult == 'UNSTABLE' && currentBuild.previousBuild.currentResult == 'UNSTABLE') {
     def msgStatus = "Build still unstable";
@@ -198,6 +198,7 @@ stage('Notifications/Slack') {
       color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
       message: "${msgHeader}\n\n${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
-    )
+    );
   }
+  // Ignore the rest (FAILURE -> FAILURE  and SUCCESS -> SUCCESS)
 }
