@@ -34,7 +34,7 @@ def runTests(bin) {
   junit([testResults: 'test_results.xml'])
 }
 
-def recordIssues(compiler) {
+def recordCompileIssues(compiler) {
   if (compiler.toLowerCase() == 'msvc') {
     recordIssues(tools: [msBuild()])
   }
@@ -105,7 +105,7 @@ parallel linux: {
       ]);
     }
     stage('linux/warnings') {
-      recordIssues('GCC');
+      recordCompileIssues('gcc');
     }
     stage('linux/test') {
       runTests('build/GhoulTest');
@@ -129,7 +129,7 @@ windows: {
         ]);
       }
       stage('windows/warnings') {
-        recordIssues('MSVC');
+        recordCompileIssues('msvc');
       }
       stage('windows/test') {
         // Currently, the unit tests are failing on Windows
@@ -153,7 +153,7 @@ osx: {
       ]);
     }
     stage('osx/warnings') {
-      recordIssues('Clang');
+      recordCompileIssues('clang');
     }
     stage('osx/test') {
       // Currently, the unit tests are crashing on OS X
