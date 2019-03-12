@@ -114,13 +114,20 @@ currentBuild.result = 'UNSTABLE';
 
 @NonCPS
 def changeString() {
-  def authors = [
-    'Alexander Bock': 'alex',
-    'Emil Axelsson': 'emil',
-    'Gene Payne': 'gpayne',
-    'Jonathas Costa': 'jccosta',
-    'Micah Acinapura': 'Micah'
-  ];
+  // def authors = [
+  //   'Alexander Bock': 'alex',
+  //   'Emil Axelsson': 'emil',
+  //   'Gene Payne': 'gpayne',
+  //   'Jonathas Costa': 'jccosta',
+  //   'Micah Acinapura': 'Micah'
+  // ];
+
+  def authors = [:]
+  authors['Alexander Bock'] = 'alex';
+  authors['Emil Axelsson'] = 'emil';
+  authors['Gene Payne'] = 'gpayne';
+  authors['Jonathas Costa'] = 'jccosta';
+  authors['Micah Acinapura'] = 'Micah';
 
   def res = "";
 
