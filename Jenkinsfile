@@ -66,11 +66,17 @@ parallel linux: {
       checkoutGit()
     }
     stage('linux/Build') {
-      createDirectory('build')
-      dir('build') {
-        runCMake('Unix Makefiles')
-        build('-j4')
-      }
+      cmakeBuild([
+        installation: 'InSearchPath',
+        generator: 'Unix Makefiles',
+        buildDir: 'build',
+        steps: [[args: '-j4', withCmake: true]]
+      ])
+      // createDirectory('build')
+      // dir('build') {
+      //   runCMake('Unix Makefiles')
+      //   build('-j4')
+      // }
     }
     stage('linux/test') {
       runTests('build/GhoulTest')
@@ -86,11 +92,18 @@ windows: {
         checkoutGit()
       }
       stage('windows/Build') {
-        createDirectory('build')
-        dir('build') {
-          runCMake('Visual Studio 15 2017 Win64')
-          build('/nologo /verbosity:minimal /m:4')
-        }
+        cmakeBuild([
+          installation: 'InSearchPath',
+          generator: 'Visual Studio 15 2017 Win64',
+          buildDir: 'build',
+          steps: [[args: '/nologo /verbosity:minimal /m:4', withCmake: true]]
+        ])
+
+        // createDirectory('build')
+        // dir('build') {
+        //   runCMake('Visual Studio 15 2017 Win64')
+        //   build('/nologo /verbosity:minimal /m:4')
+        // }
       }
       stage('windows/test') {
         // Currently, the unit tests are failing on Windows
@@ -106,11 +119,18 @@ osx: {
       checkoutGit()
     }
     stage('osx/Build') {
-      createDirectory('build')
-      dir('build') {
-        runCMake('Xcode')
-        build('-parallelizeTargets -jobs 4')
-      }
+      cmakeBuild([
+        installation: 'InSearchPath',
+        generator: 'Xcode',
+        buildDir: 'build',
+        steps: [[args: '-parallelizeTargets -jobs 4', withCmake: true]]
+      ])
+
+      // createDirectory('build')
+      // dir('build') {
+      //   runCMake('Xcode')
+      //   build('-parallelizeTargets -jobs 4')
+      // }
     }
     stage('osx/test') {
       // Currently, the unit tests are crashing on OS X
