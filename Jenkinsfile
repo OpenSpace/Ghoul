@@ -166,8 +166,17 @@ osx: {
 //
 // Post-build actions
 //
-stage('PostBuild/ReportIssues') {
-  recordIssues aggregatingResults: true, tools: [clang(), gcc4(), msBuild()]
+node('master') {
+  stage('PostBuild/ReportIssues') {
+    recordIssues(
+      aggregatingResults: true,
+      tools: [
+        clang(),
+        gcc4(),
+        msBuild()
+      ]
+    )
+  }
 }
 
 stage('Notifications/Slack') {
