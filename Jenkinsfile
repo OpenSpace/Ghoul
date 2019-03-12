@@ -15,8 +15,7 @@ parallel linux: {
       dir('build') {
         cmake([
           installation: 'InSearchPath',
-          arguments: '-G "Unix Makefiles"',
-          workingDir: '..'
+          arguments: '-G "Unix Makefiles" ..',
         ])
         cmakeBuild([
           installation: 'InSearchPath',
@@ -46,8 +45,7 @@ windows: {
         dir('build') {
           cmake([
             installation: 'InSearchPath',
-            arguments: '-G "Visual Studio 15 2017 Win64"',
-            workingDir: '..'
+            arguments: '-G "Visual Studio 15 2017 Win64" ..',
           ])
           cmakeBuild([
             installation: 'InSearchPath',
@@ -77,9 +75,7 @@ osx: {
       dir('build') {
         cmake([
           installation: 'InSearchPath',
-          arguments: '-G Xcode',
-          workingDir: '..',
-
+          arguments: '-G Xcode ..',
         ])
         cmakeBuild([
           installation: 'InSearchPath',
