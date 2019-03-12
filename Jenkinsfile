@@ -128,10 +128,9 @@ def changeString() {
     def entries = currentBuild.changeSets[i].items;
     for (int j = 0; j < entries.length; j++) {
       def entry = entries[j];
-      def atMessage = authors.containsKey(entry.author) ? authors[entry.author] : '';
 
       def date = "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")}";
-      def author = authors.containsKey(entry.author) ? "[${entry.author} (${authors[entry.author]})]" : "[${entry.author}]";
+      def author = authors.containsKey(entry.author) ? "${entry.author} (@${authors[entry.author]})" : "${entry.author}";
       def commit = "${entry.commitId.take(8)}";
       def message = "${entry.msg}";
       res += "${date} [${author}] (${commit}): ${message}\n"
@@ -139,14 +138,6 @@ def changeString() {
   }
 
   return res;
-
-  // currentBuild.changeSets.each {entries -> 
-  //   entries.each { entry -> 
-  //     res += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} "
-  //     res += "[${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n"
-  //   }
-  // }
-  // return res ?: " - No new changes"
 }
 
 stage('Notifications/Slack') {
@@ -167,7 +158,7 @@ stage('Notifications/Slack') {
     slackSend(
       color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
-      message: "@emil Status improved\n\nBranch: ${job}/${env.BRANCH_NAME}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}\nChanges:\n${changes}"
+      message: "Status improved\n\nBranch: ${job}/${env.BRANCH_NAME}\nStatus: ${currentBuild.currentResult}\nURL: ${env.BUILD_URL}\nChanges:\n${changes}"
     )
   // }
 
