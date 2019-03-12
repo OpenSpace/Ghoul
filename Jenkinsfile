@@ -113,17 +113,17 @@ stage('Notifications/Slack') {
 
   if (worse) {
     slackSend(
-      color: colors[currentBuild.result],
+      color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
-      message: "New compile error\n\nBranch: ${env.BRANCH_NAME}\nStatus: ${build.result}\nJob: ${env.BUILD_URL}"
+      message: "New compile error\n\nBranch: ${env.BRANCH_NAME}\nStatus: ${build.currentResult}\nJob: ${env.BUILD_URL}"
     )
   }
 
   if (better) {
     slackSend(
-      color: colors[currentBuild.result],
+      color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
-      message: "Status improved\n\nBranch: ${env.BRANCH_NAME}\nStatus: ${build.result}\nJob: ${env.BUILD_URL}"
+      message: "Status improved\n\nBranch: ${env.BRANCH_NAME}\nStatus: ${build.currentResult}\nJob: ${env.BUILD_URL}"
     )
   }
 
