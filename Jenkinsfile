@@ -108,7 +108,7 @@ def runTests(bin) {
 @NonCPS
 def changeString(build) {
   def res = ""
-  build.changeSets.each { entries.each { entry -> res += entries.toString() } }
+  build.changeSets.each { entries.each { entry -> res += entry.toString() } }
     // entries.each { entry -> res += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} [${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n" }
   // }
   return res
