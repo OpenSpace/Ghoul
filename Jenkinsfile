@@ -101,8 +101,12 @@ def runTests(bin) {
 //   } // node('osx')
 // }
 
-checkoutGit()
-
+node('linux') {
+  stage('linux/SCM') {
+    deleteDir()
+    checkoutGit()
+  }
+}
 currentBuild.result = 'UNSTABLE';
 
 //
