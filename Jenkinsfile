@@ -12,6 +12,7 @@ parallel linux: {
       sh 'git submodule update --init --recursive'
     }
     stage('linux/Build') {
+      cmake([installation: 'InSearchPath', arguments: '-E make_directory build'])
       dir('build') {
         cmake([
           installation: 'InSearchPath',
@@ -19,7 +20,7 @@ parallel linux: {
         ])
         cmakeBuild([
           installation: 'InSearchPath',
-          buildDir: 'build',
+          // buildDir: 'build',
           steps: [
             [ args: '--target GhoulTest -- -j4', withCmake: true ]
           ]
@@ -42,6 +43,7 @@ windows: {
         bat 'git submodule update --init --recursive'
       }
       stage('windows/Build') {
+      cmake([installation: 'InSearchPath', arguments: '-E make_directory build'])
         dir('build') {
           cmake([
             installation: 'InSearchPath',
@@ -72,6 +74,7 @@ osx: {
       sh 'git submodule update --init --recursive'
     }
     stage('osx/Build') {
+      cmake([installation: 'InSearchPath', arguments: '-E make_directory build'])
       dir('build') {
         cmake([
           installation: 'InSearchPath',
