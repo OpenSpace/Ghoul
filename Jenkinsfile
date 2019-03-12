@@ -1,3 +1,7 @@
+def createDirectory(String dir) {
+  cmake([installation: 'InSearchPath', arguments: '-E make_directory ${dir}'])
+}
+
 // Map defaultCMakeOptions() {
 //   return [
 
@@ -12,7 +16,7 @@ parallel linux: {
       sh 'git submodule update --init --recursive'
     }
     stage('linux/Build') {
-      cmake([installation: 'InSearchPath', arguments: '-E make_directory build'])
+      createDirectory('build')
       dir('build') {
         cmake([
           installation: 'InSearchPath',
@@ -43,7 +47,7 @@ windows: {
         bat 'git submodule update --init --recursive'
       }
       stage('windows/Build') {
-      cmake([installation: 'InSearchPath', arguments: '-E make_directory build'])
+        createDirectory('build')
         dir('build') {
           cmake([
             installation: 'InSearchPath',
@@ -74,7 +78,7 @@ osx: {
       sh 'git submodule update --init --recursive'
     }
     stage('osx/Build') {
-      cmake([installation: 'InSearchPath', arguments: '-E make_directory build'])
+      createDirectory('build')
       dir('build') {
         cmake([
           installation: 'InSearchPath',
