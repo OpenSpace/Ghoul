@@ -63,10 +63,11 @@ def changeString() {
       def message = "${entry.msg}";
 
       def fullMessage = "${date} [${fullAuthor}] (${commit}): ${message}";
-      if (!fullMessage in res) {
+      if (res.contains(fullMessage)) {
         // Having multiple parallel builds will cause messages to appear multiple times
-        res += fullMessage;
+        continue;
       }
+      res.add(fullMessage);
     }
   }
 
