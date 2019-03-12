@@ -114,20 +114,20 @@ currentBuild.result = 'UNSTABLE';
 
 @NonCPS
 def changeString() {
-  // def authors = [
-  //   'Alexander Bock': 'alex',
-  //   'Emil Axelsson': 'emil',
-  //   'Gene Payne': 'gpayne',
-  //   'Jonathas Costa': 'jccosta',
-  //   'Micah Acinapura': 'Micah'
-  // ];
+  def authors = [
+    'Alexander Bock': 'alex',
+    'Emil Axelsson': 'emil',
+    'Gene Payne': 'gpayne',
+    'Jonathas Costa': 'jccosta',
+    'Micah Acinapura': 'Micah'
+  ];
 
-  def authors = [:]
-  authors['Alexander Bock'] = 'alex';
-  authors['Emil Axelsson'] = 'emil';
-  authors['Gene Payne'] = 'gpayne';
-  authors['Jonathas Costa'] = 'jccosta';
-  authors['Micah Acinapura'] = 'Micah';
+  // def authors = [:]
+  // authors['Alexander Bock'] = 'alex';
+  // authors['Emil Axelsson'] = 'emil';
+  // authors['Gene Payne'] = 'gpayne';
+  // authors['Jonathas Costa'] = 'jccosta';
+  // authors['Micah Acinapura'] = 'Micah';
 
   def res = "";
 
@@ -138,10 +138,12 @@ def changeString() {
 
       def date = "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")}";
       // def author = authors.containsKey(entry.author) ? "${entry.author} (@${authors[entry.author]})" : "${entry.author}";
-      def author = "${entry.author} (@${authors[entry.author]})";
+      def author = "${entry.author}";
+      def authorHandle = authors[author];
+      def fullAuthor = authorHandle ? "${author} (@${authorHandle})" : "${author}"';;'
       def commit = "${entry.commitId.take(8)}";
       def message = "${entry.msg}";
-      res += "${date} [${author}] (${commit}): ${message}\n"
+      res += "${date} [${fullAuthor}] (${commit}): ${message}\n"
     }
   }
 
