@@ -107,7 +107,7 @@ node('linux') {
     checkoutGit()
   }
 }
-currentBuild.result = 'SUCCESS';
+currentBuild.result = 'FAILURE';
 
 //
 // Post-build options
@@ -121,13 +121,6 @@ def changeString() {
     'Jonathas Costa': 'jccosta',
     'Micah Acinapura': 'Micah'
   ];
-
-  // def authors = [:]
-  // authors['Alexander Bock'] = 'alex';
-  // authors['Emil Axelsson'] = 'emil';
-  // authors['Gene Payne'] = 'gpayne';
-  // authors['Jonathas Costa'] = 'jccosta';
-  // authors['Micah Acinapura'] = 'Micah';
 
   def res = "";
 
@@ -208,30 +201,3 @@ stage('Notifications/Slack') {
     )
   }
 }
-// if (!currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult)) {
-//   mail([
-//     to: 'alexander.bock@liu.se',
-//     from: 'jenkins@dev.openspaceproject.com',
-//     subject: "Hello there (after): ${env.JOB_NAME}",
-//     body:  "not better or equal"
-//   ])
-// }
-// else {
-//   mail([
-//     to: 'alexander.bock@liu.se',
-//     from: 'jenkins@dev.openspaceproject.com',
-//     subject: "Hello there (after): ${env.JOB_NAME}",
-//     body:  "better or equal"
-//   ])
-// }
-
-
-
-
-
-// mail([
-//   to: 'alexander.bock@liu.se',
-//   from: 'jenkins@dev.openspaceproject.com',
-//   subject: "Hello there (after): ${env.JOB_NAME}",
-//   body:  changeString(currentBuild)
-// ])
