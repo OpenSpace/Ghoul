@@ -56,6 +56,7 @@ def runTests(bin) {
 
 
 
+
 mail([
   to: 'alexander.bock@liu.se',
   from: 'jenkins@dev.openspaceproject.com',
