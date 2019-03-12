@@ -149,7 +149,7 @@ stage('Notifications/Slack') {
     slackSend(
       color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
-      message: "Status improved\n\nBranch: ${job}/${env.BRANCH_NAME}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}\nChanges:\n${changes}"
+      message: "@emil Status improved\n\nBranch: ${job}/${env.BRANCH_NAME}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}\nChanges:\n${changes}"
     )
   // }
 
