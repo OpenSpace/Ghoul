@@ -2,6 +2,19 @@ def createDirectory(String dir) {
   cmake([installation: 'InSearchPath', arguments: "-E make_directory ${dir}"])
 }
 
+def runCMake(String generator) {
+  cmake([ installation: 'InSearchPath', arguments: "-G \"${generator}\" .." ])
+}
+
+def build(String compileOptions) {
+  cmakeBuild([
+    installation: 'InSearchPath',
+    steps: [
+      [ args: "-- ${compileOptions}", withCmake: true ]
+    ]
+  ])
+}
+
 // Map defaultCMakeOptions() {
 //   return [
 
@@ -18,17 +31,8 @@ parallel linux: {
     stage('linux/Build') {
       createDirectory('build')
       dir('build') {
-        cmake([
-          installation: 'InSearchPath',
-          arguments: '-G "Unix Makefiles" ..',
-        ])
-        cmakeBuild([
-          installation: 'InSearchPath',
-          // buildDir: 'build',
-          steps: [
-            [ args: '--target GhoulTest -- -j4', withCmake: true ]
-          ]
-        ])
+        runCMake('Unix Makefiles')
+        build('-j4')
       }
     }
     stage('linux/test') {
@@ -49,17 +53,8 @@ windows: {
       stage('windows/Build') {
         createDirectory('build')
         dir('build') {
-          cmake([
-            installation: 'InSearchPath',
-            arguments: '-G "Visual Studio 15 2017 Win64" ..',
-          ])
-          cmakeBuild([
-            installation: 'InSearchPath',
-            // buildDir: 'build',
-            steps: [
-              [ args: '-- /nologo /verbosity:minimal /m:4', withCmake: true ]
-            ]
-          ])
+          runCMake('Visual Studio 15 2017 Win64')
+          build('/nologo /verbosity:minimal /m:4')
         }
       }
       // Currently, the unit tests are failing on Windows
@@ -80,17 +75,8 @@ osx: {
     stage('osx/Build') {
       createDirectory('build')
       dir('build') {
-        cmake([
-          installation: 'InSearchPath',
-          arguments: '-G Xcode ..',
-        ])
-        cmakeBuild([
-          installation: 'InSearchPath',
-          // buildDir: 'build',
-          steps: [
-            [ args: '-- -parallelizeTargets -jobs 4 -target Ghoul -target GhoulTest', withCmake: true ],
-          ]
-        ])
+        runCMake('Xcode')
+        build('-parallelizeTargets -jobs 4')
       }
     }
     // Currently, the unit tests are crashing on OS X
