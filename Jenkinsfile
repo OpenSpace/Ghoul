@@ -108,7 +108,7 @@ osx: {
 @NonCPS
 def changeString(build) {
   def res = ""
-  build.changeSets.each { res += entries -> entries.toString() }
+  build.changeSets.each { entries -> res += entries.toString() }
     // entries.each { entry -> res += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} [${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n" }
   // }
   return res
