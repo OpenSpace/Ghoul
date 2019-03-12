@@ -109,13 +109,24 @@ currentBuild.result = 'UNSTABLE';
 @NonCPS
 def changeString() {
   def res = ""
-  currentBuild.changeSets.each {entries -> 
-    entries.each { entry -> 
-      res += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} "
-      res += "[${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n"
+
+  for (int i = 0; i < currentBuild.changeSets.size(); i++) {
+    def entries = currentBuild.changeSets[i].items;
+    for (int j = 0; j < entries.length; j++) {
+      def entry = entries[j];
+      res += "${new Date(entry.timestamp)} [${entry.author}] (${entry.commitId}): ${entry.msg};
     }
   }
-  return res ?: " - No new changes"
+
+  return res;
+
+  // currentBuild.changeSets.each {entries -> 
+  //   entries.each { entry -> 
+  //     res += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} "
+  //     res += "[${entry.commitId.take(8)}] ${entry.author}: ${entry.msg}\n"
+  //   }
+  // }
+  // return res ?: " - No new changes"
 }
 
 stage('Notifications/Slack') {
@@ -128,22 +139,22 @@ stage('Notifications/Slack') {
 
   def changes = changeString();
 
-  if (better) {
+  // if (better) {
     slackSend(
       color: colors[currentBuild.currentResult],
       channel: 'Jenkins',
-      message: "Status improved\n\nBranch: ${job}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}\nChanges:\n${changes}"
+      message: "Status improved\n\nProject: ${currentBuild.projectName}\nBranch: ${job}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}\nChanges:\n${changes}"
     )
-  }
+  // }
 
 
-  if (worse) {
-    slackSend(
-      color: colors[currentBuild.currentResult],
-      channel: 'Jenkins',
-      message: "New compile error\n\nBranch: ${job}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}\nChanges:\n${changes}"
-    )
-  }
+  // if (worse) {
+  //   slackSend(
+  //     color: colors[currentBuild.currentResult],
+  //     channel: 'Jenkins',
+  //     message: "New compile error\n\nProject: ${currentBuild.projectName}\nBranch: ${job}\nStatus: ${currentBuild.currentResult}\nJob: ${env.BUILD_URL}\nChanges:\n${changes}"
+  //   )
+  // }
 
 
 }
