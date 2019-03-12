@@ -114,13 +114,27 @@ currentBuild.result = 'UNSTABLE';
 
 @NonCPS
 def changeString() {
-  def res = ""
+  def authors = [
+    'Alexander Bock': 'alex',
+    'Emil Axelsson': 'emil',
+    'Gene Payne': 'gpayne',
+    'Jonathas Costa': 'jccosta',
+    'Micah Acinapura': 'Micah'
+  ];
+
+  def res = "";
 
   for (int i = 0; i < currentBuild.changeSets.size(); i++) {
     def entries = currentBuild.changeSets[i].items;
     for (int j = 0; j < entries.length; j++) {
       def entry = entries[j];
-      res += "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")} [@${entry.author}] (${entry.commitId.take(8)}): ${entry.msg}"
+      def atMessage = authors.containsKey(entry.author) ? authors[entry.author] : '';
+
+      def date = "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")}";
+      def author = authors.containsKey(entry.author) ? "[${entry.author} (${authors[entry.author]})]" : "[${entry.author}]";
+      def commit = "${entry.commitId.take(8)}";
+      def message = "${entry.msg}";
+      res += "${date} [${author}] (${commit}): ${message}\n"
     }
   }
 
@@ -136,7 +150,11 @@ def changeString() {
 }
 
 stage('Notifications/Slack') {
-  def colors = ['SUCCESS' : 'good', 'UNSTABLE' : 'warning' , 'FAILURE' : 'danger' ]
+  def colors = [
+    'SUCCESS': 'good',
+    'UNSTABLE': 'warning',
+    'FAILURE': 'danger'
+  ]
 
   def worse = !currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult)
   def better = !currentBuild.resultIsWorseOrEqualTo(currentBuild.previousBuild.currentResult)
