@@ -101,6 +101,7 @@ def runTests(bin) {
 //   } // node('osx')
 // }
 
+currentBuild.result = 'FAILURE';
 
 //
 // Post-build options
