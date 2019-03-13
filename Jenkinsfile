@@ -122,6 +122,8 @@ def recordCompileIssues(compiler) {
 // }
 
 
+currentBuild.result = 'UNSTABLE';
+
 //
 // Post-build actions
 //
@@ -143,6 +145,6 @@ node('master') {
   stage('master/notifications') {
     def workspace = pwd();
     def slackPlugin = load("${workspace}/support/jenkins/slack_notification.groovy");
-    slackPlugin.sendSlackMessage();
+    slackPlugin.sendSlackMessage(currentBuild);
   }
 }
