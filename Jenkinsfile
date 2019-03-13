@@ -128,35 +128,6 @@ currentBuild.result = 'UNSTABLE';
 // Post-build actions
 //
 
-@NonCPS
-def changeString(build) {
-  def authors = load("${JENKINS_HOME}/slack_users.groovy").slackAuthors;
-
-  def res = [];
-
-  for (int i = 0; i < build.changeSets.size(); i++) {
-    def entries = build.changeSets[i].items;
-    for (int j = 0; j < entries.length; j++) {
-      def entry = entries[j];
-
-      def date = "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")}";
-      def author = "${entry.author}";
-      def authorHandle = authors[author];
-      def fullAuthor = authorHandle ? "${author} (@${authorHandle})" : "${author}";
-      def commit = "${entry.commitId.take(8)}";
-      def message = "${entry.msg}";
-
-      def fullMessage = "${date} [${fullAuthor}] (${commit}): ${message}";
-      if (res.contains(fullMessage)) {
-        // Having multiple parallel builds will cause messages to appear multiple times
-        continue;
-      }
-      res.add(fullMessage);
-    }
-  }
-
-  return res.join('\n');
-}
 node('master') {
   stage('master/SCM') {
     deleteDir();
