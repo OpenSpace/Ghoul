@@ -130,6 +130,7 @@ node('master') {
   stage('master/SCM') {
     deleteDir();
     checkoutGit();
+    cmake([installation: 'InSearchPath', arguments: '-E make_directory build'])
   }
   stage('master/cppcheck') {
     sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> build/cppcheck.xml';
