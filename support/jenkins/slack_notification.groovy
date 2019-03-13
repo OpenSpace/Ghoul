@@ -84,3 +84,5 @@ def sendSlackMessage() {
   }
   // Ignore the rest (FAILURE -> FAILURE  and SUCCESS -> SUCCESS)
 }
+
+return this;
