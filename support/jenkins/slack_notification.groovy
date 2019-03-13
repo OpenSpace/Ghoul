@@ -32,7 +32,7 @@ def changeString(build) {
   return res.join('\n');
 }
 
-def sendSlackMessage(build) {
+def sendSlackMessage(build, changes) {
   def colors = [ 'SUCCESS': 'good', 'UNSTABLE': 'warning', 'FAILURE': 'danger' ];
   def humanReadable = [ 'SUCCESS': 'Success', 'UNSTABLE': 'Unstable', 'FAILURE': 'Failure' ];
 
@@ -41,9 +41,10 @@ def sendSlackMessage(build) {
   def (discard, job) = env.JOB_NAME.tokenize('/');
 
   def msgHeader = "*${job}*";
+  def msgBuildTime = "Build time: ${build.duration / 1000}s";
   def msgBranch = "Branch: ${job}/${env.BRANCH_NAME}";
   def msgUrl = "URL: ${env.BUILD_URL}";
-  def changes = changeString(build);
+  // def changes = changeString(build);
   def msgChanges = "Changes:\n${changes}";
 
   if (!build.resultIsWorseOrEqualTo(build.previousBuild.currentResult)) {
@@ -55,7 +56,7 @@ def sendSlackMessage(build) {
     slackSend(
       color: colors[build.currentResult],
       channel: 'Jenkins',
-      message: "${msgHeader}\n\n${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
+      message: "${msgHeader}\n\n${msgStatus}\n${msgBuildTime}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
     );
   }
   else if (!build.resultIsBetterOrEqualTo(build.previousBuild.currentResult)) {
@@ -63,7 +64,6 @@ def sendSlackMessage(build) {
     def msgStatusPrev = humanReadable[build.previousBuild.currentResult];
     def msgStatusCurr = humanReadable[build.currentResult];
     def msgStatus = "Build status worsened (${msgStatusPrev} -> ${msgStatusCurr})";
-    def msgBuildTime = "Build time: ${build.duration / 1000}s";
 
     slackSend(
       color: colors[build.currentResult],
@@ -74,7 +74,6 @@ def sendSlackMessage(build) {
   else if (build.currentResult != 'SUCCESS' && build.previousBuild.currentResult != 'SUCCESS') {
     // Only send another message if the build is still unstable or still failing
     def msgStatus = build.currentResult == "UNSTABLE" ? "Build still unstable" : "Build still failing";
-    def msgBuildTime = "Build time: ${currentBuild.duration / 1000}s";
 
     slackSend(
       color: colors[build.currentResult],
