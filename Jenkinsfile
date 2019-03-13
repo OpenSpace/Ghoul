@@ -108,7 +108,8 @@ parallel linux: {
       recordCompileIssues('gcc');
     }
     stage('linux/cppcheck') {
-      sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> cppcheck.xml'
+      // sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> cppcheck.xml'
+      sh 'cppcheck --enable=all --xml -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> cppcheck.xml'
       publishCppcheck(
         pattern: 'cppcheck.xml'
       )
