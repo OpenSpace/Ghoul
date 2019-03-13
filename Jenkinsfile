@@ -140,8 +140,8 @@ node('master') {
     sloccountPublish(encoding: '', pattern: 'cloc.xml');
   }
   stage('master/notifications') {
-    echo pwd()
-    def slackPlugin = load('support/jenkins/slack_notification.groovy');
+    def workspace = pwd();
+    def slackPlugin = load("${workspace}/support/jenkins/slack_notification.groovy");
     slackPlugin.sendSlackMessage();
   }
 }
