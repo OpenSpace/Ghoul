@@ -90,7 +90,29 @@ def changeString() {
 //
 // Pipeline start
 //
-parallel linux: {
+parallel master: {
+  node('master') {
+    stage('master/SCM') {
+      deleteDir();
+      checkoutGit();
+    }
+    stage('master/cppcheck') {
+      // sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> cppcheck.xml';
+      sh 'cppcheck -j 4 --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> cppcheck.xml';
+      publishCppcheck(
+        pattern: 'cppcheck.xml'
+      );
+    }
+    stage('master/sloc') {
+      sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
+      sloccountPublish(
+        encoding: '',
+        pattern: 'cloc.xml'
+      );
+    }
+  }
+},
+linux: {
   node('linux') {
     stage('linux/SCM') {
       deleteDir();
@@ -106,20 +128,6 @@ parallel linux: {
     }
     stage('linux/warnings') {
       recordCompileIssues('gcc');
-    }
-    stage('linux/cppcheck') {
-      // sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> cppcheck.xml'
-      sh 'cppcheck --enable=all --xml -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> cppcheck.xml'
-      publishCppcheck(
-        pattern: 'cppcheck.xml'
-      )
-    }
-    stage('linux/sloc') {
-      sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=cloc.xml --force-lang-def=support/cloc/langDef --quiet .'
-      sloccountPublish(
-        encoding: '',
-        pattern: 'cloc.xml'
-      )
     }
     stage('linux/test') {
       runTests('build/GhoulTest');
