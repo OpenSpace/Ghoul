@@ -49,29 +49,13 @@ def recordCompileIssues(compiler) {
 //
 // Pipeline start
 //
-parallel master: {
-  node('master') {
-    stage('master/SCM') {
-      deleteDir();
-      checkoutGit();
-    }
-    stage('master/cppcheck') {
-      sh 'cppcheck -j 4 --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> cppcheck.xml';
-      publishCppcheck(pattern: 'cppcheck.xml');
-    }
-    stage('master/sloc') {
-      sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
-      sloccountPublish(encoding: '', pattern: 'cloc.xml');
-    }
-  }
-},
-linux: {
+parallel linux: {
   node('linux') {
-    stage('linux/SCM') {
+    stage('linux/scm') {
       deleteDir();
       checkoutGit();
     }
-    stage('linux/Build') {
+    stage('linux/build') {
       cmakeBuild([
         installation: 'InSearchPath',
         generator: 'Unix Makefiles',
@@ -91,11 +75,11 @@ windows: {
   node('windows') {
     // We specify the workspace directory manually to reduce the path length and thus try to avoid MSB3491 on Visual Studio
     ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}/${env.BUILD_ID}") {
-      stage('windows/SCM') {
+      stage('windows/scm') {
         deleteDir();
         checkoutGit();
       }
-      stage('windows/Build') {
+      stage('windows/build') {
         cmakeBuild([
           installation: 'InSearchPath',
           generator: 'Visual Studio 15 2017 Win64',
@@ -115,11 +99,11 @@ windows: {
 },
 osx: {
   node('osx') {
-    stage('osx/SCM') {
+    stage('osx/scm') {
       deleteDir();
       checkoutGit();
     }
-    stage('osx/Build') {
+    stage('osx/build') {
       cmakeBuild([
         installation: 'InSearchPath',
         generator: 'Xcode',
@@ -143,8 +127,21 @@ osx: {
 //
 
 node('master') {
-  stage('Notifications/Slack') {
-    def slackPlugin = load("${env.WORKSPACE}/support/jenkins/slack_notification.groovy");
+  stage('master/SCM') {
+    deleteDir();
+    checkoutGit();
+  }
+  stage('master/cppcheck') {
+    sh 'cppcheck -j 4 --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> cppcheck.xml';
+    publishCppcheck(pattern: 'cppcheck.xml');
+  }
+  stage('master/cloc') {
+    sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
+    sloccountPublish(encoding: '', pattern: 'cloc.xml');
+  }
+
+  stage('master/notifications') {
+    def slackPlugin = load('support/jenkins/slack_notification.groovy');
     slackPlugin.sendSlackMessage();
   }
 }
