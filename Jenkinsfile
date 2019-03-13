@@ -52,13 +52,7 @@ def recordCompileIssues(compiler) {
 // NonCPS is required as the changeSets of the current build are not serializable
 @NonCPS
 def changeString() {
-  def authors = [
-    'Alexander Bock': 'alex',
-    'Emil Axelsson': 'emil',
-    'Gene Payne': 'gpayne',
-    'Jonathas Costa': 'jccosta',
-    'Micah Acinapura': 'Micah'
-  ];
+  def authors = load("${JENKINS_HOME}/slack_users.groovy").slackAuthors;
 
   def res = [];
 
