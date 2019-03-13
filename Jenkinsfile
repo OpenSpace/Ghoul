@@ -97,18 +97,12 @@ parallel master: {
       checkoutGit();
     }
     stage('master/cppcheck') {
-      // sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> cppcheck.xml';
       sh 'cppcheck -j 4 --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> cppcheck.xml';
-      publishCppcheck(
-        pattern: 'cppcheck.xml'
-      );
+      publishCppcheck(pattern: 'cppcheck.xml');
     }
     stage('master/sloc') {
       sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
-      sloccountPublish(
-        encoding: '',
-        pattern: 'cloc.xml'
-      );
+      sloccountPublish(encoding: '', pattern: 'cloc.xml');
     }
   }
 },
@@ -188,68 +182,58 @@ osx: {
 //
 // Post-build actions
 //
-// node('master') {
-//   stage('PostBuild/ReportIssues') {
-//     recordIssues(
-//       aggregatingResults: true,
-//       tools: [
-//         clang(),
-//         gcc4(),
-//         msBuild()
-//       ]
-//     )
-//   }
-// }
 
-stage('Notifications/Slack') {
-  def colors = [ 'SUCCESS': 'good', 'UNSTABLE': 'warning', 'FAILURE': 'danger' ];
-  def humanReadable = [ 'SUCCESS': 'Success', 'UNSTABLE': 'Unstable', 'FAILURE': 'Failure' ];
+node('master') {
+  stage('Notifications/Slack') {
+    def colors = [ 'SUCCESS': 'good', 'UNSTABLE': 'warning', 'FAILURE': 'danger' ];
+    def humanReadable = [ 'SUCCESS': 'Success', 'UNSTABLE': 'Unstable', 'FAILURE': 'Failure' ];
 
-  // The JOB_NAME will be 'GitHub/Ghoul/feature%2Fbranch-name'.  And we are interesting in
-  // the project name here
-  def (discard, job) = env.JOB_NAME.tokenize('/');
+    // The JOB_NAME will be 'GitHub/Ghoul/feature%2Fbranch-name'.  And we are interesting in
+    // the project name here
+    def (discard, job) = env.JOB_NAME.tokenize('/');
 
-  def msgHeader = "*${job}*";
-  def msgBranch = "Branch: ${job}/${env.BRANCH_NAME}";
-  def msgUrl = "URL: ${env.BUILD_URL}";
-  def changes = changeString();
-  def msgChanges = "Changes:\n${changes}";
+    def msgHeader = "*${job}*";
+    def msgBranch = "Branch: ${job}/${env.BRANCH_NAME}";
+    def msgUrl = "URL: ${env.BUILD_URL}";
+    def changes = changeString();
+    def msgChanges = "Changes:\n${changes}";
 
-  if (!currentBuild.resultIsWorseOrEqualTo(currentBuild.previousBuild.currentResult)) {
-    // The build is better than before
-    def msgStatusPrev = humanReadable[currentBuild.previousBuild.currentResult];
-    def msgStatusCurr = humanReadable[currentBuild.currentResult];
-    def msgStatus = "Build status improved (${msgStatusPrev} -> ${msgStatusCurr})";
+    if (!currentBuild.resultIsWorseOrEqualTo(currentBuild.previousBuild.currentResult)) {
+      // The build is better than before
+      def msgStatusPrev = humanReadable[currentBuild.previousBuild.currentResult];
+      def msgStatusCurr = humanReadable[currentBuild.currentResult];
+      def msgStatus = "Build status improved (${msgStatusPrev} -> ${msgStatusCurr})";
 
-    slackSend(
-      color: colors[currentBuild.currentResult],
-      channel: 'Jenkins',
-      message: "${msgHeader}\n\n${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
-    );
+      slackSend(
+        color: colors[currentBuild.currentResult],
+        channel: 'Jenkins',
+        message: "${msgHeader}\n\n${msgStatus}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
+      );
+    }
+    else if (!currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult)) {
+      // The build is worse than before
+      def msgStatusPrev = humanReadable[currentBuild.previousBuild.currentResult];
+      def msgStatusCurr = humanReadable[currentBuild.currentResult];
+      def msgStatus = "Build status worsened (${msgStatusPrev} -> ${msgStatusCurr})";
+      def msgBuildTime = "Build time: ${currentBuild.duration / 1000}s";
+
+      slackSend(
+        color: colors[currentBuild.currentResult],
+        channel: 'Jenkins',
+        message: "${msgHeader}\n\n${msgStatus}\n${msgBuildTime}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
+      );
+    }
+    else if (currentBuild.currentResult != 'SUCCESS' && currentBuild.previousBuild.currentResult != 'SUCCESS') {
+      // Only send another message if the build is still unstable or still failing
+      def msgStatus = currentBuild.currentResult == "UNSTABLE" ? "Build still unstable" : "Build still failing";
+      def msgBuildTime = "Build time: ${currentBuild.duration / 1000}s";
+
+      slackSend(
+        color: colors[currentBuild.currentResult],
+        channel: 'Jenkins',
+        message: "${msgHeader}\n\n${msgStatus}\n${msgBuildTime}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
+      );
+    }
+    // Ignore the rest (FAILURE -> FAILURE  and SUCCESS -> SUCCESS)
   }
-  else if (!currentBuild.resultIsBetterOrEqualTo(currentBuild.previousBuild.currentResult)) {
-    // The build is worse than before
-    def msgStatusPrev = humanReadable[currentBuild.previousBuild.currentResult];
-    def msgStatusCurr = humanReadable[currentBuild.currentResult];
-    def msgStatus = "Build status worsened (${msgStatusPrev} -> ${msgStatusCurr})";
-    def msgBuildTime = "Build time: ${currentBuild.duration / 1000}s";
-
-    slackSend(
-      color: colors[currentBuild.currentResult],
-      channel: 'Jenkins',
-      message: "${msgHeader}\n\n${msgStatus}\n${msgBuildTime}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
-    );
-  }
-  else if (currentBuild.currentResult != 'SUCCESS' && currentBuild.previousBuild.currentResult != 'SUCCESS') {
-    // Only send another message if the build is still unstable or still failing
-    def msgStatus = currentBuild.currentResult == "UNSTABLE" ? "Build still unstable" : "Build still failing";
-    def msgBuildTime = "Build time: ${currentBuild.duration / 1000}s";
-
-    slackSend(
-      color: colors[currentBuild.currentResult],
-      channel: 'Jenkins',
-      message: "${msgHeader}\n\n${msgStatus}\n${msgBuildTime}\n${msgBranch}\n${msgUrl}\n${msgChanges}"
-    );
-  }
-  // Ignore the rest (FAILURE -> FAILURE  and SUCCESS -> SUCCESS)
 }
