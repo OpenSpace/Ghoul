@@ -228,10 +228,10 @@ node('master') {
     sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=build/cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
     sloccountPublish(encoding: '', pattern: 'build/cloc.xml');
   }
+}
   stage('master/notifications') {
     // def workspace = pwd();
     // def sendMsg = load("${workspace}/support/jenkins/slack_notification.groovy").sendSlackMessage;
     // sendMsg();
     sendSlackMessage();
   }
-}
