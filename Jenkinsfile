@@ -8,7 +8,7 @@ def branch = env.BRANCH_NAME;
 //
 parallel master: {
   node('master') {
-    stage('master/SCM') {
+    stage('master/scm') {
       deleteDir();
       gitHelper.checkoutGit(url, branch);
       helper.createDirectory('build');
