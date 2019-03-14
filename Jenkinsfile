@@ -1,4 +1,5 @@
-library('sharedSpace');
+library('sharedSpace'); // jenkins-pipeline-lib
+
 
 // Checks out Ghoul from Git with recursive submodules
 // unfortunately, as of now (2019-03-12), there is no good way of specifying recursive
