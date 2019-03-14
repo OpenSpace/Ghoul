@@ -133,8 +133,8 @@ currentBuild.result = 'UNSTABLE';
 // NonCPS is required as the changeSets of the current build are not serializable
 @NonCPS
 def changeString(build) {
-  // def authors = load("${JENKINS_HOME}/slack_users.groovy").slackAuthors;
-  def authors = [];
+  def authors = load("${JENKINS_HOME}/slack_users.groovy").slackAuthors;
+  // def authors = [];
 
   def res = [];
 
