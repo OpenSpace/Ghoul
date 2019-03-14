@@ -1,5 +1,8 @@
 library('sharedSpace'); // jenkins-pipeline-lib
 
+def url = 'https://github.com/OpenSpace/Ghoul';
+def branch = env.BRANCH_NAME;
+
 //
 // Pipeline start
 //
@@ -7,7 +10,7 @@ parallel linux: {
   node('linux') {
     stage('linux/scm') {
       deleteDir();
-      gitHelper.checkoutGit('https://github.com/OpenSpace/Ghoul', env.BRANCH_NAME);
+      gitHelper.checkoutGit(url, branch);
     }
     stage('linux/build') {
         compileHelper.build(compileHelper.Make(), compileHelper.Gcc());
@@ -16,7 +19,7 @@ parallel linux: {
       compileHelper.recordIssues(compileHelper.Gcc());
     }
     stage('linux/test') {
-      testHelper.runTests('build/GhoulTest');
+      testHelper.runUnitTests('build/GhoulTest');
     }
   } // node('linux')
 },
@@ -26,7 +29,7 @@ windows: {
     ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}/${env.BUILD_ID}") {
       stage('windows/scm') {
         deleteDir();
-        gitHelper.checkoutGit('https://github.com/OpenSpace/Ghoul', env.BRANCH_NAME);
+        gitHelper.checkoutGit(url, branch);
       }
       stage('windows/build') {
         compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio());
@@ -36,7 +39,7 @@ windows: {
       }
       stage('windows/test') {
         // Currently, the unit tests are failing on Windows
-        // testHelper.runTests('build\\Debug\\GhoulTest')
+        // testHelper.runUnitTests('build\\Debug\\GhoulTest')
       }
     }
   } // node('windows')
@@ -45,7 +48,7 @@ osx: {
   node('osx') {
     stage('osx/scm') {
       deleteDir();
-      gitHelper.checkoutGit('https://github.com/OpenSpace/Ghoul', env.BRANCH_NAME);
+      gitHelper.checkoutGit(url, branch);
     }
     stage('osx/build') {
         compileHelper.build(compileHelper.Xcode(), compileHelper.Clang());
@@ -55,7 +58,7 @@ osx: {
     }
     stage('osx/test') {
       // Currently, the unit tests are crashing on OS X
-      // testHelper.runTests('build/Debug/GhoulTest')
+      // testHelper.runUnitTests('build/Debug/GhoulTest')
     }
   } // node('osx')
 }
@@ -70,8 +73,8 @@ currentBuild.result = 'UNSTABLE';
 node('master') {
   stage('master/SCM') {
     deleteDir();
-    gitHelper.checkoutGit('https://github.com/OpenSpace/Ghoul', env.BRANCH_NAME);
-    cmake([installation: 'InSearchPath', arguments: '-E make_directory build'])
+    gitHelper.checkoutGit(url, branch);
+    helper.createDirectory('build');
   }
   stage('master/cppcheck') {
     sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> build/cppcheck.xml';
