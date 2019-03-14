@@ -28,7 +28,7 @@ linux: {
       gitHelper.checkoutGit(url, branch);
     }
     stage('linux/build') {
-        compileHelper.build(compileHelper.Make(), compileHelper.Gcc());
+        compileHelper.build(compileHelper.Make(), compileHelper.Gcc(), '', '');
     }
     stage('linux/warnings') {
       compileHelper.recordCompileIssues(compileHelper.Gcc());
@@ -47,7 +47,7 @@ windows: {
         gitHelper.checkoutGit(url, branch);
       }
       stage('windows/build') {
-        compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio());
+        compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio(), '', '');
       }
       stage('windows/warnings') {
         compileHelper.recordCompileIssues(compileHelper.VisualStudio());
@@ -66,7 +66,7 @@ osx: {
       gitHelper.checkoutGit(url, branch);
     }
     stage('osx/build') {
-        compileHelper.build(compileHelper.Xcode(), compileHelper.Clang());
+        compileHelper.build(compileHelper.Xcode(), compileHelper.Clang(), '', '');
     }
     stage('osx/warnings') {
       compileHelper.recordCompileIssues(compileHelper.Clang());
