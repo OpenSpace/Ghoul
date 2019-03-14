@@ -133,8 +133,7 @@ currentBuild.result = 'UNSTABLE';
 // NonCPS is required as the changeSets of the current build are not serializable
 @NonCPS
 def changeString(build) {
-  // def authors = load("${JENKINS_HOME}/slack_users.groovy").slackAuthors;
-  def authors = [];
+  def scriptHandle = load("${JENKINS_HOME}/slack_users.groovy");
 
   def res = [];
 
@@ -145,7 +144,7 @@ def changeString(build) {
 
       def date = "${new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss")}";
       def author = "${entry.author}";
-      def authorHandle = authors[author];
+      def authorHandle = scriptHandle.slackUserName(author);
       def fullAuthor = authorHandle ? "${author} (@${authorHandle})" : "${author}";
       def commit = "${entry.commitId.take(8)}";
       def message = "${entry.msg}";
