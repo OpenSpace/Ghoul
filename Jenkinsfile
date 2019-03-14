@@ -127,28 +127,6 @@ currentBuild.result = 'UNSTABLE';
 //
 // Post-build actions
 //
-
-node('master') {
-  stage('master/SCM') {
-    deleteDir();
-    checkoutGit();
-    cmake([installation: 'InSearchPath', arguments: '-E make_directory build'])
-  }
-  stage('master/cppcheck') {
-    sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> build/cppcheck.xml';
-    publishCppcheck(pattern: 'build/cppcheck.xml');
-  }
-  stage('master/cloc') {
-    sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=build/cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
-    sloccountPublish(encoding: '', pattern: 'build/cloc.xml');
-  }
-  // stage('master/notifications') {
-  //   def workspace = pwd();
-  //   def slackPlugin = load("${workspace}/support/jenkins/slack_notification.groovy");
-  //   slackPlugin.sendSlackMessage(currentBuild, changeString(currentBuild));
-  // }
-
-
 // Returns a list of the commit messages that led to this build being triggered
 // All messages are in the format:
 // <date> [Author (optionally: @author for slac)] (commit id): commit message
@@ -235,6 +213,28 @@ def sendSlackMessage(build, changes) {
   }
   // Ignore the rest (FAILURE -> FAILURE  and SUCCESS -> SUCCESS)
 }
+node('master') {
+  stage('master/SCM') {
+    deleteDir();
+    checkoutGit();
+    cmake([installation: 'InSearchPath', arguments: '-E make_directory build'])
+  }
+  stage('master/cppcheck') {
+    sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> build/cppcheck.xml';
+    publishCppcheck(pattern: 'build/cppcheck.xml');
+  }
+  stage('master/cloc') {
+    sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=build/cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
+    sloccountPublish(encoding: '', pattern: 'build/cloc.xml');
+  }
+  // stage('master/notifications') {
+  //   def workspace = pwd();
+  //   def slackPlugin = load("${workspace}/support/jenkins/slack_notification.groovy");
+  //   slackPlugin.sendSlackMessage(currentBuild, changeString(currentBuild));
+  // }
+
+
+
 
 sendSlackMessage(currentBuild, changeString(currentBuild));
 }
