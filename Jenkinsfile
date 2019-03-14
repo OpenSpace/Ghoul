@@ -10,10 +10,10 @@ parallel linux: {
       gitHelper.checkoutGit('https://github.com/OpenSpace/Ghoul', env.BRANCH_NAME);
     }
     stage('linux/build') {
-        compileHelper.build(compileHelper.generator.Make, compileHelper.compiler.GCC);
+        compileHelper.build(compileHelper.generator.Make, compileHelper.compiler.Gcc);
     }
     stage('linux/warnings') {
-      compileHelper.recordIssues(compileHelper.compiler.GCC);
+      compileHelper.recordIssues(compileHelper.compiler.Gcc);
     }
     stage('linux/test') {
       testHelper.runTests('build/GhoulTest');
