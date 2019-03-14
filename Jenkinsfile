@@ -26,7 +26,7 @@ windows: {
     ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}/${env.BUILD_ID}") {
       stage('windows/scm') {
         deleteDir();
-        gitHelper.checkoutGit();
+        gitHelper.checkoutGit('https://github.com/OpenSpace/Ghoul', env.BRANCH_NAME);
       }
       stage('windows/build') {
         compileHelper.build(compileHelper.VisualStudio, compileHelper.VisualStudio);
@@ -45,7 +45,7 @@ osx: {
   node('osx') {
     stage('osx/scm') {
       deleteDir();
-      gitHelper.checkoutGit();
+      gitHelper.checkoutGit('https://github.com/OpenSpace/Ghoul', env.BRANCH_NAME);
     }
     stage('osx/build') {
         compileHelper.build(compileHelper.Xcode, compileHelper.Clang);
@@ -70,7 +70,7 @@ currentBuild.result = 'UNSTABLE';
 node('master') {
   stage('master/SCM') {
     deleteDir();
-    gitHelper.checkoutGit();
+    gitHelper.checkoutGit('https://github.com/OpenSpace/Ghoul', env.BRANCH_NAME);
     cmake([installation: 'InSearchPath', arguments: '-E make_directory build'])
   }
   stage('master/cppcheck') {
