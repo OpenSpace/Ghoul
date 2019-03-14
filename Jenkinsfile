@@ -6,7 +6,22 @@ def branch = env.BRANCH_NAME;
 //
 // Pipeline start
 //
-parallel linux: {
+parallel master: {
+  node('master') {
+    stage('master/SCM') {
+      deleteDir();
+      gitHelper.checkoutGit(url, branch);
+      helper.createDirectory('build');
+    }
+    stage('master/cppcheck/create') {
+      sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> build/cppcheck.xml';
+    }
+    stage('master/cloc/create') {
+      sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=build/cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
+    }
+  }
+},
+linux: {
   node('linux') {
     stage('linux/scm') {
       deleteDir();
@@ -71,17 +86,10 @@ currentBuild.result = 'UNSTABLE';
 //
 
 node('master') {
-  stage('master/SCM') {
-    deleteDir();
-    gitHelper.checkoutGit(url, branch);
-    helper.createDirectory('build');
-  }
-  stage('master/cppcheck') {
-    sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> build/cppcheck.xml';
+  stage('master/cppcheck/publish') {
     publishCppcheck(pattern: 'build/cppcheck.xml');
   }
-  stage('master/cloc') {
-    sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=build/cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
+  stage('master/cloc/publish') {
     sloccountPublish(encoding: '', pattern: 'build/cloc.xml');
   }
   stage('master/notifications') {
