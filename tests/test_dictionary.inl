@@ -8247,13 +8247,13 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
     EXPECT_EQ(false, success) << "hasValue<bvec2>(\"2uint\")";
     success = d.hasValue<bvec2>("2float");
     EXPECT_EQ(false, success) << "hasValue<bvec2>(\"2float\")";
-    {
-        bvec2 value;
-        success = d.getValue("2int", value);
-        ASSERT_EQ(true, success) << "success getValue<bvec2>";
-        EXPECT_TRUE(value.x) << "correct getValue<bvec2>";
-        EXPECT_TRUE(value.y) << "correct getValue<bvec2>";
-    }
+    // {
+    //     bvec2 value;
+    //     success = d.getValue("2int", value);
+    //     ASSERT_EQ(true, success) << "success getValue<bvec2>";
+    //     EXPECT_TRUE(value.x) << "correct getValue<bvec2>";
+    //     EXPECT_TRUE(value.y) << "correct getValue<bvec2>";
+    // }
 
     using glm::vec3;
 
@@ -8337,14 +8337,14 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
     EXPECT_EQ(false, success) << "hasValue<bvec3>(\"3uint\")";
     success = d.hasValue<bvec3>("3float");
     EXPECT_EQ(false, success) << "hasValue<bvec3>(\"3float\")";
-    {
-        bvec3 value;
-        success = d.getValue("3int", value);
-        ASSERT_EQ(true, success) << "success getValue<bvec3>";
-        EXPECT_TRUE(value.x) << "correct getValue<bvec2>";
-        EXPECT_TRUE(value.y) << "correct getValue<bvec2>";
-        EXPECT_TRUE(value.z) << "correct getValue<bvec2>";
-    }
+    // {
+    //     bvec3 value;
+    //     success = d.getValue("3int", value);
+    //     ASSERT_EQ(true, success) << "success getValue<bvec3>";
+    //     EXPECT_TRUE(value.x) << "correct getValue<bvec2>";
+    //     EXPECT_TRUE(value.y) << "correct getValue<bvec2>";
+    //     EXPECT_TRUE(value.z) << "correct getValue<bvec2>";
+    // }
 
     using glm::vec4;
 
@@ -8428,15 +8428,15 @@ TEST_F(DictionaryTest, ConversionFromDictionary) {
     EXPECT_EQ(false, success) << "hasValue<bvec4>(\"4uint\")";
     success = d.hasValue<bvec4>("4float");
     EXPECT_EQ(false, success) << "hasValue<bvec4>(\"4float\")";
-    {
-        bvec4 value;
-        success = d.getValue("4int", value);
-        ASSERT_EQ(true, success) << "success getValue<bvec4>";
-        EXPECT_TRUE(value.x) << "correct getValue<bvec2>";
-        EXPECT_TRUE(value.y) << "correct getValue<bvec2>";
-        EXPECT_TRUE(value.z) << "correct getValue<bvec2>";
-        EXPECT_TRUE(value.w) << "correct getValue<bvec2>";
-    }
+    // {
+    //     bvec4 value;
+    //     success = d.getValue("4int", value);
+    //     ASSERT_EQ(true, success) << "success getValue<bvec4>";
+    //     EXPECT_TRUE(value.x) << "correct getValue<bvec2>";
+    //     EXPECT_TRUE(value.y) << "correct getValue<bvec2>";
+    //     EXPECT_TRUE(value.z) << "correct getValue<bvec2>";
+    //     EXPECT_TRUE(value.w) << "correct getValue<bvec2>";
+    // }
 
     using glm::mat2x2;
 

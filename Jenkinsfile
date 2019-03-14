@@ -1,23 +1,40 @@
-parallel linux: {
-  node('linux') {
-    stage('linux/SCM') {
-      deleteDir()
-      checkout scm
-      sh 'git submodule update --init --recursive'
+library('sharedSpace'); // jenkins-pipeline-lib
+
+def url = 'https://github.com/OpenSpace/Ghoul';
+def branch = env.BRANCH_NAME;
+
+//
+// Pipeline start
+//
+parallel master: {
+  node('master') {
+    stage('master/SCM') {
+      deleteDir();
+      gitHelper.checkoutGit(url, branch);
+      helper.createDirectory('build');
     }
-    stage('linux/Build') {
-      cmakeBuild([
-        generator: 'Unix Makefiles',
-        buildDir: 'build',
-        installation: 'InSearchPath',
-        steps: [
-          [ args: '--target GhoulTest -- -j4', withCmake: true ]
-        ]
-      ])
+    stage('master/cppcheck/create') {
+      sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> build/cppcheck.xml';
+    }
+    stage('master/cloc/create') {
+      sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=build/cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
+    }
+  }
+},
+linux: {
+  node('linux') {
+    stage('linux/scm') {
+      deleteDir();
+      gitHelper.checkoutGit(url, branch);
+    }
+    stage('linux/build') {
+        compileHelper.build(compileHelper.Make(), compileHelper.Gcc());
+    }
+    stage('linux/warnings') {
+      compileHelper.recordCompileIssues(compileHelper.Gcc());
     }
     stage('linux/test') {
-      sh 'build/GhoulTest --gtest_output=xml:test_results.xml'
-      junit([testResults: 'test_results.xml'])
+      testHelper.runUnitTests('build/GhoulTest');
     }
   } // node('linux')
 },
@@ -25,50 +42,55 @@ windows: {
   node('windows') {
     // We specify the workspace directory manually to reduce the path length and thus try to avoid MSB3491 on Visual Studio
     ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}/${env.BUILD_ID}") {
-      stage('windows/SCM') {
-        deleteDir()
-        checkout scm
-        bat 'git submodule update --init --recursive'
+      stage('windows/scm') {
+        deleteDir();
+        gitHelper.checkoutGit(url, branch);
       }
-      stage('windows/Build') {
-        cmakeBuild([
-          generator: 'Visual Studio 15 2017 Win64',
-          buildDir: 'build',
-          installation: 'InSearchPath',
-          steps: [
-            [ args: '-- /nologo /verbosity:minimal /m:4', withCmake: true ]
-          ]
-        ])
+      stage('windows/build') {
+        compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio());
       }
-      // Currently, the unit tests are failing on Windows
-      // stage('windows/test') {
-      //   bat 'build\\Debug\\GhoulTest --gtest_output=xml:test_results.xml'
-      //   junit([testResults: 'test_results.xml'])
-      // }
+      stage('windows/warnings') {
+        compileHelper.recordCompileIssues(compileHelper.VisualStudio());
+      }
+      stage('windows/test') {
+        // Currently, the unit tests are failing on Windows
+        // testHelper.runUnitTests('build\\Debug\\GhoulTest')
+      }
     }
   } // node('windows')
 },
 osx: {
   node('osx') {
-    stage('osx/SCM') {
-      deleteDir()
-      checkout scm
-      sh 'git submodule update --init --recursive'
+    stage('osx/scm') {
+      deleteDir();
+      gitHelper.checkoutGit(url, branch);
     }
-    stage('osx/Build') {
-      cmakeBuild([
-        generator: 'Xcode',
-        buildDir: 'build',
-        installation: 'InSearchPath',
-        steps: [
-          [ args: '-- -parallelizeTargets -jobs 4 -target Ghoul -target GhoulTest', withCmake: true ],
-        ]
-      ])
+    stage('osx/build') {
+        compileHelper.build(compileHelper.Xcode(), compileHelper.Clang());
     }
-    // Currently, the unit tests are crashing on OS X
-    // stage('osx/test') {
-    //   sh 'build/Debug/GhoulTest --gtest_output=xml:test_results.xml'
-    //   junit([testResults: 'test_results.xml'])
-    // }
+    stage('osx/warnings') {
+      compileHelper.recordCompileIssues(compileHelper.Clang());
+    }
+    stage('osx/test') {
+      // Currently, the unit tests are crashing on OS X
+      // testHelper.runUnitTests('build/Debug/GhoulTest')
+    }
   } // node('osx')
+}
+
+
+//
+// Post-build actions
+//
+
+node('master') {
+  stage('master/cppcheck/publish') {
+    publishCppcheck(pattern: 'build/cppcheck.xml');
+  }
+  stage('master/cloc/publish') {
+    sloccountPublish(encoding: '', pattern: 'build/cloc.xml');
+  }
+  stage('master/notifications') {
+    slackHelper.sendChangeSetSlackMessage(currentBuild);
+  }
 }
