@@ -147,7 +147,6 @@ node('master') {
   //   def slackPlugin = load("${workspace}/support/jenkins/slack_notification.groovy");
   //   slackPlugin.sendSlackMessage(currentBuild, changeString(currentBuild));
   // }
-}
 
 
 // Returns a list of the commit messages that led to this build being triggered
@@ -238,3 +237,4 @@ def sendSlackMessage(build, changes) {
 }
 
 sendSlackMessage(currentBuild, changeString(currentBuild));
+}
