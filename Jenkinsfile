@@ -16,7 +16,7 @@ parallel linux: {
         compileHelper.build(compileHelper.Make(), compileHelper.Gcc());
     }
     stage('linux/warnings') {
-      compileHelper.recordIssues(compileHelper.Gcc());
+      compileHelper.recordCompileIssues(compileHelper.Gcc());
     }
     stage('linux/test') {
       testHelper.runUnitTests('build/GhoulTest');
@@ -35,7 +35,7 @@ windows: {
         compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio());
       }
       stage('windows/warnings') {
-        compileHelper.recordIssues(compileHelper.VisualStudio());
+        compileHelper.recordCompileIssues(compileHelper.VisualStudio());
       }
       stage('windows/test') {
         // Currently, the unit tests are failing on Windows
@@ -54,7 +54,7 @@ osx: {
         compileHelper.build(compileHelper.Xcode(), compileHelper.Clang());
     }
     stage('osx/warnings') {
-      compileHelper.recordIssues(compileHelper.Clang());
+      compileHelper.recordCompileIssues(compileHelper.Clang());
     }
     stage('osx/test') {
       // Currently, the unit tests are crashing on OS X
