@@ -145,7 +145,7 @@ node('master') {
   stage('master/notifications') {
     // def workspace = pwd();
     // def slackPlugin = load("${workspace}/support/jenkins/slack_notification.groovy");
-    slack.sendSlackMessage(currentBuild, slack.changeString(currentBuild));
+    slack.sendSlackMessage(currentBuild);
     // slackPlugin.sendSlackMessage(currentBuild, changeString(currentBuild));
   }
 }
