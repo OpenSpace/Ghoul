@@ -161,6 +161,8 @@ def changeString(build) {
 
   def res = [];
 
+  echo build.changeSets.size();
+
   for (int i = 0; i < build.changeSets.size(); i++) {
     def entries = build.changeSets[i].items;
     for (int j = 0; j < entries.length; j++) {
