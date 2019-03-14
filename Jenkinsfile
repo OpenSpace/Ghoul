@@ -10,10 +10,10 @@ parallel linux: {
       gitHelper.checkoutGit('https://github.com/OpenSpace/Ghoul', env.BRANCH_NAME);
     }
     stage('linux/build') {
-        compileHelper.build(compileHelper.Make, compileHelper.GCC);
+        compileHelper.build(compileHelper.generator.Make, compileHelper.compiler.GCC);
     }
     stage('linux/warnings') {
-      compileHelper.recordIssues('gcc');
+      compileHelper.recordIssues(compileHelper.compiler.GCC);
     }
     stage('linux/test') {
       testHelper.runTests('build/GhoulTest');
@@ -29,10 +29,10 @@ windows: {
         gitHelper.checkoutGit('https://github.com/OpenSpace/Ghoul', env.BRANCH_NAME);
       }
       stage('windows/build') {
-        compileHelper.build(compileHelper.VisualStudio, compileHelper.VisualStudio);
+        compileHelper.build(compileHelper.generator.VisualStudio, compileHelper.compiler.VisualStudio);
       }
       stage('windows/warnings') {
-        compileHelper.recordIssues(compileHelper.VisualStudio);
+        compileHelper.recordIssues(compileHelper.compiler.VisualStudio);
       }
       stage('windows/test') {
         // Currently, the unit tests are failing on Windows
@@ -48,10 +48,10 @@ osx: {
       gitHelper.checkoutGit('https://github.com/OpenSpace/Ghoul', env.BRANCH_NAME);
     }
     stage('osx/build') {
-        compileHelper.build(compileHelper.Xcode, compileHelper.Clang);
+        compileHelper.build(compileHelper.generator.Xcode, compileHelper.compiler.Clang);
     }
     stage('osx/warnings') {
-      compileHelper.recordIssues('clang');
+      compileHelper.recordIssues(compileHelper.compiler.Clang);
     }
     stage('osx/test') {
       // Currently, the unit tests are crashing on OS X
