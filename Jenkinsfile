@@ -143,9 +143,6 @@ node('master') {
     sloccountPublish(encoding: '', pattern: 'build/cloc.xml');
   }
   stage('master/notifications') {
-    // def workspace = pwd();
-    // def slackPlugin = load("${workspace}/support/jenkins/slack_notification.groovy");
     slack.sendSlackMessage(currentBuild);
-    // slackPlugin.sendSlackMessage(currentBuild, changeString(currentBuild));
   }
 }
