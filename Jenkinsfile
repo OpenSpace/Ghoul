@@ -1,4 +1,4 @@
-@Library('sharedSpace') _
+library('sharedSpace');
 
 // Checks out Ghoul from Git with recursive submodules
 // unfortunately, as of now (2019-03-12), there is no good way of specifying recursive
@@ -145,7 +145,7 @@ node('master') {
   stage('master/notifications') {
     // def workspace = pwd();
     // def slackPlugin = load("${workspace}/support/jenkins/slack_notification.groovy");
-    sharedSpace.slack.sendSlackMessage(currentBuild, changeString(currentBuild));
+    slack.sendSlackMessage(currentBuild, changeString(currentBuild));
     // slackPlugin.sendSlackMessage(currentBuild, changeString(currentBuild));
   }
 }
