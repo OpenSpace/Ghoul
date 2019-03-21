@@ -102,9 +102,9 @@ if (WIN32)
     begin_dependency("WMI")
     if (GHOUL_USE_WMI)
         target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_WMI")
-        target_link_libraries(Ghoul "WbemUuid.lib" "Ws2_32.lib")
+        target_link_libraries(Ghoul PRIVATE "WbemUuid.lib" "Ws2_32.lib")
     endif ()
-    target_link_libraries(Ghoul "shlwapi")
+    target_link_libraries(Ghoul PRIVATE "shlwapi")
     end_dependency()
 endif ()
 
@@ -116,8 +116,8 @@ if (APPLE)
     find_library(APP_SERVICES_LIBRARY ApplicationServices REQUIRED)
     mark_as_advanced(COREFOUNDATION_LIBRARY COREVIDEO_LIBRARY CARBON_LIBRARY
         COCOA_LIBRARY APP_SERVICES_LIBRARY)
-    target_include_directories(Ghoul SYSTEM PUBLIC "/Developer/Headers/FlatCarbon")
-    target_link_libraries(Ghoul ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY}
+    target_include_directories(Ghoul SYSTEM PRIVATE "/Developer/Headers/FlatCarbon")
+    target_link_libraries(Ghoul PRIVATE ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY}
         ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})
     end_dependency()
 endif ()
@@ -126,8 +126,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     begin_dependency("iNotify")
     find_library(INOTIFY_LIBRARIES inotify PATHS "/usr/local/lib")
     mark_as_advanced(INOTIFY_LIBRARIES)
-    target_include_directories(Ghoul SYSTEM PUBLIC "/usr/local/include")
-    target_link_libraries(Ghoul ${INOTIFY_LIBRARIES})
+    target_include_directories(Ghoul SYSTEM PRIVATE "/usr/local/include")
+    target_link_libraries(Ghoul PRIVATE ${INOTIFY_LIBRARIES})
     end_dependency("iNotify")
 endif ()
 
@@ -148,7 +148,7 @@ if (GHOUL_MODULE_OPENGL)
     find_package(OpenGL REQUIRED)
     target_include_directories(Ghoul SYSTEM PUBLIC ${OPENGL_INCLUDE_DIR})
     message(STATUS "Including OpenGL found at ${OPENGL_INCLUDE_DIR}")
-    target_link_libraries(Ghoul ${OPENGL_LIBRARIES})
+    target_link_libraries(Ghoul PUBLIC ${OPENGL_LIBRARIES})
     message(STATUS "Linking OpenGL found at ${OPENGL_LIBRARIES}")
 
     mark_as_advanced(OPENGL_INCLUDE_DIR OPENGL_LIBRARIES)
@@ -172,7 +172,7 @@ if (GHOUL_MODULE_OPENGL)
         ${GHOUL_ROOT_DIR}/ext/glbinding/source/glbinding-aux/include)
     target_include_directories(Ghoul SYSTEM PUBLIC
         ${CMAKE_BINARY_DIR}/ext/ghoul/ext/glbinding/source/glbinding-aux/include)
-    target_link_libraries(Ghoul glbinding::glbinding glbinding::glbinding-aux)
+    target_link_libraries(Ghoul PUBLIC glbinding::glbinding glbinding::glbinding-aux)
 
     set_folder_location(glbinding "External")
     set_folder_location(check-glbinding "External/glbinding-ext")
@@ -204,7 +204,7 @@ end_dependency("LZ4")
 # Lua
 if (GHOUL_MODULE_LUA)
     begin_module("Lua")
-    include_external_library(Ghoul PUBLIC Lua "${GHOUL_ROOT_DIR}/ext/lua")
+    include_external_library(Ghoul PUBLIC Lua ${GHOUL_ROOT_DIR}/ext/lua)
     end_module()
 endif ()
 
@@ -214,9 +214,9 @@ if (GHOUL_MODULE_ASSIMP)
     find_package(Assimp QUIET)
     if (Assimp_FOUND)
         message(STATUS "Using system assimp")
-        target_include_directories(Ghoul SYSTEM PUBLIC ${ASSIMP_INCLUDE_DIRS})
-        target_link_libraries(Ghoul ${ASSIMP_LIBRARIES})
-        link_directories("${ASSIMP_LIBRARY_DIRS}")
+        target_include_directories(Ghoul SYSTEM PRIVATE ${ASSIMP_INCLUDE_DIRS})
+        target_link_libraries(Ghoul PRIVATE ${ASSIMP_LIBRARIES})
+        # link_directories("${ASSIMP_LIBRARY_DIRS}")
         set(GHOUL_LIBRARY_DIRS "${ASSIMP_LIBRARY_DIRS}" PARENT_SCOPE)
     else ()
         message(STATUS "Building assimp from source")
@@ -261,12 +261,8 @@ if (GHOUL_MODULE_ASSIMP)
             ASSIMP_PACKAGE_VERSION ASSIMP_UBSAN ASSIMP_WERROR BUILD_DOCS BUILD_FRAMEWORK
             SYSTEM_IRRXML LIBRARY_SUFFIX)
 
-        include_external_library(Ghoul
-            assimp
-            PRIVATE
-            ${GHOUL_ROOT_DIR}/ext/assimp
-            ${GHOUL_ROOT_DIR}/ext/assimp/include
-        )
+        include_external_library(Ghoul PRIVATE assimp
+            ${GHOUL_ROOT_DIR}/ext/assimp ${GHOUL_ROOT_DIR}/ext/assimp/include)
 
         # We need to include this to be able to find the assimp/config.h file
         target_include_directories(Ghoul PRIVATE
@@ -296,7 +292,7 @@ if (IL_FOUND)
     begin_dependency("DevIL")
     option(GHOUL_USE_DEVIL "Use the DevIL library" ON)
     if (GHOUL_USE_DEVIL)
-        target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_DEVIL")
+        target_compile_definitions(Ghoul PRIVATE "GHOUL_USE_DEVIL")
 
         target_include_directories(Ghoul SYSTEM PRIVATE ${IL_INCLUDE_DIR})
         target_link_libraries(Ghoul PRIVATE ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
@@ -335,7 +331,7 @@ endif ()
 option(GHOUL_USE_STB_IMAGE "Use the stb_image library" ON)
 if (GHOUL_USE_STB_IMAGE)
     begin_dependency("stb_image")
-    target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_STB_IMAGE")
+    target_compile_definitions(Ghoul PRIVATE "GHOUL_USE_STB_IMAGE")
     include_external_library(Ghoul PRIVATE stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
     end_dependency()
 endif ()
@@ -373,7 +369,7 @@ end_dependency()
 if (GHOUL_MODULE_FONTRENDERING)
     begin_module("FontRendering")
     set(FREETYPE_DIST OFF CACHE BOOL "")
-    include_external_library(Ghoul freetype
+    include_external_library(Ghoul PRIVATE freetype
         ${GHOUL_ROOT_DIR}/ext/freetype2 ${GHOUL_ROOT_DIR}/ext/freetype2/include)
 
     mark_as_advanced(FT_WITH_BZIP2 FT_WITH_HARFBUZZ FT_WITH_PNG FT_WITH_ZLIB

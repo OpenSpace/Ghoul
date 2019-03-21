@@ -25,6 +25,8 @@
 
 #include <ghoul/misc/process.h>
 
+#include <process.hpp>
+
 namespace ghoul {
 
 Process::Process(const std::string& command, const std::string& path,

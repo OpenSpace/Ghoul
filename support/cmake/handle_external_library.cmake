@@ -61,13 +61,13 @@ endfunction ()
 # target_name: Target to which the library is added
 # library_name: The library that is added by including 'path'
 # path: The path that will be included
-function (include_external_library target_name library_name path)
+function (include_external_library target_name visibility library_name path)
     set (extra_macro_args ${ARGN})
     if (NOT TARGET ${library_name})
         add_subdirectory(${path})
         get_property(INCLUDE_DIR TARGET ${target_name} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
-        target_link_libraries(${target_name} ${library_name})
-        target_include_directories(${target_name} SYSTEM PUBLIC ${INCLUDE_DIR} ${extra_macro_args})
+        target_link_libraries(${target_name} ${visibility} ${library_name})
+        target_include_directories(${target_name} SYSTEM ${visibility} ${INCLUDE_DIR} ${extra_macro_args})
         set_folder_location(${library_name} "External")
         if (MSVC)
             target_compile_options(

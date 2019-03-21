@@ -29,7 +29,7 @@
 #include <string>
 #include <functional>
 
-#include <process.hpp>
+namespace TinyProcessLib { class Process; }
 
 namespace ghoul {
 
