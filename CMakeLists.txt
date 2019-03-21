@@ -194,8 +194,8 @@ endif ()
 # LZ4
 begin_dependency("LZ4")
 find_package(LZ4 REQUIRED)
-target_include_directories(Ghoul SYSTEM PUBLIC ${LZ4_INCLUDE_DIR})
-target_link_libraries(Ghoul ${LZ4_LIBRARIES})
+target_include_directories(Ghoul SYSTEM PRIVATE ${LZ4_INCLUDE_DIR})
+target_link_libraries(Ghoul PRIVATE ${LZ4_LIBRARIES})
 
 mark_as_advanced(LZ4_INCLUDE_DIR)
 set_folder_location(lz4 "External")
@@ -204,7 +204,7 @@ end_dependency("LZ4")
 # Lua
 if (GHOUL_MODULE_LUA)
     begin_module("Lua")
-    include_external_library(Ghoul Lua ${GHOUL_ROOT_DIR}/ext/lua)
+    include_external_library(Ghoul PUBLIC Lua "${GHOUL_ROOT_DIR}/ext/lua")
     end_module()
 endif ()
 
@@ -263,10 +263,13 @@ if (GHOUL_MODULE_ASSIMP)
 
         include_external_library(Ghoul
             assimp
-            ${GHOUL_ROOT_DIR}/ext/assimp ${GHOUL_ROOT_DIR}/ext/assimp/include)
+            PRIVATE
+            ${GHOUL_ROOT_DIR}/ext/assimp
+            ${GHOUL_ROOT_DIR}/ext/assimp/include
+        )
 
         # We need to include this to be able to find the assimp/config.h file
-        target_include_directories(Ghoul PUBLIC
+        target_include_directories(Ghoul PRIVATE
             "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
 
         set_folder_location(IrrXML "External")
@@ -281,8 +284,7 @@ begin_dependency("fmt")
 set(FMT_DOC OFF CACHE BOOL "Generate the doc target.")
 set(FMT_INSTALL OFF CACHE BOOL "Generate the install target.")
 set(FMT_TEST OFF CACHE BOOL "Generate the test target.")
-include_external_library(Ghoul fmt
-    ${GHOUL_ROOT_DIR}/ext/cppformat ${GHOUL_ROOT_DIR}/ext/cppformat)
+include_external_library(Ghoul PUBLIC fmt ${GHOUL_ROOT_DIR}/ext/cppformat ${GHOUL_ROOT_DIR}/ext/cppformat)
 mark_as_advanced(FMT_DOC FMT_INSTALL FMT_PEDANTIC FMT_TEST FMT_WERROR)
 end_dependency("fmt")
 
@@ -296,8 +298,8 @@ if (IL_FOUND)
     if (GHOUL_USE_DEVIL)
         target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_DEVIL")
 
-        target_include_directories(Ghoul SYSTEM PUBLIC ${IL_INCLUDE_DIR})
-        target_link_libraries(Ghoul ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
+        target_include_directories(Ghoul SYSTEM PRIVATE ${IL_INCLUDE_DIR})
+        target_link_libraries(Ghoul PRIVATE ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
     endif ()
     end_dependency()
 endif ()
@@ -310,8 +312,8 @@ if (FREEIMAGE_FOUND)
     option(GHOUL_USE_FREEIMAGE "Use the FreeImage library" ON)
     if (GHOUL_USE_FREEIMAGE)
         target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_FREEIMAGE")
-        target_include_directories(Ghoul SYSTEM PUBLIC ${FREEIMAGE_INCLUDE_PATH})
-        target_link_libraries(Ghoul ${FREEIMAGE_LIBRARIES})
+        target_include_directories(Ghoul SYSTEM PRIVATE ${FREEIMAGE_INCLUDE_PATH})
+        target_link_libraries(Ghoul PRIVATE ${FREEIMAGE_LIBRARIES})
     endif ()
     end_dependency()
 endif ()
@@ -323,8 +325,8 @@ if (SOIL_FOUND)
     option(GHOUL_USE_SOIL "Use the SOIL library" ON)
     if (GHOUL_USE_SOIL)
         target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_SOIL")
-        target_include_directories(Ghoul PUBLIC ${SOIL_INCLUDE_DIRS} ${OPENGL_LIBRARIES})
-        target_link_libraries(Ghoul ${SOIL_LIBRARIES})
+        target_include_directories(Ghoul PRIVATE ${SOIL_INCLUDE_DIRS} ${OPENGL_LIBRARIES})
+        target_link_libraries(Ghoul PRIVATE ${SOIL_LIBRARIES})
     endif ()
     end_dependency()
 endif ()
@@ -334,15 +336,15 @@ option(GHOUL_USE_STB_IMAGE "Use the stb_image library" ON)
 if (GHOUL_USE_STB_IMAGE)
     begin_dependency("stb_image")
     target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_STB_IMAGE")
-    include_external_library(Ghoul stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
+    include_external_library(Ghoul PRIVATE stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
     end_dependency()
 endif ()
 
 # Stackwalker
 if (MSVC)
     begin_dependency("Stackwalker")
-    target_include_directories(Ghoul PUBLIC ${GHOUL_ROOT_DIR}/ext/stackwalker)
-    include_external_library(Ghoul StackWalker
+    target_include_directories(Ghoul PRIVATE ${GHOUL_ROOT_DIR}/ext/stackwalker)
+    include_external_library(Ghoul PRIVATE StackWalker
         ${GHOUL_ROOT_DIR}/ext/stackwalker ${GHOUL_ROOT_DIR}/ext/stackwalker)
     end_dependency()
 endif ()
@@ -381,7 +383,7 @@ if (GHOUL_MODULE_FONTRENDERING)
 endif ()
 
 begin_dependency("tiny-process-library")
-include_external_library(Ghoul tiny-process-library
+include_external_library(Ghoul PRIVATE tiny-process-library
     ${GHOUL_ROOT_DIR}/ext/tiny-process-library)
 mark_as_advanced(BUILD_TESTING)
 end_dependency("tiny-process-library")
@@ -409,22 +411,22 @@ if (GHOUL_HAVE_TESTS)
     set_ghoul_compile_settings(GhoulTest)
 
     if (MSVC)
-        target_compile_options(GhoulTest PUBLIC "-Od" "/bigobj")
+        target_compile_options(GhoulTest PRIVATE "-Od" "/bigobj")
     else ()
-        target_compile_options(GhoulTest PUBLIC "-O0" )
+        target_compile_options(GhoulTest PRIVATE "-O0" )
     endif ()
 
-    target_include_directories(GhoulTest PUBLIC
+    target_include_directories(GhoulTest PRIVATE
         "${GHOUL_ROOT_DIR}/ext/googletest/googletest/include" "${GHOUL_ROOT_DIR}")
 
     include_gtest("${GHOUL_ROOT_DIR}/ext/googletest")
 
-    target_link_libraries(GhoulTest gtest Ghoul Lua)
+    target_link_libraries(GhoulTest PRIVATE gtest Ghoul Lua)
 
     ghl_copy_shared_libraries(GhoulTest ${GHOUL_ROOT_DIR})
 
     if (APPLE)
-        target_link_libraries(GhoulTest
+        target_link_libraries(GhoulTest PRIVATE
             ${CARBON_LIBRARY}
             ${COREFOUNDATION_LIBRARY}
             ${COCOA_LIBRARY}
