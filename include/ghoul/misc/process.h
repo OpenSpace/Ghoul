@@ -28,6 +28,7 @@
 
 #include <string>
 #include <functional>
+#include <memory>
 
 namespace TinyProcessLib { class Process; }
 
