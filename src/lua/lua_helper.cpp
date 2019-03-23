@@ -254,7 +254,7 @@ void loadDictionaryFromString(const std::string& script, Dictionary& dictionary,
 }
 
 void loadArrayDictionaryFromString(const std::string& script, Dictionary& dictionary,
-                                                                         lua_State* state)
+                                   lua_State* state)
 {
     ghoul_assert(!script.empty(), "Script must not be empty");
 
@@ -296,7 +296,7 @@ Dictionary loadArrayDictionaryFromString(const std::string& script, lua_State* s
 }
 
 void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
-                                                                     int relativeLocation)
+                            int relativeLocation)
 {
     enum class TableType {
         Undefined = 1,  // 001
@@ -383,20 +383,24 @@ void luaArrayDictionaryFromState(lua_State* state, Dictionary& dictionary) {
         case LUA_TNUMBER: {
             double value = lua_tonumber(state, i);
             dictionary.setValue(std::to_string(i), value);
-        } break;
+            break;
+        }
         case LUA_TBOOLEAN: {
             bool value = (lua_toboolean(state, i) == 1);
             dictionary.setValue(std::to_string(i), value);
-        } break;
+            break;
+        }
         case LUA_TSTRING: {
             std::string value = lua_tostring(state, i);
             dictionary.setValue(std::to_string(i), value);
-        } break;
+            break;
+        }
         case LUA_TTABLE: {
             Dictionary d;
             luaDictionaryFromState(state, d, i);
             dictionary.setValue(std::to_string(i), d);
-        } break;
+            break;
+        }
         default:
             throw LuaFormatException(
                 "Unknown type: " + std::to_string(lua_type(state, i))
