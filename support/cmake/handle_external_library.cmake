@@ -2,7 +2,7 @@
 #                                                                                        #
 # GHOUL                                                                                  #
 #                                                                                        #
-# Copyright (c) 2012-2018                                                                #
+# Copyright (c) 2012-2019                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -23,32 +23,26 @@
 ##########################################################################################
 
 function(disable_external_warnings library_name)
-    if (MSVC)
-        target_compile_options(${library_name} PRIVATE "/W0")
-        target_compile_definitions(${library_name} PRIVATE "_SCL_SECURE_NO_WARNINGS")
-    else ()
-        target_compile_options(${library_name} PRIVATE "-w")
-    endif ()
+  if (MSVC)
+    target_compile_options(${library_name} PRIVATE "/W0")
+    target_compile_definitions(${library_name} PRIVATE "_SCL_SECURE_NO_WARNINGS")
+  else ()
+    target_compile_options(${library_name} PRIVATE "-w")
+  endif ()
 endfunction ()
 
 
 function(disable_external_warnings_for_file file_name)
-    if (MSVC)
-        set_source_files_properties(
-            ${file_name}
-            PROPERTIES COMPILE_FLAGS "/W0"
-        )
+  if (MSVC)
+    set_source_files_properties(${file_name} PROPERTIES COMPILE_FLAGS "/W0")
 
-        set_source_files_properties(
-            ${file_name}
-            PROPERTIES COMPILE_DEFINITIONS "_SCL_SECURE_NO_WARNINGS"
-        )
-    else ()
-        set_source_files_properties(
-            ${file_name}
-            PROPERTIES COMPILE_FLAGS "-w"
-        )
-    endif ()
+    set_source_files_properties(
+      ${file_name}
+      PROPERTIES COMPILE_DEFINITIONS "_SCL_SECURE_NO_WARNINGS"
+    )
+  else ()
+    set_source_files_properties(${file_name} PROPERTIES COMPILE_FLAGS "-w")
+  endif ()
 endfunction ()
 
 function (set_folder_location target folder)
@@ -62,23 +56,18 @@ endfunction ()
 # library_name: The library that is added by including 'path'
 # path: The path that will be included
 function (include_external_library target_name visibility library_name path)
-    set (extra_macro_args ${ARGN})
-    if (NOT TARGET ${library_name})
-        add_subdirectory(${path})
-        get_property(INCLUDE_DIR TARGET ${target_name} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
-        target_link_libraries(${target_name} ${visibility} ${library_name})
-        target_include_directories(${target_name} SYSTEM ${visibility} ${INCLUDE_DIR} ${extra_macro_args})
-        set_folder_location(${library_name} "External")
-        if (MSVC)
-            target_compile_options(
-                ${library_name}
-                PUBLIC
-                "/MP"
-                "/bigobj"
-            )
-        endif ()
-        if (GHOUL_DISABLE_EXTERNAL_WARNINGS)
-            disable_external_warnings(${library_name})
-        endif ()
+  set (extra_macro_args ${ARGN})
+  if (NOT TARGET ${library_name})
+    add_subdirectory(${path})
+    get_property(INCLUDE_DIR TARGET ${target_name} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+    target_link_libraries(${target_name} ${visibility} ${library_name})
+    target_include_directories(${target_name} SYSTEM ${visibility} ${INCLUDE_DIR} ${extra_macro_args})
+    set_folder_location(${library_name} "External")
+    if (MSVC)
+      target_compile_options(${library_name} PUBLIC "/MP" "/bigobj")
     endif ()
+    if (GHOUL_DISABLE_EXTERNAL_WARNINGS)
+        disable_external_warnings(${library_name})
+    endif ()
+  endif ()
 endfunction ()
