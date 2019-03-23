@@ -2,7 +2,7 @@
 #                                                                                        #
 # GHOUL                                                                                  #
 #                                                                                        #
-# Copyright (c) 2012-2018                                                                #
+# Copyright (c) 2012-2019                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -23,18 +23,17 @@
 ##########################################################################################
 
 function (include_gtest path)
-    if (NOT TARGET gtest)
-        set(BUILD_GTEST ON CACHE BOOL "")
-        set(BUILD_GMOCK OFF CACHE BOOL "")
-        set(gtest_force_shared_crt ON CACHE BOOL "")
-        add_subdirectory(${path})
+  if (NOT TARGET gtest)
+    set(BUILD_GTEST ON CACHE BOOL "")
+    set(BUILD_GMOCK OFF CACHE BOOL "")
+    set(gtest_force_shared_crt ON CACHE BOOL "")
+    add_subdirectory(${path})
 
-        mark_as_advanced(BUILD_GMOCK BUILD_GTEST INSTALL_GTEST)
+    mark_as_advanced(BUILD_GMOCK BUILD_GTEST INSTALL_GTEST)
 
-        target_compile_definitions(gtest PUBLIC "_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING")
+    target_compile_definitions(gtest PUBLIC "_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING")
 
-        set_folder_location(gtest_main "External")
-        set_folder_location(gtest "External")
-    endif ()
+    set_folder_location(gtest_main "External")
+    set_folder_location(gtest "External")
+  endif ()
 endfunction ()
-

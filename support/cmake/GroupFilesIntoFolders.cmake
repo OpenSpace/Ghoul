@@ -2,7 +2,7 @@
 #                                                                                        #
 # GHOUL                                                                                  #
 #                                                                                        #
-# Copyright (c) 2012-2018                                                                #
+# Copyright (c) 2012-2019                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -23,27 +23,27 @@
 ##########################################################################################
 
 function (group_files_into_folders)
-    # Place files into source_group
-    foreach (file ${ARGN})
-        # Remove prefixes from the files 
-        set(original_file ${file})
-        string(REPLACE "${PROJECT_SOURCE_DIR}/src/" "" file ${file})
-        string(REPLACE "${PROJECT_SOURCE_DIR}/include/ghoul/" "" file ${file})
+  # Place files into source_group
+  foreach (file ${ARGN})
+    # Remove prefixes from the files 
+    set(original_file ${file})
+    string(REPLACE "${PROJECT_SOURCE_DIR}/src/" "" file ${file})
+    string(REPLACE "${PROJECT_SOURCE_DIR}/include/ghoul/" "" file ${file})
 
-        # Extract the directory part of the rest
-        get_filename_component(directory ${file} DIRECTORY)
-        if (NOT ${directory} STREQUAL "")
-            if (MSVC)
-                    string(REPLACE "/" "\\" directory ${directory})
-            endif ()
+    # Extract the directory part of the rest
+    get_filename_component(directory ${file} DIRECTORY)
+    if (NOT ${directory} STREQUAL "")
+      if (MSVC)
+        string(REPLACE "/" "\\" directory ${directory})
+      endif ()
 
-            # Make the directory's first letter upper case
-            string(SUBSTRING ${directory} 0 1 FIRST_LETTER)
-            string(TOUPPER ${FIRST_LETTER} FIRST_LETTER)
-            string(REGEX REPLACE "^.(.*)" "${FIRST_LETTER}\\1" directory "${directory}")
-            source_group("${directory}" FILES ${original_file})
-        else ()
-            source_group("" FILES ${original_file})
-        endif ()
-    endforeach ()
+      # Make the directory's first letter upper case
+      string(SUBSTRING ${directory} 0 1 FIRST_LETTER)
+      string(TOUPPER ${FIRST_LETTER} FIRST_LETTER)
+      string(REGEX REPLACE "^.(.*)" "${FIRST_LETTER}\\1" directory "${directory}")
+      source_group("${directory}" FILES ${original_file})
+    else ()
+      source_group("" FILES ${original_file})
+    endif ()
+  endforeach ()
 endfunction ()

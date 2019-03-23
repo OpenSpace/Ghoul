@@ -2,7 +2,7 @@
 #                                                                                        #
 # GHOUL                                                                                  #
 #                                                                                        #
-# Copyright (c) 2012-2018                                                                #
+# Copyright (c) 2012-2019                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -23,41 +23,42 @@
 ##########################################################################################
 
 function (ghl_copy_files target)
-    # Add the copy command
-    foreach(file_i ${ARGN})
-        add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${file_i}"
-        $<TARGET_FILE_DIR:${target}>)
-    endforeach ()
+  # Add the copy command
+  foreach(file_i ${ARGN})
+    add_custom_command(TARGET ${target} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${file_i}"
+    $<TARGET_FILE_DIR:${target}>)
+  endforeach ()
 endfunction ()
 
 macro (ghl_copy_shared_libraries target ghoul_dir)
-    # Windows DLL
-    if (WIN32)
-        # DevIL
-        if (GHOUL_USE_DEVIL)
-            if (CMAKE_CL_64)
-                set(DEVIL_DLL_DIR ${ghoul_dir}/ext/il/lib/win64)
-            else (CMAKE_CL_64)
-                set(DEVIL_DLL_DIR ${ghoul_dir}/ext/il/lib/win32)
-            endif ()
-            set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/DevIL.dll)
-            set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/ILU.dll)
-            set(SHARED_LIBS ${SHARED_LIBS} ${DEVIL_DLL_DIR}/ILUT.dll)
-        endif ()
+  # Windows DLL
+  if (WIN32)
+    # DevIL
+    if (GHOUL_USE_DEVIL)
+      if (CMAKE_CL_64)
+        set(DEVIL_DLL_DIR ${ghoul_dir}/ext/il/lib/win64)
+      else (CMAKE_CL_64)
+        set(DEVIL_DLL_DIR ${ghoul_dir}/ext/il/lib/win32)
+      endif ()
+      set(SHARED_LIBS ${SHARED_LIBS}
+        ${DEVIL_DLL_DIR}/DevIL.dll
+        ${DEVIL_DLL_DIR}/ILU.dll
+        ${DEVIL_DLL_DIR}/ILUT.dll
+      )
+    endif ()
 
-        # FreeImage
-        if(GHOUL_USE_FREEIMAGE)
-            if (CMAKE_CL_64)
-                set(FREEIMAGE_DLL_DIR ${ghoul_dir}/ext/freeimage/lib/win64)
-            else (CMAKE_CL_64)
-                set(FREEIMAGE_DLL_DIR ${ghoul_dir}/ext/freeimage/lib/win32)
-            endif ()
-            set(SHARED_LIBS ${SHARED_LIBS} ${FREEIMAGE_DLL_DIR}/FreeImage.dll)
-        endif ()
+    # FreeImage
+    if (GHOUL_USE_FREEIMAGE)
+      if (CMAKE_CL_64)
+        set(FREEIMAGE_DLL_DIR ${ghoul_dir}/ext/freeimage/lib/win64)
+      else (CMAKE_CL_64)
+        set(FREEIMAGE_DLL_DIR ${ghoul_dir}/ext/freeimage/lib/win32)
+      endif ()
+      set(SHARED_LIBS ${SHARED_LIBS} ${FREEIMAGE_DLL_DIR}/FreeImage.dll)
+    endif ()
 
-        ghl_copy_files(${target} $<TARGET_FILE:Lua>)
-        ghl_copy_files(${target} ${SHARED_LIBS})
-    endif (WIN32)
+    ghl_copy_files(${target} $<TARGET_FILE:Lua> ${SHARED_LIBS})
+  endif (WIN32)
 endmacro ()

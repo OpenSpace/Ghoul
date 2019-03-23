@@ -28,8 +28,9 @@
 
 #include <string>
 #include <functional>
+#include <memory>
 
-#include <process.hpp>
+namespace TinyProcessLib { class Process; }
 
 namespace ghoul {
 
