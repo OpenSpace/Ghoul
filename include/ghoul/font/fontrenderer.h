@@ -58,6 +58,23 @@ public:
     };
 
     /**
+     * Information about the projected rendered text.
+     */
+    struct ProjectedLabelsInformation {
+        float scale;
+        int renderType;
+        int minSize;
+        int maxSize;
+        glm::dmat4 mvpMatrix;
+        glm::dmat4 modelViewMatrix;
+        glm::dmat4 projectionMatrix;
+        glm::vec3 orthoRight;
+        glm::vec3 orthoUp;
+        glm::dvec3 cameraPos;
+        glm::dvec3 cameraLookUp;
+    };
+
+    /**
      * This constructor requires a custom ProgramObject that handles the rendering of any
      * passed text. In addition the initial size of the rendering window has to be passed.
      * The inputs for the ProgramObject are as follows: <br>
@@ -230,23 +247,14 @@ public:
      * \param color The base color that is used to render the text
      * \param outlineColor The outline color that is used to render the text if the Font
      *        has an outline
-     * \param textScale Scale applied on the rendered text.
-     * \param textMinSize Minimal size (in pixels) for a text to be rendered.
-     * \param textMaxSize Maximal size (in pixels) for a text to be rendered.
-     * \param mvpMatrix ModelViewProjection matrix transformation.
-     * \param orthonormalRight Right vector from the orthonormal basis defining the
-     *        text's plane.
-     * \param orthonormalUp Up vector from the orthonormal basis defining the
-     *        text's plane.
+     * \param labelInfo Label information for the rendered text.
      * \param offset Moves the label in xy position of the text's plane
      * \return The bounding box of the text and the number of lines that were printed
      */
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
         const std::string& text, const glm::vec4& color, const glm::vec4& outlineColor,
-        float textScale, int textMinSize, int textMaxSize, const glm::dmat4& mvpMatrix,
-        const glm::vec3& orthonormalRight, const glm::vec3& orthonormalUp,
-        const glm::dvec3& cameraPos, const glm::dvec3& cameraLookUp,
-        int renderType, const glm::vec2 &offset = glm::vec2(0.0f, 0.0f)) const;
+        const ProjectedLabelsInformation& labelInfo,
+        const glm::vec2 &offset = glm::vec2(0.0f, 0.0f)) const;
 
     /**
     * Renders the provided \p text to the coordinates \p pos using the \p font in the
@@ -260,22 +268,14 @@ public:
     *        '\\n' to have a linebreak, which is of the correct length with regard to the
     *        selected font.
     * \param color The base color that is used to render the text
-    * \param textScale Scale applied on the rendered text.
-    * \param textMinSize Minimal size (in pixels) for a text to be rendered.
-    * \param textMaxSize Maximal size (in pixels) for a text to be rendered.
-    * \param mvpMatrix ModelViewProjection matrix transformation.
-    * \param orthonormalRight Right vector from the orthonormal basis defining the
-    *        text's plane.
-    * \param orthonormalUp Up vector from the orthonormal basis defining the
-    *        text's plane.
+    * \param labelInfo Label information for the rendered text.
     * \param offset Moves the label in xy position of the text's plane
     * \return The bounding box of the text and the number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
-        const std::string& text, const glm::vec4& color, float textScale, int textMinSize,
-        int textMaxSize, const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
-        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
-        const glm::dvec3& cameraLookUp, int renderType, const glm::vec2 &offset = glm::vec2(0.0f, 0.0f)) const;
+        const std::string& text, const glm::vec4& color, 
+        const ProjectedLabelsInformation& labelInfo, 
+        const glm::vec2 &offset = glm::vec2(0.0f, 0.0f)) const;
 
     /**
     * Renders the provided \p text to the coordinates \p pos using the \p font in white
@@ -287,21 +287,11 @@ public:
     * \param text The text that is rendered to the screen.The \p text can also contain
     *        '\\n' to have a linebreak, which is of the correct length with regard to the
     *        selected font.
-    * \param textScale Scale applied on the rendered text.
-    * \param textMinSize Minimal size (in pixels) for a text to be rendered.
-    * \param textMaxSize Maximal size (in pixels) for a text to be rendered.
-    * \param mvpMatrix ModelViewProjection matrix transformation.
-    * \param orthonormalRight Right vector from the orthonormal basis defining the
-    *        text's plane.
-    * \param orthonormalUp Up vector from the orthonormal basis defining the
-    *        text's plane.
+    * \param labelInfo Label information for the rendered text.
     * \return The bounding box of the text and the number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
-        const std::string& text, float textScale, int textMinSize, int textMaxSize,
-        const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
-        const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
-        const glm::dvec3& cameraLookUp, int renderType) const;
+        const std::string& text, const ProjectedLabelsInformation& labelInfo) const;
 
 private:
     /// Private constructor that is used in the #initialize static method
@@ -329,7 +319,7 @@ private:
     /// The index buffer object that allows reusing vertices to form one quad per glyph
     unsigned int _ibo = 0;
 
-    UniformCache(baseColor, outlineColor, texture, hasOutline, projection) _uniformCache;
+    UniformCache(baseColor, outlineColor, texture, hasOutline) _uniformCache;
     int _uniformMvp = -1;
 };
 
