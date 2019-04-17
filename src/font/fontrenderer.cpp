@@ -46,6 +46,11 @@ namespace {
         "baseColor", "outlineColor", "tex", "hasOutline"
     };
 
+    constexpr const std::array<const char*, 7> UniformNamesProjection = {
+        "baseColor", "outlineColor", "tex", "hasOutline", "modelViewTransform", 
+        "enableFalseDepth", "disableTransmittance"
+    };
+
     constexpr const char* DefaultVertexShaderPath =
         "${TEMPORARY}/defaultfontrenderer_vs.glsl";
     constexpr const char* DefaultFragmentShaderPath =
@@ -141,6 +146,8 @@ namespace {
     uniform vec4 baseColor; \n\
     uniform vec4 outlineColor; \n\
     uniform bool hasOutline; \n\
+    uniform bool enableFalseDepth; \n\
+    uniform bool disableTransmittance; \n\
     \n\
     void main() { \n\
         if (hasOutline) { \n\
@@ -155,15 +162,21 @@ namespace {
         if (FragColor.a == 0.0) { \n\
             discard; \n\
         } \n\
-        gPosition = vec4(vsPosition, 1.0); \n\
-        if (depth > 1.0) { \n\
-            gl_FragDepth = depth / pow(10, 30);\n\
+        if (enableFalseDepth) { \n\
+            gl_FragDepth = 0.0; \n\
+        } else { \n\
+            if (depth > 1.0) { \n\
+                gl_FragDepth = depth / pow(10, 30);\n\
+            } else { \n\
+                gl_FragDepth = depth - 1.0; \n\
+            } \n\
         } \n\
-        else { \n\
-            gl_FragDepth = depth - 1.0; \n\
-        } \n\
+        if (disableTransmittance) \n\
+            gPosition = vec4(0.0, 0.0, -1.0, 1.0); \n\
+        else \n\
+            gPosition = vec4(vsPosition, 1.0); \n\
         // 4th coord of the gNormal is the water reflectance \n\
-        gNormal = vec4(0.3, 0.3, 0.3, 0.0); \n\
+        gNormal = vec4(0.0, 0.0, 1.0, 0.0); \n\
     }";
 } // namespace
 
@@ -263,7 +276,8 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     FontRenderer* fr = new FontRenderer;
     fr->_program = std::move(prog);
 
-    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCache, UniformNames);
+    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCacheProjection, 
+        UniformNamesProjection);
     fr->_uniformMvp = fr->_program->uniformLocation("mvpMatrix");
 
     return std::unique_ptr<FontRenderer>(fr);
@@ -682,7 +696,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     }
     size.y = (lines.size() - 1) * font.height();
 
-    glDisable(GL_DEPTH_TEST);
+    if (!labelInfo.enableDepth) {
+        glDisable(GL_DEPTH_TEST);
+    }
     glEnablei(GL_BLEND, 0);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -692,13 +708,18 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     atlasUnit.activate();
     font.atlas().texture().bind();
 
-    _program->setUniform(_uniformCache.baseColor, color);
-    _program->setUniform(_uniformCache.outlineColor, outlineColor);
-    _program->setUniform(_uniformCache.texture, atlasUnit);
-    _program->setUniform(_uniformCache.hasOutline, font.hasOutline());
+    _program->setUniform(_uniformCacheProjection.baseColor, color);
+    _program->setUniform(_uniformCacheProjection.outlineColor, outlineColor);
+    _program->setUniform(_uniformCacheProjection.texture, atlasUnit);
+    _program->setUniform(_uniformCacheProjection.hasOutline, font.hasOutline());
     _program->setUniform(_uniformMvp, labelInfo.mvpMatrix);
-    //_program->setUniform(_uniformCache.labelInfo.minSize, labelInfo.minSize
-    _program->setUniform("modelViewTransform", labelInfo.modelViewMatrix);
+    _program->setUniform(_uniformCacheProjection.modelViewTransform, 
+        labelInfo.modelViewMatrix);
+    _program->setUniform(_uniformCacheProjection.enableFalseDepth, 
+        labelInfo.enableFalseDepth);
+    _program->setUniform(_uniformCacheProjection.disableTransmittance, 
+        labelInfo.disableTransmittance);
+
     
     glBindVertexArray(_vao);
 
@@ -743,7 +764,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glEnable(GL_DEPTH_TEST);
+    if (!labelInfo.enableDepth) {
+        glEnable(GL_DEPTH_TEST);
+    }
 
     return { size, static_cast<int>(lines.size()) };
 }

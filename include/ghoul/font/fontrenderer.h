@@ -61,6 +61,9 @@ public:
      * Information about the projected rendered text.
      */
     struct ProjectedLabelsInformation {
+        bool enableDepth;
+        bool enableFalseDepth;
+        bool disableTransmittance;
         float scale;
         int renderType;
         int minSize;
@@ -320,6 +323,8 @@ private:
     unsigned int _ibo = 0;
 
     UniformCache(baseColor, outlineColor, texture, hasOutline) _uniformCache;
+    UniformCache(baseColor, outlineColor, texture, hasOutline, modelViewTransform,
+                 enableFalseDepth, disableTransmittance) _uniformCacheProjection;
     int _uniformMvp = -1;
 };
 
