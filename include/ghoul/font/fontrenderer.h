@@ -275,7 +275,8 @@ public:
         const std::string& text, const glm::vec4& color, float textScale, int textMinSize,
         int textMaxSize, const glm::dmat4& mvpMatrix, const glm::vec3& orthonormalRight,
         const glm::vec3& orthonormalUp, const glm::dvec3& cameraPos,
-        const glm::dvec3& cameraLookUp, int renderType, const glm::vec2 &offset = glm::vec2(0.0f, 0.0f)) const;
+        const glm::dvec3& cameraLookUp, int renderType,
+        const glm::vec2& offset = glm::vec2(0.f, 0.f)) const;
 
     /**
     * Renders the provided \p text to the coordinates \p pos using the \p font in white
