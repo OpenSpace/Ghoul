@@ -110,7 +110,7 @@ void FileSystem::addFileListener(File* file) {
     auto f = _directories.find(d);
     if (f == _directories.end()) {
         bool alreadyTrackingParent = false;
-        for (const std::pair<std::string, DirectoryHandle*>& dir : _directories) {
+        for (const std::pair<const std::string, DirectoryHandle*>& dir : _directories) {
             if (d.length() > dir.first.length() &&
                 d.find(dir.first) != std::string::npos)
             {

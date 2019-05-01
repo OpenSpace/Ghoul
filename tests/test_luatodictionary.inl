@@ -477,7 +477,4 @@ TEST_F(LuaToDictionaryTest, LoadTest4CfgDirect) {
     glm::mat4x4 mat4x4Value;
     success = _d.getValue("m4x4", mat4x4Value);
     EXPECT_EQ(true, success);
-
-
-
 }
