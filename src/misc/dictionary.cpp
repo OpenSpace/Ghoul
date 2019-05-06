@@ -184,7 +184,7 @@ std::vector<string> Dictionary::keys(const string& location) const {
     if (location.empty()) {
         std::vector<string> result;
         result.reserve(size());
-        for (const std::pair<std::string, ghoul::any>& it : *this) {
+        for (const std::pair<const std::string, ghoul::any>& it : *this) {
             result.push_back(it.first);
         }
         return result;
