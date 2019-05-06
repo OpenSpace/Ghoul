@@ -159,7 +159,7 @@ namespace {
         else { \n\
             FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r); \n\
         } \n\
-        if (FragColor.a == 0.0) { \n\
+        if (FragColor.a < 0.1) { \n\
             discard; \n\
         } \n\
         if (enableFalseDepth) { \n\
