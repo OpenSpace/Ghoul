@@ -42,8 +42,8 @@
 namespace {
     constexpr const char* _loggerCat = "FontRenderer";
 
-    constexpr const std::array<const char*, 4> UniformNames = {
-        "baseColor", "outlineColor", "tex", "hasOutline"
+    constexpr const std::array<const char*, 5> UniformNames = {
+        "baseColor", "outlineColor", "tex", "hasOutline", "projection"
     };
 
     constexpr const std::array<const char*, 7> UniformNamesProjection = {
@@ -480,6 +480,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     _program->setUniform(_uniformCache.outlineColor, outlineColor);
     _program->setUniform(_uniformCache.texture, atlasUnit);
     _program->setUniform(_uniformCache.hasOutline, font.hasOutline());
+    _program->setUniform(
+        _uniformCache.projection,
+        glm::ortho(0.f, _framebufferSize.x, 0.f, _framebufferSize.y)
+    );
     
     glBindVertexArray(_vao);
 

@@ -322,7 +322,8 @@ private:
     /// The index buffer object that allows reusing vertices to form one quad per glyph
     unsigned int _ibo = 0;
 
-    UniformCache(baseColor, outlineColor, texture, hasOutline) _uniformCache;
+    UniformCache(baseColor, outlineColor, texture, hasOutline, projection) 
+        _uniformCache;
     UniformCache(baseColor, outlineColor, texture, hasOutline, modelViewTransform,
                  enableFalseDepth, disableTransmittance) _uniformCacheProjection;
     int _uniformMvp = -1;
