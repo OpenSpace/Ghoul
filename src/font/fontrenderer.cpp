@@ -545,7 +545,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec4& color,
                                                           const glm::vec4& outlineColor,                          
                                               const ProjectedLabelsInformation& labelInfo,
-                                                          const glm::vec2 &offset) const
+                                                            const glm::vec2& offset) const
 {
     float h = font.height();
 
@@ -780,7 +780,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const std::string& text,
                                                           const glm::vec4& color,
                                               const ProjectedLabelsInformation& labelInfo,
-                                                          const glm::vec2 &offset) const
+                                                            const glm::vec2& offset) const
 {
     return render(
         font,

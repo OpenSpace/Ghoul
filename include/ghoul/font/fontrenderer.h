@@ -257,7 +257,7 @@ public:
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
         const std::string& text, const glm::vec4& color, const glm::vec4& outlineColor,
         const ProjectedLabelsInformation& labelInfo,
-        const glm::vec2 &offset = glm::vec2(0.0f, 0.0f)) const;
+        const glm::vec2& offset = glm::vec2(0.f, 0.f)) const;
 
     /**
     * Renders the provided \p text to the coordinates \p pos using the \p font in the
@@ -278,7 +278,7 @@ public:
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
         const std::string& text, const glm::vec4& color, 
         const ProjectedLabelsInformation& labelInfo, 
-        const glm::vec2 &offset = glm::vec2(0.0f, 0.0f)) const;
+        const glm::vec2& offset = glm::vec2(0.f, 0.f)) const;
 
     /**
     * Renders the provided \p text to the coordinates \p pos using the \p font in white
@@ -325,7 +325,7 @@ private:
     UniformCache(baseColor, outlineColor, texture, hasOutline, projection) 
         _uniformCache;
     UniformCache(baseColor, outlineColor, texture, hasOutline, modelViewTransform,
-                 enableFalseDepth, disableTransmittance) _uniformCacheProjection;
+        enableFalseDepth, disableTransmittance) _uniformCacheProjection;
     int _uniformMvp = -1;
 };
 
