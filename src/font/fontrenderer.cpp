@@ -46,6 +46,11 @@ namespace {
         "baseColor", "outlineColor", "tex", "hasOutline", "projection"
     };
 
+    constexpr const std::array<const char*, 7> UniformNamesProjection = {
+        "baseColor", "outlineColor", "tex", "hasOutline", "modelViewTransform", 
+        "enableFalseDepth", "disableTransmittance"
+    };
+
     constexpr const char* DefaultVertexShaderPath =
         "${TEMPORARY}/defaultfontrenderer_vs.glsl";
     constexpr const char* DefaultFragmentShaderPath =
@@ -110,14 +115,17 @@ namespace {
     out vec2 outlineTexCoords; \n\
     \n\
     uniform dmat4 mvpMatrix; \n\
+    uniform dmat4 modelViewTransform; \n\
     \n\
     out float depth; \n\
+    out vec3 vsPosition; \n\
     void main() { \n\
         texCoords = in_texCoords; \n\
         outlineTexCoords = in_outlineTexCoords; \n\
         vec4 finalPos = vec4(mvpMatrix * dvec4(in_position.xyz, 1.0)); \n\
         depth = finalPos.w; \n\
         finalPos.z = 0.0; \n\
+        vsPosition = vec3(modelViewTransform * dvec4(in_position.xyz, 1.0)); \n\
         gl_Position = finalPos; \n\
     } \n\
     ";
@@ -128,13 +136,18 @@ namespace {
     in vec2 texCoords; \n\
     in vec2 outlineTexCoords; \n\
     in float depth; \n\
+    in vec3 vsPosition; \n\
     \n\
-    out vec4 FragColor; \n\
+    layout(location = 0) out vec4 FragColor; \n\
+    layout(location = 1) out vec4 gPosition; \n\
+    layout(location = 2) out vec4 gNormal; \n\
     \n\
     uniform sampler2D tex; \n\
     uniform vec4 baseColor; \n\
     uniform vec4 outlineColor; \n\
     uniform bool hasOutline; \n\
+    uniform bool enableFalseDepth; \n\
+    uniform bool disableTransmittance; \n\
     \n\
     void main() { \n\
         if (hasOutline) { \n\
@@ -146,12 +159,24 @@ namespace {
         else { \n\
             FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r); \n\
         } \n\
-        if (depth > 1.0) { \n\
-            gl_FragDepth = depth / pow(10, 30);\n\
+        if (FragColor.a < 0.1) { \n\
+            discard; \n\
         } \n\
-        else { \n\
-            gl_FragDepth = depth - 1.0; \n\
+        if (enableFalseDepth) { \n\
+            gl_FragDepth = 0.0; \n\
+        } else { \n\
+            if (depth > 1.0) { \n\
+                gl_FragDepth = depth / pow(10, 30);\n\
+            } else { \n\
+                gl_FragDepth = depth - 1.0; \n\
+            } \n\
         } \n\
+        if (disableTransmittance) \n\
+            gPosition = vec4(0.0, 0.0, -1.0, 1.0); \n\
+        else \n\
+            gPosition = vec4(vsPosition, 1.0); \n\
+        // 4th coord of the gNormal is the water reflectance \n\
+        gNormal = vec4(0.0, 0.0, 1.0, 0.0); \n\
     }";
 } // namespace
 
@@ -251,7 +276,8 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     FontRenderer* fr = new FontRenderer;
     fr->_program = std::move(prog);
 
-    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCache, UniformNames);
+    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCacheProjection, 
+        UniformNamesProjection);
     fr->_uniformMvp = fr->_program->uniformLocation("mvpMatrix");
 
     return std::unique_ptr<FontRenderer>(fr);
@@ -458,7 +484,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         _uniformCache.projection,
         glm::ortho(0.f, _framebufferSize.x, 0.f, _framebufferSize.y)
     );
-
+    
     glBindVertexArray(_vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
@@ -517,17 +543,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec3& pos,
                                                           const std::string& text,
                                                           const glm::vec4& color,
-                                                          const glm::vec4& outlineColor,
-                                                          float textScale,
-                                                          int textMinSize,
-                                                          int textMaxSize,
-                                                          const glm::dmat4& mvpMatrix,
-                                                        const glm::vec3& orthonormalRight,
-                                                         const glm::vec3& orthonormalUp,
-                                                         const glm::dvec3& cameraPos,
-                                                         const glm::dvec3& cameraLookUp,
-                                                         int renderType,
-                                                         const glm::vec2 &offset) const
+                                                          const glm::vec4& outlineColor,                          
+                                              const ProjectedLabelsInformation& labelInfo,
+                                                            const glm::vec2& offset) const
 {
     float h = font.height();
 
@@ -585,27 +603,31 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             glm::vec3 p2 = glm::vec3(0.0);
             glm::vec3 p3 = glm::vec3(0.0);
 
-            if (renderType == 0) {
-                p0 = (x0 * orthonormalRight + y0 * orthonormalUp) * textScale + pos;
-                p1 = (x0 * orthonormalRight + y1 * orthonormalUp) * textScale + pos;
-                p2 = (x1 * orthonormalRight + y1 * orthonormalUp) * textScale + pos;
-                p3 = (x1 * orthonormalRight + y0 * orthonormalUp) * textScale + pos;
+            if (labelInfo.renderType == 0) {
+                p0 = (x0 * labelInfo.orthoRight + y0 * labelInfo.orthoUp) * 
+                    labelInfo.scale + pos;
+                p1 = (x0 * labelInfo.orthoRight + y1 * labelInfo.orthoUp) * 
+                    labelInfo.scale + pos;
+                p2 = (x1 * labelInfo.orthoRight + y1 * labelInfo.orthoUp) * 
+                    labelInfo.scale + pos;
+                p3 = (x1 * labelInfo.orthoRight + y0 * labelInfo.orthoUp) * 
+                    labelInfo.scale + pos;
             }
             else {
-                glm::dvec3 normal = glm::normalize(cameraPos - glm::dvec3(pos));
-                glm::vec3 newRight = glm::vec3(glm::cross(cameraLookUp, normal));
+                glm::dvec3 normal = glm::normalize(labelInfo.cameraPos - glm::dvec3(pos));
+                glm::vec3 newRight = glm::vec3(glm::cross(labelInfo.cameraLookUp, normal));
                 glm::vec3 newUp = glm::vec3(glm::cross(normal, glm::dvec3(newRight)));
 
-                p0 = (x0 * newRight + y0 * newUp) * textScale + pos;
-                p1 = (x0 * newRight + y1 * newUp) * textScale + pos;
-                p2 = (x1 * newRight + y1 * newUp) * textScale + pos;
-                p3 = (x1 * newRight + y0 * newUp) * textScale + pos;
+                p0 = (x0 * newRight + y0 * newUp) * labelInfo.scale + pos;
+                p1 = (x0 * newRight + y1 * newUp) * labelInfo.scale + pos;
+                p2 = (x1 * newRight + y1 * newUp) * labelInfo.scale + pos;
+                p3 = (x1 * newRight + y0 * newUp) * labelInfo.scale + pos;
             }
 
 
             glm::vec4 projPos[2];
-            projPos[0] = glm::vec4(mvpMatrix * glm::dvec4(p0, 1.0));
-            projPos[1] = glm::vec4(mvpMatrix * glm::dvec4(p1, 1.0));
+            projPos[0] = glm::vec4(labelInfo.mvpMatrix * glm::dvec4(p0, 1.0));
+            projPos[1] = glm::vec4(labelInfo.mvpMatrix * glm::dvec4(p1, 1.0));
             glm::vec4 topLeft =
                 (((projPos[0] / projPos[0].w) + glm::vec4(1.0)) / glm::vec4(2.0)) *
                 glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
@@ -620,34 +642,36 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 heightInPixels;
 
             // Size-based culling
-            if (heightInPixels < static_cast<float>(textMinSize) ||
+            if (heightInPixels < static_cast<float>(labelInfo.minSize) ||
                 heightInPixels > _framebufferSize.x ||
                 heightInPixels > _framebufferSize.y)
             {
                 return { size, static_cast<int>(lines.size()) };
             }
 
-            if (heightInPixels > textMaxSize) {
-                float scaleFix = static_cast<float>(textMaxSize) / heightInPixels;
-                if (renderType == 0) {
-                    p0 = (x0 * orthonormalRight + y0 * orthonormalUp) *
-                        textScale * scaleFix + pos;
-                    p1 = (x0 * orthonormalRight + y1 * orthonormalUp) *
-                        textScale * scaleFix + pos;
-                    p2 = (x1 * orthonormalRight + y1 * orthonormalUp) *
-                        textScale * scaleFix + pos;
-                    p3 = (x1 * orthonormalRight + y0 * orthonormalUp) *
-                        textScale * scaleFix + pos;
+            if (heightInPixels > labelInfo.maxSize) {
+                float scaleFix = static_cast<float>(labelInfo.maxSize) / heightInPixels;
+                if (labelInfo.renderType == 0) {
+                    p0 = (x0 * labelInfo.orthoRight + y0 * labelInfo.orthoUp) *
+                        labelInfo.scale * scaleFix + pos;
+                    p1 = (x0 * labelInfo.orthoRight + y1 * labelInfo.orthoUp) *
+                        labelInfo.scale * scaleFix + pos;
+                    p2 = (x1 * labelInfo.orthoRight + y1 * labelInfo.orthoUp) *
+                        labelInfo.scale * scaleFix + pos;
+                    p3 = (x1 * labelInfo.orthoRight + y0 * labelInfo.orthoUp) *
+                        labelInfo.scale * scaleFix + pos;
                 }
                 else {
-                    glm::dvec3 normal = glm::normalize(cameraPos - glm::dvec3(pos));
-                    glm::vec3 newRight = glm::vec3(glm::cross(cameraLookUp, normal));
+                    glm::dvec3 normal = 
+                        glm::normalize(labelInfo.cameraPos - glm::dvec3(pos));
+                    glm::vec3 newRight = 
+                        glm::vec3(glm::cross(labelInfo.cameraLookUp, normal));
                     glm::vec3 newUp = glm::vec3(glm::cross(normal, glm::dvec3(newRight)));
 
-                    p0 = (x0 * newRight + y0 * newUp) * textScale * scaleFix + pos;
-                    p1 = (x0 * newRight + y1 * newUp) * textScale * scaleFix + pos;
-                    p2 = (x1 * newRight + y1 * newUp) * textScale * scaleFix + pos;
-                    p3 = (x1 * newRight + y0 * newUp) * textScale * scaleFix + pos;
+                    p0 = (x0 * newRight + y0 * newUp) * labelInfo.scale * scaleFix + pos;
+                    p1 = (x0 * newRight + y1 * newUp) * labelInfo.scale * scaleFix + pos;
+                    p2 = (x1 * newRight + y1 * newUp) * labelInfo.scale * scaleFix + pos;
+                    p3 = (x1 * newRight + y0 * newUp) * labelInfo.scale * scaleFix + pos;
                 }
             }
 
@@ -676,14 +700,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     }
     size.y = (lines.size() - 1) * font.height();
 
-    /*glm::mat4 projection = glm::ortho(
-    0.f,
-    _framebufferSize.x,
-    0.f,
-    _framebufferSize.y
-    );*/
-
-    glDisable(GL_DEPTH_TEST);
+    if (!labelInfo.enableDepth) {
+        glDisable(GL_DEPTH_TEST);
+    }
     glEnablei(GL_BLEND, 0);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -693,13 +712,19 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     atlasUnit.activate();
     font.atlas().texture().bind();
 
-    _program->setUniform(_uniformCache.baseColor, color);
-    _program->setUniform(_uniformCache.outlineColor, outlineColor);
-    _program->setUniform(_uniformCache.texture, atlasUnit);
-    _program->setUniform(_uniformCache.hasOutline, font.hasOutline());
-    _program->setUniform(_uniformMvp, mvpMatrix);
-    //_program->setUniform(_uniformCache.textMinSize, textMinSize);
+    _program->setUniform(_uniformCacheProjection.baseColor, color);
+    _program->setUniform(_uniformCacheProjection.outlineColor, outlineColor);
+    _program->setUniform(_uniformCacheProjection.texture, atlasUnit);
+    _program->setUniform(_uniformCacheProjection.hasOutline, font.hasOutline());
+    _program->setUniform(_uniformMvp, labelInfo.mvpMatrix);
+    _program->setUniform(_uniformCacheProjection.modelViewTransform, 
+        labelInfo.modelViewMatrix);
+    _program->setUniform(_uniformCacheProjection.enableFalseDepth, 
+        labelInfo.enableFalseDepth);
+    _program->setUniform(_uniformCacheProjection.disableTransmittance, 
+        labelInfo.disableTransmittance);
 
+    
     glBindVertexArray(_vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
@@ -743,7 +768,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glEnable(GL_DEPTH_TEST);
+    if (!labelInfo.enableDepth) {
+        glEnable(GL_DEPTH_TEST);
+    }
 
     return { size, static_cast<int>(lines.size()) };
 }
@@ -752,16 +779,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec3& pos,
                                                           const std::string& text,
                                                           const glm::vec4& color,
-                                                          float textScale,
-                                                          int textMinSize,
-                                                          int textMaxSize,
-                                                          const glm::dmat4& mvpMatrix,
-                                                        const glm::vec3& orthonormalRight,
-                                                          const glm::vec3& orthonormalUp,
-                                                          const glm::dvec3& cameraPos,
-                                                          const glm::dvec3& cameraLookUp,
-                                                          int renderType,
-                                                          const glm::vec2 &offset) const
+                                              const ProjectedLabelsInformation& labelInfo,
+                                                            const glm::vec2& offset) const
 {
     return render(
         font,
@@ -769,15 +788,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         text,
         color,
         { 0.f, 0.f, 0.f, color.a },
-        textScale,
-        textMinSize,
-        textMaxSize,
-        mvpMatrix,
-        orthonormalRight,
-        orthonormalUp,
-        cameraPos,
-        cameraLookUp,
-        renderType,
+        labelInfo,
         offset
     );
 }
@@ -785,15 +796,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec3& pos,
                                                           const std::string& text,
-                                                          float textScale,
-                                                          int textMinSize,
-                                                          int textMaxSize,
-                                                          const glm::dmat4& mvpMatrix,
-                                                        const glm::vec3& orthonormalRight,
-                                                          const glm::vec3& orthonormalUp,
-                                                          const glm::dvec3& cameraPos,
-                                                          const glm::dvec3& cameraLookUp,
-                                                          int renderType) const
+                                        const ProjectedLabelsInformation& labelInfo) const
 {
     return render(
         font,
@@ -801,15 +804,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         text,
         { 1.f, 1.f, 1.f, 1.f },
         { 0.f, 0.f, 0.f, 1.f },
-        textScale,
-        textMinSize,
-        textMaxSize,
-        mvpMatrix,
-        orthonormalRight,
-        orthonormalUp,
-        cameraPos,
-        cameraLookUp,
-        renderType
+        labelInfo
     );
 }
 
