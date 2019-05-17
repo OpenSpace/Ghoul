@@ -322,13 +322,10 @@ if (SOIL_FOUND)
 endif ()
 
 # stb_image
-option(GHOUL_USE_STB_IMAGE "Use the stb_image library" ON)
-if (GHOUL_USE_STB_IMAGE)
-  begin_dependency("stb_image")
-  target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_STB_IMAGE")
-  include_external_library(Ghoul PRIVATE stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
-  end_dependency()
-endif ()
+begin_dependency("stb_image")
+target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_STB_IMAGE")
+include_external_library(Ghoul PUBLIC stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
+end_dependency()
 
 # Stackwalker
 if (MSVC)
