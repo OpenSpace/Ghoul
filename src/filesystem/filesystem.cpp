@@ -168,8 +168,11 @@ string FileSystem::absolutePath(string path, const vector<string>& ignoredTokens
         throw FileSystemException(fmt::format(
             "Error retrieving absolute path '{}'", path
         ));
+    } else {
+        path = buffer.data();
     }
 #else
+    bool hadTrailingSlash = path.back() == '/';
     if (!realpath(path.c_str(), buffer.data())) {
         // Find the longest path that exists
         string fullPath(path);
@@ -192,9 +195,12 @@ string FileSystem::absolutePath(string path, const vector<string>& ignoredTokens
             return resolvedPath;
         }
     }
+    path = buffer.data();
+    if (hadTrailingSlash) {
+        path += "/";
+    }
 #endif
 
-    path = buffer.data();
     return path;
 }
 
