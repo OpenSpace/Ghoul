@@ -47,7 +47,7 @@ namespace {
     };
 
     constexpr const std::array<const char*, 7> UniformNamesProjection = {
-        "baseColor", "outlineColor", "tex", "hasOutline", "modelViewTransform", 
+        "baseColor", "outlineColor", "tex", "hasOutline", "modelViewTransform",
         "enableFalseDepth", "disableTransmittance"
     };
 
@@ -276,7 +276,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     FontRenderer* fr = new FontRenderer;
     fr->_program = std::move(prog);
 
-    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCacheProjection, 
+    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCacheProjection,
         UniformNamesProjection);
     fr->_uniformMvp = fr->_program->uniformLocation("mvpMatrix");
 
@@ -484,7 +484,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         _uniformCache.projection,
         glm::ortho(0.f, _framebufferSize.x, 0.f, _framebufferSize.y)
     );
-    
+
     glBindVertexArray(_vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
@@ -543,7 +543,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec3& pos,
                                                           const std::string& text,
                                                           const glm::vec4& color,
-                                                          const glm::vec4& outlineColor,                          
+                                                          const glm::vec4& outlineColor,
                                               const ProjectedLabelsInformation& labelInfo,
                                                             const glm::vec2& offset) const
 {
@@ -604,18 +604,20 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             glm::vec3 p3 = glm::vec3(0.0);
 
             if (labelInfo.renderType == 0) {
-                p0 = (x0 * labelInfo.orthoRight + y0 * labelInfo.orthoUp) * 
+                p0 = (x0 * labelInfo.orthoRight + y0 * labelInfo.orthoUp) *
                     labelInfo.scale + pos;
-                p1 = (x0 * labelInfo.orthoRight + y1 * labelInfo.orthoUp) * 
+                p1 = (x0 * labelInfo.orthoRight + y1 * labelInfo.orthoUp) *
                     labelInfo.scale + pos;
-                p2 = (x1 * labelInfo.orthoRight + y1 * labelInfo.orthoUp) * 
+                p2 = (x1 * labelInfo.orthoRight + y1 * labelInfo.orthoUp) *
                     labelInfo.scale + pos;
-                p3 = (x1 * labelInfo.orthoRight + y0 * labelInfo.orthoUp) * 
+                p3 = (x1 * labelInfo.orthoRight + y0 * labelInfo.orthoUp) *
                     labelInfo.scale + pos;
             }
             else {
                 glm::dvec3 normal = glm::normalize(labelInfo.cameraPos - glm::dvec3(pos));
-                glm::vec3 newRight = glm::vec3(glm::cross(labelInfo.cameraLookUp, normal));
+                glm::vec3 newRight = glm::vec3(
+                    glm::cross(labelInfo.cameraLookUp, normal)
+                );
                 glm::vec3 newUp = glm::vec3(glm::cross(normal, glm::dvec3(newRight)));
 
                 p0 = (x0 * newRight + y0 * newUp) * labelInfo.scale + pos;
@@ -662,9 +664,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                         labelInfo.scale * scaleFix + pos;
                 }
                 else {
-                    glm::dvec3 normal = 
+                    glm::dvec3 normal =
                         glm::normalize(labelInfo.cameraPos - glm::dvec3(pos));
-                    glm::vec3 newRight = 
+                    glm::vec3 newRight =
                         glm::vec3(glm::cross(labelInfo.cameraLookUp, normal));
                     glm::vec3 newUp = glm::vec3(glm::cross(normal, glm::dvec3(newRight)));
 
@@ -717,14 +719,19 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     _program->setUniform(_uniformCacheProjection.texture, atlasUnit);
     _program->setUniform(_uniformCacheProjection.hasOutline, font.hasOutline());
     _program->setUniform(_uniformMvp, labelInfo.mvpMatrix);
-    _program->setUniform(_uniformCacheProjection.modelViewTransform, 
-        labelInfo.modelViewMatrix);
-    _program->setUniform(_uniformCacheProjection.enableFalseDepth, 
-        labelInfo.enableFalseDepth);
-    _program->setUniform(_uniformCacheProjection.disableTransmittance, 
-        labelInfo.disableTransmittance);
+    _program->setUniform(
+        _uniformCacheProjection.modelViewTransform,
+        labelInfo.modelViewMatrix
+    );
+    _program->setUniform(
+        _uniformCacheProjection.enableFalseDepth,
+        labelInfo.enableFalseDepth
+    );
+    _program->setUniform(
+        _uniformCacheProjection.disableTransmittance,
+        labelInfo.disableTransmittance
+    );
 
-    
     glBindVertexArray(_vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);

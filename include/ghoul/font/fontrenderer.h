@@ -276,8 +276,8 @@ public:
     * \return The bounding box of the text and the number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
-        const std::string& text, const glm::vec4& color, 
-        const ProjectedLabelsInformation& labelInfo, 
+        const std::string& text, const glm::vec4& color,
+        const ProjectedLabelsInformation& labelInfo,
         const glm::vec2& offset = glm::vec2(0.f, 0.f)) const;
 
     /**
@@ -322,8 +322,7 @@ private:
     /// The index buffer object that allows reusing vertices to form one quad per glyph
     unsigned int _ibo = 0;
 
-    UniformCache(baseColor, outlineColor, texture, hasOutline, projection) 
-        _uniformCache;
+    UniformCache(baseColor, outlineColor, texture, hasOutline, projection) _uniformCache;
     UniformCache(baseColor, outlineColor, texture, hasOutline, modelViewTransform,
         enableFalseDepth, disableTransmittance) _uniformCacheProjection;
     int _uniformMvp = -1;
