@@ -48,35 +48,34 @@ constexpr const char* _loggerCat = "CommandlineParser";
 int extractArguments(const std::vector<std::string>& in, std::vector<std::string>& out,
                      const size_t begin, const int count)
 {
-    int num = 0;
     if (count == -1) {
-        for (size_t i = 0; (i < in.size()) && ((begin + 1 + i) < in.size()); ++i, ++num) {
+        for (size_t i = 0; (i < in.size()) && ((begin + 1 + i) < in.size()); ++i) {
             out.push_back(in[begin + 1 + i]);
         }
     }
     else if (count == -2) {
         // Extract arguments until a new command is found
         // The '-' restriction is enforced in the #addCommand method
-        for (size_t i = begin; (i < in.size()) && (in[i][0] != '-'); ++i, ++num) {
+        for (size_t i = begin; (i < in.size()) && (in[i][0] != '-'); ++i) {
             out.push_back(in[i]);
         }
     }
     else if (count == -3) {
         // Add the -command and then read till the end
         out.push_back(in[begin]);
-        ++num;
         // Extract arguments until a new command is found
         // The '-' restriction is enforced in the #addCommand method
-        for (size_t i = begin + 1; (i < in.size()) && (in[i][0] != '-'); ++i, ++num) {
+        for (size_t i = begin + 1; (i < in.size()) && (in[i][0] != '-'); ++i) {
             out.push_back(in[i]);
         }
     }
     else {
-        for (int i = 0; (i < count) && ((begin + 1 + i) < in.size()); ++i, ++num) {
+        for (int i = 0; (i < count) && ((begin + 1 + i) < in.size()); ++i) {
             out.push_back(in[begin + 1 + i]);
         }
     }
-    return num;
+
+    return out.size();
 }
 
 } // namespace
@@ -149,7 +148,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
     // parsing the commandline again
     std::multimap<CommandlineCommand*, std::vector<std::string>> parameterMap;
 
-    for (size_t i = 0 ; i < _arguments.size(); ++i) {
+    for (size_t i = 0 ; i < _arguments.size();) {
         // In the beginning we assume that we just started the loop or finished reading
         // parameters for the last command
 
