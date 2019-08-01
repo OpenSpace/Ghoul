@@ -75,7 +75,7 @@ int extractArguments(const std::vector<std::string>& in, std::vector<std::string
         }
     }
 
-    return out.size();
+    return static_cast<int>(out.size());
 }
 
 } // namespace
