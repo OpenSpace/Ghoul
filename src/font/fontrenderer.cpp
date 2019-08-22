@@ -60,124 +60,125 @@ namespace {
     constexpr const char* ProjectionFragmentShaderPath =
         "${TEMPORARY}/projectionfontrenderer_fs.glsl";
 
-    constexpr const char* DefaultVertexShaderSource = "\
-    #version __CONTEXT__ \n\
-    \n\
-    layout (location = 0) in vec2 in_position; \n\
-    layout (location = 1) in vec2 in_texCoords; \n\
-    layout (location = 2) in vec2 in_outlineTexCoords; \n\
-    \n\
-    layout (location = 0) out vec2 texCoords; \n\
-    layout (location = 1) out vec2 outlineTexCoords; \n\
-    \n\
-    uniform mat4 projection; \n\
-    \n\
-    void main() { \n\
-        texCoords = in_texCoords; \n\
-        outlineTexCoords = in_outlineTexCoords; \n\
-        gl_Position = projection * vec4(in_position, 0.0, 1.0); \n\
-    } \n\
-    ";
+    constexpr const char* DefaultVertexShaderSource = R"(
+    #version __CONTEXT__ 
+    
+    layout (location = 0) in vec2 in_position;
+    layout (location = 1) in vec2 in_texCoords;
+    layout (location = 2) in vec2 in_outlineTexCoords;
 
-    constexpr const char* DefaultFragmentShaderSource = "\
-    #version __CONTEXT__ \n\
-    \n\
-    layout (location = 0) in vec2 texCoords; \n\
-    layout (location = 1) in vec2 outlineTexCoords; \n\
-    \n\
-    out vec4 FragColor; \n\
-    \n\
-    uniform sampler2D tex; \n\
-    uniform vec4 baseColor; \n\
-    uniform vec4 outlineColor; \n\
-    uniform bool hasOutline; \n\
-    \n\
-    void main() { \n\
-        if (hasOutline) { \n\
-            float inside = texture(tex, texCoords).r;\n\
-            float outline = texture(tex, outlineTexCoords).r;\n\
-            vec4 blend = mix(outlineColor, baseColor, inside);\n\
-            FragColor = blend * vec4(1.0, 1.0, 1.0, max(inside, outline));\n\
-        } \n\
-        else { \n\
-            FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r); \n\
-        } \n\
-    }";
+    out vec2 texCoords;
+    out vec2 outlineTexCoords;
 
-    constexpr const char* ProjectionVertexShaderSource = "\
-    #version __CONTEXT__ \n\
-    \n\
-    layout (location = 0) in vec3 in_position; \n\
-    layout (location = 1) in vec2 in_texCoords; \n\
-    layout (location = 2) in vec2 in_outlineTexCoords; \n\
-    \n\
-    out vec2 texCoords; \n\
-    out vec2 outlineTexCoords; \n\
-    \n\
-    uniform dmat4 mvpMatrix; \n\
-    uniform dmat4 modelViewTransform; \n\
-    \n\
-    out float depth; \n\
-    out vec3 vsPosition; \n\
-    void main() { \n\
-        texCoords = in_texCoords; \n\
-        outlineTexCoords = in_outlineTexCoords; \n\
-        vec4 finalPos = vec4(mvpMatrix * dvec4(in_position.xyz, 1.0)); \n\
-        depth = finalPos.w; \n\
-        finalPos.z = 0.0; \n\
-        vsPosition = vec3(modelViewTransform * dvec4(in_position.xyz, 1.0)); \n\
-        gl_Position = finalPos; \n\
-    } \n\
-    ";
+    uniform mat4 projection;
 
-    constexpr const char* ProjectionFragmentShaderSource = "\
-    #version __CONTEXT__ \n\
-    \n\
-    in vec2 texCoords; \n\
-    in vec2 outlineTexCoords; \n\
-    in float depth; \n\
-    in vec3 vsPosition; \n\
-    \n\
-    layout(location = 0) out vec4 FragColor; \n\
-    layout(location = 1) out vec4 gPosition; \n\
-    layout(location = 2) out vec4 gNormal; \n\
-    \n\
-    uniform sampler2D tex; \n\
-    uniform vec4 baseColor; \n\
-    uniform vec4 outlineColor; \n\
-    uniform bool hasOutline; \n\
-    uniform bool enableFalseDepth; \n\
-    uniform bool disableTransmittance; \n\
-    \n\
-    void main() { \n\
-        if (hasOutline) { \n\
-            float inside = texture(tex, texCoords).r;\n\
-            float outline = texture(tex, outlineTexCoords).r;\n\
-            vec4 blend = mix(outlineColor, baseColor, inside);\n\
-            FragColor = blend * vec4(1.0, 1.0, 1.0, max(inside, outline));\n\
-        } \n\
-        else { \n\
-            FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r); \n\
-        } \n\
-        if (FragColor.a < 0.1) { \n\
-            discard; \n\
-        } \n\
-        if (enableFalseDepth) { \n\
-            gl_FragDepth = 0.0; \n\
-        } else { \n\
-            if (depth > 1.0) { \n\
-                gl_FragDepth = depth / pow(10, 30);\n\
-            } else { \n\
-                gl_FragDepth = depth - 1.0; \n\
-            } \n\
-        } \n\
-        if (disableTransmittance) \n\
-            gPosition = vec4(0.0, 0.0, -1.0, 1.0); \n\
-        else \n\
-            gPosition = vec4(vsPosition, 1.0); \n\
-        // 4th coord of the gNormal is the water reflectance \n\
-        gNormal = vec4(0.0, 0.0, 1.0, 0.0); \n\
-    }";
+    void main() {
+        texCoords = in_texCoords;
+        outlineTexCoords = in_outlineTexCoords;
+        gl_Position = projection * vec4(in_position, 0.0, 1.0);
+    })";
+
+    constexpr const char* DefaultFragmentShaderSource = R"(
+    #version __CONTEXT__
+
+    in vec2 texCoords;
+    in vec2 outlineTexCoords;
+
+    out vec4 FragColor;
+
+    uniform sampler2D tex;
+    uniform vec4 baseColor;
+    uniform vec4 outlineColor;
+    uniform bool hasOutline;
+
+    void main() {
+        if (hasOutline) {
+            float inside = texture(tex, texCoords).r;
+            float outline = texture(tex, outlineTexCoords).r;
+            vec4 blend = mix(outlineColor, baseColor, inside);
+            FragColor = blend * vec4(1.0, 1.0, 1.0, max(inside, outline));
+        }
+        else {
+            FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r);
+        }
+    })";
+
+    constexpr const char* ProjectionVertexShaderSource = R"(
+    #version __CONTEXT__
+
+    layout (location = 0) in vec3 in_position;
+    layout (location = 1) in vec2 in_texCoords;
+    layout (location = 2) in vec2 in_outlineTexCoords;
+
+    out vec2 texCoords;
+    out vec2 outlineTexCoords;
+
+    uniform dmat4 mvpMatrix;
+    uniform dmat4 modelViewTransform;
+
+    out float depth;
+    out vec3 vsPosition;
+    void main() {
+        texCoords = in_texCoords;
+        outlineTexCoords = in_outlineTexCoords;
+        vec4 finalPos = vec4(mvpMatrix * dvec4(in_position.xyz, 1.0));
+        depth = finalPos.w;
+        finalPos.z = 0.0;
+        vsPosition = vec3(modelViewTransform * dvec4(in_position.xyz, 1.0));
+        gl_Position = finalPos;
+    })";
+
+    constexpr const char* ProjectionFragmentShaderSource = R"(
+    #version __CONTEXT__
+
+    in vec2 texCoords;
+    in vec2 outlineTexCoords;
+    in float depth;
+    in vec3 vsPosition;
+
+    out vec4 FragColor;
+    out vec4 gPosition;
+    out vec4 gNormal;
+
+    uniform sampler2D tex;
+    uniform vec4 baseColor;
+    uniform vec4 outlineColor;
+    uniform bool hasOutline;
+    uniform bool enableFalseDepth;
+    uniform bool disableTransmittance;
+
+    void main() {
+        if (hasOutline) {
+            float inside = texture(tex, texCoords).r;
+            float outline = texture(tex, outlineTexCoords).r;
+            vec4 blend = mix(outlineColor, baseColor, inside);
+            FragColor = blend * vec4(1.0, 1.0, 1.0, max(inside, outline));
+        }
+        else {
+            FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r);
+        }
+        if (FragColor.a < 0.1) {
+            discard;
+        }
+        if (enableFalseDepth) {
+            gl_FragDepth = 0.0;
+        }
+        else {
+            if (depth > 1.0) {
+                gl_FragDepth = depth / pow(10, 30);
+            } else {
+                gl_FragDepth = depth - 1.0;
+            }
+        }
+        if (disableTransmittance) {
+            gPosition = vec4(0.0, 0.0, -1.0, 1.0);
+        }
+        else {
+            gPosition = vec4(vsPosition, 1.0);
+        }
+        // 4th coord of the gNormal is the water reflectance
+        gNormal = vec4(0.0, 0.0, 1.0, 0.0);
+    })";
 } // namespace
 
 namespace ghoul::fontrendering {
@@ -209,17 +210,24 @@ FontRenderer::~FontRenderer() {
 
 std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     std::string vsPath = absPath(DefaultVertexShaderPath);
-    LDEBUG(fmt::format("Writing default vertex shader to '{}'", vsPath));
-    std::ofstream file(vsPath);
-    file << DefaultVertexShaderSource;
-    file.close();
+    if (FileSys.fileExists(vsPath)) {
+        LDEBUG(fmt::format("Skipping creation of existing vertex shader {}", vsPath));
+    }
+    else {
+        LDEBUG(fmt::format("Writing default vertex shader to '{}'", vsPath));
+        std::ofstream file(vsPath);
+        file << DefaultVertexShaderSource;
+    }
 
     std::string fsPath = absPath(DefaultFragmentShaderPath);
-    LDEBUG(fmt::format("Writing default fragment shader to '{}'", fsPath));
-    file.open(fsPath);
-    file << DefaultFragmentShaderSource;
-    file.close();
-
+    if (FileSys.fileExists(fsPath)) {
+        LDEBUG(fmt::format("Skipping creation of existing fragment shader {}", fsPath));
+    }
+    else {
+        LDEBUG(fmt::format("Writing default fragment shader to '{}'", fsPath));
+        std::ofstream file(fsPath);
+        file << DefaultFragmentShaderSource;
+    }
     using namespace opengl;
     std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>("Font");
     program->attachObject(
@@ -245,17 +253,24 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
 
 std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     std::string vsPath = absPath(ProjectionVertexShaderPath);
-    LDEBUG(fmt::format("Writing default vertex shader to '{}'", vsPath));
-    std::ofstream file(vsPath);
-    file << ProjectionVertexShaderSource;
-    file.close();
+    if (FileSys.fileExists(vsPath)) {
+        LDEBUG(fmt::format("Skipping creation of existing vertex shader {}", vsPath));
+    }
+    else {
+        LDEBUG(fmt::format("Writing default vertex shader to '{}'", vsPath));
+        std::ofstream file(vsPath);
+        file << ProjectionVertexShaderSource;
+    }
 
     std::string fsPath = absPath(ProjectionFragmentShaderPath);
-    LDEBUG(fmt::format("Writing default fragment shader to '{}'", fsPath));
-    file.open(fsPath);
-    file << ProjectionFragmentShaderSource;
-    file.close();
-
+    if (FileSys.fileExists(fsPath)) {
+        LDEBUG(fmt::format("Skipping creation of existing fragment shader {}", vsPath));
+    }
+    else {
+        LDEBUG(fmt::format("Writing default fragment shader to '{}'", fsPath));
+        std::ofstream file(fsPath);
+        file << ProjectionFragmentShaderSource;
+    }
     using namespace opengl;
     std::unique_ptr<ProgramObject> prog = std::make_unique<ProgramObject>(
         "ProjectionFont"
