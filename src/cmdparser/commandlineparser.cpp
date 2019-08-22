@@ -190,7 +190,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                     for (const std::string& arg : arguments) {
                         _remainingArguments.push_back(arg);
                     }
-                    i += number;
+                    i += number + 1;
                     continue;
                 }
                 else {
