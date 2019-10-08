@@ -220,7 +220,7 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
     ZeroMemory(&(changeBuffer[activeBuffer][0]), changeBufferSize);
 
     DWORD returnedBytes;
-    BOOL success = ReadDirectoryChangesW(
+    ReadDirectoryChangesW(
         handle,
         &changeBuffer[activeBuffer][0],
         static_cast<DWORD>(changeBuffer[activeBuffer].size()),
@@ -231,41 +231,8 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
         overlappedBuffer,
         &completionHandler
     );
-
-    if (success == 0) {
-        LERROR("Could not begin read directory");
-        const DWORD error = GetLastError();
-        LPTSTR errorBuffer = nullptr;
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_ALLOCATE_BUFFER |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
-            nullptr,
-            error,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer, // NOLINT
-            0,
-            nullptr
-        );
-
-        // For some reason, there is a potential race condition here at the end of the
-        // application which can be mitigated by getting the stack trace.
-        // This should be properly fixed though --abock
-        std::vector<std::string> st = ghoul::stackTrace();
-        for (const std::string& s : st) {
-            std::cout << s << std::endl;
-        }
-
-        if (errorBuffer != nullptr) {
-            std::string errorString(errorBuffer);
-            LocalFree(errorBuffer);
-            LERROR(fmt::format("Error reading directory changes: {}", errorString));
-        }
-        else {
-            LERROR(fmt::format("Error reading directory changes: {}", error));
-        }
-    }
 }
 
 } // namespace ghoul::filesystem
 
-#endif
+#endif // WIN32

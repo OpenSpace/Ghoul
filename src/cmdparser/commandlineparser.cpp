@@ -171,7 +171,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                     for (const std::string& arg : arguments) {
                         _remainingArguments.push_back(arg);
                     }
-                    i += (number - 1);
+                    i += number;
                 }
             }
         }
@@ -202,7 +202,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
 
             std::vector<std::string> params;
             int n = extractArguments(_arguments, params, i, currentCmd->argumentNumber());
-            i += n;
+            i += (n + 1);
 
             // don't insert if the command doesn't allow multiple calls and already is in
             // the map
