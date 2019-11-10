@@ -41,7 +41,7 @@ struct ScopeExit {
 };
 
 // A second helper struct that makes it possible to pass a lambda expression to the
-// ScopeExit without the trailing ) that a constructor call would require. The choce of
+// ScopeExit without the trailing ) that a constructor call would require. The choice of
 // operator is arbitrary
 class ScopeExitHelper {
 public:
