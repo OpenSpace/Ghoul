@@ -894,7 +894,7 @@ private:
      * Stores the dimensions of the texture, <code>y</code> and <code>z</code> may be
      * <code>1</code> if the Texture is 1D or 2D
      */
-    glm::uvec3 _dimensions;
+    glm::uvec3 _dimensions = glm::uvec3(0);
     Format _format;
     GLenum _internalFormat;
     bool _swizzleMaskChanged = false;
@@ -904,7 +904,7 @@ private:
     WrappingModes _wrapping;
     GLuint _id = 0;
     GLenum _type;
-    GLubyte _bpp;
+    GLubyte _bpp = 0;
     int _mipMapLevel = 8;
     float _anisotropyLevel = -1.f;
     std::string _name;

@@ -49,32 +49,28 @@ class Font;
  */
 class FontRenderer {
 public:
-    /**
-     * Information about the bounding box for a rendered text.
-     */
+    /// Information about the bounding box for a rendered text.
     struct BoundingBoxInformation {
-        glm::vec2 boundingBox;
-        int numberOfLines;
+        glm::vec2 boundingBox = glm::vec2(0.f);
+        int numberOfLines = 0;
     };
 
-    /**
-     * Information about the projected rendered text.
-     */
+    /// Information about the projected rendered text.
     struct ProjectedLabelsInformation {
-        bool enableDepth;
-        bool enableFalseDepth;
-        bool disableTransmittance;
-        float scale;
-        int renderType;
-        int minSize;
-        int maxSize;
-        glm::dmat4 mvpMatrix;
-        glm::dmat4 modelViewMatrix;
-        glm::dmat4 projectionMatrix;
-        glm::vec3 orthoRight;
-        glm::vec3 orthoUp;
-        glm::dvec3 cameraPos;
-        glm::dvec3 cameraLookUp;
+        bool enableDepth = false;
+        bool enableFalseDepth = false;
+        bool disableTransmittance = false;
+        float scale = 0.f;
+        int renderType = 0;
+        int minSize = 0;
+        int maxSize = 0;
+        glm::dmat4 mvpMatrix = glm::dmat4(1.0);
+        glm::dmat4 modelViewMatrix = glm::dmat4(1.0);
+        glm::dmat4 projectionMatrix = glm::dmat4(1.0);
+        glm::vec3 orthoRight = glm::vec3(0.f);
+        glm::vec3 orthoUp = glm::vec3(0.f);
+        glm::dvec3 cameraPos = glm::dvec3(0.0);
+        glm::dvec3 cameraLookUp = glm::dvec3(0.0);
     };
 
     /**
@@ -308,7 +304,7 @@ private:
 
     /// The framebuffer size that is used to compute the transformation from pixel
     /// coordinates to normalized device coordinates
-    glm::vec2 _framebufferSize;
+    glm::vec2 _framebufferSize = glm::vec2(0.f);
 
     /// The ProgramObject that is used to render the text
     std::unique_ptr<opengl::ProgramObject> _program;

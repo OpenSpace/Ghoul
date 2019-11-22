@@ -40,9 +40,9 @@ TEST(DictionaryJSONFormatter, SimpleDictionary) {
     ghoul::Dictionary d = {
         { "int", 1 },
         { "double", 2.0 },
-        { "vec2", glm::vec2() },
-        { "vec3", glm::vec3() },
-        { "vec4", glm::vec4() },
+        { "vec2", glm::vec2(0.f) },
+        { "vec3", glm::vec3(0.f) },
+        { "vec4", glm::vec4(0.f) },
         { "string", ""s}
     };
 
@@ -61,18 +61,18 @@ TEST(DictionaryJSONFormatter, NestedDictionary) {
     ghoul::Dictionary d = {
         { "int", 1 },
         { "double", 2.0 },
-        { "vec2", glm::vec2() },
-        { "vec3", glm::vec3() },
-        { "vec4", glm::vec4() },
+        { "vec2", glm::vec2(0.f) },
+        { "vec3", glm::vec3(0.f) },
+        { "vec4", glm::vec4(0.f) },
         { "string", ""s }
     };
 
     ghoul::Dictionary e = {
         { "int", 1 },
         { "double", 2.0 },
-        { "vec2", glm::vec2() },
-        { "vec3", glm::vec3() },
-        { "vec4", glm::vec4() },
+        { "vec2", glm::vec2(0.f) },
+        { "vec3", glm::vec3(0.f) },
+        { "vec4", glm::vec4(0.f) },
         { "string", ""s },
         { "dict" , d}
     };
@@ -80,9 +80,9 @@ TEST(DictionaryJSONFormatter, NestedDictionary) {
     ghoul::Dictionary f = {
         { "int", 1 },
         { "double", 2.0 },
-        { "vec2", glm::vec2() },
-        { "vec3", glm::vec3() },
-        { "vec4", glm::vec4() },
+        { "vec2", glm::vec2(0.f) },
+        { "vec3", glm::vec3(0.f) },
+        { "vec4", glm::vec4(0.f) },
         { "string", ""s },
         { "dict" , e }
     };
@@ -90,9 +90,9 @@ TEST(DictionaryJSONFormatter, NestedDictionary) {
     ghoul::Dictionary g = {
         { "int", 1 },
         { "double", 2.0 },
-        { "vec2", glm::vec2() },
-        { "vec3", glm::vec3() },
-        { "vec4", glm::vec4() },
+        { "vec2", glm::vec2(0.f) },
+        { "vec3", glm::vec3(0.f) },
+        { "vec4", glm::vec4(0.f) },
         { "string", ""s },
         { "dict" , f },
         { "dict2" , f },

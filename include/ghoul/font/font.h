@@ -210,18 +210,18 @@ public:
         float _verticalAdvance;
 
         /// Normalized texture coordinate of top-left corner
-        glm::vec2 _topLeft;
+        glm::vec2 _topLeft = glm::vec2(0.f);
 
         /// Normalized texture coordinate of bottom-right corner
-        glm::vec2 _bottomRight;
+        glm::vec2 _bottomRight = glm::vec2(0.f);
 
         /// Normalized texture coordinates for the top left of the
         /// outline
-        glm::vec2 _outlineTopLeft;
+        glm::vec2 _outlineTopLeft = glm::vec2(0.f);
 
         /// Normalized texture coordinates for the bottom right of the
         /// outline
-        glm::vec2 _outlineBottomRight;
+        glm::vec2 _outlineBottomRight = glm::vec2(0.f);
 
         /// A vector of kerning pairs relative to this glyph
         std::map<wchar_t, float> _kerning;

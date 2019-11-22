@@ -38,7 +38,7 @@ public:
     struct ReadHints {
         ReadHints(glm::ivec3 dimensions = glm::ivec3(0));
 
-        glm::ivec3 _dimensions;
+        glm::ivec3 _dimensions = glm::ivec3(0);
         opengl::Texture::Format _format = opengl::Texture::Format::Red;
         GLenum _internalFormat = GLenum::GL_RED;
     };

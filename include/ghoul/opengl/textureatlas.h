@@ -174,8 +174,8 @@ public:
 
     /// Structure that is returned from textureCoordinates function
     struct TextureCoordinatesResult {
-        glm::vec2 topLeft;
-        glm::vec2 bottomRight;
+        glm::vec2 topLeft = glm::vec2(0.f);
+        glm::vec2 bottomRight = glm::vec2(0.f);
     };
 
     /**
@@ -256,7 +256,7 @@ private:
     std::vector<glm::ivec4> _handleInformation;
 
     /// Size of the texture
-    glm::ivec3 _size;
+    glm::ivec3 _size = glm::ivec3(0);
 
     /// Allocated surface size
     int _nUsed = 0;

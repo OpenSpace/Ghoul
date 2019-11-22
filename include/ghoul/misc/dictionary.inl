@@ -125,7 +125,7 @@ void Dictionary::setValueInternal(std::string key, T value,
     using StorageType = internal::StorageTypeConverter<T>;
 
     std::array<typename StorageType::type, StorageType::size> v;
-    typename T::value_type const * ptr = glm::value_ptr(value);
+    const typename T::value_type * ptr = glm::value_ptr(value);
     for (size_t i = 0; i < StorageType::size; ++i) {
         v[i] = static_cast<typename StorageType::type>(ptr[i]);
     }

@@ -397,10 +397,10 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
 
         float leftBearing = 0.f;
         float topBearing = 0.f;
-        glm::vec2 topLeft;
-        glm::vec2 bottomRight;
-        glm::vec2 outlineTopLeft;
-        glm::vec2 outlineBottomRight;
+        glm::vec2 topLeft = glm::vec2(0.f);
+        glm::vec2 bottomRight = glm::vec2(0.f);
+        glm::vec2 outlineTopLeft = glm::vec2(0.f);
+        glm::vec2 outlineBottomRight = glm::vec2(0.f);
         unsigned int width = 0;
         unsigned int height = 0;
 
