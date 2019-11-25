@@ -3,7 +3,7 @@
 	url = https://github.com/g-truc/glm.git
 [submodule "ext/freetype2"]
 	path = ext/freetype2
-url=http://git.sv.nongnu.org/r/freetype/freetype2.git
+url=https://github.com/OpenSpace/freetype-mirror
 [submodule "ext/cppformat"]
 	path = ext/cppformat
 	url = https://github.com/fmtlib/fmt.git
