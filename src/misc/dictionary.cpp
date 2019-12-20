@@ -270,139 +270,139 @@ void Dictionary::setValueAnyHelper(std::string key, ghoul::any val) {
     const std::type_info& type = val.type();
 
     if (type == typeid(bool)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<bool>(val)));
+        setValue(std::move(key), ghoul::any_cast<bool>(val);
     }
     else if (type == typeid(char)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<char>(val)));
+        setValue(std::move(key), ghoul::any_cast<char>(val);
     }
     else if (type == typeid(signed char)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<signed char>(val)));
+        setValue(std::move(key), ghoul::any_cast<signed char>(val));
     }
     else if (type == typeid(unsigned char)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<unsigned char>(val)));
+        setValue(std::move(key), ghoul::any_cast<unsigned char>(val));
     }
     else if (type == typeid(wchar_t)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<wchar_t>(val)));
+        setValue(std::move(key), ghoul::any_cast<wchar_t>(val));
     }
     else if (type == typeid(short)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<short>(val)));
+        setValue(std::move(key), ghoul::any_cast<short>(val));
     }
     else if (type == typeid(unsigned short)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<unsigned short>(val)));
+        setValue(std::move(key), ghoul::any_cast<unsigned short>(val));
     }
     else if (type == typeid(int)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<int>(val)));
+        setValue(std::move(key), ghoul::any_cast<int>(val));
     }
     else if (type == typeid(unsigned int)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<unsigned int>(val)));
+        setValue(std::move(key), ghoul::any_cast<unsigned int>(val));
     }
     else if (type == typeid(long long)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<long long>(val)));
+        setValue(std::move(key), ghoul::any_cast<long long>(val));
     }
     else if (type == typeid(unsigned long long)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<unsigned long long>(val)));
+        setValue(std::move(key), ghoul::any_cast<unsigned long long>(val));
     }
     else if (type == typeid(float)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<float>(val)));
+        setValue(std::move(key), ghoul::any_cast<float>(val));
     }
     else if (type == typeid(glm::vec2)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::vec2>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::vec2>(val));
     }
     else if (type == typeid(glm::dvec2)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::dvec2>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::dvec2>(val));
     }
     else if (type == typeid(glm::ivec2)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::ivec2>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::ivec2>(val));
     }
     else if (type == typeid(glm::uvec2)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::uvec2>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::uvec2>(val));
     }
     else if (type == typeid(glm::bvec2)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::bvec2>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::bvec2>(val));
     }
     else if (type == typeid(glm::vec3)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::vec3>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::vec3>(val));
     }
     else if (type == typeid(glm::dvec3)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::dvec3>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::dvec3>(val));
     }
     else if (type == typeid(glm::ivec3)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::ivec3>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::ivec3>(val));
     }
     else if (type == typeid(glm::uvec3)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::uvec3>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::uvec3>(val));
     }
     else if (type == typeid(glm::bvec3)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::bvec3>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::bvec3>(val));
     }
     else if (type == typeid(glm::vec4)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::vec4>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::vec4>(val));
     }
     else if (type == typeid(glm::dvec4)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::dvec4>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::dvec4>(val));
     }
     else if (type == typeid(glm::ivec4)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::ivec4>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::ivec4>(val));
     }
     else if (type == typeid(glm::uvec4)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::uvec4>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::uvec4>(val));
     }
     else if (type == typeid(glm::bvec4)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::bvec4>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::bvec4>(val));
     }
     else if (type == typeid(glm::mat2x2)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat2x2>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::mat2x2>(val));
     }
     else if (type == typeid(glm::mat2x3)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat2x3>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::mat2x3>(val));
     }
     else if (type == typeid(glm::mat2x4)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat2x4>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::mat2x4>(val));
     }
     else if (type == typeid(glm::mat3x2)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat3x2>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::mat3x2>(val));
     }
     else if (type == typeid(glm::mat3x3)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat3x3>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::mat3x3>(val));
     }
     else if (type == typeid(glm::mat3x4)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat3x4>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::mat3x4>(val));
     }
     else if (type == typeid(glm::mat4x2)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat4x2>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::mat4x2>(val));
     }
     else if (type == typeid(glm::mat4x3)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat4x3>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::mat4x3>(val));
     }
     else if (type == typeid(glm::mat4x4)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::mat4x4>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::mat4x4>(val));
     }
     else if (type == typeid(glm::dmat2x2)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat2x2>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::dmat2x2>(val));
     }
     else if (type == typeid(glm::dmat2x3)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat2x3>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::dmat2x3>(val));
     }
     else if (type == typeid(glm::dmat2x4)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat2x4>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::dmat2x4>(val));
     }
     else if (type == typeid(glm::dmat3x2)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat3x2>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::dmat3x2>(val));
     }
     else if (type == typeid(glm::dmat3x3)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat3x3>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::dmat3x3>(val));
     }
     else if (type == typeid(glm::dmat3x4)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat3x4>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::dmat3x4>(val));
     }
     else if (type == typeid(glm::dmat4x2)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat4x2>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::dmat4x2>(val));
     }
     else if (type == typeid(glm::dmat4x3)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat4x3>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::dmat4x3>(val));
     }
     else if (type == typeid(glm::dmat4x4)) {
-        setValue(std::move(key), std::move(ghoul::any_cast<glm::dmat4x4>(val)));
+        setValue(std::move(key), ghoul::any_cast<glm::dmat4x4>(val));
     }
     else {
         setValue(key, val, CreateIntermediate::No);
