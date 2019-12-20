@@ -270,10 +270,10 @@ void Dictionary::setValueAnyHelper(std::string key, ghoul::any val) {
     const std::type_info& type = val.type();
 
     if (type == typeid(bool)) {
-        setValue(std::move(key), ghoul::any_cast<bool>(val);
+        setValue(std::move(key), ghoul::any_cast<bool>(val));
     }
     else if (type == typeid(char)) {
-        setValue(std::move(key), ghoul::any_cast<char>(val);
+        setValue(std::move(key), ghoul::any_cast<char>(val));
     }
     else if (type == typeid(signed char)) {
         setValue(std::move(key), ghoul::any_cast<signed char>(val));
