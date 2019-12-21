@@ -25,3 +25,6 @@ url=https://github.com/OpenSpace/freetype-mirror
 [submodule "ext/tiny-process-library"]
 	path = ext/tiny-process-library
 	url = https://github.com/OpenSpace/tiny-process-library.git
+[submodule "ext/tracy"]
+	path = ext/tracy
+	url = https://bitbucket.org/wolfpld/tracy.git

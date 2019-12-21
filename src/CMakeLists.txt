@@ -128,6 +128,12 @@ if (GHOUL_MODULE_OPENGL)
   )
 endif ()
 
+if (GHOUL_MODULE_PROFILING)
+  set(GHOUL_SOURCE ${GHOUL_SOURCE} 
+    ${PROJECT_SOURCE_DIR}/src/misc/profiling.cpp
+  )
+endif ()
+
 if (GHOUL_MODULE_SYSTEMCAPABILITIES)
   set(GHOUL_SOURCE ${GHOUL_SOURCE}
     ${PROJECT_SOURCE_DIR}/src/systemcapabilities/generalcapabilitiescomponent.cpp
@@ -278,6 +284,12 @@ if (GHOUL_MODULE_OPENGL)
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriter.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterbase.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewritersoil.h
+  )
+endif ()
+
+if (GHOUL_MODULE_PROFILING)
+  set(GHOUL_HEADER ${GHOUL_HEADER} 
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/profiling.h
   )
 endif ()
 

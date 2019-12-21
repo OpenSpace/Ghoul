@@ -30,6 +30,7 @@
 #include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/profiling.h>
 #include <algorithm>
 #include <regex>
 
@@ -756,6 +757,8 @@ CacheManager* FileSystem::cacheManager() {
 }
 
 void FileSystem::triggerFilesystemEvents() {
+    ZoneScoped
+
 #ifdef WIN32
     // Sleeping for 0 milliseconds will trigger any pending asynchronous procedure calls
     SleepEx(0, TRUE);

@@ -55,6 +55,7 @@ option(GHOUL_MODULE_COMMANDLINEPARSER "Enable Commandlineparser" ON)
 option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
 option(GHOUL_MODULE_LUA "Enable Lua" ON)
 option(GHOUL_MODULE_OPENGL "Enable OpenGL" ON)
+option(GHOUL_MODULE_PROFILING "Enable profiling with Tracy" OFF)
 option(GHOUL_MODULE_SYSTEMCAPABILITIES "Enable System Capabilities" ON)
 
 option(BUILD_SHARED_LIBS "Build package with shared libraries." OFF)
@@ -181,6 +182,7 @@ if (GHOUL_MODULE_OPENGL)
     set_folder_location(check-all "External/glbinding-ext")
     set_folder_location(check-template "External/glbinding-ext")
     set_folder_location(cppcheck-glbinding "External/glbinding-ext")
+    set_folder_location(KHRplatform-sources "External/glbinding-ext")
   
     end_dependency("glbindings")
   endif ()
@@ -367,6 +369,10 @@ if (GHOUL_MODULE_FONTRENDERING)
 
   mark_as_advanced(FT_WITH_BZIP2 FT_WITH_HARFBUZZ FT_WITH_PNG FT_WITH_ZLIB FREETYPE_DIST pkgcfg_lib_PC_HARFBUZZ_harfbuzz)
   set_folder_location(dist "External")
+
+  if (TARGET zlib)
+    set_folder_location(zlib "External")
+  endif ()
   end_module("FontRendering")
 endif ()
 
@@ -375,6 +381,19 @@ include_external_library(Ghoul PRIVATE tiny-process-library ${GHOUL_ROOT_DIR}/ex
 mark_as_advanced(BUILD_TESTING)
 end_dependency("tiny-process-library")
 
+
+# Tracy
+if (GHOUL_MODULE_PROFILING)
+  begin_module("Profiling")
+  if (NOT TARGET tracy)
+    add_library(tracy "${PROJECT_SOURCE_DIR}/ext/tracy/TracyClient.cpp")
+    target_include_directories(tracy PUBLIC "${PROJECT_SOURCE_DIR}/ext/tracy")
+    set_folder_location(tracy "External")
+  endif ()
+  target_compile_definitions(tracy PUBLIC GHOUL_HAS_TRACY TRACY_ENABLE)
+  target_link_libraries(Ghoul PUBLIC tracy)
+  end_module("Profiling")
+endif ()
 
 #############################
 # Other applications

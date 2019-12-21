@@ -23,50 +23,16 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/ghoul.h>
+#ifndef __GHOUL___PROFILING___H__
+#define __GHOUL___PROFILING___H__
+
+#ifdef GHOUL_HAS_TRACY
 
 #include <ghoul/opengl/ghoul_gl.h>
-#include <ghoul/filesystem/filesystem.h>
-#include <ghoul/lua/lua_helper.h>
-#include <ghoul/misc/profiling.h>
 
-namespace ghoul {
+#include <Tracy.hpp>
+#include <TracyOpenGL.hpp>
 
-void initialize() {
-    ZoneScoped
-        
-    ghoul::filesystem::FileSystem::initialize();
-}
+#endif // GHOUL_HAS_TRACY
 
-void deinitialize() {
-    ZoneScoped
-
-    ghoul::lua::internal::deinitializeGlobalState();
-    ghoul::filesystem::FileSystem::deinitialize();
-}
-
-std::string licenseText() {
-    return "GHOUL\n\
-General Helpful Open Utility Library\n\
-\n\
-Copyright(c) 2012 - 2019\n\
-\n\
-Permission is hereby granted, free of charge, to any person obtaining a copy of this\n\
-software and associated documentation files(the \"Software\"), to deal in the Software\n\
-without restriction, including without limitation the rights to use, copy, modify,\n\
-merge, publish, distribute, sublicense, and / or sell copies of the Software, and to\n\
-permit persons to whom the Software is furnished to do so, subject to the following\n\
-conditions:\n\
-\n\
-The above copyright notice and this permission notice shall be included in all copies\n\
-or substantial portions of the Software.\n\
-\n\
-THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,\n\
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A\n\
-PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT\n\
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF\n\
-CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE\n\
-OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n";
-}
-
-} // namespace ghoul
+#endif // __GHOUL___PROFILING___H__
