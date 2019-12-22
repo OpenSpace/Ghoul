@@ -28,10 +28,12 @@
 
 #ifdef GHOUL_HAS_TRACY
 
+#include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/opengl/ghoul_gl.h>
 
 #include <Tracy.hpp>
 #include <TracyOpenGL.hpp>
+#include <TracyLua.hpp>
 
 #endif // GHOUL_HAS_TRACY
 
