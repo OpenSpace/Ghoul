@@ -383,17 +383,17 @@ end_dependency("tiny-process-library")
 
 
 # Tracy
-if (GHOUL_MODULE_PROFILING)
-  begin_module("Profiling")
-  if (NOT TARGET tracy)
-    add_library(tracy "${PROJECT_SOURCE_DIR}/ext/tracy/TracyClient.cpp")
-    target_include_directories(tracy PUBLIC "${PROJECT_SOURCE_DIR}/ext/tracy")
-    set_folder_location(tracy "External")
-  endif ()
-  target_compile_definitions(tracy PUBLIC GHOUL_HAS_TRACY TRACY_ENABLE)
-  target_link_libraries(Ghoul PUBLIC tracy)
-  end_module("Profiling")
+begin_module("Profiling")
+if (NOT TARGET tracy)
+  add_library(tracy "${PROJECT_SOURCE_DIR}/ext/tracy/TracyClient.cpp")
+  target_include_directories(tracy PUBLIC "${PROJECT_SOURCE_DIR}/ext/tracy")
+  set_folder_location(tracy "External")
 endif ()
+if (GHOUL_MODULE_PROFILING)
+  target_compile_definitions(tracy PUBLIC GHOUL_HAS_TRACY TRACY_ENABLE)
+endif ()
+target_link_libraries(Ghoul PUBLIC tracy)
+end_module("Profiling")
 
 #############################
 # Other applications
