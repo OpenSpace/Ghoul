@@ -28,3 +28,6 @@ url=https://github.com/OpenSpace/freetype-mirror
 [submodule "ext/tracy"]
 	path = ext/tracy
 	url = https://bitbucket.org/wolfpld/tracy.git
+[submodule "ext/catch2"]
+	path = ext/catch2
+	url = https://github.com/catchorg/Catch2.git
