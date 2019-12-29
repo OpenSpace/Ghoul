@@ -27,7 +27,7 @@
 
 #include <ghoul/misc/buffer.h>
 
-TEST_CASE("String", "[buffer]") {
+TEST_CASE("Buffer: String", "[buffer]") {
     const std::string s1 = "first";
     const std::string s2 = "second";
     std::string s4, s5, s6;
@@ -46,7 +46,7 @@ TEST_CASE("String", "[buffer]") {
     REQUIRE(s6 == "third");
 }
 
-TEST_CASE("MixedTypes", "[buffer]") {
+TEST_CASE("Buffer: MixedTypes", "[buffer]") {
     const std::string s1 = "string";
     const int i1 = 42;
     const double d1 = 123.456;
@@ -73,7 +73,7 @@ TEST_CASE("MixedTypes", "[buffer]") {
     REQUIRE(u1 == u2);
 }
 
-TEST_CASE("Copy", "[buffer]") {
+TEST_CASE("Buffer: Copy", "[buffer]") {
     const std::string s1 = "string";
     const int i1 = 42;
     const double d1 = 123.456;
@@ -104,7 +104,7 @@ TEST_CASE("Copy", "[buffer]") {
     REQUIRE(u1 == u2);
 }
 
-TEST_CASE("Move", "[buffer]") {
+TEST_CASE("Buffer: Move", "[buffer]") {
     const std::string s1 = "string";
     const int i1 = 42;
     const double d1 = 123.456;
@@ -135,7 +135,7 @@ TEST_CASE("Move", "[buffer]") {
     REQUIRE(u1 == u2);
 }
 
-TEST_CASE("Store", "[buffer]") {
+TEST_CASE("Buffer: Store", "[buffer]") {
     const std::string s1 = "string";
     const int i1 = 42;
     const double d1 = 123.456;
@@ -166,7 +166,7 @@ TEST_CASE("Store", "[buffer]") {
     REQUIRE(u1 == u2);
 }
 
-TEST_CASE("Store Compress", "[buffer]") {
+TEST_CASE("Buffer: Store Compress", "[buffer]") {
     const std::string s1 = "string";
     const int i1 = 42;
     const double d1 = 123.456;
@@ -197,7 +197,7 @@ TEST_CASE("Store Compress", "[buffer]") {
     REQUIRE(u1 == u2);
 }
 
-TEST_CASE("Capacity", "[buffer]") {
+TEST_CASE("Buffer: Capacity", "[buffer]") {
     const std::string s1 = "string";
     const int i1 = 42;
     const double d1 = 123.456;
@@ -224,7 +224,7 @@ TEST_CASE("Capacity", "[buffer]") {
     REQUIRE(u1 == u2);
 }
 
-TEST_CASE("Vector", "[buffer]") {
+TEST_CASE("Buffer: Vector", "[buffer]") {
     std::vector<float> fv;
     fv.push_back(1.5);
     fv.push_back(2.5);

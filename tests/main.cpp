@@ -44,6 +44,9 @@ int main(int argc, char** argv) {
     const std::string TestDirectory = Root + "/tests";
     const std::string ScriptDirectory = Root + "/scripts";
 
+    FileSys.registerPathToken("${UNIT_TEST}", TestDirectory);
+    FileSys.registerPathToken("${UNIT_SCRIPT}", ScriptDirectory);
+
     if (!FileSys.directoryExists(TestDirectory)) {
         LFATALC("main", "Fix me");
         return 0;

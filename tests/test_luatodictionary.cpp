@@ -23,93 +23,68 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#if 0
+#include "catch2/catch.hpp"
 
 #include <ghoul/glm.h>
-#include <fstream>
-#include <random>
-#include <ghoul/misc/dictionary.h>
+#include <ghoul/filesystem/filesystem.h>
 #include <ghoul/lua/lua_helper.h>
+#include <ghoul/misc/dictionary.h>
 
-class LuaToDictionaryTest : public testing::Test {
-protected:
-    void SetUp() override {
-        _d.clear();
-
-        // This is not necessary to do every SetUp phase, but I don't know of a better
-        // way to do it once per fixture ---abock
-        _test0 = constants::TestDirectory + "/luatodictionary/test0.cfg";
-        _test1 = constants::TestDirectory + "/luatodictionary/test1.cfg";
-        _test2 = constants::TestDirectory + "/luatodictionary/test2.cfg";
-        _test3 = constants::TestDirectory + "/luatodictionary/test3.cfg";
-        _test4 = constants::TestDirectory + "/luatodictionary/test4.cfg";
-        _test5 = constants::TestDirectory + "/luatodictionary/test5.cfg";
-    }
-
-    ghoul::Dictionary _d;
-
-    std::string _test0;
-    std::string _test1;
-    std::string _test2;
-    std::string _test3;
-    std::string _test4;
-    std::string _test5;
-};
-
-
-TEST_F(LuaToDictionaryTest, LoadTest1Cfg) {
+TEST_CASE("LuaToDictionary: Load Test1 cfg", "[luatodictionary]") {
     // test1.cfg
     // return {
     //    t = 1
     //}
 
-    _d.clear();
-    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_test1, _d));
-    EXPECT_EQ(1, _d.size());
+    ghoul::Dictionary d;
+    std::string test1 = absPath("${UNIT_TEST}/luatodictionary/test1.cfg");
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(test1, d));
+    REQUIRE(d.size() == 1);
 
     double value;
-    bool success = _d.getValue("t", value);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ(1.0, value);
+    bool success = d.getValue("t", value);
+    REQUIRE(success);
+    REQUIRE(value == 1.0);
 }
 
-TEST_F(LuaToDictionaryTest, LoadTest2Cfg) {
+TEST_CASE("LuaToDictionary: Load Test2 cfg", "[luatodictionary]") {
     // test2.cfg
     //return{
     //    t = 2,
     //    s = { a = "a", b = "b", a1 = "1" }
     //}
 
-    _d.clear();
-    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_test2, _d));
+    ghoul::Dictionary d;
+    std::string test2 = absPath("${UNIT_TEST}/luatodictionary/test2.cfg");
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(test2, d));
 
-    EXPECT_EQ(2, _d.size());
+    REQUIRE(d.size() == 2);
 
     double value;
-    bool success = _d.getValue("t", value);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ(2.0, value);
+    bool success = d.getValue("t", value);
+    REQUIRE(success);
+    REQUIRE(value == 2.0);
 
     ghoul::Dictionary dict;
-    success = _d.getValue("s", dict);
-    ASSERT_EQ(true, success);
-    ASSERT_EQ(3, dict.size());
+    success = d.getValue("s", dict);
+    REQUIRE( success);
+    REQUIRE(dict.size() == 3);
 
     std::string strValue;
     success = dict.getValue("a", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("a", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "a");
 
     success = dict.getValue("b", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("b", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "b");
 
     success = dict.getValue("a1", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("1", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "1");
 }
 
-TEST_F(LuaToDictionaryTest, LoadTest3Cfg) {
+TEST_CASE("LuaToDictionary: Load Test3 cfg", "[luatodictionary]") {
     // test3.cfg
     //return{
     //    s = {
@@ -126,37 +101,38 @@ TEST_F(LuaToDictionaryTest, LoadTest3Cfg) {
     //            -- int = { 1, "1" = 2 }
     //}
 
-    _d.clear();
-    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_test3, _d));
+    ghoul::Dictionary d;
+    std::string test3 = absPath("${UNIT_TEST}/luatodictionary/test3.cfg");
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(test3, d));
 
-    EXPECT_EQ(2, _d.size());
+    REQUIRE(d.size() == 2);
 
     ghoul::Dictionary dict;
-    bool success = _d.getValue("s", dict);
-    ASSERT_EQ(true, success);
-    ASSERT_EQ(3, dict.size());
+    bool success = d.getValue("s", dict);
+    REQUIRE(success);
+    REQUIRE(dict.size() == 3);
     std::string strValue;
     success = dict.getValue("1", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("1", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "1");
     success = dict.getValue("2", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("2", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "2");
 
     ghoul::Dictionary dict2;
     success = dict.getValue("3", dict2);
-    ASSERT_EQ(true, success);
-    ASSERT_EQ(2, dict2.size());
+    REQUIRE(success);
+    REQUIRE(dict2.size() == 2);
 
     success = dict2.getValue("a", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("3a", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "3a");
     success = dict2.getValue("b", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("3b", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "3b");
 }
 
-TEST_F(LuaToDictionaryTest, LoadTest4Cfg) {
+TEST_CASE("LuaToDictionary: Load Test4 cfg", "[luatodictionary]") {
     // test4.cfg
     //return {
     //    n2 = { 5, 6 },
@@ -185,104 +161,105 @@ TEST_F(LuaToDictionaryTest, LoadTest4Cfg) {
     //    m4x3 = { 5, 6, 7, 9, 10, 11, 13, 14, 15, 17, 18, 19 },
     //    m4x4 = { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }
     //}
-    _d.clear();
-    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromFile(_test4, _d));
+    ghoul::Dictionary d;
+    std::string test4 = absPath("${UNIT_TEST}/luatodictionary/test4.cfg");
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(test4, d));
 
-    ASSERT_EQ(25, _d.size());
+    REQUIRE(d.size() == 25);
 
     glm::vec2 vec2Value;
-    bool success = _d.getValue("n2", vec2Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("num2", vec2Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("xy", vec2Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("rg", vec2Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("st", vec2Value);
-    EXPECT_EQ(true, success);
+    bool success = d.getValue("n2", vec2Value);
+    REQUIRE(success);
+    success = d.getValue("num2", vec2Value);
+    REQUIRE(success);
+    success = d.getValue("xy", vec2Value);
+    REQUIRE(success);
+    success = d.getValue("rg", vec2Value);
+    REQUIRE(success);
+    success = d.getValue("st", vec2Value);
+    REQUIRE(success);
 
     glm::vec3 vec3Value;
-    success = _d.getValue("n3", vec3Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("num3", vec3Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("xyz", vec3Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("rgb", vec3Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("stp", vec3Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("mix", vec3Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("n3", vec3Value);
+    REQUIRE(success);
+    success = d.getValue("num3", vec3Value);
+    REQUIRE(success);
+    success = d.getValue("xyz", vec3Value);
+    REQUIRE(success);
+    success = d.getValue("rgb", vec3Value);
+    REQUIRE(success);
+    success = d.getValue("stp", vec3Value);
+    REQUIRE(success);
+    success = d.getValue("mix", vec3Value);
+    REQUIRE(success);
 
     glm::vec4 vec4Value;
-    success = _d.getValue("n4", vec4Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("num4", vec4Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("xyzw", vec4Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("rgba", vec4Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("stpq", vec4Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("n4", vec4Value);
+    REQUIRE(success);
+    success = d.getValue("num4", vec4Value);
+    REQUIRE(success);
+    success = d.getValue("xyzw", vec4Value);
+    REQUIRE(success);
+    success = d.getValue("rgba", vec4Value);
+    REQUIRE(success);
+    success = d.getValue("stpq", vec4Value);
+    REQUIRE(success);
 
     glm::mat2x2 mat2x2Value;
-    success = _d.getValue("m2x2", mat2x2Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m2x2", mat2x2Value);
+    REQUIRE(success);
 
     glm::mat2x3 mat2x3Value;
-    success = _d.getValue("m2x3", mat2x3Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m2x3", mat2x3Value);
+    REQUIRE(success);
 
     glm::mat2x4 mat2x4Value;
-    success = _d.getValue("m2x4", mat2x4Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m2x4", mat2x4Value);
+    REQUIRE(success);
 
     glm::mat3x2 mat3x2Value;
-    success = _d.getValue("m3x2", mat3x2Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m3x2", mat3x2Value);
+    REQUIRE(success);
 
     glm::mat3x3 mat3x3Value;
-    success = _d.getValue("m3x3", mat3x3Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m3x3", mat3x3Value);
+    REQUIRE(success);
 
     glm::mat3x4 mat3x4Value;
-    success = _d.getValue("m3x4", mat3x4Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m3x4", mat3x4Value);
+    REQUIRE(success);
 
     glm::mat4x2 mat4x2Value;
-    success = _d.getValue("m4x2", mat4x2Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m4x2", mat4x2Value);
+    REQUIRE(success);
 
     glm::mat4x3 mat4x3Value;
-    success = _d.getValue("m4x3", mat4x3Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m4x3", mat4x3Value);
+    REQUIRE(success);
 
     glm::mat4x4 mat4x4Value;
-    success = _d.getValue("m4x4", mat4x4Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m4x4", mat4x4Value);
+    REQUIRE(success);
 }
 
-TEST_F(LuaToDictionaryTest, LoadTest1CfgDirect) {
+TEST_CASE("LuaToDictionary: Load Test1 cfg Direct", "[luatodictionary]") {
     const std::string script = R"script(
     return {
         t = 1
     }
     )script";
 
-    _d.clear();
-    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromString(script, _d));
-    EXPECT_EQ(1, _d.size());
+    ghoul::Dictionary d;
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromString(script, d));
+    REQUIRE(d.size() == 1);
 
     double value;
-    bool success = _d.getValue("t", value);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ(1.0, value);
+    bool success = d.getValue("t", value);
+    REQUIRE(success);
+    REQUIRE(value == 1.0);
 }
 
-TEST_F(LuaToDictionaryTest, LoadTest2CfgDirect) {
+TEST_CASE("LuaToDictionary: Load Test2 cfg Direct", "[luatodictionary]") {
     const std::string script = R"script(
         return{
             t = 2,
@@ -295,36 +272,36 @@ TEST_F(LuaToDictionaryTest, LoadTest2CfgDirect) {
     //    s = { a = "a", b = "b", a1 = "1" }
     //}
 
-    _d.clear();
+    ghoul::Dictionary d;
 
-    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromString(script, _d));
-    EXPECT_EQ(2, _d.size());
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromString(script, d));
+    REQUIRE(d.size() == 2);
 
     double value;
-    bool success = _d.getValue("t", value);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ(2.0, value);
+    bool success = d.getValue("t", value);
+    REQUIRE(success);
+    REQUIRE(value == 2.0);
 
     ghoul::Dictionary dict;
-    success = _d.getValue("s", dict);
-    ASSERT_EQ(true, success);
-    ASSERT_EQ(3, dict.size());
+    success = d.getValue("s", dict);
+    REQUIRE(success);
+    REQUIRE(dict.size() == 3);
 
     std::string strValue;
     success = dict.getValue("a", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("a", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "a");
 
     success = dict.getValue("b", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("b", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "b");
 
     success = dict.getValue("a1", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("1", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "1");
 }
 
-TEST_F(LuaToDictionaryTest, LoadTest3CfgDirect) {
+TEST_CASE("LuaToDictionary: Load Test3 cfg Direct", "[luatodictionary]") {
     const std::string script = R"script(
         return {
             s = {
@@ -342,36 +319,36 @@ TEST_F(LuaToDictionaryTest, LoadTest3CfgDirect) {
         }
     )script";
 
-    _d.clear();
-    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromString(script, _d));
-    EXPECT_EQ(2, _d.size());
+    ghoul::Dictionary d;
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromString(script, d));
+    REQUIRE(d.size() == 2);
 
     ghoul::Dictionary dict;
-    bool success = _d.getValue("s", dict);
-    ASSERT_EQ(true, success);
-    ASSERT_EQ(3, dict.size());
+    bool success = d.getValue("s", dict);
+    REQUIRE(success);
+    REQUIRE(dict.size() == 3);
     std::string strValue;
     success = dict.getValue("1", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("1", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "1");
     success = dict.getValue("2", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("2", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "2");
 
     ghoul::Dictionary dict2;
     success = dict.getValue("3", dict2);
-    ASSERT_EQ(true, success);
-    ASSERT_EQ(2, dict2.size());
+    REQUIRE(success);
+    REQUIRE(dict2.size() == 2);
 
     success = dict2.getValue("a", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("3a", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "3a");
     success = dict2.getValue("b", strValue);
-    ASSERT_EQ(true, success);
-    EXPECT_EQ("3b", strValue);
+    REQUIRE(success);
+    REQUIRE(strValue == "3b");
 }
 
-TEST_F(LuaToDictionaryTest, LoadTest4CfgDirect) {
+TEST_CASE("LuaToDictionary: Load Test4 cfg Direct", "[luatodictionary]") {
     const std::string script = R"script(
         return {
             n2 = { 5, 6 },
@@ -402,83 +379,81 @@ TEST_F(LuaToDictionaryTest, LoadTest4CfgDirect) {
         }
     )script";
 
-    _d.clear();
-    ASSERT_NO_THROW(ghoul::lua::loadDictionaryFromString(script, _d));
-    ASSERT_EQ(25, _d.size());
+    ghoul::Dictionary d;
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromString(script, d));
+    REQUIRE(d.size() == 25);
 
     glm::vec2 vec2Value;
-    bool success = _d.getValue("n2", vec2Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("num2", vec2Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("xy", vec2Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("rg", vec2Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("st", vec2Value);
-    EXPECT_EQ(true, success);
+    bool success = d.getValue("n2", vec2Value);
+    REQUIRE(success);
+    success = d.getValue("num2", vec2Value);
+    REQUIRE(success);
+    success = d.getValue("xy", vec2Value);
+    REQUIRE(success);
+    success = d.getValue("rg", vec2Value);
+    REQUIRE(success);
+    success = d.getValue("st", vec2Value);
+    REQUIRE(success);
 
     glm::vec3 vec3Value;
-    success = _d.getValue("n3", vec3Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("num3", vec3Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("xyz", vec3Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("rgb", vec3Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("stp", vec3Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("mix", vec3Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("n3", vec3Value);
+    REQUIRE(success);
+    success = d.getValue("num3", vec3Value);
+    REQUIRE(success);
+    success = d.getValue("xyz", vec3Value);
+    REQUIRE(success);
+    success = d.getValue("rgb", vec3Value);
+    REQUIRE(success);
+    success = d.getValue("stp", vec3Value);
+    REQUIRE(success);
+    success = d.getValue("mix", vec3Value);
+    REQUIRE(success);
 
     glm::vec4 vec4Value;
-    success = _d.getValue("n4", vec4Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("num4", vec4Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("xyzw", vec4Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("rgba", vec4Value);
-    EXPECT_EQ(true, success);
-    success = _d.getValue("stpq", vec4Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("n4", vec4Value);
+    REQUIRE(success);
+    success = d.getValue("num4", vec4Value);
+    REQUIRE(success);
+    success = d.getValue("xyzw", vec4Value);
+    REQUIRE(success);
+    success = d.getValue("rgba", vec4Value);
+    REQUIRE(success);
+    success = d.getValue("stpq", vec4Value);
+    REQUIRE(success);
 
     glm::mat2x2 mat2x2Value;
-    success = _d.getValue("m2x2", mat2x2Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m2x2", mat2x2Value);
+    REQUIRE(success);
 
     glm::mat2x3 mat2x3Value;
-    success = _d.getValue("m2x3", mat2x3Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m2x3", mat2x3Value);
+    REQUIRE(success);
 
     glm::mat2x4 mat2x4Value;
-    success = _d.getValue("m2x4", mat2x4Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m2x4", mat2x4Value);
+    REQUIRE(success);
 
     glm::mat3x2 mat3x2Value;
-    success = _d.getValue("m3x2", mat3x2Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m3x2", mat3x2Value);
+    REQUIRE(success);
 
     glm::mat3x3 mat3x3Value;
-    success = _d.getValue("m3x3", mat3x3Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m3x3", mat3x3Value);
+    REQUIRE(success);
 
     glm::mat3x4 mat3x4Value;
-    success = _d.getValue("m3x4", mat3x4Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m3x4", mat3x4Value);
+    REQUIRE(success);
 
     glm::mat4x2 mat4x2Value;
-    success = _d.getValue("m4x2", mat4x2Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m4x2", mat4x2Value);
+    REQUIRE(success);
 
     glm::mat4x3 mat4x3Value;
-    success = _d.getValue("m4x3", mat4x3Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m4x3", mat4x3Value);
+    REQUIRE(success);
 
     glm::mat4x4 mat4x4Value;
-    success = _d.getValue("m4x4", mat4x4Value);
-    EXPECT_EQ(true, success);
+    success = d.getValue("m4x4", mat4x4Value);
+    REQUIRE(success);
 }
-
-#endif

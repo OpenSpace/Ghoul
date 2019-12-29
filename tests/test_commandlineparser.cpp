@@ -47,7 +47,7 @@
   *     provided (and vice versa)
   */
 
-TEST_CASE("Unknown Commands Unhandled", "[commandlineparser]") {
+TEST_CASE("CommandlineParser: Unknown Commands Unhandled", "[commandlineparser]") {
     ghoul::cmdparser::CommandlineParser p;
 
     std::vector<std::string> argv = {
@@ -65,7 +65,8 @@ TEST_CASE("Unknown Commands Unhandled", "[commandlineparser]") {
     );
 }
 
-TEST_CASE("Unknown Commands Handled Correctly", "[commandlineparser]") {
+TEST_CASE("CommandlineParser: Unknown Commands Handled Correctly", "[commandlineparser]")
+{
     ghoul::cmdparser::CommandlineParser p;
 
     std::vector<std::string> argv = {
@@ -83,7 +84,7 @@ TEST_CASE("Unknown Commands Handled Correctly", "[commandlineparser]") {
     REQUIRE_NOTHROW(p.execute());
 }
 
-TEST_CASE("Unknown Commands Interspersed", "[commandlineparser]") {
+TEST_CASE("CommandlineParser: Unknown Commands Interspersed", "[commandlineparser]") {
     ghoul::cmdparser::CommandlineParser p;
 
     std::vector<std::string> argv = {
@@ -116,7 +117,7 @@ TEST_CASE("Unknown Commands Interspersed", "[commandlineparser]") {
     REQUIRE(v2 == "arg3");
 }
 
-TEST_CASE("Single Zero Command Arguments", "[commandlineparser]") {
+TEST_CASE("CommandlineParser: Single Zero Command Arguments", "[commandlineparser]") {
     ghoul::cmdparser::CommandlineParser p;
 
     bool v = false;
@@ -133,7 +134,7 @@ TEST_CASE("Single Zero Command Arguments", "[commandlineparser]") {
     REQUIRE(v);
 }
 
-TEST_CASE("Single Command One Argument Bool", "[commandlineparser]") {
+TEST_CASE("CommandlineParser: Single Command One Argument Bool", "[commandlineparser]") {
     ghoul::cmdparser::CommandlineParser p;
 
     // boolean
@@ -141,7 +142,7 @@ TEST_CASE("Single Command One Argument Bool", "[commandlineparser]") {
     using T = ghoul::cmdparser::SingleCommand<bool>;
     p.addCommand(std::make_unique<T>(v, "-single"));
 
-    {
+    SECTION("false") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -152,7 +153,7 @@ TEST_CASE("Single Command One Argument Bool", "[commandlineparser]") {
         REQUIRE_NOTHROW(p.execute());
         REQUIRE_FALSE(v);
     }
-    {
+    SECTION("true") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -165,7 +166,10 @@ TEST_CASE("Single Command One Argument Bool", "[commandlineparser]") {
     }
 }
 
-TEST_CASE("Single Command Called Multiple Times", "[commandlineparser]") {
+TEST_CASE(
+    "CommandlineParser: Single Command Called Multiple Times",
+    "[commandlineparser]")
+{
     ghoul::cmdparser::CommandlineParser p;
 
     // boolean
@@ -188,7 +192,7 @@ TEST_CASE("Single Command Called Multiple Times", "[commandlineparser]") {
     );
 }
 
-TEST_CASE("Multiple Commands Permutation", "[commandlineparser]") {
+TEST_CASE("CommandlineParser: Multiple Commands Permutation", "[commandlineparser]") {
     ghoul::cmdparser::CommandlineParser p;
 
     int v1 = 0;
@@ -201,7 +205,7 @@ TEST_CASE("Multiple Commands Permutation", "[commandlineparser]") {
     p.addCommand(std::make_unique<T>(v2, "-cmd2"));
     p.addCommand(std::make_unique<T>(v3, "-cmd3"));
 
-    {
+    SECTION("123") {
         std::vector<std::string> argv = {
             "tests",
             "-cmd1",
@@ -219,11 +223,7 @@ TEST_CASE("Multiple Commands Permutation", "[commandlineparser]") {
         REQUIRE(v3 == 3);
     }
 
-    {
-        v1 = 0;
-        v2 = 0;
-        v3 = 0;
-
+    SECTION("213") {
         std::vector<std::string> argv = {
             "tests",
             "-cmd2",
@@ -241,11 +241,7 @@ TEST_CASE("Multiple Commands Permutation", "[commandlineparser]") {
         REQUIRE(v3 == 3);
     }
 
-    {
-        v1 = 0;
-        v2 = 0;
-        v3 = 0;
-
+    SECTION("321") {
         std::vector<std::string> argv = {
             "tests",
             "-cmd3",
@@ -263,11 +259,7 @@ TEST_CASE("Multiple Commands Permutation", "[commandlineparser]") {
         REQUIRE(v3 == 3);
     }
 
-    {
-        v1 = 0;
-        v2 = 0;
-        v3 = 0;
-
+    SECTION("312") {
         std::vector<std::string> argv = {
             "tests",
             "-cmd3",
@@ -286,85 +278,82 @@ TEST_CASE("Multiple Commands Permutation", "[commandlineparser]") {
     }
 }
 
-TEST_CASE("", "[commandlineparser]") {
+TEST_CASE("CommandlineParser: Single Command One Argument Int", "[commandlineparser]") {
     ghoul::cmdparser::CommandlineParser p;
-}
 
-TEST_CASE("", "[commandlineparser]") {
-    ghoul::cmdparser::CommandlineParser p;
-}
-
-
-#if 0
-
-TEST_F(CommandlineParserTest, SingleCommandOneArgumentInt) {
-    // int
     int v = 0;
     using T = ghoul::cmdparser::SingleCommand<int>;
-    _p->addCommand(std::make_unique<T>(v, "-single"));
+    p.addCommand(std::make_unique<T>(v, "-single"));
 
-    {
+    SECTION("1") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v) << "1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v == 1);
     }
-    {
+    SECTION("2") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(0, v) << "0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v == 0);
     }
 }
 
-TEST_F(CommandlineParserTest, SingleCommandOneArgumentString) {
-    // string
+TEST_CASE("CommandlineParser: Single Command One Argument String", "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     std::string v = "";
     using T = ghoul::cmdparser::SingleCommand<std::string>;
-    _p->addCommand(std::make_unique<T>(v, "-single"));
+    p.addCommand(std::make_unique<T>(v, "-single"));
 
-    {
+    SECTION("foo") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "foo"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ("foo", v) << "foo";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v == "foo");
     }
-    {
+
+    SECTION("bar") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "bar"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ("bar", v) << "bar";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v == "bar");
     }
 }
 
-TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolBool) {
-    // bool-bool
+TEST_CASE(
+    "CommandlineParser: Single Command Two Arguments Bool Bool",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     bool v1 = true;
     bool v2 = true;
     using T = ghoul::cmdparser::SingleCommand<bool, bool>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
-    {
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -372,12 +361,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 0";
-        EXPECT_EQ(false, v2) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE_FALSE(v2);
     }
-    {
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -385,12 +374,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 0";
-        EXPECT_EQ(false, v2) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE_FALSE(v2);
     }
-    {
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -398,12 +387,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 1";
-        EXPECT_EQ(true, v2) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2);
     }
-    {
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -411,21 +400,24 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 1";
-        EXPECT_EQ(true, v2) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2);
     }
 }
 
-TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntInt) {
-    // int-int
+TEST_CASE(
+    "CommandlineParser: Single Command Two Arguments Int Int",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
     int v1 = 1;
     int v2 = 1;
     using T = ghoul::cmdparser::SingleCommand<int, int>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
-    {
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -433,12 +425,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(0, v1) << "0 0";
-        EXPECT_EQ(0, v2) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 0);
+        REQUIRE(v2 == 0);
     }
-    {
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -446,12 +438,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1) << "1 0";
-        EXPECT_EQ(0, v2) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 1);
+        REQUIRE(v2 == 0);
     }
-    {
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -459,12 +451,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(0, v1) << "0 1";
-        EXPECT_EQ(1, v2) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 0);
+        REQUIRE(v2 == 1);
     }
-    {
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -472,21 +464,25 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1) << "1 1";
-        EXPECT_EQ(1, v2) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 1);
+        REQUIRE(v2 == 1);
     }
 }
 
-TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringString) {
-    // int-int
+TEST_CASE(
+    "CommandlineParser: Single Command Two Arguments String String",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     std::string v1 = "";
     std::string v2 = "";
     using T = ghoul::cmdparser::SingleCommand<std::string, std::string>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
-    {
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -494,12 +490,13 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ("0", v1) << "0 0";
-        EXPECT_EQ("0", v2) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == "0");
+        REQUIRE(v2 == "0");
     }
-    {
+    
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -507,12 +504,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ("1", v1) << "1 0";
-        EXPECT_EQ("0", v2) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == "1");
+        REQUIRE(v2 == "0");
     }
-    {
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -520,12 +517,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ("0", v1) << "0 1";
-        EXPECT_EQ("1", v2) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == "0");
+        REQUIRE(v2 == "1");
     }
-    {
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -533,21 +530,25 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ("1", v1) << "1 1";
-        EXPECT_EQ("1", v2) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == "1");
+        REQUIRE(v2 == "1");
     }
 }
 
-TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolInt) {
-    // bool-int
+TEST_CASE(
+    "CommandlineParser: Single Command Two Arguments Bool Int",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     bool v1 = true;
     int v2 = 1;
     using T = ghoul::cmdparser::SingleCommand<bool, int>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
-    {
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -555,12 +556,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 0";
-        EXPECT_EQ(0, v2) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 0);
     }
-    {
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -568,12 +569,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 0";
-        EXPECT_EQ(0, v2) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 0);
     }
-    {
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -581,12 +582,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 1";
-        EXPECT_EQ(1, v2) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 1);
     }
-    {
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -594,21 +595,24 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsBoolInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 1";
-        EXPECT_EQ(1, v2) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 1);
     }
 }
 
-TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntBool) {
-    // bool-int
+TEST_CASE(
+    "CommandlineParser: Single Command Two Arguments Int Bool",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
     int v1 = 1;
     bool v2 = true;
     using T = ghoul::cmdparser::SingleCommand<int, bool>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
-    {
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -616,12 +620,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(0, v1) << "0 0";
-        EXPECT_EQ(false, v2) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 0);
+        REQUIRE_FALSE(v2);
     }
-    {
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -629,12 +633,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1) << "1 0";
-        EXPECT_EQ(false, v2) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 1);
+        REQUIRE_FALSE(v2);
     }
-    {
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -642,12 +646,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(0, v1) << "0 1";
-        EXPECT_EQ(true, v2) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 0);
+        REQUIRE(v2);
     }
-    {
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -655,21 +659,25 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1) << "1 1";
-        EXPECT_EQ(true, v2) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 1);
+        REQUIRE(v2);
     }
 }
 
-TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntString) {
-    // bool-int
+TEST_CASE(
+    "CommandlineParser: Single Command Two Arguments Int String",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     int v1 = 1;
     std::string v2 = "";
     using T = ghoul::cmdparser::SingleCommand<int, std::string>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
-    {
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -677,12 +685,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(0, v1) << "0 0";
-        EXPECT_EQ("0", v2) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 0);
+        REQUIRE(v2 == "0");
     }
-    {
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -690,12 +698,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1) << "1 0";
-        EXPECT_EQ("0", v2) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 1);
+        REQUIRE(v2 == "0");
     }
-    {
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -703,12 +711,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(0, v1) << "0 1";
-        EXPECT_EQ("1", v2) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 0);
+        REQUIRE(v2 == "1");
     }
-    {
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -716,21 +724,25 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1) << "1 1";
-        EXPECT_EQ("1", v2) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 1);
+        REQUIRE(v2 == "1");
     }
 }
 
-TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringInt) {
-    // bool-int
+TEST_CASE(
+    "CommandlineParser: Single Command Two Arguments String Int",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     std::string v1 = "";
     int v2 = 1;
     using T = ghoul::cmdparser::SingleCommand<std::string, int>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
-    {
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -738,12 +750,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ("0", v1) << "0 0";
-        EXPECT_EQ(0, v2) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == "0");
+        REQUIRE(v2 == 0);
     }
-    {
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -751,12 +763,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ("1", v1) << "1 0";
-        EXPECT_EQ(0, v2) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == "1");
+        REQUIRE(v2 == 0);
     }
-    {
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -764,12 +776,12 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ("0", v1) << "0 1";
-        EXPECT_EQ(1, v2) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == "0");
+        REQUIRE(v2 == 1);
     }
-    {
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -777,21 +789,26 @@ TEST_F(CommandlineParserTest, SingleCommandTwoArgumentsStringInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ("1", v1) << "1 1";
-        EXPECT_EQ(1, v2) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == "1");
+        REQUIRE(v2 == 1);
     }
 }
 
-TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
+TEST_CASE(
+    "CommandlineParser: Single Command Three Arguments Bool Int String",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     bool v1 = true;
     int v2 = 1;
     std::string v3 = "";
     using T = ghoul::cmdparser::SingleCommand<bool, int, std::string>;
-    _p->addCommand(std::make_unique<T>(v1, v2, v3, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, v3, "-single"));
 
-    {
+    SECTION("000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -800,13 +817,13 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 0 0";
-        EXPECT_EQ(0, v2) << "0 0 0";
-        EXPECT_EQ("0", v3) << "0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 0);
+        REQUIRE(v3 == "0");
     }
-    {
+    SECTION("100") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -815,46 +832,44 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 0 0";
-        EXPECT_EQ(0, v2) << "1 0 0";
-        EXPECT_EQ("0", v3) << "1 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 0);
+        REQUIRE(v3 == "0");
     }
-    {
+    SECTION("010") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1",
             "0"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 1 0";
-        EXPECT_EQ(1, v2) << "0 1 0";
-        EXPECT_EQ("0", v3) << "0 1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 1);
+        REQUIRE(v3 == "0");
     }
-    {
+    SECTION("110") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1",
             "0"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 1 0";
-        EXPECT_EQ(1, v2) << "1 1 0";
-        EXPECT_EQ("0", v3) << "1 1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 1);
+        REQUIRE(v3 == "0");
     }
 
-    {
+    SECTION("001") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -863,13 +878,13 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 0 1";
-        EXPECT_EQ(0, v2) << "0 0 1";
-        EXPECT_EQ("1", v3) << "0 0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 0);
+        REQUIRE(v3 == "1");
     }
-    {
+    SECTION("101") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -878,56 +893,59 @@ TEST_F(CommandlineParserTest, SingleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 0 1";
-        EXPECT_EQ(0, v2) << "1 0 1";
-        EXPECT_EQ("1", v3) << "1 0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 0);
+        REQUIRE(v3 == "1");
     }
-    {
+    SECTION("011") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1",
             "1"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 1 1";
-        EXPECT_EQ(1, v2) << "0 1 1";
-        EXPECT_EQ("1", v3) << "0 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 1);
+        REQUIRE(v3 == "1");
     }
-    {
+    SECTION("111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1",
             "1"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 1 1";
-        EXPECT_EQ(1, v2) << "1 1 1";
-        EXPECT_EQ("1", v3) << "1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 1);
+        REQUIRE(v3 == "1");
     }
 }
 
-TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
+TEST_CASE(
+    "CommandlineParser: Single Command Four Arguments Bool Int String Float",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     bool v1 = true;
     int v2 = 1;
-    std::string v3 = "";
+    std::string v3;
     float v4 = 1.f;
 
     using T = ghoul::cmdparser::SingleCommand<bool, int, std::string, float>;
-    _p->addCommand(std::make_unique<T>(v1, v2, v3, v4, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, v3, v4, "-single"));
 
-    {
+    SECTION("0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -937,14 +955,14 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 0 0 0";
-        EXPECT_EQ(0, v2) << "0 0 0 0";
-        EXPECT_EQ("0", v3) << "0 0 0 0";
-        EXPECT_EQ(0.f, v4) << "0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 0);
+        REQUIRE(v3 == "0");
+        REQUIRE(v4 == 0.f);
     }
-    {
+    SECTION("1000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -954,14 +972,14 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 0 0 0";
-        EXPECT_EQ(0, v2) << "1 0 0 0";
-        EXPECT_EQ("0", v3) << "1 0 0 0";
-        EXPECT_EQ(0.f, v4) << "1 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 0);
+        REQUIRE(v3 == "0");
+        REQUIRE(v4 == 0.f);
     }
-    {
+    SECTION("0100") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -971,14 +989,14 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 1 0 0";
-        EXPECT_EQ(1, v2) << "0 1 0 0";
-        EXPECT_EQ("0", v3) << "0 1 0 0";
-        EXPECT_EQ(0.f, v4) << "0 1 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 1);
+        REQUIRE(v3 == "0");
+        REQUIRE(v4 == 0.f);
     }
-    {
+    SECTION("1100") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -988,15 +1006,15 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 1 0 0";
-        EXPECT_EQ(1, v2) << "1 1 0 0";
-        EXPECT_EQ("0", v3) << "1 1 0 0";
-        EXPECT_EQ(0.f, v4) << "1 1 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 1);
+        REQUIRE(v3 == "0");
+        REQUIRE(v4 == 0.f);
     }
 
-    {
+    SECTION("0010") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1006,14 +1024,14 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 0 1 0";
-        EXPECT_EQ(0, v2) << "0 0 1 0";
-        EXPECT_EQ("1", v3) << "0 0 1 0";
-        EXPECT_EQ(0.f, v4) << "0 0 1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 0);
+        REQUIRE(v3 == "1");
+        REQUIRE(v4 == 0.f);
     }
-    {
+    SECTION("1010") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1023,14 +1041,14 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 0 1 0";
-        EXPECT_EQ(0, v2) << "1 0 1 0";
-        EXPECT_EQ("1", v3) << "1 0 1 0";
-        EXPECT_EQ(0.f, v4) << "1 0 1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 0);
+        REQUIRE(v3 == "1");
+        REQUIRE(v4 == 0.f);
     }
-    {
+    SECTION("0110") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1040,14 +1058,14 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 1 1 0";
-        EXPECT_EQ(1, v2) << "0 1 1 0";
-        EXPECT_EQ("1", v3) << "0 1 1 0";
-        EXPECT_EQ(0.f, v4) << "0 1 1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 1);
+        REQUIRE(v3 == "1");
+        REQUIRE(v4 == 0.f);
     }
-    {
+    SECTION("1110") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1057,15 +1075,15 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 1 1 0";
-        EXPECT_EQ(1, v2) << "1 1 1 0";
-        EXPECT_EQ("1", v3) << "1 1 1 0";
-        EXPECT_EQ(0.f, v4) << "1 1 1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 1);
+        REQUIRE(v3 == "1");
+        REQUIRE(v4 == 0.f);
     }
 
-    {
+    SECTION("0001") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1075,14 +1093,14 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 0 0 1";
-        EXPECT_EQ(0, v2) << "0 0 0 1";
-        EXPECT_EQ("0", v3) << "0 0 0 1";
-        EXPECT_EQ(1.f, v4) << "0 0 0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 0);
+        REQUIRE(v3 == "0");
+        REQUIRE(v4 == 1.f);
     }
-    {
+    SECTION("1001") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1092,14 +1110,14 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 0 0 1";
-        EXPECT_EQ(0, v2) << "1 0 0 1";
-        EXPECT_EQ("0", v3) << "1 0 0 1";
-        EXPECT_EQ(1.f, v4) << "1 0 0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 0);
+        REQUIRE(v3 == "0");
+        REQUIRE(v4 == 1.f);
     }
-    {
+    SECTION("0101") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1109,14 +1127,14 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 1 0 1";
-        EXPECT_EQ(1, v2) << "0 1 0 1";
-        EXPECT_EQ("0", v3) << "0 1 0 1";
-        EXPECT_EQ(1.f, v4) << "0 1 0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 1);
+        REQUIRE(v3 == "0");
+        REQUIRE(v4 == 1.f);
     }
-    {
+    SECTION("1101") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1126,15 +1144,15 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 1 0 1";
-        EXPECT_EQ(1, v2) << "1 1 0 1";
-        EXPECT_EQ("0", v3) << "1 1 0 1";
-        EXPECT_EQ(1.f, v4) << "1 1 0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 1);
+        REQUIRE(v3 == "0");
+        REQUIRE(v4 == 1.f);
     }
 
-    {
+    SECTION("0011") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1144,14 +1162,14 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 0 1 1";
-        EXPECT_EQ(0, v2) << "0 0 1 1";
-        EXPECT_EQ("1", v3) << "0 0 1 1";
-        EXPECT_EQ(1.f, v4) << "0 0 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 0);
+        REQUIRE(v3 == "1");
+        REQUIRE(v4 == 1.f);
     }
-    {
+    SECTION("1011") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1161,14 +1179,14 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 0 1 1";
-        EXPECT_EQ(0, v2) << "1 0 1 1";
-        EXPECT_EQ("1", v3) << "1 0 1 1";
-        EXPECT_EQ(1.f, v4) << "1 0 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 0);
+        REQUIRE(v3 == "1");
+        REQUIRE(v4 == 1.f);
     }
-    {
+    SECTION("0111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1178,14 +1196,14 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v1) << "0 1 1 1";
-        EXPECT_EQ(1, v2) << "0 1 1 1";
-        EXPECT_EQ("1", v3) << "0 1 1 1";
-        EXPECT_EQ(1.f, v4) << "0 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v1);
+        REQUIRE(v2 == 1);
+        REQUIRE(v3 == "1");
+        REQUIRE(v4 == 1.f);
     }
-    {
+    SECTION("1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1195,34 +1213,38 @@ TEST_F(CommandlineParserTest, SingleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v1) << "1 1 1 1";
-        EXPECT_EQ(1, v2) << "1 1 1 1";
-        EXPECT_EQ("1", v3) << "1 1 1 1";
-        EXPECT_EQ(1.f, v4) << "1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1);
+        REQUIRE(v2 == 1);
+        REQUIRE(v3 == "1");
+        REQUIRE(v4 == 1.f);
     }
 }
 
-TEST_F(CommandlineParserTest, MultipleZeroCommandArguments) {
+TEST_CASE(
+    "CommandlineParser: Multiple Zero Command Arguments",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     int v = 0;
     using T = ghoul::cmdparser::MultipleCommandZeroArguments;
-    _p->addCommand(std::make_unique<T>(v, "-zero"));
+    p.addCommand(std::make_unique<T>(v, "-zero"));
 
-    {
+    SECTION("zero zero") {
         std::vector<std::string> argv = {
             "tests",
             "-zero",
             "-zero"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v) << "2x zero";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v == 2);
     }
 
-    v = 0;
-    {
+    SECTION("6x zero") {
         std::vector<std::string> argv = {
             "tests",
             "-zero",
@@ -1233,44 +1255,47 @@ TEST_F(CommandlineParserTest, MultipleZeroCommandArguments) {
             "-zero"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(6, v) << "6x zero";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v == 6);
     }
 }
 
-TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
+TEST_CASE("CommandlineParser: Multiple Command One Argument Bool", "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     std::vector<bool> v;
     using T = ghoul::cmdparser::MultipleCommand<bool>;
-    _p->addCommand(std::make_unique<T>(v, "-single"));
+    p.addCommand(std::make_unique<T>(v, "-single"));
 
-    {
+    SECTION("0") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v.size()) << "0";
-        EXPECT_EQ(false, v[0]) << "0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 1);
+        REQUIRE_FALSE(v[0]);
     }
-    v.clear();
-    {
+
+    SECTION("1") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v.size()) << "1";
-        EXPECT_EQ(true, v[0]) << "1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 1);
+        REQUIRE(v[0]);
     }
-    v.clear();
-    {
+
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1279,14 +1304,14 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v.size()) << "0 0";
-        EXPECT_EQ(false, v[0]) << "0 0";
-        EXPECT_EQ(false, v[1]) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 2);
+        REQUIRE_FALSE(v[0]);
+        REQUIRE_FALSE(v[1]);
     }
-    v.clear();
-    {
+
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1295,14 +1320,14 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v.size()) << "1 0";
-        EXPECT_EQ(true, v[0]) << "1 0";
-        EXPECT_EQ(false, v[1]) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 2);
+        REQUIRE(v[0]);
+        REQUIRE_FALSE(v[1]);
     }
-    v.clear();
-    {
+
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1311,14 +1336,14 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v.size()) << "0 1";
-        EXPECT_EQ(false, v[0]) << "0 1";
-        EXPECT_EQ(true, v[1]) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 2);
+        REQUIRE_FALSE(v[0]);
+        REQUIRE(v[1]);
     }
-    v.clear();
-    {
+
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1327,47 +1352,48 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v.size()) << "1 1";
-        EXPECT_EQ(true, v[0]) << "1 1";
-        EXPECT_EQ(false, v[1]) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 2);
+        REQUIRE(v[0]);
+        REQUIRE_FALSE(v[1]);
     }
-
 }
 
-TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
+TEST_CASE("CommandlineParser: Multiple Command One Argument Int", "[commandlineparser]") {
+    ghoul::cmdparser::CommandlineParser p;
+
     std::vector<int> v;
     using T = ghoul::cmdparser::MultipleCommand<int>;
-    _p->addCommand(std::make_unique<T>(v, "-single"));
+    p.addCommand(std::make_unique<T>(v, "-single"));
 
-    {
+    SECTION("1") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v.size()) << "1";
-        EXPECT_EQ(1, v[0]) << "1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 1);
+        REQUIRE(v[0] == 1);
     }
-    v.clear();
-    {
+
+    SECTION("0") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v.size()) << "0";
-        EXPECT_EQ(0, v[0]) << "0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 1);
+        REQUIRE(v[0] == 0);
     }
-    v.clear();
-    {
+
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1376,14 +1402,14 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v.size()) << "1 0";
-        EXPECT_EQ(1, v[0]) << "1 0";
-        EXPECT_EQ(0, v[1]) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 2);
+        REQUIRE(v[0] == 1);
+        REQUIRE(v[1] == 0);
     }
-    v.clear();
-    {
+
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1392,14 +1418,14 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v.size()) << "0 0";
-        EXPECT_EQ(0, v[0]) << "0 0";
-        EXPECT_EQ(0, v[1]) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 2);
+        REQUIRE(v[0] == 0);
+        REQUIRE(v[1] == 0);
     }
-    v.clear();
-    {
+
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1408,14 +1434,14 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v.size()) << "1 1";
-        EXPECT_EQ(1, v[0]) << "1 1";
-        EXPECT_EQ(1, v[1]) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 2);
+        REQUIRE(v[0] == 1);
+        REQUIRE(v[1] == 1);
     }
-    v.clear();
-    {
+
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1424,48 +1450,51 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v.size()) << "0 1";
-        EXPECT_EQ(0, v[0]) << "0 1";
-        EXPECT_EQ(2, v.size()) << "0 1";
-        EXPECT_EQ(1, v[1]) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 2);
+        REQUIRE(v[0] == 0);
+        REQUIRE(v[1] == 1);
     }
 }
 
+TEST_CASE(
+    "CommandlineParser: Multiple Command One Argument String",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
 
-TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
     std::vector<std::string> v;
     using T = ghoul::cmdparser::MultipleCommand<std::string>;
-    _p->addCommand(std::make_unique<T>(v, "-single"));
+    p.addCommand(std::make_unique<T>(v, "-single"));
 
-    {
+    SECTION("foo") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "foo"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v.size()) << "foo";
-        EXPECT_EQ("foo", v[0]) << "foo";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 1);
+        REQUIRE(v[0] == "foo");
     }
-    v.clear();
-    {
+
+    SECTION("bar") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "bar"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v.size()) << "bar";
-        EXPECT_EQ("bar", v[0]) << "bar";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 1);
+        REQUIRE(v[0] == "bar");
     }
-    v.clear();
-    {
+
+    SECTION("foo foo") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1474,14 +1503,14 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
             "foo"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v.size()) << "foo foo";
-        EXPECT_EQ("foo", v[0]) << "foo foo";
-        EXPECT_EQ("foo", v[1]) << "foo foo";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 2);
+        REQUIRE(v[0] == "foo");
+        REQUIRE(v[1] == "foo");
     }
-    v.clear();
-    {
+
+    SECTION("bar foo") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1490,14 +1519,14 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
             "foo"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v.size()) << "bar foo";
-        EXPECT_EQ("bar", v[0]) << "bar foo";
-        EXPECT_EQ("foo", v[1]) << "bar foo";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 2);
+        REQUIRE(v[0] == "bar");
+        REQUIRE(v[1] == "foo");
     }
-    v.clear();
-    {
+
+    SECTION("foo bar") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1506,14 +1535,14 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
             "bar"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v.size()) << "foo bar";
-        EXPECT_EQ("foo", v[0]) << "foo bar";
-        EXPECT_EQ("bar", v[1]) << "foo bar";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 2);
+        REQUIRE(v[0] == "foo");
+        REQUIRE(v[1] == "bar");
     }
-    v.clear();
-    {
+
+    SECTION("bar bar") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1522,22 +1551,26 @@ TEST_F(CommandlineParserTest, MultipleCommandOneArgumentString) {
             "bar"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v.size()) << "bar bar";
-        EXPECT_EQ("bar", v[0]) << "bar bar";
-        EXPECT_EQ("bar", v[1]) << "bar bar";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v.size() == 2);
+        REQUIRE(v[0] == "bar");
+        REQUIRE(v[1] == "bar");
     }
 }
 
-TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
-    // bool-bool
+TEST_CASE(
+    "CommandlineParser: Multiple Command Two Arguments Bool Bool",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     std::vector<bool> v1;
     std::vector<bool> v2;
     using T = ghoul::cmdparser::MultipleCommand<bool, bool>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
-    
-    {
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
+
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1545,16 +1578,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 0";
-        EXPECT_EQ(1, v2.size()) << "0 0";
-        EXPECT_EQ(false, v1[0]) << "0 0";
-        EXPECT_EQ(false, v2[0]) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE_FALSE(v2[0]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1562,16 +1594,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 0";
-        EXPECT_EQ(1, v2.size()) << "1 0";
-        EXPECT_EQ(true, v1[0]) << "1 0";
-        EXPECT_EQ(false, v2[0]) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE_FALSE(v2[0]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1579,16 +1610,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 1";
-        EXPECT_EQ(1, v2.size()) << "0 1";
-        EXPECT_EQ(false, v1[0]) << "0 1";
-        EXPECT_EQ(true, v2[0]) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1596,16 +1626,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 1";
-        EXPECT_EQ(1, v2.size()) << "1 1";
-        EXPECT_EQ(true, v1[0]) << "1 1";
-        EXPECT_EQ(true, v2[0]) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1616,18 +1645,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 0 | 0 0";
-        EXPECT_EQ(false, v2[0]) << "0 0 | 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 0 | 0 0";
-        EXPECT_EQ(false, v2[1]) << "0 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE_FALSE(v2[0]);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE_FALSE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1638,18 +1666,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 0 | 0 0";
-        EXPECT_EQ(false, v2[0]) << "1 0 | 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 0 | 0 0";
-        EXPECT_EQ(false, v2[1]) << "1 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE_FALSE(v2[0]);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE_FALSE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1660,18 +1687,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 1 | 0 0";
-        EXPECT_EQ(true, v2[0]) << "0 1 | 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 1 | 0 0";
-        EXPECT_EQ(false, v2[1]) << "0 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0]);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE_FALSE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1682,18 +1708,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 1 | 0 0";
-        EXPECT_EQ(true, v2[0]) << "1 1 | 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 1 | 0 0";
-        EXPECT_EQ(false, v2[1]) << "1 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0]);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE_FALSE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1704,18 +1729,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 0 | 1 1";
-        EXPECT_EQ(false, v2[0]) << "0 0 | 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 0 | 1 1";
-        EXPECT_EQ(true, v2[1]) << "0 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE_FALSE(v2[0]);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1726,18 +1750,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 0 | 1 1";
-        EXPECT_EQ(false, v2[0]) << "1 0 | 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 0 | 1 1";
-        EXPECT_EQ(true, v2[1]) << "1 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE_FALSE(v2[0]);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1748,18 +1771,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 1 | 1 1";
-        EXPECT_EQ(true, v2[0]) << "0 1 | 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 1 | 1 1";
-        EXPECT_EQ(true, v2[1]) << "0 1 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0]);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1770,25 +1792,30 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 1 | 1 1";
-        EXPECT_EQ(true, v2[0]) << "1 1 | 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 1 | 1 1";
-        EXPECT_EQ(true, v2[1]) << "1 1 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0]);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1]);
     }
 }
 
-TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
+TEST_CASE(
+    "CommandlineParser: Multiple Command Two Arguments Int Int",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     std::vector<int> v1;
     std::vector<int> v2;
 
     using T = ghoul::cmdparser::MultipleCommand<int, int>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
-    {
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1796,16 +1823,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 0";
-        EXPECT_EQ(1, v2.size()) << "0 0";
-        EXPECT_EQ(0, v1[0]) << "0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1813,16 +1839,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 0";
-        EXPECT_EQ(1, v2.size()) << "1 0";
-        EXPECT_EQ(1, v1[0]) << "1 0";
-        EXPECT_EQ(0, v2[0]) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1830,16 +1855,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 1";
-        EXPECT_EQ(1, v2.size()) << "0 1";
-        EXPECT_EQ(0, v1[0]) << "0 1";
-        EXPECT_EQ(1, v2[0]) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1847,16 +1871,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 1";
-        EXPECT_EQ(1, v2.size()) << "1 1";
-        EXPECT_EQ(1, v1[0]) << "1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1867,18 +1890,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
-        EXPECT_EQ(0, v1[0]) << "0 0 | 0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0 | 0 0";
-        EXPECT_EQ(0, v1[1]) << "0 0 | 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v1[1] == 0);
+        REQUIRE(v2[1] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1889,18 +1911,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
-        EXPECT_EQ(1, v1[0]) << "1 0 | 0 0";
-        EXPECT_EQ(0, v2[0]) << "1 0 | 0 0";
-        EXPECT_EQ(0, v1[1]) << "1 0 | 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v1[1] == 0);
+        REQUIRE(v2[1] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1911,18 +1932,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
-        EXPECT_EQ(0, v1[0]) << "0 1 | 0 0";
-        EXPECT_EQ(1, v2[0]) << "0 1 | 0 0";
-        EXPECT_EQ(0, v1[1]) << "0 1 | 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v1[1] == 0);
+        REQUIRE(v2[1] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1933,18 +1953,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
-        EXPECT_EQ(1, v1[0]) << "1 1 | 0 0";
-        EXPECT_EQ(1, v2[0]) << "1 1 | 0 0";
-        EXPECT_EQ(0, v1[1]) << "1 1 | 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v1[1] == 0);
+        REQUIRE(v2[1] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1955,18 +1974,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
-        EXPECT_EQ(0, v1[0]) << "0 0 | 1 1";
-        EXPECT_EQ(0, v2[0]) << "0 0 | 1 1";
-        EXPECT_EQ(1, v1[1]) << "0 0 | 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v1[1] == 1);
+        REQUIRE(v2[1] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1977,18 +1995,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
-        EXPECT_EQ(1, v1[0]) << "1 0 | 1 1";
-        EXPECT_EQ(0, v2[0]) << "1 0 | 1 1";
-        EXPECT_EQ(1, v1[1]) << "1 0 | 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v1[1] == 1);
+        REQUIRE(v2[1] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 11"){
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -1999,18 +2016,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
-        EXPECT_EQ(0, v1[0]) << "0 1 | 1 1";
-        EXPECT_EQ(1, v2[0]) << "0 1 | 1 1";
-        EXPECT_EQ(1, v1[1]) << "0 1 | 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 1 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v1[1] == 1);
+        REQUIRE(v2[1] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2021,27 +2037,30 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
-        EXPECT_EQ(1, v1[0]) << "1 1 | 1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1 | 1 1";
-        EXPECT_EQ(1, v1[1]) << "1 1 | 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 1 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v1[1] == 1);
+        REQUIRE(v2[1] == 1);
     }
 }
 
+TEST_CASE(
+    "CommandlineParser: Multiple Command Two Arguments String String",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
 
-TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
-    // int-int
     std::vector<std::string> v1;
     std::vector<std::string> v2;
 
     using T = ghoul::cmdparser::MultipleCommand<std::string, std::string>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
-    {
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2049,16 +2068,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 0";
-        EXPECT_EQ(1, v2.size()) << "0 0";
-        EXPECT_EQ("0", v1[0]) << "0 0";
-        EXPECT_EQ("0", v2[0]) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == "0");
+        REQUIRE(v2[0] == "0");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2066,16 +2084,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 0";
-        EXPECT_EQ(1, v2.size()) << "1 0";
-        EXPECT_EQ("1", v1[0]) << "1 0";
-        EXPECT_EQ("0", v2[0]) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == "1");
+        REQUIRE(v2[0] == "0");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2083,16 +2100,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 1";
-        EXPECT_EQ(1, v2.size()) << "0 1";
-        EXPECT_EQ("0", v1[0]) << "0 1";
-        EXPECT_EQ("1", v2[0]) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == "0");
+        REQUIRE(v2[0] == "1");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2100,16 +2116,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 1";
-        EXPECT_EQ(1, v2.size()) << "1 1";
-        EXPECT_EQ("1", v1[0]) << "1 1";
-        EXPECT_EQ("1", v2[0]) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == "1");
+        REQUIRE(v2[0] == "1");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2120,18 +2135,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
-        EXPECT_EQ("0", v1[0]) << "0 0 | 0 0";
-        EXPECT_EQ("0", v2[0]) << "0 0 | 0 0";
-        EXPECT_EQ("0", v1[1]) << "0 0 | 0 0";
-        EXPECT_EQ("0", v2[1]) << "0 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "0");
+        REQUIRE(v2[0] == "0");
+        REQUIRE(v1[1] == "0");
+        REQUIRE(v2[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2142,18 +2156,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
-        EXPECT_EQ("1", v1[0]) << "1 0 | 0 0";
-        EXPECT_EQ("0", v2[0]) << "1 0 | 0 0";
-        EXPECT_EQ("0", v1[1]) << "1 0 | 0 0";
-        EXPECT_EQ("0", v2[1]) << "1 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "1");
+        REQUIRE(v2[0] == "0");
+        REQUIRE(v1[1] == "0");
+        REQUIRE(v2[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2164,18 +2177,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
-        EXPECT_EQ("0", v1[0]) << "0 1 | 0 0";
-        EXPECT_EQ("1", v2[0]) << "0 1 | 0 0";
-        EXPECT_EQ("0", v1[1]) << "0 1 | 0 0";
-        EXPECT_EQ("0", v2[1]) << "0 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "0");
+        REQUIRE(v2[0] == "1");
+        REQUIRE(v1[1] == "0");
+        REQUIRE(v2[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2186,18 +2198,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
-        EXPECT_EQ("1", v1[0]) << "1 1 | 0 0";
-        EXPECT_EQ("1", v2[0]) << "1 1 | 0 0";
-        EXPECT_EQ("0", v1[1]) << "1 1 | 0 0";
-        EXPECT_EQ("0", v2[1]) << "1 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "1");
+        REQUIRE(v2[0] == "1");
+        REQUIRE(v1[1] == "0");
+        REQUIRE(v2[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2208,18 +2219,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
-        EXPECT_EQ("0", v1[0]) << "0 0 | 1 1";
-        EXPECT_EQ("0", v2[0]) << "0 0 | 1 1";
-        EXPECT_EQ("1", v1[1]) << "0 0 | 1 1";
-        EXPECT_EQ("1", v2[1]) << "0 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "0");
+        REQUIRE(v2[0] == "0");
+        REQUIRE(v1[1] == "1");
+        REQUIRE(v2[1] == "1");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2230,18 +2240,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
-        EXPECT_EQ("1", v1[0]) << "1 0 | 1 1";
-        EXPECT_EQ("0", v2[0]) << "1 0 | 1 1";
-        EXPECT_EQ("1", v1[1]) << "1 0 | 1 1";
-        EXPECT_EQ("1", v2[1]) << "1 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "1");
+        REQUIRE(v2[0] == "0");
+        REQUIRE(v1[1] == "1");
+        REQUIRE(v2[1] == "1");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2252,18 +2261,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
-        EXPECT_EQ("0", v1[0]) << "0 1 | 1 1";
-        EXPECT_EQ("1", v2[0]) << "0 1 | 1 1";
-        EXPECT_EQ("1", v1[1]) << "0 1 | 1 1";
-        EXPECT_EQ("1", v2[1]) << "0 1 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "0");
+        REQUIRE(v2[0] == "1");
+        REQUIRE(v1[1] == "1");
+        REQUIRE(v2[1] == "1");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2274,25 +2282,30 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
-        EXPECT_EQ("1", v1[0]) << "1 1 | 1 1";
-        EXPECT_EQ("1", v2[0]) << "1 1 | 1 1";
-        EXPECT_EQ("1", v1[1]) << "1 1 | 1 1";
-        EXPECT_EQ("1", v2[1]) << "1 1 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "1");
+        REQUIRE(v2[0] == "1");
+        REQUIRE(v1[1] == "1");
+        REQUIRE(v2[1] == "1");
     }
 }
 
-TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
+TEST_CASE(
+    "CommandlineParser: Multiple Command Two Arguments Bool Int",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     std::vector<bool> v1;
     std::vector<int> v2;
 
     using T = ghoul::cmdparser::MultipleCommand<bool, int>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
-    {
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2300,16 +2313,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 0";
-        EXPECT_EQ(1, v2.size()) << "0 0";
-        EXPECT_EQ(false, v1[0]) << "0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2317,16 +2329,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 0";
-        EXPECT_EQ(1, v2.size()) << "1 0";
-        EXPECT_EQ(true, v1[0]) << "1 0";
-        EXPECT_EQ(0, v2[0]) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2334,16 +2345,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 1";
-        EXPECT_EQ(1, v2.size()) << "0 1";
-        EXPECT_EQ(false, v1[0]) << "0 1";
-        EXPECT_EQ(1, v2[0]) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2351,16 +2361,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 1";
-        EXPECT_EQ(1, v2.size()) << "1 1";
-        EXPECT_EQ(true, v1[0]) << "1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2371,18 +2380,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 0 | 0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0 | 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 0 | 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2393,18 +2401,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 0 | 0 0";
-        EXPECT_EQ(0, v2[0]) << "1 0 | 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 0 | 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2415,18 +2422,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 1 | 0 0";
-        EXPECT_EQ(1, v2[0]) << "0 1 | 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 1 | 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2437,18 +2443,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 1 | 0 0";
-        EXPECT_EQ(1, v2[0]) << "1 1 | 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 1 | 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2459,18 +2464,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 0 | 1 1";
-        EXPECT_EQ(0, v2[0]) << "0 0 | 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 0 | 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2481,18 +2485,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 0 | 1 1";
-        EXPECT_EQ(0, v2[0]) << "1 0 | 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 0 | 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2503,18 +2506,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 1 | 1 1";
-        EXPECT_EQ(1, v2[0]) << "0 1 | 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 1 | 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 1 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2525,25 +2527,30 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsBoolInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 1 | 1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1 | 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 1 | 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 1 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
     }
 }
 
-TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
+TEST_CASE(
+    "CommandlineParser: Multiple Command Two Arguments Int Bool",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     std::vector<int> v1;
     std::vector<bool> v2;
 
     using T = ghoul::cmdparser::MultipleCommand<int, bool>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
-    {
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2551,16 +2558,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 0";
-        EXPECT_EQ(1, v2.size()) << "0 0";
-        EXPECT_EQ(0, v1[0]) << "0 0";
-        EXPECT_EQ(false, v2[0]) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == 0);
+        REQUIRE_FALSE(v2[0]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2568,16 +2574,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 0";
-        EXPECT_EQ(1, v2.size()) << "1 0";
-        EXPECT_EQ(1, v1[0]) << "1 0";
-        EXPECT_EQ(false, v2[0]) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == 1);
+        REQUIRE_FALSE(v2[0]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2585,16 +2590,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 1";
-        EXPECT_EQ(1, v2.size()) << "0 1";
-        EXPECT_EQ(0, v1[0]) << "0 1";
-        EXPECT_EQ(true, v2[0]) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2602,16 +2606,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 1";
-        EXPECT_EQ(1, v2.size()) << "1 1";
-        EXPECT_EQ(1, v1[0]) << "1 1";
-        EXPECT_EQ(true, v2[0]) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2622,18 +2625,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
-        EXPECT_EQ(0, v1[0]) << "0 0 | 0 0";
-        EXPECT_EQ(false, v2[0]) << "0 0 | 0 0";
-        EXPECT_EQ(0, v1[1]) << "0 0 | 0 0";
-        EXPECT_EQ(false, v2[1]) << "0 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 0);
+        REQUIRE_FALSE(v2[0]);
+        REQUIRE(v1[1] == 0);
+        REQUIRE_FALSE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2644,18 +2646,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
-        EXPECT_EQ(1, v1[0]) << "1 0 | 0 0";
-        EXPECT_EQ(false, v2[0]) << "1 0 | 0 0";
-        EXPECT_EQ(0, v1[1]) << "1 0 | 0 0";
-        EXPECT_EQ(false, v2[1]) << "1 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 1);
+        REQUIRE_FALSE(v2[0]);
+        REQUIRE(v1[1] == 0);
+        REQUIRE_FALSE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2666,18 +2667,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
-        EXPECT_EQ(0, v1[0]) << "0 1 | 0 0";
-        EXPECT_EQ(true, v2[0]) << "0 1 | 0 0";
-        EXPECT_EQ(0, v1[1]) << "0 1 | 0 0";
-        EXPECT_EQ(false, v2[1]) << "0 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0]);
+        REQUIRE(v1[1] == 0);
+        REQUIRE_FALSE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2688,18 +2688,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
-        EXPECT_EQ(1, v1[0]) << "1 1 | 0 0";
-        EXPECT_EQ(true, v2[0]) << "1 1 | 0 0";
-        EXPECT_EQ(0, v1[1]) << "1 1 | 0 0";
-        EXPECT_EQ(false, v2[1]) << "1 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0]);
+        REQUIRE(v1[1] == 0);
+        REQUIRE_FALSE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2710,18 +2709,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
-        EXPECT_EQ(0, v1[0]) << "0 0 | 1 1";
-        EXPECT_EQ(false, v2[0]) << "0 0 | 1 1";
-        EXPECT_EQ(1, v1[1]) << "0 0 | 1 1";
-        EXPECT_EQ(true, v2[1]) << "0 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 0);
+        REQUIRE_FALSE(v2[0]);
+        REQUIRE(v1[1] == 1);
+        REQUIRE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2732,18 +2730,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
-        EXPECT_EQ(1, v1[0]) << "1 0 | 1 1";
-        EXPECT_EQ(false, v2[0]) << "1 0 | 1 1";
-        EXPECT_EQ(1, v1[1]) << "1 0 | 1 1";
-        EXPECT_EQ(true, v2[1]) << "1 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 1);
+        REQUIRE_FALSE(v2[0]);
+        REQUIRE(v1[1] == 1);
+        REQUIRE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2754,18 +2751,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
-        EXPECT_EQ(0, v1[0]) << "0 1 | 1 1";
-        EXPECT_EQ(true, v2[0]) << "0 1 | 1 1";
-        EXPECT_EQ(1, v1[1]) << "0 1 | 1 1";
-        EXPECT_EQ(true, v2[1]) << "0 1 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0]);
+        REQUIRE(v1[1] == 1);
+        REQUIRE(v2[1]);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2776,25 +2772,30 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
-        EXPECT_EQ(1, v1[0]) << "1 1 | 1 1";
-        EXPECT_EQ(true, v2[0]) << "1 1 | 1 1";
-        EXPECT_EQ(1, v1[1]) << "1 1 | 1 1";
-        EXPECT_EQ(true, v2[1]) << "1 1 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0]);
+        REQUIRE(v1[1] == 1);
+        REQUIRE(v2[1]);
     }
 }
 
-TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
+TEST_CASE(
+    "CommandlineParser: Multiple Command Two Arguments Int String",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     std::vector<int> v1;
     std::vector<std::string> v2;
 
     using T = ghoul::cmdparser::MultipleCommand<int, std::string>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
-    {
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2802,16 +2803,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 0";
-        EXPECT_EQ(1, v2.size()) << "0 0";
-        EXPECT_EQ(0, v1[0]) << "0 0";
-        EXPECT_EQ("0", v2[0]) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0] == "0");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2819,16 +2819,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 0";
-        EXPECT_EQ(1, v2.size()) << "1 0";
-        EXPECT_EQ(1, v1[0]) << "1 0";
-        EXPECT_EQ("0", v2[0]) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0] == "0");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2836,16 +2835,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 1";
-        EXPECT_EQ(1, v2.size()) << "0 1";
-        EXPECT_EQ(0, v1[0]) << "0 1";
-        EXPECT_EQ("1", v2[0]) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0] == "1");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2853,16 +2851,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 1";
-        EXPECT_EQ(1, v2.size()) << "1 1";
-        EXPECT_EQ(1, v1[0]) << "1 1";
-        EXPECT_EQ("1", v2[0]) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0] == "1");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2873,18 +2870,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
-        EXPECT_EQ(0, v1[0]) << "0 0 | 0 0";
-        EXPECT_EQ("0", v2[0]) << "0 0 | 0 0";
-        EXPECT_EQ(0, v1[1]) << "0 0 | 0 0";
-        EXPECT_EQ("0", v2[1]) << "0 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0] == "0");
+        REQUIRE(v1[1] == 0);
+        REQUIRE(v2[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2895,18 +2891,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
-        EXPECT_EQ(1, v1[0]) << "1 0 | 0 0";
-        EXPECT_EQ("0", v2[0]) << "1 0 | 0 0";
-        EXPECT_EQ(0, v1[1]) << "1 0 | 0 0";
-        EXPECT_EQ("0", v2[1]) << "1 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0] == "0");
+        REQUIRE(v1[1] == 0);
+        REQUIRE(v2[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2917,18 +2912,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
-        EXPECT_EQ(0, v1[0]) << "0 1 | 0 0";
-        EXPECT_EQ("1", v2[0]) << "0 1 | 0 0";
-        EXPECT_EQ(0, v1[1]) << "0 1 | 0 0";
-        EXPECT_EQ("0", v2[1]) << "0 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0] == "1");
+        REQUIRE(v1[1] == 0);
+        REQUIRE(v2[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2939,18 +2933,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
-        EXPECT_EQ(1, v1[0]) << "1 1 | 0 0";
-        EXPECT_EQ("1", v2[0]) << "1 1 | 0 0";
-        EXPECT_EQ(0, v1[1]) << "1 1 | 0 0";
-        EXPECT_EQ("0", v2[1]) << "1 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0] == "1");
+        REQUIRE(v1[1] == 0);
+        REQUIRE(v2[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2961,18 +2954,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
-        EXPECT_EQ(0, v1[0]) << "0 0 | 1 1";
-        EXPECT_EQ("0", v2[0]) << "0 0 | 1 1";
-        EXPECT_EQ(1, v1[1]) << "0 0 | 1 1";
-        EXPECT_EQ("1", v2[1]) << "0 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0] == "0");
+        REQUIRE(v1[1] == 1);
+        REQUIRE(v2[1] == "1");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -2983,18 +2975,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
-        EXPECT_EQ(1, v1[0]) << "1 0 | 1 1";
-        EXPECT_EQ("0", v2[0]) << "1 0 | 1 1";
-        EXPECT_EQ(1, v1[1]) << "1 0 | 1 1";
-        EXPECT_EQ("1", v2[1]) << "1 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0] == "0");
+        REQUIRE(v1[1] == 1);
+        REQUIRE(v2[1] == "1");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3005,18 +2996,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
-        EXPECT_EQ(0, v1[0]) << "0 1 | 1 1";
-        EXPECT_EQ("1", v2[0]) << "0 1 | 1 1";
-        EXPECT_EQ(1, v1[1]) << "0 1 | 1 1";
-        EXPECT_EQ("1", v2[1]) << "0 1 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 0);
+        REQUIRE(v2[0] == "1");
+        REQUIRE(v1[1] == 1);
+        REQUIRE(v2[1] == "1");
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3027,25 +3017,30 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
-        EXPECT_EQ(1, v1[0]) << "1 1 | 1 1";
-        EXPECT_EQ("1", v2[0]) << "1 1 | 1 1";
-        EXPECT_EQ(1, v1[1]) << "1 1 | 1 1";
-        EXPECT_EQ("1", v2[1]) << "1 1 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == 1);
+        REQUIRE(v2[0] == "1");
+        REQUIRE(v1[1] == 1);
+        REQUIRE(v2[1] == "1");
     }
 }
 
-TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
+TEST_CASE(
+    "CommandlineParser: Multiple Command Two Arguments String Int",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     std::vector<std::string> v1;
     std::vector<int> v2;
 
     using T = ghoul::cmdparser::MultipleCommand<std::string, int>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
-    {
+    SECTION("00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3053,16 +3048,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 0";
-        EXPECT_EQ(1, v2.size()) << "0 0";
-        EXPECT_EQ("0", v1[0]) << "0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == "0");
+        REQUIRE(v2[0] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3070,16 +3064,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 0";
-        EXPECT_EQ(1, v2.size()) << "1 0";
-        EXPECT_EQ("1", v1[0]) << "1 0";
-        EXPECT_EQ(0, v2[0]) << "1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == "1");
+        REQUIRE(v2[0] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3087,16 +3080,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 1";
-        EXPECT_EQ(1, v2.size()) << "0 1";
-        EXPECT_EQ("0", v1[0]) << "0 1";
-        EXPECT_EQ(1, v2[0]) << "0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == "0");
+        REQUIRE(v2[0] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3104,16 +3096,15 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 1";
-        EXPECT_EQ(1, v2.size()) << "1 1";
-        EXPECT_EQ("1", v1[0]) << "1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v1[0] == "1");
+        REQUIRE(v2[0] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3124,18 +3115,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 0 0";
-        EXPECT_EQ("0", v1[0]) << "0 0 | 0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0 | 0 0";
-        EXPECT_EQ("0", v1[1]) << "0 0 | 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "0");
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v1[1] == "0");
+        REQUIRE(v2[1] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3146,18 +3136,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 0 0";
-        EXPECT_EQ("1", v1[0]) << "1 0 | 0 0";
-        EXPECT_EQ(0, v2[0]) << "1 0 | 0 0";
-        EXPECT_EQ("0", v1[1]) << "1 0 | 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 0 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "1");
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v1[1] == "0");
+        REQUIRE(v2[1] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3168,18 +3157,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 0 0";
-        EXPECT_EQ("0", v1[0]) << "0 1 | 0 0";
-        EXPECT_EQ(1, v2[0]) << "0 1 | 0 0";
-        EXPECT_EQ("0", v1[1]) << "0 1 | 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "0");
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v1[1] == "0");
+        REQUIRE(v2[1] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 00") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3190,18 +3178,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 0 0";
-        EXPECT_EQ("1", v1[0]) << "1 1 | 0 0";
-        EXPECT_EQ(1, v2[0]) << "1 1 | 0 0";
-        EXPECT_EQ("0", v1[1]) << "1 1 | 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 1 | 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "1");
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v1[1] == "0");
+        REQUIRE(v2[1] == 0);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("00 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3212,18 +3199,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 0 | 1 1";
-        EXPECT_EQ("0", v1[0]) << "0 0 | 1 1";
-        EXPECT_EQ(0, v2[0]) << "0 0 | 1 1";
-        EXPECT_EQ("1", v1[1]) << "0 0 | 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "0");
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v1[1] == "1");
+        REQUIRE(v2[1] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("10 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3234,18 +3220,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 0 | 1 1";
-        EXPECT_EQ("1", v1[0]) << "1 0 | 1 1";
-        EXPECT_EQ(0, v2[0]) << "1 0 | 1 1";
-        EXPECT_EQ("1", v1[1]) << "1 0 | 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 0 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "1");
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v1[1] == "1");
+        REQUIRE(v2[1] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("01 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3256,18 +3241,17 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 1 | 1 1";
-        EXPECT_EQ("0", v1[0]) << "0 1 | 1 1";
-        EXPECT_EQ(1, v2[0]) << "0 1 | 1 1";
-        EXPECT_EQ("1", v1[1]) << "0 1 | 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 1 | 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "0");
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v1[1] == "1");
+        REQUIRE(v2[1] == 1);
     }
-    v1.clear();
-    v2.clear();
-    {
+
+    SECTION("11 11") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3278,25 +3262,31 @@ TEST_F(CommandlineParserTest, MultipleCommandTwoArgumentsStringInt) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 | 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 1 | 1 1";
-        EXPECT_EQ("1", v1[0]) << "1 1 | 1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1 | 1 1";
-        EXPECT_EQ("1", v1[1]) << "1 1 | 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 1 | 1 1";
-    }}
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v1[0] == "1");
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v1[1] == "1");
+        REQUIRE(v2[1] == 1);
+    }
+}
 
-TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
+TEST_CASE(
+    "CommandlineParser: Multiple Command Three Arguments Bool Int String",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     std::vector<bool> v1;
     std::vector<int> v2;
     std::vector<std::string> v3;
 
     using T = ghoul::cmdparser::MultipleCommand<bool, int, std::string>;
-    _p->addCommand(std::make_unique<T>(v1, v2, v3, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, v3, "-single"));
 
-    {
+    SECTION("000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3305,19 +3295,17 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 0 0";
-        EXPECT_EQ(1, v2.size()) << "0 0 0";
-        EXPECT_EQ(1, v3.size()) << "0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0 0";
-        EXPECT_EQ("0", v3[0]) << "0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("100") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3326,63 +3314,55 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 0 0";
-        EXPECT_EQ(1, v2.size()) << "1 0 0";
-        EXPECT_EQ(1, v3.size()) << "1 0 0";
-        EXPECT_EQ(true, v1[0]);
-        EXPECT_EQ(0, v2[0]);
-        EXPECT_EQ("0", v3[0]);
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("010") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1",
             "0"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 1 0";
-        EXPECT_EQ(1, v2.size()) << "0 1 0";
-        EXPECT_EQ(1, v3.size()) << "0 1 0";
-        EXPECT_EQ(false, v1[0]);
-        EXPECT_EQ(1, v2[0]);
-        EXPECT_EQ("0", v3[0]);
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("110") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1",
             "0"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 1 0";
-        EXPECT_EQ(1, v2.size()) << "1 1 0";
-        EXPECT_EQ(1, v3.size()) << "1 1 0";
-        EXPECT_EQ(true, v1[0]);
-        EXPECT_EQ(1, v2[0]);
-        EXPECT_EQ("0", v3[0]);
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("001") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3391,19 +3371,17 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 0 1";
-        EXPECT_EQ(1, v2.size()) << "0 0 1";
-        EXPECT_EQ(1, v3.size()) << "0 0 1";
-        EXPECT_EQ(false, v1[0]);
-        EXPECT_EQ(0, v2[0]);
-        EXPECT_EQ("1", v3[0]);
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("101") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3412,63 +3390,55 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 0 1";
-        EXPECT_EQ(1, v2.size()) << "1 0 1";
-        EXPECT_EQ(1, v3.size()) << "1 0 1";
-        EXPECT_EQ(true, v1[0]);
-        EXPECT_EQ(0, v2[0]);
-        EXPECT_EQ("1", v3[0]);
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("011") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
             "1",
             "1"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 1 1";
-        EXPECT_EQ(1, v2.size()) << "0 1 1";
-        EXPECT_EQ(1, v3.size()) << "0 1 1";
-        EXPECT_EQ(false, v1[0]);
-        EXPECT_EQ(1, v2[0]);
-        EXPECT_EQ("1", v3[0]);
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
             "1",
             "1"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 1 1";
-        EXPECT_EQ(1, v2.size()) << "1 1 1";
-        EXPECT_EQ(1, v3.size()) << "1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1 1";
-        EXPECT_EQ("1", v3[0]) << "1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("000 000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3481,22 +3451,20 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 0 | 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 0 0 | 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "0 0 0 | 0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 0 0 | 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0 0 | 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "0 0 0 | 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 0 0 | 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 0 0 | 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "0 0 0 | 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("100 000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3509,22 +3477,20 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 0 | 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 0 0 | 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "1 0 0 | 0 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 0 0 | 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "1 0 0 | 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "1 0 0 | 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 0 0 | 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 0 0 | 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "1 0 0 | 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("010 000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3535,25 +3501,22 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0",
             "0",
             "0"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 0 | 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 1 0 | 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "0 1 0 | 0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 1 0 | 0 0 0";
-        EXPECT_EQ(1, v2[0]) << "0 1 0 | 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "0 1 0 | 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 1 0 | 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 1 0 | 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "0 1 0 | 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("110 000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3564,25 +3527,22 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0",
             "0",
             "0"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 0 | 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 1 0 | 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "1 1 0 | 0 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 1 0 | 0 0 0";
-        EXPECT_EQ(1, v2[0]) << "1 1 0 | 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "1 1 0 | 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 1 0 | 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 1 0 | 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "1 1 0 | 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("001 000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3595,22 +3555,20 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 1 | 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 0 1 | 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "0 0 1 | 0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 0 1 | 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0 1 | 0 0 0";
-        EXPECT_EQ("1", v3[0]) << "0 0 1 | 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 0 1 | 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 0 1 | 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "0 0 1 | 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("101 000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3623,22 +3581,20 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 1 | 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 0 1 | 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "1 0 1 | 0 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 0 1 | 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "1 0 1 | 0 0 0";
-        EXPECT_EQ("1", v3[0]) << "1 0 1 | 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 0 1 | 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 0 1 | 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "1 0 1 | 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("011 000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3649,25 +3605,22 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0",
             "0",
             "0"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 1 | 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 1 1 | 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "0 1 1 | 0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 1 1 | 0 0 0";
-        EXPECT_EQ(1, v2[0]) << "0 1 1 | 0 0 0";
-        EXPECT_EQ("1", v3[0]) << "0 1 1 | 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 1 1 | 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 1 1 | 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "0 1 1 | 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("111 000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3678,25 +3631,22 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "0",
             "0",
             "0"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 1 | 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 1 1 | 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "1 1 1 | 0 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 1 1 | 0 0 0";
-        EXPECT_EQ(1, v2[0]) << "1 1 1 | 0 0 0";
-        EXPECT_EQ("1", v3[0]) << "1 1 1 | 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 1 1 | 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 1 1 | 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "1 1 1 | 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("000 111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3709,22 +3659,20 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 0 | 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 0 0 | 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "0 0 0 | 1 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 0 0 | 1 1 1";
-        EXPECT_EQ(0, v2[0]) << "0 0 0 | 1 1 1";
-        EXPECT_EQ("0", v3[0]) << "0 0 0 | 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 0 0 | 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 0 0 | 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "0 0 0 | 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("100 111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3737,22 +3685,20 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 0 | 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 0 0 | 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "1 0 0 | 1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 0 0 | 1 1 1";
-        EXPECT_EQ(0, v2[0]) << "1 0 0 | 1 1 1";
-        EXPECT_EQ("0", v3[0]) << "1 0 0 | 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 0 0 | 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 0 0 | 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "1 0 0 | 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("010 111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3763,25 +3709,22 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1",
             "1",
             "1"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 0 | 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 1 0 | 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "0 1 0 | 1 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 1 0 | 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "0 1 0 | 1 1 1";
-        EXPECT_EQ("0", v3[0]) << "0 1 0 | 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 1 0 | 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 1 0 | 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "0 1 0 | 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("110 111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3792,25 +3735,22 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1",
             "1",
             "1"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 0 | 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 1 0 | 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "1 1 0 | 1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 1 0 | 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1 0 | 1 1 1";
-        EXPECT_EQ("0", v3[0]) << "1 1 0 | 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 1 0 | 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 1 0 | 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "1 1 0 | 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("001 111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3823,22 +3763,20 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 1 | 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 0 1 | 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "0 0 1 | 1 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 0 1 | 1 1 1";
-        EXPECT_EQ(0, v2[0]) << "0 0 1 | 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "0 0 1 | 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 0 1 | 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 0 1 | 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "0 0 1 | 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("101 111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3851,22 +3789,20 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 1 | 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 0 1 | 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "1 0 1 | 1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 0 1 | 1 1 1";
-        EXPECT_EQ(0, v2[0]) << "1 0 1 | 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "1 0 1 | 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 0 1 | 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 0 1 | 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "1 0 1 | 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("011 111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3877,25 +3813,22 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1",
             "1",
             "1"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 1 | 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 1 1 | 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "0 1 1 | 1 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 1 1 | 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "0 1 1 | 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "0 1 1 | 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 1 1 | 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 1 1 | 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "0 1 1 | 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    {
+
+    SECTION("111 111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3906,33 +3839,37 @@ TEST_F(CommandlineParserTest, MultipleCommandThreeArgumentsBoolIntString) {
             "1",
             "1",
             "1"
-
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 1 | 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 1 1 | 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "1 1 1 | 1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 1 1 | 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1 1 | 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "1 1 1 | 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 1 1 | 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 1 1 | 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "1 1 1 | 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
     }
 }
 
-TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
+TEST_CASE(
+    "CommandlineParser: Multiple Command Four Arguments Bool Int String Float",
+    "[commandlineparser]")
+{
+    ghoul::cmdparser::CommandlineParser p;
+
     std::vector<bool> v1;
     std::vector<int> v2;
     std::vector<std::string> v3;
     std::vector<float> v4;
 
     using T = ghoul::cmdparser::MultipleCommand<bool, int, std::string, float>;
-    _p->addCommand(std::make_unique<T>(v1, v2, v3, v4, "-single"));
+    p.addCommand(std::make_unique<T>(v1, v2, v3, v4, "-single"));
 
-    {
+    SECTION("0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3942,22 +3879,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 0 0 0";
-        EXPECT_EQ(1, v2.size()) << "0 0 0 0";
-        EXPECT_EQ(1, v3.size()) << "0 0 0 0";
-        EXPECT_EQ(1, v4.size()) << "0 0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "0 0 0 0";
-        EXPECT_EQ(0.f, v4[0]) << "0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3967,22 +3901,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 0 0 0";
-        EXPECT_EQ(1, v2.size()) << "1 0 0 0";
-        EXPECT_EQ(1, v3.size()) << "1 0 0 0";
-        EXPECT_EQ(1, v4.size()) << "1 0 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "1 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "1 0 0 0";
-        EXPECT_EQ(0.f, v4[0]) << "1 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0100") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -3992,22 +3923,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 1 0 0";
-        EXPECT_EQ(1, v2.size()) << "0 1 0 0";
-        EXPECT_EQ(1, v3.size()) << "0 1 0 0";
-        EXPECT_EQ(1, v4.size()) << "0 1 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 1 0 0";
-        EXPECT_EQ(1, v2[0]) << "0 1 0 0";
-        EXPECT_EQ("0", v3[0]) << "0 1 0 0";
-        EXPECT_EQ(0.f, v4[0]) << "0 1 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1100") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4017,22 +3945,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 1 0 0";
-        EXPECT_EQ(1, v2.size()) << "1 1 0 0";
-        EXPECT_EQ(1, v3.size()) << "1 1 0 0";
-        EXPECT_EQ(1, v4.size()) << "1 1 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 1 0 0";
-        EXPECT_EQ(1, v2[0]) << "1 1 0 0";
-        EXPECT_EQ("0", v3[0]) << "1 1 0 0";
-        EXPECT_EQ(0.f, v4[0]) << "1 1 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0010") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4042,22 +3967,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 0 1 0";
-        EXPECT_EQ(1, v2.size()) << "0 0 1 0";
-        EXPECT_EQ(1, v3.size()) << "0 0 1 0";
-        EXPECT_EQ(1, v4.size()) << "0 0 1 0";
-        EXPECT_EQ(false, v1[0]) << "0 0 1 0";
-        EXPECT_EQ(0, v2[0]) << "0 0 1 0";
-        EXPECT_EQ("1", v3[0]) << "0 0 1 0";
-        EXPECT_EQ(0.f, v4[0]) << "0 0 1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1010") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4067,22 +3989,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 0 1 0";
-        EXPECT_EQ(1, v2.size()) << "1 0 1 0";
-        EXPECT_EQ(1, v3.size()) << "1 0 1 0";
-        EXPECT_EQ(1, v4.size()) << "1 0 1 0";
-        EXPECT_EQ(true, v1[0]) << "1 0 1 0";
-        EXPECT_EQ(0, v2[0]) << "1 0 1 0";
-        EXPECT_EQ("1", v3[0]) << "1 0 1 0";
-        EXPECT_EQ(0.f, v4[0]) << "1 0 1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0110") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4092,22 +4011,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 1 1 0";
-        EXPECT_EQ(1, v2.size()) << "0 1 1 0";
-        EXPECT_EQ(1, v3.size()) << "0 1 1 0";
-        EXPECT_EQ(1, v4.size()) << "0 1 1 0";
-        EXPECT_EQ(false, v1[0]) << "0 1 1 0";
-        EXPECT_EQ(1, v2[0]) << "0 1 1 0";
-        EXPECT_EQ("1", v3[0]) << "0 1 1 0";
-        EXPECT_EQ(0.f, v4[0]) << "0 1 1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1110") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4117,22 +4033,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 1 1 0";
-        EXPECT_EQ(1, v2.size()) << "1 1 1 0";
-        EXPECT_EQ(1, v3.size()) << "1 1 1 0";
-        EXPECT_EQ(1, v4.size()) << "1 1 1 0";
-        EXPECT_EQ(true, v1[0]) << "1 1 1 0";
-        EXPECT_EQ(1, v2[0]) << "1 1 1 0";
-        EXPECT_EQ("1", v3[0]) << "1 1 1 0";
-        EXPECT_EQ(0.f, v4[0]) << "1 1 1 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0001") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4142,22 +4055,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 0 0 1";
-        EXPECT_EQ(1, v2.size()) << "0 0 0 1";
-        EXPECT_EQ(1, v3.size()) << "0 0 0 1";
-        EXPECT_EQ(1, v4.size()) << "0 0 0 1";
-        EXPECT_EQ(false, v1[0]) << "0 0 0 1";
-        EXPECT_EQ(0, v2[0]) << "0 0 0 1";
-        EXPECT_EQ("0", v3[0]) << "0 0 0 1";
-        EXPECT_EQ(1.f, v4[0]) << "0 0 0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1001") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4167,22 +4077,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 0 0 1";
-        EXPECT_EQ(1, v2.size()) << "1 0 0 1";
-        EXPECT_EQ(1, v3.size()) << "1 0 0 1";
-        EXPECT_EQ(1, v4.size()) << "1 0 0 1";
-        EXPECT_EQ(true, v1[0]) << "1 0 0 1";
-        EXPECT_EQ(0, v2[0]) << "1 0 0 1";
-        EXPECT_EQ("0", v3[0]) << "1 0 0 1";
-        EXPECT_EQ(1.f, v4[0]) << "1 0 0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0101") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4192,22 +4099,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 1 0 1";
-        EXPECT_EQ(1, v2.size()) << "0 1 0 1";
-        EXPECT_EQ(1, v3.size()) << "0 1 0 1";
-        EXPECT_EQ(1, v4.size()) << "0 1 0 1";
-        EXPECT_EQ(false, v1[0]) << "0 1 0 1";
-        EXPECT_EQ(1, v2[0]) << "0 1 0 1";
-        EXPECT_EQ("0", v3[0]) << "0 1 0 1";
-        EXPECT_EQ(1.f, v4[0]) << "0 1 0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1101") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4217,22 +4121,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 1 0 1";
-        EXPECT_EQ(1, v2.size()) << "1 1 0 1";
-        EXPECT_EQ(1, v3.size()) << "1 1 0 1";
-        EXPECT_EQ(1, v4.size()) << "1 1 0 1";
-        EXPECT_EQ(true, v1[0]) << "1 1 0 1";
-        EXPECT_EQ(1, v2[0]) << "1 1 0 1";
-        EXPECT_EQ("0", v3[0]) << "1 1 0 1";
-        EXPECT_EQ(1.f, v4[0]) << "1 1 0 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0011") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4242,22 +4143,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 0 1 1";
-        EXPECT_EQ(1, v2.size()) << "0 0 1 1";
-        EXPECT_EQ(1, v3.size()) << "0 0 1 1";
-        EXPECT_EQ(1, v4.size()) << "0 0 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 0 1 1";
-        EXPECT_EQ(0, v2[0]) << "0 0 1 1";
-        EXPECT_EQ("1", v3[0]) << "0 0 1 1";
-        EXPECT_EQ(1.f, v4[0]) << "0 0 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1011") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4267,22 +4165,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 0 1 1";
-        EXPECT_EQ(1, v2.size()) << "1 0 1 1";
-        EXPECT_EQ(1, v3.size()) << "1 0 1 1";
-        EXPECT_EQ(1, v4.size()) << "1 0 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 0 1 1";
-        EXPECT_EQ(0, v2[0]) << "1 0 1 1";
-        EXPECT_EQ("1", v3[0]) << "1 0 1 1";
-        EXPECT_EQ(1.f, v4[0]) << "1 0 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4292,22 +4187,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "0 1 1 1";
-        EXPECT_EQ(1, v2.size()) << "0 1 1 1";
-        EXPECT_EQ(1, v3.size()) << "0 1 1 1";
-        EXPECT_EQ(1, v4.size()) << "0 1 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "0 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "0 1 1 1";
-        EXPECT_EQ(1.f, v4[0]) << "0 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4317,22 +4209,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1.size()) << "1 1 1 1";
-        EXPECT_EQ(1, v2.size()) << "1 1 1 1";
-        EXPECT_EQ(1, v3.size()) << "1 1 1 1";
-        EXPECT_EQ(1, v4.size()) << "1 1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "1 1 1 1";
-        EXPECT_EQ(1.f, v4[0]) << "1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 1);
+        REQUIRE(v2.size() == 1);
+        REQUIRE(v3.size() == 1);
+        REQUIRE(v4.size() == 1);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0000 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4347,26 +4236,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "0 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "0 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0 0 0 | 0 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "0 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[0]) << "0 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 0 0 0 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "0 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "0 0 0 0 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1000 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4381,26 +4267,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "1 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "1 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "1 0 0 0 | 0 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "1 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[0]) << "1 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 0 0 0 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "1 0 0 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "1 0 0 0 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0100 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4415,26 +4298,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "0 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "0 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(1, v2[0]) << "0 1 0 0 | 0 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "0 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[0]) << "0 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 1 0 0 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "0 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "0 1 0 0 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1100 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4449,26 +4329,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "1 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "1 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(1, v2[0]) << "1 1 0 0 | 0 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "1 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[0]) << "1 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 1 0 0 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "1 1 0 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "1 1 0 0 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0010 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4483,26 +4360,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "0 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "0 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0 1 0 | 0 0 0 0";
-        EXPECT_EQ("1", v3[0]) << "0 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[0]) << "0 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 0 1 0 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "0 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "0 0 1 0 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1010 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4517,26 +4391,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "1 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "1 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "1 0 1 0 | 0 0 0 0";
-        EXPECT_EQ("1", v3[0]) << "1 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[0]) << "1 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 0 1 0 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "1 0 1 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "1 0 1 0 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0110 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4551,26 +4422,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "0 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "0 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(1, v2[0]) << "0 1 1 0 | 0 0 0 0";
-        EXPECT_EQ("1", v3[0]) << "0 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[0]) << "0 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 1 1 0 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "0 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "0 1 1 0 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1110 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4585,26 +4453,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "1 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "1 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(1, v2[0]) << "1 1 1 0 | 0 0 0 0";
-        EXPECT_EQ("1", v3[0]) << "1 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[0]) << "1 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 1 1 0 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "1 1 1 0 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "1 1 1 0 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0001 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4619,26 +4484,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "0 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "0 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0 0 1 | 0 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "0 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(1.f, v4[0]) << "0 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 0 0 1 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "0 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "0 0 0 1 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1001 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4653,26 +4515,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "1 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "1 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "1 0 0 1 | 0 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "1 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(1.f, v4[0]) << "1 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 0 0 1 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "1 0 0 1 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "1 0 0 1 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0101 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4687,26 +4546,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "0 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "0 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(1, v2[0]) << "0 1 0 1 | 0 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "0 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(1.f, v4[0]) << "0 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 1 0 1 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "0 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "0 1 0 1 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1101 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4721,26 +4577,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "1 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "1 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(1, v2[0]) << "1 1 0 1 | 0 0 0 0";
-        EXPECT_EQ("0", v3[0]) << "1 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(1.f, v4[0]) << "1 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 1 0 1 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "1 1 0 1 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "1 1 0 1 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0011 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4755,26 +4608,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "0 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "0 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "0 0 1 1 | 0 0 0 0";
-        EXPECT_EQ("1", v3[0]) << "0 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(1.f, v4[0]) << "0 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 0 1 1 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "0 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "0 0 1 1 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1011 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4789,26 +4639,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "1 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "1 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(0, v2[0]) << "1 0 1 1 | 0 0 0 0";
-        EXPECT_EQ("1", v3[0]) << "1 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(1.f, v4[0]) << "1 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 0 1 1 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "1 0 1 1 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "1 0 1 1 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0111 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4823,26 +4670,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "0 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "0 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "0 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(false, v1[0]) << "0 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(1, v2[0]) << "0 1 1 1 | 0 0 0 0";
-        EXPECT_EQ("1", v3[0]) << "0 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(1.f, v4[0]) << "0 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "0 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "0 1 1 1 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "0 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "0 1 1 1 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1111 0000") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4857,26 +4701,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(2, v2.size()) << "1 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(2, v3.size()) << "1 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(2, v4.size()) << "1 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(true, v1[0]) << "1 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(1, v2[0]) << "1 1 1 1 | 0 0 0 0";
-        EXPECT_EQ("1", v3[0]) << "1 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(1.f, v4[0]) << "1 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(false, v1[1]) << "1 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(0, v2[1]) << "1 1 1 1 | 0 0 0 0";
-        EXPECT_EQ("0", v3[1]) << "1 1 1 1 | 0 0 0 0";
-        EXPECT_EQ(0.f, v4[1]) << "1 1 1 1 | 0 0 0 0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE_FALSE(v1[1]);
+        REQUIRE(v2[1] == 0);
+        REQUIRE(v3[1] == "0");
+        REQUIRE(v4[1] == 0.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0000 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4891,26 +4732,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "0 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "0 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(0, v2[0]) << "0 0 0 0 | 1 1 1 1";
-        EXPECT_EQ("0", v3[0]) << "0 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(0.f, v4[0]) << "0 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 0 0 0 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "0 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "0 0 0 0 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1000 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4925,26 +4763,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "1 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "1 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(0, v2[0]) << "1 0 0 0 | 1 1 1 1";
-        EXPECT_EQ("0", v3[0]) << "1 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(0.f, v4[0]) << "1 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 0 0 0 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "1 0 0 0 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "1 0 0 0 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0100 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4959,26 +4794,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "0 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "0 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "0 1 0 0 | 1 1 1 1";
-        EXPECT_EQ("0", v3[0]) << "0 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(0.f, v4[0]) << "0 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 1 0 0 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "0 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "0 1 0 0 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1100 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -4993,26 +4825,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "1 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "1 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1 0 0 | 1 1 1 1";
-        EXPECT_EQ("0", v3[0]) << "1 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(0.f, v4[0]) << "1 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 1 0 0 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "1 1 0 0 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "1 1 0 0 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0010 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -5027,26 +4856,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "0 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "0 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(0, v2[0]) << "0 0 1 0 | 1 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "0 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(0.f, v4[0]) << "0 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 0 1 0 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "0 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "0 0 1 0 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1010 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -5061,26 +4887,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "1 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "1 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(0, v2[0]) << "1 0 1 0 | 1 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "1 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(0.f, v4[0]) << "1 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 0 1 0 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "1 0 1 0 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "1 0 1 0 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0110 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -5095,26 +4918,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "0 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "0 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "0 1 1 0 | 1 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "0 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(0.f, v4[0]) << "0 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 1 1 0 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "0 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "0 1 1 0 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1110 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -5129,26 +4949,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "1 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "1 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1 1 0 | 1 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "1 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(0.f, v4[0]) << "1 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 1 1 0 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "1 1 1 0 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "1 1 1 0 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 0.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0001 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -5163,26 +4980,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "0 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "0 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(0, v2[0]) << "0 0 0 1 | 1 1 1 1";
-        EXPECT_EQ("0", v3[0]) << "0 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[0]) << "0 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 0 0 1 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "0 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "0 0 0 1 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1001 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -5197,26 +5011,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "1 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "1 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(0, v2[0]) << "1 0 0 1 | 1 1 1 1";
-        EXPECT_EQ("0", v3[0]) << "1 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[0]) << "1 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 0 0 1 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "1 0 0 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "1 0 0 1 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0101 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -5231,26 +5042,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "0 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "0 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "0 1 0 1 | 1 1 1 1";
-        EXPECT_EQ("0", v3[0]) << "0 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[0]) << "0 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 1 0 1 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "0 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "0 1 0 1 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1101 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -5265,26 +5073,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "1 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "1 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1 0 1 | 1 1 1 1";
-        EXPECT_EQ("0", v3[0]) << "1 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[0]) << "1 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 1 0 1 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "1 1 0 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "1 1 0 1 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "0");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0011 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -5299,26 +5104,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "0 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "0 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(0, v2[0]) << "0 0 1 1 | 1 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "0 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[0]) << "0 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 0 1 1 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "0 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "0 0 1 1 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1011 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -5333,26 +5135,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "1 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "1 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(0, v2[0]) << "1 0 1 1 | 1 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "1 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[0]) << "1 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 0 1 1 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "1 0 1 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "1 0 1 1 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 0);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("0111 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -5367,26 +5166,23 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "0 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "0 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "0 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "0 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(false, v1[0]) << "0 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "0 1 1 1 | 1 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "0 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[0]) << "0 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "0 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "0 1 1 1 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "0 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "0 1 1 1 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE_FALSE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
-    v1.clear();
-    v2.clear();
-    v3.clear();
-    v4.clear();
-    {
+
+    SECTION("1111 1111") {
         std::vector<std::string> argv = {
             "tests",
             "-single",
@@ -5401,25 +5197,19 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(2, v1.size()) << "1 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(2, v2.size()) << "1 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(2, v3.size()) << "1 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(2, v4.size()) << "1 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(true, v1[0]) << "1 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(1, v2[0]) << "1 1 1 1 | 1 1 1 1";
-        EXPECT_EQ("1", v3[0]) << "1 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[0]) << "1 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(true, v1[1]) << "1 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(1, v2[1]) << "1 1 1 1 | 1 1 1 1";
-        EXPECT_EQ("1", v3[1]) << "1 1 1 1 | 1 1 1 1";
-        EXPECT_EQ(1.f, v4[1]) << "1 1 1 1 | 1 1 1 1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        REQUIRE(v3.size() == 2);
+        REQUIRE(v4.size() == 2);
+        REQUIRE(v1[0]);
+        REQUIRE(v2[0] == 1);
+        REQUIRE(v3[0] == "1");
+        REQUIRE(v4[0] == 1.f);
+        REQUIRE(v1[1]);
+        REQUIRE(v2[1] == 1);
+        REQUIRE(v3[1] == "1");
+        REQUIRE(v4[1] == 1.f);
     }
 }
-
-#ifdef __unix__
-#pragma GCC diagnostic pop
-#endif // __unix__
-
-#endif 

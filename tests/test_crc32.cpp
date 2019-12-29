@@ -23,13 +23,12 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#if 0
-#include <ghoul/misc/crc32.h>
+#include "catch2/catch.hpp"
 
+#include <ghoul/misc/crc32.h>
 #include <random>
 
 namespace {
-
 struct Data {
     const char* string;
     unsigned int hash;
@@ -209,18 +208,19 @@ constexpr Data TestStrings[] = {
 };
 }
 
-TEST(CRC32Test, HashFixedEquality) {
+
+TEST_CASE("HashFixedEquality", "[crc32]") {
     for (const Data& d : TestStrings) {
         unsigned int stringHash = ghoul::hashCRC32(std::string(d.string));
         unsigned int charHash = ghoul::hashCRC32(d.string);
         unsigned int bufferHash = ghoul::hashCRC32(d.string, strlen(d.string));
-        EXPECT_EQ(stringHash, charHash) << d.string;
-        EXPECT_EQ(stringHash, bufferHash) << d.string;
-        EXPECT_EQ(stringHash, d.hash) << d.string;
+        REQUIRE(stringHash == charHash);
+        REQUIRE(stringHash == bufferHash);
+        REQUIRE(stringHash == d.hash);
     }
 }
 
-TEST(CRC32Test, StaticTest) {
+TEST_CASE("CRC32: StaticTest", "[crc32]") {
     // This stops compiling when hashCRC32 stops being constexpr
     static_assert(ghoul::hashCRC32("spCfJJa98L") == 1031192370, "spCfJJa98L");
     static_assert(ghoul::hashCRC32("erNxvzgXcX") == 1755727136, "erNxvzgXcX");
@@ -230,7 +230,7 @@ TEST(CRC32Test, StaticTest) {
     static_assert(ghoul::hashCRC32("AMv6Kg4gaJ") == 2316368142, "AMv6Kg4gaJ");
 }
 
-TEST(CRC32Test, HashRandomEquality) {
+TEST_CASE("CRC32: HashRandomEquality", "[crc32]") {
     static const std::vector<char> alphanum = {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
         'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
@@ -238,7 +238,7 @@ TEST(CRC32Test, HashRandomEquality) {
         'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
     };
 
-    static const int nTests = 100;
+    constexpr const int nTests = 100;
 
     std::random_device r;
     std::default_random_engine e(r());
@@ -257,10 +257,8 @@ TEST(CRC32Test, HashRandomEquality) {
             unsigned int stringHash = ghoul::hashCRC32(string);
             unsigned int charHash = ghoul::hashCRC32(string.data());
             unsigned int bufferHash = ghoul::hashCRC32(data.data(), j);
-            EXPECT_EQ(stringHash, charHash) << string;
-            EXPECT_EQ(stringHash, bufferHash) << string;
+            REQUIRE(stringHash == charHash);
+            REQUIRE(stringHash == bufferHash);
         }
     }
 }
-
-#endif

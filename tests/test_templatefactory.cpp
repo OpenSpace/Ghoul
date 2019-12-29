@@ -23,256 +23,246 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#if 0
+#include "catch2/catch.hpp"
 
-#include "gtest/gtest.h"
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/templatefactory.h>
 
-/*
-Test checklist:
- +++ Correctness for direct subclass
- +++ Non-interference
- +++ Deep inheritance
- +++ Default constructor
- +++ Default constructor does not exist
- +++ Dictionary constructor
- +++ Dictionary constructor does not exist
- +++ Default + Dictionary ctor
- +++ Class does not exist
- +++ Correctness for 'hasClass'
- +++ Custom factory function pointer
- +++ Custom factory std::function
-*/
+ /*
+  * Test checklist:
+  * +++ Correctness for direct subclass
+  * +++ Non-interference
+  * +++ Deep inheritance
+  * +++ Default constructor
+  * +++ Default constructor does not exist
+  * +++ Dictionary constructor
+  * +++ Dictionary constructor does not exist
+  * +++ Default + Dictionary ctor
+  * +++ Class does not exist
+  * +++ Correctness for 'hasClass'
+  * +++ Custom factory function pointer
+  * +++ Custom factory std::function
+  */
 
-struct BaseClass {
-public:
-    BaseClass() : value1(-1), value2(-2) {};
-    virtual ~BaseClass() {} // virtual method necessary for RTTI
+namespace {
+    struct BaseClass {
+    public:
+        virtual ~BaseClass() {} // virtual method necessary for RTTI
 
-    int value1;
-    int value2;
-};
-
-struct SubClassDefault : public BaseClass {
-public:
-    SubClassDefault() 
-        : BaseClass()
-    {
-        value1 = 1;
-        value2 = 2;
+        int value1 = -1;
+        int value2 = -2;
     };
-};
 
-struct SubClassDefault2 : public BaseClass {
-public:
-    SubClassDefault2()
-        : BaseClass()
-    {
-        value1 = 21;
-        value2 = 22;
-    }
-};
-
-struct SubClassDictionary : public BaseClass {
-public:
-    explicit SubClassDictionary(const ghoul::Dictionary& dict)
-        : BaseClass()
-    {
-        dict.getValue("value1", value1);
-        dict.getValue("value2", value2);
+    struct SubClassDefault : public BaseClass {
+    public:
+        SubClassDefault() : BaseClass() {
+            value1 = 1;
+            value2 = 2;
+        };
     };
-};
 
-struct SubClassDefaultDictionary : public BaseClass {
-public:
-    SubClassDefaultDictionary() 
-        : BaseClass()
-    {
-        value1 = 31;
-        value2 = 32;
+    struct SubClassDefault2 : public BaseClass {
+    public:
+        SubClassDefault2() : BaseClass() {
+            value1 = 21;
+            value2 = 22;
+        }
     };
-    explicit SubClassDefaultDictionary(const ghoul::Dictionary& dict)
-        : BaseClass()
-    {
-        dict.getValue("value1", value1);
-        dict.getValue("value2", value2);
+
+    struct SubClassDictionary : public BaseClass {
+    public:
+        explicit SubClassDictionary(const ghoul::Dictionary& dict) : BaseClass() {
+            dict.getValue("value1", value1);
+            dict.getValue("value2", value2);
+        };
     };
-};
 
-struct SubClassMultipleLayers : public SubClassDefault {
-    SubClassMultipleLayers() {};
-};
+    struct SubClassDefaultDictionary : public BaseClass {
+    public:
+        SubClassDefaultDictionary() : BaseClass() {
+            value1 = 31;
+            value2 = 32;
+        };
+        explicit SubClassDefaultDictionary(const ghoul::Dictionary& dict) : BaseClass() {
+            dict.getValue("value1", value1);
+            dict.getValue("value2", value2);
+        };
+    };
 
-struct FunctionPointerClass : public BaseClass {};
-struct StdFunctionClass : public BaseClass {};
+    struct SubClassMultipleLayers : public SubClassDefault {
+        SubClassMultipleLayers() {};
+    };
 
-BaseClass* createFunctionPointerClass(bool useDictionary, const ghoul::Dictionary&) {
-    if (useDictionary)
-        return new FunctionPointerClass;
-    else
-        return nullptr;
-}
+    struct FunctionPointerClass : public BaseClass {};
+    struct StdFunctionClass : public BaseClass {};
 
-class TemplateFactoryTest : public testing::Test {
-protected:
-    TemplateFactoryTest() {
-        factory = new ghoul::TemplateFactory<BaseClass>;
+    BaseClass* createFunctionPointerClass(bool useDictionary, const ghoul::Dictionary&) {
+        if (useDictionary) {
+            return new FunctionPointerClass;
+        }
+        else {
+            return nullptr;
+        }
     }
+} // namespace
 
-    ~TemplateFactoryTest() {
-        delete factory;
-    }
+TEST_CASE("TemplateFactory: Correctness Direct Subclass", "[templatefactory]") {
+    ghoul::TemplateFactory<BaseClass> factory;
 
-    void reset() {
-        delete factory;
-        factory = new ghoul::TemplateFactory<BaseClass>;
-    }
+    factory.registerClass<SubClassDefault>("SubClassDefault");
 
-    ghoul::TemplateFactory<BaseClass>* factory;
-};
+    std::unique_ptr<BaseClass> obj = factory.create("SubClassDefault");
+    REQUIRE(obj != nullptr);
 
-TEST_F(TemplateFactoryTest, CorrectnessDirectSublass) {
-    factory->registerClass<SubClassDefault>("SubClassDefault");
-    
-    std::unique_ptr<BaseClass> obj = factory->create("SubClassDefault");
-    ASSERT_NE(nullptr, obj) << "Creation of SubClassDefault failed";
-    
     SubClassDefault* derived = dynamic_cast<SubClassDefault*>(obj.get());
-    EXPECT_NE(nullptr, derived) << "Cast to SubClassDefault failed";
+    REQUIRE(derived != nullptr);
 }
 
-TEST_F(TemplateFactoryTest, CorrectnessDeepSubClass) {
-    factory->registerClass<SubClassMultipleLayers>("SubClassMultipleLayers");
-    
-    std::unique_ptr<BaseClass> obj = factory->create("SubClassMultipleLayers");
-    ASSERT_NE(nullptr, obj) << "Creation of SubClassMultipleLayers failed";
-    
+TEST_CASE("TemplateFactory: Correctness Deep SubClass", "[templatefactory]") {
+    ghoul::TemplateFactory<BaseClass> factory;
+
+    factory.registerClass<SubClassMultipleLayers>("SubClassMultipleLayers");
+
+    std::unique_ptr<BaseClass> obj = factory.create("SubClassMultipleLayers");
+    REQUIRE(obj != nullptr);
+
     SubClassMultipleLayers* derived = dynamic_cast<SubClassMultipleLayers*>(obj.get());
-    EXPECT_NE(nullptr, derived) << "Cast to SubClassMultipleLayers failed";
+    REQUIRE(derived != nullptr);
 }
 
-TEST_F(TemplateFactoryTest, NonInterference) {
-    factory->registerClass<SubClassDefault>("SubClassDefault");
-    factory->registerClass<SubClassDefault2>("SubClassDefault2");
+TEST_CASE("TemplateFactory: Non Interference", "[templatefactory]") {
+    ghoul::TemplateFactory<BaseClass> factory;
 
-    std::unique_ptr<BaseClass> obj = factory->create("SubClassDefault");
-    ASSERT_NE(nullptr, obj) << "Creation of SubClassDefault failed";
-    std::unique_ptr<BaseClass> obj2 = factory->create("SubClassDefault2");
-    ASSERT_NE(nullptr, obj2) << "Creation of SubClassDefault2 failed";
-    ASSERT_NE(obj, obj2) << "Pointer addresses were equal";
+    factory.registerClass<SubClassDefault>("SubClassDefault");
+    factory.registerClass<SubClassDefault2>("SubClassDefault2");
+
+    std::unique_ptr<BaseClass> obj = factory.create("SubClassDefault");
+    REQUIRE(obj != nullptr);
+    std::unique_ptr<BaseClass> obj2 = factory.create("SubClassDefault2");
+    REQUIRE(obj2 != nullptr);
+    REQUIRE(obj != obj2);
 
     SubClassDefault* derived = dynamic_cast<SubClassDefault*>(obj.get());
-    EXPECT_NE(nullptr, derived) << "Cast to SubClassDefault failed";
+    REQUIRE(derived != nullptr);
 
     SubClassDefault2* derived2 = dynamic_cast<SubClassDefault2*>(obj2.get());
-    EXPECT_NE(nullptr, derived2) << "Cast to SubClassDefault2 failed";
+    REQUIRE(derived2 != nullptr);
 }
 
-TEST_F(TemplateFactoryTest, DefaultConstructor) {
-    factory->registerClass<SubClassDefault>("SubClassDefault");
+TEST_CASE("TemplateFactory: Default Constructor", "[templatefactory]") {
+    ghoul::TemplateFactory<BaseClass> factory;
 
-    std::unique_ptr<BaseClass> obj = factory->create("SubClassDefault");
-    ASSERT_NE(nullptr, obj) << "Creation of SubClassDefault failed";
+    factory.registerClass<SubClassDefault>("SubClassDefault");
 
-    EXPECT_EQ(1, obj->value1);
-    EXPECT_EQ(2, obj->value2);
+    std::unique_ptr<BaseClass> obj = factory.create("SubClassDefault");
+    REQUIRE(obj != nullptr);
+
+    REQUIRE(obj->value1 == 1);
+    REQUIRE(obj->value2 == 2);
 }
 
-TEST_F(TemplateFactoryTest, NoDefaultConstructorExists) {
-    factory->registerClass<SubClassDictionary>("SubClassDictionary");
+TEST_CASE("TemplateFactory: No Default Constructor Exists", "[templatefactory]") {
+    ghoul::TemplateFactory<BaseClass> factory;
 
-    EXPECT_THROW(
-        factory->create("SubClassDictionary"),
+    factory.registerClass<SubClassDictionary>("SubClassDictionary");
+
+    REQUIRE_THROWS_AS(
+        factory.create("SubClassDictionary"),
         ghoul::TemplateFactoryBase::TemplateConstructionError
     );
 }
 
-TEST_F(TemplateFactoryTest, DictionaryConstructor) {
-    factory->registerClass<SubClassDictionary>("SubClassDictionary");
+TEST_CASE("TemplateFactory: Dictionary Constructor", "[templatefactory]") {
+    ghoul::TemplateFactory<BaseClass> factory;
+
+    factory.registerClass<SubClassDictionary>("SubClassDictionary");
 
     ghoul::Dictionary dict = { { "value1", 100 }, { "value2", 200 } };
-    std::unique_ptr<BaseClass> obj = factory->create("SubClassDictionary", dict);
-    ASSERT_NE(nullptr, obj) << "Creation of SubClassDictionary failed";
+    std::unique_ptr<BaseClass> obj = factory.create("SubClassDictionary", dict);
+    REQUIRE(obj != nullptr);
 
-    EXPECT_EQ(100, obj->value1) << "Value1 was not modified";
-    EXPECT_EQ(200, obj->value2) << "Value2 was not modified";
+    REQUIRE(obj->value1 == 100);
+    REQUIRE(obj->value2 == 200);
 }
 
-TEST_F(TemplateFactoryTest, NoDictionaryConstructorExists) {
-    factory->registerClass<SubClassDefault>("SubClassDefault");
+TEST_CASE("TemplateFactory: No Dictionary Constructor Exists", "[templatefactory]") {
+    ghoul::TemplateFactory<BaseClass> factory;
+
+    factory.registerClass<SubClassDefault>("SubClassDefault");
 
     ghoul::Dictionary dict = { { "value1", 100 }, { "value2", 200 } };
 
-    EXPECT_THROW(
-        factory->create("SubClassDefault", dict),
+    REQUIRE_THROWS_AS(
+        factory.create("SubClassDefault", dict),
         ghoul::TemplateFactoryBase::TemplateConstructionError
     );
 }
 
-TEST_F(TemplateFactoryTest, ClassDoesNotExist) {
-    factory->registerClass<SubClassDefault>("SubClassDefault");
+TEST_CASE("TemplateFactory: Class Does Not Exist", "[templatefactory]") {
+    ghoul::TemplateFactory<BaseClass> factory;
 
-    std::unique_ptr<BaseClass> obj = factory->create("SubClassDefault");
-    ASSERT_NE(nullptr, obj) << "Creation of SubClassDefault failed";
+    factory.registerClass<SubClassDefault>("SubClassDefault");
 
-    EXPECT_THROW(
-        factory->create("DoesNotExist"),
+    std::unique_ptr<BaseClass> obj = factory.create("SubClassDefault");
+    REQUIRE(obj != nullptr);
+
+    REQUIRE_THROWS_AS(
+        factory.create("DoesNotExist"),
         ghoul::TemplateFactoryBase::TemplateClassNotFoundError
     );
 }
 
-TEST_F(TemplateFactoryTest, DefaultDictionaryConstructor) {
-    //SubClassDefaultDictionary 31 32
-    factory->registerClass<SubClassDefaultDictionary>("class");
+TEST_CASE("TemplateFactory: Default Dictionary Constructor", "[templatefactory]") {
+    ghoul::TemplateFactory<BaseClass> factory;
 
-    std::unique_ptr<BaseClass> obj = factory->create("class");
-    ASSERT_NE(nullptr, obj) << "Creation of SubClassDefaultDictionary failed";
-    EXPECT_EQ(31, obj->value1);
-    EXPECT_EQ(32, obj->value2);
+    // SubClassDefaultDictionary 31 32
+    factory.registerClass<SubClassDefaultDictionary>("class");
+
+    std::unique_ptr<BaseClass> obj = factory.create("class");
+    REQUIRE(obj != nullptr);
+    REQUIRE(obj->value1 == 31);
+    REQUIRE(obj->value2 == 32);
 
     ghoul::Dictionary dict = { { "value1", 41 }, { "value2", 42 } };
-    std::unique_ptr<BaseClass> obj2 = factory->create("class", dict);
-    ASSERT_NE(nullptr, obj2) << "Creation of SubClassDefaultDictionary failed";
-    EXPECT_EQ(41, obj2->value1);
-    EXPECT_EQ(42, obj2->value2);
+    std::unique_ptr<BaseClass> obj2 = factory.create("class", dict);
+    REQUIRE(obj2 != nullptr);
+    REQUIRE(obj2->value1 == 41);
+    REQUIRE(obj2->value2 == 42);
 }
 
-TEST_F(TemplateFactoryTest, CorrectnessForHasClass) {
-    factory->registerClass<SubClassDictionary>("SubClassDictionary");
+TEST_CASE("TemplateFactory: Correctness For HasClass", "[templatefactory]") {
+    ghoul::TemplateFactory<BaseClass> factory;
 
-    const bool subClassDirectoryExists = factory->hasClass("SubClassDictionary");
-    const bool doesNotExistExists = factory->hasClass("DoesNotExist");
+    factory.registerClass<SubClassDictionary>("SubClassDictionary");
 
-    EXPECT_EQ(subClassDirectoryExists, true);
-    EXPECT_EQ(doesNotExistExists, false);
+    REQUIRE(factory.hasClass("SubClassDictionary"));
+    REQUIRE_FALSE(factory.hasClass("DoesNotExist"));
 }
 
-TEST_F(TemplateFactoryTest, FunctionPointerConstruction) {
-    factory->registerClass("ptr", &createFunctionPointerClass);
+TEST_CASE("TemplateFactory: Function Pointer Construction", "[templatefactory]") {
+    ghoul::TemplateFactory<BaseClass> factory;
 
-    std::unique_ptr<BaseClass> obj = factory->create("ptr");
-    EXPECT_EQ(nullptr, obj) << "'useDictionary' was passed wrongly";
+    factory.registerClass("ptr", &createFunctionPointerClass);
 
-    std::unique_ptr<BaseClass> obj2 = factory->create("ptr", {});
-    EXPECT_NE(nullptr, obj2) << "'useDictionary' was passed wrongly";
+    std::unique_ptr<BaseClass> obj = factory.create("ptr");
+    REQUIRE(obj == nullptr);
+
+    std::unique_ptr<BaseClass> obj2 = factory.create("ptr", {});
+    REQUIRE(obj2 != nullptr);
 }
 
-TEST_F(TemplateFactoryTest, StdFunctionConstruction) {
-    std::function<BaseClass*(bool, const ghoul::Dictionary&)> function =
+TEST_CASE("TemplateFactory: Std Function Construction", "[templatefactory]") {
+    ghoul::TemplateFactory<BaseClass> factory;
+
+    std::function<BaseClass* (bool, const ghoul::Dictionary&)> function =
         [](bool use, const ghoul::Dictionary&) -> BaseClass* {
-        if (use)
-            return new StdFunctionClass;
-        else
-            return nullptr;
+            return use ? new StdFunctionClass : nullptr;
     };
-    factory->registerClass("ptr", function);
+    factory.registerClass("ptr", function);
 
-    std::unique_ptr<BaseClass> obj = factory->create("ptr");
-    EXPECT_EQ(nullptr, obj) << "'useDictionary' was passed wrongly";
+    std::unique_ptr<BaseClass> obj = factory.create("ptr");
+    REQUIRE(obj == nullptr);
 
-    std::unique_ptr<BaseClass> obj2 = factory->create("ptr", {});
-    EXPECT_NE(nullptr, obj2) << "'useDictionary' was passed wrongly";
+    std::unique_ptr<BaseClass> obj2 = factory.create("ptr", {});
+    REQUIRE(obj2 != nullptr);
 }
-
-#endif

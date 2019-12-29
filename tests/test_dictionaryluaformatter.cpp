@@ -23,21 +23,19 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#if 0
+#include "catch2/catch.hpp"
 
 #include <ghoul/misc/dictionaryluaformatter.h>
-
 #include <ghoul/misc/dictionary.h>
-
 #include <string>
 
-TEST(DictionaryLuaFormatter, EmptyDictionary) {
+TEST_CASE("DictionaryLuaFormatter: Empty Dictionary", "[dictionaryluaformatter]") {
     ghoul::Dictionary d;
     std::string res = ghoul::DictionaryLuaFormatter().format(d);
-    EXPECT_EQ("{}", res);
+    REQUIRE(res == "{}");
 }
 
-TEST(DictionaryLuaFormatter, SimpleDictionary) {
+TEST_CASE("DictionaryLuaFormatter: Simple Dictionary", "[dictionaryluaformatter]") {
     using namespace std::string_literals;
     ghoul::Dictionary d = {
         { "int", 1 },
@@ -49,15 +47,15 @@ TEST(DictionaryLuaFormatter, SimpleDictionary) {
     };
 
     std::string res = ghoul::DictionaryLuaFormatter().format(d);
-    EXPECT_EQ(
+    REQUIRE(
+        res == 
         "{double=2.000000E0,int=1,string=\"\","
         "vec2={0,0},vec3={0,0,0},"
-        "vec4={0,0,0,0}}",
-        res
+        "vec4={0,0,0,0}}"
     );
 }
 
-TEST(DictionaryLuaFormatter, NestedDictionary) {
+TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]") {
     using namespace std::string_literals;
 
     ghoul::Dictionary d = {
@@ -103,7 +101,8 @@ TEST(DictionaryLuaFormatter, NestedDictionary) {
 
     std::string res = ghoul::DictionaryLuaFormatter().format(g);
 
-    EXPECT_EQ(
+    REQUIRE(
+        res == 
         "{dict={dict={dict={double=2.000000E0,int=1,"
         "string=\"\",vec2={0,0},"
         "vec3={0,0,0},"
@@ -135,9 +134,6 @@ TEST(DictionaryLuaFormatter, NestedDictionary) {
         "vec4={0,0,0,0}},double=2.000000E0,int=1,"
         "string=\"\",vec2={0,0},"
         "vec3={0,0,0},"
-        "vec4={0,0,0,0}}",
-        res
+        "vec4={0,0,0,0}}"
     );
 }
-
-#endif

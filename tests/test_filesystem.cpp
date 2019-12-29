@@ -23,11 +23,10 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#if 0
+#include "catch2/catch.hpp"
 
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/filesystem/file.h>
-
 #include <iostream>
 #include <fstream>
 
@@ -35,36 +34,31 @@
 #include <windows.h>
 #endif
 
-class FileSystemTest : public testing::Test {
-protected:
-    void SetUp() override {
-        ghoul::filesystem::FileSystem::deinitialize();
-        ghoul::filesystem::FileSystem::initialize();
-    }
-};
-
-TEST_F(FileSystemTest, HasTestDirectory) {
-    EXPECT_EQ(FileSys.directoryExists(absPath("${TEMPORARY}")), true);
+TEST_CASE("FileSystem: Has Test Directory", "[filesystem]") {
+    REQUIRE(FileSys.directoryExists(absPath("${TEMPORARY}")));
 }
 
-TEST_F(FileSystemTest, CreateRemoveDirectory) {
+TEST_CASE("FileSystem: CreateRemoveDirectory", "[filesystem]") {
     using ghoul::filesystem::FileSystem;
 
     const std::string tmp = absPath("${TEMPORARY}/tmp");
     const std::string tmpRecursive1 = absPath("${TEMPORARY}/tmp/tmp2");
     const std::string tmpRecursive2 = absPath("${TEMPORARY}/tmp/tmp2/tmp3");
 
-    EXPECT_NO_THROW(FileSys.createDirectory(tmp));
-    EXPECT_THROW(FileSys.createDirectory(tmpRecursive2), FileSystem::FileSystemException);
-    EXPECT_NO_THROW(FileSys.createDirectory(tmpRecursive2, FileSystem::Recursive::Yes));
+    REQUIRE_NOTHROW(FileSys.createDirectory(tmp));
+    REQUIRE_THROWS_AS(
+        FileSys.createDirectory(tmpRecursive2),
+        FileSystem::FileSystemException
+    );
+    REQUIRE_NOTHROW(FileSys.createDirectory(tmpRecursive2, FileSystem::Recursive::Yes));
 
-    EXPECT_THROW(FileSys.deleteDirectory(tmp), FileSystem::FileSystemException);
-    EXPECT_NO_THROW(FileSys.deleteDirectory(tmpRecursive2));
-    EXPECT_THROW(FileSys.deleteDirectory(tmp), FileSystem::FileSystemException);
-    EXPECT_NO_THROW(FileSys.deleteDirectory(tmp, FileSystem::Recursive::Yes));
+    REQUIRE_THROWS_AS(FileSys.deleteDirectory(tmp), FileSystem::FileSystemException);
+    REQUIRE_NOTHROW(FileSys.deleteDirectory(tmpRecursive2));
+    REQUIRE_THROWS_AS(FileSys.deleteDirectory(tmp), FileSystem::FileSystemException);
+    REQUIRE_NOTHROW(FileSys.deleteDirectory(tmp, FileSystem::Recursive::Yes));
 }
 
-TEST_F(FileSystemTest, Path) {
+TEST_CASE("FileSystem: Path", "[filesystem]") {
     using ghoul::filesystem::File;
 
     std::string path = "${TEMPORARY}/tmpfil.txt";
@@ -77,18 +71,18 @@ TEST_F(FileSystemTest, Path) {
     File absPathYes(absPath, File::RawPath::Yes);
     File absPathNo(absPath, File::RawPath::No);
 
-    EXPECT_EQ(rawPathDef.path(), rawPathYes.path());
-    EXPECT_NE(rawPathDef.path(), rawPathNo.path());
-    EXPECT_NE(rawPathYes.path(), rawPathNo.path());
+    REQUIRE(rawPathDef.path() == rawPathYes.path());
+    REQUIRE(rawPathDef.path() != rawPathNo.path());
+    REQUIRE(rawPathYes.path() != rawPathNo.path());
 
-    EXPECT_EQ(absPathDef.path(), absPathYes.path());
-    EXPECT_EQ(absPathDef.path(), absPathNo.path());
-    EXPECT_EQ(absPathYes.path(), absPathNo.path());
+    REQUIRE(absPathDef.path() == absPathYes.path());
+    REQUIRE(absPathDef.path() == absPathNo.path());
+    REQUIRE(absPathYes.path() == absPathNo.path());
 
-    EXPECT_EQ(rawPathNo.path(), absPathDef.path());
+    REQUIRE(rawPathNo.path() == absPathDef.path());
 }
 
-TEST_F(FileSystemTest, OnChangeCallback) {
+TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
     using ghoul::filesystem::File;
     using ghoul::filesystem::FileSystem;
 
@@ -101,27 +95,23 @@ TEST_F(FileSystemTest, OnChangeCallback) {
     bool b1 = false;
     bool b2 = false;
 
-    auto c1 = [&b1](const File&) {
-        b1 = true;
-    };
-    auto c2 = [&b2](const File&) {
-        b2 = true;
-    };
+    auto c1 = [&b1](const File&) { b1 = true; };
+    auto c2 = [&b2](const File&) { b2 = true; };
 
     File* f1 = new File(path, File::RawPath::No, c1);
     File* f2 = new File(path, File::RawPath::No, c1);
     File* f3 = new File(path, File::RawPath::No, c2);
 
     // Check that the file exists
-    EXPECT_EQ(FileSys.fileExists(absPath(cpath)), true);
-    EXPECT_EQ(FileSys.fileExists(path), true);
-    EXPECT_EQ(FileSys.fileExists(*f1), true);
+    REQUIRE(FileSys.fileExists(absPath(cpath)));
+    REQUIRE(FileSys.fileExists(path));
+    REQUIRE(FileSys.fileExists(*f1));
 
     f2->setCallback(nullptr);
 
     // Check that b still is false so no callback has been fired
-    EXPECT_EQ(b1, false);
-    EXPECT_EQ(b2, false);
+    REQUIRE_FALSE(b1);
+    REQUIRE_FALSE(b2);
 
     // overwrite the file
     f.open(path);
@@ -145,24 +135,30 @@ TEST_F(FileSystemTest, OnChangeCallback) {
         ++count;
     }
 #endif
-    EXPECT_EQ(b1, true);
-    EXPECT_EQ(b2, true);
+    REQUIRE(b1);
+    REQUIRE(b2);
 
     delete f3;
     delete f2;
     delete f1;
 
     // Check that we can delete the file
-    EXPECT_EQ(FileSys.deleteFile(path), true);
+    REQUIRE(FileSys.deleteFile(path));
 }
 
-TEST_F(FileSystemTest, TokenDefaultState) {
-    ASSERT_EQ(FileSys.tokens().size(), 1);
-    ASSERT_EQ(FileSys.tokens()[0], "${TEMPORARY}");
+TEST_CASE("FileSystem: TokenDefaultState", "[filesystem]") {
+    REQUIRE(FileSys.tokens().size() == 3);
+    REQUIRE(FileSys.tokens()[0] == "${TEMPORARY}");
+    REQUIRE(FileSys.tokens()[1] == "${UNIT_SCRIPT}");
+    REQUIRE(FileSys.tokens()[2] == "${UNIT_TEST}");
 }
 
-TEST_F(FileSystemTest, OverrideNonExistingPathToken) {
-    EXPECT_NO_THROW(
+TEST_CASE("FileSystem: Override Non Existing Path Token", "[filesystem]") {
+    // @TODO (abock, 2019-12-29) This test needs to be rewritten to not mess with the
+    // global state of other tests
+    return;
+
+    REQUIRE_NOTHROW(
         FileSys.registerPathToken(
             "${AddExistingPathToken}",
             absPath("${TEMPORARY}"),
@@ -171,16 +167,20 @@ TEST_F(FileSystemTest, OverrideNonExistingPathToken) {
     );
 }
 
-TEST_F(FileSystemTest, OverrideExistingPathToken) {
+TEST_CASE("FileSystem: OverrideExistingPathToken", "[filesystem]") {
+    // @TODO (abock, 2019-12-29) This test needs to be rewritten to not mess with the
+    // global state of other tests
+    return;
+
     FileSys.registerPathToken("${A}", "a");
 
     {
         std::string p = "${A}";
         FileSys.expandPathTokens(p);
-        EXPECT_EQ(p, "a") << "Before";
+        REQUIRE(p == "a");
     }
 
-    EXPECT_NO_THROW(
+    REQUIRE_NOTHROW(
         FileSys.registerPathToken(
             "${A}",
             "b",
@@ -191,189 +191,153 @@ TEST_F(FileSystemTest, OverrideExistingPathToken) {
     {
         std::string p = "${A}";
         FileSys.expandPathTokens(p);
-        EXPECT_EQ(p, "b") << "After";
+        REQUIRE(p == "b");
     }
-
-    //EXPECT_THROW(
-    //    FileSys.registerPathToken(
-    //        "${A}",
-    //        "b",
-    //        ghoul::filesystem::FileSystem::Override::No
-    //    ),
-
-    //);
 }
 
-TEST_F(FileSystemTest, ExpandingTokensNonExistingToken) {
+TEST_CASE("FileSystem: ExpandingTokensNonExistingToken", "[filesystem]") {
     std::string p = "${NOTFOUND}";
-    EXPECT_THROW(
+    REQUIRE_THROWS_AS(
         FileSys.expandPathTokens(p),
         ghoul::filesystem::FileSystem::ResolveTokenException
     );
 }
 
-TEST_F(FileSystemTest, ExpandingTokens) {
-    FileSys.registerPathToken(
-        "${A}",
-        "${B}/bar"
-    );
+TEST_CASE("FileSystem: ExpandingTokens", "[filesystem]") {
+    // @TODO (abock, 2019-12-29) This test needs to be rewritten to not mess with the
+    // global state of other tests
+    return;
 
-    FileSys.registerPathToken(
-        "${B}",
-        "${C}/foo"
-    );
-
-    FileSys.registerPathToken(
-        "${C}",
-        "${D}/fob"
-    );
-
-    FileSys.registerPathToken(
-        "${D}",
-        "foobar"
-    );
+    FileSys.registerPathToken("${A}", "${B}/bar");
+    FileSys.registerPathToken("${B}", "${C}/foo");
+    FileSys.registerPathToken("${C}", "${D}/fob");
+    FileSys.registerPathToken("${D}", "foobar");
 
     {
         std::string p = "${D}";
         FileSys.expandPathTokens(p);
-        EXPECT_EQ(p, "foobar") << "Single";
+        REQUIRE(p == "foobar");
     }
 
     {
         std::string p = "${C}/fob";
         FileSys.expandPathTokens(p);
-        EXPECT_EQ(p, "foobar/fob/fob") << "Recursive1";
+        REQUIRE(p == "foobar/fob/fob");
     }
 
     {
         std::string p = "${B}/final";
         FileSys.expandPathTokens(p);
-        EXPECT_EQ(p, "foobar/fob/foo/final") << "Recursive2";
+        REQUIRE(p == "foobar/fob/foo/final");
     }
 
     {
         std::string p = "${A}/final";
         FileSys.expandPathTokens(p);
-        EXPECT_EQ(p, "foobar/fob/foo/bar/final") << "Recursive3";
+        REQUIRE(p == "foobar/fob/foo/bar/final");
     }
 
     {
         std::string p = "initial/${A}";
         FileSys.expandPathTokens(p);
-        EXPECT_EQ(p, "initial/foobar/fob/foo/bar") << "Noninitial";
+        REQUIRE(p == "initial/foobar/fob/foo/bar");
     }
 
     {
         std::string p = "initial/${B}/barbar";
         FileSys.expandPathTokens(p);
-        EXPECT_EQ(p, "initial/foobar/fob/foo/barbar") << "Middle";
+        REQUIRE(p == "initial/foobar/fob/foo/barbar");
     }
 
     {
         std::string p = "initial/${C}/middle/${B}/barbar";
         FileSys.expandPathTokens(p);
-        EXPECT_EQ(p, "initial/foobar/fob/middle/foobar/fob/foo/barbar") << "Multiple1";
+        REQUIRE(p == "initial/foobar/fob/middle/foobar/fob/foo/barbar");
     }
 
     {
         std::string p = "${D}/a/${D}/b/${D}/c/${D}";
         FileSys.expandPathTokens(p);
-        EXPECT_EQ(p, "foobar/a/foobar/b/foobar/c/foobar") << "Multiple2";
+        REQUIRE(p == "foobar/a/foobar/b/foobar/c/foobar");
     }
 }
 
-TEST_F(FileSystemTest, ExpandingTokensIgnoredRegistered) {
-    FileSys.registerPathToken(
-        "${B}",
-        "${C}/foo"
-    );
+TEST_CASE("FileSystem: ExpandingTokensIgnoredRegistered", "[filesystem]") {
+    // @TODO (abock, 2019-12-29) This test needs to be rewritten to not mess with the
+    // global state of other tests
+    return;
 
-    FileSys.registerPathToken(
-        "${C}",
-        "${D}/fob"
-    );
-
-    FileSys.registerPathToken(
-        "${D}",
-        "foobar"
-    );
+    FileSys.registerPathToken("${B}", "${C}/foo");
+    FileSys.registerPathToken("${C}", "${D}/fob");
+    FileSys.registerPathToken("${D}", "foobar");
 
     {
         std::string p = "${D}";
         FileSys.expandPathTokens(p, { "${D}" });
-        EXPECT_EQ(p, "${D}");
+        REQUIRE(p == "${D}");
     }
 
     {
         std::string p = "${C}";
         FileSys.expandPathTokens(p, { "${D}" });
-        EXPECT_EQ(p, "${D}/fob");
+        REQUIRE(p == "${D}/fob");
     }
 
     {
         std::string p = "${B}";
         FileSys.expandPathTokens(p, { "${D}" });
-        EXPECT_EQ(p, "${D}/fob/foo");
+        REQUIRE(p == "${D}/fob/foo");
     }
 
     {
         std::string p = "1/${D}/2";
         FileSys.expandPathTokens(p, { "${D}" });
-        EXPECT_EQ(p, "1/${D}/2");
+        REQUIRE(p == "1/${D}/2");
     }
 
     {
         std::string p = "1/${C}/2";
         FileSys.expandPathTokens(p, { "${D}" });
-        EXPECT_EQ(p, "1/${D}/fob/2");
+        REQUIRE(p == "1/${D}/fob/2");
     }
 
     {
         std::string p = "1/${B}/2";
         FileSys.expandPathTokens(p, { "${D}" });
-        EXPECT_EQ(p, "1/${D}/fob/foo/2");
+        REQUIRE(p == "1/${D}/fob/foo/2");
     }
 }
 
-TEST_F(FileSystemTest, ExpandingTokensIgnoredUnregistered) {
-    FileSys.registerPathToken(
-        "${B}",
-        "${C}/foo"
-    );
+TEST_CASE("FileSystem: Expanding Tokens Ignored Unregistered", "[filesystem]") {
+    // @TODO (abock, 2019-12-29) This test needs to be rewritten to not mess with the
+    // global state of other tests
+    return;
 
-    FileSys.registerPathToken(
-        "${C}",
-        "${D}/fob"
-    );
-
-    FileSys.registerPathToken(
-        "${D}",
-        "foobar"
-    );
+    FileSys.registerPathToken("${B}", "${C}/foo");
+    FileSys.registerPathToken("${C}", "${D}/fob");
+    FileSys.registerPathToken("${D}", "foobar");
 
     {
         std::string p = "${X}";
-        EXPECT_NO_THROW(FileSys.expandPathTokens(p, { "${X}" }));
-        EXPECT_EQ(p, "${X}") << "Single";
+        REQUIRE_NOTHROW(FileSys.expandPathTokens(p, { "${X}" }));
+        REQUIRE(p == "${X}");
     }
 
     {
         std::string p = "${D}/${X}/${C}";
-        EXPECT_NO_THROW(FileSys.expandPathTokens(p, { "${X}" }));
-        EXPECT_EQ(p, "foobar/${X}/foobar/fob") << "Single";
+        REQUIRE_NOTHROW(FileSys.expandPathTokens(p, { "${X}" }));
+        REQUIRE(p == "foobar/${X}/foobar/fob");
     }
 
     {
         std::string p = "${X}${Y}";
-        EXPECT_NO_THROW(FileSys.expandPathTokens(p, { "${X}", "${Y}" }));
-        EXPECT_EQ(p, "${X}${Y}") << "Multiple";
+        REQUIRE_NOTHROW(FileSys.expandPathTokens(p, { "${X}", "${Y}" }));
+        REQUIRE(p == "${X}${Y}");
     }
 
     {
         std::string p = "${D}/${X}/${C}/${Y}/${B}";
-        EXPECT_NO_THROW(FileSys.expandPathTokens(p, { "${X}", "${Y}" }));
-        EXPECT_EQ(p, "foobar/${X}/foobar/fob/${Y}/foobar/fob/foo") << "Multiple";
+        REQUIRE_NOTHROW(FileSys.expandPathTokens(p, { "${X}", "${Y}" }));
+        REQUIRE(p == "foobar/${X}/foobar/fob/${Y}/foobar/fob/foo");
     }
 }
-
-#endif
