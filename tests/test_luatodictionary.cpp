@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#if 0
+
 #include <ghoul/glm.h>
 #include <fstream>
 #include <random>
@@ -478,3 +480,5 @@ TEST_F(LuaToDictionaryTest, LoadTest4CfgDirect) {
     success = _d.getValue("m4x4", mat4x4Value);
     EXPECT_EQ(true, success);
 }
+
+#endif

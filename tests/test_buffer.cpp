@@ -23,10 +23,11 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include "catch2/catch.hpp"
+
 #include <ghoul/misc/buffer.h>
 
-TEST(Buffer, String) {
-    
+TEST_CASE("String", "[buffer]") {
     const std::string s1 = "first";
     const std::string s2 = "second";
     std::string s4, s5, s6;
@@ -35,237 +36,215 @@ TEST(Buffer, String) {
     b.serialize(s1);
     b.serialize(s2);
     b.serialize("third");
-    
+
     b.deserialize(s4);
     b.deserialize(s5);
     b.deserialize(s6);
-    
-    EXPECT_EQ(s1, s4);
-    EXPECT_EQ(s2, s5);
-    EXPECT_EQ("third", s6);
+
+    REQUIRE(s1 == s4);
+    REQUIRE(s2 == s5);
+    REQUIRE(s6 == "third");
 }
 
-TEST(Buffer, MixedTypes) {
-    
-    std::string         s1, s2;
-    int                 i1, i2;
-    double              d1, d2;
-    unsigned long long  u1, u2;
-    
-    s1 = "string";
-    i1 = 42;
-    d1 = 123.456;
-    u1 = 123456789;
-    
+TEST_CASE("MixedTypes", "[buffer]") {
+    const std::string s1 = "string";
+    const int i1 = 42;
+    const double d1 = 123.456;
+    const unsigned long long u1 = 123456789;
+
     ghoul::Buffer b;
-    
     b.serialize(s1);
     b.serialize(i1);
     b.serialize(d1);
     b.serialize(u1);
-    
+
+    std::string s2;
     b.deserialize(s2);
+    int i2;
     b.deserialize(i2);
+    double d2;
     b.deserialize(d2);
+    unsigned long long u2;
     b.deserialize(u2);
-    
-    EXPECT_EQ(s1, s2);
-    EXPECT_EQ(i1, i2);
-    EXPECT_EQ(d1, d2);
-    EXPECT_EQ(u1, u2);
-    
+
+    REQUIRE(s1 == s2);
+    REQUIRE(i1 == i2);
+    REQUIRE(d1 == d2);
+    REQUIRE(u1 == u2);
 }
 
-TEST(Buffer, CopyMove) {
-    
-    std::string         s1, s2;
-    int                 i1, i2;
-    double              d1, d2;
-    unsigned long long  u1, u2;
-    
-    s1 = "string";
-    i1 = 42;
-    d1 = 123.456;
-    u1 = 123456789;
-    
-    ghoul::Buffer b, b2;
-    
+TEST_CASE("Copy", "[buffer]") {
+    const std::string s1 = "string";
+    const int i1 = 42;
+    const double d1 = 123.456;
+    const unsigned long long u1 = 123456789;
+
+    ghoul::Buffer b;
     b.serialize(s1);
     b.serialize(i1);
     b.serialize(d1);
     b.serialize(u1);
-    
+
     // copy
-    b2 = b;
+    ghoul::Buffer b2 = b;
     b.reset();
-    
+
+    std::string s2;
     b2.deserialize(s2);
+    int i2;
     b2.deserialize(i2);
+    double d2;
     b2.deserialize(d2);
+    unsigned long long u2;
     b2.deserialize(u2);
-    
-    EXPECT_EQ(s1, s2);
-    EXPECT_EQ(i1, i2);
-    EXPECT_EQ(d1, d2);
-    EXPECT_EQ(u1, u2);
-    
-    s2 = "";
-    i2 = 0;
-    d2 = 0.0;
-    u2 = 0;
-    
+
+    REQUIRE(s1 == s2);
+    REQUIRE(i1 == i2);
+    REQUIRE(d1 == d2);
+    REQUIRE(u1 == u2);
+}
+
+TEST_CASE("Move", "[buffer]") {
+    const std::string s1 = "string";
+    const int i1 = 42;
+    const double d1 = 123.456;
+    const unsigned long long u1 = 123456789;
+
+    ghoul::Buffer b;
     b.serialize(s1);
     b.serialize(i1);
     b.serialize(d1);
     b.serialize(u1);
-    
+
     // move
-    b2 = std::move(b);
+    ghoul::Buffer b2 = std::move(b);
     b.reset();
-    
+
+    std::string s2;
     b2.deserialize(s2);
+    int i2;
     b2.deserialize(i2);
+    double d2;
     b2.deserialize(d2);
+    unsigned long long u2;
     b2.deserialize(u2);
-    
-    EXPECT_EQ(s1, s2);
-    EXPECT_EQ(i1, i2);
-    EXPECT_EQ(d1, d2);
-    EXPECT_EQ(u1, u2);
-    
+
+    REQUIRE(s1 == s2);
+    REQUIRE(i1 == i2);
+    REQUIRE(d1 == d2);
+    REQUIRE(u1 == u2);
 }
 
-TEST(Buffer, Store) {
-    
-    std::string         s1, s2;
-    int                 i1, i2;
-    double              d1, d2;
-    unsigned long long  u1, u2;
-    
-    s1 = "string";
-    i1 = 42;
-    d1 = 123.456;
-    u1 = 123456789;
-    
-    ghoul::Buffer b, b2;
-    
+TEST_CASE("Store", "[buffer]") {
+    const std::string s1 = "string";
+    const int i1 = 42;
+    const double d1 = 123.456;
+    const unsigned long long u1 = 123456789;
+
+    ghoul::Buffer b;
     b.serialize(s1);
     b.serialize(i1);
     b.serialize(d1);
     b.serialize(u1);
-    
     b.write("binary.bin");
+
+    ghoul::Buffer b2;
     b2.read("binary.bin");
-    
+
+    std::string s2;
     b2.deserialize(s2);
+    int i2;
     b2.deserialize(i2);
+    double d2;
     b2.deserialize(d2);
+    unsigned long long u2;
     b2.deserialize(u2);
-    
-    
-    EXPECT_EQ(s1, s2);
-    EXPECT_EQ(i1, i2);
-    EXPECT_EQ(d1, d2);
-    EXPECT_EQ(u1, u2);
-    
+
+    REQUIRE(s1 == s2);
+    REQUIRE(i1 == i2);
+    REQUIRE(d1 == d2);
+    REQUIRE(u1 == u2);
 }
 
-TEST(Buffer, StoreCompress) {
-    
-    std::string         s1, s2;
-    int                 i1, i2;
-    double              d1, d2;
-    unsigned long long  u1, u2;
-    
-    s1 = "string";
-    i1 = 42;
-    d1 = 123.456;
-    u1 = 123456789;
-    
-    ghoul::Buffer b, b2;
-    
+TEST_CASE("Store Compress", "[buffer]") {
+    const std::string s1 = "string";
+    const int i1 = 42;
+    const double d1 = 123.456;
+    const unsigned long long u1 = 123456789;
+
+    ghoul::Buffer b;
     b.serialize(s1);
     b.serialize(i1);
     b.serialize(d1);
     b.serialize(u1);
-    
-    b.write("binaryCompressed.bin", ghoul::Buffer::Compress::Yes);
-    b2.read("binaryCompressed.bin");
-    
+    b.write("binary.bin", ghoul::Buffer::Compress::Yes);
+
+    ghoul::Buffer b2;
+    b2.read("binary.bin");
+
+    std::string s2;
     b2.deserialize(s2);
+    int i2;
     b2.deserialize(i2);
+    double d2;
     b2.deserialize(d2);
+    unsigned long long u2;
     b2.deserialize(u2);
-    
-    
-    EXPECT_EQ(s1, s2);
-    EXPECT_EQ(i1, i2);
-    EXPECT_EQ(d1, d2);
-    EXPECT_EQ(u1, u2);
-    
+
+    REQUIRE(s1 == s2);
+    REQUIRE(i1 == i2);
+    REQUIRE(d1 == d2);
+    REQUIRE(u1 == u2);
 }
 
-TEST(Buffer, Capacity) {
-    
-    std::string         s1, s2;
-    int                 i1, i2;
-    double              d1, d2;
-    unsigned long long  u1, u2;
-    
-    s1 = "string";
-    i1 = 42;
-    d1 = 123.456;
-    u1 = 123456789;
-    
+TEST_CASE("Capacity", "[buffer]") {
+    const std::string s1 = "string";
+    const int i1 = 42;
+    const double d1 = 123.456;
+    const unsigned long long u1 = 123456789;
+
     ghoul::Buffer b(0);
-    
     b.serialize(s1);
     b.serialize(i1);
     b.serialize(d1);
     b.serialize(u1);
+
+    std::string s2;
     b.deserialize(s2);
+    int i2;
     b.deserialize(i2);
+    double d2;
     b.deserialize(d2);
+    unsigned long long u2;
     b.deserialize(u2);
-    
-    
-    EXPECT_EQ(s1, s2);
-    EXPECT_EQ(i1, i2);
-    EXPECT_EQ(d1, d2);
-    EXPECT_EQ(u1, u2);
-    
+
+    REQUIRE(s1 == s2);
+    REQUIRE(i1 == i2);
+    REQUIRE(d1 == d2);
+    REQUIRE(u1 == u2);
 }
 
-TEST(Buffer, Vector) {
-    
-    std::vector<float> fv, fv2;
+TEST_CASE("Vector", "[buffer]") {
+    std::vector<float> fv;
     fv.push_back(1.5);
     fv.push_back(2.5);
     fv.push_back(3.5);
     fv.push_back(4.5);
     fv.push_back(5.5);
 
-    std::vector<std::string> sv, sv2;
+    std::vector<std::string> sv;
     sv.push_back("first");
     sv.push_back("second");
     sv.push_back("third");
-    
+
     ghoul::Buffer b;
-    
     b.serialize(fv);
     b.serialize(sv);
+    std::vector<float> fv2;
     b.deserialize(fv2);
+    std::vector<std::string> sv2;
     b.deserialize(sv2);
-    
-    EXPECT_EQ(fv.size(), fv2.size());
-    for(size_t i = 0; i < fv.size(); ++i) {
-        EXPECT_EQ(fv.at(i), fv2.at(i));
-    }
 
-    EXPECT_EQ(sv.size(), sv2.size());
-    for (size_t i = 0; i < sv.size(); ++i) {
-        EXPECT_EQ(sv.at(i), sv2.at(i));
-    }
-    
+    REQUIRE(fv == fv2);
+    REQUIRE(sv == sv2);
 }
-

@@ -23,50 +23,33 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include "catch2/catch.hpp"
+
 #include <ghoul/cmdparser/commandlineparser.h>
 #include <ghoul/cmdparser/singlecommand.h>
 #include <ghoul/cmdparser/multiplecommand.h>
 
 #include <memory>
 
-// GCC throws a lot of unnecessary
-// warning: deprecated conversion from string constant to ‘char*’
-// warnings
-#ifdef __unix__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#endif //__unix__
+ /*
+  * Test checklist:
+  * +++ SingleCommand, MultipleCommand
+  * +++     1-4 arguments
+  * +++     different types
+  * +++     same types
+  * +++     calling once
+  * +++     calling multiple times
+  * +++ Multiple commands in the same command-line result
+  * +++ Variable orders should produce the same result
+  * +++ Unknown commands
+  * +++ Collection of unknown commands with known commands interspersed
+  * +++ Error messages when unknown commands are allowed but no receiving vector is
+  *     provided (and vice versa)
+  */
 
-/*
-Test checklist:
-+++ SingleCommand, MultipleCommand
-+++     1-4 arguments
-+++     different types
-+++     same types
-+++     calling once
-+++     calling multiple times
-+++ Multiple commands in the same command-line result
-+++ Variable orders should produce the same result
-+++ Unknown commands
-+++ Collection of unknown commands with known commands interspersed
-+++ Error messages when unknown commands are allowed but no receiving vector is provided
-    (and vice versa)
-*/
+TEST_CASE("Unknown Commands Unhandled", "[commandlineparser]") {
+    ghoul::cmdparser::CommandlineParser p;
 
-class CommandlineParserTest : public testing::Test {
-protected:
-    CommandlineParserTest()
-        : _p(std::make_unique<ghoul::cmdparser::CommandlineParser>())
-    {}
-
-    void reset() {
-        _p = std::make_unique<ghoul::cmdparser::CommandlineParser>();
-    }
-
-    std::unique_ptr<ghoul::cmdparser::CommandlineParser> _p;
-};
-
-TEST_F(CommandlineParserTest, UnknownCommandsUnhandled) {
     std::vector<std::string> argv = {
         "tests",
         "-cmd1",
@@ -75,11 +58,16 @@ TEST_F(CommandlineParserTest, UnknownCommandsUnhandled) {
         "arg2"
     };
 
-    _p->setCommandLine(argv);
-    EXPECT_THROW(_p->execute(), ghoul::cmdparser::CommandlineParser::CommandlineException);
+    p.setCommandLine(argv);
+    REQUIRE_THROWS_AS(
+        p.execute(),
+        ghoul::cmdparser::CommandlineParser::CommandlineException
+    );
 }
 
-TEST_F(CommandlineParserTest, UnknownCommandsHandledCorrectly) {
+TEST_CASE("Unknown Commands Handled Correctly", "[commandlineparser]") {
+    ghoul::cmdparser::CommandlineParser p;
+
     std::vector<std::string> argv = {
         "tests",
         "-cmd1",
@@ -88,13 +76,16 @@ TEST_F(CommandlineParserTest, UnknownCommandsHandledCorrectly) {
         "arg2"
     };
 
-    using ghoul::cmdparser::CommandlineParser;
-    _p->setAllowUnknownCommands(CommandlineParser::AllowUnknownCommands::Yes);
-    _p->setCommandLine(argv);
-    EXPECT_NO_THROW(_p->execute());
+    p.setAllowUnknownCommands(
+        ghoul::cmdparser::CommandlineParser::AllowUnknownCommands::Yes
+    );
+    p.setCommandLine(argv);
+    REQUIRE_NOTHROW(p.execute());
 }
 
-TEST_F(CommandlineParserTest, UnknownCommandsInterspersed) {
+TEST_CASE("Unknown Commands Interspersed", "[commandlineparser]") {
+    ghoul::cmdparser::CommandlineParser p;
+
     std::vector<std::string> argv = {
         "tests",
         "-cmd1",
@@ -105,46 +96,50 @@ TEST_F(CommandlineParserTest, UnknownCommandsInterspersed) {
         "-cmd3",
         "arg4"
     };
-    std::string v1 = "";
-    std::string v2 = "";
+    std::string v1;
+    std::string v2;
     using T = ghoul::cmdparser::SingleCommand<std::string, std::string>;
-    _p->addCommand(std::make_unique<T>(v1, v2, "-cmd2"));
+    p.addCommand(std::make_unique<T>(v1, v2, "-cmd2"));
 
     using ghoul::cmdparser::CommandlineParser;
-    _p->setAllowUnknownCommands(CommandlineParser::AllowUnknownCommands::Yes);
-    const std::vector<std::string>& arguments = _p->setCommandLine(argv);
-    
-    ASSERT_NO_THROW(_p->execute());
+    p.setAllowUnknownCommands(CommandlineParser::AllowUnknownCommands::Yes);
+    const std::vector<std::string>& arguments = p.setCommandLine(argv);
 
-    EXPECT_EQ(4, arguments.size());
-    EXPECT_EQ("-cmd1", arguments.at(0));
-    EXPECT_EQ("arg", arguments.at(1));
-    EXPECT_EQ("-cmd3", arguments.at(2));
-    EXPECT_EQ("arg4", arguments.at(3));
-    EXPECT_EQ("arg2", v1);
-    EXPECT_EQ("arg3", v2);
+    REQUIRE_NOTHROW(p.execute());
+
+    REQUIRE(arguments.size() == 4);
+    REQUIRE(arguments.at(0) == "-cmd1");
+    REQUIRE(arguments.at(1) == "arg");
+    REQUIRE(arguments.at(2) == "-cmd3");
+    REQUIRE(arguments.at(3) == "arg4");
+    REQUIRE(v1 == "arg2");
+    REQUIRE(v2 == "arg3");
 }
 
-TEST_F(CommandlineParserTest, SingleZeroCommandArguments) {
+TEST_CASE("Single Zero Command Arguments", "[commandlineparser]") {
+    ghoul::cmdparser::CommandlineParser p;
+
     bool v = false;
     using T = ghoul::cmdparser::SingleCommandZeroArguments;
-    _p->addCommand(std::make_unique<T>(v, "-zero"));
+    p.addCommand(std::make_unique<T>(v, "-zero"));
 
     std::vector<std::string> argv = {
         "tests",
         "-zero"
     };
 
-    _p->setCommandLine(argv);
-    EXPECT_NO_THROW(_p->execute());
-    EXPECT_EQ(true, v);
+    p.setCommandLine(argv);
+    REQUIRE_NOTHROW(p.execute());
+    REQUIRE(v);
 }
 
-TEST_F(CommandlineParserTest, SingleCommandOneArgumentBool) {
+TEST_CASE("Single Command One Argument Bool", "[commandlineparser]") {
+    ghoul::cmdparser::CommandlineParser p;
+
     // boolean
     bool v = true;
     using T = ghoul::cmdparser::SingleCommand<bool>;
-    _p->addCommand(std::make_unique<T>(v, "-single"));
+    p.addCommand(std::make_unique<T>(v, "-single"));
 
     {
         std::vector<std::string> argv = {
@@ -153,9 +148,9 @@ TEST_F(CommandlineParserTest, SingleCommandOneArgumentBool) {
             "0"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(false, v) << "0";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE_FALSE(v);
     }
     {
         std::vector<std::string> argv = {
@@ -164,17 +159,19 @@ TEST_F(CommandlineParserTest, SingleCommandOneArgumentBool) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(true, v) << "1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v);
     }
 }
 
-TEST_F(CommandlineParserTest, SingleCommandCalledMultipleTimes) {
+TEST_CASE("Single Command Called Multiple Times", "[commandlineparser]") {
+    ghoul::cmdparser::CommandlineParser p;
+
     // boolean
     bool v = false;
     using T = ghoul::cmdparser::SingleCommand<bool>;
-    _p->addCommand(std::make_unique<T>(v, "-single"));
+    p.addCommand(std::make_unique<T>(v, "-single"));
 
     std::vector<std::string> argv = {
         "tests",
@@ -184,20 +181,25 @@ TEST_F(CommandlineParserTest, SingleCommandCalledMultipleTimes) {
         "0"
     };
 
-    _p->setCommandLine(argv);
-    EXPECT_THROW(_p->execute(), ghoul::cmdparser::CommandlineParser::CommandlineException);
+    p.setCommandLine(argv);
+    REQUIRE_THROWS_AS(
+        p.execute(),
+        ghoul::cmdparser::CommandlineParser::CommandlineException
+    );
 }
 
-TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
+TEST_CASE("Multiple Commands Permutation", "[commandlineparser]") {
+    ghoul::cmdparser::CommandlineParser p;
+
     int v1 = 0;
     int v2 = 0;
     int v3 = 0;
 
     using T = ghoul::cmdparser::SingleCommand<int>;
 
-    _p->addCommand(std::make_unique<T>(v1, "-cmd1"));
-    _p->addCommand(std::make_unique<T>(v2, "-cmd2"));
-    _p->addCommand(std::make_unique<T>(v3, "-cmd3"));
+    p.addCommand(std::make_unique<T>(v1, "-cmd1"));
+    p.addCommand(std::make_unique<T>(v2, "-cmd2"));
+    p.addCommand(std::make_unique<T>(v3, "-cmd3"));
 
     {
         std::vector<std::string> argv = {
@@ -210,16 +212,18 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
             "3"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1) << "cmd1 cmd2 cmd3";
-        EXPECT_EQ(2, v2) << "cmd1 cmd2 cmd3";
-        EXPECT_EQ(3, v3) << "cmd1 cmd2 cmd3";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 1);
+        REQUIRE(v2 == 2);
+        REQUIRE(v3 == 3);
     }
-    v1 = 0;
-    v2 = 0;
-    v3 = 0;
+
     {
+        v1 = 0;
+        v2 = 0;
+        v3 = 0;
+
         std::vector<std::string> argv = {
             "tests",
             "-cmd2",
@@ -230,16 +234,18 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
             "3"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1) << "cmd2 cmd1 cmd3";
-        EXPECT_EQ(2, v2) << "cmd2 cmd1 cmd3";
-        EXPECT_EQ(3, v3) << "cmd2 cmd1 cmd3";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 1);
+        REQUIRE(v2 == 2);
+        REQUIRE(v3 == 3);
     }
-    v1 = 0;
-    v2 = 0;
-    v3 = 0;
+
     {
+        v1 = 0;
+        v2 = 0;
+        v3 = 0;
+
         std::vector<std::string> argv = {
             "tests",
             "-cmd3",
@@ -250,16 +256,18 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
             "1"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1) << "cmd3 cmd2 cmd1";
-        EXPECT_EQ(2, v2) << "cmd3 cmd2 cmd1";
-        EXPECT_EQ(3, v3) << "cmd3 cmd2 cmd1";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 1);
+        REQUIRE(v2 == 2);
+        REQUIRE(v3 == 3);
     }
-    v1 = 0;
-    v2 = 0;
-    v3 = 0;
+
     {
+        v1 = 0;
+        v2 = 0;
+        v3 = 0;
+
         std::vector<std::string> argv = {
             "tests",
             "-cmd3",
@@ -270,13 +278,24 @@ TEST_F(CommandlineParserTest, MultipleCommandsPermutation) {
             "2"
         };
 
-        _p->setCommandLine(argv);
-        ASSERT_NO_THROW(_p->execute());
-        EXPECT_EQ(1, v1) << "cmd3 cmd1 cmd2";
-        EXPECT_EQ(2, v2) << "cmd3 cmd1 cmd2";
-        EXPECT_EQ(3, v3) << "cmd3 cmd1 cmd2";
+        p.setCommandLine(argv);
+        REQUIRE_NOTHROW(p.execute());
+        REQUIRE(v1 == 1);
+        REQUIRE(v2 == 2);
+        REQUIRE(v3 == 3);
     }
 }
+
+TEST_CASE("", "[commandlineparser]") {
+    ghoul::cmdparser::CommandlineParser p;
+}
+
+TEST_CASE("", "[commandlineparser]") {
+    ghoul::cmdparser::CommandlineParser p;
+}
+
+
+#if 0
 
 TEST_F(CommandlineParserTest, SingleCommandOneArgumentInt) {
     // int
@@ -5402,3 +5421,5 @@ TEST_F(CommandlineParserTest, MultipleCommandFourArgumentsBoolIntStringFloat) {
 #ifdef __unix__
 #pragma GCC diagnostic pop
 #endif // __unix__
+
+#endif 

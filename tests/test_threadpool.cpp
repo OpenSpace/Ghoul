@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#if 0
+
 #include "gtest/gtest.h"
 
 #include <ghoul/misc/threadpool.h>
@@ -441,3 +443,5 @@ TEST_F(ThreadPoolTest, DetachingStop) {
     // As it is not blocking, the operation shouldn't take any time at all
     EXPECT_GE(Epsilon, ms);
 }
+
+#endif

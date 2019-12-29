@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#if 0
+
 #include <ghoul/misc/memorypool.h>
 
 TEST(MemoryPoolTest, MemoryPool) {
@@ -137,3 +139,4 @@ TEST(MemoryPoolTest, ReusableTypedMemoryPoolReuse) {
     EXPECT_EQ(p4[1], p1[1]);
 }
 
+#endif

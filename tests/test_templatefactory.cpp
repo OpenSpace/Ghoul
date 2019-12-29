@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#if 0
+
 #include "gtest/gtest.h"
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/templatefactory.h>
@@ -272,3 +274,5 @@ TEST_F(TemplateFactoryTest, StdFunctionConstruction) {
     std::unique_ptr<BaseClass> obj2 = factory->create("ptr", {});
     EXPECT_NE(nullptr, obj2) << "'useDictionary' was passed wrongly";
 }
+
+#endif

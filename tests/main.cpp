@@ -23,95 +23,32 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifdef __unix__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion-null"
-#endif // __unix__
-
-// When running the unit tests we don't want to be asked what to do in the case of an
-// assertion
-
-#ifdef _MSC_VER
-#pragma warning (push)
-#pragma warning (disable : 4619) // #pragma warning: there is no warning number '4800' 
-#endif // _MSC_VER
-
-#include <ghoul/misc/supportmacros.h>
-
-#include "gtest/gtest.h"
-
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif // _MSC_VER
+#define CATCH_CONFIG_RUNNER
+#include "catch2/catch.hpp"
 
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/consolelog.h>
 #include <ghoul/logging/logmanager.h>
-
-namespace constants {
-    static std::string TestDirectory;
-    static std::string ScriptDirectory;
-} // namespace constants
-
-#include "tests/test_buffer.inl"
-#include "tests/test_commandlineparser.inl"
-#include "tests/test_common.inl"
-#include "tests/test_crc32.inl"
-#include "tests/test_dictionary.inl"
-#include "tests/test_dictionaryjsonformatter.inl"
-#include "tests/test_dictionaryluaformatter.inl"
-#include "tests/test_filesystem.inl"
-#include "tests/test_luatodictionary.inl"
-#include "tests/test_memorypool.inl"
-#include "tests/test_templatefactory.inl"
-#include "tests/test_csvreader.inl"
+#include <ghoul/misc/supportmacros.h>
 
 using namespace ghoul::filesystem;
 using namespace ghoul::logging;
-
-#ifndef GHOUL_ROOT_DIR
-#define GHOUL_ROOT_DIR "../../../ext/ghoul"
-#endif
-
-// #define PRINT_OUTPUT
 
 int main(int argc, char** argv) {
     LogManager::initialize(LogLevel::Fatal);
     LogMgr.addLog(std::make_unique<ConsoleLog>());
 
     FileSystem::initialize();
-    
-    const std::string root = absPath(GHOUL_ROOT_DIR);
-    constants::TestDirectory = root + "/tests";
-    constants::ScriptDirectory = root + "/scripts";
 
-    if (!FileSys.directoryExists(constants::TestDirectory)) {
+    const std::string Root = absPath(GHOUL_ROOT_DIR);
+    const std::string TestDirectory = Root + "/tests";
+    const std::string ScriptDirectory = Root + "/scripts";
+
+    if (!FileSys.directoryExists(TestDirectory)) {
         LFATALC("main", "Fix me");
         return 0;
     }
 
-#ifdef PRINT_OUTPUT
-    testing::internal::CaptureStdout();
-    testing::internal::CaptureStderr();
-#endif
-
-    testing::InitGoogleTest(&argc, argv);
-    bool b = RUN_ALL_TESTS();
-
-#ifdef PRINT_OUTPUT
-    std::string output = testing::internal::GetCapturedStdout();
-    std::string error = testing::internal::GetCapturedStderr();
-
-    std::ofstream o("output.txt");
-    o << output;
-
-    std::ofstream e("error.txt");
-    e << error;
-#endif
-
-    return b;
+    int result = Catch::Session().run(argc, argv);
+    return result;
 }
-
-#ifdef __unix__
-#pragma GCC diagnostic pop
-#endif // __unix__

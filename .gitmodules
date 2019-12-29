@@ -10,9 +10,6 @@ url=https://github.com/OpenSpace/freetype-mirror
 [submodule "ext/assimp"]
 	path = ext/assimp
 	url = https://github.com/assimp/assimp.git
-[submodule "ext/googletest"]
-	path = ext/googletest
-	url = https://github.com/google/googletest.git
 [submodule "ext/lua/src"]
 	path = ext/lua/src
 	url = https://github.com/Lua/Lua.git

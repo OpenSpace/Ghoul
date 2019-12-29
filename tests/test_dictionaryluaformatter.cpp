@@ -23,19 +23,21 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/misc/dictionaryjsonformatter.h>
+#if 0
+
+#include <ghoul/misc/dictionaryluaformatter.h>
 
 #include <ghoul/misc/dictionary.h>
 
 #include <string>
 
-TEST(DictionaryJSONFormatter, EmptyDictionary) {
+TEST(DictionaryLuaFormatter, EmptyDictionary) {
     ghoul::Dictionary d;
-    std::string res = ghoul::DictionaryJsonFormatter().format(d);
+    std::string res = ghoul::DictionaryLuaFormatter().format(d);
     EXPECT_EQ("{}", res);
 }
 
-TEST(DictionaryJSONFormatter, SimpleDictionary) {
+TEST(DictionaryLuaFormatter, SimpleDictionary) {
     using namespace std::string_literals;
     ghoul::Dictionary d = {
         { "int", 1 },
@@ -46,16 +48,16 @@ TEST(DictionaryJSONFormatter, SimpleDictionary) {
         { "string", ""s}
     };
 
-    std::string res = ghoul::DictionaryJsonFormatter().format(d);
+    std::string res = ghoul::DictionaryLuaFormatter().format(d);
     EXPECT_EQ(
-        "{\"double\":2.000000E0,\"int\":1,\"string\":\"\","
-        "\"vec2\":[0,0],\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]}",
+        "{double=2.000000E0,int=1,string=\"\","
+        "vec2={0,0},vec3={0,0,0},"
+        "vec4={0,0,0,0}}",
         res
     );
 }
 
-TEST(DictionaryJSONFormatter, NestedDictionary) {
+TEST(DictionaryLuaFormatter, NestedDictionary) {
     using namespace std::string_literals;
 
     ghoul::Dictionary d = {
@@ -99,41 +101,43 @@ TEST(DictionaryJSONFormatter, NestedDictionary) {
         { "dict3" , f }
     };
 
-    std::string res = ghoul::DictionaryJsonFormatter().format(g);
+    std::string res = ghoul::DictionaryLuaFormatter().format(g);
 
     EXPECT_EQ(
-        "{\"dict\":{\"dict\":{\"dict\":{\"double\":2.000000E0,\"int\":1,"
-        "\"string\":\"\",\"vec2\":[0,0],"
-        "\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},"
-        "\"double\":2.000000E0,\"int\":1,\"string\":\"\","
-        "\"vec2\":[0,0],"
-        "\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},"
-        "\"double\":2.000000E0,\"int\":1,\"string\":\"\","
-        "\"vec2\":[0,0],\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},"
-        "\"dict2\":{\"dict\":{\"dict\":{\"double\":2.000000E0,\"int\":1,\"string\":\"\","
-        "\"vec2\":[0,0],\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},\"double\":2.000000E0,\"int\":1,"
-        "\"string\":\"\",\"vec2\":[0,0],"
-        "\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},\"double\":2.000000E0,\"int\":1,"
-        "\"string\":\"\",\"vec2\":[0,0],"
-        "\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},\"dict3\":{\"dict\":{\"dict\":{"
-        "\"double\":2.000000E0,\"int\":1,\"string\":\"\",\"vec2\":[0,0],"
-        "\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},\"double\":2.000000E0,\"int\":1,"
-        "\"string\":\"\",\"vec2\":[0,0],"
-        "\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},\"double\":2.000000E0,\"int\":1,"
-        "\"string\":\"\",\"vec2\":[0,0],"
-        "\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},\"double\":2.000000E0,\"int\":1,"
-        "\"string\":\"\",\"vec2\":[0,0],"
-        "\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]}",
+        "{dict={dict={dict={double=2.000000E0,int=1,"
+        "string=\"\",vec2={0,0},"
+        "vec3={0,0,0},"
+        "vec4={0,0,0,0}},"
+        "double=2.000000E0,int=1,string=\"\","
+        "vec2={0,0},"
+        "vec3={0,0,0},"
+        "vec4={0,0,0,0}},"
+        "double=2.000000E0,int=1,string=\"\","
+        "vec2={0,0},vec3={0,0,0},"
+        "vec4={0,0,0,0}},"
+        "dict2={dict={dict={double=2.000000E0,int=1,string=\"\","
+        "vec2={0,0},vec3={0,0,0},"
+        "vec4={0,0,0,0}},double=2.000000E0,int=1,"
+        "string=\"\",vec2={0,0},"
+        "vec3={0,0,0},"
+        "vec4={0,0,0,0}},double=2.000000E0,int=1,"
+        "string=\"\",vec2={0,0},"
+        "vec3={0,0,0},"
+        "vec4={0,0,0,0}},dict3={dict={dict={"
+        "double=2.000000E0,int=1,string=\"\",vec2={0,0},"
+        "vec3={0,0,0},"
+        "vec4={0,0,0,0}},double=2.000000E0,int=1,"
+        "string=\"\",vec2={0,0},"
+        "vec3={0,0,0},"
+        "vec4={0,0,0,0}},double=2.000000E0,int=1,"
+        "string=\"\",vec2={0,0},"
+        "vec3={0,0,0},"
+        "vec4={0,0,0,0}},double=2.000000E0,int=1,"
+        "string=\"\",vec2={0,0},"
+        "vec3={0,0,0},"
+        "vec4={0,0,0,0}}",
         res
     );
 }
+
+#endif

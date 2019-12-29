@@ -23,6 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#if 0
 #include <ghoul/misc/crc32.h>
 
 #include <random>
@@ -261,3 +262,5 @@ TEST(CRC32Test, HashRandomEquality) {
         }
     }
 }
+
+#endif

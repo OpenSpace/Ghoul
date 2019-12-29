@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#if 0
+
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/glm.h>
 #include <fstream>
@@ -8854,3 +8856,5 @@ TEST_F(DictionaryTest, RecursiveAccessSetValue) {
     // false values
     ASSERT_THROW(d.setValue("e.g.a", 1), ghoul::Dictionary::KeyError);
 }
+
+#endif

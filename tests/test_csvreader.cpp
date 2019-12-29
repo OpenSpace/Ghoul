@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#if 0
+
 #include <ghoul/misc/csvreader.h>
 
 class CSVReaderTest : public testing::Test {
@@ -101,3 +103,5 @@ TEST_F(CSVReaderTest, ColumnName) {
     EXPECT_EQ("2142", header[261][1]);
     EXPECT_EQ("peitho", header[84][2]);
 }
+
+#endif 

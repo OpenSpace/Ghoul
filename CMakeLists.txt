@@ -34,7 +34,6 @@ include(${GHOUL_ROOT_DIR}/support/cmake/handle_external_library.cmake)
 include(${GHOUL_ROOT_DIR}/support/cmake/set_ghoul_compile_settings.cmake)
 include(${GHOUL_ROOT_DIR}/support/cmake/copy_shared_libraries.cmake)
 include(${GHOUL_ROOT_DIR}/support/cmake/message_macros.cmake)
-include(${GHOUL_ROOT_DIR}/support/cmake/include_gtest.cmake)
 
 begin_header("Configuring Ghoul Project")
 
@@ -401,15 +400,27 @@ end_module("Profiling")
 option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
 if (GHOUL_HAVE_TESTS)
   begin_header("Generating tests")
-  file(GLOB_RECURSE GHOUL_TEST_FILES ${GHOUL_ROOT_DIR}/tests/*.inl)
-  add_executable(GhoulTest ${GHOUL_ROOT_DIR}/tests/main.cpp ${GHOUL_TEST_FILES})
+  add_executable(
+    GhoulTest
+    ${GHOUL_ROOT_DIR}/tests/main.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_buffer.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_commandlineparser.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_crc32.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_csvreader.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_dictionary.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_dictionaryjsonformatter.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_dictionaryluaformatter.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_filesystem.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_luatodictionary.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_memorypool.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_templatefactory.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_threadpool.cpp
+  )
 
   target_compile_definitions(GhoulTest PRIVATE
       # Jenkins shouldn't ask for asserts when they happen, but just throw
       "GHL_THROW_ON_ASSERT"
       "GHOUL_HAVE_TESTS"
-      "GTEST_HAS_TR1_TUPLE=0"
-      "GTEST_HAS_GLOBAL_STRING=0"
       "GHOUL_ROOT_DIR=\"${GHOUL_ROOT_DIR}\""
   )
 
@@ -421,11 +432,9 @@ if (GHOUL_HAVE_TESTS)
     target_compile_options(GhoulTest PRIVATE "-O0" )
   endif ()
 
-  target_include_directories(GhoulTest PRIVATE "${GHOUL_ROOT_DIR}/ext/googletest/googletest/include" "${GHOUL_ROOT_DIR}")
+  target_include_directories(GhoulTest PRIVATE "${GHOUL_ROOT_DIR}/ext/catch2/single_include")
 
-  include_gtest("${GHOUL_ROOT_DIR}/ext/googletest")
-
-  target_link_libraries(GhoulTest PRIVATE gtest Ghoul Lua)
+  target_link_libraries(GhoulTest PRIVATE Ghoul)
 
   ghl_copy_shared_libraries(GhoulTest ${GHOUL_ROOT_DIR})
 

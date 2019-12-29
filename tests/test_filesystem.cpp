@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#if 0
+
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/filesystem/file.h>
 
@@ -373,3 +375,5 @@ TEST_F(FileSystemTest, ExpandingTokensIgnoredUnregistered) {
         EXPECT_EQ(p, "foobar/${X}/foobar/fob/${Y}/foobar/fob/foo") << "Multiple";
     }
 }
+
+#endif
