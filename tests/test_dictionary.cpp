@@ -25,6 +25,7 @@
 
 #include "catch2/catch.hpp"
 
+#include <ghoul/lua/lua_helper.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/glm.h>
 #include <fstream>
@@ -39,7 +40,6 @@
   * +++  basic types
   * +++  advanced types
   * +++ nested dictionaries
-  * +++ timing
   */
 
 namespace {
@@ -102,6 +102,23 @@ namespace {
         };
     }
 
+    // A non-existing configuration file
+    const std::string _configuration0 = "${TEST_DIR}/configurationmanager/test0.cfg";
+
+    // The configuration1 test configuration has one key "t" = 1
+    const std::string _configuration1 = "${TEST_DIR}/configurationmanager/test1.cfg";
+
+    // The configuration1 test configuration has two keys "t" and "s"
+    const std::string _configuration2 = "${TEST_DIR}/configurationmanager/test2.cfg";
+
+    // More complicated configuration file with nested tables
+    const std::string _configuration3 = "${TEST_DIR}/configurationmanager/test3.cfg";
+
+    // Deeply nested configuration file with 12 level
+    const std::string _configuration4 = "${TEST_DIR}/configurationmanager/test4.cfg";
+
+    // Testfile with glm::vecX, glm::matX
+    const std::string _configuration5 = "${TEST_DIR}/configurationmanager/test5.cfg";
 } // namespace
 
 TEST_CASE("Dictionary: Empty", "[dictionary]") {
@@ -296,19 +313,19 @@ TEST_CASE("Dictionary: Get Value", "[dictionary]") {
         float value;
         const bool success = d.getValue("float", value);
         REQUIRE(success);
-        REQUIRE(value == float(1));
+        REQUIRE(value == Approx(1.f));
     }
     {
         double value;
         const bool success = d.getValue("double", value);
         REQUIRE(success);
-        REQUIRE(value == double(1));
+        REQUIRE(value == Approx(1.0));
     }
     {
         long double value;
         const bool success = d.getValue("long double", value);
         REQUIRE(success);
-        REQUIRE(value == static_cast<long double>(1));
+        REQUIRE(value == Approx(static_cast<long double>(1)));
     }
     {
         glm::vec2 value;
@@ -656,7 +673,7 @@ TEST_CASE("Dictionary: Set Value", "[dictionary]") {
         long double value;
         const bool success = d.getValue("long double", value);
         REQUIRE(success);
-        REQUIRE(value == static_cast<long double>(1));
+        REQUIRE(value == Approx(static_cast<long double>(1)));
     }
     SECTION("vec2") {
         REQUIRE_FALSE(d.hasValue<glm::vec2>("vec2"));
@@ -7802,7 +7819,7 @@ TEST_CASE("Dictionary: Conversion From Dictionary", "[dictionary]") {
         float value;
         success = d.getValue("1float", value);
         REQUIRE(success);
-        REQUIRE(value == float(1));
+        REQUIRE(value == Approx(1.f));
     }
 
     success = d.hasValue<double>("1int");
@@ -7817,7 +7834,7 @@ TEST_CASE("Dictionary: Conversion From Dictionary", "[dictionary]") {
         double value;
         success = d.getValue("1float", value);
         REQUIRE(success);
-        REQUIRE(value == double(1));
+        REQUIRE(value == Approx(1.0));
     }
 
     using glm::vec2;
@@ -8487,4 +8504,1835 @@ TEST_CASE("Dictionary: Recursive Access Set Value", "[dictionary]") {
 
     // false values
     REQUIRE_THROWS_AS(d.setValue("e.g.a", 1), ghoul::Dictionary::KeyError);
+}
+TEST_CASE("ConfigurationManager: Reinit", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    m.setValue("t", int(2));
+    m.clear();
+    const bool success = m.hasKey("t");
+    REQUIRE_FALSE(success);
+}
+
+TEST_CASE("ConfigurationManager: Load Configuration", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration0, m));
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration1, m));
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration2, m));
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration3, m));
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration4, m));
+}
+
+TEST_CASE("ConfigurationManager: Keys Function", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    // The empty configuration should not have any keys
+    SECTION("empty") {
+        const size_t nKeys = m.keys().size();
+        REQUIRE(nKeys == 0);
+    }
+
+    SECTION("config1") {
+        REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration1, m));
+        const size_t nKeys = m.keys().size();
+        REQUIRE(nKeys == 1);
+    }
+
+    SECTION("config3") {
+        REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration3, m));
+        const size_t nKeys = m.keys().size();
+        REQUIRE(nKeys == 3);
+
+        const size_t nKeysS = m.keys("s").size();
+        REQUIRE(nKeysS == 3);
+
+        const size_t nKeysS3 = m.keys("s.3").size();
+        REQUIRE(nKeysS3 == 2);
+    }
+
+    SECTION("config4") {
+        REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration4, m));
+
+        const char* keys[] = {
+            "a", "a.a", "a.a.a", "a.a.a.a", "a.a.a.a.a", "a.a.a.a.a.a", "a.a.a.a.a.a.a",
+            "a.a.a.a.a.a.a.a", "a.a.a.a.a.a.a.a.a", "a.a.a.a.a.a.a.a.a.a",
+            "a.a.a.a.a.a.a.a.a.a.a", "a.a.a.a.a.a.a.a.a.a.a.a"
+        };
+
+        for (int i = 0; i < 12; ++i) {
+            const size_t nKeys = m.keys(keys[i]).size();
+            REQUIRE(nKeys == 2);
+        }
+
+        for (int i = 0; i < 12; ++i) {
+            const bool hasKey = m.hasKey(keys[i]);
+            REQUIRE(hasKey);
+        }
+
+        constexpr const char* keysB[] = {
+            "b", "b.b", "b.b.b", "b.b.b.b", "b.b.b.b.b", "b.b.b.b.b.b", "b.b.b.b.b.b.b",
+            "b.b.b.b.b.b.b.b", "b.b.b.b.b.b.b.b.b", "b.b.b.b.b.b.b.b.b.b",
+            "b.b.b.b.b.b.b.b.b.b.b", "b.b.b.b.b.b.b.b.b.b.b.b"
+        };
+        m.setValue(keysB[11], int(0), ghoul::Dictionary::CreateIntermediate::Yes);
+        for (int i = 0; i < 12; ++i) {
+            REQUIRE(m.hasKey(keysB[i]));
+        }
+    }
+}
+
+TEST_CASE("ConfigurationManager: HasKey Subtable", "[configurationmanager]") {
+    ghoul::Dictionary m;
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration1, m));
+    SECTION("t") {
+        const bool success = m.hasKey("t");
+        REQUIRE(success);
+    }
+
+    SECTION("t.s") {
+        const bool success = m.hasKey("t.s");
+        REQUIRE_FALSE(success);
+    }
+
+    SECTION("s") {
+        const bool success = m.hasKey("s");
+        REQUIRE_FALSE(success);
+    }
+
+    SECTION("s.x") {
+        const bool success = m.hasKey("s.x");
+        REQUIRE_FALSE(success);
+    }
+}
+
+TEST_CASE("ConfigurationManager: HasKey Types", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    m.setValue("t", ghoul::Dictionary());
+    m.setValue("t.bool", bool(1));
+    m.setValue("t.char", char(1));
+    m.setValue("t.unsignedchar", static_cast<unsigned char>(1));
+    m.setValue("t.signedchar", static_cast<signed char>(1));
+    m.setValue("t.wchar", wchar_t(1));
+    m.setValue("t.short", short(1));
+    m.setValue("t.unsignedshort", static_cast<unsigned short>(1));
+    m.setValue("t.int", int(1));
+    m.setValue("t.unsignedint", static_cast<unsigned int>(1));
+    m.setValue("t.long", long(1));
+    m.setValue("t.unsignedlong", static_cast<unsigned long>(1));
+    m.setValue("t.longlong", static_cast<long long>(1));
+    m.setValue("t.unsignedlonglong", static_cast<unsigned long long>(1));
+    m.setValue("t.float", float(1));
+    m.setValue("t.double", double(1));
+    m.setValue("t.longdouble", static_cast<long double>(1));
+    m.setValue("t.string", "1");
+
+    SECTION("t.bool") {
+        const bool success = m.hasKey("t.bool");
+        REQUIRE(success);
+    }
+    SECTION("t.char") {
+        const bool success = m.hasKey("t.char");
+        REQUIRE(success);
+    }
+    SECTION("t.unsignedchar") {
+        const bool success = m.hasKey("t.unsignedchar");
+        REQUIRE(success);
+    }
+    SECTION("t.signedchar") {
+        const bool success = m.hasKey("t.signedchar");
+        REQUIRE(success);
+    }
+    SECTION("t.wchar") {
+        const bool success = m.hasKey("t.wchar");
+        REQUIRE(success);
+    }
+    SECTION("t.short") {
+        const bool success = m.hasKey("t.short");
+        REQUIRE(success);
+    }
+    SECTION("t.unsignedshort") {
+        const bool success = m.hasKey("t.unsignedshort");
+        REQUIRE(success);
+    }
+    SECTION("t.int") {
+        const bool success = m.hasKey("t.int");
+        REQUIRE(success);
+    }
+    SECTION("t.unsignedint") {
+        const bool success = m.hasKey("t.unsignedint");
+        REQUIRE(success);
+    }
+    SECTION("t.long") {
+        const bool success = m.hasKey("t.long");
+        REQUIRE(success);
+    }
+    SECTION("t.unsignedlong") {
+        const bool success = m.hasKey("t.unsignedlong");
+        REQUIRE(success);
+    }
+    SECTION("t.longlong") {
+        const bool success = m.hasKey("t.longlong");
+        REQUIRE(success);
+    }
+    SECTION("t.unsignedlonglong") {
+        const bool success = m.hasKey("t.unsignedlonglong");
+        REQUIRE(success);
+    }
+    SECTION("t.float") {
+        const bool success = m.hasKey("t.float");
+        REQUIRE(success);
+    }
+    SECTION("t.double") {
+        const bool success = m.hasKey("t.double");
+        REQUIRE(success);
+    }
+    SECTION("t.longdouble") {
+        const bool success = m.hasKey("t.longdouble");
+        REQUIRE(success);
+    }
+    SECTION("t.string") {
+        const bool success = m.hasKey("t.string");
+        REQUIRE(success);
+    }
+}
+
+TEST_CASE("ConfigurationManager: GetValue Function", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    SECTION("empty") {
+        std::string test;
+        const bool success = m.getValue("key", test);
+        REQUIRE_FALSE(success);
+    }
+
+    SECTION("missing key") {
+        std::string test;
+        const bool success = m.getValue("key.key", test);
+        REQUIRE_FALSE(success);
+    }
+
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration1, m));
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration3, m));
+
+    SECTION("t") {
+        int testInt;
+        const bool success = m.getValue("t", testInt);
+        REQUIRE(success);
+        REQUIRE(testInt == 1);
+    }
+
+    SECTION("s.a") {
+        std::string test;
+        const bool success = m.getValue("s.a", test);
+        REQUIRE_FALSE(success);
+    }
+
+    SECTION("s.1") {
+        std::string test;
+        const bool success = m.getValue("s.1", test);
+        REQUIRE(success);
+    }
+
+    SECTION("s.1.a") {
+        std::string test;
+        const bool success = m.getValue("s.1.a", test);
+        REQUIRE_FALSE(success);
+    }
+
+    SECTION("s.3.a") {
+        std::string test;
+        const bool success = m.getValue("s.3.a", test);
+        REQUIRE(success);
+    }
+
+    SECTION("vector") {
+        std::vector<int> testVec;
+        const bool success = m.getValue("key", testVec);
+        REQUIRE_FALSE(success);
+    }
+}
+
+TEST_CASE("ConfigurationManager: GetValue Correctness", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration1, m));
+
+    SECTION("bool") {
+        bool value = false;
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value);
+    }
+
+    SECTION("char") {
+        char value(0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("signed char") {
+        signed char value(0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned char") {
+        unsigned char value(0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("wchar_t") {
+        wchar_t value(0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("short") {
+        short value(0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned short") {
+        unsigned short value(0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("int") {
+        int value(0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned int") {
+        unsigned int value(0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("long") {
+        long value(0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned long") {
+        unsigned long value(0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("long long") {
+        long long value(0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned long long") {
+        unsigned long long value(0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("float") {
+        float value(0.f);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1.f);
+    }
+
+    SECTION("double") {
+        double value(0.0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1.0);
+    }
+
+    SECTION("long double") {
+        long double value(0.0);
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == 1.0);
+    }
+
+    SECTION("string") {
+        std::string value;
+        const bool success = m.getValue("t", value);
+        REQUIRE(success);
+        REQUIRE(value == "1");
+    }
+}
+
+TEST_CASE("ConfigurationManager: SetValue Recursive", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    m.setValue("t.a.b.c", 1);
+    REQUIRE(m.hasKey("t"));
+    REQUIRE(m.hasKey("t.a"));
+    REQUIRE(m.hasKey("t.a.b"));
+    REQUIRE(m.hasKey("t.a.b.c"));
+}
+
+TEST_CASE("ConfigurationManager: SetValue Correctness", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    m.setValue("t.bool", bool(1));
+    m.setValue("t.char", char(1));
+    m.setValue("t.unsignedchar", static_cast<unsigned char>(1));
+    m.setValue("t.signedchar", static_cast<signed char>(1));
+    m.setValue("t.wchar", wchar_t(1));
+    m.setValue("t.short", short(1));
+    m.setValue("t.unsignedshort", static_cast<unsigned short>(1));
+    m.setValue("t.int", int(1));
+    m.setValue("t.unsignedint", static_cast<unsigned int>(1));
+    m.setValue("t.long", long(1));
+    m.setValue("t.unsignedlong", static_cast<unsigned long>(1));
+    m.setValue("t.longlong", static_cast<long long>(1));
+    m.setValue("t.unsignedlonglong", static_cast<unsigned long long>(1));
+    m.setValue("t.float", float(1));
+    m.setValue("t.double", double(1));
+    m.setValue("t.longdouble", static_cast<long double>(1));
+    m.setValue("t.string", "1");
+
+    SECTION("bool") {
+        bool value = false;
+        const bool success = m.getValue("t.bool", value);
+        REQUIRE(success);
+        REQUIRE(value);
+    }
+
+    SECTION("char") {
+        char value(0);
+        const bool success = m.getValue("t.char", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("signed char") {
+        signed char value(0);
+        const bool success = m.getValue("t.signedchar", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned char") {
+        unsigned char value(0);
+        const bool success = m.getValue("t.unsignedchar", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("wchar_t") {
+        wchar_t value(0);
+        const bool success = m.getValue("t.wchar", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("short") {
+        short value(0);
+        const bool success = m.getValue("t.short", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned short") {
+        unsigned short value(0);
+        const bool success = m.getValue("t.unsignedshort", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("int") {
+        int value(0);
+        const bool success = m.getValue("t.int", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned int") {
+        unsigned int value(0);
+        const bool success = m.getValue("t.unsignedint", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("long") {
+        long value(0);
+        const bool success = m.getValue("t.long", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned long") {
+        unsigned long value(0);
+        const bool success = m.getValue("t.unsignedlong", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("long long") {
+        long long value(0);
+        const bool success = m.getValue("t.longlong", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned long long") {
+        unsigned long long value(0);
+        const bool success = m.getValue("t.unsignedlonglong", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("float") {
+        float value(0.f);
+        const bool success = m.getValue("t.float", value);
+        REQUIRE(success);
+        REQUIRE(value == 1.f);
+    }
+
+    SECTION("double") {
+        double value(0.0);
+        const bool success = m.getValue("t.double", value);
+        REQUIRE(success);
+        REQUIRE(value == 1.0);
+    }
+
+    SECTION("long double") {
+        long double value(0.0);
+        const bool success = m.getValue("t.longdouble", value);
+        REQUIRE(success);
+        REQUIRE(value == 1.0);
+    }
+
+    SECTION("string") {
+        std::string value;
+        const bool success = m.getValue("t.string", value);
+        REQUIRE(success);
+        REQUIRE(value == "1");
+    }
+}
+
+TEST_CASE("ConfigurationManager: SetValue Overrides Configuration", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration1, m));
+
+    int v1 = 0;
+    const bool success1 = m.getValue<int>("t", v1);
+    REQUIRE(success1);
+    REQUIRE(v1 == 1);
+
+    m.setValue("t", int(2));
+    int v2 = 0;
+    const bool success2 = m.getValue<int>("t", v2);
+    REQUIRE(success2);
+    REQUIRE(v2 == 2);
+}
+
+TEST_CASE("ConfigurationManager: GetValue Conversions", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    // converting from 1 -> all types is done in GetValueCorrectness
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration2, m));
+
+    SECTION("bool") {
+        bool value = false;
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value);
+    }
+
+    SECTION("char") {
+        char value(0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("signed char") {
+        signed char value(0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned char") {
+        unsigned char value(0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("wchar_t") {
+        wchar_t value(0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("short") {
+        short value(0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned short") {
+        unsigned short value(0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("int") {
+        int value(0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned int") {
+        unsigned int value(0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("long") {
+        long value(0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned long") {
+        unsigned long value(0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("long long") {
+        long long value(0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("unsigned long long") {
+        unsigned long long value(0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1);
+    }
+
+    SECTION("float") {
+        float value(0.f);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1.f);
+    }
+
+    SECTION("double") {
+        double value(0.0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1.0);
+    }
+
+    SECTION("long double") {
+        long double value(0.0);
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == 1.0);
+    }
+
+    SECTION("string") {
+        std::string value;
+        const bool success = m.getValue("s.a1", value);
+        REQUIRE(success);
+        REQUIRE(value == "1");
+    }
+}
+
+TEST_CASE("ConfigurationManager: String Key vs Int Key", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration3, m));
+
+    int v1 = 0;
+    const bool success1 = m.getValue("tt[\"1\"]", v1);
+    REQUIRE(success1);
+    REQUIRE(v1 == 2);
+
+    int v2 = 0;
+    const bool success2 = m.getValue("tt[1]", v2);
+    REQUIRE(success2);
+    REQUIRE(v2 == 1);
+}
+
+TEST_CASE("ConfigurationManager: Invalid Key Access Invariant", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    // Accessing an invalid key should not change the tested argument
+    std::mt19937 rd;
+    {
+        std::uniform_int_distribution<int> dist;
+        for (int i = 0; i < 10; ++i) {
+            const int testValue = dist(rd);
+            int test = testValue;
+            m.getValue("key", test);
+            REQUIRE(testValue == test);
+        }
+    }
+
+    {
+        std::uniform_real_distribution<float> dist;
+        for (int i = 0; i < 10; ++i) {
+            const float testValue = dist(rd);
+            float test = testValue;
+            m.getValue("key", test);
+            REQUIRE(testValue == Approx(test));
+        }
+    }
+}
+
+TEST_CASE("ConfigurationManager: HasKey Function", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    SECTION("empty") {
+        const bool success = m.hasKey("key");
+        REQUIRE_FALSE(success);
+    }
+
+    SECTION("test1 (t)") {
+        REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration1, m));
+        const bool success = m.hasKey("t");
+        REQUIRE(success);
+    }
+
+    SECTION("test1 (s)") {
+        REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration1, m));
+        const bool success = m.hasKey("s");
+        REQUIRE_FALSE(success);
+    }
+
+    SECTION("test1+test2 (s.a") {
+        REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration1, m));
+        REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration2, m));
+        const bool success = m.hasKey("s.a");
+        REQUIRE(success);
+    }
+
+    SECTION("test1+test2 (s.a") {
+        REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration1, m));
+        REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration2, m));
+        const bool success = m.hasKey("s.c");
+        REQUIRE_FALSE(success);
+    }
+}
+
+TEST_CASE("ConfigurationManager: Multiple Key Load Overwrite", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration1, m));
+    int value1 = 0;
+    m.getValue("t", value1);
+    REQUIRE(value1 == 1);
+
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration2, m));
+
+    // configuration2 should overwrite the value t in configuration1
+    int value2 = 0;
+    m.getValue("t", value2);
+    REQUIRE(value2 == 2);
+}
+
+TEST_CASE("ConfigurationManager: Vector Classes Get", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration5, m));
+
+    SECTION("glm::vec2") {
+        glm::vec2 value = glm::vec2(0.f);
+        SECTION("n2") {
+            const bool success = m.getValue("n2", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec2(5.f, 6.f));
+        }
+        SECTION("num2") {
+            const bool success = m.getValue("num2", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec2(5.f, 6.f));
+        }
+        SECTION("xy") {
+            const bool success = m.getValue("xy", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec2(5.f, 6.f));
+        }
+        SECTION("rg") {
+            const bool success = m.getValue("rg", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec2(5.f, 6.f));
+        }
+        SECTION("st") {
+            const bool success = m.getValue("st", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec2(5.f, 6.f));
+        }
+    }
+
+    SECTION("glm::dvec2") {
+        glm::dvec2 value = glm::dvec2(0.0);
+        SECTION("n2") {
+            const bool success = m.getValue("n2", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec2(5.0, 6.0));
+        }
+        SECTION("num2") {
+            const bool success = m.getValue("num2", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec2(5.0, 6.0));
+        }
+        SECTION("xy") {
+            const bool success = m.getValue("xy", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec2(5.0, 6.0));
+        }
+        SECTION("rg") {
+            const bool success = m.getValue("rg", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec2(5.0, 6.0));
+        }
+        SECTION("st") {
+            const bool success = m.getValue("st", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec2(5.0, 6.0));
+        }
+    }
+
+    SECTION("glm::ivec2") {
+        glm::ivec2 value = glm::ivec2(0);
+        SECTION("n2") {
+            const bool success = m.getValue("n2", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec2(5, 6));
+        }
+        SECTION("num2") {
+            const bool success = m.getValue("num2", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec2(5, 6));
+        }
+        SECTION("xy") {
+            const bool success = m.getValue("xy", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec2(5, 6));
+        }
+        SECTION("rg") {
+            const bool success = m.getValue("rg", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec2(5, 6));
+        }
+        SECTION("st") {
+            const bool success = m.getValue("st", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec2(5, 6));
+        }
+    }
+
+    SECTION("glm::uvec2") {
+        glm::uvec2 value = glm::uvec2(0);
+        SECTION("n2") {
+            const bool success = m.getValue("n2", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec2(5, 6));
+        }
+        SECTION("num2") {
+            const bool success = m.getValue("num2", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec2(5, 6));
+        }
+        SECTION("xy") {
+            const bool success = m.getValue("xy", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec2(5, 6));
+        }
+        SECTION("rg") {
+            const bool success = m.getValue("rg", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec2(5, 6));
+        }
+        SECTION("st") {
+            const bool success = m.getValue("st", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec2(5, 6));
+        }
+    }
+
+    SECTION("glm::bvec2") {
+        glm::bvec2 value = glm::bvec2(false);
+        SECTION("n2") {
+            const bool success = m.getValue("n2", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+        }
+        SECTION("num2") {
+            const bool success = m.getValue("num2", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+        }
+        SECTION("xy") {
+            const bool success = m.getValue("xy", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+        }
+        SECTION("rg") {
+            const bool success = m.getValue("rg", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+        }
+        SECTION("st") {
+            const bool success = m.getValue("st", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+        }
+    }
+
+    SECTION("glm::vec3") {
+        glm::vec3 value = glm::vec3(0.f);
+        SECTION("n3") {
+            const bool success = m.getValue("n3", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec3(5.f, 6.f, 7.f));
+        }
+        SECTION("num3") {
+            const bool success = m.getValue("num3", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec3(5.f, 6.f, 7.f));
+        }
+        SECTION("xyz") {
+            const bool success = m.getValue("xyz", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec3(5.f, 6.f, 7.f));
+        }
+        SECTION("rgb") {
+            const bool success = m.getValue("rgb", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec3(5.f, 6.f, 7.f));
+        }
+        SECTION("stp") {
+            const bool success = m.getValue("stp", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec3(5.f, 6.f, 7.f));
+        }
+    }
+
+    SECTION("glm::dvec3") {
+        glm::dvec3 value = glm::dvec3(0.0);
+        SECTION("n3") {
+            const bool success = m.getValue("n3", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec3(5.0, 6.0, 7.0));
+        }
+        SECTION("num3") {
+            const bool success = m.getValue("num3", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec3(5.0, 6.0, 7.0));
+        }
+        SECTION("xyz") {
+            const bool success = m.getValue("xyz", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec3(5.0, 6.0, 7.0));
+        }
+        SECTION("rgb") {
+            const bool success = m.getValue("rgb", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec3(5.0, 6.0, 7.0));
+        }
+        SECTION("stp") {
+            const bool success = m.getValue("stp", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec3(5.0, 6.0, 7.0));
+        }
+    }
+
+    SECTION("glm::ivec3") {
+        glm::ivec3 value = glm::ivec3(0);
+        SECTION("n3") {
+            const bool success = m.getValue("n3", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec3(5, 6, 7));
+        }
+        SECTION("num3") {
+            const bool success = m.getValue("num3", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec3(5, 6, 7));
+        }
+        SECTION("xyz") {
+            const bool success = m.getValue("xyz", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec3(5, 6, 7));
+        }
+        SECTION("rgb") {
+            const bool success = m.getValue("rgb", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec3(5, 6, 7));
+        }
+        SECTION("stp") {
+            const bool success = m.getValue("stp", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec3(5, 6, 7));
+        }
+    }
+
+    SECTION("glm::uvec3") {
+        glm::uvec3 value = glm::uvec3(0);
+        SECTION("n3") {
+            const bool success = m.getValue("n3", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec3(5, 6, 7));
+        }
+        SECTION("num3") {
+            const bool success = m.getValue("num3", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec3(5, 6, 7));
+        }
+        SECTION("xyz") {
+            const bool success = m.getValue("xyz", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec3(5, 6, 7));
+        }
+        SECTION("rgb") {
+            const bool success = m.getValue("rgb", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec3(5, 6, 7));
+        }
+        SECTION("stp") {
+            const bool success = m.getValue("stp", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec3(5, 6, 7));
+        }
+    }
+
+    SECTION("glm::bvec3") {
+        glm::bvec3 value = glm::bvec3(false);
+        SECTION("n3") {
+            const bool success = m.getValue("n3", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+            REQUIRE(value.z);
+        }
+        SECTION("num3") {
+            const bool success = m.getValue("num3", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+            REQUIRE(value.z);
+        }
+        SECTION("xyz") {
+            const bool success = m.getValue("xyz", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+            REQUIRE(value.z);
+        }
+        SECTION("rgb") {
+            const bool success = m.getValue("rgb", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+            REQUIRE(value.z);
+        }
+        SECTION("stp") {
+            const bool success = m.getValue("stp", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+            REQUIRE(value.z);
+        }
+    }
+
+    SECTION("glm::vec4") {
+        glm::vec4 value = glm::vec4(0.f);
+        SECTION("n4") {
+            const bool success = m.getValue("n4", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec4(5.f, 6.f, 7.f, 8.f));
+        }
+        SECTION("num4") {
+            const bool success = m.getValue("num4", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec4(5.f, 6.f, 7.f, 8.f));
+        }
+        SECTION("xyzw") {
+            const bool success = m.getValue("xyzw", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec4(5.f, 6.f, 7.f, 8.f));
+        }
+        SECTION("rgba") {
+            const bool success = m.getValue("rgba", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec4(5.f, 6.f, 7.f, 8.f));
+        }
+        SECTION("stpq") {
+            const bool success = m.getValue("stpq", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::vec4(5.f, 6.f, 7.f, 8.f));
+        }
+    }
+
+    SECTION("glm::dvec4") {
+        glm::dvec4 value = glm::dvec4(0.0);
+        SECTION("n4") {
+            const bool success = m.getValue("n4", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec4(5.0, 6.0, 7.0, 8.0));
+        }
+        SECTION("num4") {
+            const bool success = m.getValue("num4", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec4(5.0, 6.0, 7.0, 8.0));
+        }
+        SECTION("xyzw") {
+            const bool success = m.getValue("xyzw", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec4(5.0, 6.0, 7.0, 8.0));
+        }
+        SECTION("rgba") {
+            const bool success = m.getValue("rgba", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec4(5.0, 6.0, 7.0, 8.0));
+        }
+        SECTION("stpq") {
+            const bool success = m.getValue("stpq", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::dvec4(5.0, 6.0, 7.0, 8.0));
+        }
+    }
+
+    SECTION("glm::ivec4") {
+        glm::ivec4 value = glm::ivec4(0);
+        SECTION("n4") {
+            const bool success = m.getValue("n4", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec4(5, 6, 7, 8));
+        }
+        SECTION("num4") {
+            const bool success = m.getValue("num4", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec4(5, 6, 7, 8));
+        }
+        SECTION("xyzw") {
+            const bool success = m.getValue("xyzw", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec4(5, 6, 7, 8));
+        }
+        SECTION("rgba") {
+            const bool success = m.getValue("rgba", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec4(5, 6, 7, 8));
+        }
+        SECTION("stpq") {
+            const bool success = m.getValue("stpq", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::ivec4(5, 6, 7, 8));
+        }
+    }
+
+    SECTION("glm::uvec4") {
+        glm::uvec4 value = glm::uvec4(0);
+        SECTION("n4") {
+            const bool success = m.getValue("n4", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec4(5, 6, 7, 8));
+        }
+        SECTION("num4") {
+            const bool success = m.getValue("num4", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec4(5, 6, 7, 8));
+        }
+        SECTION("xyzw") {
+            const bool success = m.getValue("xyzw", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec4(5, 6, 7, 8));
+        }
+        SECTION("rgba") {
+            const bool success = m.getValue("rgba", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec4(5, 6, 7, 8));
+        }
+        SECTION("stpq") {
+            const bool success = m.getValue("stpq", value);
+            REQUIRE(success);
+            REQUIRE(value == glm::uvec4(5, 6, 7, 8));
+        }
+    }
+
+    SECTION("glm::bvec4") {
+        glm::bvec4 value = glm::bvec4(false);
+        SECTION("n4") {
+            const bool success = m.getValue("n4", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+            REQUIRE(value.z);
+            REQUIRE(value.w);
+        }
+        SECTION("num4") {
+            const bool success = m.getValue("num4", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+            REQUIRE(value.z);
+            REQUIRE(value.w);
+        }
+        SECTION("xyzw") {
+            const bool success = m.getValue("xyzw", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+            REQUIRE(value.z);
+            REQUIRE(value.w);
+        }
+        SECTION("rgba") {
+            const bool success = m.getValue("rgba", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+            REQUIRE(value.z);
+            REQUIRE(value.w);
+        }
+        SECTION("stpq") {
+            const bool success = m.getValue("stpq", value);
+            REQUIRE(success);
+            REQUIRE(value.x);
+            REQUIRE(value.y);
+            REQUIRE(value.z);
+            REQUIRE(value.w);
+        }
+    }
+
+    SECTION("mixed") {
+        glm::vec3 value = glm::vec3(0.f);
+        const bool success = m.getValue("mix", value);
+        REQUIRE_FALSE(success);
+        REQUIRE(value == glm::vec3(0.f));
+    }
+}
+
+TEST_CASE("ConfigurationManager: Vector Classes Set", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    m.setValue("t.vec2", glm::vec2(5, 6));
+    m.setValue("t.vec3", glm::vec3(5, 6, 7));
+    m.setValue("t.vec4", glm::vec4(5, 6, 7, 8));
+    m.setValue("t.dvec2", glm::dvec2(5, 6));
+    m.setValue("t.dvec3", glm::dvec3(5, 6, 7));
+    m.setValue("t.dvec4", glm::dvec4(5, 6, 7, 8));
+    m.setValue("t.ivec2", glm::ivec2(5, 6));
+    m.setValue("t.ivec3", glm::ivec3(5, 6, 7));
+    m.setValue("t.ivec4", glm::ivec4(5, 6, 7, 8));
+    m.setValue("t.uvec2", glm::uvec2(5, 6));
+    m.setValue("t.uvec3", glm::uvec3(5, 6, 7));
+    m.setValue("t.uvec4", glm::uvec4(5, 6, 7, 8));
+    m.setValue("t.bvec2", glm::bvec2(true));
+    m.setValue("t.bvec3", glm::bvec3(true));
+    m.setValue("t.bvec4", glm::bvec4(true));
+
+
+    SECTION("glm::vec2") {
+        glm::vec2 value = glm::vec2(0.f);
+        const bool success = m.getValue("t.vec2", value);
+        REQUIRE(success);
+        REQUIRE(value == glm::vec2(5.f, 6.f));
+    }
+
+    SECTION("glm::dvec2") {
+        glm::dvec2 value = glm::dvec2(0.0);
+        const bool success = m.getValue("t.dvec2", value);
+        REQUIRE(success);
+        REQUIRE(value == glm::dvec2(5.0, 6.0));
+    }
+
+    SECTION("glm::ivec2") {
+        glm::ivec2 value = glm::ivec2(0);
+        const bool success = m.getValue("t.ivec2", value);
+        REQUIRE(success);
+        REQUIRE(value == glm::ivec2(5, 6));
+    }
+
+    SECTION("glm::uvec2") {
+        glm::uvec2 value = glm::uvec2(0);
+        const bool success = m.getValue("t.uvec2", value);
+        REQUIRE(success);
+        REQUIRE(value == glm::uvec2(5, 6));
+    }
+
+    SECTION("glm::bvec2") {
+        glm::bvec2 value = glm::bvec2(false);
+        const bool success = m.getValue("t.bvec2", value);
+        REQUIRE(success);
+        REQUIRE(value.x);
+        REQUIRE(value.y);
+    }
+
+    SECTION("glm::vec3") {
+        glm::vec3 value = glm::vec3(0.f);
+        const bool success = m.getValue("t.vec3", value);
+        REQUIRE(success);
+        REQUIRE(value == glm::vec3(5.f, 6.f, 7.f));
+    }
+
+    SECTION("glm::dvec3") {
+        glm::dvec3 value = glm::dvec3(0.0);
+        const bool success = m.getValue("t.dvec3", value);
+        REQUIRE(success);
+        REQUIRE(value == glm::dvec3(5.0, 6.0, 7.0));
+    }
+
+    SECTION("glm::ivec3") {
+        glm::ivec3 value = glm::ivec3(0);
+        const bool success = m.getValue("t.ivec3", value);
+        REQUIRE(success);
+        REQUIRE(value == glm::ivec3(5, 6, 7));
+    }
+
+    SECTION("glm::uvec3") {
+        glm::uvec3 value = glm::uvec3(0);
+        const bool success = m.getValue("t.uvec3", value);
+        REQUIRE(success);
+        REQUIRE(value == glm::uvec3(5, 6, 7));
+    }
+
+    SECTION("glm::bvec3") {
+        glm::bvec3 value = glm::bvec3(false);
+        const bool success = m.getValue("t.bvec3", value);
+        REQUIRE(success);
+        REQUIRE(value.x);
+        REQUIRE(value.y);
+        REQUIRE(value.z);
+    }
+
+    SECTION("glm::vec4") {
+        glm::vec4 value = glm::vec4(0.f);
+        const bool success = m.getValue("t.vec4", value);
+        REQUIRE(success);
+        REQUIRE(value == glm::vec4(5.f, 6.f, 7.f, 8.f));
+    }
+
+    SECTION("glm::dvec4") {
+        glm::dvec4 value = glm::dvec4(0.0);
+        const bool success = m.getValue("t.dvec4", value);
+        REQUIRE(success);
+        REQUIRE(value == glm::dvec4(5.0, 6.0, 7.0, 8.0));
+    }
+
+    SECTION("glm::ivec4") {
+        glm::ivec4 value = glm::ivec4(0);
+        const bool success = m.getValue("t.ivec4", value);
+        REQUIRE(success);
+        REQUIRE(value == glm::ivec4(5, 6, 7, 8));
+    }
+
+    SECTION("glm::uvec4") {
+        glm::uvec4 value = glm::uvec4(0);
+        const bool success = m.getValue("t.uvec4", value);
+        REQUIRE(success);
+        REQUIRE(value == glm::uvec4(5, 6, 7, 8));
+    }
+
+    SECTION("glm::bvec4") {
+        glm::bvec4 value = glm::bvec4(false);
+        const bool success = m.getValue("t.bvec4", value);
+        REQUIRE(success);
+        REQUIRE(value.x);
+        REQUIRE(value.y);
+        REQUIRE(value.z);
+        REQUIRE(value.w);
+    }
+}
+
+TEST_CASE("ConfigurationManager: Matrix Classes Get", "[configurationmanager]") {
+    ghoul::Dictionary m;
+    REQUIRE_NOTHROW(ghoul::lua::loadDictionaryFromFile(_configuration5, m));
+
+    SECTION("glm::mat2x2") {
+        glm::mat2x2 value = glm::mat2x2(0.f);
+        const bool success = m.getValue("m2x2", value);
+        REQUIRE(success);
+
+        const glm::mat2x2 res = glm::mat2x2(5.f, 6.f, 9.f, 10.f);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat2x3") {
+        glm::mat2x3 value = glm::mat2x3(0.f);
+        const bool success = m.getValue("m2x3", value);
+        REQUIRE(success);
+
+        const glm::mat2x3 res = glm::mat2x3(5.f, 6.f, 9.f, 10.f, 13.f, 14.f);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat2x4") {
+        glm::mat2x4 value = glm::mat2x4(0.f);
+        const bool success = m.getValue("m2x4", value);
+        REQUIRE(success);
+
+        const glm::mat2x4 res = glm::mat2x4(5.f, 6.f, 9.f, 10.f, 13.f, 14.f, 17.f, 18.f);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat3x2") {
+        glm::mat3x2 value = glm::mat3x2(0.f);
+        const bool success = m.getValue("m3x2", value);
+        REQUIRE(success);
+
+        const glm::mat3x2 res = glm::mat3x2(5.f, 6.f, 7.f, 9.f, 10.f, 11.f);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat3x3") {
+        glm::mat3x3 value = glm::mat3x3(0.f);
+        const bool success = m.getValue("m3x3", value);
+        REQUIRE(success);
+
+        const glm::mat3x3 res = glm::mat3x3(
+            5.f, 6.f, 7.f, 9.f, 10.f, 11.f, 13.f, 14.f, 15.f
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat3x4") {
+        glm::mat3x4 value = glm::mat3x4(0.f);
+        const bool success = m.getValue("m3x4", value);
+        REQUIRE(success);
+
+        const glm::mat3x4 res = glm::mat3x4(
+            5.f, 6.f, 7.f, 9.f, 10.f, 11.f, 13.f, 14.f, 15.f, 17.f, 18.f, 19.f
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat4x2") {
+        glm::mat4x2 value = glm::mat4x2(0.f);
+        const bool success = m.getValue("m4x2", value);
+        REQUIRE(success);
+
+        const glm::mat4x2 res = glm::mat4x2(
+            5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat4x3") {
+        glm::mat4x3 value = glm::mat4x3(0.f);
+        const bool success = m.getValue("m4x3", value);
+        REQUIRE(success);
+
+        const glm::mat4x3 res = glm::mat4x3(
+            5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f, 13.f, 14.f, 15.f, 16.f
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat4x4") {
+        glm::mat4x4 value = glm::mat4x4(0.f);
+        const bool success = m.getValue("m4x4", value);
+        REQUIRE(success);
+
+        const glm::mat4x4 res = glm::mat4x4(
+            5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f, 13.f,
+            14.f, 15.f, 16.f, 17.f, 18.f, 19.f, 20.f
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat2x2") {
+        glm::dmat2x2 value = glm::dmat2x2(0.0);
+        const bool success = m.getValue("m2x2", value);
+        REQUIRE(success);
+
+        const glm::dmat2x2 res = glm::dmat2x2(5.0, 6.0, 9.0, 10.0);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat2x3") {
+        glm::dmat2x3 value = glm::dmat2x3(0.0);
+        const bool success = m.getValue("m2x3", value);
+        REQUIRE(success);
+
+        const glm::dmat2x3 res = glm::dmat2x3(5.0, 6.0, 9.0, 10.0, 13.0, 14.0);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat2x4") {
+        glm::dmat2x4 value = glm::dmat2x4(0.0);
+        const bool success = m.getValue("m2x4", value);
+        REQUIRE(success);
+
+        const glm::dmat2x4 res = glm::dmat2x4(
+            5.0, 6.0, 9.0, 10.0, 13.0, 14.0, 17.0, 18.0
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat3x2") {
+        glm::dmat3x2 value = glm::dmat3x2(0.0);
+        const bool success = m.getValue("m3x2", value);
+        REQUIRE(success);
+
+        const glm::dmat3x2 res = glm::dmat3x2(5.0, 6.0, 7.0, 9.0, 10.0, 11.0);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat3x3") {
+        glm::dmat3x3 value = glm::dmat3x3(0.0);
+        const bool success = m.getValue("m3x3", value);
+        REQUIRE(success);
+
+        const glm::dmat3x3 res = glm::dmat3x3(
+            5.0, 6.0, 7.0, 9.0, 10.0, 11.0, 13.0, 14.0, 15.0
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat3x4") {
+        glm::dmat3x4 value = glm::dmat3x4(0.0);
+        const bool success = m.getValue("m3x4", value);
+        REQUIRE(success);
+
+        const glm::dmat3x4 res = glm::dmat3x4(
+            5.0, 6.0, 7.0, 9.0, 10.0, 11.0, 13.0, 14.0, 15.0, 17.0, 18.0, 19.0
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat4x2") {
+        glm::dmat4x2 value = glm::dmat4x2(0.0);
+        const bool success = m.getValue("m4x2", value);
+        REQUIRE(success);
+
+        const glm::dmat4x2 res = glm::dmat4x2(
+            5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat4x3") {
+        glm::dmat4x3 value = glm::dmat4x3(0.0);
+        const bool success = m.getValue("m4x3", value);
+        REQUIRE(success);
+
+        const glm::dmat4x3 res = glm::dmat4x3(
+            5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat4x4") {
+        glm::dmat4x4 value = glm::dmat4x4(0.0);
+        const bool success = m.getValue("m4x4", value);
+        REQUIRE(success);
+
+        const glm::dmat4x4 res = glm::dmat4x4(
+            5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0,
+            14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0
+        );
+        REQUIRE(value == res);
+    }
+
+}
+
+TEST_CASE("ConfigurationManager: MatrixClass SetValue", "[configurationmanager]") {
+    ghoul::Dictionary m;
+
+    m.setValue(
+        "f.m2x2",
+        glm::mat2x2(5.f, 6.f, 9.f, 10.f)
+    );
+    m.setValue(
+        "f.m2x3",
+        glm::mat2x3(5.f, 6.f, 7.f, 9.f, 10.f, 11.f)
+    );
+    m.setValue(
+        "f.m2x4",
+        glm::mat2x4(5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f)
+    );
+    m.setValue(
+        "f.m3x2",
+        glm::mat3x2(5.f, 6.f, 9.f, 10.f, 13.f, 14.f)
+    );
+    m.setValue(
+        "f.m3x3",
+        glm::mat3x3(5.f, 6.f, 7.f, 9.f, 10.f, 11.f, 13.f, 14.f, 15.f)
+    );
+    m.setValue(
+        "f.m3x4",
+        glm::mat3x4(5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f, 13.f, 14.f, 15.f, 16.f)
+    );
+    m.setValue(
+        "f.m4x2",
+        glm::mat4x2(5.f, 6.f, 9.f, 10.f, 13.f, 14.f, 17.f, 18.f)
+    );
+    m.setValue(
+        "f.m4x3",
+        glm::mat4x3(5.f, 6.f, 7.f, 9.f, 10.f, 11.f, 13.f, 14.f, 15.f, 17.f, 18.f, 19.f)
+    );
+    m.setValue(
+        "f.m4x4",
+        glm::mat4x4(
+            5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f,
+            13.f, 14.f, 15.f, 16.f, 17.f, 18.f, 19.f, 20.f
+        )
+    );
+
+    SECTION("glm::mat2x2") {
+        glm::mat2x2 value = glm::mat2x2(0.f);
+        const bool success = m.getValue("m2x2", value);
+        REQUIRE(success);
+
+        const glm::mat2x2 res = glm::mat2x2(5.f, 6.f, 9.f, 10.f);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat2x3") {
+        glm::mat2x3 value = glm::mat2x3(0.f);
+        const bool success = m.getValue("m2x3", value);
+        REQUIRE(success);
+
+        const glm::mat2x3 res = glm::mat2x3(5.f, 6.f, 9.f, 10.f, 13.f, 14.f);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat2x4") {
+        glm::mat2x4 value = glm::mat2x4(0.f);
+        const bool success = m.getValue("m2x4", value);
+        REQUIRE(success);
+
+        const glm::mat2x4 res = glm::mat2x4(5.f, 6.f, 9.f, 10.f, 13.f, 14.f, 17.f, 18.f);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat3x2") {
+        glm::mat3x2 value = glm::mat3x2(0.f);
+        const bool success = m.getValue("m3x2", value);
+        REQUIRE(success);
+
+        const glm::mat3x2 res = glm::mat3x2(5.f, 6.f, 7.f, 9.f, 10.f, 11.f);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat3x3") {
+        glm::mat3x3 value = glm::mat3x3(0.f);
+        const bool success = m.getValue("m3x3", value);
+        REQUIRE(success);
+
+        const glm::mat3x3 res = glm::mat3x3(
+            5.f, 6.f, 7.f, 9.f, 10.f, 11.f, 13.f, 14.f, 15.f
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat3x4") {
+        glm::mat3x4 value = glm::mat3x4(0.f);
+        const bool success = m.getValue("m3x4", value);
+        REQUIRE(success);
+
+        const glm::mat3x4 res = glm::mat3x4(
+            5.f, 6.f, 7.f, 9.f, 10.f, 11.f, 13.f, 14.f, 15.f, 17.f, 18.f, 19.f
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat4x2") {
+        glm::mat4x2 value = glm::mat4x2(0.f);
+        const bool success = m.getValue("m4x2", value);
+        REQUIRE(success);
+
+        const glm::mat4x2 res = glm::mat4x2(
+            5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat4x3") {
+        glm::mat4x3 value = glm::mat4x3(0.f);
+        const bool success = m.getValue("m4x3", value);
+        REQUIRE(success);
+
+        const glm::mat4x3 res = glm::mat4x3(
+            5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f, 13.f, 14.f, 15.f, 16.f
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::mat4x4") {
+        glm::mat4x4 value = glm::mat4x4(0.f);
+        const bool success = m.getValue("m4x4", value);
+        REQUIRE(success);
+
+        const glm::mat4x4 res = glm::mat4x4(
+            5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f, 13.f,
+            14.f, 15.f, 16.f, 17.f, 18.f, 19.f, 20.f
+        );
+        REQUIRE(value == res);
+    }
+
+
+    m.setValue(
+        "d.m2x2",
+        glm::dmat2x2(5.0, 6.0, 9.0, 10.0)
+    );
+    m.setValue(
+        "d.m2x3",
+        glm::dmat2x3(5.0, 6.0, 7.0, 9.0, 10.0, 11.0)
+    );
+    m.setValue(
+        "d.m2x4",
+        glm::dmat2x4(5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0)
+    );
+    m.setValue(
+        "d.m3x2",
+        glm::dmat3x2(5.0, 6.0, 9.0, 10.0, 13.0, 14.0)
+    );
+    m.setValue(
+        "d.m3x3",
+        glm::dmat3x3(5.0, 6.0, 7.0, 9.0, 10.0, 11.0, 13.0, 14.0, 15.0)
+    );
+    m.setValue(
+        "d.m3x4",
+        glm::dmat3x4(5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0)
+    );
+    m.setValue(
+        "d.m4x2", glm::dmat4x2(5.0, 6.0, 9.0, 10.0, 13.0, 14.0, 17.0, 18.0));
+    m.setValue(
+        "d.m4x3",
+        glm::dmat4x3(5.0, 6.0, 7.0, 9.0, 10.0, 11.0, 13.0, 14.0, 15.0, 17.0, 18.0, 19.0)
+    );
+    m.setValue(
+        "d.m4x4",
+        glm::dmat4x4(
+            5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0,
+            13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0
+        )
+    );
+
+    SECTION("glm::dmat2x2") {
+        glm::dmat2x2 value = glm::dmat2x2(0.0);
+        const bool success = m.getValue("d.m2x2", value);
+        REQUIRE(success);
+
+        const glm::dmat2x2 res = glm::dmat2x2(5.0, 6.0, 9.0, 10.0);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat2x3") {
+        glm::dmat2x3 value = glm::dmat2x3(0.0);
+        const bool success = m.getValue("d.m2x3", value);
+        REQUIRE(success);
+
+        const glm::dmat2x3 res = glm::dmat2x3(5.0, 6.0, 9.0, 10.0, 13.0, 14.0);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat2x4") {
+        glm::dmat2x4 value = glm::dmat2x4(0.0);
+        const bool success = m.getValue("d.m2x4", value);
+        REQUIRE(success);
+
+        const glm::dmat2x4 res = glm::dmat2x4(
+            5.0, 6.0, 9.0, 10.0, 13.0, 14.0, 17.0, 18.0
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat3x2") {
+        glm::dmat3x2 value = glm::dmat3x2(0.0);
+        const bool success = m.getValue("d.m3x2", value);
+        REQUIRE(success);
+
+        const glm::dmat3x2 res = glm::dmat3x2(5.0, 6.0, 7.0, 9.0, 10.0, 11.0);
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat3x3") {
+        glm::dmat3x3 value = glm::dmat3x3(0.0);
+        const bool success = m.getValue("d.m3x3", value);
+        REQUIRE(success);
+
+        const glm::dmat3x3 res = glm::dmat3x3(
+            5.0, 6.0, 7.0, 9.0, 10.0, 11.0, 13.0, 14.0, 15.0
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat3x4") {
+        glm::dmat3x4 value = glm::dmat3x4(0.0);
+        const bool success = m.getValue("d.m3x4", value);
+        REQUIRE(success);
+
+        const glm::dmat3x4 res = glm::dmat3x4(
+            5.0, 6.0, 7.0, 9.0, 10.0, 11.0, 13.0, 14.0, 15.0, 17.0, 18.0, 19.0
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat4x2") {
+        glm::dmat4x2 value = glm::dmat4x2(0.0);
+        const bool success = m.getValue("d.m4x2", value);
+        REQUIRE(success);
+
+        const glm::dmat4x2 res = glm::dmat4x2(
+            5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat4x3") {
+        glm::dmat4x3 value = glm::dmat4x3(0.0);
+        const bool success = m.getValue("d.m4x3", value);
+        REQUIRE(success);
+
+        const glm::dmat4x3 res = glm::dmat4x3(
+            5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0
+        );
+        REQUIRE(value == res);
+    }
+
+    SECTION("glm::dmat4x4") {
+        glm::dmat4x4 value = glm::dmat4x4(0.0);
+        const bool success = m.getValue("d.m4x4", value);
+        REQUIRE(success);
+
+        const glm::dmat4x4 res = glm::dmat4x4(
+            5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0,
+            14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0
+        );
+        REQUIRE(value == res);
+    }
 }

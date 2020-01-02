@@ -32,6 +32,8 @@
 
 #ifdef WIN32
 #include <windows.h>
+#else
+#include <unistd.h>
 #endif
 
 TEST_CASE("FileSystem: Has Test Directory", "[filesystem]") {
