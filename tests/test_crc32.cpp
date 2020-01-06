@@ -213,10 +213,13 @@ TEST_CASE("HashFixedEquality", "[crc32]") {
     for (const Data& d : TestStrings) {
         unsigned int stringHash = ghoul::hashCRC32(std::string(d.string));
         unsigned int charHash = ghoul::hashCRC32(d.string);
-        unsigned int bufferHash = ghoul::hashCRC32(d.string, strlen(d.string));
+        unsigned int bufferHash = ghoul::hashCRC32(
+            d.string,
+            static_cast<unsigned int>(strlen(d.string))
+        );
+        REQUIRE(stringHash == d.hash);
         REQUIRE(stringHash == charHash);
         REQUIRE(stringHash == bufferHash);
-        REQUIRE(stringHash == d.hash);
     }
 }
 

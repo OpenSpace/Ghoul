@@ -230,12 +230,7 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
             }
         }
     }
-    throw ConversionError(fmt::format(
-        "Error converting key '{}' from type '{}' to type '{}'",
-        key,
-        find(key)->second.type().name(),
-        typeid(T).name()
-    ));
+    throw ConversionError(fmt::format("Error converting key '{}'", key));
 }
 #ifdef _MSC_VER
 #pragma warning(pop)
