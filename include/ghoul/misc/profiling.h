@@ -31,6 +31,16 @@
 
 #include <Tracy.hpp>
 #include <TracyOpenGL.hpp>
+
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable: 4100)
+#endif // WIN32
+
 #include <TracyLua.hpp>
+
+#ifdef WIN32
+#pragma warning(pop)
+#endif // WIN32
 
 #endif // __GHOUL___PROFILING___H__

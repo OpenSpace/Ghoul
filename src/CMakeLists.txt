@@ -204,6 +204,7 @@ set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/objectmanager.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/objectmanager.inl
+  ${PROJECT_SOURCE_DIR}/include/ghoul/misc/profiling.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/sharedmemory.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/stacktrace.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/stringconversion.h
