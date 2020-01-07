@@ -197,7 +197,7 @@ using has_storage_converter = static_not<
  * exception to this is the #setValue method, which has an additional parameter that
  * controls if each individual level of the Dictionary is created on-the-fly or not.
  */
-class Dictionary : private std::map<std::string, ghoul::any> {
+class Dictionary : public std::map<std::string, ghoul::any> {
 public:
     BooleanType(CreateIntermediate);
 
