@@ -128,12 +128,6 @@ if (GHOUL_MODULE_OPENGL)
   )
 endif ()
 
-if (GHOUL_MODULE_PROFILING)
-  set(GHOUL_SOURCE ${GHOUL_SOURCE} 
-    ${PROJECT_SOURCE_DIR}/src/misc/profiling.cpp
-  )
-endif ()
-
 if (GHOUL_MODULE_SYSTEMCAPABILITIES)
   set(GHOUL_SOURCE ${GHOUL_SOURCE}
     ${PROJECT_SOURCE_DIR}/src/systemcapabilities/generalcapabilitiescomponent.cpp
