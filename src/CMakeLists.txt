@@ -282,11 +282,9 @@ if (GHOUL_MODULE_OPENGL)
   )
 endif ()
 
-if (GHOUL_MODULE_PROFILING)
-  set(GHOUL_HEADER ${GHOUL_HEADER} 
-    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/profiling.h
-  )
-endif ()
+set(GHOUL_HEADER ${GHOUL_HEADER}
+  ${PROJECT_SOURCE_DIR}/include/ghoul/misc/profiling.h
+)
 
 if (GHOUL_MODULE_SYSTEMCAPABILITIES)
   set(GHOUL_HEADER ${GHOUL_HEADER}
