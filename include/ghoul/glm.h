@@ -58,6 +58,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/ext/matrix_common.hpp>
 #include <glm/gtx/component_wise.hpp>
 
 #include <string>
@@ -65,16 +66,13 @@
 namespace glm {
 
 template <typename genType>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR genType tau()
-{
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR genType tau() {
     return genType(6.28318530717958647692528676655900576);
 }
 
 } // namespace glm
 
-
 namespace ghoul {
-
 
 template <typename T>
 struct glm_components : public std::integral_constant<glm::length_t, 0> {};
