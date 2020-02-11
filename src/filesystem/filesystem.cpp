@@ -429,7 +429,7 @@ void FileSystem::createDirectory(const Directory& path, Recursive recursive) con
         while (!FileSys.directoryExists(dir)) {
             //LERROR("Adding path to v: " << d.path());
             directories.push_back(dir);
-            dir = dir.parentDirectory();
+            dir = absPath(dir.parentDirectory());
         }
 
         std::for_each(
