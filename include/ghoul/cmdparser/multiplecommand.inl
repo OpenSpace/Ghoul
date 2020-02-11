@@ -51,7 +51,9 @@ void MultipleCommand<T>::checkParameters(
 {
     CommandlineCommand::checkParameters(parameters);
 
-    is<T>(parameters[0]);
+    if (!is<T>(parameters[0])) {
+        throw CommandParameterException("Parameter conversion failed");
+    }
 }
 
 template<class T, class U>
@@ -82,8 +84,9 @@ void MultipleCommand<T, U>::checkParameters(
 {
     CommandlineCommand::checkParameters(parameters);
 
-    is<T>(parameters[0]);
-    is<U>(parameters[1]);
+    if (!is<T>(parameters[0]) || !is<U>(parameters[1])) {
+        throw CommandParameterException("Parameter conversion failed");
+    }
 }
 
 template<class T, class U, class V>
@@ -117,9 +120,9 @@ void MultipleCommand<T, U, V>::checkParameters(
 {
     CommandlineCommand::checkParameters(parameters);
 
-    is<T>(parameters[0]);
-    is<U>(parameters[1]);
-    is<V>(parameters[2]);
+    if (!is<T>(parameters[0]) || !is<U>(parameters[1]) || !is<V>(parameters[2])) {
+        throw CommandParameterException("Parameter conversion failed");
+    }
 }
 
 template<class T, class U, class V, class W>
@@ -155,10 +158,11 @@ void MultipleCommand<T,U,V,W>::checkParameters(
 {
     CommandlineCommand::checkParameters(parameters);
 
-    is<T>(parameters[0]);
-    is<U>(parameters[1]);
-    is<V>(parameters[2]);
-    is<W>(parameters[3]);
+    if (!is<T>(parameters[0]) || !is<U>(parameters[1]) ||
+        !is<V>(parameters[2]) || !is<W>(parameters[3]))
+    {
+        throw CommandParameterException("Parameter conversion failed");
+    }
 }
 
 } // namespace ghoul::cmdparser

@@ -96,10 +96,6 @@ CommandlineParser::CommandlineParser(std::string programName,
     , _longHelpCommand(std::move(longHelpCommand))
 {}
 
-CommandlineParser::~CommandlineParser() {
-    _commands.clear();
-}
-
 void CommandlineParser::setAllowUnknownCommands(AllowUnknownCommands allowUnknownCommands)
 {
     _allowUnknownCommands = allowUnknownCommands;
@@ -300,25 +296,25 @@ void CommandlineParser::addCommandForNamelessArguments(
 }
 
 bool CommandlineParser::hasCommandForName(const std::string& name) const {
-    auto it = std::find_if(
-        _commands.begin(),
-        _commands.end(),
+    const auto it = std::find_if(
+        _commands.cbegin(),
+        _commands.cend(),
         [&name](const std::unique_ptr<CommandlineCommand>& c) {
             return c->name() == name;
         }
     );
-    return it != _commands.end();
+    return it != _commands.cend();
 }
 
 bool CommandlineParser::hasCommandForShortName(const std::string& shortName) const {
-    auto it = std::find_if(
-        _commands.begin(),
-        _commands.end(),
+    const auto it = std::find_if(
+        _commands.cbegin(),
+        _commands.cend(),
         [&shortName](const std::unique_ptr<CommandlineCommand>& command) {
             return command->shortName() == shortName;
         }
     );
-    return it != _commands.end();
+    return it != _commands.cend();
 }
 
 bool CommandlineParser::hasNamelessCommand() const {
@@ -347,14 +343,14 @@ std::string CommandlineParser::usageInformationForCommand(
 {
     ghoul_assert(!command.empty(), "Command must not be empty");
 
-    auto it = std::find_if(
-        _commands.begin(),
-        _commands.end(),
+    const auto it = std::find_if(
+        _commands.cbegin(),
+        _commands.cend(),
         [command](const std::unique_ptr<CommandlineCommand>& i) {
             return i->name() == command || i->shortName() == command;
         }
     );
-    ghoul_assert(it != _commands.end(), "Command must name a valid name or shortname");
+    ghoul_assert(it != _commands.cend(), "Command must name a valid name or shortname");
 
     return "Usage: \n" + (*it)->usage();
 }
@@ -368,9 +364,7 @@ std::string CommandlineParser::usageInformationForNamelessCommand() const {
 }
 
 void CommandlineParser::displayHelp(std::ostream& stream) const {
-    stream << usageInformation();
-    stream << std::endl << std::endl << "Help:" << std::endl << "-----" << std::endl;
-
+    stream << usageInformation() << "\n\nHelp:\n-----\n";
     for (const std::unique_ptr<CommandlineCommand>& it : _commands) {
         stream << it->help() << std::endl;
     }
@@ -380,19 +374,14 @@ CommandlineCommand* CommandlineParser::getCommand(const std::string& shortOrLong
     if (shortOrLongName.empty()) {
         return nullptr;
     }
-    auto it = std::find_if(
-        _commands.begin(),
-        _commands.end(),
+    const auto it = std::find_if(
+        _commands.cbegin(),
+        _commands.cend(),
         [shortOrLongName](const std::unique_ptr<CommandlineCommand>& i) {
             return i->name() == shortOrLongName || i->shortName() == shortOrLongName;
         }
     );
-    if (it != _commands.end()) {
-        return it->get();
-    }
-    else {
-        return nullptr;
-    }
+    return it != _commands.cend() ? it->get() : nullptr;
 }
 
 bool CommandlineParser::hasOnlyHelpCommand() const {

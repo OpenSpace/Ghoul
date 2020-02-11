@@ -47,13 +47,13 @@ struct RuntimeError : public std::runtime_error {
      */
     explicit RuntimeError(std::string msg, std::string comp = "");
 
-    virtual ~RuntimeError();
+    virtual ~RuntimeError() = default;
 
     /// The main message describing the exception
     std::string message;
 
     /// The name of the component that threw the exception
-    std::string component;
+    const std::string component;
 };
 
 /**
@@ -72,7 +72,7 @@ struct FileNotFoundError : public RuntimeError {
     explicit FileNotFoundError(std::string f, std::string comp = "");
 
     /// The file that was missing
-    std::string file;
+    const std::string file;
 };
 
 } // namespace ghoul

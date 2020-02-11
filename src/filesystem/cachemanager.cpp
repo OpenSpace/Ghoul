@@ -46,7 +46,6 @@ namespace {
         unsigned int hash = ghoul::hashCRC32(hashString);
         return hash;
     }
-
 } // namespace
 
 namespace ghoul::filesystem {
@@ -72,10 +71,10 @@ CacheManager::IllegalArgumentException::IllegalArgumentException(std::string arg
 {}
 
 CacheManager::CacheManager(std::string directory, int version)
-    : _version(version)
+    : _directory(std::move(directory))
+    , _version(version)
 {
-    ghoul_assert(!directory.empty(), "Directory must not be empty");
-    _directory = std::move(directory);
+    ghoul_assert(!_directory.empty(), "Directory must not be empty");
 
     // In the cache state, we check our cache directory for all values, in a later step
     // we remove all persistent values, so that only the non-persistent values remain

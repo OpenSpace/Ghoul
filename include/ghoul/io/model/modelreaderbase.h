@@ -60,10 +60,10 @@ public:
         explicit ModelReaderException(std::string file, std::string error);
 
         /// The file which caused the exception
-        std::string fileName;
+        const std::string fileName;
 
         /// The error message
-        std::string errorMessage;
+        const std::string errorMessage;
     };
 
     /// Default virtual destructor

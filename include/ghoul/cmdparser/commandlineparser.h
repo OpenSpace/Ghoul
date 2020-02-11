@@ -70,11 +70,6 @@ public:
         std::string longHelpCommand = "--help");
 
     /**
-     * The destructor will also delete all the contained commands within.
-     */
-    ~CommandlineParser();
-
-    /**
      * Sets if this CommandlineParser allows command-line arguments that do not belong to
      * any registered CommandlineCommand. If this is set to <code>true</code>, a receiving
      * <code>std::vector</code> has to be provided in the setCommandline method which
@@ -275,10 +270,10 @@ protected:
     AllowUnknownCommands _allowUnknownCommands;
 
     /// Short version of the command to request help information
-    std::string _shortHelpCommand;
+    const std::string _shortHelpCommand;
 
     /// Long version of the command to request help information
-    std::string _longHelpCommand;
+    const std::string _longHelpCommand;
 };
 
 } // namespace ghoul::cmdparser

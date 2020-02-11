@@ -69,7 +69,9 @@ void SingleCommand<T>::checkParameters(
 {
     CommandlineCommand::checkParameters(parameters);
 
-    is<T>(parameters[0]);
+    if (!is<T>(parameters[0])) {
+        throw CommandParameterException("Parameter conversion failed");
+    }
 }
 
 template <typename T, typename U>
@@ -100,8 +102,9 @@ void SingleCommand<T, U>::checkParameters(
 {
     CommandlineCommand::checkParameters(parameters);
 
-    is<T>(parameters[0]);
-    is<U>(parameters[1]);
+    if (!is<T>(parameters[0]) || !is<U>(parameters[1])) {
+        throw CommandParameterException("Parameter conversion failed");
+    }
 }
 
 template <typename T, typename U, typename V>
@@ -134,9 +137,9 @@ void SingleCommand<T, U, V>::checkParameters(
 {
     CommandlineCommand::checkParameters(parameters);
 
-    is<T>(parameters[0]);
-    is<U>(parameters[1]);
-    is<V>(parameters[2]);
+    if (!is<T>(parameters[0]) || !is<U>(parameters[1]) || !is<V>(parameters[2])) {
+        throw CommandParameterException("Parameter conversion failed");
+    }
 }
 
 template <typename T, typename U, typename V, typename W>
@@ -171,10 +174,11 @@ void SingleCommand<T, U, V, W>::checkParameters(
 {
     CommandlineCommand::checkParameters(parameters);
 
-    is<T>(parameters[0]);
-    is<U>(parameters[1]);
-    is<V>(parameters[2]);
-    is<W>(parameters[3]);
+    if (!is<T>(parameters[0]) || !is<U>(parameters[1]) ||
+        !is<V>(parameters[2]) || !is<W>(parameters[3]))
+    {
+        throw CommandParameterException("Parameter conversion failed");
+    }
 }
 
 } // namespace ghoul::cmdparser

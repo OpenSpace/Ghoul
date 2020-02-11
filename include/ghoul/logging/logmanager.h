@@ -166,10 +166,10 @@ private:
     std::mutex _mutex;
 
     /// The LogLevel
-    LogLevel _level;
+    const LogLevel _level;
 
     /// Whether all logs should be flushed immediately
-    ImmediateFlush _immediateFlush;
+    const ImmediateFlush _immediateFlush;
 
     /// Stores the Logs which are managed by this LogManager
     std::vector<std::unique_ptr<Log>> _logs;

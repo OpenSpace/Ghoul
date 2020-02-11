@@ -212,22 +212,22 @@ protected:
      * otherwise
      */
     template <class T>
-    void is(const std::string& s) const;
+    [[nodiscard]] bool is(const std::string& s) const;
 
     /// Name of the command used on command-line level
-    std::string _name;
+    const std::string _name;
     /// The short name of this command which is also usable (usually an abbreviation)
-    std::string _shortName;
+    const std::string _shortName;
     /// A description of the command; used in the #help method
-    std::string _infoText;
+    const std::string _infoText;
     /// The parameter list necessary for the #usage method
-    std::string _parameterList;
+    const std::string _parameterList;
     /// Name used as a prefix for logging
-    std::string _loggerCat;
+    const std::string _loggerCat;
     /// Stores the number of arguments this command accepts
     int _nArguments;
     /// Stores, if the command can be called multiple times in a single command line
-    MultipleCalls _allowsMultipleCalls;
+    const MultipleCalls _allowsMultipleCalls;
 };
 
 }  // namespace ghoul::cmdparser

@@ -29,14 +29,11 @@
 #include <ghoul/io/socket/tcpsocket.h>
 
 #include <ghoul/misc/exception.h>
+#include <websocketpp/config/core.hpp>
+#include <websocketpp/common/functional.hpp>
+#include <websocketpp/server.hpp>
 #include <deque>
 #include <set>
-#include <websocketpp/config/core.hpp>
-#include <websocketpp/server.hpp>
-#include <websocketpp/config/core.hpp>
-#include <websocketpp/server.hpp>
-#include <websocketpp/common/functional.hpp>
-
 
 namespace ghoul::io {
 

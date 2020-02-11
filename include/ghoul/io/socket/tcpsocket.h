@@ -155,7 +155,7 @@ private:
     std::mutex _inputInterceptionMutex;
     InputInterceptor _inputInterceptor;
 
-    static std::atomic<bool> _initializedNetworkApi;
+    static std::atomic_bool _initializedNetworkApi;
 };
 
 } // namespace ghoul::io

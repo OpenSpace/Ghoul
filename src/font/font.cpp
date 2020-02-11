@@ -447,7 +447,7 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
             HandleError(error);
 
             FT_BitmapGlyph outlineBitmap = reinterpret_cast<FT_BitmapGlyph>(outlineGlyph);
-            topBearing  = static_cast<float>(outlineBitmap->top);
+            topBearing = static_cast<float>(outlineBitmap->top);
             leftBearing = computeLeftBearing(charcode);
 
             width = outlineBitmap->bitmap.width / atlasDepth;

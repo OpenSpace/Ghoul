@@ -53,7 +53,7 @@ public:
     std::unique_ptr<opengl::Texture> read(const std::string& filename) override;
 
 private:
-    ReadHints _hints = ReadHints();
+    ReadHints _hints;
 };
 
 } // namespace ghoul::io

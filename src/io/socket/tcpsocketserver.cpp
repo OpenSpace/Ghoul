@@ -104,8 +104,6 @@ namespace {
 
 namespace ghoul::io {
 
-TcpSocketServer::TcpSocketServer() {}
-
 TcpSocketServer::~TcpSocketServer() {
     if (_listening) {
         close();

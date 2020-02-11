@@ -49,8 +49,8 @@ public:
     struct MissingReaderException : public RuntimeError {
         explicit MissingReaderException(std::string extension, std::string file);
 
-        std::string fileExtension;
-        std::string file;
+        const std::string fileExtension;
+        const std::string file;
     };
 
     /**

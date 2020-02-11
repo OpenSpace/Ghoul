@@ -40,13 +40,11 @@ T CommandlineCommand::cast(const std::string& s) const {
 }
 
 template <class T>
-void CommandlineCommand::is(const std::string& s) const {
+[[nodiscard]] bool CommandlineCommand::is(const std::string& s) const {
     std::istringstream iss(s);
     T t;
     iss >> std::dec >> t;
-    if (iss.fail()) {
-        throw CommandParameterException("Conversion failed");
-    }
+    return !iss.fail();
 }
 
 }  // namespace ghoul::cmdparser

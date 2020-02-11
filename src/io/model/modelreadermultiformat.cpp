@@ -119,7 +119,8 @@ void ModelReaderMultiFormat::loadModel(const std::string& filename,
     const aiScene* scene = importer.ReadFile(filename,
         aiProcess_GenNormals |
         aiProcess_Triangulate |
-        aiProcess_JoinIdenticalVertices);
+        aiProcess_JoinIdenticalVertices
+    );
 
     if (!scene) {
         throw ModelReaderException(filename, importer.GetErrorString());
@@ -158,9 +159,9 @@ void ModelReaderMultiFormat::loadModel(const std::string& filename,
                 vTmp.normal[1] = meshPtr->mNormals[i].y;
                 vTmp.normal[2] = meshPtr->mNormals[i].z;
             } else {
-                vTmp.normal[0] = 0;
-                vTmp.normal[1] = 0;
-                vTmp.normal[2] = 0;
+                vTmp.normal[0] = 0.f;
+                vTmp.normal[1] = 0.f;
+                vTmp.normal[2] = 0.f;
             }
 
             // Texture Coordinates
@@ -171,8 +172,8 @@ void ModelReaderMultiFormat::loadModel(const std::string& filename,
                 vTmp.tex[1] = meshPtr->mTextureCoords[0][i].y;
             }
             else {
-                vTmp.tex[0] = 0.0;
-                vTmp.tex[1] = 0.0;
+                vTmp.tex[0] = 0.f;
+                vTmp.tex[1] = 0.f;
             }
 
             vertexArray.push_back(vTmp);

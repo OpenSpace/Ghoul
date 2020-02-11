@@ -58,9 +58,6 @@ public:
      *        by the CommandlineParser
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
-     *
-     * \pre \p ptr1 must not be a nullptr
-     * \pre \p ptr2 must not be a nullptr
      */
     SingleCommand(T& ptr1, std::string name, std::string shortName = "",
         std::string infoText = "", std::string parameterList = "");
@@ -117,9 +114,6 @@ public:
      *        by the CommandlineParser
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
-     *
-     * \pre \p ptr1 must not be a nullptr
-     * \pre \p ptr2 must not be a nullptr
      */
     SingleCommand(T& ptr1, U& ptr2, std::string name, std::string shortName = "",
         std::string infoText = "", std::string parameterList = "");
@@ -180,10 +174,6 @@ public:
      *        by the CommandlineParser
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
-     *
-     * \pre \p ptr1 must not be a nullptr
-     * \pre \p ptr2 must not be a nullptr
-     * \pre \p ptr3 must not be a nullptr
      */
     SingleCommand(T& ptr1, U& ptr2, V& ptr3, std::string name, std::string shortName = "",
         std::string infoText = "", std::string parameterList = "");
@@ -249,11 +239,6 @@ public:
      *        by the CommandlineParser
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
-     *
-     * \pre \p ptr1 must not be a nullptr
-     * \pre \p ptr2 must not be a nullptr
-     * \pre \p ptr3 must not be a nullptr
-     * \pre \p ptr4 must not be a nullptr
      */
     SingleCommand(T& ptr1, U& ptr2, V& ptr3, W& ptr4, std::string name,
         std::string shortName = "", std::string infoText = "",
@@ -299,7 +284,7 @@ public:
      * <code>true</code> if this command has . The command does not take
      * ownership of the passed value.
      *
-     * \param ptr The pointer to the bool that will be set to <code>true</code> on
+     * \param ptr The reference to the bool that will be set to <code>true</code> on
      *        execution
      * \param name The full name for this command. Has to start with a <code>-</code> in
      *        order to be valid

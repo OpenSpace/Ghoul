@@ -44,9 +44,8 @@ HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend,
         logLevelStamping,
         minimumLogLevel
     )
+    , _useCustomStyling(cssIncludes.size() > 1 || jsIncludes.size() > 1)
 {
-    _useCustomStyling = cssIncludes.size() > 1 || jsIncludes.size() > 1;
-
     std::string output = \
         "<html>\n\
         \t<head>\n\

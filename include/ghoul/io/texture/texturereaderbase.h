@@ -48,10 +48,10 @@ public:
             const TextureReaderBase* r);
 
         /// The filename that caused the exception to be thrown
-        std::string filename;
+        const std::string filename;
 
         /// The error message that occurred
-        std::string message;
+        const std::string message;
 
         /// The TextureReaderBase that caused the exception
         const TextureReaderBase* reader;

@@ -163,9 +163,6 @@ private:
 
     /// The map that correlates the hashed names with the file paths for the fonts
     std::map<unsigned int, std::string> _fontPaths;
-
-    /// The default set of glyphs that are loaded when a new Font is initialized
-    std::vector<wchar_t> _defaultCharacterSet;
 };
 
 } // namespace ghoul::fontrendering

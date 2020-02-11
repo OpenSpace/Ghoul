@@ -56,8 +56,8 @@ public:
     struct MemoryExhaustionException : public RuntimeError {
         explicit MemoryExhaustionException(int sizeTotal, int sizeRequested);
 
-        int totalSize;
-        int requestedSize;
+        const int totalSize;
+        const int requestedSize;
     };
 
     /**

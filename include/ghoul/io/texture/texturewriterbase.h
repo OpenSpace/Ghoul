@@ -46,17 +46,17 @@ public:
             const TextureWriterBase& w);
 
         /// The filename that caused the exception to be thrown
-        std::string filename;
+        const std::string filename;
 
         /// The error message that occurred
-        std::string message;
+        const std::string message;
 
         /// The TextureWriterBase that caused the exception
         const TextureWriterBase& writer;
     };
 
     /// Default virtual destructor
-    virtual ~TextureWriterBase() {}
+    virtual ~TextureWriterBase() = default;
 
     /**
      * Saves the \p texture to disk.

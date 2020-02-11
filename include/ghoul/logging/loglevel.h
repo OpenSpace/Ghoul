@@ -36,21 +36,13 @@ namespace ghoul::logging {
  * to be strictly ordered from least important to important.
  */
 enum class LogLevel {
-    /**
-     * All log messages are accepted.
-     */
+    /// All log messages are accepted.
     AllLogging = 0,
-    /**
-     * Used for high-throughput messages, for example to trace function calls.
-     */
+    /// Used for high-throughput messages, for example to trace function calls.
     Trace = 1,
-    /**
-     * Used for Debug output.
-     */
+    /// Used for Debug output.
     Debug = 2,
-    /**
-     * Used for informational messages which can be ignored, but might be informative.
-     */
+    /// Used for informational messages which can be ignored, but might be informative.
     Info = 3,
     /**
      * Warnings which do not represent a problem in itself, but may hint to a wrong
@@ -62,13 +54,9 @@ enum class LogLevel {
      * end of the application.
      */
     Error = 5,
-    /**
-     * Error which will be so severe that the application cannot recover from them.
-     */
+    /// Error which will be so severe that the application cannot recover from them.
     Fatal = 6,
-    /**
-     * Used as a placeholder to inhibit all LogMessages.
-     */
+    /// Used as a placeholder to inhibit all LogMessages.
     NoLogging = 7
 };
 
@@ -92,7 +80,6 @@ std::string to_string(logging::LogLevel string);
 */
 template <>
 logging::LogLevel from_string(const std::string& string);
-
 
 } // namespace
 

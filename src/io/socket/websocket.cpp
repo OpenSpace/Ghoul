@@ -47,10 +47,9 @@ WebSocket::WebSocketError::WebSocketError(std::string msg, std::string comp)
 {}
 
 WebSocket::WebSocket(std::unique_ptr<TcpSocket> socket,
-    websocketpp::server<websocketpp::config::core>& server
-) {
-    _tcpSocket = std::move(socket);
-
+                     websocketpp::server<websocketpp::config::core>& server)
+    : _tcpSocket(std::move(socket))
+{
     server.set_message_handler(bind(&WebSocket::onMessage, this, ::_1, ::_2));
     server.set_open_handler(bind(&WebSocket::onOpen, this, ::_1));
     server.set_close_handler(bind(&WebSocket::onClose, this, ::_1));

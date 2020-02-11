@@ -41,19 +41,19 @@ struct LuaRuntimeException : public RuntimeError {
 
 struct LuaFormatException : public LuaRuntimeException {
     explicit LuaFormatException(std::string msg, std::string file = "");
-    std::string filename;
+    const std::string filename;
 };
 
 struct LuaLoadingException : public LuaRuntimeException {
     explicit LuaLoadingException(std::string error, std::string file = "");
-    std::string errorMessage;
-    std::string filename;
+    const std::string errorMessage;
+    const std::string filename;
 };
 
 struct LuaExecutionException : public LuaRuntimeException {
     explicit LuaExecutionException(std::string error, std::string file = "");
-    std::string errorMessage;
-    std::string filename;
+    const std::string errorMessage;
+    const std::string filename;
 };
 
 /// If an instance of this struct is passed to the #push method, it will cause a nil value

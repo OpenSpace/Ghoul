@@ -147,7 +147,7 @@ private:
     CategoryStamping _categoryStamping; ///< Is the log printing the category?
     LogLevelStamping _logLevelStamping; ///< Is the log printing the log level?
 
-    LogLevel _logLevel; ///< The minimum allowed log level for this Log
+    const LogLevel _logLevel; ///< The minimum allowed log level for this Log
 };
 
 } // namespace ghoul::logging

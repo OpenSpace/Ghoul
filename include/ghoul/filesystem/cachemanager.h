@@ -67,8 +67,8 @@ public:
     struct MalformedCacheException : public CacheException {
         explicit MalformedCacheException(std::string file, std::string msg = "");
 
-        std::string cacheFile;
-        std::string message;
+        const std::string cacheFile;
+        const std::string message;
     };
 
     /// Exception that gets thrown if there was an error loading the previous cache files
@@ -80,7 +80,7 @@ public:
     struct IllegalArgumentException : public CacheException {
         explicit IllegalArgumentException(std::string argument);
 
-        std::string argumentName;
+        const std::string argumentName;
     };
 
     /**
@@ -338,10 +338,10 @@ protected:
         const Directory& dir) const;
 
     /// The cache directory
-    Directory _directory;
+    const Directory _directory;
 
     /// The cache version
-    int _version;
+    const int _version;
 
     /// A map containing file hashes and file information
     std::map<unsigned long, CacheInformation> _files;

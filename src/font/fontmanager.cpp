@@ -34,6 +34,22 @@
 #include <ghoul/misc/crc32.h>
 #include <ghoul/opengl/texture.h>
 
+namespace {
+    /// The default set of glyphs that are loaded when a new Font is initialized
+    std::vector<wchar_t> DefaultCharacterSet = {
+        L' ', L'!', L'\\', L'"', L'#', L'$', L'%', L'&', L'\'', L'(',
+        L')', L'*', L'+', L',', L'-', L'.', L'/', L'0', L'1', L'2',
+        L'3', L'4', L'5', L'6', L'7', L'8', L'9', L':', L';', L'<',
+        L'=', L'>', L'?', L'@', L'A', L'B', L'C', L'D', L'E', L'F',
+        L'G', L'H', L'I', L'J', L'K', L'L', L'M', L'N', L'O', L'P',
+        L'Q', L'R', L'S', L'T', L'U', L'V', L'W', L'X', L'Y', L'Z',
+        L'[', L']', L'^', L'_', L'~', L'a', L'b', L'c', L'd', L'e',
+        L'f', L'g', L'h', L'i', L'j', L'k', L'l', L'm', L'n', L'o',
+        L'p', L'q', L'r', L's', L't', L'u', L'v', L'w', L'x', L'y',
+        L'z', L'{', L'|', L'}'
+    };
+} // namespace
+
 namespace ghoul::fontrendering {
 
 FontManager::FontRegistrationException::FontRegistrationException(const std::string& msg)
@@ -46,18 +62,6 @@ FontManager::FontAccessException::FontAccessException(const std::string& msg)
 
 FontManager::FontManager(glm::ivec3 atlasDimensions)
     : _textureAtlas(std::move(atlasDimensions))
-    , _defaultCharacterSet({
-        L' ', L'!', L'\\', L'"', L'#', L'$', L'%', L'&', L'\'', L'(',
-        L')', L'*', L'+', L',', L'-', L'.', L'/', L'0', L'1', L'2',
-        L'3', L'4', L'5', L'6', L'7', L'8', L'9', L':', L';', L'<',
-        L'=', L'>', L'?', L'@', L'A', L'B', L'C', L'D', L'E', L'F',
-        L'G', L'H', L'I', L'J', L'K', L'L', L'M', L'N', L'O', L'P',
-        L'Q', L'R', L'S', L'T', L'U', L'V', L'W', L'X', L'Y', L'Z',
-        L'[', L']', L'^', L'_', L'~', L'a', L'b', L'c', L'd', L'e',
-        L'f', L'g', L'h', L'i', L'j', L'k', L'l', L'm', L'n', L'o',
-        L'p', L'q', L'r', L's', L't', L'u', L'v', L'w', L'x', L'y',
-        L'z', L'{', L'|', L'}'
-    })
 {}
 
 void FontManager::initialize() {
@@ -152,7 +156,7 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     );
 
     if (loadGlyphs) {
-        f->loadGlyphs(_defaultCharacterSet);
+        f->loadGlyphs(DefaultCharacterSet);
     }
 
     _fonts.emplace(hashName, f);

@@ -108,7 +108,8 @@ protected:
      */
     void writeLine(std::string line);
 
-    bool _printFooter; ///< Should a line be printed at the end after the file is closed?
+    /// Should a line be printed at the end after the file is closed?
+    const bool _printFooter; 
 
 private:
     std::fstream _file;

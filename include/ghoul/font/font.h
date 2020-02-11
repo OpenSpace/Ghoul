@@ -65,16 +65,16 @@ public:
             std::string msg);
 
         /// The name of the font for which the FreeType error occurred
-        std::string fontName;
+        const std::string fontName;
 
         /// The size of the font for which the FreeType error occurred
-        float fontSize;
+        const float fontSize;
 
         /// The FreeType error code that occurred
-        int errorCode;
+        const int errorCode;
 
         /// The FreeType error message that occurred
-        std::string errorMessage;
+        const std::string errorMessage;
     };
 
     /**
@@ -187,27 +187,27 @@ public:
 
     private:
         /// The wide character that this glyph represents
-        wchar_t _charcode;
+        const wchar_t _charcode;
 
         /// Glyph's width in pixels
-        int _width;
+        const int _width;
 
         /// Glyph's height in pixels
-        int _height;
+        const int _height;
 
         ///< Glyph's left bearing expressed in pixels
-        float _leftBearing;
+        const float _leftBearing;
 
         /// Glyphs's top bearing expressed in pixels
-        float _topBearing;
+        const float _topBearing;
 
         /// This is the distance used when the glyph is drawn as part
         /// of horizontal text
-        float _horizontalAdvance;
+        const float _horizontalAdvance;
 
         /// This is the distance used when the glyph is drawn as part
         /// of vertical text
-        float _verticalAdvance;
+        const float _verticalAdvance;
 
         /// Normalized texture coordinate of top-left corner
         glm::vec2 _topLeft = glm::vec2(0.f);
@@ -335,19 +335,19 @@ private:
     opengl::TextureAtlas& _atlas;
 
     /// The file name of this Font
-    std::string _name;
+    const std::string _name;
 
     /// The font size in pt
-    float _pointSize;
+    const float _pointSize;
 
     /// The vertical distance between two consecutive lines
     float _height;
 
     /// Whether this Font has an outline or not
-    Outline _hasOutline;
+    const Outline _hasOutline;
 
     /// The thickness of the outline
-    float _outlineThickness;
+    const float _outlineThickness;
 };
 
 } // namespace ghoul::fontrendering
