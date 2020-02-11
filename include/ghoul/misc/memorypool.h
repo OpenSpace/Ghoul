@@ -29,6 +29,7 @@
 #include <ghoul/misc/assert.h>
 #include <array>
 #include <cstddef>
+#include <cstring>
 #include <memory>
 #include <vector>
 
