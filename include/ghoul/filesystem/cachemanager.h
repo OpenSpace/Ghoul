@@ -338,7 +338,7 @@ protected:
         const Directory& dir) const;
 
     /// The cache directory
-    const Directory _directory;
+    Directory _directory;
 
     /// The cache version
     const int _version;

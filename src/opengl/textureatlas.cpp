@@ -32,7 +32,7 @@
 #include <ghoul/fmt.h>
 
 namespace {
-    const glm::ivec4 InvalidRegionLocation = glm::ivec4(-1, -1, 0, 0);
+    constexpr const glm::ivec4 InvalidRegionLocation = glm::ivec4(-1, -1, 0, 0);
 } // namespace
 
 namespace ghoul::opengl {
@@ -168,7 +168,6 @@ void TextureAtlas::clear() {
     _nodes.emplace_back(1, 1 , _size.x - 2);
 
     _nUsed = 0;
-
     std::fill(_data.begin(), _data.end(), static_cast<unsigned char>(0));
 }
 
@@ -186,7 +185,7 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
     int bestIndex = -1;
 
     for (size_t i = 0; i < _nodes.size(); ++i) {
-        int y = atlasFit(i, width, height);
+        const int y = atlasFit(i, width, height);
         if (y >= 0) {
             const glm::ivec3& node = _nodes[i];
             if (((y + height) < bestHeight ) ||
@@ -214,7 +213,7 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
         const glm::ivec3& prev = _nodes[i-1];
 
         if (node.x < (prev.x + prev.z)) {
-            int shrink = prev.x + prev.z - node.x;
+            const int shrink = prev.x + prev.z - node.x;
             node.x += shrink;
             node.z -= shrink;
             if (node.z <= 0) {
@@ -251,10 +250,10 @@ void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
 
     glm::ivec4 region = _handleInformation[handle];
 
-    int x = region.x;
-    int y = region.y;
-    int width = region.z;
-    int height = region.w;
+    const int x = region.x;
+    const int y = region.y;
+    const int width = region.z;
+    const int height = region.w;
 
     ghoul_assert(x > 0, "x argument out of bounds");
     ghoul_assert(x < (_size.x - 1), "x argument out of bounds");
@@ -287,11 +286,11 @@ TextureAtlas::TextureCoordinatesResult TextureAtlas::textureCoordinates(
     const glm::ivec4& region = _handleInformation[handle];
 
     // Offset the location to the pixel center
-    int topLeftX = region.x + windowing.x;
-    int topLeftY = region.y + windowing.y;
+    const int topLeftX = region.x + windowing.x;
+    const int topLeftY = region.y + windowing.y;
 
-    int bottomRightX = topLeftX + (region.z - windowing.z);
-    int bottomRightY = topLeftY + (region.w - windowing.w);
+    const int bottomRightX = topLeftX + (region.z - windowing.z);
+    const int bottomRightY = topLeftY + (region.w - windowing.w);
 
     TextureCoordinatesResult res;
     res.topLeft.x = static_cast<float>(topLeftX) / static_cast<float>(_size.x);
@@ -303,7 +302,7 @@ TextureAtlas::TextureCoordinatesResult TextureAtlas::textureCoordinates(
 }
 
 int TextureAtlas::atlasFit(size_t index, int width, int height) {
-    int x = _nodes[index].x;
+    const int x = _nodes[index].x;
     int y = _nodes[index].y;
 
     // We first fill up the width

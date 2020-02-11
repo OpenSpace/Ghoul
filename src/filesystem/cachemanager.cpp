@@ -71,10 +71,10 @@ CacheManager::IllegalArgumentException::IllegalArgumentException(std::string arg
 {}
 
 CacheManager::CacheManager(std::string directory, int version)
-    : _directory(std::move(directory))
-    , _version(version)
+    : _version(version)
 {
-    ghoul_assert(!_directory.empty(), "Directory must not be empty");
+    ghoul_assert(!directory.empty(), "Directory must not be empty");
+    _directory = std::move(directory);
 
     // In the cache state, we check our cache directory for all values, in a later step
     // we remove all persistent values, so that only the non-persistent values remain

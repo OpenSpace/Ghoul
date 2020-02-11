@@ -137,11 +137,11 @@ public:
      * \pre Element of \p dimensions must be bigger or equal <code>1</code>
      */
     Texture(glm::uvec3 dimensions, Format format = Format::RGBA,
-            GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
-            FilterMode filter = FilterMode::Linear,
-            WrappingMode wrapping = WrappingMode::Repeat,
-            AllocateData allocate = AllocateData::Yes,
-            TakeOwnership takeOwnership = TakeOwnership::Yes);
+        GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
+        FilterMode filter = FilterMode::Linear,
+        WrappingMode wrapping = WrappingMode::Repeat,
+        AllocateData allocate = AllocateData::Yes,
+        TakeOwnership takeOwnership = TakeOwnership::Yes);
 
     /**
      * This constructor will generate a Texture out of the passed data. The data should
@@ -177,9 +177,9 @@ public:
      *        of the data.
      */
     Texture(void* data, glm::uvec3 dimensions, Format format = Format::RGBA,
-            GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
-            FilterMode filter = FilterMode::Linear,
-            WrappingMode wrapping = WrappingMode::Repeat);
+        GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
+        FilterMode filter = FilterMode::Linear,
+        WrappingMode wrapping = WrappingMode::Repeat);
 
     /**
      * Unloads the Texture from GPU memory and destroys the id. The destructor will also

@@ -42,7 +42,8 @@ template <>
 std::string to_string(const ghoul::systemcapabilities::Version& v) {
     if (v.release != 0) {
         return to_string(v.major) + "." + to_string(v.minor) + "." + to_string(v.release);
-    } else {
+    }
+    else {
         return to_string(v.major) + "." + to_string(v.minor);
     }
 }

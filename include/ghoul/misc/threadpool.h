@@ -25,7 +25,6 @@
  * Based on the CPTL implementation by Vitaliy Vitsentiy found here:                     *
  * https://github.com/vit-vit/CTPL                                                       *
  *****************************************************************************************
- *                                                                                       *
  *  Copyright (C) 2014 by Vitaliy Vitsentiy                                              *
  *                                                                                       *
  *  Licensed under the Apache License, Version 2.0 (the "License");                      *
@@ -39,7 +38,6 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.             *
  *  See the License for the specific language governing permissions and                  *
  *  limitations under the License.                                                       *
- *                                                                                       *
  ****************************************************************************************/
 
 #ifndef __GHOUL___THREADPOOL___H__

@@ -65,7 +65,7 @@ void SystemCapabilities::clearCapabilities() {
 }
 
 void SystemCapabilities::logCapabilities(
-                                  SystemCapabilitiesComponent::Verbosity verbosity) const
+                                   SystemCapabilitiesComponent::Verbosity verbosity) const
 {
     using SCC = SystemCapabilitiesComponent;
     for (const std::unique_ptr<SCC>& c : _components) {
@@ -81,13 +81,12 @@ void SystemCapabilities::logCapabilities(
     }
 }
 
-void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponent> comp)
-{
+void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponent> comp) {
     ghoul_assert(comp != nullptr, "Component must not be nullptr");
 
-    auto it = std::find_if(
-        _components.begin(),
-        _components.end(),
+    const auto it = std::find_if(
+        _components.cbegin(),
+        _components.cend(),
         [&comp](const std::unique_ptr<SystemCapabilitiesComponent>& rhs) {
             SystemCapabilitiesComponent* l = comp.get();
             SystemCapabilitiesComponent* r = rhs.get();
@@ -96,7 +95,7 @@ void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponen
         }
     );
 
-    ghoul_assert(it == _components.end(), "Component must not have been added before");
+    ghoul_assert(it == _components.cend(), "Component must not have been added before");
     _components.push_back(std::move(comp));
 }
 

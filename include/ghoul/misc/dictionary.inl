@@ -93,7 +93,7 @@ void Dictionary::setValueHelper(std::string key, T value,
     }
 
     // See if it is actually a Dictionary at this location
-    Dictionary* dict = ghoul::any_cast<Dictionary>(&(keyIt->second));
+    Dictionary* dict = std::any_cast<Dictionary>(&(keyIt->second));
     if (dict == nullptr) {
         throw ConversionError(fmt::format(
             "error converting key '{}' from type '{}' to type 'Dictionary'",
@@ -157,7 +157,7 @@ void ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
     // If we can find the key directly, we can return it immediately
     auto it = find(key);
     if (it != cend()) {
-        const T* v = ghoul::any_cast<T>(&(it->second));
+        const T* v = std::any_cast<T>(&(it->second));
         // See if it has the correct type
         if (!v) {
             throw ConversionError(fmt::format(
@@ -182,7 +182,7 @@ void ghoul::Dictionary::getValueHelper(const std::string& key, T& value) const {
         throw KeyError(fmt::format("Could not find key '{}' in Dictionary", first));
     }
 
-    const Dictionary* dict = ghoul::any_cast<Dictionary>(&(keyIt->second));
+    const Dictionary* dict = std::any_cast<Dictionary>(&(keyIt->second));
     // See if it is actually a Dictionary at this location
     if (!dict) {
         throw ConversionError(fmt::format(
@@ -1053,7 +1053,7 @@ bool ghoul::Dictionary::hasValueHelper(const std::string& key) const {
         return false;
     }
 
-    const Dictionary* dict = ghoul::any_cast<Dictionary>(&(keyIt->second));
+    const Dictionary* dict = std::any_cast<Dictionary>(&(keyIt->second));
     if (!dict) {
         // If it is not a Dictionary, the value can't be found and no recursion necessary
         return false;

@@ -248,7 +248,6 @@ void Texture::applyFilter() {
             glTexParameteri(_type, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
             break;
         case FilterMode::AnisotropicMipMap:
-        {
             glGenerateMipmap(_type);
             glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -264,7 +263,6 @@ void Texture::applyFilter() {
             glTexParameterf(_type, GL_TEXTURE_MAX_ANISOTROPY_EXT, _anisotropyLevel);
             glTexParameteri(_type, GL_TEXTURE_BASE_LEVEL, 0);
             break;
-        }
         default:
             throw MissingCaseException();
     }
@@ -280,12 +278,7 @@ void Texture::setDataType(GLenum dataType) {
 }
 
 int Texture::expectedPixelDataSize() const {
-    if (_pixels) {
-        return compMul(_dimensions) * _bpp;
-    }
-    else {
-        return 0;
-    }
+    return _pixels ? compMul(_dimensions) * _bpp : 0;
 }
 
 int Texture::numberOfChannels(Format format) {

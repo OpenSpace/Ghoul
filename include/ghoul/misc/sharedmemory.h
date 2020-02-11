@@ -200,7 +200,7 @@ private:
     void* _memory = nullptr;
 
     /// The name for this SharedMemory block
-    std::string _name;
+    const std::string _name;
 
     // on Windows it is not possible to query the size of a memory mapped file, so it
     // has to be stored in the block of memory itself. On POSIX systems, we can store

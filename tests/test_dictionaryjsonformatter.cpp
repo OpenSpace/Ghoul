@@ -31,7 +31,7 @@
 
 TEST_CASE("DictionaryJsonFormatter: Empty Dictionary", "[dictionaryjsonformatter]") {
     ghoul::Dictionary d;
-    std::string res = ghoul::DictionaryJsonFormatter().format(d);
+    std::string res = ghoul::formatJson(d);
     REQUIRE(res == "{}");
 }
 
@@ -46,7 +46,7 @@ TEST_CASE("DictionaryJsonFormatter: Simple Dictionary", "[dictionaryjsonformatte
         { "string", ""s}
     };
 
-    std::string res = ghoul::DictionaryJsonFormatter().format(d);
+    std::string res = ghoul::formatJson(d);
     REQUIRE(
         res ==
         "{\"double\":2.000000E0,\"int\":1,\"string\":\"\","
@@ -99,7 +99,7 @@ TEST_CASE("DictionaryJsonFormatter: Nested Dictionary", "[dictionaryjsonformatte
         { "dict3" , f }
     };
 
-    std::string res = ghoul::DictionaryJsonFormatter().format(g);
+    std::string res = ghoul::formatJson(g);
 
     REQUIRE(
         res ==

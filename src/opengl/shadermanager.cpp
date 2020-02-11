@@ -41,8 +41,8 @@ ShaderManager& ShaderManager::ref() {
 }
 
 ShaderObject* ShaderManager::shaderObject(unsigned int hashedName) {
-    auto it = _objects.find(hashedName);
-    if (it == _objects.end()) {
+    const auto it = _objects.find(hashedName);
+    if (it == _objects.cend()) {
         throw ShaderManagerError(
             "Could not find ShaderObject for hash '" + std::to_string(hashedName) + "'"
         );
@@ -67,8 +67,8 @@ unsigned int ShaderManager::registerShaderObject(const std::string& name,
                                                  std::unique_ptr<ShaderObject> shader)
 {
     const unsigned int hashedName = hashCRC32(name);
-    auto it = _objects.find(hashedName);
-    if (it == _objects.end()) {
+    const auto it = _objects.find(hashedName);
+    if (it == _objects.cend()) {
         _objects[hashedName] = std::move(shader);
         return hashedName;
     }
@@ -87,8 +87,8 @@ std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(
 std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(
                                                                   unsigned int hashedName)
 {
-    auto it = _objects.find(hashedName);
-    if (it == _objects.end()) {
+    const auto it = _objects.find(hashedName);
+    if (it == _objects.cend()) {
         return nullptr;
     }
 

@@ -78,14 +78,13 @@ SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, HRESULT code)
 {}
 #endif
 
-SystemCapabilitiesComponent::SystemCapabilitiesComponent(InitializeWMI initializeWMI) {
+SystemCapabilitiesComponent::SystemCapabilitiesComponent(
+                                             [[maybe_unused]] InitializeWMI initializeWMI)
+{
 #ifdef GHOUL_USE_WMI
     if (initializeWMI && !isWMIInitialized()) {
         SystemCapabilitiesComponent::initializeWMI();
     }
-#else
-    // Remove 'unused parameter' warning
-    (void)(initializeWMI);
 #endif
 }
 
@@ -191,16 +190,16 @@ void SystemCapabilitiesComponent::deinitializeWMI() {
 }
 
 std::wstring str2wstr(const std::string& str) {
-    int stringLength = static_cast<int>(str.length() + 1);
-    int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), stringLength, nullptr, 0);
+    const int stringLength = static_cast<int>(str.length() + 1);
+    const int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), stringLength, nullptr, 0);
     std::vector<wchar_t> buf(len);
     MultiByteToWideChar(CP_ACP, 0, str.c_str(), stringLength, buf.data(), len);
     return std::wstring(buf.begin(), buf.end());
 }
 
 std::string wstr2str(const std::wstring& wstr) {
-    int stringLength = static_cast<int>(wstr.length() + 1);
-    int len = WideCharToMultiByte(
+    const int stringLength = static_cast<int>(wstr.length() + 1);
+    const int len = WideCharToMultiByte(
         CP_ACP,
         0,
         wstr.c_str(),

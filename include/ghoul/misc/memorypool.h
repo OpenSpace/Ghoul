@@ -90,7 +90,7 @@ private:
     };
 
     std::vector<Bucket*> _buckets; ///< The number of allocated buckets
-    int _originalBucketSize; ///< The original desired number of buckets
+    const int _originalBucketSize; ///< The original desired number of buckets
 };
 
 

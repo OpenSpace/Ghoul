@@ -135,8 +135,8 @@ protected:
     struct WMIError : public RuntimeError {
         explicit WMIError(std::string msg, HRESULT code);
 
-        std::string message;
-        HRESULT errorCode;
+        const std::string message;
+        const HRESULT errorCode;
     };
 
     /**

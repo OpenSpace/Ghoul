@@ -31,14 +31,16 @@
 #include <algorithm>
 
 #ifdef WIN32
-    #include <Windows.h>
-    #include <tchar.h>
-    #pragma comment(lib, "User32.lib")
-    #pragma comment(lib, "Kernel32.lib")
-    typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO); // NOLINT
-    typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD); // NOLINT
+#define WIN32_LEAN_AND_MEAN 
+#define NOMINMAX
+#include <Windows.h>
+#include <tchar.h>
+#pragma comment(lib, "User32.lib")
+#pragma comment(lib, "Kernel32.lib")
+typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO); // NOLINT
+typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD); // NOLINT
 #else
-    #include <sys/utsname.h>
+#include <sys/utsname.h>
 #endif
 
 namespace {
@@ -255,14 +257,10 @@ int OpenGLCapabilitiesComponent::maxUniformBufferBindings() const {
 
 std::string OpenGLCapabilitiesComponent::gpuVendorString() const {
     switch (_vendor) {
-        case Vendor::Nvidia:
-            return "Nvidia";
-        case Vendor::ATI:
-            return "ATI";
-        case Vendor::Intel:
-            return "Intel";
-        default:
-            return "other";
+        case Vendor::Nvidia: return "Nvidia";
+        case Vendor::ATI:    return "ATI";
+        case Vendor::Intel:  return "Intel";
+        default:             return "other";
     }
 }
 

@@ -45,12 +45,12 @@ namespace {
     }
 
     bool isPermanentlyIgnored(const std::string& file, int line) {
-        auto it = std::find(
-            PermanentlyIgnoredAsserts.begin(),
-            PermanentlyIgnoredAsserts.end(),
+        const auto it = std::find(
+            PermanentlyIgnoredAsserts.cbegin(),
+            PermanentlyIgnoredAsserts.cend(),
             hashing(file, line)
         );
-        return it != PermanentlyIgnoredAsserts.end();
+        return it != PermanentlyIgnoredAsserts.cend();
     }
 } // namespace
 
@@ -68,7 +68,7 @@ MissingCaseException::MissingCaseException()
 {}
 
 void internal_assert(std::string expression, std::string message, std::string file,
-                                                           std::string function, int line)
+                     std::string function, int line)
 {
     if (!isPermanentlyIgnored(file, line)) {
         const std::string padding = "    ";

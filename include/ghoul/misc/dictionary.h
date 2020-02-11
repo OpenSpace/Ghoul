@@ -29,8 +29,8 @@
 #include <ghoul/glm.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
-#include <ghoul/misc/any.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <any>
 #include <map>
 #include <string>
 #include <type_traits>
@@ -119,7 +119,6 @@ using static_not = std::integral_constant<bool, !T::value>;
 template <typename T>
 using has_storage_converter = static_not<
     typename std::is_void<typename internal::StorageTypeConverter<T>::type>>;
-
 }
 
 /**
@@ -197,7 +196,7 @@ using has_storage_converter = static_not<
  * exception to this is the #setValue method, which has an additional parameter that
  * controls if each individual level of the Dictionary is created on-the-fly or not.
  */
-class Dictionary : public std::map<std::string, ghoul::any> {
+class Dictionary : public std::map<std::string, std::any> {
 public:
     BooleanType(CreateIntermediate);
 
@@ -216,9 +215,7 @@ public:
         explicit ConversionError(std::string msg);
     };
 
-    /**
-     * Creates an empty Dictionary
-     */
+    /// Creates an empty Dictionary
     Dictionary() = default;
 
     /**
@@ -230,7 +227,7 @@ public:
      * \param l The <code>std::initializer_list</code> that contains all of the values
      *        that should be added to the Dictionary
      */
-    Dictionary(std::initializer_list<std::pair<std::string, ghoul::any>> l);
+    Dictionary(std::initializer_list<std::pair<std::string, std::any>> l);
 
     /**
      * Returns all of the keys that are stored in the dictionary at a given \p location.
@@ -433,7 +430,7 @@ private:
      * \param key The key under which the \p value is stored
      * \param value The value that should be stored under the provided key
      */
-    void setValueAnyHelper(std::string key, ghoul::any value);
+    void setValueAnyHelper(std::string key, std::any value);
 
     /**
      * This type is used in SFINAE evaluation of the internal methods (#setValueInternal,

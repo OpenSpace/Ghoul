@@ -40,9 +40,7 @@ struct AssertionException : public std::runtime_error {
         std::string func, int line);
 };
 
-/**
- * Exception that gets thrown if switch-case statement is missing a case.
- */
+/// Exception that gets thrown if switch-case statement is missing a case.
 struct MissingCaseException : public std::logic_error {
     MissingCaseException();
 };
@@ -69,11 +67,9 @@ void internal_assert(std::string expression, std::string message, std::string fi
     std::string function, int line);
 #endif // __APPLE__
 
-
 } // namespace ghoul
 
 #if !(defined(NDEBUG) || defined(DEBUG))
-
 /**
 * @defgroup ASSERT_MACRO_GROUP Assertion Macros
 *
@@ -121,11 +117,8 @@ void internal_assert(std::string expression, std::string message, std::string fi
     } while (false)
 
 #endif
-
 #else
-
 #define ghoul_assert(__condition__, __message__) {}
-
 #endif // NDEBUG
 
 /** @}  */

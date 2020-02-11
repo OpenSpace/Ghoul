@@ -135,7 +135,7 @@ private:
     };
     std::map<std::string, Info> _objects;
 
-    std::string _loggerCat;
+    const std::string _loggerCat;
 };
 
 }  // namespace ghoul

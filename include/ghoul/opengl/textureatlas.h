@@ -61,7 +61,7 @@ public:
         explicit InvalidRegionException(std::string msg);
     };
 
-    typedef int RegionHandle;
+    using RegionHandle = int;
 
     /**
      * The constructor completely initializes the Texture Atlas. No additional

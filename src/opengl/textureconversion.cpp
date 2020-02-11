@@ -31,10 +31,10 @@
 
 namespace ghoul::opengl {
 
-using ConversionFunc = void(*)(char* dst, const char* src, int nSourceChannels,
-                               int nDestinationChannels, int nBytesPerChannel);
-
 namespace {
+
+using ConversionFunc = void(*)(char* dst, const char* src, int nSourceChannels,
+    int nDestinationChannels, int nBytesPerChannel);
 
 template <Texture::Format from, Texture::Format to>
 void convert(char* dst, const char* src, int nSourceChannels, int nDestinationChannels,
@@ -50,8 +50,7 @@ void convert(char* dst, const char* src, int nSourceChannels, int nDestinationCh
 
 template <>
 void convert<Texture::Format::Red, Texture::Format::RG>(char* dst, const char* src,
-                                                        int nSourceChannels,
-                                                        int /*nDestinationChannels*/,
+                                                        int nSourceChannels, int,
                                                         int nBytesPerChannel)
 {
     int sourceSize = nSourceChannels * nBytesPerChannel;
@@ -62,9 +61,7 @@ void convert<Texture::Format::Red, Texture::Format::RG>(char* dst, const char* s
 
 template <>
 void convert<Texture::Format::Red, Texture::Format::RGB>(char* dst, const char* src,
-                                                         int /*nSourceChannels*/,
-                                                         int /*nDestinationChannels*/,
-                                                         int nBytesPerChannel)
+                                                         int, int, int nBytesPerChannel)
 {
     std::memcpy(dst, src, nBytesPerChannel);
     std::memcpy(dst + nBytesPerChannel, src, nBytesPerChannel);
@@ -73,9 +70,7 @@ void convert<Texture::Format::Red, Texture::Format::RGB>(char* dst, const char* 
 
 template <>
 void convert<Texture::Format::Red, Texture::Format::RGBA>(char* dst, const char* src,
-                                                          int /*nSourceChannels*/,
-                                                          int /*nDestinationChannels*/,
-                                                          int nBytesPerChannel)
+                                                          int, int, int nBytesPerChannel)
 {
     std::memcpy(dst, src, nBytesPerChannel);
     std::memcpy(dst + nBytesPerChannel, src, nBytesPerChannel);
@@ -85,9 +80,7 @@ void convert<Texture::Format::Red, Texture::Format::RGBA>(char* dst, const char*
 
 template <>
 void convert<Texture::Format::RG, Texture::Format::RGBA>(char* dst, const char* src,
-                                                        int /*nSourceChannels*/,
-                                                        int /*nDestinationChannels*/,
-                                                        int nBytesPerChannel)
+                                                        int, int, int nBytesPerChannel)
 {
     // Copying R into RGB
     std::memcpy(dst, src, nBytesPerChannel);
@@ -161,11 +154,11 @@ void convertTextureFormat(Texture& texture, Texture::Format newFormat) {
         return;
     }
 
-    int nPixels = glm::compMul(texture.dimensions());
-    int bytesPerChannel = texture.bytesPerPixel() / texture.numberOfChannels();
+    const int nPixels = glm::compMul(texture.dimensions());
+    const int bytesPerChannel = texture.bytesPerPixel() / texture.numberOfChannels();
 
-    int nChannelsOld = texture.numberOfChannels();
-    int nChannelsNew = Texture::numberOfChannels(newFormat);
+    const int nChannelsOld = texture.numberOfChannels();
+    const int nChannelsNew = Texture::numberOfChannels(newFormat);
 
     ConversionFunc convFunc = conversionFunctionSelector(texture.format(), newFormat);
 

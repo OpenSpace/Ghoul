@@ -36,7 +36,7 @@ void deinitialize();
 std::string licenseText();
 
 const int GHOUL_MAJOR_VERSION = 0;
-const int GHOUL_MINOR_VERSION = 19;
+const int GHOUL_MINOR_VERSION = 23;
 const int GHOUL_PATCH_VERSION = 0;
 
 } // namespace ghoul

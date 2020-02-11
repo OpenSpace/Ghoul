@@ -29,18 +29,19 @@
 #include <ghoul/misc/exception.h>
 
 #ifdef WIN32
+#define WIN32_LEAN_AND_MEAN 
+#define NOMINMAX
 #include <Windows.h>
 #else
 #include <pthread.h>
 #endif
 
 namespace ghoul::thread {
-
 namespace {
 
-int convertThreadPriorityLevel(ThreadPriorityClass c, ThreadPriorityLevel p) {
+int convertThreadPriorityLevel([[maybe_unused]] ThreadPriorityClass c,
+                               ThreadPriorityLevel p) {
 #ifdef WIN32
-    (void)c;
     switch (p) {
         case ThreadPriorityLevel::Lowest:      return THREAD_PRIORITY_LOWEST;
         case ThreadPriorityLevel::BelowNormal: return THREAD_PRIORITY_BELOW_NORMAL;

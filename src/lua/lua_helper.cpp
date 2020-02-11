@@ -535,7 +535,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range
     return nArguments;
 }
 
-void verifyStackSize(lua_State* L, int expected) {
+void verifyStackSize([[maybe_unused]] lua_State* L, [[maybe_unused]] int expected) {
 #if !(defined(NDEBUG) || defined(DEBUG))
     const int size = lua_gettop(L);
 
@@ -549,12 +549,8 @@ void verifyStackSize(lua_State* L, int expected) {
             expected, size
         )
     );
-#else // NDBEUG
-    (void)L; // Remove unused variable warning in release mode
-    (void)expected; // Remove unused variable warning in release mode
 #endif
 }
-
 
 namespace internal {
 

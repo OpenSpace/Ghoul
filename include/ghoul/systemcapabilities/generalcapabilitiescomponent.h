@@ -54,10 +54,10 @@ public:
         explicit OperatingSystemError(std::string desc, std::string errorMsg);
 
         /// The general description of the error
-        std::string description;
+        const std::string description;
 
         /// Additional information about the error message
-        std::string errorMessage;
+        const std::string errorMessage;
     };
 
     /// Exception that is thrown if there was an error detecting the main memory

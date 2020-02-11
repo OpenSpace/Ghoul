@@ -60,11 +60,10 @@ public:
 
     struct IncludeError : public ShaderPreprocessorError {
         explicit IncludeError(std::string f);
-        std::string file;
+        const std::string file;
     };
 
-    ShaderPreprocessor(std::string shaderPath = "",
-        Dictionary dictionary = Dictionary());
+    ShaderPreprocessor(std::string shaderPath = "", Dictionary dictionary = Dictionary());
 
     const std::string& filename() const;
     const Dictionary& dictionary() const;
@@ -72,7 +71,7 @@ public:
     void setFilename(const std::string& shaderPath);
     void setCallback(ShaderChangedCallback changeCallback);
     void process(std::string& output);
-    std::string getFileIdentifiersString();
+    std::string getFileIdentifiersString() const;
 
     /**
      * Adds the passed folder to the list of include paths that are checked when a shader
@@ -88,14 +87,13 @@ public:
      */
     static void addIncludePath(std::string folderPath);
 
-
 private:
     struct Input {
         Input(std::ifstream& str, ghoul::filesystem::File& f, std::string indent);
 
         std::ifstream& stream;
         ghoul::filesystem::File& file;
-        std::string indentation;
+        const std::string indentation;
         unsigned int lineNumber = 1;
     };
 
@@ -114,8 +112,7 @@ private:
     struct Env {
         using Scope = std::set<std::string>;
 
-        Env(std::stringstream& out, std::string l = "",
-            std::string indent = "");
+        explicit Env(std::stringstream& out, std::string l = "", std::string indent = "");
 
         std::stringstream& output;
         std::string line;

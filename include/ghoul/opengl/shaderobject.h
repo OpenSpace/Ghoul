@@ -65,13 +65,13 @@ public:
             std::string name);
 
         /// The compile error as reported by the GLSL compiler
-        std::string compileError;
+        const std::string compileError;
 
         /// File identifiers of included files as reported by ShaderPreprocessor
-        std::string fileIdentifiers;
+        const std::string fileIdentifiers;
 
         /// The name of the ShaderObject that caused the compile error
-        std::string shaderName;
+        const std::string shaderName;
     };
 
     /**
@@ -87,15 +87,9 @@ public:
         TesselationEvaluation = static_cast<std::underlying_type_t<GLenum>>(
             GL_TESS_EVALUATION_SHADER
         ),
-        Geometry = static_cast<std::underlying_type_t<GLenum>>(
-            GL_GEOMETRY_SHADER
-        ),
-        Fragment = static_cast<std::underlying_type_t<GLenum>>(
-            GL_FRAGMENT_SHADER
-        ),
-        Compute = static_cast<std::underlying_type_t<GLenum>>(
-            GL_COMPUTE_SHADER
-        )
+        Geometry = static_cast<std::underlying_type_t<GLenum>>(GL_GEOMETRY_SHADER),
+        Fragment = static_cast<std::underlying_type_t<GLenum>>(GL_FRAGMENT_SHADER),
+        Compute = static_cast<std::underlying_type_t<GLenum>>(GL_COMPUTE_SHADER)
     };
 
 
@@ -232,7 +226,7 @@ public:
     *
     * \return The dictionary
     */
-    Dictionary dictionary();
+    Dictionary dictionary() const;
 
     /**
      * Sets the dictionary of the shader object. Will trigger a rebuild from file.
@@ -253,7 +247,7 @@ public:
      *
      * \return The filename
      */
-    std::string filename();
+    std::string filename() const;
 
     /**
      * (Re)sets the \p filename this ShaderObject is based on. It will load the contents

@@ -64,7 +64,7 @@ struct Boolean {
     operator bool() { return value == Yes; }
     constexpr operator bool() const { return value == Yes; }
 
-    Value value;
+    const Value value;
 };
 
 // This define can be used as a drop-in for the Boolean type to make it type-safe

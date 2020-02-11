@@ -91,7 +91,7 @@ public:
      * \param verbosity The verbosity of the resulting log entries
      */
     void logCapabilities(SystemCapabilitiesComponent::Verbosity verbosity =
-                                   SystemCapabilitiesComponent::Verbosity::Default) const;
+        SystemCapabilitiesComponent::Verbosity::Default) const;
 
     /**
      * Adds the passed <code>component</code> to this SystemCapabilities and assumes

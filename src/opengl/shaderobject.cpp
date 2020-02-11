@@ -236,7 +236,7 @@ void ShaderObject::setFilename(const std::string& filename) {
     _preprocessor.setFilename(filename);
 }
 
-std::string ShaderObject::filename() {
+std::string ShaderObject::filename() const {
     return _preprocessor.filename();
 }
 
@@ -244,7 +244,7 @@ void ShaderObject::setDictionary(Dictionary dictionary) {
     _preprocessor.setDictionary(std::move(dictionary));
 }
 
-Dictionary ShaderObject::dictionary() {
+Dictionary ShaderObject::dictionary() const {
     return _preprocessor.dictionary();
 }
 

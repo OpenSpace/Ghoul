@@ -78,10 +78,10 @@ public:
         ProgramObjectLinkingError(std::string msg, std::string name);
 
         /// The linker error that was returned from the GLSL linker
-        std::string linkerError;
+        const std::string linkerError;
 
         /// The name of the program that caused the exception to be thrown
-        std::string programName;
+        const std::string programName;
     };
 
     /**
@@ -103,7 +103,7 @@ public:
      * \throw ProgramObjectError If there was an error creating the OpenGL program object
      *        name
      */
-    ProgramObject(std::string name);
+    explicit ProgramObject(std::string name);
 
     /**
      * Copy constructor that will perform a deep copy of all the attached ShaderObject%s
@@ -176,7 +176,7 @@ public:
      *
      * \return The current dictionary
      */
-    Dictionary dictionary();
+    Dictionary dictionary() const;
 
     /**
      * Sets the shader object callback.

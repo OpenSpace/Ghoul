@@ -76,13 +76,10 @@ bool FramebufferObject::isComplete() const {
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     std::string error = errorChecking(status);
 
-    if (error.empty()) {
-        return true;
-    }
-    else {
+    if (!error.empty()) {
         LERROR(error);
-        return false;
     }
+    return error.empty();
 }
 
 bool FramebufferObject::isActive() {
@@ -157,13 +154,8 @@ void FramebufferObject::detachAll() {
 }
 
 Texture* FramebufferObject::texture(GLenum attachment) {
-    auto iterator = _attachedTextures.find(attachment);
-    if (iterator != _attachedTextures.end()) {
-        return _attachedTextures[attachment];
-    }
-    else {
-        return nullptr;
-    }
+    const auto iterator = _attachedTextures.find(attachment);
+    return iterator != _attachedTextures.end() ? _attachedTextures[attachment] : nullptr;
 }
 
 GLuint FramebufferObject::getActiveObject() {

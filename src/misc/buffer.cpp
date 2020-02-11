@@ -108,7 +108,7 @@ void Buffer::write(const std::string& filename, Compress compress) {
     file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     file.open(filename, std::ios::binary | std::ios::out);
 
-    bool c = compress == Compress::Yes;
+    const bool c = compress == Compress::Yes;
     file.write(reinterpret_cast<const char*>(&c), sizeof(bool));
     if (compress == Compress::Yes) {
         std::vector<value_type> buffer(size());
@@ -128,7 +128,8 @@ void Buffer::write(const std::string& filename, Compress compress) {
         // compressed size
         file.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
         file.write(reinterpret_cast<const char*>(buffer.data()), size); // compressed data
-    } else {
+    }
+    else {
         file.write(reinterpret_cast<const char*>(&_offsetWrite), sizeof(size_t));
         file.write(
             reinterpret_cast<const char*>(_data.data()),
@@ -167,14 +168,12 @@ void Buffer::read(const std::string& filename) {
             static_cast<int>(size),
             static_cast<int>(_data.size())
         );
-    } else {
+    }
+    else {
         size_t size;
         file.read(reinterpret_cast<char*>(&size), sizeof(size_t));
         _data.resize(size);
-        file.read(
-            reinterpret_cast<char*>(_data.data()),
-            size
-        );
+        file.read(reinterpret_cast<char*>(_data.data()), size);
         _offsetWrite = size;
     }
 }
@@ -201,8 +200,8 @@ void Buffer::deserialize(value_type* data, size_t size) {
 
 template <>
 void Buffer::serialize(const std::string& v) {
-    size_t length = v.length();
-    size_t size = length + sizeof(size_t);
+    const size_t length = v.length();
+    const size_t size = length + sizeof(size_t);
     _data.resize(_data.capacity() + size);
 
     std::memcpy(_data.data() + _offsetWrite, &length, sizeof(size_t));
@@ -230,8 +229,8 @@ void Buffer::deserialize(std::string& value) {
 
 template <>
 void Buffer::serialize(const std::vector<std::string>& v) {
-    size_t length = v.size();
-    size_t size = sizeof(size_t);
+    const size_t length = v.size();
+    const size_t size = sizeof(size_t);
     _data.resize(_data.capacity() + size + length);
 
     std::memcpy(_data.data() + _offsetWrite, &length, sizeof(size_t));

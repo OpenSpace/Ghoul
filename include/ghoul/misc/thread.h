@@ -43,7 +43,6 @@ enum class ThreadPriorityClass {
     High
 };
 
-
 /**
  * Determines the priority level of a thread within a ThreadPriorityClass. The available
  * levels in this enum are most likely to be a subset of the supported classes for a

@@ -26,8 +26,8 @@
 #ifndef __GHOUL___PROCESS___H__
 #define __GHOUL___PROCESS___H__
 
-#include <string>
 #include <functional>
+#include <string>
 #include <memory>
 
 namespace TinyProcessLib { class Process; }

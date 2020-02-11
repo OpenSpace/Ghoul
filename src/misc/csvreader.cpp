@@ -34,7 +34,7 @@
 
 namespace {
     std::vector<std::vector<std::string>> internalLoadCSV(std::ifstream& file,
-                                     const std::vector<int>& indices = std::vector<int>())
+                                                          const std::vector<int>& indices)
     {
         ghoul_assert(file.good(), "File handle should be good");
 
@@ -76,7 +76,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
         std::getline(file, line);
     }
 
-    return internalLoadCSV(file);
+    return internalLoadCSV(file, std::vector<int>());
 }
 
 std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,

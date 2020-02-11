@@ -31,7 +31,7 @@
 
 TEST_CASE("DictionaryLuaFormatter: Empty Dictionary", "[dictionaryluaformatter]") {
     ghoul::Dictionary d;
-    std::string res = ghoul::DictionaryLuaFormatter().format(d);
+    std::string res = ghoul::formatLua(d);
     REQUIRE(res == "{}");
 }
 
@@ -46,7 +46,7 @@ TEST_CASE("DictionaryLuaFormatter: Simple Dictionary", "[dictionaryluaformatter]
         { "string", ""s}
     };
 
-    std::string res = ghoul::DictionaryLuaFormatter().format(d);
+    std::string res = ghoul::formatLua(d);
     REQUIRE(
         res == 
         "{double=2.000000E0,int=1,string=\"\","
@@ -99,7 +99,7 @@ TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]
         { "dict3" , f }
     };
 
-    std::string res = ghoul::DictionaryLuaFormatter().format(g);
+    std::string res = ghoul::formatLua(g);
 
     REQUIRE(
         res == 

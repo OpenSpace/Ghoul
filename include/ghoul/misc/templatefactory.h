@@ -47,7 +47,7 @@ public:
     /// Exception that is thrown if a requested class has not been registered before
     struct TemplateClassNotFoundError : public TemplateFactoryError {
         explicit TemplateClassNotFoundError(std::string name);
-        std::string className;
+        const std::string className;
     };
 
     /// Exception that is thrown if a registered class is called with a wrong constructor

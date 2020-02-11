@@ -26,55 +26,26 @@
 #ifndef __GHOUL___DICTIONARYJSONFORMATTER___H__
 #define __GHOUL___DICTIONARYJSONFORMATTER___H__
 
-#include <ghoul/misc/dictionaryformatter.h>
-
 #include <ghoul/misc/exception.h>
 
 namespace ghoul {
 
 class Dictionary;
 
-/**
- * This concrete implementation of a DictionaryFormatter converts the passed Dictionary
- * into a JSON format.
- *
- * At the moment, the only types that are supported in this conversion are:
- * <code>glm::vec2</code>, <code>glm::vec3</code>, <code>glm::vec4</code>,
- * <code>float</code>, <code>int</code>, and <code>std::string</code>.
- */
-class DictionaryJsonFormatter : public DictionaryFormatter {
-public:
-    /**
-     * This exception is thrown if an unknown type is being converted.
-     */
-    struct JsonFormattingError : public RuntimeError {
-        explicit JsonFormattingError(std::string msg);
-    };
-
-    /**
-     * Converts the passed \p dictionary into a JSON string representation.
-     *
-     * \param dictionary The Dictionary that should be converted
-     * \return A JSON string representing the Dictionary
-     *
-     * \throw JsonFormattingError If the \p key points to a type that cannot be converted
-     */
-    std::string format(const Dictionary& dictionary) const override;
-
-private:
-    /**
-     * Converts a single value \p key out of the \p dictionary by manually iterating all
-     * the types and trying to access them.
-     *
-     * \param dictionary The Dictionary from which the \p key should be extracted and
-     *        converted
-     * \param key The key in the Dictionary that should be converted
-     * \return A JSON representation of the \p key's value
-     *
-     * \throw JsonFormattingError If the \p key points to a type that cannot be converted
-     */
-    std::string formatValue(const Dictionary& dictionary, const std::string& key) const;
+/// This exception is thrown if an unknown type is being converted.
+struct JsonFormattingError : public RuntimeError {
+    explicit JsonFormattingError(std::string msg);
 };
+
+/**
+ * Converts the passed \p dictionary into a JSON string representation.
+ *
+ * \param dictionary The Dictionary that should be converted
+ * \return A JSON string representing the Dictionary
+ *
+ * \throw JsonFormattingError If the \p key points to a type that cannot be converted
+ */
+std::string formatJson(const Dictionary& dictionary);
 
 }  // namespace ghoul
 

@@ -245,7 +245,7 @@ void ProgramObject::setDictionary(const Dictionary& dictionary) {
     }
 }
 
-Dictionary ProgramObject::dictionary() {
+Dictionary ProgramObject::dictionary() const {
     if (_shaderObjects.empty()) {
         throw ProgramObjectError("No shader object attached");
     }

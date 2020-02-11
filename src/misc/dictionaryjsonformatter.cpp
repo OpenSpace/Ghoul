@@ -30,6 +30,8 @@
 #include <numeric>
 #include <string>
 
+namespace ghoul {
+
 namespace {
     std::string formatDouble(double d) {
         // This check is to silence -Wfloat-equal on GCC due to floating point comparison
@@ -40,90 +42,60 @@ namespace {
         const double base = d / std::pow(10, exponent);
         return std::to_string(base) + "E" + std::to_string(exponent);
     }
-} // namespace
-
-namespace ghoul {
-
-DictionaryJsonFormatter::JsonFormattingError::JsonFormattingError(std::string msg)
-    : RuntimeError(std::move(msg), "Dictionary")
-{}
 
 
-std::string DictionaryJsonFormatter::format(const Dictionary& dictionary) const {
-    if (dictionary.empty()) {
-        return "{}";
-    }
+    /**
+    * Converts a single value \p key out of the \p dictionary by manually iterating all
+    * the types and trying to access them.
+    * \param dictionary The Dictionary from which the \p key should be extracted and
+    * converted
+    * \param key The key in the Dictionary that should be converted
+    * \return A JSON representation of the \p key's value
+    * \throw JsonFormattingError If the \p key points to a type that cannot be converted
+    */
+    std::string formatValue(const Dictionary& dictionary, const std::string& key) {
+        if (dictionary.hasValue<Dictionary>(key)) {
+            Dictionary subDictionary = dictionary.value<Dictionary>(key);
+            return formatJson(subDictionary);
+        }
 
-    auto convert = [this, dictionary](const std::string& key) -> std::string {
-        return "\"" + key + "\":" + formatValue(dictionary, key);
-    };
+        if (dictionary.hasValue<glm::vec4>(key)) {
+            glm::vec4 vec = dictionary.value<glm::vec4>(key);
+            return "[" + formatDouble(vec.x) + "," +
+                formatDouble(vec.y) + "," +
+                formatDouble(vec.z) + "," +
+                formatDouble(vec.w) + "]";
+        }
 
-    std::vector<std::string> keys = dictionary.keys();
+        if (dictionary.hasValue<glm::vec3>(key)) {
+            glm::vec3 vec = dictionary.value<glm::vec3>(key);
+            return "[" + formatDouble(vec.x) + "," +
+                formatDouble(vec.y) + "," +
+                formatDouble(vec.z) + "]";
+        }
 
-    std::string json = std::accumulate(
-        std::next(keys.begin()),
-        keys.end(),
-        convert(*keys.begin()),
-        [convert](std::string a, std::string key) { return a + "," + convert(key); }
-    );
+        if (dictionary.hasValue<glm::vec2>(key)) {
+            glm::vec2 vec = dictionary.value<glm::vec2>(key);
+            return "[" + formatDouble(vec.x) + "," +
+                formatDouble(vec.y) + "]";
+        }
 
-    return "{" + json + "}";
-}
+        if (dictionary.hasValue<float>(key)) {
+            float value = dictionary.value<float>(key);
+            return formatDouble(value);
+        }
 
-/**
-* Converts a single value \p key out of the \p dictionary by manually iterating all
-* the types and trying to access them.
-* \param dictionary The Dictionary from which the \p key should be extracted and
-* converted
-* \param key The key in the Dictionary that should be converted
-* \return A JSON representation of the \p key's value
-* \throw JsonFormattingError If the \p key points to a type that cannot be converted
-*/
-std::string DictionaryJsonFormatter::formatValue(const Dictionary& dictionary,
-                                                 const std::string& key) const
-{
-    if (dictionary.hasValue<Dictionary>(key)) {
-        Dictionary subDictionary = dictionary.value<Dictionary>(key);
-        return format(subDictionary);
-    }
+        if (dictionary.hasValue<int>(key)) {
+            int value = dictionary.value<int>(key);
+            return std::to_string(value);
+        }
 
-    if (dictionary.hasValue<glm::vec4>(key)) {
-        glm::vec4 vec = dictionary.value<glm::vec4>(key);
-        return "[" + formatDouble(vec.x) + "," +
-            formatDouble(vec.y) + "," +
-            formatDouble(vec.z) + "," +
-            formatDouble(vec.w) + "]";
-    }
+        if (dictionary.hasValue<std::string>(key)) {
+            std::string value = dictionary.value<std::string>(key);
 
-    if (dictionary.hasValue<glm::vec3>(key)) {
-        glm::vec3 vec = dictionary.value<glm::vec3>(key);
-        return "[" + formatDouble(vec.x) + "," +
-            formatDouble(vec.y) + "," +
-            formatDouble(vec.z) + "]";
-    }
-
-    if (dictionary.hasValue<glm::vec2>(key)) {
-        glm::vec2 vec = dictionary.value<glm::vec2>(key);
-        return "[" + formatDouble(vec.x) + "," +
-            formatDouble(vec.y) + "]";
-    }
-
-    if (dictionary.hasValue<float>(key)) {
-        float value = dictionary.value<float>(key);
-        return formatDouble(value);
-    }
-
-    if (dictionary.hasValue<int>(key)) {
-        int value = dictionary.value<int>(key);
-        return std::to_string(value);
-    }
-
-    if (dictionary.hasValue<std::string>(key)) {
-        std::string value = dictionary.value<std::string>(key);
-
-        std::string jsonString;
-        for (const char& c : value) {
-            switch (c) {
+            std::string jsonString;
+            for (const char& c : value) {
+                switch (c) {
                 case '"':
                     jsonString += "\\\"";
                     break;
@@ -147,15 +119,45 @@ std::string DictionaryJsonFormatter::formatValue(const Dictionary& dictionary,
                     break;
                 default:
                     jsonString += c;
+                }
             }
+
+            return "\"" + jsonString + "\"";
         }
 
-        return "\"" + jsonString + "\"";
+        throw JsonFormattingError(
+            "Key '" + key + "' has invalid type for formatting dictionary as json"
+        );
+    }
+} // namespace
+
+
+JsonFormattingError::JsonFormattingError(std::string msg)
+    : RuntimeError(std::move(msg), "Dictionary")
+{}
+
+
+std::string formatJson(const Dictionary& dictionary) {
+    if (dictionary.empty()) {
+        return "{}";
     }
 
-    throw JsonFormattingError(
-        "Key '" + key + "' has invalid type for formatting dictionary as json"
+    auto convert = [](const std::string& key, const ghoul::Dictionary& d) -> std::string {
+        return "\"" + key + "\":" + formatValue(d, key);
+    };
+
+    std::vector<std::string> keys = dictionary.keys();
+
+    std::string json = std::accumulate(
+        std::next(keys.begin()),
+        keys.end(),
+        convert(*keys.begin(), dictionary),
+        [convert, dictionary](std::string a, std::string key) {
+            return a + "," + convert(key, dictionary);
+        }
     );
+
+    return "{" + json + "}";
 }
 
 }  // namespace ghoul

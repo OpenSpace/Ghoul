@@ -40,7 +40,6 @@ namespace ghoul::opengl {
  */
 class VertexBufferObject {
 public:
-
     /**
      * Default constructor. Initializes the internal GL objects to 0. VertexBufferObject%s
      * cannot be constructed without an OpenGL context.

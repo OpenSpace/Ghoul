@@ -31,23 +31,24 @@
 #include <string>
 
 #ifdef WIN32
-    #include <Windows.h>
-    #include <tchar.h>
-    #include <intrin.h>
-    #pragma comment(lib, "User32.lib")
-    #pragma comment(lib, "Kernel32.lib")
-    typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO); // NOLINT
-    typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD); // NOLINT
+#define WIN32_LEAN_AND_MEAN 
+#define NOMINMAX
+#include <Windows.h>
+#include <tchar.h>
+#include <intrin.h>
+#pragma comment(lib, "User32.lib")
+#pragma comment(lib, "Kernel32.lib")
+typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO); // NOLINT
+typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD); // NOLINT
 #else
-    #ifdef __APPLE__
-        #include <sys/sysctl.h>
-    #else
-        #include <sys/types.h>
-        #include <sys/sysinfo.h>
-        #include <cstring>
-    #endif
-
-    #include <sys/utsname.h>
+#ifdef __APPLE__
+#include <sys/sysctl.h>
+#else
+#include <sys/types.h>
+#include <sys/sysinfo.h>
+#include <cstring>
+#endif
+#include <sys/utsname.h>
 #endif
 
 namespace ghoul {
@@ -56,8 +57,7 @@ template <>
 std::string to_string(
            const systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem& value)
 {
-    using OS =
-        ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem;
+    using OS = ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem;
     switch (value) {
         case OS::Windows10:                   return "Windows 10";
         case OS::WindowsServer2016:           return "Windows Server 2016";
@@ -74,7 +74,7 @@ std::string to_string(
         case OS::WindowsXPProfx64:            return "Windows XP Professional x64";
         case OS::WindowsServer2003:           return "Windows Server 2003";
         case OS::WindowsXPHome:               return "Windows XP Home Edition";
-        case OS::WindowsXPProf:              return "Windows XP Professional Edition";
+        case OS::WindowsXPProf:               return "Windows XP Professional Edition";
         case OS::Windows2000Prof:             return "Windows 2000 Professional";
         case OS::Windows2000DatacenterServer: return "Windows 2000 Datacenter Server";
         case OS::Windows2000AdvancedServer:   return "Windows 2000 Advanced Server";
@@ -136,15 +136,16 @@ void GeneralCapabilitiesComponent::detectOS() {
     // http://msdn.microsoft.com/en-us/library/windows/desktop/ms724429%28v=vs.85%29.aspx
     // All rights remain with their original copyright owners
     OSVERSIONINFOEX osVersionInfo;
-    SYSTEM_INFO systemInfo;
-
-    ZeroMemory(&systemInfo, sizeof(SYSTEM_INFO));
-    ZeroMemory(&osVersionInfo, sizeof(OSVERSIONINFOEX));
+    std::memset(&osVersionInfo, 0, sizeof(OSVERSIONINFOEX));
     osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+
+    SYSTEM_INFO systemInfo;
+    std::memset(&systemInfo, 0, sizeof(SYSTEM_INFO));
+
 
 #pragma warning (push)
 #pragma warning (disable : 4996)
-    BOOL osVersionInfoEx = GetVersionEx((OSVERSIONINFO*) &osVersionInfo); // NOLINT
+    BOOL osVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO*>(&osVersionInfo));
 #pragma warning (pop)
 
     if (osVersionInfoEx == 0) {
@@ -165,13 +166,11 @@ void GeneralCapabilitiesComponent::detectOS() {
             std::string errorMsg(errorBuffer);
             LocalFree(errorBuffer);
             throw OperatingSystemError(
-                "Retrieving OS version failed. 'GetVersionEx' returned 0.",
-                errorMsg
+                "Retrieving OS version failed. 'GetVersionEx' returned 0.",errorMsg
             );
         }
         throw OperatingSystemError(
-            "Retrieving OS version failed. 'GetVersionEx' returned 0.",
-            ""
+            "Retrieving OS version failed. 'GetVersionEx' returned 0.", ""
         );
     }
     HMODULE module = GetModuleHandle(TEXT("kernel32.dll"));
@@ -198,8 +197,7 @@ void GeneralCapabilitiesComponent::detectOS() {
             );
         }
         throw OperatingSystemError(
-            "Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0.",
-            ""
+            "Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0.", ""
         );
     }
     PGNSI procedureGetNativeSystemInfo = reinterpret_cast<PGNSI>(GetProcAddress(
@@ -323,21 +321,20 @@ void GeneralCapabilitiesComponent::detectOS() {
     }
 
     _operatingSystemExtra = resultStream.str();
-    _fullOperatingSystem = ghoul::to_string(_operatingSystem) +
-                           " " + _operatingSystemExtra;
+    _fullOperatingSystem =
+        ghoul::to_string(_operatingSystem) + ' ' + _operatingSystemExtra;
 #else
     utsname name;
     int res = uname(&name);
     if (res != 0) {
         throw OperatingSystemError(
-            "OS detection failed. 'uname' returned non-null value",
-            std::to_string(res)
+            "OS detection failed. 'uname' returned non-null value", std::to_string(res)
         );
     }
 
     std::stringstream resultStream;
-    resultStream << name.sysname << " " << name.release << " "
-        << name.version << " " << name.machine;
+    resultStream <<
+        name.sysname << " " << name.release << " " << name.version << " " << name.machine;
 
     _operatingSystem = OperatingSystem::Unknown;
     _operatingSystemExtra = resultStream.str();
@@ -346,7 +343,7 @@ void GeneralCapabilitiesComponent::detectOS() {
 }
 
 void GeneralCapabilitiesComponent::detectMemory() {
-#if defined(WIN32)
+#ifdef WIN32
 #ifdef GHOUL_USE_WMI
     std::string memory;
     try {
@@ -375,10 +372,8 @@ void GeneralCapabilitiesComponent::detectMemory() {
     }
 #endif
 #elif defined(__APPLE__)
-    int mib[2];
+    int mib[2] = { CTL_HW, HW_MEMSIZE };
     size_t len;
-    mib[0] = CTL_HW;
-    mib[1] = HW_MEMSIZE;
     sysctl(mib, 2, NULL, &len, NULL, 0);
     std::vector<char> p(len);
     sysctl(mib, 2, p.data(), &len, NULL, 0);
@@ -402,17 +397,16 @@ void GeneralCapabilitiesComponent::detectCPU() {
         "ds", "acpi", "mmx", "fxsr", "sse", "sse2", "ss", "ht", "tm", "Unknown4", "pbe"
     };
 
-    // __cpuid with an InfoType argument of 0 returns the number of
-    // valid Ids in CPUInfo[0] and the CPU identification string in
-    // the other three array elements. The CPU identification string is
-    // not in linear order. The code below arranges the information
-    // in a human readable form.
+    // __cpuid with an InfoType argument of 0 returns the number of valid Ids in
+    // CPUInfo[0] and the CPU identification string in the other three array elements. The
+    // CPU identification string is not in linear order. The code below arranges the
+    // information in a human readable form.
     int CPUInfo[4] = { -1 };
     __cpuid(CPUInfo, 0);
     unsigned nIds = CPUInfo[0];
 
     char CPUString[0x20];
-    memset(CPUString, 0, sizeof(CPUString));
+    std::memset(CPUString, 0, sizeof(CPUString));
     *((int*)CPUString) = CPUInfo[1]; // NOLINT
     *((int*)(CPUString + 4)) = CPUInfo[3]; // NOLINT
     *((int*)(CPUString + 8)) = CPUInfo[2]; // NOLINT
@@ -442,7 +436,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     unsigned nExIds = CPUInfo[0];
 
     char CPUBrandString[0x40];
-    memset(CPUBrandString, 0, sizeof(CPUBrandString));
+    std::memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
     // Get the information associated with each extended ID.
     for (unsigned i = 0x80000000; i <= nExIds; ++i) {
@@ -450,13 +444,13 @@ void GeneralCapabilitiesComponent::detectCPU() {
 
         // Interpret CPU brand string and cache information.
         if (i == 0x80000002) {
-            memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+            std::memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
         }
         else if (i == 0x80000003) {
-            memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+            std::memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
         }
         else if (i == 0x80000004) {
-            memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+            std::memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
         }
         else if (i == 0x80000006) {
             _cacheLineSize = CPUInfo[2] & 0xff;

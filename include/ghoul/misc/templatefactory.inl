@@ -71,12 +71,7 @@ BaseClass* createDefault(bool useDictionary, const Dictionary& dict) {
 // Create Class using the default constructor or the Dictionary
 template <typename BaseClass, typename Class>
 BaseClass* createDefaultAndDictionary(bool useDictionary, const Dictionary& dict) {
-    if (useDictionary) {
-        return new Class(dict);
-    }
-    else {
-        return new Class;
-    }
+    return useDictionary ? new Class(dict) : new Class;
 }
 
 // Create Class using only the Dictionary constructor
@@ -130,8 +125,8 @@ std::unique_ptr<BaseClass> TemplateFactory<BaseClass>::create(
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
 
-    auto it = _map.find(className);
-    if (it == _map.end()) {
+    const auto it = _map.find(className);
+    if (it == _map.cend()) {
         throw TemplateClassNotFoundError(className);
     }
     else {
@@ -148,7 +143,7 @@ std::unique_ptr<BaseClass> TemplateFactory<BaseClass>::create(
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
 
-    auto it = _map.find(className);
+    const auto it = _map.find(className);
     if (it == _map.end()) {
         throw TemplateClassNotFoundError(className);
     }
@@ -202,10 +197,10 @@ void TemplateFactory<BaseClass>::registerClass(std::string className,
 
 template <typename BaseClass>
 void TemplateFactory<BaseClass>::registerClass(std::string className,
-            std::function<BaseClass*(bool, const ghoul::Dictionary&)> factoryFunction)
+                std::function<BaseClass*(bool, const ghoul::Dictionary&)> factoryFunction)
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
-    ghoul_assert(factoryFunction != nullptr, "Factory function must not be nullptr");
+    ghoul_assert(factoryFunction, "Factory function must not be nullptr");
 
     if (_map.find(className) != _map.end()) {
         throw TemplateFactoryError("Class '" + className + "' was registered before");
@@ -218,7 +213,6 @@ void TemplateFactory<BaseClass>::registerClass(std::string className,
 template <typename BaseClass>
 bool TemplateFactory<BaseClass>::hasClass(const std::string& className) const {
     ghoul_assert(!className.empty(), "Classname must not be empty");
-
     return (_map.find(className) != _map.end());
 }
 

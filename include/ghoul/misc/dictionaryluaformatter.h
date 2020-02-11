@@ -26,76 +26,30 @@
 #ifndef __GHOUL___DICTIONARYLUAFORMATTER___H__
 #define __GHOUL___DICTIONARYLUAFORMATTER___H__
 
-#include <ghoul/misc/dictionaryformatter.h>
-#include <ghoul/misc/exception.h>
 #include <ghoul/misc/boolean.h>
+#include <ghoul/misc/exception.h>
 
 namespace ghoul {
 
 class Dictionary;
 
-/**
- * This concrete implementation of a DictionaryFormatter converts the passed Dictionary
- * into a Lua format.
- *
- * At the moment, the only types that are supported in this conversion are:
- * <code>glm::vec2</code>, <code>glm::vec3</code>, <code>glm::vec4</code>,
- * <code>float</code>, <code>int</code>, and <code>std::string</code>.
- */
-class DictionaryLuaFormatter : public DictionaryFormatter {
-public:
-    BooleanType(PrettyPrint);
-
-    DictionaryLuaFormatter(PrettyPrint prettyPrint = PrettyPrint::No,
-        std::string indentation = "    ");
-    virtual ~DictionaryLuaFormatter() = default;
-
-    /**
-     * This exception is thrown if an unknown type is being converted.
-     */
-    struct LuaFormattingError : public RuntimeError {
-        explicit LuaFormattingError(const std::string& msg);
-    };
-
-    /**
-     * Converts the passed \p dictionary into a Lua string representation.
-     *
-     * \param dictionary The Dictionary that should be converted
-     * \return A Lua string representing the Dictionary
-     *
-     * \throw LuaFormattingError If the \p key points to a type that cannot be converted
-     */
-    std::string format(const Dictionary& dictionary) const override;
-
-private:
-    /**
-     * Converts a single value \p key out of the \p dictionary by manually iterating all
-     * the types and trying to access them.
-     *
-     * \param dictionary The Dictionary from which the \p key should be extracted and
-     *        converted
-     * \param key The key in the Dictionary that should be converted
-     * \return A Lua representation of the \p key's value
-     *
-     * \throw LuaFormattingError If the \p key points to a type that cannot be converted
-     */
-    std::string formatValue(const Dictionary& dictionary, const std::string& key,
-        int indentationSteps) const;
-
-    /**
-     * Converts the passed \p dictionary into a Lua string representation.
-     *
-     * \param dictionary The Dictionary that should be converted
-     * \param indentationSteps The number of indentation steps to begin with
-     * \return A Lua string representing the Dictionary
-     *
-     * \throw LuaFormattingError If the \p key points to a type that cannot be converted
-     */
-    std::string format(const Dictionary& dictionary, int indentationSteps) const;
-
-    bool _prettyPrint = false;
-    std::string _indentation;
+/// This exception is thrown if an unknown type is being converted.
+struct LuaFormattingError : public RuntimeError {
+    explicit LuaFormattingError(const std::string& msg);
 };
+
+BooleanType(PrettyPrint);
+
+/**
+ * Converts the passed \p dictionary into a Lua string representation.
+ *
+ * \param dictionary The Dictionary that should be converted
+ * \return A Lua string representing the Dictionary
+ *
+ * \throw LuaFormattingError If the \p key points to a type that cannot be converted
+ */
+std::string formatLua(const Dictionary& dictionary,
+    PrettyPrint prettyPrint = PrettyPrint::No, std::string indentation = "    ");
 
 }  // namespace ghoul
 
