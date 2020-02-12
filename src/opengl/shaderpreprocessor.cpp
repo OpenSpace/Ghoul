@@ -493,7 +493,8 @@ void ShaderPreprocessor::pushScope(std::map<std::string, std::string> map,
 
 void ShaderPreprocessor::popScope(ShaderPreprocessor::Env& env) {
     ghoul_assert(!env.scopes.empty(), "Environment must have open scope");
-    for ([[maybe_unused]] const std::string& key : env.scopes.back()) {
+    for (const std::string& key : env.scopes.back()) {
+        (void)key;
         ghoul_assert(env.aliases.find(key) != env.aliases.end(), "Key not found");
         ghoul_assert(!env.aliases.at(key).empty(), "No aliases for key");
     }

@@ -40,7 +40,8 @@ ObjectManager<T>::~ObjectManager() {
 
     // This loop is just to check *which* programs were left. If everything goes fine, the
     // next loop should iterate 0 times
-    for ([[maybe_unused]] const std::pair<const std::string, Info>& p : _objects) {
+    for (const std::pair<const std::string, Info>& p : _objects) {
+        (void)p;
         ghoul_assert(
             p.second.refCount == 0,
             "Ref count for Object '" + p.first + "' was not 0"
