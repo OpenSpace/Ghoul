@@ -29,7 +29,6 @@ function (set_ghoul_compile_settings target)
   if (MSVC)
     target_compile_options(
       ${target} PRIVATE
-      "/ZI"       # Edit and continue support
       "/MP"       # Multi-threading support
       "/W4"       # Highest warning level
       "/w44062"   # enumerator 'identifier' in a switch of enum 'enumeration' is not handled
@@ -82,6 +81,27 @@ function (set_ghoul_compile_settings target)
 
     # This definition can be removed when Cppformat is updated to remove the allocator warning
     target_compile_definitions(${target} PUBLIC "_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING")
+
+    if (GHOUL_OPTIMIZATION_ENABLE_AVX)
+        target_compile_options(${target} PRIVATE "/arch:AVX")
+    endif ()
+    if (GHOUL_OPTIMIZATION_ENABLE_AVX2)
+        target_compile_options(${target} PRIVATE "/arch:AVX2")
+    endif ()
+    if (GHOUL_OPTIMIZATION_ENABLE_AVX512)
+        target_compile_options(${target} PRIVATE "/arch:AVX512")
+    endif ()
+
+    if (GHOUL_OPTIMIZATION_ENABLE_OTHER_OPTIMIZATIONS)
+        target_compile_options(${target} PRIVATE
+            "/Oi" # usage of intrinsic functions
+            "/GL" # Whole program optimization
+        )
+    else ()
+        target_compile_options(${target} PRIVATE
+            "/ZI"       # Edit and continue support
+        )
+    endif ()
   elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(
       ${target} PRIVATE
