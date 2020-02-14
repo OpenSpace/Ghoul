@@ -351,7 +351,8 @@ void TcpSocket::streamInput() {
 
         if (_inputInterceptor) {
             _inputInterceptor(_inputBuffer.data(), nReadBytes);
-        } else {
+        }
+        else {
             std::lock_guard inputGuard(_inputQueueMutex);
             _inputQueue.insert(
                 _inputQueue.end(),

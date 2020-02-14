@@ -118,7 +118,8 @@ void HTMLLog::log(LogLevel level, const std::string& category,
     std::string output;
     if (_useCustomStyling) {
         output = "\t\t\t<tr class=\"" + classForLevel(level) + "\">\n";
-    } else {
+    }
+    else {
         output = "\t\t\t<tr bgcolor=\"" + colorForLevel(level) + "\">\n";
     }
     if (isDateStamping()) {

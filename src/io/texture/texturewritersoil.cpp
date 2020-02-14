@@ -53,9 +53,11 @@ void TextureWriterSOIL::saveTexture(const opengl::Texture& texture,
 
     if (extension == "bmp") {
         type = SOIL_SAVE_TYPE_BMP;
-    } else if (extension == "tga") {
+    }
+    else if (extension == "tga") {
         type = SOIL_SAVE_TYPE_TGA;
-    } else if (extension == "dds") {
+    }
+    else if (extension == "dds") {
         type = SOIL_SAVE_TYPE_DDS;
     }
 

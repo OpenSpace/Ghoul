@@ -65,7 +65,8 @@ std::unique_ptr<opengl::Texture> RawVolumeReader::read(const std::string& filena
     if (fin.good()) {
         fin.read(reinterpret_cast<char*>(data), sizeof(unsigned char) * s);
         fin.close();
-    } else {
+    }
+    else {
         LERROR(fmt::format("Could not open file {}", filename));
     }
 

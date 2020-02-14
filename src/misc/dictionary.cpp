@@ -258,7 +258,8 @@ bool Dictionary::splitKey(const string& key, string& first, string& rest) const 
     if (l == string::npos) {
         first = key;
         return false;
-    } else {
+    }
+    else {
         first = key.substr(0, l);
         rest = key.substr(l + 1);
         return true;

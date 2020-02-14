@@ -166,7 +166,8 @@ namespace {
         else {
             if (depth > 1.0) {
                 gl_FragDepth = depth / pow(10, 30);
-            } else {
+            }
+            else {
                 gl_FragDepth = depth - 1.0;
             }
         }

@@ -169,7 +169,8 @@ string FileSystem::absolutePath(string path, const vector<string>& ignoredTokens
         throw FileSystemException(fmt::format(
             "Error retrieving absolute path '{}'", path
         ));
-    } else {
+    }
+    else {
         path = buffer.data();
     }
 #else

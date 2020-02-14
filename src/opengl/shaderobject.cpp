@@ -260,7 +260,8 @@ void ShaderObject::rebuildFromFile() {
     if (_shaderName.empty()) {
         filesystem::File ghlFile(filename());
         baseName = ghlFile.baseName();
-    } else {
+    }
+    else {
         baseName = _shaderName;
     }
 

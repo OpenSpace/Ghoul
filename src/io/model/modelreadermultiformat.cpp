@@ -158,7 +158,8 @@ void ModelReaderMultiFormat::loadModel(const std::string& filename,
                 vTmp.normal[0] = meshPtr->mNormals[i].x;
                 vTmp.normal[1] = meshPtr->mNormals[i].y;
                 vTmp.normal[2] = meshPtr->mNormals[i].z;
-            } else {
+            }
+            else {
                 vTmp.normal[0] = 0.f;
                 vTmp.normal[1] = 0.f;
                 vTmp.normal[2] = 0.f;

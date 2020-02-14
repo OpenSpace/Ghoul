@@ -71,11 +71,11 @@ if (MSVC)
 
   if (GHOUL_OPTIMIZATION_ENABLE_AVX AND GHOUL_OPTIMIZATION_ENABLE_AVX512)
     message(FATAL_ERROR "Cannot enable AVX and AVX512 instructions simultaneously")
-  endif()
+  endif ()
 
   if (GHOUL_OPTIMIZATION_ENABLE_AVX2 AND GHOUL_OPTIMIZATION_ENABLE_AVX512)
     message(FATAL_ERROR "Cannot enable AVX2 and AVX512 instructions simultaneously")
-  endif()
+  endif ()
 endif ()
 
 #############################
