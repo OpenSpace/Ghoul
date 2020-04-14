@@ -29,10 +29,12 @@
 #include <cstring>
 
 #ifdef WIN32
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif // NOMINMAX
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif
+#endif // WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
