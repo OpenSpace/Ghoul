@@ -34,7 +34,7 @@ namespace ghoul {
 
 void initialize() {
     ZoneScoped
-        
+
     ghoul::filesystem::FileSystem::initialize();
 }
 

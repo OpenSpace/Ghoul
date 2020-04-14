@@ -51,9 +51,9 @@
 #endif // GLM_ENABLE_EXPERIMENTAL
 
 #ifndef __APPLE__
-#ifndef GLM_FORCE_CTOR_INIT 
-#define GLM_FORCE_CTOR_INIT 
-#endif // GLM_FORCE_CTOR_INIT 
+#ifndef GLM_FORCE_CTOR_INIT
+#define GLM_FORCE_CTOR_INIT
+#endif // GLM_FORCE_CTOR_INIT
 #endif
 
 // Enabling swizzling breaks binary compatibility between glm::vecX and float* ?

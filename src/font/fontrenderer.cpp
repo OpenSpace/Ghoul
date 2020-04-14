@@ -61,8 +61,8 @@ namespace {
         "${TEMPORARY}/projectionfontrenderer_fs.glsl";
 
     constexpr const char* DefaultVertexShaderSource = R"(
-    #version __CONTEXT__ 
-    
+    #version __CONTEXT__
+
     layout (location = 0) in vec2 in_position;
     layout (location = 1) in vec2 in_texCoords;
     layout (location = 2) in vec2 in_outlineTexCoords;
