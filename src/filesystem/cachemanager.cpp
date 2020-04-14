@@ -182,7 +182,7 @@ CacheManager::~CacheManager() {
     }
     else {
         LERROR(fmt::format(
-            "Could not open file '{}' for writing parmanent cache files", path
+            "Could not open file '{}' for writing permanent cache files", path
         ));
     }
     cleanDirectory(_directory);
