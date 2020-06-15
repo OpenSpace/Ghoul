@@ -73,6 +73,8 @@ namespace {
         ghoul::opengl::Texture::Format format;
         GLenum internalFormat;
         switch (n) {
+            // @TODO (2020-06-15), abock) At some point we should look into compressed
+            // formats here as well
             case 1:
                 format = ghoul::opengl::Texture::Format::Red;
                 internalFormat = GL_RED;
