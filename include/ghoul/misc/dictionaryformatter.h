@@ -23,34 +23,31 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___DICTIONARYLUAFORMATTER___H__
-#define __GHOUL___DICTIONARYLUAFORMATTER___H__
+#ifndef __GHOUL___DICTIONARYFORMATTER___H__
+#define __GHOUL___DICTIONARYFORMATTER___H__
 
-#include <ghoul/misc/boolean.h>
-#include <ghoul/misc/exception.h>
+#include <string>
 
 namespace ghoul {
 
-    class Dictionary;
+class Dictionary;
 
-    /// This exception is thrown if an unknown type is being converted.
-    struct LuaFormattingError : public RuntimeError {
-        explicit LuaFormattingError(const std::string& msg);
-    };
-
-    BooleanType(PrettyPrint);
-
+/**
+ * A DictionaryFormatter will take a Dictionary and convert it into an
+ * <code>std::string</code>. The resulting format of the string will be determined by the
+ * concrete implementation of the subclass.
+ */
+class DictionaryFormatter {
+public:
     /**
-     * Converts the passed \p dictionary into a Lua string representation.
+     * Converts the passed \p dictionary into a string representation.
      *
-     * \param dictionary The Dictionary that should be converted
-     * \return A Lua string representing the Dictionary
-     *
-     * \throw LuaFormattingError If the \p key points to a type that cannot be converted
+     * \param dictionary The Dictionary to convert
+     * \return A string representing the \p dictionary
      */
-    std::string formatLua(const Dictionary& dictionary,
-        PrettyPrint prettyPrint = PrettyPrint::No, std::string indentation = "    ");
+    virtual std::string format(const Dictionary& dictionary) const = 0;
+};
 
 }  // namespace ghoul
 
-#endif // __GHOUL___DICTIONARYLUAFORMATTER___H__
+#endif // __GHOUL___DICTIONARYFORMATTER___H__
