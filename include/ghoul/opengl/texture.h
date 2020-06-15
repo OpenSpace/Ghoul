@@ -493,6 +493,12 @@ public:
     void reUploadTextureFromPBO(GLuint pbo);
 
     /**
+     * If the texture is stored locally in RAM, the data representation will be removed.
+     * If thre is no local representation, this function is a no-op.
+     */
+    void purgeFromRAM();
+
+    /**
      * Downloads the texture from graphics memory and makes it available using the
      * #pixelData method.
      */
@@ -847,9 +853,6 @@ protected:
 
     /// Allocates new memory according to the dimensions and the bytes per pixel
     void allocateMemory();
-
-    /// Frees the stored memory
-    void destroyMemory();
 
     /// Generates a new OpenGL name and stores it in the _id variable
     void generateId();

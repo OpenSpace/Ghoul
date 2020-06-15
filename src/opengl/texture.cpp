@@ -97,7 +97,7 @@ Texture::~Texture() {
     }
 
     if (_hasOwnershipOfData) {
-        destroyMemory();
+        purgeFromRAM();
     }
 }
 
@@ -128,11 +128,6 @@ void Texture::allocateMemory() {
     unsigned int arraySize = compMul(_dimensions) * _bpp;
     _pixels = new GLubyte[arraySize];
     std::memset(_pixels, 0, arraySize);
-}
-
-void Texture::destroyMemory() {
-    delete[] static_cast<GLubyte*>(_pixels);
-    _pixels = nullptr;
 }
 
 void Texture::generateId() {
@@ -328,7 +323,7 @@ const void* Texture::pixelData() const {
 
 void Texture::setPixelData(void* pixels, TakeOwnership takeOwnership) {
     if (_hasOwnershipOfData) {
-        destroyMemory();
+        purgeFromRAM();
     }
     _hasOwnershipOfData = takeOwnership;
     _pixels = pixels;
@@ -498,6 +493,11 @@ void Texture::reUploadTextureFromPBO(GLuint pbo) {
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
     reUploadDataToTexture(nullptr);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+}
+
+void Texture::purgeFromRAM() {
+    delete[] static_cast<GLubyte*>(_pixels);
+    _pixels = nullptr;
 }
 
 void Texture::downloadTexture() {
