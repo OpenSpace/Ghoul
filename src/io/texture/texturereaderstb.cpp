@@ -49,7 +49,7 @@ namespace {
         }
 
 
-        LDEBUGC("TextureReaderSTB", fmt::format("{}: {} {} {}\n", message, x, y, n));
+        LDEBUGC("TextureReaderSTB", fmt::format("{}: {} {} {}", message, x, y, n));
 
         // This is weird.  stb_image.h says that the first pixel loaded is the one in the
         // upper left.  However, if we load the data and just use it, the images are
