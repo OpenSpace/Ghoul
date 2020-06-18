@@ -105,7 +105,8 @@ function (set_ghoul_compile_settings target)
   elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(
       ${target} PRIVATE
-      "-stdlib=libc++"
+      "-stdlib=libstdc++"
+      "-std=gnu++17"
       "-Wall"
       "-Wextra"
       # "-Wpedantic"
