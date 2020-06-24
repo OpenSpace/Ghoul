@@ -49,7 +49,7 @@ namespace {
         }
 
 
-        LDEBUGC("TextureReaderSTB", fmt::format("{}: {} {} {}\n", message, x, y, n));
+        LDEBUGC("TextureReaderSTB", fmt::format("{}: {} {} {}", message, x, y, n));
 
         // This is weird.  stb_image.h says that the first pixel loaded is the one in the
         // upper left.  However, if we load the data and just use it, the images are
@@ -73,6 +73,8 @@ namespace {
         ghoul::opengl::Texture::Format format;
         GLenum internalFormat;
         switch (n) {
+            // @TODO (2020-06-15), abock) At some point we should look into compressed
+            // formats here as well
             case 1:
                 format = ghoul::opengl::Texture::Format::Red;
                 internalFormat = GL_RED;

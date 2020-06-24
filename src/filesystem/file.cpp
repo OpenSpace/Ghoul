@@ -60,7 +60,7 @@ File::File(string filename, RawPath isRawPath, FileChangedCallback fileChangedCa
 
     _filename = isRawPath ?
         std::move(filename) :
-        std::move(FileSys.absolutePath(std::move(filename)));
+        FileSys.absolutePath(std::move(filename));
 
     if (_fileChangedCallback) {
         installFileChangeListener();
