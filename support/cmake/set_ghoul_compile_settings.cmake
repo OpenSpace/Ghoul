@@ -102,7 +102,88 @@ function (set_ghoul_compile_settings target)
             "/ZI"       # Edit and continue support
         )
     endif ()
-  elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  elseif (NOT LINUX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(
+      ${target} PRIVATE
+      "-stdlib=libc++"
+      "-std=gnu++17"
+      "-Wall"
+      "-Wextra"
+      # "-Wpedantic"
+      "-Wabstract-vbase-init"
+      "-Warray-bounds-pointer-arithmetic"
+      "-Wassign-enum"
+      "-Wauto-import"
+      "-Wbad-function-cast"
+      "-Wbitfield-constant-conversion"
+      "-Wcast-calling-convention"
+      "-Wcast-qual"
+      "-Wcomma"
+      "-Wcomplex-component-init"
+      "-Wconditional-uninitialized"
+      "-Wdate-time"
+      "-Wdeprecated-implementations"
+      "-Wdollar-in-identifier-extension"
+      "-Wduplicate-enum"
+      "-Wduplicate-method-match"
+      "-Wempty-body"
+      "-Wfloat-equal"
+      "-Wformat-pedantic"
+      "-Wheader-hygiene"
+      "-Widiomatic-parentheses"
+      "-Wimplicit-fallthrough"
+      "-Wimport-preprocessor-directive-pedantic"
+      "-Winconsistent-missing-override"
+      "-Wkeyword-macro"
+      "-Wlanguage-extension-token"
+      "-Wloop-analysis"
+      "-Wmethod-signatures"
+      "-Wmicrosoft-end-of-file"
+      "-Wmicrosoft-enum-forward-reference"
+      "-Wmicrosoft-fixed-enum"
+      "-Wmicrosoft-flexible-array"
+      "-Wmissing-noreturn"
+      "-Wmissing-prototypes"
+      "-Wnewline-eof"
+      "-Wno-missing-braces"
+      "-Wnon-virtual-dtor"
+      "-Wold-style-cast"
+      "-Wpessimizing-move"
+      "-Wpointer-arith"
+      "-Wpragmas"
+      "-Wredundant-move"
+      "-Wshadow-all"
+      "-Wshift-sign-overflow"
+      "-Wshorten-64-to-32"
+      "-Wstring-conversion"
+      "-Wtautological-compare"
+      "-Wthread-safety"
+      "-Wundef"
+      "-Wundefined-reinterpret-cast"
+      "-Wunneeded-internal-declaration"
+      "-Wunneeded-member-function"
+      "-Wunreachable-code-break"
+      "-Wunreachable-code-loop-increment"
+      "-Wunreachable-code-return"
+      "-Wunused-exception-parameter"
+      "-Wunused-label"
+      "-Wunused-local-typedef"
+      "-Wunused-macros"
+      "-Wunused-private-field"
+      "-Wunused-result"
+      "-Wunused-variable"
+      "-Wused-but-marked-unused"
+      "-Wvariadic-macros"
+      "-Wvla"
+      "-Wweak-template-vtables"
+      "-Wzero-length-array"
+    )
+
+    if (GHOUL_WARNINGS_AS_ERRORS)
+        target_compile_options(${target} PRIVATE "-Werror")
+    endif ()
+
+  elseif (LINUX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(
       ${target} PRIVATE
       "-stdlib=libstdc++"
@@ -182,7 +263,6 @@ function (set_ghoul_compile_settings target)
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(${target} PRIVATE "-Werror")
     endif ()
-
   elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     target_compile_options(
       ${target} PRIVATE
