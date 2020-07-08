@@ -158,6 +158,7 @@ end_dependency("GLM")
 
 if (GHOUL_MODULE_OPENGL)
   begin_module("OpenGL")
+  cmake_policy(SET CMP0072 NEW) #FindOpenGL prefers GLVND by default when available.
 
   # OpenGL
   begin_dependency("OpenGL")
