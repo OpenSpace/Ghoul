@@ -103,6 +103,7 @@ if (GHOUL_MODULE_OPENGL)
     ${PROJECT_SOURCE_DIR}/src/opengl/bufferbinding.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/debugcontext.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/framebufferobject.cpp
+    ${PROJECT_SOURCE_DIR}/src/opengl/openglstatecache.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/programobject.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/programobjectmanager.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/shadermanager.cpp
@@ -251,6 +252,7 @@ if (GHOUL_MODULE_OPENGL)
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/debugcontext.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/framebufferobject.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/ghoul_gl.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/openglstatecache.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobject.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobjectmanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shadermanager.h
