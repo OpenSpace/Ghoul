@@ -84,6 +84,20 @@ void* MemoryPool<BucketSize, InjectDebugMemory>::alloc(int bytes) {
     return ptr;
 }
 
+template <int BucketSize, bool InjectDebugMemory>
+int MemoryPool<BucketSize, InjectDebugMemory>::nBuckets() const {
+    return static_cast<int>(_buckets.size());
+}
+
+template <int BucketSize, bool InjectDebugMemory>
+std::vector<int> MemoryPool<BucketSize, InjectDebugMemory>::occupancies() const {
+    std::vector<int> res;
+    for (const std::unique_ptr<Bucket>& b : _buckets) {
+        res.push_back(b->usage);
+    }
+    return res;
+}
+
 template <typename T, int BucketSizeItems>
 std::vector<void*> TypedMemoryPool<T, BucketSizeItems>::allocate(int n) {
     // Hackish implementation to support larger allocations than number of items in a

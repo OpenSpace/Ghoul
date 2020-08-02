@@ -75,6 +75,16 @@ public:
      */
     void* alloc(int bytes);
 
+    /// Returns the number of buckets that have been allocated
+    int nBuckets() const;
+
+    /**
+     * Returns the usages for each of the buckets. The number of values returned is the
+     * same as returned by the \see nBuckets function.
+     */
+    std::vector<int> occupancies() const;
+
+
 private:
     struct Bucket {
         std::array<std::byte, BucketSize> payload; ///< The data storage of this bucket
