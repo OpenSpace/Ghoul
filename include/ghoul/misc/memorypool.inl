@@ -23,43 +23,32 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-namespace {
-    constexpr const bool InjectDebugMemory = false;
-} // namespace
-
 namespace ghoul {
 
-template <int BucketSize>
-MemoryPool<BucketSize>::MemoryPool(int nBuckets)
+template <int BucketSize, bool InjectDebugMemory>
+MemoryPool<BucketSize, InjectDebugMemory>::MemoryPool(int nBuckets)
     : _originalBucketSize(nBuckets)
 {
-    // Try to allocate as contiguous memory as possible
-    void* memory = malloc(nBuckets * BucketSize);
     _buckets.reserve(nBuckets);
     for (int i = 0; i < nBuckets; ++i) {
-        void* memPtr = reinterpret_cast<std::byte*>(memory) + (BucketSize * i);
-        Bucket* b = new (memPtr) Bucket;
-        _buckets.push_back(b);
+        _buckets.push_back(std::make_unique<Bucket>());
     }
 }
 
-template <int BucketSize>
-MemoryPool<BucketSize>::~MemoryPool() {
+template <int BucketSize, bool InjectDebugMemory>
+void MemoryPool<BucketSize, InjectDebugMemory>::reset() {
     for (Bucket* b : _buckets) {
-        delete b;
-    }
-}
+        b->usage = 0;
 
-template <int BucketSize>
-void MemoryPool<BucketSize>::reset() {
-    for (Bucket* b : _buckets) {
-        delete b;
+        if (InjectDebugMemory) {
+            std::memset(b->payload.data(), 0xAB, BucketSize);
+        }
     }
     _buckets.resize(_originalBucketSize);
 }
 
-template <int BucketSize>
-void* MemoryPool<BucketSize>::alloc(int bytes) {
+template <int BucketSize, bool InjectDebugMemory>
+void* MemoryPool<BucketSize, InjectDebugMemory>::alloc(int bytes) {
     ghoul_assert(
         bytes <= BucketSize,
         "Cannot allocate larger memory blocks than available in a bucket"
@@ -69,20 +58,21 @@ void* MemoryPool<BucketSize>::alloc(int bytes) {
     auto it = std::find_if(
         _buckets.begin(),
         _buckets.end(),
-        [bytes](Bucket* i) {
+        [bytes](const std::unique_ptr<Bucket>& i) {
             return i->usage + bytes <= BucketSize;
         }
     );
 
     // No bucket had enough space, so we have to create a new one
     if (it == _buckets.end()) {
-        _buckets.push_back(new Bucket);
+        _buckets.push_back(std::make_unique<Bucket>());
         it = _buckets.end() - 1;
     }
 
 
-    Bucket* b = *it;
-    void* ptr = reinterpret_cast<std::byte*>(b->payload.data()) + b->usage;
+    Bucket* b = it->get();
+    std::array<std::byte, BucketSize>& payload = b->payload;
+    std::byte* ptr = payload.data() + b->usage;
     b->usage += bytes;
 
     if (InjectDebugMemory) {
@@ -93,7 +83,6 @@ void* MemoryPool<BucketSize>::alloc(int bytes) {
 
     return ptr;
 }
-
 
 template <typename T, int BucketSizeItems>
 std::vector<void*> TypedMemoryPool<T, BucketSizeItems>::allocate(int n) {
@@ -120,8 +109,9 @@ std::vector<void*> TypedMemoryPool<T, BucketSizeItems>::allocate(int n) {
     return res;
 }
 
-template <typename T, int BucketSizeItems>
-ReusableTypedMemoryPool<T, BucketSizeItems>::ReusableTypedMemoryPool(int nBuckets)
+template <typename T, int BucketSizeItems, bool InjectDebugMemory>
+ReusableTypedMemoryPool<T, BucketSizeItems, InjectDebugMemory>::ReusableTypedMemoryPool(
+                                                                             int nBuckets)
     : _originalNBuckets(nBuckets)
 {
     _buckets.reserve(nBuckets);
@@ -130,16 +120,18 @@ ReusableTypedMemoryPool<T, BucketSizeItems>::ReusableTypedMemoryPool(int nBucket
     }
 }
 
-template <typename T, int BucketSizeItems>
-void ReusableTypedMemoryPool<T, BucketSizeItems>::reset() {
+template <typename T, int BucketSizeItems, bool InjectDebugMemory>
+void ReusableTypedMemoryPool<T, BucketSizeItems, InjectDebugMemory>::reset() {
     for (Bucket* b : _buckets) {
         delete b;
     }
     _buckets.resize(_originalNBuckets);
 }
 
-template <typename T, int BucketSizeItems>
-std::vector<void*> ReusableTypedMemoryPool<T, BucketSizeItems>::allocate(int n) {
+template <typename T, int BucketSizeItems, bool InjectDebugMemory>
+std::vector<void*>
+ReusableTypedMemoryPool<T, BucketSizeItems, InjectDebugMemory>::allocate(int n)
+{
     // Hackish implementation to support larger allocations than number of items in a
     // bucket; probably not likely to happen
     if (n > BucketSizeItems) {
@@ -200,8 +192,8 @@ std::vector<void*> ReusableTypedMemoryPool<T, BucketSizeItems>::allocate(int n) 
     return res;
 }
 
-template <typename T, int BucketSizeItems>
-void ReusableTypedMemoryPool<T, BucketSizeItems>::free(T* ptr) {
+template <typename T, int BucketSizeItems, bool InjectDebugMemory>
+void ReusableTypedMemoryPool<T, BucketSizeItems, InjectDebugMemory>::free(T* ptr) {
     if (ptr) {
         _freeList.push_back(ptr);
     }

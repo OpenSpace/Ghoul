@@ -46,7 +46,7 @@ namespace ghoul {
  *
  * \tparam BucketSize The size of each bucket in bytes
  */
-template <int BucketSize = 4096>
+template <int BucketSize = 4096, bool InjectDebugMemory = false>
 class MemoryPool {
 public:
     /**
@@ -57,15 +57,7 @@ public:
     MemoryPool(int nBuckets = 1);
 
     /**
-     * Frees the memory that was allocated during the existence of this MemoryPool or the
-     * last call of reset.
-     */
-    ~MemoryPool();
-
-    /**
-     * Frees the memory that was allocated during the existence of this MemoryPool or the
-     * last call of reset and returns the number of buckets to the initial number of
-     * buckets as requested in the constructor.
+     * Frees the memory that was allocated during the existence of this MemoryPool.
      */
     void reset();
 
@@ -89,7 +81,7 @@ private:
         int usage = 0; ///< The number of bytes that have been used in this Bucket
     };
 
-    std::vector<Bucket*> _buckets; ///< The number of allocated buckets
+    std::vector<std::unique_ptr<Bucket>> _buckets; ///< The number of allocated buckets
     const int _originalBucketSize; ///< The original desired number of buckets
 };
 
@@ -105,7 +97,7 @@ private:
  * \tparam BucketSizeItems The number of Ts that should be stored in a single Bucket
  */
 template <typename T, int BucketSizeItems = 128>
-class TypedMemoryPool : private MemoryPool<BucketSizeItems * sizeof(T)> {
+class TypedMemoryPool : private MemoryPool<BucketSizeItems * sizeof(T), false> {
 public:
     /**
      * Reserves a memory block that can fit \p n instances of T. Each entry in the
@@ -128,9 +120,8 @@ public:
  *
  * \tparam T The type for which the MemoryPool should operate
  * \tparam BucketSizeItems The number of Ts that should be stored in a single Bucket
- *
  */
-template <typename T, int BucketSizeItems = 128>
+template <typename T, int BucketSizeItems = 128, bool InjectDebugMemory = false>
 class ReusableTypedMemoryPool {
 public:
     /**

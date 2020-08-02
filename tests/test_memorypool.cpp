@@ -27,112 +27,160 @@
 
 #include <ghoul/misc/memorypool.h>
 
-// @TODO(abock, 2020-01-06) The MemoryPool causes a heap corruption (see issue #43) which
-// needs to be fixed first
-
-#if 0
-
-TEST_CASE("MemoryPool: MemoryPool", "[memorypool]") {
+TEST_CASE("MemoryPool: MemoryPool Default", "[memorypool]") {
     ghoul::MemoryPool<> pool1;
     void* p1 = pool1.alloc(1024);
+    std::memset(p1, 0xB0, 1024);
     REQUIRE(p1 != nullptr);
 
     void* p2 = pool1.alloc(1024);
+    std::memset(p2, 0xB1, 1024);
     REQUIRE(p2 != nullptr);
+    REQUIRE(p2 != p1);
 
     void* p3 = pool1.alloc(1024);
+    std::memset(p3, 0xB2, 1024);
     REQUIRE(p3 != nullptr);
+    REQUIRE(p3 != p1);
+    REQUIRE(p3 != p2);
 
     void* p4 = pool1.alloc(1024);
+    std::memset(p4, 0xB3, 1024);
     REQUIRE(p4 != nullptr);
-
-    ghoul::MemoryPool<2048> pool2;
-    void* q1 = pool2.alloc(1024);
-    REQUIRE(q1 != nullptr);
-    void* q2 = pool2.alloc(1024);
-    REQUIRE(q2 != nullptr);
-    void* q3 = pool2.alloc(1024);
-    REQUIRE(q3 != nullptr);
-    void* q4 = pool2.alloc(1024);
-    REQUIRE(q4 != nullptr);
+    REQUIRE(p4 != p1);
+    REQUIRE(p4 != p2);
+    REQUIRE(p4 != p3);
 }
 
-TEST_CASE("MemoryPool: Typed MemoryPool", "[memorypool]") {
-    ghoul::TypedMemoryPool<int> pool1;
-    std::vector<void*> p1 = pool1.allocate(2);
+TEST_CASE("MemoryPool: MemoryPool 2048 Bucket", "[memorypool]") {
+    ghoul::MemoryPool<2048> pool2;
+    void* p1 = pool2.alloc(1024);
+    std::memset(p1, 0xB0, 1024);
+    REQUIRE(p1 != nullptr);
+
+    void* p2 = pool2.alloc(1024);
+    std::memset(p2, 0xB1, 1024);
+    REQUIRE(p2 != nullptr);
+    REQUIRE(p2 != p1);
+
+    void* p3 = pool2.alloc(1024);
+    std::memset(p3, 0xB2, 1024);
+    REQUIRE(p3 != nullptr);
+    REQUIRE(p3 != p1);
+    REQUIRE(p3 != p2);
+
+    void* p4 = pool2.alloc(1024);
+    std::memset(p4, 0xB3, 1024);
+    REQUIRE(p4 != nullptr);
+    REQUIRE(p4 != p1);
+    REQUIRE(p4 != p2);
+    REQUIRE(p4 != p3);
+}
+
+TEST_CASE("MemoryPool: MemoryPool 2048 Bucket Pre-Alloc", "[memorypool]") {
+    ghoul::MemoryPool<2048> pool2(2);
+    void* p1 = pool2.alloc(1024);
+    std::memset(p1, 0xB0, 1024);
+    REQUIRE(p1 != nullptr);
+
+    void* p2 = pool2.alloc(1024);
+    std::memset(p2, 0xB1, 1024);
+    REQUIRE(p2 != nullptr);
+    REQUIRE(p2 != p1);
+
+    void* p3 = pool2.alloc(1024);
+    std::memset(p3, 0xB2, 1024);
+    REQUIRE(p3 != nullptr);
+    REQUIRE(p3 != p1);
+    REQUIRE(p3 != p2);
+
+    void* p4 = pool2.alloc(1024);
+    std::memset(p4, 0xB3, 1024);
+    REQUIRE(p4 != nullptr);
+    REQUIRE(p4 != p1);
+    REQUIRE(p4 != p2);
+    REQUIRE(p4 != p3);
+}
+
+TEST_CASE("MemoryPool: Typed MemoryPool Default", "[memorypool]") {
+    ghoul::TypedMemoryPool<int> pool;
+    std::vector<void*> p1 = pool.allocate(2);
     REQUIRE(p1.size() == 2);
     REQUIRE(p1[0] != p1[1]);
 
-    std::vector<void*> p2 = pool1.allocate(2);
+    std::vector<void*> p2 = pool.allocate(2);
     REQUIRE(p2.size() == 2);
     REQUIRE(p2[0] != p2[1]);
 
-    std::vector<void*> p3 = pool1.allocate(2);
+    std::vector<void*> p3 = pool.allocate(2);
     REQUIRE(p3.size() == 2);
     REQUIRE(p3[0] != p3[1]);
-    std::vector<void*> p4 = pool1.allocate(2);
+
+    std::vector<void*> p4 = pool.allocate(2);
     REQUIRE(p4.size() == 2);
     REQUIRE(p4[0] != p4[1]);
+}
 
-    ghoul::TypedMemoryPool<int, 8> pool2;
-    std::vector<void*> q1 = pool2.allocate(2);
-    REQUIRE(q1.size() == 2);
-    REQUIRE(q1[0] != q1[1]);
+TEST_CASE("MemoryPool: Typed MemoryPool 8Size", "[memorypool]") {
+    ghoul::TypedMemoryPool<int, 8> pool;
+    std::vector<void*> p1 = pool.allocate(2);
+    REQUIRE(p1.size() == 2);
+    REQUIRE(p1[0] != p1[1]);
 
-    std::vector<void*> q2 = pool2.allocate(2);
-    REQUIRE(q2.size() == 2);
-    REQUIRE(q2[0] != q2[1]);
+    std::vector<void*> p2 = pool.allocate(2);
+    REQUIRE(p2.size() == 2);
+    REQUIRE(p2[0] != p2[1]);
 
-    std::vector<void*> q3 = pool2.allocate(2);
-    REQUIRE(q3.size() == 2);
-    REQUIRE(q3[0] != q3[1]);
+    std::vector<void*> p3 = pool.allocate(2);
+    REQUIRE(p3.size() == 2);
+    REQUIRE(p3[0] != p3[1]);
 
-    std::vector<void*> q4 = pool2.allocate(2);
-    REQUIRE(q4.size() == 2);
-    REQUIRE(q4[0] != q4[1]);
+    std::vector<void*> p4 = pool.allocate(2);
+    REQUIRE(p4.size() == 2);
+    REQUIRE(p4[0] != p4[1]);
 }
 
 TEST_CASE("MemoryPool: Reusable Typed MemoryPool", "[memorypool]") {
-    ghoul::ReusableTypedMemoryPool<int> pool1;
-    std::vector<void*> p1 = pool1.allocate(2);
+    ghoul::ReusableTypedMemoryPool<int> pool;
+    std::vector<void*> p1 = pool.allocate(2);
     REQUIRE(p1.size() == 2);
     REQUIRE(p1[0] != p1[1]);
 
-    std::vector<void*> p2 = pool1.allocate(2);
+    std::vector<void*> p2 = pool.allocate(2);
     REQUIRE(p2.size() == 2);
     REQUIRE(p2[0] != p2[1]);
 
-    std::vector<void*> p3 = pool1.allocate(2);
+    std::vector<void*> p3 = pool.allocate(2);
     REQUIRE(p3.size() == 2);
     REQUIRE(p3[0] != p3[1]);
 
-    std::vector<void*> p4 = pool1.allocate(2);
+    std::vector<void*> p4 = pool.allocate(2);
     REQUIRE(p4.size() == 2);
     REQUIRE(p4[0] != p4[1]);
 
-    pool1.free(reinterpret_cast<int*>(p1[0]));
+    pool.free(reinterpret_cast<int*>(p1[0]));
 }
 
 TEST_CASE("MemoryPool: Reusable Typed MemoryPool Reuse", "[memorypool]") {
-    ghoul::ReusableTypedMemoryPool<int> pool1;
-    std::vector<void*> p1 = pool1.allocate(2);
+    ghoul::ReusableTypedMemoryPool<int> pool;
+    std::vector<void*> p1 = pool.allocate(2);
     REQUIRE(p1.size() == 2);
     REQUIRE(p1[0] != p1[1]);
 
-    std::vector<void*> p2 = pool1.allocate(2);
+    std::vector<void*> p2 = pool.allocate(2);
     REQUIRE(p2.size() == 2);
     REQUIRE(p2[0] != p2[1]);
 
-    pool1.free(reinterpret_cast<int*>(p1[0]));
-    pool1.free(reinterpret_cast<int*>(p1[1]));
-    pool1.free(reinterpret_cast<int*>(p2[0]));
-    pool1.free(reinterpret_cast<int*>(p2[1]));
+    pool.free(reinterpret_cast<int*>(p1[0]));
+    pool.free(reinterpret_cast<int*>(p1[1]));
+    pool.free(reinterpret_cast<int*>(p2[0]));
+    pool.free(reinterpret_cast<int*>(p2[1]));
 
-    std::vector<void*> p3 = pool1.allocate(2);
+    std::vector<void*> p3 = pool.allocate(2);
     REQUIRE(p3.size() == 2);
     REQUIRE(p3[0] != p3[1]);
 
-    std::vector<void*> p4 = pool1.allocate(2);
+    std::vector<void*> p4 = pool.allocate(2);
     REQUIRE(p4.size() == 2);
     REQUIRE(p4[0] != p4[1]);
 
@@ -141,5 +189,3 @@ TEST_CASE("MemoryPool: Reusable Typed MemoryPool Reuse", "[memorypool]") {
     REQUIRE(p4[0] == p1[0]);
     REQUIRE(p4[1] == p1[1]);
 }
-
-#endif
