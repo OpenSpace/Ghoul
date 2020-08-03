@@ -85,6 +85,14 @@ void* MemoryPool<BucketSize, InjectDebugMemory>::alloc(int bytes) {
 }
 
 template <int BucketSize, bool InjectDebugMemory>
+template <typename T, class... Types>
+T* MemoryPool<BucketSize, InjectDebugMemory>::alloc(Types&&... args) {
+    void* ptr = alloc(sizeof(T));
+    T* obj = new (ptr) T(std::forward<Types>(args)...);
+    return obj;
+}
+
+template <int BucketSize, bool InjectDebugMemory>
 int MemoryPool<BucketSize, InjectDebugMemory>::nBuckets() const {
     return static_cast<int>(_buckets.size());
 }
@@ -94,31 +102,6 @@ std::vector<int> MemoryPool<BucketSize, InjectDebugMemory>::occupancies() const 
     std::vector<int> res;
     for (const std::unique_ptr<Bucket>& b : _buckets) {
         res.push_back(b->usage);
-    }
-    return res;
-}
-
-template <typename T, int BucketSizeItems>
-std::vector<void*> TypedMemoryPool<T, BucketSizeItems>::allocate(int n) {
-    // Hackish implementation to support larger allocations than number of items in a
-    // bucket; probably not likely to happen
-    if (n > BucketSizeItems) {
-        std::vector<void*> res;
-        res.reserve(n);
-        while (n > BucketSizeItems) {
-            std::vector<void*> r = allocate(BucketSizeItems);
-            res.insert(res.end(), r.begin(), r.end());
-            n -= BucketSizeItems;
-        }
-        std::vector<void*> r = allocate(n);
-        res.insert(res.end(), r.begin(), r.end());
-        return res;
-    }
-
-    std::vector<void*> res(n);
-    void* ptr = MemoryPool<BucketSizeItems * sizeof(T)>::alloc(n * sizeof(T));
-    for (int i = 0; i < n; ++i) {
-        res[i] = reinterpret_cast<std::byte*>(ptr) + (i * sizeof(T));
     }
     return res;
 }

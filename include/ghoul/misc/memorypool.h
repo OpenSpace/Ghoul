@@ -75,6 +75,17 @@ public:
      */
     void* alloc(int bytes);
 
+    /**
+     * Returns a pointer to an allocated object of type T. The parameters to this function
+     * are passed on to the contructor of T.
+     *
+     * \param args The arguments to the constructor of T
+     *
+     * \tparam T The type of the object that is to be constructed 
+     */
+    template <typename T, class... Types>
+    T* alloc(Types&&... args);
+
     /// Returns the number of buckets that have been allocated
     int nBuckets() const;
 
@@ -83,7 +94,6 @@ public:
      * same as returned by the \see nBuckets function.
      */
     std::vector<int> occupancies() const;
-
 
 private:
     struct Bucket {
@@ -94,34 +104,6 @@ private:
     std::vector<std::unique_ptr<Bucket>> _buckets; ///< The number of allocated buckets
     const int _originalBucketSize; ///< The original desired number of buckets
 };
-
-
-/**
- * Similar to the MemoryPool, but instead of requesting individual bytes, this MemoryPool
- * operates instances of \tparam T. The TypedMemoryPool does not utilize any methods from
- * the provided type, but only uses the size of the type to provide a simplified interface
- * to the allocate method and BucketSizeItems parameter that operate on the number of
- * instances, rather than bytes.
- *
- * \tparam T The type for which the MemoryPool should operate
- * \tparam BucketSizeItems The number of Ts that should be stored in a single Bucket
- */
-template <typename T, int BucketSizeItems = 128>
-class TypedMemoryPool : private MemoryPool<BucketSizeItems * sizeof(T), false> {
-public:
-    /**
-     * Reserves a memory block that can fit \p n instances of T. Each entry in the
-     * returned vector points to the memory location that is big enough to fit a single
-     * instance of T.
-     *
-     * \param n The number of Ts that determine the size of the reserved memory block
-     *
-     * \return A list of pointers that each are big enough to hold a single T. These are
-     *         not guaranteed to be contiguous.
-     */
-    std::vector<void*> allocate(int n);
-};
-
 
 /**
  * This memory pool works similar to the \see TypedMemoryPool execept that instances of

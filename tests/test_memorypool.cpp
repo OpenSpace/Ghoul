@@ -62,7 +62,6 @@ TEST_CASE("MemoryPool: MemoryPool Default", "[memorypool]") {
     REQUIRE(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies().size() == 1);
     REQUIRE(pool.occupancies()[0] == 4096);
-
 }
 
 TEST_CASE("MemoryPool: MemoryPool 2048 Bucket", "[memorypool]") {
@@ -143,45 +142,6 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Bucket Pre-Alloc", "[memorypool]") {
     REQUIRE(pool.occupancies().size() == 2);
     REQUIRE(pool.occupancies()[0] == 2048);
     REQUIRE(pool.occupancies()[1] == 2048);
-}
-
-TEST_CASE("MemoryPool: Typed MemoryPool Default", "[memorypool]") {
-    ghoul::TypedMemoryPool<int> pool;
-    std::vector<void*> p1 = pool.allocate(2);
-    REQUIRE(p1.size() == 2);
-    REQUIRE(p1[0] != p1[1]);
-
-
-    std::vector<void*> p2 = pool.allocate(2);
-    REQUIRE(p2.size() == 2);
-    REQUIRE(p2[0] != p2[1]);
-
-    std::vector<void*> p3 = pool.allocate(2);
-    REQUIRE(p3.size() == 2);
-    REQUIRE(p3[0] != p3[1]);
-
-    std::vector<void*> p4 = pool.allocate(2);
-    REQUIRE(p4.size() == 2);
-    REQUIRE(p4[0] != p4[1]);
-}
-
-TEST_CASE("MemoryPool: Typed MemoryPool 8Size", "[memorypool]") {
-    ghoul::TypedMemoryPool<int, 8> pool;
-    std::vector<void*> p1 = pool.allocate(2);
-    REQUIRE(p1.size() == 2);
-    REQUIRE(p1[0] != p1[1]);
-
-    std::vector<void*> p2 = pool.allocate(2);
-    REQUIRE(p2.size() == 2);
-    REQUIRE(p2[0] != p2[1]);
-
-    std::vector<void*> p3 = pool.allocate(2);
-    REQUIRE(p3.size() == 2);
-    REQUIRE(p3[0] != p3[1]);
-
-    std::vector<void*> p4 = pool.allocate(2);
-    REQUIRE(p4.size() == 2);
-    REQUIRE(p4[0] != p4[1]);
 }
 
 TEST_CASE("MemoryPool: Reusable Typed MemoryPool", "[memorypool]") {
