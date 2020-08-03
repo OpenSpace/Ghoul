@@ -30,6 +30,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -37,27 +38,27 @@ namespace ghoul {
 
 class Dictionary;
 
+/// Main exception that is thrown by the TemplateFactory in the case of errors
+struct TemplateFactoryError : public RuntimeError {
+    explicit TemplateFactoryError(std::string msg);
+};
+
+/// Exception that is thrown if a requested class has not been registered before
+struct TemplateClassNotFoundError : public TemplateFactoryError {
+    explicit TemplateClassNotFoundError(std::string name);
+    const std::string className;
+};
+
+/// Exception that is thrown if a registered class is called with a wrong constructor
+struct TemplateConstructionError : public TemplateFactoryError {
+    explicit TemplateConstructionError(std::string msg);
+};
+
 class TemplateFactoryBase {
 public:
-    /// Main exception that is thrown by the TemplateFactory in the case of errors
-    struct TemplateFactoryError : public RuntimeError {
-        explicit TemplateFactoryError(std::string msg);
-    };
-
-    /// Exception that is thrown if a requested class has not been registered before
-    struct TemplateClassNotFoundError : public TemplateFactoryError {
-        explicit TemplateClassNotFoundError(std::string name);
-        const std::string className;
-    };
-
-    /// Exception that is thrown if a registered class is called with a wrong constructor
-    struct TemplateConstructionError : public TemplateFactoryError {
-        explicit TemplateConstructionError(std::string msg);
-    };
-
-    virtual const std::type_info& baseClassType() const = 0;
     virtual ~TemplateFactoryBase() = default;
 
+    virtual const std::type_info& baseClassType() const = 0;
     virtual bool hasClass(const std::string& className) const = 0;
     virtual std::vector<std::string> registeredClasses() const = 0;
 };
@@ -103,7 +104,7 @@ i = factory.create("B", { }); // throws an exception as B does not have a Dictio
  * \tparam BaseClass The base class of all classes that can be registered and created
  * using this factory
  */
-template <typename BaseClass>
+template <typename BaseClass, typename MemoryPool = void*>
 class TemplateFactory : public TemplateFactoryBase {
 public:
     /**
@@ -122,6 +123,9 @@ public:
      *        constructor, but a Dictionary was used.
      */
     using FactoryFuncPtr = BaseClass* (*)(bool useDictionary, const Dictionary& dict);
+
+    TemplateFactory() = default;
+    TemplateFactory(MemoryPool pool);
 
     /**
      * Creates an instance of the class which was registered under the provided
@@ -256,8 +260,13 @@ public:
      */
     const std::type_info& baseClassType() const override;
 
+    /// Returns the memory pool that was passed in the constructor
+    const MemoryPool& memoryPool() const;
+
 private:
     using FactoryFunction = std::function<BaseClass*(bool, const ghoul::Dictionary&)>;
+
+    std::optional<MemoryPool> _pool;
 
     /// The map storing all the associations from <code>className</code> to classes
     std::map<std::string, FactoryFunction> _map;

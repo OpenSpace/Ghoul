@@ -168,7 +168,7 @@ TEST_CASE("TemplateFactory: No Default Constructor Exists", "[templatefactory]")
 
     REQUIRE_THROWS_AS(
         factory.create("SubClassDictionary"),
-        ghoul::TemplateFactoryBase::TemplateConstructionError
+        ghoul::TemplateConstructionError
     );
 }
 
@@ -194,7 +194,7 @@ TEST_CASE("TemplateFactory: No Dictionary Constructor Exists", "[templatefactory
 
     REQUIRE_THROWS_AS(
         factory.create("SubClassDefault", dict),
-        ghoul::TemplateFactoryBase::TemplateConstructionError
+        ghoul::TemplateConstructionError
     );
 }
 
@@ -208,7 +208,7 @@ TEST_CASE("TemplateFactory: Class Does Not Exist", "[templatefactory]") {
 
     REQUIRE_THROWS_AS(
         factory.create("DoesNotExist"),
-        ghoul::TemplateFactoryBase::TemplateClassNotFoundError
+        ghoul::TemplateClassNotFoundError
     );
 }
 
