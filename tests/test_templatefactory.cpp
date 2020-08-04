@@ -239,30 +239,30 @@ TEST_CASE("TemplateFactory: Correctness For HasClass", "[templatefactory]") {
     REQUIRE_FALSE(factory.hasClass("DoesNotExist"));
 }
 
-TEST_CASE("TemplateFactory: Function Pointer Construction", "[templatefactory]") {
-    ghoul::TemplateFactory<BaseClass> factory;
-
-    factory.registerClass("ptr", &createFunctionPointerClass);
-
-    std::unique_ptr<BaseClass> obj = factory.create("ptr");
-    REQUIRE(obj == nullptr);
-
-    std::unique_ptr<BaseClass> obj2 = factory.create("ptr", {});
-    REQUIRE(obj2 != nullptr);
-}
-
-TEST_CASE("TemplateFactory: Std Function Construction", "[templatefactory]") {
-    ghoul::TemplateFactory<BaseClass> factory;
-
-    std::function<BaseClass* (bool, const ghoul::Dictionary&)> function =
-        [](bool use, const ghoul::Dictionary&) -> BaseClass* {
-            return use ? new StdFunctionClass : nullptr;
-    };
-    factory.registerClass("ptr", function);
-
-    std::unique_ptr<BaseClass> obj = factory.create("ptr");
-    REQUIRE(obj == nullptr);
-
-    std::unique_ptr<BaseClass> obj2 = factory.create("ptr", {});
-    REQUIRE(obj2 != nullptr);
-}
+//TEST_CASE("TemplateFactory: Function Pointer Construction", "[templatefactory]") {
+//    ghoul::TemplateFactory<BaseClass> factory;
+//
+//    factory.registerClass("ptr", &createFunctionPointerClass);
+//
+//    std::unique_ptr<BaseClass> obj = factory.create("ptr");
+//    REQUIRE(obj == nullptr);
+//
+//    std::unique_ptr<BaseClass> obj2 = factory.create("ptr", ghoul::Dictionary());
+//    REQUIRE(obj2 != nullptr);
+//}
+//
+//TEST_CASE("TemplateFactory: Std Function Construction", "[templatefactory]") {
+//    ghoul::TemplateFactory<BaseClass> factory;
+//
+//    std::function<BaseClass* (bool, const ghoul::Dictionary&)> function =
+//        [](bool use, const ghoul::Dictionary&) -> BaseClass* {
+//            return use ? new StdFunctionClass : nullptr;
+//    };
+//    factory.registerClass("ptr", function);
+//
+//    std::unique_ptr<BaseClass> obj = factory.create("ptr");
+//    REQUIRE(obj == nullptr);
+//
+//    std::unique_ptr<BaseClass> obj2 = factory.create("ptr", ghoul::Dictionary());
+//    REQUIRE(obj2 != nullptr);
+//}

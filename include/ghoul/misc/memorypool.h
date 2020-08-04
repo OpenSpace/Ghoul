@@ -35,6 +35,14 @@
 
 namespace ghoul {
 
+class MemoryPoolBase {
+public:
+    virtual ~MemoryPoolBase() = default;
+
+    virtual void reset() = 0;
+    virtual void* alloc(int bytes) = 0;
+};
+
 /**
  * This class represents a MemoryPool with a specific size from which individual memory
  * blocks can be requested. The MemoryPool is organized into multiple separate buckets
@@ -47,7 +55,7 @@ namespace ghoul {
  * \tparam BucketSize The size of each bucket in bytes
  */
 template <int BucketSize = 4096, bool InjectDebugMemory = false>
-class MemoryPool {
+class MemoryPool : public MemoryPoolBase {
 public:
     /**
      * Creates the MemoryBool with the specified number of buckets already created
@@ -59,7 +67,7 @@ public:
     /**
      * Frees the memory that was allocated during the existence of this MemoryPool.
      */
-    void reset();
+    virtual void reset() final;
 
     /**
      * Returns a pointer to a block of memory in a bucket that is big enough to hold the
@@ -73,7 +81,7 @@ public:
      *
      * \pre bytes must not be bigger than BucketSize
      */
-    void* alloc(int bytes);
+    virtual void* alloc(int bytes) final;
 
     /**
      * Returns a pointer to an allocated object of type T. The parameters to this function

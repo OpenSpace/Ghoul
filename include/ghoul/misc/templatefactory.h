@@ -27,10 +27,10 @@
 #define __GHOUL___TEMPLATEFACTORY___H__
 
 #include <ghoul/misc/exception.h>
+#include <ghoul/misc/memorypool.h>
 #include <functional>
 #include <map>
 #include <memory>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -104,7 +104,7 @@ i = factory.create("B", { }); // throws an exception as B does not have a Dictio
  * \tparam BaseClass The base class of all classes that can be registered and created
  * using this factory
  */
-template <typename BaseClass, typename MemoryPool = void*>
+template <typename BaseClass>
 class TemplateFactory : public TemplateFactoryBase {
 public:
     /**
@@ -122,10 +122,10 @@ public:
      *        constructor, for example a class that does not have a Dictionary
      *        constructor, but a Dictionary was used.
      */
-    using FactoryFuncPtr = BaseClass* (*)(bool useDictionary, const Dictionary& dict);
+    using FactoryFunction = std::function<
+        BaseClass* (bool, const ghoul::Dictionary&, MemoryPoolBase* pool)
+    >;
 
-    TemplateFactory() = default;
-    TemplateFactory(MemoryPool pool);
 
     /**
      * Creates an instance of the class which was registered under the provided
@@ -134,6 +134,9 @@ public:
      * Classes can be registered with the #registerClass method.
      *
      * \param className The class name of the instance that should be created
+     * \param pool The optional memory pool that is used to allocate the new object. If
+     *        this value is \c std::nullopt, the operating systems memory allocated is
+     *        used
      * \return A fully initialized instance of the registered class
      *
      * \throw TemplateClassNotFoundError If the \p className did not name a previously
@@ -142,7 +145,8 @@ public:
      *        not have a default constructor
      * \pre \p className must not be empty
      */
-    std::unique_ptr<BaseClass> create(const std::string& className) const;
+    std::unique_ptr<BaseClass> create(const std::string& className,
+        MemoryPoolBase* pool = nullptr) const;
 
     /**
      * Creates an instance of the class which was registered under the provided
@@ -155,6 +159,9 @@ public:
      * \param className The class name of the instance that should be created
      * \param dictionary The dictionary that will be passed to the constructor of the
      *        class
+     * \param pool The optional memory pool that is used to allocate the new object. If
+     *        this value is \c std::nullopt, the operating systems memory allocated is
+     *        used
      * \return A fully initialized instance of the registered class
      *
      * \throw TemplateClassNotFoundError If the \p className did not name a previously
@@ -164,7 +171,8 @@ public:
      * \pre \p className must not be empty
      */
     std::unique_ptr<BaseClass> create(const std::string& className,
-        const Dictionary& dictionary) const;
+        const Dictionary& dictionary,
+        MemoryPoolBase* pool = nullptr) const;
 
     /**
      * Registers a <code>Class</code> with the provided \p className so that it can later
@@ -187,30 +195,7 @@ public:
 
     /**
      * Registers a class with the provided \p className and the user-defined
-     * #FactoryFuncPtr. The \p factoryFunction must return a valid subclass of
-     * <code>BaseClass</code> when is it called in the #create methods of TemplateFactory.
-     * The function pointer is stored inside and <b>no</b> closure will be constructed.
-     * This means that it is the callers responsibility that the factory function returns
-     * a valid type for each call of #create.
-     *
-     * \param className The class name, which will be registered with the provided
-     *        factory function
-     * \param factoryFunction The function pointer that will be called if the
-     *        TemplateFactory is asked to create a class of type \p className. The first
-     *        argument of the function pointer is <code>true</code> if the #create method
-     *        was called with a Dictionary as an additional parameter, implying that the
-     *        subclass should be constructed using the Dictionary provided as the second
-     *        argument. The factory function is free to ignore this request.
-     *
-     * \throw TemplateFactoryError If the \p className has been registered before
-     * \pre \p className must not be empty
-     * \pre \p factoryFunction must not be <code>nullptr</code>
-     */
-    void registerClass(std::string className, FactoryFuncPtr factoryFunction);
-
-    /**
-     * Registers a class with the provided \p className and the user-defined
-     * #FactoryFuncPtr. The \p factoryFunction must return a valid subclass of
+     * #FactoryFunc. The \p factoryFunction must return a valid subclass of
      * <code>BaseClass</code> when is it called in the #create methods of TemplateFactory.
      * The <code>std::function</code> object is stored inside.
      *
@@ -228,7 +213,8 @@ public:
      * \pre \p factoryFunction must not be <code>nullptr</code>
      */
     void registerClass(std::string className,
-        std::function<BaseClass*(bool, const ghoul::Dictionary&)> factoryFunction);
+        std::function<BaseClass*(bool, const ghoul::Dictionary&, MemoryPoolBase* pool)> 
+            factoryFunction);
 
     /**
      * Checks if any class has been registered under the provided \p className As any
@@ -260,14 +246,7 @@ public:
      */
     const std::type_info& baseClassType() const override;
 
-    /// Returns the memory pool that was passed in the constructor
-    const MemoryPool& memoryPool() const;
-
 private:
-    using FactoryFunction = std::function<BaseClass*(bool, const ghoul::Dictionary&)>;
-
-    std::optional<MemoryPool> _pool;
-
     /// The map storing all the associations from <code>className</code> to classes
     std::map<std::string, FactoryFunction> _map;
 };

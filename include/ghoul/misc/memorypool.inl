@@ -37,7 +37,7 @@ MemoryPool<BucketSize, InjectDebugMemory>::MemoryPool(int nBuckets)
 
 template <int BucketSize, bool InjectDebugMemory>
 void MemoryPool<BucketSize, InjectDebugMemory>::reset() {
-    for (Bucket* b : _buckets) {
+    for (const std::unique_ptr<Bucket>& b : _buckets) {
         b->usage = 0;
 
         if (InjectDebugMemory) {
