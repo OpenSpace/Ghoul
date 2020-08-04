@@ -162,9 +162,8 @@ struct CreateHelper<BaseClass, Class, DICTIONARY_CONSTRUCTOR> {
 } // namespace
 
 template <typename BaseClass>
-std::unique_ptr<BaseClass> TemplateFactory<BaseClass>::create(
-                                                             const std::string& className,
-                                                               MemoryPoolBase* pool) const
+BaseClass* TemplateFactory<BaseClass>::create(const std::string& className,
+                                              MemoryPoolBase* pool) const
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
 
@@ -175,15 +174,15 @@ std::unique_ptr<BaseClass> TemplateFactory<BaseClass>::create(
     else {
         // If 'className' is a valid name, we can use the stored function pointer to
         // create the class using the 'createType' method
-        return std::unique_ptr<BaseClass>(it->second(false, {}, pool));
+        BaseClass* res = it->second(false, {}, pool);
+        return res;
     }
 }
 
 template <typename BaseClass>
-std::unique_ptr<BaseClass> TemplateFactory<BaseClass>::create(
-                                                             const std::string& className,
-                                                             const Dictionary& dictionary,
-                                                               MemoryPoolBase* pool) const
+BaseClass* TemplateFactory<BaseClass>::create(const std::string& className,
+                                              const Dictionary& dictionary,
+                                              MemoryPoolBase* pool) const
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
 
@@ -194,7 +193,8 @@ std::unique_ptr<BaseClass> TemplateFactory<BaseClass>::create(
     else {
         // If 'className' is a valid name, we can use the stored function pointer to
         // create the class using the 'createType' method
-        return std::unique_ptr<BaseClass>(it->second(true, dictionary, pool));
+        BaseClass* res = it->second(true, dictionary, pool);
+        return res;
     }
 }
 

@@ -26,6 +26,8 @@
 #include "catch2/catch.hpp"
 
 #include <ghoul/misc/dictionary.h>
+#include <ghoul/misc/managedmemoryuniqueptr.h>
+#include <ghoul/misc/memorypool.h>
 #include <ghoul/misc/templatefactory.h>
 
  /*
@@ -47,7 +49,8 @@
 namespace {
     struct BaseClass {
     public:
-        virtual ~BaseClass() {} // virtual method necessary for RTTI
+        // virtual method necessary for RTTI
+        virtual ~BaseClass() = default;
 
         int value1 = -1;
         int value2 = -2;
@@ -111,7 +114,9 @@ TEST_CASE("TemplateFactory: Correctness Direct Subclass", "[templatefactory]") {
 
     factory.registerClass<SubClassDefault>("SubClassDefault");
 
-    std::unique_ptr<BaseClass> obj = factory.create("SubClassDefault");
+    ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
+        factory.create("SubClassDefault")
+    );
     REQUIRE(obj != nullptr);
 
     SubClassDefault* derived = dynamic_cast<SubClassDefault*>(obj.get());
@@ -123,7 +128,9 @@ TEST_CASE("TemplateFactory: Correctness Deep SubClass", "[templatefactory]") {
 
     factory.registerClass<SubClassMultipleLayers>("SubClassMultipleLayers");
 
-    std::unique_ptr<BaseClass> obj = factory.create("SubClassMultipleLayers");
+    ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
+        factory.create("SubClassMultipleLayers")
+    );
     REQUIRE(obj != nullptr);
 
     SubClassMultipleLayers* derived = dynamic_cast<SubClassMultipleLayers*>(obj.get());
@@ -136,9 +143,14 @@ TEST_CASE("TemplateFactory: Non Interference", "[templatefactory]") {
     factory.registerClass<SubClassDefault>("SubClassDefault");
     factory.registerClass<SubClassDefault2>("SubClassDefault2");
 
-    std::unique_ptr<BaseClass> obj = factory.create("SubClassDefault");
+    ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
+        factory.create("SubClassDefault")
+    );
     REQUIRE(obj != nullptr);
-    std::unique_ptr<BaseClass> obj2 = factory.create("SubClassDefault2");
+
+    ghoul::mm_unique_ptr<BaseClass> obj2 = ghoul::mm_unique_ptr<BaseClass>(
+        factory.create("SubClassDefault2")
+    );
     REQUIRE(obj2 != nullptr);
     REQUIRE(obj != obj2);
 
@@ -154,7 +166,9 @@ TEST_CASE("TemplateFactory: Default Constructor", "[templatefactory]") {
 
     factory.registerClass<SubClassDefault>("SubClassDefault");
 
-    std::unique_ptr<BaseClass> obj = factory.create("SubClassDefault");
+    ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
+        factory.create("SubClassDefault")
+    );
     REQUIRE(obj != nullptr);
 
     REQUIRE(obj->value1 == 1);
@@ -178,7 +192,9 @@ TEST_CASE("TemplateFactory: Dictionary Constructor", "[templatefactory]") {
     factory.registerClass<SubClassDictionary>("SubClassDictionary");
 
     ghoul::Dictionary dict = { { "value1", 100 }, { "value2", 200 } };
-    std::unique_ptr<BaseClass> obj = factory.create("SubClassDictionary", dict);
+    ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
+        factory.create("SubClassDictionary", dict)
+    );
     REQUIRE(obj != nullptr);
 
     REQUIRE(obj->value1 == 100);
@@ -203,7 +219,9 @@ TEST_CASE("TemplateFactory: Class Does Not Exist", "[templatefactory]") {
 
     factory.registerClass<SubClassDefault>("SubClassDefault");
 
-    std::unique_ptr<BaseClass> obj = factory.create("SubClassDefault");
+    ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
+        factory.create("SubClassDefault")
+    );
     REQUIRE(obj != nullptr);
 
     REQUIRE_THROWS_AS(
@@ -218,13 +236,17 @@ TEST_CASE("TemplateFactory: Default Dictionary Constructor", "[templatefactory]"
     // SubClassDefaultDictionary 31 32
     factory.registerClass<SubClassDefaultDictionary>("class");
 
-    std::unique_ptr<BaseClass> obj = factory.create("class");
+    ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
+        factory.create("class")
+    );
     REQUIRE(obj != nullptr);
     REQUIRE(obj->value1 == 31);
     REQUIRE(obj->value2 == 32);
 
     ghoul::Dictionary dict = { { "value1", 41 }, { "value2", 42 } };
-    std::unique_ptr<BaseClass> obj2 = factory.create("class", dict);
+    ghoul::mm_unique_ptr<BaseClass> obj2 = ghoul::mm_unique_ptr<BaseClass>(
+        factory.create("class", dict)
+    );
     REQUIRE(obj2 != nullptr);
     REQUIRE(obj2->value1 == 41);
     REQUIRE(obj2->value2 == 42);
@@ -239,30 +261,41 @@ TEST_CASE("TemplateFactory: Correctness For HasClass", "[templatefactory]") {
     REQUIRE_FALSE(factory.hasClass("DoesNotExist"));
 }
 
-//TEST_CASE("TemplateFactory: Function Pointer Construction", "[templatefactory]") {
-//    ghoul::TemplateFactory<BaseClass> factory;
-//
-//    factory.registerClass("ptr", &createFunctionPointerClass);
-//
-//    std::unique_ptr<BaseClass> obj = factory.create("ptr");
-//    REQUIRE(obj == nullptr);
-//
-//    std::unique_ptr<BaseClass> obj2 = factory.create("ptr", ghoul::Dictionary());
-//    REQUIRE(obj2 != nullptr);
-//}
-//
-//TEST_CASE("TemplateFactory: Std Function Construction", "[templatefactory]") {
-//    ghoul::TemplateFactory<BaseClass> factory;
-//
-//    std::function<BaseClass* (bool, const ghoul::Dictionary&)> function =
-//        [](bool use, const ghoul::Dictionary&) -> BaseClass* {
-//            return use ? new StdFunctionClass : nullptr;
-//    };
-//    factory.registerClass("ptr", function);
-//
-//    std::unique_ptr<BaseClass> obj = factory.create("ptr");
-//    REQUIRE(obj == nullptr);
-//
-//    std::unique_ptr<BaseClass> obj2 = factory.create("ptr", ghoul::Dictionary());
-//    REQUIRE(obj2 != nullptr);
-//}
+TEST_CASE("TemplateFactory: Std Function Construction", "[templatefactory]") {
+    ghoul::TemplateFactory<BaseClass> factory;
+
+    ghoul::TemplateFactory<BaseClass>::FactoryFunction function =
+        [](bool use, const ghoul::Dictionary&, ghoul::MemoryPoolBase*) -> BaseClass* {
+            return use ? new StdFunctionClass : nullptr;
+    };
+    factory.registerClass("ptr", function);
+
+    ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
+        factory.create("ptr")
+    );
+    REQUIRE(obj == nullptr);
+
+    ghoul::mm_unique_ptr<BaseClass> obj2 = ghoul::mm_unique_ptr<BaseClass>(
+        factory.create("ptr", ghoul::Dictionary())
+    );
+    REQUIRE(obj2 != nullptr);
+}
+
+TEST_CASE("TemplateFactory: MemoryPool construction", "[templatefactory]") {
+    ghoul::MemoryPool<64, true> pool;
+
+    ghoul::TemplateFactory<BaseClass> factory;
+    factory.registerClass<SubClassDefault>("sc");
+
+    ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
+        factory.create("sc", &pool)
+    );
+    REQUIRE(pool.nBuckets() == 1);
+    REQUIRE(pool.occupancies()[0] == 16);
+
+    ghoul::mm_unique_ptr<BaseClass> obj2 = ghoul::mm_unique_ptr<BaseClass>(
+        factory.create("sc", &pool)
+    );
+    REQUIRE(pool.nBuckets() == 1);
+    REQUIRE(pool.occupancies()[0] == 32);
+}

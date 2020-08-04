@@ -23,6 +23,10 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+namespace {
+    constexpr const int DebugByte = 0x0F;
+} // namespace
+
 namespace ghoul {
 
 template <int BucketSize, bool InjectDebugMemory>
@@ -31,7 +35,11 @@ MemoryPool<BucketSize, InjectDebugMemory>::MemoryPool(int nBuckets)
 {
     _buckets.reserve(nBuckets);
     for (int i = 0; i < nBuckets; ++i) {
-        _buckets.push_back(std::make_unique<Bucket>());
+        std::unique_ptr<Bucket> b = std::make_unique<Bucket>();
+        if (InjectDebugMemory) {
+            std::memset(b->payload.data(), DebugByte, BucketSize);
+        }
+        _buckets.push_back(std::move(b));
     }
 }
 
@@ -41,7 +49,7 @@ void MemoryPool<BucketSize, InjectDebugMemory>::reset() {
         b->usage = 0;
 
         if (InjectDebugMemory) {
-            std::memset(b->payload.data(), 0xAB, BucketSize);
+            std::memset(b->payload.data(), DebugByte, BucketSize);
         }
     }
     _buckets.resize(_originalBucketSize);
@@ -77,7 +85,7 @@ void* MemoryPool<BucketSize, InjectDebugMemory>::alloc(int bytes) {
 
     if (InjectDebugMemory) {
         for (int ii = 0; ii < bytes; ++ii) {
-            std::memset(reinterpret_cast<std::byte*>(ptr) + ii, 0xAB, 1);
+            std::memset(reinterpret_cast<std::byte*>(ptr) + ii, DebugByte, 1);
         }
     }
 
@@ -182,7 +190,7 @@ ReusableTypedMemoryPool<T, BucketSizeItems, InjectDebugMemory>::allocate(int n)
         if (InjectDebugMemory) {
             for (int ii = 0; ii < sizeof(T) / sizeof(std::byte); ++ii) {
                 std::byte* bptr = reinterpret_cast<std::byte*>(res[i]);
-                std::memset(bptr + ii, 0xAB, 1);
+                std::memset(bptr + ii, DebugByte, 1);
             }
         }
     }

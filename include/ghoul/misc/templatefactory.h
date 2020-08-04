@@ -30,7 +30,6 @@
 #include <ghoul/misc/memorypool.h>
 #include <functional>
 #include <map>
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -126,7 +125,6 @@ public:
         BaseClass* (bool, const ghoul::Dictionary&, MemoryPoolBase* pool)
     >;
 
-
     /**
      * Creates an instance of the class which was registered under the provided
      * \p className. This creation uses the parameterless default constructor of the
@@ -145,8 +143,7 @@ public:
      *        not have a default constructor
      * \pre \p className must not be empty
      */
-    std::unique_ptr<BaseClass> create(const std::string& className,
-        MemoryPoolBase* pool = nullptr) const;
+    BaseClass* create(const std::string& className, MemoryPoolBase* pool = nullptr) const;
 
     /**
      * Creates an instance of the class which was registered under the provided
@@ -170,8 +167,7 @@ public:
      *        not have a constructor using a Dictionary object
      * \pre \p className must not be empty
      */
-    std::unique_ptr<BaseClass> create(const std::string& className,
-        const Dictionary& dictionary,
+    BaseClass* create(const std::string& className, const Dictionary& dictionary,
         MemoryPoolBase* pool = nullptr) const;
 
     /**
