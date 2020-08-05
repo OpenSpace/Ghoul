@@ -31,6 +31,7 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/misc.h>
+#include <ghoul/misc/profiling.h>
 #include <ghoul/opengl/programobject.h>
 #include <ghoul/opengl/texture.h>
 #include <ghoul/opengl/textureatlas.h>
@@ -191,6 +192,9 @@ FontRenderer::FontRenderer() {
     glGenVertexArrays(1, &_vao);
     glGenBuffers(1, &_vbo);
     glGenBuffers(1, &_ibo);
+
+    _vertexBuffer.reserve(128 * 4);
+    _indexBuffer.reserve(128 * 4);
 }
 
 FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
@@ -344,8 +348,6 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
 
     float h = font.height();
 
-    //unsigned int vertexIndex = 0;
-    std::vector<GLuint> indices;
     glm::vec2 movingPos = glm::vec2(0.f);
 
     glm::vec2 size = glm::vec2(0.f);
@@ -394,6 +396,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec4& color,
                                                       const glm::vec4& outlineColor) const
 {
+    ZoneScoped
+
     const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
 
     glDisable(GL_DEPTH_TEST);
@@ -410,19 +414,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         float outlineS;
         float outlineT;
     };
-
-    int nCharacters = std::accumulate(
-        lines.begin(),
-        lines.end(),
-        0,
-        [](int lhs, const std::string& rhs) { return static_cast<int>(rhs.size()) + lhs; }
-    );
-    std::vector<Vertex> vertices;
-    vertices.reserve(nCharacters * 4); // each character is four vertices
-
-    std::vector<GLushort> indices;
-    indices.reserve(nCharacters * 3); // each character is two triangles
-
+    
+    _vertexBuffer.clear();
+    _indexBuffer.clear();
 
     GLushort vertexIndex = 0;
     glm::vec2 size = glm::vec2(0.f);
@@ -469,13 +463,13 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             const GLushort idx1 = vertexIndex + 1;
             const GLushort idx2 = vertexIndex + 2;
             const GLushort idx3 = vertexIndex + 3;
-            indices.insert(indices.end(), { idx, idx1, idx2, idx, idx2, idx3 });
+            _indexBuffer.insert(_indexBuffer.end(), { idx, idx1, idx2, idx, idx2, idx3 });
             vertexIndex += 4;
-            vertices.insert(vertices.end(), {
-                { x0, y0, s0, t0, outlineS0, outlineT0 },
-                { x0, y1, s0, t1, outlineS0, outlineT1 },
-                { x1, y1, s1, t1, outlineS1, outlineT1 },
-                { x1, y0, s1, t0, outlineS1, outlineT0 }
+            _vertexBuffer.insert(_vertexBuffer.end(), {
+                x0, y0, s0, t0, outlineS0, outlineT0,
+                x0, y1, s0, t1, outlineS0, outlineT1,
+                x1, y1, s1, t1, outlineS1, outlineT1,
+                x1, y0, s1, t0, outlineS1, outlineT0
             });
             movingPos.x += glyph->horizontalAdvance();
 
@@ -506,16 +500,16 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBufferData(
         GL_ARRAY_BUFFER,
-        vertices.size() * sizeof(Vertex),
-        vertices.data(),
+        _vertexBuffer.size() * sizeof(Vertex),
+        _vertexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
-        indices.size() * sizeof(GLushort),
-        indices.data(),
+        _indexBuffer.size() * sizeof(GLushort),
+        _indexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
@@ -544,7 +538,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     glDrawElements(
         GL_TRIANGLES,
-        static_cast<GLsizei>(indices.size()),
+        static_cast<GLsizei>(_indexBuffer.size()),
         GL_UNSIGNED_SHORT,
         nullptr
     );
@@ -565,13 +559,12 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 {
     float h = font.height();
 
+    _vertexBuffer.clear();
+    _indexBuffer.clear();
+
     const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
 
-    unsigned int vertexIndex = 0;
-    std::vector<GLuint> indices;
-    std::vector<GLfloat> vertices;
-    //glm::vec3 movingPos = pos;
-    // TODO(abock): review y starting position
+    unsigned short vertexIndex = 0;
     glm::vec2 movingPos(offset);
 
     glm::vec2 size = glm::vec2(0.f);
@@ -693,17 +686,18 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 }
             }
 
-            vertices.insert(vertices.end(), {
+            _vertexBuffer.insert(_vertexBuffer.end(), {
                 p0.x, p0.y, p0.z, s0, t0, outlineS0, outlineT0,
                 p1.x, p1.y, p1.z, s0, t1, outlineS0, outlineT1,
                 p2.x, p2.y, p2.z, s1, t1, outlineS1, outlineT1,
                 p3.x, p3.y, p3.z, s1, t0, outlineS1, outlineT0
             });
 
-            indices.insert(indices.end(), {
-                vertexIndex, vertexIndex + 1, vertexIndex + 2,
-                vertexIndex, vertexIndex + 2, vertexIndex + 3
-            });
+            const unsigned short vi = vertexIndex;
+            const unsigned short vi1 = vertexIndex + 1;
+            const unsigned short vi2 = vertexIndex + 2;
+            const unsigned short vi3 = vertexIndex + 3;
+            _indexBuffer.insert(_indexBuffer.end(), { vi, vi1, vi2, vi, vi2, vi3 });
             vertexIndex += 4;
 
             movingPos.x += glyph->horizontalAdvance();
@@ -753,16 +747,16 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBufferData(
         GL_ARRAY_BUFFER,
-        vertices.size() * sizeof(float),
-        vertices.data(),
+        _vertexBuffer.size() * sizeof(float),
+        _vertexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
-        indices.size() * sizeof(GLuint),
-        indices.data(),
+        _indexBuffer.size() * sizeof(GLuint),
+        _indexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
@@ -783,7 +777,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     glDrawElements(
         GL_TRIANGLES,
-        static_cast<GLsizei>(indices.size()),
+        static_cast<GLsizei>(_indexBuffer.size()),
         GL_UNSIGNED_INT,
         nullptr
     );

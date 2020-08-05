@@ -318,6 +318,9 @@ private:
     /// The index buffer object that allows reusing vertices to form one quad per glyph
     unsigned int _ibo = 0;
 
+    mutable std::vector<float> _vertexBuffer;
+    mutable std::vector<GLushort> _indexBuffer;
+
     UniformCache(baseColor, outlineColor, texture, hasOutline, projection) _uniformCache;
     UniformCache(baseColor, outlineColor, texture, hasOutline, modelViewTransform,
         enableFalseDepth, disableTransmittance) _uniformCacheProjection;
