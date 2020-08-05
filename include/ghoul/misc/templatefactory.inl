@@ -231,7 +231,7 @@ void TemplateFactory<BaseClass>::registerClass(std::string className) {
 
 template <typename BaseClass>
 void TemplateFactory<BaseClass>::registerClass(std::string className,
-    std::function<BaseClass*(bool, const ghoul::Dictionary&, MemoryPoolBase* pool)> factoryFunction)
+                                               FactoryFunction factoryFunction)
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
     ghoul_assert(factoryFunction, "Factory function must not be nullptr");
