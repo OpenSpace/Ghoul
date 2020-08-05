@@ -23,24 +23,35 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/misc/templatefactory.h>
+#ifndef __GHOUL___MANAGEDMEMORYUNIQUEPTR___H__
+#define __GHOUL___MANAGEDMEMORYUNIQUEPTR___H__
 
-#include <ghoul/misc/dictionary.h>
+#include <memory>
+
+// The coding style in this file is a bit different to make the class in here more similar
+// to the STD
 
 namespace ghoul {
 
-TemplateFactoryError::TemplateFactoryError(std::string msg)
-    : RuntimeError(std::move(msg), "TemplateFactory")
-{}
+namespace detail {
 
-TemplateClassNotFoundError::TemplateClassNotFoundError(std::string name)
-    : TemplateFactoryError("Could not find class '" + name + "'")
-    , className(std::move(name))
-{}
+template <typename T>
+struct placement_delete {
+    void operator()(T* ptr) {
+        if (ptr) {
+            ptr->~T();
+        }
+    }
+};
 
-TemplateConstructionError::TemplateConstructionError(std::string msg)
-    : TemplateFactoryError(std::move(msg))
-{}
+} // namespace detail
+
+template <typename T>
+using managed_memory_unique_ptr = std::unique_ptr<T, detail::placement_delete<T>>;
+
+template <typename T>
+using mm_unique_ptr = managed_memory_unique_ptr<T>;
 
 } // namespace ghoul
 
+#endif // __GHOUL___MANAGEDMEMORYUNIQUEPTR___H__
