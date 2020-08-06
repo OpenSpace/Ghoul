@@ -500,7 +500,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBufferData(
         GL_ARRAY_BUFFER,
-        _vertexBuffer.size() * sizeof(Vertex),
+        _vertexBuffer.size() * sizeof(float),
         _vertexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
