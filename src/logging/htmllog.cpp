@@ -26,6 +26,7 @@
 #include <ghoul/logging/htmllog.h>
 
 #include <ghoul/misc/assert.h>
+#include <ghoul/fmt.h>
 #include <iterator>
 
 namespace ghoul::logging {
@@ -132,7 +133,9 @@ void HTMLLog::log(LogLevel level, const std::string& category,
         output += "\t\t\t\t<td class=\"log-category\">" + category + "</td>\n";
     }
     if (isLogLevelStamping()) {
-        output += "\t\t\t\t<td class=\"log-level\">" + to_string(level) + "</td>\n";
+        output += fmt::format(
+            "\t\t\t\t<td class=\"log-level\">{}</td>\n", to_string(level)
+        );
     }
 
     output += "\t\t\t\t<td class=\"log-message\">";

@@ -25,6 +25,8 @@
 
 #include <ghoul/logging/callbacklog.h>
 
+#include <ghoul/fmt.h>
+
 namespace ghoul::logging {
 
 CallbackLog::CallbackLog(CallbackFunction callbackFunction, TimeStamping timeStamping,
@@ -53,7 +55,7 @@ void CallbackLog::log(LogLevel level, const std::string& category,
         output += category + " ";
     }
     if (isLogLevelStamping()) {
-        output += "(" + to_string(level) + ")";
+        output += fmt::format("({})", to_string(level));
     }
     if (!output.empty()) {
         output += "\t";

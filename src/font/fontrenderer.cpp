@@ -181,6 +181,23 @@ namespace {
         // 4th coord of the gNormal is the water reflectance
         gNormal = vec4(0.0, 0.0, 1.0, 0.0);
     })";
+
+    // Extracts the next line from the string view and returns it, the passed string_view
+    // is modified to remove the new line *and* the \n character
+    std::string_view extractLine(std::string_view& view) {
+        std::string_view::size_type p = view.find('\n');
+        if (p == std::string_view::npos) {
+            // No new line found
+            std::string_view res = view;
+            view = std::string_view();
+            return res;
+        }
+
+        std::string_view res = view.substr(0, p);
+        view = view.substr(p + 2);
+        return res;
+    }
+
 } // namespace
 
 namespace ghoul::fontrendering {
@@ -342,19 +359,14 @@ FontRenderer& FontRenderer::defaultProjectionRenderer() {
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
-                                                            const std::string& text) const
+                                                              std::string_view text) const
 {
-    const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
-
-    float h = font.height();
-
-    glm::vec2 movingPos = glm::vec2(0.f);
-
+    const size_t lines = std::count(text.begin(), text.end(), '\n') + 1;
     glm::vec2 size = glm::vec2(0.f);
-    for (const std::string& line : lines) {
-        movingPos.x = 0.f;
+    do {
+        std::string_view line = extractLine(text);
+
         float width = 0.f;
-        float height = 0.f;
         for (char c : line) {
             wchar_t character = c;
             if (character == wchar_t('\t')) {
@@ -362,7 +374,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
             }
             const Font::Glyph* glyph;
 
-            // @TODO: Replace with an explicit lookup to not eat the cost of the throw
+            // @TODO (abock, 2018-05-28): Replace with an explicit lookup to not eat the
+            // cost of the throw
             try {
                 glyph = font.glyph(character);
             }
@@ -371,20 +384,18 @@ FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
             }
 
             width += glyph->horizontalAdvance();
-            height = std::max(height, static_cast<float>(glyph->height()));
         }
-        size.x = std::max(size.x, width);
-        size.y += height;
-        movingPos.y -= h;
-    }
-    size.y = lines.size() * font.height();
 
-    return { size, static_cast<int>(lines.size()) };
+        size.x = std::max(size.x, width);
+    } while (!text.empty());
+    size.y = lines * font.height();
+
+    return { size, static_cast<int>(lines) };
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec2& pos,
-                                                          const std::string& text,
+                                                          std::string_view text,
                                                           const glm::vec4& color) const
 {
     return render(font, pos, text, color, { 0.f, 0.f, 0.f, color.a });
@@ -392,13 +403,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec2& pos,
-                                                          const std::string& text,
+                                                          std::string_view text,
                                                           const glm::vec4& color,
                                                       const glm::vec4& outlineColor) const
 {
-    ZoneScoped
-
-    const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
+    const size_t lines = std::count(text.begin(), text.end(), '\n') + 1;
 
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -421,7 +430,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     GLushort vertexIndex = 0;
     glm::vec2 size = glm::vec2(0.f);
     glm::vec2 movingPos = pos;
-    for (const std::string& line : lines) {
+    do {
+        std::string_view line = extractLine(text);
         movingPos.x = pos.x;
         float width = 0.f;
         float height = 0.f;
@@ -479,8 +489,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         size.x = std::max(size.x, width);
         //size.y += height;
         movingPos.y -= font.height();
-    }
-    size.y = (lines.size() - 1) * font.height();
+    } while (!text.empty());
+    size.y = (lines - 1) * font.height();
 
     opengl::TextureUnit atlasUnit;
     atlasUnit.activate();
@@ -546,12 +556,12 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glBindVertexArray(0);
     glEnable(GL_DEPTH_TEST);
 
-    return { size, static_cast<int>(lines.size()) };
+    return { size, static_cast<int>(lines) };
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec3& pos,
-                                                          const std::string& text,
+                                                          std::string_view text,
                                                           const glm::vec4& color,
                                                           const glm::vec4& outlineColor,
                                               const ProjectedLabelsInformation& labelInfo,
@@ -562,15 +572,15 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     _vertexBuffer.clear();
     _indexBuffer.clear();
 
-    const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
+    const size_t lines = std::count(text.begin(), text.end(), '\n') + 1;
 
     unsigned short vertexIndex = 0;
     glm::vec2 movingPos(offset);
 
     glm::vec2 size = glm::vec2(0.f);
     float heightInPixels = 0.f;
-
-    for (const std::string& line : lines) {
+    do {
+        std::string_view line = extractLine(text);
         //movingPos.x = 0.f;
         //movingPos.x = pos.x;
         float width = 0.f;
@@ -657,7 +667,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 heightInPixels > _framebufferSize.x ||
                 heightInPixels > _framebufferSize.y)
             {
-                return { size, static_cast<int>(lines.size()) };
+                return { size, static_cast<int>(lines) };
             }
 
             if (heightInPixels > labelInfo.maxSize) {
@@ -709,8 +719,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         size.x = std::max(size.x, width);
         size.y += height;
         movingPos.y -= h;
-    }
-    size.y = (lines.size() - 1) * font.height();
+    } while (!text.empty());
+    size.y = (lines - 1) * font.height();
 
     if (!labelInfo.enableDepth) {
         glDisable(GL_DEPTH_TEST);
@@ -789,12 +799,12 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         glEnable(GL_DEPTH_TEST);
     }
 
-    return { size, static_cast<int>(lines.size()) };
+    return { size, static_cast<int>(lines) };
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec3& pos,
-                                                          const std::string& text,
+                                                          std::string_view text,
                                                           const glm::vec4& color,
                                               const ProjectedLabelsInformation& labelInfo,
                                                             const glm::vec2& offset) const
@@ -812,7 +822,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec3& pos,
-                                                          const std::string& text,
+                                                          std::string_view text,
                                         const ProjectedLabelsInformation& labelInfo) const
 {
     return render(

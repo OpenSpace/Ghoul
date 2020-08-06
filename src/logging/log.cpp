@@ -138,7 +138,7 @@ std::string Log::createFullMessageString(LogLevel level, const std::string& cate
         output += category + " ";
     }
     if (isLogLevelStamping()) {
-        output += "(" + to_string(level) + ")";
+        output += fmt::format("({})", to_string(level));
     }
     if (!output.empty()) {
         output += "\t";

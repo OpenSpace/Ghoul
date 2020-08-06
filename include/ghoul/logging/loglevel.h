@@ -70,7 +70,7 @@ namespace ghoul {
 *
 * \return The string representation of the passed LogLevel
 */
-std::string to_string(logging::LogLevel string);
+std::string_view to_string(logging::LogLevel string);
 
 /**
 * Returns the LogLevel for the passed string representation. The name of

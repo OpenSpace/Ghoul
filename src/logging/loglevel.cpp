@@ -30,7 +30,7 @@
 
 namespace ghoul {
 
-std::string to_string(logging::LogLevel string) {
+std::string_view to_string(logging::LogLevel string) {
     switch (string) {
         case logging::LogLevel::AllLogging: return "All";
         case logging::LogLevel::Trace:      return "Trace";
