@@ -106,7 +106,7 @@ bool WebSocket::getMessage(std::string& message) {
     return true;
 }
 
-bool WebSocket::putMessage(const std::string &message) {
+bool WebSocket::putMessage(const std::string& message) {
     _socketConnection->send(message);
     _tcpSocket->put<char>(_outputStream.str().c_str(), _outputStream.str().size());
     _outputStream.str("");

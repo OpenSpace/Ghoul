@@ -191,7 +191,7 @@ public:
      * \return A tuple containing the bounding box of the text that was printed and the
      *         number of lines that were printed
      */
-    BoundingBoxInformation boundingBox(Font& font, std::string_view text) const;
+    //BoundingBoxInformation boundingBox(Font& font, std::string_view text) const;
 
     /**
      * Renders the provided \p text to the pixel coordinates \p pos using the Font

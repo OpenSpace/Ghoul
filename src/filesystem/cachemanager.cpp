@@ -41,8 +41,8 @@ namespace {
     // something that cannot occur in the filesystem
     constexpr const char _hashDelimiter = '|';
 
-    unsigned int generateHash(const std::string& file, const std::string& information) {
-        std::string hashString = file + _hashDelimiter + information;
+    unsigned int generateHash(std::string_view file, std::string_view information) {
+        std::string hashString = fmt::format("{}{}{}", file, _hashDelimiter, information);
         unsigned int hash = ghoul::hashCRC32(hashString);
         return hash;
     }
@@ -193,14 +193,14 @@ std::string CacheManager::cachedFilename(const File& file, Persistent isPersiste
     return cachedFilename(file, lastModifiedTime, isPersistent);
 }
 
-std::string CacheManager::cachedFilename(const File& file, const std::string& information,
+std::string CacheManager::cachedFilename(const File& file, std::string_view information,
                                          Persistent isPersistent)
 {
     return cachedFilename(file.filename(), information, isPersistent);
 }
 
 std::string CacheManager::cachedFilename(const std::string& baseName,
-                                         const std::string& information,
+                                         std::string_view information,
                                          Persistent isPersistent)
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
@@ -254,12 +254,12 @@ bool CacheManager::hasCachedFile(const File& file) const {
     return hasCachedFile(file, lastModifiedTime);
 }
 
-bool CacheManager::hasCachedFile(const File& file, const std::string& information) const {
+bool CacheManager::hasCachedFile(const File& file, std::string_view information) const {
     return hasCachedFile(file.filename(), information);
 }
 
 bool CacheManager::hasCachedFile(const std::string& baseName,
-                                 const std::string& information) const
+                                 std::string_view information) const
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
@@ -275,12 +275,12 @@ void CacheManager::removeCacheFile(const File& file) {
     removeCacheFile(file, lastModifiedTime);
 }
 
-void CacheManager::removeCacheFile(const File& file, const std::string& information) {
+void CacheManager::removeCacheFile(const File& file, std::string_view information) {
     removeCacheFile(file.filename(), information);
 }
 
 void CacheManager::removeCacheFile(const std::string& baseName,
-                                   const std::string& information)
+                                   std::string_view information)
 {
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {

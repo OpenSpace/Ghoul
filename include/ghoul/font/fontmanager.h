@@ -54,11 +54,11 @@ public:
 
     /// This exception is thrown if registering a Font fails
     struct FontRegistrationException : public RuntimeError {
-        explicit FontRegistrationException(const std::string& msg);
+        explicit FontRegistrationException(std::string msg);
     };
 
     struct FontAccessException : public RuntimeError {
-        explicit FontAccessException(const std::string& msg);
+        explicit FontAccessException(std::string msg);
     };
 
     /**
@@ -99,7 +99,7 @@ public:
      * \pre \p fontName must not be empty
      * \pre \p filePath must not be empty
      */
-    unsigned int registerFontPath(const std::string& fontName,
+    unsigned int registerFontPath(std::string_view fontName,
         const std::string& filePath);
 
     /**

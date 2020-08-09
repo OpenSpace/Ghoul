@@ -42,7 +42,6 @@ set(GHOUL_SOURCE
   ${PROJECT_SOURCE_DIR}/src/logging/consolelog.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/htmllog.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/log.cpp
-  ${PROJECT_SOURCE_DIR}/src/logging/loglevel.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/logmanager.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/streamlog.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/textlog.cpp

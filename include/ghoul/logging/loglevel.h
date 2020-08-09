@@ -26,6 +26,8 @@
 #ifndef __GHOUL___LOGLEVEL___H__
 #define __GHOUL___LOGLEVEL___H__
 
+#include <ghoul/misc/assert.h>
+#include <ghoul/misc/exception.h>
 #include <ghoul/misc/stringconversion.h>
 #include <string>
 
@@ -70,7 +72,19 @@ namespace ghoul {
 *
 * \return The string representation of the passed LogLevel
 */
-std::string_view to_string(logging::LogLevel string);
+constexpr std::string_view to_string(logging::LogLevel string) {
+    switch (string) {
+        case logging::LogLevel::AllLogging: return "All";
+        case logging::LogLevel::Trace:      return "Trace";
+        case logging::LogLevel::Debug:      return "Debug";
+        case logging::LogLevel::Info:       return "Info";
+        case logging::LogLevel::Warning:    return "Warning";
+        case logging::LogLevel::Error:      return "Error";
+        case logging::LogLevel::Fatal:      return "Fatal";
+        case logging::LogLevel::NoLogging:  return "None";
+        default:                   throw MissingCaseException();
+    }
+}
 
 /**
 * Returns the LogLevel for the passed string representation. The name of
@@ -79,7 +93,18 @@ std::string_view to_string(logging::LogLevel string);
 * \return The the LogLevel for the passed string representation
 */
 template <>
-logging::LogLevel from_string(const std::string& string);
+constexpr logging::LogLevel from_string(std::string_view string) {
+    if (string == "All") { return logging::LogLevel::AllLogging; }
+    if (string == "Trace") { return logging::LogLevel::Trace; }
+    if (string == "Debug") { return logging::LogLevel::Debug; }
+    if (string == "Info") { return logging::LogLevel::Info; }
+    if (string == "Warning") { return logging::LogLevel::Warning; }
+    if (string == "Error") { return logging::LogLevel::Error; }
+    if (string == "Fatal") { return logging::LogLevel::Fatal; }
+    if (string == "None") { return logging::LogLevel::NoLogging; }
+
+    throw ghoul::RuntimeError("Unknown log level '" + std::string(string) + "'");
+}
 
 } // namespace
 

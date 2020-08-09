@@ -358,41 +358,6 @@ FontRenderer& FontRenderer::defaultProjectionRenderer() {
     return *_defaultProjectionRenderer;
 }
 
-FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
-                                                              std::string_view text) const
-{
-    const size_t lines = std::count(text.begin(), text.end(), '\n') + 1;
-    glm::vec2 size = glm::vec2(0.f);
-    do {
-        std::string_view line = extractLine(text);
-
-        float width = 0.f;
-        for (char c : line) {
-            wchar_t character = c;
-            if (character == wchar_t('\t')) {
-                character = wchar_t(' ');
-            }
-            const Font::Glyph* glyph;
-
-            // @TODO (abock, 2018-05-28): Replace with an explicit lookup to not eat the
-            // cost of the throw
-            try {
-                glyph = font.glyph(character);
-            }
-            catch (const Font::FontException&) {
-                glyph = font.glyph(wchar_t(' '));
-            }
-
-            width += glyph->horizontalAdvance();
-        }
-
-        size.x = std::max(size.x, width);
-    } while (!text.empty());
-    size.y = lines * font.height();
-
-    return { size, static_cast<int>(lines) };
-}
-
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec2& pos,
                                                           std::string_view text,

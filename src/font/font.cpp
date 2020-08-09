@@ -112,6 +112,23 @@ namespace {
             );
         }
     }
+
+    // Extracts the next line from the string view and returns it, the passed string_view
+    // is modified to remove the new line *and* the \n character
+    std::string_view extractLine(std::string_view& view) {
+        std::string_view::size_type p = view.find('\n');
+        if (p == std::string_view::npos) {
+            // No new line found
+            std::string_view res = view;
+            view = std::string_view();
+            return res;
+        }
+
+        std::string_view res = view.substr(0, p);
+        view = view.substr(p + 2);
+        return res;
+    }
+
 } // namespace
 
 namespace ghoul::fontrendering {
@@ -250,31 +267,37 @@ bool Font::hasOutline() const {
     return _hasOutline;
 }
 
-glm::vec2 Font::boundingBox(const std::string& text) {
-    glm::vec2 result(0.f);
+glm::vec2 Font::boundingBox(std::string_view text) {
+    const size_t lines = std::count(text.begin(), text.end(), '\n') + 1;
+    glm::vec2 size = glm::vec2(0.f);
+    do {
+        std::string_view line = extractLine(text);
 
-    const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
-
-    for (const std::string& line : lines) {
         float width = 0.f;
-        float height = 0.f;
-        for (size_t j = 0 ; j < line.size(); ++j) {
-            const Font::Glyph* const g = glyph(line[j]);
-            if (g) {
-                if (j > 0) {
-                    width += g->kerning(line[j - 1]);
-                }
-                width += g->horizontalAdvance();
-                height = std::max(height, static_cast<float>(g->height()));
+        for (char c : line) {
+            wchar_t character = c;
+            if (character == wchar_t('\t')) {
+                character = wchar_t(' ');
             }
+            const Glyph* g;
+
+            // @TODO (abock, 2018-05-28): Replace with an explicit lookup to not eat the
+            // cost of the throw
+            try {
+                g = glyph(character);
+            }
+            catch (const Font::FontException&) {
+                g = glyph(wchar_t(' '));
+            }
+
+            width += g->horizontalAdvance();
         }
-        result.x = std::max(result.x, width);
-        result.y += height;
-    }
 
-    result.y += (lines.size() - 1) * _height;
+        size.x = std::max(size.x, width);
+    } while (!text.empty());
+    size.y = lines * height();
 
-    return result;
+    return size;
 }
 
 const Font::Glyph* Font::glyph(wchar_t character) {
