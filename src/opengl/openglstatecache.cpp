@@ -185,18 +185,18 @@ void OpenGLStateCache::setColorState(const GLfloat * color, const GLboolean clam
             _colorClearValue[3] = color[3];
         }
 
-        glClearColor(
-            _colorClearValue[0],
-            _colorClearValue[1],
-            _colorClearValue[2],
-            _colorClearValue[3]
-        );
-
         if (clampColor != _clampColorEnabled) {
             _clampColorEnabled = clampColor;
             glClampColor(GL_CLAMP_READ_COLOR, GL_FALSE);
         }
     }
+
+    glClearColor(
+        _colorClearValue[0],
+        _colorClearValue[1],
+        _colorClearValue[2],
+        _colorClearValue[3]
+    );
 }
 
 void OpenGLStateCache::setViewPortState() const {
