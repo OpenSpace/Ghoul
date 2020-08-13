@@ -25,6 +25,7 @@
 
 namespace {
     constexpr const int DebugByte = 0x0F;
+    constexpr const int AlignmentByte = 0x1F;
 } // namespace
 
 namespace ghoul {
@@ -84,9 +85,17 @@ void* MemoryPool<BucketSize, InjectDebugMemory>::alloc(int bytes) {
     b->usage += bytes;
 
     if (InjectDebugMemory) {
-        for (int ii = 0; ii < bytes; ++ii) {
-            std::memset(reinterpret_cast<std::byte*>(ptr) + ii, DebugByte, 1);
-        }
+        std::memset(ptr, DebugByte, bytes);
+    }
+    
+    // Handle unaligned memory by padding to the next alignment boundary
+    const int alignment = 8 - (bytes % 8);
+    if (alignment != 8) {
+        // Mark the extra bytes as "used"
+        b->usage += alignment;
+        std::memset(ptr + bytes, AlignmentByte, alignment);
+
+        bytes = bytes;
     }
 
     return ptr;
