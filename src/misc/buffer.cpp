@@ -41,7 +41,6 @@ Buffer::Buffer(size_t capacity)
 
 Buffer::Buffer(const std::string& filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-
     read(filename);
 }
 
@@ -103,7 +102,7 @@ Buffer::size_type Buffer::size() const {
     return _offsetWrite;
 }
 
-void Buffer::write(const std::string& filename, Compress compress) {
+void Buffer::write(const std::string& filename, Compress compress) const {
     std::ofstream file;
     file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     file.open(filename, std::ios::binary | std::ios::out);
