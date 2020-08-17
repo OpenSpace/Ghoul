@@ -682,7 +682,6 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         } // end of a line
 
         size.x = std::max(size.x, width);
-        size.y += height;
         movingPos.y -= h;
     } while (!text.empty());
     size.y = (lines - 1) * font.height();
@@ -730,7 +729,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
-        _indexBuffer.size() * sizeof(GLuint),
+        _indexBuffer.size() * sizeof(GLushort),
         _indexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
@@ -753,7 +752,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glDrawElements(
         GL_TRIANGLES,
         static_cast<GLsizei>(_indexBuffer.size()),
-        GL_UNSIGNED_INT,
+        GL_UNSIGNED_SHORT,
         nullptr
     );
 
