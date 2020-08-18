@@ -39,15 +39,14 @@ VisualStudioOutputLog::VisualStudioOutputLog(TimeStamping timeStamping,
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, minimumLogLevel)
 {}
 
-#ifdef WIN32
-void VisualStudioOutputLog::log(LogLevel level, std::string_view category,
-                                std::string_view message)
+void VisualStudioOutputLog::log([[ maybe_unused ]] LogLevel level,
+                                [[ maybe_unused ]] std::string_view category,
+                                [[ maybe_unused ]] std::string_view message)
 {
+#ifdef WIN32
     std::string fullMessage = createFullMessageString(level, category, message) + '\n';
     OutputDebugString(fullMessage.c_str());
-}
-#else
-void VisualStudioOutputLog::log(LogLevel, const std::string&, const std::string&) {}
 #endif
+}
 
 } // namespace ghoul::logging
