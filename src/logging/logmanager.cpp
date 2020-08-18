@@ -82,8 +82,8 @@ void LogManager::flushLogs() {
     }
 }
 
-void LogManager::logMessage(LogLevel level, const std::string& category,
-                            const std::string& message)
+void LogManager::logMessage(LogLevel level, std::string_view category,
+                            std::string_view message)
 {
     if (level >= _level) {
         std::lock_guard lock(_mutex);
@@ -102,7 +102,7 @@ void LogManager::logMessage(LogLevel level, const std::string& category,
     }
 }
 
-void LogManager::logMessage(LogLevel level, const std::string& message) {
+void LogManager::logMessage(LogLevel level, std::string_view message) {
     logMessage(level, "", message);
 }
 

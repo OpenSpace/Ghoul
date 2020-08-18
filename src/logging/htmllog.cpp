@@ -113,9 +113,7 @@ HTMLLog::~HTMLLog() {
     );
 }
 
-void HTMLLog::log(LogLevel level, const std::string& category,
-                  const std::string& message)
-{
+void HTMLLog::log(LogLevel level, std::string_view category, std::string_view message) {
     std::string output;
     if (_useCustomStyling) {
         output = "\t\t\t<tr class=\"" + classForLevel(level) + "\">\n";
@@ -130,7 +128,9 @@ void HTMLLog::log(LogLevel level, const std::string& category,
         output += "\t\t\t\t<td class=\"log-time\">" + timeString() + "</td>\n";
     }
     if (isCategoryStamping()) {
-        output += "\t\t\t\t<td class=\"log-category\">" + category + "</td>\n";
+        output += "\t\t\t\t<td class=\"log-category\">";
+        output += category;
+        output += "</td>\n";
     }
     if (isLogLevelStamping()) {
         output += fmt::format(

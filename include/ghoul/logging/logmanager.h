@@ -31,7 +31,7 @@
 #include <array>
 #include <memory>
 #include <mutex>
-#include <string>
+#include <string_view>
 #include <vector>
 
 namespace ghoul::logging {
@@ -98,8 +98,7 @@ public:
      * \param message The message that will be passed to the Log%s. May contain
      *        control sequences.
      */
-    void logMessage(LogLevel level, const std::string& category,
-        const std::string& message);
+    void logMessage(LogLevel level, std::string_view category, std::string_view message);
 
     /**
      * The main method to log messages. If the <code>level</code> is >= the level this
@@ -111,7 +110,7 @@ public:
      * \param message The message that will be passed to the Log%s. May contain
      *        control sequences.
      */
-    void logMessage(LogLevel level, const std::string& message);
+    void logMessage(LogLevel level, std::string_view message);
 
     /**
      * Returns the LogLevel that this LogManager has been initialized with. This method is

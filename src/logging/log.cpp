@@ -120,8 +120,8 @@ std::string Log::dateString() const {
 #endif
 }
 
-std::string Log::createFullMessageString(LogLevel level, const std::string& category,
-                                         const std::string& message) const
+std::string Log::createFullMessageString(LogLevel level, std::string_view category,
+                                         std::string_view message) const
 {
     std::string output;
     if (isDateStamping()) {
@@ -135,7 +135,8 @@ std::string Log::createFullMessageString(LogLevel level, const std::string& cate
         output += "] ";
     }
     if (isCategoryStamping() && (!category.empty())) {
-        output += category + " ";
+        output += category;
+        output += ' ';
     }
     if (isLogLevelStamping()) {
         output += fmt::format("({})", to_string(level));

@@ -40,8 +40,8 @@ VisualStudioOutputLog::VisualStudioOutputLog(TimeStamping timeStamping,
 {}
 
 #ifdef WIN32
-void VisualStudioOutputLog::log(LogLevel level, const std::string& category,
-                                const std::string& message)
+void VisualStudioOutputLog::log(LogLevel level, std::string_view category,
+                                std::string_view message)
 {
     std::string fullMessage = createFullMessageString(level, category, message) + '\n';
     OutputDebugString(fullMessage.c_str());
