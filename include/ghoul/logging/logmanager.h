@@ -180,26 +180,26 @@ private:
 
 #define LogMgr (ghoul::logging::LogManager::ref())
 
-inline void log(ghoul::logging::LogLevel level, const std::string& category,
-    const std::string& message);
+inline void log(ghoul::logging::LogLevel level, std::string_view category,
+    std::string_view message);
 
 #define LTRACE(__msg__) LTRACEC(_loggerCat, __msg__)
-inline void LTRACEC(const std::string& category, const std::string& message);
+inline void LTRACEC(std::string_view category, std::string_view message);
 
 #define LDEBUG(__msg__) LDEBUGC(_loggerCat, __msg__)
-inline void LDEBUGC(const std::string& category, const std::string& message);
+inline void LDEBUGC(std::string_view category, std::string_view message);
 
 #define LINFO(__msg__) LINFOC(_loggerCat, __msg__)
-inline void LINFOC(const std::string& category, const std::string& message);
+inline void LINFOC(std::string_view category, std::string_view message);
 
 #define LWARNING(__msg__) LWARNINGC(_loggerCat, __msg__)
-inline void LWARNINGC(const std::string& category, const std::string& message);
+inline void LWARNINGC(std::string_view category, std::string_view message);
 
 #define LERROR(__msg__) LERRORC(_loggerCat, __msg__)
-inline void LERRORC(const std::string& category, const std::string& message);
+inline void LERRORC(std::string_view category, std::string_view& message);
 
 #define LFATAL(__msg__) LFATALC(_loggerCat, __msg__)
-inline void LFATALC(const std::string& category, const std::string& message);
+inline void LFATALC(std::string_view category, std::string_view message);
 
 #include "logmanager.inl"
 
