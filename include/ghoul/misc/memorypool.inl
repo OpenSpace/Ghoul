@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <numeric>
+
 namespace {
     constexpr const int DebugByte = 0x0F;
     constexpr const int AlignmentByte = 0x1F;
@@ -57,7 +59,9 @@ void MemoryPool<BucketSize, InjectDebugMemory>::reset() {
 }
 
 template <int BucketSize, bool InjectDebugMemory>
-void* MemoryPool<BucketSize, InjectDebugMemory>::alloc(int bytes) {
+void* MemoryPool<BucketSize, InjectDebugMemory>::do_allocate(std::size_t bytes,
+                                                             std::size_t alignment)
+{
     ghoul_assert(
         bytes <= BucketSize,
         "Cannot allocate larger memory blocks than available in a bucket"
@@ -89,24 +93,41 @@ void* MemoryPool<BucketSize, InjectDebugMemory>::alloc(int bytes) {
     }
     
     // Handle unaligned memory by padding to the next alignment boundary
-    const int alignment = 8 - (bytes % 8);
-    if (alignment != 8) {
+    const size_t align = alignment - (bytes % alignment);
+    if (align != alignment) {
         // Mark the extra bytes as "used"
-        b->usage += alignment;
-        std::memset(ptr + bytes, AlignmentByte, alignment);
-
-        bytes = bytes;
+        b->usage += align;
+        std::memset(ptr + bytes, AlignmentByte, align);
     }
 
     return ptr;
 }
 
+//template <int BucketSize, bool InjectDebugMemory>
+//void* MemoryPool<BucketSize, InjectDebugMemory>::alloc(int bytes) {
+//    return do_allocate(static_cast<size_t>(bytes), 8);
+//}
+
 template <int BucketSize, bool InjectDebugMemory>
 template <typename T, class... Types>
 T* MemoryPool<BucketSize, InjectDebugMemory>::alloc(Types&&... args) {
-    void* ptr = alloc(sizeof(T));
+    void* ptr = do_allocate(sizeof(T), alignof(T));
     T* obj = new (ptr) T(std::forward<Types>(args)...);
     return obj;
+}
+
+template <int BucketSize, bool InjectDebugMemory>
+void MemoryPool<BucketSize, InjectDebugMemory>::do_deallocate(void* p, std::size_t bytes,
+                                                              std::size_t alignment)
+{
+    // Mark those bytes as unused
+}
+
+template <int BucketSize, bool InjectDebugMemory>
+bool MemoryPool<BucketSize, InjectDebugMemory>::do_is_equal(
+                                    const std::pmr::memory_resource& other) const noexcept
+{
+    return this == &other;
 }
 
 template <int BucketSize, bool InjectDebugMemory>
@@ -121,6 +142,15 @@ std::vector<int> MemoryPool<BucketSize, InjectDebugMemory>::occupancies() const 
         res.push_back(b->usage);
     }
     return res;
+}
+
+template <int BucketSize, bool InjectDebugMemory>
+int MemoryPool<BucketSize, InjectDebugMemory>::totalOccupancy() const {
+    return std::accumulate(
+        _buckets.begin(), _buckets.end(),
+        0,
+        [](int v, const std::unique_ptr<Bucket>& b) { return v + b->usage; }
+    );
 }
 
 template <typename T, int BucketSizeItems, bool InjectDebugMemory>

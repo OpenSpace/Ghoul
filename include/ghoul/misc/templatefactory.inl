@@ -67,7 +67,7 @@ BaseClass* createDefault(bool useDictionary, const Dictionary& dict, MemoryPoolB
     }
 #endif
     if (pool) {
-        void* ptr = pool->alloc(sizeof(Class));
+        void* ptr = pool->allocate(sizeof(Class));
         return new (ptr) Class;
     }
     else {
@@ -82,7 +82,7 @@ BaseClass* createDefaultAndDictionary(bool useDictionary, const Dictionary& dict
 {
     if (useDictionary) {
         if (pool) {
-            void* ptr = pool->alloc(sizeof(Class));
+            void* ptr = pool->allocate(sizeof(Class));
             return new (ptr) Class(dict);
         }
         else {
@@ -91,7 +91,7 @@ BaseClass* createDefaultAndDictionary(bool useDictionary, const Dictionary& dict
     }
     else {
         if (pool) {
-            void* ptr = pool->alloc(sizeof(Class));
+            void* ptr = pool->allocate(sizeof(Class));
             return new (ptr) Class;
         }
         else {
@@ -113,7 +113,7 @@ BaseClass* createDictionary(bool useDictionary, const Dictionary& dict,
         ));
     }
     if (pool) {
-        void* ptr = pool->alloc(sizeof(Class));
+        void* ptr = pool->allocate(sizeof(Class));
         return new (ptr) Class(dict);
     }
     else {

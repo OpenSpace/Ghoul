@@ -31,16 +31,16 @@
 #include <cstddef>
 #include <cstring>
 #include <memory>
+#include <memory_resource>
 #include <vector>
 
 namespace ghoul {
 
-class MemoryPoolBase {
+class MemoryPoolBase : public std::pmr::memory_resource {
 public:
     virtual ~MemoryPoolBase() = default;
 
     virtual void reset() = 0;
-    virtual void* alloc(int bytes) = 0;
 };
 
 /**
@@ -72,20 +72,6 @@ public:
     virtual void reset() final;
 
     /**
-     * Returns a pointer to a block of memory in a bucket that is big enough to hold the
-     * provided number of \p bytes. This method only calls the global allocator if the
-     * existing number of blocks are not sufficient to provide the desired number of
-     * bytes.
-     *
-     * \param bytes The number of bytes that should be reserved
-     *
-     * \return The pointer to the reserved memory block of \p bytes size
-     *
-     * \pre bytes must not be bigger than BucketSize
-     */
-    virtual void* alloc(int bytes) final;
-
-    /**
      * Returns a pointer to an allocated object of type T. The parameters to this function
      * are passed on to the contructor of T.
      *
@@ -96,6 +82,10 @@ public:
     template <typename T, class... Types>
     T* alloc(Types&&... args);
 
+    virtual void* do_allocate(std::size_t bytes, std::size_t alignment) final;
+    virtual void do_deallocate(void* p, std::size_t bytes, std::size_t alignment) final;
+    virtual bool do_is_equal(const std::pmr::memory_resource& other) const noexcept final;
+
     /// Returns the number of buckets that have been allocated
     int nBuckets() const;
 
@@ -105,10 +95,13 @@ public:
      */
     std::vector<int> occupancies() const;
 
+    /// Returns the total occupancy for the whole MemoryPool
+    int totalOccupancy() const;
+
 private:
     struct Bucket {
         std::array<std::byte, BucketSize> payload; ///< The data storage of this bucket
-        int usage = 0; ///< The number of bytes that have been used in this Bucket
+        size_t usage = 0; ///< The number of bytes that have been used in this Bucket
     };
 
     std::vector<std::unique_ptr<Bucket>> _buckets; ///< The number of allocated buckets
