@@ -68,6 +68,10 @@ template <int BucketSize, bool InjectDebugMemory>
 void MemoryPool<BucketSize, InjectDebugMemory>::housekeeping() {
     ZoneScoped
 
+    if (_emptyList.empty()) {
+        return;
+    }
+
     // Remove all 0-sized empty pairs that have already been reused
     _emptyList.erase(
         std::remove_if(
