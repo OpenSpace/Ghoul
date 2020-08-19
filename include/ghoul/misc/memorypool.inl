@@ -23,11 +23,13 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <ghoul/misc/profiling.h>
 #include <numeric>
 
 namespace {
     constexpr const int DebugByte = 0x0F;
     constexpr const int AlignmentByte = 0x1F;
+    constexpr const int ClearByte = 0xF0;
 } // namespace
 
 namespace ghoul {
@@ -44,6 +46,8 @@ MemoryPool<BucketSize, InjectDebugMemory>::MemoryPool(int nBuckets)
         }
         _buckets.push_back(std::move(b));
     }
+
+    _emptyList.reserve(10);
 }
 
 template <int BucketSize, bool InjectDebugMemory>
@@ -56,16 +60,59 @@ void MemoryPool<BucketSize, InjectDebugMemory>::reset() {
         }
     }
     _buckets.resize(_originalBucketSize);
+
+    _emptyList.clear();
+}
+
+template <int BucketSize, bool InjectDebugMemory>
+void MemoryPool<BucketSize, InjectDebugMemory>::housekeeping() {
+    ZoneScoped
+
+    // Remove all 0-sized empty pairs that have already been reused
+    _emptyList.erase(
+        std::remove_if(
+            _emptyList.begin(), _emptyList.end(),
+            [](const EmptyPair& ep) { return ep.size == 0; }
+        ),
+        _emptyList.end()
+    );
+
+    std::sort(
+        _emptyList.begin(), _emptyList.end(),
+        [](const EmptyPair& lhs, const EmptyPair& rhs) { return lhs.size < rhs.size; }
+    );
+    for (size_t i = 0; i < _emptyList.size() - 1; ++i) {
+        EmptyPair& current = _emptyList[i];
+        EmptyPair& next = _emptyList[i + 1];
+
+        if (static_cast<char*>(current.ptr) + current.size == next.ptr) {
+            // We found a subsequent pair
+            current.size += next.size;
+            next.size = 0;
+        }
+    }
 }
 
 template <int BucketSize, bool InjectDebugMemory>
 void* MemoryPool<BucketSize, InjectDebugMemory>::do_allocate(std::size_t bytes,
                                                              std::size_t alignment)
 {
+    ZoneScoped
+        
     ghoul_assert(
         bytes <= BucketSize,
         "Cannot allocate larger memory blocks than available in a bucket"
     );
+
+    for (EmptyPair& ep : _emptyList) {
+        if (bytes <= ep.size) {
+            // We found an empty pair that works
+            ep.size -= bytes;
+            void* p = ep.ptr;
+            ep.ptr = static_cast<std::byte*>(ep.ptr) + bytes;
+            return p;
+        }
+    }
 
     // Find the first bucket that has enough space left for the number of items
     auto it = std::find_if(
@@ -103,11 +150,6 @@ void* MemoryPool<BucketSize, InjectDebugMemory>::do_allocate(std::size_t bytes,
     return ptr;
 }
 
-//template <int BucketSize, bool InjectDebugMemory>
-//void* MemoryPool<BucketSize, InjectDebugMemory>::alloc(int bytes) {
-//    return do_allocate(static_cast<size_t>(bytes), 8);
-//}
-
 template <int BucketSize, bool InjectDebugMemory>
 template <typename T, class... Types>
 T* MemoryPool<BucketSize, InjectDebugMemory>::alloc(Types&&... args) {
@@ -118,9 +160,23 @@ T* MemoryPool<BucketSize, InjectDebugMemory>::alloc(Types&&... args) {
 
 template <int BucketSize, bool InjectDebugMemory>
 void MemoryPool<BucketSize, InjectDebugMemory>::do_deallocate(void* p, std::size_t bytes,
-                                                              std::size_t alignment)
+                                                              std::size_t /*alignment*/)
 {
-    // Mark those bytes as unused
+    ZoneScoped
+        
+    for (const std::unique_ptr<Bucket>& b : _buckets) {
+        const std::array<std::byte, BucketSize>& bp = b->payload;
+        if (p >= bp.data() && p < (bp.data() + BucketSize)) {
+            // We found our bucket to which this pointer belongs
+            if (InjectDebugMemory) {
+                std::memset(p, ClearByte, bytes);
+            }
+            _emptyList.push_back({ p, bytes });
+            return;
+        }
+    }
+
+    throw std::runtime_error("Returned pointer must have been from this MemoryPool");
 }
 
 template <int BucketSize, bool InjectDebugMemory>
@@ -139,7 +195,7 @@ template <int BucketSize, bool InjectDebugMemory>
 std::vector<int> MemoryPool<BucketSize, InjectDebugMemory>::occupancies() const {
     std::vector<int> res;
     for (const std::unique_ptr<Bucket>& b : _buckets) {
-        res.push_back(b->usage);
+        res.push_back(static_cast<int>(b->usage));
     }
     return res;
 }
@@ -149,7 +205,9 @@ int MemoryPool<BucketSize, InjectDebugMemory>::totalOccupancy() const {
     return std::accumulate(
         _buckets.begin(), _buckets.end(),
         0,
-        [](int v, const std::unique_ptr<Bucket>& b) { return v + b->usage; }
+        [](int v, const std::unique_ptr<Bucket>& b) {
+            return v + static_cast<int>(b->usage);
+        }
     );
 }
 

@@ -72,6 +72,13 @@ public:
     virtual void reset() final;
 
     /**
+     * Function that will make sure the list of returned pointers is nice and clean.
+     * Should be called regularly (once per frame, for example) to make sure that the list
+     * doesn't degenerate.
+     */
+    void housekeeping();
+
+    /**
      * Returns a pointer to an allocated object of type T. The parameters to this function
      * are passed on to the contructor of T.
      *
@@ -100,9 +107,15 @@ public:
 
 private:
     struct Bucket {
-        std::array<std::byte, BucketSize> payload; ///< The data storage of this bucket
         size_t usage = 0; ///< The number of bytes that have been used in this Bucket
+        std::array<std::byte, BucketSize> payload; ///< The data storage of this bucket
     };
+
+    struct EmptyPair {
+        void* ptr = nullptr;
+        size_t size = 0;
+    };
+    std::vector<EmptyPair> _emptyList;
 
     std::vector<std::unique_ptr<Bucket>> _buckets; ///< The number of allocated buckets
     const int _originalBucketSize; ///< The original desired number of buckets
