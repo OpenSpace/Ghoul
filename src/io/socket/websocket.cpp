@@ -96,7 +96,7 @@ bool WebSocket::getMessage(std::string& message) {
         _inputNotifier.wait_for(lock, MaxWaitDuration, messageOrDisconnected);
     }
 
-    std::lock_guard<std::mutex> guard(_inputMessageQueueMutex);
+    std::lock_guard guard(_inputMessageQueueMutex);
     if (_inputMessageQueue.empty()) {
         return false;
     }
@@ -134,7 +134,7 @@ void WebSocket::onMessage(const websocketpp::connection_hdl&,
                    const websocketpp::server<websocketpp::config::core>::message_ptr& msg)
 {
     std::string msgContent = msg->get_payload();
-    std::lock_guard<std::mutex> guard(_inputMessageQueueMutex);
+    std::lock_guard guard(_inputMessageQueueMutex);
     _inputMessageQueue.push_back(msgContent);
     _inputNotifier.notify_one();
 }
