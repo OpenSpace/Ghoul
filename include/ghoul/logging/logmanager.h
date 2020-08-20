@@ -196,7 +196,7 @@ inline void LINFOC(std::string_view category, std::string_view message);
 inline void LWARNINGC(std::string_view category, std::string_view message);
 
 #define LERROR(__msg__) LERRORC(_loggerCat, __msg__)
-inline void LERRORC(std::string_view category, std::string_view& message);
+inline void LERRORC(std::string_view category, std::string_view message);
 
 #define LFATAL(__msg__) LFATALC(_loggerCat, __msg__)
 inline void LFATALC(std::string_view category, std::string_view message);
