@@ -57,7 +57,7 @@ public:
 template <int BucketSize = 4096, bool InjectDebugMemory = false>
 class MemoryPool : public MemoryPoolBase {
 public:
-    const static int BucketSize = BucketSize;
+    const static int _bucketSize = BucketSize;
 
     /**
      * Creates the MemoryBool with the specified number of buckets already created
