@@ -63,6 +63,9 @@ void push(lua_State* L, T value) {
     else if constexpr (std::is_same_v<T, std::string>) {
         lua_pushstring(L, value.c_str());
     }
+    else if constexpr (std::is_same_v<T, std::string_view>) {
+        lua_pushlstring(L, value.data(), value.size());
+    }
     else if constexpr (std::is_pointer_v<T>) {
         lua_pushlightuserdata(L, reinterpret_cast<void*>(value));
     }

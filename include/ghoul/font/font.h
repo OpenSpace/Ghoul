@@ -288,7 +288,7 @@ public:
      *        selected font.
      * \return The pixel coordinates of the bounding box of the passed text
      */
-    glm::vec2 boundingBox(const std::string& text);
+    glm::vec2 boundingBox(std::string_view text);
 
     /**
      * Returns the Glyph that representes the passed \p character. The first call to this

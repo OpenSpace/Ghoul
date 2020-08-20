@@ -26,6 +26,7 @@
 #ifndef __GHOUL___SYSTEMCAPABILITIESCOMPONENT___H__
 #define __GHOUL___SYSTEMCAPABILITIESCOMPONENT___H__
 
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/misc/stringconversion.h>
@@ -277,12 +278,38 @@ protected:
 namespace ghoul {
 
 template <>
-std::string to_string(
-    const ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity& v);
+inline std::string to_string(
+               const ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity& v)
+{
+    using Verbosity = ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity;
+    switch (v) {
+        case Verbosity::None:    return "None";
+        case Verbosity::Minimal: return "Minimal";
+        case Verbosity::Default: return "Default";
+        case Verbosity::Full:    return "Full";
+        default:                 throw ghoul::MissingCaseException();
+    }
+}
 
 template <>
-ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity
-from_string(const std::string& str);
+constexpr ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity from_string(
+                                                                  std::string_view string)
+{
+    if (string == "None") {
+        return systemcapabilities::SystemCapabilitiesComponent::Verbosity::None;
+    }
+    if (string == "Minimal") {
+        return systemcapabilities::SystemCapabilitiesComponent::Verbosity::Minimal;
+    }
+    if (string == "Default") {
+        return systemcapabilities::SystemCapabilitiesComponent::Verbosity::Default;
+    }
+    if (string == "Full") {
+        return systemcapabilities::SystemCapabilitiesComponent::Verbosity::Full;
+    }
+
+    throw RuntimeError("Unknown verbosity '" + std::string(string) + "'");
+}
 
 } // namespace ghoul
 

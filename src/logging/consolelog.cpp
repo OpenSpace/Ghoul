@@ -77,8 +77,7 @@ ConsoleLog::ConsoleLog(ColorOutput colorOutput, TimeStamping timeStamping,
     , _colorOutput(colorOutput)
 {}
 
-void ConsoleLog::log(LogLevel level, const std::string& category,
-                     const std::string& message)
+void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view message)
 {
     if (_colorOutput) {
         setColorForLevel(level);

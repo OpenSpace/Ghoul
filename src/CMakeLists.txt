@@ -42,7 +42,6 @@ set(GHOUL_SOURCE
   ${PROJECT_SOURCE_DIR}/src/logging/consolelog.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/htmllog.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/log.cpp
-  ${PROJECT_SOURCE_DIR}/src/logging/loglevel.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/logmanager.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/streamlog.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/textlog.cpp
@@ -190,6 +189,7 @@ set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/invariants.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/misc/managedmemoryuniqueptr.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.inl
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h

@@ -191,7 +191,7 @@ public:
      * \return A tuple containing the bounding box of the text that was printed and the
      *         number of lines that were printed
      */
-    BoundingBoxInformation boundingBox(Font& font, const std::string& text) const;
+    //BoundingBoxInformation boundingBox(Font& font, std::string_view text) const;
 
     /**
      * Renders the provided \p text to the pixel coordinates \p pos using the Font
@@ -208,8 +208,8 @@ public:
      * \param color The base color that is used to render the text
      * \return The bounding box of the text and the number of lines that were printed
      */
-    BoundingBoxInformation render(Font& font, const glm::vec2& pos,
-        const std::string& text, const glm::vec4& color = glm::vec4(1.f)) const;
+    BoundingBoxInformation render(Font& font, const glm::vec2& pos, std::string_view text,
+        const glm::vec4& color = glm::vec4(1.f)) const;
 
     /**
      * Renders the provided \p text to the pixel coordinates \p pos using the Font
@@ -228,9 +228,8 @@ public:
      *        has an outline
      * \return The bounding box of the text and the number of lines that were printed
      */
-    BoundingBoxInformation render(Font& font, const glm::vec2& pos,
-        const std::string& text, const glm::vec4& color,
-        const glm::vec4& outlineColor) const;
+    BoundingBoxInformation render(Font& font, const glm::vec2& pos, std::string_view text,
+        const glm::vec4& color, const glm::vec4& outlineColor) const;
 
     /**
      * Renders the provided \p text to the coordinates \p pos using the \p font in the
@@ -251,7 +250,7 @@ public:
      * \return The bounding box of the text and the number of lines that were printed
      */
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
-        const std::string& text, const glm::vec4& color, const glm::vec4& outlineColor,
+        std::string_view text, const glm::vec4& color, const glm::vec4& outlineColor,
         const ProjectedLabelsInformation& labelInfo,
         const glm::vec2& offset = glm::vec2(0.f, 0.f)) const;
 
@@ -272,7 +271,7 @@ public:
     * \return The bounding box of the text and the number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
-        const std::string& text, const glm::vec4& color,
+        std::string_view text, const glm::vec4& color,
         const ProjectedLabelsInformation& labelInfo,
         const glm::vec2& offset = glm::vec2(0.f, 0.f)) const;
 
@@ -290,7 +289,7 @@ public:
     * \return The bounding box of the text and the number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
-        const std::string& text, const ProjectedLabelsInformation& labelInfo) const;
+        std::string_view text, const ProjectedLabelsInformation& labelInfo) const;
 
 private:
     /// Private constructor that is used in the #initialize static method
@@ -317,6 +316,9 @@ private:
 
     /// The index buffer object that allows reusing vertices to form one quad per glyph
     unsigned int _ibo = 0;
+
+    mutable std::vector<float> _vertexBuffer;
+    mutable std::vector<GLushort> _indexBuffer;
 
     UniformCache(baseColor, outlineColor, texture, hasOutline, projection) _uniformCache;
     UniformCache(baseColor, outlineColor, texture, hasOutline, modelViewTransform,
@@ -348,7 +350,7 @@ enum class CrDirection {
  * \return The bounding box of the text that was printed
  */
 inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
-    const std::string& text, const glm::vec4& color, CrDirection direction,
+    std::string_view text, const glm::vec4& color, CrDirection direction,
     const glm::vec4& outlineColor)
 {
     using FR = ghoul::fontrendering::FontRenderer;
@@ -390,7 +392,7 @@ inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  * \return The bounding box of the text that was printed
  */
 inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
-    const std::string& text, const glm::vec4& color, const glm::vec4& outlineColor)
+    std::string_view text, const glm::vec4& color, const glm::vec4& outlineColor)
 {
     using FR = ghoul::fontrendering::FontRenderer;
     FR::BoundingBoxInformation res = FR::defaultRenderer().render(
@@ -416,7 +418,7 @@ inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& p
  * \return The bounding box of the text that was printed
  */
 inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
-    const std::string& text, const glm::vec4& color,
+    std::string_view text, const glm::vec4& color,
     CrDirection direction = CrDirection::None)
 {
     return RenderFont(font, pos, text, color, direction, { 0.f, 0.f, 0.f, color.a });
@@ -434,7 +436,7 @@ inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  * \return The bounding box of the text that was printed
  */
 inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
-    const std::string& text, const glm::vec4& color = glm::vec4(1.f))
+    std::string_view text, const glm::vec4& color = glm::vec4(1.f))
 {
     return RenderFont(font, pos, text, color, { 0.f, 0.f, 0.f, color.a });
 }
@@ -452,7 +454,7 @@ inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& p
  * \return The bounding box of the text that was printed
  */
 inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
-    const std::string& text, CrDirection direction = CrDirection::None)
+    std::string_view text, CrDirection direction = CrDirection::None)
 {
     return RenderFont(
         font,
@@ -476,7 +478,7 @@ inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  * \return The bounding box of the text that was printed
  */
 inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
-    const std::string& text)
+    std::string_view text)
 {
     return RenderFont(font, pos, text, { 1.f, 1.f, 1.f, 1.f }, { 0.f, 0.f, 0.f, 1.f });
 }

@@ -30,41 +30,6 @@
 #include <ghoul/misc/stringconversion.h>
 #include <map>
 
-namespace ghoul {
-
-template <>
-std::string to_string
-              (const ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity& v)
-{
-    using Verbosity = ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity;
-    switch (v) {
-        case Verbosity::None:    return "None";
-        case Verbosity::Minimal: return "Minimal";
-        case Verbosity::Default: return "Default";
-        case Verbosity::Full:    return "Full";
-        default:                 throw ghoul::MissingCaseException();
-    }
-}
-
-template <>
-ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity
-from_string(const std::string& string)
-{
-    using Verbosity = ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity;
-
-    static const std::map<std::string, Verbosity> VerbosityMap = {
-        { "None", Verbosity::None },
-        { "Minimal", Verbosity::Minimal },
-        { "Default", Verbosity::Default },
-        { "Full", Verbosity::Full }
-    };
-
-    // Throws a std::out_of_range exception if the type could not be found
-    return VerbosityMap.at(string);
-}
-
-} // namespace ghoul
-
 namespace ghoul::systemcapabilities {
 
 #ifdef GHOUL_USE_WMI

@@ -24,9 +24,9 @@
  ****************************************************************************************/
 
 #include <ghoul/io/socket/tcpsocket.h>
+
 #include <ghoul/logging/logmanager.h>
 #include <fmt/format.h>
-
 #include <algorithm>
 #include <cstring>
 
@@ -229,8 +229,8 @@ bool TcpSocket::getMessage(std::string& message) {
     if (delimiterIndex == 0) {
         return false;
     }
-    std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
-    message = std::string(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex);
+    std::lock_guard inputLock(_inputQueueMutex);
+    message.assign(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex);
     if (static_cast<int>(_inputQueue.size()) >= delimiterIndex + 1) {
         _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex + 1);
     }
@@ -409,13 +409,13 @@ void TcpSocket::waitForInput(size_t nBytes) {
         if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
         }
-        std::lock_guard<std::mutex> queueMutex(_inputQueueMutex);
+        std::lock_guard queueMutex(_inputQueueMutex);
         return _inputQueue.size() >= nBytes;
     };
 
     // Block execution until enough data has come into the input queue.
     if (!receivedRequestedInputOrDisconnected()) {
-        std::unique_lock<std::mutex> lock(_inputBufferMutex);
+        std::unique_lock lock(_inputBufferMutex);
         _inputNotifier.wait(lock, receivedRequestedInputOrDisconnected);
     }
 }

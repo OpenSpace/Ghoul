@@ -31,9 +31,17 @@
 #include <cstddef>
 #include <cstring>
 #include <memory>
+#include <memory_resource>
 #include <vector>
 
 namespace ghoul {
+
+class MemoryPoolBase : public std::pmr::memory_resource {
+public:
+    virtual ~MemoryPoolBase() = default;
+
+    virtual void reset() = 0;
+};
 
 /**
  * This class represents a MemoryPool with a specific size from which individual memory
@@ -46,9 +54,11 @@ namespace ghoul {
  *
  * \tparam BucketSize The size of each bucket in bytes
  */
-template <int BucketSize = 4096>
-class MemoryPool {
+template <int BucketSize = 4096, bool InjectDebugMemory = false>
+class MemoryPool : public MemoryPoolBase {
 public:
+    const static int BucketSize = BucketSize;
+
     /**
      * Creates the MemoryBool with the specified number of buckets already created
 
@@ -57,69 +67,59 @@ public:
     MemoryPool(int nBuckets = 1);
 
     /**
-     * Frees the memory that was allocated during the existence of this MemoryPool or the
-     * last call of reset.
+     * Frees the memory that was allocated during the existence of this MemoryPool.
      */
-    ~MemoryPool();
+    virtual void reset() final;
 
     /**
-     * Frees the memory that was allocated during the existence of this MemoryPool or the
-     * last call of reset and returns the number of buckets to the initial number of
-     * buckets as requested in the constructor.
+     * Function that will make sure the list of returned pointers is nice and clean.
+     * Should be called regularly (once per frame, for example) to make sure that the list
+     * doesn't degenerate.
      */
-    void reset();
+    void housekeeping();
 
     /**
-     * Returns a pointer to a block of memory in a bucket that is big enough to hold the
-     * provided number of \p bytes. This method only calls the global allocator if the
-     * existing number of blocks are not sufficient to provide the desired number of
-     * bytes.
+     * Returns a pointer to an allocated object of type T. The parameters to this function
+     * are passed on to the contructor of T.
      *
-     * \param bytes The number of bytes that should be reserved
+     * \param args The arguments to the constructor of T
      *
-     * \return The pointer to the reserved memory block of \p bytes size
-     *
-     * \pre bytes must not be bigger than BucketSize
+     * \tparam T The type of the object that is to be constructed 
      */
-    void* alloc(int bytes);
+    template <typename T, class... Types>
+    T* alloc(Types&&... args);
+
+    virtual void* do_allocate(std::size_t bytes, std::size_t alignment) final;
+    virtual void do_deallocate(void* p, std::size_t bytes, std::size_t alignment) final;
+    virtual bool do_is_equal(const std::pmr::memory_resource& other) const noexcept final;
+
+    /// Returns the number of buckets that have been allocated
+    int nBuckets() const;
+
+    /**
+     * Returns the usages for each of the buckets. The number of values returned is the
+     * same as returned by the \see nBuckets function.
+     */
+    std::vector<int> occupancies() const;
+
+    /// Returns the total occupancy for the whole MemoryPool
+    int totalOccupancy() const;
 
 private:
     struct Bucket {
+        size_t usage = 0; ///< The number of bytes that have been used in this Bucket
         std::array<std::byte, BucketSize> payload; ///< The data storage of this bucket
-        int usage = 0; ///< The number of bytes that have been used in this Bucket
     };
 
-    std::vector<Bucket*> _buckets; ///< The number of allocated buckets
+    struct EmptyPair {
+        void* ptr = nullptr;
+        size_t size = 0;
+    };
+    std::vector<EmptyPair> _emptyList;
+
+    std::vector<std::unique_ptr<Bucket>> _buckets; ///< The number of allocated buckets
     const int _originalBucketSize; ///< The original desired number of buckets
 };
-
-
-/**
- * Similar to the MemoryPool, but instead of requesting individual bytes, this MemoryPool
- * operates instances of \tparam T. The TypedMemoryPool does not utilize any methods from
- * the provided type, but only uses the size of the type to provide a simplified interface
- * to the allocate method and BucketSizeItems parameter that operate on the number of
- * instances, rather than bytes.
- *
- * \tparam T The type for which the MemoryPool should operate
- * \tparam BucketSizeItems The number of Ts that should be stored in a single Bucket
- */
-template <typename T, int BucketSizeItems = 128>
-class TypedMemoryPool : private MemoryPool<BucketSizeItems * sizeof(T)> {
-public:
-    /**
-     * Reserves a memory block that can fit \p n instances of T. Each entry in the
-     * returned vector points to the memory location that is big enough to fit a single
-     * instance of T.
-     *
-     * \param n The number of Ts that determine the size of the reserved memory block
-     *
-     * \return A list of pointers that each are big enough to hold a single T. These are
-     *         not guaranteed to be contiguous.
-     */
-    std::vector<void*> allocate(int n);
-};
-
 
 /**
  * This memory pool works similar to the \see TypedMemoryPool execept that instances of
@@ -128,9 +128,8 @@ public:
  *
  * \tparam T The type for which the MemoryPool should operate
  * \tparam BucketSizeItems The number of Ts that should be stored in a single Bucket
- *
  */
-template <typename T, int BucketSizeItems = 128>
+template <typename T, int BucketSizeItems = 128, bool InjectDebugMemory = false>
 class ReusableTypedMemoryPool {
 public:
     /**

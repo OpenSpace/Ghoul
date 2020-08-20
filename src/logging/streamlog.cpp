@@ -34,9 +34,7 @@ StreamLog::StreamLog(std::ostream& stream, TimeStamping timeStamping,
     , _stream(stream)
 {}
 
-void StreamLog::log(LogLevel level, const std::string& category,
-                                                               const std::string& message)
-{
+void StreamLog::log(LogLevel level, std::string_view category, std::string_view message) {
     _stream << createFullMessageString(level, category, message) << std::endl;
 }
 

@@ -23,43 +23,35 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/logging/loglevel.h>
+#ifndef __GHOUL___MANAGEDMEMORYUNIQUEPTR___H__
+#define __GHOUL___MANAGEDMEMORYUNIQUEPTR___H__
 
-#include <ghoul/misc/assert.h>
-#include <map>
+#include <memory>
+
+// The coding style in this file is a bit different to make the class in here more similar
+// to the STD
 
 namespace ghoul {
 
-std::string to_string(logging::LogLevel string) {
-    switch (string) {
-        case logging::LogLevel::AllLogging: return "All";
-        case logging::LogLevel::Trace:      return "Trace";
-        case logging::LogLevel::Debug:      return "Debug";
-        case logging::LogLevel::Info:       return "Info";
-        case logging::LogLevel::Warning:    return "Warning";
-        case logging::LogLevel::Error:      return "Error";
-        case logging::LogLevel::Fatal:      return "Fatal";
-        case logging::LogLevel::NoLogging:  return "None";
-        default:                   throw MissingCaseException();
+namespace detail {
+
+template <typename T>
+struct placement_delete {
+    void operator()(T* ptr) {
+        if (ptr) {
+            ptr->~T();
+        }
     }
-}
+};
 
-template <>
-logging::LogLevel from_string(const std::string& string) {
-    static const std::map<std::string, logging::LogLevel> levels = {
-        { "All"    , logging::LogLevel::AllLogging },
-        { "Trace"  , logging::LogLevel::Trace },
-        { "Debug"  , logging::LogLevel::Debug },
-        { "Info"   , logging::LogLevel::Info },
-        { "Warning", logging::LogLevel::Warning },
-        { "Error"  , logging::LogLevel::Error },
-        { "Fatal"  , logging::LogLevel::Fatal },
-        { "None"   , logging::LogLevel::NoLogging }
-    };
+} // namespace detail
 
-    auto it = levels.find(string);
-    ghoul_assert(it != levels.end(), "Missing entry in 'levels' map");
-    return it->second;
-}
+template <typename T>
+using managed_memory_unique_ptr = std::unique_ptr<T, detail::placement_delete<T>>;
 
-} // namespace ghoul::logging
+template <typename T>
+using mm_unique_ptr = managed_memory_unique_ptr<T>;
+
+} // namespace ghoul
+
+#endif // __GHOUL___MANAGEDMEMORYUNIQUEPTR___H__

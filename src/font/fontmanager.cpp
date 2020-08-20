@@ -52,12 +52,12 @@ namespace {
 
 namespace ghoul::fontrendering {
 
-FontManager::FontRegistrationException::FontRegistrationException(const std::string& msg)
-    : RuntimeError(msg, "FontManager")
+FontManager::FontRegistrationException::FontRegistrationException(std::string msg)
+    : RuntimeError(std::move(msg), "FontManager")
 {}
 
-FontManager::FontAccessException::FontAccessException(const std::string& msg)
-    : RuntimeError(msg, "FontManager")
+FontManager::FontAccessException::FontAccessException(std::string msg)
+    : RuntimeError(std::move(msg), "FontManager")
 {}
 
 FontManager::FontManager(glm::ivec3 atlasDimensions)
@@ -76,7 +76,7 @@ opengl::TextureAtlas& FontManager::textureAtlas() {
     return _textureAtlas;
 }
 
-unsigned int FontManager::registerFontPath(const std::string& fontName,
+unsigned int FontManager::registerFontPath(std::string_view fontName,
                                            const std::string& filePath)
 {
     ghoul_assert(!fontName.empty(), "Fontname must not be empty");

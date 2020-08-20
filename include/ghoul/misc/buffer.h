@@ -60,7 +60,7 @@ public:
      *
      * \param capacity The initial capacity for the internal array
      */
-    Buffer(size_t capacity);
+    explicit Buffer(size_t capacity);
 
     /**
      * Constructs a Buffer object from file.
@@ -155,7 +155,7 @@ public:
      * \throw RuntimeError if there was an error compressing the data
      * \pre \p filename must not be empty
      */
-    void write(const std::string& filename, Compress compress = Compress::No);
+    void write(const std::string& filename, Compress compress = Compress::No) const;
 
     /**
      * Reads the Buffer from a Buffer file.

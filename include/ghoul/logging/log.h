@@ -29,6 +29,7 @@
 #include <ghoul/logging/loglevel.h>
 #include <ghoul/misc/boolean.h>
 #include <string>
+#include <string_view>
 
 namespace ghoul::logging {
 
@@ -64,8 +65,8 @@ public:
      *        individually
      * \param message The message body of the log message
      */
-    virtual void log(LogLevel level, const std::string& category,
-        const std::string& message) = 0;
+    virtual void log(LogLevel level, std::string_view category,
+        std::string_view message) = 0;
 
     /**
      * Returns the minimum LogLevel that this Log accepts.
@@ -138,8 +139,8 @@ protected:
      */
     std::string dateString() const;
 
-    std::string createFullMessageString(LogLevel level,
-        const std::string& category, const std::string& message) const;
+    std::string createFullMessageString(LogLevel level, std::string_view category,
+        std::string_view message) const;
 
 private:
     TimeStamping _timeStamping; ///< Is the log printing the time?
