@@ -230,7 +230,7 @@ bool TcpSocket::getMessage(std::string& message) {
         return false;
     }
     std::lock_guard inputLock(_inputQueueMutex);
-    message = std::string(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex);
+    message.assign(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex);
     if (static_cast<int>(_inputQueue.size()) >= delimiterIndex + 1) {
         _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex + 1);
     }
