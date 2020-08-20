@@ -410,7 +410,11 @@ endif ()
 if (GHOUL_PROFILING_ENABLE_TRACY)
   target_compile_definitions(tracy PUBLIC TRACY_ENABLE)
 endif ()
-target_link_libraries(Ghoul PUBLIC tracy)
+if (UNIX)
+target_link_libraries(Ghoul PUBLIC tracy dl)
+else ()
+  target_link_libraries(Ghoul PUBLIC tracy)
+endif ()
 end_module("Profiling")
 
 #############################

@@ -36,10 +36,15 @@ namespace ghoul::opengl {
 /**
  * This class works as cache for the OpenGL most common properties defining the
  * current GL's state.
+ * Be aware that not all OpenGL states are available for caching at this moment.
+ * New states caching should be added as needed.
  */
 class OpenGLStateCache
 {
 public:
+    /* Currently, this class is a Singleton. In the future we will enable multiple
+     * instances of the class when working with multiple OpenGL contexts.
+     */
     static OpenGLStateCache * getInstance() {
         if (!_singleton) {
             _singleton = new OpenGLStateCache;
@@ -103,7 +108,6 @@ private:
     GLboolean _depthMaskEnabled = true;
     GLfloat _depthClearValue = 1.f;
     GLenum _depthFunction;
-
 
     // Blending
     GLboolean _blendEnabled = false;

@@ -222,7 +222,7 @@ void OpenGLStateCache::setViewPortState(const GLint * viewportCoords)  {
 
 void OpenGLStateCache::viewPort(GLint * viewPort) const {
     if (viewPort == nullptr) {
-        LERROR("Initialized memory argument passed to viewPort method.");
+        LERROR("Unitialized memory argument passed to viewPort method.");
     } else {
         viewPort[0] = _viewport[0];
         viewPort[1] = _viewport[1];
