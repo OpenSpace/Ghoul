@@ -84,6 +84,7 @@ endif ()
 if (GHOUL_MODULE_FONTRENDERING)
   set(GHOUL_SOURCE ${GHOUL_SOURCE}
     ${PROJECT_SOURCE_DIR}/src/font/font.cpp
+    ${PROJECT_SOURCE_DIR}/src/font/fonterrors.cpp
     ${PROJECT_SOURCE_DIR}/src/font/fontmanager.cpp
     ${PROJECT_SOURCE_DIR}/src/font/fontrenderer.cpp
   )
@@ -229,6 +230,7 @@ endif ()
 if (GHOUL_MODULE_FONTRENDERING)
   set(GHOUL_HEADER ${GHOUL_HEADER}
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/font/fonterrors.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontmanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontrenderer.h
   )

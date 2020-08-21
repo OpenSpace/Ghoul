@@ -80,9 +80,6 @@ public:
      */
     void deinitialize();
 
-    /// Accessor to the backend TextureAtlas
-    opengl::TextureAtlas& textureAtlas();
-
     /**
      * Registers a user-defined \p fontName to an absolute \p filePath. This function does
      * not check whether the file exists, or is accessible. If either of these is the

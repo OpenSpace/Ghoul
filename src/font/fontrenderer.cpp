@@ -418,19 +418,19 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 movingPos.x += glyph->kerning(line[j - 1]);
             }
 
-            const float x0 = movingPos.x + glyph->leftBearing();
-            const float y0 = movingPos.y + glyph->topBearing();
-            const float s0 = glyph->topLeft().x;
-            const float t0 = glyph->topLeft().y;
-            const float outlineS0 = glyph->outlineTopLeft().x;
-            const float outlineT0 = glyph->outlineTopLeft().y;
+            const float x0 = movingPos.x + glyph->leftBearing;
+            const float y0 = movingPos.y + glyph->topBearing;
+            const float s0 = glyph->topLeft.x;
+            const float t0 = glyph->topLeft.y;
+            const float outlineS0 = glyph->outlineTopLeft.x;
+            const float outlineT0 = glyph->outlineTopLeft.y;
 
-            const float x1 = x0 + glyph->width();
-            const float y1 = y0 - glyph->height();
-            const float s1 = glyph->bottomRight().x;
-            const float t1 = glyph->bottomRight().y;
-            const float outlineS1 = glyph->outlineBottomRight().x;
-            const float outlineT1 = glyph->outlineBottomRight().y;
+            const float x1 = x0 + glyph->width;
+            const float y1 = y0 - glyph->height;
+            const float s1 = glyph->bottomRight.x;
+            const float t1 = glyph->bottomRight.y;
+            const float outlineS1 = glyph->outlineBottomRight.x;
+            const float outlineT1 = glyph->outlineBottomRight.y;
 
             // These variables are necessary as the insertion would otherwise produce a
             // narrowing error on clang
@@ -446,10 +446,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 x1, y1, s1, t1, outlineS1, outlineT1,
                 x1, y0, s1, t0, outlineS1, outlineT0
             });
-            movingPos.x += glyph->horizontalAdvance();
+            movingPos.x += glyph->horizontalAdvance;
 
-            width += glyph->horizontalAdvance();
-            height = std::max(height, static_cast<float>(glyph->height()));
+            width += glyph->horizontalAdvance;
+            height = std::max(height, static_cast<float>(glyph->height));
         }
         size.x = std::max(size.x, width);
         //size.y += height;
@@ -459,7 +459,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     opengl::TextureUnit atlasUnit;
     atlasUnit.activate();
-    font.atlas().texture().bind();
+    font.atlasTexture().bind();
 
     _program->setUniform(_uniformCache.baseColor, color);
     _program->setUniform(_uniformCache.outlineColor, outlineColor);
@@ -568,19 +568,19 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 movingPos.x += glyph->kerning(line[j - 1]);
             }
 
-            float x0 = movingPos.x + glyph->leftBearing();
-            float y0 = movingPos.y + glyph->topBearing();
-            float s0 = glyph->topLeft().x;
-            float t0 = glyph->topLeft().y;
-            float outlineS0 = glyph->outlineTopLeft().x;
-            float outlineT0 = glyph->outlineTopLeft().y;
+            float x0 = movingPos.x + glyph->leftBearing;
+            float y0 = movingPos.y + glyph->topBearing;
+            float s0 = glyph->topLeft.x;
+            float t0 = glyph->topLeft.y;
+            float outlineS0 = glyph->outlineTopLeft.x;
+            float outlineT0 = glyph->outlineTopLeft.y;
 
-            float x1 = x0 + glyph->width();
-            float y1 = y0 - glyph->height();
-            float s1 = glyph->bottomRight().x;
-            float t1 = glyph->bottomRight().y;
-            float outlineS1 = glyph->outlineBottomRight().x;
-            float outlineT1 = glyph->outlineBottomRight().y;
+            float x1 = x0 + glyph->width;
+            float y1 = y0 - glyph->height;
+            float s1 = glyph->bottomRight.x;
+            float t1 = glyph->bottomRight.y;
+            float outlineS1 = glyph->outlineBottomRight.x;
+            float outlineT1 = glyph->outlineBottomRight.y;
 
             glm::vec3 p0 = glm::vec3(0.0);
             glm::vec3 p1 = glm::vec3(0.0);
@@ -675,10 +675,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             _indexBuffer.insert(_indexBuffer.end(), { vi, vi1, vi2, vi, vi2, vi3 });
             vertexIndex += 4;
 
-            movingPos.x += glyph->horizontalAdvance();
+            movingPos.x += glyph->horizontalAdvance;
 
-            width += glyph->horizontalAdvance();
-            height = std::max(height, static_cast<float>(glyph->height()));
+            width += glyph->horizontalAdvance;
+            height = std::max(height, static_cast<float>(glyph->height));
         } // end of a line
 
         size.x = std::max(size.x, width);
@@ -696,7 +696,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     opengl::TextureUnit atlasUnit;
     atlasUnit.activate();
-    font.atlas().texture().bind();
+    font.atlasTexture().bind();
 
     _program->setUniform(_uniformCacheProjection.baseColor, color);
     _program->setUniform(_uniformCacheProjection.outlineColor, outlineColor);
