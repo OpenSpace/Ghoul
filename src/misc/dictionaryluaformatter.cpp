@@ -132,31 +132,31 @@ namespace {
             std::string value = dictionary.value<std::string>(key);
 
             std::string luaString;
-            for (const char& c : value) {
+            for (const char c : value) {
                 switch (c) {
-                case '"':
-                    luaString += "\\\"";
-                    break;
-                case '\\':
-                    luaString += "\\\\";
-                    break;
-                case '\b':
-                    luaString += "\\b";
-                    break;
-                case '\f':
-                    luaString += "\\f";
-                    break;
-                case '\n':
-                    luaString += "\\n";
-                    break;
-                case '\r':
-                    luaString += "\\r";
-                    break;
-                case '\t':
-                    luaString += "\\t";
-                    break;
-                default:
-                    luaString += c;
+                    case '"':
+                        luaString += "\\\"";
+                        break;
+                    case '\\':
+                        luaString += "\\\\";
+                        break;
+                    case '\b':
+                        luaString += "\\b";
+                        break;
+                    case '\f':
+                        luaString += "\\f";
+                        break;
+                    case '\n':
+                        luaString += "\\n";
+                        break;
+                    case '\r':
+                        luaString += "\\r";
+                        break;
+                    case '\t':
+                        luaString += "\\t";
+                        break;
+                    default:
+                        luaString += c;
                 }
             }
 
