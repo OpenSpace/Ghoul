@@ -27,123 +27,151 @@
 
 #include <ghoul/fmt.h>
 #include <ghoul/logging/logmanager.h>
-
 #include <ghoul/misc/assert.h>
+
+namespace {
+    constexpr const char* _loggerCat = "OpenGLStateCache";
+} // namespace
 
 namespace ghoul::opengl {
 
 OpenGLStateCache* OpenGLStateCache::_singleton = nullptr;
 GLint OpenGLStateCache::_maxAttachBuffers = 8;
 
+OpenGLStateCache* OpenGLStateCache::instance() {
+    if (!_singleton) {
+        _singleton = new OpenGLStateCache;
+        glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &_maxAttachBuffers);
+        _singleton->_blending.enabledArray.reserve(_maxAttachBuffers);
+    }
+
+    return _singleton;
+}
+
+bool OpenGLStateCache::isCacheInitialized() const {
+    return _cacheInitialized;
+}
+
 void OpenGLStateCache::loadCurrentGLState() {
-    // ViewPort
-    glGetIntegerv(GL_VIEWPORT, _viewport);
+    // Viewport
+    glGetIntegerv(GL_VIEWPORT, _viewport.data());
 
     // Polygon and Culling
     _faceCullingEnabled = glIsEnabled(GL_CULL_FACE);
     glGetIntegerv(GL_CULL_FACE_MODE, &_faceToCull);
-    _polygonOffSetEnabled = glIsEnabled(GL_POLYGON_OFFSET_FILL);
-    glGetFloatv(GL_POLYGON_OFFSET_FACTOR, &_polygonOffSetFactor);
-    glGetFloatv(GL_POLYGON_OFFSET_UNITS, &_polygonOffSetUnits);
+    _polygonOffset.enabled = glIsEnabled(GL_POLYGON_OFFSET_FILL);
+    glGetFloatv(GL_POLYGON_OFFSET_FACTOR, &_polygonOffset.factor);
+    glGetFloatv(GL_POLYGON_OFFSET_UNITS, &_polygonOffset.units);
 
     // Color
-    glGetFloatv(GL_COLOR_CLEAR_VALUE, _colorClearValue);
+    glGetFloatv(GL_COLOR_CLEAR_VALUE, _colorClearValue.data());
     glGetBooleanv(GL_CLAMP_READ_COLOR, &_clampColorEnabled);
 
     // Depth
-    glGetFloatv(GL_DEPTH_CLEAR_VALUE, &_depthClearValue);
-    _depthTestEnabled = glIsEnabled(GL_DEPTH_TEST);
-    _depthMaskEnabled = glIsEnabled(GL_DEPTH_WRITEMASK);
-    glGetIntegerv(GL_DEPTH_FUNC, &_depthFunction);
+    glGetFloatv(GL_DEPTH_CLEAR_VALUE, &_depth.clearValue);
+    _depth.testEnabled = glIsEnabled(GL_DEPTH_TEST);
+    _depth.maskEnabled = glIsEnabled(GL_DEPTH_WRITEMASK);
+    glGetIntegerv(GL_DEPTH_FUNC, &_depth.function);
 
     // Blending
-    _blendEnabled = glIsEnabled(GL_BLEND);
+    _blending.enabled = glIsEnabled(GL_BLEND);
 
-    if (_blendEnabledArray.empty()) {
+    if (_blending.enabledArray.empty()) {
         for (int i = 0; i < _maxAttachBuffers; ++i) {
-            _blendEnabledArray.push_back(glIsEnabledi(GL_BLEND, i));
+            _blending.enabledArray.push_back(glIsEnabledi(GL_BLEND, i));
         }
-    } else {
-        std::vector<GLboolean>::iterator endBlendBuffer = _blendEnabledArray.end();
-        std::vector<GLboolean>::iterator blendBufferIt = _blendEnabledArray.begin();
+    }
+    else {
+        std::vector<GLboolean>::iterator blendBufferIt = _blending.enabledArray.begin();
+        std::vector<GLboolean>::iterator endBlendBuffer = _blending.enabledArray.end();
         for (int i = 0; blendBufferIt < endBlendBuffer; ++ blendBufferIt, ++i) {
             *blendBufferIt = glIsEnabledi(GL_BLEND, i);
         }
     }
 
-    glGetIntegerv(GL_BLEND_EQUATION_RGB, &_blendEquationRGB);
-    glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &_blendEquationAlpha);
-    glGetIntegerv(GL_BLEND_DST_ALPHA, &_blendDestAlpha);
-    glGetIntegerv(GL_BLEND_DST_RGB, &_blendDestRGB);
-    glGetIntegerv(GL_BLEND_SRC_ALPHA, &_blendSrcAlpha);
-    glGetIntegerv(GL_BLEND_SRC_RGB, &_blendSrcRGB);
+    glGetIntegerv(GL_BLEND_EQUATION_RGB, &_blending.equationRGB);
+    glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &_blending.equationAlpha);
+    glGetIntegerv(GL_BLEND_SRC_RGB, &_blending.srcRGB);
+    glGetIntegerv(GL_BLEND_SRC_ALPHA, &_blending.srcAlpha);
+    glGetIntegerv(GL_BLEND_DST_RGB, &_blending.destRGB);
+    glGetIntegerv(GL_BLEND_DST_ALPHA, &_blending.destAlpha);
 
     // Line
-    _lineSmoothEnabled = glIsEnabled(GL_LINE_SMOOTH);
-    glGetFloatv(GL_LINE_WIDTH, &_lineWidth);
+    _line.smoothEnabled = glIsEnabled(GL_LINE_SMOOTH);
+    glGetFloatv(GL_LINE_WIDTH, &_line.width);
 
     _cacheInitialized = true;
 }
 
 void OpenGLStateCache::setCachedStates() const {
-    ghoul_assert(!_cacheInitialized, "OpenGL State cache is not initialized.");
-    setViewPortState();
-    setColorState();
-    setBlendState();
-    setDepthState();
-    setLineState();
-    setPolygonAndClippingState();
+    ghoul_assert(_cacheInitialized, "OpenGL State cache is not initialized.");
+
+    resetViewportState();
+    resetColorState();
+    resetBlendState();
+    resetDepthState();
+    resetLineState();
+    resetPolygonAndClippingState();
 }
 
-void OpenGLStateCache::setBlendState() const {
-    if (_blendEnabled) {
+void OpenGLStateCache::resetBlendState() const {
+    if (_blending.enabled) {
         glEnable(GL_BLEND);
-    } else {
+    }
+    else {
         glDisable(GL_BLEND);
     }
 
-    std::vector<GLboolean>::const_iterator endBlendBuffer = _blendEnabledArray.cend();
-    std::vector<GLboolean>::const_iterator blendBufferIt  = _blendEnabledArray.cbegin();
+    std::vector<GLboolean>::const_iterator endBlendBuffer = _blending.enabledArray.cend();
+    std::vector<GLboolean>::const_iterator blendBufferIt  = _blending.enabledArray.cbegin();
     for (int i = 0; blendBufferIt < endBlendBuffer; ++ blendBufferIt, ++i) {
         if (*blendBufferIt) {
             glEnablei(GL_BLEND, i);
-        } else {
+        }
+        else {
             glDisablei(GL_BLEND, i);
         }
     }
 
-    glBlendEquationSeparate(_blendEquationRGB, _blendEquationAlpha);
-    glBlendFuncSeparate(_blendSrcRGB, _blendDestRGB, _blendSrcAlpha, _blendDestAlpha);
+    glBlendEquationSeparate(_blending.equationRGB, _blending.equationAlpha);
+    glBlendFuncSeparate(
+        _blending.srcRGB,
+        _blending.destRGB,
+        _blending.srcAlpha,
+        _blending.destAlpha
+    );
 }
 
-void OpenGLStateCache::setDepthState() const {
-    if (_depthTestEnabled) {
+void OpenGLStateCache::resetDepthState() const {
+    if (_depth.testEnabled) {
         glEnable(GL_DEPTH_TEST);
     }
     else {
         glDisable(GL_DEPTH_TEST);
     }
 
-    if (_depthMaskEnabled) {
+    if (_depth.maskEnabled) {
         glDepthMask(false);
-    } else {
+    }
+    else {
         glDepthMask(true);
     }
 
-    glClearDepth(_depthClearValue);
-    glDepthFunc(_depthFunction);
+    glClearDepth(_depth.clearValue);
+    glDepthFunc(_depth.function);
 }
 
-void OpenGLStateCache::setLineState() const {
-    if (_lineSmoothEnabled) {
+void OpenGLStateCache::resetLineState() const {
+    if (_line.smoothEnabled) {
         glEnable(GL_LINE_SMOOTH);
-    } else {
+    }
+    else {
         glDisable(GL_LINE_SMOOTH);
     }
-    glLineWidth(_lineWidth);
+    glLineWidth(_line.width);
 }
 
-void OpenGLStateCache::setPolygonAndClippingState() const {
+void OpenGLStateCache::resetPolygonAndClippingState() const {
     if (_faceCullingEnabled) {
         glEnable(GL_CULL_FACE);
     }
@@ -153,17 +181,17 @@ void OpenGLStateCache::setPolygonAndClippingState() const {
 
     glCullFace(_faceToCull);
 
-    if (_polygonOffSetEnabled) {
+    if (_polygonOffset.enabled) {
         glEnable(GL_POLYGON_OFFSET_FILL);
     }
     else {
         glDisable(GL_POLYGON_OFFSET_FILL);
     }
 
-    glPolygonOffset(_polygonOffSetFactor, _polygonOffSetUnits);
+    glPolygonOffset(_polygonOffset.factor, _polygonOffset.units);
 }
 
-void OpenGLStateCache::setColorState() const {
+void OpenGLStateCache::resetColorState() const {
     glClearColor(
         _colorClearValue[0],
         _colorClearValue[1],
@@ -172,23 +200,21 @@ void OpenGLStateCache::setColorState() const {
     );
 }
 
-void OpenGLStateCache::setColorState(const GLfloat * color, const GLboolean clampColor)  {
-    if (color != nullptr) {
-        if (color[0] != _colorClearValue[0] ||
-            color[1] != _colorClearValue[1] ||
-            color[2] != _colorClearValue[2] ||
-            color[3] != _colorClearValue[3])
-        {
-            _colorClearValue[0] = color[0];
-            _colorClearValue[1] = color[1];
-            _colorClearValue[2] = color[2];
-            _colorClearValue[3] = color[3];
-        }
+void OpenGLStateCache::setColorState(const GLfloat color[4], GLboolean clampColor)  {
+    ghoul_assert(color != nullptr, "color must not be nullptr");
 
-        if (clampColor != _clampColorEnabled) {
-            _clampColorEnabled = clampColor;
-            glClampColor(GL_CLAMP_READ_COLOR, GL_FALSE);
-        }
+    if (color[0] != _colorClearValue[0] || color[1] != _colorClearValue[1] ||
+        color[2] != _colorClearValue[2] || color[3] != _colorClearValue[3])
+    {
+        _colorClearValue[0] = color[0];
+        _colorClearValue[1] = color[1];
+        _colorClearValue[2] = color[2];
+        _colorClearValue[3] = color[3];
+    }
+
+    if (clampColor != _clampColorEnabled) {
+        _clampColorEnabled = clampColor;
+        glClampColor(GL_CLAMP_READ_COLOR, GL_FALSE);
     }
 
     glClearColor(
@@ -199,36 +225,32 @@ void OpenGLStateCache::setColorState(const GLfloat * color, const GLboolean clam
     );
 }
 
-void OpenGLStateCache::setViewPortState() const {
+void OpenGLStateCache::resetViewportState() const {
     glViewport(_viewport[0], _viewport[1], _viewport[2], _viewport[3]);
 }
 
-void OpenGLStateCache::setViewPortState(const GLint * viewportCoords)  {
-    if (viewportCoords != nullptr) {
-        if (viewportCoords[0] != _viewport[0] ||
-            viewportCoords[1] != _viewport[1] ||
-            viewportCoords[2] != _viewport[2] ||
-            viewportCoords[3] != _viewport[3])
-        {
-            _viewport[0] = viewportCoords[0];
-            _viewport[1] = viewportCoords[1];
-            _viewport[2] = viewportCoords[2];
-            _viewport[3] = viewportCoords[3];
-        }
+void OpenGLStateCache::setViewportState(const GLint viewportCoords[4])  {
+    ghoul_assert(viewportCoords != nullptr, "viewportCoords must not be nullptr");
+
+    if (viewportCoords[0] != _viewport[0] || viewportCoords[1] != _viewport[1] ||
+        viewportCoords[2] != _viewport[2] || viewportCoords[3] != _viewport[3])
+    {
+        _viewport[0] = viewportCoords[0];
+        _viewport[1] = viewportCoords[1];
+        _viewport[2] = viewportCoords[2];
+        _viewport[3] = viewportCoords[3];
     }
 
     glViewport(_viewport[0], _viewport[1], _viewport[2], _viewport[3]);
 }
 
-void OpenGLStateCache::viewPort(GLint * viewPort) const {
-    if (viewPort == nullptr) {
-        LERROR("Unitialized memory argument passed to viewPort method.");
-    } else {
-        viewPort[0] = _viewport[0];
-        viewPort[1] = _viewport[1];
-        viewPort[2] = _viewport[2];
-        viewPort[3] = _viewport[3];
-    }
+void OpenGLStateCache::viewport(GLint viewport[4]) const {
+    ghoul_assert(viewport != nullptr, "viewport must not be nullptr");
+
+    viewport[0] = _viewport[0];
+    viewport[1] = _viewport[1];
+    viewport[2] = _viewport[2];
+    viewport[3] = _viewport[3];
 }
 
 } // namespace ghoul::opengl

@@ -27,7 +27,7 @@
 #define __GHOUL___OPENGLSTATECACHE___H__
 
 #include <ghoul/opengl/ghoul_gl.h>
-
+#include <array>
 #include <string>
 #include <vector>
 
@@ -39,48 +39,35 @@ namespace ghoul::opengl {
  * Be aware that not all OpenGL states are available for caching at this moment.
  * New states caching should be added as needed.
  */
-class OpenGLStateCache
-{
+class OpenGLStateCache {
 public:
-    /* Currently, this class is a Singleton. In the future we will enable multiple
+    /* 
+     * Currently, this class is a Singleton. In the future we will enable multiple
      * instances of the class when working with multiple OpenGL contexts.
      */
-    static OpenGLStateCache * getInstance() {
-        if (!_singleton) {
-            _singleton = new OpenGLStateCache;
-            glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &_maxAttachBuffers);
-            _singleton->_blendEnabledArray.reserve(_maxAttachBuffers);
-        }
+    static OpenGLStateCache* instance();
 
-        return _singleton;
-    }
+    OpenGLStateCache(const OpenGLStateCache&) = delete;
+    OpenGLStateCache(OpenGLStateCache&&) = delete;
+    OpenGLStateCache& operator=(const OpenGLStateCache&) = delete;
+    OpenGLStateCache& operator=(OpenGLStateCache&&) = delete;
 
-    OpenGLStateCache(OpenGLStateCache const&) = delete;             // Copy construct
-    OpenGLStateCache(OpenGLStateCache&&) = delete;                  // Move construct
-    OpenGLStateCache& operator=(OpenGLStateCache const&) = delete;  // Copy assign
-    OpenGLStateCache& operator=(OpenGLStateCache &&) = delete;      // Move assign
-
-    bool isCacheInitialized() const { return _cacheInitialized; }
+    bool isCacheInitialized() const;
     void loadCurrentGLState();
     void setCachedStates() const;
-    void setBlendState() const;
-    void setDepthState() const;
-    void setLineState() const;
-    void setPolygonAndClippingState() const;
-    void setViewPortState() const;
-    void setViewPortState(const GLint * viewportCoords = nullptr);
-    void setColorState() const;
-    void setColorState(const GLfloat * clearcolor = nullptr,
-                       const GLboolean clampColor = GL_FALSE);
+    void resetBlendState() const;
+    void resetDepthState() const;
+    void resetLineState() const;
+    void resetPolygonAndClippingState() const;
+    void resetViewportState() const;
+    void setViewportState(const GLint viewportCoords[4]);
+    void resetColorState() const;
+    void setColorState(const GLfloat clearColor[4], GLboolean clampColor = GL_FALSE);
 
-    void viewPort(GLint * viewPort) const;
+    void viewport(GLint viewport[4]) const;
 
 private:
-
-    /// The logger category that will be used, if a name has been specified.
-    std::string _loggerCat = {"OpenGLStateCache"};
-
-    OpenGLStateCache() {};
+    OpenGLStateCache() = default;
     ~OpenGLStateCache() = default;
 
     static OpenGLStateCache* _singleton;
@@ -89,40 +76,47 @@ private:
     bool _cacheInitialized = false;
 
     // ViewPort
-    GLint _viewport[4] = {0, 0, 0, 0};
+    std::array<GLint, 4> _viewport = {0, 0, 0, 0};
 
     // Polygon and Culling
     GLboolean _faceCullingEnabled = false;
-    GLboolean _polygonOffSetEnabled = false;
     GLenum _faceToCull;
 
-    GLfloat _polygonOffSetFactor = 0.f;
-    GLfloat _polygonOffSetUnits = 0.f;
+    struct {
+        GLboolean enabled = false;
+        GLfloat factor = 0.f;
+        GLfloat units = 0.f;
+    } _polygonOffset;
 
     // Color
-    GLfloat _colorClearValue[4] = {0.f, 0.f, 0.f, 0.f};
+    std::array<GLfloat, 4> _colorClearValue = { 0.f, 0.f, 0.f, 0.f };
     GLboolean _clampColorEnabled;
 
     // Depth
-    GLboolean _depthTestEnabled = false;
-    GLboolean _depthMaskEnabled = true;
-    GLfloat _depthClearValue = 1.f;
-    GLenum _depthFunction;
+    struct {
+        GLboolean testEnabled = false;
+        GLboolean maskEnabled = true;
+        GLfloat clearValue = 1.f;
+        GLenum function;
+    } _depth;
 
     // Blending
-    GLboolean _blendEnabled = false;
-    std::vector<GLboolean> _blendEnabledArray;
-    GLenum _blendEquationRGB;
-    GLenum _blendEquationAlpha;
-    GLenum _blendDestAlpha;
-    GLenum _blendDestRGB;
-    GLenum _blendSrcAlpha;
-    GLenum _blendSrcRGB;
+    struct {
+        GLboolean enabled = false;
+        std::vector<GLboolean> enabledArray;
+        GLenum equationRGB;
+        GLenum equationAlpha;
+        GLenum srcRGB;
+        GLenum srcAlpha;
+        GLenum destRGB;
+        GLenum destAlpha;
+    } _blending;
 
     // Line
-    GLboolean _lineSmoothEnabled = false;
-    GLfloat _lineWidth = 1.f;
-
+    struct {
+        GLboolean smoothEnabled = false;
+        GLfloat width = 1.f;
+    } _line;
 };
 
 } // namespace ghoul::opengl
