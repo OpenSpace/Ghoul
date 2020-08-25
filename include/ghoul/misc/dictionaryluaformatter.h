@@ -31,25 +31,25 @@
 
 namespace ghoul {
 
-    class Dictionary;
+class Dictionary;
 
-    /// This exception is thrown if an unknown type is being converted.
-    struct LuaFormattingError : public RuntimeError {
-        explicit LuaFormattingError(const std::string& msg);
-    };
+/// This exception is thrown if an unknown type is being converted.
+struct LuaFormattingError : public RuntimeError {
+    explicit LuaFormattingError(const std::string& msg);
+};
 
-    BooleanType(PrettyPrint);
+BooleanType(PrettyPrint);
 
-    /**
-     * Converts the passed \p dictionary into a Lua string representation.
-     *
-     * \param dictionary The Dictionary that should be converted
-     * \return A Lua string representing the Dictionary
-     *
-     * \throw LuaFormattingError If the \p key points to a type that cannot be converted
-     */
-    std::string formatLua(const Dictionary& dictionary,
-        PrettyPrint prettyPrint = PrettyPrint::No, std::string indentation = "    ");
+/**
+    * Converts the passed \p dictionary into a Lua string representation.
+    *
+    * \param dictionary The Dictionary that should be converted
+    * \return A Lua string representing the Dictionary
+    *
+    * \throw LuaFormattingError If the \p key points to a type that cannot be converted
+    */
+std::string formatLua(const Dictionary& dictionary,
+    PrettyPrint prettyPrint = PrettyPrint::No, std::string indentation = "    ");
 
 }  // namespace ghoul
 
