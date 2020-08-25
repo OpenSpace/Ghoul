@@ -103,7 +103,7 @@ void OpenGLStateCache::loadCurrentGLState() {
     _cacheInitialized = true;
 }
 
-void OpenGLStateCache::setCachedStates() const {
+void OpenGLStateCache::resetCachedStates() const {
     ghoul_assert(_cacheInitialized, "OpenGL State cache is not initialized.");
 
     resetViewportState();
@@ -122,10 +122,9 @@ void OpenGLStateCache::resetBlendState() const {
         glDisable(GL_BLEND);
     }
 
-    std::vector<GLboolean>::const_iterator endBlendBuffer = _blending.enabledArray.cend();
-    std::vector<GLboolean>::const_iterator blendBufferIt  = _blending.enabledArray.cbegin();
-    for (int i = 0; blendBufferIt < endBlendBuffer; ++ blendBufferIt, ++i) {
-        if (*blendBufferIt) {
+    auto it  = _blending.enabledArray.cbegin();
+    for (int i = 0; it < _blending.enabledArray.cend(); ++it, ++i) {
+        if (*it) {
             glEnablei(GL_BLEND, i);
         }
         else {

@@ -54,7 +54,7 @@ public:
 
     bool isCacheInitialized() const;
     void loadCurrentGLState();
-    void setCachedStates() const;
+    void resetCachedStates() const;
     void resetBlendState() const;
     void resetDepthState() const;
     void resetLineState() const;
