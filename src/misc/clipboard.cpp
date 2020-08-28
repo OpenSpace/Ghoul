@@ -53,12 +53,13 @@ namespace {
             return false;
         }
 
-        const int buffer_size = 1024;
-        char buffer[buffer_size];
-        value = "";
+        constexpr const int BufferSize = 1024;
+        char buffer[BufferSize];
+        value.clear();
         while (!feof(pipe)) {
-            if (fgets(buffer, buffer_size, pipe) != NULL)
+            if (fgets(buffer, BufferSize, pipe) != nullptr) {
                 value += buffer;
+            }
         }
         pclose(pipe);
         return true;
@@ -125,7 +126,7 @@ void setClipboardText(const std::string& text) {
         GlobalFree(hData);
         throw RuntimeError("Error acquiring lock", "Clipboard");
     }
-    memcpy(ptrData, text.c_str(), text.length() + 1);
+    std::memcpy(ptrData, text.c_str(), text.length() + 1);
 
     GlobalUnlock(hData);
 

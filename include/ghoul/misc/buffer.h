@@ -85,7 +85,7 @@ public:
      *
      * \param other The Buffer from which the data is moved out of
      */
-    Buffer(Buffer&& other);
+    Buffer(Buffer&& other) noexcept;
 
     /**
      * Constructs a Buffer by copying another Buffer object.
@@ -102,7 +102,7 @@ public:
      * \param rhs The Buffer out of which the data is moved
      * \return The object this operator was called on
      */
-    Buffer& operator=(Buffer&& rhs);
+    Buffer& operator=(Buffer&& rhs) noexcept;
 
     /**
      * Default destructor is sufficient since no objects are allocated internally.

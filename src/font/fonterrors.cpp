@@ -28,7 +28,6 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-
 #undef __FTERRORS_H__
 #define FT_ERRORDEF(e, v, s)  ghoul::fontrendering::Error{ e, s },
 #define FT_ERROR_START_LIST     {

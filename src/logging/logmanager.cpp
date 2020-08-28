@@ -60,15 +60,14 @@ LogManager& LogManager::ref() {
     return *_instance;
 }
 
-
 void LogManager::addLog(std::unique_ptr<Log> log) {
     _logs.push_back(std::move(log));
 }
 
 void LogManager::removeLog(Log* log) {
-    auto it = std::find_if(
-        _logs.begin(),
-        _logs.end(),
+    const auto it = std::find_if(
+        _logs.cbegin(),
+        _logs.cend(),
         [log](const std::unique_ptr<Log>& l) { return l.get() == log; }
     );
     if (it != _logs.end()) {
@@ -97,7 +96,7 @@ void LogManager::logMessage(LogLevel level, std::string_view category,
             }
         }
 
-        int l = std::underlying_type<LogLevel>::type(level);
+        const int l = std::underlying_type<LogLevel>::type(level);
         ++(_logCounters[l]);
     }
 }

@@ -145,7 +145,7 @@ void ModelReaderMultiFormat::loadModel(const std::string& filename,
     for (const aiMesh* meshPtr : meshArray) {
         // Walk through each of the mesh's vertices
         for (unsigned int i = 0; i < meshPtr->mNumVertices; i++) {
-            Vertex vTmp {};
+            Vertex vTmp;
 
             // Positions
             vTmp.location[0] = meshPtr->mVertices[i].x;

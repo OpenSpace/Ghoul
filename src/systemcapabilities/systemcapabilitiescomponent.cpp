@@ -25,6 +25,7 @@
 
 #include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/stringconversion.h>
@@ -37,7 +38,7 @@ IWbemLocator* SystemCapabilitiesComponent::_iwbemLocator = nullptr;
 IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
 
 SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, HRESULT code)
-    : RuntimeError(msg + ". Error Code: " + std::to_string(code), "WMI")
+    : RuntimeError(fmt::format("{}. Error Code: {}", msg, code), "WMI")
     , message(std::move(msg))
     , errorCode(std::move(code))
 {}
@@ -134,7 +135,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         CoUninitialize();
         throw WMIError("WMI initialization failed. Could not set proxy blanket", hRes);
     }
-    LDEBUG("WMI successfully initialized.");
+    LDEBUG("WMI successfully initialized");
 }
 
 void SystemCapabilitiesComponent::deinitializeWMI() {

@@ -36,8 +36,8 @@
 #include <ghoul/opengl/texture.h>
 #include <ghoul/opengl/textureatlas.h>
 #include <ghoul/opengl/textureunit.h>
-#include <fstream>
 #include <glm/gtc/matrix_transform.hpp>
+#include <fstream>
 #include <numeric>
 
 namespace {
@@ -320,7 +320,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     return std::unique_ptr<FontRenderer>(fr);
 }
 
-bool FontRenderer::initialize() {
+void FontRenderer::initialize() {
     LDEBUG("Creating default FontRenderer");
     ghoul_assert(!_defaultRenderer, "Default FontRenderer was already initialized");
     _defaultRenderer = createDefault();
@@ -331,14 +331,11 @@ bool FontRenderer::initialize() {
         "Default projection Fontrenderer was already initialized"
     );
     _defaultProjectionRenderer = createProjectionSubjectText();
-
-    return true;
 }
 
-bool FontRenderer::deinitialize() {
+void FontRenderer::deinitialize() {
     _defaultRenderer = nullptr;
     _defaultProjectionRenderer = nullptr;
-    return true;
 }
 
 bool FontRenderer::isInitialized() {
@@ -773,15 +770,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                               const ProjectedLabelsInformation& labelInfo,
                                                             const glm::vec2& offset) const
 {
-    return render(
-        font,
-        pos,
-        text,
-        color,
-        { 0.f, 0.f, 0.f, color.a },
-        labelInfo,
-        offset
-    );
+    const glm::vec4 outlineColor = glm::vec4(0.f, 0.f, 0.f, color.a);
+    return render(font, pos, text, color, outlineColor, labelInfo, offset);
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
@@ -789,14 +779,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           std::string_view text,
                                         const ProjectedLabelsInformation& labelInfo) const
 {
-    return render(
-        font,
-        pos,
-        text,
-        { 1.f, 1.f, 1.f, 1.f },
-        { 0.f, 0.f, 0.f, 1.f },
-        labelInfo
-    );
+    constexpr const glm::vec4 color = glm::vec4(1.f, 1.f, 1.f, 1.f);
+    constexpr const glm::vec4 outlineColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
+    return render(font, pos, text, color, outlineColor, labelInfo);
 }
 
 void FontRenderer::setFramebufferSize(glm::vec2 framebufferSize) {

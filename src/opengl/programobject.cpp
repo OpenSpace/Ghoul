@@ -78,17 +78,14 @@ ProgramObject::ProgramObjectLinkingError::ProgramObjectLinkingError(std::string 
                                                                          std::string name)
     : ProgramObjectError(
         name.empty() ?
-        "Error linking program object: " + msg :
-        "Error linking program object [" + name + "]: " + msg
+        fmt::format("Error linking program object: {}", msg) :
+        fmt::format("Error linking program object [{}]: {}", name, msg)
       )
     , linkerError(std::move(msg))
     , programName(std::move(name))
 {}
 
-ProgramObject::ProgramObject()
-    : _programName("")
-    , _loggerCat("ProgramObject")
-{
+ProgramObject::ProgramObject() {
     _id = glCreateProgram();
     if (_id == 0) {
         throw ProgramObjectError("glCreateProgram returned 0");
@@ -97,7 +94,7 @@ ProgramObject::ProgramObject()
 
 ProgramObject::ProgramObject(std::string name)
     : _programName(std::move(name))
-    , _loggerCat("ProgramObject('" + _programName + "')")
+    , _loggerCat(fmt::format("ProgramObject('{}')", _programName))
 {
     _id = glCreateProgram();
     if (_id == 0) {
@@ -194,7 +191,7 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
     return *this;
 }
 
-ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) {
+ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) noexcept {
     if (this != &rhs) {
         glDeleteProgram(_id);
         _id = rhs._id;
@@ -224,7 +221,7 @@ ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) {
 
 void ProgramObject::setName(string name) {
     _programName = std::move(name);
-    _loggerCat = "ProgramObject['" + _programName + "']";
+    _loggerCat = fmt::format("ProgramObject['{}']", _programName);
     if (glbinding::Binding::ObjectLabel.isResolved()) {
         glObjectLabel(
             GL_PROGRAM,
@@ -264,8 +261,8 @@ void ProgramObject::setProgramObjectCallback(ProgramObjectCallback changeCallbac
 
 void ProgramObject::attachObject(std::shared_ptr<ShaderObject> shaderObject) {
     ghoul_assert(shaderObject, "ShaderObject must not be nullptr");
-    auto it = std::find(_shaderObjects.begin(), _shaderObjects.end(), shaderObject);
-    ghoul_assert(it == _shaderObjects.end(), "ShaderObject was already registered");
+    auto it = std::find(_shaderObjects.cbegin(), _shaderObjects.cend(), shaderObject);
+    ghoul_assert(it == _shaderObjects.cend(), "ShaderObject was already registered");
 
     shaderObject->setShaderObjectCallback([this]() { _programIsDirty = true; });
 
@@ -3823,7 +3820,7 @@ vector<string> ProgramObject::activeSubroutineUniformNames(
         GL_ACTIVE_SUBROUTINE_UNIFORMS,
         &countActiveSubroutineUniforms
     );
-    vector<string> result(static_cast<size_t>(countActiveSubroutineUniforms));
+    vector<string> result(countActiveSubroutineUniforms);
     for (GLuint i = 0; i < static_cast<GLuint>(countActiveSubroutineUniforms); ++i) {
         glGetActiveSubroutineUniformName(
             _id,
@@ -3841,7 +3838,7 @@ vector<string> ProgramObject::activeSubroutineUniformNames(
 
 vector<string> ProgramObject::compatibleSubroutineNames(
                                                       ShaderObject::ShaderType shaderType,
-                                                      GLuint subroutineUniformLocation)
+                                                         GLuint subroutineUniformLocation)
 {
     ghoul_assert(
         subroutineUniformLocation != GL_INVALID_INDEX,
@@ -3868,7 +3865,7 @@ vector<string> ProgramObject::compatibleSubroutineNames(
         return vector<string>();
     }
 
-    vector<string> result(static_cast<size_t>(numCompatibleSubroutines));
+    vector<string> result(numCompatibleSubroutines);
     std::vector<GLint> indices(numCompatibleSubroutines);
     std::vector<char> buffer(maximumUniformNameLength);
     glGetActiveSubroutineUniformiv(
@@ -3924,8 +3921,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
         LWARNING(fmt::format(
             "Number of active subroutine uniforms ({}) is different from passed uniform "
             "subroutine indices ({})",
-            countActiveSubroutineUniforms,
-            indices.size()
+            countActiveSubroutineUniforms, indices.size()
         ));
         return false;
     }
@@ -3990,7 +3986,8 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
     glUniformSubroutinesuiv(
         static_cast<GLenum>(shaderType),
         static_cast<GLsizei>(uniformIndices.size()),
-        &uniformIndices[0]);
+        &uniformIndices[0]
+    );
     return true;
 }
 

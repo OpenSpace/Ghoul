@@ -93,32 +93,30 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
 void ConsoleLog::setColorForLevel(LogLevel level) {
 #ifdef WIN32
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    WORD colorIndex = 0;
-    switch (level) {
-        case LogLevel::Trace:
-            colorIndex = FOREGROUND_INTENSITY;
-            break;
-        case LogLevel::Debug:
-            colorIndex = FOREGROUND_GREEN;
-            break;
-        case LogLevel::Info:
-            colorIndex = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN;
-            break;
-        case LogLevel::Warning:
-            colorIndex = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-            break;
-        case LogLevel::Error:
-            colorIndex = FOREGROUND_RED | FOREGROUND_INTENSITY;
-            break;
-        case LogLevel::Fatal:
-            colorIndex = FOREGROUND_RED | FOREGROUND_BLUE| FOREGROUND_INTENSITY;
-            break;
-        case LogLevel::NoLogging:
-            colorIndex = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN;
-            break;
-        case LogLevel::AllLogging:
-            return;
-    }
+
+    const WORD colorIndex = [](LogLevel level) -> WORD {
+        switch (level) {
+            case LogLevel::Trace:
+                return FOREGROUND_INTENSITY;
+            case LogLevel::Debug:
+                return FOREGROUND_GREEN;
+            case LogLevel::Info:
+                return FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN;
+            case LogLevel::Warning:
+                return FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+            case LogLevel::Error:
+                return FOREGROUND_RED | FOREGROUND_INTENSITY;
+            case LogLevel::Fatal:
+                return FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+            case LogLevel::NoLogging:
+                return FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN;
+            case LogLevel::AllLogging:
+                return 0;
+            default:
+                throw MissingCaseException();
+        }
+    }(level);
+
     // Get the old color information
     CONSOLE_SCREEN_BUFFER_INFO csbiInfo = { 0 };
     GetConsoleScreenBufferInfo(hConsole, &csbiInfo);

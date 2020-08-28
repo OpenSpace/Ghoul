@@ -145,12 +145,7 @@ bool Font::Glyph::operator==(const Font::Glyph& rhs) const {
 
 float Font::Glyph::kerning(wchar_t character) const {
     const auto it = _kerning.find(character);
-    if (it != _kerning.cend()) {
-        return it->second;
-    }
-    else {
-        return 0.f;
-    }
+    return it != _kerning.cend() ? it->second : 0.f;
 }
 
 Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
@@ -158,7 +153,6 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
     : _atlas(atlas)
     , _name(std::move(filename))
     , _pointSize(pointSize)
-    , _height(0.f)
     , _hasOutline(hasOutline)
     , _outlineThickness(outlineThickness)
 {
@@ -485,7 +479,7 @@ void Font::generateKerning() {
 
     loadFace(_name, _pointSize, library, face);
 
-    bool hasKerning = FT_HAS_KERNING(face);
+    const bool hasKerning = FT_HAS_KERNING(face);
     if (!hasKerning) {
         return;
     }

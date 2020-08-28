@@ -314,7 +314,7 @@ void luaArrayDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary
  * \param type A Lua type that should be converted to a string
  * \return The converted string
  */
-std::string luaTypeToString(int type);
+std::string_view luaTypeToString(int type);
 
 /**
  * Creates a new Lua state and initializes it with the default Lua libraries.

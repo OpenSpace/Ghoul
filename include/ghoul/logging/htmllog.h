@@ -68,7 +68,7 @@ public:
      *
      * \pre \p filename must not be empty
      */
-    HTMLLog(const std::string& filename, Append writeToAppend = Append::Yes,
+    HTMLLog(std::string filename, Append writeToAppend = Append::Yes,
         TimeStamping timeStamping = TimeStamping::Yes,
         DateStamping dateStamping = DateStamping::Yes,
         CategoryStamping categoryStamping = CategoryStamping::Yes,

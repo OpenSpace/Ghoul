@@ -67,8 +67,7 @@ private:
     std::vector<std::string>& _vector;
 };
 
-#endif
-
+#endif // _MSC_VER
 
 namespace ghoul {
 
@@ -87,7 +86,6 @@ std::vector<std::string> stackTrace() {
     char** strs = backtrace_symbols(reinterpret_cast<void**>(callstack), nFrames);
 
     stackFrames.reserve(nFrames);
-
     for (int i = 0; i < nFrames; ++i) {
         const int MaxFunctionSymbolLength = 1024;
         const int MaxModuleNameLength = 1024;
@@ -126,9 +124,8 @@ std::vector<std::string> stackTrace() {
         );
 
         int isValidCppName = 0;
-        //  if this is a C++ library, symbol will be demangled
-        //  on success function returns 0
-        //
+        // if this is a C++ library, symbol will be demangled
+        // on success function returns 0
         char* functionName = abi::__cxa_demangle(
             functionSymbol.data(),
             nullptr,
@@ -136,7 +133,7 @@ std::vector<std::string> stackTrace() {
             &isValidCppName
         );
 
-        const int MaxStackFrameSize = 4096;
+        constexpr const int MaxStackFrameSize = 4096;
         char stackFrame[MaxStackFrameSize] = {};
         if (isValidCppName == 0) {
             // success
@@ -150,9 +147,8 @@ std::vector<std::string> stackTrace() {
             );
         }
         else {
-            //  in the above traceback (in comments) last entry is not
-            //  from C++ binary, last frame, libdyld.dylib, is printed
-            //  from here
+            // in the above traceback (in comments) last entry is not from C++ binary,
+            // last frame, libdyld.dylib, is printed from here
             sprintf(
                 stackFrame,
                 "(%s)\t0x%s — %s + %d",

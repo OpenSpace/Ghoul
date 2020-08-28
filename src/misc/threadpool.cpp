@@ -195,8 +195,7 @@ void ThreadPool::clearRemainingTasks() {
 
 void ThreadPool::activateWorker(Worker& worker) {
     // a copy of the shared ptr to the flag
-    std::shared_ptr<std::atomic_bool> shouldTerminate =
-        std::make_shared<std::atomic_bool>(false);
+    auto shouldTerminate = std::make_shared<std::atomic_bool>(false);
 
     // We create local copies of the important variables so that we are guaranteed that
     // they continue to exist when we pass them to the 'workerLoop' lamdba. Otherwise,
@@ -267,7 +266,7 @@ void ThreadPool::activateWorker(Worker& worker) {
                 // We are doing this in an infinite loop, as we want to check regularly
                 // if there is more work. This shouldn't be necessary in normal cases, but
                 // is more of a last resort protection
-                std::unique_lock<std::mutex> lock(*mutex);
+                std::unique_lock lock(*mutex);
                 cv->wait_for(
                     lock,
                     WaitTime
@@ -307,16 +306,13 @@ void ThreadPool::activateWorker(Worker& worker) {
     }
 
     // Overwrite the worker and we are done
-    worker = {
-        std::move(thread),
-        std::move(shouldTerminate)
-    };
+    worker = { std::move(thread), std::move(shouldTerminate) };
 
     while (!finishedInitializing) {}
 }
 
 std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
-    std::lock_guard<std::mutex> lock(_queueMutex);
+    std::lock_guard lock(_queueMutex);
     if (_queue.empty()) {
         // No work to be done, the default constructed Task is never read
         return std::make_tuple(Task(), false);
@@ -332,17 +328,17 @@ std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
 }
 
 void ThreadPool::TaskQueue::push(ThreadPool::Task&& task) {
-    std::lock_guard<std::mutex> lock(_queueMutex);
+    std::lock_guard lock(_queueMutex);
     _queue.push(task);
 }
 
 bool ThreadPool::TaskQueue::isEmpty() const {
-    std::lock_guard<std::mutex> lock(_queueMutex);
+    std::lock_guard lock(_queueMutex);
     return _queue.empty();
 }
 
 int ThreadPool::TaskQueue::size() const {
-    std::lock_guard<std::mutex> lock(_queueMutex);
+    std::lock_guard lock(_queueMutex);
     return static_cast<int>(_queue.size());
 }
 

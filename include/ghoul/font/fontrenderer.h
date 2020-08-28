@@ -131,11 +131,8 @@ public:
      * returns the success of the compilation and linking of the default ProgramObject.
      * This method requires a valid OpenGL state. An assertion is triggered if the
      * singleton FontRenderer is initialized twice.
-     *
-     * \return <code>true</code> if the initialization succeeded, <code>false</code>
-     *         otherwise
      */
-    static bool initialize();
+    static void initialize();
 
     /**
      * Deinitializes the singleton variant of the FontRenderer and cleans all used OpenGL
@@ -144,7 +141,7 @@ public:
      * \return <code>true</code> if the deinitialization succeeded, <code>false</code>
      *         otherwise
      */
-    static bool deinitialize();
+    static void deinitialize();
 
     /**
      * Checks whether the singleton variant of the FontRenderer has already been

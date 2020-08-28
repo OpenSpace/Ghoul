@@ -262,7 +262,7 @@ private:
     const float _pointSize;
 
     /// The vertical distance between two consecutive lines
-    float _height;
+    float _height = 0.f;
 
     /// Whether this Font has an outline or not
     const Outline _hasOutline;

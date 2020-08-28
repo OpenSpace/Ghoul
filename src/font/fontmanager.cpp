@@ -106,7 +106,6 @@ std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
     ghoul_assert(!name.empty(), "Name must not be empty");
 
     unsigned int hash = hashCRC32(name);
-
     const auto itPath = _fontPaths.find(hash);
     if (itPath == _fontPaths.cend()) {
         // There is no hash registered for the current name, so it might be a local file

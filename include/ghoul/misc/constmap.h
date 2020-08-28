@@ -21,26 +21,40 @@
  * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
- ****************************************************************************************/
+****************************************************************************************/
 
-#include <ghoul/misc/exception.h>
+#ifndef __GHOUL___CONSTMAP___H__
+#define __GHOUL___CONSTMAP___H__
 
-#include <ghoul/fmt.h>
-#include <ghoul/misc/assert.h>
+#include <optional>
 
-namespace ghoul {
+template <typename Key, typename Value, int Size>
+struct Map {
+    std::array<std::pair<Key, Value>, Size> data;
 
-RuntimeError::RuntimeError(std::string msg, std::string comp)
-    : std::runtime_error(comp.empty() ? msg : "(" + comp + ") " + msg)
-    , message(std::move(msg))
-    , component(std::move(comp))
-{
-    ghoul_assert(!message.empty(), "Message must not be empty");
-}
+    [[ nodiscard ]] constexpr std::optional<Value> at(const Key& key) const {
+        // @CPP20
+        // manual constexpr std::find_if implementation until C++20 is available
+        for (const std::pair<const Key, Value>& d : data) {
+            if (d.first == key) {
+                return d.second;
+            }
+        }
 
-FileNotFoundError::FileNotFoundError(std::string f, std::string comp)
-    : RuntimeError(fmt::format("Could not find file '{}'", f ), std::move(comp))
-    , file(std::move(f))
-{}
+        return std::nullopt;
+    }
 
-} // namespace ghoul
+    [[ nodiscard ]] constexpr bool contains(const Key& key) const {
+        // @CPP20
+        // manual implementation of std::contains implementation until C++20 is available
+        for (const std::pair<const Key, Value>& d : data) {
+            if (d.first == key) {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+
+#endif // __GHOUL___CONSTMAP___H__

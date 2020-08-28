@@ -26,6 +26,7 @@
 #include <ghoul/opengl/framebufferobject.h>
 
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/constmap.h>
 
 namespace {
     constexpr const char* _loggerCat = "ghoul.opengl.FramebufferObject";
@@ -33,7 +34,7 @@ namespace {
 
 namespace ghoul::opengl {
 
-std::string FramebufferObject::errorChecking(GLenum status) {
+std::string_view FramebufferObject::errorChecking(GLenum status) {
     switch (status) {
         case GL_FRAMEBUFFER_COMPLETE:
             return "";
@@ -52,7 +53,7 @@ std::string FramebufferObject::errorChecking(GLenum status) {
         case GL_FRAMEBUFFER_UNSUPPORTED:
             return "GL_FRAMEBUFFER_UNSUPPORTED";
         default:
-            return "Unknown error!";
+            return "Unknown error";
     }
 }
 
@@ -74,7 +75,7 @@ void FramebufferObject::deactivate() {
 
 bool FramebufferObject::isComplete() const {
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    std::string error = errorChecking(status);
+    std::string_view error = errorChecking(status);
 
     if (!error.empty()) {
         LERROR(error);
@@ -141,7 +142,7 @@ void FramebufferObject::detachTexture(GLenum attachment) {
         _attachedTextures.erase(iterator);
     }
     else {
-        LWARNING("Trying to detach unknown texture!");
+        LWARNING("Trying to detach unknown texture");
     }
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, 0, 0);

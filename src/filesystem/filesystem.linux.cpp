@@ -44,8 +44,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#define EVENT_SIZE  ( sizeof (struct inotify_event) )
-#define BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
+#define EVENT_SIZE  (sizeof(struct inotify_event))
+#define BUF_LEN     (1024 * (EVENT_SIZE + 16))
 
 using std::string;
 
@@ -73,6 +73,7 @@ void FileSystem::deinitializeInternalLinux() {
 
 void FileSystem::addFileListener(File* file) {
     ghoul_assert(file != nullptr, "File cannot be nullptr");
+
     const std::string filename = file->path();
     int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
     auto eqRange = _trackedFiles.equal_range(wd);

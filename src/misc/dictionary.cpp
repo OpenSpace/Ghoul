@@ -164,18 +164,17 @@ std::string Dictionary::value<std::string>(const std::string& key) const {
         return tmp;
     }
     else {
-        throw ConversionError(
-            "Error converting key '" + key + "' from type '" +
-            find(key)->second.type().name() + "' to type '" +
-            typeid(std::string).name() + "'"
-        );
+        throw ConversionError(fmt::format(
+            "Error converting key '{}' from type '{}' to type '{}'",
+            key, find(key)->second.type().name(), typeid(std::string).name()
+        ));
     }
 }
 
 Dictionary::Dictionary(std::initializer_list<std::pair<std::string, std::any>> l) {
     for (const std::pair<std::string, std::any>& p : l) {
         if (!p.first.empty()) {
-            setValueAnyHelper(std::move(p.first), std::move(p.second));
+            setValueAnyHelper(p.first, p.second);
         }
     }
 }
@@ -196,14 +195,15 @@ std::vector<string> Dictionary::keys(const string& location) const {
 
     auto keyIt = find(first);
     if (keyIt == cend()) {
-        throw KeyError("Key '" + first + "' was not found");
+        throw KeyError(fmt::format("Key '{}' was not found", first));
     }
 
     const Dictionary* const dict = std::any_cast<Dictionary>(&(keyIt->second));
     if (!dict) {
-        throw ConversionError("Error converting key '" + first + "' from type '" +
-            keyIt->second.type().name() + "' to type 'Dictionary"
-        );
+        throw ConversionError(fmt::format(
+            "Error converting key '{}' from type '{}' to type 'Dictionary'",
+            first, keyIt->second.type().name()
+        ));
     }
     // proper tail-recursion
     return dict->keys(rest);

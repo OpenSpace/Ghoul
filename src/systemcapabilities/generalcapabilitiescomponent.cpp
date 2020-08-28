@@ -25,8 +25,10 @@
 
 #include <ghoul/systemcapabilities/generalcapabilitiescomponent.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/misc/assert.h>
 #include <algorithm>
+#include <array>
 #include <sstream>
 #include <string>
 
@@ -103,7 +105,7 @@ GeneralCapabilitiesComponent::GeneralCapabilitiesComponentError::
 
 GeneralCapabilitiesComponent::OperatingSystemError::OperatingSystemError(std::string desc,
                                                                      std::string errorMsg)
-    : GeneralCapabilitiesComponentError(desc + ". Error: " + errorMsg)
+    : GeneralCapabilitiesComponentError(fmt::format("{}. Error: {}", desc, errorMsg))
     , description(std::move(desc))
     , errorMessage(std::move(errorMsg))
 {}
@@ -160,7 +162,7 @@ void GeneralCapabilitiesComponent::detectOS() {
             nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer, // NOLINT
+            reinterpret_cast<LPTSTR>(&errorBuffer),
             0,
             nullptr
         );
@@ -168,11 +170,11 @@ void GeneralCapabilitiesComponent::detectOS() {
             std::string errorMsg(errorBuffer);
             LocalFree(errorBuffer);
             throw OperatingSystemError(
-                "Retrieving OS version failed. 'GetVersionEx' returned 0.",errorMsg
+                "Retrieving OS version failed. 'GetVersionEx' returned 0", errorMsg
             );
         }
         throw OperatingSystemError(
-            "Retrieving OS version failed. 'GetVersionEx' returned 0.", ""
+            "Retrieving OS version failed. 'GetVersionEx' returned 0", ""
         );
     }
     HMODULE module = GetModuleHandle(TEXT("kernel32.dll"));
@@ -186,7 +188,7 @@ void GeneralCapabilitiesComponent::detectOS() {
             nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer, // NOLINT
+            reinterpret_cast<LPTSTR>(&errorBuffer),
             0,
             nullptr
         );
@@ -194,12 +196,12 @@ void GeneralCapabilitiesComponent::detectOS() {
             std::string errorMsg(errorBuffer);
             LocalFree(errorBuffer);
             throw OperatingSystemError(
-                "Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0.",
+                "Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0",
                 errorMsg
             );
         }
         throw OperatingSystemError(
-            "Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0.", ""
+            "Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0", ""
         );
     }
     PGNSI procedureGetNativeSystemInfo = reinterpret_cast<PGNSI>(GetProcAddress(
@@ -319,7 +321,7 @@ void GeneralCapabilitiesComponent::detectOS() {
         }
     }
     else {
-        resultStream << "OS detection failed. Version of Windows is too old.";
+        resultStream << "OS detection failed. Version of Windows is too old";
     }
 
     _operatingSystemExtra = resultStream.str();
@@ -334,12 +336,10 @@ void GeneralCapabilitiesComponent::detectOS() {
         );
     }
 
-    std::stringstream resultStream;
-    resultStream <<
-        name.sysname << " " << name.release << " " << name.version << " " << name.machine;
-
     _operatingSystem = OperatingSystem::Unknown;
-    _operatingSystemExtra = resultStream.str();
+    _operatingSystemExtra = fmt::format(
+        "{} {} {} {}", name.sysname, name.release, name.version, name.machine
+    );
     _fullOperatingSystem = _operatingSystemExtra;
 #endif
 }
@@ -352,10 +352,9 @@ void GeneralCapabilitiesComponent::detectMemory() {
         queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
     }
     catch (const WMIError& e) {
-        throw MainMemoryError(
-            "Error reading physical memory from WMI. " +
-            e.message + " (" + std::to_string(e.errorCode) + ")"
-        );
+        throw MainMemoryError(fmt::format(
+            "Error reading physical memory from WMI. {} ({})", e.message, e.errorCode
+        ));
     }
     std::stringstream convert;
     convert << memory;
@@ -393,7 +392,7 @@ void GeneralCapabilitiesComponent::detectMemory() {
 void GeneralCapabilitiesComponent::detectCPU() {
     // @TODO This function needs cleanup ---abock
 #ifdef WIN32
-    static const std::vector<std::string> szFeatures = {
+    constexpr const std::array<std::string_view, 32> szFeatures = {
         "fpu", "vme", "de", "pse", "tsc", "msr", "pae", "mce", "cx8", "apic", "Unknown1",
         "sep", "mtrr", "pge", "mca", "cmov", "pat", "pse36", "psn", "clflush", "Unknown2",
         "ds", "acpi", "mmx", "fxsr", "sse", "sse2", "ss", "ht", "tm", "Unknown4", "pbe"
@@ -407,27 +406,21 @@ void GeneralCapabilitiesComponent::detectCPU() {
     __cpuid(CPUInfo, 0);
     unsigned nIds = CPUInfo[0];
 
-    char CPUString[0x20];
-    std::memset(CPUString, 0, sizeof(CPUString));
-    *((int*)CPUString) = CPUInfo[1]; // NOLINT
-    *((int*)(CPUString + 4)) = CPUInfo[3]; // NOLINT
-    *((int*)(CPUString + 8)) = CPUInfo[2]; // NOLINT
-
     // Get the information associated with each valid Id
     int nFeatureInfo = 0;
-    bool bSSE3NewInstructions = false;
-    bool bMONITOR_MWAIT = false;
-    bool bCPLQualifiedDebugStore = false;
-    bool bThermalMonitor2 = false;
+    bool hasSSE3NewInstructions = false;
+    bool hasMonitorMWait = false;
+    bool hasCplQualifiedDebugStore = false;
+    bool hasThermalMonitor2 = false;
     for (unsigned i = 0; i <= nIds; ++i) {
         __cpuid(CPUInfo, i);
 
         // Interpret CPU feature information.
         if (i == 1) {
-            bSSE3NewInstructions = (CPUInfo[2] & 0x1);
-            bMONITOR_MWAIT = (CPUInfo[2] & 0x8);
-            bCPLQualifiedDebugStore = (CPUInfo[2] & 0x10);
-            bThermalMonitor2 = (CPUInfo[2] & 0x100);
+            hasSSE3NewInstructions = (CPUInfo[2] & 0x1);
+            hasMonitorMWait = (CPUInfo[2] & 0x8);
+            hasCplQualifiedDebugStore = (CPUInfo[2] & 0x10);
+            hasThermalMonitor2 = (CPUInfo[2] & 0x100);
             nFeatureInfo = CPUInfo[3];
         }
     }
@@ -437,7 +430,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     __cpuid(CPUInfo, 0x80000000);
     unsigned nExIds = CPUInfo[0];
 
-    char CPUBrandString[0x40];
+    char CPUBrandString[64];
     std::memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
     // Get the information associated with each extended ID.
@@ -455,25 +448,25 @@ void GeneralCapabilitiesComponent::detectCPU() {
             std::memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
         }
         else if (i == 0x80000006) {
-            _cacheLineSize = CPUInfo[2] & 0xff;
-            _L2Associativity = (CPUInfo[2] >> 12) & 0xf;
-            _cacheSize = (CPUInfo[2] >> 16) & 0xffff;
+            _cacheLineSize = CPUInfo[2] & 0xFF;
+            _L2Associativity = (CPUInfo[2] >> 12) & 0xF;
+            _cacheSize = (CPUInfo[2] >> 16) & 0xFFFF;
         }
     }
 
     // Get extensions list
     std::stringstream extensions;
-    if (bSSE3NewInstructions) {
+    if (hasSSE3NewInstructions) {
         extensions << "sse3 ";
     }
-    if (bMONITOR_MWAIT) {
+    if (hasMonitorMWait) {
         // @TODO:  "MONITOR/MWAIT" is this correct? ---jonasstrandstedt
         extensions << "mwait ";
     }
-    if (bCPLQualifiedDebugStore) {
+    if (hasCplQualifiedDebugStore) {
         extensions << "ds_cpl ";
     }
-    if (bThermalMonitor2) {
+    if (hasThermalMonitor2) {
         extensions << "tm2 ";
     }
 
@@ -675,7 +668,7 @@ const std::string& GeneralCapabilitiesComponent::extensions() const {
     return _extensions;
 }
 
-std::string GeneralCapabilitiesComponent::name() const {
+std::string_view GeneralCapabilitiesComponent::name() const {
     return "CPU";
 }
 

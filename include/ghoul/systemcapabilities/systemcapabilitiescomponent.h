@@ -127,7 +127,7 @@ public:
      *
      * \return A descriptive name of the component
      */
-    virtual std::string name() const = 0;
+    virtual std::string_view name() const = 0;
 
 protected:
 #ifdef GHOUL_USE_WMI

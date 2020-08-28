@@ -149,7 +149,7 @@ public:
      *
      * \param rhs The assignment source
      */
-    ProgramObject& operator=(ProgramObject&& rhs);
+    ProgramObject& operator=(ProgramObject&& rhs) noexcept;
 
     /**
      * Sets the human readable name used for logging and (if available) the object label
@@ -4088,7 +4088,7 @@ private:
     std::string _programName;
 
     /// The logger category that will be used, if a name has been specified.
-    std::string _loggerCat;
+    std::string _loggerCat = "ProgramObject";
 
     /// <code>true</code> if uniform location errors should be ignored.
     bool _ignoreUniformLocationError = false;

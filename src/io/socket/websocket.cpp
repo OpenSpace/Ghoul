@@ -141,9 +141,8 @@ void WebSocket::onMessage(const websocketpp::connection_hdl&,
 
 void WebSocket::onOpen(const websocketpp::connection_hdl& hdl) {
     LDEBUG(fmt::format(
-        "onOpen: WebSocket opened. Client: {}:{}.",
-        _tcpSocket->address(),
-        _tcpSocket->port()
+        "onOpen: WebSocket opened. Client: {}:{}",
+        _tcpSocket->address(), _tcpSocket->port()
     ));
     std::lock_guard guard(_connectionHandlesMutex);
     _connectionHandles.insert(hdl);
@@ -153,9 +152,8 @@ void WebSocket::onOpen(const websocketpp::connection_hdl& hdl) {
 
 void WebSocket::onClose(const websocketpp::connection_hdl& hdl) {
     LDEBUG(fmt::format(
-        "onClose: WebSocket closing. Client: {}:{}.",
-        _tcpSocket->address(),
-        _tcpSocket->port()
+        "onClose: WebSocket closing. Client: {}:{}",
+        _tcpSocket->address(), _tcpSocket->port()
     ));
 
     std::lock_guard guard(_connectionHandlesMutex);

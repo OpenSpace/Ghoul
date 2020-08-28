@@ -116,7 +116,6 @@ std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(
     unsigned char* data = stbi_load(filename.c_str(), &x, &y, &n, 0);
 
     return load(data, x, y, n, filename, this);
-
 }
 
 std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(void* memory,
