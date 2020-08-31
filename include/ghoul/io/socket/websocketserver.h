@@ -29,8 +29,18 @@
 #include <ghoul/io/socket/socketserver.h>
 
 #include <ghoul/io/socket/tcpsocketserver.h>
+
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable: 4244 4267)
+#endif // WIN32
+
 #include <websocketpp/config/core.hpp>
 #include <websocketpp/server.hpp>
+
+#ifdef WIN32
+#pragma warning(pop)
+#endif // WIN32
 
 namespace ghoul::io {
 

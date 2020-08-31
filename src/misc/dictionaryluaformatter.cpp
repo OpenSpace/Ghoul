@@ -89,8 +89,6 @@ namespace {
                             PrettyPrint prettyPrint, std::string indentation,
                             int indentationSteps)
     {
-        const char* whitespace = prettyPrint ? " " : "";
-
         if (dictionary.hasValue<Dictionary>(key)) {
             Dictionary subDictionary = dictionary.value<Dictionary>(key);
             return format(subDictionary, prettyPrint, indentation, indentationSteps);
