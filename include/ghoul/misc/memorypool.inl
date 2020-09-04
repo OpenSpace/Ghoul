@@ -24,6 +24,7 @@
  ****************************************************************************************/
 
 #include <ghoul/misc/profiling.h>
+#include <algorithm>
 #include <numeric>
 
 namespace {
