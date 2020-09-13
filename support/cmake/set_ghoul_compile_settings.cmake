@@ -104,9 +104,9 @@ function (set_ghoul_compile_settings target)
     endif ()
   elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     if (APPLE)
-      target_compile_definitions(${target} PRIVATE "-stdlib=libc++")
+      target_compile_options(${target} PRIVATE "-stdlib=libc++")
     else ()
-      target_compile_definitions(${target} PRIVATE "-stdlib=libstdc++")
+      target_compile_options(${target} PRIVATE "-stdlib=libstdc++")
     endif ()
 
     target_compile_options(
