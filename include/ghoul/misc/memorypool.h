@@ -31,7 +31,14 @@
 #include <cstddef>
 #include <cstring>
 #include <memory>
+#ifndef __APPLE__
 #include <memory_resource>
+#else
+#include <experimental/memory_resource>
+namespace std {
+    using namespace experimental;
+} // namespace std
+#endif // __APPLE__
 #include <vector>
 
 namespace ghoul {
