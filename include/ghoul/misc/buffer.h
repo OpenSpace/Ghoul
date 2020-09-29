@@ -60,7 +60,7 @@ public:
      *
      * \param capacity The initial capacity for the internal array
      */
-    Buffer(size_t capacity);
+    explicit Buffer(size_t capacity);
 
     /**
      * Constructs a Buffer object from file.
@@ -85,7 +85,7 @@ public:
      *
      * \param other The Buffer from which the data is moved out of
      */
-    Buffer(Buffer&& other);
+    Buffer(Buffer&& other) noexcept;
 
     /**
      * Constructs a Buffer by copying another Buffer object.
@@ -102,7 +102,7 @@ public:
      * \param rhs The Buffer out of which the data is moved
      * \return The object this operator was called on
      */
-    Buffer& operator=(Buffer&& rhs);
+    Buffer& operator=(Buffer&& rhs) noexcept;
 
     /**
      * Default destructor is sufficient since no objects are allocated internally.
@@ -155,7 +155,7 @@ public:
      * \throw RuntimeError if there was an error compressing the data
      * \pre \p filename must not be empty
      */
-    void write(const std::string& filename, Compress compress = Compress::No);
+    void write(const std::string& filename, Compress compress = Compress::No) const;
 
     /**
      * Reads the Buffer from a Buffer file.

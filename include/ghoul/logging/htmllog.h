@@ -68,7 +68,7 @@ public:
      *
      * \pre \p filename must not be empty
      */
-    HTMLLog(const std::string& filename, Append writeToAppend = Append::Yes,
+    HTMLLog(std::string filename, Append writeToAppend = Append::Yes,
         TimeStamping timeStamping = TimeStamping::Yes,
         DateStamping dateStamping = DateStamping::Yes,
         CategoryStamping categoryStamping = CategoryStamping::Yes,
@@ -89,8 +89,8 @@ public:
      *        individually
      * \param message The message body of the log message
      */
-    void log(LogLevel level, const std::string& category,
-        const std::string& message) override;
+    void log(LogLevel level, std::string_view category,
+        std::string_view message) override;
 
 protected:
     /**

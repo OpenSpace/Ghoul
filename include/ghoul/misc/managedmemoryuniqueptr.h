@@ -23,24 +23,35 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/misc/exception.h>
+#ifndef __GHOUL___MANAGEDMEMORYUNIQUEPTR___H__
+#define __GHOUL___MANAGEDMEMORYUNIQUEPTR___H__
 
-#include <ghoul/fmt.h>
-#include <ghoul/misc/assert.h>
+#include <memory>
+
+// The coding style in this file is a bit different to make the class in here more similar
+// to the STD
 
 namespace ghoul {
 
-RuntimeError::RuntimeError(std::string msg, std::string comp)
-    : std::runtime_error(comp.empty() ? msg : "(" + comp + ") " + msg)
-    , message(std::move(msg))
-    , component(std::move(comp))
-{
-    ghoul_assert(!message.empty(), "Message must not be empty");
-}
+namespace detail {
 
-FileNotFoundError::FileNotFoundError(std::string f, std::string comp)
-    : RuntimeError(fmt::format("Could not find file '{}'", f ), std::move(comp))
-    , file(std::move(f))
-{}
+template <typename T>
+struct placement_delete {
+    void operator()(T* ptr) {
+        if (ptr) {
+            ptr->~T();
+        }
+    }
+};
+
+} // namespace detail
+
+template <typename T>
+using managed_memory_unique_ptr = std::unique_ptr<T, detail::placement_delete<T>>;
+
+template <typename T>
+using mm_unique_ptr = managed_memory_unique_ptr<T>;
 
 } // namespace ghoul
+
+#endif // __GHOUL___MANAGEDMEMORYUNIQUEPTR___H__

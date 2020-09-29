@@ -32,11 +32,12 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
+#include <ghoul/misc/profiling.h>
 #include <ghoul/opengl/texture.h>
 
 namespace {
     /// The default set of glyphs that are loaded when a new Font is initialized
-    std::vector<wchar_t> DefaultCharacterSet = {
+    const std::vector<wchar_t> DefaultCharacterSet = {
         L' ', L'!', L'\\', L'"', L'#', L'$', L'%', L'&', L'\'', L'(',
         L')', L'*', L'+', L',', L'-', L'.', L'/', L'0', L'1', L'2',
         L'3', L'4', L'5', L'6', L'7', L'8', L'9', L':', L';', L'<',
@@ -52,12 +53,12 @@ namespace {
 
 namespace ghoul::fontrendering {
 
-FontManager::FontRegistrationException::FontRegistrationException(const std::string& msg)
-    : RuntimeError(msg, "FontManager")
+FontManager::FontRegistrationException::FontRegistrationException(std::string msg)
+    : RuntimeError(std::move(msg), "FontManager")
 {}
 
-FontManager::FontAccessException::FontAccessException(const std::string& msg)
-    : RuntimeError(msg, "FontManager")
+FontManager::FontAccessException::FontAccessException(std::string msg)
+    : RuntimeError(std::move(msg), "FontManager")
 {}
 
 FontManager::FontManager(glm::ivec3 atlasDimensions)
@@ -72,19 +73,15 @@ void FontManager::deinitialize() {
     _textureAtlas.deinitialize();
 }
 
-opengl::TextureAtlas& FontManager::textureAtlas() {
-    return _textureAtlas;
-}
-
-unsigned int FontManager::registerFontPath(const std::string& fontName,
+unsigned int FontManager::registerFontPath(std::string_view fontName,
                                            const std::string& filePath)
 {
     ghoul_assert(!fontName.empty(), "Fontname must not be empty");
     ghoul_assert(!filePath.empty(), "Filepath must not be empty");
 
     unsigned int hash = hashCRC32(fontName);
-    auto it = _fontPaths.find(hash);
-    if (it != _fontPaths.end()) {
+    const auto it = _fontPaths.find(hash);
+    if (it != _fontPaths.cend()) {
         const std::string& registeredPath = it->second;
 
         if (registeredPath == filePath) {
@@ -92,11 +89,8 @@ unsigned int FontManager::registerFontPath(const std::string& fontName,
         }
         else {
             throw FontRegistrationException(fmt::format(
-                "Font '{}' was registered with path '{}' before. "
-                    "Trying to register with path '{}' now",
-                fontName,
-                registeredPath,
-                filePath
+                "Font '{}' was registered with path '{}' before, trying '{}' now",
+                fontName, registeredPath, filePath
             ));
         }
     }
@@ -107,12 +101,13 @@ unsigned int FontManager::registerFontPath(const std::string& fontName,
 std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
                                         Outline withOutline, LoadGlyphs loadGlyphs)
 {
+    ZoneScoped
+
     ghoul_assert(!name.empty(), "Name must not be empty");
 
     unsigned int hash = hashCRC32(name);
-
-    auto itPath = _fontPaths.find(hash);
-    if (itPath == _fontPaths.end()) {
+    const auto itPath = _fontPaths.find(hash);
+    if (itPath == _fontPaths.cend()) {
         // There is no hash registered for the current name, so it might be a local file
         if (FileSys.fileExists(name)) {
             hash = registerFontPath(name, name);
@@ -131,8 +126,10 @@ std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
 std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
                                         Outline withOutline, LoadGlyphs loadGlyphs)
 {
-    auto itPath = _fontPaths.find(hashName);
-    if (itPath == _fontPaths.end()) {
+    ZoneScoped
+
+    const auto itPath = _fontPaths.find(hashName);
+    if (itPath == _fontPaths.cend()) {
         throw FontAccessException(fmt::format(
             "Error retrieving font with hash '{}' for size '{}'", hashName, fontSize
         ));
@@ -156,6 +153,8 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     );
 
     if (loadGlyphs) {
+        ZoneScopedN("Load Glyphs")
+        TracyGpuZone("Load Glyphs")
         f->loadGlyphs(DefaultCharacterSet);
     }
 

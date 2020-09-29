@@ -52,9 +52,7 @@ public:
      */
     explicit LuaState(IncludeStandardLibrary include = IncludeStandardLibrary::Yes);
 
-    /**
-     * Destroys the created Lua state and frees all the related memory.
-     */
+    /// Destroys the created Lua state and frees all the related memory.
     ~LuaState();
 
     LuaState(LuaState&& other) noexcept;

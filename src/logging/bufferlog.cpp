@@ -36,46 +36,46 @@ namespace {
 
     struct Header {
         /**
-        * The version header contains in increasing unsigned integer, which specifies the
-        * general layout of the buffer in this BufferLog. The size of the header and,
-        * thus, the offset into the data block may depend on the version.
-        */
+         * The version header contains in increasing unsigned integer, which specifies the
+         * general layout of the buffer in this BufferLog. The size of the header and,
+         * thus, the offset into the data block may depend on the version.
+         */
         uint8_t version;
 
         /**
-        * This atomic is set to <code>true</code> if some process is currently writing to
-        * the log, otherwise it is <code>false</code>. It is not guaranteed that this
-        * value is usable when the buffer is written to disk in its entirety.
-        */
+         * This atomic is set to <code>true</code> if some process is currently writing to
+         * the log, otherwise it is <code>false</code>. It is not guaranteed that this
+         * value is usable when the buffer is written to disk in its entirety.
+         */
         std::atomic_flag mutex;
 
         /**
-        * The attributes are used for user-defined behavior. Information that is
-        * necessary to interpret the buffer may be put in here.
-        */
+         * The attributes are used for user-defined behavior. Information that is
+         * necessary to interpret the buffer may be put in here.
+         */
         uint8_t attributes;
 
         /**
-        * This value provides an offset to find the first byte in the buffer that has not
-        * been used already. The values between <code>_buffer + sizeof(Header)</code> and
-        * <code>_buffer + sizeof(Header) + firstEmptyByte</code> are the logs that have
-        * been stored before.
-        */
+         * This value provides an offset to find the first byte in the buffer that has not
+         * been used already. The values between <code>_buffer + sizeof(Header)</code> and
+         * <code>_buffer + sizeof(Header) + firstEmptyByte</code> are the logs that have
+         * been stored before.
+         */
         uint32_t firstEmptyByte;
     };
 
     /**
-    * This method returns the beginning part of the buffer that contains the header
-    * information.
-    */
+     * This method returns the beginning part of the buffer that contains the header
+     * information.
+     */
     Header& header(void* buffer) {
         return *reinterpret_cast<Header*>(buffer);
     }
 
     /**
-    This method returns the buffer block that begins at the first empty byte. This offset
-    * is guaranteed to be in valid memory if the values provided in the constructor or
-    * the \see setBuffer function were correct.
+     * This method returns the buffer block that begins at the first empty byte. This
+     * offset is guaranteed to be in valid memory if the values provided in the
+     * constructor or the \see setBuffer function were correct.
     */
     void* firstEmptyMemory(void* buffer) {
         const Header& h = header(buffer);
@@ -201,11 +201,7 @@ void BufferLog::log(unsigned long long timestamp, const std::string& message) {
 
     // Copy the message into the buffer, strcpy will copy the \0 terminator character, too
     char* destination = reinterpret_cast<char*>(firstEmptyMemory(_buffer));
-#ifdef WIN32
-    strcpy_s(destination, message.length() + 1, message.c_str());
-#else
-    strcpy(destination, message.c_str());
-#endif
+    std::memcpy(destination, message.data(), message.length() + 1);
     // Advance the empty pointer; +1 for the \0 terminator
     h.firstEmptyByte += uint32_t(message.length() + 1);
 

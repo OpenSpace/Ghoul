@@ -60,7 +60,7 @@ constexpr unsigned int hashCRC32(const char* buffer, unsigned int size);
  * \param s The string for which to compute the CRC-32 hash
  * \return The hash value for the passed string
  */
-unsigned int hashCRC32(const std::string& s);
+constexpr unsigned int hashCRC32(std::string_view s);
 
 /**
  * Computes the CRC-32 hash of the contents of the provided file.

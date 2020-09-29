@@ -43,27 +43,28 @@ ShaderManager& ShaderManager::ref() {
 ShaderObject* ShaderManager::shaderObject(unsigned int hashedName) {
     const auto it = _objects.find(hashedName);
     if (it == _objects.cend()) {
-        throw ShaderManagerError(
-            "Could not find ShaderObject for hash '" + std::to_string(hashedName) + "'"
-        );
+        throw ShaderManagerError(fmt::format(
+            "Could not find ShaderObject for hash '{}'", hashedName
+        ));
     }
-    else {
-        return it->second.get();
-    }
+
+    return it->second.get();
 }
 
-ShaderObject* ShaderManager::shaderObject(const std::string& name) {
+ShaderObject* ShaderManager::shaderObject(std::string_view name) {
     const unsigned int hash = hashCRC32(name);
     try {
         return shaderObject(hash);
     }
     catch (const ShaderManagerError&) {
         // Repackage the exception as it would otherwise contain only the hash
-        throw ShaderManagerError("Could not find ShaderObject for '" + name + "'");
+        throw ShaderManagerError(fmt::format(
+            "Could not find ShaderObject for '{}'", name
+        ));
     }
 }
 
-unsigned int ShaderManager::registerShaderObject(const std::string& name,
+unsigned int ShaderManager::registerShaderObject(std::string_view name,
                                                  std::unique_ptr<ShaderObject> shader)
 {
     const unsigned int hashedName = hashCRC32(name);
@@ -73,12 +74,11 @@ unsigned int ShaderManager::registerShaderObject(const std::string& name,
         return hashedName;
     }
     else {
-        throw ShaderManagerError("Name '" + name + "' was already registered");
+        throw ShaderManagerError(fmt::format("Name '{}' was already registered", name));
     }
 }
 
-std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(
-                                                                  const std::string& name)
+std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(std::string_view name)
 {
     const unsigned int hashedName = hashCRC32(name);
     return unregisterShaderObject(hashedName);
@@ -97,7 +97,7 @@ std::unique_ptr<ShaderObject> ShaderManager::unregisterShaderObject(
     return tmp;
 }
 
-unsigned int ShaderManager::hashedNameForName(const std::string& name) const {
+unsigned int ShaderManager::hashedNameForName(std::string_view name) const {
     return hashCRC32(name);
 }
 

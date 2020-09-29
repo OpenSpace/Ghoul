@@ -43,8 +43,8 @@ ShaderObject::ShaderCompileError::ShaderCompileError(std::string error,
                                                      std::string name)
     : ShaderObjectError(
         name.empty() ?
-        "Error linking program object: " + error + "\n" + ident :
-        "Error linking program object [" + name + "]: " + error + "\n" + ident
+        fmt::format("Error linking program object: {}\n{}", error, ident) :
+        fmt::format("Error linking program object [{}]: {}\n{}", name, error, ident)
     )
     , compileError(std::move(error))
     , fileIdentifiers(std::move(ident))
@@ -85,7 +85,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
                            std::string name, Dictionary dictionary)
     : _type(shaderType)
     , _shaderName(std::move(name))
-    , _loggerCat("ShaderObject('" + _shaderName + "')")
+    , _loggerCat(fmt::format("ShaderObject('{}')", _shaderName))
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
@@ -135,7 +135,7 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
     rebuildFromFile();
 }
 
-ShaderObject::ShaderObject(ShaderObject&& rhs) {
+ShaderObject::ShaderObject(ShaderObject&& rhs) noexcept {
     if (this != &rhs) {
         _id = std::move(rhs._id);
 
@@ -186,7 +186,7 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
     return *this;
 }
 
-ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) {
+ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) noexcept {
     if (this != &rhs) {
         _id = std::move(rhs._id);
         _type = rhs._type;
@@ -203,7 +203,7 @@ ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) {
 
 void ShaderObject::setName(std::string name) {
     _shaderName = std::move(name);
-    _loggerCat = "ShaderObject['" + _shaderName + "']";
+    _loggerCat = fmt::format("ShaderObject['{}']", _shaderName);
 #ifdef GL_VERSION_4_3
     if (glbinding::Binding::ObjectLabel.isResolved()) {
         glObjectLabel(
@@ -324,11 +324,11 @@ void ShaderObject::compile() {
     }
 }
 
-std::string ShaderObject::typeAsString() const {
+std::string_view ShaderObject::typeAsString() const {
     return ShaderObject::stringForShaderType(_type);
 }
 
-std::string ShaderObject::stringForShaderType(ShaderType type) {
+std::string_view ShaderObject::stringForShaderType(ShaderType type) {
     switch (type) {
         case ShaderType::Vertex:                return "Vertex shader";
         case ShaderType::TesselationControl:    return "Tesselation Control shader";

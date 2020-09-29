@@ -27,7 +27,7 @@
 
 namespace ghoul::opengl {
 
-VertexBufferObject::VertexBufferObject(VertexBufferObject&& other) {
+VertexBufferObject::VertexBufferObject(VertexBufferObject&& other) noexcept {
     _vaoID = other._vaoID;
     _vBufferID = other._vBufferID;
     _iBufferID = other._iBufferID;
@@ -39,7 +39,7 @@ VertexBufferObject::VertexBufferObject(VertexBufferObject&& other) {
     other._iSize = 0;
 }
 
-VertexBufferObject& VertexBufferObject::operator=(VertexBufferObject&& other) {
+VertexBufferObject& VertexBufferObject::operator=(VertexBufferObject&& other) noexcept {
     if (this != &other) {
         _vaoID = other._vaoID;
         _vBufferID = other._vBufferID;
@@ -56,24 +56,12 @@ VertexBufferObject& VertexBufferObject::operator=(VertexBufferObject&& other) {
 
 VertexBufferObject::~VertexBufferObject() {
     glDeleteBuffers(1, &_vBufferID);
-    _vBufferID = 0;
-
     glDeleteBuffers(1, &_iBufferID);
-    _iBufferID = 0;
-
     glDeleteVertexArrays(1, &_vaoID);
-    _vaoID = 0;
-
-    _iSize = 0;
 }
 
 bool VertexBufferObject::isInitialized() const {
-    bool initialized = true;
-    initialized &= (_vaoID != 0);
-    initialized &= (_vBufferID != 0);
-    initialized &= (_iBufferID != 0);
-    initialized &= (_iSize > 0);
-    return initialized;
+    return (_vaoID != 0) && (_vBufferID != 0) && (_iBufferID != 0) && (_iSize > 0);
 }
 
 void VertexBufferObject::initialize(const std::vector<GLfloat>& vertexArray,

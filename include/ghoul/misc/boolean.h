@@ -48,6 +48,8 @@ void foo(std::string value, AllowOverride override = AllowOverride::Yes);
  * typesafe version of the usage describe above.
  */
 struct Boolean {
+    // @CPP20 (abock, 2020-08-31) This should be changed to an enum class + using enum to
+    // silence a Visual Studio Analyzer warning C26812
     enum Value { Yes = 1, No = 0 };
 
     /// Non-explicit constructor so that we can automatically convert between different

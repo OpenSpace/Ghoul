@@ -29,17 +29,16 @@
 
 namespace ghoul {
 
-TemplateFactoryBase::TemplateFactoryError::TemplateFactoryError(std::string msg)
+TemplateFactoryError::TemplateFactoryError(std::string msg)
     : RuntimeError(std::move(msg), "TemplateFactory")
 {}
 
-TemplateFactoryBase::TemplateClassNotFoundError::TemplateClassNotFoundError(
-                                                                         std::string name)
+TemplateClassNotFoundError::TemplateClassNotFoundError(std::string name)
     : TemplateFactoryError("Could not find class '" + name + "'")
     , className(std::move(name))
 {}
 
-TemplateFactoryBase::TemplateConstructionError::TemplateConstructionError(std::string msg)
+TemplateConstructionError::TemplateConstructionError(std::string msg)
     : TemplateFactoryError(std::move(msg))
 {}
 

@@ -61,23 +61,28 @@ namespace {
 
         if (dictionary.hasValue<glm::vec4>(key)) {
             glm::vec4 vec = dictionary.value<glm::vec4>(key);
-            return "[" + formatDouble(vec.x) + "," +
-                formatDouble(vec.y) + "," +
-                formatDouble(vec.z) + "," +
-                formatDouble(vec.w) + "]";
+            return fmt::format(
+                "[{},{},{},{}]",
+                formatDouble(vec.x),
+                formatDouble(vec.y),
+                formatDouble(vec.z),
+                formatDouble(vec.w)
+            );
         }
 
         if (dictionary.hasValue<glm::vec3>(key)) {
             glm::vec3 vec = dictionary.value<glm::vec3>(key);
-            return "[" + formatDouble(vec.x) + "," +
-                formatDouble(vec.y) + "," +
-                formatDouble(vec.z) + "]";
+            return fmt::format(
+                "[{},{},{}]",
+                formatDouble(vec.x),
+                formatDouble(vec.y),
+                formatDouble(vec.z)
+            );
         }
 
         if (dictionary.hasValue<glm::vec2>(key)) {
             glm::vec2 vec = dictionary.value<glm::vec2>(key);
-            return "[" + formatDouble(vec.x) + "," +
-                formatDouble(vec.y) + "]";
+            return fmt::format("[{},{}]", formatDouble(vec.x), formatDouble(vec.y));
         }
 
         if (dictionary.hasValue<float>(key)) {
@@ -96,38 +101,38 @@ namespace {
             std::string jsonString;
             for (const char& c : value) {
                 switch (c) {
-                case '"':
-                    jsonString += "\\\"";
-                    break;
-                case '\\':
-                    jsonString += "\\\\";
-                    break;
-                case '\b':
-                    jsonString += "\\b";
-                    break;
-                case '\f':
-                    jsonString += "\\f";
-                    break;
-                case '\n':
-                    jsonString += "\\n";
-                    break;
-                case '\r':
-                    jsonString += "\\r";
-                    break;
-                case '\t':
-                    jsonString += "\\t";
-                    break;
-                default:
-                    jsonString += c;
+                    case '"':
+                        jsonString += "\\\"";
+                        break;
+                    case '\\':
+                        jsonString += "\\\\";
+                        break;
+                    case '\b':
+                        jsonString += "\\b";
+                        break;
+                    case '\f':
+                        jsonString += "\\f";
+                        break;
+                    case '\n':
+                        jsonString += "\\n";
+                        break;
+                    case '\r':
+                        jsonString += "\\r";
+                        break;
+                    case '\t':
+                        jsonString += "\\t";
+                        break;
+                    default:
+                        jsonString += c;
                 }
             }
 
             return "\"" + jsonString + "\"";
         }
 
-        throw JsonFormattingError(
-            "Key '" + key + "' has invalid type for formatting dictionary as json"
-        );
+        throw JsonFormattingError(fmt::format(
+            "Key '{}' has invalid type for formatting dictionary as JSON", key
+        ));
     }
 } // namespace
 
@@ -135,7 +140,6 @@ namespace {
 JsonFormattingError::JsonFormattingError(std::string msg)
     : RuntimeError(std::move(msg), "Dictionary")
 {}
-
 
 std::string formatJson(const Dictionary& dictionary) {
     if (dictionary.empty()) {

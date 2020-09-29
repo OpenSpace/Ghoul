@@ -25,11 +25,13 @@
 
 #include <ghoul/misc/easing.h>
 
+#include <ghoul/fmt.h>
 #include <array>
+#include <string_view>
 
 namespace {
 
-const std::array<const char*, 28> EaseFuncNames = {
+const std::array<std::string_view, 28> EaseFuncNames = {
     "Linear",
     "QuadraticEaseIn",   "QuadraticEaseOut",   "QuadraticEaseInOut",
     "CubicEaseIn",       "CubicEaseOut",       "CubicEaseInOut",
@@ -46,28 +48,27 @@ const std::array<const char*, 28> EaseFuncNames = {
 
 namespace ghoul {
 
-const char* nameForEasingFunction(EasingFunction func) {
+std::string_view nameForEasingFunction(EasingFunction func) {
     return EaseFuncNames[static_cast<std::underlying_type_t<EasingFunction>>(func)];
 }
 
-EasingFunction easingFunctionFromName(const char* name) {
+EasingFunction easingFunctionFromName(std::string_view name) {
+    const auto it = std::find(EaseFuncNames.begin(), EaseFuncNames.end(), name);
+
+
     for (size_t i = 0; i < EaseFuncNames.size(); ++i) {
-        if (std::string(EaseFuncNames[i]) == std::string(name)) {
+        if (EaseFuncNames[i] == name) {
             return EasingFunction(i);
         }
     }
-    throw std::invalid_argument(
-        "Could not find easing function with name " + std::string(name)
-    );
+    throw std::invalid_argument(fmt::format(
+        "Could not find easing function with name '{}'", name
+    ));
 }
 
-bool isValidEasingFunctionName(const char* name) {
-    for (const char* n : EaseFuncNames) {
-        if (std::string(n) == std::string(name)) {
-            return true;
-        }
-    }
-    return false;
+bool isValidEasingFunctionName(std::string_view name) {
+    const auto it = std::find(EaseFuncNames.begin(), EaseFuncNames.end(), name);
+    return it != EaseFuncNames.end();
 }
 
 namespace {

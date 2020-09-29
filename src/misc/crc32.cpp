@@ -37,10 +37,6 @@
 
 namespace ghoul {
 
-unsigned int hashCRC32(const std::string& s) {
-    return hashCRC32(s.c_str());
-}
-
 unsigned int hashCRC32File(const std::string& file) {
     std::fstream f(file);
     f.seekg(0, std::ios::end);

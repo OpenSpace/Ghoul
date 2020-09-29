@@ -26,11 +26,12 @@
 #include <ghoul/logging/htmllog.h>
 
 #include <ghoul/misc/assert.h>
+#include <ghoul/fmt.h>
 #include <iterator>
 
 namespace ghoul::logging {
 
-HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend,
+HTMLLog::HTMLLog(std::string filename, Append writeToAppend,
                  TimeStamping timeStamping, DateStamping dateStamping,
                  CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
                  const std::vector<std::string>& cssIncludes,
@@ -63,10 +64,7 @@ HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend,
         );
     }
 
-    output +=
-        "\t\t</style>\n\
-        \t\t<script>\n\
-        " ;
+    output += "\t\t</style>\n\t\t<script>\n";
 
     for (const std::string& j : jsIncludes) {
         std::ifstream jsInput(j);
@@ -80,10 +78,8 @@ HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend,
     output += \
         "\t\t</script>\n\
         \t</head>\n\
-        \t<body>\n\
-        \n\
-        \t<table>\n\
-        \n\
+        \t<body>\n\n\
+        \t<table>\n\n\
         \t\t<thead>\n\
         \t\t\t<tr>\n";
     if (isDateStamping()) {
@@ -105,16 +101,10 @@ HTMLLog::HTMLLog(const std::string& filename, Append writeToAppend,
 }
 
 HTMLLog::~HTMLLog() {
-    writeLine("\t\t</tbody>\n\
-              \t</table>\n\
-              \t</body>\n\
-              </html>"
-    );
+    writeLine("\t\t</tbody>\n\t</table>\n\t</body>\n</html>");
 }
 
-void HTMLLog::log(LogLevel level, const std::string& category,
-                  const std::string& message)
-{
+void HTMLLog::log(LogLevel level, std::string_view category, std::string_view message) {
     std::string output;
     if (_useCustomStyling) {
         output = "\t\t\t<tr class=\"" + classForLevel(level) + "\">\n";
@@ -129,10 +119,14 @@ void HTMLLog::log(LogLevel level, const std::string& category,
         output += "\t\t\t\t<td class=\"log-time\">" + timeString() + "</td>\n";
     }
     if (isCategoryStamping()) {
-        output += "\t\t\t\t<td class=\"log-category\">" + category + "</td>\n";
+        output += "\t\t\t\t<td class=\"log-category\">";
+        output += category;
+        output += "</td>\n";
     }
     if (isLogLevelStamping()) {
-        output += "\t\t\t\t<td class=\"log-level\">" + to_string(level) + "</td>\n";
+        output += fmt::format(
+            "\t\t\t\t<td class=\"log-level\">{}</td>\n", to_string(level)
+        );
     }
 
     output += "\t\t\t\t<td class=\"log-message\">";

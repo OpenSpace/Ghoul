@@ -21,45 +21,40 @@
  * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
- ****************************************************************************************/
+****************************************************************************************/
 
-#include <ghoul/logging/loglevel.h>
+#ifndef __GHOUL___CONSTMAP___H__
+#define __GHOUL___CONSTMAP___H__
 
-#include <ghoul/misc/assert.h>
-#include <map>
+#include <optional>
 
-namespace ghoul {
+template <typename Key, typename Value, int Size>
+struct Map {
+    std::array<std::pair<Key, Value>, Size> data;
 
-std::string to_string(logging::LogLevel string) {
-    switch (string) {
-        case logging::LogLevel::AllLogging: return "All";
-        case logging::LogLevel::Trace:      return "Trace";
-        case logging::LogLevel::Debug:      return "Debug";
-        case logging::LogLevel::Info:       return "Info";
-        case logging::LogLevel::Warning:    return "Warning";
-        case logging::LogLevel::Error:      return "Error";
-        case logging::LogLevel::Fatal:      return "Fatal";
-        case logging::LogLevel::NoLogging:  return "None";
-        default:                   throw MissingCaseException();
+    [[ nodiscard ]] constexpr std::optional<Value> at(const Key& key) const {
+        // @CPP20
+        // manual constexpr std::find_if implementation until C++20 is available
+        for (const std::pair<const Key, Value>& d : data) {
+            if (d.first == key) {
+                return d.second;
+            }
+        }
+
+        return std::nullopt;
     }
-}
 
-template <>
-logging::LogLevel from_string(const std::string& string) {
-    static const std::map<std::string, logging::LogLevel> levels = {
-        { "All"    , logging::LogLevel::AllLogging },
-        { "Trace"  , logging::LogLevel::Trace },
-        { "Debug"  , logging::LogLevel::Debug },
-        { "Info"   , logging::LogLevel::Info },
-        { "Warning", logging::LogLevel::Warning },
-        { "Error"  , logging::LogLevel::Error },
-        { "Fatal"  , logging::LogLevel::Fatal },
-        { "None"   , logging::LogLevel::NoLogging }
-    };
+    [[ nodiscard ]] constexpr bool contains(const Key& key) const {
+        // @CPP20
+        // manual implementation of std::contains implementation until C++20 is available
+        for (const std::pair<const Key, Value>& d : data) {
+            if (d.first == key) {
+                return true;
+            }
+        }
+        return false;
+    }
+};
 
-    auto it = levels.find(string);
-    ghoul_assert(it != levels.end(), "Missing entry in 'levels' map");
-    return it->second;
-}
 
-} // namespace ghoul::logging
+#endif // __GHOUL___CONSTMAP___H__

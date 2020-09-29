@@ -103,18 +103,18 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     std::vector<int> indices(columns.size());
 
     std::transform(
-        columns.begin(),
-        columns.end(),
+        columns.cbegin(),
+        columns.cend(),
         indices.begin(),
         [elements, &fileName](const std::string& column) {
-            auto it = std::find(elements.begin(), elements.end(), column);
-            if (it == elements.end()) {
+            const auto it = std::find(elements.cbegin(), elements.cend(), column);
+            if (it == elements.cend()) {
                 throw ghoul::RuntimeError(fmt::format(
                     "CSV file {} did not contain the requested key {}", fileName, column
                 ));
             }
 
-            return static_cast<int>(std::distance(elements.begin(), it));
+            return static_cast<int>(std::distance(elements.cbegin(), it));
         }
     );
 

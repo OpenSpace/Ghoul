@@ -38,11 +38,7 @@ unsigned int TextureUnit::_totalActive = 0;
 unsigned int TextureUnit::_maxTexUnits = 0;
 std::vector<bool> TextureUnit::_busyUnits = std::vector<bool>();
 
-TextureUnit::TextureUnit()
-    : _number(0)
-    , _glEnum(GLenum(0))
-    , _assigned(false)
-{
+TextureUnit::TextureUnit() {
     if (!_isInitialized) {
         initialize();
     }

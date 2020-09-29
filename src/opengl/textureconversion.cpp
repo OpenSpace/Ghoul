@@ -92,50 +92,36 @@ void convert<Texture::Format::RG, Texture::Format::RGBA>(char* dst, const char* 
 }
 
 ConversionFunc conversionFunctionSelector(Texture::Format from, Texture::Format to) {
+    using Format = Texture::Format;
+
     switch (from) {
-        case Texture::Format::Red:
+        case Format::Red:
             switch (to) {
-                case Texture::Format::RG:
-                    return &convert<Texture::Format::Red, Texture::Format::RG>;
-                case Texture::Format::RGB:
-                    return &convert<Texture::Format::Red, Texture::Format::RGB>;
-                case Texture::Format::RGBA:
-                    return &convert<Texture::Format::Red, Texture::Format::RGBA>;
-                default:
-                    throw MissingCaseException();
+                case Format::RG:   return &convert<Format::Red, Format::RG>;
+                case Format::RGB:  return &convert<Format::Red, Format::RGB>;
+                case Format::RGBA: return &convert<Format::Red, Format::RGBA>;
+                default:           throw MissingCaseException();
             }
-        case Texture::Format::RG:
+        case Format::RG:
             switch (to) {
-                case Texture::Format::Red:
-                    return &convert<Texture::Format::RG, Texture::Format::Red>;
-                case Texture::Format::RGB:
-                    return &convert<Texture::Format::RG, Texture::Format::RGB>;
-                case Texture::Format::RGBA:
-                    return &convert<Texture::Format::RG, Texture::Format::RGBA>;
-                default:
-                    throw MissingCaseException();
+                case Format::Red:  return &convert<Format::RG, Format::Red>;
+                case Format::RGB:  return &convert<Format::RG, Format::RGB>;
+                case Format::RGBA: return &convert<Format::RG, Format::RGBA>;
+                default:           throw MissingCaseException();
             }
-        case Texture::Format::RGB:
+        case Format::RGB:
             switch (to) {
-                case Texture::Format::Red:
-                    return &convert<Texture::Format::RGB, Texture::Format::Red>;
-                case Texture::Format::RG:
-                    return &convert<Texture::Format::RGB, Texture::Format::RG>;
-                case Texture::Format::RGBA:
-                    return &convert<Texture::Format::RGB, Texture::Format::RGBA>;
-                default:
-                    throw MissingCaseException();
+                case Format::Red:  return &convert<Format::RGB, Format::Red>;
+                case Format::RG:   return &convert<Format::RGB, Format::RG>;
+                case Format::RGBA: return &convert<Format::RGB, Format::RGBA>;
+                default:           throw MissingCaseException();
             }
-        case Texture::Format::RGBA:
+        case Format::RGBA:
             switch (to) {
-                case Texture::Format::Red:
-                    return &convert<Texture::Format::RGBA, Texture::Format::Red>;
-                case Texture::Format::RG:
-                    return &convert<Texture::Format::RGBA, Texture::Format::RG>;
-                case Texture::Format::RGB:
-                    return &convert<Texture::Format::RGBA, Texture::Format::RGB>;
-                default:
-                    throw MissingCaseException();
+                case Format::Red:  return &convert<Format::RGBA, Format::Red>;
+                case Format::RG:   return &convert<Format::RGBA, Format::RG>;
+                case Format::RGB:  return &convert<Format::RGBA, Format::RGB>;
+                default:           throw MissingCaseException();
             }
         default:
             throw MissingCaseException();

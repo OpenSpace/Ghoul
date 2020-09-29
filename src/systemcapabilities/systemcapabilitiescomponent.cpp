@@ -25,45 +25,11 @@
 
 #include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/stringconversion.h>
 #include <map>
-
-namespace ghoul {
-
-template <>
-std::string to_string
-              (const ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity& v)
-{
-    using Verbosity = ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity;
-    switch (v) {
-        case Verbosity::None:    return "None";
-        case Verbosity::Minimal: return "Minimal";
-        case Verbosity::Default: return "Default";
-        case Verbosity::Full:    return "Full";
-        default:                 throw ghoul::MissingCaseException();
-    }
-}
-
-template <>
-ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity
-from_string(const std::string& string)
-{
-    using Verbosity = ghoul::systemcapabilities::SystemCapabilitiesComponent::Verbosity;
-
-    static const std::map<std::string, Verbosity> VerbosityMap = {
-        { "None", Verbosity::None },
-        { "Minimal", Verbosity::Minimal },
-        { "Default", Verbosity::Default },
-        { "Full", Verbosity::Full }
-    };
-
-    // Throws a std::out_of_range exception if the type could not be found
-    return VerbosityMap.at(string);
-}
-
-} // namespace ghoul
 
 namespace ghoul::systemcapabilities {
 
@@ -72,7 +38,7 @@ IWbemLocator* SystemCapabilitiesComponent::_iwbemLocator = nullptr;
 IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
 
 SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, HRESULT code)
-    : RuntimeError(msg + ". Error Code: " + std::to_string(code), "WMI")
+    : RuntimeError(fmt::format("{}. Error Code: {}", msg, code), "WMI")
     , message(std::move(msg))
     , errorCode(std::move(code))
 {}
@@ -169,7 +135,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         CoUninitialize();
         throw WMIError("WMI initialization failed. Could not set proxy blanket", hRes);
     }
-    LDEBUG("WMI successfully initialized.");
+    LDEBUG("WMI successfully initialized");
 }
 
 void SystemCapabilitiesComponent::deinitializeWMI() {

@@ -102,11 +102,16 @@ function (set_ghoul_compile_settings target)
             "/ZI"       # Edit and continue support
         )
     endif ()
-  elseif (NOT LINUX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    if (APPLE)
+      target_compile_options(${target} PRIVATE "-stdlib=libc++")
+    else ()
+      target_compile_options(${target} PRIVATE "-stdlib=libstdc++")
+      #target_compile_options(${target} PRIVATE "-stdlib=libc++" "-std=gnu++17")
+    endif ()
+
     target_compile_options(
       ${target} PRIVATE
-      "-stdlib=libc++"
-      "-std=gnu++17"
       "-Wall"
       "-Wextra"
       # "-Wpedantic"

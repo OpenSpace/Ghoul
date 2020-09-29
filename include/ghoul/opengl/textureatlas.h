@@ -97,7 +97,7 @@ public:
      *
      * \param rhs The origin TextureAtlas
      */
-    TextureAtlas(TextureAtlas&& rhs);
+    TextureAtlas(TextureAtlas&& rhs) noexcept;
 
     /**
      * Assignment operator that performs a deep copy of all the elements in the
@@ -115,7 +115,7 @@ public:
      * \param rhs The original TextureAtlas
      * \return The atlas into which the original values were moved into
      */
-    TextureAtlas& operator=(TextureAtlas&& rhs);
+    TextureAtlas& operator=(TextureAtlas&& rhs) noexcept;
 
     /**
      * Initializes the TextureAtlas and creates its backend storage. This method

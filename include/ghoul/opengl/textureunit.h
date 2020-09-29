@@ -143,16 +143,16 @@ private:
     static void initialize();
 
     /// The number in <code>[0, maxTexUnits]</code> referring to this TextureUnit
-    GLint _number;
+    GLint _number = 0;
 
     /**
      * The enum in <code>[GL_TEXTURE0, GL_TEXTURE0 + maxTexUnits]</code> referring to this
      * TextureUnit
      */
-    GLenum _glEnum;
+    GLenum _glEnum = GLenum(0);
 
     /// <code>true</code> if this TextureUnit has been assigned
-    bool _assigned;
+    bool _assigned = false;
 
     /// <code>true</code> if the list of busy units and the maximum number of units have
     /// been initialized

@@ -30,6 +30,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <string_view>
 
 namespace ghoul::opengl {
 
@@ -82,7 +83,7 @@ public:
      *
      * \throw ShaderManagerError If the ShaderObject for \p name did not exist
      */
-    ShaderObject* shaderObject(const std::string& name);
+    ShaderObject* shaderObject(std::string_view name);
 
     /**
      * Register the passed ShaderObject under the passed name so that it can be retrieved
@@ -98,7 +99,7 @@ public:
      *        \p name
      * \pre \p shader must not be nullptr
      */
-    unsigned int registerShaderObject(const std::string& name,
+    unsigned int registerShaderObject(std::string_view name,
         std::unique_ptr<ShaderObject> shader);
 
     /**
@@ -110,7 +111,7 @@ public:
      * \return The previously registered ShaderObject or <code>nullptr</code> if the
      *         \p name was not a valid ShaderObject
      */
-    std::unique_ptr<ShaderObject> unregisterShaderObject(const std::string& name);
+    std::unique_ptr<ShaderObject> unregisterShaderObject(std::string_view name);
 
     /**
      * This method will unregister the ShaderObject that was registered under a name whose
@@ -133,7 +134,7 @@ public:
      * \param name The name which should be converted into a hash value
      * \return The hash value for the passed name
      */
-    unsigned int hashedNameForName(const std::string& name) const;
+    unsigned int hashedNameForName(std::string_view name) const;
 
 private:
     /// Map containing all the registered ShaderObject%s

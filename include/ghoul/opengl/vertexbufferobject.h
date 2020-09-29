@@ -50,13 +50,13 @@ public:
      * Moves the other object in place of the created one. The other object will be in an
      * uninitialized state afterwards.
      */
-    VertexBufferObject(VertexBufferObject&& other);
+    VertexBufferObject(VertexBufferObject&& other) noexcept;
 
     /**
      * Moves the other object in place of the created one. The other object will be in an
      * uninitialized state afterwards.
      */
-    VertexBufferObject& operator=(VertexBufferObject&& other);
+    VertexBufferObject& operator=(VertexBufferObject&& other) noexcept;
 
     /**
      * Default destructor.

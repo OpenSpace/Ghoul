@@ -87,13 +87,13 @@ namespace {
     }
 
     void setOptions(_SOCKET socket) {
-        char trueFlag = 1;
+        const char trueFlag = 1;
 
-        //Set no delay
+        // Set no delay
         setsockopt(socket,IPPROTO_TCP, TCP_NODELAY, &trueFlag, sizeof(trueFlag));
 
         // Set send timeout
-        char timeout = 0; //infinite
+        const char timeout = 0; // infinite
         setsockopt(socket, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
 
         // Set receive timeout
@@ -149,14 +149,12 @@ void TcpSocketServer::listen(int port) {
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_PASSIVE;
 
-    int iResult;
-
     // Resolve the local address and port to be used by the server
-    iResult = getaddrinfo(nullptr, std::to_string(_port).c_str(), &hints, &result);
+    int iResult = getaddrinfo(nullptr, std::to_string(_port).c_str(), &hints, &result);
     if (iResult != 0) {
-#if defined(WIN32)
+#ifdef WIN32
         WSACleanup();
-#endif
+#endif // WIN32
         throw TcpSocket::TcpSocketError("Failed to parse hints for connection!");
     }
 
@@ -164,9 +162,9 @@ void TcpSocketServer::listen(int port) {
     _serverSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (_serverSocket == INVALID_SOCKET) {
         freeaddrinfo(result);
-#if defined(WIN32)
+#ifdef WIN32
         WSACleanup();
-#endif
+#endif // WIN32
         throw TcpSocket::TcpSocketError("Failed to init server socket!");
     }
 
@@ -177,9 +175,9 @@ void TcpSocketServer::listen(int port) {
     if (iResult == SOCKET_ERROR) {
         freeaddrinfo(result);
         closeSocket(_serverSocket);
-#if defined(WIN32)
+#ifdef WIN32
         WSACleanup();
-#endif
+#endif // WIN32
         throw TcpSocket::TcpSocketError(
             "Bind failed with error: " + std::to_string(_ERRNO)
         );
@@ -190,10 +188,12 @@ void TcpSocketServer::listen(int port) {
 
     if (::listen(_serverSocket, SOMAXCONN) == SOCKET_ERROR) {
         closeSocket(_serverSocket);
-#if defined(WIN32)
+#ifdef WIN32
         WSACleanup();
-#endif
-        TcpSocket::TcpSocketError("Listen failed with error: " + std::to_string(_ERRNO));
+#endif // WIN32
+        throw TcpSocket::TcpSocketError(
+            "Listen failed with error: " + std::to_string(_ERRNO)
+        );
     }
 
     _listening = true;
@@ -209,7 +209,7 @@ bool TcpSocketServer::hasPendingSockets() const {
     if (!_listening) {
         return false;
     }
-    std::lock_guard<std::mutex> connectionLock(_connectionMutex);
+    std::lock_guard connectionLock(_connectionMutex);
     return !_pendingConnections.empty();
 }
 
@@ -238,9 +238,10 @@ std::unique_ptr<TcpSocket> TcpSocketServer::awaitPendingTcpSocket() {
 
     // Block execution until there is a pending connection or until the server stops
     // listening.
-    _connectionNotifier.wait(lock, [this]() {
-        return hasPendingSockets() || !_listening;
-    });
+    _connectionNotifier.wait(
+        lock,
+        [this]() { return hasPendingSockets() || !_listening; }
+    );
 
     return nextPendingTcpSocket();
 }
@@ -251,7 +252,7 @@ std::unique_ptr<Socket> TcpSocketServer::awaitPendingSocket() {
 
 void TcpSocketServer::waitForConnections() {
     while (_listening) {
-        sockaddr_in clientInfo {};
+        sockaddr_in clientInfo;
         std::memset(&clientInfo, 0, sizeof(clientInfo));
         _SOCKLEN clientInfoSize = sizeof(clientInfo);
 

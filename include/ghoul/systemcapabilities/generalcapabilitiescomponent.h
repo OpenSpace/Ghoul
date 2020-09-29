@@ -173,7 +173,7 @@ public:
      *
      * \return The <code>CPU</code> string
      */
-    std::string name() const override;
+    std::string_view name() const override;
 
 protected:
     /**

@@ -34,6 +34,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace ghoul::opengl {
@@ -148,7 +149,7 @@ public:
      *
      * \param rhs The assignment source
      */
-    ProgramObject& operator=(ProgramObject&& rhs);
+    ProgramObject& operator=(ProgramObject&& rhs) noexcept;
 
     /**
      * Sets the human readable name used for logging and (if available) the object label
@@ -387,7 +388,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    GLint uniformLocation(const std::string& name) const;
+    GLint uniformLocation(std::string_view name) const;
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -401,7 +402,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, bool value);
+    bool setUniform(std::string_view name, bool value);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1 and \p v2.
@@ -416,7 +417,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, bool v1, bool v2);
+    bool setUniform(std::string_view name, bool v1, bool v2);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1, \p v2, and
@@ -432,7 +433,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, bool v1, bool v2, bool v3);
+    bool setUniform(std::string_view name, bool v1, bool v2, bool v3);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1, \p v2, \p v3,
@@ -450,7 +451,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, bool v1, bool v2, bool v3, bool v4);
+    bool setUniform(std::string_view name, bool v1, bool v2, bool v3, bool v4);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -464,7 +465,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::bvec2& value);
+    bool setUniform(std::string_view name, const glm::bvec2& value);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -478,7 +479,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::bvec3& value);
+    bool setUniform(std::string_view name, const glm::bvec3& value);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -492,7 +493,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::bvec4& value);
+    bool setUniform(std::string_view name, const glm::bvec4& value);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -508,7 +509,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const bool* values, int count = 1);
+    bool setUniform(std::string_view name, const bool* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -524,7 +525,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::bvec2* values, int count = 1);
+    bool setUniform(std::string_view name, glm::bvec2* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -540,7 +541,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::bvec3* values, int count = 1);
+    bool setUniform(std::string_view name, glm::bvec3* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -556,7 +557,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::bvec4* values, int count = 1);
+    bool setUniform(std::string_view name, glm::bvec4* values, int count = 1);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -570,7 +571,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLuint value);
+    bool setUniform(std::string_view name, GLuint value);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1 and \p v2.
@@ -585,7 +586,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLuint v1, GLuint v2);
+    bool setUniform(std::string_view name, GLuint v1, GLuint v2);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1, \p v2, and
@@ -601,7 +602,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLuint v1, GLuint v2, GLuint v3);
+    bool setUniform(std::string_view name, GLuint v1, GLuint v2, GLuint v3);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1, \p v2, \p v3,
@@ -619,7 +620,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLuint v1, GLuint v2, GLuint v3, GLuint v4);
+    bool setUniform(std::string_view name, GLuint v1, GLuint v2, GLuint v3, GLuint v4);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -633,7 +634,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::uvec2& value);
+    bool setUniform(std::string_view name, const glm::uvec2& value);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -647,7 +648,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::uvec3& value);
+    bool setUniform(std::string_view name, const glm::uvec3& value);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -661,7 +662,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::uvec4& value);
+    bool setUniform(std::string_view name, const glm::uvec4& value);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -677,7 +678,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const GLuint* values, int count = 1);
+    bool setUniform(std::string_view name, const GLuint* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -693,7 +694,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::uvec2* values, int count = 1);
+    bool setUniform(std::string_view name, glm::uvec2* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -709,7 +710,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::uvec3* values, int count = 1);
+    bool setUniform(std::string_view name, glm::uvec3* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -725,7 +726,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::uvec4* values, int count = 1);
+    bool setUniform(std::string_view name, glm::uvec4* values, int count = 1);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -739,7 +740,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLint value);
+    bool setUniform(std::string_view name, GLint value);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1 and \p v2.
@@ -754,7 +755,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLint v1, GLint v2);
+    bool setUniform(std::string_view name, GLint v1, GLint v2);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1, \p v2, and
@@ -770,7 +771,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLint v1, GLint v2, GLint v3);
+    bool setUniform(std::string_view name, GLint v1, GLint v2, GLint v3);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1, \p v2, \p v3,
@@ -788,7 +789,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLint v1, GLint v2, GLint v3, GLint v4);
+    bool setUniform(std::string_view name, GLint v1, GLint v2, GLint v3, GLint v4);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -802,7 +803,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::ivec2& value);
+    bool setUniform(std::string_view name, const glm::ivec2& value);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -816,7 +817,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::ivec3& value);
+    bool setUniform(std::string_view name, const glm::ivec3& value);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -830,7 +831,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::ivec4& value);
+    bool setUniform(std::string_view name, const glm::ivec4& value);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -846,7 +847,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const GLint* values, int count = 1);
+    bool setUniform(std::string_view name, const GLint* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -862,7 +863,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::ivec2* values, int count = 1);
+    bool setUniform(std::string_view name, glm::ivec2* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -878,7 +879,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::ivec3* values, int count = 1);
+    bool setUniform(std::string_view name, glm::ivec3* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -894,7 +895,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::ivec4* values, int count = 1);
+    bool setUniform(std::string_view name, glm::ivec4* values, int count = 1);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -908,7 +909,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLfloat value);
+    bool setUniform(std::string_view name, GLfloat value);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1 and \p v2.
@@ -923,7 +924,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLfloat v1, GLfloat v2);
+    bool setUniform(std::string_view name, GLfloat v1, GLfloat v2);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1, \p v2, and
@@ -939,7 +940,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLfloat v1, GLfloat v2, GLfloat v3);
+    bool setUniform(std::string_view name, GLfloat v1, GLfloat v2, GLfloat v3);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1, \p v2, \p v3,
@@ -957,7 +958,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name,
+    bool setUniform(std::string_view name,
         GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4);
 
     /**
@@ -972,7 +973,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::vec2& value);
+    bool setUniform(std::string_view name, const glm::vec2& value);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -986,7 +987,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::vec3& value);
+    bool setUniform(std::string_view name, const glm::vec3& value);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -1000,7 +1001,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::vec4& value);
+    bool setUniform(std::string_view name, const glm::vec4& value);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -1016,7 +1017,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const GLfloat* values, int count = 1);
+    bool setUniform(std::string_view name, const GLfloat* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -1032,7 +1033,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::vec2* values, int count = 1);
+    bool setUniform(std::string_view name, glm::vec2* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -1048,7 +1049,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::vec3* values, int count = 1);
+    bool setUniform(std::string_view name, glm::vec3* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -1064,7 +1065,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::vec4* values, int count = 1);
+    bool setUniform(std::string_view name, glm::vec4* values, int count = 1);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -1078,7 +1079,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLdouble value);
+    bool setUniform(std::string_view name, GLdouble value);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1 and \p v2.
@@ -1093,7 +1094,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLdouble v1, GLdouble v2);
+    bool setUniform(std::string_view name, GLdouble v1, GLdouble v2);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1, \p v2, and
@@ -1109,7 +1110,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, GLdouble v1, GLdouble v2, GLdouble v3);
+    bool setUniform(std::string_view name, GLdouble v1, GLdouble v2, GLdouble v3);
 
     /**
      * Locates and sets the uniform \p name with the passed values \p v1, \p v2, \p v3,
@@ -1127,7 +1128,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name,
+    bool setUniform(std::string_view name,
         GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4);
 
     /**
@@ -1142,7 +1143,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::dvec2& value);
+    bool setUniform(std::string_view name, const glm::dvec2& value);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -1156,7 +1157,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::dvec3& value);
+    bool setUniform(std::string_view name, const glm::dvec3& value);
 
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
@@ -1170,7 +1171,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::dvec4& value);
+    bool setUniform(std::string_view name, const glm::dvec4& value);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -1186,7 +1187,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const GLdouble* values, int count = 1);
+    bool setUniform(std::string_view name, const GLdouble* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -1202,7 +1203,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::dvec2* values, int count = 1);
+    bool setUniform(std::string_view name, glm::dvec2* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -1218,7 +1219,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::dvec3* values, int count = 1);
+    bool setUniform(std::string_view name, glm::dvec3* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed values \p values, where the
@@ -1234,7 +1235,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, glm::dvec4* values, int count = 1);
+    bool setUniform(std::string_view name, glm::dvec4* values, int count = 1);
 
     /**
      * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
@@ -1250,7 +1251,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::mat2x2& value,
+    bool setUniform(std::string_view name, const glm::mat2x2& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1267,7 +1268,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::mat2x3& value,
+    bool setUniform(std::string_view name, const glm::mat2x3& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1284,7 +1285,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::mat2x4& value,
+    bool setUniform(std::string_view name, const glm::mat2x4& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1301,7 +1302,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::mat3x2& value,
+    bool setUniform(std::string_view name, const glm::mat3x2& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1318,7 +1319,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::mat3x3& value,
+    bool setUniform(std::string_view name, const glm::mat3x3& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1335,7 +1336,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::mat3x4& value,
+    bool setUniform(std::string_view name, const glm::mat3x4& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1352,7 +1353,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::mat4x2& value,
+    bool setUniform(std::string_view name, const glm::mat4x2& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1369,7 +1370,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::mat4x3& value,
+    bool setUniform(std::string_view name, const glm::mat4x3& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1386,7 +1387,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::mat4x4& value,
+    bool setUniform(std::string_view name, const glm::mat4x4& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1403,7 +1404,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::dmat2x2& value,
+    bool setUniform(std::string_view name, const glm::dmat2x2& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1420,7 +1421,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::dmat2x3& value,
+    bool setUniform(std::string_view name, const glm::dmat2x3& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1437,7 +1438,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::dmat2x4& value,
+    bool setUniform(std::string_view name, const glm::dmat2x4& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1454,7 +1455,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::dmat3x2& value,
+    bool setUniform(std::string_view name, const glm::dmat3x2& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1471,7 +1472,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::dmat3x3& value,
+    bool setUniform(std::string_view name, const glm::dmat3x3& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1488,7 +1489,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::dmat3x4& value,
+    bool setUniform(std::string_view name, const glm::dmat3x4& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1505,7 +1506,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::dmat4x2& value,
+    bool setUniform(std::string_view name, const glm::dmat4x2& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1522,7 +1523,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::dmat4x3& value,
+    bool setUniform(std::string_view name, const glm::dmat4x3& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -1539,7 +1540,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setUniform(const std::string& name, const glm::dmat4x4& value,
+    bool setUniform(std::string_view name, const glm::dmat4x4& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -2503,7 +2504,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setSsboBinding(const std::string& name, GLuint binding);
+    bool setSsboBinding(std::string_view name, GLuint binding);
 
     /**
      * Sets the block with index \p index with the passed binding \p binding. Will call
@@ -2548,7 +2549,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    GLuint attributeLocation(const std::string& name) const;
+    GLuint attributeLocation(std::string_view name) const;
 
     /**
      * Binds the generic vertex attribute \p index to the attribute variable \p name. Will
@@ -2559,7 +2560,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    void bindAttributeLocation(const std::string& name, GLuint index);
+    void bindAttributeLocation(std::string_view name, GLuint index);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2573,7 +2574,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, bool value);
+    bool setAttribute(std::string_view name, bool value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1 and \p v2.
@@ -2589,7 +2590,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, bool v1, bool v2);
+    bool setAttribute(std::string_view name, bool v1, bool v2);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2606,7 +2607,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, bool v1, bool v2, bool v3);
+    bool setAttribute(std::string_view name, bool v1, bool v2, bool v3);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2624,7 +2625,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, bool v1, bool v2, bool v3, bool v4);
+    bool setAttribute(std::string_view name, bool v1, bool v2, bool v3, bool v4);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2638,7 +2639,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::bvec2& value);
+    bool setAttribute(std::string_view name, const glm::bvec2& value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2652,7 +2653,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::bvec3& value);
+    bool setAttribute(std::string_view name, const glm::bvec3& value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2666,7 +2667,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::bvec4& value);
+    bool setAttribute(std::string_view name, const glm::bvec4& value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2680,7 +2681,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLint value);
+    bool setAttribute(std::string_view name, GLint value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1 and \p v2.
@@ -2696,7 +2697,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLint v1, GLint v2);
+    bool setAttribute(std::string_view name, GLint v1, GLint v2);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2713,7 +2714,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLint v1, GLint v2, GLint v3);
+    bool setAttribute(std::string_view name, GLint v1, GLint v2, GLint v3);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2731,7 +2732,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLint v1, GLint v2, GLint v3, GLint v4);
+    bool setAttribute(std::string_view name, GLint v1, GLint v2, GLint v3, GLint v4);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2745,7 +2746,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::ivec2& value);
+    bool setAttribute(std::string_view name, const glm::ivec2& value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2759,7 +2760,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::ivec3& value);
+    bool setAttribute(std::string_view name, const glm::ivec3& value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2773,7 +2774,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::ivec4& value);
+    bool setAttribute(std::string_view name, const glm::ivec4& value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2787,7 +2788,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLfloat value);
+    bool setAttribute(std::string_view name, GLfloat value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1 and \p v2.
@@ -2803,7 +2804,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLfloat v1, GLfloat v2);
+    bool setAttribute(std::string_view name, GLfloat v1, GLfloat v2);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2820,7 +2821,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLfloat v1, GLfloat v2, GLfloat v3);
+    bool setAttribute(std::string_view name, GLfloat v1, GLfloat v2, GLfloat v3);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2838,7 +2839,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name,
+    bool setAttribute(std::string_view name,
         GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4);
 
     /**
@@ -2853,7 +2854,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::vec2& value);
+    bool setAttribute(std::string_view name, const glm::vec2& value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2867,7 +2868,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::vec3& value);
+    bool setAttribute(std::string_view name, const glm::vec3& value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2881,7 +2882,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::vec4& value);
+    bool setAttribute(std::string_view name, const glm::vec4& value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2895,7 +2896,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLdouble value);
+    bool setAttribute(std::string_view name, GLdouble value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1 and \p v2.
@@ -2911,7 +2912,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLdouble v1, GLdouble v2);
+    bool setAttribute(std::string_view name, GLdouble v1, GLdouble v2);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2928,7 +2929,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLdouble v1, GLdouble v2, GLdouble v3);
+    bool setAttribute(std::string_view name, GLdouble v1, GLdouble v2, GLdouble v3);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2946,7 +2947,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name,
+    bool setAttribute(std::string_view name,
         GLdouble v1, GLdouble v2, GLdouble v3, GLdouble v4);
 
     /**
@@ -2961,7 +2962,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dvec2& value);
+    bool setAttribute(std::string_view name, const glm::dvec2& value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2975,7 +2976,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dvec3& value);
+    bool setAttribute(std::string_view name, const glm::dvec3& value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2989,7 +2990,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dvec4& value);
+    bool setAttribute(std::string_view name, const glm::dvec4& value);
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -3006,7 +3007,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat2x2& value,
+    bool setAttribute(std::string_view name, const glm::mat2x2& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3024,7 +3025,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat2x3& value,
+    bool setAttribute(std::string_view name, const glm::mat2x3& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3042,7 +3043,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat2x4& value,
+    bool setAttribute(std::string_view name, const glm::mat2x4& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3060,7 +3061,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat3x2& value,
+    bool setAttribute(std::string_view name, const glm::mat3x2& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3078,7 +3079,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat3x3& value,
+    bool setAttribute(std::string_view name, const glm::mat3x3& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3096,7 +3097,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat3x4& value,
+    bool setAttribute(std::string_view name, const glm::mat3x4& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3114,7 +3115,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat4x2& value,
+    bool setAttribute(std::string_view name, const glm::mat4x2& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3132,7 +3133,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat4x3& value,
+    bool setAttribute(std::string_view name, const glm::mat4x3& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3150,7 +3151,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat4x4& value,
+    bool setAttribute(std::string_view name, const glm::mat4x4& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3168,7 +3169,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat2x2& value,
+    bool setAttribute(std::string_view name, const glm::dmat2x2& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3186,7 +3187,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat2x3& value,
+    bool setAttribute(std::string_view name, const glm::dmat2x3& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3204,7 +3205,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat2x4& value,
+    bool setAttribute(std::string_view name, const glm::dmat2x4& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3222,7 +3223,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat3x2& value,
+    bool setAttribute(std::string_view name, const glm::dmat3x2& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3240,7 +3241,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat3x3& value,
+    bool setAttribute(std::string_view name, const glm::dmat3x3& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3258,7 +3259,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat3x4& value,
+    bool setAttribute(std::string_view name, const glm::dmat3x4& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3275,7 +3276,7 @@ public:
      *         otherwise
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat4x2& value,
+    bool setAttribute(std::string_view name, const glm::dmat4x2& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3293,7 +3294,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat4x3& value,
+    bool setAttribute(std::string_view name, const glm::dmat4x3& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -3311,7 +3312,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat4x4& value,
+    bool setAttribute(std::string_view name, const glm::dmat4x4& value,
         Transpose transpose = Transpose::No);
 
     /**
@@ -4087,7 +4088,7 @@ private:
     std::string _programName;
 
     /// The logger category that will be used, if a name has been specified.
-    std::string _loggerCat;
+    std::string _loggerCat = "ProgramObject";
 
     /// <code>true</code> if uniform location errors should be ignored.
     bool _ignoreUniformLocationError = false;

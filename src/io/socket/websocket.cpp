@@ -96,7 +96,7 @@ bool WebSocket::getMessage(std::string& message) {
         _inputNotifier.wait_for(lock, MaxWaitDuration, messageOrDisconnected);
     }
 
-    std::lock_guard<std::mutex> guard(_inputMessageQueueMutex);
+    std::lock_guard guard(_inputMessageQueueMutex);
     if (_inputMessageQueue.empty()) {
         return false;
     }
@@ -106,7 +106,7 @@ bool WebSocket::getMessage(std::string& message) {
     return true;
 }
 
-bool WebSocket::putMessage(const std::string &message) {
+bool WebSocket::putMessage(const std::string& message) {
     _socketConnection->send(message);
     _tcpSocket->put<char>(_outputStream.str().c_str(), _outputStream.str().size());
     _outputStream.str("");
@@ -134,16 +134,15 @@ void WebSocket::onMessage(const websocketpp::connection_hdl&,
                    const websocketpp::server<websocketpp::config::core>::message_ptr& msg)
 {
     std::string msgContent = msg->get_payload();
-    std::lock_guard<std::mutex> guard(_inputMessageQueueMutex);
+    std::lock_guard guard(_inputMessageQueueMutex);
     _inputMessageQueue.push_back(msgContent);
     _inputNotifier.notify_one();
 }
 
 void WebSocket::onOpen(const websocketpp::connection_hdl& hdl) {
     LDEBUG(fmt::format(
-        "onOpen: WebSocket opened. Client: {}:{}.",
-        _tcpSocket->address(),
-        _tcpSocket->port()
+        "onOpen: WebSocket opened. Client: {}:{}",
+        _tcpSocket->address(), _tcpSocket->port()
     ));
     std::lock_guard guard(_connectionHandlesMutex);
     _connectionHandles.insert(hdl);
@@ -153,9 +152,8 @@ void WebSocket::onOpen(const websocketpp::connection_hdl& hdl) {
 
 void WebSocket::onClose(const websocketpp::connection_hdl& hdl) {
     LDEBUG(fmt::format(
-        "onClose: WebSocket closing. Client: {}:{}.",
-        _tcpSocket->address(),
-        _tcpSocket->port()
+        "onClose: WebSocket closing. Client: {}:{}",
+        _tcpSocket->address(), _tcpSocket->port()
     ));
 
     std::lock_guard guard(_connectionHandlesMutex);

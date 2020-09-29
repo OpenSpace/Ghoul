@@ -58,7 +58,7 @@ std::unique_ptr<opengl::Texture> RawVolumeReader::read(const std::string& filena
         return nullptr;
     }
 
-    unsigned int s = _hints._dimensions.x * _hints._dimensions.y * _hints._dimensions.z;
+    const unsigned int s = glm::compMul(_hints._dimensions);
     GLubyte* data = new GLubyte[s];
 
     std::ifstream fin(filename, std::ios::in | std::ios::binary);

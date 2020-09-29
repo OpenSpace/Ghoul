@@ -45,9 +45,7 @@ public:
     virtual bool isConnecting() const = 0;
     int socketId() const;
 
-    /**
-     * Methods for text based communication.
-     */
+    /// Methods for text based communication.
     virtual bool getMessage(std::string& message) = 0;
     virtual bool putMessage(const std::string& message) = 0;
 

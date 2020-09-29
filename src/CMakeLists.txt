@@ -42,7 +42,6 @@ set(GHOUL_SOURCE
   ${PROJECT_SOURCE_DIR}/src/logging/consolelog.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/htmllog.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/log.cpp
-  ${PROJECT_SOURCE_DIR}/src/logging/loglevel.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/logmanager.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/streamlog.cpp
   ${PROJECT_SOURCE_DIR}/src/logging/textlog.cpp
@@ -85,6 +84,7 @@ endif ()
 if (GHOUL_MODULE_FONTRENDERING)
   set(GHOUL_SOURCE ${GHOUL_SOURCE}
     ${PROJECT_SOURCE_DIR}/src/font/font.cpp
+    ${PROJECT_SOURCE_DIR}/src/font/fonterrors.cpp
     ${PROJECT_SOURCE_DIR}/src/font/fontmanager.cpp
     ${PROJECT_SOURCE_DIR}/src/font/fontrenderer.cpp
   )
@@ -103,6 +103,7 @@ if (GHOUL_MODULE_OPENGL)
     ${PROJECT_SOURCE_DIR}/src/opengl/bufferbinding.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/debugcontext.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/framebufferobject.cpp
+    ${PROJECT_SOURCE_DIR}/src/opengl/openglstatecache.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/programobject.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/programobjectmanager.cpp
     ${PROJECT_SOURCE_DIR}/src/opengl/shadermanager.cpp
@@ -175,6 +176,7 @@ set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/buffer.inl
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/clipboard.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/constexpr.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/misc/constmap.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/crc32.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/crc32.inl
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/csvreader.h
@@ -189,6 +191,7 @@ set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/invariants.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/misc/managedmemoryuniqueptr.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.inl
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h
@@ -229,6 +232,7 @@ endif ()
 if (GHOUL_MODULE_FONTRENDERING)
   set(GHOUL_HEADER ${GHOUL_HEADER}
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/font/fonterrors.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontmanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontrenderer.h
   )
@@ -251,6 +255,7 @@ if (GHOUL_MODULE_OPENGL)
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/debugcontext.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/framebufferobject.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/ghoul_gl.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/openglstatecache.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobject.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobjectmanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shadermanager.h

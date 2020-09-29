@@ -99,6 +99,7 @@ void FileSystem::deinitializeInternalApple() {
 
 void FileSystem::addFileListener(File* file) {
     ghoul_assert(file, "File must not a nullptr");
+
 #ifdef GHL_DEBUG
     auto eqRange = _trackedFiles.equal_range(file->path());
     for (auto it = eqRange.first; it != eqRange.second; ++it) {
@@ -130,7 +131,7 @@ void FileSystem::addFileListener(File* file) {
             );
             CFArrayRef pathsToWatch = CFArrayCreate(
                 NULL,
-                reinterpret_cast<const void **>(&path),
+                reinterpret_cast<const void**>(&path),
                 1,
                 NULL
             );

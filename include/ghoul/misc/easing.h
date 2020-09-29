@@ -67,7 +67,7 @@ EasingFunc<T> easingFunction(EasingFunction func);
  * \param func The easing function for which the name should be retrieved
  * \return The name of the easing function
  */
-const char* nameForEasingFunction(EasingFunction func);
+std::string_view nameForEasingFunction(EasingFunction func);
 
 /**
  * Returns the enum for the passed \p name of an easing function. If \p name is not a
@@ -79,7 +79,7 @@ const char* nameForEasingFunction(EasingFunction func);
  * \throw std::invalid_argument If \p name is not a valid name for an easing function
  * \pre \p name must not be nullptr
  */
-EasingFunction easingFunctionFromName(const char* name);
+EasingFunction easingFunctionFromName(std::string_view name);
 
 /**
  * Returns whether \p name is naming a valid easing function. If this function returns
@@ -92,7 +92,7 @@ EasingFunction easingFunctionFromName(const char* name);
  *
  * \pre \p name must not be nullptr
  */
-bool isValidEasingFunctionName(const char* name);
+bool isValidEasingFunctionName(std::string_view name);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1] using the easing function

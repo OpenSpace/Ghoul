@@ -65,8 +65,7 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& f
     }
 }
 
-std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory,
-                                                            size_t size,
+std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t size,
                                                             const std::string& format)
 {
     ghoul_assert(memory, "Memory must not be nullptr");
@@ -93,14 +92,14 @@ void TextureReader::addReader(std::unique_ptr<TextureReaderBase> reader) {
 TextureReaderBase* TextureReader::readerForExtension(const std::string& extension) {
     std::string lowerExtension = extension;
     std::transform(
-        extension.begin(),
-        extension.end(),
+        extension.cbegin(),
+        extension.cend(),
         lowerExtension.begin(),
         [](char v) { return static_cast<char>(tolower(v)); }
     );
     for (const std::unique_ptr<TextureReaderBase>& reader : _readers) {
         std::vector<std::string> extensions = reader->supportedExtensions();
-        auto it = std::find(extensions.begin(), extensions.end(), lowerExtension);
+        auto it = std::find(extensions.cbegin(), extensions.cend(), lowerExtension);
         if (it != extensions.end()) {
             return reader.get();
         }

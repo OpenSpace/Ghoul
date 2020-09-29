@@ -36,7 +36,8 @@ namespace ghoul {
 
 namespace {
     std::string formatValue(const Dictionary& dictionary, const std::string& key,
-        PrettyPrint prettyPrint, std::string indentation, int indentationSteps);
+                            PrettyPrint prettyPrint, std::string indentation,
+                            int indentationSteps);
 
     std::string formatDouble(double d) {
         // This check is to silence -Wfloat-equal on GCC due to floating point comparison
@@ -61,8 +62,6 @@ namespace {
                 indent += indentation;
             }
         }
-
-        std::string newLine = prettyPrint ? "\n" : "";
 
         auto convert = [&](const std::string& key) {
             return
@@ -90,8 +89,6 @@ namespace {
                             PrettyPrint prettyPrint, std::string indentation,
                             int indentationSteps)
     {
-        const char* whitespace = prettyPrint ? " " : "";
-
         if (dictionary.hasValue<Dictionary>(key)) {
             Dictionary subDictionary = dictionary.value<Dictionary>(key);
             return format(subDictionary, prettyPrint, indentation, indentationSteps);
@@ -99,23 +96,28 @@ namespace {
 
         if (dictionary.hasValue<glm::dvec4>(key)) {
             glm::dvec4 vec = dictionary.value<glm::dvec4>(key);
-            return "{" + formatDouble(vec.x) + "," +
-                formatDouble(vec.y) + "," + whitespace +
-                formatDouble(vec.z) + "," + whitespace +
-                formatDouble(vec.w) + "}";
+            return fmt::format(
+                "{{{},{},{},{}}}",
+                formatDouble(vec.x),
+                formatDouble(vec.y),
+                formatDouble(vec.z),
+                formatDouble(vec.w)
+            );
         }
 
         if (dictionary.hasValue<glm::dvec3>(key)) {
             glm::dvec3 vec = dictionary.value<glm::dvec3>(key);
-            return "{" + formatDouble(vec.x) + "," + whitespace +
-                formatDouble(vec.y) + "," + whitespace +
-                formatDouble(vec.z) + "}";
+            return fmt::format(
+                "{{{},{},{}}}",
+                formatDouble(vec.x),
+                formatDouble(vec.y),
+                formatDouble(vec.z)
+            );
         }
 
         if (dictionary.hasValue<glm::dvec2>(key)) {
             const glm::dvec2 vec = dictionary.value<glm::dvec2>(key);
-            return "{" + formatDouble(vec.x) + "," + whitespace +
-                formatDouble(vec.y) + "}";
+            return fmt::format("{{{},{}}}", formatDouble(vec.x), formatDouble(vec.y));
         }
 
         if (dictionary.hasValue<double>(key)) {
@@ -132,40 +134,40 @@ namespace {
             std::string value = dictionary.value<std::string>(key);
 
             std::string luaString;
-            for (const char& c : value) {
+            for (const char c : value) {
                 switch (c) {
-                case '"':
-                    luaString += "\\\"";
-                    break;
-                case '\\':
-                    luaString += "\\\\";
-                    break;
-                case '\b':
-                    luaString += "\\b";
-                    break;
-                case '\f':
-                    luaString += "\\f";
-                    break;
-                case '\n':
-                    luaString += "\\n";
-                    break;
-                case '\r':
-                    luaString += "\\r";
-                    break;
-                case '\t':
-                    luaString += "\\t";
-                    break;
-                default:
-                    luaString += c;
+                    case '"':
+                        luaString += "\\\"";
+                        break;
+                    case '\\':
+                        luaString += "\\\\";
+                        break;
+                    case '\b':
+                        luaString += "\\b";
+                        break;
+                    case '\f':
+                        luaString += "\\f";
+                        break;
+                    case '\n':
+                        luaString += "\\n";
+                        break;
+                    case '\r':
+                        luaString += "\\r";
+                        break;
+                    case '\t':
+                        luaString += "\\t";
+                        break;
+                    default:
+                        luaString += c;
                 }
             }
 
             return "\"" + luaString + "\"";
         }
 
-        throw LuaFormattingError(
-            "Key '" + key + "' has invalid type for formatting dictionary as lua"
-        );
+        throw LuaFormattingError(fmt::format(
+            "Key '{}' has invalid type for formatting dictionary as Lua", key
+        ));
     }
 }  // namespace
 

@@ -31,12 +31,13 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/misc.h>
+#include <ghoul/misc/profiling.h>
 #include <ghoul/opengl/programobject.h>
 #include <ghoul/opengl/texture.h>
 #include <ghoul/opengl/textureatlas.h>
 #include <ghoul/opengl/textureunit.h>
-#include <fstream>
 #include <glm/gtc/matrix_transform.hpp>
+#include <fstream>
 #include <numeric>
 
 namespace {
@@ -180,6 +181,23 @@ namespace {
         // 4th coord of the gNormal is the water reflectance
         gNormal = vec4(0.0, 0.0, 1.0, 0.0);
     })";
+
+    // Extracts the next line from the string view and returns it, the passed string_view
+    // is modified to remove the new line *and* the \n character
+    std::string_view extractLine(std::string_view& view) {
+        std::string_view::size_type p = view.find('\n');
+        if (p == std::string_view::npos) {
+            // No new line found
+            std::string_view res = view;
+            view = std::string_view();
+            return res;
+        }
+
+        std::string_view res = view.substr(0, p);
+        view = view.substr(p + 2);
+        return res;
+    }
+
 } // namespace
 
 namespace ghoul::fontrendering {
@@ -191,6 +209,9 @@ FontRenderer::FontRenderer() {
     glGenVertexArrays(1, &_vao);
     glGenBuffers(1, &_vbo);
     glGenBuffers(1, &_ibo);
+
+    _vertexBuffer.reserve(128 * 4);
+    _indexBuffer.reserve(128 * 4);
 }
 
 FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
@@ -299,7 +320,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     return std::unique_ptr<FontRenderer>(fr);
 }
 
-bool FontRenderer::initialize() {
+void FontRenderer::initialize() {
     LDEBUG("Creating default FontRenderer");
     ghoul_assert(!_defaultRenderer, "Default FontRenderer was already initialized");
     _defaultRenderer = createDefault();
@@ -310,14 +331,11 @@ bool FontRenderer::initialize() {
         "Default projection Fontrenderer was already initialized"
     );
     _defaultProjectionRenderer = createProjectionSubjectText();
-
-    return true;
 }
 
-bool FontRenderer::deinitialize() {
+void FontRenderer::deinitialize() {
     _defaultRenderer = nullptr;
     _defaultProjectionRenderer = nullptr;
-    return true;
 }
 
 bool FontRenderer::isInitialized() {
@@ -337,52 +355,9 @@ FontRenderer& FontRenderer::defaultProjectionRenderer() {
     return *_defaultProjectionRenderer;
 }
 
-FontRenderer::BoundingBoxInformation FontRenderer::boundingBox(Font& font,
-                                                            const std::string& text) const
-{
-    const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
-
-    float h = font.height();
-
-    //unsigned int vertexIndex = 0;
-    std::vector<GLuint> indices;
-    glm::vec2 movingPos = glm::vec2(0.f);
-
-    glm::vec2 size = glm::vec2(0.f);
-    for (const std::string& line : lines) {
-        movingPos.x = 0.f;
-        float width = 0.f;
-        float height = 0.f;
-        for (char c : line) {
-            wchar_t character = c;
-            if (character == wchar_t('\t')) {
-                character = wchar_t(' ');
-            }
-            const Font::Glyph* glyph;
-
-            // @TODO: Replace with an explicit lookup to not eat the cost of the throw
-            try {
-                glyph = font.glyph(character);
-            }
-            catch (const Font::FontException&) {
-                glyph = font.glyph(wchar_t(' '));
-            }
-
-            width += glyph->horizontalAdvance();
-            height = std::max(height, static_cast<float>(glyph->height()));
-        }
-        size.x = std::max(size.x, width);
-        size.y += height;
-        movingPos.y -= h;
-    }
-    size.y = lines.size() * font.height();
-
-    return { size, static_cast<int>(lines.size()) };
-}
-
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec2& pos,
-                                                          const std::string& text,
+                                                          std::string_view text,
                                                           const glm::vec4& color) const
 {
     return render(font, pos, text, color, { 0.f, 0.f, 0.f, color.a });
@@ -390,11 +365,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec2& pos,
-                                                          const std::string& text,
+                                                          std::string_view text,
                                                           const glm::vec4& color,
                                                       const glm::vec4& outlineColor) const
 {
-    const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
+    const size_t lines = std::count(text.begin(), text.end(), '\n') + 1;
 
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -410,24 +385,15 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         float outlineS;
         float outlineT;
     };
-
-    int nCharacters = std::accumulate(
-        lines.begin(),
-        lines.end(),
-        0,
-        [](int lhs, const std::string& rhs) { return static_cast<int>(rhs.size()) + lhs; }
-    );
-    std::vector<Vertex> vertices;
-    vertices.reserve(nCharacters * 4); // each character is four vertices
-
-    std::vector<GLushort> indices;
-    indices.reserve(nCharacters * 3); // each character is two triangles
-
+    
+    _vertexBuffer.clear();
+    _indexBuffer.clear();
 
     GLushort vertexIndex = 0;
     glm::vec2 size = glm::vec2(0.f);
     glm::vec2 movingPos = pos;
-    for (const std::string& line : lines) {
+    do {
+        std::string_view line = extractLine(text);
         movingPos.x = pos.x;
         float width = 0.f;
         float height = 0.f;
@@ -449,19 +415,19 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 movingPos.x += glyph->kerning(line[j - 1]);
             }
 
-            const float x0 = movingPos.x + glyph->leftBearing();
-            const float y0 = movingPos.y + glyph->topBearing();
-            const float s0 = glyph->topLeft().x;
-            const float t0 = glyph->topLeft().y;
-            const float outlineS0 = glyph->outlineTopLeft().x;
-            const float outlineT0 = glyph->outlineTopLeft().y;
+            const float x0 = movingPos.x + glyph->leftBearing;
+            const float y0 = movingPos.y + glyph->topBearing;
+            const float s0 = glyph->topLeft.x;
+            const float t0 = glyph->topLeft.y;
+            const float outlineS0 = glyph->outlineTopLeft.x;
+            const float outlineT0 = glyph->outlineTopLeft.y;
 
-            const float x1 = x0 + glyph->width();
-            const float y1 = y0 - glyph->height();
-            const float s1 = glyph->bottomRight().x;
-            const float t1 = glyph->bottomRight().y;
-            const float outlineS1 = glyph->outlineBottomRight().x;
-            const float outlineT1 = glyph->outlineBottomRight().y;
+            const float x1 = x0 + glyph->width;
+            const float y1 = y0 - glyph->height;
+            const float s1 = glyph->bottomRight.x;
+            const float t1 = glyph->bottomRight.y;
+            const float outlineS1 = glyph->outlineBottomRight.x;
+            const float outlineT1 = glyph->outlineBottomRight.y;
 
             // These variables are necessary as the insertion would otherwise produce a
             // narrowing error on clang
@@ -469,28 +435,28 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             const GLushort idx1 = vertexIndex + 1;
             const GLushort idx2 = vertexIndex + 2;
             const GLushort idx3 = vertexIndex + 3;
-            indices.insert(indices.end(), { idx, idx1, idx2, idx, idx2, idx3 });
+            _indexBuffer.insert(_indexBuffer.end(), { idx, idx1, idx2, idx, idx2, idx3 });
             vertexIndex += 4;
-            vertices.insert(vertices.end(), {
-                { x0, y0, s0, t0, outlineS0, outlineT0 },
-                { x0, y1, s0, t1, outlineS0, outlineT1 },
-                { x1, y1, s1, t1, outlineS1, outlineT1 },
-                { x1, y0, s1, t0, outlineS1, outlineT0 }
+            _vertexBuffer.insert(_vertexBuffer.end(), {
+                x0, y0, s0, t0, outlineS0, outlineT0,
+                x0, y1, s0, t1, outlineS0, outlineT1,
+                x1, y1, s1, t1, outlineS1, outlineT1,
+                x1, y0, s1, t0, outlineS1, outlineT0
             });
-            movingPos.x += glyph->horizontalAdvance();
+            movingPos.x += glyph->horizontalAdvance;
 
-            width += glyph->horizontalAdvance();
-            height = std::max(height, static_cast<float>(glyph->height()));
+            width += glyph->horizontalAdvance;
+            height = std::max(height, static_cast<float>(glyph->height));
         }
         size.x = std::max(size.x, width);
         //size.y += height;
         movingPos.y -= font.height();
-    }
-    size.y = (lines.size() - 1) * font.height();
+    } while (!text.empty());
+    size.y = (lines - 1) * font.height();
 
     opengl::TextureUnit atlasUnit;
     atlasUnit.activate();
-    font.atlas().texture().bind();
+    font.atlasTexture().bind();
 
     _program->setUniform(_uniformCache.baseColor, color);
     _program->setUniform(_uniformCache.outlineColor, outlineColor);
@@ -506,16 +472,16 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBufferData(
         GL_ARRAY_BUFFER,
-        vertices.size() * sizeof(Vertex),
-        vertices.data(),
+        _vertexBuffer.size() * sizeof(float),
+        _vertexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
-        indices.size() * sizeof(GLushort),
-        indices.data(),
+        _indexBuffer.size() * sizeof(GLushort),
+        _indexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
@@ -544,7 +510,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     glDrawElements(
         GL_TRIANGLES,
-        static_cast<GLsizei>(indices.size()),
+        static_cast<GLsizei>(_indexBuffer.size()),
         GL_UNSIGNED_SHORT,
         nullptr
     );
@@ -552,12 +518,12 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glBindVertexArray(0);
     glEnable(GL_DEPTH_TEST);
 
-    return { size, static_cast<int>(lines.size()) };
+    return { size, static_cast<int>(lines) };
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec3& pos,
-                                                          const std::string& text,
+                                                          std::string_view text,
                                                           const glm::vec4& color,
                                                           const glm::vec4& outlineColor,
                                               const ProjectedLabelsInformation& labelInfo,
@@ -565,19 +531,18 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 {
     float h = font.height();
 
-    const std::vector<std::string>& lines = ghoul::tokenizeString(text, '\n');
+    _vertexBuffer.clear();
+    _indexBuffer.clear();
 
-    unsigned int vertexIndex = 0;
-    std::vector<GLuint> indices;
-    std::vector<GLfloat> vertices;
-    //glm::vec3 movingPos = pos;
-    // TODO(abock): review y starting position
+    const size_t lines = std::count(text.begin(), text.end(), '\n') + 1;
+
+    unsigned short vertexIndex = 0;
     glm::vec2 movingPos(offset);
 
     glm::vec2 size = glm::vec2(0.f);
     float heightInPixels = 0.f;
-
-    for (const std::string& line : lines) {
+    do {
+        std::string_view line = extractLine(text);
         //movingPos.x = 0.f;
         //movingPos.x = pos.x;
         float width = 0.f;
@@ -600,19 +565,19 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 movingPos.x += glyph->kerning(line[j - 1]);
             }
 
-            float x0 = movingPos.x + glyph->leftBearing();
-            float y0 = movingPos.y + glyph->topBearing();
-            float s0 = glyph->topLeft().x;
-            float t0 = glyph->topLeft().y;
-            float outlineS0 = glyph->outlineTopLeft().x;
-            float outlineT0 = glyph->outlineTopLeft().y;
+            float x0 = movingPos.x + glyph->leftBearing;
+            float y0 = movingPos.y + glyph->topBearing;
+            float s0 = glyph->topLeft.x;
+            float t0 = glyph->topLeft.y;
+            float outlineS0 = glyph->outlineTopLeft.x;
+            float outlineT0 = glyph->outlineTopLeft.y;
 
-            float x1 = x0 + glyph->width();
-            float y1 = y0 - glyph->height();
-            float s1 = glyph->bottomRight().x;
-            float t1 = glyph->bottomRight().y;
-            float outlineS1 = glyph->outlineBottomRight().x;
-            float outlineT1 = glyph->outlineBottomRight().y;
+            float x1 = x0 + glyph->width;
+            float y1 = y0 - glyph->height;
+            float s1 = glyph->bottomRight.x;
+            float t1 = glyph->bottomRight.y;
+            float outlineS1 = glyph->outlineBottomRight.x;
+            float outlineT1 = glyph->outlineBottomRight.y;
 
             glm::vec3 p0 = glm::vec3(0.0);
             glm::vec3 p1 = glm::vec3(0.0);
@@ -664,7 +629,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 heightInPixels > _framebufferSize.x ||
                 heightInPixels > _framebufferSize.y)
             {
-                return { size, static_cast<int>(lines.size()) };
+                return { size, static_cast<int>(lines) };
             }
 
             if (heightInPixels > labelInfo.maxSize) {
@@ -693,30 +658,30 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 }
             }
 
-            vertices.insert(vertices.end(), {
+            _vertexBuffer.insert(_vertexBuffer.end(), {
                 p0.x, p0.y, p0.z, s0, t0, outlineS0, outlineT0,
                 p1.x, p1.y, p1.z, s0, t1, outlineS0, outlineT1,
                 p2.x, p2.y, p2.z, s1, t1, outlineS1, outlineT1,
                 p3.x, p3.y, p3.z, s1, t0, outlineS1, outlineT0
             });
 
-            indices.insert(indices.end(), {
-                vertexIndex, vertexIndex + 1, vertexIndex + 2,
-                vertexIndex, vertexIndex + 2, vertexIndex + 3
-            });
+            const unsigned short vi = vertexIndex;
+            const unsigned short vi1 = vertexIndex + 1;
+            const unsigned short vi2 = vertexIndex + 2;
+            const unsigned short vi3 = vertexIndex + 3;
+            _indexBuffer.insert(_indexBuffer.end(), { vi, vi1, vi2, vi, vi2, vi3 });
             vertexIndex += 4;
 
-            movingPos.x += glyph->horizontalAdvance();
+            movingPos.x += glyph->horizontalAdvance;
 
-            width += glyph->horizontalAdvance();
-            height = std::max(height, static_cast<float>(glyph->height()));
+            width += glyph->horizontalAdvance;
+            height = std::max(height, static_cast<float>(glyph->height));
         } // end of a line
 
         size.x = std::max(size.x, width);
-        size.y += height;
         movingPos.y -= h;
-    }
-    size.y = (lines.size() - 1) * font.height();
+    } while (!text.empty());
+    size.y = (lines - 1) * font.height();
 
     if (!labelInfo.enableDepth) {
         glDisable(GL_DEPTH_TEST);
@@ -728,7 +693,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     opengl::TextureUnit atlasUnit;
     atlasUnit.activate();
-    font.atlas().texture().bind();
+    font.atlasTexture().bind();
 
     _program->setUniform(_uniformCacheProjection.baseColor, color);
     _program->setUniform(_uniformCacheProjection.outlineColor, outlineColor);
@@ -753,16 +718,16 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBufferData(
         GL_ARRAY_BUFFER,
-        vertices.size() * sizeof(float),
-        vertices.data(),
+        _vertexBuffer.size() * sizeof(float),
+        _vertexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
-        indices.size() * sizeof(GLuint),
-        indices.data(),
+        _indexBuffer.size() * sizeof(GLushort),
+        _indexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
@@ -783,8 +748,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     glDrawElements(
         GL_TRIANGLES,
-        static_cast<GLsizei>(indices.size()),
-        GL_UNSIGNED_INT,
+        static_cast<GLsizei>(_indexBuffer.size()),
+        GL_UNSIGNED_SHORT,
         nullptr
     );
 
@@ -795,40 +760,28 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         glEnable(GL_DEPTH_TEST);
     }
 
-    return { size, static_cast<int>(lines.size()) };
+    return { size, static_cast<int>(lines) };
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec3& pos,
-                                                          const std::string& text,
+                                                          std::string_view text,
                                                           const glm::vec4& color,
                                               const ProjectedLabelsInformation& labelInfo,
                                                             const glm::vec2& offset) const
 {
-    return render(
-        font,
-        pos,
-        text,
-        color,
-        { 0.f, 0.f, 0.f, color.a },
-        labelInfo,
-        offset
-    );
+    const glm::vec4 outlineColor = glm::vec4(0.f, 0.f, 0.f, color.a);
+    return render(font, pos, text, color, outlineColor, labelInfo, offset);
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           const glm::vec3& pos,
-                                                          const std::string& text,
+                                                          std::string_view text,
                                         const ProjectedLabelsInformation& labelInfo) const
 {
-    return render(
-        font,
-        pos,
-        text,
-        { 1.f, 1.f, 1.f, 1.f },
-        { 0.f, 0.f, 0.f, 1.f },
-        labelInfo
-    );
+    constexpr const glm::vec4 color = glm::vec4(1.f, 1.f, 1.f, 1.f);
+    constexpr const glm::vec4 outlineColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
+    return render(font, pos, text, color, outlineColor, labelInfo);
 }
 
 void FontRenderer::setFramebufferSize(glm::vec2 framebufferSize) {
