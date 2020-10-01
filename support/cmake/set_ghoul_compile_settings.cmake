@@ -102,16 +102,10 @@ function (set_ghoul_compile_settings target)
             "/ZI"       # Edit and continue support
         )
     endif ()
-  elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    if (APPLE)
-      target_compile_options(${target} PRIVATE "-stdlib=libc++")
-    else ()
-      target_compile_options(${target} PRIVATE "-stdlib=libstdc++")
-      #target_compile_options(${target} PRIVATE "-stdlib=libc++" "-std=gnu++17")
-    endif ()
-
+  elseif (APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(
       ${target} PRIVATE
+      "-stdlib=libc++"
       "-Wall"
       "-Wextra"
       # "-Wpedantic"
@@ -191,8 +185,7 @@ function (set_ghoul_compile_settings target)
   elseif (LINUX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(
       ${target} PRIVATE
-      "-stdlib=libstdc++"
-      "-std=gnu++17"
+      "-stdlib=libc++"
       "-Wall"
       "-Wextra"
       # "-Wpedantic"
@@ -264,7 +257,7 @@ function (set_ghoul_compile_settings target)
       "-Wweak-template-vtables"
       "-Wzero-length-array"
     )
-
+    target_link_libraries(openspace-core PUBLIC "-lc++" "-lc++abi" "-lc++experimental")
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(${target} PRIVATE "-Werror")
     endif ()
