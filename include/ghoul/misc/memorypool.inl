@@ -28,10 +28,12 @@
 #include <numeric>
 
 #if defined(__APPLE__) || (defined(__linux__) && defined(__clang__))
-using namespace std::experimental;
+#include <experimental/memory_resource>
+namespace pmr = std::experimental::pmr;
 #else
-using namespace std;
-#endif
+#include <memory_resource>
+namespace pmr = std::pmr;
+#endif 
 
 namespace {
     constexpr const int DebugByte = 0x0F;

@@ -257,7 +257,9 @@ function (set_ghoul_compile_settings target)
       "-Wweak-template-vtables"
       "-Wzero-length-array"
     )
-    target_link_libraries(openspace-core PUBLIC "-lc++" "-lc++abi" "-lc++experimental")
+
+    target_link_libraries(${target} PUBLIC "c++" "c++abi" "c++experimental")
+
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(${target} PRIVATE "-Werror")
     endif ()

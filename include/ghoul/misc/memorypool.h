@@ -34,10 +34,10 @@
 
 #if defined(__APPLE__) || (defined(__linux__) && defined(__clang__))
 #include <experimental/memory_resource>
-using namespace std::experimental;
+namespace pmr = std::experimental::pmr;
 #else
 #include <memory_resource>
-using namespace std;
+namespace pmr = std::pmr;
 #endif
 
 #include <vector>
