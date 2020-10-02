@@ -236,6 +236,7 @@ if (GHOUL_MODULE_ASSIMP)
     set(GHOUL_LIBRARY_DIRS "${ASSIMP_LIBRARY_DIRS}" PARENT_SCOPE)
   else ()
     message(STATUS "Building assimp from source")
+    set(ASSIMP_BUILD_SHARED_LIBS OFF)
     set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
 
     # These importers produce errors due to missing entries in the config.h right now

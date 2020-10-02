@@ -182,7 +182,7 @@ function (set_ghoul_compile_settings target)
         target_compile_options(${target} PRIVATE "-Werror")
     endif ()
 
-  elseif (LINUX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  elseif (UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(
       ${target} PRIVATE
       "-stdlib=libc++"
@@ -257,9 +257,9 @@ function (set_ghoul_compile_settings target)
       "-Wweak-template-vtables"
       "-Wzero-length-array"
     )
-
-    target_link_libraries(${target} PUBLIC "c++" "c++abi" "c++experimental")
-
+    
+    target_link_libraries(${target} PRIVATE "c++" "c++abi")
+    
     if (GHOUL_WARNINGS_AS_ERRORS)
         target_compile_options(${target} PRIVATE "-Werror")
     endif ()
