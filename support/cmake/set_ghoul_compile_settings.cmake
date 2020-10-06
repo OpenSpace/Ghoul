@@ -186,6 +186,7 @@ function (set_ghoul_compile_settings target)
     target_compile_options(
       ${target} PRIVATE
       "-stdlib=libc++"
+      "-std=c++17"
       "-Wall"
       "-Wextra"
       # "-Wpedantic"
