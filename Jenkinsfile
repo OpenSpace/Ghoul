@@ -42,7 +42,7 @@ linux_gcc: {
         compileHelper.build(compileHelper.Ninja(), compileHelper.Gcc(), '', '', 'build-ninja');
     }
     stage('linux-gcc/test') {
-      testHelper.runUnitTests('build/tests/Debug/GhoulTest');
+      testHelper.runUnitTests('build-make/tests/GhoulTest');
     }
   } // node('linux')
 },
@@ -60,7 +60,7 @@ linux_clang: {
         compileHelper.build(compileHelper.Ninja(), compileHelper.Clang(), '', '', 'build-ninja');
     }
     stage('linux-clang/test') {
-      testHelper.runUnitTests('build/tests/Debug/GhoulTest');
+      testHelper.runUnitTests('build-make/tests/GhoulTest');
     }
   } // node('linux')
 },
@@ -81,7 +81,7 @@ windows: {
       }
       stage('windows/test') {
         // Currently, the unit tests are failing on Windows
-        testHelper.runUnitTests('build\\tests\\Debug\\GhoulTest')
+        testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
       }
     }
   } // node('windows')
@@ -100,7 +100,7 @@ macos: {
     }
     stage('macos/test') {
       // Currently, the unit tests are crashing on OS X
-      testHelper.runUnitTests('build/tests/Debug/GhoulTest')
+      testHelper.runUnitTests('build/tests/GhoulTest')
     }
   } // node('osx')
 }
