@@ -7,13 +7,13 @@ def branch = env.BRANCH_NAME;
 // Pipeline start
 //
 parallel master: {
-  node('master') {
-    stage('master/scm') {
+  node('tools') {
+    stage('tools/scm') {
       deleteDir();
       gitHelper.checkoutGit(url, branch);
       helper.createDirectory('build');
     }
-    stage('master/cppcheck/create') {
+    stage('tools/cppcheck/create') {
       sh(
         script: 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> build/cppcheck.xml',
         label: 'CPPCheck'
