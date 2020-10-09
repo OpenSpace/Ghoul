@@ -14,26 +14,52 @@ parallel master: {
       helper.createDirectory('build');
     }
     stage('master/cppcheck/create') {
-      sh 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> build/cppcheck.xml';
+      sh(
+        script: 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> build/cppcheck.xml',
+        label: 'CPPCheck'
+      )
+      recordIssues(
+        id: 'tools-cppcheck',
+        tool: cppCheck()
+      )
     }
-    stage('master/cloc/create') {
-      sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=build/cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
-    }
+    // stage('master/cloc/create') {
+    //   sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=build/cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
+    // }
   }
 },
-linux: {
-  node('linux') {
-    stage('linux/scm') {
+linux_gcc: {
+  node('linux' && 'gcc') {
+    stage('linux-gcc/scm') {
       deleteDir();
       gitHelper.checkoutGit(url, branch);
     }
-    stage('linux/build') {
-        compileHelper.build(compileHelper.Make(), compileHelper.Gcc(), '', '', 'build');
-    }
-    stage('linux/warnings') {
+    stage('linux-gcc/build(make)') {
+      compileHelper.build(compileHelper.Make(), compileHelper.Gcc(), '', '', 'build-make');
       compileHelper.recordCompileIssues(compileHelper.Gcc());
     }
-    stage('linux/test') {
+    stage('linux-gcc/build(ninja)') {
+        compileHelper.build(compileHelper.Ninja(), compileHelper.Gcc(), '', '', 'build-ninja');
+    }
+    stage('linux-gcc/test') {
+      testHelper.runUnitTests('build/GhoulTest');
+    }
+  } // node('linux')
+},
+linux_clang: {
+  node('linux' && 'clang') {
+    stage('linux-clang/scm') {
+      deleteDir();
+      gitHelper.checkoutGit(url, branch);
+    }
+    stage('linux-clang/build(make)') {
+      compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
+      compileHelper.recordCompileIssues(compileHelper.Clang());
+    }
+    stage('linux-clang/build(ninja)') {
+        compileHelper.build(compileHelper.Ninja(), compileHelper.Clang(), '', '', 'build-ninja');
+    }
+    stage('linux-clang/test') {
       testHelper.runUnitTests('build/GhoulTest');
     }
   } // node('linux')
@@ -46,11 +72,12 @@ windows: {
         deleteDir();
         gitHelper.checkoutGit(url, branch);
       }
-      stage('windows/build') {
-        compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio(), '', '', 'build');
-      }
-      stage('windows/warnings') {
+      stage('windows/build(msvc)') {
+        compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio(), '', '', 'build-msvc');
         compileHelper.recordCompileIssues(compileHelper.VisualStudio());
+      }
+      stage('windows/build(ninja)') {
+        compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-msvc');
       }
       stage('windows/test') {
         // Currently, the unit tests are failing on Windows
@@ -59,38 +86,21 @@ windows: {
     }
   } // node('windows')
 },
-osx: {
-  node('osx') {
-    stage('osx/scm') {
+macos: {
+  node('macos') {
+    stage('macos/scm') {
       deleteDir();
       gitHelper.checkoutGit(url, branch);
     }
-    stage('osx/build') {
-        compileHelper.build(compileHelper.Xcode(), compileHelper.Clang(), '', '', 'build');
+    stage('macos/build(make)') {
+        compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
     }
-    stage('osx/warnings') {
-      compileHelper.recordCompileIssues(compileHelper.Clang());
+    stage('macos/build(xcode)') {
+        compileHelper.build(compileHelper.Xcode(), compileHelper.Clang(), '', '', 'build-xcode');
     }
-    stage('osx/test') {
+    stage('macos/test') {
       // Currently, the unit tests are crashing on OS X
       // testHelper.runUnitTests('build/Debug/GhoulTest')
     }
   } // node('osx')
-}
-
-
-//
-// Post-build actions
-//
-
-node('master') {
-  stage('master/cppcheck/publish') {
-    publishCppcheck(pattern: 'build/cppcheck.xml');
-  }
-  stage('master/cloc/publish') {
-    sloccountPublish(encoding: '', pattern: 'build/cloc.xml');
-  }
-  stage('master/notifications') {
-    slackHelper.sendChangeSetSlackMessage(currentBuild);
-  }
 }
