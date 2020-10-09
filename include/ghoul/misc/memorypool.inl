@@ -27,6 +27,14 @@
 #include <algorithm>
 #include <numeric>
 
+#if defined(__APPLE__) || (defined(__linux__) && defined(__clang__))
+#include <experimental/memory_resource>
+namespace pmr = std::experimental::pmr;
+#else
+#include <memory_resource>
+namespace pmr = std::pmr;
+#endif 
+
 namespace {
     constexpr const int DebugByte = 0x0F;
     constexpr const int AlignmentByte = 0x1F;
@@ -186,7 +194,7 @@ void MemoryPool<BucketSize, InjectDebugMemory>::do_deallocate(void* p, std::size
 
 template <int BucketSize, bool InjectDebugMemory>
 bool MemoryPool<BucketSize, InjectDebugMemory>::do_is_equal(
-                                    const std::pmr::memory_resource& other) const noexcept
+                                    const pmr::memory_resource& other) const noexcept
 {
     return this == &other;
 }

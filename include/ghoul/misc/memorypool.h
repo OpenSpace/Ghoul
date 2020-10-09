@@ -31,19 +31,20 @@
 #include <cstddef>
 #include <cstring>
 #include <memory>
-#ifndef __APPLE__
-#include <memory_resource>
-#else
+
+#if defined(__APPLE__) || (defined(__linux__) && defined(__clang__))
 #include <experimental/memory_resource>
-namespace std {
-    using namespace experimental;
-} // namespace std
-#endif // __APPLE__
+namespace pmr = std::experimental::pmr;
+#else
+#include <memory_resource>
+namespace pmr = std::pmr;
+#endif
+
 #include <vector>
 
 namespace ghoul {
 
-class MemoryPoolBase : public std::pmr::memory_resource {
+class MemoryPoolBase : public pmr::memory_resource {
 public:
     virtual ~MemoryPoolBase() = default;
 
@@ -98,7 +99,7 @@ public:
 
     virtual void* do_allocate(std::size_t bytes, std::size_t alignment) final;
     virtual void do_deallocate(void* p, std::size_t bytes, std::size_t alignment) final;
-    virtual bool do_is_equal(const std::pmr::memory_resource& other) const noexcept final;
+    virtual bool do_is_equal(const pmr::memory_resource& other) const noexcept final;
 
     /// Returns the number of buckets that have been allocated
     int nBuckets() const;
