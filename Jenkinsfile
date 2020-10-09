@@ -6,11 +6,11 @@ def branch = env.BRANCH_NAME;
 //
 // Pipeline start
 //
-parallel master: {
+parallel tools: {
   node('tools') {
     stage('tools/scm') {
       deleteDir();
-      gitHelper.checkoutGit(url, branch);
+      gitHelper.checkoutGit(url, branch, false);
       helper.createDirectory('build');
     }
     stage('tools/cppcheck/create') {
