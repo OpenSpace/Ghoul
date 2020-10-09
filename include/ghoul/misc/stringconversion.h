@@ -55,7 +55,7 @@ constexpr T from_string(std::string_view string) {
 template <typename T>
 std::string to_string(const T& value) {
     // std::string does not define the identity transformation so we have to handle that
-  if constexpr (std::is_same<T, std::string>::value) {
+  if constexpr (std::is_same_v<T, std::string>) {
         return value;
     }
     else {
