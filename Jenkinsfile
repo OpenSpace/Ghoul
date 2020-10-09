@@ -96,7 +96,7 @@ macos: {
         compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
     }
     stage('macos/build(xcode)') {
-        compileHelper.build(compileHelper.Xcode(), compileHelper.Clang(), '', '', 'build-xcode');
+        compileHelper.build(compileHelper.Xcode(), compileHelper.Xcode(), '', '', 'build-xcode');
     }
     stage('macos/test') {
       // Currently, the unit tests are crashing on OS X
