@@ -42,7 +42,7 @@ linux_gcc: {
         compileHelper.build(compileHelper.Ninja(), compileHelper.Gcc(), '', '', 'build-ninja');
     }
     stage('linux-gcc/test') {
-      testHelper.runUnitTests('build/GhoulTest');
+      // testHelper.runUnitTests('build-make/tests/GhoulTest');
     }
   } // node('linux')
 },
@@ -60,7 +60,7 @@ linux_clang: {
         compileHelper.build(compileHelper.Ninja(), compileHelper.Clang(), '', '', 'build-ninja');
     }
     stage('linux-clang/test') {
-      testHelper.runUnitTests('build/GhoulTest');
+      // testHelper.runUnitTests('build-make/tests/GhoulTest');
     }
   } // node('linux')
 },
@@ -77,11 +77,11 @@ windows: {
         compileHelper.recordCompileIssues(compileHelper.VisualStudio());
       }
       stage('windows/build(ninja)') {
-        compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-msvc');
+        compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-ninja');
       }
       stage('windows/test') {
         // Currently, the unit tests are failing on Windows
-        // testHelper.runUnitTests('build\\Debug\\GhoulTest')
+        // testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
       }
     }
   } // node('windows')
@@ -96,11 +96,11 @@ macos: {
         compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
     }
     stage('macos/build(xcode)') {
-        compileHelper.build(compileHelper.Xcode(), compileHelper.Clang(), '', '', 'build-xcode');
+        compileHelper.build(compileHelper.Xcode(), compileHelper.Xcode(), '', '', 'build-xcode');
     }
     stage('macos/test') {
       // Currently, the unit tests are crashing on OS X
-      // testHelper.runUnitTests('build/Debug/GhoulTest')
+      // testHelper.runUnitTests('build/tests/GhoulTest')
     }
   } // node('osx')
 }
