@@ -402,6 +402,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             if (character == wchar_t('\t')) {
                 character = wchar_t(' ');
             }
+            if (character == wchar_t('\0')) {
+                continue;
+            }
 
             const Font::Glyph* glyph;
             try {
