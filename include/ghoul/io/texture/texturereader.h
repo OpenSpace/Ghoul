@@ -53,6 +53,14 @@ public:
         const std::string file;
     };
 
+    /// Exception that gets thrown when an invalid load result occurs
+    struct InvalidLoadException : public RuntimeError {
+        explicit InvalidLoadException(void* memory, size_t size);
+
+        const void* _memory;
+        const size_t _size;
+    };
+
     /**
      * Returns the static variant of the TextureReader.
      *

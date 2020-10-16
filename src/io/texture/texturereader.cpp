@@ -44,6 +44,15 @@ TextureReader::MissingReaderException::MissingReaderException(std::string extens
     , file(std::move(f))
 {}
 
+TextureReader::InvalidLoadException::InvalidLoadException(void* memory, size_t size)
+    : RuntimeError(fmt::format("Error loading texture at location {} with size {}",
+        memory,
+        size
+    ), "IO")
+    , _memory(memory)
+    , _size(size)
+{}
+
 TextureReader& TextureReader::ref() {
     static TextureReader textureReader;
     return textureReader;
@@ -73,7 +82,12 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t
     ghoul_assert(!_readers.empty(), "No readers were registered before");
 
     TextureReaderBase* reader = readerForExtension(format);
-    return reader->loadTexture(memory, size);
+    if (reader) {
+        return reader->loadTexture(memory, size);
+    }
+    else {
+        throw InvalidLoadException(memory, size);
+    }
 }
 
 std::vector<std::string> TextureReader::supportedExtensions() {
