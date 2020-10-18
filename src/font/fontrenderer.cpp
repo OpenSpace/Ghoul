@@ -194,7 +194,7 @@ namespace {
         }
 
         std::string_view res = view.substr(0, p);
-        view = view.substr(p + 2);
+        view = view.substr(p + 1);
         return res;
     }
 

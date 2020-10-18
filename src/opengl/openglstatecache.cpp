@@ -70,7 +70,7 @@ void OpenGLStateCache::loadCurrentGLState() {
     // Depth
     glGetFloatv(GL_DEPTH_CLEAR_VALUE, &_depth.clearValue);
     _depth.testEnabled = glIsEnabled(GL_DEPTH_TEST);
-    _depth.maskEnabled = glIsEnabled(GL_DEPTH_WRITEMASK);
+    glGetBooleanv(GL_DEPTH_WRITEMASK, &_depth.maskEnabled);
     glGetIntegerv(GL_DEPTH_FUNC, &_depth.function);
 
     // Blending
@@ -150,10 +150,10 @@ void OpenGLStateCache::resetDepthState() const {
     }
 
     if (_depth.maskEnabled) {
-        glDepthMask(false);
+        glDepthMask(GL_TRUE);
     }
     else {
-        glDepthMask(true);
+        glDepthMask(GL_FALSE);
     }
 
     glClearDepth(_depth.clearValue);
