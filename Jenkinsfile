@@ -26,6 +26,7 @@ parallel tools: {
     // stage('master/cloc/create') {
     //   sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=build/cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
     // }
+    cleanWs()
   }
 },
 linux_gcc: {
@@ -44,6 +45,7 @@ linux_gcc: {
     stage('linux-gcc/test') {
       // testHelper.runUnitTests('build-make/tests/GhoulTest');
     }
+    cleanWs()
   } // node('linux')
 },
 linux_clang: {
@@ -62,6 +64,7 @@ linux_clang: {
     stage('linux-clang/test') {
       // testHelper.runUnitTests('build-make/tests/GhoulTest');
     }
+    cleanWs()
   } // node('linux')
 },
 windows: {
@@ -84,6 +87,7 @@ windows: {
         // testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
       }
     }
+    cleanWs()
   } // node('windows')
 },
 macos: {
@@ -102,5 +106,6 @@ macos: {
       // Currently, the unit tests are crashing on OS X
       // testHelper.runUnitTests('build/tests/GhoulTest')
     }
+    cleanWs()
   } // node('osx')
 }
