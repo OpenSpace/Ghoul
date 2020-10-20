@@ -23,63 +23,35 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MODELREADERBASE___H__
-#define __GHOUL___MODELREADERBASE___H__
+#ifndef __GHOUL___MODELGEOMETRY___H__
+#define __GHOUL___MODELGEOMETRY___H__
 
-#include <ghoul/io/model/modelgeometry.h>
-#include <ghoul/misc/exception.h>
+#include <ghoul/io/model/modelmesh.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <memory>
-#include <string>
 
-namespace ghoul::modelgeometry { class ModelGeometry; }
+namespace ghoul::opengl { class ProgramObject; }
 
-namespace ghoul::io {
+namespace ghoul::modelgeometry {
 
-/**
- * Concrete instantiations of this abstract base class provide the ability to load
- * geometric models from a file on disk into a ModelGeometry.
- * A valid OpenGL context has to be present for the loadModel function.
- */
-class ModelReaderBase {
+class ModelGeometry {
 public:
-    /// The exception that gets thrown if there was an error loading the Model
-    struct ModelLoadException : public RuntimeError {
-        explicit ModelLoadException(std::string name, std::string msg,
-            const ModelReaderBase* r);
+    ModelGeometry(std::vector<ghoul::io::ModelMesh>&& meshes);
+    virtual ~ModelGeometry() = default;
 
-        /// The file that caused the exception to be thrown
-        const std::string filename;
+    bool initialize(float& maximumDistanceSquared);
+    void deinitialize();
+    void render(ghoul::opengl::ProgramObject& program);
 
-        /// The error message that occurred
-        const std::string message;
+    void changeRenderMode(const GLenum mode);
+    double boundingRadius() const;
+    void setUniforms(ghoul::opengl::ProgramObject& program);
 
-        /// The ModelReaderBase that caused the exception
-        const ModelReaderBase* reader;
-    };
-
-    /// Default virtual destructor
-    virtual ~ModelReaderBase() = default;
-
-    /**
-     * The method loading the specific model from disk. The result is a ModelGeometry
-     *
-     * \param filename The file on disk that is to be loaded
-     * \return The ModelGeometry
-     *
-     * \throw ModelLoadException If there was an error loading the model from disk
-     */
-    virtual std::unique_ptr<ghoul::modelgeometry::ModelGeometry> loadModel(
-        const std::string& filename) const = 0;
-
-    /**
-     * Returns a list of all extensions.
-     *
-     * \return The supported file extensions.
-     */
-    virtual std::vector<std::string> supportedExtensions() const = 0;
+protected:
+    double _boundingRadius = 0.0;
+    std::vector<ghoul::io::ModelMesh> _meshes;
 };
 
-} // namespace ghoul::io
+}  // namespace ghoul::modelgeometry
 
-#endif // __GHOUL___MODELREADERBASE___H__
+#endif // __GHOUL___MODELGEOMETRY___H__

@@ -29,11 +29,12 @@
 
 namespace ghoul::io {
 
-ModelReaderBase::ModelReaderException::ModelReaderException(std::string file,
-                                                            std::string error)
-    : RuntimeError(fmt::format("Error reading model '{}': {}", file, error), "IO")
-    , fileName(std::move(file))
-    , errorMessage(std::move(error))
+ModelReaderBase::ModelLoadException::ModelLoadException(std::string name, std::string msg,
+                                                        const ModelReaderBase* r)
+    : RuntimeError(fmt::format("Error loading model '{}'", name), "ModelLoader")
+    , filename(std::move(name))
+    , message(std::move(msg))
+    , reader(r)
 {}
 
 } // namespace ghoul::io

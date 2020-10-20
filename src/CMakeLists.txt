@@ -30,6 +30,9 @@ set(GHOUL_SOURCE
   ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.linux.cpp
   ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.osx.cpp
   ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.windows.cpp
+  ${PROJECT_SOURCE_DIR}/src/io/model/modelgeometry.cpp
+  ${PROJECT_SOURCE_DIR}/src/io/model/modelmesh.cpp
+  ${PROJECT_SOURCE_DIR}/src/io/model/modelreader.cpp
   ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderbase.cpp
   ${PROJECT_SOURCE_DIR}/src/io/socket/socket.cpp
   ${PROJECT_SOURCE_DIR}/src/io/socket/tcpsocket.cpp
@@ -68,7 +71,7 @@ set(GHOUL_SOURCE
 
 if (GHOUL_MODULE_ASSIMP)
   set(GHOUL_SOURCE ${GHOUL_SOURCE}
-    ${PROJECT_SOURCE_DIR}/src/io/model/modelreadermultiformat.cpp
+    ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderassimp.cpp
   )
 endif ()
 
@@ -92,7 +95,6 @@ endif ()
 
 if (GHOUL_MODULE_LUA)
   set(GHOUL_SOURCE ${GHOUL_SOURCE}
-    ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderlua.cpp
     ${PROJECT_SOURCE_DIR}/src/lua/lua_helper.cpp
     ${PROJECT_SOURCE_DIR}/src/lua/luastate.cpp
   )
@@ -148,6 +150,9 @@ set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/directory.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/file.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelgeometry.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelmesh.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreader.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socket.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socketserver.h
@@ -213,7 +218,7 @@ set(GHOUL_HEADER
 
 if (GHOUL_MODULE_ASSIMP)
   set(GHOUL_HEADER ${GHOUL_HEADER}
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreadermultiformat.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderassimp.h
   )
 endif ()
 
@@ -240,7 +245,6 @@ endif ()
 
 if (GHOUL_MODULE_LUA)
   set(GHOUL_HEADER ${GHOUL_HEADER}
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderlua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/ghoul_lua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.inl

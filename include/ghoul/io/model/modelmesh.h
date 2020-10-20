@@ -23,37 +23,43 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MODELREADERWAVEFRONT___H__
-#define __GHOUL___MODELREADERWAVEFRONT___H__
+#ifndef __GHOUL___MODELMESH___H__
+#define __GHOUL___MODELMESH___H__
 
-#include <ghoul/io/model/modelreaderbase.h>
+#include <ghoul/opengl/ghoul_gl.h>
+
+#include <vector>
+
+namespace ghoul::opengl { class ProgramObject; }
 
 namespace ghoul::io {
 
-/**
- * This model reader loads the provided file using the TinyObjLoader library. This simple
- * method loads multiple shapes, but does not work on the materials described in the OBJ
- * file.
- * \sa https://github.com/syoyo/tinyobjloader
- */
-class ModelReaderWavefront : public ModelReaderBase {
+class ModelMesh {
 public:
-    /**
-     * Loads the OBJ file pointed to by \p filename and returns a constructed
-     * VertexBufferObject from it. Provided materials are ignored and all shapes are
-     * collapsed into one VertexBufferObject.
-     *
-     * \param filename The OBJ file to be loaded
-     * \return The initialized VertexBufferObject containing the model or models
-     *
-     * \throw ModelReaderException If there was an error reading the model from
-     *        \p filename
-     * \pre \p filename must not be empty
-     */
-    std::unique_ptr<opengl::VertexBufferObject> loadModel(
-        const std::string& filename) const;
+    struct Vertex {
+        GLfloat location[4];
+        GLfloat tex[2];
+        GLfloat normal[3];
+    };
+
+    ModelMesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices);
+
+    bool initialize(float& maximumDistanceSquared);
+    void deinitialize();
+    void render(ghoul::opengl::ProgramObject& program);
+
+    void changeRenderMode(const GLenum mode);
+
+    std::vector<Vertex> _vertices;
+    std::vector<unsigned int> _indices;
+
+private:
+    GLuint _vaoID = 0;
+    GLuint _vbo = 0;
+    GLuint _ibo = 0;
+    GLenum _mode = GL_TRIANGLES;
 };
 
 } // namespace ghoul::io
 
-#endif // __GHOUL___MODELREADERWAVEFRONT___H__
+#endif // __GHOUL___MODELMESH___H__
