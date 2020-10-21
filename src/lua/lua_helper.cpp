@@ -304,6 +304,11 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
 
     int location = luaAbsoluteLocation(state, relativeLocation);
 
+    const int size = lua_gettop(state);
+    if (size == 0) {
+        throw LuaFormatException("Tried to load Dictionary from empty state");
+    }
+
     lua_pushnil(state);
     while (lua_next(state, location) != 0) {
         // get the key

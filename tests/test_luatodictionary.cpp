@@ -27,10 +27,89 @@
 
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/lua/lua_helper.h>
+#include <ghoul/lua/luastate.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/glm.h>
 #include <fstream>
 #include <sstream>
+#include <iostream>
+
+TEST_CASE("LuaToDictionary: Nested Tables", "[luatodictionary]") {
+    constexpr const char* TestString = R"(
+        glob = {
+            A = {
+                B = {
+                    C = {
+                        D = {
+                            E = { 
+                                F = { "127.0.0.1", "localhost" },
+                                G = {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+)";
+
+    ghoul::lua::LuaState state(ghoul::lua::LuaState::IncludeStandardLibrary::No);
+    ghoul::lua::runScript(state, TestString);
+    //ghoul::lua::runScriptFile(state, "C:/Users/alebo68/Desktop/test.lua");
+
+    lua_getglobal(state, "glob");
+
+    std::cout <<  ghoul::lua::stackInformation(state) << '\n';
+
+
+    ghoul::Dictionary dict;
+    ghoul::lua::luaDictionaryFromState(state, dict);
+
+    REQUIRE(dict.hasKeyAndValue<ghoul::Dictionary>("A"));
+    ghoul::Dictionary a = dict.value<ghoul::Dictionary>("A");
+
+    REQUIRE(a.hasKeyAndValue<ghoul::Dictionary>("B"));
+    ghoul::Dictionary b = a.value<ghoul::Dictionary>("B");
+
+    REQUIRE(b.hasKeyAndValue<ghoul::Dictionary>("C"));
+    ghoul::Dictionary c = b.value<ghoul::Dictionary>("C");
+
+    REQUIRE(c.hasKeyAndValue<ghoul::Dictionary>("D"));
+    ghoul::Dictionary d = c.value<ghoul::Dictionary>("D");
+
+    REQUIRE(d.hasKeyAndValue<ghoul::Dictionary>("E"));
+    ghoul::Dictionary e = d.value<ghoul::Dictionary>("E");
+
+    REQUIRE(e.hasKeyAndValue<ghoul::Dictionary>("F"));
+    ghoul::Dictionary f = e.value<ghoul::Dictionary>("F");
+
+    REQUIRE(f.hasKeyAndValue<std::string>("1"));
+    REQUIRE(f.hasKeyAndValue<std::string>("2"));
+}
+
+TEST_CASE("LuaToDictionary: Nested Tables 2", "[luatodictionary]") {
+    constexpr const char* TestString = R"(
+        ModuleConfigurations = {
+            Server = {
+                Interfaces = {
+                    {
+                        RequirePasswordAddresses = {}
+                    },
+                    {
+                        RequirePasswordAddresses = {}
+                    }
+                }
+            }
+        }
+)";
+
+    ghoul::lua::LuaState state(ghoul::lua::LuaState::IncludeStandardLibrary::No);
+    ghoul::lua::runScript(state, TestString);
+
+    lua_getglobal(state, "ModuleConfigurations");
+    ghoul::Dictionary d = ghoul::lua::value<ghoul::Dictionary>(state);
+    REQUIRE(d.hasKeyAndValue<ghoul::Dictionary>("Server"));
+}
+
 
 // @TODO (abock, 2020-01-06) None of these tests really work anymore and there is an open
 // issue to rewrite the Dictionary class, so there is no much reason to make these work
