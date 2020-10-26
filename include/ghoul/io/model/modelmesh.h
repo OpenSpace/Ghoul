@@ -27,7 +27,8 @@
 #define __GHOUL___MODELMESH___H__
 
 #include <ghoul/opengl/ghoul_gl.h>
-
+#include <ghoul/opengl/texture.h>
+#include <ghoul/glm.h>
 #include <vector>
 
 namespace ghoul::opengl { class ProgramObject; }
@@ -36,13 +37,27 @@ namespace ghoul::io {
 
 class ModelMesh {
 public:
+
     struct Vertex {
         GLfloat location[4];
         GLfloat tex[2];
         GLfloat normal[3];
+        GLfloat tangent[3];
     };
 
-    ModelMesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices);
+    struct Texture {
+        std::unique_ptr<ghoul::opengl::Texture> texture;
+        std::string type;
+        bool hasTexture = false;
+        bool useForcedColor = false;
+        glm::vec3 color;
+    };
+
+    ModelMesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices,
+        std::vector<Texture>&& textures);
+
+    ModelMesh(ModelMesh&&) noexcept = default;
+    ~ModelMesh() noexcept = default;
 
     bool initialize(float& maximumDistanceSquared);
     void deinitialize();
@@ -52,6 +67,7 @@ public:
 
     std::vector<Vertex> _vertices;
     std::vector<unsigned int> _indices;
+    std::vector<Texture> _textures;
 
 private:
     GLuint _vaoID = 0;

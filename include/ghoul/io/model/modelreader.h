@@ -65,6 +65,8 @@ public:
      * ModelReaderBase is determined by the extension of the \p filename.
      *
      * \param filename The name of the file which should be loaded into a ModelGeometry
+     * \param forceRenderInvisible Force invisible meshes to render or not
+     * \param notifyInvisibleDropped Notify in log if invisible meshses were dropped
      *
      * \throw ModelLoadException If there was an error reading the \p filename
      * \throw MissingReaderException If there was no reader for the specified \p filename
@@ -73,7 +75,8 @@ public:
      * \pre At least one ModelReaderBase must have been added to the ModelReader
      *      before (addReader)
      */
-    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(const std::string& filename);
+    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(const std::string& filename,
+        const bool forceRenderInvisible = false, const bool notifyInvisibleDropped = true);
 
     /**
      * Returns a list of all the extensions that are supported by registered readers. If

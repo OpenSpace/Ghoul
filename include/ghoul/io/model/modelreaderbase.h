@@ -65,12 +65,15 @@ public:
      * The method loading the specific model from disk. The result is a ModelGeometry
      *
      * \param filename The file on disk that is to be loaded
+     * \param forceRenderInvisible Force invisible meshes to render or not
+     * \param notifyInvisibleDropped Notify in log if invisible meshses were dropped
      * \return The ModelGeometry
      *
      * \throw ModelLoadException If there was an error loading the model from disk
      */
     virtual std::unique_ptr<ghoul::modelgeometry::ModelGeometry> loadModel(
-        const std::string& filename) const = 0;
+        const std::string& filename, const bool forceRenderInvisible = false,
+        const bool notifyInvisibleDropped = true) const = 0;
 
     /**
      * Returns a list of all extensions.

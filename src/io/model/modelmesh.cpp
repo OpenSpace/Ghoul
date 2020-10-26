@@ -34,13 +34,70 @@
 namespace ghoul::io {
 
 
-ModelMesh::ModelMesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices)
-    : _vertices(std::move(vertices)), _indices(std::move(indices))
-{
-
-}
+ModelMesh::ModelMesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices,
+                     std::vector<Texture>&& textures)
+    : _vertices(std::move(vertices))
+    , _indices(std::move(indices))
+    , _textures(std::move(textures))
+{ }
 
 void ModelMesh::render(ghoul::opengl::ProgramObject& program) {
+
+    // Bind appropriate textures
+    unsigned int diffuseNr = 1;
+    unsigned int specularNr = 1;
+    unsigned int normalNr = 1;
+    unsigned int textureCounter = 0;
+    for (unsigned int i = 0; i < _textures.size(); i++)
+    {
+        std::string name = _textures[i].type;
+
+        // Tell shader wether to render invisible mesh with flasy color or not
+        program.setUniform("use_forced_color", _textures[i].useForcedColor);
+        if (_textures[i].useForcedColor) {
+            continue;
+        }
+
+        // Use textures
+        if (_textures[i].hasTexture) {
+            // Active proper texture unit before binding
+            glActiveTexture(GL_TEXTURE0 + textureCounter);
+
+            // Retrieve texture number
+            std::string number;
+            if (name == "texture_diffuse")
+                number = std::to_string(diffuseNr++);
+            else if (name == "texture_specular") {
+                number = std::to_string(specularNr++);
+                program.setUniform("has_color_specular", false);
+            }
+            else if (name == "texture_normal")
+                number = std::to_string(normalNr++);
+            // Only support diffuse, specular and normal at the moment
+            else
+                continue;
+
+            // Tell shader to use textures and set texture unit
+            program.setUniform(("has_" + name).c_str(), true);
+            program.setUniform((name + number).c_str(), textureCounter);
+
+            // And finally bind the texture
+            _textures[i].texture->bind();
+            ++textureCounter;
+        }
+        // Use embedded simple colors instead of textures
+        else {
+            if (name == "color_diffuse")
+                program.setUniform("has_texture_diffuse", false);
+            else if (name == "color_specular") {
+                program.setUniform("has_texture_specular", false);
+                program.setUniform(("has_" + name).c_str(), true);
+            }
+
+            // Set the color in shader
+            program.setUniform(name.c_str(), _textures[i].color);
+        }
+    }
 
     // Render the mesh object
     glBindVertexArray(_vaoID);
@@ -51,6 +108,9 @@ void ModelMesh::render(ghoul::opengl::ProgramObject& program) {
         nullptr
     );
     glBindVertexArray(0);
+
+    // Set everything to default once configured
+    glActiveTexture(GL_TEXTURE0);
 }
 
 void ModelMesh::changeRenderMode(const GLenum mode) {
@@ -84,10 +144,21 @@ bool ModelMesh::initialize(float& maximumDistanceSquared) {
         GL_STATIC_DRAW
     );
 
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        _indices.size() * sizeof(unsigned int),
+        &_indices[0],
+        GL_STATIC_DRAW
+    );
+
+    // Set vertex attributes pointers
+    // Vertex position
     glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
+
+    // Vertex texture coordinates
+    glEnableVertexAttribArray(1);
     glVertexAttribPointer(
         1,
         2,
@@ -96,6 +167,9 @@ bool ModelMesh::initialize(float& maximumDistanceSquared) {
         sizeof(Vertex),
         reinterpret_cast<const GLvoid*>(offsetof(Vertex, tex)) // NOLINT
     );
+
+    // Vertex normals
+    glEnableVertexAttribArray(2);
     glVertexAttribPointer(
         2,
         3,
@@ -105,15 +179,29 @@ bool ModelMesh::initialize(float& maximumDistanceSquared) {
         reinterpret_cast<const GLvoid*>(offsetof(Vertex, normal)) // NOLINT
     );
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
-    glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER,
-        _indices.size() * sizeof(unsigned int),
-        &_indices[0],
-        GL_STATIC_DRAW
+    // Vertex tangent (for normal mapping)
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(
+        3,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(Vertex),
+        reinterpret_cast<const GLvoid*>(offsetof(Vertex, tangent)) // NOLINT
     );
 
     glBindVertexArray(0);
+
+    // initialize textures
+    for (unsigned int i = 0; i < _textures.size(); ++i) {
+        if (_textures[i].hasTexture) {
+            _textures[i].texture->uploadTexture();
+            _textures[i].texture->setFilter(
+                ghoul::opengl::Texture::FilterMode::AnisotropicMipMap
+            );
+            _textures[i].texture->purgeFromRAM();
+        }
+    }
 
     return true;
 }

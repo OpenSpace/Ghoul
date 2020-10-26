@@ -50,7 +50,8 @@ ModelReader& ModelReader::ref() {
 }
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
-                                                             const std::string& filename) 
+                            const std::string& filename, const bool forceRenderInvisible,
+                            const bool notifyInvisibleDropped)
 {
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
@@ -60,7 +61,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
 
     ModelReaderBase* reader = readerForExtension(extension);
     if (reader) {
-        return reader->loadModel(filename);
+        return reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
     }
     else {
         throw MissingReaderException(extension, filename);

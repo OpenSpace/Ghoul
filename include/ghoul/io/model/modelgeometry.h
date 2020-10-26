@@ -37,7 +37,8 @@ namespace ghoul::modelgeometry {
 class ModelGeometry {
 public:
     ModelGeometry(std::vector<ghoul::io::ModelMesh>&& meshes);
-    virtual ~ModelGeometry() = default;
+    ModelGeometry(ModelGeometry&&) noexcept = default;
+    ~ModelGeometry() noexcept = default;
 
     bool initialize(float& maximumDistanceSquared);
     void deinitialize();

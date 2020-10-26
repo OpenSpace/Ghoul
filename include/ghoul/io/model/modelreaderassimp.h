@@ -68,6 +68,8 @@ public:
      * and returns a constructed ModelGeometry from it. 
      *
      * \param filename The geometric model file to be loaded
+     * \param forceRenderInvisible Force invisible meshes to render or not
+     * \param notifyInvisibleDropped Notify in log if invisible meshses were dropped
      * \return The ModelGeometry containing the model
      *
      * \throw ModelReaderException If there was an error reading the model from
@@ -75,7 +77,8 @@ public:
      * \pre \p filename must not be empty
      */
     std::unique_ptr<modelgeometry::ModelGeometry> loadModel(
-        const std::string& filename) const override;
+        const std::string& filename, const bool forceRenderInvisible = false,
+        const bool notifyInvisibleDropped = true) const override;
 
     /**
      * Returns a list of all extensions that this ModelReaderAssimp supports.
