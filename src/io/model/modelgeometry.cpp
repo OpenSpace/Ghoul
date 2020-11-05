@@ -45,6 +45,25 @@ double ModelGeometry::boundingRadius() const {
     return _boundingRadius;
 }
 
+void ModelGeometry::calculateBoundingRadius() {
+    float maximumDistanceSquared = 0.f;
+
+    for (unsigned int i = 0; i < _meshes.size(); ++i) {
+        for (const ghoul::io::ModelMesh::Vertex& v : _meshes[i]._vertices) {
+            maximumDistanceSquared = glm::max(
+                glm::pow(v.location[0], 2.f) +
+                glm::pow(v.location[1], 2.f) +
+                glm::pow(v.location[2], 2.f), maximumDistanceSquared
+            );
+        }
+    }
+    _boundingRadius = maximumDistanceSquared;
+}
+
+std::vector<ghoul::io::ModelMesh>& ModelGeometry::meshes() {
+    return _meshes;
+}
+
 void ModelGeometry::render(ghoul::opengl::ProgramObject& program) {
     for (int i = 0; i < _meshes.size(); ++i) {
         _meshes[i].render(program);

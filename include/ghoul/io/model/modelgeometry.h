@@ -46,6 +46,8 @@ public:
 
     void changeRenderMode(const GLenum mode);
     double boundingRadius() const;
+    void calculateBoundingRadius();
+    std::vector<ghoul::io::ModelMesh>& meshes();
     void setUniforms(ghoul::opengl::ProgramObject& program);
 
 protected:
