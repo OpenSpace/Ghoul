@@ -450,13 +450,13 @@ void runScriptFile(lua_State* state, const std::string& filename) {
     int status = luaL_loadfile(state, filename.c_str());
     if (status != LUA_OK) {
         std::string error = lua_tostring(state, -1);
-        throw LuaLoadingException(std::move(error));
+        throw LuaLoadingException(error);
     }
 
     status = lua_pcall(state, 0, LUA_MULTRET, 0);
     if (status != LUA_OK) {
         std::string error = lua_tostring(state, -1);
-        throw LuaExecutionException(std::move(error));
+        throw LuaExecutionException(error);
     }
 }
 
@@ -472,7 +472,8 @@ void runScript(lua_State* state, const std::string& script) {
 
     const int callStatus = lua_pcall(state, 0, LUA_MULTRET, 0);
     if (callStatus != LUA_OK) {
-        throw LuaExecutionException(lua_tostring(state, -1));
+        std::string error = lua_tostring(state, -1);
+        throw LuaExecutionException(error);
     }
 }
 
