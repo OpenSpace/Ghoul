@@ -419,7 +419,7 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                                     const std::string& geometryShaderPath,
                                       const std::string& tessellationEvaluationShaderPath,
                                          const std::string& tessellationControlShaderPath,
-                                                    Dictionary dictionary)
+                                                                    Dictionary dictionary)
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");
     ghoul_assert(
