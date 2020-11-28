@@ -92,7 +92,7 @@ public:
      *
      * \param args The arguments to the constructor of T
      *
-     * \tparam T The type of the object that is to be constructed 
+     * \tparam T The type of the object that is to be constructed
      */
     template <typename T, class... Types>
     T* alloc(Types&&... args);

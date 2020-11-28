@@ -33,7 +33,7 @@ namespace pmr = std::experimental::pmr;
 #else
 #include <memory_resource>
 namespace pmr = std::pmr;
-#endif 
+#endif
 
 namespace {
     constexpr const int DebugByte = 0x0F;
@@ -111,7 +111,7 @@ void* MemoryPool<BucketSize, InjectDebugMemory>::do_allocate(std::size_t bytes,
                                                              std::size_t alignment)
 {
     ZoneScoped
-        
+
     ghoul_assert(
         bytes <= BucketSize,
         "Cannot allocate larger memory blocks than available in a bucket"
@@ -151,7 +151,6 @@ void* MemoryPool<BucketSize, InjectDebugMemory>::do_allocate(std::size_t bytes,
     if (InjectDebugMemory) {
         std::memset(ptr, DebugByte, bytes);
     }
-    
     // Handle unaligned memory by padding to the next alignment boundary
     const size_t align = alignment - (bytes % alignment);
     if (align != alignment) {
@@ -176,7 +175,7 @@ void MemoryPool<BucketSize, InjectDebugMemory>::do_deallocate(void* p, std::size
                                                               std::size_t /*alignment*/)
 {
     ZoneScoped
-        
+
     for (const std::unique_ptr<Bucket>& b : _buckets) {
         const std::array<std::byte, BucketSize>& bp = b->payload;
         if (p >= bp.data() && p < (bp.data() + BucketSize)) {

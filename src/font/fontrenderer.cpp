@@ -385,7 +385,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         float outlineS;
         float outlineT;
     };
-    
+
     _vertexBuffer.clear();
     _indexBuffer.clear();
 

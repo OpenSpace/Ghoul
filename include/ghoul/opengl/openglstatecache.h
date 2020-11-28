@@ -41,7 +41,7 @@ namespace ghoul::opengl {
  */
 class OpenGLStateCache {
 public:
-    /* 
+    /*
      * Currently, this class is a Singleton. In the future we will enable multiple
      * instances of the class when working with multiple OpenGL contexts.
      */

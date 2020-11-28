@@ -209,7 +209,7 @@ public:
      * \pre \p factoryFunction must not be <code>nullptr</code>
      */
     void registerClass(std::string className,
-        std::function<BaseClass*(bool, const ghoul::Dictionary&, MemoryPoolBase* pool)> 
+        std::function<BaseClass*(bool, const ghoul::Dictionary&, MemoryPoolBase* pool)>
             factoryFunction);
 
     /**
