@@ -30,7 +30,7 @@ parallel tools: {
   }
 },
 linux_gcc: {
-  if (env.USE_BUILD_OS_LINUX) {
+  if (env.USE_BUILD_OS_LINUX == 'true') {
     node('linux' && 'gcc') {
       stage('linux-gcc/scm') {
         deleteDir();
@@ -51,7 +51,7 @@ linux_gcc: {
   }
 },
 linux_clang: {
-  if (env.USE_BUILD_OS_LINUX) {
+  if (env.USE_BUILD_OS_LINUX == 'true') {
     node('linux' && 'clang') {
       stage('linux-clang/scm') {
         deleteDir();
@@ -72,7 +72,7 @@ linux_clang: {
   }
 },
 windows: {
-  if (env.USE_BUILD_OS_WINDOWS) {
+  if (env.USE_BUILD_OS_WINDOWS == 'true') {
     node('windows') {
       // We specify the workspace directory manually to reduce the path length and thus try to avoid MSB3491 on Visual Studio
       ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}/${env.BUILD_ID}") {
@@ -97,7 +97,7 @@ windows: {
   }
 },
 macos: {
-  if (env.USE_BUILD_OS_MACOS) {
+  if (env.USE_BUILD_OS_MACOS == 'true') {
     node('macos') {
       stage('macos/scm') {
         deleteDir();
