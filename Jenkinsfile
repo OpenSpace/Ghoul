@@ -20,7 +20,7 @@ parallel tools: {
       )
       recordIssues(
         id: 'tools-cppcheck',
-        tool: cppCheck()
+        tool: cppCheck(pattern: 'build/cppcheck.xml')
       )
     }
     // stage('master/cloc/create') {
