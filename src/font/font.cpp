@@ -84,7 +84,7 @@ namespace {
 
         const int s = static_cast<int>(size * PointConversionFactor);
         const FT_Error e4 = FT_Set_Char_Size(face, s, 0, DPI, DPI);
-        handleError(e3, library, face, nullptr, name, size);
+        handleError(e4, library, face, nullptr, name, size);
     }
 
     // Extracts the next line from the string view and returns it, the passed string_view
