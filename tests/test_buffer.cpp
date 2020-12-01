@@ -69,7 +69,7 @@ TEST_CASE("Buffer: MixedTypes", "[buffer]") {
 
     REQUIRE(s1 == s2);
     REQUIRE(i1 == i2);
-    REQUIRE(d1 == d2);
+    REQUIRE(std::equal_to<>()(d1, d2));
     REQUIRE(u1 == u2);
 }
 

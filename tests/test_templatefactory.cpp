@@ -98,15 +98,6 @@ namespace {
 
     struct FunctionPointerClass : public BaseClass {};
     struct StdFunctionClass : public BaseClass {};
-
-    BaseClass* createFunctionPointerClass(bool useDictionary, const ghoul::Dictionary&) {
-        if (useDictionary) {
-            return new FunctionPointerClass;
-        }
-        else {
-            return nullptr;
-        }
-    }
 } // namespace
 
 TEST_CASE("TemplateFactory: Correctness Direct Subclass", "[templatefactory]") {

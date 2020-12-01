@@ -53,9 +53,6 @@ std::string_view nameForEasingFunction(EasingFunction func) {
 }
 
 EasingFunction easingFunctionFromName(std::string_view name) {
-    const auto it = std::find(EaseFuncNames.begin(), EaseFuncNames.end(), name);
-
-
     for (size_t i = 0; i < EaseFuncNames.size(); ++i) {
         if (EaseFuncNames[i] == name) {
             return EasingFunction(i);
