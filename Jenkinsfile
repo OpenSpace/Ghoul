@@ -36,12 +36,16 @@ linux_gcc: {
         deleteDir();
         gitHelper.checkoutGit(url, branch);
       }
-      stage('linux-gcc/build(make)') {
-        compileHelper.build(compileHelper.Make(), compileHelper.Gcc(), '', '', 'build-make');
-        compileHelper.recordCompileIssues(compileHelper.Gcc());
-      }
-      stage('linux-gcc/build(ninja)') {
-          compileHelper.build(compileHelper.Ninja(), compileHelper.Gcc(), '', '', 'build-ninja');
+      parallel {
+        stage('linux-gcc/build(make)') {
+          compileHelper.build(compileHelper.Make(), compileHelper.Gcc(), '', '', 'build-make');
+          compileHelper.recordCompileIssues(compileHelper.Gcc());
+        }
+      },
+      {
+        stage('linux-gcc/build(ninja)') {
+            compileHelper.build(compileHelper.Ninja(), compileHelper.Gcc(), '', '', 'build-ninja');
+        }
       }
       stage('linux-gcc/test') {
         // testHelper.runUnitTests('build-make/tests/GhoulTest');
@@ -50,6 +54,7 @@ linux_gcc: {
     } // node('linux')
   }
 },
+
 linux_clang: {
   if (env.USE_BUILD_OS_LINUX == 'true') {
     node('linux' && 'clang') {
@@ -57,12 +62,16 @@ linux_clang: {
         deleteDir();
         gitHelper.checkoutGit(url, branch);
       }
-      stage('linux-clang/build(make)') {
-        compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
-        compileHelper.recordCompileIssues(compileHelper.Clang());
-      }
-      stage('linux-clang/build(ninja)') {
-          compileHelper.build(compileHelper.Ninja(), compileHelper.Clang(), '', '', 'build-ninja');
+      parallel {
+        stage('linux-clang/build(make)') {
+          compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
+          compileHelper.recordCompileIssues(compileHelper.Clang());
+        }
+      },
+      {
+        stage('linux-clang/build(ninja)') {
+            compileHelper.build(compileHelper.Ninja(), compileHelper.Clang(), '', '', 'build-ninja');
+        }
       }
       stage('linux-clang/test') {
         // testHelper.runUnitTests('build-make/tests/GhoulTest');
@@ -80,12 +89,16 @@ windows: {
           deleteDir();
           gitHelper.checkoutGit(url, branch);
         }
-        stage('windows/build(msvc)') {
-          compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio(), '', '', 'build-msvc');
-          compileHelper.recordCompileIssues(compileHelper.VisualStudio());
-        }
-        stage('windows/build(ninja)') {
-          compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-ninja');
+        parallel {
+          stage('windows/build(msvc)') {
+            compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio(), '', '', 'build-msvc');
+            compileHelper.recordCompileIssues(compileHelper.VisualStudio());
+          }
+        },
+        {
+          stage('windows/build(ninja)') {
+            compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-ninja');
+          }
         }
         stage('windows/test') {
           // Currently, the unit tests are failing on Windows
@@ -103,11 +116,15 @@ macos: {
         deleteDir();
         gitHelper.checkoutGit(url, branch);
       }
-      stage('macos/build(make)') {
-          compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
-      }
-      stage('macos/build(xcode)') {
-          compileHelper.build(compileHelper.Xcode(), compileHelper.Xcode(), '', '', 'build-xcode');
+      parallel {
+        stage('macos/build(make)') {
+            compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
+        }
+      },
+      {
+        stage('macos/build(xcode)') {
+            compileHelper.build(compileHelper.Xcode(), compileHelper.Xcode(), '', '', 'build-xcode');
+        }
       }
       stage('macos/test') {
         // Currently, the unit tests are crashing on OS X
