@@ -36,7 +36,7 @@ namespace ghoul {
 
 namespace {
     std::string formatValue(const Dictionary& dictionary, const std::string& key,
-                            PrettyPrint prettyPrint, std::string indentation,
+                            PrettyPrint prettyPrint, const std::string& indentation,
                             int indentationSteps);
 
     std::string formatDouble(double d) {
@@ -50,7 +50,7 @@ namespace {
     }
 
     std::string format(const Dictionary& d, PrettyPrint prettyPrint,
-                       std::string indentation, int indentationSteps)
+                       const std::string& indentation, int indentationSteps)
     {
         if (d.empty()) {
             return "{}";
@@ -76,7 +76,7 @@ namespace {
             std::next(keys.begin()),
             keys.end(),
             convert(*keys.begin()),
-            [&](std::string a, std::string key) {
+            [&](const std::string& a, const std::string& key) {
                 return a + "," + (prettyPrint ? "\n" : "") + indent + convert(key);
             }
         );
@@ -86,7 +86,7 @@ namespace {
     }
 
     std::string formatValue(const Dictionary& dictionary, const std::string& key,
-                            PrettyPrint prettyPrint, std::string indentation,
+                            PrettyPrint prettyPrint, const std::string& indentation,
                             int indentationSteps)
     {
         if (dictionary.hasValue<Dictionary>(key)) {
@@ -176,7 +176,7 @@ LuaFormattingError::LuaFormattingError(const std::string& msg)
 {}
 
 std::string formatLua(const Dictionary& dictionary, PrettyPrint prettyPrint,
-                      std::string indentation)
+                      const std::string& indentation)
 {
     return format(dictionary, prettyPrint, indentation, 0);
 }

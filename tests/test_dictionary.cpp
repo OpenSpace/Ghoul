@@ -562,7 +562,7 @@ TEST_CASE("Dictionary: Set Value", "[dictionary]") {
         REQUIRE(d.hasValue<int>("int"));
         int value;
         REQUIRE(d.getValue("int", value));
-        REQUIRE(value == int(1));
+        REQUIRE(value == 1);
     }
     SECTION("unsigned int") {
         REQUIRE_FALSE(d.hasValue<unsigned int>("unsigned int"));

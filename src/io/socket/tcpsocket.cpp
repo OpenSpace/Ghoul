@@ -26,7 +26,7 @@
 #include <ghoul/io/socket/tcpsocket.h>
 
 #include <ghoul/logging/logmanager.h>
-#include <fmt/format.h>
+#include <ghoul/fmt.h>
 #include <algorithm>
 #include <cstring>
 

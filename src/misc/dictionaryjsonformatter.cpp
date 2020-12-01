@@ -157,7 +157,7 @@ std::string formatJson(const Dictionary& dictionary) {
         keys.end(),
         convert(*keys.begin(), dictionary),
         [convert, dictionary](std::string a, std::string key) {
-            return a + "," + convert(key, dictionary);
+            return std::move(a) + "," + convert(std::move(key), dictionary);
         }
     );
 
