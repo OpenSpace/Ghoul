@@ -49,7 +49,7 @@ BooleanType(PrettyPrint);
     * \throw LuaFormattingError If the \p key points to a type that cannot be converted
     */
 std::string formatLua(const Dictionary& dictionary,
-    PrettyPrint prettyPrint = PrettyPrint::No, std::string indentation = "    ");
+    PrettyPrint prettyPrint = PrettyPrint::No, const std::string& indentation = "    ");
 
 }  // namespace ghoul
 

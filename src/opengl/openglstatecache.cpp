@@ -29,10 +29,6 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 
-namespace {
-    constexpr const char* _loggerCat = "OpenGLStateCache";
-} // namespace
-
 namespace ghoul::opengl {
 
 OpenGLStateCache* OpenGLStateCache::_singleton = nullptr;
@@ -202,8 +198,10 @@ void OpenGLStateCache::resetColorState() const {
 void OpenGLStateCache::setColorState(const GLfloat color[4], GLboolean clampColor)  {
     ghoul_assert(color != nullptr, "color must not be nullptr");
 
-    if (color[0] != _colorClearValue[0] || color[1] != _colorClearValue[1] ||
-        color[2] != _colorClearValue[2] || color[3] != _colorClearValue[3])
+    if (!std::equal_to<>()(color[0], _colorClearValue[0]) ||
+        !std::equal_to<>()(color[1], _colorClearValue[1]) ||
+        !std::equal_to<>()(color[2], _colorClearValue[2]) ||
+        !std::equal_to<>()(color[3], _colorClearValue[3]))
     {
         _colorClearValue[0] = color[0];
         _colorClearValue[1] = color[1];

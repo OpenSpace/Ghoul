@@ -20,7 +20,7 @@ parallel tools: {
       )
       recordIssues(
         id: 'tools-cppcheck',
-        tool: cppCheck()
+        tool: cppCheck(pattern: 'build/cppcheck.xml')
       )
     }
     // stage('master/cloc/create') {
@@ -30,82 +30,90 @@ parallel tools: {
   }
 },
 linux_gcc: {
-  node('linux' && 'gcc') {
-    stage('linux-gcc/scm') {
-      deleteDir();
-      gitHelper.checkoutGit(url, branch);
-    }
-    stage('linux-gcc/build(make)') {
-      compileHelper.build(compileHelper.Make(), compileHelper.Gcc(), '', '', 'build-make');
-      compileHelper.recordCompileIssues(compileHelper.Gcc());
-    }
-    stage('linux-gcc/build(ninja)') {
-        compileHelper.build(compileHelper.Ninja(), compileHelper.Gcc(), '', '', 'build-ninja');
-    }
-    stage('linux-gcc/test') {
-      // testHelper.runUnitTests('build-make/tests/GhoulTest');
-    }
-    cleanWs()
-  } // node('linux')
-},
-linux_clang: {
-  node('linux' && 'clang') {
-    stage('linux-clang/scm') {
-      deleteDir();
-      gitHelper.checkoutGit(url, branch);
-    }
-    stage('linux-clang/build(make)') {
-      compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
-      compileHelper.recordCompileIssues(compileHelper.Clang());
-    }
-    stage('linux-clang/build(ninja)') {
-        compileHelper.build(compileHelper.Ninja(), compileHelper.Clang(), '', '', 'build-ninja');
-    }
-    stage('linux-clang/test') {
-      // testHelper.runUnitTests('build-make/tests/GhoulTest');
-    }
-    cleanWs()
-  } // node('linux')
-},
-windows: {
-  node('windows') {
-    // We specify the workspace directory manually to reduce the path length and thus try to avoid MSB3491 on Visual Studio
-    ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}/${env.BUILD_ID}") {
-      stage('windows/scm') {
+  if (env.USE_BUILD_OS_LINUX == 'true') {
+    node('linux' && 'gcc') {
+      stage('linux-gcc/scm') {
         deleteDir();
         gitHelper.checkoutGit(url, branch);
       }
-      stage('windows/build(msvc)') {
-        compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio(), '', '', 'build-msvc');
-        compileHelper.recordCompileIssues(compileHelper.VisualStudio());
+      stage('linux-gcc/build(make)') {
+        compileHelper.build(compileHelper.Make(), compileHelper.Gcc(), '', '', 'build-make');
+        compileHelper.recordCompileIssues(compileHelper.Gcc());
       }
-      stage('windows/build(ninja)') {
-        compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-ninja');
+      stage('linux-gcc/build(ninja)') {
+          compileHelper.build(compileHelper.Ninja(), compileHelper.Gcc(), '', '', 'build-ninja');
       }
-      stage('windows/test') {
-        // Currently, the unit tests are failing on Windows
-        // testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
+      stage('linux-gcc/test') {
+        // testHelper.runUnitTests('build-make/tests/GhoulTest');
       }
-    }
-    cleanWs()
-  } // node('windows')
+      cleanWs()
+    } // node('linux')
+  }
+},
+linux_clang: {
+  if (env.USE_BUILD_OS_LINUX == 'true') {
+    node('linux' && 'clang') {
+      stage('linux-clang/scm') {
+        deleteDir();
+        gitHelper.checkoutGit(url, branch);
+      }
+      stage('linux-clang/build(make)') {
+        compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
+        compileHelper.recordCompileIssues(compileHelper.Clang());
+      }
+      stage('linux-clang/build(ninja)') {
+          compileHelper.build(compileHelper.Ninja(), compileHelper.Clang(), '', '', 'build-ninja');
+      }
+      stage('linux-clang/test') {
+        // testHelper.runUnitTests('build-make/tests/GhoulTest');
+      }
+      cleanWs()
+    } // node('linux')
+  }
+},
+windows: {
+  if (env.USE_BUILD_OS_WINDOWS == 'true') {
+    node('windows') {
+      // We specify the workspace directory manually to reduce the path length and thus try to avoid MSB3491 on Visual Studio
+      ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}/${env.BUILD_ID}") {
+        stage('windows/scm') {
+          deleteDir();
+          gitHelper.checkoutGit(url, branch);
+        }
+        stage('windows/build(msvc)') {
+          compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio(), '', '', 'build-msvc');
+          compileHelper.recordCompileIssues(compileHelper.VisualStudio());
+        }
+        stage('windows/build(ninja)') {
+          compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-ninja');
+        }
+        stage('windows/test') {
+          // Currently, the unit tests are failing on Windows
+          // testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
+        }
+      }
+      cleanWs()
+    } // node('windows')
+  }
 },
 macos: {
-  node('macos') {
-    stage('macos/scm') {
-      deleteDir();
-      gitHelper.checkoutGit(url, branch);
-    }
-    stage('macos/build(make)') {
-        compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
-    }
-    stage('macos/build(xcode)') {
-        compileHelper.build(compileHelper.Xcode(), compileHelper.Xcode(), '', '', 'build-xcode');
-    }
-    stage('macos/test') {
-      // Currently, the unit tests are crashing on OS X
-      // testHelper.runUnitTests('build/tests/GhoulTest')
-    }
-    cleanWs()
-  } // node('osx')
+  if (env.USE_BUILD_OS_MACOS == 'true') {
+    node('macos') {
+      stage('macos/scm') {
+        deleteDir();
+        gitHelper.checkoutGit(url, branch);
+      }
+      stage('macos/build(make)') {
+          compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
+      }
+      stage('macos/build(xcode)') {
+          compileHelper.build(compileHelper.Xcode(), compileHelper.Xcode(), '', '', 'build-xcode');
+      }
+      stage('macos/test') {
+        // Currently, the unit tests are crashing on OS X
+        // testHelper.runUnitTests('build/tests/GhoulTest')
+      }
+      cleanWs()
+    } // node('osx')
+  }
 }

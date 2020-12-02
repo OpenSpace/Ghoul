@@ -1,3 +1,5 @@
 unreadVariable
 noExplicitConstructor
 missingInclude
+unusedFunction
+useStlAlgorithm

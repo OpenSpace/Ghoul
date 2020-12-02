@@ -46,25 +46,20 @@
  */
 class VectorStackWalker : public StackWalker {
 public:
-    VectorStackWalker(StackWalkOptions level, std::vector<std::string>& vector)
+    VectorStackWalker(StackWalkOptions level, std::vector<std::string>& vector_)
         : StackWalker(level)
-        , _vector(vector)
+        , vector(vector_)
     {}
 
-    void setVector(std::vector<std::string>& vector) {
-        _vector = vector;
-    }
+    std::vector<std::string>& vector;
 
 protected:
     void OnOutput(LPCSTR szText) override {
         std::string str(szText);
         // Remove trailing newline character
         str = str.substr(0, str.size() - 1);
-        _vector.push_back(str);
+        vector.push_back(str);
     }
-
-private:
-    std::vector<std::string>& _vector;
 };
 
 #endif // _MSC_VER
@@ -178,7 +173,7 @@ std::vector<std::string> stackTrace() {
     // The vector has to be set as the StackWalker library is statically initialized the
     // first time this function is called (and thus with a different stackFrames
     // reference. If this call is removed, invalid memory will be accessed
-    sw.setVector(stackFrames);
+    sw.vector = stackFrames;
 
     sw.ShowCallstack();
 #endif

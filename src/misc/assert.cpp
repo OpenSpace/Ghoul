@@ -67,6 +67,7 @@ MissingCaseException::MissingCaseException()
     : std::logic_error("Missing Case")
 {}
 
+// cppcheck-suppress unusedFunction
 void internal_assert(std::string expression, std::string message, std::string file,
                      std::string function, int line)
 {

@@ -545,13 +545,15 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                 case GL_UNSIGNED_INT:
                 {
                     uint32_t t = texel<uint32_t>(x);
-                    float tt = static_cast<float>(t) / numeric_limits<uint32_t>::max();
+                    constexpr const uint32_t max = numeric_limits<uint32_t>::max();
+                    float tt = static_cast<float>(t) / static_cast<float>(max);
                     return { tt, 0.f, 0.f, 1.f };
                 }
                 case GL_INT:
                 {
                     int32_t t = texel<int32_t>(x);
-                    float tt = static_cast<float>(t) / numeric_limits<int32_t>::max();
+                    constexpr const int32_t max = numeric_limits<int32_t>::max();
+                    float tt = static_cast<float>(t) / static_cast<float>(max);
                     return { tt, 0.f, 0.f, 1.f };
                 }
                 case GL_FLOAT:
@@ -593,15 +595,17 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                 case GL_UNSIGNED_INT:
                 {
                     const tvec2<uint32_t>& t = texel<tvec2<uint32_t>>(x);
-                    float tr = static_cast<float>(t.r) / numeric_limits<uint32_t>::max();
-                    float tg = static_cast<float>(t.g) / numeric_limits<uint32_t>::max();
+                    constexpr const uint32_t max = numeric_limits<uint32_t>::max();
+                    float tr = static_cast<float>(t.r) / static_cast<float>(max);
+                    float tg = static_cast<float>(t.g) / static_cast<float>(max);
                     return { tr, tg, 0.f, 1.f };
                 }
                 case GL_INT:
                 {
                     const tvec2<int32_t>& t = texel<tvec2<int32_t>>(x);
-                    float tr = static_cast<float>(t.r) / numeric_limits<int32_t>::max();
-                    float tg = static_cast<float>(t.g) / numeric_limits<int32_t>::max();
+                    constexpr const int32_t max = numeric_limits<int32_t>::max();
+                    float tr = static_cast<float>(t.r) / static_cast<float>(max);
+                    float tg = static_cast<float>(t.g) / static_cast<float>(max);
                     return { tr, tg, 0.f, 1.f };
                 }
                 case GL_FLOAT:
@@ -652,17 +656,19 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                 case GL_UNSIGNED_INT:
                 {
                     const tvec3<uint32_t>& t = texel<tvec3<uint32_t>>(x);
-                    float tr = static_cast<float>(t.r) / numeric_limits<uint32_t>::max();
-                    float tg = static_cast<float>(t.g) / numeric_limits<uint32_t>::max();
-                    float tb = static_cast<float>(t.b) / numeric_limits<uint32_t>::max();
+                    constexpr const uint32_t max = numeric_limits<uint32_t>::max();
+                    float tr = static_cast<float>(t.r) / static_cast<float>(max);
+                    float tg = static_cast<float>(t.g) / static_cast<float>(max);
+                    float tb = static_cast<float>(t.b) / static_cast<float>(max);
                     return { tr, tg, tb, 1.f };
                 }
                 case GL_INT:
                 {
                     const tvec3<int32_t>& t = texel<tvec3<int32_t>>(x);
-                    float tr = static_cast<float>(t.r) / numeric_limits<int32_t>::max();
-                    float tg = static_cast<float>(t.g) / numeric_limits<int32_t>::max();
-                    float tb = static_cast<float>(t.b) / numeric_limits<int32_t>::max();
+                    constexpr const int32_t max = numeric_limits<int32_t>::max();
+                    float tr = static_cast<float>(t.r) / static_cast<float>(max);
+                    float tg = static_cast<float>(t.g) / static_cast<float>(max);
+                    float tb = static_cast<float>(t.b) / static_cast<float>(max);
                     return { tr, tg, tb, 1.f };
                 }
                 case GL_FLOAT:
@@ -721,21 +727,23 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                 case GL_UNSIGNED_INT:
                 {
                     const tvec4<uint32_t>& t = texel<tvec4<uint32_t>>(x);
+                    constexpr const uint32_t max = numeric_limits<uint32_t>::max();
                     return {
-                        static_cast<float>(t.r) / numeric_limits<uint32_t>::max(),
-                        static_cast<float>(t.g) / numeric_limits<uint32_t>::max(),
-                        static_cast<float>(t.b) / numeric_limits<uint32_t>::max(),
-                        static_cast<float>(t.a) / numeric_limits<uint32_t>::max()
+                        static_cast<float>(t.r) / static_cast<float>(max),
+                        static_cast<float>(t.g) / static_cast<float>(max),
+                        static_cast<float>(t.b) / static_cast<float>(max),
+                        static_cast<float>(t.a) / static_cast<float>(max)
                     };
                 }
                 case GL_INT:
                 {
                     const tvec4<int32_t>& t = texel<tvec4<int32_t>>(x);
+                    constexpr const int32_t max = numeric_limits<int32_t>::max();
                     return {
-                        static_cast<float>(t.r) / numeric_limits<int32_t>::max(),
-                        static_cast<float>(t.g) / numeric_limits<int32_t>::max(),
-                        static_cast<float>(t.b) / numeric_limits<int32_t>::max(),
-                        static_cast<float>(t.a) / numeric_limits<int32_t>::max()
+                        static_cast<float>(t.r) / static_cast<float>(max),
+                        static_cast<float>(t.g) / static_cast<float>(max),
+                        static_cast<float>(t.b) / static_cast<float>(max),
+                        static_cast<float>(t.a) / static_cast<float>(max)
                     };
                 }
                 case GL_FLOAT:
@@ -793,13 +801,15 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                 case GL_UNSIGNED_INT:
                 {
                     uint32_t t = texel<uint32_t>(x, y);
-                    float tt = static_cast<float>(t) / numeric_limits<uint32_t>::max();
+                    constexpr const uint32_t max = numeric_limits<uint32_t>::max();
+                    float tt = static_cast<float>(t) / static_cast<float>(max);
                     return { tt, 0.f, 0.f, 1.f };
                 }
                 case GL_INT:
                 {
                     int32_t t = texel<int32_t>(x, y);
-                    float tt = static_cast<float>(t) / numeric_limits<int32_t>::max();
+                    constexpr const int32_t max = numeric_limits<int32_t>::max();
+                    float tt = static_cast<float>(t) / static_cast<float>(max);
                     return { tt, 0.f, 0.f, 1.f };
                 }
                 case GL_FLOAT:
@@ -844,15 +854,17 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                 case GL_UNSIGNED_INT:
                 {
                     const tvec2<uint32_t>& t = texel<tvec2<uint32_t>>(x, y);
-                    float tr = static_cast<float>(t.r) / numeric_limits<uint32_t>::max();
-                    float tg = static_cast<float>(t.g) / numeric_limits<uint32_t>::max();
+                    constexpr const uint32_t max = numeric_limits<uint32_t>::max();
+                    float tr = static_cast<float>(t.r) / static_cast<float>(max);
+                    float tg = static_cast<float>(t.g) / static_cast<float>(max);
                     return { tr, tg, 0.f, 1.f };
                 }
                 case GL_INT:
                 {
                     const tvec2<int32_t>& t = texel<tvec2<int32_t>>(x, y);
-                    float tr = static_cast<float>(t.r) / numeric_limits<int32_t>::max();
-                    float tg = static_cast<float>(t.g) / numeric_limits<int32_t>::max();
+                    constexpr const int32_t max = numeric_limits<int32_t>::max();
+                    float tr = static_cast<float>(t.r) / static_cast<float>(max);
+                    float tg = static_cast<float>(t.g) / static_cast<float>(max);
                     return { tr, tg, 0.f, 1.f };
                 }
                 case GL_FLOAT:
@@ -902,17 +914,19 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                 case GL_UNSIGNED_INT:
                 {
                     const tvec3<uint32_t>& t = texel<tvec3<uint32_t>>(x, y);
-                    float tr = static_cast<float>(t.r) / numeric_limits<uint32_t>::max();
-                    float tg = static_cast<float>(t.g) / numeric_limits<uint32_t>::max();
-                    float tb = static_cast<float>(t.b) / numeric_limits<uint32_t>::max();
+                    constexpr const uint32_t max = numeric_limits<uint32_t>::max();
+                    float tr = static_cast<float>(t.r) / static_cast<float>(max);
+                    float tg = static_cast<float>(t.g) / static_cast<float>(max);
+                    float tb = static_cast<float>(t.b) / static_cast<float>(max);
                     return { tr, tg, tb, 1.f };
                 }
                 case GL_INT:
                 {
                     const tvec3<int32_t>& t = texel<tvec3<int32_t>>(x, y);
-                    float tr = static_cast<float>(t.r) / numeric_limits<int32_t>::max();
-                    float tg = static_cast<float>(t.g) / numeric_limits<int32_t>::max();
-                    float tb = static_cast<float>(t.b) / numeric_limits<int32_t>::max();
+                    constexpr const int32_t max = numeric_limits<int32_t>::max();
+                    float tr = static_cast<float>(t.r) / static_cast<float>(max);
+                    float tg = static_cast<float>(t.g) / static_cast<float>(max);
+                    float tb = static_cast<float>(t.b) / static_cast<float>(max);
                     return { tr, tg, tb, 1.f };
                 }
                 case GL_FLOAT:
@@ -971,21 +985,23 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                 case GL_UNSIGNED_INT:
                 {
                     const tvec4<uint32_t>& t = texel<tvec4<uint32_t>>(x, y);
+                    constexpr const uint32_t max = numeric_limits<uint32_t>::max();
                     return {
-                        static_cast<float>(t.r) / numeric_limits<uint32_t>::max(),
-                        static_cast<float>(t.g) / numeric_limits<uint32_t>::max(),
-                        static_cast<float>(t.b) / numeric_limits<uint32_t>::max(),
-                        static_cast<float>(t.a) / numeric_limits<uint32_t>::max()
+                        static_cast<float>(t.r) / static_cast<float>(max),
+                        static_cast<float>(t.g) / static_cast<float>(max),
+                        static_cast<float>(t.b) / static_cast<float>(max),
+                        static_cast<float>(t.a) / static_cast<float>(max)
                     };
                 }
                 case GL_INT:
                 {
                     const tvec4<int32_t>& t = texel<tvec4<int32_t>>(x, y);
+                    constexpr const int32_t max = numeric_limits<int32_t>::max();
                     return {
-                        static_cast<float>(t.r) / numeric_limits<int32_t>::max(),
-                        static_cast<float>(t.g) / numeric_limits<int32_t>::max(),
-                        static_cast<float>(t.b) / numeric_limits<int32_t>::max(),
-                        static_cast<float>(t.a) / numeric_limits<int32_t>::max()
+                        static_cast<float>(t.r) / static_cast<float>(max),
+                        static_cast<float>(t.g) / static_cast<float>(max),
+                        static_cast<float>(t.b) / static_cast<float>(max),
+                        static_cast<float>(t.a) / static_cast<float>(max)
                     };
                 }
                 case GL_FLOAT:
@@ -1042,13 +1058,15 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                 case GL_UNSIGNED_INT:
                 {
                     uint32_t t = texel<uint32_t>(x, y, z);
-                    float tt = static_cast<float>(t) / numeric_limits<int16_t>::max();
+                    constexpr const uint32_t max = numeric_limits<uint32_t>::max();
+                    float tt = static_cast<float>(t) / static_cast<float>(max);
                     return { tt, 0.f, 0.f, 1.f };
                 }
                 case GL_INT:
                 {
                     int32_t t = texel<int32_t>(x, y, z);
-                    float tt = static_cast<float>(t) / numeric_limits<int32_t>::max();
+                    constexpr const int32_t max = numeric_limits<int32_t>::max();
+                    float tt = static_cast<float>(t) / static_cast<float>(max);
                     return { tt, 0.f, 0.f, 1.f };
                 }
                 case GL_FLOAT:
@@ -1093,15 +1111,17 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                 case GL_UNSIGNED_INT:
                 {
                     const tvec2<uint32_t>& t = texel<tvec2<uint32_t>>(x, y, z);
-                    float tr = static_cast<float>(t.r) / numeric_limits<uint32_t>::max();
-                    float tg = static_cast<float>(t.g) / numeric_limits<uint32_t>::max();
+                    constexpr const uint32_t max = numeric_limits<uint32_t>::max();
+                    float tr = static_cast<float>(t.r) / static_cast<float>(max);
+                    float tg = static_cast<float>(t.g) / static_cast<float>(max);
                     return { tr, tg, 0.f, 1.f };
                 }
                 case GL_INT:
                 {
                     const tvec2<int32_t>& t = texel<tvec2<int32_t>>(x, y, z);
-                    float tr = static_cast<float>(t.r) / numeric_limits<int32_t>::max();
-                    float tg = static_cast<float>(t.g) / numeric_limits<int32_t>::max();
+                    constexpr const int32_t max = numeric_limits<int32_t>::max();
+                    float tr = static_cast<float>(t.r) / static_cast<float>(max);
+                    float tg = static_cast<float>(t.g) / static_cast<float>(max);
                     return { tr, tg, 0.f, 1.f };
                 }
                 case GL_FLOAT:
@@ -1152,17 +1172,19 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                 case GL_UNSIGNED_INT:
                 {
                     const tvec3<uint32_t>& t = texel<tvec3<uint32_t>>(x, y, z);
-                    float tr = static_cast<float>(t.r) / numeric_limits<uint32_t>::max();
-                    float tg = static_cast<float>(t.g) / numeric_limits<uint32_t>::max();
-                    float tb = static_cast<float>(t.b) / numeric_limits<uint32_t>::max();
+                    constexpr const uint32_t max = numeric_limits<uint32_t>::max();
+                    float tr = static_cast<float>(t.r) / static_cast<float>(max);
+                    float tg = static_cast<float>(t.g) / static_cast<float>(max);
+                    float tb = static_cast<float>(t.b) / static_cast<float>(max);
                     return { tr, tg, tb, 1.f };
                 }
                 case GL_INT:
                 {
                     const tvec3<int32_t>& t = texel<tvec3<int32_t>>(x, y, z);
-                    float tr = static_cast<float>(t.r) / numeric_limits<int32_t>::max();
-                    float tg = static_cast<float>(t.g) / numeric_limits<int32_t>::max();
-                    float tb = static_cast<float>(t.b) / numeric_limits<int32_t>::max();
+                    constexpr const int32_t max = numeric_limits<int32_t>::max();
+                    float tr = static_cast<float>(t.r) / static_cast<float>(max);
+                    float tg = static_cast<float>(t.g) / static_cast<float>(max);
+                    float tb = static_cast<float>(t.b) / static_cast<float>(max);
                     return { tr, tg, tb, 1.f };
                 }
                 case GL_FLOAT:
@@ -1221,21 +1243,23 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                 case GL_UNSIGNED_INT:
                 {
                     const tvec4<uint32_t>& t = texel<tvec4<uint32_t>>(x, y, z);
+                    constexpr const uint32_t max = numeric_limits<uint32_t>::max();
                     return {
-                        static_cast<float>(t.r) / numeric_limits<uint32_t>::max(),
-                        static_cast<float>(t.g) / numeric_limits<uint32_t>::max(),
-                        static_cast<float>(t.b) / numeric_limits<uint32_t>::max(),
-                        static_cast<float>(t.a) / numeric_limits<uint32_t>::max()
+                        static_cast<float>(t.r) / static_cast<float>(max),
+                        static_cast<float>(t.g) / static_cast<float>(max),
+                        static_cast<float>(t.b) / static_cast<float>(max),
+                        static_cast<float>(t.a) / static_cast<float>(max)
                     };
                 }
                 case GL_INT:
                 {
                     const tvec4<int32_t>& t = texel<tvec4<int32_t>>(x, y, z);
+                    constexpr const int32_t max = numeric_limits<int32_t>::max();
                     return {
-                        static_cast<float>(t.r) / numeric_limits<int32_t>::max(),
-                        static_cast<float>(t.g) / numeric_limits<int32_t>::max(),
-                        static_cast<float>(t.b) / numeric_limits<int32_t>::max(),
-                        static_cast<float>(t.a) / numeric_limits<int32_t>::max()
+                        static_cast<float>(t.r) / static_cast<float>(max),
+                        static_cast<float>(t.g) / static_cast<float>(max),
+                        static_cast<float>(t.b) / static_cast<float>(max),
+                        static_cast<float>(t.a) / static_cast<float>(max)
                     };
                 }
                 case GL_FLOAT:

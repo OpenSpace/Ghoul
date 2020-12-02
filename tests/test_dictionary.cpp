@@ -53,7 +53,7 @@ namespace {
             { "wchar_t", wchar_t(1) },
             { "short", short(1) },
             { "unsigned short", static_cast<unsigned short>(1) },
-            { "int", int(1) },
+            { "int", 1 },
             { "unsigned int", static_cast<unsigned int>(1) },
             { "long long", static_cast<long long>(1) },
             { "unsigned long long", static_cast<unsigned long long>(1) },
@@ -279,7 +279,7 @@ TEST_CASE("Dictionary: Get Value", "[dictionary]") {
     {
         int value = 0;
         REQUIRE(d.getValue("int", value));
-        REQUIRE(value == int(1));
+        REQUIRE(value == 1);
     }
     {
         unsigned int value = 0;
@@ -502,7 +502,7 @@ TEST_CASE("Dictionary: Set Value", "[dictionary]") {
     Dictionary d;
     SECTION("bool") {
         REQUIRE_FALSE(d.hasValue<bool>("bool"));
-        d.setValue("bool", bool(true));
+        d.setValue("bool", true);
         REQUIRE(d.hasValue<bool>("bool"));
         bool value = false;
         REQUIRE(d.getValue("bool", value));
@@ -558,11 +558,11 @@ TEST_CASE("Dictionary: Set Value", "[dictionary]") {
     }
     SECTION("int") {
         REQUIRE_FALSE(d.hasValue<int>("int"));
-        d.setValue("int", int(1));
+        d.setValue("int", 1);
         REQUIRE(d.hasValue<int>("int"));
         int value;
         REQUIRE(d.getValue("int", value));
-        REQUIRE(value == int(1));
+        REQUIRE(value == 1);
     }
     SECTION("unsigned int") {
         REQUIRE_FALSE(d.hasValue<unsigned int>("unsigned int"));
@@ -3477,7 +3477,7 @@ TEST_CASE("Dictionary: Conversion From Dictionary", "[dictionary]") {
     {
         int value;
         REQUIRE(d.getValue("1int", value));
-        REQUIRE(value == int(1));
+        REQUIRE(value == 1);
     }
 
     REQUIRE_FALSE(d.hasValue<unsigned int>("1int"));

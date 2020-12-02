@@ -73,7 +73,6 @@ namespace {
         glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
         glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
         glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profileMask);
-        std::stringstream ss;
 
         const ContextProfileMask cpm = ContextProfileMask(profileMask);
         const bool isCore = cpm == ContextProfileMask::GL_CONTEXT_CORE_PROFILE_BIT;
@@ -291,15 +290,13 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
     const size_t fileIdentifier = _includedFiles.at(filename).fileIdentifier;
 
     std::string includeSeparator;
+#ifndef __APPLE__
     // Sofar, only Nvidia on Windows supports empty statements in the middle of the shader
     using Vendor = ghoul::systemcapabilities::OpenGLCapabilitiesComponent::Vendor;
     if (OpenGLCap.gpuVendor() == Vendor::Nvidia) {
         includeSeparator = "; // preprocessor add semicolon to isolate error messages";
     }
-#ifdef __APPLE__
-    // The Apple OpenGL compiler doesn't like empty semicolor statements
-    includeSeparator = "";
-#endif
+#endif // __APPLE__
 
     env.output << includeSeparator << std::endl
                << "#line " << env.inputs.back().lineNumber << " " << fileIdentifier
