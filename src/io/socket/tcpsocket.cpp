@@ -276,8 +276,6 @@ void TcpSocket::establishConnection(addrinfo* info) {
     result = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &falseFlag, sizeof(falseFlag));
     if (result == SOCKET_ERROR) {
         LWARNING(fmt::format("Socket error: {}", _ERRNO));
-    }
-    if (result == SOCKET_ERROR) {
         freeaddrinfo(info);
         _isConnecting = false;
         _isConnected = false;
@@ -305,17 +303,15 @@ void TcpSocket::establishConnection(addrinfo* info) {
 }
 
 void TcpSocket::streamInput() {
+    while (_isConnected && !_shouldStopThreads) {
 #ifdef WIN32
-    int nReadBytes = 0;
-
-    auto failed = [](int nBytes) { return nBytes <= 0; };
+        int nReadBytes = 0;
+        auto failed = [](int nBytes) { return nBytes <= 0; };
 #else
-    ssize_t nReadBytes = 0;
-
-    auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
+        ssize_t nReadBytes = 0;
+        auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
 #endif // WIN32
 
-    while (_isConnected && !_shouldStopThreads) {
         nReadBytes = recv(
             _socket,
             _inputBuffer.data(),

@@ -582,10 +582,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             float outlineS1 = glyph->outlineBottomRight.x;
             float outlineT1 = glyph->outlineBottomRight.y;
 
-            glm::vec3 p0 = glm::vec3(0.0);
-            glm::vec3 p1 = glm::vec3(0.0);
-            glm::vec3 p2 = glm::vec3(0.0);
-            glm::vec3 p3 = glm::vec3(0.0);
+            glm::vec3 p0;
+            glm::vec3 p1;
+            glm::vec3 p2;
+            glm::vec3 p3;
 
             if (labelInfo.renderType == 0) {
                 p0 = (x0 * labelInfo.orthoRight + y0 * labelInfo.orthoUp) *

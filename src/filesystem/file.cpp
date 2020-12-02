@@ -172,9 +172,10 @@ std::string File::lastModifiedDate() const {
     if (!success) {
         const DWORD error = GetLastError();
         LPTSTR errorBuffer = nullptr;
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_ALLOCATE_BUFFER |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
+        FormatMessage(
+            FORMAT_MESSAGE_FROM_SYSTEM |
+                FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
             nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
@@ -182,15 +183,10 @@ std::string File::lastModifiedDate() const {
             0,
             nullptr
         );
-        if (errorBuffer != nullptr) {
-            std::string msg(errorBuffer);
-            LocalFree(errorBuffer);
-            throw FileException(fmt::format(
-                "Could not retrieve last-modified date for file '{}': {}", _filename, msg
-            ));
-        }
+        std::string msg(errorBuffer);
+        LocalFree(errorBuffer);
         throw FileException(fmt::format(
-            "Could not retrieve last-modified date for file '{}'", _filename
+            "Could not retrieve last-modified date for file '{}': {}", _filename, msg
         ));
     }
     else {
@@ -201,9 +197,10 @@ std::string File::lastModifiedDate() const {
         if (!success) {
             const DWORD error = GetLastError();
             LPTSTR errorBuffer = nullptr;
-            DWORD nValues = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-                FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
+            FormatMessage(
+                FORMAT_MESSAGE_FROM_SYSTEM |
+                    FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                    FORMAT_MESSAGE_IGNORE_INSERTS,
                 nullptr,
                 error,
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
@@ -211,15 +208,10 @@ std::string File::lastModifiedDate() const {
                 0,
                 nullptr
             );
-            if ((nValues > 0) && (errorBuffer != nullptr)) {
-                std::string msg(errorBuffer);
-                LocalFree(errorBuffer);
-                throw FileException(fmt::format(
-                    "'FileTimeToSystemTime' failed for file '{}': {}", _filename, msg
-                ));
-            }
+            std::string msg(errorBuffer);
+            LocalFree(errorBuffer);
             throw FileException(fmt::format(
-                "'FileTimeToSystemTime' failed for file '{}'", _filename
+                "'FileTimeToSystemTime' failed for file '{}': {}", _filename, msg
             ));
         }
         else {
