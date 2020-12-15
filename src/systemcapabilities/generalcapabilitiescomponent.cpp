@@ -346,7 +346,6 @@ void GeneralCapabilitiesComponent::detectOS() {
 
 void GeneralCapabilitiesComponent::detectMemory() {
 #ifdef WIN32
-#ifdef GHOUL_USE_WMI
     std::string memory;
     try {
         queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
@@ -361,17 +360,6 @@ void GeneralCapabilitiesComponent::detectMemory() {
     unsigned long long value;
     convert >> value;
     _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
-#else
-    ULONGLONG installedMainMemory;
-    // get installed memory in kB
-    BOOL success = GetPhysicallyInstalledSystemMemory(&installedMainMemory);
-    if (success == TRUE) {
-        _installedMainMemory = static_cast<unsigned int>(installedMainMemory / 1024);
-    }
-    else {
-        throw MainMemoryError("Error reading about of physical memory");
-    }
-#endif
 #elif defined(__APPLE__)
     int mib[2] = { CTL_HW, HW_MEMSIZE };
     size_t len;

@@ -40,9 +40,6 @@ begin_header("Configuring Ghoul Project")
 #############################
 # Options
 #############################
-if (WIN32)
-  option(GHOUL_USE_WMI "Use Windows Management Instrumentation" ON)
-endif ()
 option(GHOUL_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
 option(GHOUL_LOGGING_ENABLE_TRACE "Enables the LTRACE macro" ON)
@@ -94,9 +91,6 @@ target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
 #############################
 # Compile settings
 #############################
-set_property(TARGET Ghoul PROPERTY CXX_STANDARD 17)
-set_property(TARGET Ghoul PROPERTY CXX_STANDARD_REQUIRED On)
-
 set_ghoul_compile_settings(Ghoul)
 
 if (GHOUL_HIGH_DEBUG_MODE)
@@ -117,13 +111,7 @@ endif ()
 
 # System Libraries
 if (WIN32)
-  begin_dependency("WMI")
-  if (GHOUL_USE_WMI)
-    target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_WMI")
-    target_link_libraries(Ghoul PRIVATE "WbemUuid.lib" "Ws2_32.lib")
-  endif ()
-  target_link_libraries(Ghoul PRIVATE "shlwapi")
-  end_dependency()
+  target_link_libraries(Ghoul PRIVATE "shlwapi" "WbemUuid.lib" "Ws2_32.lib")
 endif ()
 
 if (APPLE)

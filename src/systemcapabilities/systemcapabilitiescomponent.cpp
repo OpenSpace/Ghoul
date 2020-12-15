@@ -33,7 +33,7 @@
 
 namespace ghoul::systemcapabilities {
 
-#ifdef GHOUL_USE_WMI
+#ifdef WIN32
 IWbemLocator* SystemCapabilitiesComponent::_iwbemLocator = nullptr;
 IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
 
@@ -42,27 +42,27 @@ SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, HRESULT code)
     , message(std::move(msg))
     , errorCode(std::move(code))
 {}
-#endif
+#endif // WIN32
 
 SystemCapabilitiesComponent::SystemCapabilitiesComponent(
                                              [[maybe_unused]] InitializeWMI initializeWMI)
 {
-#ifdef GHOUL_USE_WMI
+#ifdef WIN32
     if (initializeWMI && !isWMIInitialized()) {
         SystemCapabilitiesComponent::initializeWMI();
     }
-#endif
+#endif // WIN32
 }
 
 SystemCapabilitiesComponent::~SystemCapabilitiesComponent() {
-#ifdef GHOUL_USE_WMI
+#ifdef WIN32
     if (isWMIInitialized()) {
         deinitializeWMI();
     }
-#endif
+#endif // WIN32
 }
 
-#ifdef GHOUL_USE_WMI
+#ifdef WIN32
 void SystemCapabilitiesComponent::initializeWMI() {
     constexpr const char* _loggerCat = "SystemCapabilitiesComponent.WMI";
 
@@ -283,6 +283,6 @@ void SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
     VariantClear(variant);
 }
 
-#endif
+#endif // WIN32
 
 } // namespace ghoul::systemcapabilities
