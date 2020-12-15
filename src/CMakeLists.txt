@@ -299,4 +299,27 @@ if (GHOUL_MODULE_SYSTEMCAPABILITIES)
 endif ()
 
 include(${GHOUL_ROOT_DIR}/support/cmake/GroupFilesIntoFolders.cmake)
-group_files_into_folders(${GHOUL_SOURCE} ${GHOUL_HEADER})
+
+# Place files into source_group
+foreach (file ${GHOUL_SOURCE} ${GHOUL_HEADER})
+  # Remove prefixes from the files 
+  set(original_file ${file})
+  string(REPLACE "${PROJECT_SOURCE_DIR}/src/" "" file ${file})
+  string(REPLACE "${PROJECT_SOURCE_DIR}/include/ghoul/" "" file ${file})
+
+  # Extract the directory part of the rest
+  get_filename_component(directory ${file} DIRECTORY)
+  if (NOT ${directory} STREQUAL "")
+    if (MSVC)
+      string(REPLACE "/" "\\" directory ${directory})
+    endif ()
+
+    # Make the directory's first letter upper case
+    string(SUBSTRING ${directory} 0 1 FIRST_LETTER)
+    string(TOUPPER ${FIRST_LETTER} FIRST_LETTER)
+    string(REGEX REPLACE "^.(.*)" "${FIRST_LETTER}\\1" directory "${directory}")
+    source_group("${directory}" FILES ${original_file})
+  else ()
+    source_group("" FILES ${original_file})
+  endif ()
+endforeach ()
