@@ -298,7 +298,6 @@ if (GHOUL_MODULE_SYSTEMCAPABILITIES)
   )
 endif ()
 
-include(${GHOUL_ROOT_DIR}/support/cmake/GroupFilesIntoFolders.cmake)
 
 # Place files into source_group
 foreach (file ${GHOUL_SOURCE} ${GHOUL_HEADER})
