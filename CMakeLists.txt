@@ -146,7 +146,7 @@ end_dependency("GLM")
 
 if (GHOUL_MODULE_OPENGL)
   begin_module("OpenGL")
-  cmake_policy(SET CMP0072 NEW) #FindOpenGL prefers GLVND by default when available.
+  cmake_policy(SET CMP0072 NEW) # FindOpenGL prefers GLVND by default when available.
 
   # OpenGL
   begin_dependency("OpenGL")
@@ -161,7 +161,7 @@ if (GHOUL_MODULE_OPENGL)
 
   # glbindings
   if (NOT TARGET glbinding)
-    begin_dependency("glbindings")
+    begin_dependency("glbinding")
     target_compile_definitions(Ghoul PUBLIC "GHOUL_MODULE_OPENGL")
   
     set(OPTION_BUILD_GPU_TESTS OFF CACHE BOOL "")
@@ -193,7 +193,7 @@ if (GHOUL_MODULE_OPENGL)
     set_folder_location(cppcheck-glbinding "External/glbinding-ext")
     set_folder_location(KHRplatform-sources "External/glbinding-ext")
   
-    end_dependency("glbindings")
+    end_dependency("glbinding")
   endif ()
   end_module("OpenGL")
 endif ()
@@ -373,9 +373,7 @@ end_dependency()
 if (GHOUL_MODULE_FONTRENDERING)
   begin_module("FontRendering")
   set(FREETYPE_DIST OFF CACHE BOOL "")
-  if (NOT TARGET freetype)
-    include_external_library(Ghoul PRIVATE freetype ${GHOUL_ROOT_DIR}/ext/freetype2 ${GHOUL_ROOT_DIR}/ext/freetype2/include)
-  endif ()
+  include_external_library(Ghoul PRIVATE freetype ${GHOUL_ROOT_DIR}/ext/freetype2 ${GHOUL_ROOT_DIR}/ext/freetype2/include)
 
   mark_as_advanced(FT_WITH_BZIP2 FT_WITH_HARFBUZZ FT_WITH_PNG FT_WITH_ZLIB FREETYPE_DIST pkgcfg_lib_PC_HARFBUZZ_harfbuzz)
   set_folder_location(dist "External")
@@ -401,12 +399,11 @@ if (NOT TARGET tracy)
   set_folder_location(tracy "External")
 endif ()
 if (GHOUL_PROFILING_ENABLE_TRACY)
-  target_compile_definitions(tracy PUBLIC TRACY_ENABLE)
-endif ()
-if (UNIX)
-  target_link_libraries(Ghoul PUBLIC tracy dl)
-else ()
+  target_compile_definitions(tracy PUBLIC "TRACY_ENABLE")
   target_link_libraries(Ghoul PUBLIC tracy)
+  if (UNIX)
+    target_link_libraries(Ghoul PUBLIC dl)
+  endif ()
 endif ()
 end_module("Profiling")
 
@@ -421,4 +418,3 @@ if (GHOUL_HAVE_TESTS)
 endif ()
 
 end_header("End: Configuring Ghoul Project")
-message(STATUS "\n\n")

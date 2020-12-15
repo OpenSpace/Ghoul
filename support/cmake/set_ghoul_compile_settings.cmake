@@ -175,11 +175,12 @@ function (set_ghoul_compile_settings target)
       target_compile_options(${target} PRIVATE "/WX")
     endif ()
 
-    # This definition can be removed when the glbinding submodule is updated
-    target_compile_definitions(${target} PUBLIC "_SILENCE_CXX17_ADAPTOR_TYPEDEFS_DEPRECATION_WARNING")
-
-    # This definition can be removed when Cppformat is updated to remove the allocator warning
-    target_compile_definitions(${target} PUBLIC "_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING")
+    target_compile_definitions(${target}
+      # This definition can be removed when the glbinding submodule is updated
+      PUBLIC "_SILENCE_CXX17_ADAPTOR_TYPEDEFS_DEPRECATION_WARNING"
+      # This definition can be removed when Cppformat is updated to remove the allocator warning
+      PUBLIC "_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING"
+    )
 
     if (GHOUL_OPTIMIZATION_ENABLE_AVX)
         target_compile_options(${target} PRIVATE "/arch:AVX")
