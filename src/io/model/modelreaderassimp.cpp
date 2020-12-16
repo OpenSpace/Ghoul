@@ -724,27 +724,27 @@ std::unique_ptr<ghoul::modelgeometry::ModelGeometry> ModelReaderAssimp::loadCach
                 }
 
                 // data
-                std::vector<std::byte> data;
-                data.reserve(textureSize);
+                std::byte* data = new std::byte[textureSize];
+
+                //std::vector<std::byte> data;
+                //data.resize(textureSize);
                 fileStream.read(reinterpret_cast<char*>(
-                    data.data()),
+                    data),
                     textureSize
                 );
                 texture.texture =
                     std::make_unique<ghoul::opengl::Texture>(
-                        ghoul::opengl::Texture(
-                            dimensions,
-                            format,
-                            internalFormat,
-                            dataType,
-                            ghoul::opengl::Texture::FilterMode::Linear,
-                            ghoul::opengl::Texture::WrappingMode::Repeat,
-                            ghoul::opengl::Texture::AllocateData::Yes,
-                            ghoul::opengl::Texture::TakeOwnership::No
-                        )
+                        dimensions,
+                        format,
+                        internalFormat,
+                        dataType,
+                        ghoul::opengl::Texture::FilterMode::Linear,
+                        ghoul::opengl::Texture::WrappingMode::Repeat,
+                        ghoul::opengl::Texture::AllocateData::No,
+                        ghoul::opengl::Texture::TakeOwnership::Yes
                     );
 
-                texture.texture->setPixelData(data.data());
+                texture.texture->setPixelData(data);
 
                 if (m == 0) {
                     std::cout << "Stop here!" << std::endl;
