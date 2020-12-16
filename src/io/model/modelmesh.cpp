@@ -52,7 +52,7 @@ void ModelMesh::render(ghoul::opengl::ProgramObject& program) {
     {
         std::string name = _textures[i].type;
 
-        // Tell shader wether to render invisible mesh with flasy color or not
+        // Tell shader wether to render invisible mesh with flashy color or not
         program.setUniform("use_forced_color", _textures[i].useForcedColor);
         if (_textures[i].useForcedColor) {
             continue;

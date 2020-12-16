@@ -27,7 +27,9 @@
 
 #include <ghoul/io/model/modelreaderbase.h>
 #include <ghoul/io/model/modelgeometry.h>
+#include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/filesystem/file.h>
+#include <ghoul/filesystem/filesystem.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/fmt.h>
 #include <algorithm>
@@ -61,7 +63,43 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
 
     ModelReaderBase* reader = readerForExtension(extension);
     if (reader) {
-        return reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
+        std::string cachedFile = FileSys.cacheManager()->cachedFilename(
+            filename,
+            ghoul::filesystem::CacheManager::Persistent::Yes
+        );
+
+        bool hasCachedFile = FileSys.fileExists(cachedFile);
+
+        if (hasCachedFile) {
+            //LINFO(fmt::format("Cached file '{}' used for GeometryModel file '{}'", cachedFile, filename));
+
+            std::unique_ptr<ghoul::modelgeometry::ModelGeometry> model = reader->loadCachedFile(cachedFile);
+            bool success = model != nullptr;
+            if (success) {
+                model->calculateBoundingRadius();
+                return model;
+            }
+            else {
+                FileSys.cacheManager()->removeCacheFile(filename);
+                // Intentional fall-through to the 'else' computation to generate the cache
+                // file for the next run
+            }
+        }
+        else {
+            //LINFO(fmt::format("Cache for ModelGeometry file '{}' not found", filename));
+        }
+
+        //LINFO(fmt::format("Loading Horizon file '{}'", filename));
+
+        std::unique_ptr<ghoul::modelgeometry::ModelGeometry> rawModel =
+            reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
+        ghoul::modelgeometry::ModelGeometry* model = rawModel.release();
+
+        //LINFO("Saving cache");
+        reader->saveCachedFile(cachedFile, model);
+
+        //return reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
+        return std::make_unique<ghoul::modelgeometry::ModelGeometry>(std::move(*model));
     }
     else {
         throw MissingReaderException(extension, filename);
