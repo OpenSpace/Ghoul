@@ -31,7 +31,7 @@ namespace ghoul::io {
 
 ModelReaderBase::ModelLoadException::ModelLoadException(std::string name, std::string msg,
                                                         const ModelReaderBase* r)
-    : RuntimeError(fmt::format("Error while loading model from cache file:'{}' Error:'{}'", name, msg), "ModelLoader")
+    : RuntimeError(fmt::format("Error:'{}' while loading model from file:'{}'", msg, name), "ModelLoader")
     , filename(std::move(name))
     , message(std::move(msg))
     , reader(r)
@@ -39,7 +39,7 @@ ModelReaderBase::ModelLoadException::ModelLoadException(std::string name, std::s
 
 ModelReaderBase::ModelSaveException::ModelSaveException(std::string name, std::string msg,
     const ModelReaderBase* r)
-    : RuntimeError(fmt::format("Error while saving model cache file:'{}' Error:'{}'", name, msg), "ModelLoader")
+    : RuntimeError(fmt::format("Error:'{}' while saving model to file:'{}'", msg, name), "ModelSaver")
     , filename(std::move(name))
     , message(std::move(msg))
     , reader(r)

@@ -30,9 +30,14 @@
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/fmt.h>
 #include <algorithm>
+
+namespace {
+    constexpr const char* _loggerCat = "ModelReader";
+}
 
 namespace ghoul::io {
 
@@ -71,34 +76,49 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
         bool hasCachedFile = FileSys.fileExists(cachedFile);
 
         if (hasCachedFile) {
-            //LINFO(fmt::format("Cached file '{}' used for GeometryModel file '{}'", cachedFile, filename));
+            LINFO(fmt::format("Cached file '{}' used for ModelGeometry file '{}'",
+                cachedFile,
+                filename)
+            );
 
-            std::unique_ptr<ghoul::modelgeometry::ModelGeometry> model = reader->loadCachedFile(cachedFile);
-            bool success = model != nullptr;
-            if (success) {
-                model->calculateBoundingRadius();
-                return model;
+            try {
+                std::unique_ptr<ghoul::modelgeometry::ModelGeometry> model =
+                    reader->loadCachedFile(cachedFile);
+                if (model != nullptr) {
+                    return model;
+                }
+
+                throw ModelReaderBase::ModelLoadException(
+                    cachedFile,
+                    "Failed to load model from cache",
+                    reader
+                );
             }
-            else {
+            catch (ModelReaderBase::ModelLoadException e) {
+                LERROR(fmt::format(
+                        "Error:'{}' while loading model from cache file:'{}'",
+                        e.message,
+                        e.filename)
+                );
+
                 FileSys.cacheManager()->removeCacheFile(filename);
                 // Intentional fall-through to the 'else' computation to generate the cache
                 // file for the next run
             }
         }
         else {
-            //LINFO(fmt::format("Cache for ModelGeometry file '{}' not found", filename));
+            LINFO(fmt::format("Cache for ModelGeometry file '{}' not found", filename));
         }
 
-        //LINFO(fmt::format("Loading Horizon file '{}'", filename));
+        LINFO(fmt::format("Loading ModelGeometry file '{}'", filename));
 
         std::unique_ptr<ghoul::modelgeometry::ModelGeometry> rawModel =
             reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
         ghoul::modelgeometry::ModelGeometry* model = rawModel.release();
 
-        //LINFO("Saving cache");
+        LINFO("Saving cache");
         reader->saveCachedFile(cachedFile, model);
 
-        //return reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
         return std::make_unique<ghoul::modelgeometry::ModelGeometry>(std::move(*model));
     }
     else {

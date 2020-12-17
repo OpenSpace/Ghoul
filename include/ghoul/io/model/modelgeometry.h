@@ -42,12 +42,13 @@ public:
 
     bool initialize(float& maximumDistanceSquared);
     void deinitialize();
-    void render(ghoul::opengl::ProgramObject& program);
+    void render(ghoul::opengl::ProgramObject& program) const;
 
     void changeRenderMode(const GLenum mode);
     double boundingRadius() const;
     void calculateBoundingRadius();
     std::vector<ghoul::io::ModelMesh>& meshes();
+    const std::vector<ghoul::io::ModelMesh>& meshes() const;
     void setUniforms(ghoul::opengl::ProgramObject& program);
 
 protected:

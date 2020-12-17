@@ -41,7 +41,7 @@ ModelMesh::ModelMesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&&
     , _textures(std::move(textures))
 { }
 
-void ModelMesh::render(ghoul::opengl::ProgramObject& program) {
+void ModelMesh::render(ghoul::opengl::ProgramObject& program) const {
 
     // Bind appropriate textures
     unsigned int diffuseNr = 1;

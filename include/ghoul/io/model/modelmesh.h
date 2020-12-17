@@ -61,8 +61,7 @@ public:
 
     bool initialize(float& maximumDistanceSquared);
     void deinitialize();
-    void render(ghoul::opengl::ProgramObject& program);
-
+    void render(ghoul::opengl::ProgramObject& program) const;
     void changeRenderMode(const GLenum mode);
 
     std::vector<Vertex> _vertices;

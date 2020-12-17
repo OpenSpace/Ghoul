@@ -64,7 +64,11 @@ std::vector<ghoul::io::ModelMesh>& ModelGeometry::meshes() {
     return _meshes;
 }
 
-void ModelGeometry::render(ghoul::opengl::ProgramObject& program) {
+const std::vector<ghoul::io::ModelMesh>& ModelGeometry::meshes() const {
+    return _meshes;
+}
+
+void ModelGeometry::render(ghoul::opengl::ProgramObject& program) const {
     for (int i = 0; i < _meshes.size(); ++i) {
         _meshes[i].render(program);
     }
