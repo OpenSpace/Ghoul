@@ -54,7 +54,7 @@ option(GHOUL_MODULE_LUA "Enable Lua" ON)
 option(GHOUL_MODULE_OPENGL "Enable OpenGL" ON)
 option(GHOUL_MODULE_SYSTEMCAPABILITIES "Enable System Capabilities" ON)
 
-option(BUILD_SHARED_LIBS "Build package with shared libraries." OFF)
+option(BUILD_SHARED_LIBS "Build package with shared libraries" OFF)
 
 if (MSVC)
   option(GHOUL_OPTIMIZATION_ENABLE_AVX "Enable AVX instruction set for compilation" OFF)
@@ -75,14 +75,9 @@ if (MSVC)
   endif ()
 endif ()
 
-# add_subdirectory(ext)
-# add_subdirectory(src)
 include(src/CMakeLists.txt)
 
-
-#############################
 # Compile settings
-#############################
 set_ghoul_compile_settings(Ghoul)
 
 if (GHOUL_HIGH_DEBUG_MODE)
@@ -97,9 +92,7 @@ if (GHOUL_THROW_ON_ASSERT)
   target_compile_definitions(Ghoul PUBLIC "GHL_THROW_ON_ASSERT")
 endif ()
 
-#############################
 # Dependencies
-#############################
 
 # System Libraries
 if (WIN32)
@@ -166,17 +159,9 @@ if (GHOUL_MODULE_OPENGL)
     target_link_libraries(Ghoul PUBLIC glbinding::glbinding glbinding::glbinding-aux)
   
     set_folder_location(glbinding "External")
-    set_folder_location(check-glbinding "External/glbinding-ext")
-    set_folder_location(check-glbinding-aux "External/glbinding-ext")
     set_folder_location(glbinding-aux "External/glbinding-ext")
-    set_folder_location(component_install "External/glbinding-ext")
-    set_folder_location(generate "External/glbinding-ext")
     set_folder_location(pack "External/glbinding-ext")
     set_folder_location(pack-glbinding "External/glbinding-ext")
-    set_folder_location(update "External/glbinding-ext")
-    set_folder_location(check-all "External/glbinding-ext")
-    set_folder_location(check-template "External/glbinding-ext")
-    set_folder_location(cppcheck-glbinding "External/glbinding-ext")
     set_folder_location(KHRplatform-sources "External/glbinding-ext")
   
     end_dependency("glbinding")
@@ -206,7 +191,6 @@ if (GHOUL_MODULE_ASSIMP)
   find_package(Assimp QUIET)
   if (Assimp_FOUND)
     message(STATUS "Using system assimp")
-    # target_include_directories(Ghoul SYSTEM PRIVATE ${ASSIMP_INCLUDE_DIRS})
     target_link_libraries(Ghoul PRIVATE ${ASSIMP_LIBRARIES})
     set(GHOUL_LIBRARY_DIRS "${ASSIMP_LIBRARY_DIRS}" PARENT_SCOPE)
   else ()
@@ -391,9 +375,7 @@ if (GHOUL_PROFILING_ENABLE_TRACY)
 endif ()
 end_dependency("Profiling")
 
-#############################
 # Other applications
-#############################
 option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
 if (GHOUL_HAVE_TESTS)
   begin_header("Generating unit test")
