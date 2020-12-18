@@ -478,7 +478,7 @@ private:
     /// The list of tracked directories
     std::map<std::string, DirectoryHandle*> _directories;
 
-#elif __APPLE__
+#elif defined(__APPLE__)
     /// OS X specific deinitialize function
     void deinitializeInternalApple();
 

@@ -59,7 +59,7 @@ namespace internal {
     struct StorageTypeConverter<T> {                                                     \
         using type = U;                                                                  \
         static const size_t size = S;                                                    \
-    };
+    }
 
     DEF_STORAGE_CONVERTER(char, IntegralType, 1);
     DEF_STORAGE_CONVERTER(signed char, IntegralType, 1);

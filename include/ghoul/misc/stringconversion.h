@@ -41,7 +41,7 @@ namespace ghoul {
  * <code>ghoul::from_string(ghoul::to_string(v)) == v</code>
  */
 template <typename T>
-constexpr T from_string(std::string_view string) {
+constexpr T from_string(std::string_view) {
     // Unfortunately, we can't write 'false' here, as the compiler is a bit too eager to
     // evaluate that
     static_assert(sizeof(T) == -1, "Missing from_string implementation");

@@ -65,10 +65,9 @@ public:
 
     /// Exception that gets thrown if the cache has a malformed information file
     struct MalformedCacheException : public CacheException {
-        explicit MalformedCacheException(std::string file, std::string msg = "");
+        explicit MalformedCacheException(std::string file);
 
         const std::string cacheFile;
-        const std::string message;
     };
 
     /// Exception that gets thrown if there was an error loading the previous cache files

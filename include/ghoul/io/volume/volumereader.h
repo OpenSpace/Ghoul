@@ -35,6 +35,7 @@ namespace ghoul::io {
 
 class VolumeReader {
 public:
+    virtual ~VolumeReader() = default;
     virtual std::unique_ptr<opengl::Texture> read(const std::string& filename) = 0;
 };
 

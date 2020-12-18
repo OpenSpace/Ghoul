@@ -54,11 +54,9 @@ CacheManager::CacheException::CacheException(std::string msg)
     : RuntimeError(std::move(msg), "Cache")
 {}
 
-CacheManager::MalformedCacheException::MalformedCacheException(std::string file,
-                                                               std::string msg)
+CacheManager::MalformedCacheException::MalformedCacheException(std::string file)
     : CacheException(fmt::format("Malformed cache at '{}'", file))
     , cacheFile(std::move(file))
-    , message(std::move(msg))
 {}
 
 CacheManager::ErrorLoadingCacheException::ErrorLoadingCacheException(std::string msg)

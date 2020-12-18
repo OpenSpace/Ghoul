@@ -39,7 +39,7 @@ using _SOCKET = int;
 using _SOCKLEN = socklen_t;
 
 #ifndef INVALID_SOCKET
-#define INVALID_SOCKET (_SOCKET)(~0)
+#define INVALID_SOCKET (static_cast<_SOCKET>(~0))
 #endif // INVALID_SOCKET
 
 #endif // WIN32
