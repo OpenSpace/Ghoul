@@ -55,7 +55,7 @@ void ModelMesh::render(ghoul::opengl::ProgramObject& program) const {
         // Tell shader wether to render invisible mesh with flashy color or not
         program.setUniform("use_forced_color", _textures[i].useForcedColor);
         if (_textures[i].useForcedColor) {
-            continue;
+            break;
         }
 
         // Use textures

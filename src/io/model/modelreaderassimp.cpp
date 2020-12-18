@@ -88,29 +88,73 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
             // Embedded texture
             if ((texture->mHeight == 0)) {
                 // Load compressed embedded texture
-                textureTmp.texture = ghoul::io::TextureReader::ref().loadTexture(
-                    static_cast<void*>(texture->pcData),
-                    texture->mWidth, texture->achFormatHint
-                );
-                LDEBUGC(
-                    "RenderableModel",
-                    fmt::format("Loaded texture from '{}'", static_cast<void*>(texture->pcData))
-                );
+
+                try {
+                    textureTmp.texture = TextureReader::ref().loadTexture(
+                        static_cast<void*>(texture->pcData),
+                        texture->mWidth,
+                        texture->achFormatHint
+                    );
+                    LDEBUG(
+                        fmt::format(
+                            "Loaded texture from '{}'",
+                            static_cast<void*>(texture->pcData)
+                        )
+                    );
+                }
+                catch (TextureReader::MissingReaderException e) {
+                    LWARNING(
+                        fmt::format(
+                            "Failed to load texture from '{}' with extension '{}' : "
+                            "Replacing with flashy color.",
+                            e.file,
+                            e.fileExtension
+                        )
+                    );
+                    textureTmp.texture = nullptr;
+                    textureTmp.hasTexture = false;
+                    textureTmp.useForcedColor = true;
+                    textureArray.push_back(std::move(textureTmp));
+                    return;
+                }
             }
             else {
                 // Load uncompressed embedded texture
-                // TODO
+                LWARNING("Uncompressed embedded texture detected: Not supported! "
+                    "Replacing with flashy color."
+                );
+                textureTmp.texture = nullptr;
+                textureTmp.hasTexture = false;
+                textureTmp.useForcedColor = true;
+                textureArray.push_back(std::move(textureTmp));
+                return;
             }
         }
         else {
             // Local texture
-            textureTmp.texture = ghoul::io::TextureReader::ref().loadTexture(
-                absPath(pathString.C_Str())
-            );
-            LDEBUGC(
-                "RenderableModel",
-                fmt::format("Loaded texture from '{}'", absPath(pathString.C_Str()))
-            );
+            try {
+                textureTmp.texture = TextureReader::ref().loadTexture(
+                    absPath(pathString.C_Str())
+                );
+                LDEBUG(
+                    fmt::format("Loaded texture from '{}'", absPath(pathString.C_Str()))
+                );
+            }
+            catch (TextureReader::MissingReaderException e) {
+                LWARNING(
+                    fmt::format(
+                        "Failed to load texture from '{}' with extension '{}' : "
+                        "Replacing with flashy color.",
+                        e.file,
+                        e.fileExtension
+                    )
+                );
+                textureTmp.texture = nullptr;
+                textureTmp.hasTexture = false;
+                textureTmp.useForcedColor = true;
+                textureArray.push_back(std::move(textureTmp));
+                return;
+            }
         }
 
         // Check if the entire texture is transparent
