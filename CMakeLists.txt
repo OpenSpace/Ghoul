@@ -237,13 +237,6 @@ if (GHOUL_MODULE_ASSIMP)
   else ()
     message(STATUS "Building assimp from source")
     set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
-
-    # These importers produce errors due to missing entries in the config.h right now
-    # When they compile, there is no reason to keep them disabled
-    set(ASSIMP_BUILD_FBX_IMPORTER OFF CACHE BOOL "" FORCE)
-    set(ASSIMP_BUILD_IFC_IMPORTER OFF CACHE BOOL "" FORCE)
-    set(ASSIMP_BUILD_X3D_IMPORTER OFF CACHE BOOL "" FORCE)
-    set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "")
     set(ASSIMP_NO_EXPORTER ON CACHE BOOL "")
     set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
 
