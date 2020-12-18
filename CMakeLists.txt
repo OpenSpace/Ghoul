@@ -75,17 +75,9 @@ if (MSVC)
   endif ()
 endif ()
 
-#############################
-# Including the source files (with source groups already defined)
-#############################
+# add_subdirectory(ext)
+# add_subdirectory(src)
 include(src/CMakeLists.txt)
-
-
-#############################
-# Declare the library
-#############################
-add_library(Ghoul STATIC ${GHOUL_SOURCE} ${GHOUL_HEADER})
-target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 
 #############################
@@ -151,8 +143,6 @@ if (GHOUL_MODULE_OPENGL)
   # OpenGL
   begin_dependency("OpenGL")
   find_package(OpenGL REQUIRED)
-  target_include_directories(Ghoul SYSTEM PUBLIC ${OPENGL_INCLUDE_DIR})
-  message(STATUS "Including OpenGL found at ${OPENGL_INCLUDE_DIR}")
   target_link_libraries(Ghoul PUBLIC ${OPENGL_LIBRARIES})
   message(STATUS "Linking OpenGL found at ${OPENGL_LIBRARIES}")
   mark_as_advanced(OPENGL_INCLUDE_DIR OPENGL_LIBRARIES)
@@ -161,7 +151,6 @@ if (GHOUL_MODULE_OPENGL)
   # glbindings
   if (NOT TARGET glbinding)
     begin_dependency("glbinding")
-    target_compile_definitions(Ghoul PUBLIC "GHOUL_MODULE_OPENGL")
   
     set(OPTION_BUILD_GPU_TESTS OFF CACHE BOOL "")
     set(OPTION_BUILD_TESTS OFF CACHE BOOL "")
@@ -174,9 +163,6 @@ if (GHOUL_MODULE_OPENGL)
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/glbinding)
     disable_external_warnings(glbinding)
     disable_external_warnings(glbinding-aux)
-    target_include_directories(Ghoul SYSTEM PUBLIC ${GHOUL_ROOT_DIR}/ext/glbinding/source/glbinding/include)
-    target_include_directories(Ghoul SYSTEM PUBLIC ${GHOUL_ROOT_DIR}/ext/glbinding/source/glbinding-aux/include)
-    target_include_directories(Ghoul SYSTEM PUBLIC ${CMAKE_BINARY_DIR}/ext/ghoul/ext/glbinding/source/glbinding-aux/include)
     target_link_libraries(Ghoul PUBLIC glbinding::glbinding glbinding::glbinding-aux)
   
     set_folder_location(glbinding "External")
@@ -220,7 +206,7 @@ if (GHOUL_MODULE_ASSIMP)
   find_package(Assimp QUIET)
   if (Assimp_FOUND)
     message(STATUS "Using system assimp")
-    target_include_directories(Ghoul SYSTEM PRIVATE ${ASSIMP_INCLUDE_DIRS})
+    # target_include_directories(Ghoul SYSTEM PRIVATE ${ASSIMP_INCLUDE_DIRS})
     target_link_libraries(Ghoul PRIVATE ${ASSIMP_LIBRARIES})
     set(GHOUL_LIBRARY_DIRS "${ASSIMP_LIBRARY_DIRS}" PARENT_SCOPE)
   else ()
@@ -342,7 +328,6 @@ end_dependency("stb_image")
 # Stackwalker
 if (MSVC)
   begin_dependency("Stackwalker")
-  target_include_directories(Ghoul PRIVATE ${GHOUL_ROOT_DIR}/ext/stackwalker)
   include_external_library(Ghoul PRIVATE StackWalker ${GHOUL_ROOT_DIR}/ext/stackwalker ${GHOUL_ROOT_DIR}/ext/stackwalker)
   end_dependency("Stackwalker")
 endif ()

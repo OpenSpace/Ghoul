@@ -298,6 +298,9 @@ if (GHOUL_MODULE_SYSTEMCAPABILITIES)
   )
 endif ()
 
+add_library(Ghoul STATIC ${GHOUL_SOURCE} ${GHOUL_HEADER})
+target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
+
 
 # Place files into source_group
 foreach (file ${GHOUL_SOURCE} ${GHOUL_HEADER})
