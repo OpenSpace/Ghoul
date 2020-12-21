@@ -30,6 +30,7 @@
 #include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/io/model/modelmesh.h>
 #include <ghoul/io/texture/texturereader.h>
+#include <ghoul/io/texture/texturereaderbase.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
@@ -117,6 +118,21 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
                     textureArray.push_back(std::move(textureTmp));
                     return;
                 }
+                catch (TextureReaderBase::TextureLoadException e) {
+                    LWARNING(
+                        fmt::format(
+                            "Failed to load texture from '{}' with error: '{}' : "
+                            "Replacing with flashy color.",
+                            e.filename,
+                            e.message
+                        )
+                    );
+                    textureTmp.texture = nullptr;
+                    textureTmp.hasTexture = false;
+                    textureTmp.useForcedColor = true;
+                    textureArray.push_back(std::move(textureTmp));
+                    return;
+                }
             }
             else {
                 // Load uncompressed embedded texture
@@ -147,6 +163,21 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
                         "Replacing with flashy color.",
                         e.file,
                         e.fileExtension
+                    )
+                );
+                textureTmp.texture = nullptr;
+                textureTmp.hasTexture = false;
+                textureTmp.useForcedColor = true;
+                textureArray.push_back(std::move(textureTmp));
+                return;
+            }
+            catch (TextureReaderBase::TextureLoadException e) {
+                LWARNING(
+                    fmt::format(
+                        "Failed to load texture from '{}' with error: '{}' : "
+                        "Replacing with flashy color.",
+                        e.filename,
+                        e.message
                     )
                 );
                 textureTmp.texture = nullptr;
