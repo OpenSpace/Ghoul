@@ -43,7 +43,6 @@ begin_header("Configuring Ghoul Project")
 option(GHOUL_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
 option(GHOUL_LOGGING_ENABLE_TRACE "Enables the LTRACE macro" ON)
-option(GHOUL_DISABLE_EXTERNAL_WARNINGS "Disable warnings in external libraries" ON)
 option(GHOUL_THROW_ON_ASSERT "Disables the feedback on asserts; for use in unit tests" OFF)
 option(GHOUL_PROFILING_ENABLE_TRACY "Enable profiling with Tracy" OFF)
 
@@ -105,7 +104,6 @@ if (APPLE)
   find_library(CARBON_LIBRARY Carbon REQUIRED)
   find_library(COCOA_LIBRARY Carbon REQUIRED)
   find_library(APP_SERVICES_LIBRARY ApplicationServices REQUIRED)
-  mark_as_advanced(COREFOUNDATION_LIBRARY COREVIDEO_LIBRARY CARBON_LIBRARY COCOA_LIBRARY APP_SERVICES_LIBRARY)
   target_include_directories(Ghoul SYSTEM PRIVATE "/Developer/Headers/FlatCarbon")
   target_link_libraries(Ghoul PRIVATE ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY} ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})
   end_dependency("Core Libraries")
@@ -114,7 +112,6 @@ endif ()
 if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
   begin_dependency("iNotify")
   find_library(INOTIFY_LIBRARIES inotify PATHS "/usr/local/lib")
-  mark_as_advanced(INOTIFY_LIBRARIES)
   target_include_directories(Ghoul SYSTEM PRIVATE "/usr/local/include")
   target_link_libraries(Ghoul PRIVATE ${INOTIFY_LIBRARIES})
   end_dependency("iNotify")
@@ -125,7 +122,6 @@ begin_dependency("GLM")
 set(GLM_ROOT_DIR "${GHOUL_ROOT_DIR}/ext/glm")
 find_package(GLM REQUIRED)
 message(STATUS "Including GLM found at ${GLM_INCLUDE_DIRS}")
-mark_as_advanced(GLM_INCLUDE_DIR GLM_INCLUDE_DIRS)
 target_include_directories(Ghoul SYSTEM PUBLIC ${GLM_INCLUDE_DIRS})
 end_dependency("GLM")
 
@@ -138,7 +134,6 @@ if (GHOUL_MODULE_OPENGL)
   find_package(OpenGL REQUIRED)
   target_link_libraries(Ghoul PUBLIC ${OPENGL_LIBRARIES})
   message(STATUS "Linking OpenGL found at ${OPENGL_LIBRARIES}")
-  mark_as_advanced(OPENGL_INCLUDE_DIR OPENGL_LIBRARIES)
   end_dependency("OpenGL")
 
   # glbindings
@@ -149,10 +144,6 @@ if (GHOUL_MODULE_OPENGL)
     set(OPTION_BUILD_TESTS OFF CACHE BOOL "")
     set(OPTION_BUILD_TOOLS OFF CACHE BOOL "")
     set(OPTION_BUILD_EXAMPLES OFF CACHE BOOL "")
-    mark_as_advanced(OPTION_BUILD_GPU_TESTS OPTION_BUILD_TESTS OPTION_BUILD_TOOLS
-      OPTION_BUILD_EXAMPLES OPTION_BUILD_CHECK OPTION_BUILD_DOCS
-      OPTION_BUILD_WITH_BOOST_THREAD INSTALL_MSVC_REDIST_FILEPATH
-    )
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/glbinding)
     disable_external_warnings(glbinding)
     disable_external_warnings(glbinding-aux)
@@ -174,7 +165,6 @@ begin_dependency("LZ4")
 find_package(LZ4 REQUIRED)
 target_include_directories(Ghoul SYSTEM PRIVATE ${LZ4_INCLUDE_DIR})
 target_link_libraries(Ghoul PRIVATE ${LZ4_LIBRARIES})
-mark_as_advanced(LZ4_INCLUDE_DIR)
 set_folder_location(lz4 "External")
 end_dependency("LZ4")
 
@@ -191,6 +181,7 @@ if (GHOUL_MODULE_ASSIMP)
   find_package(Assimp QUIET)
   if (Assimp_FOUND)
     message(STATUS "Using system assimp")
+    target_include_directories(Ghoul SYSTEM PRIVATE ${ASSIMP_INCLUDE_DIR})
     target_link_libraries(Ghoul PRIVATE ${ASSIMP_LIBRARIES})
     set(GHOUL_LIBRARY_DIRS "${ASSIMP_LIBRARY_DIRS}" PARENT_SCOPE)
   else ()
@@ -200,47 +191,16 @@ if (GHOUL_MODULE_ASSIMP)
 
     # These importers produce errors due to missing entries in the config.h right now
     # When they compile, there is no reason to keep them disabled
-    set(ASSIMP_BUILD_FBX_IMPORTER OFF CACHE BOOL "" FORCE)
-    set(ASSIMP_BUILD_IFC_IMPORTER OFF CACHE BOOL "" FORCE)
-    set(ASSIMP_BUILD_X3D_IMPORTER OFF CACHE BOOL "" FORCE)
+    set(ASSIMP_BUILD_FBX_IMPORTER OFF CACHE BOOL "")
+    set(ASSIMP_BUILD_IFC_IMPORTER OFF CACHE BOOL "")
+    set(ASSIMP_BUILD_X3D_IMPORTER OFF CACHE BOOL "")
     set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "")
-    set(ASSIMP_NO_EXPORTER ON CACHE BOOL "")
+    set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "")
+    set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF CACHE BOOL "")
+    set(ASSIMP_NO_EXPORT ON CACHE BOOL "")
     set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
 
-    mark_as_advanced(Assimp_DIR ASSIMP_ANDROID_JNIIOSYSTEM ASSIMP_ASAN
-      ASSIMP_BIN_INSTALL_DIR ASSIMP_BUILD_3DS_IMPORTER ASSIMP_BUILD_3D_IMPORTER
-      ASSIMP_BUILD_3MF_IMPORTER ASSIMP_BUILD_AC_IMPORTER
-      ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT ASSIMP_BUILD_AMF_IMPORTER
-      ASSIMP_BUILD_ASE_IMPORTER ASSIMP_BUILD_ASSBIN_IMPORTER
-      ASSIMP_BUILD_ASSIMP_TOOLS ASSIMP_BUILD_ASSXML_IMPORTER
-      ASSIMP_BUILD_B3D_IMPORTER ASSIMP_BUILD_BLEND_IMPORTER
-      ASSIMP_BUILD_BVH_IMPORTER ASSIMP_BUILD_COB_IMPORTER
-      ASSIMP_BUILD_COLLADA_IMPORTER ASSIMP_BUILD_CSM_IMPORTER
-      ASSIMP_BUILD_DXF_IMPORTER ASSIMP_BUILD_FBX_IMPORTER ASSIMP_BUILD_GLTF_IMPORTER
-      ASSIMP_BUILD_HMP_IMPORTER ASSIMP_BUILD_IFC_IMPORTER
-      ASSIMP_BUILD_IRRMESH_IMPORTER ASSIMP_BUILD_IRR_IMPORTER
-      ASSIMP_BUILD_LWO_IMPORTER ASSIMP_BUILD_LWS_IMPORTER ASSIMP_BUILD_MD2_IMPORTER
-      ASSIMP_BUILD_MD3_IMPORTER ASSIMP_BUILD_MD5_IMPORTER ASSIMP_BUILD_MDC_IMPORTER
-      ASSIMP_BUILD_MDL_IMPORTER ASSIMP_BUILD_MMD_IMPORTER ASSIMP_BUILD_MS3D_IMPORTER
-      ASSIMP_BUILD_NDO_IMPORTER ASSIMP_BUILD_NFF_IMPORTER
-      ASSIMP_BUILD_NONFREE_C4D_IMPORTER ASSIMP_BUILD_OBJ_IMPORTER
-      ASSIMP_BUILD_OFF_IMPORTER ASSIMP_BUILD_OGRE_IMPORTER
-      ASSIMP_BUILD_OPENGEX_IMPORTER ASSIMP_BUILD_PLY_IMPORTER
-      ASSIMP_BUILD_Q3BSP_IMPORTER ASSIMP_BUILD_Q3D_IMPORTER
-      ASSIMP_BUILD_RAW_IMPORTER ASSIMP_BUILD_SAMPLES ASSIMP_BUILD_SIB_IMPORTER
-      ASSIMP_BUILD_SMD_IMPORTER ASSIMP_BUILD_STL_IMPORTER
-      ASSIMP_BUILD_TERRAGEN_IMPORTER ASSIMP_BUILD_TESTS ASSIMP_BUILD_X_IMPORTER
-      ASSIMP_BUILD_X3D_IMPORTER ASSIMP_BUILD_XGL_IMPORTER ASSIMP_BUILD_ZLIB
-      ASSIMP_COVERALLS ASSIMP_DOUBLE_PRECISION ASSIMP_INCLUDE_INSTALL_DIR
-      ASSIMP_INSTALL_PDB ASSIMP_LIBRARY_SUFFIX ASSIMP_LIB_INSTALL_DIR
-      ASSIMP_NO_EXPORT ASSIMP_NO_EXPORTER ASSIMP_OPT_BUILD_PACKAGES
-      ASSIMP_PACKAGE_VERSION ASSIMP_UBSAN ASSIMP_WERROR BUILD_DOCS BUILD_FRAMEWORK
-      SYSTEM_IRRXML LIBRARY_SUFFIX
-    )
-
-    include_external_library(Ghoul PRIVATE 
-      assimp ${GHOUL_ROOT_DIR}/ext/assimp ${GHOUL_ROOT_DIR}/ext/assimp/include
-    )
+    include_external_library(Ghoul PRIVATE assimp ${GHOUL_ROOT_DIR}/ext/assimp)
 
     # We need to include this to be able to find the assimp/config.h file
     target_include_directories(Ghoul SYSTEM PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
@@ -258,7 +218,6 @@ set(FMT_DOC OFF CACHE BOOL "Generate the doc target.")
 set(FMT_INSTALL OFF CACHE BOOL "Generate the install target.")
 set(FMT_TEST OFF CACHE BOOL "Generate the test target.")
 include_external_library(Ghoul PUBLIC fmt ${GHOUL_ROOT_DIR}/ext/cppformat ${GHOUL_ROOT_DIR}/ext/cppformat)
-mark_as_advanced(FMT_DOC FMT_INSTALL FMT_PEDANTIC FMT_TEST FMT_WERROR)
 end_dependency("fmt")
 
 message(STATUS "Loading image libraries")
@@ -272,7 +231,6 @@ if (IL_FOUND)
     target_compile_definitions(Ghoul PRIVATE "GHOUL_USE_DEVIL")
     target_include_directories(Ghoul SYSTEM PRIVATE ${IL_INCLUDE_DIR})
     target_link_libraries(Ghoul PRIVATE ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
-    mark_as_advanced(IL_INCLUDE_DIR IL_LIBRARIES ILU_LIBRARIES ILUT_LIBRARIES)
   endif ()
   end_dependency("DevIL")
 endif ()
@@ -342,7 +300,6 @@ if (GHOUL_MODULE_FONTRENDERING)
   set(FREETYPE_DIST OFF CACHE BOOL "")
   include_external_library(Ghoul PRIVATE freetype ${GHOUL_ROOT_DIR}/ext/freetype2 ${GHOUL_ROOT_DIR}/ext/freetype2/include)
 
-  mark_as_advanced(FT_WITH_BZIP2 FT_WITH_HARFBUZZ FT_WITH_PNG FT_WITH_ZLIB FREETYPE_DIST pkgcfg_lib_PC_HARFBUZZ_harfbuzz)
   set_folder_location(dist "External")
 
   if (TARGET zlib)
@@ -354,7 +311,6 @@ endif ()
 # Tiny process library
 begin_dependency("tiny-process-library")
 include_external_library(Ghoul PRIVATE tiny-process-library ${GHOUL_ROOT_DIR}/ext/tiny-process-library)
-mark_as_advanced(BUILD_TESTING)
 end_dependency("tiny-process-library")
 
 
