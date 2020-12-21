@@ -102,20 +102,17 @@ linux_clang_ninja: {
 windows_msvc: {
   if (env.USE_BUILD_OS_WINDOWS == 'true') {
     node('windows') {
-      // We specify the workspace directory manually to reduce the path length and thus try to avoid MSB3491 on Visual Studio
-      ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}/${env.BUILD_ID}") {
-        stage('windows-msvc/scm') {
-          deleteDir();
-          gitHelper.checkoutGit(url, branch);
-        }
-        stage('windows-msvc/build') {
-          compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio(), '', '', 'build-msvc');
-          compileHelper.recordCompileIssues(compileHelper.VisualStudio());
-        }
-        stage('wiwindows-msvcndows/test') {
-          // Currently, the unit tests are failing on Windows
-          // testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
-        }
+      stage('windows-msvc/scm') {
+        deleteDir();
+        gitHelper.checkoutGit(url, branch);
+      }
+      stage('windows-msvc/build') {
+        compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio(), '', '', 'build-msvc');
+        compileHelper.recordCompileIssues(compileHelper.VisualStudio());
+      }
+      stage('wiwindows-msvcndows/test') {
+        // Currently, the unit tests are failing on Windows
+        // testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
       }
       cleanWs()
     } // node('windows')
@@ -124,19 +121,16 @@ windows_msvc: {
 windows_ninja: {
   if (env.USE_BUILD_OS_WINDOWS == 'true') {
     node('windows') {
-      // We specify the workspace directory manually to reduce the path length and thus try to avoid MSB3491 on Visual Studio
-      ws("${env.JENKINS_BASE}/G/${env.BRANCH_NAME}/${env.BUILD_ID}") {
-        stage('windows-ninja/scm') {
-          deleteDir();
-          gitHelper.checkoutGit(url, branch);
-        }
-        stage('windows-ninja/build') {
-          compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-ninja');
-        }
-        stage('windows-ninja/test') {
-          // Currently, the unit tests are failing on Windows
-          // testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
-        }
+      stage('windows-ninja/scm') {
+        deleteDir();
+        gitHelper.checkoutGit(url, branch);
+      }
+      stage('windows-ninja/build') {
+        compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-ninja');
+      }
+      stage('windows-ninja/test') {
+        // Currently, the unit tests are failing on Windows
+        // testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
       }
       cleanWs()
     } // node('windows')
