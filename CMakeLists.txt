@@ -243,7 +243,7 @@ if (GHOUL_MODULE_ASSIMP)
     )
 
     # We need to include this to be able to find the assimp/config.h file
-    target_include_directories(Ghoul PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
+    target_include_directories(Ghoul SYSTEM PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
 
     set_folder_location(IrrXML "External")
     set_folder_location(uninstall "External")
