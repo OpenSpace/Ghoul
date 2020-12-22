@@ -1,5 +1,7 @@
-unreadVariable
-noExplicitConstructor
-missingInclude
-unusedFunction
+// unreadVariable
+// noExplicitConstructor
+// missingInclude
+// unusedFunction
 useStlAlgorithm
+
+ConfigurationNotChecked:src/opengl/textureatlas.cpp:116
