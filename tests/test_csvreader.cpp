@@ -30,7 +30,7 @@
 
 TEST_CASE("CSVReader: Initial", "[csvreader]") {
     std::string test0 = absPath("${UNIT_TEST}/csvreader/test0.csv");
-    std::vector<std::vector<std::string>> t0 = ghoul::loadCSVFile(test0);
+    ghoul::loadCSVFile(test0);
 }
 
 TEST_CASE("CSVReader: Full Load", "[csvreader]") {

@@ -51,7 +51,7 @@ public:
         const std::string filename;
 
         /// The error message that occurred
-        const std::string message;
+        const std::string errorMessage;
 
         /// The TextureReaderBase that caused the exception
         const TextureReaderBase* reader;

@@ -980,8 +980,8 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
                     }
                 });
                 for (size_t i = 0; i < internal::StorageTypeConverter<T>::size; ++i) {
-                    const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    const std::string& k = keys[i];
+                    dict.getValue(k, glm::value_ptr(value)[i]);
                 }
                 return;
             }
@@ -1144,7 +1144,7 @@ extern template void Dictionary::setValueHelper<__TYPE__>(std::string, __TYPE__,
     CreateIntermediate);                                                                 \
 extern template void Dictionary::getValueHelper<__TYPE__>(const std::string&,            \
                                                                        __TYPE__&) const; \
-extern template bool Dictionary::hasValueHelper<__TYPE__>(const std::string&) const;
+extern template bool Dictionary::hasValueHelper<__TYPE__>(const std::string&) const
 
 EXTERN_TEMPLATE_DECLARATION(char);
 EXTERN_TEMPLATE_DECLARATION(signed char);

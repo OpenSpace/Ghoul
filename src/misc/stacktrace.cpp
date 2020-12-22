@@ -111,7 +111,7 @@ std::vector<std::string> stackTrace() {
         // we are primarily interested in module, function and address
         sscanf(
             strs[i],
-            "%*s %s %s %s %*s %d",
+            "%*s %1024s %48s %1024s %*s %d",
             moduleName.data(),
             addr.data(),
             functionSymbol.data(),

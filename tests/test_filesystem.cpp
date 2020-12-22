@@ -44,7 +44,7 @@ TEST_CASE("FileSystem: CreateRemoveDirectory", "[filesystem]") {
     using ghoul::filesystem::FileSystem;
 
     const std::string tmp = absPath("${TEMPORARY}/tmp");
-    const std::string tmpRecursive1 = absPath("${TEMPORARY}/tmp/tmp2");
+    absPath("${TEMPORARY}/tmp/tmp2");
     const std::string tmpRecursive2 = absPath("${TEMPORARY}/tmp/tmp2/tmp3");
 
     REQUIRE_NOTHROW(FileSys.createDirectory(tmp));

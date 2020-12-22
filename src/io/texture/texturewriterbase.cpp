@@ -34,7 +34,7 @@ TextureWriterBase::TextureWriteException::TextureWriteException(std::string name
                                                                const TextureWriterBase& w)
     : RuntimeError(fmt::format("Error writing texture '{}'", name), "TextureWriter")
     , filename(std::move(name))
-    , message(std::move(msg))
+    , errorMessage(std::move(msg))
     , writer(w)
 {}
 

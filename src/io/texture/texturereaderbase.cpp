@@ -34,7 +34,7 @@ TextureReaderBase::TextureLoadException::TextureLoadException(std::string name,
                                                               const TextureReaderBase* r)
     : RuntimeError(fmt::format("Error loading texture '{}'", name), "TextureLoader")
     , filename(std::move(name))
-    , message(std::move(msg))
+    , errorMessage(std::move(msg))
     , reader(r)
 {}
 

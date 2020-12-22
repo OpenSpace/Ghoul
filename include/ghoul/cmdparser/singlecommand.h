@@ -299,7 +299,7 @@ public:
     /**
      * Sets the <code>bool</code> value passed in the constructor to <code>true</code>
      */
-    void execute(const std::vector<std::string>& /*parameters*/);
+    virtual void execute(const std::vector<std::string>& /*parameters*/) override;
 
 protected:
     bool& _ptr;
