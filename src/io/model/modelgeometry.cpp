@@ -37,8 +37,10 @@
 
 namespace ghoul::modelgeometry {
 
-ModelGeometry::ModelGeometry(std::vector<ghoul::io::ModelMesh>&& meshes) 
+ModelGeometry::ModelGeometry(std::vector<ghoul::io::ModelMesh>&& meshes,
+                             std::vector<TextureEntry>&& textureStorage)
     : _meshes(std::move(meshes))
+    , _textureStorage(std::move(textureStorage))
 {}
 
 double ModelGeometry::boundingRadius() const {
@@ -66,6 +68,14 @@ std::vector<ghoul::io::ModelMesh>& ModelGeometry::meshes() {
 
 const std::vector<ghoul::io::ModelMesh>& ModelGeometry::meshes() const {
     return _meshes;
+}
+
+std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() {
+    return _textureStorage;
+}
+
+const std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() const {
+    return _textureStorage;
 }
 
 void ModelGeometry::render(ghoul::opengl::ProgramObject& program) const {

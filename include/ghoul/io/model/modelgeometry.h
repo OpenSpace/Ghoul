@@ -36,7 +36,14 @@ namespace ghoul::modelgeometry {
 
 class ModelGeometry {
 public:
-    ModelGeometry(std::vector<ghoul::io::ModelMesh>&& meshes);
+
+    struct TextureEntry {
+        std::string name;
+        std::unique_ptr<ghoul::opengl::Texture> texture;
+    };
+
+    ModelGeometry(std::vector<ghoul::io::ModelMesh>&& meshes,
+        std::vector<TextureEntry>&& textureStorage);
     ModelGeometry(ModelGeometry&&) noexcept = default;
     ~ModelGeometry() noexcept = default;
 
@@ -47,13 +54,17 @@ public:
     void changeRenderMode(const GLenum mode);
     double boundingRadius() const;
     void calculateBoundingRadius();
+    void setUniforms(ghoul::opengl::ProgramObject& program);
+
     std::vector<ghoul::io::ModelMesh>& meshes();
     const std::vector<ghoul::io::ModelMesh>& meshes() const;
-    void setUniforms(ghoul::opengl::ProgramObject& program);
+    std::vector<TextureEntry>& textureStorage();
+    const std::vector<TextureEntry>& textureStorage() const;
 
 protected:
     double _boundingRadius = 0.0;
     std::vector<ghoul::io::ModelMesh> _meshes;
+    std::vector<TextureEntry> _textureStorage;
 };
 
 }  // namespace ghoul::modelgeometry

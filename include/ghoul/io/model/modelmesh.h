@@ -46,7 +46,7 @@ public:
     };
 
     struct Texture {
-        std::unique_ptr<ghoul::opengl::Texture> texture;
+        ghoul::opengl::Texture* texture;
         std::string type;
         bool hasTexture = false;
         bool useForcedColor = false;

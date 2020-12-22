@@ -54,24 +54,25 @@ namespace ghoul::io {
 
 void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType type,
                           std::string textureType,
-                          std::vector<ghoul::io::ModelMesh::Texture>& textureArray)
+                          std::vector<ghoul::io::ModelMesh::Texture>& textureArray,
+                 std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage)
 {
-    ghoul::io::ModelMesh::Texture textureTmp;
-    textureTmp.type = textureType;
-
     for (unsigned int i = 0; i < mat->GetTextureCount(type); ++i) {
+        ghoul::io::ModelMesh::Texture textureTmp;
+        textureTmp.type = textureType;
         aiString pathString;
         mat->GetTexture(type, i, &pathString);
 
-        // Check if texture has already been loaded
+        // Check for duplicates
         bool shouldSkip = false;
         for (unsigned int j = 0; j < textureArray.size(); ++j) {
             if (textureArray[j].hasTexture) {
-                int isLoaded = std::strcmp(textureArray[j].texture->name().c_str(),
+                int isDuplicate = std::strcmp(
+                    textureArray[j].texture->name().c_str(),
                     pathString.C_Str()
                 );
-                if (isLoaded == 0) {
-                    // Texture has already been loaded, continue to next one
+                if (isDuplicate == 0) {
+                    // Texture has already been loaded for this mesh, continue to next one
                     shouldSkip = true;
                     break;
                 }
@@ -82,20 +83,41 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
         if (shouldSkip)
             continue;
 
+        // Check if texture has already been loaded by other meshes
+        for (unsigned int j = 0; j < textureStorage.size(); ++j) {
+            int isLoaded = std::strcmp(textureStorage[j].name.c_str(), pathString.C_Str());
+            if (isLoaded == 0) {
+                // Texture has already been loaded. Point to that texture instead of copying
+                textureTmp.texture = textureStorage[j].texture.get();
+                textureTmp.texture->setName(pathString.C_Str());
+                textureTmp.hasTexture = true;
+                textureArray.push_back(std::move(textureTmp));
+                shouldSkip = true;
+                break;
+            }
+        }
+
+        // Texture already loaded, do not load it again
+        if (shouldSkip)
+            continue;
+
         // Load texture
         // Check if the texture is an embedded texture and whether it is compressed or not
         const aiTexture* texture = scene->GetEmbeddedTexture(pathString.C_Str());
+        modelgeometry::ModelGeometry::TextureEntry textureEntry;
+        textureEntry.name = pathString.C_Str();
         if (texture) {
             // Embedded texture
             if ((texture->mHeight == 0)) {
                 // Load compressed embedded texture
-
                 try {
-                    textureTmp.texture = TextureReader::ref().loadTexture(
+                    textureEntry.texture = TextureReader::ref().loadTexture(
                         static_cast<void*>(texture->pcData),
                         texture->mWidth,
                         texture->achFormatHint
                     );
+                    textureTmp.texture = textureEntry.texture.get();
+                    textureTmp.texture->setName(pathString.C_Str());
                     LDEBUG(
                         fmt::format(
                             "Loaded texture from '{}'",
@@ -116,7 +138,7 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
                     textureTmp.hasTexture = false;
                     textureTmp.useForcedColor = true;
                     textureArray.push_back(std::move(textureTmp));
-                    return;
+                    continue;
                 }
                 catch (TextureReaderBase::TextureLoadException e) {
                     LWARNING(
@@ -131,7 +153,7 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
                     textureTmp.hasTexture = false;
                     textureTmp.useForcedColor = true;
                     textureArray.push_back(std::move(textureTmp));
-                    return;
+                    continue;
                 }
             }
             else {
@@ -143,15 +165,17 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
                 textureTmp.hasTexture = false;
                 textureTmp.useForcedColor = true;
                 textureArray.push_back(std::move(textureTmp));
-                return;
+                continue;
             }
         }
         else {
             // Local texture
             try {
-                textureTmp.texture = TextureReader::ref().loadTexture(
+                textureEntry.texture = TextureReader::ref().loadTexture(
                     absPath(pathString.C_Str())
                 );
+                textureTmp.texture = textureEntry.texture.get();
+                textureTmp.texture->setName(pathString.C_Str());
                 LDEBUG(
                     fmt::format("Loaded texture from '{}'", absPath(pathString.C_Str()))
                 );
@@ -169,7 +193,7 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
                 textureTmp.hasTexture = false;
                 textureTmp.useForcedColor = true;
                 textureArray.push_back(std::move(textureTmp));
-                return;
+                continue;
             }
             catch (TextureReaderBase::TextureLoadException e) {
                 LWARNING(
@@ -184,7 +208,7 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
                 textureTmp.hasTexture = false;
                 textureTmp.useForcedColor = true;
                 textureArray.push_back(std::move(textureTmp));
-                return;
+                continue;
             }
         }
 
@@ -205,17 +229,18 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
 
         // If entire texture is transparent, do not add it
         if (!isOpague)
-            return;
+            continue;
 
-        // Add Texture to the textureArray
-        textureTmp.texture->setName(pathString.C_Str());
+        // Add new Texture to the textureStorage and point to it in the texture array
         textureTmp.hasTexture = true;
         textureArray.push_back(std::move(textureTmp));
+        textureStorage.push_back(std::move(textureEntry));
     }
 }
 
 
-ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform)
+ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform,
+          std::vector<ghoul::modelgeometry::ModelGeometry::TextureEntry>& textureStorage)
 {
     std::vector<ModelMesh::Vertex> vertexArray;
     std::vector<unsigned int> indexArray;
@@ -308,7 +333,8 @@ ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform
             material,
             aiTextureType_DIFFUSE,
             "texture_diffuse",
-            textureArray
+            textureArray,
+            textureStorage
         );
     }
     else {
@@ -331,7 +357,8 @@ ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform
             material,
             aiTextureType_SPECULAR,
             "texture_specular",
-            textureArray
+            textureArray,
+            textureStorage
         );
     }
     else {
@@ -355,7 +382,8 @@ ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform
             material,
             aiTextureType_NORMALS,
             "texture_normal",
-            textureArray
+            textureArray,
+            textureStorage
         );
     }
 
@@ -369,8 +397,9 @@ ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform
 // Process a node in a recursive fashion. Process each individual mesh located 
 // at the node and repeats this process on its children nodes (if any)
 void processNode(aiNode* node, const aiScene* scene, std::vector<ModelMesh>& meshes,
-                 const glm::mat4x4& parentTransform, const bool forceRenderInvisible,
-                 const bool notifyInvisibleDropped)
+                 const glm::mat4x4& parentTransform,
+                 std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
+                 const bool forceRenderInvisible, const bool notifyInvisibleDropped)
 {
     // Convert transform matrix of the node
     // Assimp stores matrixes in row major and glm stores matrixes in column major
@@ -392,11 +421,11 @@ void processNode(aiNode* node, const aiScene* scene, std::vector<ModelMesh>& mes
 
     // Process each mesh for the current node
     for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-        // The node object only contains indices to index the actual objects in the scene. 
-        // The scene contains all the data, node is just to keep stuff organized 
+        // The node object only contains indices to index the actual objects in the scene.
+        // The scene contains all the data, node is just to keep stuff organized
         // (like relations between nodes).
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        ModelMesh loadedMesh = processMesh(mesh, scene, globalTransform);
+        ModelMesh loadedMesh = processMesh(mesh, scene, globalTransform, textureStorage);
 
         // If mesh is invisible (no materials) drop it unless forced to render anyway
         // Notify unless suppresed
@@ -429,6 +458,7 @@ void processNode(aiNode* node, const aiScene* scene, std::vector<ModelMesh>& mes
             scene,
             meshes,
             globalTransform,
+            textureStorage,
             forceRenderInvisible,
             notifyInvisibleDropped
         );
@@ -461,17 +491,22 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
 
     // Get info from all models in the scene
     std::vector<ModelMesh> meshArray;
+    std::vector<ghoul::modelgeometry::ModelGeometry::TextureEntry> textureStorage;
     processNode(scene->mRootNode,
         scene,
         meshArray,
         rootTransform,
+        textureStorage,
         forceRenderInvisible,
         notifyInvisibleDropped
     );
 
     // Return the ModelGeometry from the meshArray
     return std::make_unique<modelgeometry::ModelGeometry>(
-        std::move(modelgeometry::ModelGeometry(std::move(meshArray)))
+        std::move(modelgeometry::ModelGeometry(
+            std::move(meshArray),
+            std::move(textureStorage)
+        ))
     );
 }
 
@@ -613,7 +648,7 @@ std::unique_ptr<ghoul::modelgeometry::ModelGeometry> ModelReaderAssimp::loadCach
         throw ModelLoadException(cachedFile, "Could not open file", this);
     }
 
-    // First check the caching version
+    // Check the caching version
     int8_t version = 0;
     fileStream.read(reinterpret_cast<char*>(&version), sizeof(int8_t));
     if (version != CurrentCacheVersion) {
@@ -623,6 +658,84 @@ std::unique_ptr<ghoul::modelgeometry::ModelGeometry> ModelReaderAssimp::loadCach
             "The format of the cached file has changed: deleting old cache",
             this
         );
+    }
+
+    // First read the textureEntries
+    int32_t nTextureEntries = 0;
+    fileStream.read(reinterpret_cast<char*>(&nTextureEntries), sizeof(int32_t));
+    if (nTextureEntries == 0) {
+        throw ModelLoadException(cachedFile, "No textureEntries were loaded", this);
+    }
+    std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorageArray;
+    textureStorageArray.reserve(nTextureEntries);
+
+    for (unsigned int te = 0; te < nTextureEntries; ++te) {
+        modelgeometry::ModelGeometry::TextureEntry textureEntry;
+
+        // Name
+        int32_t nameSize = 0;
+        fileStream.read(reinterpret_cast<char*>(&nameSize), sizeof(int32_t));
+        if (nameSize == 0) {
+            throw ModelLoadException(cachedFile, "No texture name was loaded", this);
+        }
+        textureEntry.name.resize(nameSize);
+        fileStream.read(textureEntry.name.data(), nameSize);
+
+        // Texture
+        // dimensions
+        glm::uvec3 dimensions;
+        fileStream.read(reinterpret_cast<char*>(&dimensions.x), sizeof(int32_t));
+        fileStream.read(reinterpret_cast<char*>(&dimensions.y), sizeof(int32_t));
+        fileStream.read(reinterpret_cast<char*>(&dimensions.z), sizeof(int32_t));
+
+        // format
+        std::string formatString;
+        formatString.resize(FORMAT_STRING_SIZE);
+        fileStream.read(formatString.data(), FORMAT_STRING_SIZE * sizeof(char));
+        opengl::Texture::Format format = formatFromString(formatString);
+
+        // internal format
+        unsigned int rawInternalFormat;
+        fileStream.read(reinterpret_cast<char*>(
+            &rawInternalFormat),
+            sizeof(unsigned int)
+        );
+        GLenum internalFormat = static_cast<GLenum>(rawInternalFormat);
+
+        // data type
+        std::string dataTypeString;
+        dataTypeString.resize(FORMAT_STRING_SIZE);
+        fileStream.read(dataTypeString.data(), FORMAT_STRING_SIZE * sizeof(char));
+        GLenum dataType = dataTypeFromString(dataTypeString);
+
+        // data
+        int32_t textureSize = 0;
+        fileStream.read(reinterpret_cast<char*>(&textureSize), sizeof(int32_t));
+        if (textureSize == 0) {
+            throw ModelLoadException(
+                cachedFile,
+                "No texture size was loaded",
+                this
+            );
+        }
+        std::byte* data = new std::byte[textureSize];
+        fileStream.read(reinterpret_cast<char*>(data), textureSize);
+
+        textureEntry.texture =
+            std::make_unique<ghoul::opengl::Texture>(
+                dimensions,
+                format,
+                internalFormat,
+                dataType,
+                ghoul::opengl::Texture::FilterMode::Linear,
+                ghoul::opengl::Texture::WrappingMode::Repeat,
+                ghoul::opengl::Texture::AllocateData::No,
+                ghoul::opengl::Texture::TakeOwnership::Yes
+            );
+
+        textureEntry.texture->setPixelData(data);
+
+        textureStorageArray.push_back(std::move(textureEntry));
     }
 
     // Read how many meshes to read
@@ -760,58 +873,19 @@ std::unique_ptr<ghoul::modelgeometry::ModelGeometry> ModelReaderAssimp::loadCach
 
             // texture
             if (texture.hasTexture) {
-                // dimensions
-                glm::uvec3 dimensions;
-                fileStream.read(reinterpret_cast<char*>(&dimensions.x), sizeof(int32_t));
-                fileStream.read(reinterpret_cast<char*>(&dimensions.y), sizeof(int32_t));
-                fileStream.read(reinterpret_cast<char*>(&dimensions.z), sizeof(int32_t));
+                // Read which index in the textureStorageArray that this texture should point to
+                unsigned int index;
+                fileStream.read(reinterpret_cast<char*>(&index), sizeof(unsigned int));
 
-                // format
-                std::string formatString;
-                formatString.resize(FORMAT_STRING_SIZE);
-                fileStream.read(formatString.data(), FORMAT_STRING_SIZE * sizeof(char));
-                opengl::Texture::Format format = formatFromString(formatString);
-
-                // internal format
-                unsigned int rawInternalFormat;
-                fileStream.read(reinterpret_cast<char*>(
-                    &rawInternalFormat),
-                    sizeof(unsigned int)
-                );
-                GLenum internalFormat = static_cast<GLenum>(rawInternalFormat);
-
-                // data type
-                std::string dataTypeString;
-                dataTypeString.resize(FORMAT_STRING_SIZE);
-                fileStream.read(dataTypeString.data(), FORMAT_STRING_SIZE * sizeof(char));
-                GLenum dataType = dataTypeFromString(dataTypeString);
-
-                // data
-                int32_t textureSize = 0;
-                fileStream.read(reinterpret_cast<char*>(&textureSize), sizeof(int32_t));
-                if (textureSize == 0) {
+                if (index >= textureStorageArray.size()) {
                     throw ModelLoadException(
                         cachedFile,
-                        "No texture size was loaded",
+                        "Texture index is outside of textureStorage",
                         this
                     );
                 }
-                std::byte* data = new std::byte[textureSize];
-                fileStream.read(reinterpret_cast<char*>(data), textureSize);
 
-                texture.texture =
-                    std::make_unique<ghoul::opengl::Texture>(
-                        dimensions,
-                        format,
-                        internalFormat,
-                        dataType,
-                        ghoul::opengl::Texture::FilterMode::Linear,
-                        ghoul::opengl::Texture::WrappingMode::Repeat,
-                        ghoul::opengl::Texture::AllocateData::No,
-                        ghoul::opengl::Texture::TakeOwnership::Yes
-                    );
-
-                texture.texture->setPixelData(data);
+                texture.texture = textureStorageArray[index].texture.get();
             }
             textureArray.push_back(std::move(texture));
         }
@@ -825,9 +899,12 @@ std::unique_ptr<ghoul::modelgeometry::ModelGeometry> ModelReaderAssimp::loadCach
         );
     }
 
-    // Create the ModelGeometry from the meshArray
+    // Create the ModelGeometry
     return std::make_unique<modelgeometry::ModelGeometry>(
-        std::move(modelgeometry::ModelGeometry(std::move(meshArray)))
+        std::move(modelgeometry::ModelGeometry(
+            std::move(meshArray),
+            std::move(textureStorageArray)
+        ))
     );
 }
 
@@ -849,6 +926,81 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
         sizeof(int8_t)
     );
 
+    // First cache the textureStorage
+    int32_t nTextureEntries = model->textureStorage().size();
+    if (nTextureEntries == 0) {
+        throw ModelSaveException(
+            cachedFile,
+            "Error writing cache: No texture enties were loaded",
+            this
+        );
+    }
+    fileStream.write(reinterpret_cast<const char*>(&nTextureEntries), sizeof(int32_t));
+
+    for (unsigned int te = 0; te < model->textureStorage().size(); ++te) {
+        // Name
+        int32_t nameSize = model->textureStorage()[te].name.size() * sizeof(char);
+        if (nameSize == 0) {
+            throw ModelSaveException(
+                cachedFile,
+                "Error writing cache: No texture name was loaded",
+                this
+            );
+        }
+        fileStream.write(reinterpret_cast<const char*>(&nameSize), sizeof(int32_t));
+        fileStream.write(model->textureStorage()[te].name.data(), nameSize);
+
+        // Texture
+        // dimensions
+        fileStream.write(reinterpret_cast<const char*>(
+            &model->textureStorage()[te].texture->dimensions().x),
+            sizeof(int32_t)
+        );
+        fileStream.write(reinterpret_cast<const char*>(
+            &model->textureStorage()[te].texture->dimensions().y),
+            sizeof(int32_t)
+        );
+        fileStream.write(reinterpret_cast<const char*>(
+            &model->textureStorage()[te].texture->dimensions().z),
+            sizeof(int32_t)
+        );
+
+        // format
+        std::string format =
+            stringFromFormat(model->textureStorage()[te].texture->format());
+        fileStream.write(format.data(), FORMAT_STRING_SIZE * sizeof(char));
+
+        // internal format
+        unsigned int internalFormat =
+            static_cast<unsigned int>(
+                model->textureStorage()[te].texture->internalFormat()
+            );
+        fileStream.write(
+            reinterpret_cast<const char*>(&internalFormat),
+            sizeof(unsigned int)
+        );
+
+        // data type
+        std::string dataType =
+            stringFromDataType(model->textureStorage()[te].texture->dataType());
+        fileStream.write(dataType.data(), FORMAT_STRING_SIZE * sizeof(char));
+
+        // data
+        model->textureStorage()[te].texture->downloadTexture();
+        int32_t pixelSize = model->textureStorage()[te].texture->expectedPixelDataSize();
+        if (pixelSize == 0) {
+            throw ModelSaveException(
+                cachedFile,
+                "Error writing cache: No texture size loaded",
+                this
+            );
+        }
+        fileStream.write(reinterpret_cast<const char*>(&pixelSize), sizeof(int32_t));
+
+        const void* data = model->textureStorage()[te].texture->pixelData();
+        fileStream.write(reinterpret_cast<const char*>(data), pixelSize);
+    }
+
     // Write how many meshes are to be written
     int32_t nMeshes = model->meshes().size();
     if (nMeshes == 0) {
@@ -860,10 +1012,9 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
     }
     fileStream.write(reinterpret_cast<const char*>(&nMeshes), sizeof(int32_t));
 
-    // Write data
+    // Meshes
     for (unsigned int m = 0; m < nMeshes; m++) {
         // Vertices
-        // Write how many vertices are to be written
         int32_t nVertices = model->meshes()[m]._vertices.size();
         if (nVertices == 0) {
             throw ModelSaveException(
@@ -933,7 +1084,6 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
         }
 
         // Indices
-        // Write how many indices are to be written
         int32_t nIndices = model->meshes()[m]._indices.size();
         if (nIndices == 0) {
             throw ModelSaveException(
@@ -952,7 +1102,6 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
         }
 
         // Textures
-        // Write how many textures are to be written
         int32_t nTextures = model->meshes()[m]._textures.size();
         if (nTextures == 0) {
             throw ModelSaveException(
@@ -965,22 +1114,17 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
 
         for (unsigned int t = 0; t < nTextures; ++t) {
             // type
-            // write size of string
-            int32_t stringSize =
+            int32_t typeSize =
                 model->meshes()[m]._textures[t].type.size() * sizeof(char);
-            if (stringSize == 0) {
+            if (typeSize == 0) {
                 throw ModelSaveException(
                     cachedFile,
                     "Error writing cache: No texture type loaded",
                     this
                 );
             }
-            fileStream.write(reinterpret_cast<const char*>(&stringSize), sizeof(int32_t));
-
-            fileStream.write(
-                model->meshes()[m]._textures[t].type.data(),
-                stringSize
-            );
+            fileStream.write(reinterpret_cast<const char*>(&typeSize), sizeof(int32_t));
+            fileStream.write(model->meshes()[m]._textures[t].type.data(), typeSize);
 
             // hasTexture
             fileStream.write(reinterpret_cast<const char*>(
@@ -1010,55 +1154,29 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
 
             // texture
             if (model->meshes()[m]._textures[t].hasTexture) {
-                //  dimensions
-                fileStream.write(reinterpret_cast<const char*>(
-                    &model->meshes()[m]._textures[t].texture->dimensions().x),
-                    sizeof(int32_t)
-                );
-                fileStream.write(reinterpret_cast<const char*>(
-                    &model->meshes()[m]._textures[t].texture->dimensions().y),
-                    sizeof(int32_t)
-                );
-                fileStream.write(reinterpret_cast<const char*>(
-                    &model->meshes()[m]._textures[t].texture->dimensions().z),
-                    sizeof(int32_t)
-                );
-
-                // format
-                std::string format =
-                    stringFromFormat(model->meshes()[m]._textures[t].texture->format());
-                fileStream.write(format.data(), FORMAT_STRING_SIZE * sizeof(char));
-
-                // internal format
-                unsigned int internalFormat =
-                    static_cast<unsigned int>(
-                        model->meshes()[m]._textures[t].texture->internalFormat()
+                // Search the textureStorage to find which entry this texture points to
+                int wasFound = -1;
+                for (unsigned int te = 0; te < model->textureStorage().size(); ++te) {
+                    wasFound = std::strcmp(
+                        model->textureStorage()[te].name.c_str(),
+                        model->meshes()[m]._textures[t].texture->name().c_str()
                     );
-                fileStream.write(reinterpret_cast<const char*>(
-                    &internalFormat),
-                    sizeof(unsigned int)
-                );
+                    if (wasFound == 0) {
+                        fileStream.write(
+                            reinterpret_cast<const char*>(&te),
+                            sizeof(unsigned int)
+                        );
+                        break;
+                    }
+                }
 
-                // data type
-                std::string dataType =
-                    stringFromDataType(model->meshes()[m]._textures[t].texture->dataType());
-                fileStream.write(dataType.data(), FORMAT_STRING_SIZE * sizeof(char));
-
-                // data
-                model->meshes()[m]._textures[t].texture->downloadTexture();
-                int32_t pixelSize =
-                    model->meshes()[m]._textures[t].texture->expectedPixelDataSize();
-                if (pixelSize == 0) {
+                if (wasFound != 0) {
                     throw ModelSaveException(
                         cachedFile,
-                        "Error writing cache: No texture size loaded",
+                        "Error writing cache: Could not find texture in textureStorage",
                         this
                     );
                 }
-                fileStream.write(reinterpret_cast<const char*>(&pixelSize), sizeof(int32_t));
-
-                const void* data = model->meshes()[m]._textures[t].texture->pixelData();
-                fileStream.write(reinterpret_cast<const char*>(data), pixelSize);
             }
         }
     }
