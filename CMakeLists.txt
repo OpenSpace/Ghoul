@@ -147,6 +147,10 @@ if (GHOUL_MODULE_OPENGL)
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/glbinding)
     disable_external_warnings(glbinding)
     disable_external_warnings(glbinding-aux)
+    target_link_directories(Ghoul SYSTEM PUBLIC
+      ${GHOUL_ROOT_DIR}/ext/glbinding/source/glbinding/include
+      ${GHOUL_ROOT_DIR}/ext/glbinding/source/glbinding-aux/include
+    )
     target_link_libraries(Ghoul PUBLIC glbinding::glbinding glbinding::glbinding-aux)
   
     set_folder_location(glbinding "External")
@@ -171,7 +175,7 @@ end_dependency("LZ4")
 # Lua
 if (GHOUL_MODULE_LUA)
   begin_module("Lua")
-  include_external_library(Ghoul PUBLIC Lua ${GHOUL_ROOT_DIR}/ext/lua ${GHOUL_ROOT_DIR}/ext/lua)
+  include_external_library(Ghoul PUBLIC Lua ${GHOUL_ROOT_DIR}/ext/lua ${GHOUL_ROOT_DIR}/ext/lua/src)
   end_module("Lua")
 endif ()
 

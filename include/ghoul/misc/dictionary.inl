@@ -980,8 +980,8 @@ void Dictionary::getValueInternal(const std::string& key, T& value,
                     }
                 });
                 for (size_t i = 0; i < internal::StorageTypeConverter<T>::size; ++i) {
-                    const std::string& key = keys[i];
-                    dict.getValue(key, glm::value_ptr(value)[i]);
+                    const std::string& k = keys[i];
+                    dict.getValue(k, glm::value_ptr(value)[i]);
                 }
                 return;
             }

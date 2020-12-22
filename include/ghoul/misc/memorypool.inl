@@ -246,6 +246,7 @@ template <typename T, int BucketSizeItems, bool InjectDebugMemory>
 std::vector<void*>
 ReusableTypedMemoryPool<T, BucketSizeItems, InjectDebugMemory>::allocate(int n)
 {
+    ghoul_assert(n >= 0, "Need to allocate positive size");
     // Hackish implementation to support larger allocations than number of items in a
     // bucket; probably not likely to happen
     if (n > BucketSizeItems) {
@@ -262,7 +263,7 @@ ReusableTypedMemoryPool<T, BucketSizeItems, InjectDebugMemory>::allocate(int n)
     }
 
     // First check if there are items in the free list, if so, return those
-    if (_freeList.size() >= n) {
+    if (_freeList.size() >= static_cast<size_t>(n)) {
         std::vector<void*> res(n);
         size_t startIndex = _freeList.size() - n;
         for (int i = 0; i < n; ++i) {

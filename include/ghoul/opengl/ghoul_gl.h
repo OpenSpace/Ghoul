@@ -34,8 +34,16 @@
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
 
-// Evil 'using namespace' in the header to make the transition from GLEW to glbinding
-// as easy as possible
+// Evil 'using namespace' in the header to make the usage of OpenGL less painful
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wheader-hygiene"
+#endif // __clang__
+
 using namespace gl;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif // __clang__
 
 #endif // __GHOUL___GHOUL_GL___H__

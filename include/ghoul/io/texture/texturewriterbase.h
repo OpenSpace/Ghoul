@@ -49,7 +49,7 @@ public:
         const std::string filename;
 
         /// The error message that occurred
-        const std::string message;
+        const std::string errorMessage;
 
         /// The TextureWriterBase that caused the exception
         const TextureWriterBase& writer;
