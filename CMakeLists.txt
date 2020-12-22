@@ -171,7 +171,7 @@ end_dependency("LZ4")
 # Lua
 if (GHOUL_MODULE_LUA)
   begin_module("Lua")
-  include_external_library(Ghoul PUBLIC Lua ${GHOUL_ROOT_DIR}/ext/lua)
+  include_external_library(Ghoul PUBLIC Lua ${GHOUL_ROOT_DIR}/ext/lua ${GHOUL_ROOT_DIR}/ext/lua)
   end_module("Lua")
 endif ()
 
@@ -200,7 +200,7 @@ if (GHOUL_MODULE_ASSIMP)
     set(ASSIMP_NO_EXPORT ON CACHE BOOL "")
     set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
 
-    include_external_library(Ghoul PRIVATE assimp ${GHOUL_ROOT_DIR}/ext/assimp)
+    include_external_library(Ghoul PRIVATE assimp ${GHOUL_ROOT_DIR}/ext/assimp ${GHOUL_ROOT_DIR}/ext/assimp/include)
 
     # We need to include this to be able to find the assimp/config.h file
     target_include_directories(Ghoul SYSTEM PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
@@ -264,7 +264,7 @@ endif ()
 # stb_image
 begin_dependency("stb_image")
 target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_STB_IMAGE")
-include_external_library(Ghoul PUBLIC stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
+include_external_library(Ghoul PUBLIC stb_image ${GHOUL_ROOT_DIR}/ext/stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
 end_dependency("stb_image")
 
 # Stackwalker
@@ -310,7 +310,7 @@ endif ()
 
 # Tiny process library
 begin_dependency("tiny-process-library")
-include_external_library(Ghoul PRIVATE tiny-process-library ${GHOUL_ROOT_DIR}/ext/tiny-process-library)
+include_external_library(Ghoul PRIVATE tiny-process-library ${GHOUL_ROOT_DIR}/ext/tiny-process-library ${GHOUL_ROOT_DIR}/ext/tiny-process-library)
 end_dependency("tiny-process-library")
 
 
