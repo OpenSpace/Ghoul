@@ -147,7 +147,7 @@ if (GHOUL_MODULE_OPENGL)
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/glbinding)
     disable_external_warnings(glbinding)
     disable_external_warnings(glbinding-aux)
-    target_link_directories(Ghoul SYSTEM PUBLIC
+    target_include_directories(Ghoul SYSTEM PUBLIC
       ${GHOUL_ROOT_DIR}/ext/glbinding/source/glbinding/include
       ${GHOUL_ROOT_DIR}/ext/glbinding/source/glbinding-aux/include
     )
