@@ -139,10 +139,9 @@ void SystemCapabilitiesComponent::initializeWMI() {
 }
 
 void SystemCapabilitiesComponent::deinitializeWMI() {
-    constexpr const char* _loggerCat = "SystemCapabilitiesComponent.WMI";
     ghoul_assert(isWMIInitialized(), "WMI must have been initialized");
 
-    LDEBUG("Deinitializing WMI.");
+    LDEBUGC("SystemCapabilitiesComponent.WMI", "Deinitializing WMI");
     if (_iwbemLocator) {
         _iwbemLocator->Release();
     }

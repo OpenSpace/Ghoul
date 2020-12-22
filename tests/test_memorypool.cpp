@@ -182,7 +182,7 @@ TEST_CASE("MemoryPool: MemoryPool Reusing pointers w/o fragmentation", "[memoryp
     REQUIRE(pool.occupancies()[0] == 0);
     void* p1 = pool.allocate(8);
     void* p2 = pool.allocate(8);
-    [[ maybe_unused ]] void* p3 = pool.allocate(16);
+    pool.allocate(16);
     REQUIRE(pool.occupancies().size() == 1);
     REQUIRE(pool.occupancies()[0] == 32);
 

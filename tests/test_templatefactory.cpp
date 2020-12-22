@@ -278,15 +278,11 @@ TEST_CASE("TemplateFactory: MemoryPool construction", "[templatefactory]") {
     ghoul::TemplateFactory<BaseClass> factory;
     factory.registerClass<SubClassDefault>("sc");
 
-    ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
-        factory.create("sc", &pool)
-    );
+    ghoul::mm_unique_ptr<BaseClass>(factory.create("sc", &pool));
     REQUIRE(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies()[0] == 16);
 
-    ghoul::mm_unique_ptr<BaseClass> obj2 = ghoul::mm_unique_ptr<BaseClass>(
-        factory.create("sc", &pool)
-    );
+    ghoul::mm_unique_ptr<BaseClass>(factory.create("sc", &pool));
     REQUIRE(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies()[0] == 32);
 }
