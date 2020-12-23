@@ -154,6 +154,7 @@ function (set_ghoul_compile_settings target)
     "-Wdate-time"
     "-Wduplicated-cond"
     "-Wlogical-op"
+    "-Wno-deprecated-copy"
     "-Wno-long-long"
     "-Wno-write-strings"
     "-Wnon-virtual-dtor"

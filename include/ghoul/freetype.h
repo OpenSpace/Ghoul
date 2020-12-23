@@ -23,57 +23,19 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___TCPSOCKETSERVER___H__
-#define __GHOUL___TCPSOCKETSERVER___H__
+#ifndef __GHOUL___FREETYPE___H__
+#define __GHOUL___FREETYPE___H__
 
-#include <ghoul/io/socket/socketserver.h>
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignore "-Wold-style-cast"
+#endif // __clang__
 
-#include <ghoul/io/socket/sockettype.h>
-#include <ghoul/io/socket/tcpsocket.h>
-#include <condition_variable>
-#include <deque>
-#include <memory>
-#include <mutex>
-#include <thread>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
-namespace ghoul::io {
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif // __clang__
 
-class TcpSocket;
-
-class TcpSocketServer : public SocketServer {
-public:
-    virtual ~TcpSocketServer();
-
-    int port() const override;
-    void close() override;
-    void listen(int port) override;
-    bool isListening() const override;
-
-    bool hasPendingSockets() const override;
-    std::unique_ptr<TcpSocket> nextPendingTcpSocket();
-    std::unique_ptr<Socket> nextPendingSocket() override;
-
-    // Blocking methods
-    std::unique_ptr<TcpSocket> awaitPendingTcpSocket();
-    std::unique_ptr<Socket> awaitPendingSocket() override;
-
-private:
-    void waitForConnections();
-
-    mutable std::mutex _settingsMutex;
-    int _port = 0;
-    bool _listening = false;
-
-    mutable std::mutex _connectionMutex;
-    std::deque<std::unique_ptr<TcpSocket>> _pendingConnections;
-
-    std::mutex _connectionNotificationMutex;
-    std::condition_variable _connectionNotifier;
-
-    std::unique_ptr<std::thread> _serverThread;
-    _SOCKET _serverSocket = 0;
-};
-
-} // namespace ghoul::io
-
-#endif // __GHOUL___TCPSOCKETSERVER___H__
+#endif // __GHOUL___FREETYPE___H__

@@ -140,6 +140,7 @@ endif ()
 
 set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/fmt.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/freetype.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/ghoul.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/glm.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/event.h
