@@ -28,7 +28,7 @@
 
 #ifdef __clang__
 #pragma clang diagnostic push
-#pragma clang diagnostic ignore "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wold-style-cast"
 #endif // __clang__
 
 #include <ft2build.h>

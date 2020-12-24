@@ -31,21 +31,21 @@
     #undef __gl_h_
 #endif
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#elif defined(__clang__)
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignore "-Wdeprecated-copy"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif // __GNUC__
 
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#elif defined(__clang__)
+#ifdef __clang__
 #pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
 #endif // __GNUC__
 
 // Evil 'using namespace' in the header to make the usage of OpenGL less painful
