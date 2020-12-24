@@ -33,11 +33,11 @@
 
 #ifdef __clang__
 #pragma clang diagnostic push
-#pragma clang diagnostic ignore "-Wdeprecated-copy"
+#pragma clang diagnostic ignored "-Wdeprecated-copy"
 #elif defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
-#endif // __GNUC__
+#endif
 
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
@@ -46,7 +46,7 @@
 #pragma clang diagnostic pop
 #elif defined(__GNUC__)
 #pragma GCC diagnostic pop
-#endif // __GNUC__
+#endif
 
 // Evil 'using namespace' in the header to make the usage of OpenGL less painful
 #ifdef __clang__
