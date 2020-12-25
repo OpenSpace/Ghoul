@@ -25,8 +25,8 @@
 
 #include <ghoul/io/socket/tcpsocketserver.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/io/socket/tcpsocket.h>
-#include <fmt/format.h>
 #include <cstring>
 
 #ifdef WIN32
