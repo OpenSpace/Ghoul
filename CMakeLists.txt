@@ -22,8 +22,7 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
-
+cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 project(Ghoul)
 
 # Setting default paths
@@ -36,6 +35,7 @@ include(${GHOUL_ROOT_DIR}/support/cmake/copy_shared_libraries.cmake)
 include(${GHOUL_ROOT_DIR}/support/cmake/message_macros.cmake)
 
 begin_header("Configuring Ghoul Project")
+list(APPEND CMAKE_MESSAGE_CONTEXT "ghoul")
 
 #############################
 # Options
@@ -74,7 +74,9 @@ if (MSVC)
   endif ()
 endif ()
 
+list(APPEND CMAKE_MESSAGE_CONTEXT "src")
 include(src/CMakeLists.txt)
+list(POP_BACK CMAKE_MESSAGE_CONTEXT)
 
 # Compile settings
 set_ghoul_compile_settings(Ghoul)
