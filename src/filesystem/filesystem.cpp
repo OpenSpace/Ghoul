@@ -270,11 +270,11 @@ Directory FileSystem::currentDirectory() const {
             nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer, // NOLINT
+            reinterpret_cast<LPTSTR>(&errorBuffer),
             0,
             nullptr
         );
-        if ((nValues > 0) && (errorBuffer != nullptr)) {
+        if (nValues > 0) {
             string msg(errorBuffer);
             LocalFree(errorBuffer);
             throw FileSystemException(fmt::format(
@@ -310,11 +310,11 @@ void FileSystem::setCurrentDirectory(const Directory& directory) const {
             nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer, // NOLINT
+            reinterpret_cast<LPTSTR>(&errorBuffer),
             0,
             nullptr
         );
-        if ((nValues > 0) && (errorBuffer != nullptr)) {
+        if (nValues > 0) {
             string msg(errorBuffer);
             LocalFree(errorBuffer);
             throw FileSystemException(fmt::format(
@@ -351,11 +351,11 @@ bool FileSystem::fileExists(const File& path) const {
                     nullptr,
                     error,
                     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                    (LPTSTR)&errorBuffer, // NOLINT
+                    reinterpret_cast<LPTSTR>(&errorBuffer),
                     0,
                     nullptr
                 );
-                if ((nValues > 0) && (errorBuffer != nullptr)) {
+                if (nValues > 0) {
                     string msg(errorBuffer);
                     LocalFree(errorBuffer);
                     throw FileSystemException(fmt::format(
@@ -460,11 +460,11 @@ void FileSystem::createDirectory(const Directory& path, Recursive recursive) con
                     nullptr,
                     error,
                     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                    (LPTSTR)&errorBuffer, // NOLINT
+                    reinterpret_cast<LPTSTR>(&errorBuffer),
                     0,
                     nullptr
                 );
-                if ((nValues > 0) && (errorBuffer != nullptr)) {
+                if (nValues > 0) {
                     string errorMsg(errorBuffer);
                     LocalFree(errorBuffer);
                     throw FileSystemException(fmt::format(
