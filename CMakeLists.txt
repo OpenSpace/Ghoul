@@ -35,7 +35,6 @@ include(${GHOUL_ROOT_DIR}/support/cmake/copy_shared_libraries.cmake)
 include(${GHOUL_ROOT_DIR}/support/cmake/message_macros.cmake)
 
 begin_header("Configuring Ghoul Project")
-list(APPEND CMAKE_MESSAGE_CONTEXT "ghoul")
 
 #############################
 # Options
