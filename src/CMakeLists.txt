@@ -23,118 +23,116 @@
 ##########################################################################################
 
 set(GHOUL_SOURCE 
-  ${PROJECT_SOURCE_DIR}/src/filesystem/cachemanager.cpp
-  ${PROJECT_SOURCE_DIR}/src/filesystem/directory.cpp
-  ${PROJECT_SOURCE_DIR}/src/filesystem/file.cpp
-  ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.cpp
-  ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.linux.cpp
-  ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.osx.cpp
-  ${PROJECT_SOURCE_DIR}/src/filesystem/filesystem.windows.cpp
-  ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderbase.cpp
-  ${PROJECT_SOURCE_DIR}/src/io/socket/socket.cpp
-  ${PROJECT_SOURCE_DIR}/src/io/socket/tcpsocket.cpp
-  ${PROJECT_SOURCE_DIR}/src/io/socket/tcpsocketserver.cpp
-  ${PROJECT_SOURCE_DIR}/src/io/socket/websocket.cpp
-  ${PROJECT_SOURCE_DIR}/src/io/socket/websocketserver.cpp
-  ${PROJECT_SOURCE_DIR}/src/io/volume/rawvolumereader.cpp
-  ${PROJECT_SOURCE_DIR}/src/logging/bufferlog.cpp
-  ${PROJECT_SOURCE_DIR}/src/logging/callbacklog.cpp
-  ${PROJECT_SOURCE_DIR}/src/logging/consolelog.cpp
-  ${PROJECT_SOURCE_DIR}/src/logging/htmllog.cpp
-  ${PROJECT_SOURCE_DIR}/src/logging/log.cpp
-  ${PROJECT_SOURCE_DIR}/src/logging/logmanager.cpp
-  ${PROJECT_SOURCE_DIR}/src/logging/streamlog.cpp
-  ${PROJECT_SOURCE_DIR}/src/logging/textlog.cpp
-  ${PROJECT_SOURCE_DIR}/src/logging/visualstudiooutputlog.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/assert.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/buffer.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/clipboard.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/crc32.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/csvreader.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/dictionary.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/dictionaryjsonformatter.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/dictionaryluaformatter.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/easing.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/exception.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/misc.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/sharedmemory.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/stacktrace.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/templatefactory.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/thread.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/threadpool.cpp
-  ${PROJECT_SOURCE_DIR}/src/misc/process.cpp
-  ${PROJECT_SOURCE_DIR}/src/ghoul.cpp
+  filesystem/cachemanager.cpp
+  filesystem/directory.cpp
+  filesystem/file.cpp
+  filesystem/filesystem.cpp
+  filesystem/filesystem.linux.cpp
+  filesystem/filesystem.osx.cpp
+  filesystem/filesystem.windows.cpp
+  io/model/modelreaderbase.cpp
+  io/socket/socket.cpp
+  io/socket/tcpsocket.cpp
+  io/socket/tcpsocketserver.cpp
+  io/socket/websocket.cpp
+  io/socket/websocketserver.cpp
+  io/volume/rawvolumereader.cpp
+  logging/bufferlog.cpp
+  logging/callbacklog.cpp
+  logging/consolelog.cpp
+  logging/htmllog.cpp
+  logging/log.cpp
+  logging/logmanager.cpp
+  logging/streamlog.cpp
+  logging/textlog.cpp
+  logging/visualstudiooutputlog.cpp
+  misc/assert.cpp
+  misc/buffer.cpp
+  misc/clipboard.cpp
+  misc/crc32.cpp
+  misc/csvreader.cpp
+  misc/dictionary.cpp
+  misc/dictionaryjsonformatter.cpp
+  misc/dictionaryluaformatter.cpp
+  misc/easing.cpp
+  misc/exception.cpp
+  misc/misc.cpp
+  misc/sharedmemory.cpp
+  misc/stacktrace.cpp
+  misc/templatefactory.cpp
+  misc/thread.cpp
+  misc/threadpool.cpp
+  misc/process.cpp
+  ghoul.cpp
 )
 
 if (GHOUL_MODULE_ASSIMP)
-  set(GHOUL_SOURCE ${GHOUL_SOURCE}
-    ${PROJECT_SOURCE_DIR}/src/io/model/modelreadermultiformat.cpp
-  )
+  list(APPEND GHOUL_SOURCE io/model/modelreadermultiformat.cpp)
 endif ()
 
 if (GHOUL_MODULE_COMMANDLINEPARSER)
-  set(GHOUL_SOURCE ${GHOUL_SOURCE}
-    ${PROJECT_SOURCE_DIR}/src/cmdparser/commandlinecommand.cpp
-    ${PROJECT_SOURCE_DIR}/src/cmdparser/commandlineparser.cpp
-    ${PROJECT_SOURCE_DIR}/src/cmdparser/multiplecommand.cpp
-    ${PROJECT_SOURCE_DIR}/src/cmdparser/singlecommand.cpp
+  list(APPEND GHOUL_SOURCE
+    cmdparser/commandlinecommand.cpp
+    cmdparser/commandlineparser.cpp
+    cmdparser/multiplecommand.cpp
+    cmdparser/singlecommand.cpp
   )
 endif ()
 
 if (GHOUL_MODULE_FONTRENDERING)
-  set(GHOUL_SOURCE ${GHOUL_SOURCE}
-    ${PROJECT_SOURCE_DIR}/src/font/font.cpp
-    ${PROJECT_SOURCE_DIR}/src/font/fonterrors.cpp
-    ${PROJECT_SOURCE_DIR}/src/font/fontmanager.cpp
-    ${PROJECT_SOURCE_DIR}/src/font/fontrenderer.cpp
+  list(APPEND GHOUL_SOURCE
+    font/font.cpp
+    font/fonterrors.cpp
+    font/fontmanager.cpp
+    font/fontrenderer.cpp
   )
 endif ()
 
 if (GHOUL_MODULE_LUA)
-  set(GHOUL_SOURCE ${GHOUL_SOURCE}
-    ${PROJECT_SOURCE_DIR}/src/io/model/modelreaderlua.cpp
-    ${PROJECT_SOURCE_DIR}/src/lua/lua_helper.cpp
-    ${PROJECT_SOURCE_DIR}/src/lua/luastate.cpp
+  list(APPEND GHOUL_SOURCE
+    io/model/modelreaderlua.cpp
+    lua/lua_helper.cpp
+    lua/luastate.cpp
   )
 endif ()
 
 if (GHOUL_MODULE_OPENGL)
-  set(GHOUL_SOURCE ${GHOUL_SOURCE}
-    ${PROJECT_SOURCE_DIR}/src/opengl/bufferbinding.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/debugcontext.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/framebufferobject.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/openglstatecache.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/programobject.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/programobjectmanager.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/shadermanager.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/shaderobject.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/shaderpreprocessor.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/texture.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/textureatlas.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/textureconversion.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/texturemanager.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/textureunit.cpp
-    ${PROJECT_SOURCE_DIR}/src/opengl/vertexbufferobject.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereader.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderbase.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadercmap.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderdevil.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderfreeimage.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereadersoil.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturereaderstb.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriter.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturewriterbase.cpp
-    ${PROJECT_SOURCE_DIR}/src/io/texture/texturewritersoil.cpp
+  list(APPEND GHOUL_SOURCE
+    opengl/bufferbinding.cpp
+    opengl/debugcontext.cpp
+    opengl/framebufferobject.cpp
+    opengl/openglstatecache.cpp
+    opengl/programobject.cpp
+    opengl/programobjectmanager.cpp
+    opengl/shadermanager.cpp
+    opengl/shaderobject.cpp
+    opengl/shaderpreprocessor.cpp
+    opengl/texture.cpp
+    opengl/textureatlas.cpp
+    opengl/textureconversion.cpp
+    opengl/texturemanager.cpp
+    opengl/textureunit.cpp
+    opengl/vertexbufferobject.cpp
+    io/texture/texturereader.cpp
+    io/texture/texturereaderbase.cpp
+    io/texture/texturereadercmap.cpp
+    io/texture/texturereaderdevil.cpp
+    io/texture/texturereaderfreeimage.cpp
+    io/texture/texturereadersoil.cpp
+    io/texture/texturereaderstb.cpp
+    io/texture/texturewriter.cpp
+    io/texture/texturewriterbase.cpp
+    io/texture/texturewritersoil.cpp
   )
 endif ()
 
 if (GHOUL_MODULE_SYSTEMCAPABILITIES)
-  set(GHOUL_SOURCE ${GHOUL_SOURCE}
-    ${PROJECT_SOURCE_DIR}/src/systemcapabilities/generalcapabilitiescomponent.cpp
-    ${PROJECT_SOURCE_DIR}/src/systemcapabilities/openglcapabilitiescomponent.cpp
-    ${PROJECT_SOURCE_DIR}/src/systemcapabilities/systemcapabilities.cpp
-    ${PROJECT_SOURCE_DIR}/src/systemcapabilities/systemcapabilitiescomponent.cpp
-    ${PROJECT_SOURCE_DIR}/src/systemcapabilities/version.cpp
+  list(APPEND GHOUL_SOURCE
+    systemcapabilities/generalcapabilitiescomponent.cpp
+    systemcapabilities/openglcapabilitiescomponent.cpp
+    systemcapabilities/systemcapabilities.cpp
+    systemcapabilities/systemcapabilitiescomponent.cpp
+    systemcapabilities/version.cpp
   )
 endif ()
 
@@ -213,13 +211,11 @@ set(GHOUL_HEADER
 )
 
 if (GHOUL_MODULE_ASSIMP)
-  set(GHOUL_HEADER ${GHOUL_HEADER}
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreadermultiformat.h
-  )
+  list(APPEND GHOUL_HEADER ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreadermultiformat.h)
 endif ()
 
 if (GHOUL_MODULE_COMMANDLINEPARSER)
-  set(GHOUL_HEADER ${GHOUL_HEADER}
+  list(APPEND GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlineparser.h
@@ -231,7 +227,7 @@ if (GHOUL_MODULE_COMMANDLINEPARSER)
 endif ()
 
 if (GHOUL_MODULE_FONTRENDERING)
-  set(GHOUL_HEADER ${GHOUL_HEADER}
+  list(APPEND GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/fonterrors.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontmanager.h
@@ -240,7 +236,7 @@ if (GHOUL_MODULE_FONTRENDERING)
 endif ()
 
 if (GHOUL_MODULE_LUA)
-  set(GHOUL_HEADER ${GHOUL_HEADER}
+  list(APPEND GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderlua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/ghoul_lua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.h
@@ -250,7 +246,7 @@ if (GHOUL_MODULE_LUA)
 endif ()
 
 if (GHOUL_MODULE_OPENGL)
-  set(GHOUL_HEADER ${GHOUL_HEADER}
+  list(APPEND GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/bufferbinding.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/bufferbinding.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/debugcontext.h
@@ -284,12 +280,8 @@ if (GHOUL_MODULE_OPENGL)
   )
 endif ()
 
-set(GHOUL_HEADER ${GHOUL_HEADER}
-  ${PROJECT_SOURCE_DIR}/include/ghoul/misc/profiling.h
-)
-
 if (GHOUL_MODULE_SYSTEMCAPABILITIES)
-  set(GHOUL_HEADER ${GHOUL_HEADER}
+  list(APPEND GHOUL_HEADER
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/generalcapabilitiescomponent.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/openglcapabilitiescomponent.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities.h
@@ -314,6 +306,22 @@ target_precompile_headers(Ghoul PRIVATE
   <string>
   <vector>
 )
+
+# Compile settings
+set_ghoul_compile_settings(Ghoul)
+
+if (GHOUL_HIGH_DEBUG_MODE)
+  target_compile_definitions(Ghoul PUBLIC "GHL_DEBUG")
+endif ()
+
+if (GHOUL_LOGGING_ENABLE_TRACE)
+  target_compile_definitions(Ghoul PUBLIC "GHOUL_LOGGING_ENABLE_TRACE")
+endif ()
+
+if (GHOUL_THROW_ON_ASSERT)
+  target_compile_definitions(Ghoul PUBLIC "GHL_THROW_ON_ASSERT")
+endif ()
+
 
 # Place files into source_group
 foreach (file ${GHOUL_SOURCE} ${GHOUL_HEADER})
