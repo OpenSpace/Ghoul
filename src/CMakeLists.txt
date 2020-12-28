@@ -295,7 +295,7 @@ add_library(Ghoul STATIC ${GHOUL_SOURCE} ${GHOUL_HEADER})
 target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 target_precompile_headers(Ghoul PRIVATE
-  [["ghoul/fmt.h"]]
+  # [["ghoul/fmt.h"]]
   [["ghoul/misc/assert.h"]]
   [["ghoul/misc/boolean.h"]]
   [["ghoul/misc/exception.h"]]
