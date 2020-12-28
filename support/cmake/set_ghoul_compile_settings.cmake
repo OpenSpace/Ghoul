@@ -109,7 +109,6 @@ function (set_ghoul_compile_settings target)
     "-Wmicrosoft-flexible-array"
     "-Wmissing-noreturn"
     "-Wmissing-prototypes"
-    "-Wnewline-eof"
     "-Wno-missing-braces"
     "-Wnon-virtual-dtor"
     "-Wold-style-cast"
