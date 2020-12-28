@@ -33,7 +33,10 @@
 
 #ifdef __clang__
 #pragma clang diagnostic push
+#ifndef __APPLE__
+// The Apple Clang compiler doesn't understand this warning yet
 #pragma clang diagnostic ignored "-Wdeprecated-copy"
+#endif // __APPLE__
 #elif defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-copy"
