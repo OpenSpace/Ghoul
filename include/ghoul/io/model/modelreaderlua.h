@@ -52,7 +52,7 @@ namespace ghoul::io {
  *
  * \sa https://www.opengl.org/sdk/docs/man/html/glVertexAttribPointer.xhtml
  */
-class ModelReaderLua: public ModelReaderBase {
+class ModelReaderLua : public ModelReaderBase {
 public:
     /**
      * Loads the model described as a Lua table and returns the initialized
@@ -65,8 +65,8 @@ public:
      * \throw ModelReaderException If there was an exception loading the model
      * \pre \p filename must not be empty
      */
-    std::unique_ptr<opengl::VertexBufferObject> loadModel(
-        const std::string& filename) const;
+    virtual std::unique_ptr<opengl::VertexBufferObject> loadModel(
+        const std::string& filename) const override;
 };
 
 } // namespace ghoul::io

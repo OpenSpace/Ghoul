@@ -71,7 +71,7 @@ private:
     std::condition_variable _connectionNotifier;
 
     std::unique_ptr<std::thread> _serverThread;
-    _SOCKET _serverSocket = _SOCKET(0);
+    _SOCKET _serverSocket = 0;
 };
 
 } // namespace ghoul::io

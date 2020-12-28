@@ -67,10 +67,6 @@
 #define SOCKET_ERROR (-1)
 #endif
 
-#ifndef INVALID_SOCKET
-#define INVALID_SOCKET (_SOCKET)(~0)
-#endif
-
 // #ifndef NO_ERROR
 // #define NO_ERROR 0L
 // #endif

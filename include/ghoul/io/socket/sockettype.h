@@ -32,6 +32,7 @@ using _SOCKET = size_t;
 using _SOCKLEN = int;
 #else //linux & macOS
 
+#include <limits>
 #include <sys/socket.h>
 #include <sys/types.h>
 
@@ -39,7 +40,7 @@ using _SOCKET = int;
 using _SOCKLEN = socklen_t;
 
 #ifndef INVALID_SOCKET
-#define INVALID_SOCKET (static_cast<_SOCKET>(~0))
+#define INVALID_SOCKET (-std::numeric_limits<int>::max())
 #endif // INVALID_SOCKET
 
 #endif // WIN32

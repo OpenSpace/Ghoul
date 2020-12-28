@@ -23,19 +23,20 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___FMT___H__
-#define __GHOUL___FMT___H__
+#ifndef __GHOUL___FREETYPE___H__
+#define __GHOUL___FREETYPE___H__
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wshadow"
-#endif // __GNUC__
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#endif // __clang__
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_STROKER_H
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif // __GNUC__
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif // __clang__
 
-#endif // __GHOUL___FMT___H__
+#endif // __GHOUL___FREETYPE___H__

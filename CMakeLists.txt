@@ -22,8 +22,7 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
-
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 project(Ghoul)
 
 # Setting default paths
@@ -74,25 +73,9 @@ if (MSVC)
   endif ()
 endif ()
 
-include(src/CMakeLists.txt)
-
-# Compile settings
-set_ghoul_compile_settings(Ghoul)
-
-if (GHOUL_HIGH_DEBUG_MODE)
-  target_compile_definitions(Ghoul PUBLIC "GHL_DEBUG")
-endif ()
-
-if (GHOUL_LOGGING_ENABLE_TRACE)
-  target_compile_definitions(Ghoul PUBLIC "GHOUL_LOGGING_ENABLE_TRACE")
-endif ()
-
-if (GHOUL_THROW_ON_ASSERT)
-  target_compile_definitions(Ghoul PUBLIC "GHL_THROW_ON_ASSERT")
-endif ()
+add_subdirectory(src)
 
 # Dependencies
-
 # System Libraries
 if (WIN32)
   target_link_libraries(Ghoul PRIVATE "shlwapi" "WbemUuid.lib" "Ws2_32.lib")
@@ -147,10 +130,6 @@ if (GHOUL_MODULE_OPENGL)
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/glbinding)
     disable_external_warnings(glbinding)
     disable_external_warnings(glbinding-aux)
-    target_include_directories(Ghoul SYSTEM PUBLIC
-      ${GHOUL_ROOT_DIR}/ext/glbinding/source/glbinding/include
-      ${GHOUL_ROOT_DIR}/ext/glbinding/source/glbinding-aux/include
-    )
     target_link_libraries(Ghoul PUBLIC glbinding::glbinding glbinding::glbinding-aux)
   
     set_folder_location(glbinding "External")
@@ -167,7 +146,7 @@ endif ()
 # LZ4
 begin_dependency("LZ4")
 find_package(LZ4 REQUIRED)
-target_include_directories(Ghoul SYSTEM PRIVATE ${LZ4_INCLUDE_DIR})
+target_include_directories(Ghoul PRIVATE ${LZ4_INCLUDE_DIR})
 target_link_libraries(Ghoul PRIVATE ${LZ4_LIBRARIES})
 set_folder_location(lz4 "External")
 end_dependency("LZ4")
@@ -185,7 +164,6 @@ if (GHOUL_MODULE_ASSIMP)
   find_package(Assimp QUIET)
   if (Assimp_FOUND)
     message(STATUS "Using system assimp")
-    target_include_directories(Ghoul SYSTEM PRIVATE ${ASSIMP_INCLUDE_DIR})
     target_link_libraries(Ghoul PRIVATE ${ASSIMP_LIBRARIES})
     set(GHOUL_LIBRARY_DIRS "${ASSIMP_LIBRARY_DIRS}" PARENT_SCOPE)
   else ()
@@ -207,7 +185,7 @@ if (GHOUL_MODULE_ASSIMP)
     include_external_library(Ghoul PRIVATE assimp ${GHOUL_ROOT_DIR}/ext/assimp ${GHOUL_ROOT_DIR}/ext/assimp/include)
 
     # We need to include this to be able to find the assimp/config.h file
-    target_include_directories(Ghoul SYSTEM PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
+    target_include_directories(assimp PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
 
     set_folder_location(IrrXML "External")
     set_folder_location(uninstall "External")
@@ -233,7 +211,6 @@ if (IL_FOUND)
   option(GHOUL_USE_DEVIL "Use the DevIL library" ON)
   if (GHOUL_USE_DEVIL)
     target_compile_definitions(Ghoul PRIVATE "GHOUL_USE_DEVIL")
-    target_include_directories(Ghoul SYSTEM PRIVATE ${IL_INCLUDE_DIR})
     target_link_libraries(Ghoul PRIVATE ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
   endif ()
   end_dependency("DevIL")
@@ -246,7 +223,6 @@ if (FREEIMAGE_FOUND)
   option(GHOUL_USE_FREEIMAGE "Use the FreeImage library" ON)
   if (GHOUL_USE_FREEIMAGE)
     target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_FREEIMAGE")
-    target_include_directories(Ghoul SYSTEM PRIVATE ${FREEIMAGE_INCLUDE_PATH})
     target_link_libraries(Ghoul PRIVATE ${FREEIMAGE_LIBRARIES})
   endif ()
   end_dependency("FreeImage")
@@ -259,7 +235,6 @@ if (SOIL_FOUND)
   option(GHOUL_USE_SOIL "Use the SOIL library" ON)
   if (GHOUL_USE_SOIL)
     target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_SOIL")
-    target_include_directories(Ghoul PRIVATE ${SOIL_INCLUDE_DIRS} ${OPENGL_LIBRARIES})
     target_link_libraries(Ghoul PRIVATE ${SOIL_LIBRARIES})
   endif ()
   end_dependency("SOIL")
@@ -303,7 +278,6 @@ if (GHOUL_MODULE_FONTRENDERING)
   begin_module("FontRendering")
   set(FREETYPE_DIST OFF CACHE BOOL "")
   include_external_library(Ghoul PUBLIC freetype ${GHOUL_ROOT_DIR}/ext/freetype2 ${GHOUL_ROOT_DIR}/ext/freetype2/include)
-
   set_folder_location(dist "External")
 
   if (TARGET zlib)

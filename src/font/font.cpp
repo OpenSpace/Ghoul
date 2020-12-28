@@ -26,6 +26,7 @@
 #include <ghoul/font/font.h>
 
 #include <ghoul/fmt.h>
+#include <ghoul/freetype.h>
 #include <ghoul/font/fonterrors.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
@@ -35,10 +36,6 @@
 #include <algorithm>
 #include <array>
 #include <tuple>
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_STROKER_H
 
 namespace {
     // Sizes in FT are given in 1/64th of pt

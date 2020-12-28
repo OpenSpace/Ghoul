@@ -59,7 +59,7 @@ function (include_external_library target_name visibility library_name path incl
   set (extra_macro_args ${ARGN})
   if (NOT TARGET ${library_name})
     add_subdirectory(${path})
-    target_include_directories(${target_name} SYSTEM ${visibility} ${include_path})
+    # target_include_directories(${target_name} SYSTEM ${visibility} ${include_path})
     target_link_libraries(${target_name} ${visibility} ${library_name})
     set_folder_location(${library_name} "External")
     if (MSVC)
