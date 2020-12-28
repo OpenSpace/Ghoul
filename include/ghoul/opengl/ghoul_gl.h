@@ -33,6 +33,7 @@
 
 #ifdef __clang__
 #pragma clang diagnostic push
+#pragma clang diangostic ignored "-Wnewline-eof"
 #ifndef __APPLE__
 // The Apple Clang compiler doesn't understand this warning yet
 #pragma clang diagnostic ignored "-Wdeprecated-copy"
