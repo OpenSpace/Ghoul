@@ -55,10 +55,10 @@ else ()
 endif ()
 
 target_include_directories(GhoulTest PRIVATE "${GHOUL_ROOT_DIR}/ext/catch2/single_include")
-target_link_libraries(GhoulTest PUBLIC Ghoul)
+target_link_libraries(GhoulTest PRIVATE Ghoul)
 
 ghl_copy_shared_libraries(GhoulTest ${GHOUL_ROOT_DIR})
 
 if (APPLE)
-  target_link_libraries(GhoulTest PUBLIC ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY} ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})
+  target_link_libraries(GhoulTest PRIVATE ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY} ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})
 endif ()
