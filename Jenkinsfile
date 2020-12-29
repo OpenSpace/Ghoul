@@ -110,8 +110,8 @@ windows_msvc: {
         compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio(), '', '', 'build-msvc');
         compileHelper.recordCompileIssues(compileHelper.VisualStudio());
       }
-      stage('wiwindows-msvcndows/test') {
-        testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
+      stage('windows-msvc/test') {
+        testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest.exe')
       }
       cleanWs()
     } // node('windows')
@@ -128,7 +128,7 @@ windows_ninja: {
         compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-ninja');
       }
       stage('windows-ninja/test') {
-        testHelper.runUnitTests('build-ninja\\tests\\Debug\\GhoulTest')
+        testHelper.runUnitTests('build-ninja\\tests\\GhoulTest.exe')
       }
       cleanWs()
     } // node('windows')
