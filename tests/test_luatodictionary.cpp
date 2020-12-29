@@ -58,9 +58,6 @@ TEST_CASE("LuaToDictionary: Nested Tables", "[luatodictionary]") {
 
     lua_getglobal(state, "glob");
 
-    std::cout <<  ghoul::lua::stackInformation(state) << '\n';
-
-
     ghoul::Dictionary dict;
     ghoul::lua::luaDictionaryFromState(state, dict);
 
