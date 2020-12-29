@@ -55,7 +55,7 @@ endfunction ()
 # target_name: Target to which the library is added
 # library_name: The library that is added by including 'path'
 # path: The path that will be included
-function (include_external_library target_name visibility library_name path include_path)
+function (include_external_library target_name visibility library_name path)
   set (extra_macro_args ${ARGN})
   if (NOT TARGET ${library_name})
     add_subdirectory(${path})
