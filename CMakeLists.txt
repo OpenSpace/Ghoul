@@ -100,6 +100,11 @@ if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
   end_dependency("iNotify")
 endif ()
 
+if (UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -stdlib=libc++")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++ -lc++abi")
+endif ()
+
 # GLM
 begin_dependency("GLM")
 set(GLM_ROOT_DIR "${GHOUL_ROOT_DIR}/ext/glm")
@@ -154,7 +159,7 @@ end_dependency("LZ4")
 # Lua
 if (GHOUL_MODULE_LUA)
   begin_module("Lua")
-  include_external_library(Ghoul PUBLIC Lua ${GHOUL_ROOT_DIR}/ext/lua ${GHOUL_ROOT_DIR}/ext/lua/src)
+  include_external_library(Ghoul PUBLIC Lua ${GHOUL_ROOT_DIR}/ext/lua)
   end_module("Lua")
 endif ()
 
@@ -182,7 +187,7 @@ if (GHOUL_MODULE_ASSIMP)
     set(ASSIMP_NO_EXPORT ON CACHE BOOL "")
     set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
 
-    include_external_library(Ghoul PRIVATE assimp ${GHOUL_ROOT_DIR}/ext/assimp ${GHOUL_ROOT_DIR}/ext/assimp/include)
+    include_external_library(Ghoul PRIVATE assimp ${GHOUL_ROOT_DIR}/ext/assimp)
 
     # We need to include this to be able to find the assimp/config.h file
     target_include_directories(assimp PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
@@ -199,7 +204,7 @@ begin_dependency("fmt")
 set(FMT_DOC OFF CACHE BOOL "Generate the doc target.")
 set(FMT_INSTALL OFF CACHE BOOL "Generate the install target.")
 set(FMT_TEST OFF CACHE BOOL "Generate the test target.")
-include_external_library(Ghoul PUBLIC fmt ${GHOUL_ROOT_DIR}/ext/cppformat ${GHOUL_ROOT_DIR}/ext/cppformat/include)
+include_external_library(Ghoul PUBLIC fmt ${GHOUL_ROOT_DIR}/ext/cppformat)
 end_dependency("fmt")
 
 message(STATUS "Loading image libraries")
@@ -243,13 +248,13 @@ endif ()
 # stb_image
 begin_dependency("stb_image")
 target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_STB_IMAGE")
-include_external_library(Ghoul PUBLIC stb_image ${GHOUL_ROOT_DIR}/ext/stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
+include_external_library(Ghoul PUBLIC stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
 end_dependency("stb_image")
 
 # Stackwalker
 if (MSVC)
   begin_dependency("Stackwalker")
-  include_external_library(Ghoul PRIVATE StackWalker ${GHOUL_ROOT_DIR}/ext/stackwalker ${GHOUL_ROOT_DIR}/ext/stackwalker)
+  include_external_library(Ghoul PRIVATE StackWalker ${GHOUL_ROOT_DIR}/ext/stackwalker)
   end_dependency("Stackwalker")
 endif ()
 
@@ -277,7 +282,7 @@ end_dependency("WebSocketPP")
 if (GHOUL_MODULE_FONTRENDERING)
   begin_module("FontRendering")
   set(FREETYPE_DIST OFF CACHE BOOL "")
-  include_external_library(Ghoul PUBLIC freetype ${GHOUL_ROOT_DIR}/ext/freetype2 ${GHOUL_ROOT_DIR}/ext/freetype2/include)
+  include_external_library(Ghoul PUBLIC freetype ${GHOUL_ROOT_DIR}/ext/freetype2)
   set_folder_location(dist "External")
 
   if (TARGET zlib)
@@ -288,7 +293,7 @@ endif ()
 
 # Tiny process library
 begin_dependency("tiny-process-library")
-include_external_library(Ghoul PRIVATE tiny-process-library ${GHOUL_ROOT_DIR}/ext/tiny-process-library ${GHOUL_ROOT_DIR}/ext/tiny-process-library)
+include_external_library(Ghoul PRIVATE tiny-process-library ${GHOUL_ROOT_DIR}/ext/tiny-process-library)
 end_dependency("tiny-process-library")
 
 
