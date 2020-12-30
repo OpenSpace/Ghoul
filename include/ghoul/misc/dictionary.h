@@ -26,6 +26,272 @@
 #ifndef __GHOUL___DICTIONARY___H__
 #define __GHOUL___DICTIONARY___H__
 
+#include <ghoul/misc/assert.h>
+#include <ghoul/glm.h>
+#include <array>
+#include <string>
+#include <unordered_map>
+#include <variant>
+#include <vector>
+
+namespace ghoul {
+
+class Dictionary : public std::unordered_map<std::string, std::variant<
+    bool, int, unsigned int, double, std::string, Dictionary,
+    std::vector<bool>, std::vector<int>, std::vector<unsigned int>,
+    std::vector<double>
+>> {
+public:
+    template <typename T>
+    void setValue(std::string key, T value) {
+        ghoul_assert(key.find('.') == std::string::npos, "No more nested dictionaries");
+        if constexpr (std::is_same_v<T, bool> || std::is_same_v<T, int> ||
+            std::is_same_v<T, unsigned int> ||
+            std::is_same_v<T, double> || std::is_same_v<T, std::string> ||
+            std::is_same_v<T, Dictionary> || std::is_same_v<T, std::vector<bool>> ||
+            std::is_same_v<T, std::vector<int>> ||
+            std::is_same_v<T, std::vector<unsigned int>> ||
+            std::is_same_v<T, std::vector<double>>)
+        {
+            (*this)[key] = value;
+        }
+        else if constexpr (std::is_same_v<T, glm::bvec2> ||
+                            std::is_same_v<T, glm::bvec3> ||
+                            std::is_same_v<T, glm::bvec4> ||
+                            std::is_same_v<T, glm::ivec2> ||
+                            std::is_same_v<T, glm::ivec3> ||
+                            std::is_same_v<T, glm::ivec4> ||
+                            std::is_same_v<T, glm::uvec2> ||
+                            std::is_same_v<T, glm::uvec3> ||
+                            std::is_same_v<T, glm::uvec4> ||
+                            std::is_same_v<T, glm::dvec2> ||
+                            std::is_same_v<T, glm::dvec3> ||
+                            std::is_same_v<T, glm::dvec4> ||
+                            std::is_same_v<T, glm::dmat2x2> ||
+                            std::is_same_v<T, glm::dmat2x3> ||
+                            std::is_same_v<T, glm::dmat2x4> ||
+                            std::is_same_v<T, glm::dmat3x2> ||
+                            std::is_same_v<T, glm::dmat3x3> ||
+                            std::is_same_v<T, glm::dmat3x4> ||
+                            std::is_same_v<T, glm::dmat4x2> ||
+                            std::is_same_v<T, glm::dmat4x3> ||
+                            std::is_same_v<T, glm::dmat4x4>)
+        {
+            (*this)[key] = std::vector<T::value_type>(
+                glm::value_ptr(value),
+                glm::value_ptr(value) + T::length()
+            );
+        }
+        else {
+            static_assert(false, "Unknown type T");
+        }
+    }
+
+    template <typename T>
+    T value(const std::string& key) const {
+        size_t dotPos = key.find('.');
+        if (dotPos != std::string::npos) {
+            std::string before = key.substr(0, dotPos);
+            std::string after = key.substr(dotPos + 1);
+
+            ghoul::Dictionary d = value<ghoul::Dictionary>(before);
+            return d.value<T>(after);
+        }
+        else {
+            auto it = find(key);
+            if (it == end()) {
+                throw "rude";
+            }
+
+            if constexpr (std::is_same_v<T, bool> || std::is_same_v<T, int> || 
+                std::is_same_v<T, unsigned int> ||
+                std::is_same_v<T, double> || std::is_same_v<T, std::string> ||
+                std::is_same_v<T, Dictionary> || std::is_same_v<T, std::vector<bool>> ||
+                std::is_same_v<T, std::vector<int>> ||
+                std::is_same_v<T, std::vector<unsigned int>> ||
+                std::is_same_v<T, std::vector<double>>)
+            {
+                return std::get<T>(it->second);
+            }
+            else if constexpr (std::is_same_v<T, glm::bvec2> ||
+                               std::is_same_v<T, glm::bvec3> ||
+                               std::is_same_v<T, glm::bvec4> ||
+                               std::is_same_v<T, glm::ivec2> ||
+                               std::is_same_v<T, glm::ivec3> ||
+                               std::is_same_v<T, glm::ivec4> ||
+                               std::is_same_v<T, glm::uvec2> ||
+                               std::is_same_v<T, glm::uvec3> ||
+                               std::is_same_v<T, glm::uvec4> ||
+                               std::is_same_v<T, glm::dvec2> ||
+                               std::is_same_v<T, glm::dvec3> ||
+                               std::is_same_v<T, glm::dvec4> ||
+                               std::is_same_v<T, glm::dmat2x2> ||
+                               std::is_same_v<T, glm::dmat2x3> ||
+                               std::is_same_v<T, glm::dmat2x4> ||
+                               std::is_same_v<T, glm::dmat3x2> ||
+                               std::is_same_v<T, glm::dmat3x3> ||
+                               std::is_same_v<T, glm::dmat3x4> ||
+                               std::is_same_v<T, glm::dmat4x2> ||
+                               std::is_same_v<T, glm::dmat4x3> ||
+                               std::is_same_v<T, glm::dmat4x4>)
+            {
+                using VT = std::vector<T::value_type>;
+                VT vec;
+                if (std::holds_alternative<VT>(it->second)) {
+                    vec = std::get<VT>(it->second);
+                }
+                else if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
+                    ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
+                    vec.resize(d.size());
+                    for (const auto& kv : d) {
+                        // Lua is 1-based index, the rest of the world is 0-based
+                        int k = std::stoi(kv.first) - 1;
+                        vec[k] = std::get<T::value_type>(kv.second);
+                    }
+                }
+                else {
+                    throw "rude";
+                }
+                // length works for vector types, but not for matrix types
+                //ghoul_assert(vec.size() == T::length(), "Wrong stored length");
+
+                T res;
+                std::memcpy(glm::value_ptr(res), vec.data(), sizeof(T));
+                return res;
+
+            }
+            else {
+                static_assert(false, "Unknown type T");
+            }
+        }
+    }
+
+    template <typename T>
+    bool getValue(const std::string& key, T& v) const {
+        try {
+            v = value<T>(key);
+            return true;
+        }
+        catch (...) {
+            return false;
+        }
+    }
+
+    template <typename T>
+    bool hasValue(const std::string& key) const {
+        size_t dotPos = key.find('.');
+        if (dotPos != std::string::npos) {
+            std::string before = key.substr(0, dotPos);
+            std::string after = key.substr(dotPos + 1);
+
+            ghoul::Dictionary d = value<ghoul::Dictionary>(before);
+            return d.hasValue<T>(after);
+        }
+        else {
+            auto it = find(key);
+            if (it == end()) {
+                return false;
+            }
+            if constexpr (std::is_same_v<T, bool> || std::is_same_v<T, int> ||
+                std::is_same_v<T, unsigned int> ||
+                std::is_same_v<T, double> || std::is_same_v<T, std::string> ||
+                std::is_same_v<T, Dictionary> || std::is_same_v<T, std::vector<bool>> ||
+                std::is_same_v<T, std::vector<int>> ||
+                std::is_same_v<T, std::vector<unsigned int>> ||
+                std::is_same_v<T, std::vector<double>>)
+            {
+                return std::holds_alternative<T>(it->second);
+            }
+            else if constexpr (std::is_same_v<T, glm::bvec2> ||
+                                std::is_same_v<T, glm::bvec3> ||
+                                std::is_same_v<T, glm::bvec4> ||
+                                std::is_same_v<T, glm::ivec2> ||
+                                std::is_same_v<T, glm::ivec3> ||
+                                std::is_same_v<T, glm::ivec4> ||
+                                std::is_same_v<T, glm::uvec2> ||
+                                std::is_same_v<T, glm::uvec3> ||
+                                std::is_same_v<T, glm::uvec4> ||
+                                std::is_same_v<T, glm::dvec2> ||
+                                std::is_same_v<T, glm::dvec3> ||
+                                std::is_same_v<T, glm::dvec4> ||
+                                std::is_same_v<T, glm::dmat2x2> ||
+                                std::is_same_v<T, glm::dmat2x3> ||
+                                std::is_same_v<T, glm::dmat2x4> ||
+                                std::is_same_v<T, glm::dmat3x2> ||
+                                std::is_same_v<T, glm::dmat3x3> ||
+                                std::is_same_v<T, glm::dmat3x4> ||
+                                std::is_same_v<T, glm::dmat4x2> ||
+                                std::is_same_v<T, glm::dmat4x3> ||
+                                std::is_same_v<T, glm::dmat4x4>)
+            {
+                if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
+                    ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
+                    for (const auto& kv : d) {
+                        if (!std::holds_alternative<T::value_type>(kv.second)) {
+                            return false;
+                        }
+                    }
+                    // We should check whether the keys are sorted, too
+                    return true;
+                }
+                else {
+                    using VT = std::vector<T::value_type>;
+                    return std::holds_alternative<VT>(it->second) &&
+                        std::get<VT>(it->second).size() == T::length();
+                }
+            }
+            else {
+                static_assert(false, "Unknown type T");
+            }
+        }
+    }
+
+    template <typename T>
+    bool hasKeyAndValue(const std::string& key) const {
+        return hasValue<T>(key);
+    }
+
+    // This function should go away
+    std::vector<std::string> keys() const {
+        std::vector<std::string> keys;
+        keys.reserve(size());
+        for (auto kv : *this) {
+            keys.push_back(kv.first);
+        }
+        return keys;
+    }
+
+    bool hasKey(const std::string& key) const {
+        size_t dotPos = key.find('.');
+        if (dotPos != std::string::npos) {
+            std::string before = key.substr(0, dotPos);
+            std::string after = key.substr(dotPos + 1);
+
+            if (hasKey(before)) {
+                ghoul::Dictionary d = value<ghoul::Dictionary>(before);
+                return d.hasKey(after);
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            auto it = find(key);
+            return it != end();
+        }
+    }
+};
+
+} // namespace ghoul
+
+#endif // __GHOUL___DICTIONARY___H__
+
+
+#if 0
+
+//#ifndef __GHOUL___DICTIONARY___H__
+//#define __GHOUL___DICTIONARY___H__
+
 #include <ghoul/glm.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
@@ -703,3 +969,5 @@ private:
 #include "dictionary.inl"
 
 #endif // __GHOUL___DICTIONARY___H__
+
+//#endif 

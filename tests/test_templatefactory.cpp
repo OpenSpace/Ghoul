@@ -182,7 +182,10 @@ TEST_CASE("TemplateFactory: Dictionary Constructor", "[templatefactory]") {
 
     factory.registerClass<SubClassDictionary>("SubClassDictionary");
 
-    ghoul::Dictionary dict = { { "value1", 100 }, { "value2", 200 } };
+    ghoul::Dictionary dict;
+    dict.setValue("value1", 100);
+    dict.setValue("value2", 200);
+
     ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
         factory.create("SubClassDictionary", dict)
     );
@@ -197,7 +200,9 @@ TEST_CASE("TemplateFactory: No Dictionary Constructor Exists", "[templatefactory
 
     factory.registerClass<SubClassDefault>("SubClassDefault");
 
-    ghoul::Dictionary dict = { { "value1", 100 }, { "value2", 200 } };
+    ghoul::Dictionary dict;
+    dict.setValue("value1", 100);
+    dict.setValue("value2", 200);
 
     REQUIRE_THROWS_AS(
         factory.create("SubClassDefault", dict),
@@ -234,7 +239,10 @@ TEST_CASE("TemplateFactory: Default Dictionary Constructor", "[templatefactory]"
     REQUIRE(obj->value1 == 31);
     REQUIRE(obj->value2 == 32);
 
-    ghoul::Dictionary dict = { { "value1", 41 }, { "value2", 42 } };
+    ghoul::Dictionary dict;
+    dict.setValue("value1", 41);
+    dict.setValue("value2", 42);
+
     ghoul::mm_unique_ptr<BaseClass> obj2 = ghoul::mm_unique_ptr<BaseClass>(
         factory.create("class", dict)
     );

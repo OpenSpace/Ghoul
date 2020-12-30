@@ -26,6 +26,7 @@
 #include <ghoul/opengl/shaderpreprocessor.h>
 
 #include <ghoul/fmt.h>
+#include <ghoul/glm.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/log.h>
 #include <ghoul/misc/dictionary.h>
@@ -423,17 +424,20 @@ std::string ShaderPreprocessor::substitute(const std::string& in,
     else if (_dictionary.hasValue<std::string>(resolved)) {
         return _dictionary.value<std::string>(resolved);
     }
-    else if (_dictionary.hasValue<const char*>(resolved)) {
-        return _dictionary.value<const char*>(resolved);
-    }
-    else if (_dictionary.hasValue<char*>(resolved)) {
-        return _dictionary.value<char*>(resolved);
-    }
-    else if (_dictionary.hasValue<long long>(resolved)) {
-        return std::to_string(_dictionary.value<long long>(resolved));
-    }
-    else if (_dictionary.hasValue<unsigned long long>(resolved)) {
-        return std::to_string(_dictionary.value<unsigned long long>(resolved));
+    //else if (_dictionary.hasValue<const char*>(resolved)) {
+    //    return _dictionary.value<const char*>(resolved);
+    //}
+    //else if (_dictionary.hasValue<char*>(resolved)) {
+    //    return _dictionary.value<char*>(resolved);
+    //}
+    //else if (_dictionary.hasValue<long long>(resolved)) {
+    //    return std::to_string(_dictionary.value<long long>(resolved));
+    //}
+    //else if (_dictionary.hasValue<unsigned long long>(resolved)) {
+    //    return std::to_string(_dictionary.value<unsigned long long>(resolved));
+    //}
+    else if (_dictionary.hasValue<int>(resolved)) {
+        return std::to_string(_dictionary.value<int>(resolved));
     }
     else if (_dictionary.hasValue<double>(resolved)) {
         return std::to_string(_dictionary.value<double>(resolved));

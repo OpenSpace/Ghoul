@@ -59,8 +59,8 @@ namespace {
             return formatJson(subDictionary);
         }
 
-        if (dictionary.hasValue<glm::vec4>(key)) {
-            glm::vec4 vec = dictionary.value<glm::vec4>(key);
+        if (dictionary.hasValue<glm::dvec4>(key)) {
+            glm::dvec4 vec = dictionary.value<glm::dvec4>(key);
             return fmt::format(
                 "[{},{},{},{}]",
                 formatDouble(vec.x),
@@ -70,8 +70,8 @@ namespace {
             );
         }
 
-        if (dictionary.hasValue<glm::vec3>(key)) {
-            glm::vec3 vec = dictionary.value<glm::vec3>(key);
+        if (dictionary.hasValue<glm::dvec3>(key)) {
+            glm::dvec3 vec = dictionary.value<glm::dvec3>(key);
             return fmt::format(
                 "[{},{},{}]",
                 formatDouble(vec.x),
@@ -80,13 +80,13 @@ namespace {
             );
         }
 
-        if (dictionary.hasValue<glm::vec2>(key)) {
-            glm::vec2 vec = dictionary.value<glm::vec2>(key);
+        if (dictionary.hasValue<glm::dvec2>(key)) {
+            glm::dvec2 vec = dictionary.value<glm::dvec2>(key);
             return fmt::format("[{},{}]", formatDouble(vec.x), formatDouble(vec.y));
         }
 
-        if (dictionary.hasValue<float>(key)) {
-            float value = dictionary.value<float>(key);
+        if (dictionary.hasValue<double>(key)) {
+            double value = dictionary.value<double>(key);
             return formatDouble(value);
         }
 

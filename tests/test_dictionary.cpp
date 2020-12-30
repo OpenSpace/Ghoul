@@ -23,6 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#if 0
 #include "catch2/catch.hpp"
 
 #include <ghoul/filesystem/filesystem.h>
@@ -3988,3 +3989,5 @@ TEST_CASE("Dictionary: Recursive Access Set Value", "[dictionary]") {
     // false values
     REQUIRE_THROWS_AS(d.setValue("e.g.a", 1), Dictionary::KeyError);
 }
+
+#endif
