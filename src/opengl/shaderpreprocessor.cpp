@@ -424,18 +424,6 @@ std::string ShaderPreprocessor::substitute(const std::string& in,
     else if (_dictionary.hasValue<std::string>(resolved)) {
         return _dictionary.value<std::string>(resolved);
     }
-    //else if (_dictionary.hasValue<const char*>(resolved)) {
-    //    return _dictionary.value<const char*>(resolved);
-    //}
-    //else if (_dictionary.hasValue<char*>(resolved)) {
-    //    return _dictionary.value<char*>(resolved);
-    //}
-    //else if (_dictionary.hasValue<long long>(resolved)) {
-    //    return std::to_string(_dictionary.value<long long>(resolved));
-    //}
-    //else if (_dictionary.hasValue<unsigned long long>(resolved)) {
-    //    return std::to_string(_dictionary.value<unsigned long long>(resolved));
-    //}
     else if (_dictionary.hasValue<int>(resolved)) {
         return std::to_string(_dictionary.value<int>(resolved));
     }
@@ -449,14 +437,6 @@ std::string ShaderPreprocessor::substitute(const std::string& in,
     else if (_dictionary.hasValue<glm::ivec3>(resolved)) {
         glm::ivec3 vec = _dictionary.value<glm::ivec3>(resolved);
         return fmt::format("ivec3({},{},{})", vec.x, vec.y, vec.z);
-    }
-    else if (_dictionary.hasValue<glm::uvec2>(resolved)) {
-        glm::uvec2 vec = _dictionary.value<glm::uvec2>(resolved);
-        return fmt::format("uvec2({},{})", vec.x, vec.y);
-    }
-    else if (_dictionary.hasValue<glm::uvec3>(resolved)) {
-        glm::uvec3 vec = _dictionary.value<glm::uvec3>(resolved);
-        return fmt::format("uvec3({},{},{})", vec.x, vec.y, vec.z);
     }
     else if (_dictionary.hasValue<glm::dvec2>(resolved)) {
         glm::dvec2 vec = _dictionary.value<glm::dvec2>(resolved);

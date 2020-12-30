@@ -37,20 +37,17 @@
 namespace ghoul {
 
 class Dictionary : public std::unordered_map<std::string, std::variant<
-    bool, int, unsigned int, double, std::string, Dictionary,
-    std::vector<bool>, std::vector<int>, std::vector<unsigned int>,
-    std::vector<double>
+    bool, int, double, std::string, Dictionary,
+    std::vector<bool>, std::vector<int>, std::vector<double>
 >> {
 public:
     template <typename T>
     void setValue(std::string key, T value) {
         ghoul_assert(key.find('.') == std::string::npos, "No more nested dictionaries");
         if constexpr (std::is_same_v<T, bool> || std::is_same_v<T, int> ||
-            std::is_same_v<T, unsigned int> ||
             std::is_same_v<T, double> || std::is_same_v<T, std::string> ||
             std::is_same_v<T, Dictionary> || std::is_same_v<T, std::vector<bool>> ||
             std::is_same_v<T, std::vector<int>> ||
-            std::is_same_v<T, std::vector<unsigned int>> ||
             std::is_same_v<T, std::vector<double>>)
         {
             (*this)[key] = value;
@@ -61,9 +58,6 @@ public:
                             std::is_same_v<T, glm::ivec2> ||
                             std::is_same_v<T, glm::ivec3> ||
                             std::is_same_v<T, glm::ivec4> ||
-                            std::is_same_v<T, glm::uvec2> ||
-                            std::is_same_v<T, glm::uvec3> ||
-                            std::is_same_v<T, glm::uvec4> ||
                             std::is_same_v<T, glm::dvec2> ||
                             std::is_same_v<T, glm::dvec3> ||
                             std::is_same_v<T, glm::dvec4> ||
@@ -104,11 +98,9 @@ public:
             }
 
             if constexpr (std::is_same_v<T, bool> || std::is_same_v<T, int> || 
-                std::is_same_v<T, unsigned int> ||
                 std::is_same_v<T, double> || std::is_same_v<T, std::string> ||
                 std::is_same_v<T, Dictionary> || std::is_same_v<T, std::vector<bool>> ||
                 std::is_same_v<T, std::vector<int>> ||
-                std::is_same_v<T, std::vector<unsigned int>> ||
                 std::is_same_v<T, std::vector<double>>)
             {
                 return std::get<T>(it->second);
@@ -119,9 +111,6 @@ public:
                                std::is_same_v<T, glm::ivec2> ||
                                std::is_same_v<T, glm::ivec3> ||
                                std::is_same_v<T, glm::ivec4> ||
-                               std::is_same_v<T, glm::uvec2> ||
-                               std::is_same_v<T, glm::uvec3> ||
-                               std::is_same_v<T, glm::uvec4> ||
                                std::is_same_v<T, glm::dvec2> ||
                                std::is_same_v<T, glm::dvec3> ||
                                std::is_same_v<T, glm::dvec4> ||
@@ -193,11 +182,9 @@ public:
                 return false;
             }
             if constexpr (std::is_same_v<T, bool> || std::is_same_v<T, int> ||
-                std::is_same_v<T, unsigned int> ||
                 std::is_same_v<T, double> || std::is_same_v<T, std::string> ||
                 std::is_same_v<T, Dictionary> || std::is_same_v<T, std::vector<bool>> ||
                 std::is_same_v<T, std::vector<int>> ||
-                std::is_same_v<T, std::vector<unsigned int>> ||
                 std::is_same_v<T, std::vector<double>>)
             {
                 return std::holds_alternative<T>(it->second);
@@ -208,9 +195,6 @@ public:
                                 std::is_same_v<T, glm::ivec2> ||
                                 std::is_same_v<T, glm::ivec3> ||
                                 std::is_same_v<T, glm::ivec4> ||
-                                std::is_same_v<T, glm::uvec2> ||
-                                std::is_same_v<T, glm::uvec3> ||
-                                std::is_same_v<T, glm::uvec4> ||
                                 std::is_same_v<T, glm::dvec2> ||
                                 std::is_same_v<T, glm::dvec3> ||
                                 std::is_same_v<T, glm::dvec4> ||
