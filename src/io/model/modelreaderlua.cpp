@@ -62,23 +62,26 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
         throw ModelReaderException(filename, e.what());
     }
 
-    if (!dictionary.hasKeyAndValue<Dictionary>(KeyVertices)) {
+    if (!dictionary.hasKey(KeyVertices) || !dictionary.hasValue<Dictionary>(KeyVertices))
+    {
         throw ModelReaderException(
             filename, fmt::format("Missing key or wrong format for '{}'", KeyVertices)
         );
     }
-    if (!dictionary.hasKeyAndValue<Dictionary>(KeyIndices)) {
+    if (!dictionary.hasKey(KeyIndices) || !dictionary.hasValue<Dictionary>(KeyIndices)) {
         throw ModelReaderException(
             filename, fmt::format("Missing key or wrong format for '{}'", KeyIndices)
         );
     }
-    if (!dictionary.hasKeyAndValue<Dictionary>(KeyAttribPointers)) {
+    if (!dictionary.hasKey(KeyAttribPointers) ||
+        !dictionary.hasValue<Dictionary>(KeyAttribPointers))
+    {
         throw ModelReaderException(
             filename,
             fmt::format("Missing key or wrong format for '{}'", KeyAttribPointers)
         );
     }
-    if (!dictionary.hasKeyAndValue<std::string>(KeyMode)) {
+    if (!dictionary.hasKey(KeyMode) || !dictionary.hasValue<Dictionary>(KeyMode)) {
         throw ModelReaderException(
             filename, fmt::format("Missing key or wrong format for '{}'", KeyMode)
         );
@@ -114,7 +117,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     Dictionary attribPointers = dictionary.value<Dictionary>(KeyAttribPointers);
     std::vector<std::string> attribKeys = attribPointers.keys();
     for (const std::string& key : attribKeys) {
-        if (attribPointers.hasKeyAndValue<ghoul::Dictionary>(key)) {
+        if (attribPointers.hasKey(key) && dictionary.hasValue<Dictionary>(key)) {
             ghoul::Dictionary d = attribPointers.value<ghoul::Dictionary>(key);
             double position = d.value<double>(KeyPosition);
             double size = d.value<double>(KeySize);

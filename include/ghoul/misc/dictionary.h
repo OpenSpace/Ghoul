@@ -230,11 +230,6 @@ public:
         }
     }
 
-    template <typename T>
-    bool hasKeyAndValue(const std::string& key) const {
-        return hasValue<T>(key);
-    }
-
     // This function should go away
     std::vector<std::string> keys() const {
         std::vector<std::string> keys;
