@@ -70,7 +70,10 @@ namespace {
                 formatValue(d, key, prettyPrint, indentation, indentationSteps + 1);
         };
 
-        std::vector<std::string> keys = d.keys();
+        std::vector<std::string> keys;
+        for (std::string_view k : d.keys()) {
+            keys.push_back(std::string(k));
+        }
 
         std::string lua = std::accumulate(
             std::next(keys.begin()),

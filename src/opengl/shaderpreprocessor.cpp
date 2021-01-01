@@ -727,14 +727,14 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     // Fetch the dictionary to iterate over.
     Dictionary innerDictionary = _dictionary.value<Dictionary>(dictionaryRef);
 
-    std::vector<std::string> keys = innerDictionary.keys();
+    std::vector<std::string_view> keys = innerDictionary.keys();
     ShaderPreprocessor::Input& input = env.inputs.back();
     int keyIndex;
 
     std::map<std::string, std::string> table;
     if (!keys.empty()) {
-        table[keyName] = "\"" + keys[0] + "\"";
-        table[valueName] = dictionaryRef + "." + keys[0];
+        table[keyName] = "\"" + std::string(keys[0]) + "\"";
+        table[valueName] = dictionaryRef + "." + std::string(keys[0]);
         keyIndex = 0;
 
         env.output << "//# For loop over " << dictionaryRef << std::endl;
@@ -796,13 +796,15 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
 
     // Fetch the dictionary to iterate over
     Dictionary innerDict = _dictionary.value<Dictionary>(forStmnt.dictionaryReference);
-    std::vector<std::string> keys = innerDict.keys();
+    std::vector<std::string_view> keys = innerDict.keys();
 
     std::map<std::string, std::string> table;
     if (forStmnt.keyIndex < static_cast<int>(keys.size())) {
-        std::string key = keys[forStmnt.keyIndex];
-        table[forStmnt.keyName] = "\"" + key + "\"";
-        table[forStmnt.valueName] = forStmnt.dictionaryReference + "." + key;
+        std::string_view key = keys[forStmnt.keyIndex];
+        table[forStmnt.keyName] = fmt::format("\"{}\"", key);
+        table[forStmnt.valueName] = fmt::format(
+            "{}.{}", forStmnt.dictionaryReference, key
+        );
         pushScope(table, env);
         env.output <<
             fmt::format("//# Key {} in {}\n", key, forStmnt.dictionaryReference);

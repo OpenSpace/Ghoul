@@ -25,395 +25,366 @@
 
 #include <ghoul/misc/dictionary.h>
 
-#if 0
-
-#include <ghoul/misc/dictionary.h>
-
 #include <ghoul/misc/assert.h>
-#include <algorithm>
-#include <array>
-
-using std::string;
-
-using namespace ghoul::internal;
-
-/**
- * The reason for the unified storage space is the easy conversion between similar types.
- * The Dictionary should not be used for high-performance code anyway, so the additional
- * storage requirement is a valid trade-off.
- *
- * The calling hierachy for the #ghoul::Dictionary::setValue,
- * #ghoul::Dictionary::getValue, and #ghoul::Dictionary::hasValue methods are as follows:
-
- * #ghoul::Dictionary::value <code>-></code> #ghoul::Dictionary::getValue <code>-></code>
- * #ghoul::Dictionary::getValueInternal <code>-></code> #ghoul::Dictionary::getValueHelper
- *
- * #ghoul::Dictionary::hasValue <code>-></code> #ghoul::Dictionary::hasValueInternal
- * <code>-></code> #ghoul::Dictionary::hasValueHelper
- *
- * #ghoul::Dictionary::setValue <code>-></code> #ghoul::Dictionary::setValueInternal
- * <code>-></code> #ghoul::Dictionary::setValueHelper
- */
 
 namespace ghoul {
 
-Dictionary::DictionaryError::DictionaryError(std::string msg)
-    : RuntimeError(std::move(msg), "Dictionary")
-{}
-
 Dictionary::KeyError::KeyError(std::string msg)
-    : DictionaryError(std::move(msg))
+    : ghoul::RuntimeError(std::move(msg), "Dictionary")
 {}
 
-Dictionary::ConversionError::ConversionError(std::string msg)
-    : DictionaryError(std::move(msg))
+Dictionary::ValueError::ValueError(std::string key, std::string msg)
+    : ghoul::RuntimeError(
+        fmt::format("Key '{}': {}", std::move(key), std::move(msg)),
+        "Dictionary"
+    )
 {}
 
-#define EXTERN_TEMPLATE_DEFINITION(__TYPE__) \
-template void Dictionary::setValue<__TYPE__>(std::string, __TYPE__, CreateIntermediate); \
-template bool Dictionary::getValue<__TYPE__>(const std::string&, __TYPE__&) const;       \
-template __TYPE__ Dictionary::value<__TYPE__>(const std::string&) const;                 \
-template bool Dictionary::hasValue<__TYPE__>(const std::string&) const;                  \
-template bool isConvertible<__TYPE__>(const Dictionary&);                                \
-template void Dictionary::setValueHelper<__TYPE__>(std::string, __TYPE__,                \
-    CreateIntermediate);                                                                 \
-template void Dictionary::getValueHelper<__TYPE__>(const std::string&, __TYPE__&) const; \
-template bool Dictionary::hasValueHelper<__TYPE__>(const std::string&) const
+void Dictionary::setValue(std::string key, bool value) {
+    insert_or_assign(std::move(key), value);
+}
 
-EXTERN_TEMPLATE_DEFINITION(char);
-EXTERN_TEMPLATE_DEFINITION(signed char);
-EXTERN_TEMPLATE_DEFINITION(unsigned char);
-EXTERN_TEMPLATE_DEFINITION(wchar_t);
-EXTERN_TEMPLATE_DEFINITION(short);
-EXTERN_TEMPLATE_DEFINITION(unsigned short);
-EXTERN_TEMPLATE_DEFINITION(int);
-EXTERN_TEMPLATE_DEFINITION(unsigned int);
-EXTERN_TEMPLATE_DEFINITION(long long);
-EXTERN_TEMPLATE_DEFINITION(unsigned long long);
-EXTERN_TEMPLATE_DEFINITION(float);
-EXTERN_TEMPLATE_DEFINITION(double);
-EXTERN_TEMPLATE_DEFINITION(glm::vec2);
-EXTERN_TEMPLATE_DEFINITION(glm::dvec2);
-EXTERN_TEMPLATE_DEFINITION(glm::ivec2);
-EXTERN_TEMPLATE_DEFINITION(glm::uvec2);
-EXTERN_TEMPLATE_DEFINITION(glm::bvec2);
-EXTERN_TEMPLATE_DEFINITION(glm::vec3);
-EXTERN_TEMPLATE_DEFINITION(glm::dvec3);
-EXTERN_TEMPLATE_DEFINITION(glm::ivec3);
-EXTERN_TEMPLATE_DEFINITION(glm::uvec3);
-EXTERN_TEMPLATE_DEFINITION(glm::bvec3);
-EXTERN_TEMPLATE_DEFINITION(glm::vec4);
-EXTERN_TEMPLATE_DEFINITION(glm::dvec4);
-EXTERN_TEMPLATE_DEFINITION(glm::ivec4);
-EXTERN_TEMPLATE_DEFINITION(glm::uvec4);
-EXTERN_TEMPLATE_DEFINITION(glm::bvec4);
-EXTERN_TEMPLATE_DEFINITION(glm::mat2x2);
-EXTERN_TEMPLATE_DEFINITION(glm::mat2x3);
-EXTERN_TEMPLATE_DEFINITION(glm::mat2x4);
-EXTERN_TEMPLATE_DEFINITION(glm::mat3x2);
-EXTERN_TEMPLATE_DEFINITION(glm::mat3x3);
-EXTERN_TEMPLATE_DEFINITION(glm::mat3x4);
-EXTERN_TEMPLATE_DEFINITION(glm::mat4x2);
-EXTERN_TEMPLATE_DEFINITION(glm::mat4x3);
-EXTERN_TEMPLATE_DEFINITION(glm::mat4x4);
-EXTERN_TEMPLATE_DEFINITION(glm::dmat2x2);
-EXTERN_TEMPLATE_DEFINITION(glm::dmat2x3);
-EXTERN_TEMPLATE_DEFINITION(glm::dmat2x4);
-EXTERN_TEMPLATE_DEFINITION(glm::dmat3x2);
-EXTERN_TEMPLATE_DEFINITION(glm::dmat3x3);
-EXTERN_TEMPLATE_DEFINITION(glm::dmat3x4);
-EXTERN_TEMPLATE_DEFINITION(glm::dmat4x2);
-EXTERN_TEMPLATE_DEFINITION(glm::dmat4x3);
-EXTERN_TEMPLATE_DEFINITION(glm::dmat4x4);
+void Dictionary::setValue(std::string key, double value) {
+    insert_or_assign(std::move(key), value);
+}
 
-#undef EXTERN_TEMPLATE_DEFINITION
-#undef EXTERN_TEMPLATE_DEFINITION_SCALAR
+void Dictionary::setValue(std::string key, int value) {
+    insert_or_assign(std::move(key), value);
+}
 
-template <>
-bool Dictionary::getValue<Dictionary>(const string& key, Dictionary& val) const {
-    ghoul_assert(&val != this, "Value argument must not be 'this' object");
-    const bool dict = hasKeyAndValue<Dictionary>(key);
-    if (dict) {
-        getValueHelper(key, val);
-        return true;
+void Dictionary::setValue(std::string key, std::string value) {
+    insert_or_assign(std::move(key), std::move(value));
+}
+
+void Dictionary::setValue(std::string key, Dictionary value) {
+    insert_or_assign(std::move(key), std::move(value));
+}
+
+void Dictionary::setValue(std::string key, std::vector<int> value) {
+    insert_or_assign(std::move(key), std::move(value));
+}
+
+void Dictionary::setValue(std::string key, std::vector<double> value) {
+    insert_or_assign(std::move(key), std::move(value));
+}
+
+void Dictionary::setValue(std::string key, glm::ivec2 value) {
+    int* ptr = glm::value_ptr(value);
+    std::vector<int> vec(ptr, ptr + 2);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::ivec3 value) {
+    int* ptr = glm::value_ptr(value);
+    std::vector<int> vec(ptr, ptr + 3);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::ivec4 value) {
+    int* ptr = glm::value_ptr(value);
+    std::vector<int> vec(ptr, ptr + 4);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::dvec2 value) {
+    double* ptr = glm::value_ptr(value);
+    std::vector<double> vec(ptr, ptr + 2);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::dvec3 value) {
+    double* ptr = glm::value_ptr(value);
+    std::vector<double> vec(ptr, ptr + 3);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::dvec4 value) {
+    double* ptr = glm::value_ptr(value);
+    std::vector<double> vec(ptr, ptr + 4);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::dmat2x2 value) {
+    double* ptr = glm::value_ptr(value);
+    std::vector<double> vec(ptr, ptr + 2 * 2);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::dmat2x3 value) {
+    double* ptr = glm::value_ptr(value);
+    std::vector<double> vec(ptr, ptr + 2 * 3);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::dmat2x4 value) {
+    double* ptr = glm::value_ptr(value);
+    std::vector<double> vec(ptr, ptr + 2 * 4);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::dmat3x2 value) {
+    double* ptr = glm::value_ptr(value);
+    std::vector<double> vec(ptr, ptr + 3 * 2);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::dmat3x3 value) {
+    double* ptr = glm::value_ptr(value);
+    std::vector<double> vec(ptr, ptr + 3 * 3);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::dmat3x4 value) {
+    double* ptr = glm::value_ptr(value);
+    std::vector<double> vec(ptr, ptr + 3 * 4);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::dmat4x2 value) {
+    double* ptr = glm::value_ptr(value);
+    std::vector<double> vec(ptr, ptr + 4 * 2);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::dmat4x3 value) {
+    double* ptr = glm::value_ptr(value);
+    std::vector<double> vec(ptr, ptr + 4 * 3);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+void Dictionary::setValue(std::string key, glm::dmat4x4 value) {
+    double* ptr = glm::value_ptr(value);
+    std::vector<double> vec(ptr, ptr + 4 * 4);
+    insert_or_assign(std::move(key), std::move(vec));
+}
+
+// This function should go away
+std::vector<std::string_view> Dictionary::keys() const {
+    std::vector<std::string_view> keys;
+    keys.reserve(size());
+    for (const auto& kv : *this) {
+        keys.push_back(kv.first);
+    }
+    return keys;
+}
+
+template <typename T>
+T Dictionary::value(std::string_view key) const {
+    const size_t dotPos = key.find('.');
+    if (dotPos != std::string_view::npos) {
+        std::string_view before = key.substr(0, dotPos);
+        std::string_view after = key.substr(dotPos + 1);
+
+        ghoul::Dictionary d = value<ghoul::Dictionary>(before);
+        return d.value<T>(after);
     }
     else {
-        return false;
-    }
-}
+        auto it = find(key);
+        if (it == end()) {
+            throw KeyError(fmt::format("Could not find key '{}'", key));
+        }
 
-template <>
-bool Dictionary::getValue<std::string>(const std::string& key, std::string& val) const {
-    const bool str = hasValue<std::string>(key);
-    if (str) {
-        getValueHelper(key, val);
-        return true;
-    }
-    const bool c = hasValue<const char*>(key);
-    if (c) {
-        const char* data;
-        getValueHelper<const char*>(key, data);
-        val = std::string(data);
-        return true;
-    }
-    return false;
-}
+        if constexpr (
+            std::is_same_v<T, bool>       || std::is_same_v<T, int> ||
+            std::is_same_v<T, double>     || std::is_same_v<T, std::string> ||
+            std::is_same_v<T, Dictionary> || std::is_same_v<T, std::vector<int>> ||
+            std::is_same_v<T, std::vector<double>>)
+        {
+            return std::get<T>(it->second);
+        }
+        else if constexpr (
+            std::is_same_v<T, glm::ivec2>   || std::is_same_v<T, glm::ivec3> ||
+            std::is_same_v<T, glm::ivec4>   || std::is_same_v<T, glm::dvec2> ||
+            std::is_same_v<T, glm::dvec3>   || std::is_same_v<T, glm::dvec4> ||
+            std::is_same_v<T, glm::dmat2x2> || std::is_same_v<T, glm::dmat2x3> ||
+            std::is_same_v<T, glm::dmat2x4> || std::is_same_v<T, glm::dmat3x2> ||
+            std::is_same_v<T, glm::dmat3x3> || std::is_same_v<T, glm::dmat3x4> ||
+            std::is_same_v<T, glm::dmat4x2> || std::is_same_v<T, glm::dmat4x3> ||
+            std::is_same_v<T, glm::dmat4x4>)
+        {
+            using VT = std::vector<T::value_type>;
+            VT vec;
+            if (std::holds_alternative<VT>(it->second)) {
+                vec = std::get<VT>(it->second);
+            }
+            else if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
+                ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
+                vec.resize(d.size());
+                for (const auto& kv : d) {
+                    // Lua is 1-based index, the rest of the world is 0-based
+                    int k = std::stoi(kv.first) - 1;
+                    vec[k] = std::get<T::value_type>(kv.second);
+                }
+            }
+            else {
+                throw ValueError(
+                    std::string(key),
+                    fmt::format(
+                        "Requested {} but did not contain {} or {}",
+                        typeid(T).name(), typeid(T).name(),
+                        typeid(std::vector<T::value_type>).name()
+                    )
+                );
+            }
 
-template <>
-std::string Dictionary::value<std::string>(const std::string& key) const {
-    std::string tmp;
-    const bool s = getValue(key, tmp);
+            size_t expectedSize;
+            if constexpr (
+                std::is_same_v<T, glm::ivec2> || std::is_same_v<T, glm::ivec3> ||
+                std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::dvec2> ||
+                std::is_same_v<T, glm::dvec3> || std::is_same_v<T, glm::dvec4>)
+            {
+                expectedSize = T::length();
+            }
+            else {
+                expectedSize = T::col_type::length() * T::row_type::length();
+            }
 
-    if (s) {
-        return tmp;
-    }
-    else {
-        throw ConversionError(fmt::format(
-            "Error converting key '{}' from type '{}' to type '{}'",
-            key, find(key)->second.type().name(), typeid(std::string).name()
-        ));
-    }
-}
+            if (vec.size() != expectedSize) {
+                throw ValueError(
+                    std::string(key),
+                    fmt::format(
+                        "Contained wrong number of values. Expected {} got {}",
+                        expectedSize, vec.size()
+                    )
+                );
+            }
 
-Dictionary::Dictionary(std::initializer_list<std::pair<std::string, std::any>> l) {
-    for (const std::pair<std::string, std::any>& p : l) {
-        if (!p.first.empty()) {
-            setValueAnyHelper(p.first, p.second);
+            T res;
+            std::memcpy(glm::value_ptr(res), vec.data(), sizeof(T));
+            return res;
+        }
+        else {
+            static_assert(false, "Unknown type");
         }
     }
 }
 
-std::vector<string> Dictionary::keys(const string& location) const {
-    if (location.empty()) {
-        std::vector<string> result;
-        result.reserve(size());
-        for (const std::pair<const std::string, std::any>& it : *this) {
-            result.push_back(it.first);
+template <typename T>
+bool Dictionary::hasValue(std::string_view key) const {
+    const size_t dotPos = key.find('.');
+    if (dotPos != std::string_view::npos) {
+        std::string_view before = key.substr(0, dotPos);
+        std::string_view after = key.substr(dotPos + 1);
+
+        ghoul::Dictionary d = value<ghoul::Dictionary>(before);
+        return d.hasValue<T>(after);
+    }
+    else {
+        auto it = find(key);
+        if (it == end()) {
+            return false;
         }
-        return result;
+        if constexpr (std::is_same_v<T, bool> || std::is_same_v<T, int> ||
+            std::is_same_v<T, double> || std::is_same_v<T, std::string> ||
+            std::is_same_v<T, Dictionary> || /*std::is_same_v<T, std::vector<bool>> ||*/
+            std::is_same_v<T, std::vector<int>> ||
+            std::is_same_v<T, std::vector<double>>)
+        {
+            return std::holds_alternative<T>(it->second);
+        }
+        else if constexpr (std::is_same_v<T, glm::ivec2> ||
+            std::is_same_v<T, glm::ivec3> ||
+            std::is_same_v<T, glm::ivec4> ||
+            std::is_same_v<T, glm::dvec2> ||
+            std::is_same_v<T, glm::dvec3> ||
+            std::is_same_v<T, glm::dvec4> ||
+            std::is_same_v<T, glm::dmat2x2> ||
+            std::is_same_v<T, glm::dmat2x3> ||
+            std::is_same_v<T, glm::dmat2x4> ||
+            std::is_same_v<T, glm::dmat3x2> ||
+            std::is_same_v<T, glm::dmat3x3> ||
+            std::is_same_v<T, glm::dmat3x4> ||
+            std::is_same_v<T, glm::dmat4x2> ||
+            std::is_same_v<T, glm::dmat4x3> ||
+            std::is_same_v<T, glm::dmat4x4>)
+        {
+            if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
+                ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
+                for (const auto& kv : d) {
+                    if (!std::holds_alternative<T::value_type>(kv.second)) {
+                        return false;
+                    }
+                }
+                // We should check whether the keys are sorted, too
+                return true;
+            }
+            else {
+                using VT = std::vector<T::value_type>;
+                return std::holds_alternative<VT>(it->second) &&
+                    std::get<VT>(it->second).size() == T::length();
+            }
+        }
+        else {
+            static_assert(false, "Unknown type T");
+        }
     }
-
-    std::string first;
-    std::string rest;
-    splitKey(location, first, rest);
-
-    auto keyIt = find(first);
-    if (keyIt == cend()) {
-        throw KeyError(fmt::format("Key '{}' was not found", first));
-    }
-
-    const Dictionary* const dict = std::any_cast<Dictionary>(&(keyIt->second));
-    if (!dict) {
-        throw ConversionError(fmt::format(
-            "Error converting key '{}' from type '{}' to type 'Dictionary'",
-            first, keyIt->second.type().name()
-        ));
-    }
-    // proper tail-recursion
-    return dict->keys(rest);
 }
 
-bool Dictionary::hasKey(const string& key) const {
-    ghoul_assert(!key.empty(), "Key must not be empty");
+template Dictionary Dictionary::value<Dictionary>(std::string_view key) const;
+template bool Dictionary::value<bool>(std::string_view key) const;
+template double Dictionary::value<double>(std::string_view key) const;
+template int Dictionary::value<int>(std::string_view key) const;
+template std::string Dictionary::value<std::string>(std::string_view key) const;
+template std::vector<int> Dictionary::value<std::vector<int>>(std::string_view key) const;
+template std::vector<double> Dictionary::value<std::vector<double>>(
+    std::string_view key) const;
+template glm::ivec2 Dictionary::value<glm::ivec2>(std::string_view key) const;
+template glm::ivec3 Dictionary::value<glm::ivec3>(std::string_view key) const;
+template glm::ivec4 Dictionary::value<glm::ivec4>(std::string_view key) const;
+template glm::dvec2 Dictionary::value<glm::dvec2>(std::string_view key) const;
+template glm::dvec3 Dictionary::value<glm::dvec3>(std::string_view key) const;
+template glm::dvec4 Dictionary::value<glm::dvec4>(std::string_view key) const;
+template glm::dmat2x2 Dictionary::value<glm::dmat2x2>(std::string_view key) const;
+template glm::dmat2x3 Dictionary::value<glm::dmat2x3>(std::string_view key) const;
+template glm::dmat2x4 Dictionary::value<glm::dmat2x4>(std::string_view key) const;
+template glm::dmat3x2 Dictionary::value<glm::dmat3x2>(std::string_view key) const;
+template glm::dmat3x3 Dictionary::value<glm::dmat3x3>(std::string_view key) const;
+template glm::dmat3x4 Dictionary::value<glm::dmat3x4>(std::string_view key) const;
+template glm::dmat4x2 Dictionary::value<glm::dmat4x2>(std::string_view key) const;
+template glm::dmat4x3 Dictionary::value<glm::dmat4x3>(std::string_view key) const;
+template glm::dmat4x4 Dictionary::value<glm::dmat4x4>(std::string_view key) const;
 
-    auto it = find(key);
-    if (it != cend()) {
-        return true;
-    }
+template bool Dictionary::hasValue<Dictionary>(std::string_view key) const;
+template bool Dictionary::hasValue<bool>(std::string_view key) const;
+template bool Dictionary::hasValue<double>(std::string_view key) const;
+template bool Dictionary::hasValue<int>(std::string_view key) const;
+template bool Dictionary::hasValue<std::string>(std::string_view key) const;
+template bool Dictionary::hasValue<std::vector<int>>(std::string_view key) const;
+template bool Dictionary::hasValue<std::vector<double>>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::ivec2>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::ivec3>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::ivec4>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::dvec2>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::dvec3>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::dvec4>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::dmat2x2>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::dmat2x3>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::dmat2x4>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::dmat3x2>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::dmat3x3>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::dmat3x4>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::dmat4x2>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::dmat4x3>(std::string_view key) const;
+template bool Dictionary::hasValue<glm::dmat4x4>(std::string_view key) const;
 
-    std::string first;
-    std::string rest;
-    splitKey(key, first, rest);
+bool Dictionary::hasKey(std::string_view key) const {
+    const size_t dotPos = key.find('.');
+    if (dotPos != std::string_view::npos) {
+        std::string_view before = key.substr(0, dotPos);
+        std::string_view after = key.substr(dotPos + 1);
 
-    auto keyIt = find(first);
-    if (keyIt == cend()) {
-        return false;
-    }
-
-    const Dictionary* const dict = std::any_cast<Dictionary>(&(keyIt->second));
-    if (!dict) {
-        return false;
-    }
-    return dict->hasKey(rest);
-}
-
-size_t Dictionary::size() const {
-    return std::map<std::string, std::any>::size();
-}
-
-void Dictionary::clear() {
-    std::map<std::string, std::any>::clear();
-}
-
-bool Dictionary::empty() const {
-    return std::map<std::string, std::any>::empty();
-}
-
-bool Dictionary::removeKey(const std::string& key) {
-    ghoul_assert(!key.empty(), "Key must not be empty");
-
-    std::map<std::string, std::any>::size_type res = erase(key);
-    return (res == 1);
-}
-
-bool Dictionary::splitKey(const string& key, string& first, string& rest) const {
-    string::size_type l = key.find('.');
-
-    if (l == string::npos) {
-        first = key;
-        return false;
+        if (hasKey(before)) {
+            ghoul::Dictionary d = value<ghoul::Dictionary>(before);
+            return d.hasKey(after);
+        }
+        else {
+            return false;
+        }
     }
     else {
-        first = key.substr(0, l);
-        rest = key.substr(l + 1);
-        return true;
+        auto it = find(key);
+        return it != end();
     }
 }
 
-void Dictionary::setValueAnyHelper(std::string key, std::any val) {
-    // Ugly if-else statement is necessary as 'type' cannot be not constexpr
-    const std::type_info& type = val.type();
-
-    if (type == typeid(bool)) {
-        setValue(std::move(key), std::any_cast<bool>(val));
-    }
-    else if (type == typeid(char)) {
-        setValue(std::move(key), std::any_cast<char>(val));
-    }
-    else if (type == typeid(signed char)) {
-        setValue(std::move(key), std::any_cast<signed char>(val));
-    }
-    else if (type == typeid(unsigned char)) {
-        setValue(std::move(key), std::any_cast<unsigned char>(val));
-    }
-    else if (type == typeid(wchar_t)) {
-        setValue(std::move(key), std::any_cast<wchar_t>(val));
-    }
-    else if (type == typeid(short)) {
-        setValue(std::move(key), std::any_cast<short>(val));
-    }
-    else if (type == typeid(unsigned short)) {
-        setValue(std::move(key), std::any_cast<unsigned short>(val));
-    }
-    else if (type == typeid(int)) {
-        setValue(std::move(key), std::any_cast<int>(val));
-    }
-    else if (type == typeid(unsigned int)) {
-        setValue(std::move(key), std::any_cast<unsigned int>(val));
-    }
-    else if (type == typeid(long long)) {
-        setValue(std::move(key), std::any_cast<long long>(val));
-    }
-    else if (type == typeid(unsigned long long)) {
-        setValue(std::move(key), std::any_cast<unsigned long long>(val));
-    }
-    else if (type == typeid(float)) {
-        setValue(std::move(key), std::any_cast<float>(val));
-    }
-    else if (type == typeid(glm::vec2)) {
-        setValue(std::move(key), std::any_cast<glm::vec2>(val));
-    }
-    else if (type == typeid(glm::dvec2)) {
-        setValue(std::move(key), std::any_cast<glm::dvec2>(val));
-    }
-    else if (type == typeid(glm::ivec2)) {
-        setValue(std::move(key), std::any_cast<glm::ivec2>(val));
-    }
-    else if (type == typeid(glm::uvec2)) {
-        setValue(std::move(key), std::any_cast<glm::uvec2>(val));
-    }
-    else if (type == typeid(glm::bvec2)) {
-        setValue(std::move(key), std::any_cast<glm::bvec2>(val));
-    }
-    else if (type == typeid(glm::vec3)) {
-        setValue(std::move(key), std::any_cast<glm::vec3>(val));
-    }
-    else if (type == typeid(glm::dvec3)) {
-        setValue(std::move(key), std::any_cast<glm::dvec3>(val));
-    }
-    else if (type == typeid(glm::ivec3)) {
-        setValue(std::move(key), std::any_cast<glm::ivec3>(val));
-    }
-    else if (type == typeid(glm::uvec3)) {
-        setValue(std::move(key), std::any_cast<glm::uvec3>(val));
-    }
-    else if (type == typeid(glm::bvec3)) {
-        setValue(std::move(key), std::any_cast<glm::bvec3>(val));
-    }
-    else if (type == typeid(glm::vec4)) {
-        setValue(std::move(key), std::any_cast<glm::vec4>(val));
-    }
-    else if (type == typeid(glm::dvec4)) {
-        setValue(std::move(key), std::any_cast<glm::dvec4>(val));
-    }
-    else if (type == typeid(glm::ivec4)) {
-        setValue(std::move(key), std::any_cast<glm::ivec4>(val));
-    }
-    else if (type == typeid(glm::uvec4)) {
-        setValue(std::move(key), std::any_cast<glm::uvec4>(val));
-    }
-    else if (type == typeid(glm::bvec4)) {
-        setValue(std::move(key), std::any_cast<glm::bvec4>(val));
-    }
-    else if (type == typeid(glm::mat2x2)) {
-        setValue(std::move(key), std::any_cast<glm::mat2x2>(val));
-    }
-    else if (type == typeid(glm::mat2x3)) {
-        setValue(std::move(key), std::any_cast<glm::mat2x3>(val));
-    }
-    else if (type == typeid(glm::mat2x4)) {
-        setValue(std::move(key), std::any_cast<glm::mat2x4>(val));
-    }
-    else if (type == typeid(glm::mat3x2)) {
-        setValue(std::move(key), std::any_cast<glm::mat3x2>(val));
-    }
-    else if (type == typeid(glm::mat3x3)) {
-        setValue(std::move(key), std::any_cast<glm::mat3x3>(val));
-    }
-    else if (type == typeid(glm::mat3x4)) {
-        setValue(std::move(key), std::any_cast<glm::mat3x4>(val));
-    }
-    else if (type == typeid(glm::mat4x2)) {
-        setValue(std::move(key), std::any_cast<glm::mat4x2>(val));
-    }
-    else if (type == typeid(glm::mat4x3)) {
-        setValue(std::move(key), std::any_cast<glm::mat4x3>(val));
-    }
-    else if (type == typeid(glm::mat4x4)) {
-        setValue(std::move(key), std::any_cast<glm::mat4x4>(val));
-    }
-    else if (type == typeid(glm::dmat2x2)) {
-        setValue(std::move(key), std::any_cast<glm::dmat2x2>(val));
-    }
-    else if (type == typeid(glm::dmat2x3)) {
-        setValue(std::move(key), std::any_cast<glm::dmat2x3>(val));
-    }
-    else if (type == typeid(glm::dmat2x4)) {
-        setValue(std::move(key), std::any_cast<glm::dmat2x4>(val));
-    }
-    else if (type == typeid(glm::dmat3x2)) {
-        setValue(std::move(key), std::any_cast<glm::dmat3x2>(val));
-    }
-    else if (type == typeid(glm::dmat3x3)) {
-        setValue(std::move(key), std::any_cast<glm::dmat3x3>(val));
-    }
-    else if (type == typeid(glm::dmat3x4)) {
-        setValue(std::move(key), std::any_cast<glm::dmat3x4>(val));
-    }
-    else if (type == typeid(glm::dmat4x2)) {
-        setValue(std::move(key), std::any_cast<glm::dmat4x2>(val));
-    }
-    else if (type == typeid(glm::dmat4x3)) {
-        setValue(std::move(key), std::any_cast<glm::dmat4x3>(val));
-    }
-    else if (type == typeid(glm::dmat4x4)) {
-        setValue(std::move(key), std::any_cast<glm::dmat4x4>(val));
-    }
-    else {
-        setValue(key, val, CreateIntermediate::No);
-    }
-}
-
-}  // namespace ghoul
-
-#endif 
+} // namespace ghoul

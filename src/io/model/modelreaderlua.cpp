@@ -115,8 +115,8 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
     vbo->initialize(varray, iarray);
 
     Dictionary attribPointers = dictionary.value<Dictionary>(KeyAttribPointers);
-    std::vector<std::string> attribKeys = attribPointers.keys();
-    for (const std::string& key : attribKeys) {
+    std::vector<std::string_view> attribKeys = attribPointers.keys();
+    for (std::string_view key : attribKeys) {
         if (attribPointers.hasKey(key) && dictionary.hasValue<Dictionary>(key)) {
             ghoul::Dictionary d = attribPointers.value<ghoul::Dictionary>(key);
             double position = d.value<double>(KeyPosition);

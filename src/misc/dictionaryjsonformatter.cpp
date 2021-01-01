@@ -150,7 +150,10 @@ std::string formatJson(const Dictionary& dictionary) {
         return "\"" + key + "\":" + formatValue(d, key);
     };
 
-    std::vector<std::string> keys = dictionary.keys();
+    std::vector<std::string> keys;
+    for (std::string_view k : dictionary.keys()) {
+        keys.push_back(std::string(k));
+    }
 
     std::string json = std::accumulate(
         std::next(keys.begin()),

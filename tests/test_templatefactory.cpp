@@ -75,8 +75,12 @@ namespace {
     struct SubClassDictionary : public BaseClass {
     public:
         explicit SubClassDictionary(const ghoul::Dictionary& dict) : BaseClass() {
-            dict.getValue("value1", value1);
-            dict.getValue("value2", value2);
+            if (dict.hasKey("value1")) {
+                value1 = dict.value<int>("value1");
+            }
+            if (dict.hasKey("value2")) {
+                value2 = dict.value<int>("value2");
+            }
         };
     };
 
@@ -87,8 +91,12 @@ namespace {
             value2 = 32;
         };
         explicit SubClassDefaultDictionary(const ghoul::Dictionary& dict) : BaseClass() {
-            dict.getValue("value1", value1);
-            dict.getValue("value2", value2);
+            if (dict.hasKey("value1")) {
+                value1 = dict.value<int>("value1");
+            }
+            if (dict.hasKey("value2")) {
+                value2 = dict.value<int>("value2");
+            }
         };
     };
 
