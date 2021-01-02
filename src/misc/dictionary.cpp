@@ -161,8 +161,13 @@ bool Dictionary::hasValue(std::string_view key) const {
         std::string_view before = key.substr(0, dotPos);
         std::string_view after = key.substr(dotPos + 1);
 
-        ghoul::Dictionary d = value<ghoul::Dictionary>(before);
-        return d.hasValue<T>(after);
+        if (hasValue<ghoul::Dictionary>(before)) {
+            ghoul::Dictionary d = value<ghoul::Dictionary>(before);
+            return d.hasValue<T>(after);
+        }
+        else {
+            return false;
+        }
     }
     else {
         auto it = _storage.find(key);
@@ -175,6 +180,10 @@ bool Dictionary::hasValue(std::string_view key) const {
         else if constexpr (isGLMType<T>::value) {
             if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
                 ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
+
+                if (d.size() != ghoul::glm_components<T>::value) {
+                    return false;
+                }
 
                 // Check whether we have all keys and they are of the correct type
                 for (int i = 1; i <= ghoul::glm_components<T>::value; ++i) {
