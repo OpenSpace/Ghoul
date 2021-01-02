@@ -29,48 +29,37 @@
 
 namespace ghoul {
 
+namespace {
+    // List of types that are stored as-is in the Dictionary
+    using DirectTypes = std::variant<bool, double, int, std::string, Dictionary,
+        std::vector<int>, std::vector<double>>;
+    template <typename T> using isDirectType = internal::is_one_of<T, DirectTypes>;
+
+    // Vector types that are converted into std::vector for storage purposes
+    using GLMTypes = std::variant<glm::ivec2, glm::ivec3, glm::ivec4, glm::dvec2,
+    glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4, glm::dmat3x2,
+        glm::dmat3x3, glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4>;
+    template <typename T> using isGLMType = internal::is_one_of<T, GLMTypes>;
+} // namespace
+
 Dictionary::KeyError::KeyError(std::string msg)
-    : ghoul::RuntimeError(std::move(msg), "Dictionary")
+    : RuntimeError(std::move(msg), "Dictionary")
 {}
 
-Dictionary::ValueError::ValueError(std::string key, std::string msg)
-    : ghoul::RuntimeError(
-        fmt::format("Key '{}': {}", std::move(key), std::move(msg)),
-        "Dictionary"
-    )
+Dictionary::ValueError::ValueError(std::string k, std::string m)
+    : RuntimeError(fmt::format("Key '{}': {}", std::move(k), std::move(m)), "Dictionary")
 {}
 
-template <typename T, std::enable_if_t<Dictionary::IsAllowed<T>{}, int>>
+
+template <typename T, std::enable_if_t<Dictionary::IsAllowedType<T>{}, int>>
 void Dictionary::setValue(std::string key, T value) {
-    if constexpr (
-        std::is_same_v<T, bool> || std::is_same_v<T, double> ||
-        std::is_same_v<T, int> || std::is_same_v<T, std::string> ||
-        std::is_same_v<T, Dictionary> || std::is_same_v<T, std::vector<int>> ||
-        std::is_same_v<T, std::vector<double>>)
-    {
+    ghoul_assert(!key.empty(), "Key must not be empty");
+    if constexpr (isDirectType<T>::value) {
         _storage.insert_or_assign(std::move(key), std::move(value));
     }
-    else if constexpr (
-        std::is_same_v<T, glm::ivec2> || std::is_same_v<T, glm::ivec3> ||
-        std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::dvec2> ||
-        std::is_same_v<T, glm::dvec3> || std::is_same_v<T, glm::dvec4>)
-    {
-        T::value_type *ptr = glm::value_ptr(value);
-        std::vector<T::value_type> vec(ptr, ptr + T::length());
-        _storage.insert_or_assign(std::move(key), std::move(vec));
-    }
-    else if constexpr (
-        std::is_same_v<T, glm::dmat2x2> || std::is_same_v<T, glm::dmat2x3> ||
-        std::is_same_v<T, glm::dmat2x4> || std::is_same_v<T, glm::dmat3x2> ||
-        std::is_same_v<T, glm::dmat3x3> || std::is_same_v<T, glm::dmat3x4> ||
-        std::is_same_v<T, glm::dmat4x2> || std::is_same_v<T, glm::dmat4x3> ||
-        std::is_same_v<T, glm::dmat4x4>)
-    {
+    else if constexpr (isGLMType<T>::value) {
         T::value_type* ptr = glm::value_ptr(value);
-        std::vector<T::value_type> vec(
-            ptr,
-            ptr + T::col_type::length() * T::row_type::length()
-        );
+        std::vector<T::value_type> vec(ptr, ptr + ghoul::glm_components<T>::value);
         _storage.insert_or_assign(std::move(key), std::move(vec));
     }
     else {
@@ -78,8 +67,9 @@ void Dictionary::setValue(std::string key, T value) {
     }
 }
 
-template <typename T, std::enable_if_t<Dictionary::IsAllowed<T>{}, int>>
+template <typename T, std::enable_if_t<Dictionary::IsAllowedType<T>{}, int>>
 T Dictionary::value(std::string_view key) const {
+    ghoul_assert(!key.empty(), "Key must not be empty");
     const size_t dotPos = key.find('.');
     if (dotPos != std::string_view::npos) {
         std::string_view before = key.substr(0, dotPos);
@@ -94,24 +84,21 @@ T Dictionary::value(std::string_view key) const {
             throw KeyError(fmt::format("Could not find key '{}'", key));
         }
 
-        if constexpr (
-            std::is_same_v<T, bool>       || std::is_same_v<T, int> ||
-            std::is_same_v<T, double>     || std::is_same_v<T, std::string> ||
-            std::is_same_v<T, Dictionary> || std::is_same_v<T, std::vector<int>> ||
-            std::is_same_v<T, std::vector<double>>)
-        {
-            return std::get<T>(it->second);
+        if constexpr (isDirectType<T>::value) {
+            if (std::holds_alternative<T>(it->second)) {
+                return std::get<T>(it->second);
+            }
+            else {
+                throw ValueError(
+                    std::string(key),
+                    fmt::format(
+                        "Error accessing value, wanted type '{}' has '{}'",
+                        typeid(T).name(), it->second.index()
+                    )
+                );
+            }
         }
-        else if constexpr (
-            std::is_same_v<T, glm::ivec2>   || std::is_same_v<T, glm::ivec3> ||
-            std::is_same_v<T, glm::ivec4>   || std::is_same_v<T, glm::dvec2> ||
-            std::is_same_v<T, glm::dvec3>   || std::is_same_v<T, glm::dvec4> ||
-            std::is_same_v<T, glm::dmat2x2> || std::is_same_v<T, glm::dmat2x3> ||
-            std::is_same_v<T, glm::dmat2x4> || std::is_same_v<T, glm::dmat3x2> ||
-            std::is_same_v<T, glm::dmat3x3> || std::is_same_v<T, glm::dmat3x4> ||
-            std::is_same_v<T, glm::dmat4x2> || std::is_same_v<T, glm::dmat4x3> ||
-            std::is_same_v<T, glm::dmat4x4>)
-        {
+        else if constexpr (isGLMType<T>::value) {
             using VT = std::vector<T::value_type>;
             VT vec;
             if (std::holds_alternative<VT>(it->second)) {
@@ -137,24 +124,12 @@ T Dictionary::value(std::string_view key) const {
                 );
             }
 
-            size_t expectedSize;
-            if constexpr (
-                std::is_same_v<T, glm::ivec2> || std::is_same_v<T, glm::ivec3> ||
-                std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::dvec2> ||
-                std::is_same_v<T, glm::dvec3> || std::is_same_v<T, glm::dvec4>)
-            {
-                expectedSize = T::length();
-            }
-            else {
-                expectedSize = T::col_type::length() * T::row_type::length();
-            }
-
-            if (vec.size() != expectedSize) {
+            if (vec.size() != ghoul::glm_components<T>::value) {
                 throw ValueError(
                     std::string(key),
                     fmt::format(
                         "Contained wrong number of values. Expected {} got {}",
-                        expectedSize, vec.size()
+                        ghoul::glm_components<T>::value, vec.size()
                     )
                 );
             }
@@ -169,8 +144,9 @@ T Dictionary::value(std::string_view key) const {
     }
 }
 
-template <typename T, std::enable_if_t<Dictionary::IsAllowed<T>{}, int>>
+template <typename T, std::enable_if_t<Dictionary::IsAllowedType<T>{}, int>>
 bool Dictionary::hasValue(std::string_view key) const {
+    ghoul_assert(!key.empty(), "Key must not be empty");
     const size_t dotPos = key.find('.');
     if (dotPos != std::string_view::npos) {
         std::string_view before = key.substr(0, dotPos);
@@ -184,30 +160,10 @@ bool Dictionary::hasValue(std::string_view key) const {
         if (it == _storage.end()) {
             return false;
         }
-        if constexpr (std::is_same_v<T, bool> || std::is_same_v<T, int> ||
-            std::is_same_v<T, double> || std::is_same_v<T, std::string> ||
-            std::is_same_v<T, Dictionary> ||
-            std::is_same_v<T, std::vector<int>> ||
-            std::is_same_v<T, std::vector<double>>)
-        {
+        if constexpr (isDirectType<T>::value) {
             return std::holds_alternative<T>(it->second);
         }
-        else if constexpr (std::is_same_v<T, glm::ivec2> ||
-            std::is_same_v<T, glm::ivec3> ||
-            std::is_same_v<T, glm::ivec4> ||
-            std::is_same_v<T, glm::dvec2> ||
-            std::is_same_v<T, glm::dvec3> ||
-            std::is_same_v<T, glm::dvec4> ||
-            std::is_same_v<T, glm::dmat2x2> ||
-            std::is_same_v<T, glm::dmat2x3> ||
-            std::is_same_v<T, glm::dmat2x4> ||
-            std::is_same_v<T, glm::dmat3x2> ||
-            std::is_same_v<T, glm::dmat3x3> ||
-            std::is_same_v<T, glm::dmat3x4> ||
-            std::is_same_v<T, glm::dmat4x2> ||
-            std::is_same_v<T, glm::dmat4x3> ||
-            std::is_same_v<T, glm::dmat4x4>)
-        {
+        else if constexpr (isGLMType<T>::value) {
             if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
                 ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
                 for (const auto& kv : d._storage) {
@@ -230,7 +186,27 @@ bool Dictionary::hasValue(std::string_view key) const {
     }
 }
 
-// This function should go away
+bool Dictionary::hasKey(std::string_view key) const {
+    ghoul_assert(!key.empty(), "Key must not be empty");
+    const size_t dotPos = key.find('.');
+    if (dotPos != std::string_view::npos) {
+        std::string_view before = key.substr(0, dotPos);
+        std::string_view after = key.substr(dotPos + 1);
+
+        if (hasKey(before)) {
+            ghoul::Dictionary d = value<ghoul::Dictionary>(before);
+            return d.hasKey(after);
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        auto it = _storage.find(key);
+        return it != _storage.end();
+    }
+}
+
 std::vector<std::string_view> Dictionary::keys() const {
     std::vector<std::string_view> keys;
     keys.reserve(_storage.size());
@@ -238,6 +214,14 @@ std::vector<std::string_view> Dictionary::keys() const {
         keys.push_back(kv.first);
     }
     return keys;
+}
+
+bool Dictionary::isEmpty() const {
+    return _storage.empty();
+}
+
+size_t Dictionary::size() const {
+    return _storage.size();
 }
 
 template void Dictionary::setValue(std::string, Dictionary value);
@@ -287,6 +271,7 @@ template glm::dmat4x2 Dictionary::value(std::string_view) const;
 template glm::dmat4x3 Dictionary::value(std::string_view) const;
 template glm::dmat4x4 Dictionary::value(std::string_view) const;
 
+
 template bool Dictionary::hasValue<Dictionary>(std::string_view) const;
 template bool Dictionary::hasValue<bool>(std::string_view) const;
 template bool Dictionary::hasValue<double>(std::string_view) const;
@@ -309,33 +294,5 @@ template bool Dictionary::hasValue<glm::dmat3x4>(std::string_view) const;
 template bool Dictionary::hasValue<glm::dmat4x2>(std::string_view) const;
 template bool Dictionary::hasValue<glm::dmat4x3>(std::string_view) const;
 template bool Dictionary::hasValue<glm::dmat4x4>(std::string_view) const;
-
-bool Dictionary::hasKey(std::string_view key) const {
-    const size_t dotPos = key.find('.');
-    if (dotPos != std::string_view::npos) {
-        std::string_view before = key.substr(0, dotPos);
-        std::string_view after = key.substr(dotPos + 1);
-
-        if (hasKey(before)) {
-            ghoul::Dictionary d = value<ghoul::Dictionary>(before);
-            return d.hasKey(after);
-        }
-        else {
-            return false;
-        }
-    }
-    else {
-        auto it = _storage.find(key);
-        return it != _storage.end();
-    }
-}
-
-bool Dictionary::isEmpty() const {
-    return _storage.empty();
-}
-
-size_t Dictionary::size() const {
-    return _storage.size();
-}
 
 } // namespace ghoul

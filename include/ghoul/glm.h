@@ -84,21 +84,13 @@ namespace ghoul {
 template <typename T>
 struct glm_components : public std::integral_constant<glm::length_t, 0> {};
 
-template <typename T, glm::precision P>
-struct glm_components<glm::tvec2<T, P>> : public std::integral_constant<
-    glm::length_t, 2
-> {};
+template <glm::length_t L, typename T, glm::qualifier Q>
+struct glm_components<glm::vec<L, T, Q>> :
+    public std::integral_constant<glm::length_t, L> {};
 
-template <typename T, glm::precision P>
-struct glm_components<glm::tvec3<T, P>> : public std::integral_constant<
-    glm::length_t, 3
-> {};
-
-template <typename T, glm::precision P>
-struct glm_components<glm::tvec4<T, P>> : public std::integral_constant<
-    glm::length_t, 4
-> {};
-
+template <glm::length_t C, glm::length_t R, typename T, glm::qualifier Q>
+struct glm_components<glm::mat<C, R, T, Q>> :
+    public std::integral_constant<glm::length_t, C * R> {};
 
 template <typename T>
 struct glm_rows : public std::integral_constant<glm::length_t, 0> {};

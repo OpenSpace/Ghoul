@@ -31,6 +31,7 @@
 #include <map>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <variant>
 #include <vector>
 
@@ -43,7 +44,7 @@ namespace internal {
     struct is_one_of<T, std::variant<Ts...>> :
         std::bool_constant<(std::is_same_v<T, Ts> || ...)>
     {};
-}
+} // namespace internal
 
 /**
  * The Dictionary is a class that represents a mapping from a string to a fixed selection
@@ -74,7 +75,8 @@ public:
     >;
 
     /// Returns true if T is one of the allowed storage types
-    template <typename T> using IsAllowed = internal::is_one_of<T, Types>;
+    template <typename T> using IsAllowedType = internal::is_one_of<T, Types>;
+
 
     /// Exception that is thrown if the Dictionary does not contain a provided key
     struct KeyError : public ghoul::RuntimeError {
@@ -89,23 +91,90 @@ public:
     };
 
     /**
-     * Store the value \c at the specified \c key, overwriting any existing value.
+     * Store the value \p value at the specified \p key, overwriting any existing value.
+     * The type for T has to be a type that can be represented in the Types variant type.
+     *
+     * \param key The key under which the \p value is stored. If \param key already
+     *        existed, it will be silently overwritten
+     * \param value The value to store. It has to be one of the types that is present in
+     *        the Types variant
+     * 
+     * \pre \p key must not be the empty string
      */    
-    template <typename T, std::enable_if_t<IsAllowed<T>{}, int> = 0>
+    template <typename T, std::enable_if_t<IsAllowedType<T>{}, int> = 0>
     void setValue(std::string key, T value);
 
-    template <typename T, std::enable_if_t<IsAllowed<T>{}, int> = 0>
+    // Just a helper function to make the error message a bit more palatable
+    template <typename T, std::enable_if_t<!IsAllowedType<T>{}, int> = 0>
+    void setValue(std::string key, T value);
+
+    /**
+     * Retrieves the value stored at the provided \p key. The template parameter has to be
+     * one of the types contained in the Types variant described above. If the Dictionary
+     * does not contain a value for the \p key, a KeyError will be raised. If the
+     * Dictionary stores a type for the existing \p key than requested a ValueError will
+     * be raised.
+     *
+     * \param key The key for which to retrieve the value
+     * \return The value in the Dictionary stored at the \p key
+     * 
+     * \throws KeyError If the provided \p key does not exist
+     * \throws ValueError If the value stored at \p key is not of type T
+     * \pre \p key must not be the empty string
+     */
+    template <typename T, std::enable_if_t<IsAllowedType<T>{}, int> = 0>
     T value(std::string_view key) const;
 
-    template <typename T, std::enable_if_t<IsAllowed<T>{}, int> = 0>
+    // Just a helper function to make the error message a bit more palatable
+    template <typename T, std::enable_if_t<!IsAllowedType<T>{}, int> = 0>
+    T value(std::string_view key) const;
+
+    /**
+     * Checks whether the Dictionary stores a value of type T at the provided \p key. This
+     * function returns false if the key does not exist or if the stored value is not
+     * compatible with the type T.
+     * 
+     * \param key The key for which to check the existence and type
+     * \return \c true if the Dictionary contains such a key and it is of the requested
+               type T
+     * 
+     * \pre \p key must not be the empty string
+     */
+    template <typename T, std::enable_if_t<IsAllowedType<T>{}, int> = 0>
     bool hasValue(std::string_view key) const;
 
-    // This function should go away
-    std::vector<std::string_view> keys() const;
+    // Just a helper function to make the error message a bit more palatable
+    template <typename T, std::enable_if_t<!IsAllowedType<T>{}, int> = 0>
+    bool hasValue(std::string_view key) const;
 
+    /**
+     * Checks whether the Dictionary stores any value under the provided key, regardless
+     * of its type.
+     *
+     * \param key The key for which to check the existence and type
+     * \return \c true if the Dictionary contains such a key and it is of the requested
+               type T
+     *
+     * \pre \p key must not be the empty string
+     */
     bool hasKey(std::string_view key) const;
 
+    /**
+     * Returns a list of all keys stored in the Dictionary.
+     * \return A list of all keys stored in the Dictionary
+     */
+    std::vector<std::string_view> keys() const;
+
+    /**
+     * Returns whether the Dictionary is empty or contains values.
+     * \return Whether the Dictionary is empty or contains values
+     */
     bool isEmpty() const;
+
+    /**
+     * Returns the number of values stored in the Dictionary
+     * \return The number of values stored in the Dictionary
+     */
     size_t size() const;
 
 private:
@@ -114,6 +183,22 @@ private:
     >;
     std::map<std::string, StorageTypes, std::less<>> _storage;
 };
+
+// Just a few helper functions  to make the error message a bit more palatable
+template <typename T, std::enable_if_t<!Dictionary::IsAllowedType<T>{}, int>>
+void Dictionary::setValue(std::string key, T value) {
+    static_assert(false, "Type is not an allowed type for Dictionary");
+}
+
+template <typename T, std::enable_if_t<!Dictionary::IsAllowedType<T>{}, int >>
+T Dictionary::value(std::string_view key) const {
+    static_assert(false, "Type is not an allowed type for Dictionary");
+}
+
+template <typename T, std::enable_if_t<!Dictionary::IsAllowedType<T>{}, int >>
+bool Dictionary::hasValue(std::string_view key) const {
+    static_assert(false, "Type is not an allowed type for Dictionary");
+}
 
 } // namespace ghoul
 
