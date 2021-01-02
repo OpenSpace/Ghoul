@@ -177,7 +177,7 @@ bool Dictionary::hasValue(std::string_view key) const {
             else {
                 using VT = std::vector<typename T::value_type>;
                 return std::holds_alternative<VT>(it->second) &&
-                    std::get<VT>(it->second).size() == T::length();
+                    std::get<VT>(it->second).size() == ghoul::glm_components<T>::value;
             }
         }
         else {

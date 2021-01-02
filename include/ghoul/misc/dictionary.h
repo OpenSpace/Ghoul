@@ -187,17 +187,17 @@ private:
 // Just a few helper functions  to make the error message a bit more palatable
 template <typename T, std::enable_if_t<!Dictionary::IsAllowedType<T>{}, int>>
 void Dictionary::setValue(std::string, T) {
-    static_assert(Dictionary::IsAllowedType<T>{}, "Type is not an allowed type for Dictionary");
+    static_assert(sizeof(T) == 0, "Type is not an allowed type for Dictionary");
 }
 
 template <typename T, std::enable_if_t<!Dictionary::IsAllowedType<T>{}, int >>
 T Dictionary::value(std::string_view) const {
-    static_assert(Dictionary::IsAllowedType<T>{}, "Type is not an allowed type for Dictionary");
+    static_assert(sizeof(T) == 0, "Type is not an allowed type for Dictionary");
 }
 
 template <typename T, std::enable_if_t<!Dictionary::IsAllowedType<T>{}, int >>
 bool Dictionary::hasValue(std::string_view) const {
-    static_assert(Dictionary::IsAllowedType<T>{}, "Type is not an allowed type for Dictionary");
+    static_assert(sizeof(T) == 0, "Type is not an allowed type for Dictionary");
 }
 
 } // namespace ghoul
