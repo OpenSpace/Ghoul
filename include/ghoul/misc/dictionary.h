@@ -193,11 +193,13 @@ void Dictionary::setValue(std::string, T) {
 template <typename T, std::enable_if_t<!Dictionary::IsAllowedType<T>{}, int >>
 T Dictionary::value(std::string_view) const {
     static_assert(sizeof(T) == 0, "Type is not an allowed type for Dictionary");
+    return T();
 }
 
 template <typename T, std::enable_if_t<!Dictionary::IsAllowedType<T>{}, int >>
 bool Dictionary::hasValue(std::string_view) const {
     static_assert(sizeof(T) == 0, "Type is not an allowed type for Dictionary");
+    return false;
 }
 
 } // namespace ghoul
