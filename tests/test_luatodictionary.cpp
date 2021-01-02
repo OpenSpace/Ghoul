@@ -61,26 +61,26 @@ TEST_CASE("LuaToDictionary: Nested Tables", "[luatodictionary]") {
     ghoul::Dictionary dict;
     ghoul::lua::luaDictionaryFromState(state, dict);
 
-    REQUIRE(dict.hasKeyAndValue<ghoul::Dictionary>("A"));
+    REQUIRE(dict.hasValue<ghoul::Dictionary>("A"));
     ghoul::Dictionary a = dict.value<ghoul::Dictionary>("A");
 
-    REQUIRE(a.hasKeyAndValue<ghoul::Dictionary>("B"));
+    REQUIRE(a.hasValue<ghoul::Dictionary>("B"));
     ghoul::Dictionary b = a.value<ghoul::Dictionary>("B");
 
-    REQUIRE(b.hasKeyAndValue<ghoul::Dictionary>("C"));
+    REQUIRE(b.hasValue<ghoul::Dictionary>("C"));
     ghoul::Dictionary c = b.value<ghoul::Dictionary>("C");
 
-    REQUIRE(c.hasKeyAndValue<ghoul::Dictionary>("D"));
+    REQUIRE(c.hasValue<ghoul::Dictionary>("D"));
     ghoul::Dictionary d = c.value<ghoul::Dictionary>("D");
 
-    REQUIRE(d.hasKeyAndValue<ghoul::Dictionary>("E"));
+    REQUIRE(d.hasValue<ghoul::Dictionary>("E"));
     ghoul::Dictionary e = d.value<ghoul::Dictionary>("E");
 
-    REQUIRE(e.hasKeyAndValue<ghoul::Dictionary>("F"));
+    REQUIRE(e.hasValue<ghoul::Dictionary>("F"));
     ghoul::Dictionary f = e.value<ghoul::Dictionary>("F");
 
-    REQUIRE(f.hasKeyAndValue<std::string>("1"));
-    REQUIRE(f.hasKeyAndValue<std::string>("2"));
+    REQUIRE(f.hasValue<std::string>("1"));
+    REQUIRE(f.hasValue<std::string>("2"));
 }
 
 TEST_CASE("LuaToDictionary: Nested Tables 2", "[luatodictionary]") {
@@ -104,7 +104,7 @@ TEST_CASE("LuaToDictionary: Nested Tables 2", "[luatodictionary]") {
 
     lua_getglobal(state, "ModuleConfigurations");
     ghoul::Dictionary d = ghoul::lua::value<ghoul::Dictionary>(state);
-    REQUIRE(d.hasKeyAndValue<ghoul::Dictionary>("Server"));
+    REQUIRE(d.hasValue<ghoul::Dictionary>("Server"));
 }
 
 

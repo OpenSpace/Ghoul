@@ -23,6 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#if 0
 #include "catch2/catch.hpp"
 
 #include <ghoul/misc/dictionaryluaformatter.h>
@@ -137,3 +138,5 @@ TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]
         "vec4={0,0,0,0}}"
     );
 }
+
+#endif

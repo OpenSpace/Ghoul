@@ -25,6 +25,7 @@
 
 #include <ghoul/fmt.h>
 #include <ghoul/lua/ghoul_lua.h>
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/defer.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/invariants.h>
