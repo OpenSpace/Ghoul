@@ -175,15 +175,10 @@ bool Dictionary::hasValue(std::string_view key) const {
         else if constexpr (isGLMType<T>::value) {
             if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
                 ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
-                for (const auto& kv : d._storage) {
-                    if (!std::holds_alternative<typename T::value_type>(kv.second)) {
-                        return false;
-                    }
-                }
 
-                // Check whether the keys are sorted, too
+                // Check whether we have all keys and they are of the correct type
                 for (int i = 1; i <= ghoul::glm_components<T>::value; ++i) {
-                    if (!d.hasKey(std::to_string(i))) {
+                    if (!d.hasValue<typename T::value_type>(std::to_string(i))) {
                         return false;
                     }
                 }
