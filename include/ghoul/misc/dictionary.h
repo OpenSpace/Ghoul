@@ -36,6 +36,15 @@
 
 namespace ghoul {
 
+namespace internal {
+    // Boolean constant used to check whether a value T is part of a parameter pack Ts
+    template <typename T, typename U> struct is_one_of;
+    template <typename T, typename... Ts>
+    struct is_one_of<T, std::variant<Ts...>> :
+        std::bool_constant<(std::is_same_v<T, Ts> || ...)>
+    {};
+}
+
 /**
  * The Dictionary is a class that represents a mapping from a string to a fixed selection
  * of types. It has the ability to store and retrieve these items by unique string keys.
@@ -54,10 +63,19 @@ namespace ghoul {
  * </code>
  * are legal
  */
-class Dictionary : public std::map<std::string, std::variant<
-    bool, int, double, std::string, Dictionary, std::vector<int>, std::vector<double>
->, std::less<>> {
+class Dictionary {
 public:
+    /// This is a list of all types that can be stored and retrieved from the Dictionary
+    using Types = std::variant<
+        bool, int, double, std::string, Dictionary, std::vector<int>, std::vector<double>,
+        glm::ivec2, glm::ivec3, glm::ivec4, glm::dvec2, glm::dvec3, glm::dvec4,
+        glm::dmat2x2, glm::dmat2x3, glm::dmat2x4, glm::dmat3x2, glm::dmat3x3,
+        glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4
+    >;
+
+    /// Returns true if T is one of the allowed storage types
+    template <typename T> using IsAllowed = internal::is_one_of<T, Types>;
+
     /// Exception that is thrown if the Dictionary does not contain a provided key
     struct KeyError : public ghoul::RuntimeError {
         explicit KeyError(std::string msg);
@@ -73,51 +91,28 @@ public:
     /**
      * Store the value \c at the specified \c key, overwriting any existing value.
      */    
-    void setValue(std::string key, bool value);
-    void setValue(std::string key, double value);
-    void setValue(std::string key, int value);
-    void setValue(std::string key, std::string value);
-    void setValue(std::string key, Dictionary value);
-    void setValue(std::string key, std::vector<int> value);
-    void setValue(std::string key, std::vector<double> value);
-    void setValue(std::string key, glm::ivec2 value);
-    void setValue(std::string key, glm::ivec3 value);
-    void setValue(std::string key, glm::ivec4 value);
-    void setValue(std::string key, glm::dvec2 value);
-    void setValue(std::string key, glm::dvec3 value);
-    void setValue(std::string key, glm::dvec4 value);
-    void setValue(std::string key, glm::dmat2x2 value);
-    void setValue(std::string key, glm::dmat2x3 value);
-    void setValue(std::string key, glm::dmat2x4 value);
-    void setValue(std::string key, glm::dmat3x2 value);
-    void setValue(std::string key, glm::dmat3x3 value);
-    void setValue(std::string key, glm::dmat3x4 value);
-    void setValue(std::string key, glm::dmat4x2 value);
-    void setValue(std::string key, glm::dmat4x3 value);
-    void setValue(std::string key, glm::dmat4x4 value);
+    template <typename T, std::enable_if_t<IsAllowed<T>{}, int> = 0>
+    void setValue(std::string key, T value);
 
-
-    //template<typename U>
-    //std::enable_if_t < std::holds_alternative<U>(type{}) >
-    //    f() {
-    //    // that's ok
-    //}
-    template <typename T>
+    template <typename T, std::enable_if_t<IsAllowed<T>{}, int> = 0>
     T value(std::string_view key) const;
 
-
-    //template<typename U>
-    //std::enable_if_t < std::holds_alternative<U>(type{}) >
-    //    f() {
-    //    // that's ok
-    //}
-    template <typename T>
+    template <typename T, std::enable_if_t<IsAllowed<T>{}, int> = 0>
     bool hasValue(std::string_view key) const;
 
     // This function should go away
     std::vector<std::string_view> keys() const;
 
     bool hasKey(std::string_view key) const;
+
+    bool isEmpty() const;
+    size_t size() const;
+
+private:
+    using StorageTypes = std::variant<
+        bool, int, double, std::string, Dictionary, std::vector<int>, std::vector<double>
+    >;
+    std::map<std::string, StorageTypes, std::less<>> _storage;
 };
 
 } // namespace ghoul

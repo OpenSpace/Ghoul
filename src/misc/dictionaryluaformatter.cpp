@@ -52,7 +52,7 @@ namespace {
     std::string format(const Dictionary& d, PrettyPrint prettyPrint,
                        const std::string& indentation, int indentationSteps)
     {
-        if (d.empty()) {
+        if (d.isEmpty()) {
             return "{}";
         }
 

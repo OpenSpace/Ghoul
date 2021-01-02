@@ -142,7 +142,7 @@ JsonFormattingError::JsonFormattingError(std::string msg)
 {}
 
 std::string formatJson(const Dictionary& dictionary) {
-    if (dictionary.empty()) {
+    if (dictionary.isEmpty()) {
         return "{}";
     }
 
