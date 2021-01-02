@@ -58,12 +58,12 @@ void Dictionary::setValue(std::string key, T value) {
         _storage.insert_or_assign(std::move(key), std::move(value));
     }
     else if constexpr (isGLMType<T>::value) {
-        T::value_type* ptr = glm::value_ptr(value);
-        std::vector<T::value_type> vec(ptr, ptr + ghoul::glm_components<T>::value);
+        typename T::value_type* ptr = glm::value_ptr(value);
+        std::vector<typename T::value_type> vec(ptr, ptr + ghoul::glm_components<T>::value);
         _storage.insert_or_assign(std::move(key), std::move(vec));
     }
     else {
-        static_assert(false, "Unsupported type");
+        static_assert(sizeof(T) == 0, "Unsupported type");
     }
 }
 
@@ -99,7 +99,7 @@ T Dictionary::value(std::string_view key) const {
             }
         }
         else if constexpr (isGLMType<T>::value) {
-            using VT = std::vector<T::value_type>;
+            using VT = std::vector<typename T::value_type>;
             VT vec;
             if (std::holds_alternative<VT>(it->second)) {
                 vec = std::get<VT>(it->second);
@@ -110,7 +110,7 @@ T Dictionary::value(std::string_view key) const {
                 for (const auto& kv : d._storage) {
                     // Lua is 1-based index, the rest of the world is 0-based
                     int k = std::stoi(kv.first) - 1;
-                    vec[k] = std::get<T::value_type>(kv.second);
+                    vec[k] = std::get<typename T::value_type>(kv.second);
                 }
             }
             else {
@@ -119,7 +119,7 @@ T Dictionary::value(std::string_view key) const {
                     fmt::format(
                         "Requested {} but did not contain {} or {}",
                         typeid(T).name(), typeid(T).name(),
-                        typeid(std::vector<T::value_type>).name()
+                        typeid(std::vector<typename T::value_type>).name()
                     )
                 );
             }
@@ -139,7 +139,7 @@ T Dictionary::value(std::string_view key) const {
             return res;
         }
         else {
-            static_assert(false, "Unsupported type");
+            static_assert(sizeof(T) == 0, "Unsupported type");
         }
     }
 }
@@ -167,7 +167,7 @@ bool Dictionary::hasValue(std::string_view key) const {
             if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
                 ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
                 for (const auto& kv : d._storage) {
-                    if (!std::holds_alternative<T::value_type>(kv.second)) {
+                    if (!std::holds_alternative<typename T::value_type>(kv.second)) {
                         return false;
                     }
                 }
@@ -175,13 +175,13 @@ bool Dictionary::hasValue(std::string_view key) const {
                 return true;
             }
             else {
-                using VT = std::vector<T::value_type>;
+                using VT = std::vector<typename T::value_type>;
                 return std::holds_alternative<VT>(it->second) &&
                     std::get<VT>(it->second).size() == T::length();
             }
         }
         else {
-            static_assert(false, "Unknown type T");
+            static_assert(sizeof(T) == 0, "Unknown type T");
         }
     }
 }
