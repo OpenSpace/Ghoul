@@ -110,6 +110,15 @@ T Dictionary::value(std::string_view key) const {
                 for (const auto& kv : d._storage) {
                     // Lua is 1-based index, the rest of the world is 0-based
                     int k = std::stoi(kv.first) - 1;
+                    if (k < 0 || k >= d._storage.size()) {
+                        throw ValueError(
+                            std::string(key),
+                            fmt::format(
+                                "Invalid key {} outside range [0,{}]",
+                                k, d._storage.size()
+                            )
+                        );
+                    }
                     vec[k] = std::get<typename T::value_type>(kv.second);
                 }
             }
@@ -171,6 +180,14 @@ bool Dictionary::hasValue(std::string_view key) const {
                         return false;
                     }
                 }
+
+                // Check whether the keys are sorted, too
+                for (int i = 1; i <= ghoul::glm_components<T>::value; ++i) {
+                    if (!d.hasKey(std::to_string(i))) {
+                        return false;
+                    }
+                }
+
                 // We should check whether the keys are sorted, too
                 return true;
             }
