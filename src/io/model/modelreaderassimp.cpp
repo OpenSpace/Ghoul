@@ -440,10 +440,7 @@ void processNode(aiNode* node, const aiScene* scene, std::vector<ModelMesh>& mes
             // If not forced to render, drop invisible mesh
             else {
                 if (notifyInvisibleDropped) {
-                    LINFOC(
-                        "RenderableModel",
-                        fmt::format("Invisible mesh '{}' dropped", mesh->mName.C_Str())
-                    );
+                    LINFO(fmt::format("Invisible mesh '{}' dropped", mesh->mName.C_Str()));
                 }
                 continue;
             }
@@ -664,7 +661,7 @@ std::unique_ptr<ghoul::modelgeometry::ModelGeometry> ModelReaderAssimp::loadCach
     int32_t nTextureEntries = 0;
     fileStream.read(reinterpret_cast<char*>(&nTextureEntries), sizeof(int32_t));
     if (nTextureEntries == 0) {
-        throw ModelLoadException(cachedFile, "No textureEntries were loaded", this);
+        LINFO("No TextureEntries were loaded!");
     }
     std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorageArray;
     textureStorageArray.reserve(nTextureEntries);
@@ -929,11 +926,7 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
     // First cache the textureStorage
     int32_t nTextureEntries = model->textureStorage().size();
     if (nTextureEntries == 0) {
-        throw ModelSaveException(
-            cachedFile,
-            "Error writing cache: No texture enties were loaded",
-            this
-        );
+        LINFO("No TextureEntries were loaded!");
     }
     fileStream.write(reinterpret_cast<const char*>(&nTextureEntries), sizeof(int32_t));
 
