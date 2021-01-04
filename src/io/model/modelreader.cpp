@@ -117,7 +117,18 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
         ghoul::modelgeometry::ModelGeometry* model = rawModel.release();
 
         LINFO("Saving cache");
-        reader->saveCachedFile(cachedFile, model);
+        try {
+            reader->saveCachedFile(cachedFile, model);
+        }
+        catch (ModelReaderBase::ModelSaveException e) {
+            LERROR(fmt::format(
+                "Error:'{}' while saving model to cache file:'{}'. Deleting the cache file. ",
+                e.message,
+                e.filename)
+            );
+
+            FileSys.cacheManager()->removeCacheFile(filename);
+        }
 
         return std::make_unique<ghoul::modelgeometry::ModelGeometry>(std::move(*model));
     }
