@@ -30,6 +30,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <limits>
 
 namespace ghoul::opengl {
 
@@ -60,11 +61,14 @@ public:
     void resetLineState() const;
     void resetPolygonAndClippingState() const;
     void resetViewportState() const;
+    void setDefaultFramebuffer(const GLuint defaultFB);
     void setViewportState(const GLint viewportCoords[4]);
     void resetColorState() const;
     void setColorState(const GLfloat clearColor[4], GLboolean clampColor = GL_FALSE);
 
     void viewport(GLint viewport[4]) const;
+    
+    GLuint defaultFramebuffer() const { return _defaultFramebuffer; }
 
 private:
     OpenGLStateCache() = default;
@@ -74,6 +78,11 @@ private:
     static GLint _maxAttachBuffers;
 
     bool _cacheInitialized = false;
+
+    // Default Framebuffer (Initialized to max GLuint on purpose)
+    // std::numeric_limits<GLuint>::max() is way bigger than the max 
+    // number of OpenGL's FrameBuffers names possible to create
+    GLuint _defaultFramebuffer = std::numeric_limits<GLuint>::max();
 
     // ViewPort
     std::array<GLint, 4> _viewport = {0, 0, 0, 0};
