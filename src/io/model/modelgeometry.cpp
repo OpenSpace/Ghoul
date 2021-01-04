@@ -37,7 +37,7 @@
 
 namespace ghoul::modelgeometry {
 
-ModelGeometry::ModelGeometry(std::vector<ghoul::io::ModelMesh>&& meshes,
+ModelGeometry::ModelGeometry(std::vector<io::ModelMesh>&& meshes,
                              std::vector<TextureEntry>&& textureStorage)
     : _meshes(std::move(meshes))
     , _textureStorage(std::move(textureStorage))
@@ -51,7 +51,7 @@ void ModelGeometry::calculateBoundingRadius() {
     float maximumDistanceSquared = 0.f;
 
     for (unsigned int i = 0; i < _meshes.size(); ++i) {
-        for (const ghoul::io::ModelMesh::Vertex& v : _meshes[i]._vertices) {
+        for (const io::ModelMesh::Vertex& v : _meshes[i]._vertices) {
             maximumDistanceSquared = glm::max(
                 glm::pow(v.location[0], 2.f) +
                 glm::pow(v.location[1], 2.f) +
@@ -62,11 +62,11 @@ void ModelGeometry::calculateBoundingRadius() {
     _boundingRadius = maximumDistanceSquared;
 }
 
-std::vector<ghoul::io::ModelMesh>& ModelGeometry::meshes() {
+std::vector<io::ModelMesh>& ModelGeometry::meshes() {
     return _meshes;
 }
 
-const std::vector<ghoul::io::ModelMesh>& ModelGeometry::meshes() const {
+const std::vector<io::ModelMesh>& ModelGeometry::meshes() const {
     return _meshes;
 }
 
@@ -78,7 +78,7 @@ const std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() 
     return _textureStorage;
 }
 
-void ModelGeometry::render(ghoul::opengl::ProgramObject& program) const {
+void ModelGeometry::render(opengl::ProgramObject& program) const {
     for (int i = 0; i < _meshes.size(); ++i) {
         _meshes[i].render(program);
     }
@@ -109,6 +109,6 @@ void ModelGeometry::deinitialize() {
     }
 }
 
-void ModelGeometry::setUniforms(ghoul::opengl::ProgramObject&) {}
+void ModelGeometry::setUniforms(opengl::ProgramObject&) {}
 
 }  // namespace openspace::modelgeometry

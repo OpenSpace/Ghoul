@@ -46,7 +46,7 @@ public:
     };
 
     struct Texture {
-        ghoul::opengl::Texture* texture;
+        opengl::Texture* texture;
         std::string type;
         bool hasTexture = false;
         bool useForcedColor = false;
@@ -61,7 +61,7 @@ public:
 
     bool initialize(float& maximumDistanceSquared);
     void deinitialize();
-    void render(ghoul::opengl::ProgramObject& program) const;
+    void render(opengl::ProgramObject& program) const;
     void changeRenderMode(const GLenum mode);
 
     std::vector<Vertex> _vertices;

@@ -87,7 +87,7 @@ public:
      *
      * \throw ModelLoadException If there was an error loading the model from disk
      */
-    virtual std::unique_ptr<ghoul::modelgeometry::ModelGeometry> loadModel(
+    virtual std::unique_ptr<modelgeometry::ModelGeometry> loadModel(
         const std::string& filename, const bool forceRenderInvisible = false,
         const bool notifyInvisibleDropped = true) const = 0;
 
@@ -100,7 +100,7 @@ public:
      *
      * \throw ModelLoadException If there was an error loading the model from cache
      */
-    virtual std::unique_ptr<ghoul::modelgeometry::ModelGeometry> loadCachedFile(
+    virtual std::unique_ptr<modelgeometry::ModelGeometry> loadCachedFile(
         const std::string& cachedFile) const = 0;
 
     /**
@@ -114,7 +114,7 @@ public:
      * \throw ModelSaveException If there was an error saving the model to cache
      */
     virtual bool saveCachedFile(const std::string& cachedFile,
-        const ghoul::modelgeometry::ModelGeometry* model) const = 0;
+        const modelgeometry::ModelGeometry* model) const = 0;
 
     /**
      * Returns a list of all extensions.

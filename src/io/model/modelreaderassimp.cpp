@@ -54,11 +54,11 @@ namespace ghoul::io {
 
 void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType type,
                           std::string textureType,
-                          std::vector<ghoul::io::ModelMesh::Texture>& textureArray,
+                          std::vector<ModelMesh::Texture>& textureArray,
                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage)
 {
     for (unsigned int i = 0; i < mat->GetTextureCount(type); ++i) {
-        ghoul::io::ModelMesh::Texture textureTmp;
+        ModelMesh::Texture textureTmp;
         textureTmp.type = textureType;
         aiString pathString;
         mat->GetTexture(type, i, &pathString);
@@ -240,11 +240,11 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
 
 
 ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform,
-          std::vector<ghoul::modelgeometry::ModelGeometry::TextureEntry>& textureStorage)
+                 std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage)
 {
     std::vector<ModelMesh::Vertex> vertexArray;
     std::vector<unsigned int> indexArray;
-    std::vector<ghoul::io::ModelMesh::Texture> textureArray;
+    std::vector<ModelMesh::Texture> textureArray;
 
     // Go through each of the mesh's vertices
     vertexArray.reserve(mesh->mNumVertices);
@@ -341,7 +341,7 @@ ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform
         // Load embedded simple material instead of textures
         aiReturn hasColor = material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
         if (hasColor == AI_SUCCESS) {
-            ghoul::io::ModelMesh::Texture textureTmp;
+            ModelMesh::Texture textureTmp;
             textureTmp.hasTexture = false;
             textureTmp.type = "color_diffuse";
             textureTmp.color.x = color.r;
@@ -366,7 +366,7 @@ ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform
         color = aiColor3D(0.f, 0.f, 0.f);
         aiReturn hasColor = material->Get(AI_MATKEY_COLOR_SPECULAR, color);
         if (hasColor == AI_SUCCESS && !color.IsBlack()) {
-            ghoul::io::ModelMesh::Texture textureTmp;
+            ModelMesh::Texture textureTmp;
             textureTmp.hasTexture = false;
             textureTmp.type = "color_specular";
             textureTmp.color.x = color.r;
@@ -432,7 +432,7 @@ void processNode(aiNode* node, const aiScene* scene, std::vector<ModelMesh>& mes
         if (loadedMesh._textures.empty()) {
             // Force invisible mesh to render with flashy colors
             if (forceRenderInvisible) {
-                ghoul::io::ModelMesh::Texture textureTmp;
+                ModelMesh::Texture textureTmp;
                 textureTmp.hasTexture = false;
                 textureTmp.useForcedColor = true;
                 loadedMesh._textures.push_back(std::move(textureTmp));
@@ -488,8 +488,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
 
     // Get info from all models in the scene
     std::vector<ModelMesh> meshArray;
-    std::vector<ghoul::modelgeometry::ModelGeometry::TextureEntry> textureStorage;
-    processNode(scene->mRootNode,
+    std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorage;
+    processNode(
+        scene->mRootNode,
         scene,
         meshArray,
         rootTransform,
@@ -637,7 +638,7 @@ std::string stringFromDataType(const GLenum dataType) {
     return formatString;
 }
 
-std::unique_ptr<ghoul::modelgeometry::ModelGeometry> ModelReaderAssimp::loadCachedFile(
+std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadCachedFile(
                                                      const std::string& cachedFile) const
 {
     std::ifstream fileStream(cachedFile, std::ifstream::binary);
@@ -719,15 +720,15 @@ std::unique_ptr<ghoul::modelgeometry::ModelGeometry> ModelReaderAssimp::loadCach
         fileStream.read(reinterpret_cast<char*>(data), textureSize);
 
         textureEntry.texture =
-            std::make_unique<ghoul::opengl::Texture>(
+            std::make_unique<opengl::Texture>(
                 dimensions,
                 format,
                 internalFormat,
                 dataType,
-                ghoul::opengl::Texture::FilterMode::Linear,
-                ghoul::opengl::Texture::WrappingMode::Repeat,
-                ghoul::opengl::Texture::AllocateData::No,
-                ghoul::opengl::Texture::TakeOwnership::Yes
+                opengl::Texture::FilterMode::Linear,
+                opengl::Texture::WrappingMode::Repeat,
+                opengl::Texture::AllocateData::No,
+                opengl::Texture::TakeOwnership::Yes
             );
 
         textureEntry.texture->setPixelData(data);
@@ -757,64 +758,8 @@ std::unique_ptr<ghoul::modelgeometry::ModelGeometry> ModelReaderAssimp::loadCach
         vertexArray.reserve(nVertices);
 
         for (unsigned int v = 0; v < nVertices; ++v) {
-            ghoul::io::ModelMesh::Vertex vertex;
-
-            // location
-            fileStream.read(reinterpret_cast<char*>(
-                &vertex.location[0]),
-                sizeof(GLfloat)
-            );
-            fileStream.read(reinterpret_cast<char*>(
-                &vertex.location[1]),
-                sizeof(GLfloat)
-            );
-            fileStream.read(reinterpret_cast<char*>(
-                &vertex.location[2]),
-                sizeof(GLfloat)
-            );
-            fileStream.read(reinterpret_cast<char*>(
-                &vertex.location[3]),
-                sizeof(GLfloat)
-            );
-
-            // tex
-            fileStream.read(reinterpret_cast<char*>(
-                &vertex.tex[0]),
-                sizeof(GLfloat)
-            );
-            fileStream.read(reinterpret_cast<char*>(
-                &vertex.tex[1]),
-                sizeof(GLfloat)
-            );
-
-            // normal
-            fileStream.read(reinterpret_cast<char*>(
-                &vertex.normal[0]),
-                sizeof(GLfloat)
-            );
-            fileStream.read(reinterpret_cast<char*>(
-                &vertex.normal[1]),
-                sizeof(GLfloat)
-            );
-            fileStream.read(reinterpret_cast<char*>(
-                &vertex.normal[2]),
-                sizeof(GLfloat)
-            );
-
-            // tangent
-            fileStream.read(reinterpret_cast<char*>(
-                &vertex.tangent[0]),
-                sizeof(GLfloat)
-            );
-            fileStream.read(reinterpret_cast<char*>(
-                &vertex.tangent[1]),
-                sizeof(GLfloat)
-            );
-            fileStream.read(reinterpret_cast<char*>(
-                &vertex.tangent[2]),
-                sizeof(GLfloat)
-            );
-
+            ModelMesh::Vertex vertex;
+            fileStream.read(reinterpret_cast<char*>(&vertex), sizeof(ModelMesh::Vertex));
             vertexArray.push_back(std::move(vertex));
         }
 
@@ -839,7 +784,7 @@ std::unique_ptr<ghoul::modelgeometry::ModelGeometry> ModelReaderAssimp::loadCach
         if (nTextures == 0) {
             throw ModelLoadException(cachedFile, "No textures were loaded", this);
         }
-        std::vector<ghoul::io::ModelMesh::Texture> textureArray;
+        std::vector<ModelMesh::Texture> textureArray;
         textureArray.reserve(nTextures);
 
         for (unsigned int t = 0; t < nTextures; ++t) {
@@ -906,7 +851,7 @@ std::unique_ptr<ghoul::modelgeometry::ModelGeometry> ModelReaderAssimp::loadCach
 }
 
 bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
-                                  const ghoul::modelgeometry::ModelGeometry* model) const
+                                       const modelgeometry::ModelGeometry* model) const
 {
     std::ofstream fileStream(cachedFile, std::ofstream::binary);
     if (!fileStream.good()) {
@@ -930,7 +875,7 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
     }
     fileStream.write(reinterpret_cast<const char*>(&nTextureEntries), sizeof(int32_t));
 
-    for (unsigned int te = 0; te < model->textureStorage().size(); ++te) {
+    for (unsigned int te = 0; te < nTextureEntries; ++te) {
         // Name
         int32_t nameSize = model->textureStorage()[te].name.size() * sizeof(char);
         if (nameSize == 0) {
@@ -964,10 +909,9 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
         fileStream.write(format.data(), FORMAT_STRING_SIZE * sizeof(char));
 
         // internal format
-        unsigned int internalFormat =
-            static_cast<unsigned int>(
-                model->textureStorage()[te].texture->internalFormat()
-            );
+        unsigned int internalFormat = static_cast<unsigned int>(
+            model->textureStorage()[te].texture->internalFormat()
+        );
         fileStream.write(
             reinterpret_cast<const char*>(&internalFormat),
             sizeof(unsigned int)
@@ -1019,60 +963,9 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
         fileStream.write(reinterpret_cast<const char*>(&nVertices), sizeof(int32_t));
 
         for (unsigned int v = 0; v < nVertices; ++v) {
-            // location
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._vertices[v].location[0]),
-                sizeof(GLfloat)
-            );
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._vertices[v].location[1]),
-                sizeof(GLfloat)
-            );
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._vertices[v].location[2]),
-                sizeof(GLfloat)
-            );
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._vertices[v].location[3]),
-                sizeof(GLfloat)
-            );
-
-            // tex
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._vertices[v].tex[0]),
-                sizeof(GLfloat)
-            );
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._vertices[v].tex[1]),
-                sizeof(GLfloat)
-            );
-
-            // normal
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._vertices[v].normal[0]),
-                sizeof(GLfloat)
-            );
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._vertices[v].normal[1]),
-                sizeof(GLfloat)
-            );
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._vertices[v].normal[2]),
-                sizeof(GLfloat)
-            );
-
-            // tangent
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._vertices[v].tangent[0]),
-                sizeof(GLfloat)
-            );
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._vertices[v].tangent[1]),
-                sizeof(GLfloat)
-            );
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._vertices[v].tangent[2]),
-                sizeof(GLfloat)
+            fileStream.write(
+                reinterpret_cast<const char*>(&model->meshes()[m]._vertices[v]),
+                sizeof(ModelMesh::Vertex)
             );
         }
 

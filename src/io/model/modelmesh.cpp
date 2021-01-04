@@ -41,7 +41,7 @@ ModelMesh::ModelMesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&&
     , _textures(std::move(textures))
 { }
 
-void ModelMesh::render(ghoul::opengl::ProgramObject& program) const {
+void ModelMesh::render(opengl::ProgramObject& program) const {
 
     // Bind appropriate textures
     unsigned int diffuseNr = 1;
@@ -197,7 +197,7 @@ bool ModelMesh::initialize(float& maximumDistanceSquared) {
         if (_textures[i].hasTexture) {
             _textures[i].texture->uploadTexture();
             _textures[i].texture->setFilter(
-                ghoul::opengl::Texture::FilterMode::AnisotropicMipMap
+                opengl::Texture::FilterMode::AnisotropicMipMap
             );
             _textures[i].texture->purgeFromRAM();
         }

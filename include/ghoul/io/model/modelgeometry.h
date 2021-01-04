@@ -39,31 +39,31 @@ public:
 
     struct TextureEntry {
         std::string name;
-        std::unique_ptr<ghoul::opengl::Texture> texture;
+        std::unique_ptr<opengl::Texture> texture;
     };
 
-    ModelGeometry(std::vector<ghoul::io::ModelMesh>&& meshes,
+    ModelGeometry(std::vector<io::ModelMesh>&& meshes,
         std::vector<TextureEntry>&& textureStorage);
     ModelGeometry(ModelGeometry&&) noexcept = default;
     ~ModelGeometry() noexcept = default;
 
     bool initialize(float& maximumDistanceSquared);
     void deinitialize();
-    void render(ghoul::opengl::ProgramObject& program) const;
+    void render(opengl::ProgramObject& program) const;
 
     void changeRenderMode(const GLenum mode);
     double boundingRadius() const;
     void calculateBoundingRadius();
-    void setUniforms(ghoul::opengl::ProgramObject& program);
+    void setUniforms(opengl::ProgramObject& program);
 
-    std::vector<ghoul::io::ModelMesh>& meshes();
-    const std::vector<ghoul::io::ModelMesh>& meshes() const;
+    std::vector<io::ModelMesh>& meshes();
+    const std::vector<io::ModelMesh>& meshes() const;
     std::vector<TextureEntry>& textureStorage();
     const std::vector<TextureEntry>& textureStorage() const;
 
 protected:
     double _boundingRadius = 0.0;
-    std::vector<ghoul::io::ModelMesh> _meshes;
+    std::vector<io::ModelMesh> _meshes;
     std::vector<TextureEntry> _textureStorage;
 };
 

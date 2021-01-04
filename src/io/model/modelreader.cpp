@@ -63,14 +63,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-    const std::string& extension = ghoul::filesystem::File(filename).fileExtension();
+    const std::string& extension = filesystem::File(filename).fileExtension();
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
     ModelReaderBase* reader = readerForExtension(extension);
     if (reader) {
         std::string cachedFile = FileSys.cacheManager()->cachedFilename(
             filename,
-            ghoul::filesystem::CacheManager::Persistent::Yes
+            filesystem::CacheManager::Persistent::Yes
         );
 
         bool hasCachedFile = FileSys.fileExists(cachedFile);
@@ -82,7 +82,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
             );
 
             try {
-                std::unique_ptr<ghoul::modelgeometry::ModelGeometry> model =
+                std::unique_ptr<modelgeometry::ModelGeometry> model =
                     reader->loadCachedFile(cachedFile);
                 if (model != nullptr) {
                     return model;
@@ -112,13 +112,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
 
         LINFO(fmt::format("Loading ModelGeometry file '{}'", filename));
 
-        std::unique_ptr<ghoul::modelgeometry::ModelGeometry> rawModel =
+        std::unique_ptr<modelgeometry::ModelGeometry> model =
             reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
-        ghoul::modelgeometry::ModelGeometry* model = rawModel.release();
 
         LINFO("Saving cache");
         try {
-            reader->saveCachedFile(cachedFile, model);
+            reader->saveCachedFile(cachedFile, model.get());
         }
         catch (ModelReaderBase::ModelSaveException e) {
             LERROR(fmt::format(
@@ -129,8 +128,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
 
             FileSys.cacheManager()->removeCacheFile(filename);
         }
-
-        return std::make_unique<ghoul::modelgeometry::ModelGeometry>(std::move(*model));
+        return model;
     }
     else {
         throw MissingReaderException(extension, filename);
