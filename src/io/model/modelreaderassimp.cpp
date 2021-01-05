@@ -52,26 +52,26 @@ namespace {
 
 namespace ghoul::io {
 
-void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType type,
-                          std::string textureType,
+void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
+                          const aiTextureType type, const std::string& typeString,
                           std::vector<ModelMesh::Texture>& textureArray,
                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage)
 {
-    for (unsigned int i = 0; i < mat->GetTextureCount(type); ++i) {
-        ModelMesh::Texture textureTmp;
-        textureTmp.type = textureType;
-        aiString pathString;
-        mat->GetTexture(type, i, &pathString);
+    for (unsigned int i = 0; i < material->GetTextureCount(type); ++i) {
+        ModelMesh::Texture meshTexture;
+        meshTexture.type = typeString;
+        aiString path;
+        material->GetTexture(type, i, &path);
 
         // Check for duplicates
         bool shouldSkip = false;
         for (unsigned int j = 0; j < textureArray.size(); ++j) {
             if (textureArray[j].hasTexture) {
-                int isDuplicate = std::strcmp(
+                int isLoaded = std::strcmp(
                     textureArray[j].texture->name().c_str(),
-                    pathString.C_Str()
+                    path.C_Str()
                 );
-                if (isDuplicate == 0) {
+                if (isLoaded == 0) {
                     // Texture has already been loaded for this mesh, continue to next one
                     shouldSkip = true;
                     break;
@@ -85,27 +85,27 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
 
         // Check if texture has already been loaded by other meshes
         for (unsigned int j = 0; j < textureStorage.size(); ++j) {
-            int isLoaded = std::strcmp(textureStorage[j].name.c_str(), pathString.C_Str());
+            int isLoaded = std::strcmp(textureStorage[j].name.c_str(), path.C_Str());
             if (isLoaded == 0) {
                 // Texture has already been loaded. Point to that texture instead of copying
-                textureTmp.texture = textureStorage[j].texture.get();
-                textureTmp.texture->setName(pathString.C_Str());
-                textureTmp.hasTexture = true;
-                textureArray.push_back(std::move(textureTmp));
+                meshTexture.texture = textureStorage[j].texture.get();
+                meshTexture.texture->setName(path.C_Str());
+                meshTexture.hasTexture = true;
+                textureArray.push_back(std::move(meshTexture));
                 shouldSkip = true;
                 break;
             }
         }
 
-        // Texture already loaded, do not load it again
+        // Texture already loaded, point to it and do not load it again
         if (shouldSkip)
             continue;
 
         // Load texture
-        // Check if the texture is an embedded texture and whether it is compressed or not
-        const aiTexture* texture = scene->GetEmbeddedTexture(pathString.C_Str());
+        const aiTexture* texture = scene->GetEmbeddedTexture(path.C_Str());
         modelgeometry::ModelGeometry::TextureEntry textureEntry;
-        textureEntry.name = pathString.C_Str();
+        textureEntry.name = path.C_Str();
+        // Check if the texture is an embedded texture or a local texture
         if (texture) {
             // Embedded texture
             if ((texture->mHeight == 0)) {
@@ -116,8 +116,8 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
                         texture->mWidth,
                         texture->achFormatHint
                     );
-                    textureTmp.texture = textureEntry.texture.get();
-                    textureTmp.texture->setName(pathString.C_Str());
+                    meshTexture.texture = textureEntry.texture.get();
+                    meshTexture.texture->setName(path.C_Str());
                     LDEBUG(
                         fmt::format(
                             "Loaded texture from '{}'",
@@ -134,10 +134,10 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
                             e.fileExtension
                         )
                     );
-                    textureTmp.texture = nullptr;
-                    textureTmp.hasTexture = false;
-                    textureTmp.useForcedColor = true;
-                    textureArray.push_back(std::move(textureTmp));
+                    meshTexture.texture = nullptr;
+                    meshTexture.hasTexture = false;
+                    meshTexture.useForcedColor = true;
+                    textureArray.push_back(std::move(meshTexture));
                     continue;
                 }
                 catch (TextureReaderBase::TextureLoadException e) {
@@ -149,10 +149,10 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
                             e.message
                         )
                     );
-                    textureTmp.texture = nullptr;
-                    textureTmp.hasTexture = false;
-                    textureTmp.useForcedColor = true;
-                    textureArray.push_back(std::move(textureTmp));
+                    meshTexture.texture = nullptr;
+                    meshTexture.hasTexture = false;
+                    meshTexture.useForcedColor = true;
+                    textureArray.push_back(std::move(meshTexture));
                     continue;
                 }
             }
@@ -161,10 +161,10 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
                 LWARNING("Uncompressed embedded texture detected: Not supported! "
                     "Replacing with flashy color."
                 );
-                textureTmp.texture = nullptr;
-                textureTmp.hasTexture = false;
-                textureTmp.useForcedColor = true;
-                textureArray.push_back(std::move(textureTmp));
+                meshTexture.texture = nullptr;
+                meshTexture.hasTexture = false;
+                meshTexture.useForcedColor = true;
+                textureArray.push_back(std::move(meshTexture));
                 continue;
             }
         }
@@ -172,12 +172,12 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
             // Local texture
             try {
                 textureEntry.texture = TextureReader::ref().loadTexture(
-                    absPath(pathString.C_Str())
+                    absPath(path.C_Str())
                 );
-                textureTmp.texture = textureEntry.texture.get();
-                textureTmp.texture->setName(pathString.C_Str());
+                meshTexture.texture = textureEntry.texture.get();
+                meshTexture.texture->setName(path.C_Str());
                 LDEBUG(
-                    fmt::format("Loaded texture from '{}'", absPath(pathString.C_Str()))
+                    fmt::format("Loaded texture from '{}'", absPath(path.C_Str()))
                 );
             }
             catch (TextureReader::MissingReaderException e) {
@@ -189,10 +189,10 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
                         e.fileExtension
                     )
                 );
-                textureTmp.texture = nullptr;
-                textureTmp.hasTexture = false;
-                textureTmp.useForcedColor = true;
-                textureArray.push_back(std::move(textureTmp));
+                meshTexture.texture = nullptr;
+                meshTexture.hasTexture = false;
+                meshTexture.useForcedColor = true;
+                textureArray.push_back(std::move(meshTexture));
                 continue;
             }
             catch (TextureReaderBase::TextureLoadException e) {
@@ -204,22 +204,22 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
                         e.message
                     )
                 );
-                textureTmp.texture = nullptr;
-                textureTmp.hasTexture = false;
-                textureTmp.useForcedColor = true;
-                textureArray.push_back(std::move(textureTmp));
+                meshTexture.texture = nullptr;
+                meshTexture.hasTexture = false;
+                meshTexture.useForcedColor = true;
+                textureArray.push_back(std::move(meshTexture));
                 continue;
             }
         }
 
         // Check if the entire texture is transparent
         bool isOpague = false;
-        for (unsigned int j = 0; j < textureTmp.texture->dimensions().x; ++j) {
+        for (unsigned int j = 0; j < meshTexture.texture->dimensions().x; ++j) {
             if (isOpague)
                 break;
 
-            for (unsigned int k = 0; k < textureTmp.texture->dimensions().y; ++k) {
-                float alpha = textureTmp.texture->texelAsFloat(glm::vec2(j, k)).a;
+            for (unsigned int k = 0; k < meshTexture.texture->dimensions().y; ++k) {
+                float alpha = meshTexture.texture->texelAsFloat(glm::vec2(j, k)).a;
                 if (alpha != 0) {
                     isOpague = true;
                     break;
@@ -232,44 +232,46 @@ void loadMaterialTextures(const aiScene* scene, aiMaterial* mat, aiTextureType t
             continue;
 
         // Add new Texture to the textureStorage and point to it in the texture array
-        textureTmp.hasTexture = true;
-        textureArray.push_back(std::move(textureTmp));
+        meshTexture.hasTexture = true;
+        textureArray.push_back(std::move(meshTexture));
         textureStorage.push_back(std::move(textureEntry));
     }
 }
 
 
-ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform,
+ModelMesh processMesh(const aiMesh* mesh, const aiScene* scene,
+                      const glm::mat4x4& transform,
                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage)
 {
     std::vector<ModelMesh::Vertex> vertexArray;
     std::vector<unsigned int> indexArray;
     std::vector<ModelMesh::Texture> textureArray;
 
-    // Go through each of the mesh's vertices
+    // Vertices
     vertexArray.reserve(mesh->mNumVertices);
-    ModelMesh::Vertex vertex;
     for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+        ModelMesh::Vertex vertex;
 
-        // Positions
+        // Position
         vertex.location[0] = mesh->mVertices[i].x;
         vertex.location[1] = mesh->mVertices[i].y;
         vertex.location[2] = mesh->mVertices[i].z;
         vertex.location[3] = 1.0;
 
         // Apply the transform to the vertex
-        glm::vec4 transformTmp(vertex.location[0],
+        glm::vec4 position(
+            vertex.location[0],
             vertex.location[1],
             vertex.location[2],
             vertex.location[3]
         );
-        transformTmp = transform * transformTmp;
-        vertex.location[0] = transformTmp.x;
-        vertex.location[1] = transformTmp.y;
-        vertex.location[2] = transformTmp.z;
-        vertex.location[3] = transformTmp.w;
+        position = transform * position;
+        vertex.location[0] = position.x;
+        vertex.location[1] = position.y;
+        vertex.location[2] = position.z;
+        vertex.location[3] = position.w;
 
-        // Normals
+        // Normal
         if (mesh->HasNormals()) {
             vertex.normal[0] = mesh->mNormals[i].x;
             vertex.normal[1] = mesh->mNormals[i].y;
@@ -287,29 +289,34 @@ ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform
             // We are using only the first one provided.
             vertex.tex[0] = mesh->mTextureCoords[0][i].x;
             vertex.tex[1] = mesh->mTextureCoords[0][i].y;
-
-            // Tangent, used for normal mapping
-            vertex.tangent[0] = mesh->mTangents[i].x;
-            vertex.tangent[1] = mesh->mTangents[i].y;
-            vertex.tangent[2] = mesh->mTangents[i].z;
-
-            // Bitangent is calculated in shader
         }
         else {
             vertex.tex[0] = 0.f;
             vertex.tex[1] = 0.f;
         }
 
-        vertexArray.push_back(vertex);
+        // Tangent, used for normal mapping
+        // Bitangent is calculated in shader
+        if (mesh->HasTangentsAndBitangents()) {
+            vertex.tangent[0] = mesh->mTangents[i].x;
+            vertex.tangent[1] = mesh->mTangents[i].y;
+            vertex.tangent[2] = mesh->mTangents[i].z;
+        }
+        else {
+            vertex.tangent[0] = 0.f;
+            vertex.tangent[1] = 0.f;
+            vertex.tangent[2] = 0.f;
+        }
+
+        vertexArray.push_back(std::move(vertex));
     }
 
-    // Walk through the mesh faces and get the vertexes indices
+    // Indices
     // Reserve space, every face has usually three indices
     unsigned int nIndices = (mesh->mNumFaces) * static_cast<unsigned int>(3);
     indexArray.reserve(nIndices);
-    aiFace face;
     for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
-        face = mesh->mFaces[i];
+        aiFace face = mesh->mFaces[i];
 
         for (unsigned int j = 0; j < face.mNumIndices; ++j) {
             indexArray.push_back(face.mIndices[j]);
@@ -318,7 +325,7 @@ ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform
 
     // Process materials and textures
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-    aiColor3D color(0.f, 0.f, 0.f);
+
     // We assume a convention for sampler names in the shaders. Each diffuse texture
     // should be named as 'texture_diffuseN' where N is a sequential number ranging
     // from 1 to MAX_SAMPLER_NUMBER. Same applies to other textures as the following
@@ -329,7 +336,8 @@ ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform
 
     // Diffuse
     if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-        loadMaterialTextures(scene,
+        loadMaterialTextures(
+            scene,
             material,
             aiTextureType_DIFFUSE,
             "texture_diffuse",
@@ -339,21 +347,23 @@ ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform
     }
     else {
         // Load embedded simple material instead of textures
+        aiColor3D color(0.f, 0.f, 0.f);
         aiReturn hasColor = material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
         if (hasColor == AI_SUCCESS) {
-            ModelMesh::Texture textureTmp;
-            textureTmp.hasTexture = false;
-            textureTmp.type = "color_diffuse";
-            textureTmp.color.x = color.r;
-            textureTmp.color.y = color.g;
-            textureTmp.color.z = color.b;
-            textureArray.push_back(std::move(textureTmp));
+            ModelMesh::Texture texture;
+            texture.hasTexture = false;
+            texture.type = "color_diffuse";
+            texture.color.x = color.r;
+            texture.color.y = color.g;
+            texture.color.z = color.b;
+            textureArray.push_back(std::move(texture));
         }
     }
 
     // Specular
     if (material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
-        loadMaterialTextures(scene,
+        loadMaterialTextures(
+            scene,
             material,
             aiTextureType_SPECULAR,
             "texture_specular",
@@ -363,22 +373,23 @@ ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform
     }
     else {
         // Load embedded simple material instead of textures
-        color = aiColor3D(0.f, 0.f, 0.f);
+        aiColor3D color(0.f, 0.f, 0.f);
         aiReturn hasColor = material->Get(AI_MATKEY_COLOR_SPECULAR, color);
         if (hasColor == AI_SUCCESS && !color.IsBlack()) {
-            ModelMesh::Texture textureTmp;
-            textureTmp.hasTexture = false;
-            textureTmp.type = "color_specular";
-            textureTmp.color.x = color.r;
-            textureTmp.color.y = color.g;
-            textureTmp.color.z = color.b;
-            textureArray.push_back(std::move(textureTmp));
+            ModelMesh::Texture texture;
+            texture.hasTexture = false;
+            texture.type = "color_specular";
+            texture.color.x = color.r;
+            texture.color.y = color.g;
+            texture.color.z = color.b;
+            textureArray.push_back(std::move(texture));
         }
     }
 
     // Normal
     if (material->GetTextureCount(aiTextureType_NORMALS) > 0) {
-        loadMaterialTextures(scene,
+        loadMaterialTextures(
+            scene,
             material,
             aiTextureType_NORMALS,
             "texture_normal",
@@ -388,7 +399,8 @@ ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform
     }
 
     textureArray.shrink_to_fit();
-    return ModelMesh(std::move(vertexArray),
+    return ModelMesh(
+        std::move(vertexArray),
         std::move(indexArray),
         std::move(textureArray)
     );
@@ -396,7 +408,7 @@ ModelMesh processMesh(aiMesh* mesh, const aiScene* scene, glm::mat4x4& transform
 
 // Process a node in a recursive fashion. Process each individual mesh located 
 // at the node and repeats this process on its children nodes (if any)
-void processNode(aiNode* node, const aiScene* scene, std::vector<ModelMesh>& meshes,
+void processNode(const aiNode* node, const aiScene* scene, std::vector<ModelMesh>& meshes,
                  const glm::mat4x4& parentTransform,
                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
                  const bool forceRenderInvisible, const bool notifyInvisibleDropped)
@@ -421,21 +433,21 @@ void processNode(aiNode* node, const aiScene* scene, std::vector<ModelMesh>& mes
 
     // Process each mesh for the current node
     for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-        // The node object only contains indices to index the actual objects in the scene.
+        // The node object only contains indices to the actual objects in the scene
         // The scene contains all the data, node is just to keep stuff organized
-        // (like relations between nodes).
+        // (like relations between nodes)
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         ModelMesh loadedMesh = processMesh(mesh, scene, globalTransform, textureStorage);
 
         // If mesh is invisible (no materials) drop it unless forced to render anyway
         // Notify unless suppresed
         if (loadedMesh._textures.empty()) {
-            // Force invisible mesh to render with flashy colors
             if (forceRenderInvisible) {
-                ModelMesh::Texture textureTmp;
-                textureTmp.hasTexture = false;
-                textureTmp.useForcedColor = true;
-                loadedMesh._textures.push_back(std::move(textureTmp));
+                // Force invisible mesh to render with flashy colors
+                ModelMesh::Texture texture;
+                texture.hasTexture = false;
+                texture.useForcedColor = true;
+                loadedMesh._textures.push_back(std::move(texture));
             }
             // If not forced to render, drop invisible mesh
             else {
@@ -468,15 +480,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-    // Create an instance of the Importer class
     Assimp::Importer importer;
-
-    // Rendering only triangle meshes.
     const aiScene* scene = importer.ReadFile(
         filename,
-        aiProcess_Triangulate |
-        aiProcess_GenSmoothNormals |
-        aiProcess_CalcTangentSpace
+        aiProcess_Triangulate |         // Only triangles
+        aiProcess_GenSmoothNormals |    // Generate smooth normals
+        aiProcess_CalcTangentSpace      // Generate tangents and bitangents
     );
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
@@ -488,7 +497,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
 
     // Get info from all models in the scene
     std::vector<ModelMesh> meshArray;
+    meshArray.reserve(scene->mNumMeshes);
     std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorage;
+    textureStorage.reserve(scene->mNumTextures);
     processNode(
         scene->mRootNode,
         scene,
@@ -508,7 +519,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
     );
 }
 
-const opengl::Texture::Format formatFromString(const std::string format) {
+opengl::Texture::Format stringToFormat(const std::string format) {
     if (format == "Red ") {
         return opengl::Texture::Format::Red;
     }
@@ -535,7 +546,7 @@ const opengl::Texture::Format formatFromString(const std::string format) {
     }
 }
 
-std::string stringFromFormat(opengl::Texture::Format format) {
+std::string formatToString(opengl::Texture::Format format) {
     std::string formatString;
     formatString.resize(FORMAT_STRING_SIZE, ' ');
     std::string subString;
@@ -570,7 +581,7 @@ std::string stringFromFormat(opengl::Texture::Format format) {
     return formatString;
 }
 
-const GLenum dataTypeFromString(const std::string dataType) {
+GLenum stringToDataType(const std::string dataType) {
     if (dataType == "byte") {
         return GL_BYTE;
     }
@@ -600,7 +611,7 @@ const GLenum dataTypeFromString(const std::string dataType) {
     }
 }
 
-std::string stringFromDataType(const GLenum dataType) {
+std::string dataTypeToString(const GLenum dataType) {
     std::string formatString;
     formatString.resize(FORMAT_STRING_SIZE, ' ');
     std::string subString;
@@ -650,7 +661,6 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadCachedFile(
     int8_t version = 0;
     fileStream.read(reinterpret_cast<char*>(&version), sizeof(int8_t));
     if (version != CurrentCacheVersion) {
-        fileStream.close();
         throw ModelLoadException(
             cachedFile,
             "The format of the cached file has changed: deleting old cache",
@@ -662,7 +672,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadCachedFile(
     int32_t nTextureEntries = 0;
     fileStream.read(reinterpret_cast<char*>(&nTextureEntries), sizeof(int32_t));
     if (nTextureEntries == 0) {
-        LINFO("No TextureEntries were loaded!");
+        LINFO("No TextureEntries were loaded");
     }
     std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorageArray;
     textureStorageArray.reserve(nTextureEntries);
@@ -690,21 +700,18 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadCachedFile(
         std::string formatString;
         formatString.resize(FORMAT_STRING_SIZE);
         fileStream.read(formatString.data(), FORMAT_STRING_SIZE * sizeof(char));
-        opengl::Texture::Format format = formatFromString(formatString);
+        opengl::Texture::Format format = stringToFormat(formatString);
 
         // internal format
         unsigned int rawInternalFormat;
-        fileStream.read(reinterpret_cast<char*>(
-            &rawInternalFormat),
-            sizeof(unsigned int)
-        );
+        fileStream.read(reinterpret_cast<char*>(&rawInternalFormat), sizeof(unsigned int));
         GLenum internalFormat = static_cast<GLenum>(rawInternalFormat);
 
         // data type
         std::string dataTypeString;
         dataTypeString.resize(FORMAT_STRING_SIZE);
         fileStream.read(dataTypeString.data(), FORMAT_STRING_SIZE * sizeof(char));
-        GLenum dataType = dataTypeFromString(dataTypeString);
+        GLenum dataType = stringToDataType(dataTypeString);
 
         // data
         int32_t textureSize = 0;
@@ -732,7 +739,6 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadCachedFile(
             );
 
         textureEntry.texture->setPixelData(data);
-
         textureStorageArray.push_back(std::move(textureEntry));
     }
 
@@ -775,7 +781,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadCachedFile(
         for (unsigned int i = 0; i < nIndices; ++i) {
             unsigned int index;
             fileStream.read(reinterpret_cast<char*>(&index), sizeof(unsigned int));
-            indexArray.push_back(index);
+            indexArray.push_back(std::move(index));
         }
 
         // Textures
@@ -871,7 +877,7 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
     // First cache the textureStorage
     int32_t nTextureEntries = model->textureStorage().size();
     if (nTextureEntries == 0) {
-        LINFO("No TextureEntries were loaded!");
+        LINFO("No TextureEntries were loaded");
     }
     fileStream.write(reinterpret_cast<const char*>(&nTextureEntries), sizeof(int32_t));
 
@@ -905,7 +911,7 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
 
         // format
         std::string format =
-            stringFromFormat(model->textureStorage()[te].texture->format());
+            formatToString(model->textureStorage()[te].texture->format());
         fileStream.write(format.data(), FORMAT_STRING_SIZE * sizeof(char));
 
         // internal format
@@ -919,7 +925,7 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
 
         // data type
         std::string dataType =
-            stringFromDataType(model->textureStorage()[te].texture->dataType());
+            dataTypeToString(model->textureStorage()[te].texture->dataType());
         fileStream.write(dataType.data(), FORMAT_STRING_SIZE * sizeof(char));
 
         // data
@@ -981,8 +987,8 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
         fileStream.write(reinterpret_cast<const char*>(&nIndices), sizeof(int32_t));
 
         for (unsigned int i = 0; i < nIndices; ++i) {
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._indices[i]),
+            fileStream.write(
+                reinterpret_cast<const char*>(&model->meshes()[m]._indices[i]),
                 sizeof(unsigned int)
             );
         }
@@ -1025,16 +1031,16 @@ bool ModelReaderAssimp::saveCachedFile(const std::string& cachedFile,
             );
 
             // color
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._textures[t].color.r),
+            fileStream.write(
+                reinterpret_cast<const char*>(&model->meshes()[m]._textures[t].color.r),
                 sizeof(float)
             );
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._textures[t].color.g),
+            fileStream.write(
+                reinterpret_cast<const char*>(&model->meshes()[m]._textures[t].color.g),
                 sizeof(float)
             );
-            fileStream.write(reinterpret_cast<const char*>(
-                &model->meshes()[m]._textures[t].color.b),
+            fileStream.write(
+                reinterpret_cast<const char*>(&model->meshes()[m]._textures[t].color.b),
                 sizeof(float)
             );
 
