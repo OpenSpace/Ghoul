@@ -44,9 +44,6 @@ ModelMesh::ModelMesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&&
 void ModelMesh::render(opengl::ProgramObject& program) const {
 
     // Bind appropriate textures
-    unsigned int diffuseNr = 1;
-    unsigned int specularNr = 1;
-    unsigned int normalNr = 1;
     unsigned int textureCounter = 0;
     for (unsigned int i = 0; i < _textures.size(); i++)
     {
@@ -58,28 +55,19 @@ void ModelMesh::render(opengl::ProgramObject& program) const {
             break;
         }
 
-        // Use textures
+        // Use texture or color
         if (_textures[i].hasTexture) {
             // Active proper texture unit before binding
             glActiveTexture(GL_TEXTURE0 + textureCounter);
 
-            // Retrieve texture number
-            std::string number;
-            if (name == "texture_diffuse")
-                number = std::to_string(diffuseNr++);
-            else if (name == "texture_specular") {
-                number = std::to_string(specularNr++);
+            // Specular special case
+            if (name == "texture_specular") {
                 program.setUniform("has_color_specular", false);
             }
-            else if (name == "texture_normal")
-                number = std::to_string(normalNr++);
-            // Only support diffuse, specular and normal at the moment
-            else
-                continue;
 
             // Tell shader to use textures and set texture unit
             program.setUniform(("has_" + name).c_str(), true);
-            program.setUniform((name + number).c_str(), textureCounter);
+            program.setUniform(name, textureCounter);
 
             // And finally bind the texture
             _textures[i].texture->bind();
@@ -108,8 +96,6 @@ void ModelMesh::render(opengl::ProgramObject& program) const {
         nullptr
     );
     glBindVertexArray(0);
-
-    // Set everything to default once configured
     glActiveTexture(GL_TEXTURE0);
 }
 
@@ -193,7 +179,25 @@ bool ModelMesh::initialize(float& maximumDistanceSquared) {
     glBindVertexArray(0);
 
     // initialize textures
+    // Also chack if there are several textures/colors of the same type for this mesh
+    unsigned int nDiffuse = 0;
+    unsigned int nSpecular = 0;
+    unsigned int nNormal = 0;
     for (unsigned int i = 0; i < _textures.size(); ++i) {
+        if (_textures[i].type == "texture_diffuse" ||
+            _textures[i].type == "color_diffuse")
+        {
+            ++nDiffuse;
+        }
+        else if (_textures[i].type == "texture_specular" ||
+            _textures[i].type == "color_specular")
+        {
+            ++nSpecular;
+        }
+        else if (_textures[i].type == "texture_normal") {
+            ++nNormal;
+        }
+
         if (_textures[i].hasTexture) {
             _textures[i].texture->uploadTexture();
             _textures[i].texture->setFilter(
@@ -201,6 +205,14 @@ bool ModelMesh::initialize(float& maximumDistanceSquared) {
             );
             _textures[i].texture->purgeFromRAM();
         }
+    }
+
+    if (nDiffuse > 1 || nSpecular > 1 || nNormal > 1) {
+        LWARNINGC(
+            "ModelMesh",
+            "More than one texture or color of same type cannot be used for the same mesh. "
+            "Only the latest option will be used."
+        );
     }
 
     return true;
