@@ -41,6 +41,7 @@
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+#include <filesystem>
 #include <memory>
 #include <vector>
 #include <fstream>
@@ -55,7 +56,8 @@ namespace ghoul::io {
 void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
                           const aiTextureType type, const std::string& typeString,
                           std::vector<ModelMesh::Texture>& textureArray,
-                 std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage)
+                 std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
+                          const std::filesystem::path& modelDirectory)
 {
     for (unsigned int i = 0; i < material->GetTextureCount(type); ++i) {
         ModelMesh::Texture meshTexture;
@@ -118,12 +120,6 @@ void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
                     );
                     meshTexture.texture = textureEntry.texture.get();
                     meshTexture.texture->setName(path.C_Str());
-                    LDEBUG(
-                        fmt::format(
-                            "Loaded texture from '{}'",
-                            static_cast<void*>(texture->pcData)
-                        )
-                    );
                 }
                 catch (TextureReader::MissingReaderException e) {
                     LWARNING(
@@ -171,14 +167,18 @@ void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
         else {
             // Local texture
             try {
+                std::string pathString(path.C_Str());
+                std::string absolutePath =
+                    ghoul::filesystem::FileSystem::ref().pathByAppendingComponent(
+                        modelDirectory.string(),
+                        pathString
+                    );
+
                 textureEntry.texture = TextureReader::ref().loadTexture(
-                    absPath(path.C_Str())
+                    absPath(absolutePath)
                 );
                 meshTexture.texture = textureEntry.texture.get();
                 meshTexture.texture->setName(path.C_Str());
-                LDEBUG(
-                    fmt::format("Loaded texture from '{}'", absPath(path.C_Str()))
-                );
             }
             catch (TextureReader::MissingReaderException e) {
                 LWARNING(
@@ -241,7 +241,8 @@ void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
 
 ModelMesh processMesh(const aiMesh* mesh, const aiScene* scene,
                       const glm::mat4x4& transform,
-                 std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage)
+                 std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
+                      const std::filesystem::path& modelDirectory)
 {
     std::vector<ModelMesh::Vertex> vertexArray;
     std::vector<unsigned int> indexArray;
@@ -342,7 +343,8 @@ ModelMesh processMesh(const aiMesh* mesh, const aiScene* scene,
             aiTextureType_DIFFUSE,
             "texture_diffuse",
             textureArray,
-            textureStorage
+            textureStorage,
+            modelDirectory
         );
     }
     else {
@@ -368,7 +370,8 @@ ModelMesh processMesh(const aiMesh* mesh, const aiScene* scene,
             aiTextureType_SPECULAR,
             "texture_specular",
             textureArray,
-            textureStorage
+            textureStorage,
+            modelDirectory
         );
     }
     else {
@@ -394,7 +397,8 @@ ModelMesh processMesh(const aiMesh* mesh, const aiScene* scene,
             aiTextureType_NORMALS,
             "texture_normal",
             textureArray,
-            textureStorage
+            textureStorage,
+            modelDirectory
         );
     }
 
@@ -411,7 +415,8 @@ ModelMesh processMesh(const aiMesh* mesh, const aiScene* scene,
 void processNode(const aiNode* node, const aiScene* scene, std::vector<ModelMesh>& meshes,
                  const glm::mat4x4& parentTransform,
                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
-                 const bool forceRenderInvisible, const bool notifyInvisibleDropped)
+                 const bool forceRenderInvisible, const bool notifyInvisibleDropped,
+                 const std::filesystem::path& modelDirectory)
 {
     // Convert transform matrix of the node
     // Assimp stores matrixes in row major and glm stores matrixes in column major
@@ -437,7 +442,7 @@ void processNode(const aiNode* node, const aiScene* scene, std::vector<ModelMesh
         // The scene contains all the data, node is just to keep stuff organized
         // (like relations between nodes)
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        ModelMesh loadedMesh = processMesh(mesh, scene, globalTransform, textureStorage);
+        ModelMesh loadedMesh = processMesh(mesh, scene, globalTransform, textureStorage, modelDirectory);
 
         // If mesh is invisible (no materials) drop it unless forced to render anyway
         // Notify unless suppresed
@@ -469,16 +474,20 @@ void processNode(const aiNode* node, const aiScene* scene, std::vector<ModelMesh
             globalTransform,
             textureStorage,
             forceRenderInvisible,
-            notifyInvisibleDropped
+            notifyInvisibleDropped,
+            modelDirectory
         );
     }
 }
+
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
                             const std::string& filename, const bool forceRenderInvisible,
                                                  const bool notifyInvisibleDropped) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
+
+    std::filesystem::path modelDirectory = std::filesystem::path(filename).parent_path();
 
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(
@@ -507,7 +516,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         rootTransform,
         textureStorage,
         forceRenderInvisible,
-        notifyInvisibleDropped
+        notifyInvisibleDropped,
+        modelDirectory
     );
 
     // Return the ModelGeometry from the meshArray
