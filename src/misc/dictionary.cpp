@@ -110,7 +110,7 @@ T Dictionary::value(std::string_view key) const {
                 for (const auto& kv : d._storage) {
                     // Lua is 1-based index, the rest of the world is 0-based
                     int k = std::stoi(kv.first) - 1;
-                    if (k < 0 || k >= d._storage.size()) {
+                    if (k < 0 || k >= static_cast<int>(d._storage.size())) {
                         throw ValueError(
                             std::string(key),
                             fmt::format(
