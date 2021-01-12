@@ -53,7 +53,7 @@ namespace {
 
 namespace ghoul::io {
 
-void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
+bool loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
                           const aiTextureType type, const std::string& typeString,
                           std::vector<ModelMesh::Texture>& textureArray,
                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
@@ -124,8 +124,8 @@ void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
                 catch (TextureReader::MissingReaderException e) {
                     LWARNING(
                         fmt::format(
-                            "Failed to load texture from '{}' with extension '{}' : "
-                            "Replacing with flashy color.",
+                            "Could not load unsupported texture from '{}' with extension"
+                            " '{}' : Replacing with flashy color.",
                             e.file,
                             e.fileExtension
                         )
@@ -133,8 +133,9 @@ void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
                     meshTexture.texture = nullptr;
                     meshTexture.hasTexture = false;
                     meshTexture.useForcedColor = true;
+                    meshTexture.type = "color_diffuse";
                     textureArray.push_back(std::move(meshTexture));
-                    continue;
+                    return false;
                 }
                 catch (TextureReaderBase::TextureLoadException e) {
                     LWARNING(
@@ -148,8 +149,9 @@ void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
                     meshTexture.texture = nullptr;
                     meshTexture.hasTexture = false;
                     meshTexture.useForcedColor = true;
+                    meshTexture.type = "color_diffuse";
                     textureArray.push_back(std::move(meshTexture));
-                    continue;
+                    return false;
                 }
             }
             else {
@@ -160,8 +162,9 @@ void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
                 meshTexture.texture = nullptr;
                 meshTexture.hasTexture = false;
                 meshTexture.useForcedColor = true;
+                meshTexture.type = "color_diffuse";
                 textureArray.push_back(std::move(meshTexture));
-                continue;
+                return false;
             }
         }
         else {
@@ -183,8 +186,8 @@ void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
             catch (TextureReader::MissingReaderException e) {
                 LWARNING(
                     fmt::format(
-                        "Failed to load texture from '{}' with extension '{}' : "
-                        "Replacing with flashy color.",
+                        "Could not load unsupported texture from '{}' with extension"
+                        " '{}' : Replacing with flashy color.",
                         e.file,
                         e.fileExtension
                     )
@@ -192,8 +195,9 @@ void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
                 meshTexture.texture = nullptr;
                 meshTexture.hasTexture = false;
                 meshTexture.useForcedColor = true;
+                meshTexture.type = "color_diffuse";
                 textureArray.push_back(std::move(meshTexture));
-                continue;
+                return false;
             }
             catch (TextureReaderBase::TextureLoadException e) {
                 LWARNING(
@@ -207,8 +211,9 @@ void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
                 meshTexture.texture = nullptr;
                 meshTexture.hasTexture = false;
                 meshTexture.useForcedColor = true;
+                meshTexture.type = "color_diffuse";
                 textureArray.push_back(std::move(meshTexture));
-                continue;
+                return false;
             }
         }
 
@@ -236,6 +241,7 @@ void loadMaterialTextures(const aiScene* scene, const aiMaterial* material,
         textureArray.push_back(std::move(meshTexture));
         textureStorage.push_back(std::move(textureEntry));
     }
+    return true;
 }
 
 
@@ -335,9 +341,23 @@ ModelMesh processMesh(const aiMesh* mesh, const aiScene* scene,
     // specular: texture_specularN or color_specular if embedded simple material instead
     // normal: texture_normalN
 
+    // Opacity
+    float opacity = 0.f;
+    aiReturn hasOpacity = material->Get(AI_MATKEY_OPACITY, opacity);
+    if (hasOpacity == AI_SUCCESS) {
+        // If the material is transparent then do not add it
+        if (opacity == 0) {
+            return ModelMesh(
+                std::move(vertexArray),
+                std::move(indexArray),
+                std::move(textureArray)
+            );
+        }
+    }
+
     // Diffuse
     if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-        loadMaterialTextures(
+        bool success = loadMaterialTextures(
             scene,
             material,
             aiTextureType_DIFFUSE,
@@ -346,25 +366,49 @@ ModelMesh processMesh(const aiMesh* mesh, const aiScene* scene,
             textureStorage,
             modelDirectory
         );
+
+        if (!success) {
+            return ModelMesh(
+                std::move(vertexArray),
+                std::move(indexArray),
+                std::move(textureArray)
+            );
+        }
     }
     else {
         // Load embedded simple material instead of textures
-        aiColor3D color(0.f, 0.f, 0.f);
-        aiReturn hasColor = material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-        if (hasColor == AI_SUCCESS) {
-            ModelMesh::Texture texture;
-            texture.hasTexture = false;
-            texture.type = "color_diffuse";
-            texture.color.x = color.r;
-            texture.color.y = color.g;
-            texture.color.z = color.b;
-            textureArray.push_back(std::move(texture));
+        aiColor4D color4(0.f, 0.f, 0.f, 0.f);
+        aiReturn hasColor4 = material->Get(AI_MATKEY_COLOR_DIFFUSE, color4);
+        if (hasColor4 == AI_SUCCESS) {
+            // Only add the color if it is not transparent
+            if (color4.a != 0) {
+                ModelMesh::Texture texture;
+                texture.hasTexture = false;
+                texture.type = "color_diffuse";
+                texture.color.x = color4.r;
+                texture.color.y = color4.g;
+                texture.color.z = color4.b;
+                textureArray.push_back(std::move(texture));
+            }
+        }
+        else {
+            aiColor3D color3(0.f, 0.f, 0.f);
+            aiReturn hasColor3 = material->Get(AI_MATKEY_COLOR_DIFFUSE, color3);
+            if (hasColor3 == AI_SUCCESS) {
+                ModelMesh::Texture texture;
+                texture.hasTexture = false;
+                texture.type = "color_diffuse";
+                texture.color.x = color3.r;
+                texture.color.y = color3.g;
+                texture.color.z = color3.b;
+                textureArray.push_back(std::move(texture));
+            }
         }
     }
 
     // Specular
     if (material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
-        loadMaterialTextures(
+        bool success = loadMaterialTextures(
             scene,
             material,
             aiTextureType_SPECULAR,
@@ -373,25 +417,49 @@ ModelMesh processMesh(const aiMesh* mesh, const aiScene* scene,
             textureStorage,
             modelDirectory
         );
+
+        if (!success) {
+            return ModelMesh(
+                std::move(vertexArray),
+                std::move(indexArray),
+                std::move(textureArray)
+            );
+        }
     }
     else {
         // Load embedded simple material instead of textures
-        aiColor3D color(0.f, 0.f, 0.f);
-        aiReturn hasColor = material->Get(AI_MATKEY_COLOR_SPECULAR, color);
-        if (hasColor == AI_SUCCESS && !color.IsBlack()) {
-            ModelMesh::Texture texture;
-            texture.hasTexture = false;
-            texture.type = "color_specular";
-            texture.color.x = color.r;
-            texture.color.y = color.g;
-            texture.color.z = color.b;
-            textureArray.push_back(std::move(texture));
+        aiColor4D color4(0.f, 0.f, 0.f, 0.f);
+        aiReturn hasColor4 = material->Get(AI_MATKEY_COLOR_SPECULAR, color4);
+        if (hasColor4 == AI_SUCCESS && !color4.IsBlack()) {
+            // Only add the color if it is not transparent
+            if (color4.a != 0) {
+                ModelMesh::Texture texture;
+                texture.hasTexture = false;
+                texture.type = "color_specular";
+                texture.color.x = color4.r;
+                texture.color.y = color4.g;
+                texture.color.z = color4.b;
+                textureArray.push_back(std::move(texture));
+            }
+        }
+        else {
+            aiColor3D color3(0.f, 0.f, 0.f);
+            aiReturn hasColor3 = material->Get(AI_MATKEY_COLOR_SPECULAR, color3);
+            if (hasColor3 == AI_SUCCESS && !color3.IsBlack()) {
+                ModelMesh::Texture texture;
+                texture.hasTexture = false;
+                texture.type = "color_specular";
+                texture.color.x = color3.r;
+                texture.color.y = color3.g;
+                texture.color.z = color3.b;
+                textureArray.push_back(std::move(texture));
+            }
         }
     }
 
     // Normal
     if (material->GetTextureCount(aiTextureType_NORMALS) > 0) {
-        loadMaterialTextures(
+        bool success = loadMaterialTextures(
             scene,
             material,
             aiTextureType_NORMALS,
@@ -400,6 +468,14 @@ ModelMesh processMesh(const aiMesh* mesh, const aiScene* scene,
             textureStorage,
             modelDirectory
         );
+
+        if (!success) {
+            return ModelMesh(
+                std::move(vertexArray),
+                std::move(indexArray),
+                std::move(textureArray)
+            );
+        }
     }
 
     textureArray.shrink_to_fit();
@@ -452,6 +528,7 @@ void processNode(const aiNode* node, const aiScene* scene, std::vector<ModelMesh
                 ModelMesh::Texture texture;
                 texture.hasTexture = false;
                 texture.useForcedColor = true;
+                texture.type = "color_diffuse";
                 loadedMesh._textures.push_back(std::move(texture));
             }
             // If not forced to render, drop invisible mesh
