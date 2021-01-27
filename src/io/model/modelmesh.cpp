@@ -41,49 +41,50 @@ ModelMesh::ModelMesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&&
     , _textures(std::move(textures))
 { }
 
-void ModelMesh::render(opengl::ProgramObject& program) const {
+void ModelMesh::render(opengl::ProgramObject& program, bool isRenderableModel) const {
+    if (isRenderableModel) {
+        // Bind appropriate textures
+        unsigned int textureCounter = 0;
+        for (unsigned int i = 0; i < _textures.size(); i++)
+        {
+            std::string name = _textures[i].type;
 
-    // Bind appropriate textures
-    unsigned int textureCounter = 0;
-    for (unsigned int i = 0; i < _textures.size(); i++)
-    {
-        std::string name = _textures[i].type;
-
-        // Tell shader wether to render invisible mesh with flashy color or not
-        program.setUniform("use_forced_color", _textures[i].useForcedColor);
-        if (_textures[i].useForcedColor) {
-            break;
-        }
-
-        // Use texture or color
-        if (_textures[i].hasTexture) {
-            // Active proper texture unit before binding
-            glActiveTexture(GL_TEXTURE0 + textureCounter);
-
-            // Specular special case
-            if (name == "texture_specular") {
-                program.setUniform("has_color_specular", false);
+            // Tell shader wether to render invisible mesh with flashy color or not
+            program.setUniform("use_forced_color", _textures[i].useForcedColor);
+            if (_textures[i].useForcedColor) {
+                break;
             }
 
-            // Tell shader to use textures and set texture unit
-            program.setUniform(("has_" + name).c_str(), true);
-            program.setUniform(name, textureCounter);
+            // Use texture or color
+            if (_textures[i].hasTexture) {
+                // Active proper texture unit before binding
+                glActiveTexture(GL_TEXTURE0 + textureCounter);
 
-            // And finally bind the texture
-            _textures[i].texture->bind();
-            ++textureCounter;
-        }
-        // Use embedded simple colors instead of textures
-        else {
-            if (name == "color_diffuse")
-                program.setUniform("has_texture_diffuse", false);
-            else if (name == "color_specular") {
-                program.setUniform("has_texture_specular", false);
+                // Specular special case
+                if (name == "texture_specular") {
+                    program.setUniform("has_color_specular", false);
+                }
+
+                // Tell shader to use textures and set texture unit
                 program.setUniform(("has_" + name).c_str(), true);
-            }
+                program.setUniform(name, textureCounter);
 
-            // Set the color in shader
-            program.setUniform(name.c_str(), _textures[i].color);
+                // And finally bind the texture
+                _textures[i].texture->bind();
+                ++textureCounter;
+            }
+            // Use embedded simple colors instead of textures
+            else {
+                if (name == "color_diffuse")
+                    program.setUniform("has_texture_diffuse", false);
+                else if (name == "color_specular") {
+                    program.setUniform("has_texture_specular", false);
+                    program.setUniform(("has_" + name).c_str(), true);
+                }
+
+                // Set the color in shader
+                program.setUniform(name.c_str(), _textures[i].color);
+            }
         }
     }
 

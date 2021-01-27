@@ -78,9 +78,9 @@ const std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() 
     return _textureStorage;
 }
 
-void ModelGeometry::render(opengl::ProgramObject& program) const {
+void ModelGeometry::render(opengl::ProgramObject& program, bool isRenderableModel) const {
     for (int i = 0; i < _meshes.size(); ++i) {
-        _meshes[i].render(program);
+        _meshes[i].render(program, isRenderableModel);
     }
 }
 
