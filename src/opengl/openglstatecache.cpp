@@ -230,6 +230,17 @@ void OpenGLStateCache::resetViewportState() const {
     glViewport(_viewport[0], _viewport[1], _viewport[2], _viewport[3]);
 }
 
+void OpenGLStateCache::setDefaultFramebuffer(const GLuint defaultFB) {
+    ghoul_assert(
+        defaultFB < std::numeric_limits<GLuint>::max(), 
+        "The default Framebuffer must be a valid number"
+    );
+
+    if (_defaultFramebuffer != defaultFB) {
+        _defaultFramebuffer = defaultFB;
+    }
+}
+
 void OpenGLStateCache::setViewportState(const GLint viewportCoords[4])  {
     ghoul_assert(viewportCoords != nullptr, "viewportCoords must not be nullptr");
 
