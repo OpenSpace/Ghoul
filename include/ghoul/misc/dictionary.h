@@ -166,6 +166,14 @@ public:
     std::vector<std::string_view> keys() const;
 
     /**
+     * Removes the provided \p key from the dictionary.  If the key does not exist, this
+     * operation does not do anything.
+     *
+     * \param key The key to remove
+     */
+    void removeValue(std::string_view key);
+
+    /**
      * Returns whether the Dictionary is empty or contains values.
      * \return Whether the Dictionary is empty or contains values
      */

@@ -237,6 +237,12 @@ std::vector<std::string_view> Dictionary::keys() const {
     return keys;
 }
 
+void Dictionary::removeValue(std::string_view key) {
+    if (const auto it = _storage.find(key);  it != _storage.end()) {
+        _storage.erase(it);
+    }
+}
+
 bool Dictionary::isEmpty() const {
     return _storage.empty();
 }
