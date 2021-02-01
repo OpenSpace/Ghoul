@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -33,10 +33,10 @@
 #include <string>
 #include <vector>
 
-#ifdef GHOUL_USE_WMI
+#ifdef WIN32
 #include <wbemidl.h>
 #include <comdef.h>
-#endif
+#endif // WIN32
 
 // X11 #defines 'None' in its X.h header file. We don't want it here ---abock
 #undef None
@@ -83,11 +83,10 @@ public:
 
     /**
      * The base constructor will initialize the Windows Management Instrumentation
-     * (if the application is running on Windows and it was compiled with
-     * <code>GHOUL_USE_WMI</code>). If the application is compiled not on Window or the
-     * WMI is disabled in the compilation, no error will occur. If WMI should be used and
-     * an error occurs, an error will be logged. This method needs to be called from each
-     * derived subclass, even if WMI is not used.
+     * (if the application is running on Windows). If the application is compiled not on
+     * Windows, no error will occur. If WMI should be used and an error occurs, an error
+     * will be logged. This method needs to be called from each derived subclass, even if
+     * WMI is not used.
      *
      * \param initializeWMI If this parameter is <code>true</code>, the Windows Management
      *        Instrumentation will be initialized.
@@ -130,7 +129,7 @@ public:
     virtual std::string_view name() const = 0;
 
 protected:
-#ifdef GHOUL_USE_WMI
+#ifdef WIN32
     /// Exception that will be thrown if there was an error regarding Windows'
     /// Management Instrumentation
     struct WMIError : public RuntimeError {
@@ -270,7 +269,7 @@ protected:
      * call in the #initializeWMI call
      */
     static IWbemServices* _iwbemServices;
-#endif
+#endif // WIN32
 };
 
 } // namespace ghoul::systemcapabilities

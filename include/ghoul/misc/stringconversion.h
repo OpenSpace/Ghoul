@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -41,7 +41,7 @@ namespace ghoul {
  * <code>ghoul::from_string(ghoul::to_string(v)) == v</code>
  */
 template <typename T>
-constexpr T from_string(std::string_view string) {
+constexpr T from_string(std::string_view) {
     // Unfortunately, we can't write 'false' here, as the compiler is a bit too eager to
     // evaluate that
     static_assert(sizeof(T) == -1, "Missing from_string implementation");
@@ -55,7 +55,7 @@ constexpr T from_string(std::string_view string) {
 template <typename T>
 std::string to_string(const T& value) {
     // std::string does not define the identity transformation so we have to handle that
-    if constexpr (std::is_same_v<T, std::string>) {
+  if constexpr (std::is_same_v<T, std::string>) {
         return value;
     }
     else {

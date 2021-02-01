@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -31,7 +31,7 @@ TEST_CASE("MemoryPool: MemoryPool Default", "[memorypool]") {
     ghoul::MemoryPool<> pool;
     void* p1 = pool.allocate(1024);
     std::memset(p1, 0xB0, 1024);
-    REQUIRE(p1 != nullptr);
+    REQUIRE(p1);
     REQUIRE(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies().size() == 1);
     REQUIRE(pool.occupancies()[0] == 1024);
@@ -39,7 +39,7 @@ TEST_CASE("MemoryPool: MemoryPool Default", "[memorypool]") {
 
     void* p2 = pool.allocate(1024);
     std::memset(p2, 0xB1, 1024);
-    REQUIRE(p2 != nullptr);
+    REQUIRE(p2);
     REQUIRE(p2 != p1);
     REQUIRE(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies().size() == 1);
@@ -48,7 +48,7 @@ TEST_CASE("MemoryPool: MemoryPool Default", "[memorypool]") {
 
     void* p3 = pool.allocate(1024);
     std::memset(p3, 0xB2, 1024);
-    REQUIRE(p3 != nullptr);
+    REQUIRE(p3);
     REQUIRE(p3 != p1);
     REQUIRE(p3 != p2);
     REQUIRE(pool.nBuckets() == 1);
@@ -58,7 +58,7 @@ TEST_CASE("MemoryPool: MemoryPool Default", "[memorypool]") {
 
     void* p4 = pool.allocate(1024);
     std::memset(p4, 0xB3, 1024);
-    REQUIRE(p4 != nullptr);
+    REQUIRE(p4);
     REQUIRE(p4 != p1);
     REQUIRE(p4 != p2);
     REQUIRE(p4 != p3);
@@ -72,7 +72,7 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Bucket", "[memorypool]") {
     ghoul::MemoryPool<2048> pool;
     void* p1 = pool.allocate(1024);
     std::memset(p1, 0xB0, 1024);
-    REQUIRE(p1 != nullptr);
+    REQUIRE(p1);
     REQUIRE(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies().size() == 1);
     REQUIRE(pool.occupancies()[0] == 1024);
@@ -80,7 +80,7 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Bucket", "[memorypool]") {
 
     void* p2 = pool.allocate(1024);
     std::memset(p2, 0xB1, 1024);
-    REQUIRE(p2 != nullptr);
+    REQUIRE(p2);
     REQUIRE(p2 != p1);
     REQUIRE(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies().size() == 1);
@@ -89,7 +89,7 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Bucket", "[memorypool]") {
 
     void* p3 = pool.allocate(1024);
     std::memset(p3, 0xB2, 1024);
-    REQUIRE(p3 != nullptr);
+    REQUIRE(p3);
     REQUIRE(p3 != p1);
     REQUIRE(p3 != p2);
     REQUIRE(pool.nBuckets() == 2);
@@ -100,7 +100,7 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Bucket", "[memorypool]") {
 
     void* p4 = pool.allocate(1024);
     std::memset(p4, 0xB3, 1024);
-    REQUIRE(p4 != nullptr);
+    REQUIRE(p4);
     REQUIRE(p4 != p1);
     REQUIRE(p4 != p2);
     REQUIRE(p4 != p3);
@@ -115,7 +115,7 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Bucket Pre-Alloc", "[memorypool]") {
     ghoul::MemoryPool<2048> pool(2);
     void* p1 = pool.allocate(1024);
     std::memset(p1, 0xB0, 1024);
-    REQUIRE(p1 != nullptr);
+    REQUIRE(p1);
     REQUIRE(pool.nBuckets() == 2);
     REQUIRE(pool.occupancies().size() == 2);
     REQUIRE(pool.occupancies()[0] == 1024);
@@ -124,7 +124,7 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Bucket Pre-Alloc", "[memorypool]") {
 
     void* p2 = pool.allocate(1024);
     std::memset(p2, 0xB1, 1024);
-    REQUIRE(p2 != nullptr);
+    REQUIRE(p2);
     REQUIRE(p2 != p1);
     REQUIRE(pool.nBuckets() == 2);
     REQUIRE(pool.occupancies().size() == 2);
@@ -134,7 +134,7 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Bucket Pre-Alloc", "[memorypool]") {
 
     void* p3 = pool.allocate(1024);
     std::memset(p3, 0xB2, 1024);
-    REQUIRE(p3 != nullptr);
+    REQUIRE(p3);
     REQUIRE(p3 != p1);
     REQUIRE(p3 != p2);
     REQUIRE(pool.nBuckets() == 2);
@@ -145,7 +145,7 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Bucket Pre-Alloc", "[memorypool]") {
 
     void* p4 = pool.allocate(1024);
     std::memset(p4, 0xB3, 1024);
-    REQUIRE(p4 != nullptr);
+    REQUIRE(p4);
     REQUIRE(p4 != p1);
     REQUIRE(p4 != p2);
     REQUIRE(p4 != p3);

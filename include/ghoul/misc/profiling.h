@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,6 +26,8 @@
 #ifndef __GHOUL___PROFILING___H__
 #define __GHOUL___PROFILING___H__
 
+#ifdef TRACY_ENABLE
+
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/opengl/ghoul_gl.h>
 
@@ -42,5 +44,18 @@
 #ifdef WIN32
 #pragma warning(pop)
 #endif // WIN32
+
+#else
+
+// Just a dump of defines to prevent needing to include the header files even if we don't
+// use Tracy
+#define FrameMarkStart(dummy)
+#define FrameMarkEnd(dummy)
+#define TracyGpuZone(dummy)
+#define ZoneName(dummy, dummy2)
+#define ZoneScoped
+#define ZoneScopedN(dummy)
+
+#endif // TRACY_ENABLE
 
 #endif // __GHOUL___PROFILING___H__

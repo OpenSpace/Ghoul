@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -54,11 +54,9 @@ CacheManager::CacheException::CacheException(std::string msg)
     : RuntimeError(std::move(msg), "Cache")
 {}
 
-CacheManager::MalformedCacheException::MalformedCacheException(std::string file,
-                                                               std::string msg)
+CacheManager::MalformedCacheException::MalformedCacheException(std::string file)
     : CacheException(fmt::format("Malformed cache at '{}'", file))
     , cacheFile(std::move(file))
-    , message(std::move(msg))
 {}
 
 CacheManager::ErrorLoadingCacheException::ErrorLoadingCacheException(std::string msg)

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -66,6 +66,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/ext/matrix_common.hpp>
 #include <glm/gtx/component_wise.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <string>
 
@@ -83,82 +84,13 @@ namespace ghoul {
 template <typename T>
 struct glm_components : public std::integral_constant<glm::length_t, 0> {};
 
-template <typename T, glm::precision P>
-struct glm_components<glm::tvec2<T, P>> : public std::integral_constant<
-    glm::length_t, 2
-> {};
+template <glm::length_t L, typename T, glm::qualifier Q>
+struct glm_components<glm::vec<L, T, Q>> :
+    public std::integral_constant<glm::length_t, L> {};
 
-template <typename T, glm::precision P>
-struct glm_components<glm::tvec3<T, P>> : public std::integral_constant<
-    glm::length_t, 3
-> {};
-
-template <typename T, glm::precision P>
-struct glm_components<glm::tvec4<T, P>> : public std::integral_constant<
-    glm::length_t, 4
-> {};
-
-
-template <typename T>
-struct glm_rows : public std::integral_constant<glm::length_t, 0> {};
-
-template <typename T, glm::precision P>
-struct glm_rows<glm::tmat2x2<T, P>> : public std::integral_constant<glm::length_t, 2> {};
-
-template <typename T, glm::precision P>
-struct glm_rows<glm::tmat2x3<T, P>> : public std::integral_constant<glm::length_t, 3> {};
-
-template <typename T, glm::precision P>
-struct glm_rows<glm::tmat2x4<T, P>> : public std::integral_constant<glm::length_t, 4> {};
-
-template <typename T, glm::precision P>
-struct glm_rows<glm::tmat3x2<T, P>> : public std::integral_constant<glm::length_t, 2> {};
-
-template <typename T, glm::precision P>
-struct glm_rows<glm::tmat3x3<T, P>> : public std::integral_constant<glm::length_t, 3> {};
-
-template <typename T, glm::precision P>
-struct glm_rows<glm::tmat3x4<T, P>> : public std::integral_constant<glm::length_t, 4> {};
-
-template <typename T, glm::precision P>
-struct glm_rows<glm::tmat4x2<T, P>> : public std::integral_constant<glm::length_t, 2> {};
-
-template <typename T, glm::precision P>
-struct glm_rows<glm::tmat4x3<T, P>> : public std::integral_constant<glm::length_t, 3> {};
-
-template <typename T, glm::precision P>
-struct glm_rows<glm::tmat4x4<T, P>> : public std::integral_constant<glm::length_t, 4> {};
-
-
-template <typename T>
-struct glm_cols : public std::integral_constant<std::size_t, 0> {};
-
-template <typename T, glm::precision P>
-struct glm_cols<glm::tmat2x2<T, P>> : public std::integral_constant<glm::length_t, 2> {};
-
-template <typename T, glm::precision P>
-struct glm_cols<glm::tmat2x3<T, P>> : public std::integral_constant<glm::length_t, 2> {};
-
-template <typename T, glm::precision P>
-struct glm_cols<glm::tmat2x4<T, P>> : public std::integral_constant<glm::length_t, 2> {};
-
-template <typename T, glm::precision P>
-struct glm_cols<glm::tmat3x2<T, P>> : public std::integral_constant<glm::length_t, 3> {};
-
-template <typename T, glm::precision P>
-struct glm_cols<glm::tmat3x3<T, P>> : public std::integral_constant<glm::length_t, 3> {};
-
-template <typename T, glm::precision P>
-struct glm_cols<glm::tmat3x4<T, P>> : public std::integral_constant<glm::length_t, 3> {};
-
-template <typename T, glm::precision P>
-struct glm_cols<glm::tmat4x2<T, P>> : public std::integral_constant<glm::length_t, 4> {};
-
-template <typename T, glm::precision P>
-struct glm_cols<glm::tmat4x3<T, P>> : public std::integral_constant<glm::length_t, 4> {};
-
-template <typename T, glm::precision P>
-struct glm_cols<glm::tmat4x4<T, P>> : public std::integral_constant<glm::length_t, 4> {};
+template <glm::length_t C, glm::length_t R, typename T, glm::qualifier Q>
+struct glm_components<glm::mat<C, R, T, Q>> :
+    public std::integral_constant<glm::length_t, C * R> {};
 
 inline std::string to_string(const glm::bvec2& _Val) {
     return "{" + std::to_string(_Val.x) + "," + std::to_string(_Val.y) + "}";

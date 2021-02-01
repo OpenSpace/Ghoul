@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,6 +26,7 @@
 #include <ghoul/opengl/shaderpreprocessor.h>
 
 #include <ghoul/fmt.h>
+#include <ghoul/glm.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/log.h>
 #include <ghoul/misc/dictionary.h>
@@ -73,7 +74,6 @@ namespace {
         glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
         glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
         glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profileMask);
-        std::stringstream ss;
 
         const ContextProfileMask cpm = ContextProfileMask(profileMask);
         const bool isCore = cpm == ContextProfileMask::GL_CONTEXT_CORE_PROFILE_BIT;
@@ -291,15 +291,13 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
     const size_t fileIdentifier = _includedFiles.at(filename).fileIdentifier;
 
     std::string includeSeparator;
+#ifndef __APPLE__
     // Sofar, only Nvidia on Windows supports empty statements in the middle of the shader
     using Vendor = ghoul::systemcapabilities::OpenGLCapabilitiesComponent::Vendor;
     if (OpenGLCap.gpuVendor() == Vendor::Nvidia) {
         includeSeparator = "; // preprocessor add semicolon to isolate error messages";
     }
-#ifdef __APPLE__
-    // The Apple OpenGL compiler doesn't like empty semicolor statements
-    includeSeparator = "";
-#endif
+#endif // __APPLE__
 
     env.output << includeSeparator << std::endl
                << "#line " << env.inputs.back().lineNumber << " " << fileIdentifier
@@ -426,17 +424,8 @@ std::string ShaderPreprocessor::substitute(const std::string& in,
     else if (_dictionary.hasValue<std::string>(resolved)) {
         return _dictionary.value<std::string>(resolved);
     }
-    else if (_dictionary.hasValue<const char*>(resolved)) {
-        return _dictionary.value<const char*>(resolved);
-    }
-    else if (_dictionary.hasValue<char*>(resolved)) {
-        return _dictionary.value<char*>(resolved);
-    }
-    else if (_dictionary.hasValue<long long>(resolved)) {
-        return std::to_string(_dictionary.value<long long>(resolved));
-    }
-    else if (_dictionary.hasValue<unsigned long long>(resolved)) {
-        return std::to_string(_dictionary.value<unsigned long long>(resolved));
+    else if (_dictionary.hasValue<int>(resolved)) {
+        return std::to_string(_dictionary.value<int>(resolved));
     }
     else if (_dictionary.hasValue<double>(resolved)) {
         return std::to_string(_dictionary.value<double>(resolved));
@@ -448,14 +437,6 @@ std::string ShaderPreprocessor::substitute(const std::string& in,
     else if (_dictionary.hasValue<glm::ivec3>(resolved)) {
         glm::ivec3 vec = _dictionary.value<glm::ivec3>(resolved);
         return fmt::format("ivec3({},{},{})", vec.x, vec.y, vec.z);
-    }
-    else if (_dictionary.hasValue<glm::uvec2>(resolved)) {
-        glm::uvec2 vec = _dictionary.value<glm::uvec2>(resolved);
-        return fmt::format("uvec2({},{})", vec.x, vec.y);
-    }
-    else if (_dictionary.hasValue<glm::uvec3>(resolved)) {
-        glm::uvec3 vec = _dictionary.value<glm::uvec3>(resolved);
-        return fmt::format("uvec3({},{},{})", vec.x, vec.y, vec.z);
     }
     else if (_dictionary.hasValue<glm::dvec2>(resolved)) {
         glm::dvec2 vec = _dictionary.value<glm::dvec2>(resolved);
@@ -746,14 +727,14 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     // Fetch the dictionary to iterate over.
     Dictionary innerDictionary = _dictionary.value<Dictionary>(dictionaryRef);
 
-    std::vector<std::string> keys = innerDictionary.keys();
+    std::vector<std::string_view> keys = innerDictionary.keys();
     ShaderPreprocessor::Input& input = env.inputs.back();
     int keyIndex;
 
     std::map<std::string, std::string> table;
     if (!keys.empty()) {
-        table[keyName] = "\"" + keys[0] + "\"";
-        table[valueName] = dictionaryRef + "." + keys[0];
+        table[keyName] = "\"" + std::string(keys[0]) + "\"";
+        table[valueName] = dictionaryRef + "." + std::string(keys[0]);
         keyIndex = 0;
 
         env.output << "//# For loop over " << dictionaryRef << std::endl;
@@ -815,13 +796,15 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
 
     // Fetch the dictionary to iterate over
     Dictionary innerDict = _dictionary.value<Dictionary>(forStmnt.dictionaryReference);
-    std::vector<std::string> keys = innerDict.keys();
+    std::vector<std::string_view> keys = innerDict.keys();
 
     std::map<std::string, std::string> table;
     if (forStmnt.keyIndex < static_cast<int>(keys.size())) {
-        std::string key = keys[forStmnt.keyIndex];
-        table[forStmnt.keyName] = "\"" + key + "\"";
-        table[forStmnt.valueName] = forStmnt.dictionaryReference + "." + key;
+        std::string_view key = keys[forStmnt.keyIndex];
+        table[forStmnt.keyName] = fmt::format("\"{}\"", key);
+        table[forStmnt.valueName] = fmt::format(
+            "{}.{}", forStmnt.dictionaryReference, key
+        );
         pushScope(table, env);
         env.output <<
             fmt::format("//# Key {} in {}\n", key, forStmnt.dictionaryReference);

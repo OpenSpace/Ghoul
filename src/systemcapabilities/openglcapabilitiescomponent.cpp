@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -125,7 +125,7 @@ void OpenGLCapabilitiesComponent::detectExtensions() {
 }
 
 void OpenGLCapabilitiesComponent::detectDriverInformation() {
-#ifdef GHOUL_USE_WMI
+#ifdef WIN32
     queryWMI("Win32_VideoController", "DriverVersion", _driverVersion);
 
     std::string date;
@@ -155,7 +155,7 @@ void OpenGLCapabilitiesComponent::clearCapabilities() {
     _maxTextureSize3D = -1;
     _nTextureUnits = -1;
 
-#ifdef GHOUL_USE_WMI
+#ifdef WIN32
     _driverVersion.clear();
     _driverDate.clear();
     _adapterRAM = 0;
@@ -179,7 +179,7 @@ OpenGLCapabilitiesComponent::capabilities() const
         "GLEW Version",
         ghoul::to_string(_glewVersion),Verbosity::Minimal
     });
-#ifdef GHOUL_USE_WMI
+#ifdef WIN32
     result.push_back({ "GPU Name", _adapterName, Verbosity::Minimal });
     result.push_back({ "GPU Driver Version", _driverVersion, Verbosity::Minimal });
     result.push_back({ "GPU Driver Date", _driverDate, Verbosity::Minimal });

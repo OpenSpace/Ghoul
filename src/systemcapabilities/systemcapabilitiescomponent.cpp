@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -33,7 +33,7 @@
 
 namespace ghoul::systemcapabilities {
 
-#ifdef GHOUL_USE_WMI
+#ifdef WIN32
 IWbemLocator* SystemCapabilitiesComponent::_iwbemLocator = nullptr;
 IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
 
@@ -42,27 +42,27 @@ SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, HRESULT code)
     , message(std::move(msg))
     , errorCode(std::move(code))
 {}
-#endif
+#endif // WIN32
 
 SystemCapabilitiesComponent::SystemCapabilitiesComponent(
                                              [[maybe_unused]] InitializeWMI initializeWMI)
 {
-#ifdef GHOUL_USE_WMI
+#ifdef WIN32
     if (initializeWMI && !isWMIInitialized()) {
         SystemCapabilitiesComponent::initializeWMI();
     }
-#endif
+#endif // WIN32
 }
 
 SystemCapabilitiesComponent::~SystemCapabilitiesComponent() {
-#ifdef GHOUL_USE_WMI
+#ifdef WIN32
     if (isWMIInitialized()) {
         deinitializeWMI();
     }
-#endif
+#endif // WIN32
 }
 
-#ifdef GHOUL_USE_WMI
+#ifdef WIN32
 void SystemCapabilitiesComponent::initializeWMI() {
     constexpr const char* _loggerCat = "SystemCapabilitiesComponent.WMI";
 
@@ -139,10 +139,9 @@ void SystemCapabilitiesComponent::initializeWMI() {
 }
 
 void SystemCapabilitiesComponent::deinitializeWMI() {
-    constexpr const char* _loggerCat = "SystemCapabilitiesComponent.WMI";
     ghoul_assert(isWMIInitialized(), "WMI must have been initialized");
 
-    LDEBUG("Deinitializing WMI.");
+    LDEBUGC("SystemCapabilitiesComponent.WMI", "Deinitializing WMI");
     if (_iwbemLocator) {
         _iwbemLocator->Release();
     }
@@ -283,6 +282,6 @@ void SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
     VariantClear(variant);
 }
 
-#endif
+#endif // WIN32
 
 } // namespace ghoul::systemcapabilities

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,6 +26,14 @@
 #include <ghoul/misc/profiling.h>
 #include <algorithm>
 #include <numeric>
+
+#if defined(__APPLE__) || (defined(__linux__) && defined(__clang__))
+#include <experimental/memory_resource>
+namespace pmr = std::experimental::pmr;
+#else
+#include <memory_resource>
+namespace pmr = std::pmr;
+#endif
 
 namespace {
     constexpr const int DebugByte = 0x0F;
@@ -103,7 +111,7 @@ void* MemoryPool<BucketSize, InjectDebugMemory>::do_allocate(std::size_t bytes,
                                                              std::size_t alignment)
 {
     ZoneScoped
-        
+
     ghoul_assert(
         bytes <= BucketSize,
         "Cannot allocate larger memory blocks than available in a bucket"
@@ -143,7 +151,6 @@ void* MemoryPool<BucketSize, InjectDebugMemory>::do_allocate(std::size_t bytes,
     if (InjectDebugMemory) {
         std::memset(ptr, DebugByte, bytes);
     }
-    
     // Handle unaligned memory by padding to the next alignment boundary
     const size_t align = alignment - (bytes % alignment);
     if (align != alignment) {
@@ -168,7 +175,7 @@ void MemoryPool<BucketSize, InjectDebugMemory>::do_deallocate(void* p, std::size
                                                               std::size_t /*alignment*/)
 {
     ZoneScoped
-        
+
     for (const std::unique_ptr<Bucket>& b : _buckets) {
         const std::array<std::byte, BucketSize>& bp = b->payload;
         if (p >= bp.data() && p < (bp.data() + BucketSize)) {
@@ -186,7 +193,7 @@ void MemoryPool<BucketSize, InjectDebugMemory>::do_deallocate(void* p, std::size
 
 template <int BucketSize, bool InjectDebugMemory>
 bool MemoryPool<BucketSize, InjectDebugMemory>::do_is_equal(
-                                    const std::pmr::memory_resource& other) const noexcept
+                                    const pmr::memory_resource& other) const noexcept
 {
     return this == &other;
 }
@@ -239,6 +246,7 @@ template <typename T, int BucketSizeItems, bool InjectDebugMemory>
 std::vector<void*>
 ReusableTypedMemoryPool<T, BucketSizeItems, InjectDebugMemory>::allocate(int n)
 {
+    ghoul_assert(n >= 0, "Need to allocate positive size");
     // Hackish implementation to support larger allocations than number of items in a
     // bucket; probably not likely to happen
     if (n > BucketSizeItems) {
@@ -255,7 +263,7 @@ ReusableTypedMemoryPool<T, BucketSizeItems, InjectDebugMemory>::allocate(int n)
     }
 
     // First check if there are items in the free list, if so, return those
-    if (_freeList.size() >= n) {
+    if (_freeList.size() >= static_cast<size_t>(n)) {
         std::vector<void*> res(n);
         size_t startIndex = _freeList.size() - n;
         for (int i = 0; i < n; ++i) {

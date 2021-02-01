@@ -1,8 +1,9 @@
 ##########################################################################################
 #                                                                                        #
 # GHOUL                                                                                  #
+# General Helpful Open Utility Library                                                   #
 #                                                                                        #
-# Copyright (c) 2012-2020                                                                #
+# Copyright (c) 2012-2021                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -24,7 +25,7 @@
 
 function (ghl_copy_files target)
   # Add the copy command
-  foreach(file_i ${ARGN})
+  foreach (file_i ${ARGN})
     add_custom_command(TARGET ${target} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${file_i}"

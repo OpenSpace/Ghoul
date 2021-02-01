@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -194,7 +194,7 @@ namespace {
         }
 
         std::string_view res = view.substr(0, p);
-        view = view.substr(p + 2);
+        view = view.substr(p + 1);
         return res;
     }
 
@@ -385,7 +385,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         float outlineS;
         float outlineT;
     };
-    
+
     _vertexBuffer.clear();
     _indexBuffer.clear();
 
@@ -401,6 +401,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             wchar_t character = line[j];
             if (character == wchar_t('\t')) {
                 character = wchar_t(' ');
+            }
+            if (character == wchar_t('\0')) {
+                continue;
             }
 
             const Font::Glyph* glyph;
@@ -579,10 +582,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             float outlineS1 = glyph->outlineBottomRight.x;
             float outlineT1 = glyph->outlineBottomRight.y;
 
-            glm::vec3 p0 = glm::vec3(0.0);
-            glm::vec3 p1 = glm::vec3(0.0);
-            glm::vec3 p2 = glm::vec3(0.0);
-            glm::vec3 p3 = glm::vec3(0.0);
+            glm::vec3 p0;
+            glm::vec3 p1;
+            glm::vec3 p2;
+            glm::vec3 p3;
 
             if (labelInfo.renderType == 0) {
                 p0 = (x0 * labelInfo.orthoRight + y0 * labelInfo.orthoUp) *

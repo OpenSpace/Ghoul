@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -36,7 +36,7 @@ namespace ghoul {
 
 namespace {
     std::string formatValue(const Dictionary& dictionary, const std::string& key,
-                            PrettyPrint prettyPrint, std::string indentation,
+                            PrettyPrint prettyPrint, const std::string& indentation,
                             int indentationSteps);
 
     std::string formatDouble(double d) {
@@ -50,9 +50,9 @@ namespace {
     }
 
     std::string format(const Dictionary& d, PrettyPrint prettyPrint,
-                       std::string indentation, int indentationSteps)
+                       const std::string& indentation, int indentationSteps)
     {
-        if (d.empty()) {
+        if (d.isEmpty()) {
             return "{}";
         }
 
@@ -70,13 +70,16 @@ namespace {
                 formatValue(d, key, prettyPrint, indentation, indentationSteps + 1);
         };
 
-        std::vector<std::string> keys = d.keys();
+        std::vector<std::string> keys;
+        for (std::string_view k : d.keys()) {
+            keys.push_back(std::string(k));
+        }
 
         std::string lua = std::accumulate(
             std::next(keys.begin()),
             keys.end(),
             convert(*keys.begin()),
-            [&](std::string a, std::string key) {
+            [&](const std::string& a, const std::string& key) {
                 return a + "," + (prettyPrint ? "\n" : "") + indent + convert(key);
             }
         );
@@ -86,7 +89,7 @@ namespace {
     }
 
     std::string formatValue(const Dictionary& dictionary, const std::string& key,
-                            PrettyPrint prettyPrint, std::string indentation,
+                            PrettyPrint prettyPrint, const std::string& indentation,
                             int indentationSteps)
     {
         if (dictionary.hasValue<Dictionary>(key)) {
@@ -176,7 +179,7 @@ LuaFormattingError::LuaFormattingError(const std::string& msg)
 {}
 
 std::string formatLua(const Dictionary& dictionary, PrettyPrint prettyPrint,
-                      std::string indentation)
+                      const std::string& indentation)
 {
     return format(dictionary, prettyPrint, indentation, 0);
 }

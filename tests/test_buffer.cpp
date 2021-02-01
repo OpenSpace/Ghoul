@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -69,7 +69,7 @@ TEST_CASE("Buffer: MixedTypes", "[buffer]") {
 
     REQUIRE(s1 == s2);
     REQUIRE(i1 == i2);
-    REQUIRE(d1 == d2);
+    REQUIRE(std::equal_to<>()(d1, d2));
     REQUIRE(u1 == u2);
 }
 
@@ -100,7 +100,7 @@ TEST_CASE("Buffer: Copy", "[buffer]") {
 
     REQUIRE(s1 == s2);
     REQUIRE(i1 == i2);
-    REQUIRE(d1 == d2);
+    REQUIRE(std::equal_to<>()(d1, d2));
     REQUIRE(u1 == u2);
 }
 
@@ -131,7 +131,7 @@ TEST_CASE("Buffer: Move", "[buffer]") {
 
     REQUIRE(s1 == s2);
     REQUIRE(i1 == i2);
-    REQUIRE(d1 == d2);
+    REQUIRE(std::equal_to<>()(d1, d2));
     REQUIRE(u1 == u2);
 }
 
@@ -162,7 +162,7 @@ TEST_CASE("Buffer: Store", "[buffer]") {
 
     REQUIRE(s1 == s2);
     REQUIRE(i1 == i2);
-    REQUIRE(d1 == d2);
+    REQUIRE(std::equal_to<>()(d1, d2));
     REQUIRE(u1 == u2);
 }
 
@@ -193,7 +193,7 @@ TEST_CASE("Buffer: Store Compress", "[buffer]") {
 
     REQUIRE(s1 == s2);
     REQUIRE(i1 == i2);
-    REQUIRE(d1 == d2);
+    REQUIRE(std::equal_to<>()(d1, d2));
     REQUIRE(u1 == u2);
 }
 
@@ -220,7 +220,7 @@ TEST_CASE("Buffer: Capacity", "[buffer]") {
 
     REQUIRE(s1 == s2);
     REQUIRE(i1 == i2);
-    REQUIRE(d1 == d2);
+    REQUIRE(std::equal_to<>()(d1, d2));
     REQUIRE(u1 == u2);
 }
 

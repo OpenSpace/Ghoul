@@ -1,3 +1,9 @@
-unreadVariable
-noExplicitConstructor
-missingInclude
+// unreadVariable
+// noExplicitConstructor
+// missingInclude
+unusedFunction
+useStlAlgorithm
+
+ConfigurationNotChecked:src/opengl/textureatlas.cpp:116
+unreadVariable:src/systemcapabilities/systemcapabilitiescomponent.cpp:67
+unreadVariable:tests/test_memorypool.cpp:185

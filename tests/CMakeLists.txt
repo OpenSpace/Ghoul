@@ -1,8 +1,9 @@
 ##########################################################################################
 #                                                                                        #
 # GHOUL                                                                                  #
+# General Helpful Open Utility Library                                                   #
 #                                                                                        #
-# Copyright (c) 2012-2020                                                                #
+# Copyright (c) 2012-2021                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -23,20 +24,20 @@
 ##########################################################################################
 
 add_executable(
-GhoulTest
-${GHOUL_ROOT_DIR}/tests/main.cpp
-${GHOUL_ROOT_DIR}/tests/test_buffer.cpp
-${GHOUL_ROOT_DIR}/tests/test_commandlineparser.cpp
-${GHOUL_ROOT_DIR}/tests/test_crc32.cpp
-${GHOUL_ROOT_DIR}/tests/test_csvreader.cpp
-${GHOUL_ROOT_DIR}/tests/test_dictionary.cpp
-${GHOUL_ROOT_DIR}/tests/test_dictionaryjsonformatter.cpp
-${GHOUL_ROOT_DIR}/tests/test_dictionaryluaformatter.cpp
-${GHOUL_ROOT_DIR}/tests/test_filesystem.cpp
-${GHOUL_ROOT_DIR}/tests/test_luatodictionary.cpp
-${GHOUL_ROOT_DIR}/tests/test_memorypool.cpp
-${GHOUL_ROOT_DIR}/tests/test_templatefactory.cpp
-${GHOUL_ROOT_DIR}/tests/test_threadpool.cpp
+  GhoulTest
+  ${GHOUL_ROOT_DIR}/tests/main.cpp
+  ${GHOUL_ROOT_DIR}/tests/test_buffer.cpp
+  ${GHOUL_ROOT_DIR}/tests/test_commandlineparser.cpp
+  ${GHOUL_ROOT_DIR}/tests/test_crc32.cpp
+  ${GHOUL_ROOT_DIR}/tests/test_csvreader.cpp
+  ${GHOUL_ROOT_DIR}/tests/test_dictionary.cpp
+  ${GHOUL_ROOT_DIR}/tests/test_dictionaryjsonformatter.cpp
+  ${GHOUL_ROOT_DIR}/tests/test_dictionaryluaformatter.cpp
+  ${GHOUL_ROOT_DIR}/tests/test_filesystem.cpp
+  ${GHOUL_ROOT_DIR}/tests/test_luatodictionary.cpp
+  ${GHOUL_ROOT_DIR}/tests/test_memorypool.cpp
+  ${GHOUL_ROOT_DIR}/tests/test_templatefactory.cpp
+  ${GHOUL_ROOT_DIR}/tests/test_threadpool.cpp
 )
 
 target_compile_definitions(GhoulTest PRIVATE
@@ -49,17 +50,16 @@ target_compile_definitions(GhoulTest PRIVATE
 set_ghoul_compile_settings(GhoulTest)
 
 if (MSVC)
-target_compile_options(GhoulTest PRIVATE "-Od" "/bigobj")
+  target_compile_options(GhoulTest PRIVATE "-Od" "/bigobj")
 else ()
-target_compile_options(GhoulTest PRIVATE "-O0" )
+  target_compile_options(GhoulTest PRIVATE "-O0" )
 endif ()
 
 target_include_directories(GhoulTest PRIVATE "${GHOUL_ROOT_DIR}/ext/catch2/single_include")
-
 target_link_libraries(GhoulTest PRIVATE Ghoul)
 
 ghl_copy_shared_libraries(GhoulTest ${GHOUL_ROOT_DIR})
 
 if (APPLE)
-target_link_libraries(GhoulTest PRIVATE ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY} ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})
+  target_link_libraries(GhoulTest PRIVATE ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY} ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})
 endif ()

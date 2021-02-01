@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -304,6 +304,11 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
 
     int location = luaAbsoluteLocation(state, relativeLocation);
 
+    const int size = lua_gettop(state);
+    if (size == 0) {
+        throw LuaFormatException("Tried to load Dictionary from empty state");
+    }
+
     lua_pushnil(state);
     while (lua_next(state, location) != 0) {
         // get the key
@@ -445,13 +450,13 @@ void runScriptFile(lua_State* state, const std::string& filename) {
     int status = luaL_loadfile(state, filename.c_str());
     if (status != LUA_OK) {
         std::string error = lua_tostring(state, -1);
-        throw LuaLoadingException(std::move(error));
+        throw LuaLoadingException(error);
     }
 
     status = lua_pcall(state, 0, LUA_MULTRET, 0);
     if (status != LUA_OK) {
         std::string error = lua_tostring(state, -1);
-        throw LuaExecutionException(std::move(error));
+        throw LuaExecutionException(error);
     }
 }
 
@@ -467,7 +472,8 @@ void runScript(lua_State* state, const std::string& script) {
 
     const int callStatus = lua_pcall(state, 0, LUA_MULTRET, 0);
     if (callStatus != LUA_OK) {
-        throw LuaExecutionException(lua_tostring(state, -1));
+        std::string error = lua_tostring(state, -1);
+        throw LuaExecutionException(error);
     }
 }
 

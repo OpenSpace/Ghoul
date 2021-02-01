@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -65,10 +65,9 @@ public:
 
     /// Exception that gets thrown if the cache has a malformed information file
     struct MalformedCacheException : public CacheException {
-        explicit MalformedCacheException(std::string file, std::string msg = "");
+        explicit MalformedCacheException(std::string file);
 
         const std::string cacheFile;
-        const std::string message;
     };
 
     /// Exception that gets thrown if there was an error loading the previous cache files

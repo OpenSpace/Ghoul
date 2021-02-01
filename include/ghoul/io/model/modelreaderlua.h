@@ -23,65 +23,52 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___TEXTUREREADERSOIL___H__
-#define __GHOUL___TEXTUREREADERSOIL___H__
+#ifndef __GHOUL___MODELREADERLUA___H__
+#define __GHOUL___MODELREADERLUA___H__
 
-#include <ghoul/io/texture/texturereaderbase.h>
-
-#include <memory>
+#include <ghoul/io/model/modelreaderbase.h>
 
 namespace ghoul::io {
 
-#ifdef GHOUL_USE_SOIL
-
 /**
- * Loads the texture using the SOIL library. For a list of supported image formats, see
- * http://www.lonesock.net/soil.html
+ * This model reader reads a model that is specified as a Lua table. The Lua file must
+ * return a single top-level table specifying <code>Vertices</code>, <code>Indices</code>,
+ * <code>VertexAttribPointers</code>, and the <code>Mode</code>. The <code>Vertices</code>
+ * and <code>Indices</code> must be flat table whereas the
+ * <code>VertexAttribPointers</code> dictionary must contain tables with the
+ * <code>Position</code>, <code>Size</code>, <code>Stride</code>, <code>Offset</code>, and
+ * <code>Normalized</code> arguments found in OpenGL's <code>VertexAttribPointer</code>
+ * method. The default values for the <code>VertexAttribPointer</code> are:
+ * <code>Position = 0</code>, <code>Size = 0</code>, <code>Stride = 0</code>,
+ * <code>Offset = 0</code>, and <code>Normalized = false</code>.
+ * The value for the <code>type</code> is always <code>GL_FLOAT</code>.<br>
+ * The allowed values for the <code>Mode</code> are the strings:
+ * <code>GL_LINES</code>, <code>GL_POINTS</code>, <code>GL_LINE_STRIP</code>,
+ * <code>GL_LINE_LOOP</code>, <code>GL_LINES</code>, <code>GL_LINE_STRIP_ADJACENCY</code>,
+ * <code>GL_LINES_ADJACENCY</code>, <code>GL_TRIANGLE_STRIP</code>,
+ * <code>GL_TRIANGLE_FAN</code>, <code>GL_TRIANGLES</code>,
+ * <code>GL_TRIANGLE_STRIP_ADJACENCY</code>, <code>GL_TRIANGLES_ADJACENCY</code>, or
+ * <code>GL_PATCHES</code>.
+ *
+ * \sa https://www.opengl.org/sdk/docs/man/html/glVertexAttribPointer.xhtml
  */
-class TextureReaderSOIL : public TextureReaderBase {
+class ModelReaderLua : public ModelReaderBase {
 public:
     /**
-     * Loads the texture \p filename using the SOIL library from disk and returns the
-     * loaded Texture.
+     * Loads the model described as a Lua table and returns the initialized
+     * VertexBufferObject.
      *
-     * \param filename The texture that should be loaded from the hard disk
-     * \return The loaded Texture object
+     * \param filename The Lua file that is to be read. The file must return a single Lua
+     *        table
+     * \return The initialized VertexBufferObject of the specified model
      *
-     * \throw TextureLoadException If there was an error loading the texture
+     * \throw ModelReaderException If there was an exception loading the model
      * \pre \p filename must not be empty
-     * \pre The extension of \p filename must be among the supported extensions as
-     *      reported by supportedExtensions
-    */
-    std::unique_ptr<opengl::Texture> loadTexture(
+     */
+    virtual std::unique_ptr<opengl::VertexBufferObject> loadModel(
         const std::string& filename) const override;
-
-
-    /**
-     * Loads a Texture from the memory pointed at by \p memory using the SOIL library.
-     * The memory block must contain at least \p size number of bytes.
-     *
-     * \param memory The memory that contains the bytes of the Texture to be loaded
-     * \param size The number of bytes contained in \p memory
-     *
-     * \throw TextureLoadException If there was an error reading the \p memory
-     * \pre \p memory must not be <code>nullptr</code>
-     * \pre \p size must be > 0
-     */
-    std::unique_ptr<opengl::Texture> loadTexture(void* memory,
-                                                 size_t size) const override;
-
-    /**
-     * Returns the supported extensions.
-     *
-     * \return The supported extensions
-     *
-     * \sa http://lonesock.net/soil.html
-     */
-    std::vector<std::string> supportedExtensions() const override;
 };
-
-#endif // GHOUL_USE_SOIL
 
 } // namespace ghoul::io
 
-#endif // __GHOUL___TEXTUREREADERSOIL___H__
+#endif // __GHOUL___MODELREADERLUA___H__

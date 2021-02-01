@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -23,6 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#if 0
 #include "catch2/catch.hpp"
 
 #include <ghoul/misc/dictionaryjsonformatter.h>
@@ -137,3 +138,5 @@ TEST_CASE("DictionaryJsonFormatter: Nested Dictionary", "[dictionaryjsonformatte
         "\"vec4\":[0,0,0,0]}"
     );
 }
+
+#endif

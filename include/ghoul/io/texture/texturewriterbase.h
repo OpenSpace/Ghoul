@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -49,7 +49,7 @@ public:
         const std::string filename;
 
         /// The error message that occurred
-        const std::string message;
+        const std::string errorMessage;
 
         /// The TextureWriterBase that caused the exception
         const TextureWriterBase& writer;

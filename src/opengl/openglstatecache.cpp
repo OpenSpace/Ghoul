@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -28,10 +28,6 @@
 #include <ghoul/fmt.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
-
-namespace {
-    constexpr const char* _loggerCat = "OpenGLStateCache";
-} // namespace
 
 namespace ghoul::opengl {
 
@@ -70,7 +66,7 @@ void OpenGLStateCache::loadCurrentGLState() {
     // Depth
     glGetFloatv(GL_DEPTH_CLEAR_VALUE, &_depth.clearValue);
     _depth.testEnabled = glIsEnabled(GL_DEPTH_TEST);
-    _depth.maskEnabled = glIsEnabled(GL_DEPTH_WRITEMASK);
+    glGetBooleanv(GL_DEPTH_WRITEMASK, &_depth.maskEnabled);
     glGetIntegerv(GL_DEPTH_FUNC, &_depth.function);
 
     // Blending
@@ -150,10 +146,10 @@ void OpenGLStateCache::resetDepthState() const {
     }
 
     if (_depth.maskEnabled) {
-        glDepthMask(false);
+        glDepthMask(GL_TRUE);
     }
     else {
-        glDepthMask(true);
+        glDepthMask(GL_FALSE);
     }
 
     glClearDepth(_depth.clearValue);
@@ -202,8 +198,10 @@ void OpenGLStateCache::resetColorState() const {
 void OpenGLStateCache::setColorState(const GLfloat color[4], GLboolean clampColor)  {
     ghoul_assert(color != nullptr, "color must not be nullptr");
 
-    if (color[0] != _colorClearValue[0] || color[1] != _colorClearValue[1] ||
-        color[2] != _colorClearValue[2] || color[3] != _colorClearValue[3])
+    if (!std::equal_to<>()(color[0], _colorClearValue[0]) ||
+        !std::equal_to<>()(color[1], _colorClearValue[1]) ||
+        !std::equal_to<>()(color[2], _colorClearValue[2]) ||
+        !std::equal_to<>()(color[3], _colorClearValue[3]))
     {
         _colorClearValue[0] = color[0];
         _colorClearValue[1] = color[1];
@@ -213,7 +211,11 @@ void OpenGLStateCache::setColorState(const GLfloat color[4], GLboolean clampColo
 
     if (clampColor != _clampColorEnabled) {
         _clampColorEnabled = clampColor;
-        glClampColor(GL_CLAMP_READ_COLOR, GL_FALSE);
+        // glClampColor is weird as it requires a GLenum in the function definition, but
+        // the OpenGL standard says that it only accepts GL_FALSE and GL_TRUE, which are
+        // of type GLboolean *eye rolling*
+        // GLenum(0) == GLboolen(0) == GL_FALSE
+        glClampColor(GL_CLAMP_READ_COLOR, GLenum(0));
     }
 
     glClearColor(
@@ -226,6 +228,17 @@ void OpenGLStateCache::setColorState(const GLfloat color[4], GLboolean clampColo
 
 void OpenGLStateCache::resetViewportState() const {
     glViewport(_viewport[0], _viewport[1], _viewport[2], _viewport[3]);
+}
+
+void OpenGLStateCache::setDefaultFramebuffer(const GLuint defaultFB) {
+    ghoul_assert(
+        defaultFB < std::numeric_limits<GLuint>::max(), 
+        "The default Framebuffer must be a valid number"
+    );
+
+    if (_defaultFramebuffer != defaultFB) {
+        _defaultFramebuffer = defaultFB;
+    }
 }
 
 void OpenGLStateCache::setViewportState(const GLint viewportCoords[4])  {

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -49,7 +49,7 @@ BooleanType(PrettyPrint);
     * \throw LuaFormattingError If the \p key points to a type that cannot be converted
     */
 std::string formatLua(const Dictionary& dictionary,
-    PrettyPrint prettyPrint = PrettyPrint::No, std::string indentation = "    ");
+    PrettyPrint prettyPrint = PrettyPrint::No, const std::string& indentation = "    ");
 
 }  // namespace ghoul
 

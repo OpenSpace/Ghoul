@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -44,6 +44,15 @@ TextureReader::MissingReaderException::MissingReaderException(std::string extens
     , file(std::move(f))
 {}
 
+TextureReader::InvalidLoadException::InvalidLoadException(void* memory, size_t size)
+    : RuntimeError(fmt::format("Error loading texture at location {} with size {}",
+        memory,
+        size
+    ), "IO")
+    , _memory(memory)
+    , _size(size)
+{}
+
 TextureReader& TextureReader::ref() {
     static TextureReader textureReader;
     return textureReader;
@@ -77,7 +86,7 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t
         return reader->loadTexture(memory, size);
     }
     else {
-        throw MissingReaderException(format, "Memory");
+        throw InvalidLoadException(memory, size);
     }
 }
 

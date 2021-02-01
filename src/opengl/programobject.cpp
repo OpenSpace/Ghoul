@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -419,7 +419,7 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                                     const std::string& geometryShaderPath,
                                       const std::string& tessellationEvaluationShaderPath,
                                          const std::string& tessellationControlShaderPath,
-                                                    Dictionary dictionary)
+                                                                    Dictionary dictionary)
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");
     ghoul_assert(

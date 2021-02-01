@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,6 +25,7 @@
 
 #include <ghoul/io/socket/tcpsocketserver.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/io/socket/tcpsocket.h>
 #include <cstring>
 
@@ -173,13 +174,15 @@ void TcpSocketServer::listen(int port) {
     // Setup the TCP listening socket
     iResult = bind(_serverSocket, result->ai_addr, static_cast<int>(result->ai_addrlen));
     if (iResult == SOCKET_ERROR) {
+        std::string error = std::to_string(_ERRNO);
+
         freeaddrinfo(result);
         closeSocket(_serverSocket);
 #ifdef WIN32
         WSACleanup();
 #endif // WIN32
         throw TcpSocket::TcpSocketError(
-            "Bind failed with error: " + std::to_string(_ERRNO)
+            fmt::format("Bind failed (returned '{}') with error: ", iResult, error)
         );
     }
 

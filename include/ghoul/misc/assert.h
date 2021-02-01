@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -58,7 +58,7 @@ struct MissingCaseException : public std::logic_error {
 // This tells the clang static analyzer that internal_assert is just like assert itself
 void internal_assert(std::string expression, std::string message, std::string file,
     std::string function, int line);
-#elif WIN32
+#elif defined(WIN32)
 // This tells Visual studio that internal_assert is just like assert itself
 __declspec(noreturn) void internal_assert(std::string expression, std::string message,
     std::string file, std::string function, int line);

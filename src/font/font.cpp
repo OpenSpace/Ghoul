@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,6 +26,7 @@
 #include <ghoul/font/font.h>
 
 #include <ghoul/fmt.h>
+#include <ghoul/freetype.h>
 #include <ghoul/font/fonterrors.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
@@ -35,10 +36,6 @@
 #include <algorithm>
 #include <array>
 #include <tuple>
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_STROKER_H
 
 namespace {
     // Sizes in FT are given in 1/64th of pt
@@ -84,7 +81,7 @@ namespace {
 
         const int s = static_cast<int>(size * PointConversionFactor);
         const FT_Error e4 = FT_Set_Char_Size(face, s, 0, DPI, DPI);
-        handleError(e3, library, face, nullptr, name, size);
+        handleError(e4, library, face, nullptr, name, size);
     }
 
     // Extracts the next line from the string view and returns it, the passed string_view

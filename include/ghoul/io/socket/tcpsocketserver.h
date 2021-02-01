@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -71,7 +71,7 @@ private:
     std::condition_variable _connectionNotifier;
 
     std::unique_ptr<std::thread> _serverThread;
-    _SOCKET _serverSocket = _SOCKET(0);
+    _SOCKET _serverSocket = 0;
 };
 
 } // namespace ghoul::io

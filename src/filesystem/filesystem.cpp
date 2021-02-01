@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -270,11 +270,11 @@ Directory FileSystem::currentDirectory() const {
             nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer, // NOLINT
+            reinterpret_cast<LPTSTR>(&errorBuffer),
             0,
             nullptr
         );
-        if ((nValues > 0) && (errorBuffer != nullptr)) {
+        if (nValues > 0) {
             string msg(errorBuffer);
             LocalFree(errorBuffer);
             throw FileSystemException(fmt::format(
@@ -310,11 +310,11 @@ void FileSystem::setCurrentDirectory(const Directory& directory) const {
             nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer, // NOLINT
+            reinterpret_cast<LPTSTR>(&errorBuffer),
             0,
             nullptr
         );
-        if ((nValues > 0) && (errorBuffer != nullptr)) {
+        if (nValues > 0) {
             string msg(errorBuffer);
             LocalFree(errorBuffer);
             throw FileSystemException(fmt::format(
@@ -351,11 +351,11 @@ bool FileSystem::fileExists(const File& path) const {
                     nullptr,
                     error,
                     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                    (LPTSTR)&errorBuffer, // NOLINT
+                    reinterpret_cast<LPTSTR>(&errorBuffer),
                     0,
                     nullptr
                 );
-                if ((nValues > 0) && (errorBuffer != nullptr)) {
+                if (nValues > 0) {
                     string msg(errorBuffer);
                     LocalFree(errorBuffer);
                     throw FileSystemException(fmt::format(
@@ -460,11 +460,11 @@ void FileSystem::createDirectory(const Directory& path, Recursive recursive) con
                     nullptr,
                     error,
                     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                    (LPTSTR)&errorBuffer, // NOLINT
+                    reinterpret_cast<LPTSTR>(&errorBuffer),
                     0,
                     nullptr
                 );
-                if ((nValues > 0) && (errorBuffer != nullptr)) {
+                if (nValues > 0) {
                     string errorMsg(errorBuffer);
                     LocalFree(errorBuffer);
                     throw FileSystemException(fmt::format(

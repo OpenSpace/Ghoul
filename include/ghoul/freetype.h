@@ -21,32 +21,22 @@
  * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
- *****************************************************************************************
- * This file is inspired by Peter Kankowski (kankowski@narod.ru) and his work available  *
- * at http://www.strchr.com/hash_functions and http://www.strchr.com/crc32_popcnt        *
- *****************************************************************************************
- * Slicing-by-8 algorithms by Michael E. Kounavis and Frank L. Berry from Intel Corp.    *
- * http://www.intel.com/technology/comms/perfnet/download/CRC_generators.pdf             *
  ****************************************************************************************/
 
-#include <ghoul/misc/crc32.h>
+#ifndef __GHOUL___FREETYPE___H__
+#define __GHOUL___FREETYPE___H__
 
-#include <ghoul/misc/assert.h>
-#include <fstream>
-#include <vector>
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#endif // __clang__
 
-namespace ghoul {
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_STROKER_H
 
-unsigned int hashCRC32File(const std::string& file) {
-    std::fstream f(file);
-    f.seekg(0, std::ios::end);
-    unsigned int length = static_cast<int>(f.tellg());
-    f.seekg(0, std::ios::beg);
-    std::vector<char> buffer(length);
-    f.read(buffer.data(), length);
-    f.close();
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif // __clang__
 
-    return hashCRC32(buffer.data(), length);
-}
-
-} // namespace ghoul
+#endif // __GHOUL___FREETYPE___H__

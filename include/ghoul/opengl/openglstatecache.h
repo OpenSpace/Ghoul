@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -30,6 +30,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <limits>
 
 namespace ghoul::opengl {
 
@@ -41,7 +42,7 @@ namespace ghoul::opengl {
  */
 class OpenGLStateCache {
 public:
-    /* 
+    /*
      * Currently, this class is a Singleton. In the future we will enable multiple
      * instances of the class when working with multiple OpenGL contexts.
      */
@@ -60,11 +61,14 @@ public:
     void resetLineState() const;
     void resetPolygonAndClippingState() const;
     void resetViewportState() const;
+    void setDefaultFramebuffer(const GLuint defaultFB);
     void setViewportState(const GLint viewportCoords[4]);
     void resetColorState() const;
     void setColorState(const GLfloat clearColor[4], GLboolean clampColor = GL_FALSE);
 
     void viewport(GLint viewport[4]) const;
+    
+    GLuint defaultFramebuffer() const { return _defaultFramebuffer; }
 
 private:
     OpenGLStateCache() = default;
@@ -74,6 +78,11 @@ private:
     static GLint _maxAttachBuffers;
 
     bool _cacheInitialized = false;
+
+    // Default Framebuffer (Initialized to max GLuint on purpose)
+    // std::numeric_limits<GLuint>::max() is way bigger than the max 
+    // number of OpenGL's FrameBuffers names possible to create
+    GLuint _defaultFramebuffer = std::numeric_limits<GLuint>::max();
 
     // ViewPort
     std::array<GLint, 4> _viewport = {0, 0, 0, 0};

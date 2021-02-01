@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -31,11 +31,37 @@
     #undef __gl_h_
 #endif
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#ifndef __APPLE__
+// The Apple Clang compiler doesn't understand this warning yet
+#pragma clang diagnostic ignored "-Wdeprecated-copy"
+#endif // __APPLE__
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
+
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
 
-// Evil 'using namespace' in the header to make the transition from GLEW to glbinding
-// as easy as possible
+#ifdef __clang__
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
+
+// Evil 'using namespace' in the header to make the usage of OpenGL less painful
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wheader-hygiene"
+#endif // __clang__
+
 using namespace gl;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif // __clang__
 
 #endif // __GHOUL___GHOUL_GL___H__

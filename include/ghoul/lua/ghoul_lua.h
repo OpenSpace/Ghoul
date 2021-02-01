@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,11 +26,20 @@
 #ifndef __GHOUL___GHOUL_LUA___H__
 #define __GHOUL___GHOUL_LUA___H__
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#endif // __clang__
+
 extern "C" {
     #include <lua.h>
     #include <lualib.h>
     #include <lauxlib.h>
 } // extern
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif // __clang__
 
 #include <ghoul/lua/lua_helper.h>
 

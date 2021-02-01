@@ -1,8 +1,9 @@
 ##########################################################################################
 #                                                                                        #
 # GHOUL                                                                                  #
+# General Helpful Open Utility Library                                                   #
 #                                                                                        #
-# Copyright (c) 2012-2020                                                                #
+# Copyright (c) 2012-2021                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -46,9 +47,9 @@ function(disable_external_warnings_for_file file_name)
 endfunction ()
 
 function (set_folder_location target folder)
-    if (TARGET ${target})
-        set_property(TARGET ${target} PROPERTY FOLDER ${folder})
-    endif ()
+  if (TARGET ${target})
+    set_property(TARGET ${target} PROPERTY FOLDER ${folder})
+  endif ()
 endfunction ()
 
 # Includes an external library by adding its subdirectory using 'add_subdirectory'
@@ -59,15 +60,11 @@ function (include_external_library target_name visibility library_name path)
   set (extra_macro_args ${ARGN})
   if (NOT TARGET ${library_name})
     add_subdirectory(${path})
-    get_property(INCLUDE_DIR TARGET ${target_name} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
     target_link_libraries(${target_name} ${visibility} ${library_name})
-    target_include_directories(${target_name} SYSTEM ${visibility} ${INCLUDE_DIR} ${extra_macro_args})
     set_folder_location(${library_name} "External")
     if (MSVC)
       target_compile_options(${library_name} PUBLIC "/MP" "/bigobj")
     endif ()
-    if (GHOUL_DISABLE_EXTERNAL_WARNINGS)
-        disable_external_warnings(${library_name})
-    endif ()
+    disable_external_warnings(${library_name})
   endif ()
 endfunction ()

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -75,8 +75,12 @@ namespace {
     struct SubClassDictionary : public BaseClass {
     public:
         explicit SubClassDictionary(const ghoul::Dictionary& dict) : BaseClass() {
-            dict.getValue("value1", value1);
-            dict.getValue("value2", value2);
+            if (dict.hasValue<int>("value1")) {
+                value1 = dict.value<int>("value1");
+            }
+            if (dict.hasValue<int>("value2")) {
+                value2 = dict.value<int>("value2");
+            }
         };
     };
 
@@ -87,8 +91,12 @@ namespace {
             value2 = 32;
         };
         explicit SubClassDefaultDictionary(const ghoul::Dictionary& dict) : BaseClass() {
-            dict.getValue("value1", value1);
-            dict.getValue("value2", value2);
+            if (dict.hasValue<int>("value1")) {
+                value1 = dict.value<int>("value1");
+            }
+            if (dict.hasValue<int>("value2")) {
+                value2 = dict.value<int>("value2");
+            }
         };
     };
 
@@ -98,15 +106,6 @@ namespace {
 
     struct FunctionPointerClass : public BaseClass {};
     struct StdFunctionClass : public BaseClass {};
-
-    BaseClass* createFunctionPointerClass(bool useDictionary, const ghoul::Dictionary&) {
-        if (useDictionary) {
-            return new FunctionPointerClass;
-        }
-        else {
-            return nullptr;
-        }
-    }
 } // namespace
 
 TEST_CASE("TemplateFactory: Correctness Direct Subclass", "[templatefactory]") {
@@ -191,7 +190,10 @@ TEST_CASE("TemplateFactory: Dictionary Constructor", "[templatefactory]") {
 
     factory.registerClass<SubClassDictionary>("SubClassDictionary");
 
-    ghoul::Dictionary dict = { { "value1", 100 }, { "value2", 200 } };
+    ghoul::Dictionary dict;
+    dict.setValue("value1", 100);
+    dict.setValue("value2", 200);
+
     ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
         factory.create("SubClassDictionary", dict)
     );
@@ -206,7 +208,9 @@ TEST_CASE("TemplateFactory: No Dictionary Constructor Exists", "[templatefactory
 
     factory.registerClass<SubClassDefault>("SubClassDefault");
 
-    ghoul::Dictionary dict = { { "value1", 100 }, { "value2", 200 } };
+    ghoul::Dictionary dict;
+    dict.setValue("value1", 100);
+    dict.setValue("value2", 200);
 
     REQUIRE_THROWS_AS(
         factory.create("SubClassDefault", dict),
@@ -243,7 +247,10 @@ TEST_CASE("TemplateFactory: Default Dictionary Constructor", "[templatefactory]"
     REQUIRE(obj->value1 == 31);
     REQUIRE(obj->value2 == 32);
 
-    ghoul::Dictionary dict = { { "value1", 41 }, { "value2", 42 } };
+    ghoul::Dictionary dict;
+    dict.setValue("value1", 41);
+    dict.setValue("value2", 42);
+
     ghoul::mm_unique_ptr<BaseClass> obj2 = ghoul::mm_unique_ptr<BaseClass>(
         factory.create("class", dict)
     );
@@ -287,15 +294,11 @@ TEST_CASE("TemplateFactory: MemoryPool construction", "[templatefactory]") {
     ghoul::TemplateFactory<BaseClass> factory;
     factory.registerClass<SubClassDefault>("sc");
 
-    ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
-        factory.create("sc", &pool)
-    );
+    factory.create("sc", &pool);
     REQUIRE(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies()[0] == 16);
 
-    ghoul::mm_unique_ptr<BaseClass> obj2 = ghoul::mm_unique_ptr<BaseClass>(
-        factory.create("sc", &pool)
-    );
+    factory.create("sc", &pool);
     REQUIRE(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies()[0] == 32);
 }
