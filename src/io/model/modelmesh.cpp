@@ -44,7 +44,7 @@ ModelMesh::ModelMesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&&
 void ModelMesh::render(opengl::ProgramObject& program, bool isRenderableModel) const {
     if (isRenderableModel) {
         // Bind appropriate textures
-        unsigned int textureCounter = 0;
+        int textureCounter = 0;
         for (unsigned int i = 0; i < _textures.size(); i++)
         {
             std::string name = _textures[i].type;
