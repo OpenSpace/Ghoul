@@ -308,6 +308,10 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
     if (size == 0) {
         throw LuaFormatException("Tried to load Dictionary from empty state");
     }
+    const int topType = lua_type(state, size);
+    if (topType != LUA_TTABLE) {
+        throw LuaFormatException("Tried to load Dictionary from wrong parameter type");
+    }
 
     lua_pushnil(state);
     while (lua_next(state, location) != 0) {
