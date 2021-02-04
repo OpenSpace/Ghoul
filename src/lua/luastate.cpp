@@ -27,11 +27,29 @@
 
 #include <ghoul/lua/lua_helper.h>
 
+namespace {
+    int luaPanicFunction(lua_State* L) {
+        int n = lua_gettop(L);
+        if (n > 0) {
+            // The top value is the error message
+            std::string msg = lua_tostring(L, -1);
+            throw ghoul::lua::LuaRuntimeException(msg);
+        }
+        throw ghoul::lua::LuaRuntimeException("empty stack");
+    };
+}
+
 namespace ghoul::lua {
 
 LuaState::LuaState(IncludeStandardLibrary include)
     : _state(ghoul::lua::createNewLuaState(include))
-{}
+{
+    // Set a panic function to make sure that we always throw with a useful error message
+    // if an exception occurs due to a luaError. This should never happen under normal
+    // circumstances when using the runScript method, but it can happen when we manage
+    // the state manually and start manipulating the Lua stack by hand
+    lua_atpanic(_state, &luaPanicFunction);
+}
 
 LuaState::LuaState(LuaState&& other) noexcept
     : _state(other._state)
