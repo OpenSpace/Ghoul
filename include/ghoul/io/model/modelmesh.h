@@ -37,7 +37,6 @@ namespace ghoul::io {
 
 class ModelMesh {
 public:
-
     struct Vertex {
         GLfloat location[4];
         GLfloat tex[2];
@@ -53,16 +52,16 @@ public:
         glm::vec3 color;
     };
 
-    ModelMesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices,
-        std::vector<Texture>&& textures);
+    ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
+        std::vector<Texture> textures);
 
     ModelMesh(ModelMesh&&) noexcept = default;
     ~ModelMesh() noexcept = default;
 
-    bool initialize(float& maximumDistanceSquared);
+    void initialize();
     void deinitialize();
-    void render(opengl::ProgramObject& program, bool isRenderableModel = true) const;
-    void changeRenderMode(const GLenum mode);
+    void render(opengl::ProgramObject& program, bool isTexturedModel = true) const;
+    float calculateBoundingRadius() const;
 
     std::vector<Vertex> _vertices;
     std::vector<unsigned int> _indices;
@@ -72,7 +71,6 @@ private:
     GLuint _vaoID = 0;
     GLuint _vbo = 0;
     GLuint _ibo = 0;
-    GLenum _mode = GL_TRIANGLES;
 };
 
 } // namespace ghoul::io

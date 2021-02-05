@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -37,8 +37,8 @@
 
 namespace ghoul::modelgeometry {
 
-ModelGeometry::ModelGeometry(std::vector<io::ModelMesh>&& meshes,
-                             std::vector<TextureEntry>&& textureStorage)
+ModelGeometry::ModelGeometry(std::vector<io::ModelMesh> meshes,
+                             std::vector<TextureEntry> textureStorage)
     : _meshes(std::move(meshes))
     , _textureStorage(std::move(textureStorage))
 {}
@@ -50,14 +50,9 @@ double ModelGeometry::boundingRadius() const {
 void ModelGeometry::calculateBoundingRadius() {
     float maximumDistanceSquared = 0.f;
 
-    for (unsigned int i = 0; i < _meshes.size(); ++i) {
-        for (const io::ModelMesh::Vertex& v : _meshes[i]._vertices) {
-            maximumDistanceSquared = glm::max(
-                glm::pow(v.location[0], 2.f) +
-                glm::pow(v.location[1], 2.f) +
-                glm::pow(v.location[2], 2.f), maximumDistanceSquared
-            );
-        }
+    for (const io::ModelMesh& mesh : _meshes) {
+        float d = mesh.calculateBoundingRadius();
+        maximumDistanceSquared = std::max(d, maximumDistanceSquared);
     }
     _boundingRadius = maximumDistanceSquared;
 }
@@ -78,37 +73,26 @@ const std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() 
     return _textureStorage;
 }
 
-void ModelGeometry::render(opengl::ProgramObject& program, bool isRenderableModel) const {
-    for (int i = 0; i < _meshes.size(); ++i) {
-        _meshes[i].render(program, isRenderableModel);
+void ModelGeometry::render(opengl::ProgramObject& program, bool isTexturedModel) const {
+    for (const io::ModelMesh& mesh : _meshes) {
+        mesh.render(program, isTexturedModel);
     }
 }
 
-void ModelGeometry::changeRenderMode(GLenum mode) {
-    for (int i = 0; i < _meshes.size(); ++i) {
-        changeRenderMode(mode);
-    }
-}
-
-bool ModelGeometry::initialize(float& maximumDistanceSquared) {
+void ModelGeometry::initialize() {
     ZoneScoped
 
-    bool success = true;
-    for (int i = 0; i < _meshes.size(); ++i) {
-        success = _meshes[i].initialize(maximumDistanceSquared);
-        if (!success) return false;
+    for (io::ModelMesh& mesh : _meshes) {
+        mesh.initialize();
     }
-    
-    _boundingRadius = maximumDistanceSquared;
-    return true;
+
+    calculateBoundingRadius();
 }
 
 void ModelGeometry::deinitialize() {
-    for (int i = 0; i < _meshes.size(); ++i) {
-        _meshes[i].deinitialize();
+    for (io::ModelMesh& mesh : _meshes) {
+        mesh.deinitialize();
     }
 }
-
-void ModelGeometry::setUniforms(opengl::ProgramObject&) {}
 
 }  // namespace openspace::modelgeometry

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -34,29 +34,27 @@
 namespace ghoul::io {
 
 
-ModelMesh::ModelMesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices,
-                     std::vector<Texture>&& textures)
+ModelMesh::ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
+                     std::vector<Texture> textures)
     : _vertices(std::move(vertices))
     , _indices(std::move(indices))
     , _textures(std::move(textures))
 { }
 
-void ModelMesh::render(opengl::ProgramObject& program, bool isRenderableModel) const {
-    if (isRenderableModel) {
+void ModelMesh::render(opengl::ProgramObject& program, bool isTexturedModel) const {
+    if (isTexturedModel) {
         // Bind appropriate textures
         int textureCounter = 0;
-        for (unsigned int i = 0; i < _textures.size(); i++)
-        {
-            std::string name = _textures[i].type;
-
+        for (const Texture& texture : _textures) {
             // Tell shader wether to render invisible mesh with flashy color or not
-            program.setUniform("use_forced_color", _textures[i].useForcedColor);
-            if (_textures[i].useForcedColor) {
+            program.setUniform("use_forced_color", texture.useForcedColor);
+            if (texture.useForcedColor) {
                 break;
             }
 
+            std::string name = texture.type;
             // Use texture or color
-            if (_textures[i].hasTexture) {
+            if (texture.hasTexture) {
                 // Active proper texture unit before binding
                 glActiveTexture(GL_TEXTURE0 + textureCounter);
 
@@ -66,24 +64,25 @@ void ModelMesh::render(opengl::ProgramObject& program, bool isRenderableModel) c
                 }
 
                 // Tell shader to use textures and set texture unit
-                program.setUniform(("has_" + name).c_str(), true);
+                program.setUniform("has_" + name, true);
                 program.setUniform(name, textureCounter);
 
                 // And finally bind the texture
-                _textures[i].texture->bind();
+                texture.texture->bind();
                 ++textureCounter;
             }
             // Use embedded simple colors instead of textures
             else {
-                if (name == "color_diffuse")
+                if (name == "color_diffuse") {
                     program.setUniform("has_texture_diffuse", false);
+                }
                 else if (name == "color_specular") {
                     program.setUniform("has_texture_specular", false);
-                    program.setUniform(("has_" + name).c_str(), true);
+                    program.setUniform("has_" + name, true);
                 }
 
                 // Set the color in shader
-                program.setUniform(name.c_str(), _textures[i].color);
+                program.setUniform(name, texture.color);
             }
         }
     }
@@ -91,7 +90,7 @@ void ModelMesh::render(opengl::ProgramObject& program, bool isRenderableModel) c
     // Render the mesh object
     glBindVertexArray(_vaoID);
     glDrawElements(
-        _mode,
+        GL_TRIANGLES,
         static_cast<GLsizei>(_indices.size()),
         GL_UNSIGNED_INT,
         nullptr
@@ -100,22 +99,23 @@ void ModelMesh::render(opengl::ProgramObject& program, bool isRenderableModel) c
     glActiveTexture(GL_TEXTURE0);
 }
 
-void ModelMesh::changeRenderMode(const GLenum mode) {
-    _mode = mode;
+float ModelMesh::calculateBoundingRadius() const {
+    // Calculate the bounding sphere of the mesh
+    float maximumDistanceSquared = 0.f;
+    for (const Vertex& v : _vertices) {
+        float d = glm::pow(v.location[0], 2.f) +
+            glm::pow(v.location[1], 2.f) +
+            glm::pow(v.location[2], 2.f);
+
+        maximumDistanceSquared = glm::max(d, maximumDistanceSquared);
+    }
+    return maximumDistanceSquared;
 }
 
-bool ModelMesh::initialize(float& maximumDistanceSquared) {
-
+void ModelMesh::initialize() {
     if (_vertices.empty()) {
-        return false;
-    }
-
-    // Calculate the bounding sphere of the mesh
-    for (const Vertex& v : _vertices) {
-        maximumDistanceSquared = glm::max(
-            glm::pow(v.location[0], 2.f) +
-            glm::pow(v.location[1], 2.f) +
-            glm::pow(v.location[2], 2.f), maximumDistanceSquared);
+        LERRORC("ModelMesh", "Cannot initialize empty mesh");
+        return;
     }
 
     glGenVertexArrays(1, &_vaoID);
@@ -127,7 +127,7 @@ bool ModelMesh::initialize(float& maximumDistanceSquared) {
     glBufferData(
         GL_ARRAY_BUFFER,
         _vertices.size() * sizeof(Vertex),
-        &_vertices[0],
+        _vertices.data(),
         GL_STATIC_DRAW
     );
 
@@ -135,7 +135,7 @@ bool ModelMesh::initialize(float& maximumDistanceSquared) {
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
         _indices.size() * sizeof(unsigned int),
-        &_indices[0],
+        _indices.data(),
         GL_STATIC_DRAW
     );
 
@@ -184,45 +184,46 @@ bool ModelMesh::initialize(float& maximumDistanceSquared) {
     unsigned int nDiffuse = 0;
     unsigned int nSpecular = 0;
     unsigned int nNormal = 0;
-    for (unsigned int i = 0; i < _textures.size(); ++i) {
-        if (_textures[i].type == "texture_diffuse" ||
-            _textures[i].type == "color_diffuse")
+    for (const Texture& texture : _textures) {
+        if (texture.type == "texture_diffuse" ||
+            texture.type == "color_diffuse")
         {
             ++nDiffuse;
         }
-        else if (_textures[i].type == "texture_specular" ||
-            _textures[i].type == "color_specular")
+        else if (texture.type == "texture_specular" ||
+            texture.type == "color_specular")
         {
             ++nSpecular;
         }
-        else if (_textures[i].type == "texture_normal") {
+        else if (texture.type == "texture_normal") {
             ++nNormal;
         }
 
-        if (_textures[i].hasTexture) {
-            _textures[i].texture->uploadTexture();
-            _textures[i].texture->setFilter(
+        if (texture.hasTexture) {
+            texture.texture->uploadTexture();
+            texture.texture->setFilter(
                 opengl::Texture::FilterMode::AnisotropicMipMap
             );
-            _textures[i].texture->purgeFromRAM();
+            texture.texture->purgeFromRAM();
         }
     }
 
     if (nDiffuse > 1 || nSpecular > 1 || nNormal > 1) {
         LWARNINGC(
             "ModelMesh",
-            "More than one texture or color of same type cannot be used for the same mesh. "
-            "Only the latest option will be used."
+            "More than one texture or color of same type cannot be used for the same "
+            "mesh. Only the latest option will be used."
         );
     }
-
-    return true;
 }
 
 void ModelMesh::deinitialize() {
     glDeleteBuffers(1, &_vbo);
     glDeleteVertexArrays(1, &_vaoID);
     glDeleteBuffers(1, &_ibo);
+    _vbo = 0;
+    _vaoID = 0;
+    _ibo = 0;
 }
 
 } // namespace ghoul::io

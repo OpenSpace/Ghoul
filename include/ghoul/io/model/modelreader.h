@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -62,11 +62,16 @@ public:
 
     /**
      * Loads the provided \p filename into a ModelGeometry and returns it. The correct
-     * ModelReaderBase is determined by the extension of the \p filename.
+     * ModelReaderBase is determined by the extension of the \p filename. If a part of
+     * the model is invisible (has no texture or color) it will by default be dropped
+     * and not rendered at all. If the provided \p forceRenderInvisible is enabled the
+     * invisible parts will instead be forced to render with a colorful pink and green
+     * chessboard pattern. This material will also be forced if there is any error
+     * reading the texture or material.
      *
      * \param filename The name of the file which should be loaded into a ModelGeometry
-     * \param forceRenderInvisible Force invisible meshes to render or not
-     * \param notifyInvisibleDropped Notify in log if invisible meshses were dropped
+     * \param forceRenderInvisible Force invisible meshes to render or not.
+     * \param notifyInvisibleDropped Notify in log if invisible meshes were dropped
      *
      * \throw ModelLoadException If there was an error reading the \p filename
      * \throw MissingReaderException If there was no reader for the specified \p filename
@@ -75,8 +80,8 @@ public:
      * \pre At least one ModelReaderBase must have been added to the ModelReader
      *      before (addReader)
      */
-    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(const std::string& filename,
-        const bool forceRenderInvisible = false, const bool notifyInvisibleDropped = true);
+    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(std::string& filename,
+        bool forceRenderInvisible = false, bool notifyInvisibleDropped = true);
 
     /**
      * Returns a list of all the extensions that are supported by registered readers. If
@@ -85,7 +90,7 @@ public:
      *
      * \return A list of all supported extensions
      */
-    std::vector<std::string> supportedExtensions();
+    std::vector<std::string> supportedExtensions() const;
 
     /**
      * Adds the \p reader to this ModelReader and makes it available through subsequent
@@ -109,7 +114,7 @@ private:
     ModelReaderBase* readerForExtension(const std::string& extension);
 
     /// The list of all registered readers
-    std::vector < std::unique_ptr <ModelReaderBase >> _readers;
+    std::vector<std::unique_ptr<ModelReaderBase>> _readers;
 };
 
 } // namespace ghoul::io

@@ -78,7 +78,7 @@ public:
     virtual ~ModelReaderBase() = default;
 
     /**
-     * The method loading the specific model from disk. The result is a ModelGeometry
+     * The method loading the specific model from disk.
      *
      * \param filename The file on disk that is to be loaded
      * \param forceRenderInvisible Force invisible meshes to render or not
@@ -88,14 +88,13 @@ public:
      * \throw ModelLoadException If there was an error loading the model from disk
      */
     virtual std::unique_ptr<modelgeometry::ModelGeometry> loadModel(
-        const std::string& filename, const bool forceRenderInvisible = false,
-        const bool notifyInvisibleDropped = true) const = 0;
+        std::string& filename, bool forceRenderInvisible = false,
+        bool notifyInvisibleDropped = true) const = 0;
 
     /**
-     * Method to load an already cached model from disk. Result is a ModelGeometry
+     * Method to load an already cached model from disk.
      *
      * \param cachedFile The cache file to be loaded on disk
-     * \param forceRenderInvisible Force invisible meshes to render or not
      * \return The ModelGeometry
      *
      * \throw ModelLoadException If there was an error loading the model from cache
@@ -104,8 +103,7 @@ public:
         const std::string& cachedFile) const = 0;
 
     /**
-     * Method to save an already loaded model to a cache. Result is a bool telling if
-     * saving was successfull or not
+     * Method to save an already loaded model to a cache.
      *
      * \param cachedFile The file the cache should be saved to
      * \param model Pointer to the ModelGeometry that should be saved to the cache file
@@ -114,7 +112,7 @@ public:
      * \throw ModelSaveException If there was an error saving the model to cache
      */
     virtual bool saveCachedFile(const std::string& cachedFile,
-        const modelgeometry::ModelGeometry* model) const = 0;
+        const modelgeometry::ModelGeometry& model) const = 0;
 
     /**
      * Returns a list of all extensions.

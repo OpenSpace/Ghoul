@@ -76,9 +76,9 @@ public:
      *        \p filename
      * \pre \p filename must not be empty
      */
-    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(
-        const std::string& filename, const bool forceRenderInvisible = false,
-        const bool notifyInvisibleDropped = true) const override;
+    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(std::string& filename,
+        bool forceRenderInvisible = false,
+        bool notifyInvisibleDropped = true) const override;
 
     /**
      * Method to load an already cached model from disk. Result is a ModelGeometry
@@ -103,7 +103,7 @@ public:
      * \throw ModelSaveException If there was an error saving the model to cache
      */
     bool saveCachedFile(const std::string& cachedFile,
-        const ghoul::modelgeometry::ModelGeometry* model) const override;
+        const ghoul::modelgeometry::ModelGeometry& model) const override;
 
     /**
      * Returns a list of all extensions that this ModelReaderAssimp supports.
@@ -111,7 +111,6 @@ public:
      * \return A list of all extensions that this ModelReaderAssimp supports
      */
     std::vector<std::string> supportedExtensions() const override;
-
 };
 
 } // namespace ghoul::io

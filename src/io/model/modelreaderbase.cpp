@@ -31,15 +31,19 @@ namespace ghoul::io {
 
 ModelReaderBase::ModelLoadException::ModelLoadException(std::string name, std::string msg,
                                                         const ModelReaderBase* r)
-    : RuntimeError(fmt::format("Error:'{}' while loading model from file:'{}'", msg, name), "ModelLoader")
+    : RuntimeError(fmt::format(
+        "Error:'{}' while loading model from file:'{}'", msg, name), "ModelLoader"
+    )
     , filename(std::move(name))
     , message(std::move(msg))
     , reader(r)
 {}
 
 ModelReaderBase::ModelSaveException::ModelSaveException(std::string name, std::string msg,
-    const ModelReaderBase* r)
-    : RuntimeError(fmt::format("Error:'{}' while saving model to file:'{}'", msg, name), "ModelSaver")
+                                                        const ModelReaderBase* r)
+    : RuntimeError(fmt::format(
+        "Error:'{}' while saving model to file:'{}'", msg, name), "ModelSaver"
+    )
     , filename(std::move(name))
     , message(std::move(msg))
     , reader(r)

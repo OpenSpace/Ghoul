@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2020                                                               *
+ * Copyright (c) 2012-2021                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -36,25 +36,22 @@ namespace ghoul::modelgeometry {
 
 class ModelGeometry {
 public:
-
     struct TextureEntry {
         std::string name;
         std::unique_ptr<opengl::Texture> texture;
     };
 
-    ModelGeometry(std::vector<io::ModelMesh>&& meshes,
-        std::vector<TextureEntry>&& textureStorage);
+    ModelGeometry(std::vector<io::ModelMesh> meshes,
+        std::vector<TextureEntry> textureStorage);
     ModelGeometry(ModelGeometry&&) noexcept = default;
     ~ModelGeometry() noexcept = default;
 
-    bool initialize(float& maximumDistanceSquared);
+    void initialize();
     void deinitialize();
-    void render(opengl::ProgramObject& program, bool isRenderableModel = true) const;
+    void render(opengl::ProgramObject& program, bool isTexturedModel = true) const;
 
-    void changeRenderMode(const GLenum mode);
     double boundingRadius() const;
     void calculateBoundingRadius();
-    void setUniforms(opengl::ProgramObject& program);
 
     std::vector<io::ModelMesh>& meshes();
     const std::vector<io::ModelMesh>& meshes() const;
