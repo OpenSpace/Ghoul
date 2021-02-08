@@ -36,8 +36,8 @@ namespace {
             throw ghoul::lua::LuaRuntimeException(msg);
         }
         throw ghoul::lua::LuaRuntimeException("empty stack");
-    };
-}
+    }
+} // namespace
 
 namespace ghoul::lua {
 
