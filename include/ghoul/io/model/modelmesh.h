@@ -38,7 +38,7 @@ namespace ghoul::io {
 class ModelMesh {
 public:
     struct Vertex {
-        GLfloat location[4];
+        GLfloat position[3];
         GLfloat tex[2];
         GLfloat normal[3];
         GLfloat tangent[3];

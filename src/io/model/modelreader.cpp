@@ -82,20 +82,21 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
             "Cached file '{}' used for ModelGeometry file '{}'", cachedFile, filename
         ));
 
-        std::unique_ptr<modelgeometry::ModelGeometry> model =
-            reader->loadCachedFile(cachedFile);
-        if (model != nullptr) {
+        try {
+            std::unique_ptr<modelgeometry::ModelGeometry> model =
+                reader->loadCachedFile(cachedFile);
             return model;
         }
+        catch (const ModelReaderBase::ModelLoadException& e) {
+            LERROR(fmt::format(
+                "Error:'{}' while loading model from cache file:'{}'",
+                e.message, cachedFile
+            ));
+            FileSys.cacheManager()->removeCacheFile(filename);
+            // Intentional fall-through to the 'else' computation to generate the cache
+            // file for the next run
+        }
 
-        LERROR(fmt::format(
-            "Error:'{}' while loading model from cache file:'{}'",
-            "Failed to load model from cache", cachedFile
-        ));
-
-        FileSys.cacheManager()->removeCacheFile(filename);
-        // Intentional fall-through to the 'else' computation to generate the cache
-        // file for the next run
     }
     else {
         LINFO(fmt::format("Cache for ModelGeometry file '{}' not found", filename));

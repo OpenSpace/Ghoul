@@ -33,16 +33,21 @@
 
 namespace ghoul::io {
 
-
 ModelMesh::ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
                      std::vector<Texture> textures)
     : _vertices(std::move(vertices))
     , _indices(std::move(indices))
     , _textures(std::move(textures))
-{ }
+{}
 
 void ModelMesh::render(opengl::ProgramObject& program, bool isTexturedModel) const {
     if (isTexturedModel) {
+        // Reset shader
+        program.setUniform("has_texture_diffuse", false);
+        program.setUniform("has_texture_normal", false);
+        program.setUniform("has_texture_specular", false);
+        program.setUniform("has_color_specular", false);
+
         // Bind appropriate textures
         int textureCounter = 0;
         for (const Texture& texture : _textures) {
@@ -103,9 +108,9 @@ float ModelMesh::calculateBoundingRadius() const {
     // Calculate the bounding sphere of the mesh
     float maximumDistanceSquared = 0.f;
     for (const Vertex& v : _vertices) {
-        float d = glm::pow(v.location[0], 2.f) +
-            glm::pow(v.location[1], 2.f) +
-            glm::pow(v.location[2], 2.f);
+        float d = glm::pow(v.position[0], 2.f) +
+            glm::pow(v.position[1], 2.f) +
+            glm::pow(v.position[2], 2.f);
 
         maximumDistanceSquared = glm::max(d, maximumDistanceSquared);
     }
@@ -142,7 +147,7 @@ void ModelMesh::initialize() {
     // Set vertex attributes pointers
     // Vertex position
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
 
     // Vertex texture coordinates
     glEnableVertexAttribArray(1);
