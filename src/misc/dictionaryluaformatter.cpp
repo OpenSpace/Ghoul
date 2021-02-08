@@ -39,16 +39,6 @@ namespace {
                             PrettyPrint prettyPrint, const std::string& indentation,
                             int indentationSteps);
 
-    std::string formatDouble(double d) {
-        // This check is to silence -Wfloat-equal on GCC due to floating point comparison
-        if (std::equal_to<>()(d, 0.0)) {
-            return "0";
-        }
-        const int exponent = static_cast<int>(std::log10(std::abs(d)));
-        const double base = d / std::pow(10, exponent);
-        return std::to_string(base) + "E" + std::to_string(exponent);
-    }
-
     std::string format(const Dictionary& d, PrettyPrint prettyPrint,
                        const std::string& indentation, int indentationSteps)
     {
@@ -99,33 +89,22 @@ namespace {
 
         if (dictionary.hasValue<glm::dvec4>(key)) {
             glm::dvec4 vec = dictionary.value<glm::dvec4>(key);
-            return fmt::format(
-                "{{{},{},{},{}}}",
-                formatDouble(vec.x),
-                formatDouble(vec.y),
-                formatDouble(vec.z),
-                formatDouble(vec.w)
-            );
+            return fmt::format("{{{},{},{},{}}}", vec.x, vec.y, vec.z, vec.w);
         }
 
         if (dictionary.hasValue<glm::dvec3>(key)) {
             glm::dvec3 vec = dictionary.value<glm::dvec3>(key);
-            return fmt::format(
-                "{{{},{},{}}}",
-                formatDouble(vec.x),
-                formatDouble(vec.y),
-                formatDouble(vec.z)
-            );
+            return fmt::format("{{{},{},{}}}", vec.x, vec.y, vec.z);
         }
 
         if (dictionary.hasValue<glm::dvec2>(key)) {
             const glm::dvec2 vec = dictionary.value<glm::dvec2>(key);
-            return fmt::format("{{{},{}}}", formatDouble(vec.x), formatDouble(vec.y));
+            return fmt::format("{{{},{}}}", vec.x, vec.y);
         }
 
         if (dictionary.hasValue<double>(key)) {
             const double value = dictionary.value<double>(key);
-            return formatDouble(value);
+            return fmt::format("{}", value);
         }
 
         if (dictionary.hasValue<int>(key)) {

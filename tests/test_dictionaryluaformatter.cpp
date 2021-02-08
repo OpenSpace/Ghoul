@@ -39,7 +39,7 @@ TEST_CASE("DictionaryLuaFormatter: Simple Dictionary", "[dictionaryluaformatter]
     using namespace std::string_literals;
     ghoul::Dictionary d;
     d.setValue("int", 1);
-    d.setValue("double", 2.0);
+    d.setValue("double", 2.2);
     d.setValue("vec2", glm::dvec2(0.f));
     d.setValue("vec3", glm::dvec3(0.f));
     d.setValue("vec4", glm::dvec4(0.f));
@@ -48,10 +48,28 @@ TEST_CASE("DictionaryLuaFormatter: Simple Dictionary", "[dictionaryluaformatter]
     std::string res = ghoul::formatLua(d);
     REQUIRE(
         res ==
-        "{double=2.000000E0,int=1,string=\"\","
+        "{double=2.2,int=1,string=\"\","
         "vec2={0,0},vec3={0,0,0},"
         "vec4={0,0,0,0}}"
     );
+}
+
+TEST_CASE("DictionaryLuaFormatter: Dictionary with nan", "[dictionaryluaformatter]") {
+    using namespace std::string_literals;
+    ghoul::Dictionary d;
+    d.setValue("nanValue", std::numeric_limits<double>::quiet_NaN());
+
+    std::string res = ghoul::formatLua(d);
+    REQUIRE(res == "{nanValue=nan}");
+}
+
+TEST_CASE("DictionaryLuaFormatter: Dictionary with infinity", "[dictionaryluaformatter]") {
+    using namespace std::string_literals;
+    ghoul::Dictionary d;
+    d.setValue("infinity", std::numeric_limits<double>::infinity());
+
+    std::string res = ghoul::formatLua(d);
+    REQUIRE(res == "{infinity=inf}");
 }
 
 TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]") {
@@ -59,7 +77,7 @@ TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]
 
     ghoul::Dictionary d;
     d.setValue("int", 1);
-    d.setValue("double", 2.0);
+    d.setValue("double", 2.2);
     d.setValue("vec2", glm::dvec2(0.f));
     d.setValue("vec3", glm::dvec3(0.f));
     d.setValue("vec4", glm::dvec4(0.f));
@@ -67,7 +85,7 @@ TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]
 
     ghoul::Dictionary e;
     e.setValue("int", 1);
-    e.setValue("double", 2.0);
+    e.setValue("double", 2.2);
     e.setValue("vec2", glm::dvec2(0.f));
     e.setValue("vec3", glm::dvec3(0.f));
     e.setValue("vec4", glm::dvec4(0.f));
@@ -76,7 +94,7 @@ TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]
 
     ghoul::Dictionary f;
     f.setValue("int", 1);
-    f.setValue("double", 2.0);
+    f.setValue("double", 2.2);
     f.setValue("vec2", glm::dvec2(0.f));
     f.setValue("vec3", glm::dvec3(0.f));
     f.setValue("vec4", glm::dvec4(0.f));
@@ -85,7 +103,7 @@ TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]
 
     ghoul::Dictionary g;
     g.setValue("int", 1);
-    g.setValue("double", 2.0);
+    g.setValue("double", 2.2);
     g.setValue("vec2", glm::dvec2(0.f));
     g.setValue("vec3", glm::dvec3(0.f));
     g.setValue("vec4", glm::dvec4(0.f));
@@ -98,35 +116,35 @@ TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]
 
     REQUIRE(
         res ==
-        "{dict={dict={dict={double=2.000000E0,int=1,"
+        "{dict={dict={dict={double=2.2,int=1,"
         "string=\"\",vec2={0,0},"
         "vec3={0,0,0},"
         "vec4={0,0,0,0}},"
-        "double=2.000000E0,int=1,string=\"\","
+        "double=2.2,int=1,string=\"\","
         "vec2={0,0},"
         "vec3={0,0,0},"
         "vec4={0,0,0,0}},"
-        "double=2.000000E0,int=1,string=\"\","
+        "double=2.2,int=1,string=\"\","
         "vec2={0,0},vec3={0,0,0},"
         "vec4={0,0,0,0}},"
-        "dict2={dict={dict={double=2.000000E0,int=1,string=\"\","
+        "dict2={dict={dict={double=2.2,int=1,string=\"\","
         "vec2={0,0},vec3={0,0,0},"
-        "vec4={0,0,0,0}},double=2.000000E0,int=1,"
+        "vec4={0,0,0,0}},double=2.2,int=1,"
         "string=\"\",vec2={0,0},"
         "vec3={0,0,0},"
-        "vec4={0,0,0,0}},double=2.000000E0,int=1,"
+        "vec4={0,0,0,0}},double=2.2,int=1,"
         "string=\"\",vec2={0,0},"
         "vec3={0,0,0},"
         "vec4={0,0,0,0}},dict3={dict={dict={"
-        "double=2.000000E0,int=1,string=\"\",vec2={0,0},"
+        "double=2.2,int=1,string=\"\",vec2={0,0},"
         "vec3={0,0,0},"
-        "vec4={0,0,0,0}},double=2.000000E0,int=1,"
+        "vec4={0,0,0,0}},double=2.2,int=1,"
         "string=\"\",vec2={0,0},"
         "vec3={0,0,0},"
-        "vec4={0,0,0,0}},double=2.000000E0,int=1,"
+        "vec4={0,0,0,0}},double=2.2,int=1,"
         "string=\"\",vec2={0,0},"
         "vec3={0,0,0},"
-        "vec4={0,0,0,0}},double=2.000000E0,int=1,"
+        "vec4={0,0,0,0}},double=2.2,int=1,"
         "string=\"\",vec2={0,0},"
         "vec3={0,0,0},"
         "vec4={0,0,0,0}}"
