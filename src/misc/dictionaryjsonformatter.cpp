@@ -34,15 +34,14 @@ namespace ghoul {
 
 namespace {
     std::string formatDouble(double d) {
-        // This check is to silence -Wfloat-equal on GCC due to floating point comparison
-        if (std::equal_to<>()(d, 0.0)) {
-            return "0";
+        // fmt::format will represent infinite values with 'inf' and NaNs with 'nan'.
+        // These are not valid in JSON, so use 'null' instead
+        if (!std::isfinite(d)) {
+            return "null";
         }
-        const int exponent = static_cast<int>(std::log10(std::abs(d)));
-        const double base = d / std::pow(10, exponent);
-        return std::to_string(base) + "E" + std::to_string(exponent);
-    }
 
+        return fmt::format("{}", d);
+    }
 
     /**
     * Converts a single value \p key out of the \p dictionary by manually iterating all
