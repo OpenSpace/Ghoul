@@ -44,7 +44,6 @@ set(GHOUL_SOURCE
   logging/htmllog.cpp
   logging/log.cpp
   logging/logmanager.cpp
-  logging/streamlog.cpp
   logging/textlog.cpp
   logging/visualstudiooutputlog.cpp
   misc/assert.cpp
@@ -167,7 +166,6 @@ set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/logging/loglevel.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/logging/logmanager.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/logging/logmanager.inl
-  ${PROJECT_SOURCE_DIR}/include/ghoul/logging/streamlog.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/logging/textlog.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/logging/visualstudiooutputlog.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/assert.h
