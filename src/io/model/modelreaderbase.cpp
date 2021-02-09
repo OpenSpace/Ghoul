@@ -39,14 +39,4 @@ ModelReaderBase::ModelLoadException::ModelLoadException(std::string name, std::s
     , reader(r)
 {}
 
-ModelReaderBase::ModelSaveException::ModelSaveException(std::string name, std::string msg,
-                                                        const ModelReaderBase* r)
-    : RuntimeError(fmt::format(
-        "Error:'{}' while saving model to file:'{}'", msg, name), "ModelSaver"
-    )
-    , filename(std::move(name))
-    , message(std::move(msg))
-    , reader(r)
-{}
-
 } // namespace ghoul::io

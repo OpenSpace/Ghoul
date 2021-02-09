@@ -45,6 +45,9 @@ class ModelReaderBase;
  */
 class ModelReader {
 public:
+    BooleanType(ForceRenderInvisible);
+    BooleanType(NotifyInvisibleDropped);
+
     /// Exception that gets thrown when there is no reader for the provided \p extension
     struct MissingReaderException : public RuntimeError {
         explicit MissingReaderException(std::string extension, std::string file);
@@ -81,7 +84,8 @@ public:
      *      before (addReader)
      */
     std::unique_ptr<modelgeometry::ModelGeometry> loadModel(std::string& filename,
-        bool forceRenderInvisible = false, bool notifyInvisibleDropped = true);
+        ForceRenderInvisible forceRenderInvisible = ForceRenderInvisible::No,
+        NotifyInvisibleDropped notifyInvisibleDropped = NotifyInvisibleDropped::Yes);
 
     /**
      * Returns a list of all the extensions that are supported by registered readers. If

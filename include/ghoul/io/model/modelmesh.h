@@ -37,6 +37,14 @@ namespace ghoul::io {
 
 class ModelMesh {
 public:
+    enum class TextureType : uint8_t {
+        TextureDiffuse = 0,
+        TextureNormal,
+        TextureSpecular,
+        ColorDiffuse,
+        ColorSpecular
+    };
+
     struct Vertex {
         GLfloat position[3];
         GLfloat tex[2];
@@ -46,7 +54,7 @@ public:
 
     struct Texture {
         opengl::Texture* texture;
-        std::string type;
+        TextureType type;
         bool hasTexture = false;
         bool useForcedColor = false;
         glm::vec3 color;
@@ -63,11 +71,15 @@ public:
     void render(opengl::ProgramObject& program, bool isTexturedModel = true) const;
     float calculateBoundingRadius() const;
 
+    const std::vector<Vertex>& vertices() const;
+    const std::vector<unsigned int>& indices() const;
+    const std::vector<Texture>& textures() const;
+
+private:
     std::vector<Vertex> _vertices;
     std::vector<unsigned int> _indices;
     std::vector<Texture> _textures;
 
-private:
     GLuint _vaoID = 0;
     GLuint _vbo = 0;
     GLuint _ibo = 0;

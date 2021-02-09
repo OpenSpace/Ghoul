@@ -40,6 +40,17 @@ ModelMesh::ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> ind
     , _textures(std::move(textures))
 {}
 
+std::string textureTypeToString(const ModelMesh::TextureType& type) {
+    switch (type) {
+        case ModelMesh::TextureType::TextureDiffuse: return "texture_diffuse";
+        case ModelMesh::TextureType::TextureNormal: return "texture_normal";
+        case ModelMesh::TextureType::TextureSpecular: return "texture_specular";
+        case ModelMesh::TextureType::ColorDiffuse: return "color_diffuse";
+        case ModelMesh::TextureType::ColorSpecular: return "color_specular";
+        default: throw MissingCaseException();
+    }
+}
+
 void ModelMesh::render(opengl::ProgramObject& program, bool isTexturedModel) const {
     if (isTexturedModel) {
         // Reset shader
@@ -57,14 +68,14 @@ void ModelMesh::render(opengl::ProgramObject& program, bool isTexturedModel) con
                 break;
             }
 
-            std::string name = texture.type;
+            std::string name = textureTypeToString(texture.type);
             // Use texture or color
             if (texture.hasTexture) {
                 // Active proper texture unit before binding
                 glActiveTexture(GL_TEXTURE0 + textureCounter);
 
                 // Specular special case
-                if (name == "texture_specular") {
+                if (texture.type == TextureType::TextureSpecular) {
                     program.setUniform("has_color_specular", false);
                 }
 
@@ -78,10 +89,10 @@ void ModelMesh::render(opengl::ProgramObject& program, bool isTexturedModel) con
             }
             // Use embedded simple colors instead of textures
             else {
-                if (name == "color_diffuse") {
+                if (texture.type == TextureType::ColorDiffuse) {
                     program.setUniform("has_texture_diffuse", false);
                 }
-                else if (name == "color_specular") {
+                else if (texture.type == TextureType::ColorSpecular) {
                     program.setUniform("has_texture_specular", false);
                     program.setUniform("has_" + name, true);
                 }
@@ -115,6 +126,18 @@ float ModelMesh::calculateBoundingRadius() const {
         maximumDistanceSquared = glm::max(d, maximumDistanceSquared);
     }
     return maximumDistanceSquared;
+}
+
+const std::vector<ModelMesh::Vertex>& ModelMesh::vertices() const {
+    return _vertices;
+}
+
+const std::vector<unsigned int>& ModelMesh::indices() const {
+    return _indices;
+}
+
+const std::vector<ModelMesh::Texture>& ModelMesh::textures() const {
+    return _textures;
 }
 
 void ModelMesh::initialize() {
@@ -190,18 +213,18 @@ void ModelMesh::initialize() {
     unsigned int nSpecular = 0;
     unsigned int nNormal = 0;
     for (const Texture& texture : _textures) {
-        if (texture.type == "texture_diffuse" ||
-            texture.type == "color_diffuse")
-        {
-            ++nDiffuse;
-        }
-        else if (texture.type == "texture_specular" ||
-            texture.type == "color_specular")
-        {
-            ++nSpecular;
-        }
-        else if (texture.type == "texture_normal") {
-            ++nNormal;
+        switch (texture.type) {
+            case TextureType::TextureDiffuse:
+            case TextureType::ColorDiffuse:
+                ++nDiffuse;
+                break;
+            case TextureType::TextureSpecular:
+            case TextureType::ColorSpecular:
+                ++nSpecular;
+                break;
+            case TextureType::TextureNormal:
+                ++nNormal;
+                break;
         }
 
         if (texture.hasTexture) {

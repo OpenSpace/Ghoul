@@ -81,31 +81,6 @@ public:
         bool notifyInvisibleDropped = true) const override;
 
     /**
-     * Method to load an already cached model from disk. Result is a ModelGeometry
-     *
-     * \param cachedFile The cache file to be loaded on disk
-     * \param forceRenderInvisible Force invisible meshes to render or not
-     * \return The ModelGeometry
-     *
-     * \throw ModelLoadException If there was an error loading the model from cache
-     */
-    std::unique_ptr<ghoul::modelgeometry::ModelGeometry> loadCachedFile(
-        const std::string& cachedFile) const override;
-
-    /**
-     * Method to save an already loaded model to cache. Result is a bool telling if
-     * saving was successfull or not
-     *
-     * \param cachedFile The file the cache should be saved to
-     * \param model Pointer to the ModelGeometry that should be saved to the cache file
-     * \return bool if successfull or not
-     *
-     * \throw ModelSaveException If there was an error saving the model to cache
-     */
-    bool saveCachedFile(const std::string& cachedFile,
-        const ghoul::modelgeometry::ModelGeometry& model) const override;
-
-    /**
      * Returns a list of all extensions that this ModelReaderAssimp supports.
      *
      * \return A list of all extensions that this ModelReaderAssimp supports

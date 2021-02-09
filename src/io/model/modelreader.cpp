@@ -56,7 +56,8 @@ ModelReader& ModelReader::ref() {
 }
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
-           std::string& filename, bool forceRenderInvisible, bool notifyInvisibleDropped)
+                        std::string& filename, ForceRenderInvisible forceRenderInvisible,
+                                           NotifyInvisibleDropped notifyInvisibleDropped)
 {
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
@@ -84,12 +85,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
 
         try {
             std::unique_ptr<modelgeometry::ModelGeometry> model =
-                reader->loadCachedFile(cachedFile);
+                modelgeometry::ModelGeometry::loadCacheFile(cachedFile);
             return model;
         }
-        catch (const ModelReaderBase::ModelLoadException& e) {
+        catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {
             LERROR(fmt::format(
-                "Error:'{}' while loading model from cache file:'{}'",
+                "Error:'{}' while loading model from cache file:'{}'. Deleting cache",
                 e.message, cachedFile
             ));
             FileSys.cacheManager()->removeCacheFile(filename);
@@ -109,11 +110,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
 
     LINFO("Saving cache");
     try {
-        reader->saveCachedFile(cachedFile, *(model.get()));
+        model->saveToCacheFile(cachedFile);
     }
-    catch (const ModelReaderBase::ModelSaveException& e) {
+    catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {
         LERROR(fmt::format(
-            "Error:'{}' while saving model to cache file:'{}'. Deleting the cache file. ",
+            "Error:'{}' while saving model to cache file:'{}'. Deleting cache",
             e.message, e.filename
         ));
 

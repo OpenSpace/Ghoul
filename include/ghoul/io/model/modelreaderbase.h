@@ -43,25 +43,9 @@ namespace ghoul::io {
  */
 class ModelReaderBase {
 public:
-    /// The exception that gets thrown if there was an error loading the Model
-    /// from file or cache file
+    /// The exception that gets thrown if there was an error loading the Model from file
     struct ModelLoadException : public RuntimeError {
         explicit ModelLoadException(std::string name, std::string msg,
-            const ModelReaderBase* r);
-
-        /// The file that caused the exception to be thrown
-        const std::string filename;
-
-        /// The error message that occurred
-        const std::string message;
-
-        /// The ModelReaderBase that caused the exception
-        const ModelReaderBase* reader;
-    };
-
-    /// The exception that gets thrown if there was an error saving the Model to cache
-    struct ModelSaveException : public RuntimeError {
-        explicit ModelSaveException(std::string name, std::string msg,
             const ModelReaderBase* r);
 
         /// The file that caused the exception to be thrown
@@ -90,29 +74,6 @@ public:
     virtual std::unique_ptr<modelgeometry::ModelGeometry> loadModel(
         std::string& filename, bool forceRenderInvisible = false,
         bool notifyInvisibleDropped = true) const = 0;
-
-    /**
-     * Method to load an already cached model from disk.
-     *
-     * \param cachedFile The cache file to be loaded on disk
-     * \return The ModelGeometry
-     *
-     * \throw ModelLoadException If there was an error loading the model from cache
-     */
-    virtual std::unique_ptr<modelgeometry::ModelGeometry> loadCachedFile(
-        const std::string& cachedFile) const = 0;
-
-    /**
-     * Method to save an already loaded model to a cache.
-     *
-     * \param cachedFile The file the cache should be saved to
-     * \param model Pointer to the ModelGeometry that should be saved to the cache file
-     * \return bool if successfull or not
-     *
-     * \throw ModelSaveException If there was an error saving the model to cache
-     */
-    virtual bool saveCachedFile(const std::string& cachedFile,
-        const modelgeometry::ModelGeometry& model) const = 0;
 
     /**
      * Returns a list of all extensions.

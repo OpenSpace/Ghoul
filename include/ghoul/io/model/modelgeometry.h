@@ -36,6 +36,18 @@ namespace ghoul::modelgeometry {
 
 class ModelGeometry {
 public:
+    /// The exception that gets thrown if there was an error loading the cache file or
+    /// saving this model to a cache file
+    struct ModelCacheException : public RuntimeError {
+        explicit ModelCacheException(std::string file, std::string msg);
+
+        /// The file that caused the exception to be thrown
+        const std::string filename;
+
+        /// The error message that occurred
+        const std::string message;
+    };
+
     struct TextureEntry {
         std::string name;
         std::unique_ptr<opengl::Texture> texture;
@@ -45,6 +57,10 @@ public:
         std::vector<TextureEntry> textureStorage);
     ModelGeometry(ModelGeometry&&) noexcept = default;
     ~ModelGeometry() noexcept = default;
+
+    static std::unique_ptr<modelgeometry::ModelGeometry> loadCacheFile(
+        const std::string& cachedFile);
+    bool saveToCacheFile(const std::string& cachedFile) const;
 
     void initialize();
     void deinitialize();
