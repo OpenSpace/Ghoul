@@ -136,43 +136,41 @@ int luaError(lua_State* state, const std::string& message) {
 std::string stackInformation(lua_State* state) {
     ghoul_assert(state, "State must not be nullptr");
 
-    std::stringstream result;
     const int top = lua_gettop(state);
     if (top == 0) {
-        result << "Lua Stack (empty)";
+        return "Lua Stack (empty)";
     }
-    else {
-        result << "Lua Stack\n";
-        for (int i = 1; i <= top; ++i) {
-            result << i << ": ";
-            const int t = lua_type(state, i);
-            switch (t) {
-                case LUA_TSTRING:
-                    result << lua_tostring(state, i);
-                    break;
-                case LUA_TBOOLEAN:
-                    result << (lua_toboolean(state, i) ? "true" : "false");
-                    break;
-                case LUA_TNUMBER:
-                    result << lua_tonumber(state, i);
-                    break;
-                case LUA_TTABLE:
-                    result << luaTableToString(state, i);
-                    break;
-                case LUA_TTHREAD:
-                case LUA_TUSERDATA:
-                case LUA_TLIGHTUSERDATA:
-                case LUA_TFUNCTION:
-                    result << luaTypeToString(t);
-                    break;
-                default:
-                    result << lua_typename(state, t);
-                    break;
-            }
-            result << "\n";
+
+    std::string result = "Lua Stack\n";
+    for (int i = 1; i <= top; ++i) {
+        result += fmt::format("{}: ", i);
+        const int t = lua_type(state, i);
+        switch (t) {
+            case LUA_TSTRING:
+                result += lua_tostring(state, i);
+                break;
+            case LUA_TBOOLEAN:
+                result += (lua_toboolean(state, i) ? "true" : "false");
+                break;
+            case LUA_TNUMBER:
+                result += std::to_string(lua_tonumber(state, i));
+                break;
+            case LUA_TTABLE:
+                result += luaTableToString(state, i);
+                break;
+            case LUA_TTHREAD:
+            case LUA_TUSERDATA:
+            case LUA_TLIGHTUSERDATA:
+            case LUA_TFUNCTION:
+                result += luaTypeToString(t);
+                break;
+            default:
+                result += lua_typename(state, t);
+                break;
         }
+        result += '\n';
     }
-    return result.str();
+    return result;
 }
 
 void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dictionary,
@@ -216,7 +214,7 @@ ghoul::Dictionary loadDictionaryFromFile(const std::string& filename, lua_State*
 }
 
 void loadDictionaryFromString(const std::string& script, Dictionary& dictionary,
-                                                                         lua_State* state)
+                              lua_State* state)
 {
     ghoul_assert(!script.empty(), "Script must not be empty");
 
@@ -406,7 +404,7 @@ void luaArrayDictionaryFromState(lua_State* state, Dictionary& dictionary) {
             }
             default:
                 throw LuaFormatException(
-                    "Unknown type: " + std::to_string(lua_type(state, i))
+                    fmt::format("Unknown type: {}", lua_type(state, i))
                 );
         }
     }
@@ -539,8 +537,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range
     return nArguments;
 }
 
-void verifyStackSize([[maybe_unused]] lua_State* L, [[maybe_unused]] int expected) {
-#if !(defined(NDEBUG) || defined(DEBUG))
+void verifyStackSize(lua_State* L, int expected) {
     const int size = lua_gettop(L);
 
     if (size != expected) {
@@ -553,7 +550,6 @@ void verifyStackSize([[maybe_unused]] lua_State* L, [[maybe_unused]] int expecte
             expected, size
         )
     );
-#endif
 }
 
 namespace internal {
@@ -567,4 +563,4 @@ void deinitializeGlobalState() {
 
 } // namespace internal
 
-}  // namespace ghoul::lua
+} // namespace ghoul::lua

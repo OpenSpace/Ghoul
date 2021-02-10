@@ -53,7 +53,7 @@ void convert<Texture::Format::Red, Texture::Format::RG>(char* dst, const char* s
                                                         int nSourceChannels, int,
                                                         int nBytesPerChannel)
 {
-    int sourceSize = nSourceChannels * nBytesPerChannel;
+    const int sourceSize = nSourceChannels * nBytesPerChannel;
 
     std::memcpy(dst, src, sourceSize);
     std::memcpy(dst + nBytesPerChannel, src, sourceSize);

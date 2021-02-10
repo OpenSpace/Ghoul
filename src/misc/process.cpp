@@ -45,10 +45,9 @@ Process::Process(const std::string& command, const std::string& path,
 }
 
 void Process::kill() {
-    if (!_process) {
-        return;
+    if (_process) {
+        _process->kill();
     }
-    _process->kill();
     _process = nullptr;
 }
 

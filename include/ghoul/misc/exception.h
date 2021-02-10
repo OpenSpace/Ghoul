@@ -50,15 +50,13 @@ struct RuntimeError : public std::runtime_error {
     virtual ~RuntimeError() = default;
 
     /// The main message describing the exception
-    std::string message;
+    const std::string message;
 
     /// The name of the component that threw the exception
     const std::string component;
 };
 
-/**
- * Exception that is thrown if an IO access failed because a file could was not found
- */
+/// Exception that is thrown if an IO access failed because a file could was not found
 struct FileNotFoundError : public RuntimeError {
     /**
      * Main constructor constructing the exception with the provided missing file \p f and

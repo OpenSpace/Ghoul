@@ -70,7 +70,7 @@ void setDebugMessageControl(Source source, Type type, Severity severity, Enabled
 }
 
 void setDebugMessageControl(Source source, Type type,
-                            std::vector<unsigned int> identifiers, Enabled enabled)
+                            const std::vector<unsigned int>& identifiers, Enabled enabled)
 {
     ghoul_assert(source != Source::DontCare, "source must not be Source::Dontcare");
     ghoul_assert(type != Type::DontCare, "type must not be Type::Dontcare");
@@ -90,8 +90,6 @@ void setDebugMessageControl(Source source, Type type,
     );
 }
 
-//using Callback = void *(Source source, Type type, Severity severity, unsigned int id
-//  std::string message);
 void setDebugCallback(CallbackFunction callback) {
     // We have to store the function pointer that is passed into this function locally as
     // it might otherwise be destroyed (and still be referenced by \c internalCallback.

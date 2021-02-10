@@ -52,7 +52,7 @@ int convertThreadPriorityLevel([[maybe_unused]] ThreadPriorityClass c,
         case ThreadPriorityLevel::Highest:     return THREAD_PRIORITY_HIGHEST;
         default:                               throw MissingCaseException();
     }
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     switch (c) {
         case ThreadPriorityClass::Idle:
         case ThreadPriorityClass::Normal:
@@ -71,7 +71,7 @@ int convertThreadPriorityLevel([[maybe_unused]] ThreadPriorityClass c,
             }
     }
     return 0;
-#endif
+#endif // WIN32
 }
 
 [[maybe_unused]] int convertThreadPriorityClass(ThreadPriorityClass c) {
@@ -109,7 +109,7 @@ void setPriority(std::thread& t, ThreadPriorityClass priorityClass,
 
     SetPriorityClass(h, convertThreadPriorityClass(priorityClass));
     SetThreadPriority(h, convertThreadPriorityLevel(priorityClass, priorityLevel));
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     int policy;
     struct sched_param param;
     int res = pthread_getschedparam(t.native_handle(), &policy, &param);
@@ -132,7 +132,7 @@ void setPriority(std::thread& t, ThreadPriorityClass priorityClass,
             "Thread"
         );
     }
-#endif
+#endif // WIN32
 }
 
 #ifdef WIN32
@@ -141,8 +141,8 @@ void setThreadBackground(std::thread& t, Background background) {
     std::thread::native_handle_type h = t.native_handle();
     SetThreadPriority(h, m);
 }
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
 void setThreadBackground(std::thread&, Background) {}
-#endif
+#endif // WIN32
 
 } // namespace ghoul::thread

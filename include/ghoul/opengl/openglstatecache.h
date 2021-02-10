@@ -28,9 +28,9 @@
 
 #include <ghoul/opengl/ghoul_gl.h>
 #include <array>
+#include <limits>
 #include <string>
 #include <vector>
-#include <limits>
 
 namespace ghoul::opengl {
 
@@ -42,10 +42,8 @@ namespace ghoul::opengl {
  */
 class OpenGLStateCache {
 public:
-    /*
-     * Currently, this class is a Singleton. In the future we will enable multiple
-     * instances of the class when working with multiple OpenGL contexts.
-     */
+    // Currently, this class is a Singleton. In the future we will enable multiple
+    // instances of the class when working with multiple OpenGL contexts.
     static OpenGLStateCache* instance();
 
     OpenGLStateCache(const OpenGLStateCache&) = delete;
@@ -61,14 +59,14 @@ public:
     void resetLineState() const;
     void resetPolygonAndClippingState() const;
     void resetViewportState() const;
-    void setDefaultFramebuffer(const GLuint defaultFB);
-    void setViewportState(const GLint viewportCoords[4]);
+    void setDefaultFramebuffer(GLuint defaultFB);
+    void setViewportState(GLint viewportCoords[4]);
     void resetColorState() const;
-    void setColorState(const GLfloat clearColor[4], GLboolean clampColor = GL_FALSE);
+    void setColorState(GLfloat clearColor[4], GLboolean clampColor = GL_FALSE);
 
     void viewport(GLint viewport[4]) const;
     
-    GLuint defaultFramebuffer() const { return _defaultFramebuffer; }
+    GLuint defaultFramebuffer() const;
 
 private:
     OpenGLStateCache() = default;

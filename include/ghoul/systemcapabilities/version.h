@@ -30,61 +30,59 @@
 
 namespace ghoul::systemcapabilities {
 
-/**
-* This struct stores the detected version of the GLSL driver
-*/
+/// This struct stores the detected version of the GLSL driver
 struct Version {
     /**
-    * Returns <code>true</code>, if major, minor, and release version parts are the
-    * same.
-    *
-    * \return <code>True</code> if both versions are the same
-    */
+     * Returns <code>true</code>, if major, minor, and release version parts are the
+     * same.
+     *
+     * \return <code>True</code> if both versions are the same
+     */
     bool operator==(const Version& rhs) const;
 
     /**
-    * Returns <code>true</code>, if major, minor, or release version parts are
-    * different.
-    *
-    * \return <code>True</code> if either major, minor, or release version is
-    *         different
-    */
+     * Returns <code>true</code>, if major, minor, or release version parts are
+     * different.
+     *
+     * \return <code>True</code> if either major, minor, or release version is
+     *         different
+     */
     bool operator!=(const Version& rhs) const;
 
     /**
-    * First compares major version against major version, then minor against minor
-    * and finally release against release.
-    *
-    * \return <code>True</code> if <code>this</code> is a smaller version than
-    *         <code>rhs</code>
-    */
+     * First compares major version against major version, then minor against minor
+     * and finally release against release.
+     *
+     * \return <code>True</code> if <code>this</code> is a smaller version than
+     *         <code>rhs</code>
+     */
     bool operator<(const Version& rhs) const;
 
     /**
-    * First compares major version against major version, then minor against minor
-    * and finally release against release.
-    *
-    * \return <code>True</code> if <code>this</code> is a smaller or equal version
-    *         than <code>rhs</code>
-    */
+     * First compares major version against major version, then minor against minor
+     * and finally release against release.
+     *
+     * \return <code>True</code> if <code>this</code> is a smaller or equal version
+     *         than <code>rhs</code>
+     */
     bool operator<=(const Version& rhs) const;
 
     /**
-    * First compares major version against major version, then minor against minor
-    * and finally release against release.
-    *
-    * \return <code>True</code> if <code>this</code> is a greater version than
-    *         <code>rhs</code>
-    */
+     * First compares major version against major version, then minor against minor
+     * and finally release against release.
+     *
+     * \return <code>True</code> if <code>this</code> is a greater version than
+     *         <code>rhs</code>
+     */
     bool operator>(const Version& rhs) const;
 
     /**
-    * First compares major version against major version, then minor against minor
-    * and finally release against release.
-    *
-    * \return <code>True</code> if <code>this</code> is a greater or equal version
-    *         than <code>rhs</code>
-    */
+     * First compares major version against major version, then minor against minor
+     * and finally release against release.
+     *
+     * \return <code>True</code> if <code>this</code> is a greater or equal version
+     *         than <code>rhs</code>
+     */
     bool operator>=(const Version& rhs) const;
 
     /// The <code>major</code> part of the version
