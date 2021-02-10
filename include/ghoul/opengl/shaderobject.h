@@ -170,7 +170,7 @@ public:
      * A move constructor that will move all of the internal state, and the shader source,
      * but it will leave the other object in an invalid state
      */
-    ShaderObject(ShaderObject&& rhs);
+    ShaderObject(ShaderObject&& rhs) noexcept;
 
     /**
      * The destructor will mark the OpenGL name as unused again. Because of the way the
@@ -204,7 +204,7 @@ public:
      * A move assignment that will move all of the internal state, and the shader source,
      * but it will leave the other object in an invalid state.
      */
-    ShaderObject& operator=(ShaderObject&& rhs);
+    ShaderObject& operator=(ShaderObject&& rhs) noexcept;
 
     /**
      * Sets the internal name of this ShaderObject that changes the logging category by
@@ -289,14 +289,14 @@ public:
      *
      * \return The type of this ShaderObject as a human readable string
      */
-    std::string typeAsString() const;
+    std::string_view typeAsString() const;
 
     /**
      * Returns the ShaderObject <code>type</code> as a human readable string.
      *
      * \return The ShaderObject <code>type</code> as a human readable string
      */
-    static std::string stringForShaderType(ShaderType type);
+    static std::string_view stringForShaderType(ShaderType type);
 
 private:
     /// The OpenGL name of this ShaderObject

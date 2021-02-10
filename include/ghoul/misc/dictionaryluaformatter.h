@@ -41,13 +41,13 @@ struct LuaFormattingError : public RuntimeError {
 BooleanType(PrettyPrint);
 
 /**
- * Converts the passed \p dictionary into a Lua string representation.
- *
- * \param dictionary The Dictionary that should be converted
- * \return A Lua string representing the Dictionary
- *
- * \throw LuaFormattingError If the \p key points to a type that cannot be converted
- */
+    * Converts the passed \p dictionary into a Lua string representation.
+    *
+    * \param dictionary The Dictionary that should be converted
+    * \return A Lua string representing the Dictionary
+    *
+    * \throw LuaFormattingError If the \p key points to a type that cannot be converted
+    */
 std::string formatLua(const Dictionary& dictionary,
     PrettyPrint prettyPrint = PrettyPrint::No, std::string indentation = "    ");
 

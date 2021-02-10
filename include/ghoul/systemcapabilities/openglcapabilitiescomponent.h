@@ -91,7 +91,7 @@ public:
      *
      * \return The vendor of the main graphics card converted into a string
      */
-    std::string gpuVendorString() const;
+    std::string_view gpuVendorString() const;
 
     /**
      * Returns all available extensions as a list of names.
@@ -105,7 +105,7 @@ public:
      * \return <code>true</code> if the <code>extension</code> is supported;
      * <code>false</code> otherwise
      */
-    bool isExtensionSupported(const std::string& extension) const;
+    bool isExtensionSupported(std::string_view extension) const;
 
     /**
      * Returns the maximum number of texture units that are available on the main
@@ -158,7 +158,7 @@ public:
      *
      * \return The <code>OpenGL</code> string
      */
-    std::string name() const override;
+    std::string_view name() const override;
 
 protected:
     /**

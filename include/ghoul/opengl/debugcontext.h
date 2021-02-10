@@ -26,7 +26,9 @@
 #ifndef __GHOUL___DEBUGCONTEXT___H__
 #define __GHOUL___DEBUGCONTEXT___H__
 
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/boolean.h>
+#include <ghoul/misc/exception.h>
 #include <ghoul/misc/stringconversion.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <string>
@@ -196,7 +198,17 @@ namespace ghoul {
 *        opengl::debug::Source object
 */
 template <>
-opengl::debug::Source from_string(const std::string& string);
+constexpr opengl::debug::Source from_string(std::string_view string) {
+    if (string == "API") { return opengl::debug::Source::API; }
+    if (string == "Window System") { return opengl::debug::Source::WindowSystem; }
+    if (string == "Shader Compiler") { return opengl::debug::Source::ShaderCompiler; }
+    if (string == "Third Party") { return opengl::debug::Source::ThirdParty; }
+    if (string == "Application") { return opengl::debug::Source::Application; }
+    if (string == "Other") { return opengl::debug::Source::Other; }
+    if (string == "Don't care") { return opengl::debug::Source::DontCare; }
+
+    throw ghoul::RuntimeError("Unrecognized debug source '" + std::string(string) + "'");
+}
 
 /**
 * Converts a string with a \p type into a opengl::debug::Source object.
@@ -209,7 +221,20 @@ opengl::debug::Source from_string(const std::string& string);
 *        opengl::debug::Type object
 */
 template <>
-opengl::debug::Type from_string(const std::string& string);
+constexpr opengl::debug::Type from_string(std::string_view string) {
+    if (string == "Error") { return opengl::debug::Type::Error; }
+    if (string == "Deprecated") { return opengl::debug::Type::Deprecated; }
+    if (string == "Undefined") { return opengl::debug::Type::Undefined; }
+    if (string == "Portability") { return opengl::debug::Type::Portability; }
+    if (string == "Performance") { return opengl::debug::Type::Performance; }
+    if (string == "Marker") { return opengl::debug::Type::Marker; }
+    if (string == "Push group") { return opengl::debug::Type::PushGroup; }
+    if (string == "Pop group") { return opengl::debug::Type::PopGroup; }
+    if (string == "Other") { return opengl::debug::Type::Other; }
+    if (string == "Don't care") { return opengl::debug::Type::DontCare; }
+
+    throw ghoul::RuntimeError("Unrecognized debug type '" + std::string(string) + "'");
+}
 
 /**
 * Converts a string with a \p severity into a opengl::debug::Severity object.
@@ -221,7 +246,16 @@ opengl::debug::Type from_string(const std::string& string);
 *        opengl::debug::Severity object
 */
 template <>
-opengl::debug::Severity from_string(const std::string& string);
+constexpr opengl::debug::Severity from_string(std::string_view string) {
+    if (string == "High") { return opengl::debug::Severity::High; }
+    if (string == "Medium") { return opengl::debug::Severity::Medium; }
+    if (string == "Low") { return opengl::debug::Severity::Low; }
+    if (string == "Notification") { return opengl::debug::Severity::Notification; }
+
+    throw ghoul::RuntimeError(
+        "Unrecognized debug severity '" + std::string(string) + "'"
+    );
+}
 
 /**
  * Converts the \p source object into its string representation.
@@ -232,7 +266,18 @@ opengl::debug::Severity from_string(const std::string& string);
  * \return The string representation of the \p source
  */
 template <>
-std::string to_string(const ghoul::opengl::debug::Source& value);
+inline std::string to_string(const ghoul::opengl::debug::Source& value) {
+    switch (value) {
+        case ghoul::opengl::debug::Source::API:             return "API";
+        case ghoul::opengl::debug::Source::WindowSystem:    return "Window System";
+        case ghoul::opengl::debug::Source::ShaderCompiler:  return "Shader Compiler";
+        case ghoul::opengl::debug::Source::ThirdParty:      return "Third Party";
+        case ghoul::opengl::debug::Source::Application:     return "Application";
+        case ghoul::opengl::debug::Source::Other:           return "Other";
+        case ghoul::opengl::debug::Source::DontCare:        return "Don't care";
+        default:                                      throw ghoul::MissingCaseException();
+    }
+}
 
 /**
  * Converts the \p type object into its string representation.
@@ -243,7 +288,21 @@ std::string to_string(const ghoul::opengl::debug::Source& value);
  * \return The string representation of the \p type
  */
 template <>
-std::string to_string(const ghoul::opengl::debug::Type& value);
+inline std::string to_string(const ghoul::opengl::debug::Type& value) {
+    switch (value) {
+        case ghoul::opengl::debug::Type::Error:         return "Error";
+        case ghoul::opengl::debug::Type::Deprecated:    return "Deprecated";
+        case ghoul::opengl::debug::Type::Undefined:     return "Undefined";
+        case ghoul::opengl::debug::Type::Portability:   return "Portability";
+        case ghoul::opengl::debug::Type::Performance:   return "Performance";
+        case ghoul::opengl::debug::Type::Marker:        return "Marker";
+        case ghoul::opengl::debug::Type::PushGroup:     return "Push group";
+        case ghoul::opengl::debug::Type::PopGroup:      return "Pop group";
+        case ghoul::opengl::debug::Type::Other:         return "Other";
+        case ghoul::opengl::debug::Type::DontCare:      return "Don't care";
+        default:                                      throw ghoul::MissingCaseException();
+    }
+}
 
 /**
  * Converts the \p severity object into its string representation.
@@ -253,7 +312,15 @@ std::string to_string(const ghoul::opengl::debug::Type& value);
  * \return The string representation of the \p severity
  */
 template <>
-std::string to_string(const ghoul::opengl::debug::Severity& value);
+inline std::string to_string(const ghoul::opengl::debug::Severity& value) {
+    switch (value) {
+        case ghoul::opengl::debug::Severity::High:          return "High";
+        case ghoul::opengl::debug::Severity::Medium:        return "Medium";
+        case ghoul::opengl::debug::Severity::Low:           return "Low";
+        case ghoul::opengl::debug::Severity::Notification:  return "Notification";
+        default:                                      throw ghoul::MissingCaseException();
+    }
+}
 
 } // namespace ghoul
 

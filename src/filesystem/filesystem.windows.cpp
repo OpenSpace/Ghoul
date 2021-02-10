@@ -42,15 +42,15 @@ using std::string;
 namespace {
     constexpr const char* _loggerCat = "FileSystem";
 
-    void CALLBACK completionHandler(DWORD dwErrorCode, DWORD dwNumberOfBytesTransferred,
-        LPOVERLAPPED lpOverlapped);
-
     const unsigned int changeBufferSize = 16384u;
 
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 } // namespace
+
+void CALLBACK completionHandler(DWORD dwErrorCode, DWORD dwNumberOfBytesTransferred,
+    LPOVERLAPPED lpOverlapped);
 
 namespace ghoul::filesystem {
 
@@ -74,6 +74,7 @@ void FileSystem::deinitializeInternalWindows() {
 
 void FileSystem::addFileListener(File* file) {
     ghoul_assert(file != nullptr, "File must not be nullptr");
+
     std::string d = file->directoryName();
     auto f = _directories.find(d);
     if (f == _directories.end()) {
@@ -125,8 +126,7 @@ void FileSystem::removeFileListener(File* file) {
     }
     LWARNING(fmt::format(
         "Could not find tracked '{0:x}' for path '{}'",
-        reinterpret_cast<void*>(file),
-        file->path()
+        reinterpret_cast<void*>(file), file->path()
     ));
 }
 
@@ -159,21 +159,17 @@ void readStarter(DirectoryHandle* directoryHandle) {
 }
 
 void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
-    DirectoryHandle* directoryHandle = static_cast<DirectoryHandle*>(
-        lpOverlapped->hEvent
-    );
+    DirectoryHandle* handle = static_cast<DirectoryHandle*>(lpOverlapped->hEvent);
 
-    unsigned char currentBuffer = directoryHandle->_activeBuffer;
+    unsigned char currentBuffer = handle->_activeBuffer;
 
     // Change active buffer (ping-pong buffering)
-    directoryHandle->_activeBuffer = (directoryHandle->_activeBuffer + 1) % 2;
+    handle->_activeBuffer = (handle->_activeBuffer + 1) % 2;
 
     // Restart change listener as soon as possible
-    readStarter(directoryHandle);
+    readStarter(handle);
 
-    char* buffer = reinterpret_cast<char*>(
-        &(directoryHandle->_changeBuffer[currentBuffer][0])
-    );
+    char* buffer = reinterpret_cast<char*>(&(handle->_changeBuffer[currentBuffer][0]));
 
     // data might have queued up, so we need to check all changes
     while (true) {
@@ -186,14 +182,19 @@ void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
 
             // Convert from DWORD to char*
             size_t i;
-            wcstombs_s(&i, currentFilenameBuffer.data(), information.FileNameLength,
-                information.FileName, information.FileNameLength);
+            wcstombs_s(
+                &i,
+                currentFilenameBuffer.data(),
+                information.FileNameLength,
+                information.FileName,
+                information.FileNameLength
+            );
             if (i > 0) {
                 // make sure the last char is string terminating
                 currentFilenameBuffer[i - 1] = '\0';
                 const string currentFilename(currentFilenameBuffer.data(), i - 1);
 
-                callbackHandler(directoryHandle, currentFilename);
+                callbackHandler(handle, currentFilename);
             }
         }
         if (!information.NextEntryOffset) {
@@ -201,7 +202,7 @@ void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
             break;
         }
         else {
-            //continue with the next entry
+            // continue with the next entry
             buffer += information.NextEntryOffset;
         }
     }
@@ -217,7 +218,7 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
     overlappedBuffer->hEvent = directoryHandle;
 
     changeBuffer[activeBuffer].resize(changeBufferSize);
-    ZeroMemory(&(changeBuffer[activeBuffer][0]), changeBufferSize);
+    ZeroMemory(changeBuffer[activeBuffer].data(), changeBufferSize);
 
     DWORD returnedBytes;
     ReadDirectoryChangesW(

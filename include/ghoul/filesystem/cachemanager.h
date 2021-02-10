@@ -168,7 +168,7 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    std::string cachedFilename(const File& file, const std::string& information,
+    std::string cachedFilename(const File& file, std::string_view information,
         Persistent isPersistent = Persistent::No);
 
     /**
@@ -208,8 +208,8 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    std::string cachedFilename(const std::string& baseName,
-        const std::string& information, Persistent isPersistent = Persistent::No);
+    std::string cachedFilename(const std::string& baseName, std::string_view information,
+        Persistent isPersistent = Persistent::No);
 
     /**
      * This method checks if a cached \p file has been registered before in this
@@ -246,7 +246,7 @@ public:
      *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *         <code>\></code>, or <code>.</code>) in the \p file
      */
-    bool hasCachedFile(const File& file, const std::string& information) const;
+    bool hasCachedFile(const File& file, std::string_view information) const;
 
     /**
      * This method checks if a cached file has been registered before in this
@@ -265,7 +265,7 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p baseName
      */
-    bool hasCachedFile(const std::string& baseName, const std::string& information) const;
+    bool hasCachedFile(const std::string& baseName, std::string_view information) const;
 
     /**
      * Removes the cached file and deleted the entry from the CacheManager. If the
@@ -296,7 +296,7 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    void removeCacheFile(const File& file, const std::string& information);
+    void removeCacheFile(const File& file, std::string_view information);
 
     /**
      * Removes the cached file and deleted the entry from the CacheManager. If the
@@ -313,7 +313,7 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p baseName
      */
-    void removeCacheFile(const std::string& baseName, const std::string& information);
+    void removeCacheFile(const std::string& baseName, std::string_view information);
 
 protected:
     /// This struct stores the cache information for a specific hash value.

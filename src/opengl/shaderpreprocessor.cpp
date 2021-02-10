@@ -25,6 +25,7 @@
 
 #include <ghoul/opengl/shaderpreprocessor.h>
 
+#include <ghoul/fmt.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/log.h>
 #include <ghoul/misc/dictionary.h>
@@ -35,7 +36,7 @@
 #include <sstream>
 
 namespace {
-    bool isString(std::string str) {
+    bool isString(std::string_view str) {
         return str.length() > 1 && str[0] == '"' && str[str.length() - 1] == '"';
     }
 
@@ -84,9 +85,9 @@ namespace {
             "OpenGL context is neither core nor compatibility"
         );
 
-        ss << "#version " << versionMajor << versionMinor << "0";
-        ss << (isCore ? " core" : (isCompatibility ? " compatibility" : ""));
-        return ss.str();
+        std::string_view type =
+            isCore ? " core" : (isCompatibility ? " compatibility" : "");
+        return fmt::format("#version {}{}0 {}", versionMajor, versionMinor, type);
     }
 } // namespace
 
@@ -112,7 +113,9 @@ ShaderPreprocessor::ShaderPreprocessor(std::string shaderPath, Dictionary dictio
 {}
 
 ShaderPreprocessor::IncludeError::IncludeError(std::string f)
-    : ShaderPreprocessorError("Could not resolve file path for include file '" + f + "'")
+    : ShaderPreprocessorError(
+        fmt::format("Could not resolve file path for include file '{}'", f)
+    )
     , file(std::move(f))
 {}
 
@@ -237,7 +240,7 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
     if (!stream.good()) {
         perror(path.c_str());
     }
-    ghoul_assert(stream.good() , "Input stream '" + path + "' is not good");
+    ghoul_assert(stream.good() , "Input stream is not good");
 
     ghoul::filesystem::File file(path);
 
@@ -251,10 +254,9 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
 
     while (parseLine(environment)) {
         if (!environment.success) {
-            throw ParserError(
-                "Could not parse line. " + path + ":" +
-                std::to_string(environment.inputs.back().lineNumber)
-            );
+            throw ParserError(fmt::format(
+                "Could not parse line. {}: {}", path, environment.inputs.back().lineNumber
+            ));
         }
     }
 
@@ -266,10 +268,10 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
             std::string p = forInput.file.path();
             int lineNumber = forStatement.lineNumber;
 
-            throw ParserError(
-                "Unexpected end of file. Still processing #for loop from " + p + ":" +
-                std::to_string(lineNumber) + ". " + debugString(environment)
-            );
+            throw ParserError(fmt::format(
+                "Unexpected end of file. Still processing #for loop from {}: {}. {}",
+                p, lineNumber, debugString(environment)
+            ));
         }
     }
 
@@ -292,8 +294,7 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
     // Sofar, only Nvidia on Windows supports empty statements in the middle of the shader
     using Vendor = ghoul::systemcapabilities::OpenGLCapabilitiesComponent::Vendor;
     if (OpenGLCap.gpuVendor() == Vendor::Nvidia) {
-        includeSeparator =
-            "; // semicolon separator added by preprocessor to isolate error messages";
+        includeSeparator = "; // preprocessor add semicolon to isolate error messages";
     }
 #ifdef __APPLE__
     // The Apple OpenGL compiler doesn't like empty semicolor statements
@@ -411,68 +412,65 @@ std::string ShaderPreprocessor::substitute(const std::string& in,
 {
     std::string resolved;
     if (!resolveAlias(in, resolved, env)) {
-        throw SubstitutionError(
-            "Could not resolve variable '" + in + "'. " + debugString(env)
-        );
+        throw SubstitutionError(fmt::format(
+            "Could not resolve variable '{}'. {}", in, debugString(env)
+        ));
     }
 
-    std::stringstream ss;
     if (isString(resolved)) {
-        ss << resolved.substr(1, resolved.length() - 2);
+        return resolved.substr(1, resolved.length() - 2);
     }
     else if (_dictionary.hasValue<bool>(resolved)) {
-        ss << _dictionary.value<bool>(resolved);
+        return std::to_string(_dictionary.value<bool>(resolved));
     }
     else if (_dictionary.hasValue<std::string>(resolved)) {
-        ss << _dictionary.value<std::string>(resolved);
+        return _dictionary.value<std::string>(resolved);
     }
     else if (_dictionary.hasValue<const char*>(resolved)) {
-        ss << _dictionary.value<const char*>(resolved);
+        return _dictionary.value<const char*>(resolved);
     }
     else if (_dictionary.hasValue<char*>(resolved)) {
-        ss << _dictionary.value<char*>(resolved);
+        return _dictionary.value<char*>(resolved);
     }
     else if (_dictionary.hasValue<long long>(resolved)) {
-        ss << _dictionary.value<long long>(resolved);
+        return std::to_string(_dictionary.value<long long>(resolved));
     }
     else if (_dictionary.hasValue<unsigned long long>(resolved)) {
-        ss << _dictionary.value<unsigned long long>(resolved);
+        return std::to_string(_dictionary.value<unsigned long long>(resolved));
     }
     else if (_dictionary.hasValue<double>(resolved)) {
-        ss << _dictionary.value<double>(resolved);
+        return std::to_string(_dictionary.value<double>(resolved));
     }
     else if (_dictionary.hasValue<glm::ivec2>(resolved)) {
         glm::ivec2 vec = _dictionary.value<glm::ivec2>(resolved);
-        ss << "ivec2(" << vec.x << ", " << vec.y << ")";
+        return fmt::format("ivec2({},{})", vec.x, vec.y);
     }
     else if (_dictionary.hasValue<glm::ivec3>(resolved)) {
         glm::ivec3 vec = _dictionary.value<glm::ivec3>(resolved);
-        ss << "ivec3(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
+        return fmt::format("ivec3({},{},{})", vec.x, vec.y, vec.z);
     }
     else if (_dictionary.hasValue<glm::uvec2>(resolved)) {
         glm::uvec2 vec = _dictionary.value<glm::uvec2>(resolved);
-        ss << "uvec2(" << vec.x << ", " << vec.y << ")";
+        return fmt::format("uvec2({},{})", vec.x, vec.y);
     }
     else if (_dictionary.hasValue<glm::uvec3>(resolved)) {
         glm::uvec3 vec = _dictionary.value<glm::uvec3>(resolved);
-        ss << "uvec3(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
+        return fmt::format("uvec3({},{},{})", vec.x, vec.y, vec.z);
     }
     else if (_dictionary.hasValue<glm::dvec2>(resolved)) {
         glm::dvec2 vec = _dictionary.value<glm::dvec2>(resolved);
-        ss << "dvec2(" << vec.x << ", " << vec.y << ")";
+        return fmt::format("dvec2({},{})", vec.x, vec.y);
     }
     else if (_dictionary.hasValue<glm::dvec3>(resolved)) {
         glm::dvec3 vec = _dictionary.value<glm::dvec3>(resolved);
-        ss << "dvec3(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
+        return fmt::format("dvec3({},{},{})", vec.x, vec.y, vec.z);
     }
     else {
-        throw SubstitutionError(
-            "'" + in + "' was resolved to '" + resolved +
-            "' which has a type that is not supported by the preprocessor. " +
-            debugString(env)
-        );
+        throw SubstitutionError(fmt::format(
+            "'{}' was resolved to '{}' which is a type that is not supported. {}",
+            in, resolved, debugString(env)
+        ));
     }
-    return ss.str();
 }
 
 void ShaderPreprocessor::pushScope(std::map<std::string, std::string> map,
@@ -518,75 +516,72 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
 
     const bool tracksInclude = (line.find(noTrackString) == std::string::npos);
 
-    if (line.substr(0, includeString.length()) == includeString) {
-        const size_t p1 = line.find_first_not_of(ws, includeString.length());
-        if (p1 == std::string::npos) {
-            throw ParserError("Expected file path after #include. " + debugString(env));
-        }
-
-        if ((line[p1] != '\"') && (line[p1] != '<')) {
-            throw ParserError("Expected \" or <. " + debugString(env));
-        }
-
-        if (line[p1] == '\"') {
-            const size_t p2 = line.find_first_of('\"', p1 + 1);
-            if (p2 == std::string::npos) {
-                throw ParserError("Expected \"" + debugString(env));
-            }
-
-            size_t includeLength = p2 - p1 - 1;
-            std::string includeFilename = line.substr(p1 + 1, includeLength);
-            std::string includeFilepath = FileSys.pathByAppendingComponent(
-                env.inputs.back().file.directoryName(),
-                includeFilename
-            );
-
-            bool includeFileWasFound = FileSys.fileExists(includeFilepath);
-
-            // Resolve the include paths if this default includeFilename does not exist
-            if (!includeFileWasFound) {
-                for (const std::string& includePath : _includePaths) {
-                    includeFilepath = FileSys.pathByAppendingComponent(
-                        includePath,
-                        includeFilename
-                    );
-
-                    if (FileSys.fileExists(includeFilepath)) {
-                        includeFileWasFound = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!includeFileWasFound) {
-                // Our last chance is that the include file is an absolute path
-                const bool found = FileSys.fileExists(includeFilename);
-                if (found) {
-                    includeFilepath = absPath(includeFilename);
-                    includeFileWasFound = true;
-                }
-            }
-
-            if (includeFileWasFound) {
-                includeFile(absPath(includeFilepath), TrackChanges(tracksInclude), env);
-            }
-            else {
-                throw IncludeError(includeFilename);
-            }
-        }
-        else if (line.at(p1) == '<') {
-            const size_t p2 = line.find_first_of('>', p1 + 1);
-            if (p2 == std::string::npos) {
-                throw ParserError("Expected >. " + debugString(env));
-            }
-
-            const size_t includeLength = p2 - p1 - 1;
-            std::string includeFilename = absPath(line.substr(p1 + 1, includeLength));
-            includeFile(includeFilename, TrackChanges(tracksInclude), env);
-        }
-        return true;
+    if (line.substr(0, includeString.length()) != includeString) {
+        return false;
     }
-    return false;
+
+    const size_t p1 = line.find_first_not_of(ws, includeString.length());
+    if (p1 == std::string::npos) {
+        throw ParserError("Expected file path after #include. " + debugString(env));
+    }
+
+    if ((line[p1] != '\"') && (line[p1] != '<')) {
+        throw ParserError("Expected \" or <. " + debugString(env));
+    }
+
+    if (line[p1] == '\"') {
+        const size_t p2 = line.find_first_of('\"', p1 + 1);
+        if (p2 == std::string::npos) {
+            throw ParserError("Expected \"" + debugString(env));
+        }
+
+        const size_t includeLength = p2 - p1 - 1;
+        std::string includeFilename = line.substr(p1 + 1, includeLength);
+        std::string includeFilepath = FileSys.pathByAppendingComponent(
+            env.inputs.back().file.directoryName(),
+            includeFilename
+        );
+
+        bool includeFileWasFound = FileSys.fileExists(includeFilepath);
+
+        // Resolve the include paths if this default includeFilename does not exist
+        if (!includeFileWasFound) {
+            for (const std::string& path : _includePaths) {
+                includeFilepath = FileSys.pathByAppendingComponent(path, includeFilename);
+                if (FileSys.fileExists(includeFilepath)) {
+                    includeFileWasFound = true;
+                    break;
+                }
+            }
+        }
+
+        if (!includeFileWasFound) {
+            // Our last chance is that the include file is an absolute path
+            const bool found = FileSys.fileExists(includeFilename);
+            if (found) {
+                includeFilepath = absPath(includeFilename);
+                includeFileWasFound = true;
+            }
+        }
+
+        if (includeFileWasFound) {
+            includeFile(absPath(includeFilepath), TrackChanges(tracksInclude), env);
+        }
+        else {
+            throw IncludeError(includeFilename);
+        }
+    }
+    else if (line.at(p1) == '<') {
+        const size_t p2 = line.find_first_of('>', p1 + 1);
+        if (p2 == std::string::npos) {
+            throw ParserError("Expected >. " + debugString(env));
+        }
+
+        const size_t includeLength = p2 - p1 - 1;
+        std::string includeFilename = absPath(line.substr(p1 + 1, includeLength));
+        includeFile(includeFilename, TrackChanges(tracksInclude), env);
+    }
+    return true;
 }
 
 bool ShaderPreprocessor::parseVersion(ShaderPreprocessor::Env& env) {
@@ -604,21 +599,22 @@ bool ShaderPreprocessor::parseOs(ShaderPreprocessor::Env& env) {
     if (line.length() >= osString.length() &&
         line.substr(0, osString.length()) == osString)
     {
-        std::string os;
-
 #ifdef WIN32
-        os = "WIN32";
+        constexpr const char* os = "WIN32";
 #endif
 #ifdef __APPLE__
-        os = "APPLE";
+        constexpr const char* os = "APPLE";
 #endif
 #ifdef __linux__
-        os = "linux";
+        constexpr const char* os = "linux";
 #endif
-        env.output << "#ifndef __OS__" << std::endl;
-        env.output << "#define __OS__ " << os << std::endl;
-        env.output << "#define " << os << std::endl;
-        env.output << "#endif" << std::endl;
+        env.output << fmt::format(
+            "#ifndef __OS__\n"
+            "#define __OS__ {}\n"
+            "#define {}\n"
+            "#endif\n",
+            os, os
+        );
         addLineNumber(env);
         return true;
     }
@@ -734,8 +730,7 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
             return false;
         }
         // Previous dictionary name is not valid as a key since it has dots in it.
-        dictionaryName =
-            "(Range " + std::to_string(min) + " to " + std::to_string(max) + ")";
+        dictionaryName = fmt::format("(Range {} to {})", min, max);
         // Add the inner dictionary
         _dictionary.setValue(dictionaryName, rangeDictionary);
     }
@@ -744,9 +739,9 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     // Resolve the real dictionary reference.
     std::string dictionaryRef;
     if (!resolveAlias(dictionaryName, dictionaryRef, env)) {
-        throw SubstitutionError(
-            "Could not resolve variable '" + dictionaryName + "'. " + debugString(env)
-        );
+        throw SubstitutionError(fmt::format(
+            "Could not resolve variable '{}'. {}", dictionaryName, debugString(env)
+        ));
     }
     // Fetch the dictionary to iterate over.
     Dictionary innerDictionary = _dictionary.value<Dictionary>(dictionaryRef);
@@ -790,61 +785,60 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
     std::string& line = env.line;
     size_t length = line.length();
 
-    if (length > 6 && line.substr(0, endForString.length()) == endForString) {
-        if (env.forStatements.empty()) {
-            throw ParserError(
-                "Unexpected #endfor. No corresponing #for was found." + debugString(env)
-            );
-        }
-
-        ForStatement& forStatement = env.forStatements.back();
-        // Require #for and #endfor to be in the same input file
-        if (forStatement.inputIndex != env.inputs.size() - 1) {
-            env.success = false;
-            int inputIndex = forStatement.inputIndex;
-            ShaderPreprocessor::Input& forInput = env.inputs[inputIndex];
-            std::string path = forInput.file.path();
-            int lineNumber = forStatement.lineNumber;
-
-            throw ParserError(
-                "Unexpected #endfor. Last #for was in " + path + ":" +
-                std::to_string(lineNumber) + ". " + debugString(env)
-            );
-        }
-
-        popScope(env);
-        forStatement.keyIndex++;
-
-        // Fetch the dictionary to iterate over
-        Dictionary innerDictionary = _dictionary.value<Dictionary>(
-            forStatement.dictionaryReference
-        );
-        std::vector<std::string> keys = innerDictionary.keys();
-
-        std::map<std::string, std::string> table;
-        if (forStatement.keyIndex < static_cast<int>(keys.size())) {
-            std::string key = keys[forStatement.keyIndex];
-            table[forStatement.keyName] = "\"" + key + "\"";
-            table[forStatement.valueName] = forStatement.dictionaryReference + "." + key;
-            pushScope(table, env);
-            env.output << "//# Key " << key << " in " <<
-                forStatement.dictionaryReference << std::endl;
-            addLineNumber(env);
-            // Restore input to its state from when #for was found
-            Input& input = env.inputs.back();
-            input.stream.seekg(forStatement.streamPos);
-            input.lineNumber = forStatement.lineNumber;
-        }
-        else {
-            // This was the last iteration (or there ware zero iterations)
-            env.output << "//# Terminated loop over " <<
-                forStatement.dictionaryReference << std::endl;
-            addLineNumber(env);
-            env.forStatements.pop_back();
-        }
-        return true;
+    if (length <= 6 || line.substr(0, endForString.length()) != endForString) {
+        return false;
     }
-    return false;
+
+    if (env.forStatements.empty()) {
+        throw ParserError(
+            "Unexpected #endfor. No corresponding #for was found." + debugString(env)
+        );
+    }
+
+    ForStatement& forStmnt = env.forStatements.back();
+    // Require #for and #endfor to be in the same input file
+    if (forStmnt.inputIndex != env.inputs.size() - 1) {
+        env.success = false;
+        int inputIndex = forStmnt.inputIndex;
+        ShaderPreprocessor::Input& forInput = env.inputs[inputIndex];
+        std::string path = forInput.file.path();
+        int lineNumber = forStmnt.lineNumber;
+
+        throw ParserError(fmt::format(
+            "Unexpected #endfor. Last #for was in {}: {}. {}",
+            path, lineNumber, debugString(env)
+        ));
+    }
+
+    popScope(env);
+    forStmnt.keyIndex++;
+
+    // Fetch the dictionary to iterate over
+    Dictionary innerDict = _dictionary.value<Dictionary>(forStmnt.dictionaryReference);
+    std::vector<std::string> keys = innerDict.keys();
+
+    std::map<std::string, std::string> table;
+    if (forStmnt.keyIndex < static_cast<int>(keys.size())) {
+        std::string key = keys[forStmnt.keyIndex];
+        table[forStmnt.keyName] = "\"" + key + "\"";
+        table[forStmnt.valueName] = forStmnt.dictionaryReference + "." + key;
+        pushScope(table, env);
+        env.output <<
+            fmt::format("//# Key {} in {}\n", key, forStmnt.dictionaryReference);
+        addLineNumber(env);
+        // Restore input to its state from when #for was found
+        Input& input = env.inputs.back();
+        input.stream.seekg(forStmnt.streamPos);
+        input.lineNumber = forStmnt.lineNumber;
+    }
+    else {
+        // This was the last iteration (or there ware zero iterations)
+        env.output <<
+            fmt::format("//# Terminated loop over {}\n", forStmnt.dictionaryReference);
+        addLineNumber(env);
+        env.forStatements.pop_back();
+    }
+    return true;
 }
 
 } // namespace ghoul::opengl

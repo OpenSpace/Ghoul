@@ -68,8 +68,8 @@ public:
      *        individually
      * \param message The message body of the log message
      */
-    void log(LogLevel level, const std::string& category,
-        const std::string& message) override;
+    void log(LogLevel level, std::string_view category,
+        std::string_view message) override;
 };
 
 } // namespace ghoul::logging

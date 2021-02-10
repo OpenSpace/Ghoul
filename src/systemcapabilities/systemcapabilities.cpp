@@ -73,7 +73,7 @@ void SystemCapabilities::logCapabilities(
         for (const SCC::CapabilityInformation& cap : caps) {
             if (verbosity >= cap.verbosity) {
                 LINFOC(
-                    "SystemCapabilitiesComponent." + c->name(),
+                    fmt::format("SystemCapabilitiesComponent.{}", c->name()),
                     fmt::format("{}: {}", cap.description, cap.value)
                 );
             }

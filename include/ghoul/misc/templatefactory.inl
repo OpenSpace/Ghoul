@@ -25,6 +25,7 @@
 
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/dictionary.h>
+#include <ghoul/fmt.h>
 #include <type_traits>
 
 namespace ghoul {
@@ -53,49 +54,86 @@ constexpr const int DICTIONARY_CONSTRUCTOR = 2;
 
 /// Create Class using only the default constructor
 template <typename BaseClass, typename Class>
-BaseClass* createDefault(bool useDictionary, const Dictionary& dict) {
+BaseClass* createDefault(bool useDictionary, const Dictionary& dict, MemoryPoolBase* pool)
+{
 #ifdef GHL_DEBUG
     // We don't have a dictionary constructor, but the user tried to create it with a
     // Dictionary
     if (useDictionary || dict.size() != 0) {
         std::string className = typeid(Class).name();
-        throw TemplateFactoryBase::TemplateConstructionError(
-            "Class '" + className +
-            "' does not provide a constructor receiving a Dictionary"
-        );
+        throw TemplateConstructionError(fmt::format(
+            "Class '{}' does not provide a constructor receiving a Dictionary", className
+        ));
     }
 #endif
-    return new Class;
+    if (pool) {
+        void* ptr = pool->allocate(sizeof(Class));
+        return new (ptr) Class;
+    }
+    else {
+        return new Class;
+    }
 }
 
 // Create Class using the default constructor or the Dictionary
 template <typename BaseClass, typename Class>
-BaseClass* createDefaultAndDictionary(bool useDictionary, const Dictionary& dict) {
-    return useDictionary ? new Class(dict) : new Class;
+BaseClass* createDefaultAndDictionary(bool useDictionary, const Dictionary& dict,
+                                      MemoryPoolBase* pool)
+{
+    if (useDictionary) {
+        if (pool) {
+            void* ptr = pool->allocate(sizeof(Class));
+            return new (ptr) Class(dict);
+        }
+        else {
+            return new Class(dict);
+        }
+    }
+    else {
+        if (pool) {
+            void* ptr = pool->allocate(sizeof(Class));
+            return new (ptr) Class;
+        }
+        else {
+            return new Class;
+        }
+    }
 }
 
 // Create Class using only the Dictionary constructor
 template <typename BaseClass, typename Class>
-BaseClass* createDictionary(bool useDictionary, const Dictionary& dict) {
+BaseClass* createDictionary(bool useDictionary, const Dictionary& dict,
+                            MemoryPoolBase* pool)
+{
     if (!useDictionary) {
         std::string className = typeid(Class).name();
-        throw TemplateFactoryBase::TemplateConstructionError(
-            "Class '" + className + "' does only provide a Dictionary constructor " +
-            " but was called using the default constructor"
-        );
+        throw TemplateConstructionError(fmt::format(
+            "Class '{}' does only provide a Dictionary constructor but was called using "
+            "the default constructor", className
+        ));
     }
-    return new Class(dict);
+    if (pool) {
+        void* ptr = pool->allocate(sizeof(Class));
+        return new (ptr) Class(dict);
+    }
+    else {
+        return new Class(dict);
+    }
 }
 
 template <typename BaseClass, typename Class, int Constructor>
 struct CreateHelper {
-    using FactoryFuncPtr = BaseClass* (*)(bool useDictionary, const Dictionary& dict);
+    using FactoryFuncPtr = BaseClass* (*)(
+        bool useDictionary, const Dictionary& dict, MemoryPoolBase* pool
+    );
     FactoryFuncPtr createFunction();
 };
 
 template <typename BaseClass, typename Class>
 struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR | DICTIONARY_CONSTRUCTOR> {
-    using FactoryFuncPtr = BaseClass * (*)(bool useDictionary, const Dictionary& dict);
+    using FactoryFuncPtr = BaseClass* (*)(
+        bool useDictionary, const Dictionary& dict, MemoryPoolBase* pool
+    );
     FactoryFuncPtr createFunction() {
         return &createDefaultAndDictionary<BaseClass, Class>;
     }
@@ -103,7 +141,9 @@ struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR | DICTIONARY_CONSTRUCT
 
 template <typename BaseClass, typename Class>
 struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR> {
-    using FactoryFuncPtr = BaseClass * (*)(bool useDictionary, const Dictionary& dict);
+    using FactoryFuncPtr = BaseClass* (*)(
+        bool useDictionary, const Dictionary& dict, MemoryPoolBase* pool
+    );
     FactoryFuncPtr createFunction() {
         return &createDefault<BaseClass, Class>;
     }
@@ -111,7 +151,9 @@ struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR> {
 
 template <typename BaseClass, typename Class>
 struct CreateHelper<BaseClass, Class, DICTIONARY_CONSTRUCTOR> {
-    using FactoryFuncPtr = BaseClass * (*)(bool useDictionary, const Dictionary& dict);
+    using FactoryFuncPtr = BaseClass* (*)(
+        bool useDictionary, const Dictionary& dict, MemoryPoolBase* pool
+    );
     FactoryFuncPtr createFunction() {
         return &createDictionary<BaseClass, Class>;
     }
@@ -120,8 +162,8 @@ struct CreateHelper<BaseClass, Class, DICTIONARY_CONSTRUCTOR> {
 } // namespace
 
 template <typename BaseClass>
-std::unique_ptr<BaseClass> TemplateFactory<BaseClass>::create(
-                                                       const std::string& className) const
+BaseClass* TemplateFactory<BaseClass>::create(const std::string& className,
+                                              MemoryPoolBase* pool) const
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
 
@@ -132,14 +174,15 @@ std::unique_ptr<BaseClass> TemplateFactory<BaseClass>::create(
     else {
         // If 'className' is a valid name, we can use the stored function pointer to
         // create the class using the 'createType' method
-        return std::unique_ptr<BaseClass>(it->second(false, {}));
+        BaseClass* res = it->second(false, {}, pool);
+        return res;
     }
 }
 
 template <typename BaseClass>
-std::unique_ptr<BaseClass> TemplateFactory<BaseClass>::create(
-                                                             const std::string& className,
-                                                       const Dictionary& dictionary) const
+BaseClass* TemplateFactory<BaseClass>::create(const std::string& className,
+                                              const Dictionary& dictionary,
+                                              MemoryPoolBase* pool) const
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
 
@@ -150,7 +193,8 @@ std::unique_ptr<BaseClass> TemplateFactory<BaseClass>::create(
     else {
         // If 'className' is a valid name, we can use the stored function pointer to
         // create the class using the 'createType' method
-        return std::unique_ptr<BaseClass>(it->second(true, dictionary));
+        BaseClass* res = it->second(true, dictionary, pool);
+        return res;
     }
 }
 
@@ -176,34 +220,26 @@ void TemplateFactory<BaseClass>::registerClass(std::string className) {
     // Use the correct CreateHelper struct to create a function pointer that we can store
     // for later usage. std::is_constructible<>::value returns a boolean that checks at
     // run-time if there is a proper constructor for it)
-    FactoryFuncPtr&& function = CreateHelper<BaseClass, Class,
+    FactoryFunction&& function = CreateHelper<BaseClass, Class,
         (std::is_default_constructible<Class>::value * DEFAULT_CONSTRUCTOR) |
         (std::is_constructible<Class, const ghoul::Dictionary&>::value *
         DICTIONARY_CONSTRUCTOR)
     >().createFunction();
 
-    registerClass(std::move(className), function);
+    registerClass(std::move(className), FactoryFunction(function));
 }
 
 template <typename BaseClass>
 void TemplateFactory<BaseClass>::registerClass(std::string className,
-                                               FactoryFuncPtr factoryFunction)
-{
-    ghoul_assert(!className.empty(), "Classname must not be empty");
-    ghoul_assert(factoryFunction != nullptr, "Factory function must not be nullptr");
-
-    registerClass(std::move(className), FactoryFunction(std::move(factoryFunction)));
-}
-
-template <typename BaseClass>
-void TemplateFactory<BaseClass>::registerClass(std::string className,
-                std::function<BaseClass*(bool, const ghoul::Dictionary&)> factoryFunction)
+                                               FactoryFunction factoryFunction)
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
     ghoul_assert(factoryFunction, "Factory function must not be nullptr");
 
     if (_map.find(className) != _map.end()) {
-        throw TemplateFactoryError("Class '" + className + "' was registered before");
+        throw TemplateFactoryError(
+            fmt::format("Class '{}' was registered before", className)
+        );
     }
     else {
         _map.emplace(std::move(className), std::move(factoryFunction));
@@ -211,13 +247,15 @@ void TemplateFactory<BaseClass>::registerClass(std::string className,
 }
 
 template <typename BaseClass>
-bool TemplateFactory<BaseClass>::hasClass(const std::string& className) const {
+bool TemplateFactory<BaseClass>::hasClass(const std::string& className) const
+{
     ghoul_assert(!className.empty(), "Classname must not be empty");
     return (_map.find(className) != _map.end());
 }
 
 template <typename BaseClass>
-std::vector<std::string> TemplateFactory<BaseClass>::registeredClasses() const {
+std::vector<std::string> TemplateFactory<BaseClass>::registeredClasses() const
+{
     std::vector<std::string> result;
     result.reserve(_map.size());
     for (const std::pair<const std::string, FactoryFunction>& it : _map) {

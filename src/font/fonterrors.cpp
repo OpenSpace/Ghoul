@@ -23,24 +23,25 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/misc/exception.h>
+#include <ghoul/font/fonterrors.h>
 
-#include <ghoul/fmt.h>
-#include <ghoul/misc/assert.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
-namespace ghoul {
+#undef __FTERRORS_H__
+#define FT_ERRORDEF(e, v, s)  ghoul::fontrendering::Error{ e, s },
+#define FT_ERROR_START_LIST     {
+#define FT_ERROR_END_LIST       };
 
-RuntimeError::RuntimeError(std::string msg, std::string comp)
-    : std::runtime_error(comp.empty() ? msg : "(" + comp + ") " + msg)
-    , message(std::move(msg))
-    , component(std::move(comp))
-{
-    ghoul_assert(!message.empty(), "Message must not be empty");
+namespace {
+    ghoul::fontrendering::Error errors[] =
+    #include FT_ERRORS_H
+} // namespace
+
+namespace ghoul::fontrendering {
+
+Error error(int errorType) {
+    return errors[errorType];
 }
 
-FileNotFoundError::FileNotFoundError(std::string f, std::string comp)
-    : RuntimeError(fmt::format("Could not find file '{}'", f ), std::move(comp))
-    , file(std::move(f))
-{}
-
-} // namespace ghoul
+} // namespace ghoul::fontrendering

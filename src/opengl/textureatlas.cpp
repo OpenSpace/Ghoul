@@ -65,7 +65,7 @@ TextureAtlas::TextureAtlas(const TextureAtlas& rhs)
     , _data(rhs._data)
 {}
 
-TextureAtlas::TextureAtlas(TextureAtlas&& rhs)
+TextureAtlas::TextureAtlas(TextureAtlas&& rhs) noexcept
     : _nodes(std::move(rhs._nodes))
     , _handleInformation(std::move(rhs._handleInformation))
     , _size(std::move(rhs._size))
@@ -86,7 +86,7 @@ TextureAtlas& TextureAtlas::operator=(const TextureAtlas& rhs) {
     return *this;
 }
 
-TextureAtlas& TextureAtlas::operator=(TextureAtlas&& rhs) {
+TextureAtlas& TextureAtlas::operator=(TextureAtlas&& rhs) noexcept {
     if (this != &rhs) {
         _nodes = std::move(rhs._nodes);
         _texture = std::move(rhs._texture);
@@ -99,25 +99,15 @@ TextureAtlas& TextureAtlas::operator=(TextureAtlas&& rhs) {
 }
 
 void TextureAtlas::initialize() {
-    // Create texture
-    Texture::Format format;
-    // Choose the correct texture format based on the textureatlas depth
-    switch (_size.z) {
-        case 1:
-            format = Texture::Format::Red;
-            break;
-        case 2:
-            format = Texture::Format::RG;
-            break;
-        case 3:
-            format = Texture::Format::RGB;
-            break;
-        case 4:
-            format = Texture::Format::RGBA;
-            break;
-        default:
-            throw ghoul::RuntimeError("Wrong texture depth", "TextureAtlas");
-    }
+    const Texture::Format format = [](int z) {
+        switch (z) {
+            case 1: return Texture::Format::Red;
+            case 2: return Texture::Format::RG;
+            case 3: return Texture::Format::RGB;
+            case 4: return Texture::Format::RGBA;
+            default: throw ghoul::RuntimeError("Wrong texture depth", "TextureAtlas");
+        }
+    }(_size.z);
     GLenum internalFormat = GLenum(format);
 
     // Normally, we want to store data as single bytes, but if the reversed format is

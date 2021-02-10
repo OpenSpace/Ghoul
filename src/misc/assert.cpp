@@ -94,27 +94,30 @@ void internal_assert(std::string expression, std::string message, std::string fi
         }
 
         while (true) {
-            std::cerr << "(I)gnore / Ignore (P)ermanently / (A)ssertion / (S)tacktrace "
-                         "/ (E)xit: ";
+            std::cerr << 
+                "(I)gnore / Ignore (P)ermanently / (A)ssertion / (S)tacktrace / (E)xit: ";
             std::string inputLine;
             std::getline(std::cin, inputLine);
+            if (inputLine.empty()) {
+                continue;
+            }
 
             // Transform to lower case
             std::transform(
-                inputLine.begin(),
-                inputLine.end(),
+                inputLine.cbegin(),
+                inputLine.cend(),
                 inputLine.begin(),
                 [](char v) { return static_cast<char>(tolower(v)); }
             );
 
-            if (inputLine == "i") {
+            if (inputLine[0] == 'i') {
                 break;
             }
-            else if (inputLine == "p") {
+            else if (inputLine[0] == 'p') {
                 addPermanentlyIgnoredAssert(file, line);
                 break;
             }
-            else if (inputLine == "a") {
+            else if (inputLine[0] == 'a') {
 #ifdef _MSC_VER
                 __debugbreak();
 #endif // _MSC_VER
@@ -127,7 +130,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
                     line
                 );
             }
-            else if (inputLine == "s") {
+            else if (inputLine[0] == 's') {
                 std::vector<std::string> stackTrace = ghoul::stackTrace();
 
                 std::cerr << '\n';
@@ -138,7 +141,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
 
                 continue;
             }
-            else if (inputLine == "e") {
+            else if (inputLine[0] == 'e') {
                 exit(EXIT_FAILURE);
             }
         }

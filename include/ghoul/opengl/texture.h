@@ -205,7 +205,7 @@ public:
      *
      * \return The name for this texture
      */
-    const std::string& getName() const;
+    const std::string& name() const;
 
     /**
      * Sets an (optional) name for this texture. The name is not used internally and is

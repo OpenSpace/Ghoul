@@ -44,6 +44,15 @@ TextureReader::MissingReaderException::MissingReaderException(std::string extens
     , file(std::move(f))
 {}
 
+TextureReader::InvalidLoadException::InvalidLoadException(void* memory, size_t size)
+    : RuntimeError(fmt::format("Error loading texture at location {} with size {}",
+        memory,
+        size
+    ), "IO")
+    , _memory(memory)
+    , _size(size)
+{}
+
 TextureReader& TextureReader::ref() {
     static TextureReader textureReader;
     return textureReader;
@@ -65,8 +74,7 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& f
     }
 }
 
-std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory,
-                                                            size_t size,
+std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t size,
                                                             const std::string& format)
 {
     ghoul_assert(memory, "Memory must not be nullptr");
@@ -74,7 +82,12 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory,
     ghoul_assert(!_readers.empty(), "No readers were registered before");
 
     TextureReaderBase* reader = readerForExtension(format);
-    return reader->loadTexture(memory, size);
+    if (reader) {
+        return reader->loadTexture(memory, size);
+    }
+    else {
+        throw InvalidLoadException(memory, size);
+    }
 }
 
 std::vector<std::string> TextureReader::supportedExtensions() {
@@ -93,14 +106,14 @@ void TextureReader::addReader(std::unique_ptr<TextureReaderBase> reader) {
 TextureReaderBase* TextureReader::readerForExtension(const std::string& extension) {
     std::string lowerExtension = extension;
     std::transform(
-        extension.begin(),
-        extension.end(),
+        extension.cbegin(),
+        extension.cend(),
         lowerExtension.begin(),
         [](char v) { return static_cast<char>(tolower(v)); }
     );
     for (const std::unique_ptr<TextureReaderBase>& reader : _readers) {
         std::vector<std::string> extensions = reader->supportedExtensions();
-        auto it = std::find(extensions.begin(), extensions.end(), lowerExtension);
+        auto it = std::find(extensions.cbegin(), extensions.cend(), lowerExtension);
         if (it != extensions.end()) {
             return reader.get();
         }

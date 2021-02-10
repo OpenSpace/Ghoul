@@ -24,9 +24,9 @@
  ****************************************************************************************/
 
 #include <ghoul/io/socket/tcpsocket.h>
+
 #include <ghoul/logging/logmanager.h>
 #include <fmt/format.h>
-
 #include <algorithm>
 #include <cstring>
 
@@ -140,10 +140,10 @@ void TcpSocket::startStreams() {
 
 void TcpSocket::connect() {
     if (_isConnected) {
-        throw TcpSocket::TcpSocketError("Socket is already connected.");
+        throw TcpSocket::TcpSocketError("Socket is already connected");
     }
     if (_isConnecting) {
-        throw TcpSocket::TcpSocketError("Socket is already trying to connect.");
+        throw TcpSocket::TcpSocketError("Socket is already trying to connect");
     }
     if (!_initializedNetworkApi) {
         initializeNetworkApi();
@@ -229,8 +229,8 @@ bool TcpSocket::getMessage(std::string& message) {
     if (delimiterIndex == 0) {
         return false;
     }
-    std::lock_guard<std::mutex> inputLock(_inputQueueMutex);
-    message = std::string(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex);
+    std::lock_guard inputLock(_inputQueueMutex);
+    message.assign(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex);
     if (static_cast<int>(_inputQueue.size()) >= delimiterIndex + 1) {
         _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex + 1);
     }
@@ -249,7 +249,7 @@ void TcpSocket::setDelimiter(char delimiter) {
     _delimiter = delimiter;
 }
 
-void TcpSocket::establishConnection(addrinfo *info) {
+void TcpSocket::establishConnection(addrinfo* info) {
     _socket = socket(info->ai_family, info->ai_socktype, info->ai_protocol);
 
     if (_socket == INVALID_SOCKET) {
@@ -262,30 +262,18 @@ void TcpSocket::establishConnection(addrinfo *info) {
         return;
     }
 
-    int trueFlag = 1;
-    int falseFlag = 0;
+    const char trueFlag = 1;
+    const char falseFlag = 0;
     int result;
 
     // Disable Nagle's algorithm.
-    result = setsockopt(
-        _socket,
-        IPPROTO_TCP,
-        TCP_NODELAY,
-        reinterpret_cast<char*>(&trueFlag),
-        sizeof(trueFlag)
-    );
+    result = setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, &trueFlag, sizeof(trueFlag));
     if (result == SOCKET_ERROR) {
         LWARNING(fmt::format("Socket error: {}", _ERRNO));
     }
 
     // Disable address reuse
-    result = setsockopt(
-        _socket,
-        SOL_SOCKET,
-        SO_REUSEADDR,
-        reinterpret_cast<char*>(&falseFlag),
-        sizeof(falseFlag)
-    );
+    result = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &falseFlag, sizeof(falseFlag));
     if (result == SOCKET_ERROR) {
         LWARNING(fmt::format("Socket error: {}", _ERRNO));
     }
@@ -299,13 +287,7 @@ void TcpSocket::establishConnection(addrinfo *info) {
         return;
     }
     // Keep alive
-    result = setsockopt(
-        _socket,
-        SOL_SOCKET,
-        SO_KEEPALIVE,
-        reinterpret_cast<char*>(&trueFlag),
-        sizeof(trueFlag)
-    );
+    result = setsockopt(_socket, SOL_SOCKET, SO_KEEPALIVE, &trueFlag, sizeof(trueFlag));
     if (result == SOCKET_ERROR) {
         freeaddrinfo(info);
         _isConnecting = false;
@@ -409,13 +391,13 @@ void TcpSocket::waitForInput(size_t nBytes) {
         if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
         }
-        std::lock_guard<std::mutex> queueMutex(_inputQueueMutex);
+        std::lock_guard queueMutex(_inputQueueMutex);
         return _inputQueue.size() >= nBytes;
     };
 
     // Block execution until enough data has come into the input queue.
     if (!receivedRequestedInputOrDisconnected()) {
-        std::unique_lock<std::mutex> lock(_inputBufferMutex);
+        std::unique_lock lock(_inputBufferMutex);
         _inputNotifier.wait(lock, receivedRequestedInputOrDisconnected);
     }
 }
@@ -457,16 +439,16 @@ void TcpSocket::waitForOutput(size_t nBytes) {
 
     // Block execution until enough data has come into the output queue.
     if (!receivedRequestedOutputOrDisconnected()) {
-        std::unique_lock<std::mutex> lock(_outputBufferMutex);
+        std::unique_lock lock(_outputBufferMutex);
         _outputNotifier.wait(lock, receivedRequestedOutputOrDisconnected);
     }
 }
 
 void TcpSocket::initializeNetworkApi() {
 #ifdef WIN32
-    WORD version = MAKEWORD(2, 2);
+    const WORD version = MAKEWORD(2, 2);
     WSADATA wsaData;
-    int error = WSAStartup(version, &wsaData);
+    const int error = WSAStartup(version, &wsaData);
 
     if (error != 0 || LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
         // incorrect WinSock version
@@ -490,7 +472,7 @@ void TcpSocket::interceptInput(InputInterceptor interceptor) {
 }
 
 void TcpSocket::uninterceptInput() {
-    std::lock_guard<std::mutex> lock(_inputInterceptionMutex);
+    std::lock_guard lock(_inputInterceptionMutex);
     _inputInterceptor = nullptr;
 }
 
@@ -538,7 +520,7 @@ bool TcpSocket::putBytes(const char* buffer, size_t size) {
     if (_shouldStopThreads) {
         return false;
     }
-    std::lock_guard<std::mutex> outputLock(_outputQueueMutex);
+    std::lock_guard outputLock(_outputQueueMutex);
     _outputQueue.insert(_outputQueue.end(), buffer, buffer + size);
     _outputNotifier.notify_one();
     return _isConnected || _isConnecting;

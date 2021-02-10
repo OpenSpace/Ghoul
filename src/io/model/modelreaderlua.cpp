@@ -28,6 +28,7 @@
 #include <ghoul/fmt.h>
 #include <ghoul/lua/lua_helper.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/constmap.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/vertexbufferobject.h>
@@ -133,7 +134,7 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
         }
     }
 
-    static const std::map<std::string, GLenum> ModeMap = {
+    static constexpr auto ModeMap = Map<std::string_view, GLenum, 12>{{{
         { "GL_POINTS", GL_POINTS },
         { "GL_LINE_STRIP", GL_LINE_STRIP },
         { "GL_LINE_LOOP", GL_LINE_LOOP },
@@ -146,18 +147,16 @@ std::unique_ptr<opengl::VertexBufferObject> ModelReaderLua::loadModel(
         { "GL_TRIANGLE_STRIP_ADJACENCY", GL_TRIANGLE_STRIP_ADJACENCY },
         { "GL_TRIANGLES_ADJACENCY", GL_TRIANGLES_ADJACENCY },
         { "GL_PATCHES", GL_PATCHES }
-    };
+    }}};
 
     std::string modeString = dictionary.value<std::string>(KeyMode);
-    auto it = ModeMap.find(modeString);
-    if (it == ModeMap.end()) {
+    std::optional<GLenum> mode = ModeMap.at(modeString);
+    if (!mode.has_value()) {
         throw ModelReaderException(
             filename, fmt::format("Illegal rendering mode '{}'", modeString)
         );
     }
-
-    GLenum mode = ModeMap.at(modeString);
-    vbo->setRenderMode(mode);
+    vbo->setRenderMode(*mode);
     return vbo;
 }
 

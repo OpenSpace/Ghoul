@@ -26,8 +26,8 @@
 #include <iostream>
 #include <sstream>
 
-inline void log(ghoul::logging::LogLevel level, const std::string& category,
-                const std::string& message)
+inline void log(ghoul::logging::LogLevel level, std::string_view category,
+                std::string_view message)
 {
     if (ghoul::logging::LogManager::isInitialized()) {
         LogMgr.logMessage(level, category, message);
@@ -38,26 +38,26 @@ inline void log(ghoul::logging::LogLevel level, const std::string& category,
     }
 }
 
-inline void LTRACEC(const std::string& category, const std::string& message) {
+inline void LTRACEC(std::string_view category, std::string_view message) {
     log(ghoul::logging::LogLevel::Trace, category, message);
 }
 
-inline void LDEBUGC(const std::string& category, const std::string& message) {
+inline void LDEBUGC(std::string_view category, std::string_view message) {
     log(ghoul::logging::LogLevel::Debug, category, message);
 }
 
-inline void LINFOC(const std::string& category, const std::string& message) {
+inline void LINFOC(std::string_view category, std::string_view message) {
     log(ghoul::logging::LogLevel::Info, category, message);
 }
 
-inline void LWARNINGC(const std::string& category, const std::string& message) {
+inline void LWARNINGC(std::string_view category, std::string_view message) {
     log(ghoul::logging::LogLevel::Warning, category, message);
 }
 
-inline void LERRORC(const std::string& category, const std::string& message) {
+inline void LERRORC(std::string_view category, std::string_view message) {
     log(ghoul::logging::LogLevel::Error, category, message);
 }
 
-inline void LFATALC(const std::string& category, const std::string& message) {
+inline void LFATALC(std::string_view category, std::string_view message) {
     log(ghoul::logging::LogLevel::Fatal, category, message);
 }

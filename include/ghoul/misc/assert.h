@@ -58,7 +58,7 @@ struct MissingCaseException : public std::logic_error {
 // This tells the clang static analyzer that internal_assert is just like assert itself
 void internal_assert(std::string expression, std::string message, std::string file,
     std::string function, int line);
-#elif WIN32
+#elif defined(WIN32)
 // This tells Visual studio that internal_assert is just like assert itself
 __declspec(noreturn) void internal_assert(std::string expression, std::string message,
     std::string file, std::string function, int line);

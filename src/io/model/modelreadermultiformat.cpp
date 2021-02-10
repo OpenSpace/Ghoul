@@ -44,8 +44,8 @@ namespace {
     {
         for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
             meshArray.push_back(scene->mMeshes[i]);
-            totalSizeIndex += meshArray.back()->mNumFaces * 3;
-            totalSizeVertex += meshArray.back()->mNumVertices;
+            totalSizeIndex += static_cast<size_t>(meshArray.back()->mNumFaces) * 3;
+            totalSizeVertex += static_cast<size_t>(meshArray.back()->mNumVertices);
         }
 
         /*for (auto m = 0; m < currNode->mNumMeshes; ++m)
@@ -145,7 +145,7 @@ void ModelReaderMultiFormat::loadModel(const std::string& filename,
     for (const aiMesh* meshPtr : meshArray) {
         // Walk through each of the mesh's vertices
         for (unsigned int i = 0; i < meshPtr->mNumVertices; i++) {
-            Vertex vTmp {};
+            Vertex vTmp;
 
             // Positions
             vTmp.location[0] = meshPtr->mVertices[i].x;

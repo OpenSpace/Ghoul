@@ -33,7 +33,10 @@
 #include <string>
 #include <vector>
 
-namespace ghoul::opengl { class TextureAtlas; }
+namespace ghoul::opengl {
+    class TextureAtlas;
+    class Texture;
+} // namespace ghoul::opengl
 
 namespace ghoul::fontrendering {
 
@@ -102,127 +105,46 @@ public:
 
         bool operator==(const Glyph& rhs) const;
 
-        /**
-         * Returns the horizontal extent of the glyph.
-         *
-         * \return The horizontal extent of the glyph
-         */
-        int width() const;
-
-        /**
-         * Returns the vertical extent of the glyph.
-         *
-         * \return The vertical extent of the glyph
-         */
-        int height() const;
-
-        /**
-         * Returns the left-side bearing of the glyph.
-         *
-         * \return the left-side bearing of the glyph
-         */
-        float leftBearing() const;
-
-        /**
-         * Returns the top-side bearing of the glyph.
-         *
-         * \return The top-side bearing of the glyph
-         */
-        float topBearing() const;
-
-        /**
-         * Returns the horizontal advance for this glyph
-         *
-         * \return The horizontal advance for this glyph
-         */
-        float horizontalAdvance() const;
-
-        /**
-         * Returns the vertical advance for this glyph.
-         *
-         * \return The vertical advance for this glyph
-         */
-        float verticalAdvance() const;
-
-        /**
-         * Returns the kerning value between this glyph and \p character.
-         *
-         * \param character The following character for which the kerning value should be
-         *        returned.
-         * \return The kerning value between this glyph and \p character
-         */
         float kerning(wchar_t character) const;
 
-        /**
-         * Returns the texture coordinate that points to the top left corner of the base
-         * representation for this Glyph in the TextureAtlas.
-         *
-         * \return The top left base texture coordinate
-         */
-        const glm::vec2& topLeft() const;
-
-        /**
-         * Returns the texture coordinate that points to the bottom right corner of the
-         * base representation for this Glyph in the TextureAtlas.
-         *
-         * \return The bottom right base texture coordinates
-         */
-        const glm::vec2& bottomRight() const;
-
-        /**
-         * Returns the texture coordinate that points to the top left corner of the
-         * outline representation for this Glyph in the TextureAtlas.
-         *
-         * \return The top left outline texture coordinate
-         */
-        const glm::vec2& outlineTopLeft() const;
-
-        /**
-         * Returns the texture coordinate that points to the bottom right corner of the
-         * outline representation for this Glyph in the TextureAtlas.
-         *
-         * \return The bottom right outline texture coordinate
-         */
-        const glm::vec2& outlineBottomRight() const;
-
-    private:
         /// The wide character that this glyph represents
-        const wchar_t _charcode;
+        const wchar_t charcode;
 
         /// Glyph's width in pixels
-        const int _width;
+        const int width;
 
         /// Glyph's height in pixels
-        const int _height;
+        const int height;
 
         ///< Glyph's left bearing expressed in pixels
-        const float _leftBearing;
+        const float leftBearing;
 
         /// Glyphs's top bearing expressed in pixels
-        const float _topBearing;
+        const float topBearing;
 
         /// This is the distance used when the glyph is drawn as part
         /// of horizontal text
-        const float _horizontalAdvance;
+        const float horizontalAdvance;
 
         /// This is the distance used when the glyph is drawn as part
         /// of vertical text
-        const float _verticalAdvance;
+        const float verticalAdvance;
 
         /// Normalized texture coordinate of top-left corner
-        glm::vec2 _topLeft = glm::vec2(0.f);
+        glm::vec2 topLeft;
 
         /// Normalized texture coordinate of bottom-right corner
-        glm::vec2 _bottomRight = glm::vec2(0.f);
+        glm::vec2 bottomRight;
 
         /// Normalized texture coordinates for the top left of the
         /// outline
-        glm::vec2 _outlineTopLeft = glm::vec2(0.f);
+        glm::vec2 outlineTopLeft;
 
         /// Normalized texture coordinates for the bottom right of the
         /// outline
-        glm::vec2 _outlineBottomRight = glm::vec2(0.f);
+        glm::vec2 outlineBottomRight;
 
+    private:
         /// A vector of kerning pairs relative to this glyph
         std::map<wchar_t, float> _kerning;
     };
@@ -288,7 +210,7 @@ public:
      *        selected font.
      * \return The pixel coordinates of the bounding box of the passed text
      */
-    glm::vec2 boundingBox(const std::string& text);
+    glm::vec2 boundingBox(std::string_view text);
 
     /**
      * Returns the Glyph that representes the passed \p character. The first call to this
@@ -303,7 +225,7 @@ public:
     const Glyph* glyph(wchar_t character);
 
     /**
-     * Preloads a list of Glyphs. Glyphs that are passed as part of  \p characters that
+     * Preloads a list of Glyphs. Glyphs that are passed as part of \p characters that
      * have been loaded previously are ignored and not loaded multiple times.
      *
      * \param characters A list of characters for which Glyphs should be created and
@@ -315,18 +237,17 @@ public:
     void loadGlyphs(const std::vector<wchar_t>& characters);
 
     /**
-     * Returns the TextureAtlas that stores all of the Glyphs for this Font
+     * Returns the texture behind the TextureAtlas that stores all of the Glyphs
      *
-     * \return The TextureAtlas that stores all of the Glyphs for this Font
+     * \return The TextureAtlas's texture that stores all of the Glyphs for this Font
      */
-    opengl::TextureAtlas& atlas();
+    const opengl::Texture& atlasTexture() const;
 
 private:
     /// Generates the Kerning values for all Glyph pairs that have sofar been loaded
     void generateKerning();
 
-    /// Computes the left bearing for a glyph with a higher accuracy
-    float computeLeftBearing(wchar_t charcode) const;
+    //float computeLeftBearing(wchar_t charcode) const;
 
     /// A list of all loaded Glyphs
     std::vector<Glyph> _glyphs;
@@ -341,7 +262,7 @@ private:
     const float _pointSize;
 
     /// The vertical distance between two consecutive lines
-    float _height;
+    float _height = 0.f;
 
     /// Whether this Font has an outline or not
     const Outline _hasOutline;

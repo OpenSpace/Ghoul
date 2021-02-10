@@ -158,6 +158,7 @@ end_dependency("GLM")
 
 if (GHOUL_MODULE_OPENGL)
   begin_module("OpenGL")
+  cmake_policy(SET CMP0072 NEW) #FindOpenGL prefers GLVND by default when available.
 
   # OpenGL
   begin_dependency("OpenGL")
@@ -236,6 +237,7 @@ if (GHOUL_MODULE_ASSIMP)
     set(GHOUL_LIBRARY_DIRS "${ASSIMP_LIBRARY_DIRS}" PARENT_SCOPE)
   else ()
     message(STATUS "Building assimp from source")
+    set(ASSIMP_BUILD_SHARED_LIBS OFF)
     set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
 
     # These importers produce errors due to missing entries in the config.h right now
@@ -404,13 +406,18 @@ end_dependency("tiny-process-library")
 begin_module("Profiling")
 if (NOT TARGET tracy)
   add_library(tracy "${PROJECT_SOURCE_DIR}/ext/tracy/TracyClient.cpp")
+  disable_external_warnings(tracy)
   target_include_directories(tracy PUBLIC "${PROJECT_SOURCE_DIR}/ext/tracy")
   set_folder_location(tracy "External")
 endif ()
 if (GHOUL_PROFILING_ENABLE_TRACY)
   target_compile_definitions(tracy PUBLIC TRACY_ENABLE)
 endif ()
-target_link_libraries(Ghoul PUBLIC tracy)
+if (UNIX)
+  target_link_libraries(Ghoul PUBLIC tracy dl)
+else ()
+  target_link_libraries(Ghoul PUBLIC tracy)
+endif ()
 end_module("Profiling")
 
 #############################

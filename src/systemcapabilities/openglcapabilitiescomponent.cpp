@@ -128,11 +128,12 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
 #ifdef GHOUL_USE_WMI
     queryWMI("Win32_VideoController", "DriverVersion", _driverVersion);
 
-    std::string driverDateFull;
-    queryWMI("Win32_VideoController", "DriverDate", driverDateFull);
+    std::string date;
+    queryWMI("Win32_VideoController", "DriverDate", date);
 
-    _driverDate = driverDateFull.substr(0, 4) + '-' + driverDateFull.substr(4, 2) + '-' +
-        driverDateFull.substr(6, 2);
+    _driverDate = fmt::format(
+        "{}-{}-{}", date.substr(0, 4), date.substr(4, 2), date.substr(6, 2)
+    );
 
     queryWMI("Win32_VideoController", "AdapterRAM", _adapterRAM);
     // adapterRAM is in bytes
@@ -171,7 +172,9 @@ OpenGLCapabilitiesComponent::capabilities() const
     );
     result.push_back({ "OpenGL Compiler", _glslCompiler, Verbosity::Minimal });
     result.push_back({ "OpenGL Renderer", _glRenderer, Verbosity::Minimal });
-    result.push_back({ "GPU Vendor", gpuVendorString(), Verbosity::Minimal });
+    result.push_back(
+        { "GPU Vendor", std::string(gpuVendorString()), Verbosity::Minimal }
+    );
     result.push_back({
         "GLEW Version",
         ghoul::to_string(_glewVersion),Verbosity::Minimal
@@ -227,10 +230,9 @@ const std::vector<std::string>& OpenGLCapabilitiesComponent::extensions() const 
     return _extensions;
 }
 
-bool OpenGLCapabilitiesComponent::isExtensionSupported(const std::string& extension) const
-{
-    auto result = std::find(_extensions.begin(), _extensions.end(), extension);
-    return (result != _extensions.end());
+bool OpenGLCapabilitiesComponent::isExtensionSupported(std::string_view extension) const {
+    const auto result = std::find(_extensions.cbegin(), _extensions.cend(), extension);
+    return (result != _extensions.cend());
 }
 
 int OpenGLCapabilitiesComponent::maxTextureUnits() const {
@@ -257,7 +259,7 @@ int OpenGLCapabilitiesComponent::maxUniformBufferBindings() const {
     return _nUniformBufferBindings;
 }
 
-std::string OpenGLCapabilitiesComponent::gpuVendorString() const {
+std::string_view OpenGLCapabilitiesComponent::gpuVendorString() const {
     switch (_vendor) {
         case Vendor::Nvidia: return "Nvidia";
         case Vendor::ATI:    return "ATI";
@@ -266,7 +268,7 @@ std::string OpenGLCapabilitiesComponent::gpuVendorString() const {
     }
 }
 
-std::string OpenGLCapabilitiesComponent::name() const {
+std::string_view OpenGLCapabilitiesComponent::name() const {
     return "OpenGL";
 }
 

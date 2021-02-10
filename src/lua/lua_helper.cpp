@@ -49,7 +49,7 @@ int luaAbsoluteLocation(lua_State* state, int relativeLocation) {
     }
     // Negative indices implies indexing the stack from top.
     // -1 is the topmost item. +1 is the first item.
-    int nItems = lua_gettop(state);
+    const int nItems = lua_gettop(state);
     return nItems + relativeLocation + 1;
 }
 
@@ -58,16 +58,11 @@ std::string luaValueToString(lua_State* state, int location) {
 
     const int type = lua_type(state, location);
     switch (type) {
-        case LUA_TBOOLEAN:
-            return std::to_string(lua_toboolean(state, location));
-        case LUA_TNUMBER:
-            return std::to_string(lua_tonumber(state, location));
-        case LUA_TSTRING:
-            return lua_tostring(state, location);
-        case LUA_TTABLE:
-            return luaTableToString(state, location);
-        default:
-            return ghoul::lua::luaTypeToString(type);
+        case LUA_TBOOLEAN: return std::to_string(lua_toboolean(state, location));
+        case LUA_TNUMBER:  return std::to_string(lua_tonumber(state, location));
+        case LUA_TSTRING:  return lua_tostring(state, location);
+        case LUA_TTABLE:   return luaTableToString(state, location);
+        default:           return std::string(ghoul::lua::luaTypeToString(type));
     }
 }
 
@@ -282,7 +277,6 @@ void loadArrayDictionaryFromString(const std::string& script, Dictionary& dictio
     lua_settop(state, 0);
 }
 
-
 Dictionary loadDictionaryFromString(const std::string& script, lua_State* state) {
     Dictionary result;
     loadDictionaryFromString(script, result, state);
@@ -309,6 +303,11 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
     TableType type = TableType::Undefined;
 
     int location = luaAbsoluteLocation(state, relativeLocation);
+
+    const int size = lua_gettop(state);
+    if (size == 0) {
+        throw LuaFormatException("Tried to load Dictionary from empty state");
+    }
 
     lua_pushnil(state);
     while (lua_next(state, location) != 0) {
@@ -380,36 +379,36 @@ void luaArrayDictionaryFromState(lua_State* state, Dictionary& dictionary) {
 
     for (int i = 1; i <= nValues; ++i) {
         switch (lua_type(state, i)) {
-        case LUA_TNUMBER: {
-            double value = lua_tonumber(state, i);
-            dictionary.setValue(std::to_string(i), value);
-            break;
-        }
-        case LUA_TBOOLEAN: {
-            bool value = (lua_toboolean(state, i) == 1);
-            dictionary.setValue(std::to_string(i), value);
-            break;
-        }
-        case LUA_TSTRING: {
-            std::string value = lua_tostring(state, i);
-            dictionary.setValue(std::to_string(i), value);
-            break;
-        }
-        case LUA_TTABLE: {
-            Dictionary d;
-            luaDictionaryFromState(state, d, i);
-            dictionary.setValue(std::to_string(i), d);
-            break;
-        }
-        default:
-            throw LuaFormatException(
-                "Unknown type: " + std::to_string(lua_type(state, i))
-            );
+            case LUA_TNUMBER: {
+                double value = lua_tonumber(state, i);
+                dictionary.setValue(std::to_string(i), value);
+                break;
+            }
+            case LUA_TBOOLEAN: {
+                bool value = (lua_toboolean(state, i) == 1);
+                dictionary.setValue(std::to_string(i), value);
+                break;
+            }
+            case LUA_TSTRING: {
+                std::string value = lua_tostring(state, i);
+                dictionary.setValue(std::to_string(i), value);
+                break;
+            }
+            case LUA_TTABLE: {
+                Dictionary d;
+                luaDictionaryFromState(state, d, i);
+                dictionary.setValue(std::to_string(i), d);
+                break;
+            }
+            default:
+                throw LuaFormatException(
+                    "Unknown type: " + std::to_string(lua_type(state, i))
+                );
         }
     }
 }
 
-std::string luaTypeToString(int type) {
+std::string_view luaTypeToString(int type) {
     switch (type) {
         case LUA_TNONE:          return "None";
         case LUA_TNIL:           return "Nil";

@@ -28,10 +28,10 @@
 #include <ghoul/misc/buffer.h>
 
 #include <ghoul/logging/logmanager.h>
+#include <lz4/lz4.h>
 #include <algorithm>
 #include <iostream>
 #include <fstream>
-#include <lz4/lz4.h>
 
 namespace ghoul {
 
@@ -41,11 +41,10 @@ Buffer::Buffer(size_t capacity)
 
 Buffer::Buffer(const std::string& filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-
     read(filename);
 }
 
-Buffer::Buffer(Buffer&& other) {
+Buffer::Buffer(Buffer&& other) noexcept {
     if (this != &other) {
         // move memory
         _data = std::move(other._data);
@@ -68,7 +67,7 @@ Buffer& Buffer::operator=(const Buffer& rhs) {
     return *this;
 }
 
-Buffer& Buffer::operator=(Buffer&& rhs) {
+Buffer& Buffer::operator=(Buffer&& rhs) noexcept {
     if (this != &rhs) {
         // move memory
         _data = std::move(rhs._data);
@@ -103,7 +102,7 @@ Buffer::size_type Buffer::size() const {
     return _offsetWrite;
 }
 
-void Buffer::write(const std::string& filename, Compress compress) {
+void Buffer::write(const std::string& filename, Compress compress) const {
     std::ofstream file;
     file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     file.open(filename, std::ios::binary | std::ios::out);
@@ -112,16 +111,16 @@ void Buffer::write(const std::string& filename, Compress compress) {
     file.write(reinterpret_cast<const char*>(&c), sizeof(bool));
     if (compress == Compress::Yes) {
         std::vector<value_type> buffer(size());
-        int compressed_size = LZ4_compress(
+        const int compressedSize = LZ4_compress(
             reinterpret_cast<const char*>(_data.data()),
             reinterpret_cast<char*>(buffer.data()),
             static_cast<int>(_offsetWrite)
         );
-        if (compressed_size <= 0) {
+        if (compressedSize <= 0) {
             throw RuntimeError("Error compressing Buffer using LZ4", "Buffer");
         }
 
-        std::streamsize size(compressed_size);
+        std::streamsize size(compressedSize);
         // orginal size
         file.write(reinterpret_cast<const char*>(&_offsetWrite), sizeof(size_t));
 
@@ -235,7 +234,7 @@ void Buffer::serialize(const std::vector<std::string>& v) {
 
     std::memcpy(_data.data() + _offsetWrite, &length, sizeof(size_t));
     _offsetWrite += sizeof(size_t);
-    for (const auto& e : v) {
+    for (const std::string& e : v) {
         serialize(e);
     }
 }

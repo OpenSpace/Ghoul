@@ -23,24 +23,31 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/misc/exception.h>
+#ifndef __GHOUL___DICTIONARYFORMATTER___H__
+#define __GHOUL___DICTIONARYFORMATTER___H__
 
-#include <ghoul/fmt.h>
-#include <ghoul/misc/assert.h>
+#include <string>
 
 namespace ghoul {
 
-RuntimeError::RuntimeError(std::string msg, std::string comp)
-    : std::runtime_error(comp.empty() ? msg : "(" + comp + ") " + msg)
-    , message(std::move(msg))
-    , component(std::move(comp))
-{
-    ghoul_assert(!message.empty(), "Message must not be empty");
-}
+class Dictionary;
 
-FileNotFoundError::FileNotFoundError(std::string f, std::string comp)
-    : RuntimeError(fmt::format("Could not find file '{}'", f ), std::move(comp))
-    , file(std::move(f))
-{}
+/**
+ * A DictionaryFormatter will take a Dictionary and convert it into an
+ * <code>std::string</code>. The resulting format of the string will be determined by the
+ * concrete implementation of the subclass.
+ */
+class DictionaryFormatter {
+public:
+    /**
+     * Converts the passed \p dictionary into a string representation.
+     *
+     * \param dictionary The Dictionary to convert
+     * \return A string representing the \p dictionary
+     */
+    virtual std::string format(const Dictionary& dictionary) const = 0;
+};
 
-} // namespace ghoul
+}  // namespace ghoul
+
+#endif // __GHOUL___DICTIONARYFORMATTER___H__

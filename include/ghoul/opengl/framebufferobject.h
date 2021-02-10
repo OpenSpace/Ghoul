@@ -33,7 +33,7 @@ namespace ghoul::opengl {
 
 class FramebufferObject {
 public:
-    static std::string errorChecking(GLenum status);
+    static std::string_view errorChecking(GLenum status);
 
     FramebufferObject();
     ~FramebufferObject();
