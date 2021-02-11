@@ -54,8 +54,8 @@ public:
 /**
  * This class represents a MemoryPool with a specific size from which individual memory
  * blocks can be requested. The MemoryPool is organized into multiple separate buckets
- * with a specific size. The number of buckets in the MemoryPool will increase until
- * the MemoryPool is destroyed or the reset method is called.
+ * with a specific size. The number of buckets in the MemoryPool will increase until the 
+ * MemoryPool is destroyed or the reset method is called.
  * OBS: If the MemoryPool is destroyed, all memory that was returned from the alloc method
  *      is freed, but if the memory was used to create objects, their destructors are not
  *      called.
@@ -142,7 +142,7 @@ class ReusableTypedMemoryPool {
 public:
     /**
      * Creates the MemoryBool with the specified number of buckets already created
-
+     *
      * \param nBuckets the number of buckets that should be created at creation time
      */
     ReusableTypedMemoryPool(int nBuckets = 1);

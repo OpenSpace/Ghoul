@@ -34,6 +34,7 @@
 namespace ghoul::lua {
 
 namespace internal {
+
 template <typename T>
 void push(lua_State* L, T value) {
     // We have to handle the floating point types first in this as floats are able to be
@@ -154,17 +155,6 @@ T value(lua_State* L, int location, PopValue shouldPopValue) {
     }
     return res;
 }
-
-// template <typename T1, typename T2, typename... Ts>
-// std::tuple<T1, T2, Ts...> pop(lua_State* L) {
-//     std::tuple<T1, T2, Ts...> res = std::apply(
-//         [](auto... x) -> std::tuple<T1, T2, Ts...> {
-//             return std::make_tuple(do_something(x)...);
-//         },
-//         std::tuple<T1, T2, Ts...>()
-//     );
-//     return res;
-// }
 
 template <typename T>
 T value(lua_State* L, const char* name, PopValue shouldPopValue) {

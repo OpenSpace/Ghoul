@@ -37,7 +37,7 @@
 
 namespace {
     /// The default set of glyphs that are loaded when a new Font is initialized
-    const std::vector<wchar_t> DefaultCharacterSet = {
+    constexpr const std::array<wchar_t, 94> DefaultCharacterSet = {
         L' ', L'!', L'\\', L'"', L'#', L'$', L'%', L'&', L'\'', L'(',
         L')', L'*', L'+', L',', L'-', L'.', L'/', L'0', L'1', L'2',
         L'3', L'4', L'5', L'6', L'7', L'8', L'9', L':', L';', L'<',
@@ -102,7 +102,6 @@ std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
                                         Outline withOutline, LoadGlyphs loadGlyphs)
 {
     ZoneScoped
-
     ghoul_assert(!name.empty(), "Name must not be empty");
 
     unsigned int hash = hashCRC32(name);
@@ -155,7 +154,9 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     if (loadGlyphs) {
         ZoneScopedN("Load Glyphs")
         TracyGpuZone("Load Glyphs")
-        f->loadGlyphs(DefaultCharacterSet);
+        f->loadGlyphs(
+            std::vector<wchar_t>(DefaultCharacterSet.begin(), DefaultCharacterSet.end())
+        );
     }
 
     _fonts.emplace(hashName, f);

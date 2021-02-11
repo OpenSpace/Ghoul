@@ -30,14 +30,19 @@
 #include <stack>
 
 #ifdef WIN32
-#include <windows.h>
-#include <tchar.h>
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif // NOMINMAX
+
 #include <direct.h>
+#include <tchar.h>
+#include <windows.h>
 #else
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <dirent.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
 #endif
 
 using std::string;
@@ -82,7 +87,7 @@ Directory Directory::parentDirectory([[maybe_unused]] AbsolutePath absolutePath)
             absolutePath ? RawPath::No : RawPath::Yes
         );
     }
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     size_t length = _directoryPath.length();
     size_t position = _directoryPath.find_last_of(FileSystem::PathSeparator);
     if (position == length && length > 1) {
@@ -90,7 +95,7 @@ Directory Directory::parentDirectory([[maybe_unused]] AbsolutePath absolutePath)
     }
 
     return Directory(_directoryPath.substr(0, position));
-#endif
+#endif // WIN32
 }
 
 vector<string> Directory::read(Recursive recursiveSearch, Sort sort) const {
@@ -117,7 +122,7 @@ void Directory::internalReadFiles(vector<string>& result, const string& path,
 {
     std::stack<string> directories;
 #ifdef WIN32
-    WIN32_FIND_DATA findFileData = {0};
+    WIN32_FIND_DATA findFileData = { 0 };
     string directory = path + "\\*";
 
     HANDLE findHandle = FindFirstFile(directory.c_str(), &findFileData);
@@ -134,7 +139,7 @@ void Directory::internalReadFiles(vector<string>& result, const string& path,
         } while (FindNextFile(findHandle, &findFileData) != 0);
     }
     FindClose(findHandle);
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     DIR* dir = opendir(path.c_str());
     struct dirent* ent;
     if (dir) {
@@ -152,7 +157,7 @@ void Directory::internalReadFiles(vector<string>& result, const string& path,
         }
         closedir(dir);
     }
-#endif
+#endif // WIN32
     while (!directories.empty()) {
         const string& d = directories.top();
         internalReadFiles(result, d, recursiveSearch);
@@ -192,7 +197,7 @@ void Directory::internalReadDirectories(vector<string>& result, const string& pa
         } while (FindNextFile(findHandle, &findFileData) != 0);
     }
     FindClose(findHandle);
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     DIR* dir = opendir(path.c_str());
     struct dirent* ent;
     if (dir) {
@@ -208,7 +213,7 @@ void Directory::internalReadDirectories(vector<string>& result, const string& pa
         }
         closedir(dir);
     }
-#endif
+#endif // WIN32
     while (!directories.empty()) {
         const string& d = directories.top();
         internalReadDirectories(result, d, recursiveSearch);

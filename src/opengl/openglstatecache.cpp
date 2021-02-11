@@ -195,7 +195,7 @@ void OpenGLStateCache::resetColorState() const {
     );
 }
 
-void OpenGLStateCache::setColorState(const GLfloat color[4], GLboolean clampColor)  {
+void OpenGLStateCache::setColorState(GLfloat color[4], GLboolean clampColor)  {
     ghoul_assert(color != nullptr, "color must not be nullptr");
 
     if (!std::equal_to<>()(color[0], _colorClearValue[0]) ||
@@ -230,7 +230,7 @@ void OpenGLStateCache::resetViewportState() const {
     glViewport(_viewport[0], _viewport[1], _viewport[2], _viewport[3]);
 }
 
-void OpenGLStateCache::setDefaultFramebuffer(const GLuint defaultFB) {
+void OpenGLStateCache::setDefaultFramebuffer(GLuint defaultFB) {
     ghoul_assert(
         defaultFB < std::numeric_limits<GLuint>::max(), 
         "The default Framebuffer must be a valid number"
@@ -241,7 +241,7 @@ void OpenGLStateCache::setDefaultFramebuffer(const GLuint defaultFB) {
     }
 }
 
-void OpenGLStateCache::setViewportState(const GLint viewportCoords[4])  {
+void OpenGLStateCache::setViewportState(GLint viewportCoords[4])  {
     ghoul_assert(viewportCoords != nullptr, "viewportCoords must not be nullptr");
 
     if (viewportCoords[0] != _viewport[0] || viewportCoords[1] != _viewport[1] ||
@@ -263,6 +263,10 @@ void OpenGLStateCache::viewport(GLint viewport[4]) const {
     viewport[1] = _viewport[1];
     viewport[2] = _viewport[2];
     viewport[3] = _viewport[3];
+}
+
+GLuint OpenGLStateCache::defaultFramebuffer() const {
+    return _defaultFramebuffer;
 }
 
 } // namespace ghoul::opengl

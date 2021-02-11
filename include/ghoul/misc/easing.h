@@ -37,15 +37,15 @@ namespace ghoul {
 enum class EasingFunction : uint8_t {
     // @FRAGILE(abock):  The cpp expects the values to be in this order and start at 0
     Linear = 0,
-    QuadraticEaseIn, QuadraticEaseOut, QuadraticEaseInOut,
-    CubicEaseIn, CubicEaseOut, CubicEaseInOut,
-    QuarticEaseIn, QuarticEaseOut, QuarticEaseInOut,
-    QuinticEaseIn, QuinticEaseOut, QuinticEaseInOut,
-    SineEaseIn, SineEaseOut, SineEaseInOut,
-    CircularEaseIn, CircularEaseOut, CircularEaseInOut,
+    QuadraticEaseIn,   QuadraticEaseOut,   QuadraticEaseInOut,
+    CubicEaseIn,       CubicEaseOut,       CubicEaseInOut,
+    QuarticEaseIn,     QuarticEaseOut,     QuarticEaseInOut,
+    QuinticEaseIn,     QuinticEaseOut,     QuinticEaseInOut,
+    SineEaseIn,        SineEaseOut,        SineEaseInOut,
+    CircularEaseIn,    CircularEaseOut,    CircularEaseInOut,
     ExponentialEaseIn, ExponentialEaseOut, ExponentialEaseInOut,
-    ElasticEaseIn, ElasticEaseOut, ElasticEaseInOut,
-    BounceEaseIn, BounceEaseOut, BounceEaseInOut
+    ElasticEaseIn,     ElasticEaseOut,     ElasticEaseInOut,
+    BounceEaseIn,      BounceEaseOut,      BounceEaseInOut
 };
 
 /// Function pointer representing any of the easing functions defined in this file
@@ -58,7 +58,7 @@ template <typename T> using EasingFunc = T(*)(T);
  * \return A function pointer to the easing function that is to be called
  */
 template <typename T>
-EasingFunc<T> easingFunction(EasingFunction func);
+[[nodiscard]] EasingFunc<T> easingFunction(EasingFunction func);
 
 /**
  * Converts the passed \p func enum into a textual representation, which can be used for
@@ -67,7 +67,7 @@ EasingFunc<T> easingFunction(EasingFunction func);
  * \param func The easing function for which the name should be retrieved
  * \return The name of the easing function
  */
-std::string_view nameForEasingFunction(EasingFunction func);
+[[nodiscard]] std::string_view nameForEasingFunction(EasingFunction func);
 
 /**
  * Returns the enum for the passed \p name of an easing function. If \p name is not a
@@ -79,7 +79,7 @@ std::string_view nameForEasingFunction(EasingFunction func);
  * \throw std::invalid_argument If \p name is not a valid name for an easing function
  * \pre \p name must not be nullptr
  */
-EasingFunction easingFunctionFromName(std::string_view name);
+[[nodiscard]] EasingFunction easingFunctionFromName(std::string_view name);
 
 /**
  * Returns whether \p name is naming a valid easing function. If this function returns
@@ -92,7 +92,7 @@ EasingFunction easingFunctionFromName(std::string_view name);
  *
  * \pre \p name must not be nullptr
  */
-bool isValidEasingFunctionName(std::string_view name);
+[[nodiscard]] bool isValidEasingFunctionName(std::string_view name);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1] using the easing function
@@ -107,7 +107,7 @@ bool isValidEasingFunctionName(std::string_view name);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T easing(T p, EasingFunction func);
+[[nodiscard]] T easing(T p, EasingFunction func);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the line
@@ -120,7 +120,7 @@ T easing(T p, EasingFunction func);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T linear(T p);
+[[nodiscard]] T linear(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the parabola
@@ -133,7 +133,7 @@ T linear(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T quadraticEaseIn(T p);
+[[nodiscard]] T quadraticEaseIn(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the parabola
@@ -146,7 +146,7 @@ T quadraticEaseIn(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T quadraticEaseOut(T p);
+[[nodiscard]] T quadraticEaseOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
@@ -162,7 +162,7 @@ T quadraticEaseOut(T p);
  */
 
 template <typename T>
-T quadraticEaseInOut(T p);
+[[nodiscard]] T quadraticEaseInOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the cubic
@@ -175,7 +175,7 @@ T quadraticEaseInOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T cubicEaseIn(T p);
+[[nodiscard]] T cubicEaseIn(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the cubic
@@ -188,7 +188,7 @@ T cubicEaseIn(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T cubicEaseOut(T p);
+[[nodiscard]] T cubicEaseOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
@@ -203,7 +203,7 @@ T cubicEaseOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T cubicEaseInOut(T p);
+[[nodiscard]] T cubicEaseInOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quartic
@@ -216,7 +216,7 @@ T cubicEaseInOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T quarticEaseIn(T p);
+[[nodiscard]] T quarticEaseIn(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quartic
@@ -229,7 +229,7 @@ T quarticEaseIn(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T quarticEaseOut(T p);
+[[nodiscard]] T quarticEaseOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
@@ -244,7 +244,7 @@ T quarticEaseOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T quarticEaseInOut(T p);
+[[nodiscard]] T quarticEaseInOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quintic
@@ -257,7 +257,7 @@ T quarticEaseInOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T quinticEaseIn(T p);
+[[nodiscard]] T quinticEaseIn(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quintic
@@ -270,7 +270,7 @@ T quinticEaseIn(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T quinticEaseOut(T p);
+[[nodiscard]] T quinticEaseOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
@@ -285,7 +285,7 @@ T quinticEaseOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T quinticEaseInOut(T p);
+[[nodiscard]] T quinticEaseInOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the
@@ -298,7 +298,7 @@ T quinticEaseInOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T sineEaseIn(T p);
+[[nodiscard]] T sineEaseIn(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the
@@ -311,7 +311,7 @@ T sineEaseIn(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T sineEaseOut(T p);
+[[nodiscard]] T sineEaseOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the half sine
@@ -324,7 +324,7 @@ T sineEaseOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T sineEaseInOut(T p);
+[[nodiscard]] T sineEaseInOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the shifted
@@ -337,7 +337,7 @@ T sineEaseInOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T circularEaseIn(T p);
+[[nodiscard]] T circularEaseIn(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the shifted
@@ -350,7 +350,7 @@ T circularEaseIn(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T circularEaseOut(T p);
+[[nodiscard]] T circularEaseOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
@@ -366,7 +366,7 @@ T circularEaseOut(T p);
  */
 
 template <typename T>
-T circularEaseInOut(T p);
+[[nodiscard]] T circularEaseInOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the
@@ -379,7 +379,7 @@ T circularEaseInOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T exponentialEaseIn(T p);
+[[nodiscard]] T exponentialEaseIn(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the
@@ -392,7 +392,7 @@ T exponentialEaseIn(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T exponentialEaseOut(T p);
+[[nodiscard]] T exponentialEaseOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the
@@ -408,7 +408,7 @@ T exponentialEaseOut(T p);
  */
 
 template <typename T>
-T exponentialEaseInOut(T p);
+[[nodiscard]] T exponentialEaseInOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the damped
@@ -421,7 +421,7 @@ T exponentialEaseInOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T elasticEaseIn(T p);
+[[nodiscard]] T elasticEaseIn(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the damped
@@ -434,7 +434,7 @@ T elasticEaseIn(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T elasticEaseOut(T p);
+[[nodiscard]] T elasticEaseOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
@@ -449,7 +449,7 @@ T elasticEaseOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T elasticEaseInOut(T p);
+[[nodiscard]] T elasticEaseInOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the
@@ -462,7 +462,7 @@ T elasticEaseInOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T backEaseIn(T p);
+[[nodiscard]] T backEaseIn(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the
@@ -475,7 +475,7 @@ T backEaseIn(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T backEaseOut(T p);
+[[nodiscard]] T backEaseOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
@@ -490,7 +490,7 @@ T backEaseOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T backEaseInOut(T p);
+[[nodiscard]] T backEaseInOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quadratic
@@ -503,7 +503,7 @@ T backEaseInOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T bounceEaseIn(T p);
+[[nodiscard]] T bounceEaseIn(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quadratic
@@ -516,7 +516,7 @@ T bounceEaseIn(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T bounceEaseOut(T p);
+[[nodiscard]] T bounceEaseOut(T p);
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quadratic
@@ -529,7 +529,7 @@ T bounceEaseOut(T p);
  * \pre \p p must be in [0,1]
  */
 template <typename T>
-T bounceEaseInOut(T p);
+[[nodiscard]] T bounceEaseInOut(T p);
 
 } // namespace ghoul
 

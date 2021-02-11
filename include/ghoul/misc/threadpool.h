@@ -163,8 +163,7 @@ public:
      *      <code>!(runTasks == Yes && detachThreads == Yes)</code>
      * \post The ThreadPool is stopped
      */
-    void stop(
-        RunRemainingTasks runTasks = RunRemainingTasks::Yes,
+    void stop(RunRemainingTasks runTasks = RunRemainingTasks::Yes,
         DetachThreads detachThreads = DetachThreads::No
     );
 
@@ -263,9 +262,8 @@ ghoul::ThreadPool pool(2);
      * <code>std::future<void></code> is returned
      */
     template <typename Function, typename... Args>
-    auto queue(
-        Function&& function, Args&&... arguments
-    ) -> std::future<decltype(function(arguments...))>;
+    auto queue(Function&& function, Args&&... arguments)
+        -> std::future<decltype(function(arguments...))>;
 
     /**
     * This function queues a <code>std::packaged_task</code> and returns its
@@ -284,8 +282,8 @@ ghoul::ThreadPool pool(2);
     * passed \p arguments.
     */
     template <typename T, typename... Args>
-    auto queue(std::packaged_task<T>&& task, Args&&... arguments
-        ) -> decltype(task.get_future());
+    auto queue(std::packaged_task<T>&& task, Args&&... arguments)
+        -> decltype(task.get_future());
 
 private:
     ThreadPool(const ThreadPool&) = delete;

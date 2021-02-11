@@ -51,43 +51,17 @@ ShaderObject::ShaderCompileError::ShaderCompileError(std::string error,
     , shaderName(std::move(name))
 {}
 
-ShaderObject::ShaderObject(ShaderType shaderType, Dictionary dictionary)
-    : _type(shaderType)
-    , _loggerCat("ShaderObject")
-{
-    _id = glCreateShader(static_cast<GLenum>(_type));
-    _preprocessor.setDictionary(std::move(dictionary));
-    _preprocessor.setFilename("");
-
-    if (_id == 0) {
-        throw ShaderObjectError("glCreateShader returned 0");
-    }
-}
-
-ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
-                           Dictionary dictionary)
-    : _type(shaderType)
-    , _loggerCat("ShaderObject")
-{
-    ghoul_assert(!filename.empty(), "Filename must not be empty");
-
-    _id = glCreateShader(static_cast<GLenum>(_type));
-    if (_id == 0) {
-        throw ShaderObjectError("glCreateShader returned 0");
-    }
-    _preprocessor.setDictionary(std::move(dictionary));
-    _preprocessor.setFilename(std::move(filename));
-
-    rebuildFromFile();
-}
-
 ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
                            std::string name, Dictionary dictionary)
     : _type(shaderType)
     , _shaderName(std::move(name))
-    , _loggerCat(fmt::format("ShaderObject('{}')", _shaderName))
+    , _loggerCat(
+        _shaderName.empty() ?
+            "ShaderObject" :
+            fmt::format("ShaderObject('{}')", _shaderName)
+    )
 {
-    ghoul_assert(!filename.empty(), "Filename must not be empty");
+    const bool hasFilename = !filename.empty();
 
     _id = glCreateShader(static_cast<GLenum>(_type));
     if (_id == 0) {
@@ -95,7 +69,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
     }
 
 #ifdef GL_VERSION_4_3
-    if (glbinding::Binding::ObjectLabel.isResolved()) {
+    if (glbinding::Binding::ObjectLabel.isResolved() && !_shaderName.empty()) {
         glObjectLabel(
             GL_SHADER,
             _id,
@@ -107,7 +81,9 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
     _preprocessor.setFilename(std::move(filename));
     _preprocessor.setDictionary(std::move(dictionary));
 
-    rebuildFromFile();
+    if (hasFilename) {
+        rebuildFromFile();
+    }
 }
 
 ShaderObject::ShaderObject(const ShaderObject& cpy)

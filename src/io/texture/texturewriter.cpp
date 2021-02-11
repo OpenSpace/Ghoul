@@ -55,15 +55,13 @@ void TextureWriter::saveTexture(const opengl::Texture& texture, const string& fi
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
     TextureWriterBase* writer = writerForExtension(extension);
-
-    if (writer) {
-        // Make sure the directory for the file exists
-        FileSys.createDirectory(file.directoryName());
-        writer->saveTexture(texture, filename);
-    }
-    else {
+    if (!writer) {
         throw MissingWriterException(extension);
     }
+
+    // Make sure the directory for the file exists
+    FileSys.createDirectory(file.directoryName());
+    writer->saveTexture(texture, filename);
 }
 
 void TextureWriter::addWriter(std::unique_ptr<TextureWriterBase> writer) {

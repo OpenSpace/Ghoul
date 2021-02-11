@@ -100,43 +100,10 @@ public:
     using ShaderObjectCallback = std::function<void()>;
 
     /**
-     * This constructor creates a shader of the passed type with an empty source string.
-     * Before this can be used, a shader must be loaded with #setFilename and it has to be
-     * compiled.
-     *
-     * \param shaderType The type of shader that this ShaderObject will represent
-     * \param dictionary The dictionary that is used for the !ShaderPreprocessor
-     *
-     * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
-     *        generated
-     */
-    ShaderObject(ShaderType shaderType, Dictionary dictionary = Dictionary());
-
-    /**
      * This constructor creates a shader of the passed type and loads the shader source
-     * from the provided filename. If the filename is an empty string, no source will be
-     * loaded and the shader remains uninitialized. If the filename is a valid file, its
-     * contents will be used to initialize this ShaderObject.
-     *
-     * \param shaderType The type of shader that this ShaderObject will represent
-     * \param filename The name of the file that will be used to load the source of this
-     *        shader
-     * \param dictionary The dictionary that is used for the !ShaderPreprocessor
-     *
-     * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
-     *        generated
-     * \pre \p filename must not be empty
-     * \pre \p filename must be a file that exists
-     */
-    ShaderObject(ShaderType shaderType, std::string filename,
-        Dictionary dictionary = Dictionary());
-
-    /**
-     * This constructor creates a shader of the passed type and loads the shader source
-     * from the provided filename. If the filename is an empty string, no source will be
-     * loaded and the shader remains uninitialized. If the filename is a valid file, its
+     * from the provided filename if it is provided. If the filename is a valid file, its
      * contents will be used to initialize this ShaderObject. The internal name, debug
-     * label and logging category will be set based on the user provided name.
+     * label and logging category will be set based on the user provided name if provided.
      *
      * \param shaderType The type of shader that this ShaderObject will represent
      * \param filename The name of the file that will be used to load the source of this
@@ -149,7 +116,7 @@ public:
      * \pre \p filename must not be empty
      * \pre \p filename must be a file that exists
      */
-    ShaderObject(ShaderType shaderType, std::string filename, std::string name,
+    ShaderObject(ShaderType shaderType, std::string filename = "", std::string name = "",
         Dictionary dictionary = Dictionary());
 
     /**
