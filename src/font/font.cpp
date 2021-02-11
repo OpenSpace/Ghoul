@@ -43,7 +43,7 @@ namespace {
     constexpr const int DPI = 96;
 
     void handleError(FT_Error error, FT_Library library, FT_Face face, FT_Stroker stroker,
-        const std::string& name, float size)
+                     const std::string& name, float size)
     {
         if (!error) {
             return;

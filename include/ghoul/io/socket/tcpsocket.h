@@ -89,14 +89,14 @@ public:
     bool put(const T* buffer, size_t nItems = 1);
 
 private:
-    /*
+    /**
      * Read size bytes from the socket, store them in buffer and dequeue them from input.
      * Block until size bytes have been read.
      * Return false if this fails. Use error() to get the socket error code.
      */
     bool getBytes(char* buffer, size_t nItems = 1);
 
-    /*
+    /**
      * Read size bytes from the socket, store them in buffer.
      * Do NOT dequeue them from input.
      * Block until size bytes have been read.
@@ -104,7 +104,7 @@ private:
      */
     bool peekBytes(char* buffer, size_t nItems);
 
-    /*
+    /**
      * Skip size bytes from the socket.
      * Block until size bytes have been read.
      * Return false if this fails. Use error() to get the socket error code.
