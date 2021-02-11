@@ -39,30 +39,7 @@ CallbackLog::CallbackLog(CallbackFunction callbackFunction, TimeStamping timeSta
 
 void CallbackLog::log(LogLevel level, std::string_view category, std::string_view message)
 {
-    std::string output;
-    if (isDateStamping()) {
-        output += "[" + dateString();
-    }
-    if (isTimeStamping()) {
-        output += " | " + timeString();
-    }
-
-    if (isDateStamping() || isTimeStamping()) {
-        output += "] ";
-    }
-    if (isCategoryStamping() && (!category.empty())) {
-        output += category;
-        output += ' ';
-    }
-    if (isLogLevelStamping()) {
-        output += fmt::format("({})", to_string(level));
-    }
-    if (!output.empty()) {
-        output += "\t";
-    }
-    output += message;
-
-    _callbackFunction(std::move(output));
+    _callbackFunction(createFullMessageString(level, category, message));
 }
 
 void CallbackLog::setCallback(CallbackFunction callbackFunction) {

@@ -49,13 +49,11 @@ namespace {
         }
 
 
-        LDEBUGC("TextureReaderSTB", fmt::format("{}: {} {} {}", message, x, y, n));
-
         // This is weird.  stb_image.h says that the first pixel loaded is the one in the
         // upper left.  However, if we load the data and just use it, the images are
         // flipped in y.  I assume that there is a 1-t floating around somewhere and
-        // someone should hunt that down.  For now, we just flip these values as well.
-        // In addition, stb uses malloc to clear the memory and since we use delete[] for
+        // someone should hunt that down.  For now, we just flip these values as well. In
+        // addition, stb uses malloc to clear the memory and since we use delete[] for
         // cleanup in the texture class, I don't know what will happen. But probably
         // nothing good, so we copy it into a new array (abock)
 
@@ -119,13 +117,13 @@ std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(
 }
 
 std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(void* memory,
-                                                                 size_t size) const
+                                                               size_t size) const
 {
     int x;
     int y;
     int n;
     unsigned char* data = stbi_load_from_memory(
-        reinterpret_cast<const unsigned char*>(memory),
+        reinterpret_cast<unsigned char*>(memory),
         static_cast<int>(size),
         &x,
         &y,

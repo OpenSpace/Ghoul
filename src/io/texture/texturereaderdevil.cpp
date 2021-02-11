@@ -170,7 +170,7 @@ std::unique_ptr<opengl::Texture> TextureReaderDevIL::loadTexture(void* memory,
             "Memory",
             fmt::format("Error loading image: {}", iluErrorString(error)),
             this
-            );
+        );
     }
 
     return loadTextureInternal("Memory");

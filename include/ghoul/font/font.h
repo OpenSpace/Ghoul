@@ -83,12 +83,12 @@ public:
     /**
      * This class contains the metrics and the texture locations in the TextureAtlas for a
      * single glyph for a specific font. Each glyph supplies two pairs of coordinates:
-     * <br>
+     *
      * 1. The top left and bottom right corners of the base glyph (i.e., the regular
-     * glyph if it is rendered without an outline.<br>
+     *    glyph if it is rendered without an outline.<br>
      * 2. The top left and bottom right corners of the outline glyph (i.e., a filled glyph
-     * that can be rendered behind the base glyph in a different color to provide an
-     * outline to the base.
+     *    that can be rendered behind the base glyph in a different color to provide an
+     *    outline to the base.
      */
     class Glyph {
     public:
@@ -230,11 +230,13 @@ public:
      *
      * \param characters A list of characters for which Glyphs should be created and
      *        cached
+     * \return \c true if all of the glyphs could be loaded, if this is \c false at least
+     *         one glyph was replaced with a space
      *
      * \throw FreeTypeException If a FreeType exception occurred while loading the glyphs
      * \throw GlyphException If there was an error loading the glyph
      */
-    void loadGlyphs(const std::vector<wchar_t>& characters);
+    bool loadGlyphs(std::vector<wchar_t> characters);
 
     /**
      * Returns the texture behind the TextureAtlas that stores all of the Glyphs

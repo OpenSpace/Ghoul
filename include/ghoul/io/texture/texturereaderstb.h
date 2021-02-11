@@ -30,9 +30,7 @@
 
 namespace ghoul::io {
 
-/**
- * Loads the texture using the Sean Barrett's stb_image library.
- */
+/// Loads the texture using the Sean Barrett's stb_image library.
 class TextureReaderSTB : public TextureReaderBase {
 public:
     /**
@@ -52,8 +50,8 @@ public:
 
 
     /**
-     * Loads a Texture from the memory pointed at by \p memory using the STB library.
-     * The memory block must contain at least \p size number of bytes.
+     * Loads a Texture from the memory pointed at by \p memory using the STB library. The
+     * memory block must contain at least \p size number of bytes.
      *
      * \param memory The memory that contains the bytes of the Texture to be loaded
      * \param size The number of bytes contained in \p memory
@@ -71,9 +69,6 @@ public:
      * \return The supported file extensions
      */
     std::vector<std::string> supportedExtensions() const override;
-
-private:
-    std::unique_ptr<opengl::Texture> loadTextureInternal(const std::string& source) const;
 };
 
 } // namespace ghoul::io

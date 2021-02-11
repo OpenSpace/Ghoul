@@ -124,16 +124,16 @@ std::string Log::createFullMessageString(LogLevel level, std::string_view catego
                                          std::string_view message) const
 {
     std::string output;
-    if (isDateStamping()) {
-        output += "[" + dateString();
+    if (_dateStamping && !_timeStamping) {
+        output += fmt::format("[{}] ", dateString());
     }
-    if (isTimeStamping()) {
-        output += " | " + timeString();
+    else if (!_dateStamping && _timeStamping) {
+        output += fmt::format("[{}] ", timeString());
+    }
+    else if (_dateStamping && _timeStamping) {
+        output += fmt::format("[{} | {}] ", dateString(), timeString());
     }
 
-    if (isDateStamping() || isTimeStamping()) {
-        output += "] ";
-    }
     if (isCategoryStamping() && (!category.empty())) {
         output += category;
         output += ' ';
@@ -142,7 +142,7 @@ std::string Log::createFullMessageString(LogLevel level, std::string_view catego
         output += fmt::format("({})", to_string(level));
     }
     if (!output.empty()) {
-        output += "\t";
+        output += '\t';
     }
     output += message;
 

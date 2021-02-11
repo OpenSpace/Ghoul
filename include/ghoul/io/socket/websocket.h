@@ -50,12 +50,11 @@ namespace ghoul::io {
 class WebSocketServerInternal;
 
 /**
- * WebSockets are essentially a wrapper around regular TCP sockets.
- * The difference is how the messages are interpeted. In TCP sockets,
- * we delimit the messages using `_delimiter`.
+ * WebSockets are essentially a wrapper around regular TCP sockets. The difference is how
+ * the messages are interpreted. In TCP sockets, we delimit the messages using
+ * `_delimiter`.
  *
- * In WebSockets however, the message delimiting is handled by a
- * message header.
+ * In WebSockets however, the message delimiting is handled by a message header.
  */
 class WebSocket : public Socket {
 public:
@@ -75,7 +74,7 @@ public:
     };
 
     WebSocket(std::unique_ptr<TcpSocket> socket,
-              websocketpp::server<websocketpp::config::core>& server);
+        websocketpp::server<websocketpp::config::core>& server);
 
     virtual ~WebSocket();
 
@@ -93,7 +92,6 @@ public:
     void startStreams() override;
 
 private:
-
     void onMessage(const websocketpp::connection_hdl& hdl,
         const websocketpp::server<websocketpp::config::core>::message_ptr& msg);
 

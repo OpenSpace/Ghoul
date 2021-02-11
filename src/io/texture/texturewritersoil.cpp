@@ -51,15 +51,9 @@ void TextureWriterSOIL::saveTexture(const opengl::Texture& texture,
 
     int type;
 
-    if (extension == "bmp") {
-        type = SOIL_SAVE_TYPE_BMP;
-    }
-    else if (extension == "tga") {
-        type = SOIL_SAVE_TYPE_TGA;
-    }
-    else if (extension == "dds") {
-        type = SOIL_SAVE_TYPE_DDS;
-    }
+    if (extension == "bmp")      { type = SOIL_SAVE_TYPE_BMP; }
+    else if (extension == "tga") { type = SOIL_SAVE_TYPE_TGA; }
+    else if (extension == "dds") { type = SOIL_SAVE_TYPE_DDS; }
 
     const unsigned char* data = static_cast<const unsigned char*>(texture.pixelData());
     int result = SOIL_save_image(
@@ -77,11 +71,7 @@ void TextureWriterSOIL::saveTexture(const opengl::Texture& texture,
 
 std::vector<std::string> TextureWriterSOIL::supportedExtensions() const {
     // taken from http://www.lonesock.net/soil.html
-    return {
-        "bmp",
-        "tga",
-        "dds"
-    };
+    return { "bmp", "tga", "dds" };
 }
 
 } // namespace ghoul::io

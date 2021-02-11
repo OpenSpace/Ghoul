@@ -31,6 +31,42 @@
 #include <ghoul/misc/stringconversion.h>
 #include <map>
 
+namespace {
+    std::wstring str2wstr(const std::string& str) {
+        const int strLen = static_cast<int>(str.length() + 1);
+        const int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), strLen, nullptr, 0);
+        std::vector<wchar_t> buf(len);
+        MultiByteToWideChar(CP_ACP, 0, str.c_str(), strLen, buf.data(), len);
+        return std::wstring(buf.begin(), buf.end());
+    }
+
+    std::string wstr2str(const std::wstring& wstr) {
+        const int stringLength = static_cast<int>(wstr.length() + 1);
+        const int len = WideCharToMultiByte(
+            CP_ACP,
+            0,
+            wstr.c_str(),
+            stringLength,
+            nullptr,
+            0,
+            nullptr,
+            nullptr
+        );
+        std::vector<char> buf(len);
+        WideCharToMultiByte(
+            CP_ACP,
+            0,
+            wstr.c_str(),
+            stringLength,
+            buf.data(),
+            len,
+            nullptr,
+            nullptr
+        );
+        return std::string(buf.begin(), buf.end());
+    }
+} // namespace
+
 namespace ghoul::systemcapabilities {
 
 #ifdef WIN32
@@ -115,7 +151,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         );
     }
 
-    LDEBUG("Connected to ROOT\\CIMV2 WMI namespace.");
+    LDEBUG("Connected to ROOT\\CIMV2 WMI namespace");
 
     hRes = CoSetProxyBlanket(
         _iwbemServices,              // Indicates the proxy to set
@@ -154,40 +190,6 @@ void SystemCapabilitiesComponent::deinitializeWMI() {
     CoUninitialize();
 }
 
-std::wstring str2wstr(const std::string& str) {
-    const int stringLength = static_cast<int>(str.length() + 1);
-    const int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), stringLength, nullptr, 0);
-    std::vector<wchar_t> buf(len);
-    MultiByteToWideChar(CP_ACP, 0, str.c_str(), stringLength, buf.data(), len);
-    return std::wstring(buf.begin(), buf.end());
-}
-
-std::string wstr2str(const std::wstring& wstr) {
-    const int stringLength = static_cast<int>(wstr.length() + 1);
-    const int len = WideCharToMultiByte(
-        CP_ACP,
-        0,
-        wstr.c_str(),
-        stringLength,
-        nullptr,
-        0,
-        nullptr,
-        nullptr
-    );
-    std::vector<char> buf(len);
-    WideCharToMultiByte(
-        CP_ACP,
-        0,
-        wstr.c_str(),
-        stringLength,
-        buf.data(),
-        len,
-        nullptr,
-        nullptr
-    );
-    return std::string(buf.begin(), buf.end());
-}
-
 bool SystemCapabilitiesComponent::isWMIInitialized() {
     return (_iwbemLocator && _iwbemServices);
 }
@@ -201,7 +203,7 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
 
     VARIANT* result = nullptr;
     IEnumWbemClassObject* enumerator = nullptr;
-    std::string query = "SELECT " + attribute + " FROM " + wmiClass;
+    std::string query = fmt::format("SELECT {} FROM {}", attribute, wmiClass);
     HRESULT hRes = _iwbemServices->ExecQuery(
         bstr_t("WQL"),
         bstr_t(query.c_str()),

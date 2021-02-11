@@ -35,9 +35,13 @@
 #include <regex>
 
 #ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif // NOMINMAX
 #include <direct.h>
-#include <windows.h>
 #include <Shlwapi.h>
+#include <windows.h>
 #else
 #include <dirent.h>
 #include <unistd.h>
