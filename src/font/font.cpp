@@ -253,7 +253,7 @@ const Font::Glyph* Font::glyph(wchar_t character) {
     return &(_glyphs.back());
 }
 
-bool Font::loadGlyphs(std::vector<wchar_t> characters) {
+void Font::loadGlyphs(std::vector<wchar_t> characters) {
     ZoneScoped
     TracyGpuZone("loadGlyph")
 
@@ -269,13 +269,18 @@ bool Font::loadGlyphs(std::vector<wchar_t> characters) {
     loadFace(_name, _pointSize * HighResolutionFactor, libraryHighRes, faceHighRes);
 
     // check for invalid glyph codes first
-    bool anyGlyphChanged = false;
     for (wchar_t& charcode : characters) {
         FT_UInt glyphIndex = FT_Get_Char_Index(face, charcode);
         if (glyphIndex == 0) {
             // invalid glyph; replace with a space
+            LWARNINGC(
+                "Font",
+                fmt::format(
+                    "Invalid glyph '{}' found and replaced", static_cast<int>(charcode)
+                )
+            );
+
             charcode = ' ';
-            anyGlyphChanged = true;
         }
     }
 
@@ -462,8 +467,6 @@ bool Font::loadGlyphs(std::vector<wchar_t> characters) {
     FT_Done_FreeType(library);
     _atlas.upload();
     generateKerning();
-
-    return !anyGlyphChanged;
 }
 
 void Font::generateKerning() {

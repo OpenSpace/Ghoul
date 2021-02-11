@@ -230,13 +230,11 @@ public:
      *
      * \param characters A list of characters for which Glyphs should be created and
      *        cached
-     * \return \c true if all of the glyphs could be loaded, if this is \c false at least
-     *         one glyph was replaced with a space
      *
      * \throw FreeTypeException If a FreeType exception occurred while loading the glyphs
      * \throw GlyphException If there was an error loading the glyph
      */
-    bool loadGlyphs(std::vector<wchar_t> characters);
+    void loadGlyphs(std::vector<wchar_t> characters);
 
     /**
      * Returns the texture behind the TextureAtlas that stores all of the Glyphs
