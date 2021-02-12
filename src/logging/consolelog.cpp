@@ -79,9 +79,9 @@ ConsoleLog::ConsoleLog(ColorOutput colorOutput, LogLevel minimumLogLevel)
     , _colorOutput(colorOutput)
 {}
 
-void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view message)
-{
+void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view msg) {
     constexpr const int CategoryLength = 20;
+    constexpr const char FillerCharacter = ' ';
 
     if (_colorOutput) {
         setColorForLevel(level);
@@ -92,7 +92,7 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
     //  3  20                message.size()
     // + 2 for spaces in between
 
-    const int totalLength = 3 + 1 + CategoryLength + 1 + static_cast<int>(message.size());
+    const int totalLength = 3 + 1 + CategoryLength + 1 + static_cast<int>(msg.size());
 
     std::string res;
     res.reserve(totalLength);
@@ -109,7 +109,7 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
 
     if (category.length() <= CategoryLength) {
         res += category;
-        res += std::string(CategoryLength - category.length(), '.');
+        res += std::string(CategoryLength - category.length(), FillerCharacter);
         res += ' ';
     }
     else {
@@ -137,7 +137,7 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
         );
     }
 
-    res += message;
+    res += msg;
     std::cout << std::move(res) << '\n';
 
 
