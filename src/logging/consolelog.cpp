@@ -26,7 +26,9 @@
 #include <ghoul/logging/consolelog.h>
 
 #include <ghoul/misc/assert.h>
+#include <ghoul/fmt.h>
 #include <iostream>
+#include <string_view>
 
 #ifdef WIN32
 #include <windows.h>
@@ -65,29 +67,85 @@ static bool runningInDebugger() {
     // We're being debugged if the P_TRACED flag is set.
     return ( (info.kp_proc.p_flag & P_TRACED) != 0 );
 }
-#endif
+#endif // __APPLE__
 
 namespace ghoul::logging {
 
-ConsoleLog::ConsoleLog(ColorOutput colorOutput, TimeStamping timeStamping,
-            DateStamping dateStamping, CategoryStamping categoryStamping,
-            LogLevelStamping logLevelStamping, LogLevel minimumLogLevel)
-    : StreamLog(std::cout, timeStamping, dateStamping, categoryStamping, logLevelStamping,
-                minimumLogLevel)
+ConsoleLog::ConsoleLog(ColorOutput colorOutput, LogLevel minimumLogLevel)
+    : Log(
+        Log::TimeStamping::No, Log::DateStamping::No, Log::CategoryStamping::Yes, 
+        Log::LogLevelStamping::Yes, minimumLogLevel
+    )
     , _colorOutput(colorOutput)
 {}
 
-void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view message)
-{
+void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view msg) {
+    constexpr const int CategoryLength = 20;
+    constexpr const char FillerCharacter = ' ';
+
     if (_colorOutput) {
         setColorForLevel(level);
     }
 
-    StreamLog::log(level, category, message);
+    // (W) Category          Message text
+    //  ^  ^                 ^
+    //  3  20                message.size()
+    // + 2 for spaces in between
+
+    const int totalLength = 5 + CategoryLength + static_cast<int>(msg.size());
+
+    std::string res;
+    res.reserve(totalLength);
+    switch (level) {
+        case LogLevel::AllLogging: res += "(A) "; break;
+        case LogLevel::Trace:      res += "(T) "; break;
+        case LogLevel::Debug:      res += "(D) "; break;
+        case LogLevel::Info:       res += "(I) "; break;
+        case LogLevel::Warning:    res += "(W) "; break;
+        case LogLevel::Error:      res += "(E) "; break;
+        case LogLevel::Fatal:      res += "(F) "; break;
+        case LogLevel::NoLogging:  res += "(-) "; break;
+    }
+
+    if (category.length() <= CategoryLength) {
+        res += category;
+        res += std::string(CategoryLength - category.length(), FillerCharacter);
+        res += ' ';
+    }
+    else {
+        // the message is longer than our 25 width space. We'd like to keep 4 characters
+        // at the end for context
+
+        // Onelongcategorystringthatneedstobeshortended ->
+        // Onelongcatego...nded 
+
+        // slightlylongerstringhere ->
+        // slightlylonge...here
+
+        // shorterstillinthisline ->
+        // shorterstillin..line
+
+        size_t nDots = std::min<size_t>(category.length() - CategoryLength, 2);
+        // 20(length) - 4(remaining four characters at the end) - number of dots
+        res += fmt::format(
+            "{}{}{} ",
+            category.substr(0, CategoryLength - 4 - nDots),
+            std::string(nDots, '.'),
+            category.substr(category.size() - 4)
+        );
+    }
+
+    res += msg;
+    std::cout << std::move(res) << '\n';
+
 
     if (_colorOutput) {
         resetColor();
     }
+}
+
+void ConsoleLog::flush() {
+    std::cout.flush();
 }
 
 void ConsoleLog::setColorForLevel(LogLevel level) {

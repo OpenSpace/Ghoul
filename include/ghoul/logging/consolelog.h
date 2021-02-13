@@ -26,7 +26,7 @@
 #ifndef __GHOUL___CONSOLELOG___H__
 #define __GHOUL___CONSOLELOG___H__
 
-#include <ghoul/logging/streamlog.h>
+#include <ghoul/logging/log.h>
 
 #include <ghoul/misc/boolean.h>
 
@@ -51,7 +51,7 @@ namespace ghoul::logging {
  * LogLevel::Fatal -> Cyan<br>
  */
 
-class ConsoleLog : public StreamLog {
+class ConsoleLog : public Log {
 public:
     BooleanType(ColorOutput);
 
@@ -69,10 +69,6 @@ public:
      *        log messages
      */
     ConsoleLog(ColorOutput colorOutput = ColorOutput::Yes,
-        TimeStamping timeStamping = TimeStamping::No,
-        DateStamping dateStamping = DateStamping::No,
-        CategoryStamping categoryStamping = CategoryStamping::Yes,
-        LogLevelStamping logLevelStamping = LogLevelStamping::Yes,
         LogLevel minimumLogLevel = LogLevel::AllLogging);
 
     /**
@@ -85,6 +81,9 @@ public:
      */
     void log(LogLevel level, std::string_view category,
         std::string_view message) override;
+
+    /// Flushes the stream and, thereby, all messages that are in the associated buffer
+    void flush() override;
 
 protected:
     /**
