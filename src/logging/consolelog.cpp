@@ -87,12 +87,12 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
         setColorForLevel(level);
     }
 
-    // (W) Category......... Message text
+    // (W) Category          Message text
     //  ^  ^                 ^
     //  3  20                message.size()
     // + 2 for spaces in between
 
-    const int totalLength = 3 + 1 + CategoryLength + 1 + static_cast<int>(msg.size());
+    const int totalLength = 5 + CategoryLength + static_cast<int>(msg.size());
 
     std::string res;
     res.reserve(totalLength);
@@ -124,8 +124,6 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
 
         // shorterstillinthisline ->
         // shorterstillin..line
-        //           11111111112222
-        // 012345678901234567890123
 
         size_t nDots = std::min<size_t>(category.length() - CategoryLength, 2);
         // 20(length) - 4(remaining four characters at the end) - number of dots
