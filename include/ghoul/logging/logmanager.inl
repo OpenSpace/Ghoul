@@ -29,13 +29,7 @@
 inline void log(ghoul::logging::LogLevel level, std::string_view category,
                 std::string_view message)
 {
-    if (ghoul::logging::LogManager::isInitialized()) {
-        LogMgr.logMessage(level, category, message);
-    }
-    else {
-        std::cout << category << " (" <<
-            ghoul::to_string(level) << ") : " << message << std::endl;
-    }
+    LogMgr.logMessage(level, category, message);
 }
 
 inline void LTRACEC(std::string_view category, std::string_view message) {
