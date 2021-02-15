@@ -41,7 +41,10 @@ LogManager::LogManager(LogLevel level, ImmediateFlush immediateFlush)
 {}
 
 void LogManager::initialize(LogLevel level, ImmediateFlush immediateFlush) {
-    ghoul_assert(!isInitialized(), "LogManager is already initialized");
+    if (_instance) {
+        _instance->_level = level;
+        _instance->_immediateFlush = immediateFlush;
+    }
     _instance = new LogManager(level, immediateFlush);
 }
 
