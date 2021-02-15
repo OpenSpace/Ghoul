@@ -186,25 +186,25 @@ void ConsoleLog::setColorForLevel(LogLevel level) {
 #elif defined __unix__
     switch (level) {
         case LogLevel::Trace:
-            _stream << "\033[0;37m";    // grey
+            std::cout << "\033[0;37m";    // grey
             break;
         case LogLevel::Debug:
-            _stream << "\033[22;32m";   // green
+            std::cout << "\033[22;32m";   // green
             break;
         case LogLevel::Info:
-            _stream << "\033[0m";       // white
+            std::cout << "\033[0m";       // white
             break;
         case LogLevel::Warning:
-            _stream << "\033[01;40;33m";// yellow on black
+            std::cout << "\033[01;40;33m";// yellow on black
             break;
         case LogLevel::Error:
-            _stream << "\033[22;31m";   // red
+            std::cout << "\033[22;31m";   // red
             break;
         case LogLevel::Fatal:
-            _stream << "\033[22;35m";   // blue
+            std::cout << "\033[22;35m";   // blue
             break;
         case LogLevel::NoLogging:
-            _stream << "\033[0m";       // white
+            std::cout << "\033[0m";       // white
             break;
         case LogLevel::AllLogging:
             break;
@@ -213,32 +213,34 @@ void ConsoleLog::setColorForLevel(LogLevel level) {
     // The Xcode debugger is a bit strange with those control commands, so we have to
     // disable them if where are being debugged
     bool inDebugger = runningInDebugger();
-    if (!inDebugger) {
-        switch (level) {
-            case LogLevel::Trace:
-                _stream << "\033[0;37m";    // grey
-                break;
-            case LogLevel::Debug:
-                _stream << "\033[22;32m";   // green
-                break;
-            case LogLevel::Info:
-                _stream << "\033[0m";       // white
-                break;
-            case LogLevel::Warning:
-                _stream << "\033[01;40;33m";// yellow on black
-                break;
-            case LogLevel::Error:
-                _stream << "\033[22;31m";   // red
-                break;
-            case LogLevel::Fatal:
-                _stream << "\033[22;35m";   // blue
-                break;
-            case LogLevel::NoLogging:
-                _stream << "\033[0m";       // white
-                break;
-            case LogLevel::AllLogging:
-                break;
-        }
+    if (inDebugger) {
+        return;
+    }
+
+    switch (level) {
+        case LogLevel::Trace:
+            std::cout << "\033[0;37m";    // grey
+            break;
+        case LogLevel::Debug:
+            std::cout << "\033[22;32m";   // green
+            break;
+        case LogLevel::Info:
+            std::cout << "\033[0m";       // white
+            break;
+        case LogLevel::Warning:
+            std::cout << "\033[01;40;33m";// yellow on black
+            break;
+        case LogLevel::Error:
+            std::cout << "\033[22;31m";   // red
+            break;
+        case LogLevel::Fatal:
+            std::cout << "\033[22;35m";   // blue
+            break;
+        case LogLevel::NoLogging:
+            std::cout << "\033[0m";       // white
+            break;
+        case LogLevel::AllLogging:
+            std::cout;
     }
 #endif
 }
