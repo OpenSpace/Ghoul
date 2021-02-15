@@ -32,6 +32,7 @@
 #include <map>
 
 namespace {
+#ifdef WIN32
     std::wstring str2wstr(const std::string& str) {
         const int strLen = static_cast<int>(str.length() + 1);
         const int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), strLen, nullptr, 0);
@@ -65,6 +66,7 @@ namespace {
         );
         return std::string(buf.begin(), buf.end());
     }
+#endif // WIN32
 } // namespace
 
 namespace ghoul::systemcapabilities {
