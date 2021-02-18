@@ -96,6 +96,9 @@ void LogManager::logMessage(LogLevel level, std::string_view category,
         std::lock_guard lock(_mutex);
 
         _consoleLog.log(level, category, message);
+        if (_immediateFlush) {
+            _consoleLog.flush();
+        }
         for (const std::unique_ptr<Log>& log : _logs) {
             if (level >= log->logLevel()) {
                 log->log(level, category, message);
