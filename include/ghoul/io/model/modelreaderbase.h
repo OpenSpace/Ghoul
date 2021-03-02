@@ -26,60 +26,61 @@
 #ifndef __GHOUL___MODELREADERBASE___H__
 #define __GHOUL___MODELREADERBASE___H__
 
+#include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <memory>
 #include <string>
 
-namespace ghoul::opengl { class VertexBufferObject; }
+namespace ghoul::modelgeometry { class ModelGeometry; }
 
 namespace ghoul::io {
 
 /**
  * Concrete instantiations of this abstract base class provide the ability to load
- * geometric models from a file on disk into a VertexBufferObject. The resulting
- * VertexBufferObject is fully initialized and usable. A valid OpenGL context has to be
- * present for the loadModel function.
+ * geometric models from a file on disk into a ModelGeometry.
+ * A valid OpenGL context has to be present for the loadModel function.
  */
 class ModelReaderBase {
 public:
-    /**
-     * Vertex base properties.
-     */
-    struct Vertex {
-        GLfloat location[3];
-        GLfloat tex[2];
-        GLfloat normal[3];
-    };
+    /// The exception that gets thrown if there was an error loading the Model from file
+    struct ModelLoadException : public RuntimeError {
+        explicit ModelLoadException(std::string name, std::string msg,
+            const ModelReaderBase* r);
 
-    /**
-     * The exception that gets thrown if there is an error loading a model from the
-     * provided \p file. The \p error message is contained in the exception.
-     */
-    struct ModelReaderException : public RuntimeError {
-        explicit ModelReaderException(std::string file, std::string error);
+        /// The file that caused the exception to be thrown
+        const std::string filename;
 
-        /// The file which caused the exception
-        const std::string fileName;
+        /// The error message that occurred
+        const std::string message;
 
-        /// The error message
-        const std::string errorMessage;
+        /// The ModelReaderBase that caused the exception
+        const ModelReaderBase* reader;
     };
 
     /// Default virtual destructor
     virtual ~ModelReaderBase() = default;
 
     /**
-     * The method loading the specific model from disk. The result is a fully initialized
-     * and usable VertexBufferObject
+     * The method loading the specific model from disk.
      *
      * \param filename The file on disk that is to be loaded
-     * \return The intialized VertexBufferObject
+     * \param forceRenderInvisible Force invisible meshes to render or not
+     * \param notifyInvisibleDropped Notify in log if invisible meshses were dropped
+     * \return The ModelGeometry
      *
-     * \throw ModelReaderException If there was an error loading the model from disk
+     * \throw ModelLoadException If there was an error loading the model from disk
      */
-    virtual std::unique_ptr<opengl::VertexBufferObject> loadModel(
-        const std::string& filename) const = 0;
+    virtual std::unique_ptr<modelgeometry::ModelGeometry> loadModel(
+        std::string& filename, bool forceRenderInvisible = false,
+        bool notifyInvisibleDropped = true) const = 0;
+
+    /**
+     * Returns a list of all extensions.
+     *
+     * \return The supported file extensions.
+     */
+    virtual std::vector<std::string> supportedExtensions() const = 0;
 };
 
 } // namespace ghoul::io

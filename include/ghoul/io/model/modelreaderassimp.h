@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MODELREADERMULTIFORMAT___H__
-#define __GHOUL___MODELREADERMULTIFORMAT___H__
+#ifndef __GHOUL___MODELREADERASSIMP___H__
+#define __GHOUL___MODELREADERASSIMP___H__
 
 #include <ghoul/io/model/modelreaderbase.h>
 
@@ -37,7 +37,8 @@ namespace ghoul::io {
 
 /**
  * This model reader loads the provided file using the Assimp library. This simple
- * method loads multiple shapes, from different 3D file formats:
+ * method loads multiple shapes, from different 3D file formats (An asterisk 
+ * indicates limited support):
  * Autodesk ( .fbx )
  * Collada ( .dae )
  * glTF ( .gltf, .glb )
@@ -48,53 +49,45 @@ namespace ghoul::io {
  * Industry Foundation Classes (IFC/Step) ( .ifc )
  * XGL ( .xgl,.zgl )
  * Stanford Polygon Library ( .ply )
- * AutoCAD DXF ( .dxf )
+ * AutoCAD DXF ( .dxf ) *
  * LightWave ( .lwo )
  * LightWave Scene ( .lws )
  * Modo ( .lxo )
  * Stereolithography ( .stl )
- * DirectX X ( .x ) <-- Disabled
+ * DirectX X ( .x )
  * AC3D ( .ac )
  * Milkshape 3D ( .ms3d )
- * TrueSpace ( .cob,.scn )
+ * TrueSpace ( .cob,.scn ) *
  *
  * \sa https://github.com/assimp/assimp
  */
-class ModelReaderMultiFormat : public ModelReaderBase {
+class ModelReaderAssimp : public ModelReaderBase {
 public:
     /**
      * Loads the 3D model (anyone from the previous list) file pointed to by \p filename
-     * and returns a constructed VertexBufferObject from it. Provided materials are
-     * ignored and all shapes are collapsed into one VertexBufferObject.
+     * and returns a constructed ModelGeometry from it. 
      *
      * \param filename The geometric model file to be loaded
-     * \return The initialized VertexBufferObject containing the model or models
+     * \param forceRenderInvisible Force invisible meshes to render or not
+     * \param notifyInvisibleDropped Notify in log if invisible meshses were dropped
+     * \return The ModelGeometry containing the model
      *
      * \throw ModelReaderException If there was an error reading the model from
      *        \p filename
      * \pre \p filename must not be empty
      */
-    std::unique_ptr<opengl::VertexBufferObject> loadModel(
-        const std::string& filename) const override;
+    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(std::string& filename,
+        bool forceRenderInvisible = false,
+        bool notifyInvisibleDropped = true) const override;
 
     /**
-     * Loads the 3D model (anyone from the previous list) file pointed to by \p filename
-     * and returns populates the vertexArray and indexArray objects. Provided materials
-     * are ignored and all shapes are collapsed into one VertexBufferObject.
+     * Returns a list of all extensions that this ModelReaderAssimp supports.
      *
-     * \param filename The geometric model file to be loaded
-     * \param vertexArray STL vector of ModelReaderBase::Vertex objects
-     * \param indexArray STL vector of integers containing the indexes for the vertexes
-     * \return The initialized VertexBufferObject containing the model or models
-     *
-     * \throw ModelReaderException If there was an error reading the model from
-     *        \p filename
-     * \pre \p filename must not be empty
+     * \return A list of all extensions that this ModelReaderAssimp supports
      */
-    void loadModel(const std::string& filename, std::vector<Vertex>& vertexArray,
-        std::vector<int>& indexArray) const;
+    std::vector<std::string> supportedExtensions() const override;
 };
 
 } // namespace ghoul::io
 
-#endif // __GHOUL___MODELREADERMULTIFORMAT___H__
+#endif // __GHOUL___MODELREADERASSIMP___H__

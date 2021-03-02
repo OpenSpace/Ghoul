@@ -23,37 +23,63 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MODELREADERWAVEFRONT___H__
-#define __GHOUL___MODELREADERWAVEFRONT___H__
+#ifndef __GHOUL___MODELGEOMETRY___H__
+#define __GHOUL___MODELGEOMETRY___H__
 
-#include <ghoul/io/model/modelreaderbase.h>
+#include <ghoul/io/model/modelmesh.h>
+#include <ghoul/opengl/ghoul_gl.h>
+#include <memory>
 
-namespace ghoul::io {
+namespace ghoul::opengl { class ProgramObject; }
 
-/**
- * This model reader loads the provided file using the TinyObjLoader library. This simple
- * method loads multiple shapes, but does not work on the materials described in the OBJ
- * file.
- * \sa https://github.com/syoyo/tinyobjloader
- */
-class ModelReaderWavefront : public ModelReaderBase {
+namespace ghoul::modelgeometry {
+
+class ModelGeometry {
 public:
-    /**
-     * Loads the OBJ file pointed to by \p filename and returns a constructed
-     * VertexBufferObject from it. Provided materials are ignored and all shapes are
-     * collapsed into one VertexBufferObject.
-     *
-     * \param filename The OBJ file to be loaded
-     * \return The initialized VertexBufferObject containing the model or models
-     *
-     * \throw ModelReaderException If there was an error reading the model from
-     *        \p filename
-     * \pre \p filename must not be empty
-     */
-    std::unique_ptr<opengl::VertexBufferObject> loadModel(
-        const std::string& filename) const;
+    /// The exception that gets thrown if there was an error loading the cache file or
+    /// saving this model to a cache file
+    struct ModelCacheException : public RuntimeError {
+        explicit ModelCacheException(std::string file, std::string msg);
+
+        /// The file that caused the exception to be thrown
+        const std::string filename;
+
+        /// The error message that occurred
+        const std::string message;
+    };
+
+    struct TextureEntry {
+        std::string name;
+        std::unique_ptr<opengl::Texture> texture;
+    };
+
+    ModelGeometry(std::vector<io::ModelMesh> meshes,
+        std::vector<TextureEntry> textureStorage);
+    ModelGeometry(ModelGeometry&&) noexcept = default;
+    ~ModelGeometry() noexcept = default;
+
+    static std::unique_ptr<modelgeometry::ModelGeometry> loadCacheFile(
+        const std::string& cachedFile);
+    bool saveToCacheFile(const std::string& cachedFile) const;
+
+    void initialize();
+    void deinitialize();
+    void render(opengl::ProgramObject& program, bool isTexturedModel = true) const;
+
+    double boundingRadius() const;
+    void calculateBoundingRadius();
+
+    std::vector<io::ModelMesh>& meshes();
+    const std::vector<io::ModelMesh>& meshes() const;
+    std::vector<TextureEntry>& textureStorage();
+    const std::vector<TextureEntry>& textureStorage() const;
+
+protected:
+    double _boundingRadius = 0.0;
+    std::vector<io::ModelMesh> _meshes;
+    std::vector<TextureEntry> _textureStorage;
 };
 
-} // namespace ghoul::io
+}  // namespace ghoul::modelgeometry
 
-#endif // __GHOUL___MODELREADERWAVEFRONT___H__
+#endif // __GHOUL___MODELGEOMETRY___H__

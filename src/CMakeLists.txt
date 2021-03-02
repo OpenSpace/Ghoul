@@ -31,6 +31,9 @@ set(GHOUL_SOURCE
   filesystem/filesystem.linux.cpp
   filesystem/filesystem.osx.cpp
   filesystem/filesystem.windows.cpp
+  io/model/modelgeometry.cpp
+  io/model/modelmesh.cpp
+  io/model/modelreader.cpp
   io/model/modelreaderbase.cpp
   io/socket/socket.cpp
   io/socket/tcpsocket.cpp
@@ -67,7 +70,7 @@ set(GHOUL_SOURCE
 )
 
 if (GHOUL_MODULE_ASSIMP)
-  list(APPEND GHOUL_SOURCE io/model/modelreadermultiformat.cpp)
+  list(APPEND GHOUL_SOURCE io/model/modelreaderassimp.cpp)
 endif ()
 
 if (GHOUL_MODULE_COMMANDLINEPARSER)
@@ -90,7 +93,6 @@ endif ()
 
 if (GHOUL_MODULE_LUA)
   list(APPEND GHOUL_SOURCE
-    io/model/modelreaderlua.cpp
     lua/lua_helper.cpp
     lua/luastate.cpp
   )
@@ -146,6 +148,9 @@ set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/directory.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/file.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelgeometry.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelmesh.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreader.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socket.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socketserver.h
@@ -209,7 +214,7 @@ set(GHOUL_HEADER
 )
 
 if (GHOUL_MODULE_ASSIMP)
-  list(APPEND GHOUL_HEADER ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreadermultiformat.h)
+  list(APPEND GHOUL_HEADER ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderassimp.h)
 endif ()
 
 if (GHOUL_MODULE_COMMANDLINEPARSER)
@@ -235,7 +240,6 @@ endif ()
 
 if (GHOUL_MODULE_LUA)
   list(APPEND GHOUL_HEADER
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderlua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/ghoul_lua.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.inl

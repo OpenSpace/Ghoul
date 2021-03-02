@@ -23,20 +23,68 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/io/model/modelreaderbase.h>
+#ifndef __GHOUL___MODELMESH___H__
+#define __GHOUL___MODELMESH___H__
 
-#include <ghoul/fmt.h>
+#include <ghoul/opengl/ghoul_gl.h>
+#include <ghoul/opengl/texture.h>
+#include <ghoul/glm.h>
+#include <vector>
+
+namespace ghoul::opengl { class ProgramObject; }
 
 namespace ghoul::io {
 
-ModelReaderBase::ModelLoadException::ModelLoadException(std::string name, std::string msg,
-                                                        const ModelReaderBase* r)
-    : RuntimeError(fmt::format(
-        "Error:'{}' while loading model from file:'{}'", msg, name), "ModelLoader"
-    )
-    , filename(std::move(name))
-    , message(std::move(msg))
-    , reader(r)
-{}
+class ModelMesh {
+public:
+    enum class TextureType : uint8_t {
+        TextureDiffuse = 0,
+        TextureNormal,
+        TextureSpecular,
+        ColorDiffuse,
+        ColorSpecular
+    };
+
+    struct Vertex {
+        GLfloat position[3];
+        GLfloat tex[2];
+        GLfloat normal[3];
+        GLfloat tangent[3];
+    };
+
+    struct Texture {
+        opengl::Texture* texture;
+        TextureType type;
+        bool hasTexture = false;
+        bool useForcedColor = false;
+        glm::vec3 color;
+    };
+
+    ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
+        std::vector<Texture> textures);
+
+    ModelMesh(ModelMesh&&) noexcept = default;
+    ~ModelMesh() noexcept = default;
+
+    void initialize();
+    void deinitialize();
+    void render(opengl::ProgramObject& program, bool isTexturedModel = true) const;
+    float calculateBoundingRadius() const;
+
+    const std::vector<Vertex>& vertices() const;
+    const std::vector<unsigned int>& indices() const;
+    const std::vector<Texture>& textures() const;
+
+private:
+    std::vector<Vertex> _vertices;
+    std::vector<unsigned int> _indices;
+    std::vector<Texture> _textures;
+
+    GLuint _vaoID = 0;
+    GLuint _vbo = 0;
+    GLuint _ibo = 0;
+};
 
 } // namespace ghoul::io
+
+#endif // __GHOUL___MODELMESH___H__
