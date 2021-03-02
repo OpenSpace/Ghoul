@@ -43,25 +43,24 @@ namespace {
     constexpr const int DPI = 96;
 
     void handleError(FT_Error error, FT_Library library, FT_Face face, FT_Stroker stroker,
-        const std::string& name, float pointSize)
+                     const std::string& name, float size)
     {
-        if (error) {
-            if (stroker) {
-                FT_Stroker_Done(stroker);
-            }
-            if (face) {
-                FT_Done_Face(face);
-            }
-            if (library) {
-                FT_Done_FreeType(library);
-            }
-            throw ghoul::fontrendering::Font::FreeTypeException(
-                name,
-                pointSize,
-                ghoul::fontrendering::error(error).code,
-                ghoul::fontrendering::error(error).message
-            );
+        if (!error) {
+            return;
         }
+
+        if (stroker) {
+            FT_Stroker_Done(stroker);
+        }
+        if (face) {
+            FT_Done_Face(face);
+        }
+        if (library) {
+            FT_Done_FreeType(library);
+        }
+        using namespace ghoul;
+        fontrendering::Error e = fontrendering::error(error);
+        throw fontrendering::Font::FreeTypeException(name, size, e.code, e.message);
     }
 
     // Initializes the passed 'library' and loads the font face specified by the 'name'
@@ -208,17 +207,7 @@ glm::vec2 Font::boundingBox(std::string_view text) {
             if (character == wchar_t('\t')) {
                 character = wchar_t(' ');
             }
-            const Glyph* g;
-
-            // @TODO (abock, 2018-05-28): Replace with an explicit lookup to not eat the
-            // cost of the throw
-            try {
-                g = glyph(character);
-            }
-            catch (const Font::FontException&) {
-                g = glyph(wchar_t(' '));
-            }
-
+            const Glyph* g = glyph(character);
             width += g->horizontalAdvance;
         }
 
@@ -264,7 +253,7 @@ const Font::Glyph* Font::glyph(wchar_t character) {
     return &(_glyphs.back());
 }
 
-void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
+void Font::loadGlyphs(std::vector<wchar_t> characters) {
     ZoneScoped
     TracyGpuZone("loadGlyph")
 
@@ -278,6 +267,22 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
     FT_Library libraryHighRes = nullptr;
     FT_Face faceHighRes = nullptr;
     loadFace(_name, _pointSize * HighResolutionFactor, libraryHighRes, faceHighRes);
+
+    // check for invalid glyph codes first
+    for (wchar_t& charcode : characters) {
+        FT_UInt glyphIndex = FT_Get_Char_Index(face, charcode);
+        if (glyphIndex == 0) {
+            // invalid glyph; replace with a space
+            LWARNINGC(
+                "Font",
+                fmt::format(
+                    "Invalid glyph '{}' found and replaced", static_cast<int>(charcode)
+                )
+            );
+
+            charcode = ' ';
+        }
+    }
 
     for (wchar_t charcode : characters) {
         ZoneScopedN("Character");
@@ -304,13 +309,7 @@ void Font::loadGlyphs(const std::vector<wchar_t>& characters) {
         unsigned int height = 0;
 
         FT_UInt glyphIndex = FT_Get_Char_Index(face, charcode);
-        if (glyphIndex == 0) {
-            FT_Done_Face(face);
-            FT_Done_FreeType(library);
-            throw FontException(fmt::format(
-                "Glyph {} was not present in the FreeType face", char(charcode)
-            ));
-        }
+        assert(glyphIndex != 0);
 
         const FT_Error error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
         handleError(error, library, face, nullptr, _name, _pointSize);

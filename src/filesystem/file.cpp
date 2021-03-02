@@ -30,12 +30,16 @@
 #include <ghoul/misc/assert.h>
 
 #ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif // NOMINMAX
 #include <windows.h>
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
 #include <ctime>
 #include <sys/types.h>
 #include <sys/stat.h>
-#endif
+#endif // WIN32
 
 using std::string;
 
@@ -105,7 +109,7 @@ const std::string& File::path() const {
 }
 
 std::string File::filename() const {
-    string::size_type separator = _filename.rfind(FileSystem::PathSeparator);
+    const string::size_type separator = _filename.rfind(FileSystem::PathSeparator);
     if (separator != string::npos) {
         return _filename.substr(separator + 1);
     }
@@ -116,7 +120,7 @@ std::string File::filename() const {
 
 string File::baseName() const {
     string fileName = filename();
-    string::size_type dot = fileName.rfind('.');
+    const string::size_type dot = fileName.rfind('.');
     if (dot != string::npos) {
         return fileName.substr(0, dot);
     }
@@ -126,7 +130,7 @@ string File::baseName() const {
 }
 
 string File::fullBaseName() const {
-    string::size_type dot = _filename.rfind('.');
+    const string::size_type dot = _filename.rfind('.');
     if (dot != string::npos) {
         return _filename.substr(0, dot);
     }
@@ -136,7 +140,7 @@ string File::fullBaseName() const {
 }
 
 string File::directoryName() const {
-    string::size_type separator = _filename.rfind(FileSystem::PathSeparator);
+    const string::size_type separator = _filename.rfind(FileSystem::PathSeparator);
     if (separator != string::npos) {
         return _filename.substr(0, separator);
     }
@@ -146,7 +150,7 @@ string File::directoryName() const {
 }
 
 string File::fileExtension() const {
-    string::size_type dot = _filename.rfind('.');
+    const string::size_type dot = _filename.rfind('.');
     if (dot != string::npos) {
         return _filename.substr(dot + 1);
     }
@@ -179,7 +183,7 @@ std::string File::lastModifiedDate() const {
             nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&errorBuffer, // NOLINT
+            reinterpret_cast<LPTSTR>(&errorBuffer), // NOLINT
             0,
             nullptr
         );
@@ -204,7 +208,7 @@ std::string File::lastModifiedDate() const {
                 nullptr,
                 error,
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                (LPTSTR)&errorBuffer, // NOLINT
+                reinterpret_cast<LPTSTR>(&errorBuffer), // NOLINT
                 0,
                 nullptr
             );
@@ -230,7 +234,6 @@ std::string File::lastModifiedDate() const {
     return buffer;
 #endif
 }
-
 
 void File::installFileChangeListener() {
     FileSys.addFileListener(this);

@@ -45,14 +45,14 @@ namespace ghoul {
 
 #ifdef WIN32
 std::map<const std::string, HANDLE> SharedMemory::_createdSections;
-#endif
+#endif // WIN32
 
 namespace {
     struct Header {
         std::atomic_flag mutex;
 #ifdef WIN32
         size_t size;
-#endif
+#endif // WIN32
     };
 
     Header* header(void* memory) {
@@ -82,7 +82,7 @@ namespace {
             return "Error constructing format message for error: " + std::to_string(err);
         }
     }
-#endif
+#endif // WIN32
 }
 
 SharedMemory::SharedMemoryError::SharedMemoryError(std::string msg)
@@ -131,7 +131,7 @@ void SharedMemory::create(const std::string& name, size_t size) {
     h->size = size  - sizeof(Header);
     UnmapViewOfFile(memory);
     _createdSections[name] = handle;
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     unsigned int h = hashCRC32(name);
     int result = shmget(h, size, IPC_CREAT | IPC_EXCL | IPC_R | IPC_W | IPC_M);
     if (result == -1) {
@@ -146,7 +146,7 @@ void SharedMemory::create(const std::string& name, size_t size) {
     memoryHeader->mutex.clear();
     shmdt(memory);
 #endif
-}
+} // WIN32
 
 void SharedMemory::remove(const std::string& name) {
 #ifdef WIN32
@@ -162,7 +162,7 @@ void SharedMemory::remove(const std::string& name) {
         std::string errorMsg = lastErrorToString(error);
         throw SharedMemoryError("Error closing handle: " + errorMsg);
     }
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     unsigned int h = hashCRC32(name);
     int result = shmget(h, 0, IPC_R | IPC_W | IPC_M);
     if (result == -1) {
@@ -174,7 +174,7 @@ void SharedMemory::remove(const std::string& name) {
         std::string errorMsg = strerror(errno);
         throw SharedMemoryError("Error while removing shared memory: " + errorMsg);
     }
-#endif
+#endif // WIN32
 }
 
 bool SharedMemory::exists(const std::string& name) {
@@ -198,11 +198,11 @@ bool SharedMemory::exists(const std::string& name) {
             "Error checking if shared memory exists: " + errorMsg
         );
     }
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     unsigned int h = hashCRC32(name);
     int result = shmget(h, 0, IPC_EXCL);
     return result != -1;
-#endif
+#endif // WIN32
 }
 
 SharedMemory::SharedMemory(std::string name)
@@ -212,9 +212,9 @@ SharedMemory::SharedMemory(std::string name)
     _sharedMemoryHandle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, _name.c_str());
     if (!_sharedMemoryHandle) {
         std::string errorMsg = lastErrorToString(GetLastError());
-        throw SharedMemoryError(
-            "Error accessing shared memory '" + name + "': " + errorMsg
-        );
+        throw SharedMemoryError(fmt::format(
+            "Error accessing shared memory '{}': {}", name, errorMsg
+        ));
     }
 
     _memory = MapViewOfFileEx(_sharedMemoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, 0, nullptr);
@@ -222,11 +222,11 @@ SharedMemory::SharedMemory(std::string name)
         CloseHandle(_sharedMemoryHandle);
 
         std::string errorMsg = lastErrorToString(GetLastError());
-        throw SharedMemoryError(
-            "Error creating view for shared memory '" + name + "': " + errorMsg
-        );
+        throw SharedMemoryError(fmt::format(
+            "Error creating view for shared memory '{}': {}", name, errorMsg
+        ));
     }
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     unsigned int h = hashCRC32(_name);
     _sharedMemoryHandle = shmget(h, 0, IPC_R | IPC_W | IPC_M);
     if (_sharedMemoryHandle == -1) {
@@ -245,16 +245,16 @@ SharedMemory::SharedMemory(std::string name)
     struct shmid_ds sharedMemoryInfo;
     shmctl(_sharedMemoryHandle, IPC_STAT, &sharedMemoryInfo);
     _size = sharedMemoryInfo.shm_segsz - sizeof(Header);
-#endif
+#endif // WIN32
 }
 
 SharedMemory::~SharedMemory() {
 #ifdef WIN32
     CloseHandle(_sharedMemoryHandle);
     UnmapViewOfFile(_memory);
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     shmdt(_memory);
-#endif
+#endif // WIN32
 }
 
 void* SharedMemory::memory() const {
@@ -264,9 +264,9 @@ void* SharedMemory::memory() const {
 size_t SharedMemory::size() const {
 #ifdef WIN32
     return header(_memory)->size;
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     return _size;
-#endif
+#endif // WIN32
 }
 
 std::string SharedMemory::name() const {

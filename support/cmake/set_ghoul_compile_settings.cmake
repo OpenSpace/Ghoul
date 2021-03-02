@@ -155,6 +155,7 @@ function (set_ghoul_compile_settings target)
     "-Wduplicated-cond"
     "-Wlogical-op"
     "-Wno-deprecated-copy"
+    "-Wno-float-equal"
     "-Wno-long-long"
     "-Wno-write-strings"
     "-Wnon-virtual-dtor"

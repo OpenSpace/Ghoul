@@ -45,6 +45,7 @@
 
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
+#define __GL_H__
 
 #ifdef __clang__
 #pragma clang diagnostic pop

@@ -83,14 +83,14 @@ protected:
     /**
      * Base constructor, which initializes the passed parameters.
      *
-     * \param timeStamping Determines if the log should print the time when a message
-     *        is logged in the log messages
-     * \param dateStamping Determines if the log should print the time when a message
-     *        is logged in the log messages
-     * \param categoryStamping Determines if the log should print the categories in
-     *        the log messages
-     * \param logLevelStamping Determines if the log should print the log level in
-     *        the log messages
+     * \param timeStamping Determines if the log should print the time when a message is
+     *        logged in the log messages
+     * \param dateStamping Determines if the log should print the time when a message is
+     *        logged in the log messages
+     * \param categoryStamping Determines if the log should print the categories in the
+     *        log messages
+     * \param logLevelStamping Determines if the log should print the log level in the log
+     *        messages
      * \param minimumLogLevel The minimum level for Log messages that are processed by
      *        this Log
      */
@@ -139,8 +139,8 @@ protected:
      */
     std::string dateString() const;
 
-    std::string createFullMessageString(LogLevel level, std::string_view category,
-        std::string_view message) const;
+    std::string createFullMessageString(LogLevel level,
+        std::string_view category, std::string_view message) const;
 
 private:
     TimeStamping _timeStamping; ///< Is the log printing the time?

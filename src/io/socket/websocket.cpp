@@ -27,9 +27,9 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/fmt.h>
+#include <websocketpp/common/functional.hpp>
 #include <chrono>
 #include <functional>
-#include <websocketpp/common/functional.hpp>
 
 namespace {
     constexpr const char* _loggerCat = "WebSocket";

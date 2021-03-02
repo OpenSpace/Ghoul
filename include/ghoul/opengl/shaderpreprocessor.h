@@ -119,7 +119,7 @@ private:
         std::vector<Input> inputs;
         std::vector<Scope> scopes;
         std::vector<ForStatement> forStatements;
-        std::map<std::string, std::vector<std::string> > aliases;
+        std::map<std::string, std::vector<std::string>> aliases;
         std::string indentation;
         bool success = true;
     };

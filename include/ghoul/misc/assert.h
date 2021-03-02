@@ -54,18 +54,8 @@ struct MissingCaseException : public std::logic_error {
  * \param function The function in which the assertion triggered
  * \param line The line in the \p file that triggered the assertion
  */
-#ifdef __APPLE__
-// This tells the clang static analyzer that internal_assert is just like assert itself
-void internal_assert(std::string expression, std::string message, std::string file,
-    std::string function, int line);
-#elif defined(WIN32)
-// This tells Visual studio that internal_assert is just like assert itself
-__declspec(noreturn) void internal_assert(std::string expression, std::string message,
+[[noreturn]] void internal_assert(std::string expression, std::string message,
     std::string file, std::string function, int line);
-#else
-void internal_assert(std::string expression, std::string message, std::string file,
-    std::string function, int line);
-#endif // __APPLE__
 
 } // namespace ghoul
 

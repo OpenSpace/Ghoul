@@ -259,7 +259,7 @@ bool CacheManager::hasCachedFile(const File& file, std::string_view information)
 bool CacheManager::hasCachedFile(const std::string& baseName,
                                  std::string_view information) const
 {
-    size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
+    const size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
     }
@@ -280,13 +280,12 @@ void CacheManager::removeCacheFile(const File& file, std::string_view informatio
 void CacheManager::removeCacheFile(const std::string& baseName,
                                    std::string_view information)
 {
-    size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
+    const size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
     }
 
-    unsigned int hash = generateHash(baseName, information);
-
+    const unsigned int hash = generateHash(baseName, information);
     auto it = _files.find(hash);
     if (it != _files.end()) {
         // If we find the hash, it has been created before and we can just return the
@@ -314,7 +313,7 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
     // Apple stores the .DS_Store directory in the directory which can be removed
     std::string dsStore = FileSys.pathByAppendingComponent(dir, ".DS_Store");
     isEmpty |= ((contents.size() == 1) && contents[0] == dsStore);
-#endif
+#endif // __APPLE__
     // If this directory is empty, we can delete it
     if (isEmpty) {
         FileSys.deleteDirectory(dir, FileSystem::Recursive::Yes);

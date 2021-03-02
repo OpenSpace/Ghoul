@@ -132,7 +132,7 @@ void TcpSocketServer::close() {
 
 void TcpSocketServer::listen(int port) {
     if (_listening) {
-        throw TcpSocket::TcpSocketError("Socket is already listening.");
+        throw TcpSocket::TcpSocketError("Socket is already listening");
     }
     if (!TcpSocket::initializedNetworkApi()) {
         TcpSocket::initializeNetworkApi();
@@ -156,7 +156,7 @@ void TcpSocketServer::listen(int port) {
 #ifdef WIN32
         WSACleanup();
 #endif // WIN32
-        throw TcpSocket::TcpSocketError("Failed to parse hints for connection!");
+        throw TcpSocket::TcpSocketError("Failed to parse hints for connection");
     }
 
     // Create a socket for the server to listen for client connections
@@ -166,7 +166,7 @@ void TcpSocketServer::listen(int port) {
 #ifdef WIN32
         WSACleanup();
 #endif // WIN32
-        throw TcpSocket::TcpSocketError("Failed to init server socket!");
+        throw TcpSocket::TcpSocketError("Failed to init server socket");
     }
 
     setOptions(_serverSocket);

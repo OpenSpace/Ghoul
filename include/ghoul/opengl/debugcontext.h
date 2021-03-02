@@ -160,7 +160,7 @@ void setDebugMessageControl(Source source, Type type, Severity severity, Enabled
  * \pre \p type must not be Type::Dontcare
   */
 void setDebugMessageControl(Source source, Type type,
-    std::vector<unsigned int> identifiers, Enabled enabled);
+    const std::vector<unsigned int>& identifiers, Enabled enabled);
 
 /**
  * The callback function that is passed to the setDebugCallback function and that is
@@ -207,7 +207,7 @@ constexpr opengl::debug::Source from_string(std::string_view string) {
     if (string == "Other") { return opengl::debug::Source::Other; }
     if (string == "Don't care") { return opengl::debug::Source::DontCare; }
 
-    throw ghoul::RuntimeError("Unrecognized debug source '" + std::string(string) + "'");
+    throw ghoul::RuntimeError(fmt::format("Unrecognized debug source '{}'", string));
 }
 
 /**
@@ -233,7 +233,7 @@ constexpr opengl::debug::Type from_string(std::string_view string) {
     if (string == "Other") { return opengl::debug::Type::Other; }
     if (string == "Don't care") { return opengl::debug::Type::DontCare; }
 
-    throw ghoul::RuntimeError("Unrecognized debug type '" + std::string(string) + "'");
+    throw ghoul::RuntimeError(fmt::format("Unrecognized debug type '{}'", string));
 }
 
 /**
@@ -252,9 +252,7 @@ constexpr opengl::debug::Severity from_string(std::string_view string) {
     if (string == "Low") { return opengl::debug::Severity::Low; }
     if (string == "Notification") { return opengl::debug::Severity::Notification; }
 
-    throw ghoul::RuntimeError(
-        "Unrecognized debug severity '" + std::string(string) + "'"
-    );
+    throw ghoul::RuntimeError(fmt::format("Unrecognized debug severity '{}'", string));
 }
 
 /**

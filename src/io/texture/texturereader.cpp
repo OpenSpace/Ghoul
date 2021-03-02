@@ -36,19 +36,19 @@ namespace ghoul::io {
 
 TextureReader::MissingReaderException::MissingReaderException(std::string extension,
                                                               std::string f)
-    : RuntimeError(fmt::format("No reader was found for extension '{}' with file '{}'",
-        extension,
-        f
-    ), "IO")
+    : RuntimeError(
+        fmt::format("No reader found for extension '{}' with file '{}'", extension, f),
+        "IO"
+    )
     , fileExtension(std::move(extension))
     , file(std::move(f))
 {}
 
 TextureReader::InvalidLoadException::InvalidLoadException(void* memory, size_t size)
-    : RuntimeError(fmt::format("Error loading texture at location {} with size {}",
-        memory,
-        size
-    ), "IO")
+    : RuntimeError(
+        fmt::format("Error loading texture at location {} with size {}", memory, size),
+        "IO"
+    )
     , _memory(memory)
     , _size(size)
 {}
@@ -66,12 +66,11 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& f
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
     TextureReaderBase* reader = readerForExtension(extension);
-    if (reader) {
-        return reader->loadTexture(filename);
-    }
-    else {
+    if (!reader) {
         throw MissingReaderException(extension, filename);
     }
+
+    return reader->loadTexture(filename);
 }
 
 std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t size,
@@ -82,12 +81,11 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t
     ghoul_assert(!_readers.empty(), "No readers were registered before");
 
     TextureReaderBase* reader = readerForExtension(format);
-    if (reader) {
-        return reader->loadTexture(memory, size);
-    }
-    else {
+    if (!reader) {
         throw InvalidLoadException(memory, size);
     }
+
+    return reader->loadTexture(memory, size);
 }
 
 std::vector<std::string> TextureReader::supportedExtensions() {
@@ -109,7 +107,7 @@ TextureReaderBase* TextureReader::readerForExtension(const std::string& extensio
         extension.cbegin(),
         extension.cend(),
         lowerExtension.begin(),
-        [](char v) { return static_cast<char>(tolower(v)); }
+        [](char v) { return static_cast<char>(::tolower(v)); }
     );
     for (const std::unique_ptr<TextureReaderBase>& reader : _readers) {
         std::vector<std::string> extensions = reader->supportedExtensions();

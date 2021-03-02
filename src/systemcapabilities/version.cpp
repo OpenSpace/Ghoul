@@ -28,10 +28,7 @@ namespace {
 
 unsigned int packVersion(int major, int minor, int release) {
     // safe since: 2^8 * 1000 * 1000 < 2^32
-    return
-        major * 1000 * 1000 +
-        minor * 1000 +
-        release;
+    return major * 1000 * 1000  +  minor * 1000  +  release;
 }
 
 } // namespace
@@ -41,10 +38,10 @@ namespace ghoul {
 template <>
 std::string to_string(const ghoul::systemcapabilities::Version& v) {
     if (v.release != 0) {
-        return to_string(v.major) + "." + to_string(v.minor) + "." + to_string(v.release);
+        return fmt::format("{}.{}.{}", v.major, v.minor, v.release);
     }
     else {
-        return to_string(v.major) + "." + to_string(v.minor);
+        return fmt::format("{}.{}", v.major, v.minor);
     }
 }
 

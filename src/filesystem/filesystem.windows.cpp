@@ -140,7 +140,7 @@ void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,
         }
     }
 
-    size_t n = FileSys._trackedFiles.count(fullPath);
+    const size_t n = FileSys._trackedFiles.count(fullPath);
     if (n > 0) {
         auto eqRange = FileSys._trackedFiles.equal_range(fullPath);
         for (auto it = eqRange.first; it != eqRange.second; ++it) {
@@ -223,7 +223,7 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
     DWORD returnedBytes;
     ReadDirectoryChangesW(
         handle,
-        &changeBuffer[activeBuffer][0],
+        changeBuffer[activeBuffer].data(),
         static_cast<DWORD>(changeBuffer[activeBuffer].size()),
         false,
         FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE |

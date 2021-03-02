@@ -57,7 +57,7 @@ namespace {
 namespace ghoul {
 
 AssertionException::AssertionException(std::string exp, std::string msg,
-                                         std::string file, std::string func, int line)
+                                       std::string file, std::string func, int line)
     : std::runtime_error(fmt::format("{}, \"{}\" ({}:{} ({})",
         std::move(exp), std::move(msg), std::move(file), line, std::move(func)
     ))
@@ -73,9 +73,9 @@ void internal_assert(std::string expression, std::string message, std::string fi
     if (!isPermanentlyIgnored(file, line)) {
         const std::string padding = "    ";
 
-        std::cerr << std::endl
-            << padding << "File:       " << file << ", line " << line << std::endl
-            << padding << "Function:   " << function << std::endl
+        std::cerr << '\n'
+            << padding << "File:       " << file << ", line " << line << '\n'
+            << padding << "Function:   " << function << '\n'
             << padding << "Assertion:  " << expression
             << padding << message << std::endl;
 

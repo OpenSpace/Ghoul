@@ -37,9 +37,9 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif // NOMINMAX
-#include <Windows.h>
-#include <tchar.h>
 #include <intrin.h>
+#include <tchar.h>
+#include <Windows.h>
 #pragma comment(lib, "User32.lib")
 #pragma comment(lib, "Kernel32.lib")
 typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO); // NOLINT
@@ -495,10 +495,10 @@ void GeneralCapabilitiesComponent::detectCPU() {
 //    delete[] p;
 
     // CPU name
-//    sysctlbyname( "machdep.cpu.brand_string", NULL, &len, NULL, 0 );
+//    sysctlbyname("machdep.cpu.brand_string", NULL, &len, NULL, 0);
 //    p = new char[len];
     std::memset(p, 0, 512);
-    sysctlbyname("machdep.cpu.brand_string", p, &len, NULL, 0 );
+    sysctlbyname("machdep.cpu.brand_string", p, &len, NULL, 0);
     _cpu = p;
 //    delete[] p;
 
@@ -506,7 +506,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 //    sysctlbyname( "machdep.cpu.features", NULL, &len, NULL, 0 );
 //    p = new char[len];
     std::memset(p, 0, 512);
-    sysctlbyname( "machdep.cpu.features", p, &len, NULL, 0 );
+    sysctlbyname("machdep.cpu.features", p, &len, NULL, 0);
     _extensions = p;
 //    delete[] p;
 
@@ -552,7 +552,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 //    sysctlbyname( "machdep.cpu.cache.L2_associativity", NULL, &len, NULL, 0 );
 //    p = new char[len];
     std::memset(p, 0, 512);
-    sysctlbyname( "machdep.cpu.cache.L2_associativity", p, &len, NULL, 0 );
+    sysctlbyname("machdep.cpu.cache.L2_associativity", p, &len, NULL, 0);
     std::memcpy(&intValue, p, sizeof(int));
     _L2Associativity = static_cast<unsigned int>(intValue);
 //    delete[] p;
@@ -564,7 +564,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     // We must use c-style file opening because /proc is no ordinary filesystem
     file = fopen("/proc/cpuinfo", "r");
     if (file) {
-        while(fgets(line, maxSize, file) != NULL){
+        while (fgets(line, maxSize, file) != NULL) {
             if (strncmp(line, "processor", 9) == 0) ++_cores;
             if (strncmp(line, "model name", 10) == 0) {
                 _cpu = line;

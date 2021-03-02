@@ -26,6 +26,7 @@
 #ifndef __GHOUL___LOGMANAGER___H__
 #define __GHOUL___LOGMANAGER___H__
 
+#include <ghoul/logging/consolelog.h>
 #include <ghoul/logging/loglevel.h>
 #include <ghoul/misc/boolean.h>
 #include <array>
@@ -165,13 +166,16 @@ private:
     std::mutex _mutex;
 
     /// The LogLevel
-    const LogLevel _level;
+    LogLevel _level;
 
     /// Whether all logs should be flushed immediately
-    const ImmediateFlush _immediateFlush;
+    ImmediateFlush _immediateFlush;
 
     /// Stores the Logs which are managed by this LogManager
     std::vector<std::unique_ptr<Log>> _logs;
+
+    /// The always-present console log
+    ConsoleLog _consoleLog;
 
     /// Stores the number of messages for each log level (7)
     std::array<int, 7> _logCounters = { 0, 0, 0, 0, 0, 0, 0 };

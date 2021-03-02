@@ -76,7 +76,8 @@ public:
     /**
      * This constructor requires a custom ProgramObject that handles the rendering of any
      * passed text. In addition the initial size of the rendering window has to be passed.
-     * The inputs for the ProgramObject are as follows: <br>
+     * The inputs for the ProgramObject are as follows:
+     *
      * The <b>vertex shader</b> recieves three <code>vec2</code> for each vertex: The
      * <i>Position</i> (location 0) in pixel screen space coordinates, the
      * <i>Base Texture Coordinates</i> (location 1) which provides the texture coordinates
@@ -104,28 +105,27 @@ public:
     ~FontRenderer();
 
     /**
-     * Creates a new instance of the FontRenderer with a default ProgramObject.
-     * This method requires the FileSystem to be initialized, as temporary
-     * files containing the source code of the ShaderObjects will be created.
-     * This method requires a valid OpenGL state.
+     * Create a new instance of the FontRenderer with a default ProgramObject. This
+     * method requires the FileSystem to be initialized, as temporary files containing the
+     * source code of the ShaderObjects will be created. This method requires a valid
+     * OpenGL state.
      *
      * \return a raw pointer to the new default instance
      */
     static std::unique_ptr<FontRenderer> createDefault();
 
     /**
-     * Creates a new instance of the FontRenderer with a perspective subject
-     * ProgramObject.
-     * This method requires the FileSystem to be initialized, as temporary
-     * files containing the source code of the ShaderObjects will be created.
-     * This method requires a valid OpenGL state.
+     * Create a new instance of the FontRenderer with a perspective subject ProgramObject.
+     * This method requires the FileSystem to be initialized, as temporary files
+     * containing the source code of the ShaderObjects will be created. This method
+     * requires a valid OpenGL state.
      *
      * \return a raw pointer to the new default instance
      */
     static std::unique_ptr<FontRenderer> createProjectionSubjectText();
 
     /**
-     * Initializes the singleton variant of the FontRenderer with the default
+     * Initialize the singleton variant of the FontRenderer with the default
      * ProgramObject. This method requires the FileSystem to be initialized, as temporary
      * files containing the source code of the ShaderObjects will be created. The method
      * returns the success of the compilation and linking of the default ProgramObject.
@@ -135,7 +135,7 @@ public:
     static void initialize();
 
     /**
-     * Deinitializes the singleton variant of the FontRenderer and cleans all used OpenGL
+     * Deinitialize the singleton variant of the FontRenderer and cleans all used OpenGL
      * objects. Therefore, it requires a valid OpenGL state.
      *
      * \return <code>true</code> if the deinitialization succeeded, <code>false</code>
@@ -144,7 +144,7 @@ public:
     static void deinitialize();
 
     /**
-     * Checks whether the singleton variant of the FontRenderer has already been
+     * Check whether the singleton variant of the FontRenderer has already been
      * initialized.
      *
      * \return <code>true</code> if the singleton FontRenderer has already been
@@ -176,19 +176,6 @@ public:
      * \param framebufferSize The size of the target framebuffer
      */
     void setFramebufferSize(glm::vec2 framebufferSize);
-
-    /**
-     * Returns the size in pixels that the text would require if it were rendered to
-     * screen.
-     *
-     * \param font The Font that is used to render the provided text
-     * \param text The text that is rendered to the screen. The \p text can also contain
-     *        '\\n' to have a linebreak, which is of the correct length with regard to the
-     *        selected font.
-     * \return A tuple containing the bounding box of the text that was printed and the
-     *         number of lines that were printed
-     */
-    //BoundingBoxInformation boundingBox(Font& font, std::string_view text) const;
 
     /**
      * Renders the provided \p text to the pixel coordinates \p pos using the Font
@@ -346,31 +333,9 @@ enum class CrDirection {
  *        provided \p font has one
  * \return The bounding box of the text that was printed
  */
-inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
     std::string_view text, const glm::vec4& color, CrDirection direction,
-    const glm::vec4& outlineColor)
-{
-    using FR = ghoul::fontrendering::FontRenderer;
-    FR::BoundingBoxInformation res = FR::defaultRenderer().render(
-        font,
-        pos,
-        text,
-        color,
-        outlineColor
-    );
-
-    switch (direction) {
-        case CrDirection::Up:
-            pos.y += res.numberOfLines * font.height();
-            break;
-        case CrDirection::None:
-            break;
-        case CrDirection::Down:
-            pos.y -= res.numberOfLines * font.height();
-            break;
-    }
-    return res.boundingBox;
-}
+    const glm::vec4& outlineColor);
 
 /**
  * This helper method prints the passed arguments using the Font::render function of the
@@ -388,19 +353,8 @@ inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  *        provided \p font has one
  * \return The bounding box of the text that was printed
  */
-inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
-    std::string_view text, const glm::vec4& color, const glm::vec4& outlineColor)
-{
-    using FR = ghoul::fontrendering::FontRenderer;
-    FR::BoundingBoxInformation res = FR::defaultRenderer().render(
-        font,
-        pos,
-        text,
-        color,
-        outlineColor
-    );
-    return res.boundingBox;
-}
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
+    std::string_view text, const glm::vec4& color, const glm::vec4& outlineColor);
 
 /**
  * This helper method prints the passed arguments using the Font::render function of the
@@ -414,12 +368,9 @@ inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& p
  * \param color The color that is used to the render the text
  * \return The bounding box of the text that was printed
  */
-inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
     std::string_view text, const glm::vec4& color,
-    CrDirection direction = CrDirection::None)
-{
-    return RenderFont(font, pos, text, color, direction, { 0.f, 0.f, 0.f, color.a });
-}
+    CrDirection direction = CrDirection::None);
 
 /**
  * This helper method prints the passed arguments using the Font::render function of the
@@ -432,11 +383,8 @@ inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  * \param color The color that is used to the render the text
  * \return The bounding box of the text that was printed
  */
-inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
-    std::string_view text, const glm::vec4& color = glm::vec4(1.f))
-{
-    return RenderFont(font, pos, text, color, { 0.f, 0.f, 0.f, color.a });
-}
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
+    std::string_view text, const glm::vec4& color = glm::vec4(1.f));
 
 /**
  * This helper method prints the passed arguments using the Font::render function of the
@@ -450,18 +398,8 @@ inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& p
  * \param color The color that is used to the render the text
  * \return The bounding box of the text that was printed
  */
-inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
-    std::string_view text, CrDirection direction = CrDirection::None)
-{
-    return RenderFont(
-        font,
-        pos,
-        text,
-        { 1.f, 1.f, 1.f, 1.f },
-        direction,
-        { 0.f, 0.f, 0.f, 1.f }
-    );
-}
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
+    std::string_view text, CrDirection direction = CrDirection::None);
 
 /**
  * This helper method prints the passed arguments using the Font::render function of the
@@ -474,11 +412,8 @@ inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  * \param color The color that is used to the render the text
  * \return The bounding box of the text that was printed
  */
-inline glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
-    std::string_view text)
-{
-    return RenderFont(font, pos, text, { 1.f, 1.f, 1.f, 1.f }, { 0.f, 0.f, 0.f, 1.f });
-}
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
+    std::string_view text);
 
 } // namespace ghoul::fontrendering
 

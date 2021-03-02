@@ -83,7 +83,7 @@ namespace {
 
 namespace ghoul::io {
 
-std::atomic<bool> TcpSocket::_initializedNetworkApi{false};
+std::atomic<bool> TcpSocket::_initializedNetworkApi = false;
 
 TcpSocket::TcpSocketError::TcpSocketError(std::string msg, std::string comp)
     : RuntimeError(std::move(msg), std::move(comp))
@@ -126,12 +126,8 @@ int TcpSocket::port() const {
 }
 
 void TcpSocket::startStreams() {
-    _inputThread = std::thread(
-        [this]() { streamInput(); }
-    );
-    _outputThread = std::thread(
-        [this]() { streamOutput(); }
-    );
+    _inputThread = std::thread([this]() { streamInput(); });
+    _outputThread = std::thread([this]() { streamOutput(); });
 }
 
 void TcpSocket::connect() {
@@ -146,7 +142,7 @@ void TcpSocket::connect() {
     }
 
     struct addrinfo* addresult = nullptr;
-    struct addrinfo hints {};
+    struct addrinfo hints{};
     std::memset(&hints, 0, sizeof(hints));
 
     hints.ai_family = AF_INET;
@@ -154,13 +150,8 @@ void TcpSocket::connect() {
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_PASSIVE;
 
-    int result = getaddrinfo(
-        _address.c_str(),
-        std::to_string(_port).c_str(),
-        &hints,
-        &addresult
-    );
-
+    std::string p = std::to_string(_port);
+    int result = getaddrinfo(_address.c_str(), p.c_str(), &hints, &addresult);
     if (result != 0) {
         return;
     }
@@ -221,7 +212,7 @@ bool TcpSocket::isConnecting() const {
 }
 
 bool TcpSocket::getMessage(std::string& message) {
-    int delimiterIndex = waitForDelimiter();
+    const int delimiterIndex = waitForDelimiter();
     if (delimiterIndex == 0) {
         return false;
     }
@@ -350,17 +341,14 @@ void TcpSocket::streamOutput() {
             std::copy_n(_outputQueue.begin(), nBytesToSend, _outputBuffer.begin());
 
 #ifdef WIN32
-            int nSentBytes = send(_socket,
-                _outputBuffer.data(),
-                static_cast<int>(nBytesToSend),
-                0
-            );
+            const int n = static_cast<int>(nBytesToSend);
+            int nSentBytes = send(_socket, _outputBuffer.data(), n, 0);
 
             auto failed = [](int nBytes) { return nBytes <= 0; };
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
             ssize_t nSentBytes = send(_socket, _outputBuffer.data(), nBytesToSend, 0);
             auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
-#endif //WIN32
+#endif // WIN32
 
             if (failed(nSentBytes)) {
                 closeSocket();
@@ -396,8 +384,8 @@ void TcpSocket::waitForInput(size_t nBytes) {
 
 int TcpSocket::waitForDelimiter() {
     size_t currentIndex = 0;
-    auto receivedRequestedInputOrDisconnected = [this, &currentIndex,
-                                                 d = _delimiter.load()]()
+    auto receivedRequestedInputOrDisconnected =
+        [this, &currentIndex, d = _delimiter.load()]()
     {
         if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
@@ -448,9 +436,7 @@ void TcpSocket::initializeNetworkApi() {
 
         throw std::runtime_error("Failed to initialize WinSock API");
     }
-#else
-    // No init needed on unix
-#endif
+#endif // WIN32
     _initializedNetworkApi = true;
 }
 
@@ -470,10 +456,7 @@ void TcpSocket::uninterceptInput() {
 
 bool TcpSocket::getBytes(char* buffer, size_t nItems) {
     waitForInput(nItems);
-    if (_shouldStopThreads) {
-        return false;
-    }
-    if (!_isConnected && !_isConnecting) {
+    if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
         return false;
     }
     std::lock_guard inputLock(_inputQueueMutex);
@@ -484,10 +467,7 @@ bool TcpSocket::getBytes(char* buffer, size_t nItems) {
 
 bool TcpSocket::peekBytes(char* buffer, size_t nItems) {
     waitForInput(nItems);
-    if (_shouldStopThreads) {
-        return false;
-    }
-    if (!_isConnected && !_isConnecting) {
+    if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
         return false;
     }
     std::lock_guard inputLock(_inputQueueMutex);
@@ -497,10 +477,7 @@ bool TcpSocket::peekBytes(char* buffer, size_t nItems) {
 
 bool TcpSocket::skipBytes(size_t nItems) {
     waitForInput(nItems);
-    if (_shouldStopThreads) {
-        return false;
-    }
-    if (!_isConnected && !_isConnecting) {
+    if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
         return false;
     }
     std::lock_guard inputLock(_inputQueueMutex);

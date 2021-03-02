@@ -180,9 +180,9 @@ void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
     _onChangeCallback = std::move(changeCallback);
     for (std::pair<const std::string, FileStruct>& files : _includedFiles) {
         if (files.second.isTracked) {
-            files.second.file.setCallback([this](const filesystem::File&) {
-                _onChangeCallback();
-            });
+            files.second.file.setCallback(
+                [this](const filesystem::File&) { _onChangeCallback(); }
+            );
         }
     }
 }

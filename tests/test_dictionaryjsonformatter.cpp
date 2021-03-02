@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#if 0
 #include "catch2/catch.hpp"
 
 #include <ghoul/misc/dictionaryjsonformatter.h>
@@ -38,105 +37,116 @@ TEST_CASE("DictionaryJsonFormatter: Empty Dictionary", "[dictionaryjsonformatter
 
 TEST_CASE("DictionaryJsonFormatter: Simple Dictionary", "[dictionaryjsonformatter]") {
     using namespace std::string_literals;
-    ghoul::Dictionary d = {
-        { "int", 1 },
-        { "double", 2.0 },
-        { "vec2", glm::vec2(0.f) },
-        { "vec3", glm::vec3(0.f) },
-        { "vec4", glm::vec4(0.f) },
-        { "string", ""s}
-    };
+    ghoul::Dictionary d;
+    d.setValue("int", 1);
+    d.setValue("double", 2.2);
+    d.setValue("vec2", glm::dvec2(0.f));
+    d.setValue("vec3", glm::dvec3(0.f));
+    d.setValue("vec4", glm::dvec4(0.f));
+    d.setValue("string", ""s);
 
     std::string res = ghoul::formatJson(d);
     REQUIRE(
         res ==
-        "{\"double\":2.000000E0,\"int\":1,\"string\":\"\","
+        "{\"double\":2.2,\"int\":1,\"string\":\"\","
         "\"vec2\":[0,0],\"vec3\":[0,0,0],"
         "\"vec4\":[0,0,0,0]}"
     );
+}
+
+TEST_CASE("DictionaryJsonFormatter: Dictionary with nan", "[dictionaryjsonformatter]") {
+    ghoul::Dictionary d;
+    d.setValue("nanValue", std::numeric_limits<double>::quiet_NaN());
+
+    std::string res = ghoul::formatJson(d);
+    REQUIRE(res == "{\"nanValue\":null}");
+}
+
+TEST_CASE("DictionaryJsonFormatter: Dictionary with infinity",
+          "[dictionaryjsonformatter]")
+{
+    ghoul::Dictionary d;
+    d.setValue("infinity", std::numeric_limits<double>::infinity());
+
+    std::string res = ghoul::formatJson(d);
+    REQUIRE(res == "{\"infinity\":null}");
 }
 
 TEST_CASE("DictionaryJsonFormatter: Nested Dictionary", "[dictionaryjsonformatter]") {
     using namespace std::string_literals;
 
-    ghoul::Dictionary d = {
-        { "int", 1 },
-        { "double", 2.0 },
-        { "vec2", glm::vec2(0.f) },
-        { "vec3", glm::vec3(0.f) },
-        { "vec4", glm::vec4(0.f) },
-        { "string", ""s }
-    };
+    ghoul::Dictionary d;
+    d.setValue("int", 1);
+    d.setValue("double", 2.2);
+    d.setValue("vec2", glm::dvec2(0.f));
+    d.setValue("vec3", glm::dvec3(0.f));
+    d.setValue("vec4", glm::dvec4(0.f));
+    d.setValue("string", ""s);
 
-    ghoul::Dictionary e = {
-        { "int", 1 },
-        { "double", 2.0 },
-        { "vec2", glm::vec2(0.f) },
-        { "vec3", glm::vec3(0.f) },
-        { "vec4", glm::vec4(0.f) },
-        { "string", ""s },
-        { "dict" , d}
-    };
+    ghoul::Dictionary e;
+    e.setValue("int", 1);
+    e.setValue("double", 2.2);
+    e.setValue("vec2", glm::dvec2(0.f));
+    e.setValue("vec3", glm::dvec3(0.f));
+    e.setValue("vec4", glm::dvec4(0.f));
+    e.setValue("string", ""s);
+    e.setValue("dict", d);
 
-    ghoul::Dictionary f = {
-        { "int", 1 },
-        { "double", 2.0 },
-        { "vec2", glm::vec2(0.f) },
-        { "vec3", glm::vec3(0.f) },
-        { "vec4", glm::vec4(0.f) },
-        { "string", ""s },
-        { "dict" , e }
-    };
+    ghoul::Dictionary f;
+    f.setValue("int", 1);
+    f.setValue("double", 2.2);
+    f.setValue("vec2", glm::dvec2(0.f));
+    f.setValue("vec3", glm::dvec3(0.f));
+    f.setValue("vec4", glm::dvec4(0.f));
+    f.setValue("string", ""s);
+    f.setValue("dict", e);
 
-    ghoul::Dictionary g = {
-        { "int", 1 },
-        { "double", 2.0 },
-        { "vec2", glm::vec2(0.f) },
-        { "vec3", glm::vec3(0.f) },
-        { "vec4", glm::vec4(0.f) },
-        { "string", ""s },
-        { "dict" , f },
-        { "dict2" , f },
-        { "dict3" , f }
-    };
+    ghoul::Dictionary g;
+    g.setValue("int", 1);
+    g.setValue("double", 2.2);
+    g.setValue("vec2", glm::dvec2(0.f));
+    g.setValue("vec3", glm::dvec3(0.f));
+    g.setValue("vec4", glm::dvec4(0.f));
+    g.setValue("string", ""s);
+    g.setValue("dict", f);
+    g.setValue("dict2", f);
+    g.setValue("dict3", f);
 
     std::string res = ghoul::formatJson(g);
 
     REQUIRE(
         res ==
-        "{\"dict\":{\"dict\":{\"dict\":{\"double\":2.000000E0,\"int\":1,"
+        "{\"dict\":{\"dict\":{\"dict\":{\"double\":2.2,\"int\":1,"
         "\"string\":\"\",\"vec2\":[0,0],"
         "\"vec3\":[0,0,0],"
         "\"vec4\":[0,0,0,0]},"
-        "\"double\":2.000000E0,\"int\":1,\"string\":\"\","
+        "\"double\":2.2,\"int\":1,\"string\":\"\","
         "\"vec2\":[0,0],"
         "\"vec3\":[0,0,0],"
         "\"vec4\":[0,0,0,0]},"
-        "\"double\":2.000000E0,\"int\":1,\"string\":\"\","
+        "\"double\":2.2,\"int\":1,\"string\":\"\","
         "\"vec2\":[0,0],\"vec3\":[0,0,0],"
         "\"vec4\":[0,0,0,0]},"
-        "\"dict2\":{\"dict\":{\"dict\":{\"double\":2.000000E0,\"int\":1,\"string\":\"\","
+        "\"dict2\":{\"dict\":{\"dict\":{\"double\":2.2,\"int\":1,\"string\":\"\","
         "\"vec2\":[0,0],\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},\"double\":2.000000E0,\"int\":1,"
+        "\"vec4\":[0,0,0,0]},\"double\":2.2,\"int\":1,"
         "\"string\":\"\",\"vec2\":[0,0],"
         "\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},\"double\":2.000000E0,\"int\":1,"
+        "\"vec4\":[0,0,0,0]},\"double\":2.2,\"int\":1,"
         "\"string\":\"\",\"vec2\":[0,0],"
         "\"vec3\":[0,0,0],"
         "\"vec4\":[0,0,0,0]},\"dict3\":{\"dict\":{\"dict\":{"
-        "\"double\":2.000000E0,\"int\":1,\"string\":\"\",\"vec2\":[0,0],"
+        "\"double\":2.2,\"int\":1,\"string\":\"\",\"vec2\":[0,0],"
         "\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},\"double\":2.000000E0,\"int\":1,"
+        "\"vec4\":[0,0,0,0]},\"double\":2.2,\"int\":1,"
         "\"string\":\"\",\"vec2\":[0,0],"
         "\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},\"double\":2.000000E0,\"int\":1,"
+        "\"vec4\":[0,0,0,0]},\"double\":2.2,\"int\":1,"
         "\"string\":\"\",\"vec2\":[0,0],"
         "\"vec3\":[0,0,0],"
-        "\"vec4\":[0,0,0,0]},\"double\":2.000000E0,\"int\":1,"
+        "\"vec4\":[0,0,0,0]},\"double\":2.2,\"int\":1,"
         "\"string\":\"\",\"vec2\":[0,0],"
         "\"vec3\":[0,0,0],"
         "\"vec4\":[0,0,0,0]}"
     );
 }
-
-#endif

@@ -21,19 +21,13 @@
  * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
- *****************************************************************************************
- * This file is inspired by Peter Kankowski (kankowski@narod.ru) and his work available  *
- * at http://www.strchr.com/hash_functions and http://www.strchr.com/crc32_popcnt        *
- *****************************************************************************************
- * Slicing-by-8 algorithms by Michael E. Kounavis and Frank L. Berry from Intel Corp.    *
- * http://www.intel.com/technology/comms/perfnet/download/CRC_generators.pdf             *
  ****************************************************************************************/
 
 #include <ghoul/misc/clipboard.h>
 
 #include <ghoul/misc/exception.h>
-#include <algorithm>
 #include <ghoul/fmt.h>
+#include <algorithm>
 #include <sstream>
 
 #ifdef WIN32

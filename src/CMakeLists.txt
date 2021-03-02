@@ -47,7 +47,6 @@ set(GHOUL_SOURCE
   logging/htmllog.cpp
   logging/log.cpp
   logging/logmanager.cpp
-  logging/streamlog.cpp
   logging/textlog.cpp
   logging/visualstudiooutputlog.cpp
   misc/assert.cpp
@@ -107,7 +106,6 @@ if (GHOUL_MODULE_OPENGL)
     opengl/openglstatecache.cpp
     opengl/programobject.cpp
     opengl/programobjectmanager.cpp
-    opengl/shadermanager.cpp
     opengl/shaderobject.cpp
     opengl/shaderpreprocessor.cpp
     opengl/texture.cpp
@@ -172,7 +170,6 @@ set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/logging/loglevel.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/logging/logmanager.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/logging/logmanager.inl
-  ${PROJECT_SOURCE_DIR}/include/ghoul/logging/streamlog.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/logging/textlog.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/logging/visualstudiooutputlog.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/assert.h
@@ -260,7 +257,6 @@ if (GHOUL_MODULE_OPENGL)
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/openglstatecache.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobject.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobjectmanager.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shadermanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderobject.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderpreprocessor.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.h

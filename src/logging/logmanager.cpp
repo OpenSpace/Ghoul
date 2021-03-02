@@ -41,14 +41,17 @@ LogManager::LogManager(LogLevel level, ImmediateFlush immediateFlush)
 {}
 
 void LogManager::initialize(LogLevel level, ImmediateFlush immediateFlush) {
-    ghoul_assert(!isInitialized(), "LogManager is already initialized");
+    if (_instance) {
+        _instance->_level = level;
+        _instance->_immediateFlush = immediateFlush;
+    }
     _instance = new LogManager(level, immediateFlush);
 }
 
 void LogManager::deinitialize() {
     ghoul_assert(isInitialized(), "LogManager is not initialized");
-    delete _instance;
-    _instance = nullptr;
+
+    _instance->_logs.clear();
 }
 
 bool LogManager::isInitialized() {
@@ -84,9 +87,18 @@ void LogManager::flushLogs() {
 void LogManager::logMessage(LogLevel level, std::string_view category,
                             std::string_view message)
 {
+    if (!ghoul::logging::LogManager::isInitialized()) {
+        _consoleLog.log(level, category, message);
+        return;
+    }
+
     if (level >= _level) {
         std::lock_guard lock(_mutex);
 
+        _consoleLog.log(level, category, message);
+        if (_immediateFlush) {
+            _consoleLog.flush();
+        }
         for (const std::unique_ptr<Log>& log : _logs) {
             if (level >= log->logLevel()) {
                 log->log(level, category, message);

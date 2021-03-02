@@ -27,6 +27,7 @@
 
 #ifdef GHOUL_USE_FREEIMAGE
 
+#include <ghoul/fmt.h>
 #include <ghoul/opengl/texture.h>
 #include <ghoul/glm.h>
 
@@ -67,7 +68,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
     if ((bits == nullptr) || (width == 0) || (height == 0)) {
         throw TextureLoadException(
             "Memory",
-            "Unable to ready bits or size (" + source + ")",
+            fmt::format("Unable to ready bits or size ({})", source),
             this
         );
     }
@@ -104,7 +105,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
     if (imageType != FIT_BITMAP) {
         throw TextureLoadException(
             "Memory",
-            "Could not read image (" + source + ")",
+            fmt::format("Could not read image ({})", source),
             this
         );
     }
@@ -129,7 +130,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
         default:
             throw TextureLoadException(
                 "Memory",
-                "Could not read image (" + source + ")",
+                fmt::format("Could not read image ({})", source),
                 this
             );
     }
@@ -151,7 +152,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
     if (!flipSuccess) {
         throw TextureLoadException(
             "Memory",
-            "Could not flip image (" + source + ")",
+            fmt::format("Could not flip image ({})", source),
             this
         );
     }
@@ -194,7 +195,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
     if (fif == FIF_UNKNOWN) {
         throw TextureLoadException(
             filename,
-            "Could not determine file format (" + filename + ")",
+            fmt::format("Could not determine file format ({})", filename),
             this
         );
     }
@@ -207,7 +208,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
     if (!dib) {
         throw TextureLoadException(
             filename,
-            "Could not load image (" + filename + ")",
+            fmt:format("Could not load image ({})", filename),
             this
         );
     }

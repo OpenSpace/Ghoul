@@ -406,14 +406,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 continue;
             }
 
-            const Font::Glyph* glyph;
-            try {
-                glyph = font.glyph(character);
-            }
-            catch (const Font::FontException&) {
-                glyph = font.glyph(wchar_t(' '));
-            }
-
+            const Font::Glyph* glyph = font.glyph(character);
             if (j > 0) {
                 movingPos.x += glyph->kerning(line[j - 1]);
             }
@@ -452,7 +445,6 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             height = std::max(height, static_cast<float>(glyph->height));
         }
         size.x = std::max(size.x, width);
-        //size.y += height;
         movingPos.y -= font.height();
     } while (!text.empty());
     size.y = (lines - 1) * font.height();
@@ -556,14 +548,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 character = wchar_t(' ');
             }
 
-            const Font::Glyph* glyph;
-            try {
-                glyph = font.glyph(character);
-            }
-            catch (const Font::FontException&) {
-                glyph = font.glyph(wchar_t(' '));
-            }
-
+            const Font::Glyph* glyph = font.glyph(character);
             if (j > 0) {
                 movingPos.x += glyph->kerning(line[j - 1]);
             }
@@ -789,6 +774,79 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
 void FontRenderer::setFramebufferSize(glm::vec2 framebufferSize) {
     _framebufferSize = std::move(framebufferSize);
+}
+
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
+                     std::string_view text, const glm::vec4& color, CrDirection direction,
+                     const glm::vec4& outlineColor)
+{
+    using FR = ghoul::fontrendering::FontRenderer;
+    FR::BoundingBoxInformation res = FR::defaultRenderer().render(
+        font,
+        pos,
+        text,
+        color,
+        outlineColor
+    );
+
+    switch (direction) {
+        case CrDirection::Up:
+            pos.y += res.numberOfLines * font.height();
+            break;
+        case CrDirection::None:
+            break;
+        case CrDirection::Down:
+            pos.y -= res.numberOfLines * font.height();
+            break;
+    }
+    return res.boundingBox;
+}
+
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
+                     std::string_view text, const glm::vec4& color,
+                     const glm::vec4& outlineColor)
+{
+    using FR = ghoul::fontrendering::FontRenderer;
+    FR::BoundingBoxInformation res = FR::defaultRenderer().render(
+        font,
+        pos,
+        text,
+        color,
+        outlineColor
+    );
+    return res.boundingBox;
+}
+
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
+                     std::string_view text, const glm::vec4& color,
+                     CrDirection direction)
+{
+    return RenderFont(font, pos, text, color, direction, { 0.f, 0.f, 0.f, color.a });
+}
+
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
+                     std::string_view text, const glm::vec4& color)
+{
+    return RenderFont(font, pos, text, color, { 0.f, 0.f, 0.f, color.a });
+}
+
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
+                     std::string_view text, CrDirection direction)
+{
+    return RenderFont(
+        font,
+        pos,
+        text,
+        { 1.f, 1.f, 1.f, 1.f },
+        direction,
+        { 0.f, 0.f, 0.f, 1.f }
+    );
+}
+
+glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
+                     std::string_view text)
+{
+    return RenderFont(font, pos, text, { 1.f, 1.f, 1.f, 1.f }, { 0.f, 0.f, 0.f, 1.f });
 }
 
 } // namespace ghoul::fontrendering

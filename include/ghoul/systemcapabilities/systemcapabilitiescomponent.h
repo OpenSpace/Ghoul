@@ -179,7 +179,7 @@ protected:
      * \pre \p attribute must not be empty
      * \pre The Windows Management Instrumentation must have been initialized
      */
-    static VARIANT* queryWMI(const std::string& wmiClass, const std::string& attribute);
+    VARIANT* queryWMI(const std::string& wmiClass, const std::string& attribute);
 
     /**
      * Helper function that queries the Windows Management Instrumentation for the
@@ -197,7 +197,7 @@ protected:
      * \pre \p attribute must not be empty
      * \pre The Windows Management Instrumentation must have been initialized
      */
-    static void queryWMI(const std::string& wmiClass, const std::string& attribute,
+    void queryWMI(const std::string& wmiClass, const std::string& attribute,
         std::string& value);
 
     /**
@@ -216,7 +216,7 @@ protected:
      * \pre \p attribute must not be empty
      * \pre The Windows Management Instrumentation must have been initialized
      */
-    static void queryWMI(const std::string& wmiClass, const std::string& attribute,
+    void queryWMI(const std::string& wmiClass, const std::string& attribute,
         int& value);
 
     /**
@@ -235,7 +235,7 @@ protected:
      * \pre \p attribute must not be empty
      * \pre The Windows Management Instrumentation must have been initialized
      */
-    static void queryWMI(const std::string& wmiClass, const std::string& attribute,
+    void queryWMI(const std::string& wmiClass, const std::string& attribute,
         unsigned int& value);
 
     /**
@@ -255,7 +255,7 @@ protected:
      * \pre \p attribute must not be empty
      * \pre The Windows Management Instrumentation must have been initialized
      */
-    static void queryWMI(const std::string& wmiClass, const std::string& attribute,
+    void queryWMI(const std::string& wmiClass, const std::string& attribute,
         unsigned long long& value);
 
     /**

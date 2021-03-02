@@ -59,12 +59,8 @@ struct Boolean {
     /// Explicit constructor to convert from \c bool into Boolean
     constexpr explicit Boolean(bool v) : value(v ? Yes : No) {}
 
-    /**
-     * This operator returns <code>true</code> if the stored value is equal to
-     * <code>Yes</code>.
-     */
-    operator bool() { return value == Yes; }
-    constexpr operator bool() const { return value == Yes; }
+    /// This operator returns <code>true</code> if the stored value is equal to \c Yes.
+    constexpr operator bool() const noexcept { return value == Yes; }
 
     const Value value;
 };
@@ -78,8 +74,7 @@ struct __name__ {                                                               
                                                                                          \
     constexpr explicit __name__(bool v) : value(v ? Yes : No) {}                         \
                                                                                          \
-    operator bool() { return value == Yes; }                                             \
-    constexpr operator bool() const { return value == Yes; }                             \
+    constexpr operator bool() const noexcept { return value == Yes; }                    \
                                                                                          \
     Value value;                                                                         \
 }
