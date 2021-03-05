@@ -38,19 +38,79 @@ TEST_CASE("DictionaryLuaFormatter: Empty Dictionary", "[dictionaryluaformatter]"
 TEST_CASE("DictionaryLuaFormatter: Simple Dictionary", "[dictionaryluaformatter]") {
     using namespace std::string_literals;
     ghoul::Dictionary d;
+    d.setValue("boolFalse", false);
+    d.setValue("boolTrue", true);
     d.setValue("int", 1);
     d.setValue("double", 2.2);
-    d.setValue("vec2", glm::dvec2(0.f));
-    d.setValue("vec3", glm::dvec3(0.f));
-    d.setValue("vec4", glm::dvec4(0.f));
+    d.setValue("vec2", glm::dvec2(0.0));
+    d.setValue("vec3", glm::dvec3(0.0));
+    d.setValue("vec4", glm::dvec4(0.0));
     d.setValue("string", ""s);
 
     std::string res = ghoul::formatLua(d);
     REQUIRE(
         res ==
-        "{double=2.2,int=1,string=\"\","
+        "{boolFalse=false,boolTrue=true,"
+        "double=2.2,int=1,string=\"\","
         "vec2={0,0},vec3={0,0,0},"
         "vec4={0,0,0,0}}"
+    );
+}
+
+TEST_CASE("DictionaryLuaFormatter: Dictionary with Ivec", "[dictionaryluaformatter]") {
+    using namespace std::string_literals;
+    ghoul::Dictionary d;
+    d.setValue("ivec2", glm::ivec2(0));
+    d.setValue("ivec3", glm::ivec3(0));
+    d.setValue("ivec4", glm::ivec4(0));
+
+    std::string res = ghoul::formatLua(d);
+    REQUIRE(
+        res ==
+        "{ivec2={0,0},ivec3={0,0,0},"
+        "ivec4={0,0,0,0}}"
+    );
+}
+
+TEST_CASE("DictionaryLuaFormatter: std::vectors", "[dictionaryluaformatter]") {
+    using namespace std::string_literals;
+    ghoul::Dictionary d;
+    d.setValue("iVector", std::vector<int>{ 1, 2, 3, 4, 5 });
+    d.setValue("dVector", std::vector<double>{ 0.1, 0.2, 0.3, 0.4, 0.5 });
+    d.setValue("empty", std::vector<double>{});
+
+    std::string res = ghoul::formatLua(d);
+    REQUIRE(
+        res ==
+        "{dVector={0.1,0.2,0.3,0.4,0.5},"
+        "empty={},"
+        "iVector={1,2,3,4,5}}"
+    );
+}
+
+TEST_CASE("DictionaryLuaFormatter: Matrices", "[dictionaryluaformatter]") {
+    using namespace std::string_literals;
+    ghoul::Dictionary d;
+    d.setValue("dmat2x2", glm::dmat2(0.0));
+    d.setValue("dmat2x3", glm::dmat2x3(0.0));
+    d.setValue("dmat2x4", glm::dmat2x4(0.0));
+
+    d.setValue("dmat3x3", glm::dmat3(0.0));
+    d.setValue("dmat3x2", glm::dmat3x2(0.0));
+    d.setValue("dmat3x4", glm::dmat3x4(0.0));
+
+    d.setValue("dmat4x4", glm::dmat4(0.0));
+    d.setValue("dmat4x2", glm::dmat4x2(0.0));
+    d.setValue("dmat4x3", glm::dmat4x3(0.0));
+
+    std::string res = ghoul::formatLua(d);
+    REQUIRE(
+        res ==
+        "{dmat2x2={0,0,0,0},dmat2x3={0,0,0,0,0,0},dmat2x4={0,0,0,0,0,0,0,0},"
+        "dmat3x2={0,0,0,0,0,0},dmat3x3={0,0,0,0,0,0,0,0,0},"
+        "dmat3x4={0,0,0,0,0,0,0,0,0,0,0,0},dmat4x2={0,0,0,0,0,0,0,0},"
+        "dmat4x3={0,0,0,0,0,0,0,0,0,0,0,0},"
+        "dmat4x4={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}"
     );
 }
 
