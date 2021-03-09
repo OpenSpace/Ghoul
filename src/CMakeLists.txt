@@ -33,6 +33,7 @@ set(GHOUL_SOURCE
   filesystem/filesystem.windows.cpp
   io/model/modelgeometry.cpp
   io/model/modelmesh.cpp
+  io/model/modelnode.cpp
   io/model/modelreader.cpp
   io/model/modelreaderbase.cpp
   io/socket/socket.cpp
@@ -150,6 +151,7 @@ set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelgeometry.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelmesh.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelnode.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreader.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socket.h

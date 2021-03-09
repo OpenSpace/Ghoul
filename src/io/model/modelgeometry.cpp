@@ -52,9 +52,9 @@ ModelGeometry::ModelCacheException::ModelCacheException(std::string file,
     , filename(std::move(file))
 {}
 
-ModelGeometry::ModelGeometry(std::vector<io::ModelMesh> meshes,
+ModelGeometry::ModelGeometry(std::vector<io::ModelNode> nodes,
                              std::vector<TextureEntry> textureStorage)
-    : _meshes(std::move(meshes))
+    : _nodes(std::move(nodes))
     , _textureStorage(std::move(textureStorage))
 {}
 
@@ -490,19 +490,21 @@ double ModelGeometry::boundingRadius() const {
 void ModelGeometry::calculateBoundingRadius() {
     float maximumDistanceSquared = 0.f;
 
-    for (const io::ModelMesh& mesh : _meshes) {
-        float d = mesh.calculateBoundingRadius();
-        maximumDistanceSquared = std::max(d, maximumDistanceSquared);
+    for (const io::ModelNode& node : _nodes) {
+        for (const io::ModelMesh& mesh : node.meshes()) {
+            float d = mesh.calculateBoundingRadius();
+            maximumDistanceSquared = std::max(d, maximumDistanceSquared);
+        }
     }
     _boundingRadius = maximumDistanceSquared;
 }
 
-std::vector<io::ModelMesh>& ModelGeometry::meshes() {
-    return _meshes;
+std::vector<io::ModelNode>& ModelGeometry::nodes() {
+    return _nodes;
 }
 
-const std::vector<io::ModelMesh>& ModelGeometry::meshes() const {
-    return _meshes;
+const std::vector<io::ModelNode>& ModelGeometry::nodes() const {
+    return _nodes;
 }
 
 std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() {
@@ -513,25 +515,50 @@ const std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() 
     return _textureStorage;
 }
 
-void ModelGeometry::render(opengl::ProgramObject& program, bool isTexturedModel) const {
-    for (const io::ModelMesh& mesh : _meshes) {
-        mesh.render(program, isTexturedModel);
+void renderRecursive(const std::vector<io::ModelNode>& nodes, const io::ModelNode* node,
+    opengl::ProgramObject& program, glm::mat4x4& parentTransform, bool isTexturedModel)
+{
+    if(!node) {
+        LERROR("Cannot render empty node!");
+        return;
     }
+
+    glm::mat4x4 globalTransform = parentTransform * node->transform();
+    for (const io::ModelMesh& mesh : node->meshes()) {
+        mesh.render(program, globalTransform, isTexturedModel);
+    }
+
+    for (const int child : node->children()) {
+        renderRecursive(nodes, &nodes[child], program, globalTransform, isTexturedModel);
+    }
+}
+
+void ModelGeometry::render(opengl::ProgramObject& program, bool isTexturedModel) const {
+    if (_nodes.empty()) {
+        LERROR("Cannot render empty geometry");
+    }
+
+    glm::mat4x4 parentTransform;
+    renderRecursive(_nodes, &_nodes[0], program, parentTransform, isTexturedModel);
 }
 
 void ModelGeometry::initialize() {
     ZoneScoped
 
-    for (io::ModelMesh& mesh : _meshes) {
-        mesh.initialize();
+    for (io::ModelNode& node : _nodes) {
+        for (io::ModelMesh& mesh : node.meshes()) {
+            mesh.initialize();
+        }
     }
 
     calculateBoundingRadius();
 }
 
 void ModelGeometry::deinitialize() {
-    for (io::ModelMesh& mesh : _meshes) {
-        mesh.deinitialize();
+    for (io::ModelNode& node : _nodes) {
+        for (io::ModelMesh& mesh : node.meshes()) {
+            mesh.deinitialize();
+        }
     }
 }
 

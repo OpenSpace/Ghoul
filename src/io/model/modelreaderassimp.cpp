@@ -218,7 +218,6 @@ bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
 
 
 ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
-                      glm::mat4x4& transform,
                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
                       std::filesystem::path& modelDirectory, bool forceRenderInvisible,
                       bool notifyInvisibleDropped)
@@ -236,18 +235,6 @@ ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
         vertex.position[0] = mesh.mVertices[i].x;
         vertex.position[1] = mesh.mVertices[i].y;
         vertex.position[2] = mesh.mVertices[i].z;
-
-        // Apply the transform to the vertex
-        glm::vec4 position(
-            vertex.position[0],
-            vertex.position[1],
-            vertex.position[2],
-            1.f
-        );
-        position = transform * position;
-        vertex.position[0] = position.x;
-        vertex.position[1] = position.y;
-        vertex.position[2] = position.z;
 
         // Normal
         if (mesh.HasNormals()) {
@@ -481,8 +468,8 @@ ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
 
 // Process a node in a recursive fashion. Process each individual mesh located 
 // at the node and repeats this process on its children nodes (if any)
-void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelMesh>& meshes,
-                 glm::mat4x4& parentTransform,
+void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode>& nodes,
+                 int parent,
                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
                  bool forceRenderInvisible, bool notifyInvisibleDropped,
                  std::filesystem::path& modelDirectory)
@@ -503,9 +490,9 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelMesh
         node.mTransformation.c4, node.mTransformation.d4
     );
 
-    glm::mat4x4 globalTransform = parentTransform * nodeTransform;
-
     // Process each mesh for the current node
+    std::vector<ModelMesh> meshArray;
+    meshArray.reserve(node.mNumMeshes);
     for (unsigned int i = 0; i < node.mNumMeshes; i++) {
         // The node object only contains indices to the actual objects in the scene
         // The scene contains all the data, node is just to keep stuff organized
@@ -514,7 +501,6 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelMesh
         ModelMesh loadedMesh = processMesh(
             *mesh,
             scene,
-            globalTransform,
             textureStorage,
             modelDirectory,
             forceRenderInvisible,
@@ -526,7 +512,15 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelMesh
             continue;
         }
 
-        meshes.push_back(std::move(loadedMesh));
+        meshArray.push_back(std::move(loadedMesh));
+    }
+
+    ModelNode modelNode(nodeTransform, std::move(meshArray));
+    modelNode.setParent(parent);
+    nodes.push_back(std::move(modelNode));
+    int newNode = nodes.size() - 1;
+    if (parent != -1) {
+        nodes[parent].addChild(newNode);
     }
 
     // After we've processed all of the meshes (if any) we then recursively 
@@ -535,8 +529,8 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelMesh
         processNode(
             *(node.mChildren[i]),
             scene,
-            meshes,
-            globalTransform,
+            nodes,
+            newNode,
             textureStorage,
             forceRenderInvisible,
             notifyInvisibleDropped,
@@ -570,15 +564,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
     glm::mat4x4 rootTransform;
 
     // Get info from all models in the scene
-    std::vector<ModelMesh> meshArray;
-    meshArray.reserve(scene->mNumMeshes);
+    std::vector<ModelNode> nodeArray;
     std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorage;
     textureStorage.reserve(scene->mNumTextures);
     processNode(
         *(scene->mRootNode),
         *scene,
-        meshArray,
-        rootTransform,
+        nodeArray,
+        -1,
         textureStorage,
         forceRenderInvisible,
         notifyInvisibleDropped,
@@ -587,7 +580,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
 
     // Return the ModelGeometry from the meshArray
     return std::make_unique<modelgeometry::ModelGeometry>(
-        std::move(meshArray),
+        std::move(nodeArray),
         std::move(textureStorage)
     );
 }

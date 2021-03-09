@@ -23,64 +23,73 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MODELGEOMETRY___H__
-#define __GHOUL___MODELGEOMETRY___H__
-
-#include <ghoul/io/model/modelmesh.h>
 #include <ghoul/io/model/modelnode.h>
-#include <ghoul/opengl/ghoul_gl.h>
-#include <memory>
 
-namespace ghoul::opengl { class ProgramObject; }
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/fmt.h>
+#include <glm/gtc/type_ptr.hpp>
 
-namespace ghoul::modelgeometry {
+namespace ghoul::io {
 
-class ModelGeometry {
-public:
-    /// The exception that gets thrown if there was an error loading the cache file or
-    /// saving this model to a cache file
-    struct ModelCacheException : public RuntimeError {
-        explicit ModelCacheException(std::string file, std::string msg);
+ModelNode::ModelNode(glm::mat4x4 transform, std::vector<io::ModelMesh> meshes)
+    : _meshes(std::move(meshes))
+    , _parent(-1)
+{
+   // glm is column major, array is column major too
+    _transform[0] = transform[0][0];
+    _transform[1] = transform[0][1];
+    _transform[2] = transform[0][2];
+    _transform[3] = transform[0][3];
 
-        /// The file that caused the exception to be thrown
-        const std::string filename;
+    _transform[4] = transform[1][0];
+    _transform[5] = transform[1][1];
+    _transform[6] = transform[1][2];
+    _transform[7] = transform[1][3];
 
-        /// The error message that occurred
-        const std::string message;
-    };
+    _transform[8] = transform[2][0];
+    _transform[9] = transform[2][1];
+    _transform[10] = transform[2][2];
+    _transform[11] = transform[2][3];
 
-    struct TextureEntry {
-        std::string name;
-        std::unique_ptr<opengl::Texture> texture;
-    };
+    _transform[12] = transform[3][0];
+    _transform[13] = transform[3][1];
+    _transform[14] = transform[3][2];
+    _transform[15] = transform[3][3];
+}
 
-    ModelGeometry(std::vector<io::ModelNode> nodes,
-        std::vector<TextureEntry> textureStorage);
-    ModelGeometry(ModelGeometry&&) noexcept = default;
-    ~ModelGeometry() noexcept = default;
+void ModelNode::setParent(int parent) {
+    _parent = parent;
+}
 
-    static std::unique_ptr<modelgeometry::ModelGeometry> loadCacheFile(
-        const std::string& cachedFile);
-    bool saveToCacheFile(const std::string& cachedFile) const;
+void ModelNode::setChildren(std::vector<int> children) {
+    _children = std::move(children);
+}
 
-    void initialize();
-    void deinitialize();
-    void render(opengl::ProgramObject& program, bool isTexturedModel = true) const;
+void ModelNode::addChild(int child) {
+    _children.push_back(child);
+    if (_children.size() == 0) {
+        std::cout << "Elin!" << std::endl;
+    }
+}
 
-    double boundingRadius() const;
-    void calculateBoundingRadius();
+std::vector<io::ModelMesh>& ModelNode::meshes() {
+    return _meshes;
+}
 
-    std::vector<io::ModelNode>& nodes();
-    const std::vector<io::ModelNode>& nodes() const;
-    std::vector<TextureEntry>& textureStorage();
-    const std::vector<TextureEntry>& textureStorage() const;
+const std::vector<io::ModelMesh>& ModelNode::meshes() const {
+    return _meshes;
+}
 
-protected:
-    double _boundingRadius = 0.0;
-    std::vector<io::ModelNode> _nodes;
-    std::vector<TextureEntry> _textureStorage;
-};
+std::vector<int>& ModelNode::children() {
+    return _children;
+}
 
-}  // namespace ghoul::modelgeometry
+const std::vector<int>& ModelNode::children() const {
+    return _children;
+}
 
-#endif // __GHOUL___MODELGEOMETRY___H__
+const glm::mat4x4 ModelNode::transform() const {
+    return glm::make_mat4(_transform);
+}
+
+} // namespace ghoul::io
