@@ -23,67 +23,54 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MODELGEOMETRY___H__
-#define __GHOUL___MODELGEOMETRY___H__
+#ifndef __GHOUL___MODELANIMATION___H__
+#define __GHOUL___MODELANIMATION___H__
 
-#include <ghoul/io/model/modelmesh.h>
-#include <ghoul/io/model/modelnode.h>
-#include <ghoul/io/model/modelanimation.h>
-#include <ghoul/opengl/ghoul_gl.h>
-#include <memory>
+#include <ghoul/glm.h>
+#include <vector>
 
-namespace ghoul::opengl { class ProgramObject; }
+namespace ghoul::io {
 
-namespace ghoul::modelgeometry {
-
-class ModelGeometry {
+class ModelAnimation {
 public:
-    /// The exception that gets thrown if there was an error loading the cache file or
-    /// saving this model to a cache file
-    struct ModelCacheException : public RuntimeError {
-        explicit ModelCacheException(std::string file, std::string msg);
-
-        /// The file that caused the exception to be thrown
-        const std::string filename;
-
-        /// The error message that occurred
-        const std::string message;
+    struct PositionKeyframe {
+        glm::vec3 position;
+        double time;
     };
 
-    struct TextureEntry {
-        std::string name;
-        std::unique_ptr<opengl::Texture> texture;
+    struct RotationKeyframe {
+        glm::quat rotation;
+        double time;
     };
 
-    ModelGeometry(std::vector<io::ModelNode> nodes,
-        std::vector<TextureEntry> textureStorage,
-        std::vector<io::ModelAnimation> animations);
-    ModelGeometry(ModelGeometry&&) noexcept = default;
-    ~ModelGeometry() noexcept = default;
+    struct ScaleKeyframe {
+        glm::vec3 scale;
+        double time;
+    };
 
-    static std::unique_ptr<modelgeometry::ModelGeometry> loadCacheFile(
-        const std::string& cachedFile);
-    bool saveToCacheFile(const std::string& cachedFile) const;
+    struct NodeAnimation {
+        int node;
+        std::vector<PositionKeyframe> positions;
+        std::vector<RotationKeyframe> rotations;
+        std::vector<ScaleKeyframe> scales;
+    };
 
-    void initialize();
-    void deinitialize();
-    void render(opengl::ProgramObject& program, bool isTexturedModel = true) const;
+    ModelAnimation(std::string name, double duration);
 
-    double boundingRadius() const;
-    void calculateBoundingRadius();
+    ModelAnimation(ModelAnimation&&) noexcept = default;
+    ~ModelAnimation() noexcept = default;
 
-    std::vector<io::ModelNode>& nodes();
-    const std::vector<io::ModelNode>& nodes() const;
-    std::vector<TextureEntry>& textureStorage();
-    const std::vector<TextureEntry>& textureStorage() const;
+    std::vector<NodeAnimation>& nodeAnimations();
+    const std::vector<NodeAnimation>& nodeAnimations() const;
+    std::string name();
 
-protected:
-    double _boundingRadius = 0.0;
-    std::vector<io::ModelNode> _nodes;
-    std::vector<TextureEntry> _textureStorage;
-    std::vector<io::ModelAnimation> _animations;
+
+private:
+    std::string _name;
+    double _duration;
+    std::vector<NodeAnimation> _nodeAnimations;
 };
 
-}  // namespace ghoul::modelgeometry
+} // namespace ghoul::io
 
-#endif // __GHOUL___MODELGEOMETRY___H__
+#endif // __GHOUL___MODELANIMATION___H__

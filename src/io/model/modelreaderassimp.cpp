@@ -26,6 +26,7 @@
 #include <ghoul/io/model/modelreaderassimp.h>
 
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/io/model/modelanimation.h>
 #include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/io/model/modelmesh.h>
 #include <ghoul/io/texture/texturereader.h>
@@ -469,7 +470,7 @@ ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
 // Process a node in a recursive fashion. Process each individual mesh located 
 // at the node and repeats this process on its children nodes (if any)
 void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode>& nodes,
-                 int parent,
+                 int parent, std::vector<ModelAnimation>& animations,
                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
                  bool forceRenderInvisible, bool notifyInvisibleDropped,
                  std::filesystem::path& modelDirectory)
@@ -523,6 +524,74 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
         nodes[parent].addChild(newNode);
     }
 
+    // Check animations
+    if (scene.HasAnimations()) {
+        for (unsigned int a = 0; a < scene.mNumAnimations; ++a) {
+            aiAnimation* animation = scene.mAnimations[a];
+
+            for (unsigned int c = 0; c < scene.mAnimations[a]->mNumChannels; ++c) {
+                aiNodeAnim* nodeAnim = animation->mChannels[c];
+
+                if (nodeAnim->mNodeName == node.mName) {
+                    ModelAnimation::NodeAnimation nodeAnimation;
+                    nodeAnimation.node = newNode;
+                    std::cout << "Pre: " << nodeAnim->mPreState << std::endl;
+                    std::cout << "Post: " << nodeAnim->mPostState << std::endl;
+
+                    for (unsigned int p = 0; p < nodeAnim->mNumPositionKeys; ++p) {
+                        aiVectorKey posKey = nodeAnim->mPositionKeys[p];
+
+                        ModelAnimation::PositionKeyframe positionKeyframe;
+                        positionKeyframe.time = posKey.mTime / animation->mTicksPerSecond;
+                        positionKeyframe.position = glm::vec3(
+                            posKey.mValue.x,
+                            posKey.mValue.y,
+                            posKey.mValue.z
+                        );
+
+                        nodeAnimation.positions.push_back(std::move(positionKeyframe));
+                    }
+
+                    for (unsigned int r = 0; r < nodeAnim->mNumRotationKeys; ++r) {
+                        aiQuatKey rotKey = nodeAnim->mRotationKeys[r];
+
+                        ModelAnimation::RotationKeyframe rotationKeyframe;
+                        rotationKeyframe.time = rotKey.mTime / animation->mTicksPerSecond;
+                        rotationKeyframe.rotation = glm::quat(
+                            rotKey.mValue.w,
+                            rotKey.mValue.x,
+                            rotKey.mValue.y,
+                            rotKey.mValue.z
+                        );
+
+                        nodeAnimation.rotations.push_back(std::move(rotationKeyframe));
+                    }
+
+                    for (unsigned int s = 0; s < nodeAnim->mNumScalingKeys; ++s) {
+                        aiVectorKey scaleKey = nodeAnim->mScalingKeys[s];
+
+                        ModelAnimation::ScaleKeyframe scaleKeyframe;
+                        scaleKeyframe.time = scaleKey.mTime / animation->mTicksPerSecond;
+                        scaleKeyframe.scale = glm::vec3(
+                            scaleKey.mValue.x,
+                            scaleKey.mValue.y,
+                            scaleKey.mValue.z
+                        );
+
+                        nodeAnimation.scales.push_back(std::move(scaleKeyframe));
+                    }
+
+                    for (ModelAnimation& modelAnimation : animations) {
+                        if (modelAnimation.name() == animation->mName.C_Str()) {
+                            modelAnimation.nodeAnimations().push_back(std::move(nodeAnimation));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // After we've processed all of the meshes (if any) we then recursively 
     // process each of the children nodes (if any)
     for (unsigned int i = 0; i < node.mNumChildren; i++) {
@@ -531,6 +600,7 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
             scene,
             nodes,
             newNode,
+            animations,
             textureStorage,
             forceRenderInvisible,
             notifyInvisibleDropped,
@@ -560,8 +630,26 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         throw ModelLoadException(filename, importer.GetErrorString(), this);
     }
 
-    // Start with an identity matrix as root transform
-    glm::mat4x4 rootTransform;
+    // Check animations
+    std::vector<ModelAnimation> animationArray;
+    animationArray.reserve(scene->mNumAnimations);
+    if (scene->HasAnimations()) {
+        std::cout << "Animations!" << std::endl;
+
+        for (unsigned int a = 0; a < scene->mNumAnimations; ++a) {
+            aiAnimation* animation = scene->mAnimations[a];
+
+            if (animation->mNumMeshChannels != 0) {
+                std::cout << "Mesh channels: " << animation->mNumMeshChannels << std::endl;
+            }
+            if (animation->mNumMorphMeshChannels != 0) {
+                std::cout << "Morph mesh channels: " << animation->mNumMorphMeshChannels << std::endl;
+            }
+
+            std::cout << "Ticks per second: " << animation->mTicksPerSecond << std::endl;
+            animationArray.push_back(ModelAnimation(animation->mName.C_Str(), animation->mDuration));
+        }
+    }
 
     // Get info from all models in the scene
     std::vector<ModelNode> nodeArray;
@@ -572,6 +660,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         *scene,
         nodeArray,
         -1,
+        animationArray,
         textureStorage,
         forceRenderInvisible,
         notifyInvisibleDropped,
@@ -581,7 +670,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
     // Return the ModelGeometry from the meshArray
     return std::make_unique<modelgeometry::ModelGeometry>(
         std::move(nodeArray),
-        std::move(textureStorage)
+        std::move(textureStorage),
+        std::move(animationArray)
     );
 }
 

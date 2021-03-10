@@ -23,67 +23,25 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MODELGEOMETRY___H__
-#define __GHOUL___MODELGEOMETRY___H__
-
-#include <ghoul/io/model/modelmesh.h>
-#include <ghoul/io/model/modelnode.h>
 #include <ghoul/io/model/modelanimation.h>
-#include <ghoul/opengl/ghoul_gl.h>
-#include <memory>
 
-namespace ghoul::opengl { class ProgramObject; }
+namespace ghoul::io {
 
-namespace ghoul::modelgeometry {
+ModelAnimation::ModelAnimation(std::string name, double duration)
+    : _name(name)
+    , _duration(duration)
+{}
 
-class ModelGeometry {
-public:
-    /// The exception that gets thrown if there was an error loading the cache file or
-    /// saving this model to a cache file
-    struct ModelCacheException : public RuntimeError {
-        explicit ModelCacheException(std::string file, std::string msg);
+std::vector<ModelAnimation::NodeAnimation>& ModelAnimation::nodeAnimations() {
+    return _nodeAnimations;
+}
 
-        /// The file that caused the exception to be thrown
-        const std::string filename;
+const std::vector<ModelAnimation::NodeAnimation>& ModelAnimation::nodeAnimations() const {
+    return _nodeAnimations;
+}
 
-        /// The error message that occurred
-        const std::string message;
-    };
+std::string ModelAnimation::name() {
+    return _name;
+}
 
-    struct TextureEntry {
-        std::string name;
-        std::unique_ptr<opengl::Texture> texture;
-    };
-
-    ModelGeometry(std::vector<io::ModelNode> nodes,
-        std::vector<TextureEntry> textureStorage,
-        std::vector<io::ModelAnimation> animations);
-    ModelGeometry(ModelGeometry&&) noexcept = default;
-    ~ModelGeometry() noexcept = default;
-
-    static std::unique_ptr<modelgeometry::ModelGeometry> loadCacheFile(
-        const std::string& cachedFile);
-    bool saveToCacheFile(const std::string& cachedFile) const;
-
-    void initialize();
-    void deinitialize();
-    void render(opengl::ProgramObject& program, bool isTexturedModel = true) const;
-
-    double boundingRadius() const;
-    void calculateBoundingRadius();
-
-    std::vector<io::ModelNode>& nodes();
-    const std::vector<io::ModelNode>& nodes() const;
-    std::vector<TextureEntry>& textureStorage();
-    const std::vector<TextureEntry>& textureStorage() const;
-
-protected:
-    double _boundingRadius = 0.0;
-    std::vector<io::ModelNode> _nodes;
-    std::vector<TextureEntry> _textureStorage;
-    std::vector<io::ModelAnimation> _animations;
-};
-
-}  // namespace ghoul::modelgeometry
-
-#endif // __GHOUL___MODELGEOMETRY___H__
+} // namespace ghoul::io

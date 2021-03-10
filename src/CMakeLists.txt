@@ -31,6 +31,7 @@ set(GHOUL_SOURCE
   filesystem/filesystem.linux.cpp
   filesystem/filesystem.osx.cpp
   filesystem/filesystem.windows.cpp
+  io/model/modelanimation.cpp
   io/model/modelgeometry.cpp
   io/model/modelmesh.cpp
   io/model/modelnode.cpp
@@ -149,6 +150,7 @@ set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/directory.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/file.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelanimation.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelgeometry.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelmesh.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelnode.h

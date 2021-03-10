@@ -53,9 +53,11 @@ ModelGeometry::ModelCacheException::ModelCacheException(std::string file,
 {}
 
 ModelGeometry::ModelGeometry(std::vector<io::ModelNode> nodes,
-                             std::vector<TextureEntry> textureStorage)
+                             std::vector<TextureEntry> textureStorage,
+                             std::vector<io::ModelAnimation> animations)
     : _nodes(std::move(nodes))
     , _textureStorage(std::move(textureStorage))
+    , _animations(std::move(animations))
 {}
 
 opengl::Texture::Format stringToFormat(std::string_view format) {
