@@ -56,7 +56,7 @@ namespace {
         }
 
         std::stringstream values;
-        for (int i = 0; i < vec.size() - 1; i++) {
+        for (size_t i = 0; i < vec.size() - 1; i++) {
             double v = static_cast<double>(vec[i]);
             values << formatNumber(v) << ",";
         }

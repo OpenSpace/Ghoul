@@ -90,7 +90,7 @@ namespace {
         }
 
         std::string values;
-        for (int i = 0; i < vec.size() - 1; i++) {
+        for (size_t i = 0; i < vec.size() - 1; i++) {
             values += fmt::format("{},", vec[i]);
         }
         values += fmt::format("{}", vec.back());
