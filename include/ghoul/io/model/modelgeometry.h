@@ -65,12 +65,16 @@ public:
         const std::string& cachedFile);
     bool saveToCacheFile(const std::string& cachedFile) const;
 
+    void setTimeScale(float timeScale);
+
     void initialize();
     void deinitialize();
     void render(opengl::ProgramObject& program, bool isTexturedModel = true) const;
+    void update(double now);
 
     double boundingRadius() const;
     void calculateBoundingRadius();
+    bool hasAnimation() const;
 
     std::vector<io::ModelNode>& nodes();
     const std::vector<io::ModelNode>& nodes() const;

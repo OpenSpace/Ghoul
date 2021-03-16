@@ -33,6 +33,7 @@
 #include <ghoul/misc/invariants.h>
 #include <ghoul/misc/profiling.h>
 #include <ghoul/misc/templatefactory.h>
+#include <glm/gtx/quaternion.hpp>
 #include <fstream>
 
 namespace {
@@ -501,6 +502,10 @@ void ModelGeometry::calculateBoundingRadius() {
     _boundingRadius = maximumDistanceSquared;
 }
 
+bool ModelGeometry::hasAnimation() const {
+    return !_animations.empty();
+}
+
 std::vector<io::ModelNode>& ModelGeometry::nodes() {
     return _nodes;
 }
@@ -525,7 +530,16 @@ void renderRecursive(const std::vector<io::ModelNode>& nodes, const io::ModelNod
         return;
     }
 
-    glm::mat4x4 globalTransform = parentTransform * node->transform();
+    glm::mat4x4 globalTransform;
+    if (node->hasAnimation()) {
+        // Animation is given by asimp in absolute format
+        // i.e. animation replaces old transform
+        globalTransform = parentTransform * node->animationTransform();
+    }
+    else {
+        globalTransform = parentTransform * node->transform();
+    }
+
     for (const io::ModelMesh& mesh : node->meshes()) {
         mesh.render(program, globalTransform, isTexturedModel);
     }
@@ -542,6 +556,153 @@ void ModelGeometry::render(opengl::ProgramObject& program, bool isTexturedModel)
 
     glm::mat4x4 parentTransform;
     renderRecursive(_nodes, &_nodes[0], program, parentTransform, isTexturedModel);
+}
+
+void ModelGeometry::update(double now) {
+    if (_animations.empty()) {
+        LERROR("Cannot update empty animation");
+    }
+
+    // Currently only one animation is supported per model
+    // that is why only index 0 is used
+
+    // Animation out of scope
+    if (now > _animations[0].duration() || now < 0) {
+        return;
+    }
+
+    // Find keyframe(s)
+    for (const io::ModelAnimation::NodeAnimation& nodeAnimation :
+        _animations[0].nodeAnimations())
+    {
+        // Position
+        glm::vec3 currPos;
+        if (nodeAnimation.positions.size() > 1) {
+            double prevPosTime = -DBL_MAX;
+            glm::vec3 prevPos;
+            double nextPosTime = DBL_MAX;
+            glm::vec3 nextPos;
+            bool interpolate = true;
+
+            for (const io::ModelAnimation::PositionKeyframe& pos : nodeAnimation.positions) {
+                double diff = (pos.time / _animations[0].timeScale()) - now;
+
+                // Exact on a keyframe
+                if (diff == 0.0) {
+                    currPos = pos.position;
+                    interpolate = false;
+                }
+                // Prev keyframe
+                else if (diff < 0 && diff > (prevPosTime - now)) {
+                    prevPosTime = pos.time / _animations[0].timeScale();
+                    prevPos = pos.position;
+                }
+                // next keyframe
+                else if (diff > 0 && diff < (nextPosTime - now)) {
+                    nextPosTime = pos.time / _animations[0].timeScale();
+                    nextPos = pos.position;
+                }
+            }
+
+            if (interpolate) {
+                double blend = (now - prevPosTime) / (nextPosTime - prevPosTime);
+                currPos = glm::mix(prevPos, nextPos, static_cast<float>(blend));
+            }
+        }
+        else {
+            currPos = nodeAnimation.positions[0].position;
+        }
+
+        // Rotation
+        glm::quat currRot;
+        if (nodeAnimation.rotations.size() > 1) {
+            double prevRotTime = -DBL_MAX;
+            glm::quat prevRot;
+            double nextRotTime = DBL_MAX;
+            glm::quat nextRot;
+            bool interpolate = true;
+
+            for (const io::ModelAnimation::RotationKeyframe& rot : nodeAnimation.rotations) {
+                double diff = (rot.time / _animations[0].timeScale()) - now;
+
+                // Exact on a keyframe
+                if (diff == 0.0) {
+                    currRot = rot.rotation;
+                    interpolate = false;
+                }
+                // Prev keyframe
+                else if (diff < 0 && diff > (prevRotTime - now)) {
+                    prevRotTime = rot.time / _animations[0].timeScale();
+                    prevRot = rot.rotation;
+                }
+                // next keyframe
+                else if (diff > 0 && diff < (nextRotTime - now)) {
+                    nextRotTime = rot.time / _animations[0].timeScale();
+                    nextRot = rot.rotation;
+                }
+            }
+
+            if (interpolate) {
+                double blend = (now - prevRotTime) / (nextRotTime - prevRotTime);
+                currRot = glm::slerp(prevRot, nextRot, static_cast<float>(blend));
+            }
+        }
+        else {
+            currRot = nodeAnimation.rotations[0].rotation;
+        }
+
+        // Scale
+        glm::vec3 currScale;
+        if (nodeAnimation.scales.size() > 1) {
+            double prevScaleTime = -DBL_MAX;
+            glm::vec3 prevScale;
+            double nextScaleTime = DBL_MAX;
+            glm::vec3 nextScale;
+            bool interpolate = true;
+
+            for (const io::ModelAnimation::ScaleKeyframe& scale : nodeAnimation.scales) {
+                double diff = (scale.time / _animations[0].timeScale()) - now;
+
+                // Exact on a keyframe
+                if (diff == 0.0) {
+                    currScale = scale.scale;
+                    interpolate = false;
+                }
+                // Prev keyframe
+                else if (diff < 0 && diff > (prevScaleTime - now)) {
+                    prevScaleTime = scale.time / _animations[0].timeScale();
+                    prevScale = scale.scale;
+                }
+                // next keyframe
+                else if (diff > 0 && diff < (nextScaleTime - now)) {
+                    nextScaleTime = scale.time / _animations[0].timeScale();
+                    nextScale = scale.scale;
+                }
+            }
+
+            if (interpolate) {
+                double blend = (now - prevScaleTime) / (nextScaleTime - prevScaleTime);
+                currScale = glm::mix(prevScale, nextScale, static_cast<float>(blend));
+            }
+        }
+        else {
+            currScale = nodeAnimation.scales[0].scale;
+        }
+
+        glm::mat4x4 animationTransform;
+        animationTransform =
+            glm::translate(glm::mat4(1.0), currPos) *
+            glm::toMat4(currRot) *
+            glm::scale(animationTransform, currScale);
+
+        _nodes[nodeAnimation.node].setAnimation(animationTransform);
+    }
+}
+
+void ModelGeometry::setTimeScale(float timeScale) {
+    for (io::ModelAnimation& animation : _animations) {
+        animation.setTimeScale(timeScale);
+    }
 }
 
 void ModelGeometry::initialize() {

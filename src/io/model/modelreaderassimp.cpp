@@ -634,20 +634,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
     std::vector<ModelAnimation> animationArray;
     animationArray.reserve(scene->mNumAnimations);
     if (scene->HasAnimations()) {
-        std::cout << "Animations!" << std::endl;
-
         for (unsigned int a = 0; a < scene->mNumAnimations; ++a) {
             aiAnimation* animation = scene->mAnimations[a];
-
-            if (animation->mNumMeshChannels != 0) {
-                std::cout << "Mesh channels: " << animation->mNumMeshChannels << std::endl;
-            }
-            if (animation->mNumMorphMeshChannels != 0) {
-                std::cout << "Morph mesh channels: " << animation->mNumMorphMeshChannels << std::endl;
-            }
-
-            std::cout << "Ticks per second: " << animation->mTicksPerSecond << std::endl;
-            animationArray.push_back(ModelAnimation(animation->mName.C_Str(), animation->mDuration));
+            animationArray.push_back(ModelAnimation(
+                animation->mName.C_Str(),
+                animation->mDuration / animation->mTicksPerSecond
+            ));
         }
     }
 

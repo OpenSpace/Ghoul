@@ -60,14 +60,18 @@ public:
     ModelAnimation(ModelAnimation&&) noexcept = default;
     ~ModelAnimation() noexcept = default;
 
+    void setTimeScale(float timeScale);
+
     std::vector<NodeAnimation>& nodeAnimations();
     const std::vector<NodeAnimation>& nodeAnimations() const;
-    std::string name();
-
+    std::string name() const;
+    double duration() const;
+    float timeScale() const;
 
 private:
     std::string _name;
     double _duration;
+    float _timeScale = 1.0;
     std::vector<NodeAnimation> _nodeAnimations;
 };
 

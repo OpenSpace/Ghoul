@@ -72,6 +72,31 @@ void ModelNode::addChild(int child) {
     }
 }
 
+void ModelNode::setAnimation(glm::mat4x4 animation) {
+    // glm is column major, array is column major too
+    _animationTransform[0] = animation[0][0];
+    _animationTransform[1] = animation[0][1];
+    _animationTransform[2] = animation[0][2];
+    _animationTransform[3] = animation[0][3];
+
+    _animationTransform[4] = animation[1][0];
+    _animationTransform[5] = animation[1][1];
+    _animationTransform[6] = animation[1][2];
+    _animationTransform[7] = animation[1][3];
+
+    _animationTransform[8] = animation[2][0];
+    _animationTransform[9] = animation[2][1];
+    _animationTransform[10] = animation[2][2];
+    _animationTransform[11] = animation[2][3];
+
+    _animationTransform[12] = animation[3][0];
+    _animationTransform[13] = animation[3][1];
+    _animationTransform[14] = animation[3][2];
+    _animationTransform[15] = animation[3][3];
+
+    _hasAnimation = true;
+}
+
 std::vector<io::ModelMesh>& ModelNode::meshes() {
     return _meshes;
 }
@@ -90,6 +115,14 @@ const std::vector<int>& ModelNode::children() const {
 
 const glm::mat4x4 ModelNode::transform() const {
     return glm::make_mat4(_transform);
+}
+
+const glm::mat4x4 ModelNode::animationTransform() const {
+    return glm::make_mat4(_animationTransform);
+}
+
+bool ModelNode::hasAnimation() const {
+    return _hasAnimation;
 }
 
 } // namespace ghoul::io

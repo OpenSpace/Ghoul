@@ -32,6 +32,11 @@ ModelAnimation::ModelAnimation(std::string name, double duration)
     , _duration(duration)
 {}
 
+void ModelAnimation::setTimeScale(float timeScale) {
+    _timeScale = timeScale;
+    _duration = _duration / _timeScale;
+}
+
 std::vector<ModelAnimation::NodeAnimation>& ModelAnimation::nodeAnimations() {
     return _nodeAnimations;
 }
@@ -40,8 +45,16 @@ const std::vector<ModelAnimation::NodeAnimation>& ModelAnimation::nodeAnimations
     return _nodeAnimations;
 }
 
-std::string ModelAnimation::name() {
+std::string ModelAnimation::name() const {
     return _name;
+}
+
+double ModelAnimation::duration() const {
+    return _duration;
+}
+
+float ModelAnimation::timeScale() const {
+    return _timeScale;
 }
 
 } // namespace ghoul::io

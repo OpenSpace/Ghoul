@@ -43,20 +43,25 @@ public:
     void setParent(int parent);
     void setChildren(std::vector<int> children);
     void addChild(int child);
+    void setAnimation(glm::mat4x4 animation);
 
     std::vector<io::ModelMesh>& meshes();
     const std::vector<io::ModelMesh>& meshes() const;
     std::vector<int>& children();
     const std::vector<int>& children() const;
     const glm::mat4x4 transform() const;
+    const glm::mat4x4 animationTransform() const;
+    bool hasAnimation() const;
 
 private:
-    // glm::mat4x4 is not noexcept move constructable, user an array instead for transform
+    // glm::mat4x4 is not noexcept move constructable, use an array instead for transform
     // Array is column major
     GLfloat _transform[16];
+    GLfloat _animationTransform[16];
     std::vector<ModelMesh> _meshes;
     int _parent;
     std::vector<int> _children;
+    bool _hasAnimation = false;
 };
 
 } // namespace ghoul::io
