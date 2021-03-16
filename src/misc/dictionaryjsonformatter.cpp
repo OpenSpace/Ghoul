@@ -29,11 +29,12 @@
 #include <ghoul/misc/dictionary.h>
 #include <numeric>
 #include <string>
+#include <sstream>
 
 namespace ghoul {
 
 namespace {
-    std::string formatDouble(double d) {
+    std::string formatNumber(double d) {
         // fmt::format will represent infinite values with 'inf' and NaNs with 'nan'.
         // These are not valid in JSON, so use 'null' instead
         if (!std::isfinite(d)) {
@@ -41,6 +42,27 @@ namespace {
         }
 
         return fmt::format("{}", d);
+    }
+
+    template <typename T>
+    std::string formatVector(const std::vector<T>& vec) {
+        static_assert(
+            std::is_same_v<T, double> || std::is_same_v<T, int>,
+            "Only double or ints allowed"
+        );
+
+        if (vec.empty()) {
+            return "[]";
+        }
+
+        std::stringstream values;
+        for (size_t i = 0; i < vec.size() - 1; i++) {
+            double v = static_cast<double>(vec[i]);
+            values << formatNumber(v) << ",";
+        }
+        values << vec.back();
+
+        return fmt::format("[{}]", values.str());
     }
 
     /**
@@ -58,40 +80,29 @@ namespace {
             return formatJson(subDictionary);
         }
 
-        if (dictionary.hasValue<glm::dvec4>(key)) {
-            glm::dvec4 vec = dictionary.value<glm::dvec4>(key);
-            return fmt::format(
-                "[{},{},{},{}]",
-                formatDouble(vec.x),
-                formatDouble(vec.y),
-                formatDouble(vec.z),
-                formatDouble(vec.w)
-            );
-        }
-
-        if (dictionary.hasValue<glm::dvec3>(key)) {
-            glm::dvec3 vec = dictionary.value<glm::dvec3>(key);
-            return fmt::format(
-                "[{},{},{}]",
-                formatDouble(vec.x),
-                formatDouble(vec.y),
-                formatDouble(vec.z)
-            );
-        }
-
-        if (dictionary.hasValue<glm::dvec2>(key)) {
-            glm::dvec2 vec = dictionary.value<glm::dvec2>(key);
-            return fmt::format("[{},{}]", formatDouble(vec.x), formatDouble(vec.y));
-        }
-
         if (dictionary.hasValue<double>(key)) {
             double value = dictionary.value<double>(key);
-            return formatDouble(value);
+            return formatNumber(value);
         }
 
         if (dictionary.hasValue<int>(key)) {
             int value = dictionary.value<int>(key);
-            return std::to_string(value);
+            return formatNumber(static_cast<double>(value));
+        }
+
+        if (dictionary.hasValue<bool>(key)) {
+            bool value = dictionary.value<bool>(key);
+            return value ? "true" : "false";
+        }
+
+        if (dictionary.hasValue<std::vector<int>>(key)) {
+            std::vector<int> vec = dictionary.value<std::vector<int>>(key);
+            return formatVector(vec);
+        }
+
+        if (dictionary.hasValue<std::vector<double>>(key)) {
+            std::vector<double> vec = dictionary.value<std::vector<double>>(key);
+            return formatVector(vec);
         }
 
         if (dictionary.hasValue<std::string>(key)) {

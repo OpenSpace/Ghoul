@@ -78,6 +78,26 @@ namespace {
             (prettyPrint ? "\n" : "") + indent + "}";
     }
 
+    template <typename T>
+    std::string formatVector(const std::vector<T>& vec) {
+        static_assert(
+            std::is_same_v<T, double> || std::is_same_v<T, int>,
+            "Only double or ints allowed"
+        );
+
+        if (vec.empty()) {
+            return "{}";
+        }
+
+        std::string values;
+        for (size_t i = 0; i < vec.size() - 1; i++) {
+            values += fmt::format("{},", vec[i]);
+        }
+        values += fmt::format("{}", vec.back());
+
+        return fmt::format("{{{}}}", values);
+    }
+
     std::string formatValue(const Dictionary& dictionary, const std::string& key,
                             PrettyPrint prettyPrint, const std::string& indentation,
                             int indentationSteps)
@@ -85,21 +105,6 @@ namespace {
         if (dictionary.hasValue<Dictionary>(key)) {
             Dictionary subDictionary = dictionary.value<Dictionary>(key);
             return format(subDictionary, prettyPrint, indentation, indentationSteps);
-        }
-
-        if (dictionary.hasValue<glm::dvec4>(key)) {
-            glm::dvec4 vec = dictionary.value<glm::dvec4>(key);
-            return fmt::format("{{{},{},{},{}}}", vec.x, vec.y, vec.z, vec.w);
-        }
-
-        if (dictionary.hasValue<glm::dvec3>(key)) {
-            glm::dvec3 vec = dictionary.value<glm::dvec3>(key);
-            return fmt::format("{{{},{},{}}}", vec.x, vec.y, vec.z);
-        }
-
-        if (dictionary.hasValue<glm::dvec2>(key)) {
-            const glm::dvec2 vec = dictionary.value<glm::dvec2>(key);
-            return fmt::format("{{{},{}}}", vec.x, vec.y);
         }
 
         if (dictionary.hasValue<double>(key)) {
@@ -110,6 +115,21 @@ namespace {
         if (dictionary.hasValue<int>(key)) {
             int value = dictionary.value<int>(key);
             return std::to_string(value);
+        }
+
+        if (dictionary.hasValue<bool>(key)) {
+            bool value = dictionary.value<bool>(key);
+            return value ? "true" : "false";
+        }
+
+        if (dictionary.hasValue<std::vector<int>>(key)) {
+            std::vector<int> vec = dictionary.value<std::vector<int>>(key);
+            return formatVector(vec);
+        }
+
+        if (dictionary.hasValue<std::vector<double>>(key)) {
+            std::vector<double> vec = dictionary.value<std::vector<double>>(key);
+            return formatVector(vec);
         }
 
         if (dictionary.hasValue<std::string>(key)) {

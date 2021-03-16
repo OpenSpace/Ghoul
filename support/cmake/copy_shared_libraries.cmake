@@ -26,10 +26,23 @@
 function (ghl_copy_files target)
   # Add the copy command
   foreach (file_i ${ARGN})
-    add_custom_command(TARGET ${target} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${file_i}"
-    $<TARGET_FILE_DIR:${target}>)
+    if (IS_DIRECTORY "${file_i}")
+      # copy_if_different doesn't handle directories well and just copies them without
+      # contents.  So if the path is a directory, we need to issue a different copy
+      # command
+      get_filename_component(folder ${file_i} NAME)
+      add_custom_command(
+        TARGET ${target}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${file_i}" "$<TARGET_FILE_DIR:${target}>/${folder}"
+      )
+    else ()
+      add_custom_command(
+        TARGET ${target}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${file_i}" $<TARGET_FILE_DIR:${target}>
+      )
+    endif ()
   endforeach ()
 endfunction ()
 
