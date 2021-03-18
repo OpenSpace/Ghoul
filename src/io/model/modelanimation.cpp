@@ -34,7 +34,7 @@ ModelAnimation::ModelAnimation(std::string name, double duration)
 
 void ModelAnimation::setTimeScale(float timeScale) {
     _timeScale = timeScale;
-    _duration = _duration / _timeScale;
+    _duration = _duration * _timeScale;
 }
 
 std::vector<ModelAnimation::NodeAnimation>& ModelAnimation::nodeAnimations() {

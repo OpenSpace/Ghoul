@@ -75,6 +75,7 @@ public:
     double boundingRadius() const;
     void calculateBoundingRadius();
     bool hasAnimation() const;
+    double animationDuration() const;
 
     std::vector<io::ModelNode>& nodes();
     const std::vector<io::ModelNode>& nodes() const;

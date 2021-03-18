@@ -506,6 +506,15 @@ bool ModelGeometry::hasAnimation() const {
     return !_animations.empty();
 }
 
+double ModelGeometry::animationDuration() const {
+    if (_animations.empty()) {
+        LERROR("Model does not have any animation!");
+        return -1.0;
+    }
+
+    return _animations[0].duration();
+}
+
 std::vector<io::ModelNode>& ModelGeometry::nodes() {
     return _nodes;
 }
@@ -585,7 +594,7 @@ void ModelGeometry::update(double now) {
             bool interpolate = true;
 
             for (const io::ModelAnimation::PositionKeyframe& pos : nodeAnimation.positions) {
-                double diff = (pos.time / _animations[0].timeScale()) - now;
+                double diff = (pos.time * _animations[0].timeScale()) - now;
 
                 // Exact on a keyframe
                 if (diff == 0.0) {
@@ -594,12 +603,12 @@ void ModelGeometry::update(double now) {
                 }
                 // Prev keyframe
                 else if (diff < 0 && diff > (prevPosTime - now)) {
-                    prevPosTime = pos.time / _animations[0].timeScale();
+                    prevPosTime = pos.time * _animations[0].timeScale();
                     prevPos = pos.position;
                 }
                 // next keyframe
                 else if (diff > 0 && diff < (nextPosTime - now)) {
-                    nextPosTime = pos.time / _animations[0].timeScale();
+                    nextPosTime = pos.time * _animations[0].timeScale();
                     nextPos = pos.position;
                 }
             }
@@ -623,7 +632,7 @@ void ModelGeometry::update(double now) {
             bool interpolate = true;
 
             for (const io::ModelAnimation::RotationKeyframe& rot : nodeAnimation.rotations) {
-                double diff = (rot.time / _animations[0].timeScale()) - now;
+                double diff = (rot.time * _animations[0].timeScale()) - now;
 
                 // Exact on a keyframe
                 if (diff == 0.0) {
@@ -632,12 +641,12 @@ void ModelGeometry::update(double now) {
                 }
                 // Prev keyframe
                 else if (diff < 0 && diff > (prevRotTime - now)) {
-                    prevRotTime = rot.time / _animations[0].timeScale();
+                    prevRotTime = rot.time * _animations[0].timeScale();
                     prevRot = rot.rotation;
                 }
                 // next keyframe
                 else if (diff > 0 && diff < (nextRotTime - now)) {
-                    nextRotTime = rot.time / _animations[0].timeScale();
+                    nextRotTime = rot.time * _animations[0].timeScale();
                     nextRot = rot.rotation;
                 }
             }
@@ -661,7 +670,7 @@ void ModelGeometry::update(double now) {
             bool interpolate = true;
 
             for (const io::ModelAnimation::ScaleKeyframe& scale : nodeAnimation.scales) {
-                double diff = (scale.time / _animations[0].timeScale()) - now;
+                double diff = (scale.time * _animations[0].timeScale()) - now;
 
                 // Exact on a keyframe
                 if (diff == 0.0) {
@@ -670,12 +679,12 @@ void ModelGeometry::update(double now) {
                 }
                 // Prev keyframe
                 else if (diff < 0 && diff > (prevScaleTime - now)) {
-                    prevScaleTime = scale.time / _animations[0].timeScale();
+                    prevScaleTime = scale.time * _animations[0].timeScale();
                     prevScale = scale.scale;
                 }
                 // next keyframe
                 else if (diff > 0 && diff < (nextScaleTime - now)) {
-                    nextScaleTime = scale.time / _animations[0].timeScale();
+                    nextScaleTime = scale.time * _animations[0].timeScale();
                     nextScale = scale.scale;
                 }
             }
