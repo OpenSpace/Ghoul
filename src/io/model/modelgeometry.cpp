@@ -577,6 +577,13 @@ void ModelGeometry::update(double now) {
 
     // Animation out of scope
     if (now > _animations[0].duration() || now < 0) {
+        // Reset animation
+        for (const io::ModelAnimation::NodeAnimation& nodeAnimation :
+            _animations[0].nodeAnimations())
+        {
+            _nodes[nodeAnimation.node].setAnimation(_nodes[nodeAnimation.node].transform());
+        }
+
         return;
     }
 
