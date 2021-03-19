@@ -66,6 +66,7 @@ public:
     bool saveToCacheFile(const std::string& cachedFile) const;
 
     void setTimeScale(float timeScale);
+    void enableAnimation(bool value);
 
     void initialize();
     void deinitialize();
@@ -84,6 +85,7 @@ public:
 
 protected:
     double _boundingRadius = 0.0;
+    bool _animationEnabled = false;
     std::vector<io::ModelNode> _nodes;
     std::vector<TextureEntry> _textureStorage;
     std::vector<io::ModelAnimation> _animations;

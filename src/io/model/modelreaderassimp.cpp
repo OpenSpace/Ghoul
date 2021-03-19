@@ -535,8 +535,6 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
                 if (nodeAnim->mNodeName == node.mName) {
                     ModelAnimation::NodeAnimation nodeAnimation;
                     nodeAnimation.node = newNode;
-                    std::cout << "Pre: " << nodeAnim->mPreState << std::endl;
-                    std::cout << "Post: " << nodeAnim->mPostState << std::endl;
 
                     for (unsigned int p = 0; p < nodeAnim->mNumPositionKeys; ++p) {
                         aiVectorKey posKey = nodeAnim->mPositionKeys[p];

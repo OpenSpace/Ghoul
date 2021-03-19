@@ -575,8 +575,8 @@ void ModelGeometry::update(double now) {
     // Currently only one animation is supported per model
     // that is why only index 0 is used
 
-    // Animation out of scope
-    if (now > _animations[0].duration() || now < 0) {
+    // Animation out of scope or disabled
+    if (!_animationEnabled || now > _animations[0].duration() || now < 0) {
         // Reset animation
         for (const io::ModelAnimation::NodeAnimation& nodeAnimation :
             _animations[0].nodeAnimations())
@@ -719,6 +719,10 @@ void ModelGeometry::setTimeScale(float timeScale) {
     for (io::ModelAnimation& animation : _animations) {
         animation.setTimeScale(timeScale);
     }
+}
+
+void ModelGeometry::enableAnimation(bool value) {
+    _animationEnabled = value;
 }
 
 void ModelGeometry::initialize() {
