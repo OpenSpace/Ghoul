@@ -555,7 +555,10 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
                         aiVectorKey posKey = nodeAnim->mPositionKeys[p];
 
                         ModelAnimation::PositionKeyframe positionKeyframe;
-                        positionKeyframe.time = posKey.mTime / animation->mTicksPerSecond;
+                        positionKeyframe.time =
+                            animation->mTicksPerSecond < DBL_EPSILON ?
+                            posKey.mTime :
+                            posKey.mTime / animation->mTicksPerSecond;
                         positionKeyframe.position = glm::vec3(
                             posKey.mValue.x,
                             posKey.mValue.y,
@@ -569,7 +572,10 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
                         aiQuatKey rotKey = nodeAnim->mRotationKeys[r];
 
                         ModelAnimation::RotationKeyframe rotationKeyframe;
-                        rotationKeyframe.time = rotKey.mTime / animation->mTicksPerSecond;
+                        rotationKeyframe.time =
+                            animation->mTicksPerSecond < DBL_EPSILON ?
+                            rotKey.mTime :
+                            rotKey.mTime / animation->mTicksPerSecond;
                         rotationKeyframe.rotation = glm::quat(
                             rotKey.mValue.w,
                             rotKey.mValue.x,
@@ -584,7 +590,10 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
                         aiVectorKey scaleKey = nodeAnim->mScalingKeys[s];
 
                         ModelAnimation::ScaleKeyframe scaleKeyframe;
-                        scaleKeyframe.time = scaleKey.mTime / animation->mTicksPerSecond;
+                        scaleKeyframe.time =
+                            animation->mTicksPerSecond < DBL_EPSILON ?
+                            scaleKey.mTime :
+                            scaleKey.mTime / animation->mTicksPerSecond;
                         scaleKeyframe.scale = glm::vec3(
                             scaleKey.mValue.x,
                             scaleKey.mValue.y,
@@ -666,6 +675,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         if (animation->mNumChannels > 0) {
             modelAnimation = std::make_unique<ModelAnimation>(
                 animation->mName.C_Str(),
+                animation->mTicksPerSecond < DBL_EPSILON ?  // Not all formats have this
+                animation->mDuration :
                 animation->mDuration / animation->mTicksPerSecond
             );
         }
