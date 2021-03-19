@@ -505,6 +505,11 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
                 "currently only keyframe animation is supported"
             );
         }
+        if (mesh->mNumAnimMeshes > 0) {
+            LWARNING("Detected unsupported animation type: 'Mesh', "
+                "currently only keyframe animation is supported"
+            );
+        }
 
         ModelMesh loadedMesh = processMesh(
             *mesh,
