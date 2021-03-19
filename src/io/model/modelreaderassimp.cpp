@@ -499,6 +499,13 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
         // The scene contains all the data, node is just to keep stuff organized
         // (like relations between nodes)
         aiMesh* mesh = scene.mMeshes[node.mMeshes[i]];
+
+        if (mesh->HasBones()) {
+            LWARNING("Detected unsupported animation type: 'Bones', "
+                "currently only keyframe animation is supported"
+            );
+        }
+
         ModelMesh loadedMesh = processMesh(
             *mesh,
             scene,
@@ -529,7 +536,7 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
         for (unsigned int a = 0; a < scene.mNumAnimations; ++a) {
             aiAnimation* animation = scene.mAnimations[a];
 
-            for (unsigned int c = 0; c < scene.mAnimations[a]->mNumChannels; ++c) {
+            for (unsigned int c = 0; c < animation->mNumChannels; ++c) {
                 aiNodeAnim* nodeAnim = animation->mChannels[c];
 
                 if (nodeAnim->mNodeName == node.mName) {
@@ -632,8 +639,28 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
     std::vector<ModelAnimation> animationArray;
     animationArray.reserve(scene->mNumAnimations);
     if (scene->HasAnimations()) {
-        for (unsigned int a = 0; a < scene->mNumAnimations; ++a) {
-            aiAnimation* animation = scene->mAnimations[a];
+        // Do not support more than one animation
+        if (scene->mNumAnimations > 1) {
+            LWARNING("Detected more than one animation, only first one will be used, "
+                "currently only one animation per model is supported"
+            );
+        }
+        aiAnimation* animation = scene->mAnimations[0];
+
+        // Do not support morph animation
+        if (animation->mMorphMeshChannels > 0) {
+            LWARNING("Detected unsupported animation type: 'Morph', "
+                "currently only keyframe animation is supported"
+            );
+        }
+        // Do not support animation that replaces the mesh for every frame
+        if (animation->mNumMeshChannels > 0) {
+            LWARNING("Detected unsupported animation type: 'Replace', "
+                "currently only keyframe animation is supported"
+            );
+        }
+        // Only support keyframe animation
+        if (animation->mNumChannels > 0) {
             animationArray.push_back(ModelAnimation(
                 animation->mName.C_Str(),
                 animation->mDuration / animation->mTicksPerSecond
