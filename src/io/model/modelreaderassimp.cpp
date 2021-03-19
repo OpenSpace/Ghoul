@@ -470,7 +470,7 @@ ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
 // Process a node in a recursive fashion. Process each individual mesh located 
 // at the node and repeats this process on its children nodes (if any)
 void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode>& nodes,
-                 int parent, std::vector<ModelAnimation>& animations,
+                 int parent, std::unique_ptr<ModelAnimation>& modelAnimation,
                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
                  bool forceRenderInvisible, bool notifyInvisibleDropped,
                  std::filesystem::path& modelDirectory)
@@ -535,6 +535,9 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
     if (scene.HasAnimations()) {
         for (unsigned int a = 0; a < scene.mNumAnimations; ++a) {
             aiAnimation* animation = scene.mAnimations[a];
+            if (modelAnimation->name() != animation->mName.C_Str()) {
+                continue;
+            }
 
             for (unsigned int c = 0; c < animation->mNumChannels; ++c) {
                 aiNodeAnim* nodeAnim = animation->mChannels[c];
@@ -586,12 +589,8 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
                         nodeAnimation.scales.push_back(std::move(scaleKeyframe));
                     }
 
-                    for (ModelAnimation& modelAnimation : animations) {
-                        if (modelAnimation.name() == animation->mName.C_Str()) {
-                            modelAnimation.nodeAnimations().push_back(std::move(nodeAnimation));
-                            break;
-                        }
-                    }
+                    modelAnimation->nodeAnimations().push_back(std::move(nodeAnimation));
+                    break;
                 }
             }
         }
@@ -605,7 +604,7 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
             scene,
             nodes,
             newNode,
-            animations,
+            modelAnimation,
             textureStorage,
             forceRenderInvisible,
             notifyInvisibleDropped,
@@ -636,8 +635,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
     }
 
     // Check animations
-    std::vector<ModelAnimation> animationArray;
-    animationArray.reserve(scene->mNumAnimations);
+    std::unique_ptr<ModelAnimation> modelAnimation = nullptr;
     if (scene->HasAnimations()) {
         // Do not support more than one animation
         if (scene->mNumAnimations > 1) {
@@ -648,7 +646,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         aiAnimation* animation = scene->mAnimations[0];
 
         // Do not support morph animation
-        if (animation->mMorphMeshChannels > 0) {
+        if (animation->mNumMorphMeshChannels > 0) {
             LWARNING("Detected unsupported animation type: 'Morph', "
                 "currently only keyframe animation is supported"
             );
@@ -661,10 +659,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         }
         // Only support keyframe animation
         if (animation->mNumChannels > 0) {
-            animationArray.push_back(ModelAnimation(
+            modelAnimation = std::make_unique<ModelAnimation>(
                 animation->mName.C_Str(),
                 animation->mDuration / animation->mTicksPerSecond
-            ));
+            );
         }
     }
 
@@ -677,7 +675,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         *scene,
         nodeArray,
         -1,
-        animationArray,
+        modelAnimation,
         textureStorage,
         forceRenderInvisible,
         notifyInvisibleDropped,
@@ -688,7 +686,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
     return std::make_unique<modelgeometry::ModelGeometry>(
         std::move(nodeArray),
         std::move(textureStorage),
-        std::move(animationArray)
+        std::move(modelAnimation)
     );
 }
 

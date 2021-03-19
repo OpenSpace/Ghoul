@@ -57,7 +57,7 @@ public:
 
     ModelGeometry(std::vector<io::ModelNode> nodes,
         std::vector<TextureEntry> textureStorage,
-        std::vector<io::ModelAnimation> animations);
+        std::unique_ptr<io::ModelAnimation> animation);
     ModelGeometry(ModelGeometry&&) noexcept = default;
     ~ModelGeometry() noexcept = default;
 
@@ -88,7 +88,7 @@ protected:
     bool _animationEnabled = false;
     std::vector<io::ModelNode> _nodes;
     std::vector<TextureEntry> _textureStorage;
-    std::vector<io::ModelAnimation> _animations;
+    std::unique_ptr<io::ModelAnimation> _animation;
 };
 
 }  // namespace ghoul::modelgeometry

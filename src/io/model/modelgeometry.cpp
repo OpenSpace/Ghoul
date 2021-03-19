@@ -55,10 +55,10 @@ ModelGeometry::ModelCacheException::ModelCacheException(std::string file,
 
 ModelGeometry::ModelGeometry(std::vector<io::ModelNode> nodes,
                              std::vector<TextureEntry> textureStorage,
-                             std::vector<io::ModelAnimation> animations)
+                             std::unique_ptr<io::ModelAnimation> animation)
     : _nodes(std::move(nodes))
     , _textureStorage(std::move(textureStorage))
-    , _animations(std::move(animations))
+    , _animation(std::move(animation))
 {}
 
 opengl::Texture::Format stringToFormat(std::string_view format) {
@@ -503,16 +503,16 @@ void ModelGeometry::calculateBoundingRadius() {
 }
 
 bool ModelGeometry::hasAnimation() const {
-    return !_animations.empty();
+    return _animation != nullptr;
 }
 
 double ModelGeometry::animationDuration() const {
-    if (_animations.empty()) {
+    if (_animation == nullptr) {
         LERROR("Model does not have any animation!");
         return -1.0;
     }
 
-    return _animations[0].duration();
+    return _animation->duration();
 }
 
 std::vector<io::ModelNode>& ModelGeometry::nodes() {
@@ -561,6 +561,7 @@ void renderRecursive(const std::vector<io::ModelNode>& nodes, const io::ModelNod
 void ModelGeometry::render(opengl::ProgramObject& program, bool isTexturedModel) const {
     if (_nodes.empty()) {
         LERROR("Cannot render empty geometry");
+        return;
     }
 
     glm::mat4x4 parentTransform;
@@ -568,18 +569,19 @@ void ModelGeometry::render(opengl::ProgramObject& program, bool isTexturedModel)
 }
 
 void ModelGeometry::update(double now) {
-    if (_animations.empty()) {
+    if (_animation == nullptr) {
         LERROR("Cannot update empty animation");
+        return;
     }
 
     // Currently only one animation is supported per model
     // that is why only index 0 is used
 
     // Animation out of scope or disabled
-    if (!_animationEnabled || now > _animations[0].duration() || now < 0) {
+    if (!_animationEnabled || now > _animation->duration() || now < 0) {
         // Reset animation
         for (const io::ModelAnimation::NodeAnimation& nodeAnimation :
-            _animations[0].nodeAnimations())
+            _animation->nodeAnimations())
         {
             _nodes[nodeAnimation.node].setAnimation(_nodes[nodeAnimation.node].transform());
         }
@@ -589,7 +591,7 @@ void ModelGeometry::update(double now) {
 
     // Find keyframe(s)
     for (const io::ModelAnimation::NodeAnimation& nodeAnimation :
-        _animations[0].nodeAnimations())
+        _animation->nodeAnimations())
     {
         // Position
         glm::vec3 currPos;
@@ -601,7 +603,7 @@ void ModelGeometry::update(double now) {
             bool interpolate = true;
 
             for (const io::ModelAnimation::PositionKeyframe& pos : nodeAnimation.positions) {
-                double diff = (pos.time * _animations[0].timeScale()) - now;
+                double diff = (pos.time * _animation->timeScale()) - now;
 
                 // Exact on a keyframe
                 if (diff == 0.0) {
@@ -610,12 +612,12 @@ void ModelGeometry::update(double now) {
                 }
                 // Prev keyframe
                 else if (diff < 0 && diff > (prevPosTime - now)) {
-                    prevPosTime = pos.time * _animations[0].timeScale();
+                    prevPosTime = pos.time * _animation->timeScale();
                     prevPos = pos.position;
                 }
                 // next keyframe
                 else if (diff > 0 && diff < (nextPosTime - now)) {
-                    nextPosTime = pos.time * _animations[0].timeScale();
+                    nextPosTime = pos.time * _animation->timeScale();
                     nextPos = pos.position;
                 }
             }
@@ -639,7 +641,7 @@ void ModelGeometry::update(double now) {
             bool interpolate = true;
 
             for (const io::ModelAnimation::RotationKeyframe& rot : nodeAnimation.rotations) {
-                double diff = (rot.time * _animations[0].timeScale()) - now;
+                double diff = (rot.time * _animation->timeScale()) - now;
 
                 // Exact on a keyframe
                 if (diff == 0.0) {
@@ -648,12 +650,12 @@ void ModelGeometry::update(double now) {
                 }
                 // Prev keyframe
                 else if (diff < 0 && diff > (prevRotTime - now)) {
-                    prevRotTime = rot.time * _animations[0].timeScale();
+                    prevRotTime = rot.time * _animation->timeScale();
                     prevRot = rot.rotation;
                 }
                 // next keyframe
                 else if (diff > 0 && diff < (nextRotTime - now)) {
-                    nextRotTime = rot.time * _animations[0].timeScale();
+                    nextRotTime = rot.time * _animation->timeScale();
                     nextRot = rot.rotation;
                 }
             }
@@ -677,7 +679,7 @@ void ModelGeometry::update(double now) {
             bool interpolate = true;
 
             for (const io::ModelAnimation::ScaleKeyframe& scale : nodeAnimation.scales) {
-                double diff = (scale.time * _animations[0].timeScale()) - now;
+                double diff = (scale.time * _animation->timeScale()) - now;
 
                 // Exact on a keyframe
                 if (diff == 0.0) {
@@ -686,12 +688,12 @@ void ModelGeometry::update(double now) {
                 }
                 // Prev keyframe
                 else if (diff < 0 && diff > (prevScaleTime - now)) {
-                    prevScaleTime = scale.time * _animations[0].timeScale();
+                    prevScaleTime = scale.time * _animation->timeScale();
                     prevScale = scale.scale;
                 }
                 // next keyframe
                 else if (diff > 0 && diff < (nextScaleTime - now)) {
-                    nextScaleTime = scale.time * _animations[0].timeScale();
+                    nextScaleTime = scale.time * _animation->timeScale();
                     nextScale = scale.scale;
                 }
             }
@@ -716,9 +718,11 @@ void ModelGeometry::update(double now) {
 }
 
 void ModelGeometry::setTimeScale(float timeScale) {
-    for (io::ModelAnimation& animation : _animations) {
-        animation.setTimeScale(timeScale);
+    if (_animation == nullptr) {
+        LERROR("Cannot set time scale of empty animation");
+        return;
     }
+    _animation->setTimeScale(timeScale);
 }
 
 void ModelGeometry::enableAnimation(bool value) {
