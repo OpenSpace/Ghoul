@@ -50,6 +50,13 @@ Dictionary::ValueError::ValueError(std::string k, std::string m)
     : RuntimeError(fmt::format("Key '{}': {}", std::move(k), std::move(m)), "Dictionary")
 {}
 
+bool Dictionary::operator==(const Dictionary& rhs) const noexcept {
+    return _storage == rhs._storage;
+}
+
+bool Dictionary::operator==(const Dictionary& rhs) const noexcept {
+    return _storage != rhs._storage;
+}
 
 template <typename T, std::enable_if_t<Dictionary::IsAllowedType<T>{}, int>>
 void Dictionary::setValue(std::string key, T value) {
