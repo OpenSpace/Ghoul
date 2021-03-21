@@ -54,7 +54,7 @@ bool Dictionary::operator==(const Dictionary& rhs) const noexcept {
     return _storage == rhs._storage;
 }
 
-bool Dictionary::operator==(const Dictionary& rhs) const noexcept {
+bool Dictionary::operator!=(const Dictionary& rhs) const noexcept {
     return _storage != rhs._storage;
 }
 
