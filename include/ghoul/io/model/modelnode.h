@@ -47,6 +47,7 @@ public:
 
     std::vector<io::ModelMesh>& meshes();
     const std::vector<io::ModelMesh>& meshes() const;
+    int parent() const;
     std::vector<int>& children();
     const std::vector<int>& children() const;
     const glm::mat4x4 transform() const;

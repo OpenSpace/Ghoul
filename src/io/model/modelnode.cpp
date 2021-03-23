@@ -105,6 +105,10 @@ const std::vector<io::ModelMesh>& ModelNode::meshes() const {
     return _meshes;
 }
 
+int ModelNode::parent() const {
+    return _parent;
+}
+
 std::vector<int>& ModelNode::children() {
     return _children;
 }
