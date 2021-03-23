@@ -26,6 +26,7 @@
 #ifndef __GHOUL___MODELANIMATION___H__
 #define __GHOUL___MODELANIMATION___H__
 
+#include <ghoul/io/model/modelnode.h>
 #include <ghoul/glm.h>
 #include <vector>
 
@@ -61,6 +62,7 @@ public:
     ~ModelAnimation() noexcept = default;
 
     void setTimeScale(float timeScale);
+    void animate(std::vector<ModelNode>& nodes, double now, bool enabled);
 
     std::vector<NodeAnimation>& nodeAnimations();
     const std::vector<NodeAnimation>& nodeAnimations() const;
