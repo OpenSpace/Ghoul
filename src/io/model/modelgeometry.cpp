@@ -931,6 +931,10 @@ void ModelGeometry::setTimeScale(float timeScale) {
 
 void ModelGeometry::enableAnimation(bool value) {
     _animationEnabled = value;
+
+    if (!value) {
+        _animation->reset(_nodes);
+    }
 }
 
 void ModelGeometry::initialize() {

@@ -42,13 +42,6 @@ void ModelAnimation::setTimeScale(float timeScale) {
 void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool enabled) {
     // Animation out of scope or disabled
     if (!enabled || now > _duration || now < 0) {
-        // Reset animation
-        for (const io::ModelAnimation::NodeAnimation& nodeAnimation :
-            _nodeAnimations)
-        {
-            nodes[nodeAnimation.node].setAnimation(nodes[nodeAnimation.node].transform());
-        }
-
         return;
     }
 
@@ -177,6 +170,14 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
             glm::scale(animationTransform, currScale);
 
         nodes[nodeAnimation.node].setAnimation(animationTransform);
+    }
+}
+
+void ModelAnimation::reset(std::vector<ModelNode>& nodes) {
+    for (const io::ModelAnimation::NodeAnimation& nodeAnimation :
+        _nodeAnimations)
+    {
+        nodes[nodeAnimation.node].setAnimation(nodes[nodeAnimation.node].transform());
     }
 }
 

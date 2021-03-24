@@ -63,6 +63,7 @@ public:
 
     void setTimeScale(float timeScale);
     void animate(std::vector<ModelNode>& nodes, double now, bool enabled);
+    void reset(std::vector<ModelNode>& nodes);
 
     std::vector<NodeAnimation>& nodeAnimations();
     const std::vector<NodeAnimation>& nodeAnimations() const;
