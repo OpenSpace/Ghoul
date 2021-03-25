@@ -90,6 +90,9 @@ public:
         explicit ValueError(std::string key, std::string msg);
     };
 
+    bool operator==(const Dictionary& rhs) const noexcept;
+    bool operator!=(const Dictionary& rhs) const noexcept;
+
     /**
      * Store the value \p value at the specified \p key, overwriting any existing value.
      * The type for T has to be a type that can be represented in the Types variant type.
