@@ -208,7 +208,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
     if (!dib) {
         throw TextureLoadException(
             filename,
-            fmt:format("Could not load image ({})", filename),
+            fmt::format("Could not load image ({})", filename),
             this
         );
     }
