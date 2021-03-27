@@ -65,8 +65,8 @@ void Dictionary::setValue(std::string key, T value) {
         _storage.insert_or_assign(std::move(key), std::move(value));
     }
     else if constexpr (isGLMType<T>::value) {
-        typename T::value_type* ptr = glm::value_ptr(value);
-        std::vector<typename T::value_type> vec(ptr, ptr + ghoul::glm_components<T>::value);
+        typename T::value_type* p = glm::value_ptr(value);
+        std::vector<typename T::value_type> vec(p, p + ghoul::glm_components<T>::value);
         _storage.insert_or_assign(std::move(key), std::move(vec));
     }
     else {

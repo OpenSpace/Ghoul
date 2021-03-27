@@ -309,7 +309,7 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
         unsigned int height = 0;
 
         FT_UInt glyphIndex = FT_Get_Char_Index(face, charcode);
-        assert(glyphIndex != 0);
+        ghoul_assert(glyphIndex != 0, "Glyph index not found");
 
         const FT_Error error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_FORCE_AUTOHINT);
         handleError(error, library, face, nullptr, _name, _pointSize);
