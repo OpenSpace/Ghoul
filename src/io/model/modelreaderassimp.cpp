@@ -35,7 +35,6 @@
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/fmt.h>
 #include <ghoul/glm.h>
-#include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
