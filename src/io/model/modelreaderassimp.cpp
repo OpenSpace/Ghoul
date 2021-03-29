@@ -556,7 +556,7 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
 
                         ModelAnimation::PositionKeyframe positionKeyframe;
                         positionKeyframe.time =
-                            animation->mTicksPerSecond < DBL_EPSILON ?
+                            abs(animation->mTicksPerSecond) < DBL_EPSILON ?
                             posKey.mTime :
                             posKey.mTime / animation->mTicksPerSecond;
                         positionKeyframe.position = glm::vec3(
@@ -573,7 +573,7 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
 
                         ModelAnimation::RotationKeyframe rotationKeyframe;
                         rotationKeyframe.time =
-                            animation->mTicksPerSecond < DBL_EPSILON ?
+                            abs(animation->mTicksPerSecond) < DBL_EPSILON ?
                             rotKey.mTime :
                             rotKey.mTime / animation->mTicksPerSecond;
                         rotationKeyframe.rotation = glm::quat(
@@ -591,7 +591,7 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
 
                         ModelAnimation::ScaleKeyframe scaleKeyframe;
                         scaleKeyframe.time =
-                            animation->mTicksPerSecond < DBL_EPSILON ?
+                            abs(animation->mTicksPerSecond) < DBL_EPSILON ?
                             scaleKey.mTime :
                             scaleKey.mTime / animation->mTicksPerSecond;
                         scaleKeyframe.scale = glm::vec3(
@@ -667,7 +667,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         }
         // Do not support animation that replaces the mesh for every frame
         if (animation->mNumMeshChannels > 0) {
-            LWARNING("Detected unsupported animation type: 'Replace', "
+            LWARNING("Detected unsupported animation type: 'Mesh', "
                 "currently only keyframe animation is supported"
             );
         }
@@ -675,7 +675,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         if (animation->mNumChannels > 0) {
             modelAnimation = std::make_unique<ModelAnimation>(
                 animation->mName.C_Str(),
-                animation->mTicksPerSecond < DBL_EPSILON ?  // Not all formats have this
+                abs(animation->mTicksPerSecond) < DBL_EPSILON ? // Not all formats have it
                 animation->mDuration :
                 animation->mDuration / animation->mTicksPerSecond
             );

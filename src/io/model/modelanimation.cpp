@@ -62,16 +62,16 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                 double diff = (pos.time * _timeScale) - now;
 
                 // Exact on a keyframe
-                if (diff == 0.0) {
+                if (abs(diff) < DBL_EPSILON) {
                     currPos = pos.position;
                     interpolate = false;
                 }
                 // Prev keyframe
-                else if (diff < 0 && diff >(prevPosTime - now)) {
+                else if (diff < 0 && diff > (prevPosTime - now)) {
                     prevPosTime = pos.time * _timeScale;
                     prevPos = pos.position;
                 }
-                // next keyframe
+                // Next keyframe
                 else if (diff > 0 && diff < (nextPosTime - now)) {
                     nextPosTime = pos.time * _timeScale;
                     nextPos = pos.position;
@@ -100,16 +100,16 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                 double diff = (rot.time * _timeScale) - now;
 
                 // Exact on a keyframe
-                if (diff == 0.0) {
+                if (abs(diff) < DBL_EPSILON) {
                     currRot = rot.rotation;
                     interpolate = false;
                 }
                 // Prev keyframe
-                else if (diff < 0 && diff >(prevRotTime - now)) {
+                else if (diff < 0 && diff > (prevRotTime - now)) {
                     prevRotTime = rot.time * _timeScale;
                     prevRot = rot.rotation;
                 }
-                // next keyframe
+                // Next keyframe
                 else if (diff > 0 && diff < (nextRotTime - now)) {
                     nextRotTime = rot.time * _timeScale;
                     nextRot = rot.rotation;
@@ -138,16 +138,16 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                 double diff = (scale.time * _timeScale) - now;
 
                 // Exact on a keyframe
-                if (diff == 0.0) {
+                if (abs(diff) < DBL_EPSILON) {
                     currScale = scale.scale;
                     interpolate = false;
                 }
                 // Prev keyframe
-                else if (diff < 0 && diff >(prevScaleTime - now)) {
+                else if (diff < 0 && diff > (prevScaleTime - now)) {
                     prevScaleTime = scale.time * _timeScale;
                     prevScale = scale.scale;
                 }
-                // next keyframe
+                // Next keyframe
                 else if (diff > 0 && diff < (nextScaleTime - now)) {
                     nextScaleTime = scale.time * _timeScale;
                     nextScale = scale.scale;

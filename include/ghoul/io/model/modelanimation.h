@@ -74,7 +74,7 @@ public:
 private:
     std::string _name;
     double _duration;
-    float _timeScale = 1.0;
+    float _timeScale = 1.0f;
     std::vector<NodeAnimation> _nodeAnimations;
 };
 

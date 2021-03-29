@@ -67,9 +67,6 @@ void ModelNode::setChildren(std::vector<int> children) {
 
 void ModelNode::addChild(int child) {
     _children.push_back(child);
-    if (_children.size() == 0) {
-        std::cout << "Elin!" << std::endl;
-    }
 }
 
 void ModelNode::setAnimation(glm::mat4x4 animation) {
