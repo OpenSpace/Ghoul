@@ -39,17 +39,66 @@ namespace {
     constexpr const char* _loggerCat = "ModelGeometry";
     constexpr const int8_t CurrentCacheVersion = 4;
     constexpr const int FormatStringSize = 4;
+
+    ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
+        using Format = ghoul::opengl::Texture::Format;
+        if (format == "Red ") { return Format::Red; }
+        else if (format == "RG  ") { return Format::RG; }
+        else if (format == "RGB ") { return Format::RGB; }
+        else if (format == "BGR ") { return Format::BGR; }
+        else if (format == "RGBA") { return Format::RGBA; }
+        else if (format == "BGRA") { return Format::BGRA; }
+        else if (format == "Dept") { return Format::DepthComponent; }
+        else { throw ghoul::MissingCaseException(); }
+    }
+
+    std::string formatToString(ghoul::opengl::Texture::Format format) {
+        switch (format) {
+            case ghoul::opengl::Texture::Format::Red: return "Red ";
+            case ghoul::opengl::Texture::Format::RG: return "RG  ";
+            case ghoul::opengl::Texture::Format::RGB: return "RGB ";
+            case ghoul::opengl::Texture::Format::BGR: return "BGR ";
+            case ghoul::opengl::Texture::Format::RGBA: return "RGBA";
+            case ghoul::opengl::Texture::Format::BGRA: return "BGRA";
+            case ghoul::opengl::Texture::Format::DepthComponent: return "Dept";
+            default: throw ghoul::MissingCaseException();
+        }
+    }
+
+    GLenum stringToDataType(std::string_view dataType) {
+        if (dataType == "byte") { return GL_BYTE; }
+        else if (dataType == "ubyt") { return GL_UNSIGNED_BYTE; }
+        else if (dataType == "shor") { return GL_SHORT; }
+        else if (dataType == "usho") { return GL_UNSIGNED_SHORT; }
+        else if (dataType == "int ") { return GL_INT; }
+        else if (dataType == "uint") { return GL_UNSIGNED_INT; }
+        else if (dataType == "floa") { return GL_FLOAT; }
+        else if (dataType == "doub") { return GL_DOUBLE; }
+        else { throw ghoul::MissingCaseException(); }
+    }
+
+    std::string dataTypeToString(GLenum dataType) {
+        switch (dataType) {
+            case GL_BYTE: return "byte";
+            case GL_UNSIGNED_BYTE: return "ubyt";
+            case GL_SHORT: return "shor";
+            case GL_UNSIGNED_SHORT: return "usho";
+            case GL_INT: return "int ";
+            case GL_UNSIGNED_INT: return "uint";
+            case GL_FLOAT: return "floa";
+            case GL_DOUBLE: return "doub";
+            default: throw ghoul::MissingCaseException();
+        }
+    }
 } // namespace
 
 namespace ghoul::modelgeometry {
 
 ModelGeometry::ModelCacheException::ModelCacheException(std::string file,
     std::string msg)
-    : RuntimeError(fmt::format(
-        "Error:'{}' with cache file:'{}'", msg, file
-    ))
-    , message(std::move(msg))
+    : RuntimeError(fmt::format("Error: '{}' with cache file: '{}'", msg, file))
     , filename(std::move(file))
+    , errorMessage(std::move(msg))
 {}
 
 ModelGeometry::ModelGeometry(std::vector<io::ModelMesh> meshes,
@@ -57,56 +106,6 @@ ModelGeometry::ModelGeometry(std::vector<io::ModelMesh> meshes,
     : _meshes(std::move(meshes))
     , _textureStorage(std::move(textureStorage))
 {}
-
-opengl::Texture::Format stringToFormat(std::string_view format) {
-    if (format == "Red ") { return opengl::Texture::Format::Red; }
-    else if (format == "RG  ") { return opengl::Texture::Format::RG; }
-    else if (format == "RGB ") { return opengl::Texture::Format::RGB; }
-    else if (format == "BGR ") { return opengl::Texture::Format::BGR; }
-    else if (format == "RGBA") { return opengl::Texture::Format::RGBA; }
-    else if (format == "BGRA") { return opengl::Texture::Format::BGRA; }
-    else if (format == "Dept") { return opengl::Texture::Format::DepthComponent; }
-    else { throw MissingCaseException(); }
-}
-
-std::string formatToString(opengl::Texture::Format format) {
-    switch (format) {
-        case opengl::Texture::Format::Red: return "Red ";
-        case opengl::Texture::Format::RG: return "RG  ";
-        case opengl::Texture::Format::RGB: return "RGB ";
-        case opengl::Texture::Format::BGR: return "BGR ";
-        case opengl::Texture::Format::RGBA: return "RGBA";
-        case opengl::Texture::Format::BGRA: return "BGRA";
-        case opengl::Texture::Format::DepthComponent: return "Dept";
-        default: throw MissingCaseException();
-    }
-}
-
-GLenum stringToDataType(std::string_view dataType) {
-    if (dataType == "byte") { return GL_BYTE; }
-    else if (dataType == "ubyt") { return GL_UNSIGNED_BYTE; }
-    else if (dataType == "shor") { return GL_SHORT; }
-    else if (dataType == "usho") { return GL_UNSIGNED_SHORT; }
-    else if (dataType == "int ") { return GL_INT; }
-    else if (dataType == "uint") { return GL_UNSIGNED_INT; }
-    else if (dataType == "floa") { return GL_FLOAT; }
-    else if (dataType == "doub") { return GL_DOUBLE; }
-    else { throw MissingCaseException(); }
-}
-
-std::string dataTypeToString(GLenum dataType) {
-    switch (dataType) {
-        case GL_BYTE: return "byte";
-        case GL_UNSIGNED_BYTE: return "ubyt";
-        case GL_SHORT: return "shor";
-        case GL_UNSIGNED_SHORT: return "usho";
-        case GL_INT: return "int ";
-        case GL_UNSIGNED_INT: return "uint";
-        case GL_FLOAT: return "floa";
-        case GL_DOUBLE: return "doub";
-        default: throw MissingCaseException();
-    }
-}
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     const std::string& cachedFile) {
@@ -134,7 +133,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorageArray;
     textureStorageArray.reserve(nTextureEntries);
 
-    for (unsigned int te = 0; te < nTextureEntries; ++te) {
+    for (int te = 0; te < nTextureEntries; ++te) {
         modelgeometry::ModelGeometry::TextureEntry textureEntry;
 
         // Name
@@ -149,7 +148,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Texture
         // dimensions
         std::array<int32_t, 3> dimensionStorage;
-        fileStream.read(reinterpret_cast<char*>(dimensionStorage.data()), 3 * sizeof(int32_t));
+        fileStream.read(
+            reinterpret_cast<char*>(dimensionStorage.data()),
+            3 * sizeof(int32_t)
+        );
         glm::uvec3 dimensions = glm::uvec3(
             static_cast<unsigned int>(dimensionStorage[0]),
             static_cast<unsigned int>(dimensionStorage[1]),
@@ -209,7 +211,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     meshArray.reserve(nMeshes);
 
     // Read the meshes in same order as they were written
-    for (unsigned int m = 0; m < nMeshes; ++m) {
+    for (int m = 0; m < nMeshes; ++m) {
         // Vertices
         int32_t nVertices = 0;
         fileStream.read(reinterpret_cast<char*>(&nVertices), sizeof(int32_t));
@@ -219,7 +221,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         std::vector<io::ModelMesh::Vertex> vertexArray;
         vertexArray.reserve(nVertices);
 
-        for (unsigned int v = 0; v < nVertices; ++v) {
+        for (int v = 0; v < nVertices; ++v) {
             io::ModelMesh::Vertex vertex;
             fileStream.read(
                 reinterpret_cast<char*>(&vertex),
@@ -237,7 +239,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         std::vector<unsigned int> indexArray;
         indexArray.reserve(nIndices);
 
-        for (unsigned int i = 0; i < nIndices; ++i) {
+        for (int i = 0; i < nIndices; ++i) {
             uint32_t index;
             fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
             indexArray.push_back(std::move(static_cast<unsigned int>(index)));
@@ -252,7 +254,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         std::vector<io::ModelMesh::Texture> textureArray;
         textureArray.reserve(nTextures);
 
-        for (unsigned int t = 0; t < nTextures; ++t) {
+        for (int t = 0; t < nTextures; ++t) {
             io::ModelMesh::Texture texture;
 
             // type
@@ -278,7 +280,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
 
             // texture
             if (texture.hasTexture) {
-                // Read which index in the textureStorageArray that this texture should point to
+                // Read which index in the textureStorageArray that this texture should
+                // point to
                 uint32_t index;
                 fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
 
@@ -309,8 +312,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     );
 }
 
-bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const
-{
+bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
     std::ofstream fileStream(cachedFile, std::ofstream::binary);
     if (!fileStream.good()) {
         throw ModelCacheException( cachedFile, "Could not open file");
@@ -323,15 +325,17 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const
     );
 
     // First cache the textureStorage
-    int32_t nTextureEntries = _textureStorage.size();
+    int32_t nTextureEntries = static_cast<int32_t>(_textureStorage.size());
     if (nTextureEntries == 0) {
         LINFO("No TextureEntries were loaded while saving cache");
     }
     fileStream.write(reinterpret_cast<const char*>(&nTextureEntries), sizeof(int32_t));
 
-    for (unsigned int te = 0; te < nTextureEntries; ++te) {
+    for (int te = 0; te < nTextureEntries; ++te) {
         // Name
-        int32_t nameSize = _textureStorage[te].name.size() * sizeof(char);
+        int32_t nameSize = static_cast<int32_t>(
+            _textureStorage[te].name.size() * sizeof(char)
+        );
         if (nameSize == 0) {
             throw ModelCacheException(cachedFile, "No texture name was loaded");
         }
@@ -382,22 +386,22 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const
     }
 
     // Write how many meshes are to be written
-    int32_t nMeshes = _meshes.size();
+    int32_t nMeshes = static_cast<int32_t>(_meshes.size());
     if (nMeshes == 0) {
         throw ModelCacheException(cachedFile, "No meshes were loaded");
     }
     fileStream.write(reinterpret_cast<const char*>(&nMeshes), sizeof(int32_t));
 
     // Meshes
-    for (unsigned int m = 0; m < nMeshes; m++) {
+    for (int m = 0; m < nMeshes; m++) {
         // Vertices
-        int32_t nVertices = _meshes[m].vertices().size();
+        int32_t nVertices = static_cast<int32_t>(_meshes[m].vertices().size());
         if (nVertices == 0) {
             throw ModelCacheException(cachedFile, "No vertices were loaded");
         }
         fileStream.write(reinterpret_cast<const char*>(&nVertices), sizeof(int32_t));
 
-        for (unsigned int v = 0; v < nVertices; ++v) {
+        for (int v = 0; v < nVertices; ++v) {
             fileStream.write(
                 reinterpret_cast<const char*>(&_meshes[m].vertices()[v]),
                 sizeof(io::ModelMesh::Vertex)
@@ -405,25 +409,25 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const
         }
 
         // Indices
-        int32_t nIndices = _meshes[m].indices().size();
+        int32_t nIndices = static_cast<int32_t>(_meshes[m].indices().size());
         if (nIndices == 0) {
             throw ModelCacheException(cachedFile, "No indices were loaded");
         }
         fileStream.write(reinterpret_cast<const char*>(&nIndices), sizeof(int32_t));
 
-        for (unsigned int i = 0; i < nIndices; ++i) {
+        for (int i = 0; i < nIndices; ++i) {
             uint32_t index = static_cast<uint32_t>(_meshes[m].indices()[i]);
             fileStream.write(reinterpret_cast<const char*>(&index), sizeof(uint32_t));
         }
 
         // Textures
-        int32_t nTextures = _meshes[m].textures().size();
+        int32_t nTextures = static_cast<int32_t>(_meshes[m].textures().size());
         if (nTextures == 0) {
             throw ModelCacheException(cachedFile, "No textures were loaded");
         }
         fileStream.write(reinterpret_cast<const char*>(&nTextures), sizeof(int32_t));
 
-        for (unsigned int t = 0; t < nTextures; ++t) {
+        for (int t = 0; t < nTextures; ++t) {
             // type
             fileStream.write(
                 reinterpret_cast<const char*>(&_meshes[m].textures()[t].type),

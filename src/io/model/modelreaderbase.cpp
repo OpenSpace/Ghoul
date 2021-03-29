@@ -35,7 +35,7 @@ ModelReaderBase::ModelLoadException::ModelLoadException(std::string name, std::s
         "Error:'{}' while loading model from file:'{}'", msg, name), "ModelLoader"
     )
     , filename(std::move(name))
-    , message(std::move(msg))
+    , errorMessage(std::move(msg))
     , reader(r)
 {}
 
