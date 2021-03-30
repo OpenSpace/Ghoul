@@ -240,7 +240,7 @@ void ConsoleLog::setColorForLevel(LogLevel level) {
             std::cout << "\033[0m";       // white
             break;
         case LogLevel::AllLogging:
-            std::cout;
+            break;
     }
 #endif
 }
