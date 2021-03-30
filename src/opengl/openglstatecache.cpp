@@ -232,7 +232,7 @@ void OpenGLStateCache::resetViewportState() const {
 
 void OpenGLStateCache::setDefaultFramebuffer(GLuint defaultFB) {
     ghoul_assert(
-        defaultFB < std::numeric_limits<GLuint>::max(), 
+        defaultFB < std::numeric_limits<GLuint>::max(),
         "The default Framebuffer must be a valid number"
     );
 

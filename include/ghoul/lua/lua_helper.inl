@@ -68,11 +68,37 @@ void push(lua_State* L, T value) {
     else if constexpr (std::is_same_v<T, std::string_view>) {
         lua_pushlstring(L, value.data(), value.size());
     }
-    else if constexpr (std::is_same_v<T, std::vector<double>>) {
+    else if constexpr (std::is_same_v<T, std::vector<double>>
+        || std::is_same_v<T, std::vector<float>>)
+    {
         lua_newtable(L);
         for (size_t i = 0; i < value.size(); ++i) {
             lua_pushinteger(L, i + 1);
-            lua_pushnumber(L, value[i]);
+            lua_pushnumber(L, std::move(value[i]));
+            lua_settable(L, -3);
+        }
+    }
+    else if constexpr (std::is_same_v<T, std::vector<int>>) {
+        lua_newtable(L);
+        for (size_t i = 0; i < value.size(); ++i) {
+            lua_pushinteger(L, i + 1);
+            lua_pushinteger(L, std::move(value[i]));
+            lua_settable(L, -3);
+        }
+    }
+    else if constexpr (std::is_same_v<T, std::vector<const char*>>) {
+        lua_newtable(L);
+        for (size_t i = 0; i < value.size(); ++i) {
+            lua_pushinteger(L, i + 1);
+            lua_pushstring(L, value[i]);
+            lua_settable(L, -3);
+        }
+    }
+    else if constexpr (std::is_same_v<T, std::vector<std::string>>) {
+        lua_newtable(L);
+        for (size_t i = 0; i < value.size(); ++i) {
+            lua_pushinteger(L, i + 1);
+            lua_pushstring(L, value[i].c_str());
             lua_settable(L, -3);
         }
     }

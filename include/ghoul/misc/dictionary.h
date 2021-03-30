@@ -55,12 +55,13 @@ namespace internal {
  * Dictionary d;
  * d.setValue("a", glm::dvec4(1.0, 2.0, 3.0, 4.0);
  * std::vector<double> v = d.value<std::vector<double>>("a");
- * assert(v.size() == 4 && v[0] == 1.0 && v[1] == 2.0 && v[2] == 3.0 && v[3] == 4.0);
- * 
+ * // v.size() == 4
+ * // v[0] == 1.0 && v[1] == 2.0 && v[2] == 3.0 && v[3] == 4.0
+ *
  * Dictionary e;
  * e.setValue("a", std::vector<double>{5.0, 6.0, 7.0, 8.0});
  * glm::dvec4 vv = e.value<glm::dvec4>("a");
- * assert(vv.x == 5.0 && vv.y == 6.0 && vv.z == 7.0 && vv.w == 8.0);
+ * // vv.x == 5.0 && vv.y == 6.0 && vv.z == 7.0 && vv.w == 8.0
  * </code>
  * are legal
  */
@@ -101,9 +102,9 @@ public:
      *        existed, it will be silently overwritten
      * \param value The value to store. It has to be one of the types that is present in
      *        the Types variant
-     * 
+     *
      * \pre \p key must not be the empty string
-     */    
+     */
     template <typename T, std::enable_if_t<IsAllowedType<T>{}, int> = 0>
     void setValue(std::string key, T value);
 
@@ -120,7 +121,7 @@ public:
      *
      * \param key The key for which to retrieve the value
      * \return The value in the Dictionary stored at the \p key
-     * 
+     *
      * \throws KeyError If the provided \p key does not exist
      * \throws ValueError If the value stored at \p key is not of type T
      * \pre \p key must not be the empty string
@@ -136,11 +137,11 @@ public:
      * Checks whether the Dictionary stores a value of type T at the provided \p key. This
      * function returns false if the key does not exist or if the stored value is not
      * compatible with the type T.
-     * 
+     *
      * \param key The key for which to check the existence and type
      * \return \c true if the Dictionary contains such a key and it is of the requested
                type T
-     * 
+     *
      * \pre \p key must not be the empty string
      */
     template <typename T, std::enable_if_t<IsAllowedType<T>{}, int> = 0>

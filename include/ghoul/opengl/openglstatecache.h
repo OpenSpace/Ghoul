@@ -65,7 +65,7 @@ public:
     void setColorState(GLfloat clearColor[4], GLboolean clampColor = GL_FALSE);
 
     void viewport(GLint viewport[4]) const;
-    
+
     GLuint defaultFramebuffer() const;
 
 private:
@@ -78,8 +78,8 @@ private:
     bool _cacheInitialized = false;
 
     // Default Framebuffer (Initialized to max GLuint on purpose)
-    // std::numeric_limits<GLuint>::max() is way bigger than the max 
-    // number of OpenGL's FrameBuffers names possible to create
+    // std::numeric_limits<GLuint>::max() is way bigger than the max number of OpenGL's
+    // FrameBuffers names possible to create
     GLuint _defaultFramebuffer = std::numeric_limits<GLuint>::max();
 
     // ViewPort

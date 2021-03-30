@@ -73,7 +73,7 @@ namespace ghoul::logging {
 
 ConsoleLog::ConsoleLog(ColorOutput colorOutput, LogLevel minimumLogLevel)
     : Log(
-        Log::TimeStamping::No, Log::DateStamping::No, Log::CategoryStamping::Yes, 
+        Log::TimeStamping::No, Log::DateStamping::No, Log::CategoryStamping::Yes,
         Log::LogLevelStamping::Yes, minimumLogLevel
     )
     , _colorOutput(colorOutput)
@@ -117,7 +117,7 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
         // at the end for context
 
         // Onelongcategorystringthatneedstobeshortended ->
-        // Onelongcatego...nded 
+        // Onelongcatego...nded
 
         // slightlylongerstringhere ->
         // slightlylonge...here
