@@ -706,27 +706,27 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
 }
 
 std::vector<std::string> ModelReaderAssimp::supportedExtensions() const {
-    // Taken from https://github.com/assimp/assimp
+    // Taken from https://github.com/assimp/assimp/blob/master/doc/Fileformats.md
     return {
+        "obj",          // Wavefront Object
         "fbx",          // Autodesk
-        "dae",          // Collada
         "gltf", "glb",  // glTF
+        "dae",          // Collada
         "blend",        // Blender 3D
         "3ds",          // 3ds Max 3DS
         "ase",          // 3ds Max ASE
-        "obj",          // Wavefront Object
+        "x",            // DirectX X
+        "stl",          // Stereolithography
         "ifc",          // Industry Foundation Classes(IFC / Step)
         "xgl", "zgl"    // XGL
         "ply",          // Stanford Polygon Library
-        "dxf",          // * AutoCAD DXF
+        "dxf",          // AutoCAD DXF
         "lwo",          // LightWave
         "lws",          // LightWave Scene
         "lxo",          // Modo
-        "stl",          // Stereolithography
-        "x",            // DirectX X
         "ac",           // AC3D
         "ms3d",         // Milkshape 3D
-        "cob", "scn"    // * TrueSpace
+        "cob", "scn"    // TrueSpace
     };
 }
 
