@@ -27,10 +27,11 @@
 
 #include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/fmt.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/misc/dictionary.h>
-#include <ghoul/fmt.h>
+#include <ghoul/misc/misc.h>
 #include <fstream>
 #include <sstream>
 
@@ -41,8 +42,6 @@ namespace {
 constexpr const int KeyTableIndex = -2;
 constexpr const int ValueTableIndex = -1;
 
-std::string luaTableToString(lua_State* state, int tableLocation);
-
 int luaAbsoluteLocation(lua_State* state, int relativeLocation) {
     if (relativeLocation >= 0) {
         return relativeLocation;
@@ -51,40 +50,6 @@ int luaAbsoluteLocation(lua_State* state, int relativeLocation) {
     // -1 is the topmost item. +1 is the first item.
     const int nItems = lua_gettop(state);
     return nItems + relativeLocation + 1;
-}
-
-std::string luaValueToString(lua_State* state, int location) {
-    ghoul_assert(state, "State must not be nullptr");
-
-    const int type = lua_type(state, location);
-    switch (type) {
-        case LUA_TBOOLEAN: return std::to_string(lua_toboolean(state, location));
-        case LUA_TNUMBER:  return std::to_string(lua_tonumber(state, location));
-        case LUA_TSTRING:  return lua_tostring(state, location);
-        case LUA_TTABLE:   return luaTableToString(state, location);
-        default:           return std::string(ghoul::lua::luaTypeToString(type));
-    }
-}
-
-std::string luaTableToString(lua_State* state, int tableLocation) {
-    ghoul_assert(state, "State must not be nullptr");
-    ghoul_assert(lua_istable(state, tableLocation), "Lua object is not a table");
-
-    std::stringstream result;
-    lua_pushvalue(state, tableLocation);
-    lua_pushnil(state);
-
-    result << "{ ";
-    while (lua_next(state, -2) != 0) {
-        result << luaValueToString(state, KeyTableIndex);
-        result << " = ";
-        result << luaValueToString(state, ValueTableIndex);
-        result << ",  ";
-        lua_pop(state, 1);
-    }
-    lua_pop(state, 1);
-    result << "}";
-    return result.str();
 }
 
 lua_State* staticLuaState() {
@@ -131,6 +96,44 @@ const char* errorLocation(lua_State* state) {
 int luaError(lua_State* state, const std::string& message) {
     ghoul_assert(state, "State must not be empty");
     return luaL_error(state, message.c_str());
+}
+
+std::string luaValueToString(lua_State* state, int location) {
+    ghoul_assert(state, "State must not be nullptr");
+
+    const int type = lua_type(state, location);
+    switch (type) {
+    case LUA_TBOOLEAN: return std::to_string(lua_toboolean(state, location));
+    case LUA_TNUMBER:  return std::to_string(lua_tonumber(state, location));
+    case LUA_TSTRING:  return lua_tostring(state, location);
+    case LUA_TTABLE:   return luaTableToString(state, location);
+    default:           return std::string(ghoul::lua::luaTypeToString(type));
+    }
+}
+
+std::string luaTableToString(lua_State* state, int tableLocation) {
+    ghoul_assert(state, "State must not be nullptr");
+    ghoul_assert(lua_istable(state, tableLocation), "Lua object is not a table");
+
+    lua_pushvalue(state, tableLocation);
+    lua_pushnil(state);
+
+    std::vector<std::string> values;
+    while (lua_next(state, -2) != 0) {
+        values.push_back(fmt::format(
+            "{} = {}",
+            luaValueToString(state, KeyTableIndex),
+            luaValueToString(state, ValueTableIndex)
+        ));
+        lua_pop(state, 1);
+    }
+    lua_pop(state, 1);
+
+    if (values.size() == 0) {
+        return "{}";
+    }
+
+    return fmt::format("{{ {} }}", join(values, ", "));
 }
 
 std::string stackInformation(lua_State* state) {

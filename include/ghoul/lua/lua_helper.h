@@ -89,6 +89,30 @@ BooleanType(PopValue);
  */
 [[nodiscard]] int luaError(lua_State* state, const std::string& message);
 
+/**
+ * Returns a string describing the \p state's value at location \p location. Supported
+ * value types are \c boolean, \c number, \c string and \c table. For other types, only
+ * the type as converted to string is returned.
+ *
+ * \param state The Lua state from which to read the value
+ * \param location The location from which the value should be extracted
+ * \return A string representation of the value
+ *
+ * \pre \p state must not be nullptr
+ */
+[[nodiscard]] std::string luaValueToString(lua_State* state, int location);
+
+/**
+ * Returns a string describing a table from the Lua state.
+ *
+ * \param state The Lua state from which to read the value
+ * \param tableLocation The location from which the table should be extracted
+ * \return A string representation of the table
+ *
+ * \pre \p state must not be nullptr
+ * \pre The Lua object at location \p \tableLocation must be a table
+ */
+[[nodiscard]] std::string luaTableToString(lua_State* state, int tableLocation);
 
 /**
  * Returns a string describing the \p state's current stack. The values of each entry in
