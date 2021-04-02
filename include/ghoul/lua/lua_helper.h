@@ -345,11 +345,13 @@ std::string_view luaTypeToString(int type);
  *
  * \param loadStandardLibraries If \c true, the Lua standard libraries will be loaded into
  *        the newly created state by means of a \c luaL_openlibs call
+ * \param strictState If this is \c true, the created Lua state will panic if an unused
+ *        variable is read or being written to before being defined before 
  * \return A valid new Lua state initialized with the default Lua libraries
  *
  * \throw LuaRuntimeException If there was an error creating the new Lua state
  */
-lua_State* createNewLuaState(bool loadStandardLibraries = true);
+lua_State* createNewLuaState(bool loadStandardLibraries = true, bool strictState = false);
 
 /**
  * Destroys the passed lua state and frees all memory that is associated with it.
