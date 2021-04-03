@@ -498,7 +498,7 @@ void ModelGeometry::calculateBoundingRadius() {
         float d = mesh.calculateBoundingRadius();
         maximumDistanceSquared = std::max(d, maximumDistanceSquared);
     }
-    _boundingRadius = maximumDistanceSquared;
+    _boundingRadius = std::sqrt(maximumDistanceSquared);
 }
 
 std::vector<io::ModelMesh>& ModelGeometry::meshes() {
