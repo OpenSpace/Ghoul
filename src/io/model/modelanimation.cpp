@@ -43,8 +43,13 @@ void ModelAnimation::setTimeScale(float timeScale) {
 void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool enabled) {
     // Animation out of scope or disabled
     if (!enabled || now > _duration || now < 0) {
+        if (_wasActive) {
+            reset(nodes);
+            _wasActive = false;
+        }
         return;
     }
+    _wasActive = true;
 
     // Find keyframes
     for (const io::ModelAnimation::NodeAnimation& nodeAnimation :
