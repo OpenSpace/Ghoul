@@ -35,8 +35,9 @@ ModelAnimation::ModelAnimation(std::string name, double duration)
 {}
 
 void ModelAnimation::setTimeScale(float timeScale) {
+    double duration = _duration / _timeScale;
     _timeScale = timeScale;
-    _duration = _duration * _timeScale;
+    _duration = duration * _timeScale;
 }
 
 void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool enabled) {
@@ -52,9 +53,9 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
         // Position
         glm::vec3 currPos;
         if (nodeAnimation.positions.size() > 1) {
-            double prevPosTime = -DBL_MAX;
+            double prevPosTime = -std::numeric_limits<double>::max();
             glm::vec3 prevPos;
-            double nextPosTime = DBL_MAX;
+            double nextPosTime = std::numeric_limits<double>::max();
             glm::vec3 nextPos;
             bool interpolate = true;
 
@@ -62,17 +63,17 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                 double diff = (pos.time * _timeScale) - now;
 
                 // Exact on a keyframe
-                if (abs(diff) < DBL_EPSILON) {
+                if (abs(diff) < std::numeric_limits<double>::epsilon()) {
                     currPos = pos.position;
                     interpolate = false;
                 }
                 // Prev keyframe
-                else if (diff < 0 && diff > (prevPosTime - now)) {
+                else if (diff < 0.0 && diff > (prevPosTime - now)) {
                     prevPosTime = pos.time * _timeScale;
                     prevPos = pos.position;
                 }
                 // Next keyframe
-                else if (diff > 0 && diff < (nextPosTime - now)) {
+                else if (diff > 0.0 && diff < (nextPosTime - now)) {
                     nextPosTime = pos.time * _timeScale;
                     nextPos = pos.position;
                 }
@@ -83,16 +84,19 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                 currPos = glm::mix(prevPos, nextPos, static_cast<float>(blend));
             }
         }
-        else {
+        else if (!nodeAnimation.positions.empty()) {
             currPos = nodeAnimation.positions[0].position;
+        }
+        else {
+            currPos = glm::vec3(0.0);
         }
 
         // Rotation
         glm::quat currRot;
         if (nodeAnimation.rotations.size() > 1) {
-            double prevRotTime = -DBL_MAX;
+            double prevRotTime = -std::numeric_limits<double>::max();
             glm::quat prevRot;
-            double nextRotTime = DBL_MAX;
+            double nextRotTime = std::numeric_limits<double>::max();
             glm::quat nextRot;
             bool interpolate = true;
 
@@ -100,17 +104,17 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                 double diff = (rot.time * _timeScale) - now;
 
                 // Exact on a keyframe
-                if (abs(diff) < DBL_EPSILON) {
+                if (abs(diff) < std::numeric_limits<double>::epsilon()) {
                     currRot = rot.rotation;
                     interpolate = false;
                 }
                 // Prev keyframe
-                else if (diff < 0 && diff > (prevRotTime - now)) {
+                else if (diff < 0.0 && diff > (prevRotTime - now)) {
                     prevRotTime = rot.time * _timeScale;
                     prevRot = rot.rotation;
                 }
                 // Next keyframe
-                else if (diff > 0 && diff < (nextRotTime - now)) {
+                else if (diff > 0.0 && diff < (nextRotTime - now)) {
                     nextRotTime = rot.time * _timeScale;
                     nextRot = rot.rotation;
                 }
@@ -121,16 +125,19 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                 currRot = glm::slerp(prevRot, nextRot, static_cast<float>(blend));
             }
         }
-        else {
+        else if (!nodeAnimation.rotations.empty()) {
             currRot = nodeAnimation.rotations[0].rotation;
+        }
+        else {
+            currRot = glm::quat(0.f, 0.f, 0.f, 0.f);
         }
 
         // Scale
         glm::vec3 currScale;
         if (nodeAnimation.scales.size() > 1) {
-            double prevScaleTime = -DBL_MAX;
+            double prevScaleTime = -std::numeric_limits<double>::max();
             glm::vec3 prevScale;
-            double nextScaleTime = DBL_MAX;
+            double nextScaleTime = std::numeric_limits<double>::max();
             glm::vec3 nextScale;
             bool interpolate = true;
 
@@ -138,17 +145,17 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                 double diff = (scale.time * _timeScale) - now;
 
                 // Exact on a keyframe
-                if (abs(diff) < DBL_EPSILON) {
+                if (abs(diff) < std::numeric_limits<double>::epsilon()) {
                     currScale = scale.scale;
                     interpolate = false;
                 }
                 // Prev keyframe
-                else if (diff < 0 && diff > (prevScaleTime - now)) {
+                else if (diff < 0.0 && diff > (prevScaleTime - now)) {
                     prevScaleTime = scale.time * _timeScale;
                     prevScale = scale.scale;
                 }
                 // Next keyframe
-                else if (diff > 0 && diff < (nextScaleTime - now)) {
+                else if (diff > 0.0 && diff < (nextScaleTime - now)) {
                     nextScaleTime = scale.time * _timeScale;
                     nextScale = scale.scale;
                 }
@@ -159,8 +166,11 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                 currScale = glm::mix(prevScale, nextScale, static_cast<float>(blend));
             }
         }
-        else {
+        else if (!nodeAnimation.scales.empty()) {
             currScale = nodeAnimation.scales[0].scale;
+        }
+        else {
+            currScale = glm::vec3(1.0);
         }
 
         glm::mat4x4 animationTransform;

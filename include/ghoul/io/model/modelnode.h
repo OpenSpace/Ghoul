@@ -43,7 +43,7 @@ public:
     void setParent(int parent);
     void setChildren(std::vector<int> children);
     void addChild(int child);
-    void setAnimation(glm::mat4x4 animation);
+    void setAnimation(const glm::mat4x4& animation);
 
     std::vector<io::ModelMesh>& meshes();
     const std::vector<io::ModelMesh>& meshes() const;
@@ -57,10 +57,20 @@ public:
 private:
     // glm::mat4x4 is not noexcept move constructable, use an array instead for transform
     // Array is column major
-    GLfloat _transform[16];
-    GLfloat _animationTransform[16];
+    GLfloat _transform[16] = {
+        1.f, 0.f, 0.f, 0.f,
+        0.f, 1.f, 0.f, 0.f,
+        0.f, 0.f, 1.f, 0.f,
+        0.f, 0.f, 0.f, 1.f
+    };
+    GLfloat _animationTransform[16] = {
+        1.f, 0.f, 0.f, 0.f,
+        0.f, 1.f, 0.f, 0.f,
+        0.f, 0.f, 1.f, 0.f,
+        0.f, 0.f, 0.f, 1.f
+    };
     std::vector<ModelMesh> _meshes;
-    int _parent;
+    int _parent = -1;
     std::vector<int> _children;
     bool _hasAnimation = false;
 };

@@ -33,7 +33,6 @@ namespace ghoul::io {
 
 ModelNode::ModelNode(glm::mat4x4 transform, std::vector<io::ModelMesh> meshes)
     : _meshes(std::move(meshes))
-    , _parent(-1)
 {
    // glm is column major, array is column major too
     _transform[0] = transform[0][0];
@@ -69,7 +68,7 @@ void ModelNode::addChild(int child) {
     _children.push_back(child);
 }
 
-void ModelNode::setAnimation(glm::mat4x4 animation) {
+void ModelNode::setAnimation(const glm::mat4x4& animation) {
     // glm is column major, array is column major too
     _animationTransform[0] = animation[0][0];
     _animationTransform[1] = animation[0][1];

@@ -26,9 +26,9 @@
 #ifndef __GHOUL___MODELGEOMETRY___H__
 #define __GHOUL___MODELGEOMETRY___H__
 
+#include <ghoul/io/model/modelanimation.h>
 #include <ghoul/io/model/modelmesh.h>
 #include <ghoul/io/model/modelnode.h>
-#include <ghoul/io/model/modelanimation.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <memory>
 

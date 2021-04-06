@@ -52,7 +52,7 @@ std::string textureTypeToString(const ModelMesh::TextureType& type) {
 }
 
 void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
-    bool isTexturedModel) const
+                       bool isTexturedModel) const
 {
     if (isTexturedModel) {
         // Reset shader

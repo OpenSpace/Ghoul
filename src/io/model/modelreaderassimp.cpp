@@ -555,8 +555,8 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
 
                         ModelAnimation::PositionKeyframe positionKeyframe;
                         positionKeyframe.time =
-                            abs(animation->mTicksPerSecond) < DBL_EPSILON ?
-                            posKey.mTime :
+                            abs(animation->mTicksPerSecond) <
+                            std::numeric_limits<double>::epsilon() ? posKey.mTime :
                             posKey.mTime / animation->mTicksPerSecond;
                         positionKeyframe.position = glm::vec3(
                             posKey.mValue.x,
@@ -572,8 +572,8 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
 
                         ModelAnimation::RotationKeyframe rotationKeyframe;
                         rotationKeyframe.time =
-                            abs(animation->mTicksPerSecond) < DBL_EPSILON ?
-                            rotKey.mTime :
+                            abs(animation->mTicksPerSecond) <
+                            std::numeric_limits<double>::epsilon() ? rotKey.mTime :
                             rotKey.mTime / animation->mTicksPerSecond;
                         rotationKeyframe.rotation = glm::quat(
                             rotKey.mValue.w,
@@ -590,8 +590,8 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
 
                         ModelAnimation::ScaleKeyframe scaleKeyframe;
                         scaleKeyframe.time =
-                            abs(animation->mTicksPerSecond) < DBL_EPSILON ?
-                            scaleKey.mTime :
+                            abs(animation->mTicksPerSecond) <
+                            std::numeric_limits<double>::epsilon() ? scaleKey.mTime :
                             scaleKey.mTime / animation->mTicksPerSecond;
                         scaleKeyframe.scale = glm::vec3(
                             scaleKey.mValue.x,
@@ -674,7 +674,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         if (animation->mNumChannels > 0) {
             modelAnimation = std::make_unique<ModelAnimation>(
                 animation->mName.C_Str(),
-                abs(animation->mTicksPerSecond) < DBL_EPSILON ? // Not all formats have it
+                abs(animation->mTicksPerSecond) <
+                std::numeric_limits<double>::epsilon() ? // Not all formats have this
                 animation->mDuration :
                 animation->mDuration / animation->mTicksPerSecond
             );

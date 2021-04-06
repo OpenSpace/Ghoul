@@ -111,7 +111,7 @@ ModelGeometry::ModelGeometry(std::vector<io::ModelNode> nodes,
 {}
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
-    const std::string& cachedFile)
+                                                           const std::string& cachedFile)
 {
     std::ifstream fileStream(cachedFile, std::ifstream::binary);
     if (!fileStream.good()) {
@@ -137,7 +137,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorageArray;
     textureStorageArray.reserve(nTextureEntries);
 
-    for (int te = 0; te < nTextureEntries; ++te) {
+    for (int32_t te = 0; te < nTextureEntries; ++te) {
         modelgeometry::ModelGeometry::TextureEntry textureEntry;
 
         // Name
@@ -214,7 +214,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     // Nodes
     std::vector<io::ModelNode> nodeArray;
     nodeArray.reserve(nNodes);
-    for (int n = 0; n < nNodes; ++n) {
+    for (int32_t n = 0; n < nNodes; ++n) {
         // Read how many meshes to read
         int32_t nMeshes = 0;
         fileStream.read(reinterpret_cast<char*>(&nMeshes), sizeof(int32_t));
@@ -222,7 +222,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Meshes
         std::vector<io::ModelMesh> meshArray;
         meshArray.reserve(nMeshes);
-        for (int m = 0; m < nMeshes; ++m) {
+        for (int32_t m = 0; m < nMeshes; ++m) {
             // Vertices
             int32_t nVertices = 0;
             fileStream.read(reinterpret_cast<char*>(&nVertices), sizeof(int32_t));
@@ -232,7 +232,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             std::vector<io::ModelMesh::Vertex> vertexArray;
             vertexArray.reserve(nVertices);
 
-            for (int v = 0; v < nVertices; ++v) {
+            for (int32_t v = 0; v < nVertices; ++v) {
                 io::ModelMesh::Vertex vertex;
                 fileStream.read(
                     reinterpret_cast<char*>(&vertex),
@@ -250,7 +250,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             std::vector<unsigned int> indexArray;
             indexArray.reserve(nIndices);
 
-            for (int i = 0; i < nIndices; ++i) {
+            for (int32_t i = 0; i < nIndices; ++i) {
                 uint32_t index;
                 fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
                 indexArray.push_back(std::move(static_cast<unsigned int>(index)));
@@ -265,7 +265,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             std::vector<io::ModelMesh::Texture> textureArray;
             textureArray.reserve(nTextures);
 
-            for (int t = 0; t < nTextures; ++t) {
+            for (int32_t t = 0; t < nTextures; ++t) {
                 io::ModelMesh::Texture texture;
 
                 // type
@@ -282,7 +282,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                     reinterpret_cast<char*>(&f),
                     sizeof(uint8_t)
                 );
-                texture.useForcedColor = static_cast<bool>(f);
+                texture.useForcedColor = f == 1;
 
                 // color
                 fileStream.read(reinterpret_cast<char*>(&texture.color.r), sizeof(float));
@@ -320,7 +320,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         glm::mat4x4 transform;
         GLfloat rawTransform[16];
         fileStream.read(
-            reinterpret_cast<char*>(&rawTransform),
+            reinterpret_cast<char*>(rawTransform),
             16 * sizeof(GLfloat)
         );
         transform = glm::make_mat4(rawTransform);
@@ -345,7 +345,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Children
         std::vector<int> childrenArray;
         nodeArray.reserve(nChildren);
-        for (int c = 0; c < nChildren; ++c) {
+        for (int32_t c = 0; c < nChildren; ++c) {
             int child;
             fileStream.read(reinterpret_cast<char*>(&child), sizeof(int32_t));
             childrenArray.push_back(child);
@@ -354,7 +354,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // HasAnimation
         uint8_t a;
         fileStream.read(reinterpret_cast<char*>(&a), sizeof(uint8_t));
-        bool hasAnimation = static_cast<bool>(a);
+        bool hasAnimation = a == 1;
 
         // Create Node
         io::ModelNode node = io::ModelNode(std::move(transform), std::move(meshArray));
@@ -370,7 +370,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     // Animation
     uint8_t anim;
     fileStream.read(reinterpret_cast<char*>(&anim), sizeof(uint8_t));
-    bool hasAnimation = static_cast<bool>(anim);
+    bool hasAnimation = anim == 1;
 
     if (hasAnimation) {
         // Name
@@ -399,7 +399,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             std::make_unique<io::ModelAnimation>(io::ModelAnimation(name, duration));
         animation->nodeAnimations().reserve(nNodeAnimations);
         animation->setTimeScale(timeScale);
-        for (int na = 0; na < nNodeAnimations; ++na) {
+        for (int32_t na = 0; na < nNodeAnimations; ++na) {
             io::ModelAnimation::NodeAnimation nodeAnimation;
 
             // Node index
@@ -411,7 +411,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             uint8_t nPos;
             fileStream.read(reinterpret_cast<char*>(&nPos), sizeof(uint8_t));
             nodeAnimation.positions.reserve(nPos);
-            for (int p = 0; p < nPos; ++p) {
+            for (uint8_t p = 0; p < nPos; ++p) {
                 io::ModelAnimation::PositionKeyframe posKeyframe;
 
                 // Position
@@ -433,7 +433,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             uint8_t nRot;
             fileStream.read(reinterpret_cast<char*>(&nRot), sizeof(uint8_t));
             nodeAnimation.rotations.reserve(nRot);
-            for (int p = 0; p < nRot; ++p) {
+            for (uint8_t p = 0; p < nRot; ++p) {
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotition
@@ -456,7 +456,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             uint8_t nScale;
             fileStream.read(reinterpret_cast<char*>(&nScale), sizeof(uint8_t));
             nodeAnimation.scales.reserve(nScale);
-            for (int p = 0; p < nScale; ++p) {
+            for (uint8_t p = 0; p < nScale; ++p) {
                 io::ModelAnimation::ScaleKeyframe scaleKeyframe;
 
                 // Scaleition
@@ -513,7 +513,7 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
     }
     fileStream.write(reinterpret_cast<const char*>(&nTextureEntries), sizeof(int32_t));
 
-    for (int te = 0; te < nTextureEntries; ++te) {
+    for (int32_t te = 0; te < nTextureEntries; ++te) {
         // Name
         int32_t nameSize = static_cast<int32_t>(
             _textureStorage[te].name.size() * sizeof(char)
@@ -589,7 +589,7 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
             }
             fileStream.write(reinterpret_cast<const char*>(&nVertices), sizeof(int32_t));
 
-            for (int v = 0; v < nVertices; ++v) {
+            for (int32_t v = 0; v < nVertices; ++v) {
                 fileStream.write(
                     reinterpret_cast<const char*>(&mesh.vertices()[v]),
                     sizeof(io::ModelMesh::Vertex)
@@ -603,7 +603,7 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
             }
             fileStream.write(reinterpret_cast<const char*>(&nIndices), sizeof(int32_t));
 
-            for (int i = 0; i < nIndices; ++i) {
+            for (int32_t i = 0; i < nIndices; ++i) {
                 uint32_t index = static_cast<uint32_t>(mesh.indices()[i]);
                 fileStream.write(reinterpret_cast<const char*>(&index), sizeof(uint32_t));
             }
@@ -615,7 +615,7 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
             }
             fileStream.write(reinterpret_cast<const char*>(&nTextures), sizeof(int32_t));
 
-            for (int t = 0; t < nTextures; ++t) {
+            for (int32_t t = 0; t < nTextures; ++t) {
                 // type
                 fileStream.write(
                     reinterpret_cast<const char*>(&mesh.textures()[t].type),
@@ -856,7 +856,7 @@ bool ModelGeometry::hasAnimation() const {
 
 double ModelGeometry::animationDuration() const {
     if (_animation == nullptr) {
-        LERROR("Model does not have any animation!");
+        LERROR("Model does not have any animation");
         return -1.0;
     }
 
@@ -880,10 +880,11 @@ const std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() 
 }
 
 void renderRecursive(const std::vector<io::ModelNode>& nodes, const io::ModelNode* node,
-    opengl::ProgramObject& program, glm::mat4x4& parentTransform, bool isTexturedModel)
+                     opengl::ProgramObject& program, glm::mat4x4& parentTransform,
+                     bool isTexturedModel)
 {
-    if(!node) {
-        LERROR("Cannot render empty node!");
+    if (!node) {
+        LERROR("Cannot render empty node");
         return;
     }
 
@@ -901,24 +902,24 @@ void renderRecursive(const std::vector<io::ModelNode>& nodes, const io::ModelNod
         mesh.render(program, globalTransform, isTexturedModel);
     }
 
-    for (const int child : node->children()) {
+    for (int child : node->children()) {
         renderRecursive(nodes, &nodes[child], program, globalTransform, isTexturedModel);
     }
 }
 
 void ModelGeometry::render(opengl::ProgramObject& program, bool isTexturedModel) const {
     if (_nodes.empty()) {
-        LERROR("Cannot render empty geometry!");
+        LERROR("Cannot render empty geometry");
         return;
     }
 
     glm::mat4x4 parentTransform;
-    renderRecursive(_nodes, &_nodes[0], program, parentTransform, isTexturedModel);
+    renderRecursive(_nodes, _nodes.data(), program, parentTransform, isTexturedModel);
 }
 
 void ModelGeometry::update(double now) {
     if (_animation == nullptr) {
-        LERROR("Cannot update empty animation!");
+        LERROR("Cannot update empty animation");
         return;
     }
 
