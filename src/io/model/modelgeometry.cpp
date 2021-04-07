@@ -274,7 +274,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 // hasTexture
                 uint8_t h;
                 fileStream.read(reinterpret_cast<char*>(&h), sizeof(uint8_t));
-                texture.hasTexture = static_cast<bool>(h);
+                texture.hasTexture = h == 1;
 
                 // useForcedColor
                 uint8_t f;

@@ -30,7 +30,7 @@
 namespace ghoul::io {
 
 ModelAnimation::ModelAnimation(std::string name, double duration)
-    : _name(name)
+    : _name(std::move(name))
     , _duration(duration)
 {}
 
