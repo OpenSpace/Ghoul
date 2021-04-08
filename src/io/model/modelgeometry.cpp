@@ -838,15 +838,49 @@ double ModelGeometry::boundingRadius() const {
     return _boundingRadius;
 }
 
-void ModelGeometry::calculateBoundingRadius() {
-    float maximumDistanceSquared = 0.f;
-
-    for (const io::ModelNode& node : _nodes) {
-        for (const io::ModelMesh& mesh : node.meshes()) {
-            float d = mesh.calculateBoundingRadius();
-            maximumDistanceSquared = std::max(d, maximumDistanceSquared);
-        }
+void calculateBoundingRadiusRecursive(const std::vector<io::ModelNode>& nodes,
+                                      const io::ModelNode* node,
+                                      glm::mat4x4& parentTransform,
+                                      float& maximumDistanceSquared)
+{
+    if (!node) {
+        LERROR("Cannot calculate bounding radius for empty node");
+        return;
     }
+
+    // NOTE: The bounding radius will not change along with an animation
+    glm::mat4x4 globalTransform = parentTransform * node->transform();
+
+    for (const io::ModelMesh& mesh : node->meshes()) {
+        float d = mesh.calculateBoundingRadius(globalTransform);
+        maximumDistanceSquared = std::max(d, maximumDistanceSquared);
+    }
+
+    for (int child : node->children()) {
+        calculateBoundingRadiusRecursive(
+            nodes,
+            &nodes[child],
+            globalTransform,
+            maximumDistanceSquared
+        );
+    }
+}
+
+void ModelGeometry::calculateBoundingRadius() {
+    if (_nodes.empty()) {
+        LERROR("Cannot calculate bounding radius for empty geometry");
+        return;
+    }
+
+    glm::mat4x4 parentTransform;
+    float maximumDistanceSquared = 0.f;
+    calculateBoundingRadiusRecursive(
+        _nodes,
+        _nodes.data(),
+        parentTransform,
+        maximumDistanceSquared
+    );
+
     _boundingRadius = maximumDistanceSquared;
 }
 
@@ -890,7 +924,7 @@ void renderRecursive(const std::vector<io::ModelNode>& nodes, const io::ModelNod
 
     glm::mat4x4 globalTransform;
     if (node->hasAnimation()) {
-        // Animation is given by asimp in absolute format
+        // Animation is given by Assimp in absolute format
         // i.e. animation replaces old transform
         globalTransform = parentTransform * node->animationTransform();
     }

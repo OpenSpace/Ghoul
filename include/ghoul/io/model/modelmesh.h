@@ -70,7 +70,7 @@ public:
     void deinitialize();
     void render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
         bool isTexturedModel = true) const;
-    float calculateBoundingRadius() const;
+    float calculateBoundingRadius(glm::mat4x4& transform) const;
 
     const std::vector<Vertex>& vertices() const;
     const std::vector<unsigned int>& indices() const;

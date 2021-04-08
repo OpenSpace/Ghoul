@@ -122,13 +122,22 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
     glActiveTexture(GL_TEXTURE0);
 }
 
-float ModelMesh::calculateBoundingRadius() const {
+float ModelMesh::calculateBoundingRadius(glm::mat4x4& transform) const {
     // Calculate the bounding sphere of the mesh
     float maximumDistanceSquared = 0.f;
     for (const Vertex& v : _vertices) {
-        float d = glm::pow(v.position[0], 2.f) +
-            glm::pow(v.position[1], 2.f) +
-            glm::pow(v.position[2], 2.f);
+        // Apply the transform to the vertex to get its final position
+        glm::vec4 position(
+            v.position[0],
+            v.position[1],
+            v.position[2],
+            1.f
+        );
+        position = transform * position;
+
+        float d = glm::pow(position.x, 2.f) +
+            glm::pow(position.y, 2.f) +
+            glm::pow(position.z, 2.f);
 
         maximumDistanceSquared = glm::max(d, maximumDistanceSquared);
     }
