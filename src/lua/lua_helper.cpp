@@ -27,10 +27,11 @@
 
 #include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/fmt.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/misc/dictionary.h>
-#include <ghoul/fmt.h>
+#include <ghoul/misc/misc.h>
 #include <fstream>
 #include <sstream>
 
@@ -40,8 +41,6 @@ namespace {
 
 constexpr const int KeyTableIndex = -2;
 constexpr const int ValueTableIndex = -1;
-
-std::string luaTableToString(lua_State* state, int tableLocation);
 
 int luaAbsoluteLocation(lua_State* state, int relativeLocation) {
     if (relativeLocation >= 0) {
@@ -53,46 +52,56 @@ int luaAbsoluteLocation(lua_State* state, int relativeLocation) {
     return nItems + relativeLocation + 1;
 }
 
-std::string luaValueToString(lua_State* state, int location) {
-    ghoul_assert(state, "State must not be nullptr");
-
-    const int type = lua_type(state, location);
-    switch (type) {
-        case LUA_TBOOLEAN: return std::to_string(lua_toboolean(state, location));
-        case LUA_TNUMBER:  return std::to_string(lua_tonumber(state, location));
-        case LUA_TSTRING:  return lua_tostring(state, location);
-        case LUA_TTABLE:   return luaTableToString(state, location);
-        default:           return std::string(ghoul::lua::luaTypeToString(type));
-    }
-}
-
-std::string luaTableToString(lua_State* state, int tableLocation) {
-    ghoul_assert(state, "State must not be nullptr");
-    ghoul_assert(lua_istable(state, tableLocation), "Lua object is not a table");
-
-    std::stringstream result;
-    lua_pushvalue(state, tableLocation);
-    lua_pushnil(state);
-
-    result << "{ ";
-    while (lua_next(state, -2) != 0) {
-        result << luaValueToString(state, KeyTableIndex);
-        result << " = ";
-        result << luaValueToString(state, ValueTableIndex);
-        result << ",  ";
-        lua_pop(state, 1);
-    }
-    lua_pop(state, 1);
-    result << "}";
-    return result.str();
-}
-
 lua_State* staticLuaState() {
     if (!_state) {
         _state = ghoul::lua::createNewLuaState();
     }
     return _state;
 }
+
+// Code snippet that causes the Lua State to strict by making it that the lookup in the
+// meta table for an unknown key causes a panic
+// Code taken originally from the Lua webpage and used under the Lua license
+constexpr const char StrictStateSource[] = R"(
+--[[ strict.lua
+checks uses of undeclared global variables
+All global variables must be 'declared' through a regular assignment (even assigning nil
+will do) in a main chunk before being used anywhere or assigned to inside a function.
+distributed under the Lua license: http://www.lua.org/license.html
+]]--
+
+local getinfo, error, rawset, rawget = debug.getinfo, error, rawset, rawget
+
+local mt = getmetatable(_G)
+if mt == nil then
+  mt = {}
+  setmetatable(_G, mt)
+end
+
+mt.__declared = {}
+
+local function what ()
+  local d = getinfo(3, "S")
+  return d and d.what or "C"
+end
+
+mt.__newindex = function (t, n, v)
+  if not mt.__declared[n] then
+    local w = what()
+    if w ~= "main" and w ~= "C" then
+      error("assign to undeclared variable '"..n.."'", 2)
+    end
+    mt.__declared[n] = true
+  end
+  rawset(t, n, v)
+end
+  
+mt.__index = function (t, n)
+  if not mt.__declared[n] and what() ~= "C" then
+    error("variable '"..n.."' is not declared", 2)
+  end
+  return rawget(t, n)
+end)";
 
 } // namespace
 
@@ -131,6 +140,44 @@ const char* errorLocation(lua_State* state) {
 int luaError(lua_State* state, const std::string& message) {
     ghoul_assert(state, "State must not be empty");
     return luaL_error(state, message.c_str());
+}
+
+std::string luaValueToString(lua_State* state, int location) {
+    ghoul_assert(state, "State must not be nullptr");
+
+    const int type = lua_type(state, location);
+    switch (type) {
+    case LUA_TBOOLEAN: return std::to_string(lua_toboolean(state, location));
+    case LUA_TNUMBER:  return std::to_string(lua_tonumber(state, location));
+    case LUA_TSTRING:  return lua_tostring(state, location);
+    case LUA_TTABLE:   return luaTableToString(state, location);
+    default:           return std::string(ghoul::lua::luaTypeToString(type));
+    }
+}
+
+std::string luaTableToString(lua_State* state, int tableLocation) {
+    ghoul_assert(state, "State must not be nullptr");
+    ghoul_assert(lua_istable(state, tableLocation), "Lua object is not a table");
+
+    lua_pushvalue(state, tableLocation);
+    lua_pushnil(state);
+
+    std::vector<std::string> values;
+    while (lua_next(state, -2) != 0) {
+        values.push_back(fmt::format(
+            "{} = {}",
+            luaValueToString(state, KeyTableIndex),
+            luaValueToString(state, ValueTableIndex)
+        ));
+        lua_pop(state, 1);
+    }
+    lua_pop(state, 1);
+
+    if (values.size() == 0) {
+        return "{}";
+    }
+
+    return fmt::format("{{ {} }}", join(values, ", "));
 }
 
 std::string stackInformation(lua_State* state) {
@@ -426,7 +473,7 @@ std::string_view luaTypeToString(int type) {
     }
 }
 
-lua_State* createNewLuaState(bool loadStandardLibraries) {
+lua_State* createNewLuaState(bool loadStandardLibraries, bool strictState) {
     LDEBUGC("Lua", "Creating Lua state");
     lua_State* s = luaL_newstate();
     if (!s) {
@@ -435,6 +482,10 @@ lua_State* createNewLuaState(bool loadStandardLibraries) {
     if (loadStandardLibraries) {
         LDEBUGC("Lua", "Open libraries");
         luaL_openlibs(s);
+    }
+    if (strictState) {
+        LDEBUGC("Lua", "Registering strict code");
+        runScript(s, StrictStateSource);
     }
     return s;
 }

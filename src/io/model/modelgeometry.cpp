@@ -881,7 +881,7 @@ void ModelGeometry::calculateBoundingRadius() {
         maximumDistanceSquared
     );
 
-    _boundingRadius = maximumDistanceSquared;
+    _boundingRadius = std::sqrt(maximumDistanceSquared);
 }
 
 bool ModelGeometry::hasAnimation() const {

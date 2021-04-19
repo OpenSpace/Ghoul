@@ -41,8 +41,8 @@ namespace {
 
 namespace ghoul::lua {
 
-LuaState::LuaState(IncludeStandardLibrary include)
-    : _state(ghoul::lua::createNewLuaState(include))
+LuaState::LuaState(IncludeStandardLibrary include, StrictState strict)
+    : _state(ghoul::lua::createNewLuaState(include, strict))
 {
     // Set a panic function to make sure that we always throw with a useful error message
     // if an exception occurs due to a luaError. This should never happen under normal
