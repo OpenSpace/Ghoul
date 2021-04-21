@@ -673,14 +673,16 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
         }
 
         // Transform
+        glm::mat4x4 transform = node.transform();
         fileStream.write(
-            reinterpret_cast<const char*>(&node.transform()),
+            reinterpret_cast<const char*>(&transform),
             16 * sizeof(GLfloat)
         );
 
         // AnimationTransform
+        glm::mat4x4 animationTransform = node.animationTransform();
         fileStream.write(
-            reinterpret_cast<const char*>(&node.animationTransform()),
+            reinterpret_cast<const char*>(&animationTransform),
             16 * sizeof(GLfloat)
         );
 
