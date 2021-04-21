@@ -113,11 +113,11 @@ const std::vector<int>& ModelNode::children() const {
     return _children;
 }
 
-const glm::mat4x4 ModelNode::transform() const {
+const glm::mat4x4& ModelNode::transform() const {
     return glm::make_mat4(_transform);
 }
 
-const glm::mat4x4 ModelNode::animationTransform() const {
+const glm::mat4x4& ModelNode::animationTransform() const {
     return glm::make_mat4(_animationTransform);
 }
 
