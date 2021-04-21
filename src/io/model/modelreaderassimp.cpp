@@ -713,7 +713,7 @@ std::vector<std::string> ModelReaderAssimp::supportedExtensions() const {
         "obj",          // * Wavefront Object
         "fbx",          // Autodesk
         "gltf", "glb",  // glTF
-        "dae", "zae"    // Collada
+        "dae", "zae",   // Collada
         "blend",        // * Blender 3D
         "3ds", "prj",   // * 3ds Max 3DS
         "ase", "ask",   // 3ds Max ASE
