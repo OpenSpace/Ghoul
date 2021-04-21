@@ -26,6 +26,7 @@
 #include <ghoul/io/model/modelreaderassimp.h>
 
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/io/model/modelanimation.h>
 #include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/io/model/modelmesh.h>
 #include <ghoul/io/texture/texturereader.h>
@@ -217,7 +218,6 @@ bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
 
 
 ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
-                      glm::mat4x4& transform,
                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
                       std::filesystem::path& modelDirectory, bool forceRenderInvisible,
                       bool notifyInvisibleDropped)
@@ -235,18 +235,6 @@ ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
         vertex.position[0] = mesh.mVertices[i].x;
         vertex.position[1] = mesh.mVertices[i].y;
         vertex.position[2] = mesh.mVertices[i].z;
-
-        // Apply the transform to the vertex
-        glm::vec4 position(
-            vertex.position[0],
-            vertex.position[1],
-            vertex.position[2],
-            1.f
-        );
-        position = transform * position;
-        vertex.position[0] = position.x;
-        vertex.position[1] = position.y;
-        vertex.position[2] = position.z;
 
         // Normal
         if (mesh.HasNormals()) {
@@ -480,8 +468,8 @@ ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
 
 // Process a node in a recursive fashion. Process each individual mesh located 
 // at the node and repeats this process on its children nodes (if any)
-void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelMesh>& meshes,
-                 glm::mat4x4& parentTransform,
+void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode>& nodes,
+                 int parent, std::unique_ptr<ModelAnimation>& modelAnimation,
                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
                  bool forceRenderInvisible, bool notifyInvisibleDropped,
                  std::filesystem::path& modelDirectory)
@@ -502,18 +490,29 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelMesh
         node.mTransformation.c4, node.mTransformation.d4
     );
 
-    glm::mat4x4 globalTransform = parentTransform * nodeTransform;
-
     // Process each mesh for the current node
+    std::vector<ModelMesh> meshArray;
+    meshArray.reserve(node.mNumMeshes);
     for (unsigned int i = 0; i < node.mNumMeshes; i++) {
         // The node object only contains indices to the actual objects in the scene
         // The scene contains all the data, node is just to keep stuff organized
         // (like relations between nodes)
         aiMesh* mesh = scene.mMeshes[node.mMeshes[i]];
+
+        if (mesh->HasBones()) {
+            LWARNING("Detected unsupported animation type: 'Bones', "
+                "currently only keyframe animation is supported"
+            );
+        }
+        if (mesh->mNumAnimMeshes > 0) {
+            LWARNING("Detected unsupported animation type: 'Mesh', "
+                "currently only keyframe animation is supported"
+            );
+        }
+
         ModelMesh loadedMesh = processMesh(
             *mesh,
             scene,
-            globalTransform,
             textureStorage,
             modelDirectory,
             forceRenderInvisible,
@@ -525,7 +524,89 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelMesh
             continue;
         }
 
-        meshes.push_back(std::move(loadedMesh));
+        meshArray.push_back(std::move(loadedMesh));
+    }
+
+    ModelNode modelNode(nodeTransform, std::move(meshArray));
+    modelNode.setParent(parent);
+    nodes.push_back(std::move(modelNode));
+    int newNode = nodes.size() - 1;
+    if (parent != -1) {
+        nodes[parent].addChild(newNode);
+    }
+
+    // Check animations
+    if (scene.HasAnimations()) {
+        for (unsigned int a = 0; a < scene.mNumAnimations; ++a) {
+            aiAnimation* animation = scene.mAnimations[a];
+            if (modelAnimation->name() != animation->mName.C_Str()) {
+                continue;
+            }
+
+            for (unsigned int c = 0; c < animation->mNumChannels; ++c) {
+                aiNodeAnim* nodeAnim = animation->mChannels[c];
+
+                if (nodeAnim->mNodeName == node.mName) {
+                    ModelAnimation::NodeAnimation nodeAnimation;
+                    nodeAnimation.node = newNode;
+
+                    for (unsigned int p = 0; p < nodeAnim->mNumPositionKeys; ++p) {
+                        aiVectorKey posKey = nodeAnim->mPositionKeys[p];
+
+                        ModelAnimation::PositionKeyframe positionKeyframe;
+                        positionKeyframe.time =
+                            abs(animation->mTicksPerSecond) <
+                            std::numeric_limits<double>::epsilon() ? posKey.mTime :
+                            posKey.mTime / animation->mTicksPerSecond;
+                        positionKeyframe.position = glm::vec3(
+                            posKey.mValue.x,
+                            posKey.mValue.y,
+                            posKey.mValue.z
+                        );
+
+                        nodeAnimation.positions.push_back(std::move(positionKeyframe));
+                    }
+
+                    for (unsigned int r = 0; r < nodeAnim->mNumRotationKeys; ++r) {
+                        aiQuatKey rotKey = nodeAnim->mRotationKeys[r];
+
+                        ModelAnimation::RotationKeyframe rotationKeyframe;
+                        rotationKeyframe.time =
+                            abs(animation->mTicksPerSecond) <
+                            std::numeric_limits<double>::epsilon() ? rotKey.mTime :
+                            rotKey.mTime / animation->mTicksPerSecond;
+                        rotationKeyframe.rotation = glm::quat(
+                            rotKey.mValue.w,
+                            rotKey.mValue.x,
+                            rotKey.mValue.y,
+                            rotKey.mValue.z
+                        );
+
+                        nodeAnimation.rotations.push_back(std::move(rotationKeyframe));
+                    }
+
+                    for (unsigned int s = 0; s < nodeAnim->mNumScalingKeys; ++s) {
+                        aiVectorKey scaleKey = nodeAnim->mScalingKeys[s];
+
+                        ModelAnimation::ScaleKeyframe scaleKeyframe;
+                        scaleKeyframe.time =
+                            abs(animation->mTicksPerSecond) <
+                            std::numeric_limits<double>::epsilon() ? scaleKey.mTime :
+                            scaleKey.mTime / animation->mTicksPerSecond;
+                        scaleKeyframe.scale = glm::vec3(
+                            scaleKey.mValue.x,
+                            scaleKey.mValue.y,
+                            scaleKey.mValue.z
+                        );
+
+                        nodeAnimation.scales.push_back(std::move(scaleKeyframe));
+                    }
+
+                    modelAnimation->nodeAnimations().push_back(std::move(nodeAnimation));
+                    break;
+                }
+            }
+        }
     }
 
     // After we've processed all of the meshes (if any) we then recursively 
@@ -534,8 +615,9 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelMesh
         processNode(
             *(node.mChildren[i]),
             scene,
-            meshes,
-            globalTransform,
+            nodes,
+            newNode,
+            modelAnimation,
             textureStorage,
             forceRenderInvisible,
             notifyInvisibleDropped,
@@ -565,19 +647,51 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         throw ModelLoadException(filename, importer.GetErrorString(), this);
     }
 
-    // Start with an identity matrix as root transform
-    glm::mat4x4 rootTransform;
+    // Check animations
+    std::unique_ptr<ModelAnimation> modelAnimation = nullptr;
+    if (scene->HasAnimations()) {
+        // Do not support more than one animation
+        if (scene->mNumAnimations > 1) {
+            LWARNING("Detected more than one animation, only first one will be used, "
+                "currently only one animation per model is supported"
+            );
+        }
+        aiAnimation* animation = scene->mAnimations[0];
+
+        // Do not support morph animation
+        if (animation->mNumMorphMeshChannels > 0) {
+            LWARNING("Detected unsupported animation type: 'Morph', "
+                "currently only keyframe animation is supported"
+            );
+        }
+        // Do not support animation that replaces the mesh for every frame
+        if (animation->mNumMeshChannels > 0) {
+            LWARNING("Detected unsupported animation type: 'Mesh', "
+                "currently only keyframe animation is supported"
+            );
+        }
+        // Only support keyframe animation
+        if (animation->mNumChannels > 0) {
+            modelAnimation = std::make_unique<ModelAnimation>(
+                animation->mName.C_Str(),
+                abs(animation->mTicksPerSecond) <
+                std::numeric_limits<double>::epsilon() ? // Not all formats have this
+                animation->mDuration :
+                animation->mDuration / animation->mTicksPerSecond
+            );
+        }
+    }
 
     // Get info from all models in the scene
-    std::vector<ModelMesh> meshArray;
-    meshArray.reserve(scene->mNumMeshes);
+    std::vector<ModelNode> nodeArray;
     std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorage;
     textureStorage.reserve(scene->mNumTextures);
     processNode(
         *(scene->mRootNode),
         *scene,
-        meshArray,
-        rootTransform,
+        nodeArray,
+        -1,
+        modelAnimation,
         textureStorage,
         forceRenderInvisible,
         notifyInvisibleDropped,
@@ -586,33 +700,63 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
 
     // Return the ModelGeometry from the meshArray
     return std::make_unique<modelgeometry::ModelGeometry>(
-        std::move(meshArray),
-        std::move(textureStorage)
+        std::move(nodeArray),
+        std::move(textureStorage),
+        std::move(modelAnimation)
     );
 }
 
 std::vector<std::string> ModelReaderAssimp::supportedExtensions() const {
-    // Taken from https://github.com/assimp/assimp
+    // Taken from https://github.com/assimp/assimp/blob/master/doc/Fileformats.md
+    // (An asterisk * indicates limited support)
     return {
+        "obj",          // * Wavefront Object
         "fbx",          // Autodesk
-        "dae",          // Collada
         "gltf", "glb",  // glTF
-        "blend",        // Blender 3D
-        "3ds",          // 3ds Max 3DS
-        "ase",          // 3ds Max ASE
-        "obj",          // Wavefront Object
-        "ifc",          // Industry Foundation Classes(IFC / Step)
+        "dae", "zae"    // Collada
+        "blend",        // * Blender 3D
+        "3ds", "prj",   // * 3ds Max 3DS
+        "ase", "ask",   // 3ds Max ASE
+        "x",            // DirectX X
+        "stl",          // Stereolithography
+        "ifc", "ifczip" // Industry Foundation Classes (IFC / Step)
         "xgl", "zgl"    // XGL
         "ply",          // Stanford Polygon Library
-        "dxf",          // * AutoCAD DXF
+        "dxf",          // AutoCAD DXF
         "lwo",          // LightWave
-        "lws",          // LightWave Scene
+        "lws", "mot",   // LightWave Scene
         "lxo",          // Modo
-        "stl",          // Stereolithography
-        "x",            // DirectX X
-        "ac",           // AC3D
+        "ac", "ac3d",   // AC3D
+        "acc"           // AC3D
         "ms3d",         // Milkshape 3D
-        "cob", "scn"    // * TrueSpace
+        "cob", "scn",   // * TrueSpace
+        "amf",          // * Additive manufacturing file format
+        "md3",          // Quake III Mesh
+        "mdl",          // Quake Mesh / 3D GameStudio Mesh
+        "md2",          // Quake II Mesh
+        "smd", "vta",   // Valve SMD
+        "mdc",          // Return To Castle Wolfenstein Mesh
+        "md5anim",      // Doom 3 / MD5 Mesh
+        "md5mesh",      // Doom 3 / MD5 Mesh
+        "md5camera",    // Doom 3 / MD5 Mesh
+        "nff", "enff",  // Neutral File Format
+        "raw",          // Raw
+        "sib",          // * Silo SIB
+        "off",          // OFF
+        "irr",          // Irrlicht Scene
+        "irrmesh",      // Irrlicht Mesh
+        "q3o", "q3s",   // Quick3D
+        "b3d",          // BlitzBasic 3D
+        "3d", "uc",     // Unreal Mesh
+        "mesh",         // Ogre3D Mesh
+        "mesh.xml",     // Ogre3D Mesh
+        "ogex",         // Open Game Engine Exchange
+        "pk3", "bsp",   // Quake III BSP
+        "ndo",          // Nendo Mesh
+        "assbin",       // Assimp Binary
+        "3mf",          // 3D Manufacturing Format
+        "x3d", "x3db",  // * Extensible 3D
+        "m3d"           // Model 3D
     };
 }
 

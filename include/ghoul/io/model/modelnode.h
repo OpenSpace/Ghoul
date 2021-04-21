@@ -23,74 +23,58 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MODELGEOMETRY___H__
-#define __GHOUL___MODELGEOMETRY___H__
+#ifndef __GHOUL___MODELNODE___H__
+#define __GHOUL___MODELNODE___H__
 
-#include <ghoul/io/model/modelanimation.h>
 #include <ghoul/io/model/modelmesh.h>
-#include <ghoul/io/model/modelnode.h>
 #include <ghoul/opengl/ghoul_gl.h>
-#include <memory>
+#include <ghoul/glm.h>
+#include <vector>
 
-namespace ghoul::opengl { class ProgramObject; }
+namespace ghoul::io {
 
-namespace ghoul::modelgeometry {
-
-class ModelGeometry {
+class ModelNode {
 public:
-    /// The exception that gets thrown if there was an error loading the cache file or
-    /// saving this model to a cache file
-    struct ModelCacheException : public RuntimeError {
-        explicit ModelCacheException(std::string file, std::string msg);
+    ModelNode(glm::mat4x4 transform, std::vector<io::ModelMesh> meshes);
 
-        /// The file that caused the exception to be thrown
-        const std::string filename;
+    ModelNode(ModelNode&&) noexcept = default;
+    ~ModelNode() noexcept = default;
 
-        /// The error message that occurred
-        const std::string errorMessage;
-    };
+    void setParent(int parent);
+    void setChildren(std::vector<int> children);
+    void addChild(int child);
+    void setAnimation(const glm::mat4x4& animation);
 
-    struct TextureEntry {
-        std::string name;
-        std::unique_ptr<opengl::Texture> texture;
-    };
-
-    ModelGeometry(std::vector<io::ModelNode> nodes,
-        std::vector<TextureEntry> textureStorage,
-        std::unique_ptr<io::ModelAnimation> animation);
-    ModelGeometry(ModelGeometry&&) noexcept = default;
-    ~ModelGeometry() noexcept = default;
-
-    static std::unique_ptr<modelgeometry::ModelGeometry> loadCacheFile(
-        const std::string& cachedFile);
-    bool saveToCacheFile(const std::string& cachedFile) const;
-
-    void setTimeScale(float timeScale);
-    void enableAnimation(bool value);
-
-    void initialize();
-    void deinitialize();
-    void render(opengl::ProgramObject& program, bool isTexturedModel = true) const;
-    void update(double now);
-
-    double boundingRadius() const;
-    void calculateBoundingRadius();
+    std::vector<io::ModelMesh>& meshes();
+    const std::vector<io::ModelMesh>& meshes() const;
+    int parent() const;
+    std::vector<int>& children();
+    const std::vector<int>& children() const;
+    const glm::mat4x4 transform() const;
+    const glm::mat4x4 animationTransform() const;
     bool hasAnimation() const;
-    double animationDuration() const;
 
-    std::vector<io::ModelNode>& nodes();
-    const std::vector<io::ModelNode>& nodes() const;
-    std::vector<TextureEntry>& textureStorage();
-    const std::vector<TextureEntry>& textureStorage() const;
-
-protected:
-    double _boundingRadius = 0.0;
-    bool _animationEnabled = false;
-    std::vector<io::ModelNode> _nodes;
-    std::vector<TextureEntry> _textureStorage;
-    std::unique_ptr<io::ModelAnimation> _animation;
+private:
+    // glm::mat4x4 is not noexcept move constructable, use an array instead for transform
+    // Array is column major
+    GLfloat _transform[16] = {
+        1.f, 0.f, 0.f, 0.f,
+        0.f, 1.f, 0.f, 0.f,
+        0.f, 0.f, 1.f, 0.f,
+        0.f, 0.f, 0.f, 1.f
+    };
+    GLfloat _animationTransform[16] = {
+        1.f, 0.f, 0.f, 0.f,
+        0.f, 1.f, 0.f, 0.f,
+        0.f, 0.f, 1.f, 0.f,
+        0.f, 0.f, 0.f, 1.f
+    };
+    std::vector<ModelMesh> _meshes;
+    int _parent = -1;
+    std::vector<int> _children;
+    bool _hasAnimation = false;
 };
 
-}  // namespace ghoul::modelgeometry
+} // namespace ghoul::io
 
-#endif // __GHOUL___MODELGEOMETRY___H__
+#endif // __GHOUL___MODELNODE___H__

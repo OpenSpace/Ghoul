@@ -37,27 +37,8 @@ namespace ghoul::io {
 
 /**
  * This model reader loads the provided file using the Assimp library. This simple
- * method loads multiple shapes, from different 3D file formats (An asterisk 
- * indicates limited support):
- * Autodesk ( .fbx )
- * Collada ( .dae )
- * glTF ( .gltf, .glb )
- * Blender 3D ( .blend )
- * 3ds Max 3DS ( .3ds )
- * 3ds Max ASE ( .ase )
- * Wavefront Object ( .obj )
- * Industry Foundation Classes (IFC/Step) ( .ifc )
- * XGL ( .xgl,.zgl )
- * Stanford Polygon Library ( .ply )
- * AutoCAD DXF ( .dxf ) *
- * LightWave ( .lwo )
- * LightWave Scene ( .lws )
- * Modo ( .lxo )
- * Stereolithography ( .stl )
- * DirectX X ( .x )
- * AC3D ( .ac )
- * Milkshape 3D ( .ms3d )
- * TrueSpace ( .cob,.scn ) *
+ * method loads multiple shapes, from different 3D file formats.
+ * All supported formats are listed in ModelReaderAssimp::supportedExtensions().
  *
  * \sa https://github.com/assimp/assimp
  */

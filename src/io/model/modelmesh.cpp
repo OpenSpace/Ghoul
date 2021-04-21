@@ -51,7 +51,9 @@ std::string textureTypeToString(const ModelMesh::TextureType& type) {
     }
 }
 
-void ModelMesh::render(opengl::ProgramObject& program, bool isTexturedModel) const {
+void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
+                       bool isTexturedModel) const
+{
     if (isTexturedModel) {
         // Reset shader
         program.setUniform("has_texture_diffuse", false);
@@ -103,6 +105,11 @@ void ModelMesh::render(opengl::ProgramObject& program, bool isTexturedModel) con
         }
     }
 
+    // Transform mesh
+    program.setUniform("meshTransform", glm::mat4(meshTransform));
+    glm::dmat4 normalTransform = glm::transpose(glm::inverse(meshTransform));
+    program.setUniform("meshNormalTransform", glm::mat4(normalTransform));
+
     // Render the mesh object
     glBindVertexArray(_vaoID);
     glDrawElements(
@@ -115,13 +122,22 @@ void ModelMesh::render(opengl::ProgramObject& program, bool isTexturedModel) con
     glActiveTexture(GL_TEXTURE0);
 }
 
-float ModelMesh::calculateBoundingRadius() const {
+float ModelMesh::calculateBoundingRadius(glm::mat4x4& transform) const {
     // Calculate the bounding sphere of the mesh
     float maximumDistanceSquared = 0.f;
     for (const Vertex& v : _vertices) {
-        float d = glm::pow(v.position[0], 2.f) +
-            glm::pow(v.position[1], 2.f) +
-            glm::pow(v.position[2], 2.f);
+        // Apply the transform to the vertex to get its final position
+        glm::vec4 position(
+            v.position[0],
+            v.position[1],
+            v.position[2],
+            1.f
+        );
+        position = transform * position;
+
+        float d = glm::pow(position.x, 2.f) +
+            glm::pow(position.y, 2.f) +
+            glm::pow(position.z, 2.f);
 
         maximumDistanceSquared = glm::max(d, maximumDistanceSquared);
     }
