@@ -89,9 +89,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
             return model;
         }
         catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {
-            LERROR(fmt::format(
-                "Error: '{}' while loading model from cache file: '{}'. Deleting cache",
-                e.errorMessage, cachedFile
+            LINFO(fmt::format(
+                "Encountered problem: '{}' while loading model from cache file: '{}'. "
+                "Deleting cache", e.errorMessage, cachedFile
             ));
             FileSys.cacheManager()->removeCacheFile(filename);
             // Intentional fall-through to the 'else' computation to generate the cache
@@ -113,9 +113,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
         model->saveToCacheFile(cachedFile);
     }
     catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {
-        LERROR(fmt::format(
-            "Error:'{}' while saving model to cache file:'{}'. Deleting cache",
-            e.errorMessage, e.filename
+        LINFO(fmt::format(
+            "Encountered problem: '{}' while saving model to cache file:'{}'. "
+            "Deleting cache", e.errorMessage, e.filename
         ));
 
         FileSys.cacheManager()->removeCacheFile(filename);
