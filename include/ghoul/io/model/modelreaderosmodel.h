@@ -23,30 +23,21 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MODELREADERASSIMP___H__
-#define __GHOUL___MODELREADERASSIMP___H__
+#ifndef __GHOUL___MODELREADEROSMODEL___H__
+#define __GHOUL___MODELREADEROSMODEL___H__
 
 #include <ghoul/io/model/modelreaderbase.h>
-
-#include <vector>
-
-struct aiMesh;
-struct aiScene;
 
 namespace ghoul::io {
 
 /**
- * This model reader loads the provided file using the Assimp library. This simple
- * method loads multiple shapes, from different 3D file formats.
- * All supported formats are listed in ModelReaderAssimp::supportedExtensions().
- *
- * \sa https://github.com/assimp/assimp
+ * This model reader loads a custom OpenSpace model from the provided file.
  */
-class ModelReaderAssimp : public ModelReaderBase {
+class ModelReaderOSModel : public ModelReaderBase {
 public:
     /**
-     * Loads the 3D model (anyone from the previous list) file pointed to by \p filename
-     * and returns a constructed ModelGeometry from it. 
+     * Loads the 3D OpenSpace model file pointed to by \p filename
+     * and returns a constructed ModelGeometry from it.
      *
      * \param filename The geometric model file to be loaded
      * \param forceRenderInvisible Force invisible meshes to render or not
@@ -62,13 +53,13 @@ public:
         bool notifyInvisibleDropped = true) const override;
 
     /**
-     * Returns a list of all extensions that this ModelReaderAssimp supports.
+     * Returns a list of all extensions that this ModelReaderOSModel supports.
      *
-     * \return A list of all extensions that this ModelReaderAssimp supports
+     * \return A list of all extensions that this ModelReaderOSModel supports
      */
     std::vector<std::string> supportedExtensions() const override;
 };
 
 } // namespace ghoul::io
 
-#endif // __GHOUL___MODELREADERASSIMP___H__
+#endif // __GHOUL___MODELREADEROSMODEL___H__
