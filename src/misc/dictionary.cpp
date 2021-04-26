@@ -32,7 +32,7 @@ namespace ghoul {
 namespace {
     // List of types that are stored as-is in the Dictionary
     using DirectTypes = std::variant<bool, double, int, std::string, Dictionary,
-        std::vector<int>, std::vector<double>>;
+        std::vector<int>, std::vector<double>, std::vector<std::string>>;
     template <typename T> using isDirectType = internal::is_one_of<T, DirectTypes>;
 
     // Vector types that are converted into std::vector for storage purposes
@@ -265,6 +265,7 @@ template void Dictionary::setValue(std::string, int);
 template void Dictionary::setValue(std::string, std::string);
 template void Dictionary::setValue(std::string, std::vector<int>);
 template void Dictionary::setValue(std::string, std::vector<double>);
+template void Dictionary::setValue(std::string, std::vector<std::string>);
 template void Dictionary::setValue(std::string, glm::ivec2);
 template void Dictionary::setValue(std::string, glm::ivec3);
 template void Dictionary::setValue(std::string, glm::ivec4);
@@ -289,6 +290,7 @@ template int Dictionary::value(std::string_view) const;
 template std::string Dictionary::value(std::string_view) const;
 template std::vector<int> Dictionary::value(std::string_view) const;
 template std::vector<double> Dictionary::value(std::string_view) const;
+template std::vector<std::string> Dictionary::value(std::string_view) const;
 template glm::ivec2 Dictionary::value(std::string_view) const;
 template glm::ivec3 Dictionary::value(std::string_view) const;
 template glm::ivec4 Dictionary::value(std::string_view) const;

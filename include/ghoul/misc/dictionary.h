@@ -70,9 +70,9 @@ public:
     /// This is a list of all types that can be stored and retrieved from the Dictionary
     using Types = std::variant<
         bool, int, double, std::string, Dictionary, std::vector<int>, std::vector<double>,
-        glm::ivec2, glm::ivec3, glm::ivec4, glm::dvec2, glm::dvec3, glm::dvec4,
-        glm::dmat2x2, glm::dmat2x3, glm::dmat2x4, glm::dmat3x2, glm::dmat3x3,
-        glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4
+        std::vector<std::string>, glm::ivec2, glm::ivec3, glm::ivec4, glm::dvec2,
+        glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4, glm::dmat3x2, 
+        glm::dmat3x3, glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4
     >;
 
     /// Returns true if T is one of the allowed storage types
@@ -191,7 +191,8 @@ public:
 
 private:
     using StorageTypes = std::variant<
-        bool, int, double, std::string, Dictionary, std::vector<int>, std::vector<double>
+        bool, int, double, std::string, Dictionary, std::vector<int>, std::vector<double>,
+        std::vector<std::string>
     >;
     std::map<std::string, StorageTypes, std::less<>> _storage;
 };
