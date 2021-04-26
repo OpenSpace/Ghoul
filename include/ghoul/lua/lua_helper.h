@@ -346,7 +346,7 @@ std::string_view luaTypeToString(int type);
  * \param loadStandardLibraries If \c true, the Lua standard libraries will be loaded into
  *        the newly created state by means of a \c luaL_openlibs call
  * \param strictState If this is \c true, the created Lua state will panic if an unused
- *        variable is read or being written to before being defined before 
+ *        variable is read or being written to before being defined before
  * \return A valid new Lua state initialized with the default Lua libraries
  *
  * \throw LuaRuntimeException If there was an error creating the new Lua state
@@ -504,11 +504,14 @@ T value(lua_State* L, const char* name, PopValue shouldPopValue = PopValue::No);
  * nil_t tag struct, it will cause a nil value to be pushed to the stack.
  *
  * The allowed types for T are:
- *  - integer number types)
+ *  - integer number types
  *  - floating point types
  *  - bool
  *  - nil_t for pushing a nil value
- *  - pointers which are pushed as light user data
+ *  - text (<code>std::string</code> or <code>const char *</code>)
+ *  - std::vectors with integer, floating point, or text
+ *  - pointers, which are pushed as light user data
+ *  - GLM matrix and vector types
  *
  * \tparam Ts the list of types of passed arguments
  * \param L The lua_State onto which the \p arguments are pushed
@@ -519,6 +522,23 @@ T value(lua_State* L, const char* name, PopValue shouldPopValue = PopValue::No);
  */
 template <typename... Ts>
 void push(lua_State* L, Ts... arguments);
+
+/**
+ * Tries to read a value of type T from the top of the Lua stack and informs about
+ * whether it was successful or not. Can be used to try to read more complex data types,
+ * that are not supported by the <code>value</code> functions. If the provided type is
+ * not supported by the function, a compile error will occur.
+ *
+ * \tparam T The type of the return value.
+ * \param L The stack from from which the top value is extracted
+ * \param success Will be set to true if the extraction succeeded, \c false otherwise
+ *
+ * \return The extracted value of type T
+ *
+ * \pre \L must not be nullptr
+ */
+template <typename T>
+T tryGetValue(lua_State* L, bool& success);
 
 namespace internal {
     void deinitializeGlobalState();
