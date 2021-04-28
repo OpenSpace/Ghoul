@@ -34,6 +34,7 @@ add_executable(
   ${GHOUL_ROOT_DIR}/tests/test_dictionaryjsonformatter.cpp
   ${GHOUL_ROOT_DIR}/tests/test_dictionaryluaformatter.cpp
   ${GHOUL_ROOT_DIR}/tests/test_filesystem.cpp
+  ${GHOUL_ROOT_DIR}/tests/test_luaconversions.cpp
   ${GHOUL_ROOT_DIR}/tests/test_luatodictionary.cpp
   ${GHOUL_ROOT_DIR}/tests/test_memorypool.cpp
   ${GHOUL_ROOT_DIR}/tests/test_templatefactory.cpp

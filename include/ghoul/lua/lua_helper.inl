@@ -24,12 +24,38 @@
  ****************************************************************************************/
 
 #include <ghoul/fmt.h>
+#include <ghoul/glm.h>
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/defer.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/invariants.h>
 #include <type_traits>
+
+namespace {
+    template <class T, class... Ts>
+    struct is_any : std::disjunction<std::is_same<T, Ts>...> {};
+
+    template <typename T>
+    constexpr bool isGlmMatrix() {
+        return is_any<T,
+            glm::mat2x2, glm::mat2x3, glm::mat2x4,
+            glm::mat3x2, glm::mat3x3, glm::mat3x4,
+            glm::mat4x2, glm::mat4x3, glm::mat4x4,
+            glm::dmat2x2, glm::dmat2x3, glm::dmat2x4,
+            glm::dmat3x2, glm::dmat3x3, glm::dmat3x4,
+            glm::dmat4x2, glm::dmat4x3, glm::dmat4x4>::value;
+    }
+
+    template <typename T>
+    constexpr bool isGlmVector() {
+        return is_any<T,
+            glm::vec2, glm::vec3, glm::vec4,
+            glm::ivec2, glm::ivec3, glm::ivec4,
+            glm::dvec2, glm::dvec3, glm::dvec4,
+            glm::uvec2, glm::uvec3, glm::uvec4>::value;
+    }
+} // namespace
 
 namespace ghoul::lua {
 
@@ -104,6 +130,26 @@ void push(lua_State* L, T value) {
     }
     else if constexpr (std::is_pointer_v<T>) {
         lua_pushlightuserdata(L, reinterpret_cast<void*>(value));
+    }
+    else if constexpr (isGlmVector<T>()) {
+        lua_newtable(L);
+        int number = 1;
+        for (glm::length_t i = 0; i < ghoul::glm_components<T>::value; ++i) {
+            lua_pushnumber(L, static_cast<lua_Number>(value[i]));
+            lua_rawseti(L, -2, number);
+            ++number;
+        }
+    }
+    else if constexpr (isGlmMatrix<T>()) {
+        lua_newtable(L);
+        int number = 1;
+        for (glm::length_t i = 0; i < T::type::row_type::length(); ++i) {
+            for (glm::length_t j = 0; j < T::type::col_type::length(); ++j) {
+                lua_pushnumber(L, static_cast<lua_Number>(value[i][j]));
+                lua_rawseti(L, -2, number);
+                ++number;
+            }
+        }
     }
     else {
         static_assert(sizeof(T) == 0, "Unable to push type T onto the Lua stack");
@@ -206,5 +252,65 @@ void push(lua_State* L, Ts... arguments) {
     (internal::push(L, arguments), ...);
 }
 
+template <typename T>
+T tryGetValue(lua_State* L, bool& success) {
+    ghoul_precondition(L != nullptr, "L must not be nullptr");
+
+    const T fallback = T();
+    T result = fallback;
+
+    if constexpr (isGlmVector<T>()) {
+        lua_pushnil(L);
+        for (glm::length_t i = 0; i < ghoul::glm_components<T>::value; ++i) {
+            int hasNext = lua_next(L, -2);
+            if (hasNext != 1) {
+                success = false;
+                return fallback;
+            }
+            if (lua_isnumber(L, -1) != 1) {
+                success = false;
+                return fallback;
+            }
+            else {
+                result[i] = static_cast<typename T::value_type>(lua_tonumber(L, -1));
+                lua_pop(L, 1);
+            }
+        }
+        // The last accessor argument and the table are still on the stack
+        lua_pop(L, 1);
+        success = true;
+    }
+    else if constexpr (isGlmMatrix<T>()) {
+        lua_pushnil(L);
+        int number = 1;
+        for (glm::length_t i = 0; i < T::type::row_type::length(); ++i) {
+            for (glm::length_t j = 0; j < T::type::col_type::length(); ++j) {
+                int hasNext = lua_next(L, -2);
+                if (hasNext != 1) {
+                    success = false;
+                    return fallback;
+                }
+                if (lua_isnumber(L, -1) != 1) {
+                    success = false;
+                    return fallback;
+                }
+                else {
+                    result[i][j] =
+                        static_cast<typename T::value_type>(lua_tonumber(L, -1));
+                    lua_pop(L, 1);
+                    ++number;
+                }
+            }
+        }
+        // The last accessor argument and the table are still on the stack
+        lua_pop(L, 1);
+        success = true;
+    }
+    else {
+        static_assert(sizeof(T) == 0, "Unable to push type T onto the Lua stack");
+    }
+
+    return result;
+}
 
 } // namespace ghoul::lua
