@@ -38,7 +38,7 @@
 
 namespace {
     constexpr const char* _loggerCat = "ModelGeometry";
-    constexpr const int8_t CurrentCacheVersion = 5;
+    constexpr const int8_t CurrentCacheVersion = 6;
     constexpr const int FormatStringSize = 4;
 
     ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
@@ -111,7 +111,7 @@ ModelGeometry::ModelGeometry(std::vector<io::ModelNode> nodes,
 {}
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
-                                                           const std::string& cachedFile)
+    const std::string& cachedFile, bool forceRenderInvisible, bool notifyInvisibleDropped)
 {
     std::ifstream fileStream(cachedFile, std::ifstream::binary);
     if (!fileStream.good()) {
@@ -256,10 +256,15 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 indexArray.push_back(std::move(static_cast<unsigned int>(index)));
             }
 
+            // IsInvisible
+            uint8_t inv;
+            fileStream.read(reinterpret_cast<char*>(&inv), sizeof(uint8_t));
+            bool isInvisible = inv == 1;
+
             // Textures
             int32_t nTextures = 0;
             fileStream.read(reinterpret_cast<char*>(&nTextures), sizeof(int32_t));
-            if (nTextures == 0) {
+            if (nTextures == 0 && !isInvisible) {
                 throw ModelCacheException(cachedFile, "No textures were loaded");
             }
             std::vector<io::ModelMesh::Texture> textureArray;
@@ -275,14 +280,6 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 uint8_t h;
                 fileStream.read(reinterpret_cast<char*>(&h), sizeof(uint8_t));
                 texture.hasTexture = h == 1;
-
-                // useForcedColor
-                uint8_t f;
-                fileStream.read(
-                    reinterpret_cast<char*>(&f),
-                    sizeof(uint8_t)
-                );
-                texture.useForcedColor = f == 1;
 
                 // color
                 fileStream.read(reinterpret_cast<char*>(&texture.color.r), sizeof(float));
@@ -308,11 +305,26 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 textureArray.push_back(std::move(texture));
             }
 
+            // If mesh is invisible then check if it should be forced to render with
+            // flashy colors and/or there should ba a notification
+            if (isInvisible) {
+                if (forceRenderInvisible) {
+                    // Force invisible mesh to render with flashy colors
+                    io::ModelMesh::Texture texture;
+                    io::ModelMesh::generateDebugTexture(texture);
+                    textureArray.push_back(std::move(texture));
+                }
+                else if (notifyInvisibleDropped) {
+                    LINFO("An invisible mesh has been dropped while loading from cache");
+                }
+            }
+
             // Make mesh
             meshArray.push_back(io::ModelMesh(
                 std::move(vertexArray),
                 std::move(indexArray),
-                std::move(textureArray)
+                std::move(textureArray),
+                isInvisible
             ));
         }
 
@@ -608,14 +620,23 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
                 fileStream.write(reinterpret_cast<const char*>(&index), sizeof(uint32_t));
             }
 
+            // IsInvisible
+            uint8_t inv = mesh.isInvisible() ? 1 : 0;
+            fileStream.write(reinterpret_cast<const char*>(&inv), sizeof(uint8_t));
+
             // Textures
             int32_t nTextures = static_cast<int32_t>(mesh.textures().size());
-            if (nTextures == 0) {
+            if (nTextures == 0 && !mesh.isInvisible()) {
                 throw ModelCacheException(cachedFile, "No textures were loaded");
             }
             fileStream.write(reinterpret_cast<const char*>(&nTextures), sizeof(int32_t));
 
             for (int32_t t = 0; t < nTextures; ++t) {
+                // Don't save the debug texture to the cache
+                if (mesh.textures()[t].useForcedColor) {
+                    continue;
+                }
+
                 // type
                 fileStream.write(
                     reinterpret_cast<const char*>(&mesh.textures()[t].type),
@@ -625,10 +646,6 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
                 // hasTexture
                 uint8_t h = (mesh.textures()[t].hasTexture) ? 1 : 0;
                 fileStream.write(reinterpret_cast<const char*>(&h), sizeof(uint8_t));
-
-                // useForcedColor
-                uint8_t f = (mesh.textures()[t].useForcedColor) ? 1 : 0;
-                fileStream.write(reinterpret_cast<const char*>(&f), sizeof(uint8_t));
 
                 // color
                 fileStream.write(

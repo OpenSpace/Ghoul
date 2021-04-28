@@ -85,7 +85,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
 
         try {
             std::unique_ptr<modelgeometry::ModelGeometry> model =
-                modelgeometry::ModelGeometry::loadCacheFile(cachedFile);
+                modelgeometry::ModelGeometry::loadCacheFile(
+                    cachedFile,
+                    forceRenderInvisible,
+                    notifyInvisibleDropped
+                );
             return model;
         }
         catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {

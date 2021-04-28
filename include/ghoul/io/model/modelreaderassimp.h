@@ -46,7 +46,7 @@ class ModelReaderAssimp : public ModelReaderBase {
 public:
     /**
      * Loads the 3D model (anyone from the previous list) file pointed to by \p filename
-     * and returns a constructed ModelGeometry from it. 
+     * and returns a constructed ModelGeometry from it.
      *
      * \param filename The geometric model file to be loaded
      * \param forceRenderInvisible Force invisible meshes to render or not

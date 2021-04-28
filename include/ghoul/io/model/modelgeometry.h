@@ -62,7 +62,8 @@ public:
     ~ModelGeometry() noexcept = default;
 
     static std::unique_ptr<modelgeometry::ModelGeometry> loadCacheFile(
-        const std::string& cachedFile);
+        const std::string& cachedFile, bool forceRenderInvisible,
+        bool notifyInvisibleDropped);
     bool saveToCacheFile(const std::string& cachedFile) const;
 
     void setTimeScale(float timeScale);
