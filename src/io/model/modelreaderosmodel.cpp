@@ -31,7 +31,7 @@
 
 namespace {
     constexpr const char* _loggerCat = "ModelReaderOSModel";
-    constexpr const int8_t CurrentCacheVersion = 5;
+    constexpr const int8_t CurrentModelVersion = 6;
     constexpr const int FormatStringSize = 4;
 
     ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
@@ -89,8 +89,7 @@ namespace {
 namespace ghoul::io {
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
-                                        std::string& filename, bool forceRenderInvisible,
-                                                       bool notifyInvisibleDropped) const
+    std::string& filename, bool forceRenderInvisible, bool notifyInvisibleDropped) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
@@ -102,10 +101,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
     // Check the caching version
     int8_t version = 0;
     fileStream.read(reinterpret_cast<char*>(&version), sizeof(int8_t));
-    if (version != CurrentCacheVersion) {
+    if (version != CurrentModelVersion) {
         throw ModelLoadException(
             filename,
-            "The format of the cached file has changed",
+            "The format of the OS-model file has changed",
             this
         );
     }
@@ -238,10 +237,15 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
                 indexArray.push_back(std::move(static_cast<unsigned int>(index)));
             }
 
+            // IsInvisible
+            uint8_t inv;
+            fileStream.read(reinterpret_cast<char*>(&inv), sizeof(uint8_t));
+            bool isInvisible = inv == 1;
+
             // Textures
             int32_t nTextures = 0;
             fileStream.read(reinterpret_cast<char*>(&nTextures), sizeof(int32_t));
-            if (nTextures == 0) {
+            if (nTextures == 0 && !isInvisible) {
                 throw ModelLoadException(filename, "No textures were loaded", this);
             }
             std::vector<io::ModelMesh::Texture> textureArray;
@@ -257,14 +261,6 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
                 uint8_t h;
                 fileStream.read(reinterpret_cast<char*>(&h), sizeof(uint8_t));
                 texture.hasTexture = h == 1;
-
-                // useForcedColor
-                uint8_t f;
-                fileStream.read(
-                    reinterpret_cast<char*>(&f),
-                    sizeof(uint8_t)
-                );
-                texture.useForcedColor = f == 1;
 
                 // color
                 fileStream.read(reinterpret_cast<char*>(&texture.color.r), sizeof(float));
@@ -291,11 +287,26 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
                 textureArray.push_back(std::move(texture));
             }
 
+            // If mesh is invisible then check if it should be forced to render with
+            // flashy colors and/or there should ba a notification
+            if (isInvisible) {
+                if (forceRenderInvisible) {
+                    // Force invisible mesh to render with flashy colors
+                    io::ModelMesh::Texture texture;
+                    io::ModelMesh::generateDebugTexture(texture);
+                    textureArray.push_back(std::move(texture));
+                }
+                else if (notifyInvisibleDropped) {
+                    LINFO("An invisible mesh has been dropped");
+                }
+            }
+
             // Make mesh
             meshArray.push_back(io::ModelMesh(
                 std::move(vertexArray),
                 std::move(indexArray),
-                std::move(textureArray)
+                std::move(textureArray),
+                isInvisible
             ));
         }
 
