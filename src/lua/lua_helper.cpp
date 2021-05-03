@@ -479,7 +479,17 @@ lua_State* createNewLuaState(bool loadStandardLibraries, bool strictState) {
     if (!s) {
         throw LuaRuntimeException("Error creating Lua state: Memory allocation");
     }
-    if (loadStandardLibraries) {
+
+    if (strictState) {
+        ghoul_assert(
+            loadStandardLibraries,
+            "If requesting strict state, the standard libraries must be loaded"
+        );
+    }
+
+    if (loadStandardLibraries || strictState) {
+        // Fallback to prevent a crash that would otherwise happen in release builds when
+        // strict=true and loadStandard=false
         LDEBUGC("Lua", "Open libraries");
         luaL_openlibs(s);
     }

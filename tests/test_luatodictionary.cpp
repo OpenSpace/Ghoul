@@ -52,7 +52,7 @@ TEST_CASE("LuaToDictionary: Nested Tables", "[luatodictionary]") {
         }
 )";
 
-    ghoul::lua::LuaState state(ghoul::lua::LuaState::IncludeStandardLibrary::No);
+    ghoul::lua::LuaState state;
     ghoul::lua::runScript(state, TestString);
     //ghoul::lua::runScriptFile(state, "C:/Users/alebo68/Desktop/test.lua");
 
@@ -99,7 +99,7 @@ TEST_CASE("LuaToDictionary: Nested Tables 2", "[luatodictionary]") {
         }
 )";
 
-    ghoul::lua::LuaState state(ghoul::lua::LuaState::IncludeStandardLibrary::No);
+    ghoul::lua::LuaState state;
     ghoul::lua::runScript(state, TestString);
 
     lua_getglobal(state, "ModuleConfigurations");
