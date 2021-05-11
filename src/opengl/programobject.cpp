@@ -29,6 +29,7 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <filesystem>
 
 using std::map;
 using std::string;
@@ -338,12 +339,12 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(vertexShaderPath),
+        std::filesystem::is_regular_file(vertexShaderPath),
         "VertexShaderPath file must exist"
     );
     ghoul_assert(!fragmentShaderPath.empty(), "FragmentShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(fragmentShaderPath),
+        std::filesystem::is_regular_file(fragmentShaderPath),
         "FragmentShaderPath file must exist"
     );
 
@@ -374,17 +375,17 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(vertexShaderPath),
+        std::filesystem::is_regular_file(vertexShaderPath),
         "VertexShaderPath file must exist"
     );
     ghoul_assert(!fragmentShaderPath.empty(), "FragmentShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(fragmentShaderPath),
+        std::filesystem::is_regular_file(fragmentShaderPath),
         "FragmentShaderPath file must exist"
     );
     ghoul_assert(!geometryShaderPath.empty(), "GeometryShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(geometryShaderPath),
+        std::filesystem::is_regular_file(geometryShaderPath),
         "GeometryShaderPath file must exist"
     );
 
@@ -423,17 +424,17 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(vertexShaderPath),
+        std::filesystem::is_regular_file(vertexShaderPath),
         "VertexShaderPath file must exist"
     );
     ghoul_assert(!fragmentShaderPath.empty(), "FragmentShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(fragmentShaderPath),
+        std::filesystem::is_regular_file(fragmentShaderPath),
         "FragmentShaderPath file must exist"
     );
     ghoul_assert(!geometryShaderPath.empty(), "GeometryShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(geometryShaderPath),
+        std::filesystem::is_regular_file(geometryShaderPath),
         "GeometryShaderPath file must exist"
     );
     ghoul_assert(
@@ -441,7 +442,7 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
         "Tessellation evaluation shader must not be empty"
     );
     ghoul_assert(
-        FileSys.fileExists(tessellationEvaluationShaderPath),
+        std::filesystem::is_regular_file(tessellationEvaluationShaderPath),
         "Tessellation evaluation shader file must exist"
     );
     ghoul_assert(
@@ -449,7 +450,7 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
         "Tessellation control shader must not be empty"
     );
     ghoul_assert(
-        FileSys.fileExists(tessellationControlShaderPath),
+        std::filesystem::is_regular_file(tessellationControlShaderPath),
         "Tessellation control shader file must exist"
     );
 

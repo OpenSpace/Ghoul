@@ -32,6 +32,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/profiling.h>
 #include <algorithm>
+#include <filesystem>
 #include <regex>
 
 #ifdef WIN32
@@ -258,167 +259,8 @@ std::string FileSystem::convertPathSeparator(std::string path, char separator) c
     return path;
 }
 
-Directory FileSystem::currentDirectory() const {
-#ifdef WIN32
-    // Get the size of the directory
-    DWORD size = GetCurrentDirectory(0, nullptr);
-    std::vector<char> buffer(size);
-    DWORD success = GetCurrentDirectory(size, buffer.data());
-    if (success == 0) {
-        // Log error
-        DWORD error = GetLastError();
-        LPTSTR errorBuffer = nullptr;
-        DWORD nValues = FormatMessage(
-            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
-            nullptr,
-            error,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            reinterpret_cast<LPTSTR>(&errorBuffer),
-            0,
-            nullptr
-        );
-        if (nValues > 0) {
-            string msg(errorBuffer);
-            LocalFree(errorBuffer);
-            throw FileSystemException(fmt::format(
-                "Error retrieving current directory: {}", msg
-            ));
-        }
-        throw FileSystemException("Error retrieving current directory");
-    }
-    string currentDir(buffer.data());
-#else
-    std::vector<char> buffer(MAXPATHLEN);
-    char* result = getcwd(buffer.data(), MAXPATHLEN);
-    if (!result) {
-        throw FileSystemException(fmt::format(
-            "Error retrieving current directory: {}", strerror(errno)
-        ));
-    }
-    string currentDir(buffer.data());
-#endif
-    return Directory(currentDir);
-}
-
-void FileSystem::setCurrentDirectory(const Directory& directory) const {
-#ifdef WIN32
-    const BOOL success = SetCurrentDirectory(directory.path().c_str());
-    if (success == 0) {
-        // Log error
-        DWORD error = GetLastError();
-        LPTSTR errorBuffer = nullptr;
-        DWORD nValues = FormatMessage(
-            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
-            nullptr,
-            error,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            reinterpret_cast<LPTSTR>(&errorBuffer),
-            0,
-            nullptr
-        );
-        if (nValues > 0) {
-            string msg(errorBuffer);
-            LocalFree(errorBuffer);
-            throw FileSystemException(fmt::format(
-                "Error setting current directory: {}", msg
-            ));
-        }
-    }
-#else
-    const int success = chdir(directory.path().c_str());
-    if (success != 0) {
-        throw FileSystemException(fmt::format(
-            "Error setting current directory: {}", strerror(errno)
-        ));
-    }
-#endif
-}
-
-bool FileSystem::fileExists(const File& path) const {
-#ifdef WIN32
-    BOOL exists = PathFileExists(path.path().c_str());
-    if (exists == FALSE) {
-        // The path did not exist, so the file cannot exist
-        return false;
-    }
-    else {
-        const DWORD attributes = GetFileAttributes(path.path().c_str());
-        if (attributes == INVALID_FILE_ATTRIBUTES) {
-            const DWORD error = GetLastError();
-            if ((error != ERROR_FILE_NOT_FOUND) && (error != ERROR_PATH_NOT_FOUND)) {
-                LPTSTR errorBuffer = nullptr;
-                DWORD nValues = FormatMessage(
-                    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                        FORMAT_MESSAGE_IGNORE_INSERTS,
-                    nullptr,
-                    error,
-                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                    reinterpret_cast<LPTSTR>(&errorBuffer),
-                    0,
-                    nullptr
-                );
-                if (nValues > 0) {
-                    string msg(errorBuffer);
-                    LocalFree(errorBuffer);
-                    throw FileSystemException(fmt::format(
-                        "Error retrieving file attributes: {}", msg
-                    ));
-                }
-            }
-            throw FileSystemException("Error retrieving file attributes");
-        }
-        else {
-            return (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
-        }
-    }
-#else
-    struct stat buffer;
-    const int statResult = stat(path.path().c_str(), &buffer);
-    if (statResult != 0) {
-        if (errno == ENOENT) {
-            // The error is that the file didn't exist
-            return false;
-        }
-        else {
-            throw FileSystemException(fmt::format(
-                "Error retrieving file attributes: {}", strerror(errno)
-            ));
-        }
-    }
-    const int isFile = S_ISREG(buffer.st_mode);
-    return (isFile != 0);
-#endif
-}
-
-bool FileSystem::directoryExists(const Directory& path) const {
-#ifdef WIN32
-    BOOL isDirectory = PathIsDirectory(path.path().c_str());
-    return isDirectory == static_cast<BOOL>(FILE_ATTRIBUTE_DIRECTORY);
-#else
-    const string& dirPath = path.path();
-    struct stat buffer;
-    const int statResult = stat(dirPath.c_str(), &buffer);
-    if (statResult != 0) {
-        if (errno == ENOENT) {
-            // The error is that the file didn't exist
-            return false;
-        }
-        else {
-            throw FileSystemException(fmt::format(
-                "Error retrieving file attributes: {}", strerror(errno)
-            ));
-        }
-    }
-    const int isDir = S_ISDIR(buffer.st_mode);
-    return (isDir != 0);
-#endif
-}
-
 bool FileSystem::deleteFile(const File& path) const {
-    bool isFile = fileExists(path);
-    if (isFile) {
+    if (std::filesystem::is_regular_file(path.path())) {
         int removeResult = remove(path.path().c_str());
         return (removeResult == 0);
     }
@@ -427,72 +269,11 @@ bool FileSystem::deleteFile(const File& path) const {
     }
 }
 
-void FileSystem::createDirectory(const Directory& path, Recursive recursive) const {
-    if (recursive) {
-        std::vector<Directory> directories;
-        Directory dir = path;
-        while (!FileSys.directoryExists(dir)) {
-            //LERROR("Adding path to v: " << d.path());
-            directories.push_back(dir);
-            dir = absPath(dir.parentDirectory());
-        }
-
-        std::for_each(
-            directories.rbegin(),
-            directories.rend(),
-            [this](const Directory& d) {
-                if (!FileSys.directoryExists(d)) {
-                    createDirectory(d, Recursive::No);
-                }
-            });
-
-        return;
-    }
-    else {
-#ifdef WIN32
-        BOOL success = CreateDirectory(path.path().c_str(), nullptr);
-        if (!success) {
-            DWORD error = GetLastError();
-            if (ERROR == ERROR_ALREADY_EXISTS) {
-                return;
-            }
-            else {
-                LPTSTR errorBuffer = nullptr;
-                DWORD nValues = FormatMessage(
-                    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                        FORMAT_MESSAGE_IGNORE_INSERTS,
-                    nullptr,
-                    error,
-                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                    reinterpret_cast<LPTSTR>(&errorBuffer),
-                    0,
-                    nullptr
-                );
-                if (nValues > 0) {
-                    string errorMsg(errorBuffer);
-                    LocalFree(errorBuffer);
-                    throw FileSystemException(fmt::format(
-                        "Error creating directory '{}': {}", path.path(), errorMsg
-                    ));
-                }
-                throw FileSystemException(fmt::format(
-                    "Error creating directory '{}'", path.path()
-                ));
-            }
-        }
-#else
-        int success = mkdir(path.path().c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-        if (success != 0 && errno != EEXIST) {
-            throw FileSystemException(fmt::format(
-                "Error creating diretory '{}': {}", path.path(), strerror(errno)
-            ));
-        }
-#endif
-    }
-}
-
 void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) const {
-    ghoul_assert(directoryExists(path), "Path must be an existing directory");
+    ghoul_assert(
+        std::filesystem::is_directory(path.path()),
+        "Path must be an existing directory"
+    );
     if ((!recursive) && (!emptyDirectory(path))) {
         throw FileSystemException("Directory must be empty");
     }
@@ -745,7 +526,10 @@ bool FileSystem::hasRegisteredToken(const string& token) const {
 }
 
 void FileSystem::createCacheManager(const Directory& cacheDirectory, int version) {
-    ghoul_assert(directoryExists(cacheDirectory), "Cache directory did not exist");
+    ghoul_assert(
+        std::filesystem::is_directory(cacheDirectory.path()),
+        "Cache directory did not exist"
+    );
     ghoul_assert(!_cacheManager, "CacheManager was already created");
 
     _cacheManager = std::make_unique<CacheManager>(cacheDirectory, version);

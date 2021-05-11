@@ -28,6 +28,7 @@
 #include <ghoul/fmt.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/misc/assert.h>
+#include <filesystem>
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -160,7 +161,7 @@ string File::fileExtension() const {
 }
 
 std::string File::lastModifiedDate() const {
-    if (!FileSys.fileExists(_filename)) {
+    if (!std::filesystem::is_regular_file(_filename)) {
         throw FileException(fmt::format(
             "Error retrieving last-modified date for file '{}'. File did not exist",
             _filename

@@ -167,52 +167,6 @@ public:
     std::string convertPathSeparator(std::string path, char separator) const;
 
     /**
-     * Returns the current working directory of this process.
-     *
-     * \return The current working directory of this process
-     *
-     * \throw FileSystemException If the current directory could not be determined
-     */
-    Directory currentDirectory() const;
-
-    /**
-     * Changes the current working directory of this process. Please note that this will
-     * have an effect on all relative paths which are used henceforth.
-     *
-     * \param directory The path that will be used as the new working directory
-     *
-     * \throw FileSystemException If the current directory could not be set
-     */
-    void setCurrentDirectory(const Directory& directory) const;
-
-    /**
-     * Checks if the file at the \p path exists or not. This method will also return
-     * <code>false</code> if \p path points to a directory. This method will not expand
-     * any tokens that are passed to it.
-     *
-     * \param path The path that should be tested for existence
-     * \return <code>true</code> if \p path points to an existing file, <code>false</code>
-     *         otherwise
-     *
-     * \throw FileSystemException If there is an error retrieving the file attribtues
-     *        for the \p path
-     */
-    bool fileExists(const File& path) const;
-
-    /**
-     * Checks if the directory at the \p path exists or not. This method will return
-     * <code>false</code> if \p path points to a file.
-     *
-     * \param path The path that should be tested for existence
-     * \return <code>true</code> if \p path points to an existing directory,
-     *         <code>false</code> otherwise
-     *
-     * \throw FileSystemException If there is an error retrieving the directory attributes
-     *        for the \p path
-     */
-    bool directoryExists(const Directory& path) const;
-
-    /**
      * Deletes the file pointed to by \p path. The method will return <code>true</code> if
      * the file was deleted successfully, <code>false</code> otherwise.
      *
@@ -221,21 +175,6 @@ public:
      *         otherwise
      */
     bool deleteFile(const File& path) const;
-
-    /**
-     * Creates the directory pointed to by \p path. The method will return
-     * <code>true</code> if the directory was created successfully. If \p recursive is
-     * <code>true</code> all directories leading to the \p path will be created a well.
-     *
-     * \param path The directory that is to be created
-     * \param recursive If <code>true</code> all directories leading to the
-     *        \p path will be created; if <code>false</code> and the leading directories
-     *        do not exist, the method will fail and return <code>false</code>
-     *
-     * \throw FileSystemException If there was an error creating the directory
-     */
-    void createDirectory(const Directory& path,
-        Recursive recursive = Recursive::No) const;
 
     /**
      * Deletes the directory pointed to by \p path. The method will return

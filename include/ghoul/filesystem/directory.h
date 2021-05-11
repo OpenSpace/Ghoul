@@ -68,7 +68,7 @@ public:
      *        the path is used as-is without changes. This might make the Directory object
      *        outdated if the current working directory is subsequently changed.
      */
-    Directory(std::string path, RawPath isRawPath = RawPath::Yes);
+    Directory(std::string path/*, RawPath isRawPath = RawPath::Yes*/);
 
     /**
      * This constructor creates a Directory object pointing to the \p path. If
@@ -85,7 +85,7 @@ public:
      *        the path is used as-is without changes. This might make the Directory object
      *        outdated if the current working directory is subsequently changed.
      */
-    Directory(const char* path, RawPath isRawPath = RawPath::Yes);
+    Directory(const char* path/*, RawPath isRawPath = RawPath::Yes*/);
 
     /**
      * Operator that returns the path this directory points to. This can, depending on the
@@ -120,7 +120,7 @@ public:
      * \return The Directory object pointing to the parent directory of the current
      *         directory.
      */
-    Directory parentDirectory(AbsolutePath absolutePath = AbsolutePath::No) const;
+    Directory parentDirectory(/*AbsolutePath absolutePath = AbsolutePath::No*/) const;
 
     /**
      * This method creates a list of all files and subdirectories in the current directory
@@ -203,5 +203,6 @@ private:
 };
 
 } // namespace ghoul::filesystem
+
 
 #endif // __GHOUL___DIRECTORY___H__

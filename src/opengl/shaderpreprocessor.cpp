@@ -32,6 +32,7 @@
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
+#include <filesystem>
 #include <fstream>
 #include <string>
 #include <sstream>
@@ -198,7 +199,7 @@ std::string ShaderPreprocessor::getFileIdentifiersString() const {
 void ShaderPreprocessor::addIncludePath(std::string folderPath) {
     ghoul_assert(!folderPath.empty(), "Folder path must not be empty");
     ghoul_assert(
-        FileSys.directoryExists(folderPath),
+        std::filesystem::is_directory(folderPath),
         "Folder path must be an existing directory"
     );
     ghoul_assert(
@@ -217,7 +218,7 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
                                      ShaderPreprocessor::Env& environment)
 {
     ghoul_assert(!path.empty(), "Path must not be empty");
-    ghoul_assert(FileSys.fileExists(path), "Path must be an existing file");
+    ghoul_assert(std::filesystem::is_regular_file(path), "Path must be an existing file");
     ghoul_assert(!FileSys.containsToken(path), "Path must not contain path tokens");
 
     if (_includedFiles.find(path) == _includedFiles.end()) {
@@ -523,13 +524,13 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
             includeFilename
         );
 
-        bool includeFileWasFound = FileSys.fileExists(includeFilepath);
+        bool includeFileWasFound = std::filesystem::is_regular_file(includeFilepath);
 
         // Resolve the include paths if this default includeFilename does not exist
         if (!includeFileWasFound) {
             for (const std::string& path : _includePaths) {
                 includeFilepath = FileSys.pathByAppendingComponent(path, includeFilename);
-                if (FileSys.fileExists(includeFilepath)) {
+                if (std::filesystem::is_regular_file(includeFilepath)) {
                     includeFileWasFound = true;
                     break;
                 }
@@ -538,7 +539,7 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
 
         if (!includeFileWasFound) {
             // Our last chance is that the include file is an absolute path
-            const bool found = FileSys.fileExists(includeFilename);
+            const bool found = std::filesystem::is_regular_file(includeFilename);
             if (found) {
                 includeFilepath = absPath(includeFilename);
                 includeFileWasFound = true;

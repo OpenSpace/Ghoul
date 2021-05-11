@@ -34,6 +34,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/fmt.h>
 #include <algorithm>
+#include <filesystem>
 
 namespace {
     constexpr const char* _loggerCat = "ModelReader";
@@ -76,7 +77,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
         filesystem::CacheManager::Persistent::Yes
     );
 
-    bool hasCachedFile = FileSys.fileExists(cachedFile);
+    bool hasCachedFile = std::filesystem::is_regular_file(cachedFile);
 
     if (hasCachedFile) {
         LINFO(fmt::format(

@@ -32,6 +32,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 
 namespace {
@@ -154,9 +155,9 @@ CacheManager::CacheManager(std::string directory, int version)
         //FileSys.deleteDirectory(_directory, true);
         file.close();
         FileSys.deleteFile(path);
-        if (!FileSys.directoryExists(_directory)) {
+        if (!std::filesystem::is_directory(_directory.path())) {
             // Then recreate the directory for further use
-            FileSys.createDirectory(_directory);
+            std::filesystem::create_directory(_directory.path());
         }
     }
 }
@@ -215,8 +216,8 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
 
     // If this is the first time anyone requests a cache for the file name, we have to
     // create the base directory under the cache directory
-    if (!FileSys.directoryExists(destinationBase)) {
-        FileSys.createDirectory(destinationBase);
+    if (!std::filesystem::is_directory(destinationBase)) {
+        std::filesystem::create_directory(destinationBase);
     }
 
     std::string destination = FileSys.pathByAppendingComponent(
@@ -227,8 +228,8 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
     // The new destination should always not exist, since we checked before if we have the
     // value in the map and only get here if it isn't; persistent cache entries are always
     // in the map and non-persistent entries should have been deleted on application close
-    if (!FileSys.directoryExists(destination)) {
-        FileSys.createDirectory(destination);
+    if (!std::filesystem::is_directory(destination)) {
+        std::filesystem::create_directory(destination);
     }
 
     auto it = _files.find(hash);
@@ -300,7 +301,7 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
     // First search for all subdirectories and call this function recursively on them
     std::vector<std::string> contents = dir.readDirectories();
     for (const std::string& content : contents) {
-        if (FileSys.directoryExists(content)) {
+        if (std::filesystem::is_directory(content)) {
             cleanDirectory(content);
         }
     }

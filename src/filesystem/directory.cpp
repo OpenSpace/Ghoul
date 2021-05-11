@@ -52,17 +52,17 @@ namespace ghoul::filesystem {
 
 Directory::Directory() : _directoryPath(FileSys.absolutePath(".")) {}
 
-Directory::Directory(string path, RawPath isRawPath) {
-    if (isRawPath) {
-        _directoryPath = path.empty() ? "." : std::move(path);
-    }
-    else {
+Directory::Directory(string path/*, RawPath isRawPath*/) {
+    //if (isRawPath) {
+    //    _directoryPath = path.empty() ? "." : std::move(path);
+    //}
+    //else {
         _directoryPath = FileSys.absolutePath(path.empty() ? "." : path);
-    }
+    //}
 }
 
-Directory::Directory(const char* path, RawPath isRawPath)
-    : Directory(string(path), isRawPath)
+Directory::Directory(const char* path/*, RawPath isRawPath*/)
+    : Directory(string(path)/*, isRawPath*/)
 {}
 
 Directory::operator const string&() const {
@@ -73,18 +73,18 @@ const string& Directory::path() const {
     return _directoryPath;
 }
 
-Directory Directory::parentDirectory([[maybe_unused]] AbsolutePath absolutePath) const {
+Directory Directory::parentDirectory(/*[[maybe_unused]] AbsolutePath absolutePath*/) const {
 #ifdef WIN32
     if (_directoryPath.back() == FileSystem::PathSeparator) {
         return Directory(
-            _directoryPath + "..",
-            absolutePath ? RawPath::No : RawPath::Yes
+            _directoryPath + ".."/*,
+            absolutePath ? RawPath::No : RawPath::Yes*/
         );
     }
     else {
         return Directory(
-            _directoryPath + FileSystem::PathSeparator + "..",
-            absolutePath ? RawPath::No : RawPath::Yes
+            _directoryPath + FileSystem::PathSeparator + ".."/*,
+            absolutePath ? RawPath::No : RawPath::Yes*/
         );
     }
 #else // ^^^^ WIN32 // !WIN32 vvvv

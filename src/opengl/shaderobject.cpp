@@ -29,8 +29,9 @@
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/misc/crc32.h>
 #include <algorithm>
-#include <functional>
+#include <filesystem>
 #include <fstream>
+#include <functional>
 
 namespace ghoul::opengl {
 
@@ -205,7 +206,7 @@ void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) 
 
 void ShaderObject::setFilename(const std::string& filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    if (!FileSys.fileExists(filename)) {
+    if (!std::filesystem::is_regular_file(filename)) {
         throw FileNotFoundError(filename);
     }
 

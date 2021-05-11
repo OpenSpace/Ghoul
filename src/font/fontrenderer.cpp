@@ -37,6 +37,7 @@
 #include <ghoul/opengl/textureatlas.h>
 #include <ghoul/opengl/textureunit.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <filesystem>
 #include <fstream>
 #include <numeric>
 
@@ -232,7 +233,7 @@ FontRenderer::~FontRenderer() {
 
 std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     std::string vsPath = absPath(DefaultVertexShaderPath);
-    if (FileSys.fileExists(vsPath)) {
+    if (std::filesystem::is_regular_file(vsPath)) {
         LDEBUG(fmt::format("Skipping creation of existing vertex shader {}", vsPath));
     }
     else {
@@ -242,7 +243,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     }
 
     std::string fsPath = absPath(DefaultFragmentShaderPath);
-    if (FileSys.fileExists(fsPath)) {
+    if (std::filesystem::is_regular_file(fsPath)) {
         LDEBUG(fmt::format("Skipping creation of existing fragment shader {}", fsPath));
     }
     else {
@@ -275,7 +276,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
 
 std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     std::string vsPath = absPath(ProjectionVertexShaderPath);
-    if (FileSys.fileExists(vsPath)) {
+    if (std::filesystem::is_regular_file(vsPath)) {
         LDEBUG(fmt::format("Skipping creation of existing vertex shader {}", vsPath));
     }
     else {
@@ -285,7 +286,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     }
 
     std::string fsPath = absPath(ProjectionFragmentShaderPath);
-    if (FileSys.fileExists(fsPath)) {
+    if (std::filesystem::is_regular_file(fsPath)) {
         LDEBUG(fmt::format("Skipping creation of existing fragment shader {}", vsPath));
     }
     else {

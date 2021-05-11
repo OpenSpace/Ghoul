@@ -31,6 +31,7 @@
 #include <ghoul/io/texture/texturewriterbase.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
+#include <filesystem>
 
 using std::string;
 
@@ -60,7 +61,7 @@ void TextureWriter::saveTexture(const opengl::Texture& texture, const string& fi
     }
 
     // Make sure the directory for the file exists
-    FileSys.createDirectory(file.directoryName());
+    std::filesystem::create_directory(file.directoryName());
     writer->saveTexture(texture, filename);
 }
 
