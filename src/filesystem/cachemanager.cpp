@@ -81,7 +81,7 @@ CacheManager::CacheManager(std::string directory, int version)
     // last execution of the application crashed, the directory was not cleaned up
     // properly
     std::vector<LoadedCacheInfo> cacheState = cacheInformationFromDirectory(_directory);
-    std::string path = FileSys.pathByAppendingComponent(_directory, _cacheFile);
+    std::string path = fmt::format("{}/{}", _directory.path(), _cacheFile);
 
     std::ifstream file(path);
     if (file.good()) {
@@ -95,11 +95,15 @@ CacheManager::CacheManager(std::string directory, int version)
             ));
             for (const LoadedCacheInfo& cache : cacheState) {
                 LINFO(fmt::format("Deleting file '{}'", cache.second));
-                FileSys.deleteFile(cache.second);
+                if (std::filesystem::is_regular_file(cache.second)) {
+                    std::filesystem::remove(cache.second);
+                }
             }
             cleanDirectory(_directory);
             file.close();
-            FileSys.deleteFile(path);
+            if (std::filesystem::is_regular_file(path)) {
+                std::filesystem::remove(path);
+            }
             return;
         }
 
@@ -148,13 +152,17 @@ CacheManager::CacheManager(std::string directory, int version)
               "Cleaning it now");
         for (const LoadedCacheInfo& cache : cacheState) {
             LINFO(fmt::format("Deleting file '{}'", cache.second));
-            FileSys.deleteFile(cache.second);
+            if (std::filesystem::is_regular_file(cache.second)) {
+                std::filesystem::remove(cache.second);
+            }
         }
         // First clean the cache directory with all contents
         cleanDirectory(_directory);
         //FileSys.deleteDirectory(_directory, true);
         file.close();
-        FileSys.deleteFile(path);
+        if (std::filesystem::is_regular_file(path)) {
+            std::filesystem::remove(path);
+        }
         if (!std::filesystem::is_directory(_directory.path())) {
             // Then recreate the directory for further use
             std::filesystem::create_directory(_directory.path());
@@ -163,14 +171,16 @@ CacheManager::CacheManager(std::string directory, int version)
 }
 
 CacheManager::~CacheManager() {
-    std::string path = FileSys.pathByAppendingComponent(_directory, _cacheFile);
+    std::string path = fmt::format("{}/{}", _directory.path(), _cacheFile);
     std::ofstream file(path, std::ofstream::out);
     if (file.good()) {
         file << _version << std::endl;
         for (const std::pair<const unsigned long, CacheInformation>& p : _files) {
             if (!p.second.isPersistent) {
                 // Delete all the non-persistent files
-                FileSys.deleteFile(p.second.file);
+                if (std::filesystem::is_regular_file(p.second.file)) {
+                    std::filesystem::remove(p.second.file);
+                }
             }
             else {
                 // Save the persistent files in the cache file
@@ -212,7 +222,7 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
     // If we couldn't find the file, we have to generate a directory with the name of the
     // hash and return the full path containing of the cache path + requested filename +
     // hash value
-    std::string destinationBase = FileSys.pathByAppendingComponent(_directory, baseName);
+    std::string destinationBase = fmt::format("{}/{}", _directory.path(), baseName);
 
     // If this is the first time anyone requests a cache for the file name, we have to
     // create the base directory under the cache directory
@@ -220,10 +230,7 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
         std::filesystem::create_directory(destinationBase);
     }
 
-    std::string destination = FileSys.pathByAppendingComponent(
-        destinationBase,
-        std::to_string(hash)
-    );
+    std::string destination = fmt::format("{}/{}", destinationBase, hash);
 
     // The new destination should always not exist, since we checked before if we have the
     // value in the map and only get here if it isn't; persistent cache entries are always
@@ -240,7 +247,7 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
     }
 
     // Generate and output the newly generated cache name
-    std::string cachedFileName = FileSys.pathByAppendingComponent(destination, baseName);
+    std::string cachedFileName = fmt::format("{}/{}", destination, baseName);
 
     // Store the cache information in the map
     CacheInformation info = { cachedFileName, isPersistent };
@@ -292,7 +299,9 @@ void CacheManager::removeCacheFile(const std::string& baseName,
         // If we find the hash, it has been created before and we can just return the
         // file name to the caller
         const std::string& cachedFileName = it->second.file;
-        FileSys.deleteFile(cachedFileName);
+        if (std::filesystem::is_regular_file(cachedFileName)) {
+            std::filesystem::remove(cachedFileName);
+        }
         _files.erase(it);
     }
 }
@@ -317,7 +326,7 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
 #endif // __APPLE__
     // If this directory is empty, we can delete it
     if (isEmpty) {
-        FileSys.deleteDirectory(dir, FileSystem::Recursive::Yes);
+        std::filesystem::remove_all(dir.path());
     }
 }
 

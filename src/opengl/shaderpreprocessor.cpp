@@ -519,9 +519,8 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
 
         const size_t includeLength = p2 - p1 - 1;
         std::string includeFilename = line.substr(p1 + 1, includeLength);
-        std::string includeFilepath = FileSys.pathByAppendingComponent(
-            env.inputs.back().file.directoryName(),
-            includeFilename
+        std::string includeFilepath = fmt::format(
+            "{}/{}", env.inputs.back().file.directoryName(), includeFilename
         );
 
         bool includeFileWasFound = std::filesystem::is_regular_file(includeFilepath);
@@ -529,7 +528,7 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
         // Resolve the include paths if this default includeFilename does not exist
         if (!includeFileWasFound) {
             for (const std::string& path : _includePaths) {
-                includeFilepath = FileSys.pathByAppendingComponent(path, includeFilename);
+                includeFilepath = fmt::format("{}/{}", path, includeFilename);
                 if (std::filesystem::is_regular_file(includeFilepath)) {
                     includeFileWasFound = true;
                     break;
