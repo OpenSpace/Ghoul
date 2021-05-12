@@ -400,18 +400,28 @@ void CacheManager::removeCacheFile(const std::string& baseName,
 }
 
 void CacheManager::cleanDirectory(const Directory& dir) const {
+    if (!std::filesystem::is_directory(dir.path())) {
+        return;
+    }
+
     // First search for all subdirectories and call this function recursively on them
-    std::vector<std::string> contents = dir.readDirectories();
-    for (const std::string& content : contents) {
-        if (std::filesystem::is_directory(content)) {
-            cleanDirectory(content);
+    namespace fs = std::filesystem;
+    for (const fs::directory_entry& e : fs::directory_iterator(dir.path())) {
+        if (e.is_directory()) {
+            cleanDirectory(e.path().string());
         }
     }
+
     // We get to this point in the recursion if either all subdirectories have been
     // deleted or there exists a file somewhere in the directory tree
-
-    contents = dir.read();
-    bool isEmpty = contents.empty();
+    bool isEmpty = true;
+    for (const fs::directory_entry& e : fs::directory_iterator(dir.path())) {
+        if (e.is_regular_file() || e.is_directory()) {
+            isEmpty = false;
+            break;
+        }
+    }
+    
 #ifdef __APPLE__
     // Apple stores the .DS_Store directory in the directory which can be removed
     std::string dsStore = FileSys.pathByAppendingComponent(dir, ".DS_Store");
@@ -419,7 +429,7 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
 #endif // __APPLE__
     // If this directory is empty, we can delete it
     if (isEmpty) {
-        std::filesystem::remove_all(dir.path());
+        std::filesystem::remove(dir.path());
     }
 }
 
@@ -427,24 +437,29 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
                                                                const Directory& dir) const
 {
     std::vector<LoadedCacheInfo> result;
-    std::vector<std::string> directories = dir.readDirectories();
-    for (const std::string& directory : directories) {
-        Directory d(directory);
+    //std::vector<std::string> directories = dir.readDirectories();
+    namespace fs = std::filesystem;
+    for (const fs::directory_entry& e : fs::directory_iterator(dir.path())) {
+        if (!e.is_directory()) {
+            continue;
+        }
+
+        Directory d(e.path().string());
 
         // Extract the name of the directory
         // +1 as the last path delimiter is missing from the path
-        std::string directoryName = directory.substr(dir.path().size() + 1);
+        std::string directoryName = e.path().string().substr(dir.path().size() + 1);
 
-        std::vector<std::string> hashes = d.readDirectories();
-        for (const std::string& hash : hashes) {
+        for (const fs::directory_entry& f : fs::directory_iterator(e)) {
+            std::string hash = f.path().string();
             // Extract the hash from the directory name
             // +1 as the last path delimiter is missing from the path
             std::string hashName = hash.substr(d.path().size() + 1);
 
             namespace fs = std::filesystem;
             std::vector<fs::directory_entry> files;
-            for (fs::directory_entry e : fs::directory_iterator(hash)) {
-                files.push_back(e);
+            for (fs::directory_entry g : fs::directory_iterator(hash)) {
+                files.push_back(g);
             }
 
             // Cache directories should only contain a single file with the

@@ -97,69 +97,7 @@ public:
      */
     const std::string& path() const;
 
-    /**
-     * This method creates a list of all files and subdirectories in the current directory
-     * and returns the paths to each. If \p recursiveSearch is <code>true</code>, each
-     * subdirectory will be searched as well and all results will be combined. The
-     * parameter \p sort determines if the end result will be sorted by name.
-     *
-     * \param recursiveSearch Determines if the subdirectories will be searched as well as
-     *        the current directory.
-     * \param sort If <code>true</code> the final result will be sorted by name
-     * \return The paths to all files and directories in the current directory (and
-     *         subdirectories if \p recursiveSearch is <code>true</code>)
-     */
-    std::vector<std::string> read(Recursive recursiveSearch = Recursive::No,
-        Sort sort = Sort::No) const;
-
-    /**
-     * This method creates a list of all subdirectories in the current directory and
-     * returns the path to each. If \p recursiveSearch is <code>true</code>, each
-     * subdirectory will be searched as well and all results will be combined. The
-     * parameter \p sort determines if the end result will be sorted by name.
-     *
-     * \param recursiveSearch Determines if the subdirectories will be searched as well as
-     *        the current directory.
-     * \param sort If <code>true</code> the final result will be sorted by name
-     * \return The paths to all directories in the current directory (and subdirectories
-     *         if \p recursiveSearch is <code>true</code>)
-     */
-    std::vector<std::string> readDirectories(Recursive recursiveSearch = Recursive::No,
-        Sort sort = Sort::No) const;
-
 private:
-    std::vector<std::string> readFiles(Recursive recursiveSearch = Recursive::No,
-        Sort sort = Sort::No) const;
-    /**
-     * Internal function that does the directory marching of all files that are in the
-     * directory point to by \p path. It will combine all results in the \p result
-     * parameter and will, if \p recursiveSearch is <code>true</code> recursively call
-     * itself; thus reusing the \p result parameter.
-     *
-     * \param result The result vector that will contain all files in the directory
-     * \param path The path of the directory whose files should be listed
-     * \param recursiveSearch If <code>true</code>, this method will be called recursively
-     *        for each directory in the current directory, combining all results in the
-     *        \p result> vector
-     */
-    void internalReadFiles(std::vector<std::string>& result, const std::string& path,
-        Recursive recursiveSearch = Recursive::No) const;
-
-    /**
-     * Internal function that does the directory marching of all subdirectories that are
-     * in the directory point to by \p path. It will combine all results in the \p result
-     * parameter and will, if \p recursiveSearch is <code>true</code> recursively call
-     * itself; thus reusing the \p result parameter.
-     *
-     * \param result The result vector that will contain all files in the directory
-     * \param path The path of the directory whose files should be listed
-     * \param recursiveSearch If <code>true</code>, this method will be called recursively
-     *        for each directory in the current directory, combining all results in the
-     *        \p result vector.
-     */
-    void internalReadDirectories(std::vector<std::string>& result,
-        const std::string& path, Recursive recursiveSearch = Recursive::No) const;
-
     /// The path in the filesystem to this Directory object. May be absolute or relative
     std::string _directoryPath;
 };
