@@ -28,61 +28,14 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/filesystem/file.h>
 #include <iostream>
+#include <filesystem>
 #include <fstream>
 
 #ifdef WIN32
-#include <windows.h>
+#include <Windows.h>
 #else
 #include <unistd.h>
 #endif
-
-TEST_CASE("FileSystem: Has Test Directory", "[filesystem]") {
-    REQUIRE(FileSys.directoryExists(absPath("${TEMPORARY}")));
-}
-
-TEST_CASE("FileSystem: CreateRemoveDirectory", "[filesystem]") {
-    using ghoul::filesystem::FileSystem;
-
-    const std::string tmp = absPath("${TEMPORARY}/tmp");
-    absPath("${TEMPORARY}/tmp/tmp2");
-    const std::string tmpRecursive2 = absPath("${TEMPORARY}/tmp/tmp2/tmp3");
-
-    REQUIRE_NOTHROW(FileSys.createDirectory(tmp));
-    REQUIRE_THROWS_AS(
-        FileSys.createDirectory(tmpRecursive2),
-        FileSystem::FileSystemException
-    );
-    REQUIRE_NOTHROW(FileSys.createDirectory(tmpRecursive2, FileSystem::Recursive::Yes));
-
-    REQUIRE_THROWS_AS(FileSys.deleteDirectory(tmp), FileSystem::FileSystemException);
-    REQUIRE_NOTHROW(FileSys.deleteDirectory(tmpRecursive2));
-    REQUIRE_THROWS_AS(FileSys.deleteDirectory(tmp), FileSystem::FileSystemException);
-    REQUIRE_NOTHROW(FileSys.deleteDirectory(tmp, FileSystem::Recursive::Yes));
-}
-
-TEST_CASE("FileSystem: Path", "[filesystem]") {
-    using ghoul::filesystem::File;
-
-    std::string path = "${TEMPORARY}/tmpfil.txt";
-    std::string absPath = absPath(path);
-
-    File rawPathDef(path);
-    File rawPathYes(path, File::RawPath::Yes);
-    File rawPathNo(path, File::RawPath::No);
-    File absPathDef(absPath);
-    File absPathYes(absPath, File::RawPath::Yes);
-    File absPathNo(absPath, File::RawPath::No);
-
-    REQUIRE(rawPathDef.path() == rawPathYes.path());
-    REQUIRE(rawPathDef.path() != rawPathNo.path());
-    REQUIRE(rawPathYes.path() != rawPathNo.path());
-
-    REQUIRE(absPathDef.path() == absPathYes.path());
-    REQUIRE(absPathDef.path() == absPathNo.path());
-    REQUIRE(absPathYes.path() == absPathNo.path());
-
-    REQUIRE(rawPathNo.path() == absPathDef.path());
-}
 
 TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
     using ghoul::filesystem::File;
@@ -100,14 +53,14 @@ TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
     auto c1 = [&b1](const File&) { b1 = true; };
     auto c2 = [&b2](const File&) { b2 = true; };
 
-    File* f1 = new File(path, File::RawPath::No, c1);
-    File* f2 = new File(path, File::RawPath::No, c1);
-    File* f3 = new File(path, File::RawPath::No, c2);
+    File* f1 = new File(path, c1);
+    File* f2 = new File(path, c1);
+    File* f3 = new File(path, c2);
 
     // Check that the file exists
-    REQUIRE(FileSys.fileExists(absPath(cpath)));
-    REQUIRE(FileSys.fileExists(path));
-    REQUIRE(FileSys.fileExists(*f1));
+    REQUIRE(std::filesystem::is_regular_file(absPath(cpath)));
+    REQUIRE(std::filesystem::is_regular_file(path));
+    REQUIRE(std::filesystem::is_regular_file(f1->path()));
 
     f2->setCallback(nullptr);
 
@@ -145,7 +98,7 @@ TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
     delete f1;
 
     // Check that we can delete the file
-    REQUIRE(FileSys.deleteFile(path));
+    REQUIRE(std::filesystem::remove(path));
 }
 
 TEST_CASE("FileSystem: TokenDefaultState", "[filesystem]") {

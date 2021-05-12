@@ -32,8 +32,21 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
 #include <algorithm>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
+
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif // NOMINMAX
+#include <Windows.h>
+#else // ^^^^ WIN32 // !WIN32 vvvv
+#include <ctime>
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif // WIN32
 
 namespace {
     constexpr const char* _loggerCat = "CacheManager";
@@ -46,6 +59,83 @@ namespace {
         std::string hashString = fmt::format("{}{}{}", file, _hashDelimiter, information);
         unsigned int hash = ghoul::hashCRC32(hashString);
         return hash;
+    }
+
+    std::string lastModifiedDate(std::filesystem::path path) {
+        if (!std::filesystem::is_regular_file(path)) {
+            throw ghoul::RuntimeError(fmt::format(
+                "Error retrieving last-modified date for file '{}'. File did not exist",
+                path.string()
+            ));
+        }
+#ifdef WIN32
+        WIN32_FILE_ATTRIBUTE_DATA infoData;
+        BOOL success = GetFileAttributesEx(
+            path.string().c_str(),
+            GetFileExInfoStandard,
+            &infoData
+        );
+        if (!success) {
+            const DWORD error = GetLastError();
+            LPTSTR errorBuffer = nullptr;
+            FormatMessage(
+                FORMAT_MESSAGE_FROM_SYSTEM |
+                    FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                    FORMAT_MESSAGE_IGNORE_INSERTS,
+                nullptr,
+                error,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                reinterpret_cast<LPTSTR>(&errorBuffer), // NOLINT
+                0,
+                nullptr
+            );
+            std::string msg(errorBuffer);
+            LocalFree(errorBuffer);
+            throw ghoul::RuntimeError(fmt::format(
+                "Could not retrieve last-modified date for file '{}': {}",
+                path.string(), msg
+            ));
+        }
+        else {
+            FILETIME lastWriteTime = infoData.ftLastWriteTime;
+            SYSTEMTIME time;
+            //LPSYSTEMTIME time = NULL;
+            success = FileTimeToSystemTime(&lastWriteTime, &time);
+            if (!success) {
+                const DWORD error = GetLastError();
+                LPTSTR errorBuffer = nullptr;
+                FormatMessage(
+                    FORMAT_MESSAGE_FROM_SYSTEM |
+                        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                        FORMAT_MESSAGE_IGNORE_INSERTS,
+                    nullptr,
+                    error,
+                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                    reinterpret_cast<LPTSTR>(&errorBuffer), // NOLINT
+                    0,
+                    nullptr
+                );
+                std::string msg(errorBuffer);
+                LocalFree(errorBuffer);
+                throw ghoul::RuntimeError(fmt::format(
+                    "'FileTimeToSystemTime' failed for file '{}': {}", path.string(), msg
+                ));
+            }
+            else {
+                return fmt::format(
+                    "{}-{}-{}T{}:{}:{}.{}", time.wYear, time.wMonth, time.wDay, time.wHour,
+                    time.wMinute, time.wSecond, time.wMilliseconds
+                );
+            }
+        }
+#else
+        struct stat attrib;
+        stat(path.string().c_str(), &attrib);
+        struct tm* time = gmtime(&(attrib.st_ctime));
+        char buffer[128];
+        strftime(buffer, 128, "%Y-%m-%dT%H:%M:%S", time);
+        return buffer;
+#endif
     }
 } // namespace
 
@@ -198,7 +288,7 @@ CacheManager::~CacheManager() {
 }
 
 std::string CacheManager::cachedFilename(const File& file, Persistent isPersistent) {
-    std::string lastModifiedTime = file.lastModifiedDate();
+    std::string lastModifiedTime = lastModifiedDate(file.path());
     return cachedFilename(file, lastModifiedTime, isPersistent);
 }
 
@@ -257,7 +347,7 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
 }
 
 bool CacheManager::hasCachedFile(const File& file) const {
-    std::string lastModifiedTime = file.lastModifiedDate();
+    std::string lastModifiedTime = lastModifiedDate(file.path());
     return hasCachedFile(file, lastModifiedTime);
 }
 
@@ -279,7 +369,7 @@ bool CacheManager::hasCachedFile(const std::string& baseName,
 }
 
 void CacheManager::removeCacheFile(const File& file) {
-    std::string lastModifiedTime = file.lastModifiedDate();
+    std::string lastModifiedTime = lastModifiedDate(file.path());
     removeCacheFile(file, lastModifiedTime);
 }
 
@@ -351,7 +441,12 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
             // +1 as the last path delimiter is missing from the path
             std::string hashName = hash.substr(d.path().size() + 1);
 
-            std::vector<std::string> files = Directory(hash).readFiles();
+            namespace fs = std::filesystem;
+            std::vector<fs::directory_entry> files;
+            for (fs::directory_entry e : fs::directory_iterator(hash)) {
+                files.push_back(e);
+            }
+
             // Cache directories should only contain a single file with the
             // same name as the directory
             if (files.size() > 1) {
@@ -362,7 +457,9 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
             if (files.size() == 1) {
                 // Extract the file name from the full path
                 // +1 as the last path delimiter is missing from the path
-                std::string filename = files[0].substr(Directory(hash).path().size() + 1);
+                std::string filename = files[0].path().string().substr(
+                    Directory(hash).path().size() + 1
+                );
                 if (filename != directoryName) {
                     throw ErrorLoadingCacheException(fmt::format(
                         "File contained in cache directory '{}' contains a file with "
@@ -371,7 +468,7 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
                     ));
                 }
 
-                result.emplace_back(std::stoul(hashName), files[0]);
+                result.emplace_back(std::stoul(hashName), files[0].path().string());
             }
         }
     }

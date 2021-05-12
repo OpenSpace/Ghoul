@@ -288,7 +288,7 @@ void FileSystem::createCacheManager(const Directory& cacheDirectory, int version
     );
     ghoul_assert(!_cacheManager, "CacheManager was already created");
 
-    _cacheManager = std::make_unique<CacheManager>(cacheDirectory, version);
+    _cacheManager = std::make_unique<CacheManager>(cacheDirectory.path(), version);
     ghoul_assert(_cacheManager, "CacheManager creation failed");
 }
 

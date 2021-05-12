@@ -30,6 +30,7 @@
 #include <ghoul/logging/consolelog.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/supportmacros.h>
+#include <filesystem>
 
 using namespace ghoul::filesystem;
 using namespace ghoul::logging;
@@ -47,7 +48,7 @@ int main(int argc, char** argv) {
     FileSys.registerPathToken("${UNIT_TEST}", TestDirectory);
     FileSys.registerPathToken("${UNIT_SCRIPT}", ScriptDirectory);
 
-    if (!FileSys.directoryExists(TestDirectory)) {
+    if (!std::filesystem::is_directory(TestDirectory)) {
         LFATALC("main", "Fix me");
         return 0;
     }

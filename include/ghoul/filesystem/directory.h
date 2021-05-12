@@ -43,7 +43,6 @@ namespace ghoul::filesystem {
  */
 class Directory {
 public:
-    BooleanType(RawPath);
     BooleanType(AbsolutePath);
     BooleanType(Recursive);
     BooleanType(Sort);
@@ -88,17 +87,6 @@ public:
     Directory(const char* path/*, RawPath isRawPath = RawPath::Yes*/);
 
     /**
-     * Operator that returns the path this directory points to. This can, depending on the
-     * constructor that was used, be either an absolute path or a relative path. If the
-     * current working directory has been changed, and the Directory has been created
-     * with a relative path, it might be outdated and point to a different location than
-     * intended.
-     *
-     * \return The stored path this Directory points to
-     */
-    operator const std::string&() const;
-
-    /**
      * Returns the path this directory points to. This can, depending on the constructor
      * that was used, be either an absolute path or a relative path. If the current
      * working directory has been changed, and the Directory has been created with a
@@ -108,19 +96,6 @@ public:
      * \return The stored path this Directory points to
      */
     const std::string& path() const;
-
-    /**
-     * Returns the Directory object that points to the parent directory of the current
-     * object. The path to this new object is created by appending <code>..</code> to the
-     * path of the current object. The \p absolutePath parameter determines if the new
-     * object is created using the absolute or relative path.
-     *
-     * \param absolutePath Determines if the path to the new object should be converted
-     *        into an absolute path or remain relative
-     * \return The Directory object pointing to the parent directory of the current
-     *         directory.
-     */
-    Directory parentDirectory(/*AbsolutePath absolutePath = AbsolutePath::No*/) const;
 
     /**
      * This method creates a list of all files and subdirectories in the current directory
@@ -135,21 +110,6 @@ public:
      *         subdirectories if \p recursiveSearch is <code>true</code>)
      */
     std::vector<std::string> read(Recursive recursiveSearch = Recursive::No,
-        Sort sort = Sort::No) const;
-
-    /**
-     * This method creates a list of all files in the current directory and returns the
-     * path to each. If \p recursiveSearch is <code>true</code>, each subdirectory will be
-     * searched as well and all results will be combined. The parameter \p sort determines
-     * if the end result will be sorted by name.
-     *
-     * \param recursiveSearch Determines if the subdirectories will be searched as well as
-     *        the current directory.
-     * \param sort If <code>true</code> the final result will be sorted by name
-     * \return The paths to all files in the current directory (and subdirectories if
-     *         \p recursiveSearch is <code>true</code>)
-     */
-    std::vector<std::string> readFiles(Recursive recursiveSearch = Recursive::No,
         Sort sort = Sort::No) const;
 
     /**
@@ -168,6 +128,8 @@ public:
         Sort sort = Sort::No) const;
 
 private:
+    std::vector<std::string> readFiles(Recursive recursiveSearch = Recursive::No,
+        Sort sort = Sort::No) const;
     /**
      * Internal function that does the directory marching of all files that are in the
      * directory point to by \p path. It will combine all results in the \p result

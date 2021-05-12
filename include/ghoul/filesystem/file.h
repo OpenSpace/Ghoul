@@ -77,8 +77,8 @@ public:
      *
      * \see FileSystem The system to register and use tokens
      */
-    File(std::string filename, RawPath isRawPath = RawPath::Yes,
-         FileChangedCallback fileChangedCallback = FileChangedCallback());
+    File(std::string filename,
+        FileChangedCallback fileChangedCallback = FileChangedCallback());
 
     /**
      * Copy constructor.
@@ -120,33 +120,7 @@ public:
      *
      * \return The full path to the file as an <code>std::string</code>
      */
-    operator const std::string&() const;
-
-    /**
-     * Returns the full path to the file as an <code>std::string</code>.
-     *
-     * \return The full path to the file as an <code>std::string</code>
-     */
     const std::string& path() const;
-
-    /**
-     * Returns the directory name of the path. The directory name is defined as the part
-     * of the path before the last path separator (<code>'/'</code> or
-     * <code>'\\\\'</code>) and does not include the separator itself. Example(
-     * <code>'/home/user/file.txt' -> '/home/user'</code>)
-     *
-     * \return The directory name of the path
-     */
-    //std::string directoryName() const;
-
-    /**
-     * This method returns the last-modified date of the file as an ISO 8601 string.
-     *
-     * \return The last-modified date of the file as an ISO 8601 string
-     *
-     * \throw FileException If there is an error accessing the file
-     */
-    std::string lastModifiedDate() const;
 
 private:
     /**
