@@ -520,7 +520,9 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
         const size_t includeLength = p2 - p1 - 1;
         std::string includeFilename = line.substr(p1 + 1, includeLength);
         std::string includeFilepath = fmt::format(
-            "{}/{}", env.inputs.back().file.directoryName(), includeFilename
+            "{}/{}",
+            std::filesystem::path(env.inputs.back().file.path()).parent_path().string(),
+            includeFilename
         );
 
         bool includeFileWasFound = std::filesystem::is_regular_file(includeFilepath);

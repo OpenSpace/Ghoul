@@ -63,7 +63,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-    const std::string& extension = filesystem::File(filename).fileExtension();
+    std::string extension = std::filesystem::path(filename).extension().string();
+    if (!extension.empty()) {
+        extension = extension.substr(1);
+    }
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
     ModelReaderBase* reader = readerForExtension(extension);

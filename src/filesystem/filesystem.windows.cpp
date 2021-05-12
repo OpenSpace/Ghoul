@@ -34,6 +34,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/stacktrace.h>
 #include <algorithm>
+#include <filesystem>
 #include <regex>
 #include <Shlobj.h>
 
@@ -75,7 +76,7 @@ void FileSystem::deinitializeInternalWindows() {
 void FileSystem::addFileListener(File* file) {
     ghoul_assert(file != nullptr, "File must not be nullptr");
 
-    std::string d = file->directoryName();
+    std::string d = std::filesystem::path(file->path()).parent_path().string();
     auto f = _directories.find(d);
     if (f == _directories.end()) {
         LDEBUG(fmt::format("Started watching: {}", d));

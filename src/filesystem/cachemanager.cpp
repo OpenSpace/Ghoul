@@ -205,7 +205,8 @@ std::string CacheManager::cachedFilename(const File& file, Persistent isPersiste
 std::string CacheManager::cachedFilename(const File& file, std::string_view information,
                                          Persistent isPersistent)
 {
-    return cachedFilename(file.filename(), information, isPersistent);
+    std::string filename = std::filesystem::path(file.path()).filename().string();
+    return cachedFilename(filename, information, isPersistent);
 }
 
 std::string CacheManager::cachedFilename(const std::string& baseName,
@@ -261,7 +262,8 @@ bool CacheManager::hasCachedFile(const File& file) const {
 }
 
 bool CacheManager::hasCachedFile(const File& file, std::string_view information) const {
-    return hasCachedFile(file.filename(), information);
+    std::string filename = std::filesystem::path(file.path()).filename().string();
+    return hasCachedFile(filename, information);
 }
 
 bool CacheManager::hasCachedFile(const std::string& baseName,
@@ -282,7 +284,8 @@ void CacheManager::removeCacheFile(const File& file) {
 }
 
 void CacheManager::removeCacheFile(const File& file, std::string_view information) {
-    removeCacheFile(file.filename(), information);
+    std::string filename = std::filesystem::path(file.path()).filename().string();
+    removeCacheFile(filename, information);
 }
 
 void CacheManager::removeCacheFile(const std::string& baseName,

@@ -130,35 +130,6 @@ public:
     const std::string& path() const;
 
     /**
-     * Returns the filename part of the full path. The filename is defined as the part of
-     * the path after the last path separator (<code>'/'</code> or <code>'\\\\'</code>)
-     * and including the extension. Example (
-     * <code>'/home/user/file.txt' -> 'file.txt'</code>)
-     *
-     * \return The filename part of the full path
-     */
-    std::string filename() const;
-
-    /**
-     * Returns the base name part of the full path. The base name is defined as the part
-     * of the path between the last path separator (<code>'/'</code> or
-     * <code>'\\\\'</code>) and the extension (separated by a '.', if existing). Example
-     * (<code>'/home/user/file.txt' -> 'file'</code>)
-     *
-     * \return The base name part of the full path
-     */
-    std::string baseName() const;
-
-    /**
-     * Returns the full base name of the path. The full base name is defined as the part
-     * of the path before the extension (if existing). Example (
-     * <code>'/home/user/file.txt' -> '/home/user/file'</code>)
-     *
-     * \return The full base name part of the path
-     */
-    std::string fullBaseName() const;
-
-    /**
      * Returns the directory name of the path. The directory name is defined as the part
      * of the path before the last path separator (<code>'/'</code> or
      * <code>'\\\\'</code>) and does not include the separator itself. Example(
@@ -166,16 +137,7 @@ public:
      *
      * \return The directory name of the path
      */
-    std::string directoryName() const;
-
-    /**
-     * Returns the extension part of the full path. The extension is defined as the part
-     * of the path after the extension separator (<code>'.'</code>). Example (
-     * <code>'/home/user/file.txt' -> '/home/user/file'</code>).
-     *
-     * \return The extension part of the full path
-     */
-    std::string fileExtension() const;
+    //std::string directoryName() const;
 
     /**
      * This method returns the last-modified date of the file as an ISO 8601 string.

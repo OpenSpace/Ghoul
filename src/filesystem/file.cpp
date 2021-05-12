@@ -109,56 +109,15 @@ const std::string& File::path() const {
     return _filename;
 }
 
-std::string File::filename() const {
-    const string::size_type separator = _filename.rfind(FileSystem::PathSeparator);
-    if (separator != string::npos) {
-        return _filename.substr(separator + 1);
-    }
-    else {
-        return _filename;
-    }
-}
-
-string File::baseName() const {
-    string fileName = filename();
-    const string::size_type dot = fileName.rfind('.');
-    if (dot != string::npos) {
-        return fileName.substr(0, dot);
-    }
-    else {
-        return fileName;
-    }
-}
-
-string File::fullBaseName() const {
-    const string::size_type dot = _filename.rfind('.');
-    if (dot != string::npos) {
-        return _filename.substr(0, dot);
-    }
-    else {
-        return _filename;
-    }
-}
-
-string File::directoryName() const {
-    const string::size_type separator = _filename.rfind(FileSystem::PathSeparator);
-    if (separator != string::npos) {
-        return _filename.substr(0, separator);
-    }
-    else {
-        return _filename;
-    }
-}
-
-string File::fileExtension() const {
-    const string::size_type dot = _filename.rfind('.');
-    if (dot != string::npos) {
-        return _filename.substr(dot + 1);
-    }
-    else {
-        return _filename;
-    }
-}
+//string File::directoryName() const {
+//    const string::size_type separator = _filename.rfind(FileSystem::PathSeparator);
+//    if (separator != string::npos) {
+//        return _filename.substr(0, separator);
+//    }
+//    else {
+//        return _filename;
+//    }
+//}
 
 std::string File::lastModifiedDate() const {
     if (!std::filesystem::is_regular_file(_filename)) {

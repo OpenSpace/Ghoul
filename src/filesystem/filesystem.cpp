@@ -313,67 +313,6 @@ void FileSystem::triggerFilesystemEvents() {
 #endif
 }
 
-string FileSystem::cleanupPath(string path) const {
-    ghoul_assert(!path.empty(), "Path must not be empty");
-
-#ifdef WIN32
-    // In Windows, replace all '/' by '\\' for conformity
-    std::replace(path.begin(), path.end(), '/', '\\');
-    std::string drivePart = path.substr(0, 3);
-    std::regex driveRegex = std::regex(R"(([[:lower:]][\:][\\]))");
-    bool hasCorrectSize = path.size() >= 3;
-    if (hasCorrectSize && std::regex_match(drivePart, driveRegex)) {
-        std::transform(
-            path.begin(),
-            path.begin() + 1,
-            path.begin(),
-            [](char v) { return static_cast<char>(toupper(v)); }
-        );
-    }
-#else
-    // Remove all double separators (will automatically be done on Windows)
-#endif
-    size_t position = 0;
-    while (position != string::npos) {
-        char dualSeparator[] = { PathSeparator, PathSeparator };
-        position = path.find(dualSeparator, 0, 2);
-        if (position != string::npos) {
-            path = path.substr(0, position) + path.substr(position + 1);
-        }
-    }
-
-    // Remove trailing separator
-    if (path[path.size() - 1] == PathSeparator) {
-        path = path.substr(0, path.size() - 1);
-    }
-
-    return path;
-}
-
-size_t FileSystem::commonBasePathPosition(const string& p1, const string& p2) const {
-    // 'currentPosition' stores the position until which the two paths are the same,
-    // 'nextPosition' is a look-ahead. If the look-ahead is equal as well,
-    // 'currentPosition' is replaced by this. At the end of the loop 'currentPosition'
-    // contains the last position until which both paths are the same
-    size_t currentPosition = 0;
-    size_t nextPosition = p1.find(PathSeparator);
-    while (nextPosition != string::npos) {
-        int result = p1.compare(0, nextPosition, p2, 0 , nextPosition);
-        if (result == 0) {
-            currentPosition = nextPosition;
-            nextPosition = p1.find(PathSeparator, nextPosition + 1);
-        }
-        else {
-            break;
-        }
-    }
-    int result = p1.compare(0, p1.length(), p2, 0 , p1.length());
-    if (result == 0) {
-        currentPosition = p1.length();
-    }
-    return currentPosition;
-}
-
 bool FileSystem::containsToken(const string& path) const {
     ghoul_assert(!path.empty(), "Path must not be empty");
 

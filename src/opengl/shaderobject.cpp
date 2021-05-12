@@ -235,8 +235,7 @@ void ShaderObject::rebuildFromFile() {
 
     std::string baseName;
     if (_shaderName.empty()) {
-        filesystem::File ghlFile(filename());
-        baseName = ghlFile.baseName();
+        baseName = std::filesystem::path(filename()).stem().string();
     }
     else {
         baseName = _shaderName;

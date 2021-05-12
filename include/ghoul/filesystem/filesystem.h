@@ -71,8 +71,6 @@ class File;
  */
 class FileSystem {
 public:
-    BooleanType(RawPath);
-    BooleanType(Recursive);
     BooleanType(Override);
 
     /// Exception that gets thrown if the FileSystem encounters a nonrecoverable error
@@ -266,28 +264,6 @@ private:
      * inconsistencies.
      */
     ~FileSystem();
-
-    /**
-     * This method cleans up a passed \p path by removing any double path separators and
-     * replacing all separators into the ones used by the operating system. It also
-     * removes any trailing separators at the end of the path.
-     *
-     * \param path The path that should be cleaned up
-     * \return The cleaned path with correct separators
-     *
-     * \pre \p path must not be empty
-     */
-    std::string cleanupPath(std::string path) const;
-
-    /**
-     * This method returns the position until both paths \p p1 and \p p2 are equal. After
-     * the returned position, the paths are diverging.
-     *
-     * \param p1 The one path that is used for the comparison
-     * \param p2 The other path that is used for the comparison
-     * \return The position until which the paths \p p1 and \p p2 are equal
-     */
-    size_t commonBasePathPosition(const std::string& p1, const std::string& p2) const;
 
     /**
      * Returns true, if the \p path contains the \p token.
