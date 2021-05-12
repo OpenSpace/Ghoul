@@ -281,14 +281,14 @@ bool FileSystem::hasRegisteredToken(const string& token) const {
     return _tokenMap.find(token) != _tokenMap.end();
 }
 
-void FileSystem::createCacheManager(const Directory& cacheDirectory, int version) {
+void FileSystem::createCacheManager(const std::filesystem::path& directory, int version) {
     ghoul_assert(
-        std::filesystem::is_directory(cacheDirectory.path()),
+        std::filesystem::is_directory(directory),
         "Cache directory did not exist"
     );
     ghoul_assert(!_cacheManager, "CacheManager was already created");
 
-    _cacheManager = std::make_unique<CacheManager>(cacheDirectory.path(), version);
+    _cacheManager = std::make_unique<CacheManager>(directory.string(), version);
     ghoul_assert(_cacheManager, "CacheManager creation failed");
 }
 

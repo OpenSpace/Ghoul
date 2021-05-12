@@ -33,7 +33,6 @@
 #include <ghoul/misc/crc32.h>
 #include <algorithm>
 #include <chrono>
-#include <filesystem>
 #include <fstream>
 
 #ifdef WIN32
@@ -171,7 +170,7 @@ CacheManager::CacheManager(std::string directory, int version)
     // last execution of the application crashed, the directory was not cleaned up
     // properly
     std::vector<LoadedCacheInfo> cacheState = cacheInformationFromDirectory(_directory);
-    std::string path = fmt::format("{}/{}", _directory.path(), _cacheFile);
+    std::string path = fmt::format("{}/{}", _directory.string(), _cacheFile);
 
     std::ifstream file(path);
     if (file.good()) {
@@ -253,15 +252,15 @@ CacheManager::CacheManager(std::string directory, int version)
         if (std::filesystem::is_regular_file(path)) {
             std::filesystem::remove(path);
         }
-        if (!std::filesystem::is_directory(_directory.path())) {
+        if (!std::filesystem::is_directory(_directory)) {
             // Then recreate the directory for further use
-            std::filesystem::create_directory(_directory.path());
+            std::filesystem::create_directory(_directory);
         }
     }
 }
 
 CacheManager::~CacheManager() {
-    std::string path = fmt::format("{}/{}", _directory.path(), _cacheFile);
+    std::string path = fmt::format("{}/{}", _directory.string(), _cacheFile);
     std::ofstream file(path, std::ofstream::out);
     if (file.good()) {
         file << _version << std::endl;
@@ -313,7 +312,7 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
     // If we couldn't find the file, we have to generate a directory with the name of the
     // hash and return the full path containing of the cache path + requested filename +
     // hash value
-    std::string destinationBase = fmt::format("{}/{}", _directory.path(), baseName);
+    std::string destinationBase = fmt::format("{}/{}", _directory.string(), baseName);
 
     // If this is the first time anyone requests a cache for the file name, we have to
     // create the base directory under the cache directory
@@ -399,14 +398,14 @@ void CacheManager::removeCacheFile(const std::string& baseName,
     }
 }
 
-void CacheManager::cleanDirectory(const Directory& dir) const {
-    if (!std::filesystem::is_directory(dir.path())) {
+void CacheManager::cleanDirectory(const std::filesystem::path& path) const {
+    if (!std::filesystem::is_directory(path)) {
         return;
     }
 
     // First search for all subdirectories and call this function recursively on them
     namespace fs = std::filesystem;
-    for (const fs::directory_entry& e : fs::directory_iterator(dir.path())) {
+    for (const fs::directory_entry& e : fs::directory_iterator(path)) {
         if (e.is_directory()) {
             cleanDirectory(e.path().string());
         }
@@ -415,7 +414,7 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
     // We get to this point in the recursion if either all subdirectories have been
     // deleted or there exists a file somewhere in the directory tree
     bool isEmpty = true;
-    for (const fs::directory_entry& e : fs::directory_iterator(dir.path())) {
+    for (const fs::directory_entry& e : fs::directory_iterator(path)) {
         if (e.is_regular_file() || e.is_directory()) {
             isEmpty = false;
             break;
@@ -429,32 +428,32 @@ void CacheManager::cleanDirectory(const Directory& dir) const {
 #endif // __APPLE__
     // If this directory is empty, we can delete it
     if (isEmpty) {
-        std::filesystem::remove(dir.path());
+        std::filesystem::remove(path);
     }
 }
 
 std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDirectory(
-                                                               const Directory& dir) const
+                                                  const std::filesystem::path& path) const
 {
     std::vector<LoadedCacheInfo> result;
     //std::vector<std::string> directories = dir.readDirectories();
     namespace fs = std::filesystem;
-    for (const fs::directory_entry& e : fs::directory_iterator(dir.path())) {
+    for (const fs::directory_entry& e : fs::directory_iterator(path)) {
         if (!e.is_directory()) {
             continue;
         }
 
-        Directory d(e.path().string());
+        std::filesystem::path d = e.path();
 
         // Extract the name of the directory
         // +1 as the last path delimiter is missing from the path
-        std::string directoryName = e.path().string().substr(dir.path().size() + 1);
+        std::string directoryName = e.path().string().substr(path.string().size() + 1);
 
         for (const fs::directory_entry& f : fs::directory_iterator(e)) {
             std::string hash = f.path().string();
             // Extract the hash from the directory name
             // +1 as the last path delimiter is missing from the path
-            std::string hashName = hash.substr(d.path().size() + 1);
+            std::string hashName = hash.substr(d.string().size() + 1);
 
             namespace fs = std::filesystem;
             std::vector<fs::directory_entry> files;
@@ -472,9 +471,7 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
             if (files.size() == 1) {
                 // Extract the file name from the full path
                 // +1 as the last path delimiter is missing from the path
-                std::string filename = files[0].path().string().substr(
-                    Directory(hash).path().size() + 1
-                );
+                std::string filename = files[0].path().string().substr(hash.size() + 1);
                 if (filename != directoryName) {
                     throw ErrorLoadingCacheException(fmt::format(
                         "File contained in cache directory '{}' contains a file with "

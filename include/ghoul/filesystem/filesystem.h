@@ -26,9 +26,9 @@
 #ifndef __GHOUL___FILESYSTEM___H__
 #define __GHOUL___FILESYSTEM___H__
 
-#include <ghoul/filesystem/directory.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
+#include <filesystem>
 #include <map>
 #include <memory>
 #include <string>
@@ -204,7 +204,7 @@ public:
      * \pre \p cacheDirectory must point to an existing directory
      * \pre \p The CacheManager must not have been created before without destroying it
      */
-    void createCacheManager(const Directory& cacheDirectory, int version = -1);
+    void createCacheManager(const std::filesystem::path& directory, int version = -1);
 
     /**
      * Destroys the previously created CacheManager. The destruction of the CacheManager

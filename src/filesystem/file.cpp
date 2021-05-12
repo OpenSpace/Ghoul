@@ -42,32 +42,17 @@
 #include <sys/stat.h>
 #endif // WIN32
 
-using std::string;
-
-namespace {
 #ifdef WIN32
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif // _CRT_SECURE_NO_WARNINGS
 #endif // WIN32
-} // namespace
 
 namespace ghoul::filesystem {
 
-File::FileException::FileException(std::string msg)
-    : RuntimeError(std::move(msg), "File")
-{}
-
-File::File(string filename, FileChangedCallback fileChangedCallback)
-    : _fileChangedCallback(std::move(fileChangedCallback))
-{
+File::File(std::string filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-
     _filename = std::move(filename);
-
-    if (_fileChangedCallback) {
-        installFileChangeListener();
-    }
 }
 
 File::File(const File& file)

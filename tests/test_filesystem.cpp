@@ -53,9 +53,12 @@ TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
     auto c1 = [&b1](const File&) { b1 = true; };
     auto c2 = [&b2](const File&) { b2 = true; };
 
-    File* f1 = new File(path, c1);
-    File* f2 = new File(path, c1);
-    File* f3 = new File(path, c2);
+    File* f1 = new File(path);
+    f1->setCallback(c1);
+    File* f2 = new File(path);
+    f2->setCallback(c1);
+    File* f3 = new File(path);
+    f3->setCallback(c2);
 
     // Check that the file exists
     REQUIRE(std::filesystem::is_regular_file(absPath(cpath)));

@@ -26,9 +26,9 @@
 #ifndef __GHOUL___CACHEMANAGER___H__
 #define __GHOUL___CACHEMANAGER___H__
 
-#include <ghoul/filesystem/directory.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
+#include <filesystem>
 #include <map>
 #include <string>
 
@@ -326,7 +326,7 @@ protected:
     /**
      * Cleans a directory from files not flagged as persistent and removes
      */
-    void cleanDirectory(const Directory& dir) const;
+    void cleanDirectory(const std::filesystem::path& path) const;
 
     /**
      * Reads informations from a directory about the content and transofrms it to a
@@ -334,10 +334,10 @@ protected:
      * and used as a foundation for cleaning directories.
      */
     std::vector<LoadedCacheInfo> cacheInformationFromDirectory(
-        const Directory& dir) const;
+        const std::filesystem::path& path) const;
 
     /// The cache directory
-    Directory _directory;
+    std::filesystem::path _directory;
 
     /// The cache version
     const int _version;

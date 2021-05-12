@@ -50,13 +50,6 @@ class FileSystem;
  */
 class File {
 public:
-    BooleanType(RawPath);
-
-     /// Exception that gets thrown if there is a file-related error in any of the methods
-    struct FileException : public RuntimeError {
-        explicit FileException(std::string msg);
-    };
-
     /// The type of the std::function that is used as the prototype for the callback
     using FileChangedCallback = std::function<void (const File&)>;
 
@@ -77,8 +70,7 @@ public:
      *
      * \see FileSystem The system to register and use tokens
      */
-    File(std::string filename,
-        FileChangedCallback fileChangedCallback = FileChangedCallback());
+    File(std::string filename);
 
     /**
      * Copy constructor.
