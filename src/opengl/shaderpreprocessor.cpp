@@ -181,7 +181,8 @@ void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
     _onChangeCallback = std::move(changeCallback);
     for (std::pair<const std::string, FileStruct>& files : _includedFiles) {
         if (files.second.isTracked) {
-            files.second.file.setCallback(
+            files.second.file = ghoul::filesystem::File(
+                files.second.file.path(),
                 [this](const std::filesystem::path&) { _onChangeCallback(); }
             );
         }

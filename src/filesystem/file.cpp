@@ -25,71 +25,19 @@
 
 #include <ghoul/filesystem/file.h>
 
-#include <ghoul/fmt.h>
 #include <ghoul/filesystem/filesystem.h>
-#include <ghoul/misc/assert.h>
-#include <filesystem>
-
-#ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif // NOMINMAX
-#include <windows.h>
-#else // ^^^^ WIN32 // !WIN32 vvvv
-#include <ctime>
-#include <sys/types.h>
-#include <sys/stat.h>
-#endif // WIN32
-
-#ifdef WIN32
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#endif // _CRT_SECURE_NO_WARNINGS
-#endif // WIN32
 
 namespace ghoul::filesystem {
 
-File::File(std::string filename) {
-    ghoul_assert(!filename.empty(), "Filename must not be empty");
-    _filename = std::move(filename);
-}
-
-File::File(const File& file)
-    : _filename(file._filename)
-    , _fileChangedCallback(file._fileChangedCallback)
-{
-    if (_fileChangedCallback) {
-        installFileChangeListener();
-    }
+File::File(std::filesystem::path filename, FileChangedCallback callback) {
+    _path = filename;
+    _callbackIndex = FileSys.addFileListener(std::move(filename), std::move(callback));
 }
 
 File::~File() {
-    if (_fileChangedCallback) {
-        removeFileChangeListener();
+    if (_callbackIndex >= 0) {
+        FileSys.removeFileListener(_callbackIndex);
     }
-}
-
-void File::setCallback(FileChangedCallback callback) {
-    if (_fileChangedCallback) {
-        removeFileChangeListener();
-    }
-    _fileChangedCallback = std::move(callback);
-    if (_fileChangedCallback) {
-        installFileChangeListener();
-    }
-}
-
-const std::string& File::path() const {
-    return _filename;
-}
-
-void File::installFileChangeListener() {
-    _indx = FileSys.addFileListener(path(), _fileChangedCallback);
-}
-
-void File::removeFileChangeListener() {
-    FileSys.removeFileListener(_indx);
 }
 
 } // namespace ghoul::filesystem

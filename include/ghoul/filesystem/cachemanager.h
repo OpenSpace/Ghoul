@@ -34,8 +34,6 @@
 
 namespace ghoul::filesystem {
 
-class File;
-
 /**
  * The CacheManager allows users to request a storage location for an, optionally
  * persistent, file path to store a cached result. This class only generates and manages
@@ -136,7 +134,7 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    std::string cachedFilename(const File& file,
+    std::string cachedFilename(const std::filesystem::path& file,
         Persistent isPersistent = Persistent::No);
 
     /**
@@ -167,8 +165,8 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    std::string cachedFilename(const File& file, std::string_view information,
-        Persistent isPersistent = Persistent::No);
+    std::string cachedFilename(const std::filesystem::path& file,
+        std::string_view information, Persistent isPersistent = Persistent::No);
 
     /**
      * Returns the path to a storage location for the cached file. Depending on the
@@ -226,7 +224,7 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    bool hasCachedFile(const File& file) const;
+    bool hasCachedFile(const std::filesystem::path& file) const;
 
     /**
      * This method checks if a cached \p file has been registered before in this
@@ -245,7 +243,8 @@ public:
      *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *         <code>\></code>, or <code>.</code>) in the \p file
      */
-    bool hasCachedFile(const File& file, std::string_view information) const;
+    bool hasCachedFile(const std::filesystem::path& file,
+        std::string_view information) const;
 
     /**
      * This method checks if a cached file has been registered before in this
@@ -279,7 +278,7 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    void removeCacheFile(const File& file);
+    void removeCacheFile(const std::filesystem::path& file);
 
     /**
      * Removes the cached file and deleted the entry from the CacheManager. If the
@@ -295,7 +294,7 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    void removeCacheFile(const File& file, std::string_view information);
+    void removeCacheFile(const std::filesystem::path& file, std::string_view information);
 
     /**
      * Removes the cached file and deleted the entry from the CacheManager. If the

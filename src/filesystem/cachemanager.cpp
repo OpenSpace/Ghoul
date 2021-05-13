@@ -286,15 +286,18 @@ CacheManager::~CacheManager() {
     cleanDirectory(_directory);
 }
 
-std::string CacheManager::cachedFilename(const File& file, Persistent isPersistent) {
-    std::string lastModifiedTime = lastModifiedDate(file.path());
+std::string CacheManager::cachedFilename(const std::filesystem::path& file,
+                                         Persistent isPersistent)
+{
+    std::string lastModifiedTime = lastModifiedDate(file);
     return cachedFilename(file, lastModifiedTime, isPersistent);
 }
 
-std::string CacheManager::cachedFilename(const File& file, std::string_view information,
+std::string CacheManager::cachedFilename(const std::filesystem::path& file,
+                                         std::string_view information,
                                          Persistent isPersistent)
 {
-    std::string filename = std::filesystem::path(file.path()).filename().string();
+    std::string filename = std::filesystem::path(file).filename().string();
     return cachedFilename(filename, information, isPersistent);
 }
 
@@ -345,13 +348,15 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
     return cachedFileName;
 }
 
-bool CacheManager::hasCachedFile(const File& file) const {
-    std::string lastModifiedTime = lastModifiedDate(file.path());
+bool CacheManager::hasCachedFile(const std::filesystem::path& file) const {
+    std::string lastModifiedTime = lastModifiedDate(file);
     return hasCachedFile(file, lastModifiedTime);
 }
 
-bool CacheManager::hasCachedFile(const File& file, std::string_view information) const {
-    std::string filename = std::filesystem::path(file.path()).filename().string();
+bool CacheManager::hasCachedFile(const std::filesystem::path& file,
+                                 std::string_view information) const
+{
+    std::string filename = file.filename().string();
     return hasCachedFile(filename, information);
 }
 
@@ -367,13 +372,15 @@ bool CacheManager::hasCachedFile(const std::string& baseName,
     return _files.find(hash) != _files.end();
 }
 
-void CacheManager::removeCacheFile(const File& file) {
-    std::string lastModifiedTime = lastModifiedDate(file.path());
+void CacheManager::removeCacheFile(const std::filesystem::path& file) {
+    std::string lastModifiedTime = lastModifiedDate(file);
     removeCacheFile(file, lastModifiedTime);
 }
 
-void CacheManager::removeCacheFile(const File& file, std::string_view information) {
-    std::string filename = std::filesystem::path(file.path()).filename().string();
+void CacheManager::removeCacheFile(const std::filesystem::path& file,
+                                   std::string_view information)
+{
+    std::string filename = file.filename().string();
     removeCacheFile(filename, information);
 }
 

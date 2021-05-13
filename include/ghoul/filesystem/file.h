@@ -26,110 +26,26 @@
 #ifndef __GHOUL___FILE___H__
 #define __GHOUL___FILE___H__
 
-#include <ghoul/misc/boolean.h>
-#include <ghoul/misc/exception.h>
 #include <filesystem>
 #include <functional>
-#include <string>
 
 namespace ghoul::filesystem {
 
-class FileSystem;
-
-/**
- * This class is a handle for a generic file in the file system. The main functionality is
- * to be able to extract parts of the path like the #baseName, the #directoryName, or the
- * #fileExtension. The second functionality of this class is a platform-independent way of
- * being notified of changes of the file. The constructor or the #setCallback methods
- * expect an <code>std::function</code> object (possibly initialized using a lambda-
- * expression) that will be called whenever the file changes on the hard disk. The
- * callback function has this object passed as a parameter. If many changes of the file
- * happen in quick succession, each change will trigger a separate call of the callback.
- * The file system is not polled, but the changes are pushed to the application, so the
- * changes are registered efficiently and are solely impacted by the overhead of
- * <code>std::function</code>.
- */
 class File {
 public:
     /// The type of the std::function that is used as the prototype for the callback
     using FileChangedCallback = std::function<void (const std::filesystem::path&)>;
 
-    /**
-     * This method constructs a new File object using a given \p filename. \p isRawPath
-     * controls if the path is used without changes, or if tokens should be converted
-     * first. The token conversion is done using the FileSystem. \p fileChangedCallback
-     * will be called whenever the pointed file changes on the hard disk.
-     *
-     * \param filename The path to the file this File object should point to
-     * \param isRawPath If this value is <code>true</code>, the value of \p filename is
-     *        used as-is. If it is <code>false</code>, the path is converted into an
-     *        absolute path and any tokens, if present, are resolved
-     * \param fileChangedCallback The callback function that is called once per change of
-     *        the file on the filesystem
-     *
-     * \pre \p filename must not be empty
-     *
-     * \see FileSystem The system to register and use tokens
-     */
-    File(std::string filename);
-
-    /**
-     * Copy constructor.
-     */
-    File(const File& file);
-
-    File(File&& file) = default;
-
-    /**
-     * The destructor will automatically stop the notification of future changes in the
-     * file system.
-     */
+    File(std::filesystem::path filename, FileChangedCallback callback);
     ~File();
 
-    File& operator=(const File& rhs) = default;
-    File& operator=(File&& rhs) = default;
-
-
-    /**
-     * Sets a new callback function that will be used for this File object. If there
-     * has not been a callback before, there are no race conditions. If there has been a
-     * registered callback before and the callback is changed from another thread, a race
-     * condition might appear if a file is changed in the file system at the same time.
-     *
-     * \param callback The new callback function that will be used in this File object
-     */
-    void setCallback(FileChangedCallback callback);
-
-    /**
-     * Returns the full path to the file as an <code>std::string</code>.
-     *
-     * \return The full path to the file as an <code>std::string</code>
-     */
-    const std::string& path() const;
+    std::filesystem::path path() const {
+        return _path;
+    }
 
 private:
-    /**
-     * Registers and starts the platform-dependent listener to file changes on disk. Will
-     * remove and unregister the old listener in the process
-     */
-    void installFileChangeListener();
-
-    /**
-     * Removes the platform-dependent listener. If there is no listener present, this
-     * operation is a no-op.
-     */
-    void removeFileChangeListener();
-
-    /// The filename of this File
-    std::string _filename;
-
-    /**
-     * The callback that is called when the file changes on disk. Has no performance
-     * impact when it is not used
-     */
-    FileChangedCallback _fileChangedCallback;
-
-    int _indx;
+    int _callbackIndex = -1;
+    std::filesystem::path _path;
 };
 
 } // namespace ghoul::filesystem
