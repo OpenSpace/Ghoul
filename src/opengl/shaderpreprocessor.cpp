@@ -181,9 +181,7 @@ void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
     _onChangeCallback = std::move(changeCallback);
     for (std::pair<const std::string, FileStruct>& files : _includedFiles) {
         if (files.second.isTracked) {
-            files.second.file.setCallback(
-                [this](const std::filesystem::path&) { _onChangeCallback(); }
-            );
+            files.second.file.setCallback([this]() { _onChangeCallback(); });
         }
     }
 }
@@ -231,9 +229,7 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
             }
         ).first;
         if (trackChanges) {
-            it->second.file.setCallback([this](const std::filesystem::path&) {
-                _onChangeCallback();
-            });
+            it->second.file.setCallback([this]() { _onChangeCallback(); });
         }
     }
 
@@ -266,12 +262,12 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
         if (forStatement.inputIndex + 1 >= environment.inputs.size()) {
             int inputIndex = forStatement.inputIndex;
             ShaderPreprocessor::Input& forInput = environment.inputs[inputIndex];
-            std::string p = forInput.file.path();
+            std::filesystem::path p = forInput.file.path();
             int lineNumber = forStatement.lineNumber;
 
             throw ParserError(fmt::format(
                 "Unexpected end of file. Still processing #for loop from {}: {}. {}",
-                p, lineNumber, debugString(environment)
+                p.string(), lineNumber, debugString(environment)
             ));
         }
     }
@@ -284,7 +280,7 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
 }
 
 void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
-    const std::string& filename = env.inputs.back().file.path();
+    std::string filename = env.inputs.back().file.path().string();
     ghoul_assert(
         _includedFiles.find(filename) != _includedFiles.end(),
         "File not in included files"
@@ -349,7 +345,7 @@ bool ShaderPreprocessor::parseLine(ShaderPreprocessor::Env& env) {
 std::string ShaderPreprocessor::debugString(ShaderPreprocessor::Env& env) {
     if (!env.inputs.empty()) {
         ShaderPreprocessor::Input& input = env.inputs.back();
-        return input.file.path() + ": " + std::to_string(input.lineNumber);
+        return input.file.path().string() + ": " + std::to_string(input.lineNumber);
     }
     else {
         return "";
@@ -784,7 +780,7 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
         env.success = false;
         int inputIndex = forStmnt.inputIndex;
         ShaderPreprocessor::Input& forInput = env.inputs[inputIndex];
-        std::string path = forInput.file.path();
+        std::string path = forInput.file.path().string();
         int lineNumber = forStmnt.lineNumber;
 
         throw ParserError(fmt::format(

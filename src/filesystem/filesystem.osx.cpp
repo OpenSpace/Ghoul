@@ -187,7 +187,7 @@ void callbackHandler(const std::string& path) {
 void FileSystem::callbackHandler(const std::string& path) {
     for (const FileChangeInfo& info : FileSys._trackedFiles) {
         if (info.path == path) {
-            info.callback(path);
+            info.callback();
         }
     }
 }

@@ -142,9 +142,7 @@ void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,
 
     for (const FileChangeInfo& info : FileSys._trackedFiles) {
         if (info.path == fullPath) {
-            // TODO;  probably can lose the parameter as the caller probably should know
-            // which file has just changed
-            info.callback(fullPath);
+            info.callback();
         }
     }
 }

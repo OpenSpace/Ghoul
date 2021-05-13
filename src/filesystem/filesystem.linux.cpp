@@ -129,7 +129,7 @@ void FileSystem::inotifyWatcher() {
                     int wd = e->wd;
                     for (const FileChangeInfo& info : FileSys._trackedFiles) {
                         if (info.inotifyHandle == wd) {
-                            info.callback(info.path);
+                            info.callback();
                         }
                     }
                     break;

@@ -50,8 +50,8 @@ TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
     bool b1 = false;
     bool b2 = false;
 
-    auto c1 = [&b1](const std::filesystem::path&) { b1 = true; };
-    auto c2 = [&b2](const std::filesystem::path&) { b2 = true; };
+    auto c1 = [&b1]() { b1 = true; };
+    auto c2 = [&b2]() { b2 = true; };
 
     File* f1 = new File(path);
     f1->setCallback(c1);

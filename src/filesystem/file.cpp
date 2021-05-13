@@ -50,7 +50,7 @@
 
 namespace ghoul::filesystem {
 
-File::File(std::string filename) {
+File::File(std::filesystem::path filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     _filename = std::move(filename);
 }
@@ -80,7 +80,7 @@ void File::setCallback(FileChangedCallback callback) {
     }
 }
 
-const std::string& File::path() const {
+const std::filesystem::path& File::path() const {
     return _filename;
 }
 

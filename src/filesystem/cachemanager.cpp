@@ -158,7 +158,7 @@ CacheManager::IllegalArgumentException::IllegalArgumentException(std::string arg
     , argumentName(std::move(argument))
 {}
 
-CacheManager::CacheManager(std::string directory, int version)
+CacheManager::CacheManager(std::filesystem::path directory, int version)
     : _version(version)
 {
     ghoul_assert(!directory.empty(), "Directory must not be empty");
@@ -286,22 +286,18 @@ CacheManager::~CacheManager() {
     cleanDirectory(_directory);
 }
 
-std::string CacheManager::cachedFilename(const File& file, Persistent isPersistent) {
-    std::string lastModifiedTime = lastModifiedDate(file.path());
+std::string CacheManager::cachedFilename(const std::filesystem::path& file,
+                                         Persistent isPersistent)
+{
+    std::string lastModifiedTime = lastModifiedDate(file);
     return cachedFilename(file, lastModifiedTime, isPersistent);
 }
 
-std::string CacheManager::cachedFilename(const File& file, std::string_view information,
-                                         Persistent isPersistent)
-{
-    std::string filename = std::filesystem::path(file.path()).filename().string();
-    return cachedFilename(filename, information, isPersistent);
-}
-
-std::string CacheManager::cachedFilename(const std::string& baseName,
+std::string CacheManager::cachedFilename(const std::filesystem::path& file,
                                          std::string_view information,
                                          Persistent isPersistent)
 {
+    std::string baseName = file.filename().string();
     size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
@@ -345,19 +341,15 @@ std::string CacheManager::cachedFilename(const std::string& baseName,
     return cachedFileName;
 }
 
-bool CacheManager::hasCachedFile(const File& file) const {
-    std::string lastModifiedTime = lastModifiedDate(file.path());
+bool CacheManager::hasCachedFile(const std::filesystem::path& file) const {
+    std::string lastModifiedTime = lastModifiedDate(file);
     return hasCachedFile(file, lastModifiedTime);
 }
 
-bool CacheManager::hasCachedFile(const File& file, std::string_view information) const {
-    std::string filename = std::filesystem::path(file.path()).filename().string();
-    return hasCachedFile(filename, information);
-}
-
-bool CacheManager::hasCachedFile(const std::string& baseName,
+bool CacheManager::hasCachedFile(const std::filesystem::path& file,
                                  std::string_view information) const
 {
+    std::string baseName = file.filename().string();
     const size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
@@ -367,19 +359,15 @@ bool CacheManager::hasCachedFile(const std::string& baseName,
     return _files.find(hash) != _files.end();
 }
 
-void CacheManager::removeCacheFile(const File& file) {
-    std::string lastModifiedTime = lastModifiedDate(file.path());
+void CacheManager::removeCacheFile(const std::filesystem::path& file) {
+    std::string lastModifiedTime = lastModifiedDate(file);
     removeCacheFile(file, lastModifiedTime);
 }
 
-void CacheManager::removeCacheFile(const File& file, std::string_view information) {
-    std::string filename = std::filesystem::path(file.path()).filename().string();
-    removeCacheFile(filename, information);
-}
-
-void CacheManager::removeCacheFile(const std::string& baseName,
+void CacheManager::removeCacheFile(const std::filesystem::path& file,
                                    std::string_view information)
 {
+    std::string baseName = file.filename().string();
     const size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
@@ -436,7 +424,6 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
                                                   const std::filesystem::path& path) const
 {
     std::vector<LoadedCacheInfo> result;
-    //std::vector<std::string> directories = dir.readDirectories();
     namespace fs = std::filesystem;
     for (const fs::directory_entry& e : fs::directory_iterator(path)) {
         if (!e.is_directory()) {
@@ -455,7 +442,6 @@ std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDir
             // +1 as the last path delimiter is missing from the path
             std::string hashName = hash.substr(d.string().size() + 1);
 
-            namespace fs = std::filesystem;
             std::vector<fs::directory_entry> files;
             for (fs::directory_entry g : fs::directory_iterator(hash)) {
                 files.push_back(g);

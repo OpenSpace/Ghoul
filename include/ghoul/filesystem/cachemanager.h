@@ -34,8 +34,6 @@
 
 namespace ghoul::filesystem {
 
-class File;
-
 /**
  * The CacheManager allows users to request a storage location for an, optionally
  * persistent, file path to store a cached result. This class only generates and manages
@@ -97,7 +95,7 @@ public:
      * \throw ErrorLoadingCacheException If the previous cache could not be loaded
      * \pre \p directory must not be empty
      */
-    CacheManager(std::string directory, int version = -1);
+    CacheManager(std::filesystem::path directory, int version = -1);
 
     /**
      * The destructor will save all information on persistent files in a
@@ -136,7 +134,7 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    std::string cachedFilename(const File& file,
+    std::string cachedFilename(const std::filesystem::path& file,
         Persistent isPersistent = Persistent::No);
 
     /**
@@ -167,48 +165,8 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    std::string cachedFilename(const File& file, std::string_view information,
-        Persistent isPersistent = Persistent::No);
-
-    /**
-     * Returns the path to a storage location for the cached file. Depending on the
-     * persistence (\p isPersistent), the directory and files will automatically be
-     * cleaned on application end or be made available automatically on the next
-     * application run. Subsequent calls (in the same run or different) with the same
-     * \p baseName and \p information will consistently produce the same file path. The
-     * combination of \p baseName and \p information is the unique key for the returned
-     * cached file. If the cached file was created before, the \p isPersistent parameter
-     * is silently ignored.<br>
-     * As the \p baseName will be used as a name for a directory in the file system, the
-     * usual restrictions apply. The \p baseName is automatically converted into
-     * lower case, so that the \p baseName of <code>base</code>, <code>bAsE</code>, and
-     * <code>BASE</code> all refer to the same file. Furthermore, the \p baseName cannot
-     * contain any of the following characters:
-     * <code>/</code>, <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     * <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>, <code>\></code>,
-     * or <code>.</code>
-     *
-     * \param baseName The base name for which the cached entry is to be retrieved. A list
-     *        of restrictions apply to this base name (see above)
-     * \param information Additional information that is used to uniquely identify the
-     *        cached file. This can be, for example, resolutions or parameters. The
-     *        combination of the \p baseName and \p information must uniquely identiy a
-     *        cached file
-     * \param isPersistent This parameter will only be used if the cached file is used for
-     *        the first time and determines if the CacheManager should automatically
-     *        delete the file when the application closes (<code>false</code>) or if the
-     *        file should be kept and automatically be re-added to the CacheManager on the
-     *        next application run (<code>true</code>). If the cached file has been
-     *        created before, this parameter is silently ignored.
-     * \return The cached file that can be used by the caller to store the results
-     *
-     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *        <code>\></code>, or <code>.</code>) in the \p file
-     */
-    std::string cachedFilename(const std::string& baseName, std::string_view information,
-        Persistent isPersistent = Persistent::No);
+    std::string cachedFilename(const std::filesystem::path& file,
+        std::string_view information, Persistent isPersistent = Persistent::No);
 
     /**
      * This method checks if a cached \p file has been registered before in this
@@ -226,7 +184,7 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    bool hasCachedFile(const File& file) const;
+    bool hasCachedFile(const std::filesystem::path& file) const;
 
     /**
      * This method checks if a cached \p file has been registered before in this
@@ -245,26 +203,8 @@ public:
      *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *         <code>\></code>, or <code>.</code>) in the \p file
      */
-    bool hasCachedFile(const File& file, std::string_view information) const;
-
-    /**
-     * This method checks if a cached file has been registered before in this
-     * application run (persistent and non-persistent files) or in a previous run
-     * (persistent cache files only) with the provided \p baseName and \p information.
-     * Note that this only checks if a file has been requested before, not if the cached
-     * file has actually been used.
-     *
-     * \param baseName The base name for which the cache file should be searched
-     * \param information The identifying information for the file
-     * \return <code>true</code> if a cached file was requested before; <code>false</code>
-     *         otherwise
-     *
-     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *        <code>\></code>, or <code>.</code>) in the \p baseName
-     */
-    bool hasCachedFile(const std::string& baseName, std::string_view information) const;
+    bool hasCachedFile(const std::filesystem::path& file,
+        std::string_view information) const;
 
     /**
      * Removes the cached file and deleted the entry from the CacheManager. If the
@@ -279,7 +219,7 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    void removeCacheFile(const File& file);
+    void removeCacheFile(const std::filesystem::path& file);
 
     /**
      * Removes the cached file and deleted the entry from the CacheManager. If the
@@ -295,24 +235,7 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    void removeCacheFile(const File& file, std::string_view information);
-
-    /**
-     * Removes the cached file and deleted the entry from the CacheManager. If the
-     * <code>baseName</code> has not previously been used to request a cache entry, no
-     * error will be signaled. The same restrictions for the <code>baseName</code> as in
-     * getCachedFile apply to this function.
-     *
-     * \param baseName The base name for which the cache file should be deleted
-     * \param information The detailed information identifying the cached file that
-     *        should be deleted
-     *
-     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *        <code>\></code>, or <code>.</code>) in the \p baseName
-     */
-    void removeCacheFile(const std::string& baseName, std::string_view information);
+    void removeCacheFile(const std::filesystem::path& file, std::string_view information);
 
 protected:
     /// This struct stores the cache information for a specific hash value.

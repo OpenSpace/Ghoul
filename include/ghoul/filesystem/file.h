@@ -26,8 +26,6 @@
 #ifndef __GHOUL___FILE___H__
 #define __GHOUL___FILE___H__
 
-#include <ghoul/misc/boolean.h>
-#include <ghoul/misc/exception.h>
 #include <filesystem>
 #include <functional>
 #include <string>
@@ -52,7 +50,7 @@ class FileSystem;
 class File {
 public:
     /// The type of the std::function that is used as the prototype for the callback
-    using FileChangedCallback = std::function<void (const std::filesystem::path&)>;
+    using FileChangedCallback = std::function<void()>;
 
     /**
      * This method constructs a new File object using a given \p filename. \p isRawPath
@@ -71,7 +69,7 @@ public:
      *
      * \see FileSystem The system to register and use tokens
      */
-    File(std::string filename);
+    File(std::filesystem::path filename);
 
     /**
      * Copy constructor.
@@ -105,7 +103,7 @@ public:
      *
      * \return The full path to the file as an <code>std::string</code>
      */
-    const std::string& path() const;
+    const std::filesystem::path& path() const;
 
 private:
     /**
@@ -121,7 +119,7 @@ private:
     void removeFileChangeListener();
 
     /// The filename of this File
-    std::string _filename;
+    std::filesystem::path _filename;
 
     /**
      * The callback that is called when the file changes on disk. Has no performance
