@@ -26,6 +26,7 @@
 #ifndef __GHOUL___FILESYSTEM___H__
 #define __GHOUL___FILESYSTEM___H__
 
+#include <ghoul/filesystem/file.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 #include <filesystem>
@@ -234,7 +235,7 @@ public:
      * \pre \p file must not be a <code>nullptr</code>
      * \pre \p file must not have been added before
      */
-    void addFileListener(File* file);
+    int addFileListener(std::filesystem::path path, File::FileChangedCallback callback);
 
     /**
      * Removes the file object from tracking lists. The file on the filesystem may still
@@ -243,7 +244,7 @@ public:
      * \pre \p file must not be a <code>nullptr</code>
      * \pre \p file must have been added before (addFileListener)
      */
-    void removeFileListener(File* file);
+    void removeFileListener(int callbackIdentifier);
 
     /**
      * Triggers callbacks on filesystem. May not be needed depending on environment.
@@ -312,8 +313,14 @@ private:
     friend void callbackHandler(DirectoryHandle* directoryHandle,
         const std::string& filePath);
 
+    struct FileChangeInfo {
+        static int NextIdentifier;
+        int identifier;
+        std::filesystem::path path;
+        File::FileChangedCallback callback;
+    };
     /// The list of all tracked files
-    std::multimap<std::string, File*> _trackedFiles;
+    std::vector<FileChangeInfo> _trackedFiles;
 
     /// The list of tracked directories
     std::map<std::string, DirectoryHandle*> _directories;
@@ -331,8 +338,14 @@ private:
     /// Friend callback handler calling the static callback handler
     friend void callbackHandler(const std::string& path);
 
+    struct FileChangeInfo {
+        static int NextIdentifier;
+        int identifier;
+        std::filesystem::path path;
+        File::FileChangedCallback callback;
+    };
     /// The list of all tracked files
-    std::multimap<std::string, File*> _trackedFiles;
+    std::vector<FileChangeInfo> _trackedFiles;
 
     /// The list of tracked directories
     std::map<std::string, DirectoryHandle*> _directories;
@@ -351,8 +364,15 @@ private:
     bool _keepGoing;
     std::thread _t;
 
-    /// The list of tracked files
-    std::multimap<int, File*> _trackedFiles;
+    struct FileChangeInfo {
+        static int NextIdentifier;
+        int identifier;
+        int inotifyHandle;
+        std::filesystem::path path;
+        File::FileChangedCallback callback;
+    };
+    /// The list of all tracked files
+    std::vector<FileChangeInfo> _trackedFiles;
 #endif
 
     static FileSystem* _instance;

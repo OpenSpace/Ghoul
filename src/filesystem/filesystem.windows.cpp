@@ -38,22 +38,23 @@
 #include <regex>
 #include <Shlobj.h>
 
-using std::string;
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 
 namespace {
     constexpr const char* _loggerCat = "FileSystem";
 
     const unsigned int changeBufferSize = 16384u;
-
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#endif
 } // namespace
 
 void CALLBACK completionHandler(DWORD dwErrorCode, DWORD dwNumberOfBytesTransferred,
     LPOVERLAPPED lpOverlapped);
 
 namespace ghoul::filesystem {
+
+int FileSystem::FileChangeInfo::NextIdentifier = 0;
 
 struct DirectoryHandle {
     HANDLE _handle = nullptr;
@@ -73,10 +74,11 @@ void FileSystem::deinitializeInternalWindows() {
     }
 }
 
-void FileSystem::addFileListener(File* file) {
-    ghoul_assert(file != nullptr, "File must not be nullptr");
+int FileSystem::addFileListener(std::filesystem::path path,
+                                File::FileChangedCallback callback)
+{
 
-    std::string d = std::filesystem::path(file->path()).parent_path().string();
+    std::string d = path.parent_path().string();
     auto f = _directories.find(d);
     if (f == _directories.end()) {
         LDEBUG(fmt::format("Started watching: {}", d));
@@ -95,40 +97,37 @@ void FileSystem::addFileListener(File* file) {
         );
 
         if (handle->_handle == INVALID_HANDLE_VALUE) {  // NOLINT
-            LERROR(fmt::format("Directory handle for '{}' could not be obtained", d));
             delete handle;
-            return;
+            throw ghoul::RuntimeError(
+                fmt::format("Directory handle for '{}' could not be obtained", d)
+            );
         }
 
         _directories[d] = handle;
         beginRead(handle);
     }
 
-#ifdef GHL_DEBUG
-    auto eqRange = _trackedFiles.equal_range(file->path());
-    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        if (it->second == file) {
-            LERROR("Already tracking fileobject");
-            return;
-        }
-    }
-#endif
-    _trackedFiles.emplace(file->path(), file);
+    int idx = FileChangeInfo::NextIdentifier;
+
+    FileChangeInfo info;
+    info.identifier = idx;
+    info.path = std::move(path);
+    info.callback = std::move(callback);
+    _trackedFiles.push_back(std::move(info));
+
+    FileChangeInfo::NextIdentifier += 1;
+    return idx;
 }
 
-void FileSystem::removeFileListener(File* file) {
-    ghoul_assert(file != nullptr, "File must not be nullptr");
-    auto eqRange = _trackedFiles.equal_range(file->path());
-    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        if (it->second == file) {
-            _trackedFiles.erase(it);
+void FileSystem::removeFileListener(int callbackIdentifier) {
+    for (size_t i = 0; i < _trackedFiles.size(); i += 1) {
+        if (_trackedFiles[i].identifier == callbackIdentifier) {
+            _trackedFiles.erase(_trackedFiles.begin() + i);
             return;
         }
     }
-    LWARNING(fmt::format(
-        "Could not find tracked '{0:x}' for path '{}'",
-        reinterpret_cast<void*>(file), file->path()
-    ));
+
+    LWARNING(fmt::format("Could not find callback identifier '{}'", callbackIdentifier));
 }
 
 void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,
@@ -141,12 +140,11 @@ void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,
         }
     }
 
-    const size_t n = FileSys._trackedFiles.count(fullPath);
-    if (n > 0) {
-        auto eqRange = FileSys._trackedFiles.equal_range(fullPath);
-        for (auto it = eqRange.first; it != eqRange.second; ++it) {
-            File* f = (*it).second;
-            f->callback()(*f);
+    for (const FileChangeInfo& info : FileSys._trackedFiles) {
+        if (info.path == fullPath) {
+            // TODO;  probably can lose the parameter as the caller probably should know
+            // which file has just changed
+            info.callback(fullPath);
         }
     }
 }
@@ -193,7 +191,7 @@ void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
             if (i > 0) {
                 // make sure the last char is string terminating
                 currentFilenameBuffer[i - 1] = '\0';
-                const string currentFilename(currentFilenameBuffer.data(), i - 1);
+                const std::string currentFilename(currentFilenameBuffer.data(), i - 1);
 
                 callbackHandler(handle, currentFilename);
             }

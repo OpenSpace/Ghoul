@@ -80,20 +80,16 @@ void File::setCallback(FileChangedCallback callback) {
     }
 }
 
-const File::FileChangedCallback& File::callback() const {
-    return _fileChangedCallback;
-}
-
 const std::string& File::path() const {
     return _filename;
 }
 
 void File::installFileChangeListener() {
-    FileSys.addFileListener(this);
+    _indx = FileSys.addFileListener(path(), _fileChangedCallback);
 }
 
 void File::removeFileChangeListener() {
-    FileSys.removeFileListener(this);
+    FileSys.removeFileListener(_indx);
 }
 
 } // namespace ghoul::filesystem

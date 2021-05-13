@@ -28,6 +28,7 @@
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
+#include <filesystem>
 #include <functional>
 #include <string>
 
@@ -51,7 +52,7 @@ class FileSystem;
 class File {
 public:
     /// The type of the std::function that is used as the prototype for the callback
-    using FileChangedCallback = std::function<void (const File&)>;
+    using FileChangedCallback = std::function<void (const std::filesystem::path&)>;
 
     /**
      * This method constructs a new File object using a given \p filename. \p isRawPath
@@ -100,14 +101,6 @@ public:
     void setCallback(FileChangedCallback callback);
 
     /**
-     * Returns the currently active callback. This object might be uninitialized if no
-     * callback has been registered previously.
-     *
-     * \return The currently active callback function
-     */
-    const FileChangedCallback& callback() const;
-
-    /**
      * Returns the full path to the file as an <code>std::string</code>.
      *
      * \return The full path to the file as an <code>std::string</code>
@@ -135,6 +128,8 @@ private:
      * impact when it is not used
      */
     FileChangedCallback _fileChangedCallback;
+
+    int _indx;
 };
 
 } // namespace ghoul::filesystem

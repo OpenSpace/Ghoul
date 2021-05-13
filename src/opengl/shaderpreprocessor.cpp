@@ -182,7 +182,7 @@ void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
     for (std::pair<const std::string, FileStruct>& files : _includedFiles) {
         if (files.second.isTracked) {
             files.second.file.setCallback(
-                [this](const filesystem::File&) { _onChangeCallback(); }
+                [this](const std::filesystem::path&) { _onChangeCallback(); }
             );
         }
     }
@@ -231,7 +231,7 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
             }
         ).first;
         if (trackChanges) {
-            it->second.file.setCallback([this](const filesystem::File&) {
+            it->second.file.setCallback([this](const std::filesystem::path&) {
                 _onChangeCallback();
             });
         }
