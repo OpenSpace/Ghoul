@@ -141,7 +141,7 @@ void FileSystem::inotifyWatcher() {
                     // remove tracking of the removed descriptor
                     inotify_rm_watch(fd, wd);
 
-                    for (FileChangeInfo& info : FileSys._trackedFiled) {
+                    for (FileChangeInfo& info : FileSys._trackedFiles) {
                         if (info.inotifyHandle != wd) {
                             continue;
                         }

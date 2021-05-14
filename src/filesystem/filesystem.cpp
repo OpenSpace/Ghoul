@@ -189,7 +189,12 @@ std::filesystem::path FileSystem::expandPathTokens(std::string path,
             break;
         }
 
-        std::string replacement = resolveToken(tokenInformation.token).string();
+        auto it = _tokenMap.find(tokenInformation.token);
+        if (it == _tokenMap.end()) {
+            throw ResolveTokenException(tokenInformation.token);
+        }
+
+        std::string replacement = it->second.string();
         path.replace(tokenInformation.beginning, tokenInformation.length, replacement);
     }
 
@@ -267,18 +272,6 @@ bool FileSystem::hasToken(const std::string& path, const std::string& token) con
         }
     }
     return false;
-}
-
-std::filesystem::path FileSystem::resolveToken(const std::string& token) const {
-    ghoul_assert(!token.empty(), "Token must not be empty");
-
-    auto it = _tokenMap.find(token);
-    if (it == _tokenMap.end()) {
-        throw ResolveTokenException(token);
-    }
-    else {
-        return it->second;
-    }
 }
 
 } // namespace ghoul::filesystem

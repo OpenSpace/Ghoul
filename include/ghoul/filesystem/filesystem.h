@@ -235,18 +235,6 @@ private:
      */
     bool hasToken(const std::string& path, const std::string& token) const;
 
-    /**
-     * Returns the path that was registered for the \p token. If the token has not been
-     * registered with any replacement path, the token itself is returned.
-     *
-     * \param token The token whose replacement is looked up
-     * \return The replacement string for the token
-     *
-     * \throw FileSystemException If the token could not be resolved
-     * \pre \p token must not be empty
-     */
-    std::filesystem::path resolveToken(const std::string& token) const;
-
     /// This map stores all the tokens that are used in the FileSystem.
     std::map<std::string, std::filesystem::path> _tokenMap;
 
