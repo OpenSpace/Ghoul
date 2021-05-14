@@ -116,8 +116,8 @@ public:
      * \pre \p filename must not be empty
      * \pre \p filename must be a file that exists
      */
-    ShaderObject(ShaderType shaderType, std::string filename = "", std::string name = "",
-        Dictionary dictionary = Dictionary());
+    ShaderObject(ShaderType shaderType, std::filesystem::path filename = "",
+        std::string name = "", Dictionary dictionary = Dictionary());
 
     /**
      * A copy constructor that will copy all of the internal state, and the shader source,
@@ -214,7 +214,7 @@ public:
      *
      * \return The filename
      */
-    std::string filename() const;
+    std::filesystem::path filename() const;
 
     /**
      * (Re)sets the \p filename this ShaderObject is based on. It will load the contents
@@ -228,7 +228,7 @@ public:
      * \throw ShaderObjectError If the file pointed to by \p filename was empty
      * \pre \p filename must not be empty
      */
-    void setFilename(const std::string& filename);
+    void setFilename(std::filesystem::path filename);
 
     /**
     * Rebuild the shader object from file using the file set by setFilename and the

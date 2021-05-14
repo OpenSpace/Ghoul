@@ -75,7 +75,7 @@ void FontManager::deinitialize() {
 }
 
 unsigned int FontManager::registerFontPath(std::string_view fontName,
-                                           const std::string& filePath)
+                                           std::filesystem::path filePath)
 {
     ghoul_assert(!fontName.empty(), "Fontname must not be empty");
     ghoul_assert(!filePath.empty(), "Filepath must not be empty");
@@ -95,7 +95,7 @@ unsigned int FontManager::registerFontPath(std::string_view fontName,
             ));
         }
     }
-    _fontPaths[hash] = filePath;
+    _fontPaths[hash] = filePath.string();
     return hash;
 }
 

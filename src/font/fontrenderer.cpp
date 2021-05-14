@@ -232,7 +232,7 @@ FontRenderer::~FontRenderer() {
 }
 
 std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
-    std::string vsPath = absPath(DefaultVertexShaderPath);
+    std::filesystem::path vsPath = absPath(DefaultVertexShaderPath);
     if (std::filesystem::is_regular_file(vsPath)) {
         LDEBUG(fmt::format("Skipping creation of existing vertex shader {}", vsPath));
     }
@@ -242,7 +242,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
         file << DefaultVertexShaderSource;
     }
 
-    std::string fsPath = absPath(DefaultFragmentShaderPath);
+    std::filesystem::path fsPath = absPath(DefaultFragmentShaderPath);
     if (std::filesystem::is_regular_file(fsPath)) {
         LDEBUG(fmt::format("Skipping creation of existing fragment shader {}", fsPath));
     }
@@ -275,7 +275,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
 }
 
 std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
-    std::string vsPath = absPath(ProjectionVertexShaderPath);
+    std::filesystem::path vsPath = absPath(ProjectionVertexShaderPath);
     if (std::filesystem::is_regular_file(vsPath)) {
         LDEBUG(fmt::format("Skipping creation of existing vertex shader {}", vsPath));
     }
@@ -285,7 +285,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
         file << ProjectionVertexShaderSource;
     }
 
-    std::string fsPath = absPath(ProjectionFragmentShaderPath);
+    std::filesystem::path fsPath = absPath(ProjectionFragmentShaderPath);
     if (std::filesystem::is_regular_file(fsPath)) {
         LDEBUG(fmt::format("Skipping creation of existing fragment shader {}", vsPath));
     }

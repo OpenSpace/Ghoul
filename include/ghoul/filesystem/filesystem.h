@@ -76,12 +76,6 @@ public:
         const std::string token;
     };
 
-    /// Opening braces that are used for path tokens
-    static constexpr const char* TokenOpeningBraces = "${";
-
-    /// Closing braces that are used for path tokens
-    static constexpr const char* TokenClosingBraces = "}";
-
     FileSystem(const FileSystem& rhs) = delete;
     FileSystem(const FileSystem&&) = delete;
     FileSystem& operator=(const FileSystem& rhs) = delete;
@@ -91,21 +85,6 @@ public:
     static void deinitialize();
     static bool isInitialized();
     static FileSystem& ref();
-
-    /**
-     * Returns the absolute path to the passed \p path, resolving any tokens (if present)
-     * in the process. The current working directory (#currentDirectory) is used as a base
-     * path for this. All tokens contained in the \p ignoredTokens are ignored from the
-     * token resolving
-     *
-     * \param path The path that should be converted into an absolute path
-     * \param ignoredTokens All tokens contained in this list are ignored during the
-     *        resolving of path tokens
-     * \return The absolute path to the passed \p path
-     *
-     * \pre \p path must not be empty
-     */
-    std::string absolutePath(std::string path) const;
 
     /**
      * Registers the path token \p token with this FileSystem. Henceforth, every call to,
@@ -135,10 +114,9 @@ public:
      * \param path The path whose tokens should be replaced
      * \param ignoredTokens All tokens contained in this list are ignored during the
      *        resolving of path tokens
-     * \return <code>true</code> if all tokens were replaced successfully,
-     *         <code>false</code> otherwise
+     * \return The path with the tokens replaced
      */
-    bool expandPathTokens(std::string& path,
+    [[nodiscard]] std::filesystem::path expandPathTokens(std::string path,
         const std::vector<std::string>& ignoredTokens = std::vector<std::string>()) const;
 
     /**
@@ -356,8 +334,22 @@ private:
 };
 
 #define FileSys (ghoul::filesystem::FileSystem::ref())
-#define absPath(__path__) ghoul::filesystem::FileSystem::ref().absolutePath(__path__)
 
 } // namespace ghoul::filesystem
+
+/**
+ * Returns the absolute path to the passed \p path, resolving any tokens (if present)
+ * in the process. The current working directory (#currentDirectory) is used as a base
+ * path for this. All tokens contained in the \p ignoredTokens are ignored from the
+ * token resolving
+ *
+ * \param path The path that should be converted into an absolute path
+ * \param ignoredTokens All tokens contained in this list are ignored during the
+ *        resolving of path tokens
+ * \return The absolute path to the passed \p path
+ *
+ * \pre \p path must not be empty
+ */
+std::string absPath(std::string path);
 
 #endif // __GHOUL___FILESYSTEM___H__

@@ -30,6 +30,7 @@
 #include <ghoul/opengl/textureatlas.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
+#include <filesystem>
 #include <map>
 #include <memory>
 #include <string>
@@ -94,7 +95,7 @@ public:
      * \pre \p filePath must not be empty
      */
     unsigned int registerFontPath(std::string_view fontName,
-        const std::string& filePath);
+        std::filesystem::path filePath);
 
     /**
      * Retrieves the Font with the name <code>name</code>, which must have been previously

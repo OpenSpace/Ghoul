@@ -52,7 +52,7 @@ ShaderObject::ShaderCompileError::ShaderCompileError(std::string error,
     , shaderName(std::move(name))
 {}
 
-ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
+ShaderObject::ShaderObject(ShaderType shaderType, std::filesystem::path filename,
                            std::string name, Dictionary dictionary)
     : _type(shaderType)
     , _shaderName(std::move(name))
@@ -204,16 +204,16 @@ void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) 
     _preprocessor.setCallback(_onChangeCallback);
 }
 
-void ShaderObject::setFilename(const std::string& filename) {
+void ShaderObject::setFilename(std::filesystem::path filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     if (!std::filesystem::is_regular_file(filename)) {
-        throw FileNotFoundError(filename);
+        throw FileNotFoundError(filename.string());
     }
 
     _preprocessor.setFilename(filename);
 }
 
-std::string ShaderObject::filename() const {
+std::filesystem::path ShaderObject::filename() const {
     return _preprocessor.filename();
 }
 

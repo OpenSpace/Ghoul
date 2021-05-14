@@ -365,7 +365,7 @@ CacheManager::~CacheManager() {
             }
             else {
                 // Save the persistent files in the cache file
-                file << p.first << '\n' << p.second.file << '\n';
+                file << p.first << '\n' << p.second.file.string() << '\n';
             }
         }
         file.close();

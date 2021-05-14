@@ -333,8 +333,8 @@ void ProgramObject::deactivate() {
 }
 
 std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
-                                                    const std::string& vertexShaderPath,
-                                                    const std::string& fragmentShaderPath,
+                                            const std::filesystem::path& vertexShaderPath,
+                                          const std::filesystem::path& fragmentShaderPath,
                                                     Dictionary dictionary)
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");
@@ -368,10 +368,10 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
 }
 
 std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
-                                                    const std::string& vertexShaderPath,
-                                                    const std::string& fragmentShaderPath,
-                                                    const std::string& geometryShaderPath,
-                                                    Dictionary dictionary)
+                                            const std::filesystem::path& vertexShaderPath,
+                                          const std::filesystem::path& fragmentShaderPath,
+                                          const std::filesystem::path& geometryShaderPath,
+                                                                    Dictionary dictionary)
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");
     ghoul_assert(
@@ -415,11 +415,11 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
 }
 
 std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
-                                                    const std::string& vertexShaderPath,
-                                                    const std::string& fragmentShaderPath,
-                                                    const std::string& geometryShaderPath,
-                                      const std::string& tessellationEvaluationShaderPath,
-                                         const std::string& tessellationControlShaderPath,
+                                            const std::filesystem::path& vertexShaderPath,
+                                          const std::filesystem::path& fragmentShaderPath,
+                                          const std::filesystem::path& geometryShaderPath,
+                            const std::filesystem::path& tessellationEvaluationShaderPath,
+                               const std::filesystem::path& tessellationControlShaderPath,
                                                                     Dictionary dictionary)
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");

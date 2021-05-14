@@ -278,7 +278,8 @@ public:
      * \pre \p fragmentShaderPath must be a file that exists
      */
     static std::unique_ptr<ProgramObject> Build(const std::string& name,
-        const std::string& vertexShaderPath, const std::string& fragmentShaderPath,
+        const std::filesystem::path& vertexShaderPath,
+        const std::filesystem::path& fragmentShaderPath,
         Dictionary dictionary = Dictionary());
 
     /**
@@ -309,8 +310,10 @@ public:
      * \pre \p geometryShaderPath must be a file that exists
      */
     static std::unique_ptr<ProgramObject> Build(const std::string& name,
-        const std::string& vertexShaderPath, const std::string& fragmentShaderPath,
-        const std::string& geometryShaderPath, Dictionary dictionary = Dictionary());
+        const std::filesystem::path& vertexShaderPath,
+        const std::filesystem::path& fragmentShaderPath,
+        const std::filesystem::path& geometryShaderPath,
+        Dictionary dictionary = Dictionary());
 
     /**
      * Constructs and links a ProgramObject built from the provided \p vertexShaderPath
@@ -350,10 +353,11 @@ public:
      * \pre \p tessellationControlShaderPath must be a file that exists
      */
     static std::unique_ptr<ProgramObject> Build(const std::string& name,
-        const std::string& vertexShaderPath, const std::string& fragmentShaderPath,
-        const std::string& geometryShaderPath,
-        const std::string& tessellationEvaluationShaderPath,
-        const std::string& tessellationControlShaderPath,
+        const std::filesystem::path& vertexShaderPath,
+        const std::filesystem::path& fragmentShaderPath,
+        const std::filesystem::path& geometryShaderPath,
+        const std::filesystem::path& tessellationEvaluationShaderPath,
+        const std::filesystem::path& tessellationControlShaderPath,
         Dictionary dictionary = Dictionary());
 
     //////////////////////////////////////////////////////////////////////////////////////

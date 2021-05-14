@@ -30,6 +30,7 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/log.h>
 #include <ghoul/misc/dictionary.h>
+#include <ghoul/misc/exception.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
 #include <filesystem>
@@ -113,9 +114,9 @@ ShaderPreprocessor::ShaderPreprocessor(std::string shaderPath, Dictionary dictio
     , _dictionary(std::move(dictionary))
 {}
 
-ShaderPreprocessor::IncludeError::IncludeError(std::string f)
+ShaderPreprocessor::IncludeError::IncludeError(std::filesystem::path f)
     : ShaderPreprocessorError(
-        fmt::format("Could not resolve file path for include file '{}'", f)
+        fmt::format("Could not resolve file path for include file {}", f)
     )
     , file(std::move(f))
 {}
@@ -144,7 +145,7 @@ const Dictionary& ShaderPreprocessor::dictionary() const {
     return _dictionary;
 }
 
-void ShaderPreprocessor::setFilename(const std::string& shaderPath) {
+void ShaderPreprocessor::setFilename(std::filesystem::path shaderPath) {
     if (_shaderPath != shaderPath) {
         _shaderPath = shaderPath;
         if (_onChangeCallback) {
@@ -153,7 +154,7 @@ void ShaderPreprocessor::setFilename(const std::string& shaderPath) {
     }
 }
 
-const std::string& ShaderPreprocessor::filename() const {
+const std::filesystem::path& ShaderPreprocessor::filename() const {
     return _shaderPath;
 }
 
@@ -161,7 +162,7 @@ void ShaderPreprocessor::process(std::string& output) {
     std::stringstream stream;
     ShaderPreprocessor::Env env{stream};
 
-    includeFile(absPath(_shaderPath), TrackChanges::Yes, env);
+    includeFile(absPath(_shaderPath.string()), TrackChanges::Yes, env);
 
     if (!env.forStatements.empty()) {
         throw ParserError(
@@ -194,34 +195,33 @@ std::string ShaderPreprocessor::getFileIdentifiersString() const {
     return identifiers.str();
 }
 
-void ShaderPreprocessor::addIncludePath(std::string folderPath) {
+void ShaderPreprocessor::addIncludePath(std::filesystem::path folderPath) {
     ghoul_assert(!folderPath.empty(), "Folder path must not be empty");
     ghoul_assert(
         std::filesystem::is_directory(folderPath),
         "Folder path must be an existing directory"
     );
-    ghoul_assert(
-        !FileSys.containsToken(folderPath),
-        "Folder path must not contain path tokens"
+
+    const auto it = std::find(
+        _includePaths.begin(), _includePaths.end(),
+        folderPath.string()
     );
 
-    const auto it = std::find(_includePaths.begin(), _includePaths.end(), folderPath);
-
     if (it == _includePaths.cend()) {
-        _includePaths.push_back(std::move(folderPath));
+        _includePaths.push_back(folderPath.string());
     }
 }
 
-void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges trackChanges,
+void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
+                                     TrackChanges trackChanges,
                                      ShaderPreprocessor::Env& environment)
 {
     ghoul_assert(!path.empty(), "Path must not be empty");
     ghoul_assert(std::filesystem::is_regular_file(path), "Path must be an existing file");
-    ghoul_assert(!FileSys.containsToken(path), "Path must not contain path tokens");
 
-    if (_includedFiles.find(path) == _includedFiles.end()) {
+    if (_includedFiles.find(path.string()) == _includedFiles.end()) {
         const auto it = _includedFiles.emplace(
-            path,
+            path.string(),
             FileStruct {
                 filesystem::File(path),
                 _includedFiles.size(),
@@ -235,7 +235,7 @@ void ShaderPreprocessor::includeFile(const std::string& path, TrackChanges track
 
     std::ifstream stream(path);
     if (!stream.good()) {
-        perror(path.c_str());
+        throw ghoul::RuntimeError(fmt::format("Error loading include file {}", path));
     }
     ghoul_assert(stream.good() , "Input stream is not good");
 
@@ -514,19 +514,16 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
         }
 
         const size_t includeLength = p2 - p1 - 1;
-        std::string includeFilename = line.substr(p1 + 1, includeLength);
-        std::string includeFilepath = fmt::format(
-            "{}/{}",
-            std::filesystem::path(env.inputs.back().file.path()).parent_path().string(),
-            includeFilename
-        );
+        std::filesystem::path includeFilename = line.substr(p1 + 1, includeLength);
+        std::filesystem::path includeFilepath =
+            env.inputs.back().file.path().parent_path() / includeFilename;
 
         bool includeFileWasFound = std::filesystem::is_regular_file(includeFilepath);
 
         // Resolve the include paths if this default includeFilename does not exist
         if (!includeFileWasFound) {
             for (const std::string& path : _includePaths) {
-                includeFilepath = fmt::format("{}/{}", path, includeFilename);
+                includeFilepath = std::filesystem::path(path) / includeFilename;
                 if (std::filesystem::is_regular_file(includeFilepath)) {
                     includeFileWasFound = true;
                     break;
@@ -538,13 +535,17 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
             // Our last chance is that the include file is an absolute path
             const bool found = std::filesystem::is_regular_file(includeFilename);
             if (found) {
-                includeFilepath = absPath(includeFilename);
+                includeFilepath = includeFilename;
                 includeFileWasFound = true;
             }
         }
 
         if (includeFileWasFound) {
-            includeFile(absPath(includeFilepath), TrackChanges(tracksInclude), env);
+            includeFile(
+                absPath(includeFilepath.string()),
+                TrackChanges(tracksInclude),
+                env
+            );
         }
         else {
             throw IncludeError(includeFilename);
@@ -556,9 +557,9 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
             throw ParserError("Expected >. " + debugString(env));
         }
 
-        const size_t includeLength = p2 - p1 - 1;
-        std::string includeFilename = absPath(line.substr(p1 + 1, includeLength));
-        includeFile(includeFilename, TrackChanges(tracksInclude), env);
+        const size_t includeLen = p2 - p1 - 1;
+        std::filesystem::path includeFilename = absPath(line.substr(p1 + 1, includeLen));
+        includeFile(includeFilename.string(), TrackChanges(tracksInclude), env);
     }
     return true;
 }
