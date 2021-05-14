@@ -55,6 +55,8 @@ namespace {
 
 namespace ghoul::filesystem {
 
+int FileSystem::FileChangeInfo::NextIdentifier = 0;
+
 void FileSystem::initializeInternalLinux() {
     _inotifyHandle = inotify_init();
     _keepGoing = true;

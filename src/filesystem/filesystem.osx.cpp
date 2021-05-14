@@ -83,6 +83,8 @@ namespace {
 
 namespace ghoul::filesystem {
 
+int FileSystem::FileChangeInfo::NextIdentifier = 0;
+
 struct DirectoryHandle {
     FSEventStreamRef _eventStream;
 };
